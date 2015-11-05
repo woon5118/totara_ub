@@ -88,7 +88,6 @@ class MoodleQuickForm_modgrade extends MoodleQuickForm_group {
      * @param mixed $attributes Either a typical HTML attribute string or an associative array
      */
     public function __construct($elementname = null, $elementlabel = null, $options = array(), $attributes = null) {
-        // TODO MDL-52313 Replace with the call to parent::__construct().
         HTML_QuickForm_element::__construct($elementname, $elementlabel, $attributes);
         $this->_persistantFreeze = true;
         $this->_appendName = true;
@@ -120,9 +119,12 @@ class MoodleQuickForm_modgrade extends MoodleQuickForm_group {
     }
 
     /**
-     * Old syntax of class constructor for backward compatibility.
+     * Old syntax of class constructor. Deprecated in PHP7.
+     *
+     * @deprecated since Moodle 3.1
      */
     public function MoodleQuickForm_modgrade($elementname = null, $elementlabel = null, $options = array(), $attributes = null) {
+        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
         self::__construct($elementname, $elementlabel, $options, $attributes);
     }
 

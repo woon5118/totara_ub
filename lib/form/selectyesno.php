@@ -48,16 +48,18 @@ class MoodleQuickForm_selectyesno extends MoodleQuickForm_select{
      * @param mixed $options ignored, not used.
      */
     public function __construct($elementName=null, $elementLabel=null, $attributes=null, $options=null) {
-        // TODO MDL-52313 Replace with the call to parent::__construct().
         HTML_QuickForm_element::__construct($elementName, $elementLabel, $attributes, null);
         $this->_type = 'selectyesno';
         $this->_persistantFreeze = true;
     }
 
     /**
-     * Old syntax of class constructor for backward compatibility.
+     * Old syntax of class constructor. Deprecated in PHP7.
+     *
+     * @deprecated since Moodle 3.1
      */
     public function MoodleQuickForm_selectyesno($elementName=null, $elementLabel=null, $attributes=null, $options=null) {
+        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
         self::__construct($elementName, $elementLabel, $attributes, $options);
     }
 
