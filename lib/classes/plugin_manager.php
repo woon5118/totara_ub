@@ -1944,7 +1944,7 @@ class core_plugin_manager {
                 'certification', 'completionimport', 'mssql', 'generator', 'connect',
             ),
             'tabexport' => array(
-                'csv', 'excel', 'ods', 'pdflandscape', 'pdfportrait',
+                'csv', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',
             ),
 
             'webservice' => array(
