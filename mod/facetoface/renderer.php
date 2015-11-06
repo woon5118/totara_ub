@@ -364,19 +364,16 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string HTML fragment to be output
      */
     function session_user_selector($team, $session, $reserveinfo) {
-        $table = new html_table();
-        $table->attributes['class'] = 'generaltable generalbox groupmanagementtable boxaligncenter';
+        $output = html_writer::start_tag('div', array('class' => 'row-fluid user-multiselect'));
 
-        $cells = array();
         // Current allocations.
-        $cell = new html_table_cell();
-        $cell->id = 'existingcell';
+        $output .= html_writer::start_tag('div', array('class' => 'span5'));
         $info = (object)array(
             'allocated' => $reserveinfo['allocated'][$session->id],
             'max' => $reserveinfo['maxallocate'][$session->id],
         );
         $heading = get_string('currentallocations', 'mod_facetoface', $info);
-        $cell->text = html_writer::tag('label', $heading, array('for' => 'deallocation'));
+        $output .= html_writer::tag('label', $heading, array('for' => 'deallocation'));
         $selected = optional_param_array('deallocation', array(), PARAM_INT);
 
         $opts = '';
@@ -409,28 +406,23 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $opts .= html_writer::tag('option', $name, $attr)."\n";
             }
         }
-        $select = html_writer::tag('select', $opts, array('name' => 'deallocation[]', 'multiple' => 'multiple',
+        $output .= html_writer::tag('select', $opts, array('name' => 'deallocation[]', 'multiple' => 'multiple',
                                                           'id' => 'deallocation', 'size' => 20));
-        $cell->text .= html_writer::div($select, 'userselector');
-        $cells[] = $cell;
+        $output .= html_writer::end_tag('div');
 
         // Buttons.
-        $cell = new html_table_cell();
-        $cell->id = 'buttonscell';
+        $output .= html_writer::start_tag('div', array('class' => 'span2 controls'));
         $addlabel = $this->output->larrow().' '.get_string('add');
-        $buttons = html_writer::empty_tag('input', array('name' => 'add', 'id' => 'add', 'type' => 'submit',
+        $output .= html_writer::empty_tag('input', array('name' => 'add', 'id' => 'add', 'type' => 'submit',
                                                          'value' => $addlabel, 'title' => get_string('add')));
-        $buttons .= html_writer::empty_tag('br');
         $removelabel = get_string('remove').' '.$this->output->rarrow();
-        $buttons .= html_writer::empty_tag('input', array('name' => 'remove', 'id' => 'remove', 'type' => 'submit',
+        $output .= html_writer::empty_tag('input', array('name' => 'remove', 'id' => 'remove', 'type' => 'submit',
                                                           'value' => $removelabel, 'title' => get_string('remove')));
-        $cell->text = html_writer::tag('p', $buttons, array('class' => 'arrow_button'));
-        $cells[] = $cell;
+        $output .= html_writer::end_tag('div');
 
         // Potential allocations.
-        $cell = new html_table_cell();
-        $cell->id = 'potentialcell';
-        $cell->text = html_writer::tag('label', get_string('potentialallocations', 'mod_facetoface',
+        $output .= html_writer::start_tag('div', array('class' => 'span5'));
+        $output .= html_writer::tag('label', get_string('potentialallocations', 'mod_facetoface',
                                                            $reserveinfo['allocate'][$session->id]),
                                        array('for' => 'allocation'));
 
@@ -443,16 +435,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         if ($reserveinfo['allocate'][$session->id] == 0) {
             $attr['disabled'] = 'disabled';
         }
-        $select = html_writer::select($optspotential, 'allocation[]', $selected, null, $attr);
+        $output .= html_writer::select($optspotential, 'allocation[]', $selected, null, $attr);
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div');
 
-        $cell->text .= html_writer::div($select, 'userselector');
-        $cells[] = $cell;
-
-        $row = new html_table_row($cells);
-
-        $table->data[] = $row;
-
-        return html_writer::table($table);
+        return $output;
     }
 
     /**
