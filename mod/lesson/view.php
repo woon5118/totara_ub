@@ -87,6 +87,7 @@ if (!$canmanage) {
     } else if ($lesson->usepassword && empty($USER->lessonloggedin[$lesson->id])) { // Password protected lesson code
         $correctpass = false;
         if (!empty($userpassword) && $lesson->password === trim($userpassword)) {
+            require_sesskey();
             $correctpass = true;
             $USER->lessonloggedin[$lesson->id] = true;
             if ($lesson->highscores) {
@@ -94,9 +95,11 @@ if (!$canmanage) {
                 redirect("$CFG->wwwroot/mod/lesson/view.php?id=$cm->id");
             }
         } else if (isset($lesson->extrapasswords)) {
+
             // Group overrides may have additional passwords.
             foreach ($lesson->extrapasswords as $password) {
                 if ($password === trim($userpassword)) {
+                    require_sesskey();
                     $correctpass = true;
                     $USER->lessonloggedin[$lesson->id] = true;
                     if ($lesson->highscores) {

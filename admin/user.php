@@ -89,8 +89,11 @@
             echo $OUTPUT->header();
             $fullname = fullname($user, true);
             echo $OUTPUT->heading(get_string('deleteuser', 'admin'));
+
             $optionsyes = array('delete'=>$delete, 'confirm'=>md5($delete), 'sesskey'=>sesskey());
-            $deletebutton = new single_button(new moodle_url($returnurl, $optionsyes), get_string('delete'), 'post');
+            $deleteurl = new moodle_url($returnurl, $optionsyes);
+            $deletebutton = new single_button($deleteurl, get_string('delete'), 'post');
+
             echo $OUTPUT->confirm(get_string('deleteusercheckfull', 'totara_core', "'$fullname'"), $deletebutton, $returnurl);
             echo $OUTPUT->footer();
             die;

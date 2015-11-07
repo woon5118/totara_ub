@@ -154,9 +154,6 @@ class core_date_legacy_testcase extends advanced_testcase {
         $this->assertEquals(60 * 60 * 6.5, get_timezone_offset('Asia/Rangoon'));
         $this->assertEquals(60 * 60 * 9.5, get_timezone_offset('9.5'));
         $this->assertEquals(60 * 60 * 9.5, get_timezone_offset('Australia/Darwin'));
-        // Totara: do not test because they changed to 11 offset.
-        //$this->assertEquals(60 * 60 * 11.5, get_timezone_offset('11.5'));
-        //$this->assertEquals(60 * 60 * 11.5, get_timezone_offset('Pacific/Norfolk'));
 
         $this->resetDebugging();
     }
@@ -339,8 +336,10 @@ class core_date_legacy_testcase extends advanced_testcase {
                     $this->setUser($user);
                     $expected->setTimezone(new DateTimeZone(($user->timezone == 99 ? 'Pacific/Auckland' : $user->timezone)));
                     $result = userdate($expected->getTimestamp(), '', 99, false, false);
-                    $ex = date_format_string($expected->getTimestamp(), $format, $expected->getTimezone()->getName());
-                    $this->assertSame($ex, $result);
+                    date_default_timezone_set($expected->getTimezone()->getName());
+                    $ex = strftime($format, $expected->getTimestamp());
+                    date_default_timezone_set($CFG->timezone);
+                    $this->assertSame(core_text::strtoupper($ex), core_text::strtoupper($result));
                 }
             }
         }

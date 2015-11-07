@@ -2866,7 +2866,7 @@ EOD;
      * @return string HTML fragment.
      */
     public function notify_message($message) {
-        $n = new notification($message, notification::NOTIFY_MESSAGE);
+        $n = new \core\output\notification($message, \core\output\notification::NOTIFY_MESSAGE);
         return $this->render($n);
     }
 
@@ -4045,6 +4045,7 @@ EOD;
                         'page' => $this->page
                     )
                 );
+                $this->page->requires->string_for_js('changesmadereallygoaway', 'moodle');
             }
         }
 
