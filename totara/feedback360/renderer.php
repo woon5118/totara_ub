@@ -933,62 +933,45 @@ class totara_feedback360_renderer extends plugin_renderer_base {
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'selected', 'value' => $selected));
 
-        $table = new html_table();
-        $table->attributes['class'] = 'generaltable generalbox boxaligncenter';
+        $out .= html_writer::start_tag('div', array('class' => 'row-fluid user-multiselect'));
+        $out .= html_writer::start_tag('div', array('class' => 'span5'));
 
-        $row = array();
-
-        $existing_cell = new html_table_cell(html_writer::tag('p', html_writer::tag('label',
+        $out .= html_writer::tag('label',
                 get_string('currentrequestees', 'totara_feedback360'),
-                array('for' => 'removeselect'))) . $remove_user_selector->display(true));
-        $existing_cell->id = 'existingcell';
-        $row[] = $existing_cell;
+                array('for' => 'removeselect'));
+        $out .= $remove_user_selector->display(true);
+        $out .= html_writer::end_tag('div');
 
-        $addbutton = $this->output->container(
-            html_writer::empty_tag('input', array(
+        $out .= html_writer::start_tag('div', array('class' => 'span2 controls'));
+        $out .= html_writer::empty_tag('input', array(
                 'type' => 'submit',
                 'name' => 'add',
                 'value' => $this->output->larrow() . get_string('add'),
                 'title' => get_string('add')
-            )), null, 'addcontrols');
+            ));
 
         // Anonymous feedback can't have requests removed.
-        if ($anonymous) {
-            $delbutton = '';
-        } else {
-            $delbutton = $this->output->container(
-                html_writer::empty_tag('input', array(
+        if (!$anonymous) {
+            $out .= html_writer::empty_tag('input', array(
                     'type' => 'submit',
                     'name' => 'remove',
                     'value' => $this->output->rarrow(). get_string('remove'),
                     'title' => get_string('remove')
-                )), null, 'removecontrols');
+                ));
         }
+        $out .= html_writer::end_tag('div');
 
-        $buttons_cell = new html_table_cell($addbutton . $delbutton);
-        $buttons_cell->id = 'buttonscell';
-        $row[] = $buttons_cell;
-
-        $potential_cell = new html_table_cell(html_writer::tag('p', html_writer::tag('label',
+        $out .= html_writer::start_tag('div', array('class' => 'span5'));
+        $out .= html_writer::tag('label',
                 get_string('potentialrequestees', 'totara_feedback360'),
-                array('for' => 'addselect'))) . $add_user_selector->display(true));
-        $potential_cell->id = 'potentialcell';
-        $row[] = $potential_cell;
+                array('for' => 'addselect'));
+        $out .= $add_user_selector->display(true);
+        $out .= html_writer::end_tag('div');
+        $out .= html_writer::end_tag('div');
 
-        $table->data[] = $row;
-
-        $row = array();
-
-        $backbutton_cell = new html_table_cell(html_writer::empty_tag('input',
+        $out .= html_writer::empty_tag('input',
                 array('type' => 'submit', 'name' => 'cancel',
-                    'value' => get_string('backtofeedbackrequest', 'totara_feedback360'))));
-        $backbutton_cell->id = 'backcell';
-        $backbutton_cell->colspan = 3;
-        $row[] = $backbutton_cell;
-
-        $table->data[] = $row;
-
-        $out .= html_writer::table($table);
+                    'value' => get_string('backtofeedbackrequest', 'totara_feedback360')));
 
         $out .= html_writer::end_tag('form');
 
