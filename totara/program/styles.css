@@ -249,6 +249,9 @@ div#prog-completion-relative-date label {
     width: 100px;
 }
 
+.dir-rtl #completion-dialog select {
+    float: none;
+}
 
 /*****************************************************************************/
 /** Program Assignments **/

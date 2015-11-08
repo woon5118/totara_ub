@@ -218,7 +218,7 @@ class rb_source_program_completion extends rb_base_source {
             'duedate',
             get_string('duedate', 'rb_source_program_completion'),
             'base.timedue',
-            array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
+            array('displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp')
         );
 
         $columnoptions[] =new rb_column_option(

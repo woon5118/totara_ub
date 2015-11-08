@@ -469,7 +469,9 @@ abstract class prog_assignment_category {
                 if ($object->completiontime != COMPLETION_TIME_NOT_SET) {
                     if ($object->completionevent == COMPLETION_EVENT_NONE) {
                         // Convert fixed dates.
-                        $object->completiontime = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $object->completiontime);
+                        $hour = isset($data->completiontimehour[$this->id][$itemid]) ? sprintf("%02d", $data->completiontimehour[$this->id][$itemid]) : '00';
+                        $minute = isset($data->completiontimeminute[$this->id][$itemid]) ? sprintf("%02d", $data->completiontimeminute[$this->id][$itemid]) : '00';
+                        $object->completiontime = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core').' H:i', $object->completiontime.' '.$hour.':'.$minute);
                     } else {
                         // Convert relative dates.
                         $parts = explode(' ', $object->completiontime);
@@ -607,6 +609,9 @@ abstract class prog_assignment_category {
         global $OUTPUT;
         $completion_string = get_string('setduedate', 'totara_program');
 
+        $hour = 0;
+        $minute = 0;
+
         $show_deletecompletionlink = false;
 
         if (empty($item->completiontime)) {
@@ -624,11 +629,12 @@ abstract class prog_assignment_category {
         if ($item->completionevent == COMPLETION_EVENT_NONE) {
             // Completiontime must be a timestamp.
             if ($item->completiontime != COMPLETION_TIME_NOT_SET) {
+                $hour = (int)userdate($item->completiontime, '%H', 99, false);
+                $minute = (int)userdate($item->completiontime, '%M', 99, false);
                 // Print a date.
                 $item->completiontime = trim(userdate($item->completiontime,
                     get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false));
-                $completion_string = self::build_completion_string(
-                    $item->completiontime, $item->completionevent, $item->completioninstance);
+                $completion_string = self::build_completion_string($item->completiontime, $item->completionevent, $item->completioninstance, $hour, $minute);
                 $show_deletecompletionlink = true;
             }
         } else {
@@ -643,6 +649,10 @@ abstract class prog_assignment_category {
         if ($item->completiontime != COMPLETION_TIME_NOT_SET && !empty($item->completiontime)) {
             $html .= html_writer::empty_tag('input', array('type' => 'hidden',
                 'name' => 'completiontime['.$this->id.']['.$item->id.']', 'value' => $item->completiontime));
+            $html .= html_writer::empty_tag('input', array('type' => 'hidden',
+                'name' => 'completiontimehour['.$this->id.']['.$item->id.']', 'value' => $hour));
+            $html .= html_writer::empty_tag('input', array('type' => 'hidden',
+                'name' => 'completiontimeminute['.$this->id.']['.$item->id.']', 'value' => $minute));
         }
         if ($item->completionevent != COMPLETION_EVENT_NONE) {
             $html .= html_writer::empty_tag('input', array('type' => 'hidden',
@@ -674,7 +684,8 @@ abstract class prog_assignment_category {
         return $output;
     }
 
-    public static function build_completion_string($completiontime, $completionevent, $completioninstance) {
+    public static function build_completion_string($completiontime, $completionevent, $completioninstance,
+                                                   $completiontimehour = 0, $completiontimeminute = 0) {
         global $COMPLETION_EVENTS_CLASSNAMES, $TIMEALLOWANCESTRINGS;
         if (isset($COMPLETION_EVENTS_CLASSNAMES[$completionevent])) {
             $eventobject = new $COMPLETION_EVENTS_CLASSNAMES[$completionevent];
@@ -708,7 +719,15 @@ abstract class prog_assignment_category {
             if (preg_match($datepattern, $completiontime, $matches) == 0) {
                 return '';
             } else {
-                return get_string('completebytime', 'totara_program', $completiontime);
+                $completiontimehour = sprintf("%02d", $completiontimehour);
+                $completiontimeminute = sprintf("%02d", $completiontimeminute);
+                // To ensure multi-language compatibility, we must work out the timestamp and then convert that
+                // to a string in the user's language.
+                $timestamp = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core').' H:i',
+                    $completiontime.' '.$completiontimehour.':'.$completiontimeminute);
+                $completiontimestring = userdate($timestamp, get_string('strfdateattime', 'langconfig'), 99);
+
+                return get_string('completebytime', 'totara_program', $completiontimestring);
             }
         }
     }
@@ -1412,12 +1431,12 @@ class individuals_category extends prog_assignment_category {
                 // Program which is complete.
                 $row[] = get_string('timeduefixedprog', 'totara_program');
                 $row[] = trim(userdate($item->timedue,
-                    get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false));
+                    get_string('strfdateattime', 'langconfig'), 99, false));
             } else if (!$isprog && ($item->certifpath == CERTIFPATH_RECERT || $item->renewalstatus == CERTIFRENEWALSTATUS_EXPIRED)) {
                 // Certification which is complete.
                 $row[] = get_string('timeduefixedcert', 'totara_program');
                 $row[] = trim(userdate($item->timedue,
-                    get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false));
+                    get_string('strfdateattime', 'langconfig'), 99, false));
             } else if (empty($item->timedue) || $item->timedue == COMPLETION_TIME_NOT_SET) {
                 // No date set.
                 $row[] = $this->get_completion($item);
@@ -1432,7 +1451,7 @@ class individuals_category extends prog_assignment_category {
                 $item->completionevent = COMPLETION_EVENT_NONE;
                 $row[] = $this->get_completion($item);
                 $row[] = trim(userdate($item->timedue,
-                    get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false));
+                    get_string('strfdateattime', 'langconfig'), 99, false));
             }
         } else {
             // New individual assignment.

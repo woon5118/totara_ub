@@ -1,8 +1,8 @@
 @totara @totara_program
-Feature: Enable request extension in programs
-  In order to allow/restrict extension requests for a specif program
-  As admin
-  I need to be able to toggle program extension request
+Feature: Request extensions in programs
+  In order to request extensions for a specific program
+  As user
+  I need to be able to request extension if it is enabled
 
   Background:
     Given I am on a totara site
@@ -145,3 +145,65 @@ Feature: Enable request extension in programs
     And I click on "Programs" in the totara menu
     And I click on "Program toggle request" "link"
     Then I should not see "Request an extension"
+
+  @javascript
+  Scenario: Learner makes a request in the future. Manager is able to see it and grant it.
+    Given I log in as "student1"
+    And I click on "Programs" in the totara menu
+    And I click on "Program toggle request" "link"
+    And I click on "Request an extension" "link"
+    And I set the following fields to these values:
+      | extensionreason     | I need an extension |
+      | extensiontime       | 01/01/2010          |
+      | extensiontimehour   | 10                  |
+      | extensiontimeminute | 15                  |
+    And I press "Ok"
+    Then I should see "Cannot request extension that is before current program due date"
+    When I click on "Request an extension" "link"
+    And I set the following fields to these values:
+      | extensionreason     | I need an extension |
+      | extensiontime       | 14/01/2025          |
+      | extensiontimehour   | 14                  |
+      | extensiontimeminute | 55                  |
+    And I press "Ok"
+    Then I should see "Request for program extension sent to manager"
+    When I log out
+    And I log in as "manager1"
+    And I click on "My Team" in the totara menu
+    And I click on "1" "link" in the "Sam Student" "table_row"
+    Then I should see "14 January 2025, 2:55 PM"
+    When I click on "Grant" "option" in the ".approval" "css_element"
+    And I press "Update Extensions"
+    Then I should see "All extensions successfully updated"
+    When I log out
+    And I log in as "student1"
+    And I click on "Programs" in the totara menu
+    And I click on "Program toggle request" "link"
+    Then I should see "Due date: 14 January 2025, 2:55 PM"
+
+  @javascript
+  Scenario: Learner makes a request in the future. Manager is able to see it and deny it.
+    Given I log in as "student1"
+    And I click on "Programs" in the totara menu
+    And I click on "Program toggle request" "link"
+    When I click on "Request an extension" "link"
+    And I set the following fields to these values:
+      | extensionreason     | I need an extension |
+      | extensiontime       | 14/01/2025          |
+      | extensiontimehour   | 14                  |
+      | extensiontimeminute | 55                  |
+    And I press "Ok"
+    Then I should see "Request for program extension sent to manager"
+    When I log out
+    And I log in as "manager1"
+    And I click on "My Team" in the totara menu
+    And I click on "1" "link" in the "Sam Student" "table_row"
+    Then I should see "14 January 2025, 2:55 PM"
+    When I click on "Deny" "option" in the ".approval" "css_element"
+    And I press "Update Extensions"
+    Then I should see "All extensions successfully updated"
+    When I log out
+    And I log in as "student1"
+    And I click on "Programs" in the totara menu
+    And I click on "Program toggle request" "link"
+    Then I should not see "Due date: 14 January 2025, 2:55 PM"

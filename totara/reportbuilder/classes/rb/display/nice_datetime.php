@@ -31,7 +31,7 @@ namespace totara_reportbuilder\rb\display;
  */
 class nice_datetime extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        if (!is_numeric($value) or $value == 0) {
+        if (!is_numeric($value) || $value == 0 || $value == -1) {
             return '';
         }
 

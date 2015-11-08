@@ -88,6 +88,8 @@ M.totara_programview = M.totara_programview || {
             var success = false;
 
             var extensiontime = $('.extensiontime', this._container).val();
+            var extensiontimehour = $('.extensiontimehour', this._container).val();
+            var extensiontimeminute = $('.extensiontimeminute', this._container).val();
             var extensionreason = $('.extensionreason', this._container).val();
 
             var dateformat = new RegExp(M.util.get_string('datepickerlongyearregexjs', 'totara_core'));
@@ -106,6 +108,8 @@ M.totara_programview = M.totara_programview || {
                     userid: module.config.userid,
                     extrequest: "1",
                     extdate: extensiontime,
+                    exthour: extensiontimehour,
+                    extminute: extensiontimeminute,
                     extreason: extensionreason,
                     sesskey: M.cfg.sesskey
                 };

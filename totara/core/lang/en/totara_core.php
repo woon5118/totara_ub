@@ -133,6 +133,7 @@ $string['datatable:sLoadingRecords'] = 'Loading...';
 $string['datatable:sProcessing'] = 'Processing...';
 $string['datatable:sSearch'] = 'Search:';
 $string['datatable:sZeroRecords'] = 'No matching records found';
+$string['datepickerattime'] = 'at';
 $string['datepickerlongyeardisplayformat'] = 'dd/mm/yy';
 $string['datepickerlongyearparseformat'] = 'd/m/Y';
 $string['datepickerlongyearphpuserdate'] = '%d/%m/%Y';

@@ -415,14 +415,45 @@ class totara_program_renderer extends plugin_renderer_base {
     */
     public function display_set_completion() {
         $out = '';
+        $out .= html_writer::start_tag('fieldset');
+        $out .= html_writer::start_tag('span', array('class' => 'legend')) . get_string('completeby', 'totara_program') . html_writer::end_tag('span');
         $out .= html_writer::start_tag('div', array('id' => 'prog-completion-fixed-date'));
-        $out .= html_writer::start_tag('label', array('for' => 'completiontime')) . get_string('completeby', 'totara_program') . html_writer::end_tag('label');
-        $out .= html_writer::start_tag('div', array('class' => 'datepicker-wrapper'));
+
+        $hours = array();
+        for ($i = 0; $i <= 23; $i++) {
+            $hours[$i] = sprintf("%02d", $i);
+        }
+        $minutes = array();
+        for ($i = 0; $i < 60; $i += 5) {
+            $minutes[$i] = sprintf("%02d", $i);
+        }
+
+        $out .= html_writer::start_tag('span', array('class' => 'datepicker-wrapper'));
+        $out .= html_writer::label(get_string('date', 'moodle'), 'completiontime', false, array('class' => 'accesshide'));
         $out .= html_writer::empty_tag('input', array('class' => 'completiontime', 'type' => 'text', 'name' => "completiontime", 'placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core')));
-        $out .= html_writer::end_tag('div');
+        $out .= html_writer::end_tag('span');
+
+        // Matching display of time in RTL to what is done in lib/form/datetimeselector.php.
+        if (right_to_left()) {
+            $out .= ' '.get_string('datepickerattime', 'totara_core'). ' ';
+            $out .= html_writer::label(get_string('minute', 'moodle'), 'completiontimeminute', false, array('class' => 'accesshide'));
+            $out .= html_writer::select($minutes, 'completiontimeminute', array(0 => '00'), false, array('name' => 'completiontimeminute', 'class' => 'completiontimeminute'));
+            $out .= ':';
+            $out .= html_writer::label(get_string('hour', 'moodle'), 'completiontimehour', false, array('class' => 'accesshide'));
+            $out .= html_writer::select($hours, 'completiontimehour', array(0 => '00'), false, array('name' => 'completiontimehour', 'class' => 'completiontimehour'));
+        } else {
+            $out .= ' '.get_string('datepickerattime', 'totara_core'). ' ';
+            $out .= html_writer::label(get_string('hour', 'moodle'), 'completiontimehour', false, array('class' => 'accesshide'));
+            $out .= html_writer::select($hours, 'completiontimehour', array(0 => '00'), false, array('name' => 'completiontimehour', 'class' => 'completiontimehour'));
+            $out .= ':';
+            $out .= html_writer::label(get_string('minute', 'moodle'), 'completiontimeminute', false, array('class' => 'accesshide'));
+            $out .= html_writer::select($minutes, 'completiontimeminute', array(0 => '00'), false, array('name' => 'completiontimeminute', 'class' => 'completiontimeminute'));
+        }
+
         $out .= ' ' . html_writer::start_tag('button', array('class' => 'fixeddate')) .
             get_string('setfixedcompletiondate', 'totara_program') . html_writer::end_tag('button');
         $out .= html_writer::end_tag('div');
+        $out .= html_writer::end_tag('fieldset');
 
         $out .= html_writer::start_tag('div', array('id' => 'prog-completion-or-string'));
         $out .= get_string('or', 'totara_program');
@@ -452,6 +483,34 @@ class totara_program_renderer extends plugin_renderer_base {
         $out .= html_writer::start_tag('div');
         $out .= html_writer::start_tag('label', array('for' => 'extensiontime')) . get_string('extenduntil', 'totara_program') . html_writer::end_tag('label');
         $out .= html_writer::empty_tag('input', array('class' => 'extensiontime', 'type' => 'text', 'name' => 'extensiontime', 'id' => 'extensiontime', 'size' => '20', 'maxlength' => '10', 'placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core')));
+
+        // Create and add hour and minute select elements.
+        $hours = array();
+        for ($i = 0; $i <= 23; $i++) {
+            $hours[$i] = sprintf("%02d", $i);
+        }
+        $minutes = array();
+        for ($i = 0; $i < 60; $i += 5) {
+            $minutes[$i] = sprintf("%02d", $i);
+        }
+
+        // Matching display of time in RTL to what is done in lib/form/datetimeselector.php.
+        if (right_to_left()) {
+            $out .= ' '.get_string('datepickerattime', 'totara_core'). ' ';
+            $out .= html_writer::label(get_string('minute', 'moodle'), 'extensiontimeminute', false, array('class' => 'accesshide'));
+            $out .= html_writer::select($minutes, 'extensiontimeminute', array(0 => '00'), false, array('name' => 'extensiontimeminute', 'class' => 'extensiontimeminute'));
+            $out .= ':';
+            $out .= html_writer::label(get_string('hour', 'moodle'), 'extensiontimehour', false, array('class' => 'accesshide'));
+            $out .= html_writer::select($hours, 'extensiontimehour', array(0 => '00'), false, array('name' => 'extensiontimehour', 'class' => 'extensiontimehour'));
+        } else {
+            $out .= ' '.get_string('datepickerattime', 'totara_core'). ' ';
+            $out .= html_writer::label(get_string('hour', 'moodle'), 'extensiontimehour', false, array('class' => 'accesshide'));
+            $out .= html_writer::select($hours, 'extensiontimehour', array(0 => '00'), false, array('name' => 'extensiontimehour', 'class' => 'extensiontimehour'));
+            $out .= ':';
+            $out .= html_writer::label(get_string('minute', 'moodle'), 'extensiontimeminute', false, array('class' => 'accesshide'));
+            $out .= html_writer::select($minutes, 'extensiontimeminute', array(0 => '00'), false, array('name' => 'extensiontimeminute', 'class' => 'extensiontimeminute'));
+        }
+
         $out .= html_writer::end_tag('div');
         $out .= html_writer::empty_tag('br');
 

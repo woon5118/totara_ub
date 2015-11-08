@@ -265,6 +265,7 @@ class rb_source_user extends rb_base_source {
                         array(
                             'joins' => 'prog_extension_count',
                             'displayfunc' => 'extension_link',
+                            'extrafields' => array('user_id' => 'base.id')
                         )
         );
 

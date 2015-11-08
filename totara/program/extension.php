@@ -36,6 +36,8 @@ $programid = required_param('id', PARAM_INT);
 $userid = required_param('userid', PARAM_INT);
 $extensionrequest = optional_param('extrequest', false, PARAM_BOOL);
 $extensiondate = optional_param('extdate', '', PARAM_TEXT);
+$extensionhour = optional_param('exthour', 0, PARAM_INT);
+$extensionminute = optional_param('extminute', 0, PARAM_INT);
 $extensionreason = optional_param('extreason', '', PARAM_TEXT);
 
 $PAGE->set_context(context_program::instance($programid));
@@ -65,22 +67,12 @@ if (!$manager = totara_get_manager($userid)) {
     return;
 }
 
-$timearray = explode('/', $extensiondate);
-$day = $timearray[0];
-$month = $timearray[1];
-$year = $timearray[2];
-$extensiontime = mktime(0, 0, 0, $month, $day, $year);
-
-$manageurl = new moodle_url('/totara/program/manageextensions.php');
-$extensiondata = array(
-    'extensiondate'         => $extensiontime,
-    'extensiondatestr'      => $extensiondate,
-    'extensionreason'       => $extensionreason,
-    'programfullname'       => format_string($program->fullname),
-    'manageurl'             => $manageurl->out()
-);
-
-$extensiondate_timestamp = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $extensiondate);  // convert to timestamp
+// We receive the date as a string, but also need to append hour and minute so that the timestamp includes those.
+// This appended string is used for processing only and is not shown to users.
+$extensionhour = sprintf("%02d", $extensionhour);
+$extensionminute = sprintf("%02d", $extensionminute);
+$extensiondate_timestamp = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core').' H:i',
+    $extensiondate.' '.$extensionhour.':'.$extensionminute);  // convert to timestamp
 
 $extension = new stdClass;
 $extension->programid = $program->id;
@@ -121,12 +113,23 @@ if ($extensionid = $DB->insert_record('prog_extension', $extension)) {
     $data = array();
     $data['extensionid'] = $extensionid;
 
-
-    // Get user to send message to
-    $user = $DB->get_record('user', array('id' => $userid));
-    $userfullname = fullname($user);
     //send request in managers language
     $strmgr = get_string_manager();
+
+    // Create object to add into extensionrequestmessage string (for the content of the email to the manager).
+    $extensiontime = userdate($extensiondate_timestamp, $strmgr->get_string('strftimedatetime', 'langconfig', null, $manager->lang), core_date::get_user_timezone($manager));
+    $manageurl = new moodle_url('/totara/program/manageextensions.php');
+    $extensiondata = array(
+        'extensiondatestr'      => $extensiontime,
+        'extensionreason'       => $extensionreason,
+        'programfullname'       => format_string($program->fullname),
+        'manageurl'             => $manageurl->out()
+    );
+
+    // Get record for learner requesting extension.
+    $user = $DB->get_record('user', array('id' => $userid));
+    $userfullname = fullname($user);
+
     $extension_message = new prog_extension_request_message($program->id, $extension->userid, null, null, $data);
     $managermessagedata = $extension_message->get_manager_message_data();
     $managermessagedata->subject = $strmgr->get_string('extensionrequest', 'totara_program', $userfullname, $manager->lang);

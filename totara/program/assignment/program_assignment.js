@@ -148,6 +148,8 @@ M.totara_programassignment = M.totara_programassignment || {
 
         totaraDialog_completion_handler.prototype.every_load = function() {
             var completiontime = this._dialog.item.get_completion_time();
+            var completiontimehour = this._dialog.item.get_completion_time_hour();
+            var completiontimeminute = this._dialog.item.get_completion_time_minute();
             var completionevent = this._dialog.item.get_completion_event();
             var completioninstance = this._dialog.item.get_completion_instance();
             // TODO SCANMSG: check datatype usage of 'COMPLETION_EVENT_NONE' and similar args stored in config
@@ -157,6 +159,14 @@ M.totara_programassignment = M.totara_programassignment || {
                     completiontime != module.config.COMPLETION_TIME_NOT_SET) {
                     $('.completiontime', this._container).val(completiontime);
                 }
+                if (typeof completiontimehour === 'undefined') {
+                    completiontimehour = 0;
+                }
+                $('.completiontimehour', this._container).val(completiontimehour);
+                if (typeof completiontimeminute === 'undefined') {
+                    completiontimeminute = 0;
+                }
+                $('.completiontimeminute', this._container).val(completiontimeminute);
             }
             else {
                 var parts = completiontime.split(" ");
@@ -207,13 +217,15 @@ M.totara_programassignment = M.totara_programassignment || {
                 var completiontime = $('.completiontime', self.handler._container).val();
                 var completionevent = module.config.COMPLETION_EVENT_NONE;
                 var completioninstance = 0;
+                var completiontimehour = $('.completiontimehour', self.handler._container).val();
+                var completiontimeminute = $('.completiontimeminute', self.handler._container).val();
 
                 var dateformat = new RegExp(M.util.get_string('datepickerlongyearregexjs', 'totara_core'));
                 if (dateformat.test(completiontime) == false) {
                     alert(M.util.get_string('pleaseentervaliddate', 'totara_program', M.util.get_string('datepickerlongyearplaceholder', 'totara_core')));
                 }
                 else {
-                    self.item.update_completiontime(completiontime, completionevent, completioninstance);
+                    self.item.update_completiontime(completiontime, completionevent, completioninstance, completiontimehour, completiontimeminute);
                     self.hide();
                 }
             });
@@ -233,7 +245,7 @@ M.totara_programassignment = M.totara_programassignment || {
                     completionevent != module.config.COMPLETION_EVENT_ENROLLMENT_DATE) {
                     alert(M.util.get_string('pleasepickaninstance', 'totara_program'));
                 } else {
-                    self.item.update_completiontime(completiontime, completionevent, completioninstance);
+                    self.item.update_completiontime(completiontime, completionevent, completioninstance, 0, 0);
                     self.hide();
                 }
             });
@@ -880,17 +892,21 @@ function item(category, element, isexistingitem) {
 
     // Hidden values
     this.completiontime = this.element.find('input[name^="completiontime"]');
+    this.completiontimehour = this.element.find('input[name^="completiontimehour"]');
+    this.completiontimeminute = this.element.find('input[name^="completiontimeminute"]');
     this.completionevent = this.element.find('input[name^="completionevent"]');
     this.completioninstance = this.element.find('input[name^="completioninstance"]');
     this.includechildren = this.element.find('[name^="includechildren"]');
 
     // Label
     this.completionlink = this.element.find('.completionlink');
-    this.update_completiontime = function(completiontime, completionevent, completioninstance) {
+    this.update_completiontime = function(completiontime, completionevent, completioninstance, completiontimehour, completiontimeminute) {
     // Update the hidden inputs
 
         var url = this.category.url + 'completion/get_completion_string.php' +
                   '?completiontime=' + completiontime +
+                  '&completiontimehour=' + completiontimehour +
+                  '&completiontimeminute=' + completiontimeminute +
                   '&completionevent=' + completionevent +
                   '&completioninstance=' + completioninstance;
 
@@ -931,6 +947,25 @@ function item(category, element, isexistingitem) {
                                 type: 'hidden',
                                 name: 'completiontime['+self.category.id+']['+self.itemid+']',
                                 value: completiontime
+                        }).insertBefore(self.completionlink);
+                    }
+                    // Now do the same as above for hours and minutes
+                    if (self.completiontimehour.length > 0) {
+                        self.completiontimehour.val(completiontimehour);
+                    } else {
+                        $('<input>').attr({
+                            type: 'hidden',
+                            name: 'completiontimehour['+self.category.id+']['+self.itemid+']',
+                            value: completiontimehour
+                        }).insertBefore(self.completionlink);
+                    }
+                    if (self.completiontimeminute.length > 0) {
+                        self.completiontimeminute.val(completiontimeminute);
+                    } else {
+                        $('<input>').attr({
+                            type: 'hidden',
+                            name: 'completiontimeminute['+self.category.id+']['+self.itemid+']',
+                            value: completiontimeminute
                         }).insertBefore(self.completionlink);
                     }
                 }
@@ -976,6 +1011,8 @@ function item(category, element, isexistingitem) {
                 // Update stored values in case multiple changes are
                 // made without reloading page.
                 self.completiontime = self.element.find('input[name^="completiontime"]');
+                self.completiontimehour = self.element.find('input[name^="completiontimehour"]');
+                self.completiontimeminute = self.element.find('input[name^="completiontimeminute"]');
                 self.completionevent = self.element.find('input[name^="completionevent"]');
                 self.completioninstance = self.element.find('input[name^="completioninstance"]');
 
@@ -986,6 +1023,8 @@ function item(category, element, isexistingitem) {
     };
 
     this.get_completion_time = function() { return this.completiontime.val(); };
+    this.get_completion_time_hour = function() { return this.completiontimehour.val(); }
+    this.get_completion_time_minute = function() { return this.completiontimeminute.val(); }
     this.get_completion_event = function() { return this.completionevent.val(); };
     this.get_completion_instance = function() { return this.completioninstance.val(); };
     this.get_completion_link = function() { return this.completionlink.html(); };
@@ -1047,7 +1086,7 @@ function item(category, element, isexistingitem) {
     // Add handler to remove completion dates
     this.element.on('click', '.deletecompletiondatelink', function(event){
         event.preventDefault();
-        self.update_completiontime(M.totara_programassignment.config.COMPLETION_TIME_NOT_SET, 0, 0);
+        self.update_completiontime(M.totara_programassignment.config.COMPLETION_TIME_NOT_SET, 0, 0, 0, 0);
     });
 
     // Set the current completion name (contained between the single quotes).

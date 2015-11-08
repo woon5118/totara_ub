@@ -95,13 +95,15 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
                 this.dialog.height(150);
             }
 
-            this.update_completiontime = function(completiontime, completionevent, completioninstance) {
+            this.update_completiontime = function(completiontime, completionevent, completioninstance, completiontimehour, completiontimeminute) {
             // Update the hidden inputs
 
                 var url = M.cfg.wwwroot + '/totara/cohort/dialog/updateprogramcompletion.php' +
                           '?programid=' + this.programid +
                           '&cohortid=' + this.cohortid +
                           '&completiontime=' + completiontime +
+                          '&completiontimehour=' + completiontimehour +
+                          '&completiontimeminute=' + completiontimeminute +
                           '&completionevent=' + completionevent +
                           '&completioninstance=' + completioninstance +
                           '&sesskey=' + M.cfg.sesskey;
@@ -116,6 +118,8 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
                     } else {
                         thisdialog.completionlink.html(data);
                         thisdialog.completiontime.val(completiontime);
+                        thisdialog.completiontime.val(completiontimehour);
+                        thisdialog.completiontime.val(completiontimeminute);
                         thisdialog.completionevent.val(completionevent);
                         thisdialog.completioninstance.val(completioninstance);
                     }
@@ -124,6 +128,8 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
 
             this.handler._container.on('click', '.fixeddate', function() {
                 var completiontime = $('.completiontime', thisdialog.handler._container).val();
+                var completiontimehour = $('.completiontimehour', thisdialog.handler._container).val();
+                var completiontimeminute = $('.completiontimeminute', thisdialog.handler._container).val();
                 var completionevent = M.totara_cohortprogramcompletion.config.COMPLETION_EVENT_NONE;
                 var completioninstance = 0;
 
@@ -132,7 +138,7 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
                     alert(M.util.get_string('pleaseentervaliddate', 'totara_program', M.util.get_string('datepickerlongyearplaceholder', 'totara_core')));
                 }
                 else {
-                    thisdialog.update_completiontime(completiontime, completionevent, completioninstance);
+                    thisdialog.update_completiontime(completiontime, completionevent, completioninstance, completiontimehour, completiontimeminute);
                     thisdialog.hide();
                 }
             });
@@ -155,7 +161,7 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
                     alert(M.util.get_string('pleasepickaninstance', 'totara_program'));
                 }
                 else {
-                    thisdialog.update_completiontime(completiontime, completionevent, completioninstance);
+                    thisdialog.update_completiontime(completiontime, completionevent, completioninstance, 0, 0);
                     thisdialog.hide();
                 }
             });
@@ -179,6 +185,8 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
             });
 
             var completiontime = this._dialog.completiontime.val();
+            var completiontimehour = this._dialog.completiontimehour.val();
+            var completiontimeminute = this._dialog.completiontimeminute.val();
             var completionevent = this._dialog.completionevent.val();
             var completioninstance = this._dialog.completioninstance.val();
 
@@ -187,6 +195,14 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
                 if (typeof completionevent === 'undefined' ||
                     completiontime != M.totara_cohortprogramcompletion.config.COMPLETION_TIME_NOT_SET) {
                     $('.completiontime').val(completiontime);
+                    if (typeof completiontimehour === 'undefined') {
+                        completiontimehour = 0;
+                    }
+                    $('.completiontimehour').val(completiontimehour);
+                    if (typeof completiontimeminute === 'undefined') {
+                        completiontimeminute = 0;
+                    }
+                    $('.completiontimeminute').val(completiontimeminute);
                 }
             } else {
                 var parts = completiontime.split(" ");
@@ -275,6 +291,8 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
             dialog.programid = $(this).siblings('.completionprogramid').val();
 
             dialog.completiontime = $('input[name^="completiontime"]', div);
+            dialog.completiontimehour = $('input[name^="completiontimehour"]', div);
+            dialog.completiontimeminute = $('input[name^="completiontimeminute"]', div);
             dialog.completionevent = $('input[name^="completionevent"]', div);
             dialog.completioninstance = $('input[name^="completioninstance"]', div);
             dialog.completionlink = div;
@@ -291,6 +309,8 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
             dialog.programid = $(this).siblings('.completionprogramid').val();
             dialog.cohortid = M.totara_cohortprogramcompletion.config.cohortid;
             dialog.completiontime = $('input[name^="completiontime"]', div);
+            dialog.completiontimehour = $('input[name^="completiontimehour"]', div);
+            dialog.completiontimeminute = $('input[name^="completiontimeminute"]', div);
             dialog.completionevent = $('input[name^="completionevent"]', div);
             dialog.completioninstance = $('input[name^="completioninstance"]', div);
             dialog.completionlink = div;

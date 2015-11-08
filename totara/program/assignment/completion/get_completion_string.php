@@ -29,11 +29,13 @@ require_login();
 $completiontime = required_param('completiontime', PARAM_TEXT);
 $completionevent = required_param('completionevent', PARAM_INT);
 $completioninstance = required_param('completioninstance', PARAM_INT);
+$completiontimehour = optional_param('completiontimehour', 0, PARAM_INT);
+$completiontimeminute = optional_param('completiontimeminute', 0, PARAM_INT);
 
 if ($completiontime == COMPLETION_TIME_NOT_SET && $completionevent == COMPLETION_EVENT_NONE && $completioninstance == 0) {
     echo get_string('setcompletion', 'totara_program');
 } else {
-    $string = prog_assignment_category::build_completion_string($completiontime, $completionevent, $completioninstance);
+    $string = prog_assignment_category::build_completion_string($completiontime, $completionevent, $completioninstance, $completiontimehour, $completiontimeminute);
     if (trim($string) == '') {
         echo 'error';
     } else {

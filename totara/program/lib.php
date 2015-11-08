@@ -1273,7 +1273,7 @@ function prog_process_extensions($extensionslist, $reasonfordecision = array()) 
                     $messagedata->contexturl       = $CFG->wwwroot.'/totara/program/required.php?id='.$extension->programid;
                     $messagedata->contexturlname   = $stringmanager->get_string('launchprogram', 'totara_program', null, $userto->lang);
                     $messagedata->fullmessage      = $stringmanager->get_string('extensiongrantedmessage', 'totara_program',
-                        userdate($extension->extensiondate, get_string('strftimedate', 'langconfig'), core_date::get_user_timezone($userto)),
+                        userdate($extension->extensiondate, get_string('strftimedatetime', 'langconfig'), core_date::get_user_timezone($userto)),
                         $userto->lang);
                     $messagedata->icon             = 'program-approve';
                     $messagedata->msgtype          = TOTARA_MSG_TYPE_PROGRAM;
@@ -2112,7 +2112,7 @@ function prog_display_duedate($duedate, $progid, $userid, $certifpath = null, $c
 
     $out = '';
     if (!empty($duedate)) {
-        $out .= userdate($duedate, get_string('strftimedate', 'langconfig'), 99, false);
+        $out .= userdate($duedate, get_string('strftimedatetime', 'langconfig'), 99, false);
     }
 
     $completed = isset($completion) ? $completion == STATUS_PROGRAM_COMPLETE : prog_is_complete($progid, $userid);

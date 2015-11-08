@@ -39,6 +39,8 @@ $cohortid = required_param('cohortid', PARAM_INT);
 // TODO: when they add some white-listing to edit_assignments.php, add it here too
 
 $completiontime = optional_param('completiontime', null, PARAM_TEXT);
+$completiontimehour = optional_param('completiontimehour', 0, PARAM_INT);
+$completiontimeminute = optional_param('completiontimeminute', 0, PARAM_INT);
 $completionevent = optional_param('completionevent', null, PARAM_INT);
 $completioninstance = optional_param('completioninstance', null, PARAM_INT);
 
@@ -55,6 +57,16 @@ $data->item = array(
 $data->completiontime = array(
     ASSIGNTYPE_COHORT => array(
         $cohortid => $completiontime
+    )
+);
+$data->completiontimehour = array(
+    ASSIGNTYPE_COHORT => array(
+        $cohortid => $completiontimehour
+    )
+);
+$data->completiontimeminute = array(
+    ASSIGNTYPE_COHORT => array(
+        $cohortid => $completiontimeminute
     )
 );
 $data->completionevent = array(
