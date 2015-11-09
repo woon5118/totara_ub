@@ -79,27 +79,20 @@ class mod_forum_renderer extends plugin_renderer_base {
         $formattributes['id'] = 'subscriberform';
         $formattributes['action'] = '';
         $formattributes['method'] = 'post';
+
+        // TL-7890: removed table
         $output .= html_writer::start_tag('form', $formattributes);
         $output .= html_writer::empty_tag('input', array('type'=>'hidden', 'name'=>'sesskey', 'value'=>sesskey()));
+        $output .= html_writer::start_tag('div', array('class' => 'row-fluid user-multiselect'));
 
-        $existingcell = new html_table_cell();
-        $existingcell->text = $existinguc->display(true);
-        $existingcell->attributes['class'] = 'existing';
-        $actioncell = new html_table_cell();
-        $actioncell->text  = html_writer::start_tag('div', array());
-        $actioncell->text .= html_writer::empty_tag('input', array('type'=>'submit', 'name'=>'subscribe', 'value'=>$this->page->theme->larrow.' '.get_string('add'), 'class'=>'actionbutton'));
-        $actioncell->text .= html_writer::empty_tag('br', array());
-        $actioncell->text .= html_writer::empty_tag('input', array('type'=>'submit', 'name'=>'unsubscribe', 'value'=>$this->page->theme->rarrow.' '.get_string('remove'), 'class'=>'actionbutton'));
-        $actioncell->text .= html_writer::end_tag('div', array());
-        $actioncell->attributes['class'] = 'actions';
-        $potentialcell = new html_table_cell();
-        $potentialcell->text = $potentialuc->display(true);
-        $potentialcell->attributes['class'] = 'potential';
+        $output .= html_writer::tag('div', $existinguc->display(true), array('class' => 'span5'));
 
-        $table = new html_table();
-        $table->attributes['class'] = 'subscribertable boxaligncenter';
-        $table->data = array(new html_table_row(array($existingcell, $actioncell, $potentialcell)));
-        $output .= html_writer::table($table);
+        $output .= html_writer::start_tag('div', array('class' => 'span2 controls'));
+        $output .= html_writer::empty_tag('input', array('type'=>'submit', 'name'=>'subscribe', 'value'=>$this->page->theme->larrow.' '.get_string('add'), 'class'=>'actionbutton'));
+        $output .= html_writer::empty_tag('input', array('type'=>'submit', 'name'=>'unsubscribe', 'value'=>$this->page->theme->rarrow.' '.get_string('remove'), 'class'=>'actionbutton'));
+        $output .= html_writer::end_tag('div');
+
+        $output .= html_writer::tag('div', $potentialuc->display(true), array('class' => 'span5'));
 
         $output .= html_writer::end_tag('form');
         return $output;
