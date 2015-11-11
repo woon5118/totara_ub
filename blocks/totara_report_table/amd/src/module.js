@@ -38,7 +38,7 @@ define(['jquery', 'core/config'], function ($, mdlconfig) {
             var xhr = null;
 
             // Change links behaviour to load page using AJAX (pages and sorting).
-            $('div.block_totara_report_table.' + uniqueid + ' div.content table').
+            $('.block_totara_report_table.' + uniqueid + ' .content .rb-display-table-container').
                     find('div.paging a, th.header a').each(function() {
                 $(this).click(function(e){
                     e.preventDefault();
@@ -58,7 +58,7 @@ define(['jquery', 'core/config'], function ($, mdlconfig) {
                         var splash = '<div class="instantreportwait"><img src="' + M.util.image_url('waitbig', 'totara_reportbuilder') +
                                 '"/></div>',
                             $splash = $(splash).insertBefore($(e.target).parent().children().last()),
-                            $content = $('.block_totara_report_table.' + uniqueid + ' .content table'),
+                            $content = $('.block_totara_report_table.' + uniqueid + ' .content .rb-display-table-container'),
                             offset = $content.offset();
                         $splash.css(offset);
                         $splash.height($content.height());

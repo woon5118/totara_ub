@@ -280,6 +280,73 @@ fieldset.felement.fgroup > .rb-filter-content-list {
     margin: 10px 5px 10px 5px;
 }
 
+.totara-table-container {
+    border: 1px solid #bbbbbb;
+    padding: 0;
+    overflow: auto;
+}
+.totara-table-container .totaratable {
+    width: 100%;
+    border: none;
+}
+.totara-table-container .totara-toolbar-top {
+    width: 100%;
+}
+.totara-table-container .toolbar-left-table,
+.totara-table-container .toolbar-right-table {
+    margin: 1px;
+}
+.totara-table-container .toolbar-cell {
+    padding: 4px;
+    display: inline-block;
+}
+.totara-table-container .fitem_fsubmit,
+.totara-table-container input {
+    vertical-align: top;
+    margin: 0;
+}
+.totara-table-container form div {
+    margin: 0;
+}
+
+/* Align the toolbar items, swapping sides in RTL languages */
+.totara-table-container .toolbar-left-table {
+    float: left;
+    clear: left;
+}
+.totara-table-container .toolbar-right-table {
+    float: right;
+    clear: right;
+}
+.dir-rtl .totara-table-container .toolbar-left-table {
+    float: right;
+    clear: right;
+}
+.dir-rtl .totara-table-container .toolbar-right-table {
+    float: left;
+    clear: left;
+}
+.totara-table-container .no-results {
+    clear: both;
+    display: block;
+    padding: 5px 0;
+    margin: 0;
+    text-align: center;
+}
+.totara-table-container .totaratable {
+    border: none;
+    margin-bottom: 0;
+}
+.totara-table-container .top {
+    border-top: 1px solid #dddddd;
+}
+.totara-table-container .bottom {
+    border-bottom: 1px solid #dddddd;
+}
+.totara-table-container .totara-toolbar-bottom {
+    width: 100%;
+}
+
 /* IE does not work properly with 100% height, so let'd use http://alistapart.com/article/creating-intrinsic-ratios-for-video */
 .ie .rb-report-svggraph {
     position: relative;

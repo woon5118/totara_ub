@@ -280,40 +280,34 @@ class totara_core_renderer extends plugin_renderer_base {
         ksort($toolbar);
         $count = 1;
         $totalcount = count($toolbar);
-        foreach ($toolbar as $index => $row) {
-            // don't render empty toolbars
-            // if you want to render one, add an empty content string to the toolbar
-            if (empty($row['left']) && empty($row['right'])) {
-                continue;
-            }
-            $trclass = "toolbar-{$position}";
-            if ($count == 1) {
-                $trclass .= ' first';
-            }
-            if ($count == $totalcount) {
-                $trclass .= ' last';
-            }
-            echo html_writer::start_tag('tr', array('class' => $trclass));
-            echo html_writer::start_tag('td', array('class' => 'toolbar', 'colspan' => $numcolumns));
 
-            if (!empty($row['left'])) {
-                echo html_writer::start_tag('div', array('class' => 'toolbar-left-table'));
-                foreach ($row['left'] as $item) {
-                    echo html_writer::tag('div', $item, array('class' => 'toolbar-cell'));
+        if ($totalcount > 0) {
+            echo html_writer::start_tag('div', array('class' => 'totara-toolbar totara-toolbar-' . $position));
+            foreach ($toolbar as $index => $row) {
+                // don't render empty toolbars
+                // if you want to render one, add an empty content string to the toolbar
+                if (empty($row['left']) && empty($row['right'])) {
+                    continue;
                 }
-                echo html_writer::end_tag('div');
-            }
 
-            if (!empty($row['right'])) {
-                echo html_writer::start_tag('div', array('class' => 'toolbar-right-table'));
-                foreach (array_reverse($row['right']) as $item) {
-                    echo html_writer::tag('div', $item, array('class' => 'toolbar-cell'));
+                if (!empty($row['left'])) {
+                    echo html_writer::start_tag('div', array('class' => 'toolbar-left-table'));
+                    foreach ($row['left'] as $item) {
+                        echo html_writer::tag('div', $item, array('class' => 'toolbar-cell'));
+                    }
+                    echo html_writer::end_tag('div');
                 }
-                echo html_writer::end_tag('div');
+
+                if (!empty($row['right'])) {
+                    echo html_writer::start_tag('div', array('class' => 'toolbar-right-table'));
+                    foreach (array_reverse($row['right']) as $item) {
+                        echo html_writer::tag('div', $item, array('class' => 'toolbar-cell'));
+                    }
+                    echo html_writer::end_tag('div');
+                }
+                $count++;
             }
-            echo html_writer::end_tag('td');
-            echo html_writer::end_tag('tr');
-            $count++;
+            echo html_writer::end_tag('div');
         }
     }
 
