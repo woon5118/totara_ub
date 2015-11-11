@@ -1765,9 +1765,14 @@ class reportbuilder {
     public function display_search() {
         global $CFG;
 
+        $standard_filters = $this->get_standard_filters();
+        if (count($standard_filters) === 0) {
+            return;
+        }
+
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
         $mformstandard = new report_builder_standard_search_form($this->get_current_url(),
-                array('fields' => $this->get_standard_filters()), 'post', '', array('class' => 'rb-search'));
+                array('fields' => $standard_filters), 'post', '', array('class' => 'rb-search'));
         $mformstandard->display();
     }
 
@@ -1888,9 +1893,14 @@ class reportbuilder {
     public function display_sidebar_search() {
         global $CFG, $PAGE;
 
+        $sidebarfilters = $this->get_sidebar_filters();
+        if (count($sidebarfilters) === 0) {
+            return;
+        }
+
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
         $mformsidebar = new report_builder_sidebar_search_form($this->get_current_url(),
-                array('report' => $this, 'fields' => $this->get_sidebar_filters()), 'post', '', array('class' => 'rb-sidebar'));
+                array('report' => $this, 'fields' => $sidebarfilters), 'post', '', array('class' => 'rb-sidebar'));
         $mformsidebar->display();
 
         // If is_capable is not implemented on an embedded report then don't activate instant filters.
