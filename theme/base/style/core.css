@@ -2365,3 +2365,11 @@ body.lockscroll {
     margin: 10px auto;
     white-space: normal;
 }
+.user-multiselect .controls select {
+    width: auto;
+    max-width: 100%;
+    display: block;
+}
+#page-enrol-manual-manage .user-multiselect .controls {
+    margin-top: 55px;
+}

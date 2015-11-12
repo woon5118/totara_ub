@@ -157,42 +157,38 @@ $removeenabled = $canunenrol ? '' : 'disabled="disabled"';
 ?>
 <form id="assignform" method="post" action="<?php echo $PAGE->url ?>"><div>
   <input type="hidden" name="sesskey" value="<?php echo sesskey() ?>" />
+  <?php // TL-7880: removed table ?>
+  <div class="row-fluid user-multiselect">
+    <div class="span5">
+      <label for="removeselect"><?php print_string('enrolledusers', 'enrol'); ?></label>
+      <?php $currentuserselector->display() ?>
+    </div>
+    <div class="span2 controls">
+      <input name="add" <?php echo $addenabled; ?> id="add" type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>" title="<?php print_string('add'); ?>" />
 
-  <table summary="" class="roleassigntable generaltable generalbox boxaligncenter" cellspacing="0">
-    <tr>
-      <td id="existingcell">
-          <p><label for="removeselect"><?php print_string('enrolledusers', 'enrol'); ?></label></p>
-          <?php $currentuserselector->display() ?>
-      </td>
-      <td id="buttonscell">
-          <div id="addcontrols">
-              <input name="add" <?php echo $addenabled; ?> id="add" type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>" title="<?php print_string('add'); ?>" /><br />
+      <div>
+          <label for="menuroleid"><?php print_string('assignrole', 'enrol_manual') ?></label>
+          <?php echo html_writer::select($roles, 'roleid', $roleid, false); ?>
+      </div>
 
-              <div class="enroloptions">
+      <div>
+          <label for="menuextendperiod"><?php print_string('enrolperiod', 'enrol') ?></label>
+          <?php echo html_writer::select($periodmenu, 'extendperiod', $defaultperiod, $unlimitedperiod); ?>
+      </div>
 
-              <p><label for="menuroleid"><?php print_string('assignrole', 'enrol_manual') ?></label><br />
-              <?php echo html_writer::select($roles, 'roleid', $roleid, false); ?></p>
+      <div>
+          <label for="menuextendbase"><?php print_string('startingfrom') ?></label>
+          <?php echo html_writer::select($basemenu, 'extendbase', $extendbase, false); ?>
+      </div>
 
-              <p><label for="menuextendperiod"><?php print_string('enrolperiod', 'enrol') ?></label><br />
-              <?php echo html_writer::select($periodmenu, 'extendperiod', $defaultperiod, $unlimitedperiod); ?></p>
-
-              <p><label for="menuextendbase"><?php print_string('startingfrom') ?></label><br />
-              <?php echo html_writer::select($basemenu, 'extendbase', $extendbase, false); ?></p>
-
-              </div>
-          </div>
-
-          <div id="removecontrols">
-              <input name="remove" id="remove" <?php echo $removeenabled; ?> type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>" title="<?php print_string('remove'); ?>" />
-          </div>
-      </td>
-      <td id="potentialcell">
-          <p><label for="addselect"><?php print_string('enrolcandidates', 'enrol'); ?></label></p>
-          <?php $potentialuserselector->display() ?>
-      </td>
-    </tr>
-  </table>
-</div></form>
+      <input name="remove" id="remove" <?php echo $removeenabled; ?> type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>" title="<?php print_string('remove'); ?>" />
+    </div>
+    <div class="span5">
+      <label for="addselect"><?php print_string('enrolcandidates', 'enrol'); ?></label>
+      <?php $potentialuserselector->display() ?>
+    </div>
+  </div>
+</form>
 <?php
 
 
