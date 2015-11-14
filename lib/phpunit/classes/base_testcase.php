@@ -249,7 +249,7 @@ abstract class base_testcase extends PHPUnit_Framework_TestCase {
                         }
                     } // match by exact string
                     else {
-                        if ($node->getAttribute($name) != $value) {
+                        if ($node->getAttribute($name) !== (string) $value) {
                             $invalid = true;
                         }
                     }
