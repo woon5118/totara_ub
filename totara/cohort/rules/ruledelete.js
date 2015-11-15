@@ -166,11 +166,11 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
         });
 
         function remove_rule(ruleid) {
-            var rulerow = $('div#ruledef' + ruleid).closest('tr');
+            var rulerow = $('#rule' + ruleid);
 
             // If this row is the first one in the table, then blank out the "operator" in the next row
-            if (!rulerow.prev('tr').length) {
-                rulerow.next('tr').children('.operator').html('&nbsp;');
+            if (!rulerow.prev('li').length) {
+                rulerow.next('li').children('.cohort_rule_type').html('');
             }
             rulerow.remove();
 

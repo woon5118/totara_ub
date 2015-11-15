@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/lib/formslib.php');
 
 class cohort_rules_form extends moodleform {
     function definition() {
-        global $CFG;
+        global $CFG, $OUTPUT;
         $mform =& $this->_form;
         $strdelete = get_string('delete');
         $cohort = $this->_customdata['cohort'];
@@ -95,31 +95,10 @@ class cohort_rules_form extends moodleform {
             $radiogroup[] =& $mform->createElement('radio', $radioname, '', get_string('cohortoperatorandlabel', 'totara_cohort'), COHORT_RULES_OP_AND);
             $radiogroup[] =& $mform->createElement('radio', $radioname, '', get_string('cohortoperatororlabel', 'totara_cohort'), COHORT_RULES_OP_OR);
             $mform->addGroup($radiogroup, $radioname, get_string('rulesetoperatorlabel', 'totara_cohort'), '<br />', false);
-//            $mform->setDefault($radioname, COHORT_RULES_OP_AND);
             $mform->setType($radioname, PARAM_INT);
 
-            $mform->addElement('html', '<div class="rulelist fitem"><table class="rule_table">');
-            $firstrule = true;
-            foreach ($ruleset->rules as $rulerec) {
-                $rule = cohort_rules_get_rule_definition($rulerec->ruletype, $rulerec->name);
-                if ($rule) {
-                    $rule->sqlhandler->fetch($rulerec->id);
-                    $rule->ui->setParamValues($rule->sqlhandler->paramvalues);
-                    $mform->addElement('html', cohort_rule_form_html($rulerec->id,
-                        $rule->ui->getRuleDescription($rulerec->id, false), $rulerec->ruletype, $rulerec->name, $firstrule,
-                        $ruleset->operator, false));
-                } else { // Broken rule.
-                    $a = new stdClass();
-                    $a->type = $rulerec->ruletype;
-                    $a->name = $rulerec->name;
-                    $content = get_string('cohortbrokenrule', 'totara_cohort', $a);
-                    $description = html_writer::tag('b', $content, array('class' => 'error'));
-                    $mform->addElement('html', cohort_rule_form_html($rulerec->id, $description, $rulerec->ruletype, $rulerec->name,
-                        $firstrule, $ruleset->operator, true));
-                }
-                $firstrule = false;
-            }
-            $mform->addElement('html', '</table></div>');
+            $ruledata = cohort_ruleset_form_template_object($ruleset);
+            $mform->addElement('html', $OUTPUT->render_from_template('totara_cohort/editing_ruleset', $ruledata));
 
             // todo: what should the label for this select be?
             $mform->addElement(
