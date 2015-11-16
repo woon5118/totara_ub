@@ -172,7 +172,7 @@ Redisplaying a future question or another redisplay question is not possible (th
 Answers or information entered in the original question will be shown in the redisplayed question. Changes made
 in the redisplayed question will be saved over the original answer. If the original question is locked for a particular
 user then the redisplayed question will also be locked for that user.';
-$string['removeconfirm'] = 'Are you sure want to remove this item?';
+$string['removeconfirm'] = 'Are you sure you want to remove this item?';
 $string['reorder'] = 'Change order';
 $string['reviewcompfromplanassignmissing'] = 'This competency has been removed from the learning plan';
 $string['reviewcoursefromplanassignmissing'] = 'This course has been removed from the learning plan';

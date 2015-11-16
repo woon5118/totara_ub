@@ -5006,6 +5006,7 @@ function totara_appraisal_pluginfile($course, $cm, $context, $filearea, $args, $
 function totara_appraisal_install_example_appraisal() {
     global $CFG, $DB;
     require_once($CFG->dirroot . '/totara/question/field/multichoice.class.php');
+    require_once($CFG->dirroot . '/totara/question/field/goals.class.php');
 
     $now = time();
 
@@ -5079,7 +5080,11 @@ function totara_appraisal_install_example_appraisal() {
         1 => array(
             1 => array(
                 1 => array(
-                    'datatype' => 'goals'
+                    'datatype' => 'goals',
+                    // param4 is 'Include rating' - '0' is for not including the rating.
+                    'param4' => '0',
+                    // param5 is goal selection options.
+                    'param5' => question_goals::SELECT_COMPANY_USERCANCHOOSE | question_goals::SELECT_PERSONAL_USERCANCHOOSE
                 ),
             ),
             2 => array(
@@ -5090,6 +5095,8 @@ function totara_appraisal_install_example_appraisal() {
             3 => array(
                 1 => array(
                     'datatype' => 'compfromplan',
+                    // param4 is 'Include rating' - '0' is for not including the rating.
+                    'param4' => '0',
                 ),
             ),
             4 => array(
@@ -5105,6 +5112,8 @@ function totara_appraisal_install_example_appraisal() {
             1 => array(
                 1 => array(
                     'datatype' => 'goals',
+                    'param4' => '0',
+                    'param5' => question_goals::SELECT_COMPANY_USERCANCHOOSE | question_goals::SELECT_PERSONAL_USERCANCHOOSE
                 ),
                 2 => array(
                     'datatype' => 'ratingnumeric',
@@ -5115,6 +5124,7 @@ function totara_appraisal_install_example_appraisal() {
             2 => array(
                 1 => array(
                     'datatype' => 'compfromplan',
+                    'param4' => '0',
                 ),
                 2 => array(
                     'datatype' => 'ratingnumeric',
@@ -5131,7 +5141,9 @@ function totara_appraisal_install_example_appraisal() {
         3 => array(
             1 => array(
                 1 => array(
-                    'datatype' => 'goals'
+                    'datatype' => 'goals',
+                    'param4' => '0',
+                    'param5' => question_goals::SELECT_COMPANY_USERCANCHOOSE | question_goals::SELECT_PERSONAL_USERCANCHOOSE
                 ),
                 2 => array(
                     'datatype' => 'ratingnumeric',
@@ -5142,6 +5154,7 @@ function totara_appraisal_install_example_appraisal() {
             2 => array(
                 1 => array(
                     'datatype' => 'compfromplan',
+                    'param4' => '0',
                 ),
                 2 => array(
                     'datatype' => 'ratingnumeric',

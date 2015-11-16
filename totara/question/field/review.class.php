@@ -236,8 +236,8 @@ abstract class review extends multichoice {
                         if ($reviewsearch->itemid == $reviewdata->itemid && $reviewsearch->$answerfield == $this->answerid) {
                             if (!$reviewsearch->scope || ($reviewsearch->scope == $reviewdata->scope)) {
                                 $found = true;
+                                break;
                             }
-                            break;
                         }
                     }
                     if (!$found && $this->cananswer) {
