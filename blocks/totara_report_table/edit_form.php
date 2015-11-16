@@ -40,7 +40,7 @@ class block_totara_report_table_edit_form extends block_edit_form {
 
         // Include the required JavaScript.
         $this->page->requires->string_for_js('allavailabledata', 'block_totara_report_table');
-        $this->page->requires->js_init_call('M.block_totara_report_table.populatelist', array(), true);
+        $this->page->requires->js_call_amd('block_totara_report_table/module', 'populatelist', array());
 
         // Output the form.
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));

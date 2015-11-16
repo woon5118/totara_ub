@@ -105,8 +105,7 @@ class block_totara_report_table extends block_base {
         // Always execute the parent block JS just in case.
         parent::get_required_javascript();
 
-        local_js();
-        $this->page->requires->js_init_call('M.block_totara_report_table.init', array($this->get_uniqueid(), $this->instance->id), true);
+        $this->page->requires->js_call_amd('block_totara_report_table/module', 'change_links', array($this->get_uniqueid(), $this->instance->id));
     }
 
     /**
