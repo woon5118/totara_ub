@@ -77,23 +77,12 @@ if (!$item) {
     echo "You have no competencies defined: you should have at least two for this example to work properly";
 } else {
     echo 'You\'ll need at least two competencies defined for this to work:';
-    $jargs = '{';
-    if (!empty($item->id)) {
-        $jargs .= '"id":'.$item->id;
-    }
-    if (!empty($CFG->competencyuseresourcelevelevidence)) {
-        $jargs .= ', "competencyuseresourcelevelevidence":true';
-    }
-    $jargs .= '}';
+
     // Include competency item js module
     $PAGE->requires->strings_for_js(array('assignrelatedcompetencies',
         'assignnewevidenceitem','assigncoursecompletions'), 'totara_hierarchy');
-    $jsmodule = array(
-        'name' => 'totara_elementlibmultiselect',
-        'fullpath' => '/elementlibrary/js/competency.item.js',
-        'requires' => array('json'));
-    $PAGE->requires->js_init_call('M.totara_elementlibmultiselect.init',
-        array('args'=>$jargs), false, $jsmodule);
+
+    $PAGE->requires->js_call_amd('elementlibrary/competency_item', 'init', array('args' => $item->id));
 
     $out = html_writer::start_tag('div', array('class' => 'buttons'));
     $out .= html_writer::start_tag('div', array('class' => 'singlebutton'));

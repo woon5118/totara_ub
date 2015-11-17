@@ -429,6 +429,8 @@ $cache = '.var_export($cache, true).';
             'user'        => $CFG->dirroot.'/user',
             'userkey'     => null,
             'webservice'  => $CFG->dirroot.'/webservice',
+            // Totara: extra subsystems - do not add any new!
+            'elementlibrary' => $CFG->dirroot.'/elementlibrary',
         );
 
         return $info;
