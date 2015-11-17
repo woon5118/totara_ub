@@ -37,6 +37,7 @@ $string['user'] = 'User';
 $string['users'] = 'Users';
 $string['picture'] = 'Picture';
 $string['options'] = 'Options';
+$string['coursecompletionsasevidence'] = 'Course Completions as Evidence';
 $string['coursesstarted'] = 'Courses Started';
 $string['coursescompleted'] = 'Courses Completed';
 $string['competenciesachieved'] = 'Competencies Achieved';

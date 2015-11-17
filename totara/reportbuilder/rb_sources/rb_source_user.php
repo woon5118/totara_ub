@@ -128,6 +128,19 @@ class rb_source_user extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
+                'totara_stats_course_completion_imports',
+                'LEFT',
+                // Note that a userid does not exist on the tcic table
+                // so we have to use username for joining.
+                "(SELECT u.id, count(DISTINCT tcic.courseidnumber) AS number
+                    FROM {totara_compl_import_course} tcic
+                    INNER JOIN {user} u ON tcic.username = u.username
+                    WHERE tcic.importevidence = 1
+                    GROUP BY u.id)",
+                'base.id = totara_stats_course_completion_imports.id',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
+            new rb_join(
                 'prog_extension_count',
                 'LEFT',
                 "(SELECT userid, count(*) as extensioncount
@@ -235,6 +248,19 @@ class rb_source_user extends rb_base_source {
                             'joins' => 'totara_stats_courses_completed',
                             'dbdatatype' => 'integer',
                         )
+        );
+
+        // A column to display the number of course completions as evidence for a user.
+        $columnoptions[] = new rb_column_option(
+            'statistics',
+            'coursecompletionsasevidence',
+            get_string('coursecompletionsasevidence', 'rb_source_user'),
+            'totara_stats_course_completion_imports.number',
+            array(
+                'displayfunc' => 'count',
+                'joins' => 'totara_stats_course_completion_imports',
+                'dbdatatype' => 'integer',
+            )
         );
 
         $usednamefields = totara_get_all_user_name_fields_join('base', null, true);
