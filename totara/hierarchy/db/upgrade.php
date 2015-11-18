@@ -1387,5 +1387,18 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015112500, 'totara', 'hierarchy');
     }
 
+    if ($oldversion < 2015120700) {
+
+        // Define key posassi_type_fk (foreign) to be added to pos_assignment.
+        $table = new xmldb_table('pos_assignment');
+        $key = new xmldb_key('posassi_type_fk', XMLDB_KEY_FOREIGN, array('type'), 'pos_type', array('id'));
+
+        // Launch add key posassi_type_fk.
+        $dbman->add_key($table, $key);
+
+        // Hierarchy savepoint reached.
+        upgrade_plugin_savepoint(true, 2015120700, 'totara', 'hierarchy');
+    }
+
     return true;
 }

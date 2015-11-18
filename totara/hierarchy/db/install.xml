@@ -368,6 +368,7 @@
         <KEY NAME="posassi_pos_fk" TYPE="foreign" FIELDS="positionid" REFTABLE="pos" REFFIELDS="id"/>
         <KEY NAME="posassi_rep_fk" TYPE="foreign" FIELDS="reportstoid" REFTABLE="role_assignments" REFFIELDS="id"/>
         <KEY NAME="posassi_man_fk" TYPE="foreign" FIELDS="managerid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="posassi_type_fk" TYPE="foreign" FIELDS="type" REFTABLE="pos_type" REFFIELDS="id" COMMENT="References the pos_type table"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="posassi_usetyp_uix" UNIQUE="true" FIELDS="userid, type"/>
