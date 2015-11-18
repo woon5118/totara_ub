@@ -1926,11 +1926,7 @@ class reportbuilder {
             return;
         }
 
-        $jsmodule = array(
-            'name' => 'totara_reportbuilder_instantfilter',
-            'fullpath' => '/totara/reportbuilder/js/instantfilter.js',
-            'requires' => array('json'));
-        $PAGE->requires->js_init_call('M.totara_reportbuilder_instantfilter.init', array('id' => $this->_id), true, $jsmodule);
+        $PAGE->requires->js_call_amd('totara_reportbuilder/instantfilter', 'init', array('id' => $this->_id));
     }
 
 
