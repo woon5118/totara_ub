@@ -638,12 +638,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             $PAGE->requires->string_for_js('ok', 'moodle');
             $strcache = get_string('cachenow', 'totara_reportbuilder');
             local_js(array(TOTARA_JS_DIALOG));
-            $jsmodule = array(
-                'name' => 'totara_reportbuilder_cachenow',
-                'fullpath' => '/totara/reportbuilder/js/cachenow.js',
-                'requires' => array('json'));
-            $args = array('args'=>json_encode(array('reportid' => $reportid)));
-            $PAGE->requires->js_init_call('M.totara_reportbuilder_cachenow.init', $args, false, $jsmodule);
+            $PAGE->requires->js_call_amd('totara_reportbuilder/cachenow-lazy', 'init', array());
         }
 
         if ($icon) {
