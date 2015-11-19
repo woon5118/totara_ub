@@ -17,13 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Jon Sharp <jonathans@catalyst-eu.net>
- * @author Russell England <russell.england@catalyst-eu.net>
- * @package totara_certification
+ * @author Nathan Lewis <nathan.lewis@totaralms.com>
+ * @package totara
+ * @subpackage reportbuilder
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2016021000;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2015051102;       // Requires this Moodle version.
-$plugin->component = 'totara_certification'; // To check on upgrade, that module sits in correct place.
+$string['editcompletion'] = 'Edit completion records';
+$string['isassigned'] = 'Is currently assigned';
+$string['sourcetitle'] = 'Program Membership';
+$string['status'] = 'Status';
+$string['type_prog'] = 'Program';
+$string['type_progcompletion'] = 'User completion';

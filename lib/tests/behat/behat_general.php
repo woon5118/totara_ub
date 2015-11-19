@@ -391,6 +391,40 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Click on the element of the specified type which is located inside the second element.
+     *
+     * Totara added step
+     *
+     * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" in the "(?P<element_container_string>(?:[^"]|\\")*)" "(?P<text_selector_string>[^"]*)" confirming the dialogue$/
+     * @param string $element Element we look for
+     * @param string $selectortype The type of what we look for
+     * @param string $nodeelement Element we look in
+     * @param string $nodeselectortype The type of selector where we look in
+     */
+    public function i_click_on_in_the_confirming_the_dialogue($element, $selectortype, $nodeelement, $nodeselectortype) {
+
+        $node = $this->i_click_on_in_the($element, $selectortype, $nodeelement, $nodeselectortype);
+        $this->accept_currently_displayed_alert_dialog();
+    }
+
+    /**
+     * Click on the element of the specified type which is located inside the second element.
+     *
+     * Totara added step
+     *
+     * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" in the "(?P<element_container_string>(?:[^"]|\\")*)" "(?P<text_selector_string>[^"]*)" dismissing the dialogue$/
+     * @param string $element Element we look for
+     * @param string $selectortype The type of what we look for
+     * @param string $nodeelement Element we look in
+     * @param string $nodeselectortype The type of selector where we look in
+     */
+    public function i_click_on_in_the_dismissing_the_dialogue($element, $selectortype, $nodeelement, $nodeselectortype) {
+
+        $node = $this->i_click_on_in_the($element, $selectortype, $nodeelement, $nodeselectortype);
+        $this->dismiss_currently_displayed_alert_dialog();
+    }
+
+    /**
      * Drags and drops the specified element to the specified container. This step does not work in all the browsers, consider it experimental.
      *
      * The steps definitions calling this step as part of them should

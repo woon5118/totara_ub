@@ -190,4 +190,10 @@ $capabilities = array(
         )
     ),
 
+    // Ability to edit program and certification completion data.
+    'totara/program:editcompletion' => array(
+        'riskbitmask' => RISK_DATALOSS | RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_PROGRAM,
+    ),
 );

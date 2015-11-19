@@ -45,4 +45,9 @@ $observers = array(
         'callback' => 'certification_event_handler::completed',
         'includefile' => 'totara/certification/lib.php',
     ),
+    array(
+        'eventname' => '\totara_certification\event\certification_updated',
+        'callback' => 'certification_event_handler::certification_updated',
+        'includefile' => 'totara/certification/lib.php',
+    ),
 );

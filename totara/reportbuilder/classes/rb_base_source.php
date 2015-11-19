@@ -2995,12 +2995,21 @@ abstract class rb_base_source {
      * @return Boolean
      */
     protected function add_certification_fields_to_columns(&$columnoptions, $join = 'certif', $langfile = 'totara_certification') {
-        global $DB;
+        $columnoptions[] = new rb_column_option(
+            'certif',
+            'recertifydatetype',
+            get_string('recertdatetype', 'totara_certification'),
+            "$join.recertifydatetype",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'recertifydatetype',
+            )
+        );
 
         $columnoptions[] = new rb_column_option(
             'certif',
             'activeperiod',
-            get_string('activeperiod', $langfile),
+            get_string('activeperiod', 'totara_certification'),
             "$join.activeperiod",
             array('joins' => $join,
                   'dbdatatype' => 'char',
@@ -3010,7 +3019,7 @@ abstract class rb_base_source {
         $columnoptions[] = new rb_column_option(
             'certif',
             'windowperiod',
-            get_string('windowperiod', $langfile),
+            get_string('windowperiod', 'totara_certification'),
             "$join.windowperiod",
             array('joins' => $join,
                   'dbdatatype' => 'char',
@@ -3018,6 +3027,18 @@ abstract class rb_base_source {
         );
 
         return true;
+    }
+
+    public function rb_display_recertifydatetype($recertifydatetype, $row) {
+        switch ($recertifydatetype) {
+            case CERTIFRECERT_COMPLETION:
+                return get_string('editdetailsrccmpl', 'totara_certification');
+            case CERTIFRECERT_EXPIRY:
+                return get_string('editdetailsrcexp', 'totara_certification');
+            case CERTIFRECERT_FIXED:
+                return get_string('editdetailsrcfixed', 'totara_certification');
+        }
+        return "Error - Recertification method not found";
     }
 
     /**
@@ -3030,23 +3051,41 @@ abstract class rb_base_source {
      * @return boolean
      */
     protected function add_certification_fields_to_filters(&$filteroptions, $langfile = 'totara_certification') {
+
+        $filteroptions[] = new rb_filter_option(
+            'certif',
+            'recertifydatetype',
+            get_string('recertdatetype', 'totara_certification'),
+            'select',
+            array(
+                'selectfunc' => 'recertifydatetype',
+            )
+        );
+
         $filteroptions[] = new rb_filter_option(
             'certif',
             'activeperiod',
-            get_string('activeperiod', $langfile),
+            get_string('activeperiod', 'totara_certification'),
             'text'
         );
 
         $filteroptions[] = new rb_filter_option(
             'certif',
             'windowperiod',
-            get_string('windowperiod', $langfile),
+            get_string('windowperiod', 'totara_certification'),
             'text'
         );
 
         return true;
     }
 
+    public function rb_filter_recertifydatetype() {
+        return array(
+            CERTIFRECERT_COMPLETION => get_string('editdetailsrccmpl', 'totara_certification'),
+            CERTIFRECERT_EXPIRY => get_string('editdetailsrcexp', 'totara_certification'),
+            CERTIFRECERT_FIXED => get_string('editdetailsrcfixed', 'totara_certification')
+        );
+    }
 
     /**
      * Adds the course_category table to the $joinlist array

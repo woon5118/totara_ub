@@ -26,6 +26,8 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');
 }
 
+require_once($CFG->libdir.'/totaratablelib.php');
+
 /**
  * Standard HTML output renderer for totara_core module
  */
@@ -103,4 +105,157 @@ class totara_certification_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Generates HTML to display the confirmation warnings when editing a current certification completion record.
+     *
+     * @param $data Object with a bunch of stuff.
+     * @return str HTML fragment
+     */
+    public function get_save_completion_confirmation($data) {
+        global $CERTIFCOMPLETIONSTATE;
+
+        $out = '';
+
+        if ($data->originalstate != $data->newstate) {
+            $states = array(
+                'from' => get_string($CERTIFCOMPLETIONSTATE[$data->originalstate], 'totara_certification'),
+                'to' => get_string($CERTIFCOMPLETIONSTATE[$data->newstate], 'totara_certification')
+            );
+            $out .= html_writer::tag('p', get_string('completionchangestates', 'totara_certification', $states));
+        }
+
+        if (!empty($data->userresults)) {
+            $out .= html_writer::tag('span', get_string('completionchangeuser', 'totara_certification'));
+            $out .= html_writer::start_tag('ul');
+            foreach ($data->userresults as $result) {
+                $out .= html_writer::tag('li',
+                    get_string($result, 'totara_certification'));
+            }
+            $out .= html_writer::end_tag('ul');
+        }
+
+        if (!empty($data->cronresults)) {
+            $out .= html_writer::tag('span', get_string('completionchangecron', 'totara_certification'));
+            $out .= html_writer::start_tag('ul');
+            foreach ($data->cronresults as $change) {
+                $out .= html_writer::tag('li',
+                    get_string($change, 'totara_certification'));
+            }
+            $out .= html_writer::end_tag('ul');
+        }
+
+        $out .= html_writer::tag('span', get_string('completionchangeconfirm', 'totara_certification'));
+
+        return $out;
+    }
+
+    /**
+     * Generates HTML to display certifications which have problems, including summary info.
+     *
+     * @param $data Object with a bunch of stuff.
+     * @return str HTML fragment
+     */
+    public function get_completion_checker_results($data) {
+        global $DB;
+
+        $out = "";
+
+        $count = 0;
+        $problemcount = 0;
+
+        $aggregatedata = array();
+
+        // Create the table with individual errors first, but display it last.
+        ob_start();
+        $errortable = new totara_table('checkall');
+        $errortable->define_columns(array('user', 'program', 'errors'));
+        $errortable->define_headers(array(get_string('user'), get_string('program', 'totara_program'),
+            get_string('problem', 'totara_program')));
+        $errortable->define_baseurl($data->url);
+        $errortable->sortable(false);
+        $errortable->setup();
+
+        foreach ($data->rs as $record) {
+            $certcompletion = new stdClass();
+            $certcompletion->status = $record->status;
+            $certcompletion->renewalstatus = $record->renewalstatus;
+            $certcompletion->certifpath = $record->certifpath;
+            $certcompletion->timecompleted = $record->timecompleted;
+            $certcompletion->timewindowopens = $record->timewindowopens;
+            $certcompletion->timeexpires = $record->timeexpires;
+
+            $progcompletion = new stdClass();
+            $progcompletion->status = $record->progstatus;
+            $progcompletion->timecompleted = $record->progtimecompleted;
+            $progcompletion->timedue = $record->timedue;
+
+            $errors = certif_get_completion_errors($certcompletion, $progcompletion);
+
+            if (!empty($errors)) {
+                // Aggregate this combination of errors.
+                $problemkey = certif_get_completion_error_problemkey($errors);
+                // If the problem key doesn't exist in the aggregate array already then create it.
+                if (!isset($aggregatedata[$problemkey])) {
+                    $aggregatedata[$problemkey] = new stdClass();
+                    $aggregatedata[$problemkey]->count = 0;
+
+                    $errorstrings = array();
+                    foreach ($errors as $errorkey => $errorfield) {
+                        $errorstrings[] = get_string($errorkey, 'totara_certification');
+                    }
+
+                    $aggregatedata[$problemkey]->problem = implode('<br>', $errorstrings);
+                    $aggregatedata[$problemkey]->solution =
+                        certif_get_completion_error_solution($problemkey, $data->programid, $data->userid);
+                }
+                $aggregatedata[$problemkey]->count++;
+
+                $userurl = new moodle_url('/totara/certification/edit_completion.php',
+                    array('id' => $record->programid, 'userid' => $record->userid));
+                $username = fullname($DB->get_record('user', array('id' => $record->userid)));
+                $programname = format_string($record->fullname);
+                $errortable->add_data(array(html_writer::link($userurl, $username),
+                    $programname, $aggregatedata[$problemkey]->problem));
+                $problemcount++;
+            }
+            $count++;
+        }
+        $errortable->finish_html();
+        $errorhtml = ob_get_clean();
+
+        // Display the summary of results.
+        if (!empty($data->progname)) {
+            $out .= html_writer::tag('p', get_string('completionfilterbycertification', 'totara_certification', $data->progname));
+        }
+        if (!empty($data->username)) {
+            $out .= html_writer::tag('p', get_string('completionfilterbyuser', 'totara_certification', $data->username));
+        }
+        $out .= html_writer::tag('p', get_string('completionrecordcounttotal', 'totara_certification', $count));
+        $out .= html_writer::tag('p', get_string('completionrecordcountproblem', 'totara_certification', $problemcount));
+
+        // Display the aggregated problems and solution, including link to activate any fixes that are available.
+        ob_start();
+        if (!empty($aggregatedata)) {
+            $aggregatetable = new totara_table('checkall_aggregate');
+            $aggregatetable->define_columns(array('problems', 'count', 'explanation'));
+            $aggregatetable->define_headers(array(get_string('problem', 'totara_program'), get_string('count', 'totara_program'),
+                get_string('completionprobleminformation', 'totara_program')));
+            $aggregatetable->define_baseurl($data->url);
+            $errortable->sortable(false);
+            $aggregatetable->setup();
+
+            foreach ($aggregatedata as $key => $value) {
+                // Dev note: Change $value->solution to $key to see error keys in summary table.
+                $aggregatetable->add_data(array($value->problem, $value->count, $value->solution));
+            }
+
+            $aggregatetable->finish_html();
+        }
+        $out .= ob_get_clean();
+
+        // Finally, add the individual errors table to the output.
+        $out .= $errorhtml;
+
+        return $out;
+    }
 }

@@ -27,6 +27,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 require_once($CFG->dirroot . '/course/renderer.php');
+require_once($CFG->libdir.'/totaratablelib.php');
 
 /**
 * Standard HTML output renderer for totara_core module
@@ -1320,6 +1321,103 @@ class totara_program_renderer extends plugin_renderer_base {
             $this->page->requires->yui_module('moodle-totara_program-categoryexpander', 'M.program.categoryexpander.init');
             $jsloaded = true;
         }
+    }
+
+    /**
+     * Generates HTML to display programs which have problems, including summary info.
+     *
+     * @param $data Object with a bunch of stuff.
+     * @return str HTML fragment
+     */
+    public function get_completion_checker_results($data) {
+        global $DB;
+
+        $out = "";
+
+        $count = 0;
+        $problemcount = 0;
+
+        $aggregatedata = array();
+
+        // Create the table with individual errors first, but display it last.
+        ob_start();
+        $errortable = new totara_table('checkall');
+        $errortable->define_columns(array('userid', 'progid', 'errors'));
+        $errortable->define_headers(array(get_string('user'), get_string('program', 'totara_program'),
+            get_string('problem', 'totara_program')));
+        $errortable->define_baseurl($data->url);
+        $errortable->sortable(false);
+        $errortable->setup();
+
+        foreach ($data->rs as $record) {
+            $errors = prog_get_completion_errors($record);
+
+            if (!empty($errors)) {
+                // Aggregate this combination of errors.
+                $problemkey = prog_get_completion_error_problemkey($errors);
+                // If the problem key doesn't exist in the aggregate array already then create it.
+                if (!isset($aggregatedata[$problemkey])) {
+                    $aggregatedata[$problemkey] = new stdClass();
+                    $aggregatedata[$problemkey]->count = 0;
+
+                    $errorstrings = array();
+                    foreach ($errors as $errorkey => $errorfield) {
+                        $errorstrings[] = get_string($errorkey, 'totara_program');
+                    }
+
+                    $aggregatedata[$problemkey]->problem = implode('<br>', $errorstrings);
+                    $aggregatedata[$problemkey]->solution =
+                        prog_get_completion_error_solution($problemkey, $data->programid, $data->userid);
+                }
+                $aggregatedata[$problemkey]->count++;
+
+                $userurl = new moodle_url('/totara/program/edit_completion.php',
+                    array('id' => $record->programid, 'userid' => $record->userid));
+                $username = fullname($DB->get_record('user', array('id' => $record->userid)));
+                $programname = format_string($record->fullname);
+                $errortable->add_data(array(html_writer::link($userurl, $username),
+                    $programname, $aggregatedata[$problemkey]->problem));
+                $problemcount++;
+            }
+            $count++;
+        }
+        $errortable->finish_html();
+        $errorhtml = ob_get_clean();
+
+        // Display the summary of results.
+        if (!empty($data->progname)) {
+            $out .= html_writer::tag('p', get_string('completionfilterbyprogram', 'totara_program', $data->progname));
+        }
+        if (!empty($data->username)) {
+            $out .= html_writer::tag('p', get_string('completionfilterbyuser', 'totara_program', $data->username));
+        }
+        $out .= html_writer::tag('p', get_string('completionrecordcounttotal', 'totara_program', $count));
+        $out .= html_writer::tag('p', get_string('completionrecordcountproblem', 'totara_program', $problemcount));
+
+        // Display the aggregated problems and solution, including link to activate any fixes that are available.
+        ob_start();
+        if (!empty($aggregatedata)) {
+            $aggregatetable = new totara_table('checkall_aggregate');
+            $aggregatetable->define_columns(array('problems', 'count', 'explanation'));
+            $aggregatetable->define_headers(array(get_string('problem', 'totara_program'), get_string('count', 'totara_program'),
+                get_string('completionprobleminformation', 'totara_program')));
+            $aggregatetable->define_baseurl($data->url);
+            $errortable->sortable(false);
+            $aggregatetable->setup();
+
+            foreach ($aggregatedata as $key => $value) {
+                // Dev note: Change $value->solution to $key to see error keys in summary table.
+                $aggregatetable->add_data(array($value->problem, $value->count, $value->solution));
+            }
+
+            $aggregatetable->finish_html();
+        }
+        $out .= ob_get_clean();
+
+        // Finally, add the individual errors table to the output.
+        $out .= $errorhtml;
+
+        return $out;
     }
 }
 

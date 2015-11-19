@@ -920,6 +920,7 @@ function import_certification($importname, $importtime) {
     $cchistory = array();
     $pua = array();
     $users = array();
+    $completionstolog = array();
     // Arrays to hold info on previously-processed records for program/user pairs in this batch.
     // In certifications an upload may contain multiple records for a program for one user going back historically.
     $priorcc = array();
@@ -1005,21 +1006,50 @@ function import_certification($importname, $importtime) {
             if (empty($programid) || ($programid != $program->progid) || (($insertcount++ % BATCH_INSERT_MAX_ROW_COUNT) == 0)) {
                 // Insert a batch for a given programid (as need to insert user roles with program context).
                 if (!empty($deleted)) {
+                    list($deletedidssql, $deletedparams) = $DB->get_in_or_equal($deleted);
+                    $sql = "SELECT cc.id, prog.id AS programid, cc.userid
+                              FROM {certif_completion} cc
+                              JOIN {prog} prog ON prog.certifid = cc.certifid
+                             WHERE cc.id {$deletedidssql}";
+                    $logrecords = $DB->get_records_sql($sql, $deletedparams);
+                    $description = 'Completion deleted by import';
+                    foreach ($logrecords as $logrecord) {
+                        prog_log_completion($logrecord->programid, $logrecord->userid, $description);
+                    }
+
                     $DB->delete_records_list('certif_completion', 'id', $deleted);
                     unset($deleted);
                     $deleted = array();
                 }
                 if (!empty($cc)) {
+                    foreach ($cc as $ccrecord) {
+                        $completiontolog = new stdClass();
+                        $completiontolog->programid = $ccrecord->programid;
+                        $completiontolog->userid = $ccrecord->userid;
+                        $completionstolog[$ccrecord->programid . '_' . $ccrecord->userid] = $completiontolog;
+                        unset($ccrecord->programid);
+                    }
+
                     $DB->insert_records_via_batch('certif_completion', $cc);
                     unset($cc);
                     $cc = array();
                 }
                 if (!empty($cchistory)) {
-                    $DB->insert_records_via_batch('certif_completion_history', $cchistory);
+                    $message = 'Completion history added by import';
+                    foreach ($cchistory as $newhistoryrecord) {
+                        certif_write_completion_history($newhistoryrecord, $message);
+                    }
                     unset($cchistory);
                     $cchistory = array();
                 }
                 if (!empty($pc)) {
+                    foreach ($pc as $pcrecord) {
+                        $completiontolog = new stdClass();
+                        $completiontolog->programid = $pcrecord->programid;
+                        $completiontolog->userid = $pcrecord->userid;
+                        $completionstolog[$pcrecord->programid . '_' . $pcrecord->userid] = $completiontolog;
+                    }
+
                     $DB->insert_records_via_batch('prog_completion', $pc);
                     unset($pc);
                     $pc = array();
@@ -1057,6 +1087,7 @@ function import_certification($importname, $importtime) {
 
             // Create Certification completion record.
             $ccdata = new stdClass();
+            $ccdata->programid = $program->progid;
             $ccdata->certifid = $program->certifid;
             $ccdata->userid = $program->userid;
             $ccdata->certifpath = CERTIFPATH_RECERT;
@@ -1229,21 +1260,50 @@ function import_certification($importname, $importtime) {
     $programs->close();
 
     if (!empty($deleted)) {
+        list($deletedidssql, $deletedparams) = $DB->get_in_or_equal($deleted);
+        $sql = "SELECT cc.id, prog.id AS programid, cc.userid
+                  FROM {certif_completion} cc
+                  JOIN {prog} prog ON prog.certifid = cc.certifid
+                 WHERE cc.id {$deletedidssql}";
+        $logrecords = $DB->get_records_sql($sql, $deletedparams);
+        $description = 'Completion deleted by import';
+        foreach ($logrecords as $logrecord) {
+            prog_log_completion($logrecord->programid, $logrecord->userid, $description);
+        }
+
         $DB->delete_records_list('certif_completion', 'id', $deleted);
         unset($deleted);
         $deleted = array();
     }
     if (!empty($cc)) {
+        foreach ($cc as $ccrecord) {
+            $completiontolog = new stdClass();
+            $completiontolog->programid = $ccrecord->programid;
+            $completiontolog->userid = $ccrecord->userid;
+            $completionstolog[$ccrecord->programid . '_' . $ccrecord->userid] = $completiontolog;
+            unset($ccrecord->programid);
+        }
+
         $DB->insert_records_via_batch('certif_completion', $cc);
         unset($cc);
         $cc = array();
     }
     if (!empty($cchistory)) {
-        $DB->insert_records_via_batch('certif_completion_history', $cchistory);
+        $message = 'Completion history added by import';
+        foreach ($cchistory as $newhistoryrecord) {
+            certif_write_completion_history($newhistoryrecord, $message);
+        }
         unset($cchistory);
         $cchistory = array();
     }
     if (!empty($pc)) {
+        foreach ($pc as $pcrecord) {
+            $completiontolog = new stdClass();
+            $completiontolog->programid = $pcrecord->programid;
+            $completiontolog->userid = $pcrecord->userid;
+            $completionstolog[$pcrecord->programid . '_' . $pcrecord->userid] = $completiontolog;
+        }
+
         $DB->insert_records_via_batch('prog_completion', $pc);
         unset($pc);
         $pc = array();
@@ -1293,6 +1353,14 @@ function import_certification($importname, $importtime) {
                               AND {prog_completion}.userid = cc.userid
                               AND cc.timemodified = :now)";
     $DB->execute($sql, array('now' => $now));
+
+    // Write the program completion logs. This has to happen last, after all changes have been saved to db.
+    if (!empty($completionstolog)) {
+        $message = 'Completion added by import';
+        foreach ($completionstolog as $completiontolog) {
+            certif_write_completion_log($completiontolog->programid, $completiontolog->userid, $message);
+        }
+    }
 
     return $errors;
 }

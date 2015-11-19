@@ -2347,3 +2347,318 @@ function totara_prog_removed_selected_ids($programid, $selected, $removed, $assi
 
     return $selectedids;
 }
+
+/**
+ * Checks the state of a user's program completion record.
+ *
+ * When an inconsistent state is detected, this function assumes that the status is correct, and reports
+ * problems with other fields relative to this. It is possible that the problem (or solution to the
+ * problem) is that the status is incorrect, and the other fields are correct, but it's not possible to
+ * distinguish between the two scenarios.
+ *
+ * @param stdClass $progcompletion as stored in the prog_completion table (not all fields are required)
+ * @return array describes any problems (error key => form field)
+ */
+function prog_get_completion_errors($progcompletion) {
+    $errors = array();
+
+    if ($progcompletion->timedue == COMPLETION_TIME_UNKNOWN) {
+        $errors['error:timedueunknown'] = 'timedue';
+    }
+
+    switch ($progcompletion->status) {
+        case STATUS_PROGRAM_INCOMPLETE:
+            if ($progcompletion->timecompleted > 0) {
+                $errors['error:stateincomplete-timecompletednotempty'] = 'timecompleted';
+            }
+            break;
+        case STATUS_PROGRAM_COMPLETE:
+            if ($progcompletion->timecompleted <= 0) {
+                $errors['error:statecomplete-timecompletedempty'] = 'timecompleted';
+            }
+            break;
+        default:
+            $errors['error:progstatusinvalid'] = 'status';
+            break;
+    }
+
+    return $errors;
+}
+
+/**
+ * Convert the errors returned by prog_get_completion_errors into errors that can be used for form validation.
+ *
+ * @param array $errors as returned by prog_get_completion_errors
+ * @return array of form validation errors
+ */
+function prog_get_completion_form_errors($errors) {
+    $formerrors = array();
+    foreach ($errors as $stringkey => $formkey) {
+        if (isset($formerrors[$formkey])) {
+            $formerrors[$formkey] .= '<br>' . get_string($stringkey, 'totara_program');
+        } else {
+            $formerrors[$formkey] = get_string($stringkey, 'totara_program');
+        }
+    }
+    return $formerrors;
+}
+
+/**
+ * Given a set of errors, calculate a unique problem key (just sort and concatenate errors).
+ *
+ * @param array $errors as returned by prog_get_completion_errors
+ * @return string
+ */
+function prog_get_completion_error_problemkey($errors) {
+    if (empty($errors)) {
+        return '';
+    }
+
+    $errorkeys = array_keys($errors);
+    sort($errorkeys);
+    return implode('|', $errorkeys);
+}
+
+/**
+ * Given a problem key returned by prog_get_completion_error_problemkey, return any known explanation or solutions, in html format.
+ *
+ * @param string $problemkey as returned by prog_get_completion_error_problemkey
+ * @param int $programid if provided (non-0), url should only fix problems for this program
+ * @param int $userid if provided (non-0), url should only fix problems for this user
+ * @return string html formatted, possibly including url links to activate known fixes
+ */
+function prog_get_completion_error_solution($problemkey, $programid = 0, $userid = 0) {
+    if (empty($problemkey)) {
+        return '';
+    }
+
+    $params = array('progorcert' => 'program', 'progid' => $programid, 'userid' => $userid);
+    $baseurl = new moodle_url('/totara/program/check_completion.php', $params);
+
+    switch ($problemkey) {
+        // See certs for examples of automated fixes. Remove this when a fix is implemented.
+        case 'error:timedueunknown':
+            $html = get_string('error:info_timedueunknown', 'totara_program');
+            break;
+        default:
+            $html = get_string('error:info_unknowncombination', 'totara_program');
+            break;
+    }
+
+    return $html;
+}
+
+/**
+ * Applies the specified fix to program completion record.
+ *
+ * @param string $fixkey the key for the specific fix to be applied (see switch in code)
+ * @param int $programid if provided (non-0), only fix problems for this program
+ * @param int $userid if provided (non-0), only fix problems for this user
+ */
+function prog_fix_completions($fixkey, $programid = 0, $userid = 0) {
+    global $DB;
+
+    // Get all completion records, applying the specified filters.
+    $sql = "SELECT pc.*
+              FROM {prog_completion} pc
+              JOIN {prog} prog
+                ON prog.id = pc.programid
+             WHERE pc.coursesetid = 0
+               AND prog.certifid IS NULL";
+    $params = array();
+    if ($programid) {
+        $sql .= " AND pc.programid = :programid";
+        $params['programid'] = $programid;
+    }
+    if ($userid) {
+        $sql .= " AND pc.userid = :userid";
+        $params['userid'] = $userid;
+    }
+
+    $rs = $DB->get_recordset_sql($sql, $params);
+
+    foreach ($rs as $progcompletion) {
+        // Check for errors.
+        $errors = prog_get_completion_errors($progcompletion);
+
+        // Nothing wrong, so skip this record.
+        if (empty($errors)) {
+            continue;
+        }
+
+        $problemkey = prog_get_completion_error_problemkey($errors);
+        $result = "";
+        $ignoreproblem = "";
+
+        // Only fix if this is an exact match for the specified problem.
+        switch ($fixkey) {
+            // See certif_fix_completions for an example. Remove this comment when first fix is implemented.
+            // When adding the first fix here, you must also implement (copy from certs) the following tests:
+            // * test_prog_fix_completions_only_selected
+            // * test_prog_fix_completions_only_specified_state
+            // * test_prog_fix_completions_only_if_isolated_problem
+            // * test_prog_fix_completions_known_unfixed_problems
+            // Plus one test for each fix function.
+            default:
+                break;
+        }
+
+        // Nothing happened, so no need to update or log.
+        if (empty($result)) {
+            continue;
+        }
+
+        prog_write_completion($progcompletion, $ignoreproblem, $result);
+    }
+}
+
+/**
+ * Create or update prog_completion record. Checks are performed to ensure that the data is valid before it
+ * can be written to the db.
+ *
+ * NOTE: $ignoreproblemkey should only be used by prog_fix_completions!!! If specified, the record will be
+ *       written to the db even if the records have the specified problem, and only that exact problem, or
+ *       no problem at all, otherwise the update will not occur.
+ *
+ * @param stdClass $progcompletion A prog_completion record to be saved, including 'id' if this is an update.
+ * @param string $message If provided, will be added to the program completion log message.
+ * @param mixed $ignoreproblemkey String returned by prog_get_completion_error_problemkey which can be ignored.
+ * @return True if the record was successfully created or updated.
+ */
+function prog_write_completion($progcompletion, $message = '', $ignoreproblemkey = false) {
+    global $DB;
+
+    // Decide if this is an insert or update.
+    $isinsert = empty($progcompletion->id);
+
+    // Ensure the record matches the database records.
+    if ($isinsert) {
+        $sql = "SELECT prog.id, pc.id AS pcid
+                  FROM {prog} prog
+             LEFT JOIN {prog_completion} pc
+                    ON pc.programid = prog.id AND pc.userid = :pcuserid AND pc.coursesetid = 0
+                 WHERE prog.id = :programid";
+        $params = array('programid' => $progcompletion->programid, 'pcuserid' => $progcompletion->userid);
+        $prog = $DB->get_record_sql($sql, $params);
+        if (empty($prog) || !empty($prog->pcid)) {
+            print_error(get_string('error:updatinginvalidcompletionrecord', 'totara_program'));
+        }
+
+        if (empty($message)) {
+            $message = "Completion record created";
+        }
+    } else {
+        $sql = "SELECT pc.id
+                  FROM {prog_completion} pc
+                  JOIN {prog} prog
+                    ON prog.id = pc.programid
+                 WHERE pc.id = :pcid
+                   AND pc.programid = :programid
+                   AND pc.userid = :userid
+                   AND pc.coursesetid = 0
+                   AND prog.certifid IS NULL";
+        $params = array('pcid' => $progcompletion->id, 'programid' => $progcompletion->programid, 'userid' => $progcompletion->userid);
+        if (!$DB->record_exists_sql($sql, $params)) {
+            print_error(get_string('error:updatinginvalidcompletionrecord', 'totara_program'));
+        }
+    }
+
+    // Before applying the changes, verify that the new record is in a valid state.
+    $errors = prog_get_completion_errors($progcompletion);
+    if (!empty($errors)) {
+        $problemkey = prog_get_completion_error_problemkey($errors);
+    }
+
+    if (empty($errors) || $problemkey === $ignoreproblemkey) {
+        if ($isinsert) {
+            $DB->insert_record('prog_completion', $progcompletion);
+        } else {
+            $DB->update_record('prog_completion', $progcompletion);
+        }
+
+        prog_write_completion_log($progcompletion->programid, $progcompletion->userid, $message);
+
+        return true;
+    } else {
+        // Some error was detected, and it wasn't specified in $ignoreproblemkey.
+        return false;
+    }
+}
+
+/**
+ * Write a record to the program completion log.
+ *
+ * @param int    $programid    ID of the program.
+ * @param int    $userid       ID of the user who's record is being affected, or null if it affects the whole program.
+ * @param string $description  Describing what happened, including details. Can include simple html formatting.
+ * @param null   $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if empty.
+ */
+function prog_log_completion($programid, $userid, $description, $changeuserid = null) {
+    global $DB, $USER;
+
+    if (is_null($changeuserid)) {
+        $changeuserid = $USER->id;
+    }
+
+    $record = new stdClass();
+    $record->programid = $programid;
+    $record->userid = $userid;
+    $record->changeuserid = $changeuserid;
+    $record->description = $description;
+    $record->timemodified = time();
+
+    $DB->insert_record('prog_completion_log', $record);
+}
+
+/**
+ * Write a log message (in the program completion log) when a program completion has been added or edited.
+ *
+ * @param int $programid
+ * @param int $userid
+ * @param string $message If provided, will be added at the start of the log message (instead of "Completion record edited")
+ * @param null $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if empty.
+ */
+function prog_write_completion_log($programid, $userid, $message = '', $changeuserid = null) {
+    global $DB;
+
+    $progcompletion = $DB->get_record('prog_completion', array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0));
+
+    $progstatus = '';
+    switch ($progcompletion->status) {
+        case STATUS_PROGRAM_INCOMPLETE:
+            $progstatus = 'Not complete';
+            break;
+        case STATUS_PROGRAM_COMPLETE:
+            $progstatus = 'Complete';
+            break;
+    }
+
+    if ($progcompletion->timedue > 0) {
+        $timedue = userdate($progcompletion->timedue, '%d %B %Y, %H:%M', 0) .
+            ' (' . $progcompletion->timedue . ')';
+    } else {
+        $timedue = "Not set ({$progcompletion->timedue})";
+    }
+    if ($progcompletion->timecompleted > 0) {
+        $timecompleted = userdate($progcompletion->timecompleted, '%d %B %Y, %H:%M', 0) .
+            ' (' . $progcompletion->timecompleted . ')';
+    } else {
+        $timecompleted = "Not set ({$progcompletion->timecompleted})";
+    }
+
+    if (empty($message)) {
+        $message = 'Completion record edited';
+    }
+
+    $description = $message . '<br>' .
+        '<ul><li>Status: ' . $progstatus . '</li>' .
+        '<li>Due date: ' . $timedue . '</li>' .
+        '<li>Completion date: ' . $timecompleted . '</li></ul>';
+
+    prog_log_completion(
+        $programid,
+        $userid,
+        $description,
+        $changeuserid
+    );
+}

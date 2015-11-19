@@ -112,6 +112,22 @@
         <INDEX NAME="progcomphist_rec_ix" UNIQUE="false" FIELDS="recurringcourseid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="prog_completion_log" COMMENT="Record of changes made to program completion records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="programid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Program ID"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Users id"/>
+        <FIELD NAME="changeuserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User id of the person who caused the change"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Description of what changed, English only"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="certif_comp_log_programid_ix" TYPE="foreign" FIELDS="programid" REFTABLE="prog" REFFIELDS="id"/>
+        <KEY NAME="certif_comp_log_userid_ix" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="certif_comp_log_changeuserid_ix" TYPE="foreign" FIELDS="changeuserid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
     <TABLE NAME="prog_courseset" COMMENT="Stores details of the sets of courses and competencies contained within a program">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>

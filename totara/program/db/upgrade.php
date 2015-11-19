@@ -546,5 +546,34 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015082500, 'totara_program');
     }
 
+    // TL-7970 Add program completion log table.
+    if ($oldversion < 2016021000) {
+
+        // Define table prog_completion_log to be created.
+        $table = new xmldb_table('prog_completion_log');
+
+        // Adding fields to table prog_completion_log.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('programid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('changeuserid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table prog_completion_log.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('certif_comp_log_programid_ix', XMLDB_KEY_FOREIGN, array('programid'), 'prog', array('id'));
+        $table->add_key('certif_comp_log_userid_ix', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        $table->add_key('certif_comp_log_changeuserid_ix', XMLDB_KEY_FOREIGN, array('changeuserid'), 'user', array('id'));
+
+        // Conditionally launch create table for prog_completion_log.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2016021000, 'totara_program');
+    }
+
     return true;
 }

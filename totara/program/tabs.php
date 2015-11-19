@@ -102,6 +102,14 @@ if ($iscertif && has_capability('totara/certification:configurecertification', $
     }
 }
 
+if (!empty($CFG->enableprogramcompletioneditor) &&
+    has_capability('totara/program:editcompletion', $context)) {
+    $toprow[] = new tabobject('completion', $CFG->wwwroot.'/totara/program/completion.php?id='.$id,
+        get_string('completion', 'totara_program'));
+    if (substr($currenttab, 0, 10) == 'completion') {
+        $activated[] = 'completion';
+    }
+}
 
 // Exceptions Report Tab
 // Only show if there are exceptions or you are on the exceptions tab already
@@ -114,7 +122,7 @@ if (has_capability('totara/program:handleexceptions', $context) && ($exceptions 
 }
 
 if (!$id) {
-    $inactive += array('overview', 'content', 'assignments', 'messages', 'certification');
+    $inactive += array('overview', 'content', 'assignments', 'messages', 'certification', 'completion');
 }
 
 $tabs = array($toprow);

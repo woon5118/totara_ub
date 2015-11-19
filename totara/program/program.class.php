@@ -528,8 +528,7 @@ class program {
 
                             // Update user's due date.
                             $progcompletion->timedue = $timedue; // Updates $allpreviousprogcompletions, for following assignments.
-                            $DB->set_field('prog_completion', 'timedue', $timedue,
-                                array('programid' => $this->id, 'userid' => $user->id));
+                            $this->set_timedue($user->id, $timedue);
 
                             if ($userassignment->exceptionstatus == PROGRAM_EXCEPTION_NONE && $sendmessage) {
                                 // Trigger event for observers to deal with resolved exception from first assignment.
@@ -560,8 +559,7 @@ class program {
                         } else if ($timedue > $progcompletion->timedue) {
                             // Update user's due date.
                             $progcompletion->timedue = $timedue; // Updates $allpreviousprogcompletions, for following assignments.
-                            $DB->set_field('prog_completion', 'timedue', $timedue,
-                                array('programid' => $this->id, 'userid' => $user->id));
+                            $this->set_timedue($user->id, $timedue);
                         } // Else no change or decrease, skipped. If we want to allow decrease then it should be added here.
                     }
                 } // End user assignments loop.
@@ -885,11 +883,25 @@ class program {
             $todb = new stdClass();
             $todb->id = $completion->id;
             $todb->timedue = $timedue;
-            return $DB->update_record('prog_completion', $todb);
+            $result = $DB->update_record('prog_completion', $todb);
+
+            // Record the change in the program completion log.
+            if ($timedue > 0) {
+                $timeduestr = userdate($timedue, '%d %B %Y, %H:%M', 0) .
+                    ' (' . $timedue . ')';
+            } else {
+                $timeduestr = 'Not set (' . $timedue . ')';
+            }
+            prog_log_completion(
+                $this->id,
+                $userid,
+                'Due date set to: ' . $timeduestr
+            );
+
+            return $result;
         } else {
             return false;
         }
-
     }
 
     /**

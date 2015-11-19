@@ -45,3 +45,21 @@ P.subheader {
 #page-admin-totara-completionimport-viewreport table#completionimport_certification TH {
     white-space: normal;
 }
+
+#page-totara-certification-edit_completion .certification_completion_section {
+    margin: 15px 0;
+}
+
+#page-totara-certification-edit_completion .certification_completion_section td,
+#page-totara-certification-edit_completion .certification_completion_section th {
+    border-left: 1px solid #2e2e2e;
+}
+.dir-ltr #page-totara-certification-edit_completion .certification_completion_section td:first-child,
+.dir-ltr #page-totara-certification-edit_completion .certification_completion_section th:first-child {
+    border-left: 0px solid;
+}
+
+.dir-rtl #page-totara-certification-edit_completion .certification_completion_section td:last-child,
+.dir-rtl #page-totara-certification-edit_completion .certification_completion_section th:last-child {
+    border-right: 0px solid;
+}
