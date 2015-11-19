@@ -150,8 +150,13 @@ class totara_core_renderer extends plugin_renderer_base {
         $data->statusclass = $COMPLETION_STATUS[$status];
         $data->statustext = get_string($COMPLETION_STATUS[$status], 'completion');
         if (completion_can_view_data($userid, $courseid)) {
-            $data->href = (string) new moodle_url('/blocks/completionstatus/details.php',
+            $course = new stdClass();
+            $course->id = $courseid;
+            $info = new completion_info($course);
+            if ($info->user_has_completion_status($userid)) {
+                $data->href = (string) new moodle_url('/blocks/completionstatus/details.php',
                                                             array('course' => $courseid, 'user' => $userid));
+            }
         }
 
         return $this->output->render_from_template('totara_core/course_progress_bar', $data);

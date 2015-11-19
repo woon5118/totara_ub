@@ -70,8 +70,8 @@ $params = array(
 );
 $ccompletion = new completion_completion($params);
 
-// Check this user is enroled.
-if (!$info->is_tracked_user($user->id) && !$criteriacomplete && !$ccompletion->timestarted) {
+// Check this user is enrolled or otherwise has a completion status.
+if (!$info->user_has_completion_status($user->id)) {
     if ($USER->id == $user->id) {
         print_error('notenroled', 'completion', $returnurl);
     } else {

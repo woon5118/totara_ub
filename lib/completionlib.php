@@ -1744,4 +1744,36 @@ class completion_info {
 
         return $completions;
     }
+
+    /**
+     * TOTARA - Checks if a user has some form of completion status in a course.
+     *
+     * @param int $userid - the id of the user.
+     * @return bool - true if there is a completion status and false if not.
+     */
+    public function user_has_completion_status($userid) {
+
+        if (empty($userid)) {
+            // Not logged in.
+            return false;
+        } else if (isguestuser($userid)) {
+            // Guest account can not have completions.
+            return false;
+        }
+
+        if ($this->is_tracked_user($userid)) {
+            return true;
+        }
+
+        if ($this->count_course_user_data($userid)) {
+            return true;
+        }
+
+        $ccompletion = new completion_completion(array('userid' => $userid, 'course' => $this->course_id));
+        if ($ccompletion->timestarted) {
+            return true;
+        }
+
+        return false;
+    }
 }
