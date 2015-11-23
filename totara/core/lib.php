@@ -270,9 +270,6 @@ function db_reorder($id, $pos, $table, $parentfield = '', $orderfield = 'sortord
 function totara_site_version_tracking() {
     global $CFG, $PAGE, $TOTARA;
 
-    require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
-    local_js();
-
     //Params for JS
     $totara_version = $TOTARA->version;
     $major_version = substr($TOTARA->version, 0, 3);

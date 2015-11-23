@@ -26,7 +26,6 @@
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 $deactivate = optional_param('deactivate', 0, PARAM_INT);
 $activate = optional_param('activate', 0, PARAM_INT);
@@ -118,8 +117,6 @@ if (($data = data_submitted()) && !empty($data->bulk_update)) {
 
 
 // Header
-local_js();
-
 $str_edit = get_string('edit', 'moodle');
 $str_remove = get_string('delete', 'moodle');
 $str_activate = get_string('activate', 'facetoface');

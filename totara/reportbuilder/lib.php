@@ -1926,7 +1926,6 @@ class reportbuilder {
             return;
         }
 
-        local_js();
         $jsmodule = array(
             'name' => 'totara_reportbuilder_instantfilter',
             'fullpath' => '/totara/reportbuilder/js/instantfilter.js',
@@ -3911,7 +3910,6 @@ class reportbuilder {
 
         echo $tablehmtml;
 
-        local_js();
         $jsmodule = array(
             'name' => 'totara_reportbuilder_expand',
             'fullpath' => '/totara/reportbuilder/js/expand.js',

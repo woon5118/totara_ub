@@ -752,7 +752,6 @@ from
         global $CFG, $DB;
         // needed for approval constants
         require_once($CFG->dirroot . '/totara/plan/lib.php');
-        require_once($CFG->dirroot."/totara/core/js/lib/setup.php");
 
         $content = array();
         $approved = isset($row->approved) ? $row->approved : null;
@@ -796,8 +795,6 @@ from
                     }
                     $this->compscales[$compframeworkid] = $compscale;
                 }
-
-                local_js();
 
                 $action = "var response; ".
                           "response = \$.get(".

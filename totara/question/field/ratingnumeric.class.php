@@ -190,8 +190,6 @@ class question_ratingnumeric extends question_base{
 
         switch ($this->param2) {
             case self::DISPLAY_SLIDER:
-                local_js();
-
                 $args = array('args' => '{"slider_field_name": "' . $this->get_prefix_form(). '"}');
 
                 $jsmodule = array(

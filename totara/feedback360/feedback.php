@@ -25,7 +25,6 @@
  * View answer on feedback360
  */
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot . '/totara/feedback360/lib.php');
 require_once($CFG->dirroot . '/totara/feedback360/feedback360_forms.php');
 
@@ -214,8 +213,6 @@ if ($form->is_submitted() && !$respassignment->is_completed()) {
     $form->set_data($feedback360->get_answers($respassignment));
 }
 
-// JS support.
-local_js();
 $jsmodule = array(
     'name' => 'totara_feedback360_feedback',
     'fullpath' => '/totara/feedback360/js/feedback.js',

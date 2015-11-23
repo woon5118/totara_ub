@@ -83,10 +83,6 @@ class question_manager {
         if (!$subjectid) {
             $subjectid = $USER->id;
         }
-        if (!is_ajax_request($_SERVER)) {
-            require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
-            local_js();
-        }
         $this->subjectid = $subjectid;
         $this->answerid = $answerid;
     }

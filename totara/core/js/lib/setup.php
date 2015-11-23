@@ -48,7 +48,11 @@ function local_js($options = array()) {
     // jQuery component and UI bundle found here: http://jqueryui.com/download
     // Core, Widget, Position, Dialog, Tabs, Datepicker, Effects Core, Effects "Fade"
 
-    // jQuery is loaded on each page since 8.0.
+    // jQuery is loaded on each page since 2.9.0.
+    if (count($options) === 0) {
+        debugging('Totara loads jQuery on every page since 2.9.0', DEBUG_DEVELOPER);
+        return;
+    }
 
     $directory = $CFG->cachejs ? 'build' : 'src';
     $min = $CFG->cachejs ? '.min' : '';

@@ -25,7 +25,6 @@
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once($CFG->libdir . '/adminlib.php');
-require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/notification/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/notification/edit_form.php');
@@ -56,8 +55,6 @@ $formurl = new moodle_url('/mod/facetoface/notification/edit.php', array('f' => 
 require_login($course, false, $cm); // needed to setup proper $COURSE
 $context = context_module::instance($cm->id);
 require_capability('moodle/course:manageactivities', $context);
-
-local_js();
 
 $templates = $DB->get_records('facetoface_notification_tpl', array('status' => 1));
 $json_templates = json_encode($templates);

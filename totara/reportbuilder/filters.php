@@ -25,7 +25,6 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
-require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 $id = required_param('id', PARAM_INT); // Report builder id.
 $d = optional_param('d', null, PARAM_TEXT); // Delete.
@@ -82,8 +81,6 @@ foreach ($report->columnoptions as $option) {
     }
 }
 
-// Include jquery.
-local_js();
 $PAGE->requires->strings_for_js(array('saving', 'confirmfilterdelete', 'confirmsearchcolumndelete', 'delete', 'moveup',
     'movedown', 'add', 'initialdisplay_error'), 'totara_reportbuilder');
 $args = array('args' => '{"user_sesskey":"'.$USER->sesskey.'", "rb_reportid":'.$id.',

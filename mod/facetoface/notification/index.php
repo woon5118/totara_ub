@@ -26,7 +26,6 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 require_once($CFG->dirroot.'/mod/facetoface/notification/lib.php');
-require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
 $update = required_param('update', PARAM_INT);
 $display = optional_param('display', '', PARAM_ALPHANUM);
