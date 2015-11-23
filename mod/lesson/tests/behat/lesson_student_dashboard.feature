@@ -1,8 +1,8 @@
 @mod @mod_lesson
-Feature: In My learning, a student can see their current status on all lessons with an upcoming due date
+Feature: In Dashboard, a student can see their current status on all lessons with an upcoming due date
   In order to know my status on a lesson
   As a student
-  I need to see it in My learning
+  I need to see it in Dashboard
 
   Background:
     Given the following "users" exist:

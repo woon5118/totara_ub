@@ -193,7 +193,7 @@ Feature: Test reaggregating completion data when changing course completion sett
     And I should see "Not yet started" in the "Course 2" "table_row"
     And "#plan_courses #plan_courses_r2 span" "css_element" should not exist
     # Run cron to cause reaggregation.
-    Then I run the "\core\task\completion_cron_task" task
+    Then I run the "\core\task\completion_regular_task" task
     # Confirm the status of the courses for user1.
     Then I log out
     And I log in as "user1"

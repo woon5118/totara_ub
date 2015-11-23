@@ -633,9 +633,6 @@ function optional_param($parname, $default, $type) {
     if (func_num_args() != 3 or empty($parname) or empty($type)) {
         throw new coding_exception('optional_param requires $parname, $default + $type to be specified (parameter: '.$parname.')');
     }
-    if (!isset($default)) {
-        $default = null;
-    }
 
     // POST has precedence.
     if (isset($_POST[$parname])) {
@@ -2956,15 +2953,6 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         }
     }
 
-    // Set the global $COURSE.
-    // TODO MDL-49434: setting current course/cm should be after the check $cm->uservisible .
-    if ($cm) {
-        $PAGE->set_cm($cm, $course);
-        $PAGE->set_pagelayout('incourse');
-    } else if (!empty($courseorid)) {
-        $PAGE->set_course($course);
-    }
-
     // Check visibility of activity to current user; includes visible flag, conditional availability, etc.
     if ($cm && !$cm->uservisible) {
         if ($preventredirect) {
@@ -2978,7 +2966,15 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         redirect($url, get_string('activityiscurrentlyhidden'));
     }
 
-    // If completion is enabled and mark as started on first view is on
+    // Set the global $COURSE.
+    if ($cm) {
+        $PAGE->set_cm($cm, $course);
+        $PAGE->set_pagelayout('incourse');
+    } else if (!empty($courseorid)) {
+        $PAGE->set_course($course);
+    }
+
+    // Totara: If completion is enabled and mark as started on first view is on
     if ($course->id !== $SITE->id) {
         require_once("{$CFG->libdir}/completionlib.php");
         $completion = new completion_info($course);
@@ -2997,7 +2993,7 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         }
     }
 
-    // Finally access granted, update lastaccess times
+    // Finally access granted, update lastaccess times.
     user_accesstime_log($course->id);
 }
 
@@ -3705,9 +3701,6 @@ function get_extra_user_fields_sql($context, $alias='', $prefix='', $already = a
 function get_user_field_name($field) {
     // Some fields have language strings which are not the same as field name.
     switch ($field) {
-        case 'phone1' : {
-            return get_string('phone');
-        }
         case 'url' : {
             return get_string('webpage');
         }
@@ -4949,7 +4942,7 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
     require_once($CFG->libdir.'/questionlib.php');
     require_once($CFG->libdir.'/gradelib.php');
     require_once($CFG->dirroot.'/group/lib.php');
-    require_once($CFG->dirroot.'/tag/coursetagslib.php');
+    require_once($CFG->dirroot.'/tag/lib.php');
     require_once($CFG->dirroot.'/comment/lib.php');
     require_once($CFG->dirroot.'/rating/lib.php');
     require_once($CFG->dirroot.'/notes/lib.php');
@@ -5066,12 +5059,14 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
         echo $OUTPUT->notification($strdeleted.get_string('type_mod_plural', 'plugin'), 'notifysuccess');
     }
 
-    // Cleanup the rest of plugins
+    // Cleanup the rest of plugins.
     $cleanuplugintypes = array('report', 'coursereport', 'format', 'totara');
+    $callbacks = get_plugins_with_function('delete_course', 'lib.php');
     foreach ($cleanuplugintypes as $type) {
-        $plugins = get_plugin_list_with_function($type, 'delete_course', 'lib.php');
-        foreach ($plugins as $plugin => $pluginfunction) {
-            $pluginfunction($course->id, $showfeedback);
+        if (!empty($callbacks[$type])) {
+            foreach ($callbacks[$type] as $pluginfunction) {
+                $pluginfunction($course->id, $showfeedback);
+            }
         }
         if ($showfeedback) {
             echo $OUTPUT->notification($strdeleted.get_string('type_'.$type.'_plural', 'plugin'), 'notifysuccess');
@@ -5123,7 +5118,7 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
     $rm->delete_ratings($delopt);
 
     // Delete course tags.
-    coursetag_delete_course_tags($course->id, $showfeedback);
+    tag_set('course', $course->id, array(), 'core', $coursecontext->id);
 
     // Delete calendar events.
     $DB->delete_records('event', array('courseid' => $course->id));
@@ -5926,7 +5921,6 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     }
 
     if ($mail->send()) {
-
         set_send_count($user);
         if (!empty($mail->SMTPDebug)) {
             echo '</pre>';
@@ -7273,7 +7267,7 @@ function endecrypt ($pwd, $data, $case) {
     return $cipher;
 }
 
-/// ENVIRONMENT CHECKING  ////////////////////////////////////////////////////////////
+// ENVIRONMENT CHECKING.
 
 /**
  * This method validates a plug name. It is much faster than calling clean_param.
@@ -7300,24 +7294,120 @@ function is_valid_plugin_name($name) {
  *      and the function names as values (e.g. 'report_courselist_hook', 'forum_hook').
  */
 function get_plugin_list_with_function($plugintype, $function, $file = 'lib.php') {
+    global $CFG;
+
+    // We don't include here as all plugin types files would be included.
+    $plugins = get_plugins_with_function($function, $file, false);
+
+    if (empty($plugins[$plugintype])) {
+        return array();
+    }
+
+    $allplugins = core_component::get_plugin_list($plugintype);
+
+    // Reformat the array and include the files.
     $pluginfunctions = array();
-    $pluginswithfile = core_component::get_plugin_list_with_file($plugintype, $file, true);
-    foreach ($pluginswithfile as $plugin => $notused) {
-        $fullfunction = $plugintype . '_' . $plugin . '_' . $function;
+    foreach ($plugins[$plugintype] as $pluginname => $functionname) {
 
-        if (function_exists($fullfunction)) {
-            // Function exists with standard name. Store, indexed by frankenstyle name of plugin.
-            $pluginfunctions[$plugintype . '_' . $plugin] = $fullfunction;
+        // Check that it has not been removed and the file is still available.
+        if (!empty($allplugins[$pluginname])) {
 
-        } else if ($plugintype === 'mod') {
-            // For modules, we also allow plugin without full frankenstyle but just starting with the module name.
-            $shortfunction = $plugin . '_' . $function;
-            if (function_exists($shortfunction)) {
-                $pluginfunctions[$plugintype . '_' . $plugin] = $shortfunction;
+            $filepath = $allplugins[$pluginname] . DIRECTORY_SEPARATOR . $file;
+            if (file_exists($filepath)) {
+                include_once($filepath);
+                $pluginfunctions[$plugintype . '_' . $pluginname] = $functionname;
             }
         }
     }
+
     return $pluginfunctions;
+}
+
+/**
+ * Get a list of all the plugins that define a certain API function in a certain file.
+ *
+ * @param string $function the part of the name of the function after the
+ *      frankenstyle prefix. e.g 'hook' if you are looking for functions with
+ *      names like report_courselist_hook.
+ * @param string $file the name of file within the plugin that defines the
+ *      function. Defaults to lib.php.
+ * @param bool $include Whether to include the files that contain the functions or not.
+ * @return array with [plugintype][plugin] = functionname
+ */
+function get_plugins_with_function($function, $file = 'lib.php', $include = true) {
+    global $CFG;
+
+    $cache = \cache::make('core', 'plugin_functions');
+
+    // Including both although I doubt that we will find two functions definitions with the same name.
+    // Clearning the filename as cache_helper::hash_key only allows a-zA-Z0-9_.
+    $key = $function . '_' . clean_param($file, PARAM_ALPHA);
+
+    if ($pluginfunctions = $cache->get($key)) {
+
+        // Checking that the files are still available.
+        foreach ($pluginfunctions as $plugintype => $plugins) {
+
+            $allplugins = \core_component::get_plugin_list($plugintype);
+            foreach ($plugins as $plugin => $fullpath) {
+
+                // Cache might be out of sync with the codebase, skip the plugin if it is not available.
+                if (empty($allplugins[$plugin])) {
+                    unset($pluginfunctions[$plugintype][$plugin]);
+                    continue;
+                }
+
+                $fileexists = file_exists($allplugins[$plugin] . DIRECTORY_SEPARATOR . $file);
+                if ($include && $fileexists) {
+                    // Include the files if it was requested.
+                    include_once($allplugins[$plugin] . DIRECTORY_SEPARATOR . $file);
+                } else if (!$fileexists) {
+                    // If the file is not available any more it should not be returned.
+                    unset($pluginfunctions[$plugintype][$plugin]);
+                }
+            }
+        }
+        return $pluginfunctions;
+    }
+
+    $pluginfunctions = array();
+
+    // To fill the cached. Also, everything should continue working with cache disabled.
+    $plugintypes = \core_component::get_plugin_types();
+    foreach ($plugintypes as $plugintype => $unused) {
+
+        // We need to include files here.
+        $pluginswithfile = \core_component::get_plugin_list_with_file($plugintype, $file, true);
+        foreach ($pluginswithfile as $plugin => $notused) {
+
+            $fullfunction = $plugintype . '_' . $plugin . '_' . $function;
+
+            $pluginfunction = false;
+            if (function_exists($fullfunction)) {
+                // Function exists with standard name. Store, indexed by frankenstyle name of plugin.
+                $pluginfunction = $fullfunction;
+
+            } else if ($plugintype === 'mod') {
+                // For modules, we also allow plugin without full frankenstyle but just starting with the module name.
+                $shortfunction = $plugin . '_' . $function;
+                if (function_exists($shortfunction)) {
+                    $pluginfunction = $shortfunction;
+                }
+            }
+
+            if ($pluginfunction) {
+                if (empty($pluginfunctions[$plugintype])) {
+                    $pluginfunctions[$plugintype] = array();
+                }
+                $pluginfunctions[$plugintype][$plugin] = $pluginfunction;
+            }
+
+        }
+    }
+    $cache->set($key, $pluginfunctions);
+
+    return $pluginfunctions;
+
 }
 
 /**
@@ -9105,7 +9195,7 @@ function remove_dir($dir, $contentonly=false) {
         if ($item != '.' && $item != '..') {
             if (is_dir($dir.'/'.$item)) {
                 $result = remove_dir($dir.'/'.$item) && $result;
-            }else{
+            } else {
                 if ($CFG->ostype == 'WINDOWS') {
                     // WINDOWS specific bug when META-INF folder locked by javaw process and cannot be deleted
                     $result = @unlink($dir.'/'.$item) && $result;
@@ -9125,9 +9215,9 @@ function remove_dir($dir, $contentonly=false) {
         // WINDOWS specific bug when META-INF folder locked by javaw process and cannot be deleted
         $result = @rmdir($dir);
     } else {
-        $result = rmdir($dir); // if anything left the result will be false, no need for && $result
+        $result = rmdir($dir); // If anything left the result will be false, no need for && $result.
     }
-    clearstatcache(); // make sure file stat cache is properly invalidated
+    clearstatcache(); // Make sure file stat cache is properly invalidated.
     return $result;
 }
 

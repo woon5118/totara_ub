@@ -11,7 +11,6 @@
 .block .content .list .c1 {margin-left:5px;display:inline;}
 .block .footer {margin-bottom: 4px;}
 .block_navigation .block_tree li {overflow:hidden;}
-.block .header .block_action { margin-top: 2px;}
 .block_calendar_upcoming .footer { margin-top: .5em; }
 
 /** block_list blocks need column stuffs **/
@@ -60,10 +59,7 @@
 .dir-rtl .block .header h2 {
     padding: .2em .2em 0 0;
 }
-
-.dir-rtl .block .header,
-.dir-rtl .block h2.header {text-align:right;}
-.dir-rtl .block .header .block_action { float: left; margin-left: 4px; margin-left: 0;}
+.dir-rtl .block .header .block_action { float: left;}
 
 .dir-rtl.editing .block .header .commands {
     text-align: left;

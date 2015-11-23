@@ -114,9 +114,10 @@ class mod_forum_generator extends testing_module_generator {
         $record = (object)$record;
 
         // Add the subscription.
-        $id = $DB->insert_record('forum_subscriptions', $record);
+        $record->id = $DB->insert_record('forum_subscriptions', $record);
 
-        return $DB->get_record('forum_subscriptions', array('id' => $id));
+        // Totara: include extra fields.
+        return $DB->get_record('forum_subscriptions', array('id' => $record->id));
     }
 
     /**
@@ -188,9 +189,10 @@ class mod_forum_generator extends testing_module_generator {
         $record = (object) $record;
 
         // Add the discussion.
-        $id = forum_add_discussion($record, null, null, $record->userid);
+        $record->id = forum_add_discussion($record, null, null, $record->userid);
 
-        return $DB->get_record('forum_discussions', array('id' => $id));
+        // Totara: include extra fields.
+        return $DB->get_record('forum_discussions', array('id' => $record->id));
     }
 
     /**
@@ -270,6 +272,7 @@ class mod_forum_generator extends testing_module_generator {
         // Update the last post.
         forum_discussion_update_last_post($record->discussion);
 
+        // Totara: include extra fields.
         return $DB->get_record('forum_posts', array('id' => $record->id));
     }
 

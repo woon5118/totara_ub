@@ -25,14 +25,10 @@
 require_once('../config.php');
 require_once('lib.php');
 require_once('edit_form.php');
+
+// Totara: extra includes
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
-
-$usetags = (!empty($CFG->usetags) && get_config('moodlecourse', 'coursetagging') == 1) ? true : false;
-
-if ($usetags) {
-    require_once($CFG->dirroot.'/tag/lib.php');
-}
 require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/totara/cohort/lib.php');
 require_once($CFG->dirroot.'/totara/program/lib.php');
@@ -94,10 +90,6 @@ if ($id) {
 
     // Login to the course and retrieve also all fields defined by course format.
     $course = get_course($id);
-    if ($usetags) {
-        $course->otags = array_keys(tag_get_tags_array('course', $course->id, 'official'));
-    }
-
     require_login($course);
     $course = course_get_format($course)->get_course();
 
@@ -197,6 +189,12 @@ if (!empty($course)) {
         $course->{'role_'.$alias->roleid} = $alias->name;
     }
 
+    // Populate course tags.
+    if (!empty($CFG->usetags)) {
+        include_once($CFG->dirroot.'/tag/lib.php');
+        $course->tags = tag_get_tags_array('course', $course->id);
+    }
+
 } else {
     // Editor should respect category context if course context is not set.
     $editoroptions['context'] = $catcontext;
@@ -224,13 +222,6 @@ if ($editform->is_cancelled()) {
     if (empty($course->id)) {
         // In creating the course.
         $course = create_course($data, $editoroptions);
-        if ($usetags) {
-            if (isset($data->otags)) {
-                tag_set('course', $course->id, tag_get_name($data->otags));
-            } else {
-                tag_set('course', $course->id, array());
-            }
-        }
 
         // Get the context of the newly created course.
         $context = context_course::instance($course->id, MUST_EXIST);
@@ -264,21 +255,12 @@ if ($editform->is_cancelled()) {
         // Set the URL to take them too if they choose save and display.
         $courseurl = new moodle_url('/course/view.php', array('id' => $course->id));
 
-        // Ensure all completion records are created.
+        // Totara: Ensure all completion records are created.
         completion_start_user_bulk($course->id);
-        if ($usetags) {
-            if (isset($data->otags)) {
-                tag_set('course', $course->id, tag_get_name($data->otags));
-            } else {
-                tag_set('course', $course->id, array());
-            }
-        }
     }
 
-    // Get context for capability checks.
-    if (!isset($context)) {
-        $context = context_course::instance($course->id, MUST_EXIST);
-    }
+    // Totara: Get context for capability checks.
+    $context = context_course::instance($course->id, MUST_EXIST);
 
     ///
     /// Update course cohorts if user has permissions

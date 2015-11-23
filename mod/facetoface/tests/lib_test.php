@@ -2026,7 +2026,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             . "This string should start repeating at 75 charaters for three repetitions.");
 
         $this->assertEquals(facetoface_ical_escape($text4, $converthtml1), "/'s \; \\\" ' \\n \, . & &nbsp\;");
-        $this->assertEquals(facetoface_ical_escape($text4, $converthtml2), "/'s \; \\\" ' \, . & ");
+        $this->assertEquals(facetoface_ical_escape($text4, $converthtml2), "/'s \; \\\" ' \, . &  ");
 
         $this->resetAfterTest(true);
     }

@@ -1927,7 +1927,7 @@ class core_course_courselib_testcase extends advanced_testcase {
         $sink->close();
 
         // Validate the event.
-        $event = $events[0];
+        $event = array_pop($events);
         $this->assertInstanceOf('\core\event\course_restored', $event);
         $this->assertEquals('course', $event->objecttable);
         $this->assertEquals($rc->get_courseid(), $event->objectid);

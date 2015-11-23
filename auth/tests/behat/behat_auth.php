@@ -68,7 +68,6 @@ class behat_auth extends behat_base {
 
         // Generic steps (we will prefix them later expanding the navigation dropdown if necessary).
         $steps = array(
-            //new Given('I pause'),
             new Given('I click on "' . get_string('login') . '" "link" in the ".login" "css_element"'),
             new Given('I set the field "' . get_string('username') . '" to "' . $this->escape($username) . '"'),
             new Given('I set the field "' . get_string('password') . '" to "'. $this->escape($username) . '"'),

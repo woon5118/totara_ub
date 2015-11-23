@@ -610,6 +610,7 @@ class core_badges_renderer extends plugin_renderer_base {
     public function print_badge_tabs($badgeid, $context, $current = 'overview') {
         global $DB;
 
+        $row = array();
         $tabs = $row = array();
 
         $row[] = new tabobject('overview',
@@ -801,7 +802,7 @@ class core_badges_renderer extends plugin_renderer_base {
             }
         }
 
-        return html_writer::div($output, '', array('id' => 'addbadgecriteria'));
+        return $output;
     }
 
     // Renders a table with users who have earned the badge.

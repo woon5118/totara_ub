@@ -525,7 +525,7 @@ class core_calendar_renderer extends plugin_renderer_base {
 
         $events = calendar_get_upcoming($calendar->courses, $calendar->groups, $calendar->users, $futuredays, $maxevents);
 
-        $output  = html_writer::start_tag('div', array('class' => 'header'));
+        $output  = html_writer::start_tag('div', array('class'=>'header'));
         $output .= $this->course_filter_selector($returnurl, get_string('upcomingeventsfor', 'calendar'));
         if (calendar_user_can_add_event($calendar->course)) {
             $output .= $this->add_event_button($calendar->course->id);

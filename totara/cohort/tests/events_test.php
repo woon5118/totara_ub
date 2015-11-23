@@ -106,7 +106,10 @@ class totara_cohort_events_testcase extends advanced_testcase {
 
         // Assertions.
         $events = $sink->get_events();
-        $event = $events[0]->get_data();
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf('core\event\enrol_instance_created', $events[0]);
+        $this->assertInstanceOf('totara_cohort\event\enrolled_course_item_added', $events[1]);
+        $event = $events[1]->get_data();
         $this->assertEquals('enrol', $event['objecttable']);
         $this->assertEquals($assncourseid, $event['objectid']);
         $this->assertEquals('c', $event['crud']);
@@ -116,8 +119,11 @@ class totara_cohort_events_testcase extends advanced_testcase {
         $sink->clear();
         totara_cohort_delete_association($cohortid, $assncourseid, COHORT_ASSN_ITEMTYPE_COURSE, $value);
         $events = $sink->get_events();
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf('core\event\enrol_instance_deleted', $events[0]);
+        $this->assertInstanceOf('totara_cohort\event\enrolled_course_item_deleted', $events[1]);
 
-        $event = $events[0]->get_data();
+        $event = $events[1]->get_data();
         $this->assertEquals('enrol', $event['objecttable']);
         $this->assertEquals($assncourseid, $event['objectid']);
         $this->assertEquals('d', $event['crud']);

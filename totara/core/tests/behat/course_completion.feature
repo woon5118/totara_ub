@@ -107,7 +107,7 @@ Feature: Users completion of courses
     And I press "Unlock criteria and delete existing completion data"
     And I click on "Choice - Activity Two" "checkbox"
     And I press "Save changes"
-    And I run the "\core\task\completion_cron_task" task
+    And I run the "\core\task\completion_regular_task" task
 
     When I log out
     And I log in as "user001"

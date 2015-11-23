@@ -400,7 +400,7 @@ class mod_wiki_renderer extends plugin_renderer_base {
                 $name = 'groupanduser';
                 $selected = $subwiki->groupid . '-' . $subwiki->userid;
                 echo $this->output->single_select($baseurl, $name, $options, $selected, null, null,
-                    array('label' => get_string('user')));
+                    array('label' => get_string('user') . ':'));
                 echo $this->output->container_end();
 
                 return;

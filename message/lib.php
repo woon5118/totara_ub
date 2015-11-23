@@ -179,6 +179,7 @@ function message_print_participants($context, $courseid, $contactselecturl=null,
     $participants = $DB->get_records_sql($sql, $params, $page * MESSAGE_CONTACTS_PER_PAGE, MESSAGE_CONTACTS_PER_PAGE);
 
     $pagingbar = new paging_bar($countparticipants, $page, MESSAGE_CONTACTS_PER_PAGE, $PAGE->url, 'page');
+    $pagingbar->maxdisplay = 4;
     echo $OUTPUT->render($pagingbar);
 
     echo html_writer::start_tag('div', array('id' => 'message_participants', 'class' => 'boxaligncenter'));
@@ -778,6 +779,7 @@ function message_get_recent_conversations($user, $limitfrom=0, $limitto=100) {
     // Union the 2 result sets together looking for the message with the most
     // recent timecreated for each other user.
     // $conversation->id (the array key) is the other user's ID.
+    $conversations = array();
     $conversation_arrays = array($unread, $read);
     foreach ($conversation_arrays as $conversation_array) {
         foreach ($conversation_array as $conversation) {
@@ -1124,6 +1126,86 @@ function message_unblock_contact($contactid) {
  */
 function message_block_contact($contactid) {
     return message_add_contact($contactid, 1);
+}
+
+/**
+ * Checks if a user can delete a message.
+ *
+ * @param stdClass $message the message to delete
+ * @param string $userid the user id of who we want to delete the message for (this may be done by the admin
+ *  but will still seem as if it was by the user)
+ * @return bool Returns true if a user can delete the message, false otherwise.
+ */
+function message_can_delete_message($message, $userid) {
+    global $USER;
+
+    if ($message->useridfrom == $userid) {
+        $userdeleting = 'useridfrom';
+    } else if ($message->useridto == $userid) {
+        $userdeleting = 'useridto';
+    } else {
+        return false;
+    }
+
+    $systemcontext = context_system::instance();
+
+    // Let's check if the user is allowed to delete this message.
+    if (has_capability('moodle/site:deleteanymessage', $systemcontext) ||
+        ((has_capability('moodle/site:deleteownmessage', $systemcontext) &&
+            $USER->id == $message->$userdeleting))) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Deletes a message.
+ *
+ * This function does not verify any permissions.
+ *
+ * @param stdClass $message the message to delete
+ * @param string $userid the user id of who we want to delete the message for (this may be done by the admin
+ *  but will still seem as if it was by the user)
+ * @return bool
+ */
+function message_delete_message($message, $userid) {
+    global $DB;
+
+    // The column we want to alter.
+    if ($message->useridfrom == $userid) {
+        $coltimedeleted = 'timeuserfromdeleted';
+    } else if ($message->useridto == $userid) {
+        $coltimedeleted = 'timeusertodeleted';
+    } else {
+        return false;
+    }
+
+    // Don't update it if it's already been deleted.
+    if ($message->$coltimedeleted > 0) {
+        return false;
+    }
+
+    // Get the table we want to update.
+    if (isset($message->timeread)) {
+        $messagetable = 'message_read';
+    } else {
+        $messagetable = 'message';
+    }
+
+    // Mark the message as deleted.
+    $updatemessage = new stdClass();
+    $updatemessage->id = $message->id;
+    $updatemessage->$coltimedeleted = time();
+    $success = $DB->update_record($messagetable, $updatemessage);
+
+    if ($success) {
+        // Trigger event for deleting a message.
+        \core\event\message_deleted::create_from_ids($message->useridfrom, $message->useridto,
+            $userid, $messagetable, $message->id)->trigger();
+    }
+
+    return $success;
 }
 
 /**
@@ -2020,7 +2102,13 @@ function message_get_history($user1, $user2, $limitnum=0, $viewingnewmessages=fa
  * @param bool $viewingnewmessages are we currently viewing new messages?
  */
 function message_print_message_history($user1, $user2 ,$search = '', $messagelimit = 0, $messagehistorylink = false, $viewingnewmessages = false, $showactionlinks = true) {
-    global $CFG, $OUTPUT;
+    global $OUTPUT, $PAGE;
+
+    $PAGE->requires->yui_module(
+        array('moodle-core_message-toolbox'),
+        'M.core_message.toolbox.deletemsg.init',
+        array(array())
+    );
 
     echo $OUTPUT->box_start('center', 'message_user_pictures');
     echo $OUTPUT->box_start('user');
@@ -2073,7 +2161,9 @@ function message_print_message_history($user1, $user2 ,$search = '', $messagelim
         $current->year = '';
         $messagedate = get_string('strftimetime');
         $blockdate   = get_string('strftimedaydate');
+        $messagenumber = 0;
         foreach ($messages as $message) {
+            $messagenumber++;
             if ($message->notification) {
                 $notificationclass = ' notification';
             } else {
@@ -2091,7 +2181,6 @@ function message_print_message_history($user1, $user2 ,$search = '', $messagelim
                 $tablecontents .= $OUTPUT->heading(userdate($message->timecreated, $blockdate), 4, 'mdl-align');
             }
 
-            $formatted_message = $side = null;
             if ($message->useridfrom == $user1->id) {
                 $formatted_message = message_format_message($message, $messagedate, $search, 'me');
                 $side = 'left';
@@ -2099,7 +2188,28 @@ function message_print_message_history($user1, $user2 ,$search = '', $messagelim
                 $formatted_message = message_format_message($message, $messagedate, $search, 'other');
                 $side = 'right';
             }
-            $tablecontents .= html_writer::tag('div', $formatted_message, array('class' => "mdl-left $side $notificationclass"));
+
+            // Check if it is a read message or not.
+            if (isset($message->timeread)) {
+                $type = 'message_read';
+            } else {
+                $type = 'message';
+            }
+
+            if (message_can_delete_message($message, $user1->id)) {
+                $usergroup = optional_param('usergroup', MESSAGE_VIEW_UNREAD_MESSAGES, PARAM_ALPHANUMEXT);
+                $viewing = optional_param('viewing', $usergroup, PARAM_ALPHANUMEXT);
+                $deleteurl = new moodle_url('/message/index.php', array('user1' => $user1->id, 'user2' => $user2->id,
+                    'viewing' => $viewing, 'deletemessageid' => $message->id, 'deletemessagetype' => $type,
+                    'sesskey' => sesskey()));
+
+                $deleteicon = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
+                $deleteicon = html_writer::tag('div', $deleteicon, array('class' => 'deleteicon accesshide'));
+                $formatted_message .= $deleteicon;
+            }
+
+            $tablecontents .= html_writer::tag('div', $formatted_message, array('class' => "mdl-left messagecontent
+                $side $notificationclass", 'id' => 'message_' . $messagenumber));
         }
 
         echo html_writer::nonempty_tag('div', $tablecontents, array('class' => 'mdl-left messagehistory'));

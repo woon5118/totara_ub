@@ -27,6 +27,6 @@
 
 $plugin->version  = 2015100201;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2015051102;       // Requires this Moodle version.
-$module->release   = '2.4.0 (2012112900)'; // User-friendly version number
-$module->component = 'mod_facetoface';
-$module->maturity  = MATURITY_STABLE;
+$plugin->release   = '2.4.0 (2012112900)'; // User-friendly version number
+$plugin->component = 'mod_facetoface';
+$plugin->maturity  = MATURITY_STABLE;

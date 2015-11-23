@@ -1,6 +1,6 @@
 <?php
 
-    // Display the course home page.
+//  Display the course home page.
 
     require_once('../config.php');
     require_once('lib.php');

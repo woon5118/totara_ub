@@ -2589,7 +2589,8 @@ function course_overviewfiles_options($course) {
  * @return object new course instance
  */
 function create_course($data, $editoroptions = NULL) {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot.'/tag/lib.php');
 
     //check the categoryid - must be given for all new courses
     $category = $DB->get_record('course_categories', array('id'=>$data->category), '*', MUST_EXIST);
@@ -2646,12 +2647,6 @@ function create_course($data, $editoroptions = NULL) {
 
     $course = course_get_format($newcourseid)->get_course();
 
-    // Setup the blocks
-    blocks_add_default_course_blocks($course);
-
-    // Create a default section.
-    course_create_sections_if_missing($course, 0);
-
     fix_course_sortorder();
     // purge appropriate caches in case fix_course_sortorder() did not change anything
     cache_helper::purge_by_event('changesincourse');
@@ -2659,13 +2654,7 @@ function create_course($data, $editoroptions = NULL) {
     // new context created - better mark it as dirty
     $context->mark_dirty();
 
-    // Save any custom role names.
-    save_local_role_names($course->id, (array)$data);
-
-    // set up enrolments
-    enrol_course_updated(true, $course, $data);
-
-    // Save the custom fields.
+    // Totara: Save the custom fields.
     $data->id = $course->id;
     customfield_save_data($data, 'course', 'course');
 
@@ -2674,9 +2663,26 @@ function create_course($data, $editoroptions = NULL) {
         'objectid' => $course->id,
         'context' => context_course::instance($course->id),
         'other' => array('shortname' => $course->shortname,
-                         'fullname' => $course->fullname)
+            'fullname' => $course->fullname)
     ));
     $event->trigger();
+
+    // Setup the blocks
+    blocks_add_default_course_blocks($course);
+
+    // Create a default section.
+    course_create_sections_if_missing($course, 0);
+
+    // Save any custom role names.
+    save_local_role_names($course->id, (array)$data);
+
+    // set up enrolments
+    enrol_course_updated(true, $course, $data);
+
+    // Update course tags.
+    if ($CFG->usetags && isset($data->tags)) {
+        tag_set('course', $course->id, $data->tags, 'core', context_course::instance($course->id)->id);
+    }
 
     return $course;
 }
@@ -2692,7 +2698,8 @@ function create_course($data, $editoroptions = NULL) {
  * @return void
  */
 function update_course($data, $editoroptions = NULL) {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot.'/tag/lib.php');
 
     $data->timemodified = time();
 
@@ -2779,7 +2786,7 @@ function update_course($data, $editoroptions = NULL) {
     // update enrol settings
     enrol_course_updated(false, $course, $data);
 
-    // Update the custom fields.
+    // Totara: Update the custom fields.
     customfield_save_data($data, 'course', 'course');
 
     // TOTARA performance improvement - invalidate static caching of course information.
@@ -2789,6 +2796,11 @@ function update_course($data, $editoroptions = NULL) {
     require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
     completion_criteria_activity::invalidatecache();
     completion_criteria_course::invalidatecache();
+
+    // Update course tags.
+    if ($CFG->usetags && isset($data->tags)) {
+        tag_set('course', $course->id, $data->tags, 'core', context_course::instance($course->id)->id);
+    }
 
     // Trigger a course updated event.
     $event = \core\event\course_updated::create(array(
@@ -3384,6 +3396,8 @@ function include_course_ajax($course, $usedmodules = array(), $enabledmodules = 
             'edittitleinstructions',
             'show',
             'hide',
+            'highlight',
+            'highlightoff',
             'groupsnone',
             'groupsvisible',
             'groupsseparate',

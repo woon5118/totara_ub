@@ -48,11 +48,12 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Description | Test forum description |
-    And I click on "Edit settings" "link" in the "Administration" "block"
+    And I navigate to "Enrolment methods" node in "Course administration > Users"
+    And I click on "Edit" "link" in the "Guest access" "table_row"
     And I set the following fields to these values:
       | Allow guest access | Yes |
       | Password | moodle_rules |
-    And I press "Save and display"
+    And I press "Save changes"
 
     Given I follow "Course 1"
     And I add a "Face-to-face" to section "1" and I fill the form with:

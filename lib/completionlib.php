@@ -549,20 +549,10 @@ class completion_info {
     }
 
     /**
-     * Get incomplete course completion criteria
-     *
-     * @return array
+     * @deprecated since Moodle 2.8 MDL-46290.
      */
     public function get_incomplete_criteria() {
-        $incomplete = array();
-
-        foreach ($this->get_criteria() as $criteria) {
-            if (!$criteria->is_complete()) {
-                $incomplete[] = $criteria;
-            }
-        }
-
-        return $incomplete;
+        throw new coding_exception('completion_info->get_incomplete_criteria() is removed.');
     }
 
     /**

@@ -40,7 +40,7 @@ $PAGE->set_course($course);
 
 if (!completion_can_view_data($user->id, $course->id)) {
     // this should never happen
-    error('Can not access user completion report');
+    print_error('nocapability', 'report_completion');
 }
 
 $stractivityreport = get_string('activityreport');

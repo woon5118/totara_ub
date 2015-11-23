@@ -92,7 +92,6 @@ if ($courseid != SITEID && !empty($courseid)) {
 require_course_login($course);
 
 $calendar = new calendar_information(0, 0, 0, $time);
-
 $calendar->prepare_for_view($course, $courses);
 
 $pagetitle = '';

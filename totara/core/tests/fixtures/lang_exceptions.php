@@ -29,6 +29,7 @@ $exceptions = array(
         'configallowoverride2', 'configallowswitch', 'configallowuserswitchrolestheycantassign', 'showuseridentity_desc', // Caps.
         'configenablemobilewebservice', // Broken mobile app.
         'requiredentrieschanged', // Upgrade notes.
+        'unsupporteddbtablerowformat', // Link to docs
     ),
     'core_cohort' => array('visible_help'), // Caps.
     'core_completion' => array('err_noroles', 'manualcompletionbynote', 'err_noroles'), // Caps.
@@ -44,6 +45,7 @@ $exceptions = array(
         'error:cannotupgradefrommoodle', 'error:cannotupgradefromnewermoodle', 'moodlecore', 'totaracopyright',
     ),
     'tool_behat' => array('fieldvalueargument_help'), // Docs link.
+    'tool_installaddon' => true, // Mentions "Moodle plugin repo"
     'message_airnotifier' => array( // Broken mobile stuff.
         'configairnotifiermobileappname', 'errorretrievingkey', 'nodevices', 'sitemustberegistered'
     ),

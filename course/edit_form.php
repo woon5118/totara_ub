@@ -4,8 +4,10 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/completionlib.php');
-require_once($CFG->dirroot.'/totara/cohort/lib.php');
 require_once($CFG->libdir. '/coursecatlib.php');
+
+// Totara: extra includes
+require_once($CFG->dirroot.'/totara/cohort/lib.php');
 
 /**
  * The form for handling editing a course.
@@ -387,32 +389,26 @@ class course_edit_form extends moodleform {
             }
         }
 
-        //--------------------------------------------------------------------------------
+        // Totara: deal with custom fields.
         if (empty($course->id)) {
             $course->id = 0;
         }
         customfield_definition($mform, $course, 'course', 0, 'course');
 
-        // Display offical Course Tags
-        if (!empty($CFG->usetags) && $DB->count_records('tag', array('tagtype' => 'official')) && (get_config('moodlecourse', 'coursetagging') == 1)) {
+        if (!empty($CFG->usetags) &&
+                ((empty($course->id) && guess_if_creator_will_have_course_capability('moodle/course:tag', $categorycontext))
+                || (!empty($course->id) && has_capability('moodle/course:tag', $coursecontext)))) {
             $mform->addElement('header', 'tagshdr', get_string('tags', 'tag'));
-
-            $namefield = empty($CFG->keeptagnamecase) ? 'name' : 'rawname';
-            $sql = "SELECT id, {$namefield} FROM {tag} WHERE tagtype = ? ORDER by name ASC";
-            $params = array('official');
-            if ($otags = $DB->get_records_sql_menu($sql, $params)) {
-                $otagsselEl =& $mform->addElement('select', 'otags', get_string('otags', 'tag'), $otags, 'size="5"');
-                $otagsselEl->setMultiple(true);
-                $mform->addHelpButton('otags', 'otags', 'tag');
-            }
+            $mform->addElement('tags', 'tags', get_string('tags'));
         }
-        
+
         // When two elements we need a group.
         $buttonarray = array();
+        $classarray = array('class' => 'form-submit');
         if ($returnto !== 0) {
-            $buttonarray[] = &$mform->createElement('submit', 'saveandreturn', get_string('savechangesandreturn'));
+            $buttonarray[] = &$mform->createElement('submit', 'saveandreturn', get_string('savechangesandreturn'), $classarray);
         }
-        $buttonarray[] = &$mform->createElement('submit', 'saveanddisplay', get_string('savechangesanddisplay'));
+        $buttonarray[] = &$mform->createElement('submit', 'saveanddisplay', get_string('savechangesanddisplay'), $classarray);
         $buttonarray[] = &$mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');

@@ -324,6 +324,9 @@ class core_formslib_testcase extends advanced_testcase {
         $mform->display();
     }
 
+    /**
+     * Totara hack test.
+     */
     public function test_group_class() {
         $formrender = new MoodleQuickForm_Renderer();
         $mform = new MoodleQuickForm('mform', 'post', '');
@@ -332,9 +335,8 @@ class core_formslib_testcase extends advanced_testcase {
         $group->updateAttributes(array('class' => 'test'));
         $formrender->startGroup($group, false, '');
 
-        $xml = new DomDocument();
-        $xml->loadXML($formrender->_groupTemplate);
-        $this->assertSelectCount('div[class="test"]', 1, $xml);
+        $expected = '<div id="fgroup_id_group_1" class="fitem fitem_fgroup test femptylabel"><fieldset class="fgroup test error"><div class="felement"><span class="error" tabindex="0"></span>{element}</div></fieldset></div>';
+        $this->assertSame($expected, trim($formrender->_groupTemplate));
     }
 
     public function test_settype_debugging_group() {
