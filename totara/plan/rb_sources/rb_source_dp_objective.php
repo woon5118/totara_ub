@@ -307,7 +307,7 @@ class rb_source_dp_objective extends rb_base_source {
         $columnoptions[] = new rb_column_option(
                 'objective',
                 'status',
-                get_string('objstatus', 'rb_source_dp_objective'),
+                get_string('objapproved', 'rb_source_dp_objective'),
                 'base.approved',
                 array(
                     'displayfunc' => 'plan_item_status'
@@ -317,7 +317,7 @@ class rb_source_dp_objective extends rb_base_source {
         $columnoptions[] = new rb_column_option(
                 'objective',
                 'proficiency',
-                get_string('objproficiency', 'rb_source_dp_objective'),
+                get_string('objstatus', 'rb_source_dp_objective'),
                 'objective_scale_value.name',
                 array(
                     'joins' => 'objective_scale_value',
@@ -341,12 +341,12 @@ class rb_source_dp_objective extends rb_base_source {
         $columnoptions[] = new rb_column_option(
                 'objective',
                 'proficiencyandapproval',
-                get_string('objproficiencyandapproval', 'rb_source_dp_objective'),
+                get_string('objectivestatusandapproval', 'rb_source_dp_objective'),
                 'objective_scale_value.name',
                 array(
                     'joins' => 'objective_scale_value',
                     'displayfunc' => 'proficiency_and_approval',
-                    'defaultheading' => get_string('objproficiency', 'rb_source_dp_objective'),
+                    'defaultheading' => get_string('objstatus', 'rb_source_dp_objective'),
                     'extrafields' => array('approved' => 'base.approved')
                 )
         );
@@ -530,6 +530,7 @@ class rb_source_dp_objective extends rb_base_source {
 
         // highlight if the item has not yet been approved
         if ($approved == DP_APPROVAL_UNAPPROVED ||
+            $approved == DP_APPROVAL_DECLINED ||
             $approved == DP_APPROVAL_REQUESTED) {
             $content .= html_writer::empty_tag('br') . $this->rb_display_plan_item_status($approved);
         }

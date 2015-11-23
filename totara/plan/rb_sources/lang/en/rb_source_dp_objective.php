@@ -45,10 +45,10 @@ $string['objduedate'] = 'Objective due date';
 $string['objdescription'] = 'Objective Description';
 $string['objname'] = 'Objective Name';
 $string['objpriority'] = 'Objective priority';
+$string['objapproved'] = 'Objective approved';
 $string['objstatus'] = 'Objective status';
-$string['objproficiency'] = 'Objective proficiency';
 $string['objproficient'] = 'Achieved Objective?';
-$string['objproficiencyandapproval'] = 'Objective proficiency (and approval status)';
+$string['objectivestatusandapproval'] = 'Objective status (and approval status)';
 $string['coursetypeicon'] = 'Type';
 // filters
 $string['objfullname'] = 'Objective full name';
@@ -58,3 +58,7 @@ $string['objshortname'] = 'Objective short name';
 $string['type_plan'] = 'Plan';
 $string['type_template'] = 'Plan Template';
 $string['type_objective'] = 'Objective';
+
+// Deprecated in 9.0
+$string['objproficiency'] = 'Objective proficiency';
+$string['objproficiencyandapproval'] = 'Objective proficiency (and approval status)';
