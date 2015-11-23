@@ -38,10 +38,6 @@ class block_totara_stats extends block_base {
         return true;
     }
 
-    function preferred_width() {
-        return 210;
-    }
-
     function specialization() {
 
     }
