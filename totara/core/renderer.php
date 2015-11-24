@@ -32,17 +32,28 @@ if (!defined('MOODLE_INTERNAL')) {
 class totara_core_renderer extends plugin_renderer_base {
 
     /**
+     * Displays a count of the number of active users in the last year
+     *
+     * @param integer $activeusers Number of active users in the last year
+     * @return string HTML to output.
+     * @deprecated since 9.0.
+     */
+    public function totara_print_active_users($activeusers) {
+        debugging('totara_print_active_users has been deprecated please use active_users', DEBUG_DEVELOPER);
+        return $this->active_users($activeusers);
+    }
+
+    /**
     * Displays a count of the number of active users in the last year
     *
     * @param integer $activeusers Number of active users in the last year
     * @return string HTML to output.
     */
-    public function totara_print_active_users($activeusers) {
-        $output = '';
-        $output .= $this->output->box_start('generalbox adminwarning');
-        $output .= get_string('numberofactiveusers', 'totara_core', $activeusers);
-        $output .= $this->output->box_end();
-        return $output;
+    public function active_users($activeusers) {
+        $data = new stdClass();
+        $data->activeusers = $activeusers;
+
+        return $this->output->render_from_template('totara_core/active_users', $data);
     }
 
     /**
