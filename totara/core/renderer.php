@@ -111,6 +111,23 @@ class totara_core_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Returns markup for displaying a progress bar for a user's course progress
+     *
+     * Optionally with a link to the user's profile if they have the correct permissions
+     *
+     * @deprecated since 9.0
+     * @access  public
+     * @param   $userid     int
+     * @param   $courseid   int
+     * @param   $status     int     COMPLETION_STATUS_ constant
+     * @return  string html to display
+     */
+    public function display_course_progress_icon($userid, $courseid, $status) {
+        debugging("display_course_progress_icon has been deprecated. Use course_progress_icon instead", DEBUG_DEVELOPER);
+        return $this->course_progress_bar($userid, $courseid, $status);
+    }
+
+    /**
     * Returns markup for displaying a progress bar for a user's course progress
     *
     * Optionally with a link to the user's profile if they have the correct permissions
@@ -121,27 +138,23 @@ class totara_core_renderer extends plugin_renderer_base {
     * @param   $status     int     COMPLETION_STATUS_ constant
     * @return  string html to display
     */
-    public function display_course_progress_icon($userid, $courseid, $status) {
+    public function course_progress_bar($userid, $courseid, $status) {
         global $COMPLETION_STATUS;
 
         if (!isset($status) || !array_key_exists($status, $COMPLETION_STATUS)) {
             return '';
         }
-        $statusstring = $COMPLETION_STATUS[$status];
-        $status = get_string($statusstring, 'completion');
-        // Display progress bar
-        $content = html_writer::start_tag('span', array('class'=>'coursecompletionstatus'));
-        $content .= html_writer::start_tag('span', array('class'=>'completion-' . $statusstring, 'title' => $status));
-        $content .= $status;
-        $content .= html_writer::end_tag('span');
-        $content .= html_writer::end_tag('span');
-        // Check if user has permissions to see details
+
+        // Display the course progress bar.
+        $data = new stdClass();
+        $data->statusclass = $COMPLETION_STATUS[$status];
+        $data->statustext = get_string($COMPLETION_STATUS[$status], 'completion');
         if (completion_can_view_data($userid, $courseid)) {
-            $url = new moodle_url("/blocks/completionstatus/details.php?course={$courseid}&user={$userid}");
-            $attributes = array('href' => $url);
-            $content = html_writer::tag('a', $content, $attributes);
+            $data->href = (string) new moodle_url('/blocks/completionstatus/details.php',
+                                                            array('course' => $courseid, 'user' => $userid));
         }
-        return $content;
+
+        return $this->output->render_from_template('totara_core/course_progress_bar', $data);
     }
 
     /**

@@ -668,7 +668,7 @@ function totara_display_course_progress_icon($userid, $courseid, $status) {
     global $PAGE, $COMPLETION_STATUS;
 
     $renderer = $PAGE->get_renderer('totara_core');
-    $content = $renderer->display_course_progress_icon($userid, $courseid, $status);
+    $content = $renderer->course_progress_bar($userid, $courseid, $status);
     return $content;
 }
 
