@@ -568,7 +568,9 @@ class totara_core_renderer extends plugin_renderer_base {
             $message = get_string('registrationisenabled', 'admin');
         }
 
-        return $this->box($message, 'generalbox adminwarning');
+        $data = new stdClass();
+        $data->content = $message;
+        return $this->render_from_template('totara_core/is_registered', $data);
     }
 
     /**
