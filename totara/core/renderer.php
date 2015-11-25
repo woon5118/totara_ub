@@ -145,10 +145,24 @@ class totara_core_renderer extends plugin_renderer_base {
     }
 
     /**
-    * print out the Totara My Team nav section
-    * @return html_writer::table
-    */
+     * Print out the Totara My Team nav section.
+     *
+     * @deprecated since 9.0
+     * @param integer $numteammembers The number of members in the team.
+     * @return string HTML
+     */
     public function print_my_team_nav($numteammembers) {
+        debugging("print_my_team_nav has been deprecated. Please use my_team_nav instead.", DEBUG_DEVELOPER);
+        return $this->my_team_nav($numteammembers);
+    }
+
+    /**
+     * Use a template to generate the My Team nav markup.
+     *
+     * @param integer $numteammembers The number of members in the team.
+     * @return string HTML
+     */
+    public function my_team_nav($numteammembers) {
         if (empty($numteammembers) || $numteammembers == 0) {
             return '';
         }
@@ -157,13 +171,11 @@ class totara_core_renderer extends plugin_renderer_base {
             return '';
         }
 
-        $text = get_string('viewmyteam','totara_core');
-        $icon = new pix_icon('teammembers', $text, 'totara_core');
-        $url = new moodle_url('/my/teammembers.php');
-        $content = $this->output->action_icon($url, $icon);
-        $content .= html_writer::link($url, $text);
-        $content .= html_writer::tag('span', get_string('numberofstaff', 'totara_core', $numteammembers));
-        return $content;
+        $data = new stdClass();
+        $data->numberinteam = $numteammembers;
+        $data->href = (string) new moodle_url('/my/teammembers.php');
+
+        return $this->output->render_from_template('totara_core/my_team_nav', $data);
     }
 
     /**

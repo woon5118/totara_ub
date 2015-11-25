@@ -849,7 +849,7 @@ function totara_print_my_team_nav() {
 
     //call renderer
     $renderer = $PAGE->get_renderer('totara_core');
-    $content = $renderer->print_my_team_nav($teammembers);
+    $content = $renderer->my_team_nav($teammembers);
     return $content;
 }
 
