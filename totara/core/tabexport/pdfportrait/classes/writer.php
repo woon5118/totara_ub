@@ -78,6 +78,9 @@ class writer extends tabexport_writer {
         global $CFG;
         require_once $CFG->libdir . '/pdflib.php';
 
+        // PDF header content.
+        $header = $this->source->get_custom_header();
+
         // Table.
         $html = '';
         $html .= '<table border="1" cellpadding="2" cellspacing="0">
@@ -134,10 +137,15 @@ class writer extends tabexport_writer {
         $pdf->SetFont($font, 'B', REPORT_BUILDER_PDF_FONT_SIZE_TITLE);
         $pdf->Write(0, $fullname, '', 0, 'L', true, 0, false, false, 0);
 
-        $resultstr = $count == 1 ? 'record' : 'records';
-        $recordscount = get_string('x' . $resultstr, 'totara_reportbuilder', $count);
-        $pdf->SetFont($font, 'B', REPORT_BUILDER_PDF_FONT_SIZE_RECORD);
-        $pdf->Write(0, $recordscount, '', 0, 'L', true, 0, false, false, 0);
+        $pdf->SetFont($font, '', REPORT_BUILDER_PDF_FONT_SIZE_DATA);
+        $pdf->WriteHTML($header, true, false, false, false, '');
+
+        if ($this->source->export_row_count()) {
+            $resultstr = $count == 1 ? 'record' : 'records';
+            $recordscount = get_string('x' . $resultstr, 'totara_reportbuilder', $count);
+            $pdf->SetFont($font, 'B', REPORT_BUILDER_PDF_FONT_SIZE_RECORD);
+            $pdf->Write(0, $recordscount, '', 0, 'L', true, 0, false, false, 0);
+        }
 
         $pdf->SetFont($font, '', REPORT_BUILDER_PDF_FONT_SIZE_DATA);
 

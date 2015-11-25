@@ -54,6 +54,9 @@ abstract class rb_base_source {
     /** @var array named query params used in global restriction joins */
     public $globalrestrictionparams = array();
 
+    /** @var bool whether to export the report row count */
+    public $exportrowcount = true;
+
     /**
      * Class constructor
      *
@@ -5111,5 +5114,15 @@ abstract class rb_base_source {
                 $mform->_form->_errors[$nameprefix . $errorname] = $error;
             }
         }
+    }
+
+    /**
+     * Retrieve the custom content for the PDF export.
+     *
+     * @param reportbuilder $report
+     * @return string
+     */
+    public function custom_pdf_header(reportbuilder $report) {
+        return '';
     }
 }

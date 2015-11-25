@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2016 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralms.com>
- * @author Alastair Munro <alastair.munro@totaralms.com>
+ * @author Lee Campbell <lee@learningpool.com>
  * @package mod_facetoface
  */
 
@@ -28,11 +27,25 @@ global $CFG;
 
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 
-class rb_source_facetoface_sessions extends rb_facetoface_base_source {
+/**
+ * FacetoFace downloadable sign in sheet report.
+ *
+ * Class rb_source_facetoface_signin
+ */
+class rb_source_facetoface_signin extends rb_facetoface_base_source {
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $sourcetitle, $requiredcolumns;
 
+    public $exportrowcount = false;
+
+    /**
+     * Constructor.
+     *
+     * @param mixed $groupid
+     * @param rb_global_restriction_set|null $globalrestrictionset
+     * @throws coding_exception
+     */
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
             throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
@@ -43,8 +56,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         // Apply global user restrictions.
         $this->add_global_report_restriction_join('base', 'userid');
 
-        $this->base = '{facetoface_signups}';
         $this->usedcomponents[] = 'mod_facetoface';
+        $this->base = '{facetoface_signups}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -53,7 +66,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
-        $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_sessions');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_signin');
         $this->add_customfields();
         parent::__construct();
     }
@@ -72,15 +85,19 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     //
     //
 
+    /**
+     * Define the joins available for this report.
+     *
+     * @return array
+     */
     protected function define_joinlist() {
         global $CFG;
         require_once($CFG->dirroot .'/mod/facetoface/lib.php');
 
-        // joinlist for this source
         $joinlist = array(
             new rb_join(
                 'sessions',
-                'LEFT',
+                'INNER',
                 '{facetoface_sessions}',
                 'sessions.id = base.sessionid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
@@ -111,23 +128,13 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_join(
                 'attendees',
                 'LEFT',
-                // subquery as table
                 "(SELECT su.sessionid, count(ss.id) AS number
-                    FROM {facetoface_signups} su
-                    JOIN {facetoface_signups_status} ss
-                        ON su.id = ss.signupid
-                    WHERE ss.superceded=0 AND ss.statuscode >= 50
-                    GROUP BY su.sessionid)",
+                  FROM {facetoface_signups} su
+                  JOIN {facetoface_signups_status} ss
+                      ON su.id = ss.signupid
+                  WHERE ss.superceded=0 AND ss.statuscode >= 50
+                  GROUP BY su.sessionid)",
                 'attendees.sessionid = base.sessionid',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
-            ),
-            new rb_join(
-                'cancellationstatus',
-                'LEFT',
-                '{facetoface_signups_status}',
-                '(cancellationstatus.signupid = base.id AND
-                    cancellationstatus.superceded = 0 AND
-                    cancellationstatus.statuscode = '.MDL_F2F_STATUS_USER_CANCELLED.')',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
@@ -146,14 +153,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 REPORT_BUILDER_RELATION_MANY_TO_ONE
             ),
             new rb_join(
-                'creator',
-                'LEFT',
-                '{user}',
-                'status.createdby = creator.id',
-                REPORT_BUILDER_RELATION_MANY_TO_ONE,
-                'status'
-            ),
-            new rb_join(
                 'pos',
                 'LEFT',
                 '{pos}',
@@ -169,56 +168,49 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
         );
 
-
-        // include some standard joins
+        // Include some standard joins.
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
         $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course', 'INNER');
         $this->add_context_table_to_joinlist($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
-        // requires the course join
-        $this->add_course_category_table_to_joinlist($joinlist,
-            'course', 'category');
+        $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
         $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
-        // requires the position_assignment join
-        $this->add_manager_tables_to_joinlist($joinlist,
-            'position_assignment', 'reportstoid');
+        $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
         $this->add_tag_tables_to_joinlist('course', $joinlist, 'facetoface', 'course');
-
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
-
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_cohort_course_tables_to_joinlist($joinlist, 'facetoface', 'course');
 
         return $joinlist;
     }
 
+    /**
+     * Define the column options available for this report.
+     *
+     * @return array
+     */
     protected function define_columnoptions() {
-        global $DB, $CFG;
-        $intimezone = '';
-        if (!empty($CFG->facetoface_displaysessiontimezones)) {
-            $intimezone = '_in_timezone';
-        }
-
-        $usernamefieldscreator = totara_get_all_user_name_fields_join('creator');
+        global $DB;
         $usernamefieldsbooked  = totara_get_all_user_name_fields_join('bookedby');
+
         $columnoptions = array(
             new rb_column_option(
-                'session',                  // Type.
-                'capacity',                 // Value.
-                get_string('sesscapacity', 'rb_source_facetoface_sessions'),    // Name.
-                'sessions.capacity',        // Field.
-                array('joins' => 'sessions', 'dbdatatype' => 'integer')         // Options array.
+                'session',
+                'capacity',
+                get_string('sesscapacity', 'rb_source_facetoface_signin'),
+                'sessions.capacity',
+                array('joins' => 'sessions', 'dbdatatype' => 'integer')
             ),
             new rb_column_option(
                 'session',
                 'numattendees',
-                get_string('numattendees', 'rb_source_facetoface_sessions'),
+                get_string('numattendees', 'rb_source_facetoface_signin'),
                 'attendees.number',
                 array('joins' => 'attendees', 'dbdatatype' => 'integer')
             ),
             new rb_column_option(
                 'session',
                 'details',
-                get_string('sessdetails', 'rb_source_facetoface_sessions'),
+                get_string('sessdetails', 'rb_source_facetoface_signin'),
                 'sessions.details',
                 array(
                     'joins' => 'sessions',
@@ -237,7 +229,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'session',
                 'duration',
-                get_string('sessduration', 'rb_source_facetoface_sessions'),
+                get_string('sessduration', 'rb_source_facetoface_signin'),
                 'CASE WHEN sessions.datetimeknown = 1
                     THEN
                         (sessiondate.timefinish-sessiondate.timestart)/' . MINSECS . '
@@ -253,25 +245,25 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'status',
                 'statuscode',
-                get_string('status', 'rb_source_facetoface_sessions'),
+                get_string('status', 'rb_source_facetoface_signin'),
                 'status.statuscode',
                 array(
                     'joins' => 'status',
                     'displayfunc' => 'f2f_status',
                 )
             ),
-             new rb_column_option(
+            new rb_column_option(
                 'session',
                 'discountcode',
-                get_string('discountcode', 'rb_source_facetoface_sessions'),
+                get_string('discountcode', 'rb_source_facetoface_signin'),
                 'base.discountcode',
                 array('dbdatatype' => 'text',
-                      'outputformat' => 'text')
+                    'outputformat' => 'text')
             ),
             new rb_column_option(
                 'session',
                 'normalcost',
-                get_string('normalcost', 'rb_source_facetoface_sessions'),
+                get_string('normalcost', 'rb_source_facetoface_signin'),
                 'sessions.normalcost',
                 array(
                     'joins' => 'sessions',
@@ -282,7 +274,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'session',
                 'discountcost',
-                get_string('discountcost', 'rb_source_facetoface_sessions'),
+                get_string('discountcost', 'rb_source_facetoface_signin'),
                 'sessions.discountcost',
                 array(
                     'joins' => 'sessions',
@@ -293,56 +285,45 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'facetoface',
                 'name',
-                get_string('ftfname', 'rb_source_facetoface_sessions'),
+                get_string('f2fname', 'rb_source_facetoface_signin'),
                 'facetoface.name',
                 array('joins' => 'facetoface',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text')
             ),
             new rb_column_option(
                 'facetoface',
                 'namelink',
-                get_string('ftfnamelink', 'rb_source_facetoface_sessions'),
+                get_string('f2fnamelink', 'rb_source_facetoface_signin'),
                 "facetoface.name",
                 array(
                     'joins' => array('facetoface','sessions'),
                     'displayfunc' => 'link_f2f',
-                    'defaultheading' => get_string('ftfname', 'rb_source_facetoface_sessions'),
+                    'defaultheading' => get_string('f2fname', 'rb_source_facetoface_signin'),
                     'extrafields' => array('activity_id' => 'sessions.facetoface'),
-                )
-            ),
-            new rb_column_option(
-                'status',
-                'createdby',
-                get_string('createdby', 'rb_source_facetoface_sessions'),
-                $DB->sql_concat_join("' '", $usernamefieldscreator),
-                array(
-                    'joins' => 'creator',
-                    'displayfunc' => 'link_user',
-                    'extrafields' => array_merge(array('id' => 'creator.id'), $usernamefieldscreator),
                 )
             ),
             new rb_column_option(
                 'date',
                 'sessiondate',
-                get_string('sessdate', 'rb_source_facetoface_sessions'),
+                get_string('sessdate', 'rb_source_facetoface_signin'),
                 'sessiondate.timestart',
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' =>'sessiondate',
-                    'displayfunc' => 'nice_date' . $intimezone,
+                    'displayfunc' => 'nice_date_in_timezone',
                     'dbdatatype' => 'timestamp'
                 )
             ),
             new rb_column_option(
                 'date',
                 'sessiondate_link',
-                get_string('sessdatelink', 'rb_source_facetoface_sessions'),
+                get_string('sessdatelink', 'rb_source_facetoface_signin'),
                 'sessiondate.timestart',
                 array(
                     'joins' => 'sessiondate',
                     'displayfunc' => 'link_f2f_session',
-                    'defaultheading' => get_string('sessdate', 'rb_source_facetoface_sessions'),
+                    'defaultheading' => get_string('sessdate', 'rb_source_facetoface_signin'),
                     'extrafields' => array('session_id' => 'base.sessionid', 'timezone' => 'sessiondate.sessiontimezone'),
                     'dbdatatype' => 'timestamp'
                 )
@@ -350,98 +331,88 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'date',
                 'datefinish',
-                get_string('sessdatefinish', 'rb_source_facetoface_sessions'),
+                get_string('sessdatefinish', 'rb_source_facetoface_signin'),
                 'sessiondate.timefinish',
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_date' . $intimezone,
+                    'displayfunc' => 'nice_date_in_timezone',
                     'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'date',
                 'timestart',
-                get_string('sessstart', 'rb_source_facetoface_sessions'),
+                get_string('sessstart', 'rb_source_facetoface_signin'),
                 'sessiondate.timestart',
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_time' . $intimezone,
+                    'displayfunc' => 'nice_time_in_timezone',
                     'dbdatatype' => 'timestamp'
                 )
             ),
             new rb_column_option(
                 'date',
                 'timefinish',
-                get_string('sessfinish', 'rb_source_facetoface_sessions'),
+                get_string('sessfinish', 'rb_source_facetoface_signin'),
                 'sessiondate.timefinish',
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_time' . $intimezone,
+                    'displayfunc' => 'nice_time_in_timezone',
                     'dbdatatype' => 'timestamp'
                 )
             ),
             new rb_column_option(
                 'session',
-                'cancellationdate',
-                get_string('cancellationdate', 'rb_source_facetoface_sessions'),
-                'cancellationstatus.timecreated',
-                array('joins' => 'cancellationstatus', 'displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp')
-            ),
-            new rb_column_option(
-                'session',
                 'bookedby',
-                get_string('bookedby', 'rb_source_facetoface_sessions'),
+                get_string('bookedby', 'rb_source_facetoface_signin'),
                 $DB->sql_concat_join("' '", $usernamefieldsbooked),
-                array(
-                    'joins' => 'bookedby',
-                    'displayfunc' => 'link_user',
-                    'extrafields' => array_merge(array('id' => 'bookedby.id'), $usernamefieldsbooked),
-                )
+                array('joins' => 'bookedby', 'displayfunc' => 'link_f2f_bookedby',
+                    'extrafields' => array_merge(array('user_id' => 'bookedby.id')), $usernamefieldsbooked)
             ),
             new rb_column_option(
                 'room',
                 'name',
-                get_string('roomname', 'rb_source_facetoface_sessions'),
+                get_string('roomname', 'rb_source_facetoface_signin'),
                 'room.name',
                 array('joins' => 'room',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text')
             ),
             new rb_column_option(
                 'room',
                 'building',
-                get_string('building', 'rb_source_facetoface_sessions'),
+                get_string('building', 'rb_source_facetoface_signin'),
                 'room.building',
                 array('joins' => 'room',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text')
             ),
             new rb_column_option(
                 'room',
                 'address',
-                get_string('address', 'rb_source_facetoface_sessions'),
+                get_string('address', 'rb_source_facetoface_signin'),
                 'room.address',
                 array('joins' => 'room',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text')
             ),
             new rb_column_option(
                 'room',
                 'capacity',
-                get_string('roomcapacity', 'rb_source_facetoface_sessions'),
+                get_string('roomcapacity', 'rb_source_facetoface_signin'),
                 'room.capacity',
                 array('joins' => 'room', 'dbdatatype' => 'integer')
             ),
             new rb_column_option(
                 'room',
                 'description',
-                get_string('roomdescription', 'rb_source_facetoface_sessions'),
+                get_string('roomdescription', 'rb_source_facetoface_signin'),
                 'room.description',
                 array('joins' => 'room',
-                      'dbdatatype' => 'text',
-                      'outputformat' => 'text')
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text')
             ),
             new rb_column_option(
                 'session',
@@ -454,20 +425,12 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'session',
-                'positionnameedit',
-                get_string('selectedpositionedit', 'rb_source_facetoface_sessions'),
-                'pos_assignment.fullname',
-                array(
-                    'columngenerator' => 'position_edit')
-                ),
-            new rb_column_option(
-                'session',
                 'positionassignmentname',
                 get_string('selectedpositionassignment', 'mod_facetoface'),
                 'pos_assignment.fullname',
                 array('joins' => 'pos_assignment',
-                'dbdatatype' => 'text',
-                'outputformat' => 'text')
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text')
             ),
             new rb_column_option(
                 'session',
@@ -475,50 +438,52 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('selectedpositiontype', 'mod_facetoface'),
                 'base.positiontype',
                 array('dbdatatype' => 'text',
-                      'outputformat' => 'text',
-                      'displayfunc' => 'position_type')
+                    'outputformat' => 'text',
+                    'displayfunc' => 'position_type')
             ),
             new rb_column_option(
-                'status',
-                'timecreated',
-                get_string('timeofsignup', 'rb_source_facetoface_sessions'),
-                'status.timecreated',
+                'user_signups',
+                'signature',
+                get_string('signature', 'mod_facetoface'),
+                'base.id',
                 array(
-                    'displayfunc' => 'nice_datetime',
-                    'dbdatatype' => 'timestamp'
+                    'displayfunc' => 'signature'
                 )
-            )
+            ),
         );
 
-        // include some standard columns
+        // Include some standard columns.
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_course_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions);
         $this->add_position_fields_to_columns($columnoptions);
         $this->add_manager_fields_to_columns($columnoptions);
         $this->add_tag_fields_to_columns('course', $columnoptions);
-
         $this->add_facetoface_session_roles_to_columns($columnoptions);
-
         $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_course_fields_to_columns($columnoptions);
 
         return $columnoptions;
     }
 
+    /**
+     * Define the filter options available for this report.
+     *
+     * @return array
+     */
     protected function define_filteroptions() {
         $filteroptions = array(
             new rb_filter_option(
                 'facetoface',
                 'name',
-                'Face to face name',
+                get_string('f2fname', 'rb_source_facetoface_signin'),
                 'text'
             ),
             new rb_filter_option(
                 'status',
                 'statuscode',
-                get_string('status', 'rb_source_facetoface_sessions'),
-                'multicheck',
+                get_string('status', 'rb_source_facetoface_signin'),
+                'select',
                 array(
                     'selectfunc' => 'session_status_list',
                     'attributes' => rb_filter_option::select_width_limiter(),
@@ -527,111 +492,105 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_filter_option(
                 'date',
                 'sessiondate',
-                get_string('sessdate', 'rb_source_facetoface_sessions'),
+                get_string('sessdate', 'rb_source_facetoface_signin'),
                 'date'
             ),
             new rb_filter_option(
                 'date',
                 'timestart',
-                get_string('sessstart', 'rb_source_facetoface_sessions'),
+                get_string('sessstart', 'rb_source_facetoface_signin'),
                 'date',
                 array('includetime' => true)
             ),
             new rb_filter_option(
                 'date',
                 'timefinish',
-                get_string('sessfinish', 'rb_source_facetoface_sessions'),
+                get_string('sessfinish', 'rb_source_facetoface_signin'),
                 'date',
                 array('includetime' => true)
             ),
             new rb_filter_option(
                 'session',
                 'capacity',
-                get_string('sesscapacity', 'rb_source_facetoface_sessions'),
+                get_string('sesscapacity', 'rb_source_facetoface_signin'),
                 'number'
             ),
             new rb_filter_option(
                 'session',
                 'details',
-                get_string('sessdetails', 'rb_source_facetoface_sessions'),
+                get_string('sessdetails', 'rb_source_facetoface_signin'),
                 'text'
             ),
             new rb_filter_option(
                 'session',
                 'discountcode',
-                get_string('discountcode', 'rb_source_facetoface_sessions'),
+                get_string('discountcode', 'rb_source_facetoface_signin'),
                 'text'
             ),
             new rb_filter_option(
                 'session',
                 'duration',
-                get_string('sessduration', 'rb_source_facetoface_sessions'),
+                get_string('sessduration', 'rb_source_facetoface_signin'),
                 'number'
             ),
             new rb_filter_option(
                 'session',
                 'normalcost',
-                get_string('normalcost', 'rb_source_facetoface_sessions'),
+                get_string('normalcost', 'rb_source_facetoface_signin'),
                 'text'
             ),
             new rb_filter_option(
                 'session',
                 'discountcost',
-                get_string('discountcost', 'rb_source_facetoface_sessions'),
+                get_string('discountcost', 'rb_source_facetoface_signin'),
                 'text'
             ),
             new rb_filter_option(
                 'session',
                 'bookedby',
-                get_string('bookedby', 'rb_source_facetoface_sessions'),
+                get_string('bookedby', 'rb_source_facetoface_signin'),
                 'text'
             ),
             new rb_filter_option(
                 'session',
                 'reserved',
-                get_string('reserved', 'rb_source_facetoface_sessions'),
+                get_string('reserved', 'rb_source_facetoface_signin'),
                 'select',
                 array(
-                     'selectchoices' => array(
-                         '0' => get_string('reserved', 'rb_source_facetoface_sessions'),
-                     )
+                    'selectchoices' => array(
+                        '0' => get_string('reserved', 'rb_source_facetoface_signin'),
+                    )
                 ),
                 'base.userid'
             ),
             new rb_filter_option(
                 'room',
                 'name',
-                get_string('roomname', 'rb_source_facetoface_sessions'),
+                get_string('roomname', 'rb_source_facetoface_signin'),
                 'text'
             ),
             new rb_filter_option(
                 'room',
                 'building',
-                get_string('building', 'rb_source_facetoface_sessions'),
+                get_string('building', 'rb_source_facetoface_signin'),
                 'text'
             ),
             new rb_filter_option(
                 'room',
                 'address',
-                get_string('address', 'rb_source_facetoface_sessions'),
+                get_string('address', 'rb_source_facetoface_signin'),
                 'text'
             ),
             new rb_filter_option(
                 'room',
                 'capacity',
-                get_string('roomcapacity', 'rb_source_facetoface_sessions'),
+                get_string('roomcapacity', 'rb_source_facetoface_signin'),
                 'number'
             ),
             new rb_filter_option(
                 'room',
                 'description',
-                get_string('roomdescription', 'rb_source_facetoface_sessions'),
-                'text'
-            ),
-            new rb_filter_option(
-                'status',
-                'createdby',
-                get_string('createdby', 'rb_source_facetoface_sessions'),
+                get_string('roomdescription', 'rb_source_facetoface_signin'),
                 'text'
             ),
             new rb_filter_option(
@@ -668,23 +627,25 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
         );
 
-        // include some standard filters
+        // Include some standard filters.
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
         $this->add_position_fields_to_filters($filteroptions);
         $this->add_manager_fields_to_filters($filteroptions);
         $this->add_tag_fields_to_filters('course', $filteroptions);
-
-        // add session role fields to filters
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
-
         $this->add_cohort_user_fields_to_filters($filteroptions);
         $this->add_cohort_course_fields_to_filters($filteroptions);
 
         return $filteroptions;
     }
 
+    /**
+     * Position types filter.
+     *
+     * @return array
+     */
     public function rb_filter_position_types_list() {
         global $CFG, $POSITION_TYPES;
 
@@ -693,6 +654,11 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         return $POSITION_TYPES;
     }
 
+    /**
+     * Define the available content options for this report.
+     *
+     * @return array
+     */
     protected function define_contentoptions() {
         $contentoptions = array(
             new rb_content_option(
@@ -709,7 +675,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_content_option(
                 'user',
-                get_string('user', 'rb_source_facetoface_sessions'),
+                get_string('user', 'rb_source_facetoface_signin'),
                 array(
                     'userid' => 'base.userid',
                     'managerid' => 'position_assignment.managerid',
@@ -720,7 +686,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_content_option(
                 'date',
-                get_string('thedate', 'rb_source_facetoface_sessions'),
+                get_string('thedate', 'rb_source_facetoface_signin'),
                 'sessiondate.timestart',
                 'sessiondate'
             ),
@@ -728,11 +694,16 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         return $contentoptions;
     }
 
+    /**
+     * Define the available param options for this report.
+     *
+     * @return array
+     */
     protected function define_paramoptions() {
         $paramoptions = array(
             new rb_param_option(
-                'userid',         // parameter name
-                'base.userid'     // field
+                'userid',
+                'base.userid'
             ),
             new rb_param_option(
                 'courseid',
@@ -748,11 +719,21 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'sessionid',
                 'base.sessionid'
             ),
+            new rb_param_option(
+                'hasbooked',
+                'CASE WHEN status.statuscode >= 70 THEN 1 ELSE 0 END',
+                'status'
+            )
         );
 
         return $paramoptions;
     }
 
+    /**
+     * Define the default columns for this report.
+     *
+     * @return array
+     */
     protected function define_defaultcolumns() {
         $defaultcolumns = array(
             array(
@@ -760,18 +741,19 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'value' => 'namelink',
             ),
             array(
-                'type' => 'course',
-                'value' => 'courselink',
-            ),
-            array(
-                'type' => 'date',
-                'value' => 'sessiondate',
-            ),
+                'type' => 'user_signups',
+                'value' => 'signature',
+            )
         );
 
         return $defaultcolumns;
     }
 
+    /**
+     * Columns required for totara_visibility_where() to function correctly in post_config.
+     *
+     * @return array
+     */
     protected function define_requiredcolumns() {
         $requiredcolumns = array();
 
@@ -813,6 +795,11 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         return $requiredcolumns;
     }
 
+    /**
+     * Define the default filters for this report.
+     *
+     * @return array
+     */
     protected function define_defaultfilters() {
         $defaultfilters = array(
             array(
@@ -839,98 +826,40 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         return $defaultfilters;
     }
 
+    /**
+     * Define the custom fields for this report.
+     *
+     * @return void
+     */
     protected function add_customfields() {
-        $this->columnoptions[] = new rb_column_option(
-            'facetoface_signup',
-            'allsignupcustomfields',
-            get_string('allsignupcustomfields', 'rb_source_facetoface_sessions'),
-            'allsignupcustomfields',
-            array(
-                'columngenerator' => 'allcustomfields'
-            )
-        );
         $this->add_custom_fields_for('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
         $this->add_custom_fields_for('facetoface_signup', 'status', 'facetofacesignupid', $this->joinlist, $this->columnoptions, $this->filteroptions);
-        $this->add_custom_fields_for('facetoface_cancellation', 'cancellationstatus', 'facetofacecancellationid', $this->joinlist, $this->columnoptions, $this->filteroptions);
     }
-
-    //
-    //
-    // Methods for adding commonly used data to source definitions
-    //
-    //
 
     //
     //
     // Face-to-face specific display functions
     //
     //
-    /**
-     * Position name column with edit icon
-     */
-    public function rb_display_position_edit($position, $row, $isexport = false) {
-        global $OUTPUT;
-
-        if ($isexport) {
-            return $position;
-        }
-
-        if (!$cm = get_coursemodule_from_instance('facetoface', $row->facetofaceid, $row->courseid)) {
-            print_error('error:incorrectcoursemodule', 'facetoface');
-        }
-        $context = context_module::instance($cm->id);
-        $canchangesignedupjobposition = has_capability('mod/facetoface:changesignedupjobposition', $context);
-
-        $label = position::position_label($row);
-
-        $url = new moodle_url('/mod/facetoface/attendee_position.php', array('s' => $row->sessionid, 'id' => $row->userid));
-        $pix = new pix_icon('t/edit', get_string('edit', 'facetoface'));
-        $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-position pull-right'));
-        $positionhtml = html_writer::span($label, 'position'.$row->userid, array('id' => 'position'.$row->userid));
-
-        if ($canchangesignedupjobposition) {
-            return $icon . $positionhtml;
-        }
-        return $positionhtml;
-    }
 
     /**
-     * Position name column that will be displayed only when position select settings are enabled
+     * Display function for signature column.
      *
-     * @param rb_column_option $columnoption Column settings configured by user
-     * @param bool $hidden should this column always be hidden
-     * @return array
+     * @param $position
+     * @param $row
+     * @return string
      */
-    public function rb_cols_generator_position_edit(rb_column_option $columnoption, $hidden) {
-        $result = array();
-
-        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-        if ($selectpositiononsignupglobal) {
-            $result[] = new rb_column(
-                'session',
-                'positionnameedit',
-                format_text($columnoption->name),
-                'pos_assignment.fullname',
-                array(
-                    'joins' => array('pos_assignment','pos'),
-                    'dbdatatype' => 'text',
-                    'outputformat' => 'text',
-                    'displayfunc' => 'position_edit',
-                    'hidden' => $hidden,
-                    'extrafields' => array(
-                        'positionassignmentname' => 'pos_assignment.fullname',
-                        'positiontype' => 'pos_assignment.type',
-                        'positionname' => 'pos.fullname',
-                        'userid' => 'base.userid',
-                        'courseid' => 'facetoface.course',
-                        'sessionid' => 'sessions.id',
-                        'facetofaceid' => 'facetoface.id')
-                    )
-            );
-        }
-        return $result;
+    public function rb_display_signature($position, $row) {
+        return '';
     }
 
+    /**
+     * Display function for position type.
+     *
+     * @param $position
+     * @param $row
+     * @return string
+     */
     public function rb_display_position_type($position, $row) {
         global $CFG, $POSITION_TYPES;
 
@@ -939,37 +868,76 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         return get_string('type'.$POSITION_TYPES[$position], 'totara_hierarchy');
     }
 
-    // convert a f2f activity name into a link to that activity
-    function rb_display_link_f2f($name, $row) {
-        global $OUTPUT;
-        $activityid = $row->activity_id;
-        return $OUTPUT->action_link(new moodle_url('/mod/facetoface/view.php', array('f' => $activityid)), $name);
+    /**
+     * Display function for the booking managers name (linked to
+     * their profile).
+     *
+     * @param $name
+     * @param $row
+     * @return string
+     */
+    function rb_display_link_f2f_bookedby($name, $row) {
+        $user = fullname($row);
+        return $this->rb_display_link_user($user, $row, false);
     }
 
-    // Override user display function to show 'Reserved' for reserved spaces.
+    /**
+     * Display function for the actioning users name (linked to
+     * their profile).
+     *
+     * @param $name
+     * @param $row
+     * @return string
+     */
+    function rb_display_link_f2f_actionedby($name, $row) {
+        $user = fullname($row);
+        return $this->rb_display_link_user($user, $row, false);
+    }
+
+    /**
+     * Display function to show 'Reserved' for reserved spaces.
+     *
+     * @param string $user
+     * @param object $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_link_user($user, $row, $isexport = false) {
-        if (!empty($row->id)) {
+        if ($row->id) {
             return parent::rb_display_link_user($user, $row, $isexport);
         }
-        return get_string('reserved', 'rb_source_facetoface_sessions');
+        return get_string('reserved', 'rb_source_facetoface_signin');
     }
 
-    // Override user display function to show 'Reserved' for reserved spaces.
+    /**
+     * Display function to link the user icon.
+     *
+     * @param string $user
+     * @param object $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_link_user_icon($user, $row, $isexport = false) {
-        if (!empty($row->id)) {
+        if ($row->id) {
             return parent::rb_display_link_user_icon($user, $row, $isexport);
         }
-        return get_string('reserved', 'rb_source_facetoface_sessions');
+        return get_string('reserved', 'rb_source_facetoface_signin');
     }
 
-    // Override user display function to show 'Reserved' for reserved spaces.
+    /**
+     * Display function to show the user.
+     *
+     * @param string $user
+     * @param object $row
+     * @param bool $isexport
+     * @return string
+     */
     function rb_display_user($user, $row, $isexport = false) {
         if (!empty($user)) {
             return parent::rb_display_user($user, $row, $isexport);
         }
-        return get_string('reserved', 'rb_source_facetoface_sessions');
+        return get_string('reserved', 'rb_source_facetoface_signin');
     }
-
 
     //
     //
@@ -977,6 +945,11 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     //
     //
 
+    /**
+     * Filter option for session status list.
+     *
+     * @return array
+     */
     function rb_filter_session_status_list() {
         global $CFG,$MDL_F2F_STATUS;
 
@@ -988,11 +961,16 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 $output[$code] = get_string('status_'.$statusitem,'facetoface');
             }
         }
-        // show most completed option first in pulldown
+        // Show most completed option first in pulldown.
         return array_reverse($output, true);
 
     }
 
+    /**
+     * Filter option for course delivery list.
+     *
+     * @return array
+     */
     function rb_filter_coursedelivery_list() {
         $coursedelivery = array();
         $coursedelivery['Internal'] = 'Internal';
@@ -1000,6 +978,11 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         return $coursedelivery;
     }
 
+    /**
+     * Report post config operations.
+     *
+     * @param reportbuilder $report
+     */
     public function post_config(reportbuilder $report) {
         $userid = $report->reportfor;
         if (isset($report->embedobj->embeddedparams['userid'])) {
@@ -1013,5 +996,101 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'course', $report->is_cached()));
     }
 
-} // end of rb_source_facetoface_sessions class
+    /**
+     * Custom PDF header content.
+     *
+     * @param reportbuilder $report
+     * @return string
+     */
+    public function custom_pdf_header(reportbuilder $report) {
+        global $DB;
 
+        if(!isset($report->embedobj->embeddedparams['sessionid'])) {
+            return '';
+        }
+
+        $session = facetoface_get_session($report->embedobj->embeddedparams['sessionid']);
+        if(!$session) {
+            return '';
+        }
+
+        $dates = facetoface_format_session_times($session->sessiondates[0]->timestart,
+            $session->sessiondates[0]->timefinish, $session->sessiondates[0]->sessiontimezone
+        );
+
+        $activityname = $DB->get_field('facetoface', 'name', array('id' => $session->facetoface));
+
+        $rooms = facetoface_get_rooms($session->facetoface);
+        if(empty($session->roomid)) {
+            $roomstring = get_string('nonapplicable', 'facetoface');
+        } else {
+            $room = $rooms[$session->roomid];
+
+            $roomarray[] = !empty($room->name) ? format_string($room->name) : false;
+            $roomarray[] = !empty($room->building) ? format_string($room->building) : false;
+            $roomarray[] = !empty($room->address) ? format_string($room->address) : false;
+
+            if (empty($roomarray)) {
+                $roomstring = '';
+            } else {
+                $roomstring = implode('<br />', $roomarray);
+            }
+
+            unset($room);
+        }
+
+        $table = new html_table();
+        $table->size = array('200px');
+        $table->head = array();
+
+        $titlestyles = 'font-weight:bold;';
+
+        $table->data = array();
+
+        // Get session custom fields.
+        $sessioncustomfields = customfield_get_fields($session, 'facetoface_session', 'facetofacesession');
+        if (!empty($sessioncustomfields)) {
+            foreach($sessioncustomfields as $name => $data) {
+                $title = new html_table_cell($name);
+                $title->style = $titlestyles;
+                $table->data[] = new html_table_row(array(
+                    $title,
+                    $data));
+            }
+        }
+
+        $titlestrings = get_strings(array(
+            'sessionname','sessionstartdate','sessionenddate',
+            'capacity','numberofattendees','place'),
+            'mod_facetoface');
+
+        $titles = array();
+        foreach($titlestrings as $identifier => $string) {
+            $titles[$identifier] = new html_table_cell($string);
+            $titles[$identifier]->style = $titlestyles;
+        }
+
+        $table->data[] = new html_table_row(array(
+            $titles['sessionstartdate'],
+            get_string('sessionstartdatewithtime', 'facetoface', $dates)));
+
+        $table->data[] = new html_table_row(array(
+            $titles['sessionenddate'],
+            get_string('sessionenddatewithtime', 'facetoface', $dates)));
+
+        $table->data[] = new html_table_row(array(
+            $titles['capacity'],
+            $session->capacity));
+
+        $table->data[] = new html_table_row(array(
+            $titles['numberofattendees'],
+            facetoface_get_num_attendees($session->id)));
+
+        $table->data[] = new html_table_row(array(
+            $titles['place'],
+            $roomstring));
+
+        return html_writer::table($table);
+    }
+
+} // end of rb_source_facetoface_signin class

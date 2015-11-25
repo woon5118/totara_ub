@@ -148,6 +148,22 @@ class tabexport_source extends \totara_core\tabexport_source {
     }
 
     /**
+     * Returns whether to include the row count in the export.
+     * @return bool
+     */
+    public function export_row_count() {
+        return $this->report->src->exportrowcount;
+    }
+
+    /**
+     * Returns the HTML content for the PDF export.
+     * @return string
+     */
+    public function get_custom_header() {
+        return $this->report->src->custom_pdf_header($this->report);
+    }
+
+    /**
      * Returns current row of data formatted according to specified type.
      * @return array rows of tabular data
      */

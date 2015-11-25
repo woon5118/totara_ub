@@ -247,6 +247,19 @@ $capabilities = array(
         )
     ),
 
+    // Can export session sign-in sheet.
+    'mod/facetoface:exportsessionsigninsheet' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+            'staffmanager' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
     // Ability to edit the position a learner has used to sign up to a session.
     'mod/facetoface:changesignedupjobposition' => array(
         'captype' => 'write',

@@ -42,6 +42,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
 
         // Global report restrictions are applied in define_joinlist() method.
 
+        $this->usedcomponents[] = 'mod_facetoface';
         $this->base = '{facetoface_sessions_dates}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -538,53 +539,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         return $defaultcolumns;
     }
 
-    /**
-     * Convert a f2f activity name into a link to that activity.
-     *
-     * @param string $name Name of of activity
-     * @param object $row Report row
-     * @param bool $isexport
-     * @return string Display html
-     */
-    function rb_display_link_f2f($name, $row, $isexport = false) {
-        global $OUTPUT;
-        $activityid = $row->activity_id;
-        if ($isexport) {
-            return $name;
-        }
-        return $OUTPUT->action_link(new moodle_url('/mod/facetoface/view.php', array('f' => $activityid)), $name);
-    }
-
-    /**
-     * Convert a f2f date into a link to that session.
-     *
-     * @param string $date Date of session
-     * @param object $row Report row
-     * @param bool $isexport
-     * @return string Display html
-     */
-    function rb_display_link_f2f_session($date, $row, $isexport = false) {
-        global $OUTPUT, $CFG;
-        $sessionid = $row->session_id;
-        if ($date && is_numeric($date)) {
-            if (empty($row->timezone) or empty($CFG->facetoface_displaysessiontimezones)) {
-                $targetTZ = core_date::get_user_timezone();
-            } else {
-                $targetTZ = core_date::normalise_timezone($row->timezone);
-            }
-            $date = userdate($date, get_string('strftimedate', 'langconfig'), $targetTZ);
-            if ($isexport) {
-                return $date;
-            }
-            return $OUTPUT->action_link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessionid)), $date);
-        } else {
-            $unknownstr = get_string('unknowndate', 'rb_source_facetoface_summary');
-            if ($isexport) {
-                return $unknownstr;
-            }
-            return $OUTPUT->action_link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessionid)), $unknownstr);
-        }
-    }
     /**
      * Convert a f2f date into a link to that session with timezone.
      *

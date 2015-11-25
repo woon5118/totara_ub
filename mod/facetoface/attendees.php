@@ -916,6 +916,16 @@ if ($show_table) {
         }
     }
 
+    // Session downloadable sign in sheet.
+    if (($action === 'attendees') && $session->datetimeknown && has_capability('mod/facetoface:exportsessionsigninsheet', $context)) {
+        $downloadsheetattendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_FULLY_ATTENDED, MDL_F2F_STATUS_NOT_SET,
+            MDL_F2F_STATUS_NO_SHOW, MDL_F2F_STATUS_PARTIALLY_ATTENDED));
+        if (!empty($downloadsheetattendees)) {
+            $url = new moodle_url('/mod/facetoface/signinsheet.php', array('sessionid' => $s, 'format' => 'landscape'));
+            echo $OUTPUT->single_button($url, get_string('downloadsigninsheet', 'mod_facetoface'), 'get', array('class' => 'f2fdownloadsigninsheet'));
+        }
+    }
+
     if (has_any_capability(array('mod/facetoface:addattendees', 'mod/facetoface:removeattendees'), $context)) {
         if ($action == 'takeattendance') {
             // Changes checker

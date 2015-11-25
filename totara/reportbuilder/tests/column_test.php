@@ -223,7 +223,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $f2f_signup_status_data = array(
-        'id' => 1, 'signupid' => 1, 'statuscode' => 2, 'superceded' => 0, 'grade' => 2, 'note' => 'test note', 'createdby' => 1, 'timecreated' => 1205445539,
+        'id' => 1, 'signupid' => 1, 'statuscode' => 70, 'superceded' => 0, 'grade' => 2, 'note' => 'test note', 'createdby' => 1, 'timecreated' => 1205445539,
     );
 
     protected $f2f_session_roles_data = array(

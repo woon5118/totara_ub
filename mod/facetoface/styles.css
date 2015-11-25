@@ -119,6 +119,14 @@ div.mod-indent form.togglecompletion input[type="image"] {
     float: none;
 }
 
+.path-mod-facetoface .f2fdownloadsigninsheet {
+    margin: 10px 0px;
+}
+
+.path-mod-facetoface .f2fdownloadsigninsheet input[type="submit"] {
+    margin: 0;
+}
+
 @media screen and (min-width: 1200px) {
     .dir-ltr .mform .fcontainer .f2f-roomselect {
         margin-left: 26%;
