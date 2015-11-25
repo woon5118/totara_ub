@@ -580,9 +580,10 @@ class totara_core_renderer extends plugin_renderer_base {
         return $this->render_from_template('totara_core/totara_notifications', $data);
     }
 
-
     /**
      * Displays relevant progress bar
+     *
+     * @deprecated since 9.0
      * @param $percent int a percentage value (0-100)
      * @param $size string large, medium...
      * @param $showlabel boolean show completion text label
@@ -590,6 +591,20 @@ class totara_core_renderer extends plugin_renderer_base {
      * @return $out html string
      */
     public function print_totara_progressbar($percent, $size='medium', $showlabel=false, $tooltip='DEFAULTTOOLTIP') {
+        debugging('print_totara_progressbar has been deprecated please use progressbar', DEBUG_DEVELOPER);
+        return $this->progressbar($percent, $size, $showlabel, $tooltip);
+    }
+
+    /**
+     * Displays relevant progress bar
+     *
+     * @param int $percent a percentage value (0-100)
+     * @param string $size large, medium...
+     * @param boolean $showlabel show completion text label
+     * @param string $tooltip required tooltip text
+     * @return html string
+     */
+    public function progressbar($percent, $size='medium', $showlabel=false, $tooltip='DEFAULTTOOLTIP') {
         $percent = round($percent);
 
         if ($percent < 0 || $percent > 100) {
@@ -617,14 +632,19 @@ class totara_core_renderer extends plugin_renderer_base {
             $tooltip = get_string('xpercent', 'totara_core', $percent);
         }
 
-        $out = '';
+        // This is really unfortunate - in the future we should be using a dynamic progressbar model
+        // rather than switching icons and setting a background position.
+        $icon = $this->pix_icon($bar_foreground, $tooltip, 'totara_core', array('title' => $tooltip, 'style' => 'background-position: ' . $pixeloffset . 'px 0px;', 'class' => $class));
 
-        $out .= $this->pix_icon($bar_foreground, $tooltip, 'totara_core', array('title' => $tooltip, 'style' => 'background-position: ' . $pixeloffset . 'px 0px;', 'class' => $class));
+        $data = new stdClass();
+        $data->icon = $icon;
+        $data->percent = $percent;
+
         if ($showlabel) {
-            $out .= ' ' . get_string('xpercentcomplete', 'totara_core', $percent) . html_writer::empty_tag('br');
+            $data->showlabel = true;
         }
 
-        return $out;
+        return $this->render_from_template('totara_core/progressbar', $data);
     }
 
     /**

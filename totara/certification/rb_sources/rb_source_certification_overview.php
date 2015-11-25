@@ -373,7 +373,7 @@ class rb_source_certification_overview extends rb_source_program_overview {
         }
 
         // Get relevant progress bar and return for display.
-        return $totara_renderer->print_totara_progressbar($percentage, 'medium', $isexport, $percentage . '%');
+        return $totara_renderer->progressbar($percentage, 'medium', $isexport, $percentage . '%');
     }
 
     /**

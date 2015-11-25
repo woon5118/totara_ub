@@ -586,7 +586,7 @@ class development_plan {
         $totara_renderer = $PAGE->get_renderer('totara_core');
 
         // Get relevant progress bar and return for display
-        return $totara_renderer->print_totara_progressbar($overall_progress, 'medium', false, $tooltipstr);
+        return $totara_renderer->progressbar($overall_progress, 'medium', false, $tooltipstr);
     }
 
 

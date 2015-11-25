@@ -2174,7 +2174,7 @@ function prog_display_progress($programid, $userid, $certifpath = CERTIFPATH_CER
 
     // Get relevant progress bar and return for display.
     $renderer = $PAGE->get_renderer('totara_core');
-    return $renderer->print_totara_progressbar($overall_progress, 'medium', false, $tooltipstr);
+    return $renderer->progressbar($overall_progress, 'medium', false, $tooltipstr);
 }
 
 /**

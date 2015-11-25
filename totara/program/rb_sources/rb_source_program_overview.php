@@ -740,7 +740,7 @@ class rb_source_program_overview extends rb_base_source {
         $totara_renderer = $PAGE->get_renderer('totara_core');
 
         // Get relevant progress bar and return for display.
-        return $totara_renderer->print_totara_progressbar($percentage, 'medium', $isexport, $percentage . '%');
+        return $totara_renderer->progressbar($percentage, 'medium', $isexport, $percentage . '%');
     }
 
     // Source specific filter display methods.
