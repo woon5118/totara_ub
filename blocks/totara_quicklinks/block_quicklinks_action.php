@@ -29,7 +29,7 @@ require_once('../../config.php');
 require_login();
 global $USER;
 
-if (!$referer = get_referer(false)) {
+if (!$referer = get_local_referer(false)) {
     $referer = $CFG->wwwroot.'/';
 }
 

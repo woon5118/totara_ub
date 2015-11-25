@@ -56,7 +56,7 @@ $reasonfordecision = optional_param('reasonfordecision', '', PARAM_TEXT);
 
 // Is this an ajax call?
 $ajax = optional_param('ajax', 0, PARAM_BOOL);
-$referer = optional_param('referer', get_referer(false), PARAM_URL);
+$referer = optional_param('referer', get_local_referer(false), PARAM_URL);
 //making sure that we redirect to somewhere inside platform
 //in case passed param is invalid or even HTTP_REFERER is bogus
 $referer = clean_param($referer, PARAM_LOCALURL);

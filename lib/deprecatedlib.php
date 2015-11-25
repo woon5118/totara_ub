@@ -2395,8 +2395,7 @@ function get_timezone_record($timezonename) {
  * @return string The resulting referer or empty string.
  */
 function get_referer($stripquery = true) {
-    // Totara: TL-7983 deprecate this properly in Totara code
-    //debugging('get_referer() is deprecated. Please use get_local_referer() instead.', DEBUG_DEVELOPER);
+    debugging('get_referer() is deprecated. Please use get_local_referer() instead.', DEBUG_DEVELOPER);
     if (isset($_SERVER['HTTP_REFERER'])) {
         if ($stripquery) {
             return strip_querystring($_SERVER['HTTP_REFERER']);
