@@ -353,47 +353,53 @@ class totara_core_renderer extends plugin_renderer_base {
     }
 
     /**
-    * Generate markup for search box
-    */
+     * Generate markup for search box
+     *
+     * @deprecated since 9.0
+     * @param string $action the form action
+     * @param array $hiddenfields array of hidden field names and values
+     * @param string $placeholder the form input placeholder text
+     * @param string $value the form input value text
+     * @param string $formid the form id
+     * @param string $inputid the form input id
+     * @return string the html form
+     */
     public function print_totara_search($action, $hiddenfields = null, $placeholder = '', $value = '', $formid = null, $inputid = null) {
+        debugging('print_totara_search has been deprecated please use totara_search', DEBUG_DEVELOPER);
+        return $this->totara_search($action, $hiddenfields, $placeholder = '', $value = '', $formid, $inputid);
+    }
 
-        $attr = array(
-            'action' => $action,
-            'method' => 'get',
-        );
-        if (isset($formid)) {
-            $attr['id'] = $formid;
-        }
-        $output = html_writer::start_tag('form', $attr);
-        $output .= html_writer::start_tag('fieldset', array('class' => 'coursesearchbox invisiblefieldset'));
+    /**
+     * Generate markup for search box.
+     *
+     * @param string $action the form action
+     * @param array $hiddenfields array of hidden field names and values
+     * @param string $placeholder the form input placeholder text
+     * @param string $value the form input value text
+     * @param string $formid the form id
+     * @param string $inputid the form input id
+     * @return string the html form
+     */
+    public function totara_search($action, $hiddenfields = null, $placeholder = '', $value = '', $formid = null, $inputid = null) {
+        $data = new stdClass();
+        $data->id = $formid;
+        $data->action = $action;
+        $data->value = $value;
+        $data->placeholder = $placeholder;
+        $data->alt = $placeholder;
+        $data->inputid = $inputid;
+        $data->hiddenfields = array();
+
         if (isset($hiddenfields)) {
             foreach ($hiddenfields as $fname => $fvalue) {
-                $attr = array(
-                    'type' => 'hidden',
+                $data->hiddenfields[] = array(
                     'name' => $fname,
                     'value' => $fvalue
                 );
-                $output .= html_writer::empty_tag('input', $attr);
             }
         }
-        $attr = array(
-            'type' => 'text',
-            'class' => 'search-box',
-            'name' => 'search',
-            'placeholder' => $placeholder,
-            'alt' => $placeholder,
-        );
-        if (strlen($value) != 0) {
-            $attr['value'] = $value;
-        }
-        if (isset($inputid)) {
-            $attr['id'] = $inputid;
-        }
-        $output .= html_writer::empty_tag('input', $attr);
-        $output .= html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('go')));
-        $output .= html_writer::end_tag('fieldset');
-        $output .= html_writer::end_tag('form');
-        return $output;
+
+        return $this->render_from_template('totara_core/totara_search', $data);
     }
 
     /**

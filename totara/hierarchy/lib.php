@@ -1991,7 +1991,7 @@ class hierarchy {
         $hiddenfields = array('prefix' => $this->prefix, 'frameworkid' => $this->frameworkid);
 
         $renderer = $PAGE->get_renderer('totara_core');
-        $out = $renderer->print_totara_search('', $hiddenfields, $placeholdertext, $query, 'hierarchy-search-form', 'hierarchy-search-text-field');
+        $out = $renderer->totara_search('', $hiddenfields, $placeholdertext, $query, 'hierarchy-search-form', 'hierarchy-search-text-field');
         return $out;
     }
 
