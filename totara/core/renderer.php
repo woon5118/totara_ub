@@ -505,14 +505,7 @@ class totara_core_renderer extends plugin_renderer_base {
      * @return string Totara-style HTML comment template
      */
     public function comment_template() {
-        $template = html_writer::tag('div', '___picture___', array('class' => 'comment-userpicture'));
-        $template .= html_writer::start_tag('div', array('class' => 'comment-content'));
-        $template .= html_writer::tag('span', '___name___', array('class' => 'comment-user-name'));
-        $template .= '___content___';
-        $template .= html_writer::tag('div', '___time___', array('class' => 'comment-datetime'));
-        $template .= html_writer::end_tag('div');
-
-        return $template;
+        return $this->render_from_template('totara_core/comment_template', null);
     }
     /**
      * Print list of icons
