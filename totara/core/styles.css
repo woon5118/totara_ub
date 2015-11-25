@@ -70,6 +70,7 @@ ul.reportmanager {
 
 ul.reportmanager img {
     padding: 2px 5px;
+    vertical-align: middle;
 }
 #browse-tab,
 #search-tab,

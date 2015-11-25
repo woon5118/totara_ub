@@ -197,56 +197,66 @@ class totara_core_renderer extends plugin_renderer_base {
     }
 
     /**
-    * print out the table of visible reports
-    * @param array $reports array of report objects visible to this user
-    * @param bool $showsettings if this user is an admin with editing turned on
-    * @return html_writer::table
-    */
+     * Print out the table of visible reports.
+     *
+     * @deprecated since 9.0
+     * @param array $reports array of report objects visible to this user.
+     * @param bool $canedit if this user is an admin with editing turned on.
+     * @return string HTML
+     */
     public function print_report_manager($reports, $canedit) {
-        $output = '';
+        debugging("print_report_manager has been deprecated. Use report_list instead.", DEBUG_DEVELOPER);
+        return $this->report_list($reports, $canedit);
+    }
 
-        if (count($reports) == 0) {
-            return $output;
+    /**
+     * Use a template to generate a table of visible reports.
+     *
+     * @param array $reports array of report objects visible to this user.
+     * @param bool $canedit if this user is an admin with editing turned on.
+     * @return string HTML
+     */
+    public function report_list($reports, $canedit) {
+        // If we've generated a report list, generate the mark-up.
+        if ($report_list = $this->report_list_export_for_template($reports, $canedit)) {
+            $data = new stdClass();
+            $data->report_list = $report_list;
+
+            return $this->output->render_from_template('totara_core/report_list', $data);
+        } else {
+            return '';
         }
+    }
+
+    /**
+     * Generate the data required for the report_list template.
+     *
+     * @param array $reports array of report objects visible to this user.
+     * @param bool $canedit if this user is an admin with editing turned on.
+     * @return array List of reports.
+     */
+    public function report_list_export_for_template($reports, $canedit) {
+        $report_list = array();
 
         foreach ($reports as $report) {
             // Check url property is set.
-            if (!isset($report->url)) {
+            if (isset($report->url)) {
+                $report_data = array ('name' => $report->fullname, 'href' => $report->url);
+
+                if ($canedit) {
+                    $report_data['edit_href'] = (string) new moodle_url('/totara/reportbuilder/general.php', array('id' => $report->id));
+                }
+
+                $report_list[] = $report_data;
+            } else {
                 debugging(get_string('error:reporturlnotset', 'totara_reportbuilder', $report->fullname), DEBUG_DEVELOPER);
-                continue;
             }
-            // Show reports user has permission to view, that are not hidden.
-            $output .= html_writer::start_tag('li');
-            $cells = array();
-            $text = format_string($report->fullname);
-            $icon = html_writer::empty_tag(
-                    'img',
-                    array('src' => $this->output->pix_url('report_icon', 'totara_reportbuilder'),
-                    'alt'=> $text)
-            );
-
-            $attributes = array('href' => $report->url);
-            $output .= html_writer::tag('a', $icon . $text, $attributes);
-            // if admin with edit mode on show settings button too
-            if ($canedit) {
-                $text = get_string('settings','totara_core');
-                $icon = html_writer::empty_tag('img', array('src' => $this->output->pix_url('/t/edit'),
-                                                'alt'=> $text));
-                $url = new moodle_url('/totara/reportbuilder/general.php?id='.$report->id);
-                $attributes = array('href' => $url);
-                $output .= '&nbsp;' . html_writer::tag('a', $icon, $attributes);
-            }
-
-            $output .= html_writer::end_tag('li');
         }
 
-        // If we've generated a list of report links, wrap it.
-        if ($output) {
-            $output = html_writer::start_tag('ul', array('class' => 'reportmanager')) . $output . html_writer::end_tag('ul');
-        }
-
-        return $output;
+        return $report_list;
     }
+
+
     /**
     * Returns markup for displaying saved scheduled reports
     *

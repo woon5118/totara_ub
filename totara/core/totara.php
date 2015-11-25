@@ -883,7 +883,7 @@ function totara_print_report_manager() {
 
     if (count($reportbuilder_permittedreports) > 0) {
         $renderer = $PAGE->get_renderer('totara_core');
-        $returnstr = $renderer->print_report_manager($reportbuilder_permittedreports, $canedit);
+        $returnstr = $renderer->report_list($reportbuilder_permittedreports, $canedit);
     } else {
         $returnstr = get_string('nouserreports', 'totara_reportbuilder');
     }
