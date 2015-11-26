@@ -103,7 +103,8 @@ Feature: Users can edit tags to add description or rename
       | Related tags | Dog,  Turtle,Fish |
       | Official | 0 |
     And I press "Update"
-    Then "Manage tags" "link" should exist in the ".breadcrumb-nav" "css_element"
+# Totara has a bit different nav
+    Then "Manage tags" "text" should exist in the ".breadcrumb-nav" "css_element"
     And I follow "Kitten"
     And "Description of tag 1" "text" should exist in the "#tag-description" "css_element"
     And I should see "Related tags: Dog, Turtle, Fish"
