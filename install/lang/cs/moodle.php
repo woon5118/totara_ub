@@ -31,6 +31,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['language'] = 'Jazyk';
+$string['moodlelogo'] = 'Totara logo';
 $string['next'] = 'Další';
 $string['previous'] = 'Předchozí';
 $string['reload'] = 'Obnovit';
