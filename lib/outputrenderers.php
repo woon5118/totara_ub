@@ -1021,7 +1021,7 @@ class core_renderer extends renderer_base {
 
         $totararenderer = $PAGE->get_renderer('totara_core', null);
         return $header . $this->skip_link_target('maincontent') .
-            $totararenderer->print_totara_notifications();
+            $totararenderer->totara_notifications();
     }
 
     /**
