@@ -301,7 +301,7 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $totara_renderer->is_registered();
 
         if ($latesterror) {
-            $output .= $totara_renderer->totara_print_errorlog_link($latesterror);
+            $output .= $totara_renderer->errorlog_link($latesterror);
         }
         // list count of active users
         $output .= $totara_renderer->active_users($activeusers);

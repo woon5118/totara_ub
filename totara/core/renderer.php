@@ -59,17 +59,33 @@ class totara_core_renderer extends plugin_renderer_base {
     /**
      * Displays a link to download error log
      *
+     * @deprecated since 9.0
      * @param object $latesterror Object containing information about the last site error
      *
      * @return string HTML to output.
      */
     public function totara_print_errorlog_link($latesterror) {
-        $output = '';
-        $output .= $this->output->box_start('generalbox adminwarning');
-        $output .= get_string('lasterroroccuredat', 'totara_core', userdate($latesterror->timeoccured));
-        $output .= $this->output->single_button(new moodle_url('/admin/index.php', array('geterrors' => 1)), get_string('downloaderrorlog', 'totara_core'), 'post');
-        $output .= $this->output->box_end();
-        return $output;
+        debugging('totara_print_errorlog_link has been deprecated please use errorlog_link', DEBUG_DEVELOPER);
+        return $this->errorlog_link($latesterror);
+    }
+
+    /**
+     * Displays a link to download error log
+     *
+     * @param object $latesterror Object containing information about the last site error
+     *
+     * @return string HTML to output.
+     */
+    public function errorlog_link($latesterror) {
+        $data = new stdClass();
+        $data->timeoccured = userdate($latesterror->timeoccured);
+        $data->downloadbutton = $this->output->single_button(new moodle_url('/admin/index.php', array('geterrors' => 1)), get_string('downloaderrorlog', 'totara_core'), 'post');
+        $output = $this->render_from_template('totara_core/errorlog_link', $data);
+
+        // Add admin warning box and return the output.
+        $data = new stdClass();
+        $data->content = $output;
+        return $this->render_from_template('core/admin_warning', $data);
     }
 
     /**
