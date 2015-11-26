@@ -414,8 +414,25 @@ class totara_core_renderer extends plugin_renderer_base {
 
     /**
      * Generate markup for totara menu
+     *
+     * @deprecated since 9.0
      */
     public function print_totara_menu($menudata, $parent=null, $selected_items=array()) {
+        debugging('print_totara_menu has been deprecated please use totara_menu', DEBUG_DEVELOPER);
+        return $this->totara_menu($menudata, $parent, $selected_items);
+    }
+
+    /**
+     * Generate markup for totara menu. This function is called recursively.
+     *
+     * @param $menudata array the menu data
+     * @param $parent string the parent menu name
+     * @param $selected_items array selected menu name items
+     * @param $templatedata object the full data object. Only used on recursive calls.
+     * @param $createchildren boolean create child items. Only used on recursive calls.
+     * @return string the html output
+     */
+    public function totara_menu($menudata, $parent=null, $selected_items=array(), $templatedata = null, $createchildren = false) {
         global $PAGE;
         static $menuinited = false;
 
@@ -424,8 +441,6 @@ class totara_core_renderer extends plugin_renderer_base {
             $PAGE->requires->yui_module('moodle-totara_core-totaramenu', 'M.coremenu.setfocus.init');
             $menuinited = true;
         }
-
-        $output = '';
 
         // Gets selected items, only done first time
         if (!$selected_items && $PAGE->totara_menu_selected) {
@@ -456,40 +471,48 @@ class totara_core_renderer extends plugin_renderer_base {
 
         $numitems = count($currentlevel);
 
+        if (!$templatedata) {
+            $templatedata = new stdClass();
+            $templatedata->menuitems = array();
+        }
+
         $count = 0;
+        $items = array();
         if ($numitems > 0) {
-            // Print out Structure
-            $output .= html_writer::start_tag('ul');
+            // Create Structure
             foreach ($currentlevel as $menuitem) {
                 $url = new moodle_url($menuitem->url);
 
-                $class = 'menu-' . $menuitem->name;
-                if ($count == 0) {
-                    $class .= ' first';
-                }
-
-                if ($count == $numitems - 1) {
-                    $class .= ' last';
-                }
-
+                $class_isfirst = ($count == 0 ? true : false);
+                $class_islast = ($count == $numitems - 1 ? true : false);
                 // If the menu item is known to be selected or it if its a direct match to the current pages URL.
-                if (in_array($menuitem->name, $selected_items) || $this->page->url->compare($url)) {
-                    $class .= ' selected';
-                }
+                $class_isselected = (in_array($menuitem->name, $selected_items) || $this->page->url->compare($url) ? true : false);
 
-                $output .= html_writer::start_tag('li', array('class' => $class));
+                $children = $this->totara_menu($menudata, $menuitem->name, $selected_items, $templatedata, true);
+                $haschildren = ($children ? true : false);
 
-                $output .= $this->output->action_link($url, $menuitem->linktext, null, array('target' => $menuitem->target));
-
-                $output .= $this->print_totara_menu($menudata, $menuitem->name, $selected_items);
-                $output .= html_writer::end_tag('li');
-
+                $items[] = array(
+                    'class_name' => $menuitem->name,
+                    'class_isfirst' => $class_isfirst,
+                    'class_islast' => $class_islast,
+                    'class_isselected' => $class_isselected,
+                    'linktext' => $menuitem->linktext,
+                    'url' => (string) new moodle_url($menuitem->url),
+                    'target' => $menuitem->target,
+                    'haschildren' => $haschildren,
+                    'children' => $children
+                );
                 $count++;
             }
-
-            $output .= html_writer::end_tag('ul');
         }
-        return $output;
+
+        $templatedata->menuitems = $items;
+
+        if ($createchildren) {
+            return $items;
+        }
+
+        return  $this->render_from_template('totara_core/totara_menu', $templatedata);
     }
 
     /**

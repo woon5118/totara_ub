@@ -39,7 +39,7 @@ if ($showmenu && !$hascustommenu) {
     // load totara menu
     $menudata = totara_build_menu();
     $totara_core_renderer = $PAGE->get_renderer('totara_core');
-    $totaramenu = $totara_core_renderer->print_totara_menu($menudata);
+    $totaramenu = $totara_core_renderer->totara_menu($menudata);
 }
 
 $kiwifruitheading = $OUTPUT->kiwifruit_header();
