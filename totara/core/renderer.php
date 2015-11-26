@@ -518,43 +518,75 @@ class totara_core_renderer extends plugin_renderer_base {
     public function comment_template() {
         return $this->render_from_template('totara_core/comment_template', null);
     }
+
     /**
-     * Print list of icons
+     * Print list of icons.
+     *
+     * @deprecated since 9.0
+     * @param string $type Choose the group of Totara icons to return
+     * @return string HTML
      */
     public function print_icons_list($type = 'course') {
+        debugging("print_icons_list has been deprecated. Please use icon_list instead.",DEBUG_DEVELOPER);
+        return $this->icon_list($type);
+    }
+
+    /**
+     * Print list of icons.
+     *
+     * @param string $type Choose the group of icons to return
+     * @return string HTML
+     */
+    public function icon_list($type = 'course') {
         global $CFG;
+
+        $icons = array();
 
         $fs = get_file_storage();
         $files = $fs->get_area_files(context_system::instance()->id, 'totara_core', $type, 0, 'itemid', false);
 
-        $out = html_writer::start_tag('ol', array('id' => 'icon-selectable'));
         // Custom icons.
         foreach ($files as $file) {
-            $itemid = $file->get_itemid();
+            $id = $file->get_itemid();
             $filename = $file->get_filename();
-            $url = moodle_url::make_pluginfile_url($file->get_contextid(), 'totara_core',
-                $file->get_filearea(), $itemid, $file->get_filepath(), $filename, true);
-            $out .= html_writer::start_tag('li', array('id' => $file->get_pathnamehash(), 'iconname' => $filename));
-            $out .= html_writer::empty_tag('img', array('src' => $url, 'class' => 'course_icon', 'alt' => ''));
-            $out .= html_writer::end_tag('li');
-        }
-        // Totara icons.
-        $path = $CFG->dirroot . '/totara/core/pix/' . $type . 'icons';
-        foreach (scandir($path) as $icon) {
-            if ($icon == '.' || $icon == '..') {
-                continue;
-            }
-            $iconid = str_replace('.png', '', $icon);
-            $replace = array('.png' => '', '_' => ' ', '-' => ' ');
-            $iconname = ucwords(strtr($icon, $replace));
-            $out .= html_writer::start_tag('li', array('id' => $iconid));
-            $out .= $this->output->pix_icon('/' . $type . 'icons/' . $iconid, $iconname, 'totara_core',
-                    array('class' => 'course-icon'));
-            $out .= html_writer::end_tag('li');
-        }
-        $out .= html_writer::end_tag('ol');
+            // Create a name to be use in the akt and title parameters of the img tag.
+            $name = preg_replace('/\.[^.\s]{1,}$/', '', $filename);
+            $name = ucwords(strtr($name, array( '_' => ' ', '-' => ' ')));
+            // Generate the full URL of the image.
+            $src = (string) moodle_url::make_pluginfile_url($file->get_contextid(), 'totara_core',
+                $file->get_filearea(), $id, $file->get_filepath(), $filename, true);
 
-        return $out;
+            // Build the icon data so we can use the core/pic_icon template.
+            $attributes = array();
+            $attributes[] = array ('name' => 'alt', 'value' => $name);
+            $attributes[] = array ('name' => 'title', 'value' => $name);
+            $attributes[] = array ('name' => 'class', 'value' => 'course_icon');
+            $attributes[] = array ('name' => 'src', 'value' => $src);
+            $icon = array('id' => $file->get_pathnamehash(), 'attributes' => $attributes);
+            $icons[] = $icon;
+        }
+
+        // Totara icons.
+        foreach (scandir("{$CFG->dirroot}/totara/core/pix/{$type}icons") as $icon) {
+            if ($icon != '.' && $icon != '..') {
+                $id = str_replace('.png', '', $icon);
+                $name = ucwords(strtr($icon, array('.png' => '', '_' => ' ', '-' => ' ')));
+                $src = $this->pix_url("{$type}icons/{$id}", 'totara_core');
+
+                $attributes = array();
+                $attributes[] = array ('name' => 'alt', 'value' => $name);
+                $attributes[] = array ('name' => 'title', 'value' => $name);
+                $attributes[] = array ('name' => 'class', 'value' => 'course_icon');
+                $attributes[] = array ('name' => 'src', 'value' => $src);
+                $icon = array('id' => $id, 'attributes' => $attributes);
+                $icons[] = $icon;
+            }
+        }
+
+        $template_data = new stdClass();
+        $template_data->icons = $icons;
+
+        return $this->output->render_from_template('totara_core/icon_list', $template_data);
     }
 
      /**
