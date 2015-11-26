@@ -30,6 +30,32 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/* === Start of deprecated Totara stuff === */
+
+/**
+ * Given a function name or array syntax (same as first arg of call_user_func)
+ * returns true if the function or method exists
+ *
+ * @deprecated since Totara 9.0
+ * @param callback $function Function name or array defining the method
+ * @return boolean true if function or method exists
+ *
+ * // TODO: delete in Totara 11.0
+ */
+function function_or_method_exists($function) {
+    debugging('Totara function function_or_method_exists() has been deprecated, use standard is_callable() instead', DEBUG_DEVELOPER);
+    // see if it's a function
+    if (is_string($function) && function_exists($function)) {
+        return true;
+    }
+    if (is_array($function) && method_exists($function[0], $function[1])) {
+        return true;
+    }
+    return false;
+}
+
+/* === End of deprecated Totara specific stuff === */
+
 /* === Functions that needs to be kept longer in deprecated lib than normal time period === */
 
 /**

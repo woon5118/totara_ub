@@ -9686,24 +9686,6 @@ function get_home_page() {
 }
 
 /**
- * Given a function name or array syntax (same as first arg of call_user_func)
- * returns true if the function or method exists
- *
- * @param callback $function Function name or array defining the method
- * @return boolean true if function or method exists
- */
-function function_or_method_exists($function) {
-    // see if it's a function
-    if (is_string($function) && function_exists($function)) {
-        return true;
-    }
-    if (is_array($function) && method_exists($function[0], $function[1])) {
-        return true;
-    }
-    return false;
-}
-
-/**
  * Gets the name of a course to be displayed when showing a list of courses.
  * By default this is just $course->fullname but user can configure it. The
  * result of this function should be passed through print_string.
