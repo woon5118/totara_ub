@@ -278,6 +278,19 @@ class core_formslib_testcase extends advanced_testcase {
             'attributes'=>array('type'=>'radio', 'name'=>'repeatradio[2]', 'value'=>'2')), $html);
     }
 
+    // TOTARA TL-8057 - Ensure that all fields are contained in a div.fitem with an id, including static and frozen fields.
+    public function test_rendering_fitem_ids() {
+        $form = new formslib_fitem_ids_test_form();
+
+        ob_start();
+        $form->display();
+        $html = ob_get_clean();
+
+        $this->assertTag(array('tag'=>'div', 'class'=>'fitem', 'id'=>'fitem_id_availabletext'), $html);
+        $this->assertTag(array('tag'=>'div', 'class'=>'fitem', 'id'=>'fitem_id_staticfield'), $html);
+        $this->assertTag(array('tag'=>'div', 'class'=>'fitem', 'id'=>'fitem_id_frozentext'), $html);
+    }
+
     public function test_settype_debugging_text() {
         $mform = new formslib_settype_debugging_text();
         $this->assertDebuggingCalled("Did you remember to call setType() for 'texttest'? Defaulting to PARAM_RAW cleaning.");
@@ -596,6 +609,20 @@ class formslib_test_form extends moodleform {
             $this->_form->createElement('radio', 'repeatradio', 'Choose {no}', 'Two', 2),
         );
         $this->repeat_elements($repeatels, 3, array(), 'numradios', 'addradios');
+    }
+}
+
+/**
+ * TOTARA TL-8057 - Test form to be used by {@link formslib_test::test_rendering_fitem_ids()}.
+ */
+class formslib_fitem_ids_test_form extends moodleform {
+    public function definition() {
+        $this->_form->addElement('text', 'availabletext', 'Available text');
+        $this->_form->setType('availabletext', PARAM_ALPHANUMEXT);
+        $this->_form->addElement('static', 'staticfield', 'Static text');
+        $this->_form->addElement('text', 'frozentext', 'Frozen text');
+        $this->_form->setType('frozentext', PARAM_ALPHANUMEXT);
+        $this->_form->hardFreeze('frozentext');
     }
 }
 
