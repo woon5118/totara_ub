@@ -97,7 +97,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                             PLAN_LINKTYPE_MANDATORY => get_string('mandatory','totara_hierarchy'),
                             PLAN_LINKTYPE_OPTIONAL => get_string('optional','totara_hierarchy'),
                         ),
-                        'linktype', //$name,
+                        'linktype' . $eitem->id, //$name
                         (isset($eitem->linktype) ? $eitem->linktype : PLAN_LINKTYPE_OPTIONAL), //$selected,
                         false, //$nothing,
                         array('data-id' => $eitem->id)
@@ -413,7 +413,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                             PLAN_LINKTYPE_OPTIONAL => get_string('optional', 'totara_hierarchy'),
                             PLAN_LINKTYPE_MANDATORY => get_string('mandatory', 'totara_hierarchy'),
                         ),
-                        'linktype', //$name,
+                        'linktype' . $ritem->aid, //$name,
                         ($ritem->linktype ? $ritem->linktype : PLAN_LINKTYPE_OPTIONAL), //$selected,
                         false, //$nothing,
                         array('data-id' => $ritem->aid)
