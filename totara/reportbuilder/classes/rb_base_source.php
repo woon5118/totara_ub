@@ -4084,6 +4084,33 @@ abstract class rb_base_source {
     }
 
     /**
+     * Dynamically add customfields to columns
+     * @param rb_column_option $columnoption should have public string property "type" which value is the type of customfields to show
+     * @param bool $hidden should all these columns be hidden
+     * @return array
+     */
+    public function rb_cols_generator_allcustomfields(rb_column_option $columnoption, $hidden) {
+        $result = array();
+        foreach($this->columnoptions as $existingcolumn) {
+            if ($existingcolumn->type == $columnoption->type && empty($existingcolumn->columngenerator)) {
+                $result[] = new rb_column(
+                    $existingcolumn->type,
+                    $existingcolumn->value,
+                    $existingcolumn->name,
+                    $existingcolumn->field,
+                    array(
+                        'joins' => $existingcolumn->joins,
+                        'hidden' => $hidden,
+                        'displayfunc' => $existingcolumn->displayfunc,
+                        'extrafields' => $existingcolumn->extrafields
+                    )
+                );
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Adds user custom fields to the report
      *
      * @param array $joinlist

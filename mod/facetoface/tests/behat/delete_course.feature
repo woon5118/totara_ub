@@ -45,14 +45,15 @@ Feature: Delete a course with a facetoface
       | timefinish[0][minute] | 00   |
     And I press "Save changes"
     When I click on "Attendees" "link"
-    And I click on "Add/remove attendees" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
     And I wait "1" seconds
     And I click on "Sam2 Student2, student2@example.com" "option"
     And I press "Add"
     And I wait "1" seconds
-    And I press "Save"
+    And I press "Continue"
+    And I press "Confirm"
     Then I wait until "Sam1 Student1" "text" exists
     And I log out
 

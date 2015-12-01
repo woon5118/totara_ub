@@ -584,6 +584,24 @@ function customfield_get_fields($item, $tableprefix, $prefix) {
 }
 
 /**
+ * Return an associative array of custom field ids and definition pairs
+ *
+ *
+ * @param string $tableprefix Prefix to append '_info_field' to
+ *
+ * @return array Associate array of field definition ids and properties
+ */
+function customfield_get_fields_definition($tableprefix) {
+    global $DB;
+
+    $fields = $DB->get_records($tableprefix.'_info_field', array(), 'sortorder ASC');
+    if (!$fields) {
+        $fields = array();
+    }
+    return $fields;
+}
+
+/**
  * Get custom fields and their data.
  *
  * @param stdClass $item The Item associated with the customfield

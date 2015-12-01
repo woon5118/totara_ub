@@ -21,6 +21,8 @@
  */
 
 $string['activate'] = 'Activate';
+$string['addattendeestep1'] = "Select users to add (step 1 of 2)";
+$string['addattendeestep2'] = "Add users (step 2 of 2)";
 $string['addeditattendeeserror'] = 'Add/edit attendees error';
 $string['addeditattendeesresults'] = 'Add/edit attendees results';
 $string['addeditattendeessuccess'] = 'Add/edit attendees success';
@@ -36,6 +38,7 @@ $string['addnewfield'] = 'Add a new custom field';
 $string['addnewfieldlink'] = 'Create a new custom field';
 $string['addnewnotice'] = 'Add a new site notice';
 $string['addnewnoticelink'] = 'Create a new site notice';
+$string['addattendees'] = 'Add users';
 $string['addremoveattendees'] = 'Add/remove attendees';
 $string['addremoveattendeeswaitlisted'] = 'Please Note: Attendees added will be automatically added to the waiting list';
 $string['addroom'] = 'Add a room';
@@ -157,15 +160,16 @@ $string['bookingstatus'] = 'You are booked for the following session';
 $string['building'] = 'Building';
 $string['bulkactions'] = 'Bulk actions';
 $string['bulkaddattendeeserror'] = 'Bulk add attendees error';
-$string['bulkaddattendeesfromfile'] = 'Bulk add attendees from file';
-$string['bulkaddattendeesfrominput'] = 'Bulk add attendees from text input';
-$string['bulkaddattendeesresults'] = 'Bulk add attendees results';
-$string['bulkaddattendeessuccess'] = 'Bulk add attendees success';
+$string['bulkaddattendeesfromfile'] = 'Add users via file upload';
+$string['bulkaddattendeesfrominput'] = 'Add users via list of IDs';
+$string['bulkaddattendeesresults'] = 'Bulk add users results';
+$string['bulkaddattendeessuccess'] = 'Bulk add users success';
 $string['bulkaddheading'] = 'Bulk Add';
 $string['bulkaddhelptext'] = 'Note: Users must be referenced by their {$a} and must be delimited by a comma or newline';
 $string['bulkaddsourceidnumber'] = 'ID number';
 $string['bulkaddsourceuserid'] = 'user id';
 $string['bulkaddsourceusername'] = 'username';
+$string['bulkremoveattendeessuccess'] = 'Bulk remove users success';
 $string['calendareventdescriptionbooking'] = 'You are booked for this <a href="{$a}">Face-to-face session</a>.';
 $string['calendareventdescriptionsession'] = 'You have created this <a href="{$a}">Face-to-face session</a>.';
 $string['calendarfiltersheading'] = 'Facetoface calendar filters';
@@ -194,6 +198,7 @@ $string['cannotsignupsessionover'] = 'You cannot sign up, this session is over.'
 $string['cannotapproveatcapacity'] = 'You cannot approve any more attendees as this session is full.';
 $string['ccmanager'] = 'Manager copy';
 $string['ccmanager_note'] = 'Send a copy of this notification to the user\'s manager';
+$string['changeselectedusers'] = 'Change selected users';
 $string['chooseroom'] = 'Choose a room';
 $string['choosepredefinedroom'] = 'Choose a pre-defined room';
 $string['cannotapproveatcapacity'] = 'You cannot approve any more attendees as this session is full.';
@@ -235,8 +240,23 @@ $string['cutoff_help'] = 'The amount of time before the first session that messa
 This must be at least 24 hours before the session.
 The start date of the earliest session must be at least this far in the future.';
 $string['csvtextfile'] = 'Text file';
+$string['scvtextfile_help'] = '*File format information*
+
+The file should be a text file containing a heading row and one or more data rows. If a row contains multiple columns they should be separated by a comma (,). Every row must have the same number of columns. Below is a list of the heading names you can use:
+
+ * username - the username of the user to add
+ * idnumber - the idnumber of the user to add
+ * email - the email address of the user to add
+{$a->customfields}
+
+The following fields must be provided:
+
+ * Either username, idnumber, or email (only one)
+{$a->requiredcustomfields}
+';
 $string['csvtextinput'] = 'CSV text input';
 $string['currentallocations'] = 'Current allocations ({$a->allocated} / {$a->max})';
+$string['currentattendees'] = 'Current attendees';
 $string['currentstatus'] = 'Current status';
 $string['customfieldsheading'] = 'Custom Fields';
 $string['customfieldsheadingaction'] = '{$a} Custom Session Fields';
@@ -349,8 +369,14 @@ $string['error:couldnotupdatenotice'] = 'Could not update site notice.';
 $string['error:couldnotupdatesession'] = 'Could not update session';
 $string['error:coursemisconfigured'] = 'Course is misconfigured';
 $string['error:cronprefix'] = 'Error: facetoface cron:';
+$string['error:csvcannotparse'] = 'Cannot parse submitted CSV file.';
+$string['error:csvinconsistentrows'] = 'Rows {$a} of your file contain a different number of columns than the header row';
+$string['error:csvnoidfields'] = 'You did not provide a column called \'username\', \'email\', or \'idnumber\'';
+$string['error:csvnorequiredcf'] = 'You did not provide a column called \'{$a}\'';
+$string['error:csvtoomanyidfields'] = 'Your file contained more than one of the following columns: \'username\', \'email\', \'idnumber\'';
 $string['error:cutofftooclose'] = 'The cut-off time for minimum capacity is too close to the sessions earliest start date, please set at least a 24 hours cut-off';
 $string['error:cutofftoolate'] = 'The cut-off for minimum capacity is after the sessions earliest start date, it must be before to have any effect.';
+$string['error:emailnotfound'] = 'No users were found with the following emails: {$a}';
 $string['error:emptymanageremail'] = 'Manager email address empty.';
 $string['error:emptylocation'] = 'Location was empty.';
 $string['error:emptyvenue'] = 'Venue was empty.';
@@ -358,6 +384,7 @@ $string['error:enrolmentfailed'] = 'Could not enrol {$a} into the course.';
 $string['error:eventoccurred'] = 'You cannot cancel an event that has already occurred.';
 $string['error:fieldidincorrect'] = 'Field ID is incorrect: {$a}';
 $string['error:f2ffailedupdatestatus'] = 'Face-to-face failed to update the user\'s status';
+$string['error:idnumbernotfound'] = 'No users were found with the following ID numbers: {$a}';
 $string['error:incorrectcoursemodule'] = 'Course module is incorrect';
 $string['error:incorrectcoursemoduleid'] = 'Course Module ID was incorrect';
 $string['error:incorrectcoursemodulesession'] = 'Course Module Face-to-face Session was incorrect';
@@ -390,6 +417,7 @@ $string['error:takeattendance'] = 'An error occurred while taking attendance';
 $string['error:therearexconflicts'] = 'There are ({$a}) conflicts with the proposed time period.';
 $string['error:thereisaconflict'] = 'There is a conflict with the proposed time period.';
 $string['error:unknownbuttonclicked'] = 'No action associated with the button that was clicked';
+$string['error:unknownuserfield'] = 'This field is not supported for user search.';
 $string['error:userassignedsessionconflictsameday'] = '{$a->fullname} is already assigned as a \'{$a->participation}\' for {$a->session} at {$a->timestart} to {$a->timefinish} on {$a->datestart}. Please select another user or change the session date';
 $string['error:userbookedsessionconflictsameday'] = '{$a->fullname} is already booked to attend {$a->session} at {$a->timestart} to {$a->timefinish} on {$a->datestart}. Please select another user or change the session date';
 $string['error:userassignedsessionconflictmultiday'] = '{$a->fullname} is already assigned as a \'{$a->participation}\' for {$a->session} at {$a->datetimestart} to {$a->datetimefinish}. Please select another user or change the session date';
@@ -400,6 +428,7 @@ $string['error:userassignedsessionconflictmultidayselfsignup'] = 'You are alread
 $string['error:userbookedsessionconflictmultidayselfsignup'] = 'You are already booked to attend {$a->session} at {$a->datetimestart} to {$a->datetimefinish}.';
 $string['error:userdeleted'] = 'Can not add deleted user {$a} to the facetoface.';
 $string['error:userimportuseridnotanint'] = 'Cannot add user with user id {$a} because it is not an integer';
+$string['error:usernamenotfound'] = 'No users were found with the following usernames: {$a}';
 $string['error:usersuspended'] = 'Can not add suspended user {$a} to the facetoface.';
 $string['eventattendancerequestsapproved'] = 'Attendance requests approved';
 $string['eventattendancerequestsdeclined'] = 'Attendance requests declined';
@@ -588,6 +617,10 @@ $string['notificationboth'] = 'Email Notification and iCalendar Appointment';
 $string['notificationemail'] = 'Email Notification only';
 $string['notificationnone'] = 'No Email Notification';
 $string['notifications_help'] = 'Here you can manage notifications for this Face-to-face acitivity'; //TODO: write better help
+$string['notifycancelleduser'] = 'Notify cancelled attendees';
+$string['notifycancelledusermanager'] = 'Notify cancelled attendees\' managers';
+$string['notifynewuser'] = 'Notify new attendees';
+$string['notifynewusermanager'] = 'Notify new attendees\' managers';
 $string['noticedeleteconfirm'] = 'Delete site notice \'{$a->name}\'?<br/><blockquote>{$a->text}</blockquote>';
 $string['noticetext'] = 'Notice text';
 $string['notrequired'] = 'Not required';
@@ -698,6 +731,7 @@ $string['placeholder:lateststarttime'] = '[lateststarttime]';
 $string['placeholder:lateststartdate'] = '[lateststartdate]';
 $string['placeholder:latestfinishtime'] = '[latestfinishtime]';
 $string['placeholder:latestfinishdate'] = '[latestfinishdate]';
+$string['pleaseselectusers'] = 'Please select users before continuing.';
 $string['pluginadministration'] = 'Facetoface administration';
 $string['pluginname'] = 'Face-to-face';
 $string['points'] = 'Points';
@@ -718,6 +752,10 @@ $string['registeredon'] = 'Registered On';
 $string['registrations'] = 'Registrations';
 $string['reminder'] = 'Reminder';
 $string['remindermessage'] = 'Reminder message';
+$string['removeattendees'] = 'Remove users';
+$string['removeattendeestep1'] = "Select users to remove (step 1 of 2)";
+$string['removeattendeestep2'] = "Remove users (step 2 of 2)";
+$string['removecfdatawarning'] = 'Removing users from this session also deletes their sign up data.';
 $string['removedsuccessfully'] = 'Removed successfully';
 $string['removeroominuse'] = 'This room is currently being used';
 $string['replaceallocations'] = 'Create reservations when removing allocations';
@@ -777,6 +815,7 @@ $string['sendnow'] = 'Send now';
 $string['sentxnotifications'] = 'Send {$a} notifications';
 $string['sentremindermanager'] = 'Sent reminder email to user manager';
 $string['sentreminderuser'] = 'Sent reminder email to user';
+$string['sessionattendees'] = 'Session attendees';
 $string['sessioncustomfieldtab'] = 'Session';
 $string['sessiondate'] = 'Session date';
 $string['sessiondatetime'] = 'Session date/time';
@@ -1172,6 +1211,9 @@ $string['showcancelreason'] = 'Show cancellation reason';
 $string['showoncalendar'] = 'Calendar display settings';
 $string['signup'] = 'Sign-up';
 $string['signupcustomfieldtab'] = 'Sign-up note';
+$string['signupdata'] = 'Sign-up data';
+$string['signupfields'] = 'Sign-up fields';
+$string['signupfieldslimitation'] = 'The values entered below will be populated for all selected users. To enter different values for each user use the <a href="{$a}">file import</a>';
 $string['signups'] = 'Sign-ups';
 $string['signupfor'] = 'Sign-up for {$a}';
 $string['signupforsession'] = 'Sign-up for an available upcoming session';
@@ -1252,6 +1294,10 @@ $string['upgradeprocessinggrades'] = 'Processing Face-to-face grades, this may t
 $string['usercancelledon'] = 'User cancelled on {$a}';
 $string['userdoesnotexist'] = 'User with {$a->fieldname} "{$a->value}" does not exist';
 $string['useriddoesnotexist'] = 'User with ID "{$a}" does not exist';
+$string['userstoadd'] = 'Users to add';
+$string['userstoaddcomment'] = 'Enter one user per line:';
+$string['userstobeadded'] = 'Users to be added';
+$string['userstoremove'] = 'Users to remove';
 $string['allowbookingscancellations'] = 'Allow booking cancellations';
 $string['allowbookingscancellationsdefault'] = 'Default booking cancellation setting for this facetoface';
 $string['allowbookingscancellations_help'] = 'Allow users to cancel their bookings at any time, never or until cut-off reached (x amount of time before the session starts).';
@@ -1451,6 +1497,7 @@ $string['timefinish_help'] = 'Finish time is the time when the session ends.';
 
 $string['timestart_help'] = 'Start time is the time when the session begins.';
 
+$string['useridentifier'] = 'User identifier';
 $string['usercalentry_help'] = 'When active this setting adds a User Event entry to the calendar of an attendee of a face-to-face session. When turned off this prevents a duplicate event appearing in a session attendee\'s calendar, where you have calendar display settings set to Course or Site.';
 
 $string['venue_help'] = '**Venue** is the building the session will be held in.

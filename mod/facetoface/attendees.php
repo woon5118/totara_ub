@@ -43,25 +43,18 @@ $cancelform        = optional_param('cancelform', false, PARAM_BOOL);
 $action            = optional_param('action', 'attendees', PARAM_ALPHA);
 // Only return content
 $onlycontent        = optional_param('onlycontent', false, PARAM_BOOL);
-// export download
+// Export download.
 $download = optional_param('download', '', PARAM_ALPHA);
 // If approval requests have been updated, show a success message.
 $approved = optional_param('approved', 0, PARAM_INT);
 
-// Load data
-if (!$session = facetoface_get_session($s)) {
-    print_error('error:incorrectcoursemodulesession', 'facetoface');
-}
-if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface))) {
-    print_error('error:incorrectfacetofaceid', 'facetoface');
-}
-if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
-    print_error('error:coursemisconfigured', 'facetoface');
-}
-if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
-    print_error('error:incorrectcoursemodule', 'facetoface');
-}
-$context = context_module::instance($cm->id);
+// Report support.
+$format = optional_param('format','',PARAM_TEXT);
+$sid = optional_param('sid', '0', PARAM_INT);
+$debug = optional_param('debug', 0, PARAM_INT);
+
+
+list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 
 if ($action == 'approvalrequired') {
     // Allow managers to be able to approve staff without being enrolled in the course.
@@ -100,7 +93,7 @@ $allowed_actions = array();
 $available_actions = array();
 
 $PAGE->set_context($context);
-$PAGE->set_url('/mod/facetoface/atendees.php', array('s' => $s));
+$PAGE->set_url('/mod/facetoface/attendees.php', array('s' => $s));
 
 // Actions the user can perform
 $has_attendees = facetoface_get_num_attendees($s);
@@ -245,6 +238,8 @@ $heading_message = '';
 $params = array('sessionid' => $s);
 $cols = array();
 $actions = array();
+$exports = array();
+
 if ($action == 'attendees') {
     $heading = get_string('attendees', 'facetoface');
 
@@ -255,27 +250,32 @@ if ($action == 'attendees') {
 
     // Get list of actions
     if (in_array('addattendees', $allowed_actions)) {
-        $actions['addremove']    = get_string('addremoveattendees', 'facetoface');
+        $actions['add']    = get_string('addattendees', 'facetoface');
         $actions['bulkaddfile']  = get_string('bulkaddattendeesfromfile', 'facetoface');
         $actions['bulkaddinput'] = get_string('bulkaddattendeesfrominput', 'facetoface');
+        $actions['remove']    = get_string('removeattendees', 'facetoface');
     }
 
-    if ($has_attendees) {
-        $actions['exportxls'] = get_string('exportattendancexls', 'facetoface');
-        $actions['exportods'] = get_string('exportattendanceods', 'facetoface');
-        $actions['exportcsv'] = get_string('exportattendancetxt', 'facetoface');
-    };
+    // Verify global restrictions and process report early before any output is done (required for export).
+    $shortname = 'facetoface_sessions';
+    $reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
+    $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
-    $params['statusgte'] = MDL_F2F_STATUS_BOOKED;
-    $cols = array(
-        array('user', 'idnumber'),
-        array('user', 'namelink'),
-        array('user', 'email'),
-        array('user', 'position'),
-        //array('session', 'discountcode'),
-        array('status', 'statuscode'),
-    );
+    $attendancestatuses = array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_FULLY_ATTENDED, MDL_F2F_STATUS_NOT_SET,
+        MDL_F2F_STATUS_NO_SHOW, MDL_F2F_STATUS_PARTIALLY_ATTENDED);
+    if (!$report = reportbuilder_get_embedded_report($shortname, array('sessionid' => $s, 'status' => $attendancestatuses),
+            false, $sid, $globalrestrictionset)) {
+        print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
+    }
 
+    if ($format != '') {
+        $report->export_data($format);
+        die;
+    }
+
+    $report->include_js();
+
+    // We will show embedded report.
     $show_table = true;
 }
 
@@ -303,7 +303,7 @@ if ($action == 'cancellations') {
     $heading = get_string('cancellations', 'facetoface');
 
     // Get list of actions
-    $actions = array(
+    $exports = array(
         'exportxls'     => get_string('exportxls', 'totara_reportbuilder'),
         'exportods'     => get_string('exportods', 'totara_reportbuilder'),
         'exportcsv'     => get_string('exportcsv', 'totara_reportbuilder')
@@ -324,7 +324,7 @@ if ($action == 'takeattendance') {
     $heading = get_string('takeattendance', 'facetoface');
 
     // Get list of actions
-    $actions = array(
+    $exports = array(
         'exportxls'                 => get_string('exportxls', 'totara_reportbuilder'),
         'exportods'                 => get_string('exportods', 'totara_reportbuilder'),
         'exportcsv'                 => get_string('exportcsv', 'totara_reportbuilder')
@@ -556,11 +556,6 @@ if (!$onlycontent && !$download) {
     echo $OUTPUT->container_start('f2f-attendees-table');
 }
 
-if ($onlycontent && !$download) {
-    // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
-    send_headers('text/html; charset=utf-8', false);
-}
-
 /**
  * Print attendees (if user able to view)
  */
@@ -585,20 +580,6 @@ if ($show_table) {
             $rows = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_NO_SHOW,
                 MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
             break;
-
-        case 'attendees':
-            if ($attendees) {
-                $rows = $attendees;
-            } else {
-                if ($session->datetimeknown) {
-                    $rows = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_NO_SHOW,
-                        MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
-                } else {
-                    $rows = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_WAITLISTED, MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_NO_SHOW,
-                        MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
-                }
-            }
-            break;
     }
 
     if (!$download) {
@@ -618,7 +599,40 @@ if ($show_table) {
         echo $OUTPUT->heading($heading);
     }
 
-    if (empty($rows)) {
+    if ($action == 'attendees') {
+        $report->display_restrictions();
+    }
+
+    // Actions menu.
+    if (has_any_capability(array('mod/facetoface:addattendees', 'mod/facetoface:removeattendees'), $context)) {
+        echo $OUTPUT->container_start('actions last');
+        if ($actions) {
+            // Action selector
+            echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('actions')));
+            if ($action == 'waitlist') {
+                echo $OUTPUT->help_icon('f2f-waitlist-actions', 'mod_facetoface');
+            }
+        }
+        echo $OUTPUT->container_end();
+    }
+
+    if ($action == 'attendees') {
+
+        if ($debug) {
+            $report->debug($debug);
+        }
+
+        $report->display_search();
+        $report->display_sidebar_search();
+
+        // Print saved search buttons if appropriate.
+        echo $report->display_saved_search_options();
+
+        $report->display_table();
+        $output = $PAGE->get_renderer('totara_reportbuilder');
+        $output->export_select($report, $sid);
+
+    } else if (empty($rows)) {
         if ($facetoface->approvalreqd) {
             if (count($requests) == 1) {
                 echo $OUTPUT->notification(get_string('nosignedupusersonerequest', 'facetoface'));
@@ -920,12 +934,9 @@ if ($show_table) {
             echo html_writer::end_tag('p') . html_writer::end_tag('form');
         }
         echo $OUTPUT->container_start('actions last');
-        if ($actions) {
+        if ($exports) {
             // Action selector
-            echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('action')));
-            if ($action == 'waitlist') {
-                echo $OUTPUT->help_icon('f2f-waitlist-actions', 'mod_facetoface');
-            }
+            echo html_writer::select($exports, 'f2f-actions', '', array('' => get_string('export', 'totara_reportbuilder')));
         }
         echo $OUTPUT->container_end();
     }

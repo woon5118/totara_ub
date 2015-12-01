@@ -75,6 +75,12 @@ div.mod-indent form.togglecompletion input[type="image"] {
     right: -5px;
 }
 
+.controls.addremove button {
+    display:block;
+    min-width: 100px;
+    margin: 10px auto;
+}
+
 /* modal dialogs */
 .path-admin-mod-facetoface.yui3-skin-sam .yui3-panel-content,
 .path-mod-facetoface.yui3-skin-sam .yui3-panel-content {
@@ -194,4 +200,55 @@ table.reportbuilder-table tr {
 .reportbuilder-table .session_bookingstatus div.fullybooked,
 .reportbuilder-table .session_overallstatus div.started {
     background-color: #90ee90;
+}
+
+textarea[name="csvinput"] {
+    min-height: 200px;
+}
+
+dl.f2fline {
+  width: 100%;
+  overflow: hidden;
+  padding: 0;
+  margin: 0 0 10px 0;
+}
+
+.f2fline dt {
+  float: left;
+  clear: left;
+  padding: 0;
+  margin: 0 10px 0 0;
+}
+
+.f2fline dd {
+  float: left;
+  padding: 0;
+  margin: 0;
+}
+
+.dir-rtl .f2fline dt {
+    float: right;
+    margin: 0 0 0 10px;
+}
+
+.dir-rtl .f2fline dd {
+    float:right;
+}
+
+.noshow {
+    display: none;
+}
+
+#assignform button.search,
+#assignform input[type="submit"].search {
+    margin: 2px auto;
+}
+
+#assignform input[type="text"] {
+    margin: 5px 0 0 0;
+    vertical-align: top;
+}
+
+#assignform .user-multiselect select {
+    height: 400px;
 }

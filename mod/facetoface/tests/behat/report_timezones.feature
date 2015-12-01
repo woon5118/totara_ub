@@ -70,19 +70,19 @@ Feature: Facetoface timezones in reports
     And I should see "1:00 AM - 2:30 AM Australia/Perth" in the "Room 2" "table_row"
     And I should see "4 February 2021" in the "Room 2" "table_row"
     And I click on "Attendees" "link" in the "Room 1" "table_row"
-    And I click on "Add/remove attendees" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "First User, user1@example.com" "option"
     And I press "Add"
-    And I wait "1" seconds
-    And I press "Save"
+    And I press "Continue"
+    And I press "Confirm"
     And I wait until "First User" "text" exists
     And I click on "Go back" "link"
     And I click on "Attendees" "link" in the "Room 2" "table_row"
-    And I click on "Add/remove attendees" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Second User, user2@example.com" "option"
     And I press "Add"
-    And I wait "1" seconds
-    And I press "Save"
+    And I press "Continue"
+    And I press "Confirm"
     And I wait until "Second User" "text" exists
 
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"

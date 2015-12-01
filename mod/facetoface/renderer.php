@@ -572,4 +572,51 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         return $out;
     }
+
+    /**
+     * Render table of users used in add attendees list
+     * @param array $users
+     * @return string
+     */
+    public function print_user_table($users) {
+        global $OUTPUT;
+        $out = '';
+        $showcfdatawarning = false;
+
+        if (count($users) > 0) {
+            $table = new html_table();
+            $table->head = array(
+                get_string('name'),
+                get_string('email'),
+                get_string('username'),
+                get_string('idnumber'));
+
+            if (isset(current($users)->cntcfdata)) {
+                $table->head[] = get_string('signupdata', 'facetoface');
+            }
+
+            $table->attributes = array('class' => 'generaltable userstoadd fullwidth');
+
+            foreach ($users as $user) {
+                $fullname = fullname($user);
+                $row = array($fullname, $user->email, $user->username, $user->idnumber);
+                if (isset($user->cntcfdata)) {
+                    if ($user->cntcfdata) {
+                        $showcfdatawarning = true;
+                        $row[] = html_writer::tag('strong', get_string('yes'));
+                    } else {
+                        $row[] = get_string('no');
+                    }
+                }
+                $row = new html_table_row($row);
+                $table->data[] = $row;
+            }
+
+            if ($showcfdatawarning) {
+                $out .= $OUTPUT->notification(get_string('removecfdatawarning', 'facetoface'), 'notifymessage');
+            }
+            $out .= html_writer::table($table);
+        }
+        return $out;
+    }
 }

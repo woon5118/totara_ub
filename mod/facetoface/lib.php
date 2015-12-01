@@ -3403,11 +3403,12 @@ function facetoface_session_has_capacity($session, $context = false, $status = M
  * @param boolean $calendaroutput Whether the output should be formatted for a calendar event
  * @param boolean $return         Whether to return (true) the html or print it directly (true)
  * @param boolean $hidesignup     Hide any messages relating to signing up
+ * @param string  $class          Custom css class for dl
  */
-function facetoface_print_session($session, $showcapacity, $calendaroutput=false, $return=false, $hidesignup=false) {
+function facetoface_print_session($session, $showcapacity, $calendaroutput=false, $return=false, $hidesignup=false, $class='f2f') {
     global $CFG, $DB;
 
-    $output = html_writer::start_tag('dl', array('class' => 'f2f'));
+    $output = html_writer::start_tag('dl', array('class' => $class));
 
     // Print customfields.
     $customfields = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
@@ -4655,6 +4656,40 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
     return $result;
 }
 
+/**
+ * Sets totara_set_notification message describing bulk import results
+ * @param array $results
+ * @param string $type
+ */
+function facetoface_set_bulk_result_notification($results, $type = 'bulkadd') {
+    $added          = $results[0];
+    $errors         = $results[1];
+    $result_message = '';
+
+    $dialogid = 'f2f-import-results';
+    $noticeclass = 'notifysuccess';
+    // Generate messages
+    if ($errors) {
+        $noticeclass = 'notifyproblem';
+        $result_message .= get_string($type.'attendeeserror', 'facetoface') . ' - ';
+
+        if (count($errors) == 1 && is_string($errors[0])) {
+            $result_message .= $errors[0];
+        } else {
+            $result_message .= get_string('xerrorsencounteredduringimport', 'facetoface', count($errors));
+            $result_message .= ' <a href="#" class="'.$dialogid.'">('.get_string('viewresults', 'facetoface').')</a>';
+        }
+    }
+    if ($added) {
+        $result_message .= get_string($type.'attendeessuccess', 'facetoface') . ' - ';
+        $result_message .= get_string('successfullyaddededitedxattendees', 'facetoface', count($added));
+        $result_message .= ' <a href="#" class="'.$dialogid.'">('.get_string('viewresults', 'facetoface').')</a>';
+    }
+
+    if ($result_message != '') {
+        totara_set_notification($result_message, null, array('class' => $noticeclass));
+    }
+}
 /**
  * Return message describing bulk import results
  *
@@ -6273,4 +6308,30 @@ function facetoface_delete_reservations($sessionid, $managerid) {
     $transaction->allow_commit();
 
     return $result;
+}
+
+/**
+ * Get facetoface session related instances commonly used in the code
+ * Will stop code execution and display error if wrong id supplied
+ * @param int $sessionid sessionid
+ *
+ * @return array($session, $facetoface, $course, $cm, $context)
+ */
+function facetoface_get_env_session($sessionid) {
+    global $DB;
+    if (!$session = facetoface_get_session($sessionid)) {
+        print_error('error:incorrectcoursemodulesession', 'facetoface');
+    }
+    if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface))) {
+        print_error('error:incorrectfacetofaceid', 'facetoface');
+    }
+    if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
+        print_error('error:coursemisconfigured', 'facetoface');
+    }
+    if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
+        print_error('error:incorrectcoursemodule', 'facetoface');
+    }
+    $context = context_module::instance($cm->id);
+
+    return array($session, $facetoface, $course, $cm, $context);
 }

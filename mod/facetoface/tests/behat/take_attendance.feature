@@ -58,7 +58,7 @@ Feature: Take attendance for Face to face sessions
       | timefinish[0][minute] | -30              |
     And I press "Save changes"
     And I click on "Attendees" "link"
-    And I click on "Add/remove attendees" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
     And I wait "1" seconds
@@ -72,14 +72,12 @@ Feature: Take attendance for Face to face sessions
     And I press "Add"
     # We must wait here, because the refresh may not happen before the save button is clicked otherwise.
     And I wait "1" seconds
-    And I click on "Save" "button"
-    And I wait "1" seconds
-    And I reload the page
+    And I press "Continue"
+    And I press "Confirm"
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
     And I should see "Sam3 Student3"
     And I should see "Sam4 Student4"
-    And I wait "1" seconds
     And I log out
 
   @javascript
@@ -93,6 +91,7 @@ Feature: Take attendance for Face to face sessions
     And I click on "Fully attended" "option" in the "Sam1 Student1" "table_row"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
+    And I should see "Sam1 Student1"
     When I navigate to "Course completion" node in "Course administration > Reports"
     And I click on "Sam1 Student1" "link"
     Then I should see "Completed" in the "#criteriastatus" "css_element"

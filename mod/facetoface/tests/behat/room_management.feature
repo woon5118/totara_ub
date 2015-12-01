@@ -97,7 +97,7 @@ Feature: Manage pre-defined rooms
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I set the field "menuf2f-actions" to "Add/remove attendees"
+    And I set the field "menuf2f-actions" to "Add users"
     And I wait "1" seconds
     And I click on "User One, user1@example.invalid" "option"
     And I click on "User Two, user2@example.invalid" "option"
@@ -106,21 +106,23 @@ Feature: Manage pre-defined rooms
     And I click on "User Five, user5@example.invalid" "option"
     And I press "Add"
     And I wait "1" seconds
-    And I press "Save"
+    And I press "Continue"
+    And I press "Confirm"
     Then I should see "User One"
     And I should see "User Two"
     And I should see "User Three"
     And I should see "User Four"
     And I should see "User Five"
-    And I should see "Add/edit attendees success"
+    And I should see "Bulk add users success"
     And I should not see "This session is overbooked"
 
-    And I set the field "menuf2f-actions" to "Add/remove attendees"
+    And I set the field "menuf2f-actions" to "Add users"
     And I wait "1" seconds
     And I click on "User Six, user6@example.invalid" "option"
     And I press "Add"
     And I wait "1" seconds
-    And I press "Save"
+    And I press "Continue"
+    And I press "Confirm"
     Then I should see "User Six"
     And I should see "This session is overbooked"
 

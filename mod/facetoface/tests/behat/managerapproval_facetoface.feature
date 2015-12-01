@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara
-Feature: Manager approval
+Feature: Manager approval in face-to-face
   In order to control seminar attendance
   As a manager
   I need to authorise seminar signups
@@ -127,8 +127,8 @@ Feature: Manager approval
     Then I press "Update requests"
     And I follow "Attendees"
     And I should see "This session is overbooked (2 / 1)"
-    And I should see "Sam1 Student1" in the "table.mod-facetoface-attendees" "css_element"
-    And I should see "Sam2 Student2" in the "table.mod-facetoface-attendees" "css_element"
+    And I should see "Sam1 Student1" in the "#facetoface_sessions" "css_element"
+    And I should see "Sam2 Student2" in the "#facetoface_sessions" "css_element"
     And I log out
     # Student 1 cancels their attendance.
     When I log in as "student1"
@@ -146,8 +146,8 @@ Feature: Manager approval
     And I follow "Test facetoface name"
     And I follow "Attendees"
     Then I should not see "This session is overbooked (2 / 1)"
-    And I should not see "Sam1 Student1" in the "table.mod-facetoface-attendees" "css_element"
-    And I should see "Sam2 Student2" in the "table.mod-facetoface-attendees" "css_element"
+    And I should not see "Sam1 Student1" in the "#facetoface_sessions" "css_element"
+    And I should see "Sam2 Student2" in the "#facetoface_sessions" "css_element"
     # Confirm the cancellation page shows the correct result
     When I follow "Cancellations"
     And I should see "Sam1 Student1" in the "table.mod-facetoface-attendees" "css_element"

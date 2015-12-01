@@ -24,6 +24,7 @@
 $string['sourcetitle'] = 'Face-to-face sessions';
 // columns
 $string['address'] = 'Address';
+$string['allsignupcustomfields'] = 'All sign up custom fields';
 $string['bookedby'] = 'Booked by';
 $string['building'] = 'Building';
 $string['createdby'] = 'Actioned By';
@@ -43,6 +44,7 @@ $string['ftfnamelink'] = 'Face to Face Name (linked to session page)';
 $string['room'] = 'Room';
 $string['roomdescription'] = 'Room description';
 $string['roomname'] = 'Room name';
+$string['selectedpositionedit'] = 'Select position name (when enabled)';
 $string['sessdate'] = 'Session Start Date';
 $string['sessdatefinish'] = 'Session Finish Date';
 $string['sessdatelink'] = 'Session Start Date (linked to activity)';
@@ -53,6 +55,7 @@ $string['sessionrole'] = 'Session {$a}';
 $string['sessionrolelink'] = 'Session {$a} (linked to profile)';
 $string['sessionx'] = 'Session {$a}';
 $string['starttime'] = 'Start Time';
+$string['timeofsignup'] = 'Time of sign-up';
 $string['cancellationdate'] = 'Cancellation date';
 $string['cancellationreason'] = 'Cancellation reason';
 $string['usernote'] = 'User\'s note';

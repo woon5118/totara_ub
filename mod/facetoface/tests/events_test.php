@@ -247,7 +247,7 @@ class facetoface_events_testcase extends advanced_testcase {
         $this->assertSame('u', $data['crud']);
         $this->assertEventContextNotUsed($event);
         $this->assertEventLegacyLogData(array($this->course->id, 'facetoface', 'Add/remove attendees',
-            "editattendees.php?s={$this->session->id}&clear=1", $this->session->id, $this->facetoface->cmid), $event);
+            "attendees.php?s={$this->session->id}", $this->session->id, $this->facetoface->cmid), $event);
     }
 
     public function test_attendee_position_updated() {

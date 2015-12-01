@@ -107,13 +107,14 @@ Feature: Face to face summary report overview
       | discountcost         | 2.10              |
     And I press "Save changes"
     And I click on the link "Attendees" in row 1
-    And I click on "Add/remove attendees" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
     And I click on "Sam2 Student2, student2@example.com" "option"
     And I press "Add"
     And I wait "1" seconds
-    And I press "Save"
+    And I press "Continue"
+    And I press "Confirm"
     And I follow "Go back"
 
     # 3: (2nd activity of C1) Bookings available, upcoming
@@ -135,11 +136,12 @@ Feature: Face to face summary report overview
       | discountcost          | 1.50 |
     And I press "Save changes"
     And I click on the link "Attendees" in row 1
-    And I click on "Add/remove attendees" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam3 Student3, student3@example.com" "option"
     And I press "Add"
     And I wait "1" seconds
-    And I press "Save"
+    And I press "Continue"
+    And I press "Confirm"
 
     # 4: (1st activity of C2) Fully booked, ended, no one
     And I click on "Find Learning" in the totara menu
@@ -170,11 +172,12 @@ Feature: Face to face summary report overview
     And I click on "Sam5 Student5" "checkbox"
     And I press "Save changes"
     And I follow "Attendees"
-    And I click on "Add/remove attendees" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam6 Student6, student6@example.com" "option"
     And I press "Add"
     And I wait "1" seconds
-    And I press "Save"
+    And I press "Continue"
+    And I press "Confirm"
 
   Scenario: Create report and check all data
     Given I navigate to "Manage reports" node in "Site administration > Reports > Report builder"

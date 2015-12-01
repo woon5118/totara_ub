@@ -453,6 +453,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'session',
+                'positionnameedit',
+                get_string('selectedpositionedit', 'rb_source_facetoface_sessions'),
+                'pos_assignment.fullname',
+                array(
+                    'columngenerator' => 'position_edit')
+                ),
+            new rb_column_option(
+                'session',
                 'positionassignmentname',
                 get_string('selectedpositionassignment', 'mod_facetoface'),
                 'pos_assignment.fullname',
@@ -469,6 +477,16 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                       'outputformat' => 'text',
                       'displayfunc' => 'position_type')
             ),
+            new rb_column_option(
+                'status',
+                'timecreated',
+                get_string('timeofsignup', 'rb_source_facetoface_sessions'),
+                'status.timecreated',
+                array(
+                    'displayfunc' => 'nice_datetime',
+                    'dbdatatype' => 'timestamp'
+                )
+            )
         );
 
         // include some standard columns
@@ -499,7 +517,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'status',
                 'statuscode',
                 get_string('status', 'rb_source_facetoface_sessions'),
-                'select',
+                'multicheck',
                 array(
                     'selectfunc' => 'session_status_list',
                     'attributes' => rb_filter_option::select_width_limiter(),
@@ -725,6 +743,10 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'status.statuscode',
                 'status'
             ),
+            new rb_param_option(
+                'sessionid',
+                'base.sessionid'
+            ),
         );
 
         return $paramoptions;
@@ -817,11 +839,19 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     }
 
     protected function add_customfields() {
+        $this->columnoptions[] = new rb_column_option(
+            'facetoface_signup',
+            'allsignupcustomfields',
+            get_string('allsignupcustomfields', 'rb_source_facetoface_sessions'),
+            'allsignupcustomfields',
+            array(
+                'columngenerator' => 'allcustomfields'
+            )
+        );
         $this->add_custom_fields_for('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
         $this->add_custom_fields_for('facetoface_signup', 'status', 'facetofacesignupid', $this->joinlist, $this->columnoptions, $this->filteroptions);
         $this->add_custom_fields_for('facetoface_cancellation', 'cancellationstatus', 'facetofacecancellationid', $this->joinlist, $this->columnoptions, $this->filteroptions);
     }
-
 
     //
     //
@@ -834,6 +864,71 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     // Face-to-face specific display functions
     //
     //
+    /**
+     * Position name column with edit icon
+     */
+    public function rb_display_position_edit($position, $row, $isexport = false) {
+        global $OUTPUT;
+
+        if ($isexport) {
+            return $position;
+        }
+
+        if (!$cm = get_coursemodule_from_instance('facetoface', $row->facetofaceid, $row->courseid)) {
+            print_error('error:incorrectcoursemodule', 'facetoface');
+        }
+        $context = context_module::instance($cm->id);
+        $canchangesignedupjobposition = has_capability('mod/facetoface:changesignedupjobposition', $context);
+
+        $label = position::position_label($row);
+
+        $url = new moodle_url('/mod/facetoface/attendee_position.php', array('s' => $row->sessionid, 'id' => $row->userid));
+        $pix = new pix_icon('t/edit', get_string('edit', 'facetoface'));
+        $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-position pull-right'));
+        $positionhtml = html_writer::span($label, 'position'.$row->userid, array('id' => 'position'.$row->userid));
+
+        if ($canchangesignedupjobposition) {
+            return $icon . $positionhtml;
+        }
+        return $positionhtml;
+    }
+
+    /**
+     * Position name column that will be displayed only when position select settings are enabled
+     *
+     * @param rb_column_option $columnoption Column settings configured by user
+     * @param bool $hidden should this column always be hidden
+     * @return array
+     */
+    public function rb_cols_generator_position_edit(rb_column_option $columnoption, $hidden) {
+        $result = array();
+
+        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+        if ($selectpositiononsignupglobal) {
+            $result[] = new rb_column(
+                'session',
+                'positionnameedit',
+                format_text($columnoption->name),
+                'pos_assignment.fullname',
+                array(
+                    'joins' => array('pos_assignment','pos'),
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text',
+                    'displayfunc' => 'position_edit',
+                    'hidden' => $hidden,
+                    'extrafields' => array(
+                        'positionassignmentname' => 'pos_assignment.fullname',
+                        'positiontype' => 'pos_assignment.type',
+                        'positionname' => 'pos.fullname',
+                        'userid' => 'base.userid',
+                        'courseid' => 'facetoface.course',
+                        'sessionid' => 'sessions.id',
+                        'facetofaceid' => 'facetoface.id')
+                    )
+            );
+        }
+        return $result;
+    }
 
     public function rb_display_position_type($position, $row) {
         global $CFG, $POSITION_TYPES;

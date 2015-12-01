@@ -2178,6 +2178,7 @@ class reportbuilder {
      * @return array containing SQL snippet (created from URL parameters) and SQL params
      */
     function get_param_restrictions($cache = false) {
+        global $DB;
         $out = array();
         $sqlparams = array();
         $params = $this->_params;
@@ -2186,25 +2187,40 @@ class reportbuilder {
             foreach ($params as $param) {
                 $field = ($cache) ? $param->fieldalias : $param->field;
                 $value = $param->value;
-                $type = $param->type;
+
                 // don't include if param not set to anything
-                if (!isset($value) || strlen(trim($value)) == 0 || $param->field == '') {
+                if (empty($value) || (!is_array($value) && strlen(trim($value)) == 0) || $param->field == '') {
                     continue;
                 }
 
                 $wherestr = $field;
 
-                // if value starts with '!', do a not equals match
-                // to the rest of the string
-                $uniqueparam = rb_unique_param("pr{$count}_");
-                if (substr($value, 0, 1) == '!') {
-                    $wherestr .= " != :{$uniqueparam}";
-                    // Strip off the leading '!'
-                    $sqlparams[$uniqueparam] = substr($value, 1);
+                // Notice: If you change value parsing logic please document changes in @see rb_param_option class.
+                if (is_array($value)) {
+                    list($sql, $params) = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED, "pr{$count}_");
+                    $wherestr .= ' ' . $sql;
+                    $sqlparams = array_merge($sqlparams, $params);
                 } else {
-                    // normal match
-                    $wherestr .= " = :{$uniqueparam}";
-                    $sqlparams[$uniqueparam] = $value;
+                    $uniqueparam = rb_unique_param("pr{$count}_");
+                    // if value starts with '!', do a not equals match
+                    // to the rest of the string
+                    if (substr($value, 0, 1) == '!') {
+                        $wherestr .= " != :{$uniqueparam}";
+                        // Strip off the leading '!'
+                        $sqlparams[$uniqueparam] = substr($value, 1);
+                    } else if (substr($value, 0, 1) == '>') {
+                        $wherestr .= " > :{$uniqueparam}";
+                        // Strip off the leading '!'
+                        $sqlparams[$uniqueparam] = substr($value, 1);
+                    } else if (substr($value, 0, 1) == '<') {
+                        $wherestr .= " < :{$uniqueparam}";
+                        // Strip off the leading '!'
+                        $sqlparams[$uniqueparam] = substr($value, 1);
+                    } else {
+                        // normal match
+                        $wherestr .= " = :{$uniqueparam}";
+                        $sqlparams[$uniqueparam] = $value;
+                    }
                 }
 
                 $out[] = $wherestr;
