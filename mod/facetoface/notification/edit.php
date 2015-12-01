@@ -190,7 +190,7 @@ if ($id) {
     $PAGE->navbar->add(get_string('add', 'moodle'));
 }
 
-$button = update_module_button($cm->id, $course->id, get_string('modulename', 'facetoface'));
+$button = $OUTPUT->update_module_button($cm->id, 'facetoface');
 
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($SITE->fullname));

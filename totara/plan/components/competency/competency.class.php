@@ -318,13 +318,13 @@ class dp_competency_component extends dp_base_component {
         if ($this->get_setting('autoassignorg')) {
             // From organisation
             if (!$this->assign_from_org()) {
-                error(get_string('unabletoassigncompsfromorg', 'totara_plan'));
+                print_error('unabletoassigncompsfromorg', 'totara_plan');
             }
         }
         if ($this->get_setting('autoassignpos')) {
             // From position
             if (!$this->assign_from_pos()) {
-                error(get_string('unabletoassigncompsfrompos', 'totara_plan'));
+                print_error('unabletoassigncompsfrompos', 'totara_plan');
             }
         }
     }

@@ -196,4 +196,4 @@ $form->display();
 // Help text
 $bulkaddsourcestring = get_string($bulkaddsource, 'facetoface');
 $notestring = get_string('bulkaddhelptext', 'facetoface', $bulkaddsourcestring);
-notify($notestring, 'notifyinfo', 'left');
+$OUTPUT->notification($notestring, 'notifyinfo');

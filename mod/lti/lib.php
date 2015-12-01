@@ -198,7 +198,7 @@ function lti_get_types() {
     global $OUTPUT;
 
     $subtypes = array();
-    foreach (get_plugin_list('ltisource') as $name => $dir) {
+    foreach (core_component::get_plugin_list('ltisource') as $name => $dir) {
         if ($moretypes = component_callback("ltisource_$name", 'get_types')) {
             $subtypes = array_merge($subtypes, $moretypes);
         }
