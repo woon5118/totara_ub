@@ -170,6 +170,10 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'hierarchy_type_checkbox',
                 'required' => array('hierarchy', 'typeidnumber', 'value'),
             ),
+            'menu field for hierarchy type' => array(
+                'datagenerator' => 'hierarchy_type_generic_menu',
+                'required' => array('hierarchy', 'typeidnumber', 'value'),
+            ),
             'textinput field for hierarchy type' => array(
                 'datagenerator' => 'hierarchy_type_text',
                 'required' => array('hierarchy', 'typeidnumber', 'value'),

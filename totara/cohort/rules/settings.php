@@ -452,14 +452,14 @@ function cohort_rules_list($reset = false){
                         get_string('usersorgx', 'totara_cohort', $field->name),
                         array_combine($options, $options)
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_in_posorgcustomfield($id);
+                    $sqlhandler = new cohort_rule_sqlhandler_in_posorgcustomfield($id, $field->datatype);
                     break;
                 case 'text':
                     $dialog = new cohort_rule_ui_text(
                         get_string('usersorgx', 'totara_cohort', $field->name),
                         get_string('separatemultiplebycommas', 'totara_cohort')
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_in_posorgcustomfield($id);
+                    $sqlhandler = new cohort_rule_sqlhandler_in_posorgcustomfield($id, $field->datatype);
                     break;
                 case 'datetime':
                     $dialog = new cohort_rule_ui_date(
@@ -476,7 +476,7 @@ function cohort_rules_list($reset = false){
                             0 => get_string('checkboxyes','totara_cohort')
                         )
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_in_posorgcustomfield($id);
+                    $sqlhandler = new cohort_rule_sqlhandler_in_posorgcustomfield($id, $field->datatype);
                     break;
                 default:
                     // Skip field types we haven't defined a rule for yet.

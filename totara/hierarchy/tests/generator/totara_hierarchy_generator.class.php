@@ -260,6 +260,14 @@ class totara_hierarchy_generator extends component_generator_base {
         $this->create_hierarchy_type_customfield($customfield);
     }
 
+    public function create_hierarchy_type_generic_menu($data) {
+        $customfield = $data;
+        $customfield['field']  = 'menu';
+        $customfield['param1'] = str_replace(',', "\n", $data['value']);
+        $customfield['value'] = '';
+        $this->create_hierarchy_type_customfield($customfield);
+    }
+
     private function create_hierarchy_type_customfield($customfield) {
         global $CFG, $DB;
 

@@ -364,7 +364,8 @@ class cohort_rule_sqlhandler_in_posorgcustomfield extends cohort_rule_sqlhandler
     /**
      * These fields are always char
      */
-    public function __construct($field) {
+    public function __construct($field, $datatype) {
+        $this->fielddatatype = $datatype;
         parent::__construct($field, true);
     }
 
@@ -381,7 +382,20 @@ class cohort_rule_sqlhandler_in_posorgcustomfield extends cohort_rule_sqlhandler
             AND otid.fieldid = {$field}
             AND ( ";
         $query = " otid.data";
-        $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
+        $equal = $this->equal;
+
+        // [Added for TL7896 to solve a problem with dynamic audience rules]
+        //
+        // A menu custom field allows two operators when it is used as a filter
+        // in dynamic audience rules: equals and not equals. In the UI, when the
+        // user selects an operator, it is submitted as an enumerated integer to
+        // the filter module. The filter module however, works with a completely
+        // different set of enumerations. Therefore, this code exists to map the
+        // UI enumeration into the correct filter module enumeration.
+        if ($this->fielddatatype == 'menu') {
+            $equal = $this->equal == COHORT_RULES_OP_IN_EQUAL ? COHORT_RULES_OP_IN_ISEQUALTO : COHORT_RULES_OP_IN_NOTEQUALTO;
+        }
+        $sqlhandler = $this->get_query_base_operator($equal, $query, $lov);
         $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
 
         return $sqlhandler;
