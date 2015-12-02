@@ -675,6 +675,9 @@ class competency extends hierarchy {
             $heading4->text = get_string('options', 'totara_hierarchy');
             $heading4->header = true;
             $head[] = $heading4;
+
+            $js_params = array('prefix' => 'course');
+            $PAGE->requires->js_call_amd('totara_hierarchy/hierarchyitems', 'init', $js_params);
         } // if ($can_edit)
         // add the completed row to the table
         $out->head = $head;
@@ -728,8 +731,6 @@ class competency extends hierarchy {
                     $cell = new html_table_cell();
 
                     // TODO: Rewrite to use a component_action object
-                    // the 't' param may need reworking, since it is applied via
-                    // onChange using the old inline jQuery code below.
                     $select = html_writer::select(
                         $options = array(
                             PLAN_LINKTYPE_OPTIONAL => get_string('optional', 'totara_hierarchy'),
@@ -738,12 +739,7 @@ class competency extends hierarchy {
                         'linktype', //$name,
                         (isset($competency->linktype) ? $competency->linktype : PLAN_LINKTYPE_MANDATORY), //$selected,
                         false, //$nothing,
-                        array('onChange' => "\$.get(".
-                                    "'{$CFG->wwwroot}/totara/plan/update-linktype.php".
-                                    "?type=course&c={$competency->evidenceid}".
-                                    "&sesskey=".sesskey().
-                                    "&t=' + $(this).val()".
-                            ");")
+                        array('data-id' => $competency->evidenceid)
                     );
 
                     $cell->text = $select;

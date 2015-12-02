@@ -41,7 +41,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
     * @return string HTML to output.
     */
     public function print_competency_view_evidence($item, $evidence=null, $can_edit=false) {
-        global $CFG;
+        global $CFG, $PAGE;
         require_once($CFG->dirroot . '/totara/plan/lib.php');
         $out = html_writer::start_tag('div', array('id' => 'evidence-list-container'));
         $out .= $this->output->heading(get_string('evidenceitems', 'totara_hierarchy'));
@@ -59,6 +59,8 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         if ($can_edit) {
             $table->head[] = get_string('linktype', 'totara_plan');
             $table->head[] = get_string('options', 'totara_hierarchy');
+            $js_params = array('prefix' => 'course');
+            $PAGE->requires->js_call_amd('totara_hierarchy/hierarchyitems', 'init', $js_params);
         }
 
         // Now the rows if any.
@@ -76,19 +78,14 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 if ($can_edit) {
 
                     $content = html_writer::select(
-                    array( //$options
-                    PLAN_LINKTYPE_MANDATORY => get_string('mandatory','totara_hierarchy'),
-                    PLAN_LINKTYPE_OPTIONAL => get_string('optional','totara_hierarchy'),
-                    ),
-                    'linktype', //$name,
-                    (isset($eitem->linktype) ? $eitem->linktype : PLAN_LINKTYPE_OPTIONAL), //$selected,
-                    false, //$nothing,
-                    array('onchange' => "\$.get(".
-                                "'{$CFG->wwwroot}/totara/plan/update-linktype.php".
-                                "?type=course&c={$eitem->id}".
-                                "&sesskey=".sesskey().
-                                "&t=' + $(this).val()".
-                            ");")
+                        array( //$options
+                            PLAN_LINKTYPE_MANDATORY => get_string('mandatory','totara_hierarchy'),
+                            PLAN_LINKTYPE_OPTIONAL => get_string('optional','totara_hierarchy'),
+                        ),
+                        'linktype', //$name,
+                        (isset($eitem->linktype) ? $eitem->linktype : PLAN_LINKTYPE_OPTIONAL), //$selected,
+                        false, //$nothing,
+                        array('data-id' => $eitem->id)
                     );
 
                     $cell = new html_table_cell($content);
@@ -333,7 +330,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
     * @return string HTML to output.
     */
     function print_hierarchy_items($framework, $prefix, $shortprefix, $displaytitle, $addurl, $itemid, $items, $can_edit=false){
-        global $CFG;
+        global $CFG, $PAGE;
 
         require_once($CFG->libdir . '/tablelib.php');
         require_once($CFG->dirroot . '/totara/plan/lib.php');
@@ -359,6 +356,8 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             $headers[] = get_string('linktype', 'totara_plan');
             $columns[] = 'options';
             $headers[] = get_string('options', 'totara_hierarchy');
+            $js_args = array('prefix' => $shortprefix);
+            $PAGE->requires->js_call_amd('totara_hierarchy/hierarchyitems', 'init', $js_args);
         }
         $out = '';
         if (is_array($items) && count($items)) {
@@ -372,8 +371,6 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             $table->set_attribute('cellspacing', '0');
             $table->set_attribute('class', 'generalbox boxaligncenter edit'.$displayprefix);
             $table->setup();
-            // Add one blank line
-            $table->add_data(NULL);
             foreach ($items as $ritem) {
                 $content = array();
                 $content[] = empty($ritem->type) ? get_string('unclassified', 'totara_hierarchy') : $ritem->type;
@@ -387,19 +384,14 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 if ($can_edit) {
                     // TODO: Rewrite to use a component_action object
                     $content[] = html_writer::select(
-                    array( //$options
-                    PLAN_LINKTYPE_OPTIONAL => get_string('optional', 'totara_hierarchy'),
-                    PLAN_LINKTYPE_MANDATORY => get_string('mandatory', 'totara_hierarchy'),
-                    ),
-                    'linktype', //$name,
-                    ($ritem->linktype ? $ritem->linktype : PLAN_LINKTYPE_OPTIONAL), //$selected,
-                    false, //$nothing,
-                    array('onChange' => "\$.get(".
-                                "'{$CFG->wwwroot}/totara/plan/update-linktype.php".
-                                "?type={$shortprefix}&c={$ritem->aid}".
-                                "&sesskey=".sesskey().
-                                "&t=' + $(this).val()".
-                            ");")
+                        array( //$options
+                            PLAN_LINKTYPE_OPTIONAL => get_string('optional', 'totara_hierarchy'),
+                            PLAN_LINKTYPE_MANDATORY => get_string('mandatory', 'totara_hierarchy'),
+                        ),
+                        'linktype', //$name,
+                        ($ritem->linktype ? $ritem->linktype : PLAN_LINKTYPE_OPTIONAL), //$selected,
+                        false, //$nothing,
+                        array('data-id' => $ritem->aid)
                     );
                     $content[] = $this->output->action_icon(
                         new moodle_url('/totara/hierarchy/prefix/' . $prefix . '/assigncompetency/remove.php',
@@ -576,7 +568,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
      * @param bool $can_edit    Whether or not the person viewing the page can edit it
      */
     public function mygoals_company_table($userid, $can_edit, $display = false) {
-        global $CFG, $DB;
+        global $CFG, $DB, $PAGE;
 
         $out = '';
 
@@ -601,6 +593,8 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
 
             // Set up the scale value selector.
             if ($can_edit) {
+                $jsparams = array('userid' => $userid, 'companyscope' => goal::SCOPE_COMPANY);
+                $PAGE->requires->js_call_amd('totara_hierarchy/mygoals', 'init_company', $jsparams);
                 // Get the current scale value id.
                 $params = array('userid' => $userid, 'goalid' => $goalid);
                 $goalrecord = goal::get_goal_item($params, goal::SCOPE_COMPANY);
@@ -617,17 +611,10 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 }
 
                 $attributes = array(
+                    'id' => 'company-goal-' . $goalrecord->id,
                     'class' => 'company_scalevalue_selector',
-                    'itemid' => $assignment->assignmentid,
-                    'onChange' => "\$.get(".
-                        "'{$CFG->wwwroot}/totara/hierarchy/prefix/goal/update-scalevalue.php" .
-                        "?scope=" . goal::SCOPE_COMPANY .
-                        "&sesskey=" . sesskey() .
-                        "&goalitemid={$goalrecord->id}" .
-                        "&userid={$userid}" .
-                        "&scalevalueid=' + $(this).val()" .
-                        ");"
-                    );
+                    'data-goalid' => $goalrecord->id
+                );
 
                 $update_text = get_string('update');
                 $scaleurl = new moodle_url('/totara/hierarchy/prefix/goal/update-scalevalue.php', array('nojs' => true));
@@ -693,7 +680,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
      * @param bool $display     Whether or not the personal goals will show additional details
      */
     public function mygoals_personal_table($userid, $can_edit, $display = false) {
-        global $CFG;
+        global $CFG, $PAGE;
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
         $out = '';
@@ -731,6 +718,8 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             }
 
             if ($can_edit) {
+                $jsparams = array('userid' => $userid, 'personalscope' => goal::SCOPE_PERSONAL);
+                $PAGE->requires->js_call_amd('totara_hierarchy/mygoals', 'init_personal', $jsparams);
                 // Set up the edit and delete icons.
                 $edit_url = new moodle_url('/totara/hierarchy/prefix/goal/item/edit_personal.php',
                         array('userid' => $userid, 'id' => $goalid));
@@ -764,16 +753,9 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                     $options =  goal::get_personal_scale_value($assignment);
 
                     $attributes = array(
+                        'id' => 'personal-goal-' . $assignment->id,
                         'class' => 'personal_scalevalue_selector',
-                        'itemid' => $goalid,
-                        'onChange' => "\$.get(".
-                            "'{$CFG->wwwroot}/totara/hierarchy/prefix/goal/update-scalevalue.php" .
-                            "?scope=" . goal::SCOPE_PERSONAL .
-                            "&sesskey=" . sesskey() .
-                            "&goalitemid={$assignment->id}" .
-                            "&userid={$userid}" .
-                            "&scalevalueid=' + $(this).val()" .
-                            ");"
+                        'data-goalid' => $assignment->id
                     );
 
                     $update_text = get_string('update');

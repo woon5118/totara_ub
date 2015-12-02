@@ -64,17 +64,15 @@ if (!empty($goalpersonal->scaleid)) {
             $options[$scalevalue->id] = format_string($scalevalue->name);
         }
 
+        $js_args = array(
+            'userid' => $userid,
+            'personalscope' => goal::SCOPE_PERSONAL
+        );
+        $PAGE->requires->js_call_amd('totara_hierarchy/mygoals', 'init_single_personal', $js_args);
+
         $attributes = array(
             'class' => 'personal_scalevalue_selector',
-            'itemid' => $goalpersonalid,
-            'onChange' => "\$.get(".
-                "'{$CFG->wwwroot}/totara/hierarchy/prefix/goal/update-scalevalue.php" .
-                "?scope=" . goal::SCOPE_PERSONAL .
-                "&sesskey=" . sesskey() .
-                "&goalitemid={$goalpersonalid}" .
-                "&userid={$userid}" .
-                "&scalevalueid=' + $(this).val()" .
-                ");"
+            'data-goalid' => $goalpersonalid
         );
 
         $scalevalue = html_writer::select($options, 'personal_scalevalue', $goalpersonal->scalevalueid, null, $attributes);
