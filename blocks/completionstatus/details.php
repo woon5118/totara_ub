@@ -105,30 +105,31 @@ echo html_writer::start_tag('tbody');
 if ($USER->id != $user->id) {
     echo html_writer::start_tag('tr');
     echo html_writer::start_tag('td', array('colspan' => '2'));
-    echo html_writer::tag('b', get_string('showinguser', 'completion'));
     $url = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
-    echo html_writer::link($url, fullname($user));
+    $userlink = html_writer::link($url, fullname($user));
+    echo get_string('showinguser', 'block_completionstatus', $userlink);
     echo html_writer::end_tag('td');
     echo html_writer::end_tag('tr');
 }
 
 echo html_writer::start_tag('tr');
 echo html_writer::start_tag('td', array('colspan' => '2'));
-echo html_writer::tag('b', get_string('status'));
 
 if ($coursecomplete) {
     // Check for RPL
     if (strlen($ccompletion->rpl)) {
-        echo get_string('completeviarpl', 'completion');
+        $statusstring = get_string('completeviarpl', 'completion');
     } else {
-        echo get_string('complete');
+        $statusstring = get_string('complete');
     }
 
 } else if (!$criteriacomplete && !$ccompletion->timestarted) {
-    echo html_writer::tag('i', get_string('notyetstarted', 'completion'));
+    $statusstring = html_writer::tag('i', get_string('notyetstarted', 'completion'));
 } else {
-    echo html_writer::tag('i', get_string('inprogress', 'completion'));
+    $statusstring = html_writer::tag('i', get_string('inprogress', 'completion'));
 }
+
+echo get_string('status', 'block_completionstatus', $statusstring);
 
 echo html_writer::end_tag('td');
 echo html_writer::end_tag('tr');
@@ -158,16 +159,17 @@ if (empty($completions)) {
 } else {
     echo html_writer::start_tag('tr');
     echo html_writer::start_tag('td', array('colspan' => '2'));
-    echo html_writer::tag('b', get_string('required'));
 
     // Get overall aggregation method.
     $overall = $info->get_aggregation_method();
 
     if ($overall == COMPLETION_AGGREGATION_ALL) {
-        echo get_string('criteriarequiredall', 'completion');
+        $criteriastr = get_string('criteriarequiredall', 'completion');
     } else {
-        echo get_string('criteriarequiredany', 'completion');
+        $criteriastr = get_string('criteriarequiredany', 'completion');
     }
+
+    echo get_string('required', 'block_completionstatus', $criteriastr);
 
     echo html_writer::end_tag('td');
     echo html_writer::end_tag('tr');
@@ -266,12 +268,12 @@ if (empty($completions)) {
                 $agg = $info->get_aggregation_method($row['type']);
                 echo '('. html_writer::start_tag('i');
                 if ($agg == COMPLETION_AGGREGATION_ALL) {
-                    echo core_text::strtolower(get_string('all', 'completion'));
+                    $aggstr = core_text::strtolower(get_string('all', 'completion'));
                 } else {
-                    echo core_text::strtolower(get_string('any', 'completion'));
+                    $aggstr = core_text::strtolower(get_string('any', 'completion'));
                 }
 
-                echo html_writer::end_tag('i') .core_text::strtolower(get_string('required')).')';
+                echo html_writer::end_tag('i') .core_text::strtolower(get_string('xrequired', 'block_completionstatus', $aggstr)).')';
                 $agg_type = false;
             }
         }
