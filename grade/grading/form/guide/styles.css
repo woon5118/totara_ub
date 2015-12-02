@@ -87,3 +87,11 @@
     margin: 0;
     width: auto;
 }
+
+/*
+ * TL-8056: These labels do nothing when clicked
+ * so it is misleading to display pointer.
+ */
+.gradingform_guide.editor .criteria label {
+    cursor: default;
+}

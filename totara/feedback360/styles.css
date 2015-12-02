@@ -1,4 +1,9 @@
-.empty {
+/*
+ * This style hides element used by JavaScript
+ * to position info header at top of page on 360
+ * response if content longer than viewport.
+ */
+#feedbackhead-anchor.empty {
     height: 0px;
 }
 
