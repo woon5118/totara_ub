@@ -969,17 +969,15 @@ function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $s
         $sched->schedule = $formatted;
     }
 
-    if (count($scheduledreports) > 0) {
-        $renderer = $PAGE->get_renderer('totara_core');
-        echo $renderer->print_scheduled_reports($scheduledreports, $showoptions);
-    } else {
-        echo get_string('noscheduledreports', 'totara_reportbuilder') . html_writer::empty_tag('br') . html_writer::empty_tag('br');
-    }
-
     if ($showaddform) {
         $mform = new scheduled_reports_add_form($CFG->wwwroot . '/totara/reportbuilder/scheduled.php', array());
-        $mform->display();
+        $addform = $mform->render();
+    } else {
+        $addform = '';
     }
+
+    $renderer = $PAGE->get_renderer('totara_core');
+    echo $renderer->scheduled_reports($scheduledreports, $showoptions, $addform);
 }
 
 function totara_print_my_courses() {

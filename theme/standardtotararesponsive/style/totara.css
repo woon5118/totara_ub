@@ -520,9 +520,11 @@ ul.comment-list li .comment-delete {
     display: inline;
 }
 
+.felement input[type='submit'],
 .felement input[type='button'] {
     margin: 0;
 }
-fieldset .felement input[type='button'] {
+fieldset .felement input[type='button'],
+fieldset .felement input[type='submit'] {
     margin-bottom: 0;
 }

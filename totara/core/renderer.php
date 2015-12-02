@@ -258,16 +258,47 @@ class totara_core_renderer extends plugin_renderer_base {
 
 
     /**
-    * Returns markup for displaying saved scheduled reports
-    *
-    * Optionally without the options column and add/delete form
-    * Optionally with an additional sql WHERE clause
-    */
+     * Returns markup for displaying saved scheduled reports.
+     *
+     * @deprecated since 9.0.
+     * @param array $scheduledreports List of scheduled reports.
+     * @param boolean $showoptions boolean Show actions to edit or delete the scheduled report.
+     * @return string HTML
+     */
     public function print_scheduled_reports($scheduledreports, $showoptions=true) {
+        debugging("print_scheduled_reports has been deprecated. Please use scheduled_reports_list instead.");
+        return $this->scheduled_reports($scheduledreports, $showoptions);
+    }
+
+
+    /**
+     * Uses a template to generate markup for displaying saved scheduled reports.
+     *
+     * @param array $scheduledreports List of scheduled reports.
+     * @param boolean $showoptions boolean Show actions to edit or delete the scheduled report.
+     * @return string HTML containing a form plus a table of scheduled reports or text.
+     */
+    public function scheduled_reports($scheduledreports, $showoptions=true, $addform = '') {
+        global $OUTPUT;
+
+        $dataobject = $this->scheduled_reports_export_for_template($scheduledreports, $showoptions, $addform);
+        return $OUTPUT->render_from_template('totara_core/scheduled_reports', $dataobject);
+    }
+
+
+    /**
+     * Uses a template to generate markup for displaying saved scheduled reports.
+     *
+     * @param array $scheduledreports List of scheduled reports.
+     * @param boolean $showoptions Show actions to edit or delete the scheduled report.
+     * @param string $addform form HTML to add another scheduled report.
+     * @return object Table data object for the table template.
+     */
+    public function scheduled_reports_export_for_template($scheduledreports, $showoptions, $addform) {
 
         $table = new html_table();
         $table->id = 'scheduled_reports';
-        $table->attributes['class'] = 'scheduled-reports generaltable';
+        $table->attributes['class'] = 'generaltable';
         $headers = array();
         $headers[] = get_string('reportname', 'totara_reportbuilder');
         $headers[] = get_string('savedsearch', 'totara_reportbuilder');
@@ -312,7 +343,11 @@ class totara_core_renderer extends plugin_renderer_base {
             $table->data[] = $row;
         }
 
-        return html_writer::table($table);
+        $dataobject = $table->export_for_template($this);
+        $dataobject->scheduled_reports_count = count($scheduledreports);
+        $dataobject->scheduled_report_form = $addform;
+
+        return $dataobject;
     }
 
     /**

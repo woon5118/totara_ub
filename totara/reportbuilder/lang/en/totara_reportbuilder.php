@@ -44,6 +44,7 @@ $string['addbadges'] = 'Add badges';
 $string['addcohorts'] = 'Add audiences';
 $string['addedscheduledreport'] = 'Added new scheduled report';
 $string['addexternalemail'] = 'Add email';
+$string['addanewscheduledreport'] = 'Add a new scheduled report to the list: ';
 $string['addscheduledreport'] = 'Add scheduled report';
 $string['addsystemusers'] = 'Add system user(s)';
 $string['addnewscheduled'] = 'Add scheduled';

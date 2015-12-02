@@ -242,13 +242,10 @@ class scheduled_reports_add_form extends moodleform {
         }
 
         if (!empty($reportselect)) {
-            $mform->addElement('select', 'reportid', get_string('addnewscheduled', 'totara_reportbuilder'), $reportselect);
-            $mform->addElement('submit', 'submitbutton', get_string('addscheduledreport', 'totara_reportbuilder'));
-
-            $renderer =& $mform->defaultRenderer();
-            $elementtemplate = '<span>{element}</span>';
-            $renderer->setElementTemplate($elementtemplate, 'submitbutton');
-            $renderer->setElementTemplate('<label for="{id}" class="accesshide">{label}</label><span>{element}</span>', 'reportid');
+            $elements = array ();
+            $elements[] = &$mform->createElement('select', 'reportid', get_string('addnewscheduled', 'totara_reportbuilder'), $reportselect);
+            $elements[] = &$mform->createElement('submit', 'submitbutton', get_string('addscheduledreport', 'totara_reportbuilder'));
+            $mform->addGroup($elements, 'addanewscheduledreport', get_string('addanewscheduledreport', 'totara_reportbuilder'), '');
         }
     }
 }
