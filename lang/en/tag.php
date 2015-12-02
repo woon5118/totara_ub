@@ -64,7 +64,6 @@ $string['newnamefor'] = 'New name for tag {$a}';
 $string['noresultsfor'] = 'No results for "{$a}"';
 $string['nothingtoupdate'] = 'Nothing to update';
 $string['officialtag'] = 'Official';
-$string['otags'] = 'Official tags';
 $string['othertags'] = 'Other tags';
 $string['owner'] = 'Owner';
 $string['ptags'] = 'User defined tags (Comma separated)';

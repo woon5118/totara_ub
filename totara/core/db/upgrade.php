@@ -1524,5 +1524,46 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015110600, 'totara_core');
     }
 
+    if ($oldversion < 2015121700) {
+        // Course tags are fine, but activity tags need a bit of help.
+        $sql = "SELECT ti.id, ti.itemtype, cm.id as cmid
+                  FROM {tag_instance} ti
+            INNER JOIN {modules} m
+                    ON ti.itemtype = m.name
+            INNER JOIN {course_modules} cm
+                    ON cm.module = m.id
+                   AND cm.instance = ti.itemid
+                 WHERE ti.component IS NULL";
+        $moduletags = $DB->get_records_sql($sql);
+
+        foreach ($moduletags as $modtag) {
+            $modtag->component = "mod_{$modtag->itemtype}";
+            $context = context_module::instance($modtag->cmid, IGNORE_MISSING);
+
+            if (!empty($context)) {
+                $modtag->contextid = $context->id;
+                unset($context);
+
+                $DB->update_record('tag_instance', $modtag);
+            }
+        }
+
+        // Audience tags also need a little nudge.
+        $sql = "SELECT ti.id, c.contextid as contextid
+                  FROM {tag_instance} ti
+            INNER JOIN {cohort} c
+                    ON ti.itemtype = 'cohort'
+                   AND ti.itemid = c.id
+                 WHERE ti.component IS NULL";
+        $audtags = $DB->get_records_sql($sql);
+
+        foreach ($audtags as $audtag) {
+            $audtag->component = "core";
+            $DB->update_record('tag_instance', $audtag);
+        }
+
+        totara_upgrade_mod_savepoint(true, 2015121700, 'totara_core');
+    }
+
     return true;
 }

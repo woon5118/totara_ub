@@ -48,7 +48,7 @@ $category = null;
 if ($id) {
     $cohort = $DB->get_record('cohort', array('id'=>$id), '*', MUST_EXIST);
     if ($usetags) {
-        $cohort->otags = array_keys(tag_get_tags_array('cohort', $cohort->id, 'official'));
+        $cohort->tags = tag_get_tags_array('cohort', $cohort->id);
     }
 
     $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
@@ -62,6 +62,7 @@ if ($id) {
     $cohort->contextid   = $context->id;
     $cohort->name        = '';
     $cohort->description = '';
+    $cohort->tags = array();
     $cohort->cohorttype  = cohort::TYPE_STATIC;
 }
 
@@ -173,10 +174,8 @@ if ($editform->is_cancelled()) {
         cohort_update_cohort($data);
         // Totara: handle tags and go to view page after update.
         if ($usetags) {
-            if (isset($data->otags)) {
-                tag_set('cohort', $cohort->id, tag_get_name($data->otags));
-            } else {
-                tag_set('cohort', $cohort->id, array());
+            if (isset($data->tags)) {
+                tag_set('cohort', $cohort->id, $data->tags, 'core', $data->contextid);
             }
         }
         $url = new moodle_url('/cohort/view.php', array('id' => $data->id));
@@ -195,10 +194,8 @@ if ($editform->is_cancelled()) {
         }
         // Totara: handle tags and go to relevant page after insert.
         if ($usetags) {
-            if (isset($data->otags)) {
-                tag_set('cohort', $data->id, tag_get_name($data->otags));
-            } else {
-                tag_set('cohort', $data->id, array());
+            if (isset($data->tags)) {
+                tag_set('cohort', $data->id, $data->tags, 'core', $context->id);
             }
         }
         if ($data->cohorttype == cohort::TYPE_STATIC && has_capability('moodle/cohort:assign', $context)) {
@@ -211,10 +208,8 @@ if ($editform->is_cancelled()) {
         redirect($url);
     }
     if ($usetags) {
-        if (isset($data->otags)) {
-            tag_set('cohort', $cohort->id, tag_get_name($data->otags));
-        } else {
-            tag_set('cohort', $cohort->id, array());
+        if (isset($data->tags)) {
+            tag_set('cohort', $cohort->id, $data->tags, 'core', $data->contextid);
         }
     }
 

@@ -26,7 +26,6 @@ Feature: Tagging courses
     And I log in as "teacher1"
     And I follow "Course 1"
     And I click on "Edit settings" "link" in the "Administration" "block"
-# Totara - TODO: TL-8022 find out what is wrong with tag autocomplete
     And I set the following fields to these values:
       | Tags | Mathematics, |
     And I press "Save and display"
@@ -45,7 +44,6 @@ Feature: Tagging courses
     And I click on "My learning" "link" in the "Navigation" "block"
     And I follow "Course 2"
     And I click on "Edit settings" "link" in the "Administration" "block"
-# Totara - TODO: TL-8022 find out what is wrong with tag autocomplete
     And I set the following fields to these values:
       | Tags | Mathematics, Geometry, |
     And I press "Save and display"
@@ -75,14 +73,12 @@ Feature: Tagging courses
     And "Edit settings" "link" should not exist in the "Administration" "block"
     And I click on "Course tags" "link" in the "Administration" "block"
     Then I should see "Mathematics" in the ".form-autocomplete-selection" "css_element"
-# Totara - TODO: TL-8022 find out what is wrong with tag autocomplete
     And I set the following fields to these values:
       | Tags | Algebra, |
     And I press "Save changes"
     And I click on "My learning" "link" in the "Navigation" "block"
     And I follow "Course 2"
     And I click on "Course tags" "link" in the "Administration" "block"
-# Totara - TODO: TL-8022 find out what is wrong with tag autocomplete
     And I set the following fields to these values:
       | Tags | Mathematics, Geometry, |
     And I press "Save changes"
