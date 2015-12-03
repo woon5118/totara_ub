@@ -159,6 +159,11 @@ function tool_totara_sync_run($forcerun=false) {
 function totara_sync_log($element, $info, $type='info', $action='', $showmessage=true) {
     global $DB, $OUTPUT;
 
+    // Avoid getting an error from the database trying to save a value longer than length limit (255 characters).
+    if (core_text::strlen($info) > 255) {
+        $info = trim(core_text::substr($info, 0, 252)) . "...";
+    }
+
     static $sync_runid = null;
 
     if ($sync_runid == null) {

@@ -128,10 +128,6 @@ abstract class totara_sync_source {
      * Add source sync log entries to the sync database with this method
      */
     function addlog($info, $type='info', $action='') {
-        // Avoid getting an error from the database trying to save a value longer than length limit (255 characters)
-        if (strlen($info) > 255) {
-            $info = substr($info, 0, 255);
-        }
         totara_sync_log($this->get_element_name(), $info, $type, $action);
     }
 

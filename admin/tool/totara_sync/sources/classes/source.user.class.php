@@ -264,10 +264,10 @@ abstract class totara_sync_source_user extends totara_sync_source {
             $table->add_field('url', XMLDB_TYPE_CHAR, '255');
         }
         if (!empty($this->config->import_institution)) {
-            $table->add_field('institution', XMLDB_TYPE_CHAR, '40');
+            $table->add_field('institution', XMLDB_TYPE_CHAR, '255');
         }
         if (!empty($this->config->import_department)) {
-            $table->add_field('department', XMLDB_TYPE_CHAR, '30');
+            $table->add_field('department', XMLDB_TYPE_CHAR, '255');
         }
         if (!empty($this->config->import_phone1)) {
             $table->add_field('phone1', XMLDB_TYPE_CHAR, '20');
@@ -276,7 +276,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
             $table->add_field('phone2', XMLDB_TYPE_CHAR, '20');
         }
         if (!empty($this->config->import_address)) {
-            $table->add_field('address', XMLDB_TYPE_CHAR, '70');
+            $table->add_field('address', XMLDB_TYPE_CHAR, '255');
         }
         if (!empty($this->config->import_orgidnumber)) {
             $table->add_field('orgidnumber', XMLDB_TYPE_CHAR, '100');
@@ -303,7 +303,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
             $table->add_field('auth', XMLDB_TYPE_CHAR, '20');
         }
         if (!empty($this->config->import_password)) {
-            $table->add_field('password', XMLDB_TYPE_CHAR, '32');
+            $table->add_field('password', XMLDB_TYPE_CHAR, '255');
         }
         if (!empty($this->config->import_suspended)) {
             $table->add_field('suspended', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');

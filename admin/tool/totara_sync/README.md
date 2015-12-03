@@ -16,4 +16,4 @@ The following snippet illustrates the addition needed to you your sites config.p
     define('TEST_SYNC_DB_PORT', '');
     define('TEST_SYNC_DB_TABLE', '');
 
-All tests that require an extarnal database will be skipped if the above configuration is not defined.
+All tests that require an external database will be skipped if the above configuration is not defined.
