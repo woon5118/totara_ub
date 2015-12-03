@@ -104,6 +104,15 @@ class core_requirejs {
         }
 
         foreach ($jsdirs as $component => $dir) {
+            // Totara: make sure devs know about grunt, without build dirs the JS fails.
+            if (!file_exists($dir . '/src')) {
+                continue;
+            }
+            if (!file_exists($dir . '/build')) {
+                error_log("Missing build directory {$dir}/build - run grunt!");
+                continue;
+            }
+
             $srcdir = $dir . '/build';
             if ($debug) {
                 $srcdir = $dir . '/src';
