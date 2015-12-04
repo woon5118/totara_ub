@@ -613,7 +613,6 @@ class core_calendar_renderer extends plugin_renderer_base {
             get_string('colactions', 'calendar')
         );
         $table->align = array('left', 'left', 'left', 'center');
-        $table->width = '100%';
         $table->data  = array();
 
         if (empty($subscriptions)) {

@@ -210,6 +210,10 @@ table.invisiblepadded th.header {
 table.invisiblepadded td{
    padding:5px;
 }
+.generaltable tbody+tbody tr:first-child td,
+.generaltable tbody+tbody tr:first-child th {
+    border-top: 1px solid #e0e1cf;
+}
 
 .course_icon, .program_icon{
     padding-right:5px;

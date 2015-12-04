@@ -248,8 +248,6 @@ $usercount = count(certificate_get_issues($certificate->id, $DB->sql_fullname(),
 
 // Create the table for the users
 $table = new html_table();
-$table->width = "95%";
-$table->tablealign = "center";
 $table->head  = array($strto, $strdate, $strgrade, $strcode);
 $table->align = array("left", "left", "center", "center");
 foreach ($users as $user) {

@@ -3725,6 +3725,17 @@ EOD;
     }
 
     /**
+     * Renders an html_table object.
+     *
+     * @param html_table $table
+     * @return string
+     */
+    protected function render_html_table(html_table $table) {
+        $dataobject = $table->export_for_template($this);
+        return $this->render_from_template('core/table', $dataobject);
+    }
+
+    /**
      * Get the HTML for blocks in the given region.
      *
      * @since Moodle 2.5.1 2.6

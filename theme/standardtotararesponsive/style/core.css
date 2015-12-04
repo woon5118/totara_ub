@@ -265,6 +265,10 @@ table.generalbox :last-child .last td:last-child {
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 0;
 }
+.generaltable tbody+tbody tr:first-child td,
+.generaltable tbody+tbody tr:first-child th {
+    border-top: 1px solid #bbbbbb;
+}
 
 .paging a,
 .paging span {

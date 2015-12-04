@@ -122,9 +122,6 @@ class mod_forum_renderer extends plugin_renderer_base {
             $strparams->count = count($users);
             $output .= $this->output->heading(get_string("subscriberstowithcount", "forum", $strparams));
             $table = new html_table();
-            $table->cellpadding = 5;
-            $table->cellspacing = 5;
-            $table->tablealign = 'center';
             $table->data = array();
             foreach ($users as $user) {
                 $info = array($this->output->user_picture($user, array('courseid'=>$course->id)), fullname($user));

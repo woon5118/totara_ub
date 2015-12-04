@@ -1230,7 +1230,6 @@ $cir->close();
 $table = new html_table();
 $table->id = "uupreview";
 $table->attributes['class'] = 'generaltable';
-$table->tablealign = 'center';
 $table->summary = get_string('uploaduserspreview', 'tool_uploaduser');
 $table->head = array();
 $table->data = $data;

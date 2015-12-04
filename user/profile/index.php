@@ -128,7 +128,6 @@ foreach ($categories as $category) {
     $table = new html_table();
     $table->head  = array(get_string('profilefield', 'admin'), get_string('edit'));
     $table->align = array('left', 'right');
-    $table->width = '95%';
     $table->attributes['class'] = 'generaltable profilefield';
     $table->data = array();
 
