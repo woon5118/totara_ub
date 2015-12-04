@@ -1400,53 +1400,9 @@ class core_renderer extends renderer_base {
      * @return string the HTML to be output.
      */
     public function block(block_contents $bc, $region) {
-        $bc = clone($bc); // Avoid messing up the object passed in.
-        if (empty($bc->blockinstanceid) || !strip_tags($bc->title)) {
-            $bc->collapsible = block_contents::NOT_HIDEABLE;
-        }
-        if (!empty($bc->blockinstanceid)) {
-            $bc->attributes['data-instanceid'] = $bc->blockinstanceid;
-        }
-        $skiptitle = strip_tags($bc->title);
-        if ($bc->blockinstanceid && !empty($skiptitle)) {
-            $bc->attributes['aria-labelledby'] = 'instance-'.$bc->blockinstanceid.'-header';
-        } else if (!empty($bc->arialabel)) {
-            $bc->attributes['aria-label'] = $bc->arialabel;
-        }
-        if ($bc->dockable) {
-            $bc->attributes['data-dockable'] = 1;
-        }
-        if ($bc->collapsible == block_contents::HIDDEN) {
-            $bc->add_class('hidden');
-        }
-        if (!empty($bc->controls)) {
-            $bc->add_class('block_with_controls');
-        }
-
-
-        if (empty($skiptitle)) {
-            $output = '';
-            $skipdest = '';
-        } else {
-            $output = html_writer::link('#sb-'.$bc->skipid, get_string('skipa', 'access', $skiptitle),
-                      array('class' => 'skip skip-block', 'id' => 'fsb-' . $bc->skipid));
-            $skipdest = html_writer::span('', 'skip-block-to',
-                      array('id' => 'sb-' . $bc->skipid));
-        }
-
-        $output .= html_writer::start_tag('div', $bc->attributes);
-
-        $output .= $this->block_header($bc);
-        $output .= $this->block_content($bc);
-
-        $output .= html_writer::end_tag('div');
-
-        $output .= $this->block_annotation($bc);
-
-        $output .= $skipdest;
-
         $this->init_block_hider_js($bc);
-        return $output;
+        $data = \core\output\block::from_block_contents($bc, $this);
+        return $this->render_from_template('core/block', $data);
     }
 
     /**
@@ -3779,18 +3735,21 @@ EOD;
         $displayregion = $this->page->apply_theme_region_manipulations($region);
         $classes = (array)$classes;
         $classes[] = 'block-region';
-        $attributes = array(
-            'id' => 'block-region-'.preg_replace('#[^a-zA-Z0-9_\-]+#', '-', $displayregion),
-            'class' => join(' ', $classes),
-            'data-blockregion' => $displayregion,
-            'data-droptarget' => '1'
-        );
+
         if ($this->page->blocks->region_has_content($displayregion, $this)) {
             $content = $this->blocks_for_region($displayregion);
         } else {
             $content = '';
         }
-        return html_writer::tag($tag, $content, $attributes);
+
+        $data = new stdClass();
+        $data->tag = $tag;
+        $data->id = 'block-region-'.preg_replace('#[^a-zA-Z0-9_\-]+#', '-', $displayregion);
+        $data->displayregion = $displayregion;
+        $data->class = join(' ', $classes);
+        $data->content = $content; // string html
+
+        return $this->render_from_template('core/blocks', $data);
     }
 
     /**
