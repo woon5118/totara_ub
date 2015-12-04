@@ -71,6 +71,7 @@
 }
 .totara-table-container .totaratable {
     margin-bottom: 0;
+    border: none;
 }
 .totara-table-container .top {
     border-top-left-radius: 0;
