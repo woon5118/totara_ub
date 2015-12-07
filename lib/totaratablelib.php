@@ -110,9 +110,8 @@ class totara_table extends flexible_table {
             debugging("print_toolbars: Unknown position '{$position}', should be 'top' or 'bottom'");
             return false;
         }
-        $numcols = count($this->columns);
         $renderer = $PAGE->get_renderer('totara_core');
-        $renderer->print_toolbars($position, $numcols, $this->toolbar[$position]);
+        echo $renderer->table_toolbars($this->toolbar[$position], $position);
 
         return true;
     }

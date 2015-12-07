@@ -369,48 +369,68 @@ class totara_core_renderer extends plugin_renderer_base {
     /**
     * Render a set of toolbars (either top or bottom)
     *
+    * @deprecated since 9.0
     * @param string $position 'top' or 'bottom'
     * @param int $numcolumns
     * @param array $toolbar array of left and right arrays
     *              eg. $toolbar[0]['left'] = <first row left content>
     *                  $toolbar[0]['right'] = <first row right content>
     *                  $toolbar[1]['left'] = <second row left content>
-    * @return boolean True if the toolbar was successfully rendered
     */
     public function print_toolbars($position='top', $numcolumns, $toolbar) {
+        debugging('print_toolbars has been deprecated please use table_toolbars', DEBUG_DEVELOPER);
+        echo $this->table_toolbars($toolbar, $position);
+    }
+
+    /**
+     * Render a set of toolbars (either top or bottom)
+     *
+     * @param array $toolbar array of left and right arrays
+     *              eg. $toolbar[0]['left'] = <first row left content>
+     *                  $toolbar[0]['right'] = <first row right content>
+     *                  $toolbar[1]['left'] = <second row left content>
+     * @param string $position 'top' or 'bottom'
+     * @return string the rendered html template
+     */
+    public function table_toolbars($toolbar, $position='top') {
 
         ksort($toolbar);
-        $count = 1;
-        $totalcount = count($toolbar);
 
-        if ($totalcount > 0) {
-            echo html_writer::start_tag('div', array('class' => 'totara-toolbar totara-toolbar-' . $position));
-            foreach ($toolbar as $index => $row) {
-                // don't render empty toolbars
-                // if you want to render one, add an empty content string to the toolbar
-                if (empty($row['left']) && empty($row['right'])) {
-                    continue;
-                }
+        $data = new stdClass();
+        $data->postion = $position;
+        $data->toolbars_has_items = count($toolbar) > 0 ? true : false;
+        $data->toolbars = array();
 
-                if (!empty($row['left'])) {
-                    echo html_writer::start_tag('div', array('class' => 'toolbar-left-table'));
-                    foreach ($row['left'] as $item) {
-                        echo html_writer::tag('div', $item, array('class' => 'toolbar-cell'));
-                    }
-                    echo html_writer::end_tag('div');
-                }
-
-                if (!empty($row['right'])) {
-                    echo html_writer::start_tag('div', array('class' => 'toolbar-right-table'));
-                    foreach (array_reverse($row['right']) as $item) {
-                        echo html_writer::tag('div', $item, array('class' => 'toolbar-cell'));
-                    }
-                    echo html_writer::end_tag('div');
-                }
-                $count++;
+        foreach ($toolbar as $index => $row) {
+            // don't render empty toolbars
+            // if you want to render one, add an empty content string to the toolbar
+            if (empty($row['left']) && empty($row['right'])) {
+                continue;
             }
-            echo html_writer::end_tag('div');
+
+            $datarow = array(
+                "left_content_has_items" => false,
+                "left_content" => array(),
+                "right_content_has_items" => false,
+                "right" => array()
+            );
+
+            if (!empty($row['left'])) {
+                $datarow['left_content_has_items'] = true;
+                foreach ($row['left'] as $item) {
+                    $datarow['left_content'][] = $item;
+                }
+            }
+
+            if (!empty($row['right'])) {
+                $datarow['right_content_has_items'] = true;
+                foreach (array_reverse($row['right']) as $item) {
+                    $datarow['right_content'][] = $item;
+                }
+            }
+            $data->toolbars[] = $datarow;
         }
+        return $this->render_from_template('totara_core/table_toolbars', $data);
     }
 
     /**
