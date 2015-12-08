@@ -120,6 +120,13 @@ $string['notset'] = 'Not set';
 $string['nofileselected'] = 'No file selected';
 $string['pluginname'] = 'Customfields';
 $string['programcertcustomfields'] = 'Program and Certification custom fields';
+$string['regexpattern'] = 'Regular expression validation';
+$string['regexpattern_help'] = 'A regular expression that will be used to ensure entered text is in the expected format. For example "/^[0-9]{3}$/" will ensure the text consists of exactly 3 numbers.
+
+For more information on regular expressions please refer to the PHP PCRE regular expression documentation.';
+$string['regexpatternerror'] = 'The regular expression you have entered is not valid. Information on regular expression syntax and patterns can be found in the PHP PCRE regular expression documentation.';
+$string['regexpatterndelimitererror'] = 'A delimiter or modifier was used that is not permitted. Permitted delimiters: forward slash (/) only. Permitted modifiers: PCRE_CASELESS (i) only.';
+$string['regexvalidationfailed'] = 'The value you have entered for {$a} does not match the required format.';
 $string['requiredandlockednotallowed'] = 'The combination of required and locked is not allowed. Please, change one of them';
 $string['returntoframework'] = 'Return to Framework';
 $string['shortname'] = 'Short name (must be unique)';

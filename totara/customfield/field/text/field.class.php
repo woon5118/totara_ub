@@ -28,10 +28,19 @@ class customfield_text extends customfield_base {
         $size = $this->field->param1;
         $maxlength = $this->field->param2;
         $fieldtype = ($this->field->param3 == 1 ? 'password' : 'text');
+        $fullname = format_string($this->field->fullname);
+        $regex = '';
+        if (!empty($this->field->param4) && $param4 = json_decode($this->field->param4, true)) {
+            $regex = !empty($param4['regex']) ? $param4['regex'] : '';
+        }
 
         /// Create the form field
-        $mform->addElement($fieldtype, $this->inputname, format_string($this->field->fullname), 'maxlength="'.$maxlength.'" size="'.$size.'" ');
+        $mform->addElement($fieldtype, $this->inputname, $fullname, 'maxlength="'.$maxlength.'" size="'.$size.'" ');
         $mform->setType($this->inputname, PARAM_MULTILANG);
+
+        if (!empty($regex)) {
+            $mform->addRule($this->inputname, get_string('regexvalidationfailed', 'totara_customfield', $fullname), 'regex', $regex);
+        }
     }
 
 }

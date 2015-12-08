@@ -43,6 +43,67 @@ class customfield_define_text extends customfield_define_base {
         $form->setDefault('param2', 2048);
         $form->setType('param2', PARAM_INT);
         $form->addHelpButton('param2', 'customfieldmaxlengthtext', 'totara_customfield');
+
+        // Param4 is storing settings as json.
+        // Regex pattern validation.
+        $form->addElement('text', 'regex', get_string('regexpattern', 'totara_customfield'));
+        $form->setType('regex', PARAM_TEXT);
+        $form->addHelpButton('regex', 'regexpattern', 'totara_customfield');
+    }
+
+    function define_validate_specific($data, $files, $tableprefix) {
+        $errors = parent::define_validate_specific($data, $files, $tableprefix);
+        if (!empty($data->regex) && empty($errors['regex'])) {
+            $errors = array_merge($errors, $this->validate_regex($data));
+        }
+        if (!empty($data->defaultdata) && empty($errors['regex']) && empty($errors['defaultdata'])) {
+            $errors = array_merge($errors, $this->validate_defaultdata($data));
+        }
+        return $errors;
+    }
+
+    /**
+     * Performs regex pattern validation
+     * @param stdClass $data form data
+     *
+     * @return array with regex field validation error (if any)
+     */
+    protected function validate_regex(stdClass $data) {
+        if (!preg_match("/^\/.*\/[i]?$/", $data->regex)) {
+            return array('regex' => get_string('regexpatterndelimitererror', 'totara_customfield'));
+        }
+        if (@preg_match($data->regex, null) === false) {
+            return array('regex' => get_string('regexpatternerror', 'totara_customfield'));
+        }
+        return array();
+    }
+
+    /**
+     * Performs default data validation
+     * @param stdClass $data form data
+     *
+     * @return array with regex field validation error (if any)
+     */
+    protected function validate_defaultdata(stdClass $data) {
+        if (!empty($data->defaultdata) && !empty($data->regex) && !preg_match($data->regex, $data->defaultdata)) {
+            $fieldname = get_string('defaultdata', 'totara_customfield');
+            return array('defaultdata' => get_string('regexvalidationfailed', 'totara_customfield', $fieldname));
+        }
+        return array();
+    }
+
+    public function define_save_preprocess($data, $old = null) {
+        if (!empty($data->regex)) {
+            $data->param4 = json_encode(array('regex' => $data->regex));
+        }
+        return $data;
+    }
+
+    public function define_load_preprocess($data) {
+        if (!empty($data->param4) && $param4 = json_decode($data->param4, true)) {
+            $data->regex = !empty($param4['regex']) ? $param4['regex'] : '';
+        }
+        return $data;
     }
 
 }
