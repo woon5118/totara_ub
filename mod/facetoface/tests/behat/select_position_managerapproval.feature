@@ -26,9 +26,7 @@ Feature: Manager approval
     And I expand "Enrolments" node
     And I follow "Manage enrol plugins"
     And I click on "Enable" "link" in the "Face-to-face direct enrolment" "table_row"
-    And I expand "Activity modules" node
-    And I expand "Face-to-face" node
-    And I follow "General Settings"
+    And I navigate to "Global settings" node in "Site administration > Face-to-face"
     And I set the following fields to these values:
       | Select position on signup | 1 |
     And I press "Save changes"
@@ -43,8 +41,8 @@ Feature: Manager approval
       | Description               | Test facetoface description |
       | Approval required         | 1                           |
       | Select position on signup | 1                           |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -80,7 +78,7 @@ Feature: Manager approval
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
-    And I should see "This session requires manager approval to book."
+    And I should see "This event requires manager approval to book."
     And I set the following fields to these values:
       | Select a position | Position2 |
     And I press "Sign-up"

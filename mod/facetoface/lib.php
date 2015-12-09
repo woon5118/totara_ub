@@ -1551,7 +1551,6 @@ function facetoface_get_userfields() {
                 $userfields = array_merge($userfields, $customfields);
             }
         }
-        $userfields['managersemail'] = get_string('manageremail', 'facetoface');
     }
 
     return $userfields;
@@ -2416,38 +2415,6 @@ function facetoface_check_signup($facetofaceid, $sessionid = null) {
 
     if ($submissions = facetoface_get_user_submissions($facetofaceid, $USER->id, MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_FULLY_ATTENDED, $sessionid)) {
         return reset($submissions)->sessionid;
-    } else {
-        return false;
-    }
-}
-
-/**
- * Human-readable version of the format of the manager's email address
- */
-function facetoface_get_manageremailformat() {
-
-    $addressformat = get_config(NULL, 'facetoface_manageraddressformat');
-
-    if (!empty($addressformat)) {
-        $readableformat = get_config(NULL, 'facetoface_manageraddressformatreadable');
-        return get_string('manageremailformat', 'facetoface', $readableformat);
-    }
-
-    return '';
-}
-
-/**
- * Returns true if the given email address follows the format
- * prescribed by the site administrator
- *
- * @param string $manageremail email address as entered by the user
- */
-function facetoface_check_manageremail($manageremail) {
-
-    $addressformat = get_config(NULL, 'facetoface_manageraddressformat');
-
-    if (empty($addressformat) || strpos($manageremail, $addressformat)) {
-        return true;
     } else {
         return false;
     }

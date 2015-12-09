@@ -46,8 +46,8 @@ Feature: Manager approval
       | Description                                                        | Test facetoface description     |
       | Approval required                                                  | 1                               |
       | Enable "Declare Interest" option                                   | 1                               |
-    And I click on "View all sessions" "link" in the "declareinterestfullybooked" activity
-    And I follow "Add a new session"
+    And I click on "View all events" "link" in the "declareinterestfullybooked" activity
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -85,9 +85,9 @@ Feature: Manager approval
       | Name                                                               | Test declareinterestfullybooked |
       | Description                                                        | Test facetoface description     |
       | Enable "Declare Interest" option                                   | 1                               |
-      | Show "Declare Interest" link only if all sessions are closed       | 1                               |
-    And I click on "View all sessions" "link" in the "declareinterestfullybooked" activity
-    And I follow "Add a new session"
+      | Show "Declare Interest" link only if all events are closed         | 1                               |
+    And I click on "View all events" "link" in the "declareinterestfullybooked" activity
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -126,9 +126,9 @@ Feature: Manager approval
       | Name                                                               | Test declareinterestfullybooked |
       | Description                                                        | Test facetoface description     |
       | Enable "Declare Interest" option                                   | 1                               |
-      | Show "Declare Interest" link only if all sessions are closed       | 1                               |
-    And I click on "View all sessions" "link" in the "declareinterestfullybooked" activity
-    And I follow "Add a new session"
+      | Show "Declare Interest" link only if all events are closed         | 1                               |
+    And I click on "View all events" "link" in the "declareinterestfullybooked" activity
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | Allow overbooking     | Yes  |
       | datetimeknown         | Yes  |
@@ -168,8 +168,8 @@ Feature: Manager approval
       | Name                                                               | Test f2f 1                      |
       | Description                                                        | Test facetoface description     |
       | Enable "Declare Interest" option                                   | 1                               |
-    And I click on "View all sessions" "link" in the "Test f2f 1" activity
-    And I follow "Add a new session"
+    And I click on "View all events" "link" in the "Test f2f 1" activity
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -188,8 +188,8 @@ Feature: Manager approval
       | Name                                                               | Test f2f 2                      |
       | Description                                                        | Test facetoface description     |
       | Enable "Declare Interest" option                                   | 1                               |
-    And I click on "View all sessions" "link" in the "Test f2f 2" activity
-    And I follow "Add a new session"
+    And I click on "View all events" "link" in the "Test f2f 2" activity
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |

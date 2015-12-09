@@ -41,8 +41,8 @@ Feature: Take attendance for Face to face sessions
     And I set the following fields to these values:
       | Face-to-face - Test facetoface name | 1 |
     And I press "Save changes"
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I fill facetoface session with relative date in form data:
       | datetimeknown         | Yes              |
       | sessiontimezone[0]    | Pacific/Auckland |
@@ -85,7 +85,7 @@ Feature: Take attendance for Face to face sessions
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I click on "View all sessions" "link"
+    And I click on "View all events" "link"
     And I click on "Attendees" "link"
     And I click on "Take attendance" "link"
     And I click on "Fully attended" "option" in the "Sam1 Student1" "table_row"
@@ -106,7 +106,7 @@ Feature: Take attendance for Face to face sessions
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I click on "View all sessions" "link"
+    And I click on "View all events" "link"
     And I click on "Attendees" "link"
     And I click on "Take attendance" "link"
     And I click on "input[class='selectedcheckboxes']" "css_element" in the "Sam1 Student1" "table_row"

@@ -190,13 +190,6 @@ if (!empty($filters)) {
     echo html_writer::end_tag('form');
 }
 
-// Important notices.
-if ($notice = get_notice($activefilters['customfields'])) {
-    echo $OUTPUT->box_start();
-    echo format_text($notice, FORMAT_HTML);
-    echo $OUTPUT->box_end();
-}
-
 // Display settings
 $courses = true; // display all courses
 $groups = false; // don't show group events
@@ -905,67 +898,6 @@ function print_sessions($sessions, $tab) {
 function new_session_table() {
     $table = new html_table();
     return $table;
-}
-
-/**
- * Return a random notice matching the current criteria
- */
-function get_notice($activefilters) {
-    global $CFG, $DB;
-    global $customfields;
-
-    // Get all notices
-    if (!$allnotices = $DB->get_records('facetoface_notice', array(), 'id', 'id')) {
-        return false; // no matches
-    }
-
-    $filterjoins = '';
-    $filterwhere = '';
-    $filterparams = array();
-
-    $filternb = 1;
-    foreach ($activefilters as $fieldid => $fieldvalue) {
-        if ('all' == $fieldvalue) {
-            continue; // Not actually a filter
-        }
-
-        $joincondition = "d1.noticeid = n.id";
-        if ($filternb > 1) {
-            $joincondition = "d{$filternb}.noticeid = d". ($filternb - 1) .'.noticeid';
-        }
-        $filterjoins .= " JOIN {facetoface_notice_data} d$filternb ON $joincondition";
-
-        //$whereclause = "d{$filternb}.data <> '$value'";
-        $whereclause = "d{$filternb}.data <> ?";
-        $whereparams = array($fieldvalue);
-        if ('multiselect' == $customfields[$fieldid]->datatype) {
-            $whereclause = $DB->sql_like("d{$filternb}.data", '?', true, true, true);
-            $whereparams = array('%' . $fieldvalue . '%');
-        }
-        $filterwhere .= " OR (d{$filternb}.fieldid = ? AND $whereclause) ";
-        $filterparams = array_merge($filterparams, array($fieldid), $whereparams);
-        $filternb++;
-    }
-
-    // Get notices to filter out
-    $sql = "SELECT DISTINCT n.id
-                  FROM {facetoface_notice} n
-                  $filterjoins
-                 WHERE 1 = 0
-                 $filterwhere
-              ORDER BY n.id";
-    $nonmatchingnotices = $DB->get_records_sql($sql, $filterparams);
-
-    // Compute the difference
-    $noticeids = array_diff(array_keys($allnotices), array_keys($nonmatchingnotices));
-    if (empty($noticeids)) {
-        return false;
-    }
-
-    // Select a notice at random
-    shuffle($noticeids);
-    $randomnoticeid = reset($noticeids);
-    return $DB->get_field('facetoface_notice', 'text', array('id' => $randomnoticeid));
 }
 
 function get_matching_waitlisted_sessions($activefilters) {

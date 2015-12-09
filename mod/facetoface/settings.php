@@ -21,38 +21,72 @@
  * @author David Curry <david.curry@totaralms.com>
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
  * @author Francois Marier <francois@catalyst.net.nz>
- * @package modules
- * @subpackage facetoface
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package mod_facetoface
  */
 defined('MOODLE_INTERNAL') || die();
 
 require_once "$CFG->dirroot/mod/facetoface/lib.php";
 
-$ADMIN->add('modsettings', new admin_category('modfacetofacefolder', new lang_string('pluginname', 'mod_facetoface'), $module->is_enabled() === false));
+$ADMIN->add('root', new admin_category('modfacetofacefolder', new lang_string('pluginname', 'mod_facetoface'), $module->is_enabled() === false));
 
 $sessionreporturl = new moodle_url('/mod/facetoface/sessionreport.php');
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacesessionreport', new lang_string('managesessions','mod_facetoface'), $sessionreporturl, 'mod/facetoface:viewallsessions'));
 
-$settings = new admin_settingpage($section, get_string('generalsettings', 'mod_facetoface'), 'moodle/site:config', $module->is_enabled() === false);
+$settings = new admin_settingpage($section, get_string('globalsettings', 'mod_facetoface'), 'moodle/site:config', $module->is_enabled() === false);
 $ADMIN->add('modfacetofacefolder', $settings);
 
 if ($ADMIN->fulltree) { // Improve performance.
+    $settings->add(new admin_setting_heading('facetoface_general_header', get_string('generalsettings', 'facetoface'), ''));
+
+    $settings->add(new admin_setting_pickroles('facetoface_session_roles', new lang_string('setting:sessionroles_caption', 'facetoface'),
+        new lang_string('setting:sessionroles', 'facetoface'), array()));
+
+    $settings->add(new admin_setting_configcheckbox('facetoface_allowschedulingconflicts', new lang_string('setting:allowschedulingconflicts_caption', 'facetoface'),
+        new lang_string('setting:allowschedulingconflicts', 'facetoface'), 0));
+
+    $settings->add(new admin_setting_configtext('facetoface_export_userprofilefields', new lang_string('exportuserprofilefields', 'facetoface'), new lang_string('exportuserprofilefields_desc', 'facetoface'), 'firstname,lastname,idnumber,institution,department,email', PARAM_TEXT));
+
+    $settings->add(new admin_setting_configtext('facetoface_export_customprofilefields', new lang_string('exportcustomprofilefields', 'facetoface'), new lang_string('exportcustomprofilefields_desc', 'facetoface'), '', PARAM_TEXT));
+
+// Create array with existing custom fields (if any), empty array otherwise.
+    $customfields = array();
+    $allcustomfields = facetoface_get_session_customfields();
+    // Exclude customfields type file.
+    $allcustomfields = totara_search_for_value($allcustomfields, 'datatype', TOTARA_SEARCH_OP_NOT_EQUAL, 'file');
+    foreach ($allcustomfields as $fieldid => $fielname) {
+        $customfields[$fieldid] = $fielname->fullname;
+    }
+
+    // List of facetoface session fields that can be selected as filters.
+    $calendarfilters = array(
+        'timestart' => get_string('startdateafter', 'facetoface'),
+        'timefinish' => get_string('finishdatebefore', 'facetoface'),
+        'room' => get_string('room', 'facetoface'),
+        'building' => get_string('building', 'facetoface'),
+        'address' => get_string('address', 'facetoface'),
+        'capacity' => get_string('capacity', 'facetoface')
+    );
+    $calendarfilters = $calendarfilters + $customfields;
+    $settings->add(new admin_setting_configmultiselect('facetoface_calendarfilters', new lang_string('setting:calendarfilterscaption', 'facetoface'), new lang_string('setting:calendarfilters', 'facetoface'), array('room', 'building', 'address'), $calendarfilters));
+
+    $settings->add(new admin_setting_heading('facetoface_notifications_header', get_string('notificationsheading', 'facetoface'), ''));
+
+    $settings->add(new admin_setting_configcheckbox('facetoface_notificationdisable', new lang_string('setting:notificationdisable_caption', 'facetoface'),
+        new lang_string('setting:notificationdisable', 'facetoface'), 0));
 
     $settings->add(new admin_setting_configtext('facetoface_fromaddress', new lang_string('setting:fromaddress_caption', 'facetoface'),
         new lang_string('setting:fromaddress', 'facetoface'), new lang_string('setting:fromaddressdefault', 'facetoface'),
         "/^((?:[\w\.\-])+\@(?:(?:[a-zA-Z\d\-])+\.)+(?:[a-zA-Z\d]{2,4}))$/", 30));
 
-    $settings->add(new admin_setting_pickroles('facetoface_session_roles', new lang_string('setting:sessionroles_caption', 'facetoface'),
-        new lang_string('setting:sessionroles', 'facetoface'), array()));
-
     $settings->add(new admin_setting_pickroles('facetoface_session_rolesnotify', new lang_string('setting:sessionrolesnotify_caption', 'facetoface'),
         new lang_string('setting:sessionrolesnotify', 'facetoface'), array('editingteacher')));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_allowschedulingconflicts', new lang_string('setting:allowschedulingconflicts_caption', 'facetoface'),
-        new lang_string('setting:allowschedulingconflicts', 'facetoface'), 0));
+    $settings->add(new admin_setting_configcheckbox('facetoface_oneemailperday', new lang_string('setting:oneemailperday_caption', 'facetoface'), new lang_string('setting:oneemailperday', 'facetoface'), 0));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_notificationdisable', new lang_string('setting:notificationdisable_caption', 'facetoface'),
-        new lang_string('setting:notificationdisable', 'facetoface'), 0));
+    $settings->add(new admin_setting_configcheckbox('facetoface_disableicalcancel', new lang_string('setting:disableicalcancel_caption', 'facetoface'), new lang_string('setting:disableicalcancel', 'facetoface'), 0));
+
+    $settings->add(new admin_setting_heading('facetoface_additional_features_header', get_string('additionalfeaturesheading', 'facetoface'), ''));
 
     $setting = new admin_setting_configcheckbox('facetoface_displaysessiontimezones', new lang_string('setting:displaysessiontimezones_caption', 'facetoface'),
         new lang_string('setting:displaysessiontimezones', 'facetoface'), 1);
@@ -80,8 +114,13 @@ if ($ADMIN->fulltree) { // Improve performance.
         new lang_string('setting:defaultminbookings', 'facetoface'),
         new lang_string('setting:defaultminbookings_help', 'facetoface'), 0, PARAM_INT));
 
-    $settings->add(new admin_setting_heading('facetoface_multiplesessions_header', get_string('multiplesessionsheading', 'facetoface'), ''));
-
+    $settings->add(new admin_setting_configcheckbox('facetoface_hidecost', new lang_string('setting:hidecost_caption', 'facetoface'), new lang_string('setting:hidecost', 'facetoface'), 0));
+    $settings->add(new admin_setting_configcheckbox('facetoface_hidediscount', new lang_string('setting:hidediscount_caption', 'facetoface'), new lang_string('setting:hidediscount', 'facetoface'), 0));
+}
+// Activity defaults
+$settings = new admin_settingpage('modfacetofacactivitydefaults', get_string('activitydefaults', 'mod_facetoface'), 'moodle/site:config', $module->is_enabled() === false);
+$ADMIN->add('modfacetofacefolder', $settings);
+if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('facetoface_multiplesessions', get_string('setting:multiplesessions_caption', 'facetoface'), get_string('setting:multiplesessions', 'facetoface'), 0));
 
     $settings->add(new admin_setting_heading('facetoface_signupapproval_header', new lang_string('setting:signupapproval_header', 'facetoface'), ''));
@@ -130,59 +169,6 @@ if ($ADMIN->fulltree) { // Improve performance.
     $settings->add(new admin_setting_configtext('facetoface/reservedays',
         new lang_string('setting:reservedays', 'mod_facetoface'),
         new lang_string('setting:reservedays_desc', 'mod_facetoface'), 2, PARAM_INT));
-
-    $settings->add(new admin_setting_heading('facetoface_cost_header', new lang_string('costheading', 'facetoface'), ''));
-
-    $settings->add(new admin_setting_configcheckbox('facetoface_hidecost', new lang_string('setting:hidecost_caption', 'facetoface'), new lang_string('setting:hidecost', 'facetoface'), 0));
-
-    $settings->add(new admin_setting_configcheckbox('facetoface_hidediscount', new lang_string('setting:hidediscount_caption', 'facetoface'), new lang_string('setting:hidediscount', 'facetoface'), 0));
-
-
-    $settings->add(new admin_setting_heading('facetoface_icalendar_header', new lang_string('icalendarheading', 'facetoface'), ''));
-
-    $settings->add(new admin_setting_configcheckbox('facetoface_oneemailperday', new lang_string('setting:oneemailperday_caption', 'facetoface'), new lang_string('setting:oneemailperday', 'facetoface'), 0));
-
-    $settings->add(new admin_setting_configcheckbox('facetoface_disableicalcancel', new lang_string('setting:disableicalcancel_caption', 'facetoface'), new lang_string('setting:disableicalcancel', 'facetoface'), 0));
-
-
-    $settings->add(new admin_setting_heading('facetoface_bulkadd_header', new lang_string('bulkaddheading', 'facetoface'), ''));
-
-    $options = array();
-    $options['bulkaddsourceidnumber'] = new lang_string('bulkaddsourceidnumber', 'facetoface');
-    $options['bulkaddsourceuserid'] = new lang_string('bulkaddsourceuserid', 'facetoface');
-    $options['bulkaddsourceusername'] = new lang_string('bulkaddsourceusername', 'facetoface');
-
-    $settings->add(new admin_setting_configselect('facetoface_bulkaddsource',
-        new lang_string('setting:bulkaddsource_caption', 'facetoface'),
-        new lang_string('setting:bulkaddsource', 'facetoface'), 'bulkaddsourceidnumber', $options));
-
-    // Export.
-    $settings->add(new admin_setting_heading('facetoface_export_header', new lang_string('exportheading', 'facetoface'), ''));
-    $settings->add(new admin_setting_configtext('facetoface_export_userprofilefields', new lang_string('exportuserprofilefields', 'facetoface'), new lang_string('exportuserprofilefields_desc', 'facetoface'), 'firstname,lastname,idnumber,institution,department,email', PARAM_TEXT));
-
-    $settings->add(new admin_setting_configtext('facetoface_export_customprofilefields', new lang_string('exportcustomprofilefields', 'facetoface'), new lang_string('exportcustomprofilefields_desc', 'facetoface'), '', PARAM_TEXT));
-
-    // Create array with existing custom fields (if any), empty array otherwise.
-    $customfields = array();
-    $allcustomfields = facetoface_get_session_customfields();
-    // Exclude customfields type file.
-    $allcustomfields = totara_search_for_value($allcustomfields, 'datatype', TOTARA_SEARCH_OP_NOT_EQUAL, 'file');
-    foreach ($allcustomfields as $fieldid => $fielname) {
-        $customfields[$fieldid] = $fielname->fullname;
-    }
-
-    // List of facetoface session fields that can be selected as filters.
-    $settings->add(new admin_setting_heading('facetoface_calendarfilters_header', new lang_string('calendarfiltersheading', 'facetoface'), ''));
-    $calendarfilters = array(
-        'timestart' => get_string('startdateafter', 'facetoface'),
-        'timefinish' => get_string('finishdatebefore', 'facetoface'),
-        'room' => get_string('room', 'facetoface'),
-        'building' => get_string('building', 'facetoface'),
-        'address' => get_string('address', 'facetoface'),
-        'capacity' => get_string('capacity', 'facetoface')
-    );
-    $calendarfilters = $calendarfilters + $customfields;
-    $settings->add(new admin_setting_configmultiselect('facetoface_calendarfilters', new lang_string('setting:calendarfilterscaption', 'facetoface'), new lang_string('setting:calendarfilters', 'facetoface'), array('room', 'building', 'address'), $calendarfilters));
 }
 
 // Session default settings page.
@@ -201,6 +187,5 @@ $settings = null;
 
 $customfieldurl = new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacesession'));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacecustomfields', new lang_string('customfieldsheading','facetoface'), $customfieldurl, 'mod/facetoface:managecustomfield'));
-$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacerooms', new lang_string('rooms','facetoface'), "$CFG->wwwroot/mod/facetoface/room/manage.php"));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacetemplates', new lang_string('notificationtemplates','facetoface'), "$CFG->wwwroot/mod/facetoface/notification/template/index.php"));
-$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacesitenotices', new lang_string('sitenoticesheading','facetoface'), "$CFG->wwwroot/mod/facetoface/sitenotices.php"));
+$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacerooms', new lang_string('rooms','facetoface'), "$CFG->wwwroot/mod/facetoface/room/manage.php"));

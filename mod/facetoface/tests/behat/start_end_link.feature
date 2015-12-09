@@ -16,11 +16,11 @@ Feature: Confirm end date is adjusted when start date is altered
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name                                    | Test facetoface name        |
       | Description                             | Test facetoface description |
-      | Allow multiple sessions signup per user | 1                           |
+      | Allow multiple events signup per user   | 1                           |
       | Allow manager reservations              | Yes                         |
       | Maximum reservations                    | 10                          |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |

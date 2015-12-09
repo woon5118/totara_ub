@@ -16,8 +16,8 @@ Feature: Confirm overlapping sessions can be removed
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I press "Add a new date"
     And I set the following fields to these values:
       | datetimeknown           | Yes              |
@@ -47,8 +47,8 @@ Feature: Confirm overlapping sessions can be removed
       | timefinish[1][timezone] | <timezone>       |
       | datedelete[1]           | 1                |
     And I press "Save changes"
-    Then I should not see "This date conflicts with an earlier date in this session"
-    And I should see "Upcoming sessions"
+    Then I should not see "This date conflicts with an earlier date in this event"
+    And I should see "Upcoming events"
 
   Examples:
     | starthour | startminute | finishhour | finishminute | timezone         |

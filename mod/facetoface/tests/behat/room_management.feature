@@ -28,7 +28,7 @@ Feature: Manage pre-defined rooms
       | user5    | C1     | student        |
       | user6    | C1     | student        |
     And I log in as "admin"
-    And I navigate to "Rooms" node in "Site administration > Plugins > Activity modules > Face-to-face"
+    And I navigate to "Rooms" node in "Site administration > Face-to-face"
     And I press "Add a room"
     And I set the following fields to these values:
       | Room name | Room 1          |
@@ -46,7 +46,7 @@ Feature: Manage pre-defined rooms
     And I press "Add a room"
 
   Scenario: See that the rooms were created correctly
-    Given I navigate to "Rooms" node in "Site administration > Plugins > Activity modules > Face-to-face"
+    Given I navigate to "Rooms" node in "Site administration > Face-to-face"
     Then I should see "That house" in the "Room 1" "table_row"
     And I should see "123 here street" in the "Room 1" "table_row"
     And I should see "5" in the "Room 1" "table_row"
@@ -61,8 +61,8 @@ Feature: Manage pre-defined rooms
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     When I press "Choose a pre-defined room"
     Then I should see "Room 1, That house, 123 here street,  (Capacity: 5)" in the "Choose a room" "totaradialogue"
     And I should see "Room 2, Your house, 123 near street,  (Capacity: 6)" in the "Choose a room" "totaradialogue"
@@ -74,8 +74,8 @@ Feature: Manage pre-defined rooms
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -113,8 +113,8 @@ Feature: Manage pre-defined rooms
     And I should see "User Three"
     And I should see "User Four"
     And I should see "User Five"
-    And I should see "Bulk add users success"
-    And I should not see "This session is overbooked"
+    And I should see "Add/edit attendees success"
+    And I should not see "This event is overbooked"
 
     And I set the field "menuf2f-actions" to "Add users"
     And I wait "1" seconds
@@ -124,7 +124,7 @@ Feature: Manage pre-defined rooms
     And I press "Continue"
     And I press "Confirm"
     Then I should see "User Six"
-    And I should see "This session is overbooked"
+    And I should see "This event is overbooked"
 
   Scenario: Try and clash a room
     Given I click on "Find Learning" in the totara menu
@@ -133,8 +133,8 @@ Feature: Manage pre-defined rooms
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -155,7 +155,7 @@ Feature: Manage pre-defined rooms
     And I wait "1" seconds
     And I press "Save changes"
 
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -200,7 +200,7 @@ Feature: Manage pre-defined rooms
       | timefinish[0][hour]   | 12   |
       | timefinish[0][minute] | 00   |
     And I press "Save changes"
-    And I should see "There is a room conflict - another session is using the room at the same time"
+    And I should see "There is a room conflict - another event is using the room at the same time"
 
     When I set the following fields to these values:
       | datetimeknown         | No |
@@ -215,8 +215,8 @@ Feature: Manage pre-defined rooms
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown           | Yes              |
       | timestart[0][day]       | 1                |
@@ -239,7 +239,7 @@ Feature: Manage pre-defined rooms
     And I wait "1" seconds
     And I press "Save changes"
 
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown           | Yes           |
       | timestart[0][day]       | 1             |
@@ -293,8 +293,7 @@ Feature: Manage pre-defined rooms
     And I press "Save changes"
     And I wait "1" seconds
     And I press "Save changes"
-    And I should see "There is a room conflict - another session is using the room at the same time"
-
+    And I should see "There is a room conflict - another event is using the room at the same time"
     When I set the following fields to these values:
       | datetimeknown         | No |
     And I press "Save changes"

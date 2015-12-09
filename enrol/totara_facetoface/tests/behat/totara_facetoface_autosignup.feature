@@ -32,7 +32,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
       | Description | Test facetoface description 1 |
       | Approval required | 0                     |
     And I follow "Test facetoface name 1"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown | Yes |
       | timestart[0][day] | 1 |
@@ -52,7 +52,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
       | Description | Test facetoface description 2 |
       | Approval required | 0                     |
     And I follow "Test facetoface name 2"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown | Yes |
       | timestart[0][day] | 2 |
@@ -74,10 +74,10 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I follow "Course 1"
     When I add "Face-to-face direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
-      | Automatically sign users up to face to face sessions | 1 |
+      | Automatically sign users up to face to face events | 1 |
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I press "Sign-up"
-    Then I should see "Your booking has been completed and you have been enrolled on 2 session(s)."
+    Then I should see "Your booking has been completed and you have been enrolled on 2 event(s)."

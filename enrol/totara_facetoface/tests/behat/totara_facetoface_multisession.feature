@@ -32,7 +32,7 @@ Feature: Users can enrol on courses that have several facetoface activities and 
       | Description | Test facetoface description 1 |
       | Approval required | 0                     |
     And I follow "Test facetoface name 1"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown | Yes |
       | timestart[0][day] | 1 |
@@ -52,7 +52,7 @@ Feature: Users can enrol on courses that have several facetoface activities and 
       | Description | Test facetoface description 2 |
       | Approval required | 0                     |
     And I follow "Test facetoface name 2"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown | Yes |
       | timestart[0][day] | 2 |
@@ -69,7 +69,7 @@ Feature: Users can enrol on courses that have several facetoface activities and 
     And I follow "Course 1"
     When I add "Face-to-face direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
-      | Automatically sign users up to face to face sessions | 0 |
+      | Automatically sign users up to face to face events | 0 |
     And I log out
 
   @javascript
@@ -89,5 +89,5 @@ Feature: Users can enrol on courses that have several facetoface activities and 
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I press "Sign-up"
-    Then I should see "Choose at least one session to enrol."
+    Then I should see "Choose at least one event to enrol."
     And I should not see "Your booking has been completed."

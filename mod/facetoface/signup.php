@@ -72,8 +72,6 @@ if (isguestuser()) {
     exit();
 }
 
-$manageremail = false;
-
 $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
 if ($selectpositiononsignupglobal) {
     $manager = totara_get_most_primary_manager($USER->id);
@@ -220,11 +218,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
     }
 
     redirect($returnurl);
-} else if (!empty($manageremail)) {
-    // Set values for the form
-    $toform = new stdClass();
-    $toform->manageremail = $manageremail;
-    $mform->set_data($toform);
 }
 
 echo $OUTPUT->header();

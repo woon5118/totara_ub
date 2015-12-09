@@ -677,7 +677,7 @@ $string['multicourseset'] = 'Set of courses';
 $string['multicourseset_help'] = 'This is a set of courses chosen individually from the course catalogue.
 
 You can define the set name, whether the Learner must complete one or all courses and the general time allowance to complete the set.';
-$string['multiplefacetofacewarning'] = 'Warning : this course has face to face activity without multiple sessions set';
+$string['multiplefacetofacewarning'] = 'Warning : this course has face to face activity without multiple events set';
 $string['nocertificationlearning'] = 'No certifications';
 $string['nocontent'] = 'Does not contain any content';
 $string['nocoursecontent'] = 'No course content.';

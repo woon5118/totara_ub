@@ -31,10 +31,10 @@ Feature: Face to face calendar
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name                                    | Test facetoface name        |
       | Description                             | Test facetoface description |
-      | Allow multiple sessions signup per user | 1                           |
+      | Allow multiple events signup per user   | 1                           |
       | Show entry on user's calendar           | 1                           |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I fill facetoface session with relative date in form data:
       | datetimeknown         | Yes              |
       | sessiontimezone[0]    | Pacific/Auckland |

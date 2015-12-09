@@ -21,14 +21,10 @@ Feature: Play waiting list lottery
       | student2 | C1     | student        |
 
     And I log in as "admin"
-    And I expand "Site administration" node
-    And I expand "Plugins" node
-    And I expand "Activity modules" node
-    And I expand "Face-to-face" node
-    And I follow "General Settings"
+    And I navigate to "Global settings" node in "Site administration > Face-to-face"
     And I set the following fields to these values:
-      | Enable everyone on waiting list option | Yes  |
-      | Enable waitlist lottery                 | Yes  |
+      | Everyone on waiting list | Yes  |
+      | Waitlist lottery         | Yes  |
     And I press "Save changes"
     And I log out
 
@@ -41,8 +37,8 @@ Feature: Play waiting list lottery
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name              | Test facetoface name        |
       | Description       | Test facetoface description |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown                  | Yes  |
       | timestart[0][day]              | 1    |
@@ -65,18 +61,18 @@ Feature: Play waiting list lottery
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
-    And I should see "You will be added to the waiting list for this session"
+    And I should see "You will be added to the waiting list for this event"
     And I press "Join waitlist"
-    And I should see "You have been placed on the waitlist for this session."
+    And I should see "You have been placed on the waitlist for this event."
     And I log out
 
     When I log in as "student2"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
-    And I should see "You will be added to the waiting list for this session"
+    And I should see "You will be added to the waiting list for this event"
     And I press "Join waitlist"
-    And I should see "You have been placed on the waitlist for this session."
+    And I should see "You have been placed on the waitlist for this event."
     And I log out
 
     When I log in as "teacher1"

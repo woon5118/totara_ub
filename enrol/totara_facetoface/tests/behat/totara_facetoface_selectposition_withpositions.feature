@@ -18,17 +18,12 @@ Feature: Users can enrol themself in courses with selected position where face t
       | teacher1 | C1 | editingteacher |
 
     And I log in as "admin"
-    And I expand "Site administration" node
-    And I expand "Plugins" node
-    And I expand "Activity modules" node
-    And I expand "Face-to-face" node
-    And I follow "General Settings"
+    And I navigate to "Global settings" node in "Site administration > Face-to-face"
     And I set the following fields to these values:
       | Select position on signup | 1 |
     And I press "Save changes"
 
-    And I expand "Enrolments" node
-    And I follow "Manage enrol plugins"
+    And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Face-to-face direct enrolment" "table_row"
 
     And the following "position" frameworks exist:
@@ -59,8 +54,8 @@ Feature: Users can enrol themself in courses with selected position where face t
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
       | Select position on signup | 1             |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown | Yes |
       | timestart[0][day] | 1 |
@@ -91,7 +86,7 @@ Feature: Users can enrol themself in courses with selected position where face t
 
     And I log in as "teacher1"
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I follow "Attendees"
     And I should see "Position2"
 
@@ -110,6 +105,6 @@ Feature: Users can enrol themself in courses with selected position where face t
 
     And I log in as "teacher1"
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I follow "Attendees"
     And I should see "Position2"

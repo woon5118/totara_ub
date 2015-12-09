@@ -27,13 +27,13 @@
  */
 
 $string['additionalinformation'] = 'Additional signup information';
-$string['autobookingcompleted'] = 'Your booking has been completed and you have been enrolled on {$a} session(s).';
-$string['autosignup'] = 'Automatically sign users up to face to face sessions';
+$string['autobookingcompleted'] = 'Your booking has been completed and you have been enrolled on {$a} event(s).';
+$string['autosignup'] = 'Automatically sign users up to face to face events';
 $string['autosignup_help'] = 'If set to yes then on enrolling the user will be signed up to all face to face activities on the course.
-If multiple enrolment is enabled then the user will be signed up to every session that has availability or a waiting list, otherwise they will be signed up to the earliest session with either a space or waiting list.';
+If multiple enrolment is enabled then the user will be signed up to every event that has availability or a waiting list, otherwise they will be signed up to the earliest event with either a space or waiting list.';
 $string['cannotenrol'] = 'Enrolment is disabled or inactive';
-$string['cannotenrolalreadyrequested'] = 'It is not possible to sign up for these sessions (manager request already pending).';
-$string['cannotenrolnosessions'] = 'Cannot enrol (no face-fo-face sessions in this course)';
+$string['cannotenrolalreadyrequested'] = 'It is not possible to sign up for these events (manager request already pending).';
+$string['cannotenrolnosessions'] = 'Cannot enrol (no face-fo-face events in this course)';
 $string['cannnotupdatemanageremail'] = 'Manager email cannot be updated, configure using positions instead.';
 $string['cohortnonmemberinfo'] = 'Only members of cohort \'{$a}\' can use face-to-face enrolment.';
 $string['cohortonly'] = 'Only cohort members';
@@ -59,7 +59,7 @@ $string['enrolperiod_desc'] = 'Default length of time that the enrolment is vali
 $string['enrolperiod_help'] = 'Length of time that the enrolment is valid, starting with the moment the user enrols themselves. If disabled, the enrolment duration will be unlimited.';
 $string['enrolstartdate'] = 'Start date';
 $string['enrolstartdate_help'] = 'If enabled, users can enrol themselves from this date onward only.';
-$string['error:choosession'] = 'Choose at least one session to enrol.';
+$string['error:choosession'] = 'Choose at least one event to enrol.';
 $string['expiredaction'] = 'Enrolment expiration action';
 $string['expiredaction_help'] = 'Select action to carry out when user enrolment expires. Please note that some user data and settings are purged from course during course unenrolment.';
 $string['expirymessageenrollerbody'] = 'Face-to-Face Direct enrolment in the course \'{$a->course}\' will expire within the next {$a->threshold} for the following users:
@@ -77,7 +77,7 @@ $string['expirymessageenrollersubject'] = 'Face-to-Face Direct enrolment expiry 
 $string['longtimenosee'] = 'Unenrol inactive after';
 $string['longtimenosee_help'] = 'If users haven\'t accessed a course for a long time, then they are automatically unenrolled. This parameter specifies that time limit.';
 $string['managermissingallsessions'] = 'Direct enrolment is not available to you because you are not assigned a manager.';
-$string['managermissingsomesessions'] = 'Some sessions are not available to you because you are not assigned a manager.';
+$string['managermissingsomesessions'] = 'Some events are not available to you because you are not assigned a manager.';
 $string['maxenrolled'] = 'Max enrolled users';
 $string['maxenrolled_help'] = 'Specifies the maximum number of users that can use face-to-face enrolment. 0 means no limit.';
 $string['maxenrolledreached'] = 'Maximum number of users allowed to use face-to-face enrolment was already reached.';
@@ -88,18 +88,18 @@ $string['newenrols_help'] = 'This setting determines whether a user can enrol in
 $string['pluginname'] = 'Face-to-face direct enrolment';
 $string['pluginname_desc'] = 'The face-to-face direct enrolment plugin allows users to choose which courses they want to participate in. The courses may be protected by an enrolment key.';
 $string['role'] = 'Default assigned role';
-$string['selectthissession'] = 'Select this session:';
-$string['selectsession'] = 'Select session';
+$string['selectthissession'] = 'Select this event:';
+$string['selectsession'] = 'Select event';
 $string['self:config'] = 'Configure Face-to-face direct enrol instances';
 $string['self:manage'] = 'Manage enrolled users';
 $string['self:unenrol'] = 'Unenrol users from course';
 $string['self:unenrolself'] = 'Unenrol self from the course';
-$string['selfapprovalrequired'] = 'Please check the box below confirming that self-approval has been sought for the chosen session.';
+$string['selfapprovalrequired'] = 'Please check the box below confirming that self-approval has been sought for the chosen event.';
 $string['sendcoursewelcomemessage'] = 'Send course welcome message';
 $string['sendcoursewelcomemessage_help'] = 'If enabled, users receive a welcome message via email when they sign up for a course using face-to-face enrolment.';
 $string['showhint'] = 'Show hint';
 $string['showhint_desc'] = 'Show first letter of the guest access key.';
-$string['signuptoenrol'] = 'To enrol in the session and course, choose a session below and click \'Sign-up\'. Manager approval may be required.';
+$string['signuptoenrol'] = 'To enrol in the event and course, choose a event below and click \'Sign-up\'. Manager approval may be required.';
 $string['signuppersessionresult'] = '{$a->facetoface}: {$a->message}';
 $string['status'] = 'Enable existing enrolments';
 $string['status_desc'] = 'Enable face-to-face enrolment method in new courses.';
@@ -107,16 +107,16 @@ $string['status_help'] = 'If disabled all existing Face-to-face direct enrolment
 $string['totara_facetoface:config'] = 'Configure Face-to-Face Direct enrolment instances';
 $string['totara_facetoface:manage'] = 'Manage Face-to-Face Direct enrolled users';
 $string['totara_facetoface:unenrol'] = 'Unenrol Face-to-Face Direct enrolment users from course';
-$string['totara_facetoface:unenrolself'] = 'Unenrol self from the course and Face-to-Face sessions';
+$string['totara_facetoface:unenrolself'] = 'Unenrol self from the course and Face-to-Face events';
 $string['unenrol'] = 'Unenrol user';
 $string['unenrolselfconfirm'] = 'Do you really want to unenrol yourself from course "{$a}"?';
 $string['unenroluser'] = 'Do you really want to unenrol "{$a->user}" from course "{$a->course}"?';
-$string['unenrolwhenremoved'] = 'Unenrol users when removed from all Face-to-face sessions';
+$string['unenrolwhenremoved'] = 'Unenrol users when removed from all Face-to-face events';
 $string['welcometocourse'] = 'Welcome to {$a}';
 $string['welcometocoursetext'] = 'Welcome to {$a->coursename}!
 
 If you have not done so already, you should edit your profile page so that we can learn more about you:
 
   {$a->profileurl}';
-$string['withdrawconfifm'] = 'Are you sure you want to withdraw your manager sign-up request from this course and session?';
+$string['withdrawconfifm'] = 'Are you sure you want to withdraw your manager sign-up request from this course and event?';
 $string['withdrawpending'] = 'Withdraw pending request';

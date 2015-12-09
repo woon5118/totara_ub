@@ -21,7 +21,7 @@
  */
 
 // lang file for mod/facetoface/rb_sources/rb_source_facetoface_sessions.php
-$string['sourcetitle'] = 'Face-to-face sessions';
+$string['sourcetitle'] = 'Face-to-face events';
 // columns
 $string['address'] = 'Address';
 $string['allsignupcustomfields'] = 'All sign up custom fields';
@@ -33,28 +33,28 @@ $string['roomcapacity'] = 'Room capacity';
 $string['discountcode'] = 'Discount code';
 $string['normalcost'] = 'Normal cost';
 $string['discountcost'] = 'Discount cost';
-$string['sesscapacity'] = 'Session Capacity';
+$string['sesscapacity'] = 'Event Capacity';
 $string['numattendees'] = 'Number of Attendees';
-$string['sessdetails'] = 'Session Details';
-$string['sessduration'] = 'Session Duration';
+$string['sessdetails'] = 'Event Details';
+$string['sessduration'] = 'Event Duration';
 $string['status'] = 'Status';
 $string['endtime'] = 'End Time';
 $string['facilitator'] = 'Facilitator';
 $string['ftfname'] = 'Face to Face Name';
-$string['ftfnamelink'] = 'Face to Face Name (linked to session page)';
+$string['ftfnamelink'] = 'Face to Face Name (linked to event page)';
 $string['room'] = 'Room';
 $string['roomdescription'] = 'Room description';
 $string['roomname'] = 'Room name';
 $string['selectedpositionedit'] = 'Select position name (when enabled)';
-$string['sessdate'] = 'Session Start Date';
-$string['sessdatefinish'] = 'Session Finish Date';
-$string['sessdatelink'] = 'Session Start Date (linked to activity)';
-$string['sessname'] = 'Session Name';
-$string['sessstart'] = 'Session Start Time';
-$string['sessfinish'] = 'Session Finish Time';
-$string['sessionrole'] = 'Session {$a}';
-$string['sessionrolelink'] = 'Session {$a} (linked to profile)';
-$string['sessionx'] = 'Session {$a}';
+$string['sessdate'] = 'Session Start';
+$string['sessdatefinish'] = 'Session Finish';
+$string['sessdatelink'] = 'Session Start (linked to actvity)';
+$string['sessname'] = 'Event Name';
+$string['sessstart'] = 'Event Start Time';
+$string['sessfinish'] = 'Event Finish Time';
+$string['sessionrole'] = 'Event {$a}';
+$string['sessionrolelink'] = 'Event {$a} (linked to profile)';
+$string['sessionx'] = 'Event {$a}';
 $string['starttime'] = 'Start Time';
 $string['timeofsignup'] = 'Time of sign-up';
 $string['cancellationdate'] = 'Cancellation date';
@@ -66,7 +66,7 @@ $string['currentorg'] = 'The user\'s current organisation';
 $string['currentpos'] = 'The user\'s current position';
 $string['user'] = 'The user';
 $string['reserved'] = 'Reserved';
-$string['thedate'] = 'The session date';
+$string['thedate'] = 'The session';
 
 // filters
 $string['pilot'] = 'Pilot';
@@ -75,12 +75,12 @@ $string['coursedelivery'] = 'Course Delivery';
 
 // column types for this source, as strings
 $string['type_approver'] = 'Approver';
-$string['type_session'] = 'Session';
+$string['type_session'] = 'Event';
 $string['type_status'] = 'Status';
 $string['type_role'] = 'Role';
 $string['type_room'] = 'Room';
 $string['type_facetoface'] = 'Face-to-face';
-$string['type_facetoface_session'] = 'Session customfields';
+$string['type_facetoface_session'] = 'Event customfields';
 $string['type_facetoface_signup'] = 'Signup note customfields';
 $string['type_facetoface_cancellation'] = 'Cancellation note customfields';
-$string['type_date'] = 'Session Date';
+$string['type_date'] = 'Date';

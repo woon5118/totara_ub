@@ -27,7 +27,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I click on "Enable" "link" in the "Face-to-face direct enrolment" "table_row"
     And I expand "Activity modules" node
     And I expand "Face-to-face" node
-    And I follow "General Settings"
+    And I follow "Global settings"
     And I set the field "Select position on signup" to "checked_checkbox"
     And I press "Save changes"
     And I log out
@@ -40,7 +40,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
       | Select position on signup | 1 |
       | Prevent signup if no position is selected or can be found | 0 |
     And I follow "Test facetoface name 1"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown | Yes |
       | timestart[0][day] | 1 |
@@ -64,7 +64,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
       | Select position on signup | 1 |
       | Prevent signup if no position is selected or can be found | 1 |
     And I follow "Test facetoface name 1"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown | Yes |
       | timestart[0][day] | 1 |
@@ -86,7 +86,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I follow "Course 1"
     When I add "Face-to-face direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
-      | Automatically sign users up to face to face sessions | 0 |
+      | Automatically sign users up to face to face events | 0 |
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
@@ -101,7 +101,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I follow "Course 2"
     When I add "Face-to-face direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
-      | Automatically sign users up to face to face sessions | 0 |
+      | Automatically sign users up to face to face events | 0 |
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu

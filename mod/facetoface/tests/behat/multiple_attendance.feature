@@ -27,7 +27,7 @@ Feature: Take attendance for a Face to face with multiple sessions
       | Description                             | Test facetoface description                       |
       | Completion tracking                     | Show activity as complete when conditions are met |
       | completionstatusrequired[100]           | 1                                                 |
-      | Allow multiple sessions signup per user | 1                                                 |
+      | Allow multiple events signup per user   | 1                                                 |
 
     # Set course completion to f2f completion.
     And I navigate to "Course completion" node in "Course administration"
@@ -36,8 +36,8 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I press "Save changes"
 
     # Add sessions to f2f.
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I fill facetoface session with relative date in form data:
       | datetimeknown         | Yes              |
       | sessiontimezone[0]    | Pacific/Auckland |
@@ -54,7 +54,7 @@ Feature: Take attendance for a Face to face with multiple sessions
       | customroom            | 1                |
       | croomname             | later session    |
     And I press "Save changes"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I fill facetoface session with relative date in form data:
       | datetimeknown         | Yes              |
       | sessiontimezone[0]    | Pacific/Auckland |
@@ -115,7 +115,7 @@ Feature: Take attendance for a Face to face with multiple sessions
     # Complete older session.
     Then I click on "Home" in the totara menu
     And I follow "course1"
-    And I click on "View all sessions" "link"
+    And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
@@ -146,7 +146,7 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I log in as "admin"
     And I click on "Home" in the totara menu
     And I follow "course1"
-    And I click on "View all sessions" "link"
+    And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
@@ -180,7 +180,7 @@ Feature: Take attendance for a Face to face with multiple sessions
     # Complete newer session.
     Then I click on "Home" in the totara menu
     And I follow "course1"
-    And I click on "View all sessions" "link"
+    And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
@@ -215,7 +215,7 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I log in as "admin"
     And I click on "Home" in the totara menu
     And I follow "course1"
-    And I click on "View all sessions" "link"
+    And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
@@ -248,7 +248,7 @@ Feature: Take attendance for a Face to face with multiple sessions
     # Complete newer session.
     Then I click on "Home" in the totara menu
     And I follow "course1"
-    And I click on "View all sessions" "link"
+    And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
@@ -273,7 +273,7 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I log in as "admin"
     And I click on "Home" in the totara menu
     And I follow "course1"
-    And I click on "View all sessions" "link"
+    And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
@@ -314,7 +314,7 @@ Feature: Take attendance for a Face to face with multiple sessions
     # Complete older session.
     Then I click on "Home" in the totara menu
     And I follow "course1"
-    And I click on "View all sessions" "link"
+    And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "earlier session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"
@@ -339,7 +339,7 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I log in as "admin"
     And I click on "Home" in the totara menu
     And I follow "course1"
-    And I click on "View all sessions" "link"
+    And I click on "View all events" "link"
     And I click on "Attendees" "link" in the "later session" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "first1 last1, user1@example.com" "option"

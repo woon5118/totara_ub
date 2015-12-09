@@ -32,8 +32,8 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
       | Approval required | 0                     |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown | Yes |
       | timestart[0][day] | 1 |

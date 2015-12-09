@@ -23,4 +23,4 @@
 $string['sourcetitle'] = 'Face-to-face interest';
 $string['declareinterestreportdate'] = 'Date of declared interest';
 $string['declareinterestreportreason'] = 'Stated reason for interest';
-$string['thedate'] = 'The session date';
+$string['thedate'] = 'The event date';

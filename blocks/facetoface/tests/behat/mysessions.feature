@@ -25,9 +25,9 @@ Feature: Confirm Sessions show up in my face to face sessions
       | Name | Test session |
       | Description | Test session |
     And I follow "Test session"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
-      | Session date/time known | Yes          |
+      | Event date/time known   | Yes          |
       | timestart[0][day]       | 1            |
       | timestart[0][month]     | 1            |
       | timestart[0][year]      | 2020         |
@@ -41,9 +41,9 @@ Feature: Confirm Sessions show up in my face to face sessions
       | Capacity                | 20           |
       | Details                 | some details |
     And I click on "Save changes" "button"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
-      | Session date/time known | Yes               |
+      | Event date/time known   | Yes               |
       | timestart[0][day]       | 2                 |
       | timestart[0][month]     | 1                 |
       | timestart[0][year]      | 2020              |
@@ -62,9 +62,9 @@ Feature: Confirm Sessions show up in my face to face sessions
       | Name        | Test session 2              |
       | Description | Test session 2 description  |
     And I follow "Test session 2"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
-      | Session date/time known | Yes            |
+      | Event date/time known   | Yes            |
       | timestart[0][day]       | 1              |
       | timestart[0][month]     | 2              |
       | timestart[0][year]      | 2020           |
@@ -78,9 +78,9 @@ Feature: Confirm Sessions show up in my face to face sessions
       | Capacity                | 30             |
       | Details                 | 1 some details |
     And I click on "Save changes" "button"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
-      | Session date/time known | Yes                 |
+      | Event date/time known   | Yes                 |
       | timestart[0][day]       | 2                   |
       | timestart[0][month]     | 2                   |
       | timestart[0][year]      | 2020                |
@@ -97,7 +97,7 @@ Feature: Confirm Sessions show up in my face to face sessions
     And I add the "Face-to-face" block
 
   Scenario: Test filters
-    Given I follow "Upcoming sessions"
+    Given I follow "Upcoming events"
     And I set the following fields to these values:
       | from[day]   | 1    |
       | from[month] | 1    |

@@ -571,14 +571,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         array(4,    4,  4,  4),
     );
 
-    protected $facetoface_notice_data = array (
-        array('id', 'name',     'text'),
-        array(1,    'name1',    'text1'),
-        array(2,    'name2',    'text2'),
-        array(3,    'name3',    'text3'),
-        array(4,    'name4',    'text4'),
-    );
-
     protected $user_preferences_data = array (
         array('id',     'userid',   'name',     'value'),
         array(1,        1,          'name1',    'val1'),
@@ -774,7 +766,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
                     'user_info_category'            => $this->user_info_category_data,
                     'course_categories'             => $this->course_categories_data,
                     'facetoface_session_roles'      => $this->facetoface_session_roles_data,
-                    'facetoface_notice'             => $this->facetoface_notice_data,
                     'user_preferences'              => $this->user_preferences_data,
                 )
             )
@@ -1901,31 +1892,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         // and finishtime in this case.
         $this->assertContains('duration 1 day 3 hours', $fullmessage);
         $this->assertContains('duration 1 day 3 hours', $fullmessagehtml);
-    }
-
-    function test_facetoface_get_manageremailformat() {
-        //TODO how to run negative test?
-        // Define test variables.
-        //$addressformat = '';
-
-        // test for no address format
-        $this->assertEquals(facetoface_get_manageremailformat(), '');
-        $this->resetAfterTest(true);
-    }
-
-    function test_facetoface_check_manageremail() {
-        set_config('facetoface_manageraddressformat', 'example.com');
-
-        // Define test variables.
-        $validEmail = 'user@example.com';
-        $invalidEmail = NULL;
-
-        // Test for valid case.
-        $this->assertTrue((bool)facetoface_check_manageremail($validEmail), $this->msgtrue);
-
-        // Test for invalid case.
-        $this->assertFalse((bool)facetoface_check_manageremail($invalidEmail), $this->msgfalse);
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_take_attendance() {

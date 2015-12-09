@@ -74,6 +74,6 @@ $string['setting_core_feature_organisationalhierarchy_desc'] = 'Organisational h
 $string['setting_core_feature_audiencemanagement'] = 'Audience management';
 $string['setting_core_feature_audiencemanagement_desc'] = 'Audience management allows you to create rulesets to dynamically group users for automated learning assignment, role assignment, course visibility, dashboard access, and menu selections.';
 $string['setting_core_feature_facetoface'] = 'Face to Face activities';
-$string['setting_core_feature_facetoface_desc'] = 'The Face-to-face activity tracks instructor-led training sessions, allowing learners to choose a session and register, receive automated notifications, and view upcoming and past bookings on their calendar. Trainers can register learners, view/print a registration list, and track session attendance.  ';
+$string['setting_core_feature_facetoface_desc'] = 'The Face-to-face activity tracks instructor-led training events, allowing learners to choose a event and register, receive automated notifications, and view upcoming and past bookings on their calendar. Trainers can register learners, view/print a registration list, and track event attendance.  ';
 $string['unavailable'] = 'Unavailable';
 $string['unknown'] = 'Unknown';

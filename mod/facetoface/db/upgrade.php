@@ -3415,5 +3415,22 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016022900, 'facetoface');
     }
 
+    if ($oldversion < 2016030100) {
+
+        // Drop Site Notices.
+        $table = new xmldb_table('facetoface_notice');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('facetoface_notice_data');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2016030100, 'facetoface');
+    }
+
     return $result;
 }

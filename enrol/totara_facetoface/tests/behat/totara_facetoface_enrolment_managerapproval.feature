@@ -28,8 +28,8 @@ Feature: Users are forced to get manager approval where required
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
       | Approval required | 1                     |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown | Yes |
       | timestart[0][day] | 1 |
@@ -85,7 +85,7 @@ Feature: Users are forced to get manager approval where required
 
     When I log in as "teacher1"
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I follow "Attendees"
     And I follow "Approval required"
     Then I should see "Student 1"
@@ -94,7 +94,7 @@ Feature: Users are forced to get manager approval where required
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    Then I should see "It is not possible to sign up for these sessions (manager request already pending)."
+    Then I should see "It is not possible to sign up for these events (manager request already pending)."
     And I follow "Withdraw pending request"
     And I press "Confirm"
     Then I should see "Enrolment options"
@@ -102,7 +102,7 @@ Feature: Users are forced to get manager approval where required
 
     When I log in as "teacher1"
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I follow "Attendees"
     And I follow "Cancellations"
     Then I should see "Student 1"
@@ -117,7 +117,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
     And I log in as "teacher1"
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I follow "Attendees"
     And I follow "Approval required"
     And I click on "input[value='2']" "css_element" in the "Student 1" "table_row"

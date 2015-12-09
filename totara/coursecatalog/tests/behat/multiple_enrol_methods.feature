@@ -61,7 +61,7 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
       | Description | Test facetoface description 2 |
       | Approval required | 0                     |
     And I follow "Test facetoface name 2"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown | Yes |
       | timestart[0][day] | 1 |

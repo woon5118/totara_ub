@@ -23,13 +23,9 @@ Feature: Manager approval
       | student3 | C1     | student        |
 
     And I log in as "admin"
-    And I expand "Site administration" node
-    And I expand "Plugins" node
-    And I expand "Activity modules" node
-    And I expand "Face-to-face" node
-    And I follow "General Settings"
+    And I navigate to "Global settings" node in "Site administration > Face-to-face"
     And I set the following fields to these values:
-      | Enable everyone on waiting list option | Yes  |
+      | Everyone on waiting list | Yes  |
     And I press "Save changes"
     And I log out
 
@@ -42,8 +38,8 @@ Feature: Manager approval
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name              | Test facetoface name        |
       | Description       | Test facetoface description |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown                  | Yes  |
       | timestart[0][day]              | 1    |
@@ -74,18 +70,18 @@ Feature: Manager approval
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
-    Then I should see "This session is currently full. By clicking the \"Join waitlist\" button, you will be placed on the sessions's wait-list."
+    Then I should see "This event is currently full. By clicking the \"Join waitlist\" button, you will be placed on the event's wait-list."
     And I press "Join waitlist"
-    And I should see "You have been placed on the waitlist for this session."
+    And I should see "You have been placed on the waitlist for this event."
     And I log out
 
     When I log in as "student3"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
-    Then I should see "This session is currently full. By clicking the \"Join waitlist\" button, you will be placed on the sessions's wait-list."
+    Then I should see "This event is currently full. By clicking the \"Join waitlist\" button, you will be placed on the event's wait-list."
     And I press "Join waitlist"
-    And I should see "You have been placed on the waitlist for this session."
+    And I should see "You have been placed on the waitlist for this event."
     And I log out
 
     When I log in as "teacher1"

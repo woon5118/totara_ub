@@ -48,11 +48,11 @@ Feature: Allocate spaces for team
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name                                    | Test facetoface name        |
       | Description                             | Test facetoface description |
-      | Allow multiple sessions signup per user | 1                           |
+      | Allow multiple events signup per user   | 1                           |
       | Allow manager reservations              | Yes                         |
       | Maximum reservations                    | 10                          |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -67,7 +67,7 @@ Feature: Allocate spaces for team
       | timefinish[0][minute] | 00   |
       | capacity              | 3    |
     And I press "Save changes"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 2    |
@@ -89,7 +89,7 @@ Feature: Allocate spaces for team
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
     And I click on "Sam1 Student1" "option"
     And I press "Add"
@@ -107,7 +107,7 @@ Feature: Allocate spaces for team
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
     And I click on "Sam1 Student1" "option"
     When I press "Add"
@@ -130,7 +130,7 @@ Feature: Allocate spaces for team
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
     And I click on "Sam1 Student1" "option"
     When I press "Add"
@@ -151,7 +151,7 @@ Feature: Allocate spaces for team
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
     And I click on "Sam1 Student1" "option"
     And I press "Add"
@@ -162,7 +162,7 @@ Feature: Allocate spaces for team
     When I log in as "sitemanager2"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
     Then the "Current allocations" select box should not contain "Sam1 Student1"
     And I log out
@@ -172,7 +172,7 @@ Feature: Allocate spaces for team
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Sign-up" in row 1
     And I press "Sign-up"
     And I should see "Your booking has been completed."
@@ -181,7 +181,7 @@ Feature: Allocate spaces for team
     When I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
     Then the "Current allocations" select box should contain "Sam1 Student1 (Self booked)"
     When I click on "Sam1 Student1" "option"
@@ -195,7 +195,7 @@ Feature: Allocate spaces for team
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
     And I click on "Sam1 Student1" "option"
     And I press "Add"
@@ -203,13 +203,13 @@ Feature: Allocate spaces for team
     Then the "Current allocations" select box should contain "Sam1 Student1"
 
     When I click on "Course 1" "link"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 2
-    Then I should see "Sam1 Student1" in the "Other session(s) in this activity" "optgroup"
+    Then I should see "Sam1 Student1" in the "Other event(s) in this activity" "optgroup"
     When I click on "Sam1 Student1" "option" in the "#deallocation" "css_element"
     And I press "Remove"
     And I click on the link "Allocate spaces for team" in row 2
-    But I should see "Sam1 Student1" in the "Other session(s) in this activity" "optgroup"
+    But I should see "Sam1 Student1" in the "Other event(s) in this activity" "optgroup"
     And I log out
 
   @javascript
@@ -217,7 +217,7 @@ Feature: Allocate spaces for team
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 1
     When I click on "Sam1 Student1" "option"
     And I press "Add"
@@ -225,7 +225,7 @@ Feature: Allocate spaces for team
     Then the "Current allocations" select box should contain "Sam1 Student1"
 
     When I click on "Course 1" "link"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Allocate spaces for team" in row 2
     When I click on "Sam1 Student1" "option"
     And I press "Add"

@@ -26,7 +26,7 @@ Feature: Cancellation for session
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name                                    | Test facetoface name        |
       | Description                             | Test facetoface description |
-      | Allow multiple sessions signup per user | 1                           |
+      | Allow multiple events signup per user   | 1                           |
     And I log out
 
   @javascript
@@ -34,8 +34,8 @@ Feature: Cancellation for session
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I fill facetoface session with relative date in form data:
       | datetimeknown         | Yes              |
       | sessiontimezone[0]    | Pacific/Auckland |
@@ -57,7 +57,7 @@ Feature: Cancellation for session
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Sign-up" in row 1
     And I press "Sign-up"
     Then I should see "Your booking has been completed."
@@ -72,8 +72,8 @@ Feature: Cancellation for session
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I fill facetoface session with relative date in form data:
       | datetimeknown         | Yes              |
       | sessiontimezone[0]    | Pacific/Auckland |
@@ -95,7 +95,7 @@ Feature: Cancellation for session
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Sign-up" in row 1
     And I press "Sign-up"
     Then I should see "Your booking has been completed."
@@ -107,8 +107,8 @@ Feature: Cancellation for session
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I fill facetoface session with relative date in form data:
       | datetimeknown         | Yes              |
       | sessiontimezone[0]    | Pacific/Auckland |
@@ -130,7 +130,7 @@ Feature: Cancellation for session
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I click on the link "Sign-up" in row 1
     And I press "Sign-up"
     Then I should see "Your booking has been completed."
@@ -140,8 +140,8 @@ Feature: Cancellation for session
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
-    And I click on "Edit session" "link"
+    And I follow "View all events"
+    And I click on "Edit event" "link"
     And I fill facetoface session with relative date in form data:
       | datetimeknown                | Yes              |
       | sessiontimezone[0]           | Pacific/Auckland |
@@ -163,6 +163,6 @@ Feature: Cancellation for session
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "View all sessions"
+    And I follow "View all events"
     Then I should not see "Cancel booking"
     And I log out
