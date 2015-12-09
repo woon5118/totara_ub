@@ -70,6 +70,14 @@ if (get_home_page() != HOMEPAGE_SITE) {
         set_user_preference('user_home_page_preference', HOMEPAGE_SITE);
     } else if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_MY) && $redirect === 1) {
         redirect($CFG->wwwroot .'/my/');
+    } else if (!empty($CFG->defaulthomepage) && $CFG->defaulthomepage == HOMEPAGE_TOTARA_DASHBOARD && $redirect === 1) {
+        require_once($CFG->dirroot . '/totara/dashboard/lib.php');
+
+        // Check for dashboard assignments.
+        if (count(totara_dashboard::get_user_dashboards($USER->id))) {
+            redirect(new moodle_url('/totara/dashboard/index.php'));
+        }
+        redirect($CFG->wwwroot .'/my/');
     } else if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_USER)) {
         $frontpagenode = $PAGE->settingsnav->find('frontpage', null);
         if ($frontpagenode) {

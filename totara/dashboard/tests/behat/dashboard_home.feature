@@ -19,7 +19,7 @@ Feature: test default home page feature with dashboards
     And I press "Save changes"
 
     # Totara 2.9 sets "My learning" as home page while upgrade from Totara 2.7 sets site front page.
-    # For testing make site fornt page as a home page.
+    # For testing make site front page as a home page.
     And I set the following administration settings values:
       | defaulthomepage | Site |
 
@@ -87,6 +87,18 @@ Feature: test default home page feature with dashboards
     And I click on "My second dashboard" "link"
     And I should see "Second dashboard block header"
     And I click on "My learning" "link"
+    And I should see "Course overview" in the "#region-main" "css_element"
+    # Check the "Site home" link in the navigation block works correctly.
+    And I click on "Site home" "link"
+    And I should see "I'm a label on the frontpage"
+    # Check that clicking "Home" in the Totara menu shows the dashboard.
+    And I click on "Home" "link"
+    And I should see "My first dashboard" in the "#page-header" "css_element"
+    # Check admin (who doesn't have any dashboard) is redirected correctly.
+    And I log out
+    And I log in as "admin"
+    And I should see "Course overview" in the "#region-main" "css_element"
+    And I click on "Home" "link"
     And I should see "Course overview" in the "#region-main" "css_element"
     And I click on "Site home" "link"
     And I should see "I'm a label on the frontpage"

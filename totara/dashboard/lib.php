@@ -102,6 +102,12 @@ class totara_dashboard {
     public static function get_user_dashboards($userid) {
         global $DB;
 
+        // If dashboards are disabled then return an empty array
+        // so redirects are done where necessary.
+        if (totara_feature_disabled('totaradashboard')) {
+            return array();
+        }
+
         // Get user cohorts.
         $cohorts = totara_cohort_get_user_cohorts($userid);
         if (empty($cohorts)) {
