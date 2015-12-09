@@ -3548,49 +3548,21 @@ abstract class rb_base_source {
         );
         $filteroptions[] = new rb_filter_option(
             'user',
-            'organisationid',
-            get_string('participantscurrentorgbasic', 'totara_reportbuilder'),
-            'select',
-            array(
-                'selectfunc' => 'organisations_list',
-                'attributes' => rb_filter_option::select_width_limiter(),
-            )
-        );
-        $filteroptions[] = new rb_filter_option(
-            'user',
-            'organisationpath',
-            get_string('participantscurrentorg', 'totara_reportbuilder'),
+            'positionpath',
+            get_string('userspos', 'totara_reportbuilder'),
             'hierarchy',
             array(
-                'hierarchytype' => 'org',
-            )
-        );
-        $filteroptions[] = new rb_filter_option(
-            'user',
-            'organisationid2',
-            get_string('usersorgmulti', 'totara_reportbuilder'),
-            'hierarchy_multi',
-            array(
-                'hierarchytype' => 'org',
+                'hierarchytype' => 'pos',
             )
         );
         $filteroptions[] = new rb_filter_option(
             'user',
             'positionid',
-            get_string('participantscurrentposbasic', 'totara_reportbuilder'),
+            get_string('usersposbasic', 'totara_reportbuilder'),
             'select',
             array(
                 'selectfunc' => 'positions_list',
                 'attributes' => rb_filter_option::select_width_limiter(),
-            )
-        );
-        $filteroptions[] = new rb_filter_option(
-            'user',
-            'positionpath',
-            get_string('participantscurrentpos', 'totara_reportbuilder'),
-            'hierarchy',
-            array(
-                'hierarchytype' => 'pos',
             )
         );
         $filteroptions[] = new rb_filter_option(
@@ -3626,16 +3598,6 @@ abstract class rb_base_source {
         );
         $filteroptions[] = new rb_filter_option(
                 'user',
-                'org_type_id',
-                get_string('organisationtype', 'totara_reportbuilder'),
-                'select',
-                array(
-                    'selectfunc' => 'organisation_type_list',
-                    'attributes' => rb_filter_option::select_width_limiter(),
-                )
-        );
-        $filteroptions[] = new rb_filter_option(
-                'user',
                 'positionframework',
                 get_string('positionframework', 'totara_reportbuilder'),
                 'text'
@@ -3657,6 +3619,44 @@ abstract class rb_base_source {
                 'positionframeworkdescription',
                 get_string('positionframeworkdescription', 'totara_reportbuilder'),
                 'text'
+        );
+        $filteroptions[] = new rb_filter_option(
+            'user',
+            'organisationpath',
+            get_string('usersorg', 'totara_reportbuilder'),
+            'hierarchy',
+            array(
+                'hierarchytype' => 'org',
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'user',
+            'organisationid',
+            get_string('usersorgbasic', 'totara_reportbuilder'),
+            'select',
+            array(
+                'selectfunc' => 'organisations_list',
+                'attributes' => rb_filter_option::select_width_limiter(),
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'user',
+            'organisationid2',
+            get_string('usersorgmulti', 'totara_reportbuilder'),
+            'hierarchy_multi',
+            array(
+                'hierarchytype' => 'org',
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'user',
+            'org_type_id',
+            get_string('organisationtype', 'totara_reportbuilder'),
+            'select',
+            array(
+                'selectfunc' => 'organisation_type_list',
+                'attributes' => rb_filter_option::select_width_limiter(),
+            )
         );
         $filteroptions[] = new rb_filter_option(
                 'user',
