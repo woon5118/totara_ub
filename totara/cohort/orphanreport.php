@@ -50,6 +50,8 @@ if($format!='') {
     die;
 }
 
+$report->include_js();
+
 $url = new moodle_url('/totara/cohort/orphanreport.php', array('format' => $format, 'debug' => $debug));
 admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
 
