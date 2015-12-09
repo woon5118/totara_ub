@@ -64,5 +64,20 @@ function xmldb_totara_dashboard_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015030201, 'totara_dashboard');
     }
 
+    if ($oldversion < 2015120900) {
+        global $DB;
+
+        $dashboards = $DB->get_records('totara_dashboard_cohort');
+        if ($dashboards) {
+            foreach ($dashboards as $dashboard) {
+                if (!$DB->record_exists('cohort', array('id' => $dashboard->cohortid))) {
+                    $DB->delete_records('totara_dashboard_cohort', array('cohortid' => $dashboard->cohortid));
+                }
+            }
+        }
+
+        totara_upgrade_mod_savepoint(true, 2015120900, 'totara_dashboard');
+    }
+
     return true;
 }
