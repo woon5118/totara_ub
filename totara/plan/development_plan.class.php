@@ -1042,6 +1042,7 @@ class development_plan {
         $sql = "SELECT * FROM {dp_plan_history} WHERE planid = ? ORDER BY timemodified DESC";
         $history = $DB->get_records_sql($sql, array($this->id), 0, 1);
         $history = array_shift($history);
+        $message = null;
         switch ($history->reason) {
         case DP_PLAN_REASON_MANUAL_COMPLETE:
             $message = get_string('plancompleted', 'totara_plan');
