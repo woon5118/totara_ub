@@ -141,7 +141,7 @@ $PAGE->set_title($title);
 $PAGE->set_heading($appraisal->name);
 $PAGE->navbar->add($appraisal->name);
 echo $output->header();
-echo $output->heading($appraisal->name);
+echo $output->heading(format_string($appraisal->name));
 echo $output->appraisal_additional_actions($appraisal->status, $appraisal->id);
 
 echo $output->appraisal_management_tabs($appraisal->id, 'messages');

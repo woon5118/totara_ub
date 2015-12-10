@@ -45,8 +45,11 @@ class appraisal_edit_form extends moodleform {
         $mform->setType('id', PARAM_INT);
 
         if ($readonly) {
+            $appraisal->name = format_string($appraisal->name);
+            $appraisal->desc = format_text($appraisal->description_editor['text']);
+
             $mform->addElement('static', 'name', get_string('name', 'totara_appraisal'));
-            $mform->addElement('static', null, get_string('description'), $appraisal->description_editor['text']);
+            $mform->addElement('static', null, get_string('description'), $appraisal->desc);
         } else {
             $mform->addElement('text', 'name', get_string('name', 'totara_appraisal'), 'maxlength="255" size="50"');
             $mform->addRule('name', null, 'required');
@@ -152,6 +155,7 @@ class appraisal_answer_form extends moodleform {
         // Set required property.
         $rolecodestrings = appraisal::get_roles();
         foreach ($questions as $question) {
+            $question->name = format_string($question->name);
             $isviewonlyquestion = true;
             $elem = $question->get_element();
             $rights = $question->roles[$roleassignment->appraisalrole];
@@ -280,6 +284,7 @@ class appraisal_stage_edit_form extends moodleform {
         $mform->setType('action', PARAM_ACTION);
 
         if ($readonly) {
+            $stage->name = format_string($stage->name);
             $mform->addElement('static', 'name', get_string('name', 'totara_appraisal'), 'maxlength="255" size="50"');
         } else {
             $mform->addElement('text', 'name', get_string('name', 'totara_appraisal'), 'maxlength="255" size="50"');
@@ -294,6 +299,7 @@ class appraisal_stage_edit_form extends moodleform {
         $submittitle = ($stage->id > 0) ? get_string('savechanges', 'moodle') : get_string('addstage', 'totara_appraisal');
 
         if ($readonly) {
+            $stage->timedue = userdate($stage->timedue, get_string('strftimedate'));
             $mform->addElement('static', 'timedue', get_string('completeby', 'totara_appraisal'));
         } else {
             $mform->addElement('date_selector', 'timedue', get_string('completeby', 'totara_appraisal'), array('optional' => 'true'));

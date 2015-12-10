@@ -187,7 +187,7 @@ if (($editor instanceof tinymce_texteditor)) {
 }
 
 echo $output->header();
-echo $output->heading($appraisal->name);
+echo $output->heading(format_string($appraisal->name));
 echo $output->appraisal_additional_actions($appraisal->status, $appraisal->id);
 
 echo $output->appraisal_management_tabs($appraisal->id, 'content');

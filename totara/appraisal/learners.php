@@ -109,7 +109,7 @@ $notlivenotice = $output->display_notlive_notice($appraisalid, $canassign);
 totara_setup_assigndialogs($module, $appraisalid, $canviewusers, $notlivenotice);
 echo $output->header();
 if ($appraisal->id) {
-    echo $output->heading($appraisal->name);
+    echo $output->heading(format_string($appraisal->name));
     echo $output->appraisal_additional_actions($appraisal->status, $appraisal->id);
 }
 

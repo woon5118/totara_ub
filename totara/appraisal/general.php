@@ -85,7 +85,7 @@ $PAGE->navbar->add($appraisal->name);
 $output = $PAGE->get_renderer('totara_appraisal');
 echo $output->header();
 if ($appraisal->id) {
-    echo $output->heading($appraisal->name);
+    echo $output->heading(format_string($appraisal->name));
     echo $output->appraisal_additional_actions($appraisal->status, $appraisal->id);
 } else {
     echo $output->heading(get_string('createappraisalheading', 'totara_appraisal'));
