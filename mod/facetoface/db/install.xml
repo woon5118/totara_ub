@@ -72,9 +72,10 @@
         <FIELD NAME="timemodified" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="selfapproval" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Allow self approval"/>
-        <FIELD NAME="mincapacity" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The minimum number of people for this session to take place."/>
+        <FIELD NAME="mincapacity" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The minimum number of people for this session to take place."/>
         <FIELD NAME="cutoff" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="86400" SEQUENCE="false" COMMENT="The number of seconds before the session start by which the minimum capacity should be reached"/>
         <FIELD NAME="availablesignupnote" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User sign-up note"/>
+        <FIELD NAME="sendcapacityemail" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Notification flag for minimum bookings capactiy email."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="primary key of the table, please edit me"/>

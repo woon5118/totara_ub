@@ -75,6 +75,10 @@ if ($ADMIN->fulltree) { // Improve performance.
         new lang_string('setting:lotteryenabled_caption', 'facetoface'),
         new lang_string('setting:lotteryenabled', 'facetoface'), 0));
 
+    $settings->add(new admin_setting_configtext('facetoface/defaultminbookings',
+        new lang_string('setting:defaultminbookings', 'facetoface'),
+        new lang_string('setting:defaultminbookings_help', 'facetoface'), 0, PARAM_INT));
+
     $settings->add(new admin_setting_heading('facetoface_multiplesessions_header', get_string('multiplesessionsheading', 'facetoface'), ''));
 
     $settings->add(new admin_setting_configcheckbox('facetoface_multiplesessions', get_string('setting:multiplesessions_caption', 'facetoface'), get_string('setting:multiplesessions', 'facetoface'), 0));

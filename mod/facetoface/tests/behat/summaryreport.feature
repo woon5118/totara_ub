@@ -62,8 +62,8 @@ Feature: Face to face summary report overview
       | timefinish[0][hour]   | 12   |
       | timefinish[0][minute] | 00   |
       | capacity              | 2    |
-      | enablemincapacity     | 1    |
       | mincapacity           | 1    |
+      | sendcapacityemail     | 1    |
       | normalcost            | 1.11 |
       | discountcost          | 1.00 |
     And I press "Save changes"

@@ -199,10 +199,6 @@ if (!isset($session)) {
             $sessiondata->croomcapacity = $sroom->capacity;
         }
     }
-
-    if ($session->mincapacity) {
-        $sessiondata->enablemincapacity = 1;
-    }
 }
 
 $mform = new mod_facetoface_session_form(null, compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm', 'sessiondata'));
@@ -274,11 +270,17 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $todb->availablesignupnote = $fromform->availablesignupnote;
 
     // If min capacity is not provided or unset default to 0.
-    if (empty($fromform->enablemincapacity) || $fromform->mincapacity < 0) {
+    if ($fromform->mincapacity < 0) {
         $fromform->mincapacity = 0;
     }
 
+    // If sendcapacityemail is empty default to 0
+    if (empty($fromform->sendcapacityemail)) {
+        $fromform->sendcapacityemail = 0;
+    }
+
     $todb->mincapacity = $fromform->mincapacity;
+    $todb->sendcapacityemail = $fromform->sendcapacityemail;
     $todb->cutoff = $fromform->cutoff;
 
     if ($canconfigurecancellation) {

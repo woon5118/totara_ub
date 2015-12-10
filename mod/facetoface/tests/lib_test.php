@@ -2284,6 +2284,132 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertEquals(get_string('sessionundercapacity', 'facetoface', format_string($facetoface1->name)), $messages[0]->subject);
     }
 
+    // Face-to-face minimum capacity specification.
+    function test_facetoface_disable_notify_under_capacity() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        $teacher1 = $this->getDataGenerator()->create_user();
+        $student1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+
+        $this->getDataGenerator()->enrol_user($teacher1->id, $course1->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id, $studentrole->id);
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface1',
+            'course' => $course1->id
+        );
+        $facetoface1 = $facetofacegenerator->create_instance($facetofacedata);
+
+        // Session that starts in 24hrs time.
+        // This session should not trigger a mincapacity warning now as cutoff is 23:59 hrs before start time.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + DAYSECS;
+        $sessiondate->timefinish = time() + DAYSECS + 60;
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondata = array(
+            'facetoface' => $facetoface1->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1',
+            'mincapacity' => '1',
+            'cutoff' => ""
+        );
+        $facetofacegenerator->add_session($sessiondata);
+
+        $sink = $this->redirectMessages();
+        ob_start();
+        facetoface_notify_under_capacity();
+        $mtrace = ob_get_clean();
+        $this->assertNotContains('is under capacity', $mtrace);
+        $messages = $sink->get_messages();
+
+        // There should be no messages received.
+        $this->assertCount(0, $messages);
+    }
+
+    // Face-to-face minimum capacity specification.
+    public function test_under_capacity_notification() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        $teacher1 = $this->getDataGenerator()->create_user();
+        $student1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+
+        $this->getDataGenerator()->enrol_user($teacher1->id, $course1->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id, $studentrole->id);
+
+        /** @var mod_facetoface_generator $facetofacegenerator */
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetofacedata = array(
+            'name' => 'facetoface1',
+            'course' => $course1->id
+        );
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+
+        // Session that starts in 24hrs time.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + DAYSECS;
+        $sessiondate->timefinish = time() + DAYSECS + 60;
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 10,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1',
+            'mincapacity' => '4',
+            'cutoff' => "86400"
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $session = facetoface_get_session($sessionid);
+
+        // Sign the user up user 2.
+        facetoface_user_signup(
+            $session,
+            $facetoface,
+            $course1,
+            'discountcode1',
+            MDL_F2F_INVITE,
+            MDL_F2F_STATUS_BOOKED,
+            $student1->id,
+            false
+        );
+
+        // Set the session date back an hour, this is enough for facetoface_notify_under_capacity to find this session.
+        $sql = 'UPDATE {facetoface_sessions_dates} SET timestart = (timestart - 360) WHERE sessionid = :sessionid';
+        $DB->execute($sql, array('sessionid' => $sessionid));
+
+        $sink = $this->redirectMessages();
+        ob_start();
+        facetoface_notify_under_capacity();
+        $mtrace = ob_get_clean();
+        $this->assertContains('is under capacity - 1/10 (min capacity 4)', $mtrace);
+        $messages = $sink->get_messages();
+
+        // There should be one messages received.
+        $this->assertCount(1, $messages);
+        $message = array_pop($messages);
+        $this->assertSame('Session under capacity for: facetoface1', $message->subject);
+        $this->assertContains('The following session is under capacity:', $message->fullmessage);
+        $this->assertContains('Capacity: 1 / 10 (minimum: 4)', $message->fullmessage);
+    }
+
     public function test_facetoface_waitlist() {
         $this->resetAfterTest();
 

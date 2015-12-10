@@ -1046,6 +1046,11 @@ function facetoface_notify_under_capacity() {
             continue;
         }
 
+        // No cutoff period means the notify bookings email checkbox was not checked.
+        if (empty($session->cutoff)) {
+            continue;
+        }
+
         // We've found a session that has not reached the minimum capacity by the cut-off - time to send out emails.
         $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
         $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course, false);

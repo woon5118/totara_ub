@@ -3210,5 +3210,33 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2015100201, 'facetoface');
     }
 
+    if ($oldversion < 2016022300) {
+        // Define field sendcapacityemail to be added to facetoface_sessions.
+        $table = new xmldb_table('facetoface_sessions');
+        $field = new xmldb_field('sendcapacityemail', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'availablesignupnote');
+
+        // Conditionally launch add field sendcapacityemail.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2016022300, 'facetoface');
+    }
+
+    if ($oldversion < 2016022301) {
+        // Changing nullability of field mincapacity on table facetoface_sessions to null.
+        $table = new xmldb_table('facetoface_sessions');
+        $field = new xmldb_field('mincapacity', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'selfapproval');
+
+        // Ensure that we don't have any records with mincapacity=null by setting all of those to 0.
+        $DB->execute('UPDATE {facetoface_sessions} SET mincapacity = 0 WHERE mincapacity IS NULL');
+
+        // Launch change of nullability for field mincapacity.
+        $dbman->change_field_notnull($table, $field);
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2016022301, 'facetoface');
+    }
+
     return $result;
 }
