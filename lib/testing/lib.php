@@ -229,17 +229,17 @@ function testing_update_composer_dependencies() {
         }
     }
 
-    // Update composer dependencies.
-    passthru("php composer.phar install", $code);
+    // Totara: find out if we need to update (slower) or can just install to validate setup.
+    $output = null;
+    exec("php composer.phar validate -q", $output, $code);
+    if ($code == 2) {
+        // Most likely requirements changed or dev switched branch.
+        passthru("php composer.phar update", $code);
+    } else {
+        passthru("php composer.phar install", $code);
+    }
     if ($code != 0) {
         exit($code);
-    }
-
-    // Totara: find out if we need to update.
-    $output = null;
-    exec("php composer.phar validate", $output, $code);
-    if ($code == 2) {
-        passthru("php composer.phar update", $code);
     }
 
     // Return to our original location.
