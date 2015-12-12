@@ -70,7 +70,7 @@ function totara_search_get_keyword_where_clause($keywords, $fields, $type=SQL_PA
 
     $queries = array();
     $params = array();
-    static $TOTARA_SEARCH_PARAM_COUNTER = 1;
+
     foreach ($keywords as $keyword) {
         $matches = array();
         foreach ($fields as $field) {
@@ -78,11 +78,9 @@ function totara_search_get_keyword_where_clause($keywords, $fields, $type=SQL_PA
                 $matches[] = $DB->sql_like($field, '?', false);
                 $params[] = '%' . $DB->sql_like_escape($keyword) . '%';
             } else {
-                $paramname = $prefix . $TOTARA_SEARCH_PARAM_COUNTER;
+                $paramname = $DB->get_unique_param($prefix);
                 $matches[] = $DB->sql_like($field, ":$paramname", false);
                 $params[$paramname] = '%' . $DB->sql_like_escape($keyword) . '%';
-
-                $TOTARA_SEARCH_PARAM_COUNTER++;
             }
         }
         // Look for each keyword in any field.
@@ -91,7 +89,15 @@ function totara_search_get_keyword_where_clause($keywords, $fields, $type=SQL_PA
         }
     }
     // All keywords must be found in at least one field.
-    return array(implode(' AND ', $queries), $params);
+    $sql = implode(' AND ', $queries);
+
+    // We need to separate evaluation of search conditions from the rest of SQL,
+    // there is a lot of buggy code that does not wrap this sql properly with ()!
+    if ($sql !== '') {
+        $sql = '(' . $sql . ')';
+    }
+
+    return array($sql, $params);
 }
 
 /**
@@ -149,6 +155,12 @@ function search_get_keyword_where_clause_options($field, $keywords, $negate=fals
     }
 
     $sql =  implode($token, $queries);
+
+    // We need to separate evaluation of search conditions from the rest of SQL,
+    // there is a lot of buggy code that does not wrap this sql properly with ()!
+    if ($sql !== '') {
+        $sql = '(' . $sql . ')';
+    }
 
     return array($sql, $params);
 }
