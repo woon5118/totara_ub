@@ -502,6 +502,9 @@ class report_builder_edit_columns_form extends moodleform {
                     $mform->addElement('html', $OUTPUT->notification(get_string('warngroupaggregation', 'totara_reportbuilder'), 'notifymessage'));
                 }
             }
+            if ($report->requiredcolumns) {
+                $mform->addElement('html', $OUTPUT->notification(get_string('warnrequiredcolumns', 'totara_reportbuilder'), 'notifymessage'));
+            }
 
             $mform->addElement('html', $OUTPUT->container(get_string('help:columnsdesc', 'totara_reportbuilder')) .
                 html_writer::empty_tag('br'));
