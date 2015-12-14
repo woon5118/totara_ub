@@ -118,9 +118,9 @@ class rb_source_user extends rb_base_source {
             new rb_join(
                 'totara_stats_courses_completed',
                 'LEFT',
-                "(SELECT userid, count(DISTINCT data2) AS number
-                    FROM {block_totara_stats}
-                    WHERE eventtype = 3
+                "(SELECT userid, count(DISTINCT course) AS number
+                    FROM {course_completions}
+                    WHERE status >= " . COMPLETION_STATUS_COMPLETE . "
                     GROUP BY userid)",
                 'base.id = totara_stats_courses_completed.userid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
