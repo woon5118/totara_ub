@@ -4963,6 +4963,8 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
     // Delete course completion information, this has to be done before grades and enrols.
     $cc = new completion_info($course);
     $cc->clear_criteria();
+    // Totara: disable completion in activities, we are going to drop data later anyway, this prevents bogus completion updates during deleting.
+    $DB->set_field('course_modules', 'completion', 0, array('course' => $courseid));
     if ($showfeedback) {
         echo $OUTPUT->notification($strdeleted.get_string('completion', 'completion'), 'notifysuccess');
     }
