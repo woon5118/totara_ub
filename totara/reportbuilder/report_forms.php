@@ -921,7 +921,7 @@ class report_builder_edit_graph_form extends moodleform {
             }
         }
 
-        if (trim($data['settings'])) {
+        if (isset($data['settings']) and trim($data['settings'])) {
             // Unfortunately it is not easy to get meaningful errors from this parser.
             $test = @parse_ini_string($data['settings'], false);
             if ($test === false) {
