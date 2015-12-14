@@ -47,5 +47,5 @@ $maturity = MATURITY_ALPHA;             // this version's maturity level
 $TOTARA = new stdClass();
 
 $TOTARA->version    = '9.0dev';       // Please keep as string.
-$TOTARA->build      = '20151228.00';  // Please keep as string.
+$TOTARA->build      = '20160118.00';  // Please keep as string.
 $TOTARA->release    = "{$TOTARA->version} (Build: {$TOTARA->build})";
