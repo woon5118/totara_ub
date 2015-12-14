@@ -3826,9 +3826,25 @@ function facetoface_get_customfield_value(&$object, $field, $otherid, $table) {
  * @returns array Indexed by field shortnames
  */
 function facetoface_get_customfielddata($sessionid) {
-    $session = facetoface_get_session($sessionid);
+    global $CFG, $DB;
 
-    return customfield_get_data_shortname_key($session, 'facetoface_session', 'facetofacesession');
+    $out = array();
+    $session = facetoface_get_session($sessionid);
+    $fields  = $DB->get_records('facetoface_session_info_field', array(), 'sortorder ASC');
+
+    foreach ($fields as $field) {
+        require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
+        $newfield = 'customfield_'.$field->datatype;
+        $formfield = new $newfield($field->id, $session, 'facetofacesession', 'facetoface_session');
+        if (!$formfield->is_hidden() && !$formfield->is_empty()) {
+            $extradata = array('prefix' => $formfield->prefix, 'itemid' => $formfield->dataid);
+            if ($field->datatype == 'multiselect') {
+                $extradata['display'] = 'list-text';
+            }
+            $out[$formfield->field->shortname] = $formfield::display_item_data($formfield->data, $extradata);
+        }
+    }
+    return $out;
 }
 
 /**
@@ -5428,7 +5444,7 @@ function facetoface_download_csv($fields, $datarows, $file=null) {
  * @return void
  */
 function facetoface_filter_calendar_events(&$events) {
-    global $CFG, $SESSION;
+    global $SESSION;
 
     if (empty($SESSION->calendarfacetofacefilter)) {
         return;
@@ -5443,7 +5459,7 @@ function facetoface_filter_calendar_events(&$events) {
         $cfield_vals = facetoface_get_customfielddata($event->uuid);
 
         foreach ($filters as $shortname => $fval) {
-            if (empty($fval)) {  // ignore empty filters
+            if (empty($fval) || $fval == 'all') {  // ignore empty filters
                 continue;
             }
             if (empty($cfield_vals[$shortname])) {
