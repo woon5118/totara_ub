@@ -20,16 +20,18 @@ Feature: Perform basic dashboard user changes
     | Dashboard unlocked published | 0 | 1 | CH1 |
     | Dashboard unpublished | 1 | 0 | CH1 |
     | Dashboard unassigned | 1 | 1 | |
+  And the following "cohort members" exist:
+    | user     | cohort |
+    | learner1 | CH1    |
   And I log in as "admin"
   And I set the following administration settings values:
     | defaulthomepage | Totara dashboard |
-  And I add "learner1" user to "CH1" cohort members
   And I log out
 
   Scenario: Add block to personal version of second dashboard and then reset
-    When I log in as "admin"
-    And I add "learner2" user to "CH1" cohort members
-    And I log out
+    And the following "cohort members" exist:
+      | user     | cohort |
+      | learner2 | CH1    |
     And I log in as "learner1"
     And I follow "Dashboard unlocked published"
 

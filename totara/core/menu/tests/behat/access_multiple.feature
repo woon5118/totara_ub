@@ -44,7 +44,9 @@ Feature: Test restricting Totara custom menu access with rule aggregation
     Then I should see "test item" in the totara menu
     When I log out
     And I log in as "admin"
-    And I add "user 1 (user1@example.com)" user to "aud1" cohort members
+    And the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | aud1   |
     And I log out
     And I log in as "user1"
     Then I should see "test item" in the totara menu
@@ -60,7 +62,9 @@ Feature: Test restricting Totara custom menu access with rule aggregation
     Then I should not see "test item" in the totara menu
     When I log out
     And I log in as "admin"
-    And I add "user 1 (user1@example.com)" user to "aud1" cohort members
+    And the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | aud1   |
     And I log out
     And I log in as "user1"
     Then I should see "test item" in the totara menu

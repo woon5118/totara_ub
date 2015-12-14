@@ -18,7 +18,9 @@ Feature: Test restricting Totara custom menu access by audience
     And I log in as "admin"
 
   Scenario: Test menu access with one audience
-    Given I add "user 1 (user1@example.com)" user to "aud1" cohort members
+    Given the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | aud1   |
     And I navigate to "Main menu" node in "Site administration > Appearance"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
@@ -47,8 +49,10 @@ Feature: Test restricting Totara custom menu access by audience
     Then I should not see "test item" in the totara menu
 
   Scenario: Test menu access with multiple audiences and using any as the aggregation
-    Given I add "user 1 (user1@example.com)" user to "aud1" cohort members
-    And I add "user 3 (user3@example.com)" user to "aud2" cohort members
+    Given the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | aud1   |
+      | user3 | aud2   |
     And I navigate to "Main menu" node in "Site administration > Appearance"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:
@@ -82,9 +86,11 @@ Feature: Test restricting Totara custom menu access by audience
     Then I should see "test item" in the totara menu
 
   Scenario: Test menu access with multiple audiences and using all as the aggregation
-    Given I add "user 1 (user1@example.com)" user to "aud1" cohort members
-    And I add "user 1 (user1@example.com)" user to "aud2" cohort members
-    And I add "user 2 (user2@example.com)" user to "aud2" cohort members
+    Given the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | aud1   |
+      | user1 | aud2   |
+      | user2 | aud2   |
     And I navigate to "Main menu" node in "Site administration > Appearance"
     And I click on "Add new menu item" "button"
     And I set the following fields to these values:

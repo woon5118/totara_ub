@@ -24,7 +24,9 @@
       And I set the following administration settings values:
         | defaulthomepage | Site |
 
-      And I add "Student One (student.one@example.com)" user to "CH1" cohort members
+      And the following "cohort members" exist:
+        | user     | cohort |
+        | student1 | CH1    |
       And I navigate to "Dashboards" node in "Site administration > Appearance"
       # Add a dashboard.
       And I press "Create dashboard"

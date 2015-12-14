@@ -23,7 +23,9 @@ Feature: test default home page feature with dashboards
     And I set the following administration settings values:
       | defaulthomepage | Site |
 
-    And I add "Student One (student.one@local.host)" user to "CH1" cohort members
+    And the following "cohort members" exist:
+      | user     | cohort |
+      | student1 | CH1    |
     And I log out
 
   Scenario: the default defaulthomepage setting works as expected

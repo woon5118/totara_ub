@@ -134,9 +134,11 @@ Feature: Test visibility control of menu items
         | name     | idnumber |
         | Cohort 1 | CH1      |
         | Cohort 2 | CH2      |
+      And the following "cohort members" exist:
+        | user  | cohort |
+        | user2 | CH1    |
+        | user3 | CH2    |
       When I log in as "admin"
-      And I add "User Two (two@totaralms.com)" user to "CH1" cohort members
-      And I add "User Three (three@totaralms.com)" user to "CH2" cohort members
       And I create the following totara menu items:
         | Menu title          | Visibility              | Menu default url address | Restrict access by audience |
         | CH1 members only    | Use custom access rules | http://totaralms.com     | 1                           |

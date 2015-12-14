@@ -17,10 +17,12 @@ Feature: Confirm global report restrictions work accross multiple reports
     And the following "cohorts" exist:
       | name             | idnumber | cohorttype |
       | System audience  | CH0      | 1          |
+    And the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | CH0    |
+      | user4 | CH0    |
+      | user5 | CH0    |
     And I log in as "admin"
-    And I add "User One (user1@example.invalid)" user to "CH0" cohort members
-    And I add "User Four (user4@example.invalid)" user to "CH0" cohort members
-    And I add "User Five (user5@example.invalid)" user to "CH0" cohort members
     And I set the following administration settings values:
       | Enable report restrictions | 1 |
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"

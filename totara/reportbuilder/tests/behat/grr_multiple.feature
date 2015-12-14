@@ -21,9 +21,12 @@ Feature: Global report restrictions multiple interactions
       | name             | idnumber | cohorttype |
       | System audience  | CH0      | 1          |
       | Dynamic audience | D1       | 2          |
-    And I add "User One (user1@example.invalid)" user to "CH0" cohort members
-    And I add "User Two (user2@example.invalid)" user to "CH0" cohort members
-    And I add "User Three (user3@example.invalid)" user to "CH0" cohort members
+
+    And the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | CH0    |
+      | user2 | CH0    |
+      | user3 | CH0    |
     And I navigate to "Audiences" node in "Site administration > Users > Accounts"
     And I follow "Dynamic audience"
     And I click on "Rule sets" "link" in the ".tabtree" "css_element"

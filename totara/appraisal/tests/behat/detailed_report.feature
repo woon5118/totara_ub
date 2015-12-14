@@ -12,9 +12,11 @@ Feature: Test appraisal detailed report with numeric question
     And the following "cohorts" exist:
       | name     | idnumber |
       | Cohort 1 | CH1      |
+    And the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | CH1    |
+      | user2 | CH1    |
     And I log in as "admin"
-    And I add "User One (one@example.invalid)" user to "CH1" cohort members
-    And I add "User Two (two@example.invalid)" user to "CH1" cohort members
 
     # Set manager for User One
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"

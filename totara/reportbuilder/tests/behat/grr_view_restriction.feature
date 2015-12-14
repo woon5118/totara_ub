@@ -65,9 +65,11 @@ Feature: Create global report view restrictions
     Given the following "cohorts" exist:
       | name            | idnumber |
       | System audience | CH0      |
-    And I add "User One (user1@example.invalid)" user to "CH0" cohort members
-    And I add "User Two (user2@example.invalid)" user to "CH0" cohort members
-    And I add "User Three (user3@example.invalid)" user to "CH0" cohort members
+    And the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | CH0    |
+      | user2 | CH0    |
+      | user3 | CH0    |
     And I navigate to "Global report restrictions" node in "Site administration > Reports > Report builder"
     And I click on "Edit" "link" in the "test restriction" "table_row"
     And I click on "View records related to" "link" in the ".tabtree" "css_element"
