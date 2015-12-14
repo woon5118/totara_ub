@@ -1,0 +1,205 @@
+/*
+ * This file is part of Totara LMS
+ *
+ * Copyright (C) 2015 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author       Brian Barnes <brian.barnes@totaralms.com>
+ * @package      theme
+ * @subpackage   standardtotararesponsive
+ */
+
+/**
+ * Overriding core rendering functions for totara.
+ */
+#page-admin-index .flavournotice {
+    text-align: center;
+    margin-bottom: 1em;
+    padding: 0 0 15px 0;
+    border: 1px solid #d6e9c6;
+    border-radius: 4px;
+    background-color: #dff0d8;
+}
+
+#page-admin-index .flavournotice h3 {
+    color: #3c763d;
+    margin:0;
+}
+
+a:focus {
+    outline: none;
+}
+
+pre {
+    word-break: initial;
+}
+#addmembersform {
+    clear: both;
+}
+/* Settings for option rows and option subtypes */
+.choosercontainer #chooseform .moduletypetitle,
+.choosercontainer #chooseform .option,
+.choosercontainer #chooseform .nonoption {
+    font-size: 14px;
+}
+
+#addbadgecriteria label {
+    display: inline;
+}
+.statusbox {
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+.statusbox .activatebadge {
+    display: inline-block;
+}
+.statusbox .activatebadge input[type=submit]{
+    margin: 3px;
+}
+.table-no-entries {
+    font-weight: bold;
+    font-size: 28px;
+    line-height: 40px;
+    margin: 10px 0;
+}
+.ie8 #dock .dockedtitle .filterrotate {
+    margin-left: 0;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 15px;
+    padding: 3px 0;
+}
+.mform fieldset > .felement span.error {
+    display: block;
+}
+@media screen and (min-width: 1200px) {
+    .mform fieldset > .felement span.error {
+        margin-top: 8px;
+    }
+}
+.fitem .fstaticlabel,
+.form-item .admin-label {
+    font-size: 14px;
+}
+.form-item .form-description,
+.felement.fstatic {
+    padding-top: 7px;
+    margin-bottom: 3px;
+    font-size: 14px;
+    color: #555555;
+}
+
+.mform .fitem_fcheckbox .felement,
+.mform .fitem_fradio .felement {
+    padding-top: 5px;
+}
+
+@media (max-width: 979px) {
+    body #region-main .mform .fitem_fcheckbox .felement.fcheckbox,
+    body #region-main .mform .fitem_fradio .felement.fradio {
+        padding: 0;
+        width: 100%;
+    }
+}
+
+.mform .fitem {
+    fieldset legend {
+        display: inline-block;
+        #font > .shorthand(@baseFontSize,bold,@baseLineHeight);
+        border-bottom: none;
+        margin-bottom: 5px;
+        float: left;
+    }
+}
+
+@media (min-width: 1200px) {
+    .mform .fitem {
+        fieldset {
+            margin-top: 5px;
+        }
+
+        fieldset .legend {
+            display: inline-block;
+            width: 245px;
+            text-align: right;
+        }
+
+        fieldset .felement {
+            margin-top: -30px;
+        }
+    }
+}
+
+.dir-rtl .mform .fitem .legend {
+    text-align: left;
+    width: 145px;
+}
+
+.user-multiselect select {
+    width: 100%;
+}
+.user-multiselect .controls {
+    margin-top: 130px;
+
+    input {
+        white-space: normal;
+        display: block;
+        margin: 10px auto;
+    }
+
+    select {
+        width: auto;
+        max-width: 100%;
+    }
+
+    #page-enrol-manual-manage & {
+        margin-top: 55px;
+    }
+}
+@media screen and (max-width: 767px) {
+    .user-multiselect .controls {
+        margin-top: 0;
+
+        input {
+            display: inline-block;
+        }
+    }
+}
+.dir-rtl .user-multiselect > div {
+    float: right;
+    margin-left: 0;
+    margin-right: 2.5641%;
+
+    &:first-child {
+        margin-right: 0;
+    }
+}
+
+#groupeditform {
+    .groups,
+    .members {
+        width: 49%;
+        float: left;
+        text-align: left;
+    }
+}
+.dir-rtl #groupeditform {
+    .groups,
+    .members {
+        float: right;
+        text-align: right;
+    }
+}
