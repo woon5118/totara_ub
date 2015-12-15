@@ -309,8 +309,8 @@ class course_edit_form extends moodleform {
 //--------------------------------------------------------------------------------
         enrol_course_edit_form($mform, $course, $context);
 
-        // Only show the Enrolled Audiences functionality to users with the appropriate permissions.
-        if (has_capability('moodle/cohort:manage', $context)) {
+        // Only show the Enrolled Audiences functionality to users with the appropriate permissions to alter cohort enrol methods.
+        if (enrol_is_enabled('cohort') and has_capability('moodle/course:enrolconfig', $context) and has_capability('enrol/cohort:config', $context)) {
             $mform->addElement('header','enrolledcohortshdr', get_string('enrolledcohorts', 'totara_cohort'));
 
             if (empty($course->id)) {

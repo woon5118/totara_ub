@@ -290,6 +290,23 @@ switch ($searchtype) {
         $fields = array('idnumber', 'name');
         list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields);
 
+        // Include only contexts at and above the current where user has cohort:view capability.
+        $context = context_system::instance();
+        if (!empty($this->customdata['instancetype']) and !empty($this->customdata['instanceid'])) {
+            $instancetype = $this->customdata['instancetype'];
+            $instanceid = $this->customdata['instanceid'];
+            if ($instancetype == COHORT_ASSN_ITEMTYPE_COURSE) {
+                $context = context_course::instance($instanceid);
+            } else if ($instancetype == COHORT_ASSN_ITEMTYPE_CATEGORY) {
+                $context = context_coursecat::instance($instanceid);
+            } else if ($instancetype == COHORT_ASSN_ITEMTYPE_PROGRAM || $instancetype == COHORT_ASSN_ITEMTYPE_CERTIF) {
+                $context = context_program::instance($instanceid);
+            }
+        }
+        $contextids = array_filter($context->get_parent_context_ids(true),
+            create_function('$a', 'return has_capability("moodle/cohort:view", context::instance_by_id($a));'));
+        list($contextssql, $contextparams) = $DB->get_in_or_equal($contextids);
+
         $search_info->fullname = "(
             CASE WHEN {cohort}.idnumber IS NULL
                 OR {cohort}.idnumber = ''
@@ -303,8 +320,9 @@ switch ($searchtype) {
             FROM
                 {cohort}
             WHERE
-                {$searchsql}
+                {$searchsql} AND {cohort}.contextid {$contextssql}
         ";
+        $params = array_merge($params, $contextparams);
         if (!empty($this->customdata['current_cohort_id'])) {
             $search_info->sql .= ' AND {cohort}.id != ? ';
             $params[] = $this->customdata['current_cohort_id'];

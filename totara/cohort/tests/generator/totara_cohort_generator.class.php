@@ -31,10 +31,93 @@ defined('MOODLE_INTERNAL') || die();
  * @category test
  */
 class totara_cohort_generator extends component_generator_base {
-    protected static $ind = 0;
+    /**
+     * Enable cohort enrolment plugin.
+     */
+    public function enable_enrol_plugin() {
+        $enabled = enrol_get_plugins(true);
+        $enabled['cohort'] = true;
+        $enabled = array_keys($enabled);
+        set_config('enrol_plugins_enabled', implode(',', $enabled));
+    }
+
+    /**
+     * Disable cohort enrolment plugin.
+     */
+    public function disable_enrol_plugin() {
+        $enabled = enrol_get_plugins(true);
+        unset($enabled['cohort']);
+        $enabled = array_keys($enabled);
+        set_config('enrol_plugins_enabled', implode(',', $enabled));
+    }
+
+    /**
+     * Add cohort enrolment method to course.
+     *
+     * @param array|stdClass $record
+     * @return stdClass record from enrol table
+     */
+    public function create_cohort_enrolment($record) {
+        global $DB, $CFG;
+        $record = (array)$record;
+
+        if (empty($record['cohortid'])) {
+            throw new coding_exception('cohortid is required in totara_cohort_generator::create_cohort_enrolment() $record');
+        }
+        $cohort = $DB->get_record('cohort', array('id' => $record['cohortid']), '*', MUST_EXIST);
+        unset($record['cohortid']);
+        $record['customint1'] = $cohort->id;
+
+        if (empty($record['courseid'])) {
+            throw new coding_exception('courseid is required in totara_cohort_generator::create_cohort_enrolment() $record');
+        }
+        $course = $DB->get_record('course', array('id' => $record['courseid']), '*', MUST_EXIST);
+
+        if (!isset($record['roleid']) or $record['roleid'] === '') {
+            $record['roleid'] = $CFG->learnerroleid;
+        } else if ($record['roleid'] == 0) {
+            $record['roleid'] = 0;
+        } else {
+            $role = $DB->get_record('role', array('id' => $record['roleid']), '*', MUST_EXIST);
+            $record['roleid'] = $role->id;
+        }
+
+        /** @var enrol_cohort_plugin $cohortplugin */
+        $cohortplugin = enrol_get_plugin('cohort');
+        $id = $cohortplugin->add_instance($course, $record);
+
+        return $DB->get_record('enrol', array('id' => $id));
+    }
+
+    /**
+     * Add user to cohort.
+     *
+     * @param array|stdClass $record
+     */
+    public function create_cohort_member($record) {
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
+        $record = (array)$record;
+
+        if (empty($record['cohortid'])) {
+            throw new coding_exception('cohortid is required in totara_cohort_generator::create_cohort_member() $record');
+        }
+
+        if (empty($record['userid'])) {
+            throw new coding_exception('userid is required in totara_cohort_generator::create_cohort_member() $record');
+        }
+        // Make sure user exists.
+        $DB->get_record('user', array('id' => $record['userid'], 'deleted' => 0), 'id', MUST_EXIST);
+
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
+
+        cohort_add_member($record['cohortid'], $record['userid']);
+    }
 
     /**
      * Creates audiences.
+     *
+     * @deprecated use crate_cohort() from core generator in a loop
      *
      * @param int $numaudience Number of audiences
      * @param array $userids users id to be added to the audience of last user
@@ -59,29 +142,28 @@ class totara_cohort_generator extends component_generator_base {
     /**
      * Create an Audience.
      *
-     * @param array $record Info related to the cohort table
-     * @return mixed Info related to the cohort table
+     * @deprecated use core generator
+     *
+     * @param stdClass|array $record Info related to the cohort table
+     * @return stdClass Info related to the cohort table
      */
-    public function create_cohort($record = array()) {
-        global $CFG, $DB;
+    public function create_cohort($record = null) {
+        global $CFG;
         require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
         $record = (array) $record;
         $idnumber = totara_cohort_next_automatic_id();
 
-        $cohort = new stdClass();
-        $cohort->name = (isset($record['name'])) ? $record['name'] : 'tool_generator_' . $idnumber;
-        $cohort->idnumber = (isset($record['idnumber'])) ? $record['idnumber'] : $idnumber;
-        $cohort->contextid = (isset($record['contextid'])) ? $record['contextid'] : context_system::instance()->id;
-        $cohort->cohorttype = (isset($record['cohorttype'])) ? $record['cohorttype'] : cohort::TYPE_STATIC;
-        $cohort->description = (isset($record['description'])) ? $record['description'] : 'Audience create by tool_generator';
-        $cohort->descriptionformat = (isset($record['descriptionformat'])) ? $record['descriptionformat'] : FORMAT_HTML;
+        $record['name'] = (isset($record['name'])) ? $record['name'] : 'tool_generator_' . $idnumber;
+        $record['idnumber'] = (isset($record['idnumber'])) ? $record['idnumber'] : $idnumber;
+        $record['contextid'] = (isset($record['contextid'])) ? $record['contextid'] : context_system::instance()->id;
+        $record['cohorttype'] = (isset($record['cohorttype'])) ? $record['cohorttype'] : cohort::TYPE_STATIC;
+        $record['description'] = (isset($record['description'])) ? $record['description'] : 'Audience create by tool_generator';
+        $record['descriptionformat'] = (isset($record['descriptionformat'])) ? $record['descriptionformat'] : FORMAT_HTML;
 
-        // Create cohort.
-        $id = cohort_add_cohort($cohort);
-
-        return $DB->get_record('cohort', array('id'=>$id), '*', MUST_EXIST);
+        return $this->datagenerator->create_cohort($record);
     }
+
     /**
      * Assign users to the cohort.
      *
@@ -120,7 +202,6 @@ class totara_cohort_generator extends component_generator_base {
         foreach($data as $d) {
             foreach ($d as $name => $value) {
                 $todb = new stdClass();
-                $todb->id = self::$ind;
                 $todb->ruleid = $ruleid;
                 $todb->name = $name;
                 $todb->value = $value;
@@ -128,7 +209,6 @@ class totara_cohort_generator extends component_generator_base {
                 $todb->timemodified = time();
                 $todb->modifierid = $USER->id;
                 $DB->insert_record('cohort_rule_params', $todb);
-                self::$ind++;
             }
         }
     }

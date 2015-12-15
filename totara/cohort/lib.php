@@ -1361,7 +1361,7 @@ function totara_cohort_is_active($cohort, $now = null){
  * Get the next suggested automatic id number.
  * NOTE: After using this function, make sure to call totara_cohort_increment_automatic_id
  * to "mark off" the id number you used.
- * @return str
+ * @return string
  */
 function totara_cohort_next_automatic_id() {
     global $CFG, $DB;

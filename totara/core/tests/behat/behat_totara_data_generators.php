@@ -67,6 +67,25 @@ class behat_totara_data_generators extends behat_base {
                 'required' => array('datatype'),
             ),
         ),
+        'totara_cohort' => array(
+            'cohort enrolments' => array(
+                'datagenerator' => 'cohort_enrolment',
+                'required' => array('cohort', 'course'),
+                'switchids' => array(
+                    'cohort' => 'cohortid',
+                    'course' => 'courseid',
+                    'role' => 'roleid',
+                ),
+            ),
+            'cohort members' => array(
+                'datagenerator' => 'cohort_member',
+                'required' => array('cohort', 'user'),
+                'switchids' => array(
+                    'cohort' => 'cohortid',
+                    'user' => 'userid',
+                ),
+            ),
+        ),
         'totara_program' => array(
             'programs' => array(
                 'datagenerator' => 'program',
@@ -341,7 +360,12 @@ class behat_totara_data_generators extends behat_base {
 
     public function get_user_id($username) {
         global $DB;
-        return $DB->get_field('user', 'id', array('username' => $username), MUST_EXIST);
+
+        if (!$id = $DB->get_field('user', 'id', array('username' => $username))) {
+            throw new Exception('The specified user with username "' . $username . '" does not exist');
+        }
+
+        return $id;
     }
 
     public function get_program_id($shortname) {
@@ -387,5 +411,51 @@ class behat_totara_data_generators extends behat_base {
     public function get_goal_id($idnumber) {
         global $DB;
         return $DB->get_field('goal', 'id', array('idnumber' => $idnumber));
+    }
+
+    /**
+     * Gets the cohort id from it's idnumber.
+     * @throws Exception
+     * @param string $idnumber
+     * @return int
+     */
+    protected function get_cohort_id($idnumber) {
+        global $DB;
+
+        if (!$id = $DB->get_field('cohort', 'id', array('idnumber' => $idnumber))) {
+            throw new Exception('The specified cohort with idnumber "' . $idnumber . '" does not exist');
+        }
+        return $id;
+    }
+
+    /**
+     * Gets the course id from it's shortname.
+     * @throws Exception
+     * @param string $shortname
+     * @return int
+     */
+    protected function get_course_id($shortname) {
+        global $DB;
+
+        if (!$id = $DB->get_field('course', 'id', array('shortname' => $shortname))) {
+            throw new Exception('The specified course with shortname "' . $shortname . '" does not exist');
+        }
+        return $id;
+    }
+
+    /**
+     * Gets the role id from it's shortname.
+     * @throws Exception
+     * @param string $roleshortname
+     * @return int
+     */
+    protected function get_role_id($roleshortname) {
+        global $DB;
+
+        if (!$id = $DB->get_field('role', 'id', array('shortname' => $roleshortname))) {
+            throw new Exception('The specified role with shortname "' . $roleshortname . '" does not exist');
+        }
+
+        return $id;
     }
 }

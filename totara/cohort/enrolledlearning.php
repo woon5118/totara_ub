@@ -62,6 +62,9 @@ require_capability('moodle/cohort:view', $context);
 // allow all necessary permissions checks at category level
 $canedit = has_capability('moodle/cohort:manage', context_system::instance());
 
+// NOTE: the manage capability is actually wrong here for courses because the enrolment changes are controlled with:
+//       enrol_is_enabled('cohort') and has_capability('moodle/course:enrolconfig', $coursecontext) and has_capability('enrol/cohort:config', $coursecontext)
+
 $report = reportbuilder_get_embedded_report('cohort_associations_enrolled', array('cohortid' => $id), false, $sid);
 
 $url = new moodle_url('/totara/cohort/enrolledlearning.php', array('id' => $id));
