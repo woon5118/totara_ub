@@ -174,5 +174,15 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015080500, 'tool', 'totara_sync');
     }
 
+    if ($oldversion < 2015121800) {
+        // Update any empty user lang fields to $CFG->lang.
+        $sql = "UPDATE {user} set lang = ? WHERE lang IS NULL OR lang = ''";
+        $params = array($CFG->lang);
+
+        $DB->execute($sql, $params);
+
+        upgrade_plugin_savepoint(true, 2015121800, 'tool', 'totara_sync');
+    }
+
     return true;
 }

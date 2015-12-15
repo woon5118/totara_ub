@@ -739,6 +739,13 @@ class totara_sync_element_user extends totara_sync_element {
                             // Default to now.
                             $user->$field = empty($suser->$field) ? time() : $suser->$field;
                             break;
+                        case 'lang':
+                            // Sanity check will check for validity and add log but we will still
+                            // store invalid lang and it will default to $CFG->lang internally.
+                            if (!empty($suser->$field)) {
+                                $user->$field = $suser->$field;
+                            }
+                            break;
                         default:
                             $user->$field = $suser->$field;
                     }
@@ -805,6 +812,12 @@ class totara_sync_element_user extends totara_sync_element {
         // Check position start date is not larger than position end date.
         if (isset($syncfields->posstartdate) && isset($syncfields->posenddate)) {
             $badids = $this->get_invalid_start_end_dates($synctable, 'posstartdate', 'posenddate', 'posstartdateafterenddate');
+            $invalidids = array_merge($invalidids, $badids);
+        }
+
+        // Check invalid language set.
+        if (isset($syncfields->lang)) {
+            $badids = $this->get_invalid_lang($synctable);
             $invalidids = array_merge($invalidids, $badids);
         }
 
@@ -1295,6 +1308,46 @@ class totara_sync_element_user extends totara_sync_element {
             unset($r);
         }
         $rs->close();
+
+        return $invalidids;
+    }
+
+    /**
+     * Get invalid langauge in the lang field
+     *
+     * @param string $synctable sync table name
+     *
+     * @return array with a dummy invalid id record if there is a row with an invalid language
+     */
+    protected function get_invalid_lang($synctable) {
+        global $DB;
+
+        $forcewarning = false;
+        $params = array();
+        $invalidids = array();
+        $extracondition = '';
+        if (empty($this->config->sourceallrecords)) {
+            $extracondition = "AND deleted = ?";
+            $params[0] = 0;
+        }
+        $sql = "SELECT id, idnumber, lang
+                  FROM {{$synctable}}
+                WHERE lang != '' AND lang IS NOT NULL {$extracondition}";
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $r) {
+            if (!get_string_manager()->translation_exists($r->lang)) {
+                // Add log entry for invalid language but don't skip user.
+                $this->addlog(get_string('invalidlangx', 'tool_totara_sync', $r), 'error', 'checksanity');
+                $forcewarning = true;
+            }
+            unset($r);
+        }
+        $rs->close();
+
+        if ($forcewarning) {
+            // Put a dummy record in here to flag a problem without skipping the user.
+            $invalidids[] = 0;
+        }
 
         return $invalidids;
     }

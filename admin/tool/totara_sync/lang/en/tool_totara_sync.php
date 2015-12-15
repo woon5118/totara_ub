@@ -269,6 +269,7 @@ $string['emptyvaluepasswordx'] = 'Password cannot be empty. Skipped user {$a->id
 $string['emptyvalueusernamex'] = 'Username cannot be empty. Skipped user {$a->idnumber}';
 $string['fieldcountmismatch'] = 'Skipping row {$a->rownum} in CSV file - {$a->fieldcount} fields found but {$a->headercount} fields expected. Please make sure fields are separated by a selected delimiter ("{$a->delimiter}").';
 $string['invalidemailx'] = 'Invalid email address. Skipped user {$a->idnumber}';
+$string['invalidlangx'] = 'Invalid language specified for user {$a->idnumber}';
 $string['nosynctablemethodforsourcex'] = 'Source {$a} has no get_sync_table method. This needs to be fixed by a programmer.';
 $string['sourcefilexnotfound'] = 'Source file {$a} not found.';
 $string['sourceclassxnotfound'] = 'Source class {$a} not found. This must be fixed by a programmer.';
