@@ -659,7 +659,7 @@ abstract class prog_assignment_category {
             $html .= $OUTPUT->action_icon('#', new pix_icon('t/delete', get_string('removeduedate', 'totara_program')), null,
                 array('class' => 'deletecompletiondatelink'));
         }
-        html_writer::end_tag('div');
+        $html .= html_writer::end_tag('div');
         return $html;
     }
 
