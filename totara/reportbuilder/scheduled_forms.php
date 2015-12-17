@@ -118,40 +118,29 @@ class scheduled_reports_new_form extends moodleform {
         $mform->addElement('hidden', 'externalemails');
         $mform->setType('externalemails', PARAM_TEXT);
 
-        // Create Audience list option.
-        $audiencestr = html_writer::tag('strong', get_string('cohorts', 'totara_cohort'));
-        $mform->addElement('static', 'audienceslabel', $audiencestr);
-
         // Create a place to show existing audiences.
-        $mform->addElement('static', 'audiences_list', '', '<div class="list-audiences"></div>');
-
-        $mform->addElement('button', 'addaudiences', get_string('addcohorts', 'totara_reportbuilder'),
-            array('id' => 'show-audiences-dialog'));
-
-        $systemuserstr = html_writer::tag('strong', get_string('systemusers', 'totara_reportbuilder'));
-        $mform->addElement('static', 'systemuserslabel', $systemuserstr);
+        $audiences = array();
+        $audiences[] =& $mform->createElement('static', 'audiences_list', '', html_writer::div('', 'list-audiences'));
+        $audiences[] =& $mform->createElement('button', 'addaudiences', get_string('addcohorts', 'totara_reportbuilder'), array('id' => 'show-audiences-dialog'));
+        $mform->addGroup($audiences, 'audiences_group', get_string('cohorts', 'totara_cohort'), '');
 
         // Create a place to show existing system users.
-        $mform->addElement('static', 'systemusers_list', '', '<div class="list-systemusers"></div>');
-
-        $mform->addElement('button', 'addsystemusers', get_string('addsystemusers', 'totara_reportbuilder'),
-            array('id' => 'show-systemusers-dialog'));
-
-        $externalemailstr = html_writer::tag('strong', get_string('emailexternalusers', 'totara_reportbuilder'));
-        $mform->addElement('static', 'externalemaillabel', $externalemailstr);
-        $mform->addHelpButton('externalemaillabel', 'emailexternalusers', 'totara_reportbuilder');
-
-        // Create a place to show existing external emails.
-        $mform->addElement('static', 'externalemails_list', '', '<div class="list-externalemails"></div>');
+        $sysusers = array();
+        $sysusers[] =& $mform->createElement('static', 'systemusers_list', get_string('systemusers', 'totara_reportbuilder'), html_writer::div('', 'list-systemusers'));
+        $sysusers[] =& $mform->createElement('button', 'addsystemusers', get_string('addsystemusers', 'totara_reportbuilder'), array('id' => 'show-systemusers-dialog'));
+        $mform->addGroup($sysusers, 'systemusers_list_group', get_string('systemusers', 'totara_reportbuilder'), '');
 
         // Text input to add new emails for external users.
         $objs = array();
-        $objs[] =& $mform->createElement('text', 'emailexternals', '', 'maxlength="150" size="30"');
+        $objs[] =& $mform->createElement('static', 'externalemails_list', '', html_writer::div('', 'list-externalemails'));
+        $objs[] =& $mform->createElement('text', 'emailexternals', get_string('externalemail', 'totara_reportbuilder'), array('class' => 'reportbuilder_scheduled_addexternal', 'maxlength' => 150, 'size' => 30));
         $objs[] =& $mform->createElement('button', 'addemail', get_string('addexternalemail', 'totara_reportbuilder'),
             array('id' => 'addexternalemail'));
 
         // Create a group for the elements.
-        $grp =& $mform->addElement('group', 'externalemailsgrp', '', $objs, '', false);
+        $mform->addGroup($objs, 'externalemailsgrp', get_string('emailexternalusers', 'totara_reportbuilder'), '');
+        $mform->setType('externalemailsgrp[emailexternals]', PARAM_TEXT);
+        $mform->addHelpButton('externalemailsgrp', 'emailexternalusers', 'totara_reportbuilder');
 
         $mform->setType('emailexternals', PARAM_EMAIL);
 
@@ -185,7 +174,7 @@ class scheduled_reports_new_form extends moodleform {
                 $audienceids[] = $audience->id;
             }
             $divcontainer = html_writer::div(implode($audiencesrecords, ''), 'list-audiences');
-            $mform->getElement('audiences_list')->setValue($divcontainer);
+            $mform->getElement('audiences_group')->getElements()[0]->setValue($divcontainer);
             $mform->getElement('audiences')->setValue(implode(',', $audienceids));
         }
 
@@ -198,7 +187,8 @@ class scheduled_reports_new_form extends moodleform {
                 $userids[] = $user->id;
             }
             $divcontainer = html_writer::div(implode($systemusers, ''), 'list-systemusers');
-            $mform->getElement('systemusers_list')->setValue($divcontainer);
+
+            $mform->getElement('systemusers_list_group')->getElements()[0]->setValue($divcontainer);
             $mform->getElement('systemusers')->setValue(implode(',', $userids));
         }
 
@@ -212,7 +202,7 @@ class scheduled_reports_new_form extends moodleform {
                 $externalemails[] = $renderer->schedule_email_setting($external, 'externalemails');
             }
             $divcontainer = html_writer::div(implode($externalemails, ''), 'list-externalemails');
-            $mform->getElement('externalemails_list')->setValue($divcontainer);
+            $mform->getElement('externalemailsgrp')->getElements()[0]->setValue($divcontainer);
             $mform->getElement('externalemails')->setValue(implode(',', $extusers));
         }
     }

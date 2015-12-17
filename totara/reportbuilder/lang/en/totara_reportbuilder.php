@@ -323,6 +323,7 @@ $string['exporttofilesystem'] = 'Export to file system';
 $string['exporttofilesystemenable'] = 'Enable exporting to file system';
 $string['exporttosave'] = 'Save scheduled report to file system only';
 $string['exportxls'] = 'Export in Excel format';
+$string['externalemail'] = 'External email address to add';
 $string['extrasqlshouldusenamedparams'] = 'get_sql_filter() extra sql should use named parameters';
 $string['eventreportcloned'] = 'Report cloned';
 $string['eventreportcreated'] = 'Report created';

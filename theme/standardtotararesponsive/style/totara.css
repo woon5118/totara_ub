@@ -519,3 +519,10 @@ ul.comment-list li .comment-delete {
 #page-admin-tool-totara_sync-admin-sourcesettings .db_connect_message {
     display: inline;
 }
+
+.felement input[type='button'] {
+    margin: 0;
+}
+fieldset .felement input[type='button'] {
+    margin-bottom: 0;
+}
