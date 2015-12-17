@@ -142,3 +142,56 @@ div.mod-indent form.togglecompletion input[type="image"] {
 .room {
     display: block;
 }
+
+table.reportbuilder-table tr {
+    height: 100%;
+}
+
+.reportbuilder-table .session_bookingstatus,
+.reportbuilder-table .session_overallstatus {
+    padding: 0;
+    height: 100%;
+}
+
+.reportbuilder-table .session_bookingstatus div,
+.reportbuilder-table .session_overallstatus div {
+    display: inline-block;
+    text-align: center;
+    height: 100%;
+    width:100%;
+    position: relative;
+    transform-style: preserve-3d;
+    -moz-transform-style: initial;
+}
+
+.reportbuilder-table .session_bookingstatus div span,
+.reportbuilder-table .session_overallstatus div span {
+    display: inline-block;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+}
+
+.reportbuilder-table .session_bookingstatus div.underbooked,
+.reportbuilder-table .session_overallstatus div.ended {
+    background-color: #ff1493;
+}
+
+.reportbuilder-table .session_bookingstatus div.available,
+.reportbuilder-table .session_overallstatus div.upcoming {
+    background-color: #adff2f;
+}
+
+.reportbuilder-table .session_bookingstatus div.overbooked {
+    background-color: #ffc200;
+}
+
+.reportbuilder-table .session_overallstatus div.cancelled {
+    background-color: #f08080;
+}
+
+.reportbuilder-table .session_bookingstatus div.fullybooked,
+.reportbuilder-table .session_overallstatus div.started {
+    background-color: #90ee90;
+}

@@ -180,7 +180,7 @@ class rb_filter_type {
      *
      * @return object|false A columnoption, or false if not found
      */
-    private function get_columnoption($type, $value) {
+    protected function get_columnoption($type, $value) {
 
         $sourcename = get_class($this->report->src);
         $columnoption = reportbuilder::get_single_item($this->report->columnoptions, $type, $value);

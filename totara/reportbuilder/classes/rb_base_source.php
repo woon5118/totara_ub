@@ -1378,6 +1378,18 @@ abstract class rb_base_source {
         }
     }
 
+    /**
+     * Display duration in human readable format
+     * @param integer $seconds
+     * @param stdClass $row
+     */
+    public function rb_display_duration($seconds, $row) {
+        if (empty($seconds)) {
+            return '';
+        }
+        return format_time($seconds);
+    }
+
     // convert an integer number of minutes into a
     // formatted duration (e.g. 90 mins => 1h 30m)
     function rb_display_hours_minutes($mins, $row) {
@@ -3155,6 +3167,17 @@ abstract class rb_base_source {
                 'extrafields' => array('cat_id' => "$catjoin.id",
                                         'cat_visible' => "$catjoin.visible",
                                         $column => "{$catjoin}.{$column}")
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_category',
+            'idnumber',
+            get_string('coursecategoryidnumber', 'totara_reportbuilder'),
+            "$catjoin.idnumber",
+            array(
+                'joins' => $catjoin,
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
         );
         $columnoptions[] = new rb_column_option(

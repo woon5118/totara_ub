@@ -288,4 +288,14 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         ),
     ),
+
+    // View all sessions.
+    'mod/facetoface:viewallsessions' => array(
+        'riskbitmask'   => RISK_CONFIG,
+        'captype'       => 'read',
+        'contextlevel'  => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        ),
+    ),
 );

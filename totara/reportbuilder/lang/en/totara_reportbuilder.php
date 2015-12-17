@@ -164,6 +164,7 @@ $string['coursecategoryid'] = 'Course Category ID';
 $string['coursecategorylinked'] = 'Course Category (linked to category)';
 $string['coursecategorylinkedicon'] = 'Course Category (linked to category with icon)';
 $string['coursecategorymultichoice'] = 'Course Category (multichoice)';
+$string['coursecategoryidnumber'] = 'Course Category ID Number';
 $string['coursecompletedon'] = 'Course completed on {$a}';
 $string['courseenrolledincohort'] = 'Course is enrolled in by audience';
 $string['courseicon'] = 'Course Icon';

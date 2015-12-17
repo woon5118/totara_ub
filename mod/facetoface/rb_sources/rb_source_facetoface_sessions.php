@@ -24,7 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class rb_source_facetoface_sessions extends rb_base_source {
+global $CFG;
+
+require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
+
+class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $sourcetitle, $requiredcolumns;
@@ -824,171 +828,6 @@ class rb_source_facetoface_sessions extends rb_base_source {
     // Methods for adding commonly used data to source definitions
     //
     //
-
-    //
-    // Join data
-    //
-
-    /*
-     * Adds any facetoface session roles to the $joinlist array
-     *
-     * @param array &$joinlist Array of current join options
-     *                         Passed by reference and updated if
-     *                         any session roles exist
-     * @return boolean True if any roles exist
-     */
-    function add_facetoface_session_roles_to_joinlist(&$joinlist) {
-        global $CFG, $DB;
-        // add joins for the following roles as "session_role_X" and
-        // "session_role_user_X"
-        $allowedroles = get_config(null, 'facetoface_session_roles');
-        if (!isset($allowedroles) || $allowedroles == '') {
-            return false;
-        }
-        $allowedroles = explode(',', $allowedroles);
-
-        list($allowedrolessql, $params) = $DB->get_in_or_equal($allowedroles);
-
-        $sessionroles = $DB->get_records_sql_menu("SELECT id,shortname FROM {role} WHERE id $allowedrolessql", $params);
-        if (!$sessionroles) {
-            return false;
-        }
-
-        if ($roles = $DB->get_records('role', null, '', 'id,shortname')) {
-            foreach ($roles as $role) {
-                if (in_array($role->shortname, $sessionroles)) {
-                    $field = $role->shortname;
-                    $id = $role->id;
-                    $key = "session_role_$field";
-                    $userkey = "session_role_user_$field";
-                    $joinlist[] = new rb_join(
-                        $key,
-                        'LEFT',
-                        '{facetoface_session_roles}',
-                        "($key.sessionid = base.sessionid AND $key.roleid = $id)",
-                        REPORT_BUILDER_RELATION_ONE_TO_MANY
-                    );
-                    $joinlist[] = new rb_join(
-                        $userkey,
-                        'LEFT',
-                        '{user}',
-                        "$userkey.id = $key.userid",
-                        REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                        $key
-                    );
-
-                }
-            }
-            return true;
-        }
-
-        return false;
-    }
-
-    //
-    // Column data
-    //
-
-    /*
-     * Adds any session role fields to the $columnoptions array
-     *
-     * @param array &$columnoptions Array of current column options
-     *                              Passed by reference and updated if
-     *                              any session roles exist
-     * @return boolean True if session roles exist
-     */
-    function add_facetoface_session_roles_to_columns(&$columnoptions) {
-        global $CFG, $DB;
-
-        $allowedroles = get_config(null, 'facetoface_session_roles');
-        if (!isset($allowedroles) || $allowedroles == '') {
-            return false;
-        }
-        $allowedroles = explode(',', $allowedroles);
-
-        list($allowedrolessql, $params) = $DB->get_in_or_equal($allowedroles);
-
-        $sessionroles = $DB->get_records_sql("SELECT id,name,shortname
-            FROM {role}
-            WHERE id {$allowedrolessql}", $params);
-        if (!$sessionroles) {
-            return false;
-        }
-
-        foreach ($sessionroles as $sessionrole) {
-            $field = $sessionrole->shortname;
-            $name = $sessionrole->name;
-            if (empty($name)) {
-                $name = $field;
-            }
-            $key = "session_role_$field";
-            $userkey = "session_role_user_$field";
-            $usernamefields = totara_get_all_user_name_fields_join($userkey);
-            $columnoptions[] = new rb_column_option(
-                'role',
-                $field . '_name',
-                get_string('sessionrole', 'rb_source_facetoface_sessions', $name),
-                $DB->sql_concat_join("' '", $usernamefields),
-                array(
-                    'joins' => $userkey,
-                    'grouping' => 'comma_list_unique',
-                    'dbdatatype' => 'char',
-                    'outputformat' => 'text'
-                )
-            );
-        }
-        return true;
-    }
-
-
-    //
-    // Filter data
-    //
-
-
-    /*
-     * Adds some common user field to the $filteroptions array
-     *
-     * @param array &$filteroptions Array of current filter options
-     *                              Passed by reference and updated by
-     *                              this method
-     * @return True
-     */
-    protected function add_facetoface_session_role_fields_to_filters(&$filteroptions) {
-        // auto-generate filters for session roles fields
-        global $CFG, $DB;
-        $allowedroles = get_config(null, 'facetoface_session_roles');
-        if (!isset($allowedroles) || $allowedroles == '') {
-            return false;
-        }
-        $allowedroles = explode(',', $allowedroles);
-
-        list($allowedrolessql, $params) = $DB->get_in_or_equal($allowedroles);
-
-        $sessionroles = $DB->get_records_sql("SELECT id,name,shortname
-            FROM {role}
-            WHERE id {$allowedrolessql}", $params);
-        if (!$sessionroles) {
-            return false;
-        }
-
-        foreach ($sessionroles as $sessionrole) {
-            $field = $sessionrole->shortname;
-            $name = $sessionrole->name;
-            if (empty($name)) {
-                $name = $field;
-            }
-            $key = "session_role_$field";
-            $userkey = "session_role_user_$field";
-            $filteroptions[] = new rb_filter_option(
-                'role',
-                $field . '_name',
-                get_string('sessionrole', 'rb_source_facetoface_sessions', $name),
-                'text'
-            );
-        }
-        return true;
-    }
 
     //
     //
