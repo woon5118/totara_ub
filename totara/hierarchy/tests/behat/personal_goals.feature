@@ -1,5 +1,5 @@
 @totara_hierarchy @totara_hierarchy_goals @totara @javascript
-Feature: Verify creation and use of personal goal types and custom fields
+Feature: Verify creation and use of personal goal types and custom fields.
 
 Background:
   Given I am on a totara site
@@ -111,8 +111,7 @@ Scenario: Verify audiences can be successfully added and removed from a goal typ
   And I should not see "Audience 2" in the "#goal-cohorts-table-enrolled" "css_element"
   And I should see "Audience 3" in the "#goal-cohorts-table-enrolled" "css_element"
 
-# Uncomment tag below when problem with the file manager fixed.
-# @_file_upload
+@_file_upload @totara_customfield
 Scenario: Verify custom fields can be successfully added to a personal goal type and personal goal.
 
   # Create a new Personal Goal Type
@@ -195,6 +194,14 @@ Scenario: Verify custom fields can be successfully added to a personal goal type
   And I press "Save changes"
   Then I should see "Text input 1"
 
+  # Create a URL field.
+  When I set the field "Create a new custom field" to "URL"
+  And I set the following fields to these values:
+    | Full name                   | URL 1 |
+    | Short name (must be unique) | url1  |
+  And I press "Save changes"
+  Then I should see "URL 1"
+
   # Login as a learner and create a personal goal with the custom fields.
   When I log out
   And I log in as "learner1"
@@ -215,37 +222,41 @@ Scenario: Verify custom fields can be successfully added to a personal goal type
   # We can only add the custom field data after the goal has been created.
   When I click on "Edit" "link" in the ".personal_table" "css_element"
   And I set the following fields to these values:
-    | Checkbox 1                        | 1            |
-    | customfield_datetime1[enabled]    | 1            |
-    | customfield_datetime1[day]        | 31           |
-    | customfield_datetime1[month]      | December     |
-    | customfield_datetime1[year]       | 2035         |
-    | customfield_menuofchoices1        | Choice 1     |
-    | Select 1                          | 1            |
-    | Select 2                          | 1            |
-    | Select 3                          | 1            |
-    | Text area 1                       | Text area 1  |
-    | Text input 1                      | Text input 1 |
+    | Checkbox 1                     | 1                         |
+    | customfield_datetime1[enabled] | 1                         |
+    | customfield_datetime1[day]     | 31                        |
+    | customfield_datetime1[month]   | December                  |
+    | customfield_datetime1[year]    | 2035                      |
+    | customfield_menuofchoices1     | Choice 1                  |
+    | Select 1                       | 1                         |
+    | Select 2                       | 1                         |
+    | Select 3                       | 1                         |
+    | Text area 1                    | Text area 1               |
+    | Text input 1                   | Text input 1              |
+    | customfield_url1[url]          | https://www.totaralms.com |
+    | customfield_url1[text]         | Totara LMS                |
+    | customfield_url1[target]       | 1                         |
   # The file upload won't work while there's an existing problem with the file manager loading.
   # Uncomment tag over scenario and lines below when problem with the file manager fixed.
   # And I upload "/totara/core/pix/logo.png" file to "File 1" filemanager
   And I press "Save changes"
-  And I click on "showhide-personalgoal-details" "button"
+  And I press "Show details"
   # Check that all the data has been added to the personal goal.
-  Then I should see "Type: Personal Goal Type 1" in the ".personal_table" "css_element"
-  And I should see "Checkbox 1: Yes" in the ".personal_table" "css_element"
-  And I should see "Datetime 1: 31 December 2035" in the ".personal_table" "css_element"
-  And I should see "File 1:" in the ".personal_table" "css_element"
-  # And I should see "logo.png" in the ".personal_table" "css_element"
-  And I should see "Menu of choices 1: Choice 1" in the ".personal_table" "css_element"
-  And I should see "Multi-select 1:" in the ".personal_table" "css_element"
-  And I should see "Select 1" in the ".personal_table" "css_element"
-  And I should see "Select 2" in the ".personal_table" "css_element"
-  And I should see "Select 3" in the ".personal_table" "css_element"
-  And I should see "Text area 1: Text area 1" in the ".personal_table" "css_element"
-  And I should see "Text input 1: Text input 1" in the ".personal_table" "css_element"
+  Then I should see "Type: Personal Goal Type 1"
+  And I should see "Checkbox 1: Yes"
+  And I should see "Datetime 1: 31 December 2035"
+  And I should see "File 1:"
+  # And I should see "logo.png"
+  And I should see "Menu of choices 1: Choice 1"
+  And I should see "Multi-select 1:"
+  And I should see "Select 1"
+  And I should see "Select 2"
+  And I should see "Select 3"
+  And I should see "Text area 1: Text area 1"
+  And I should see "Text input 1: Text input 1"
+  And I should see "URL 1: Totara LMS"
 
-@_file_upload
+@_file_upload @totara_customfield
 Scenario: Verify personal goal data can be added to an appraisal.
 
   # Create an appraisal using the data generator.
@@ -366,6 +377,14 @@ Scenario: Verify personal goal data can be added to an appraisal.
   And I press "Save changes"
   Then I should see "Text input 1"
 
+  # Create a URL field.
+  When I set the field "Create a new custom field" to "URL"
+  And I set the following fields to these values:
+    | Full name                   | URL 1 |
+    | Short name (must be unique) | url1  |
+  And I press "Save changes"
+  Then I should see "URL 1"
+
   # Login as a learner and create a personal goal with the custom fields.
   When I log out
   And I log in as "learner1"
@@ -398,18 +417,22 @@ Scenario: Verify personal goal data can be added to an appraisal.
 
   # Add some date to the custom fields and fill in the review answer.
   When I set the following fields to these values:
-    | Checkbox 1                        | 1             |
-    | customfield_datetime1_1[enabled]  | 1             |
-    | customfield_datetime1_1[day]      | 31            |
-    | customfield_datetime1_1[month]    | December      |
-    | customfield_datetime1_1[year]     | 2035          |
-    | customfield_menuofchoices1_1      | Choice 1      |
-    | Select 1                          | 1             |
-    | Select 2                          | 1             |
-    | Select 3                          | 1             |
-    | Text area 1                       | Text area 1   |
-    | Text input 1                      | Text input 1  |
-    | Your answer                       | How did I do? |
+    | Checkbox 1                       | 1                         |
+    | customfield_datetime1_1[enabled] | 1                         |
+    | customfield_datetime1_1[day]     | 31                        |
+    | customfield_datetime1_1[month]   | December                  |
+    | customfield_datetime1_1[year]    | 2035                      |
+    | customfield_menuofchoices1_1     | Choice 1                  |
+    | Select 1                         | 1                         |
+    | Select 2                         | 1                         |
+    | Select 3                         | 1                         |
+    | Text area 1                      | Text area 1               |
+    | Text input 1                     | Text input 1              |
+    | customfield_url1_1[url]          | https://www.totaralms.com |
+    | customfield_url1_1[text]         | Totara LMS                |
+    | customfield_url1_1[target]       | 1                         |
+    | Your answer                      | How did I do?             |
+
   And I press "Complete Stage"
   Then I should see "You have completed this stage"
   And I log out
@@ -431,21 +454,27 @@ Scenario: Verify personal goal data can be added to an appraisal.
   And the field "Select 3" matches value "1"
   And the field "Text area 1" matches value "Text area 1"
   And the field "Text input 1" matches value "Text input 1"
+  And the field "customfield_url1_1[url]" matches value "https://www.totaralms.com"
+  And the field "customfield_url1_1[text]" matches value "Totara LMS"
+  And the field "customfield_url1_1[target]" matches value "1"
 
   # Update the custom fields and fill in the review answer.
   When I set the following fields to these values:
-    | Checkbox 1                        | 0                    |
-    | customfield_datetime1_1[enabled]  | 1                    |
-    | customfield_datetime1_1[day]      | 5                    |
-    | customfield_datetime1_1[month]    | November             |
-    | customfield_datetime1_1[year]     | 2035                 |
-    | customfield_menuofchoices1_1      | Choice 2             |
-    | Select 1                          | 1                    |
-    | Select 2                          | 0                    |
-    | Select 3                          | 0                    |
-    | Text area 1                       | Text area 1 updated  |
-    | Text input 1                      | Text input 1 updated |
-    | Your answer                       | Not bad.             |
+    | Checkbox 1                       | 0                              |
+    | customfield_datetime1_1[enabled] | 1                              |
+    | customfield_datetime1_1[day]     | 5                              |
+    | customfield_datetime1_1[month]   | November                       |
+    | customfield_datetime1_1[year]    | 2035                           |
+    | customfield_menuofchoices1_1     | Choice 2                       |
+    | Select 1                         | 1                              |
+    | Select 2                         | 0                              |
+    | Select 3                         | 0                              |
+    | Text area 1                      | Text area 1 updated            |
+    | Text input 1                     | Text input 1 updated           |
+    | customfield_url1_1[url]          | https://www.totaralearning.com |
+    | customfield_url1_1[text]         | Totara Learning                |
+    | customfield_url1_1[target]       | 1                              |
+    | Your answer                      | Not bad.                       |
 
   And I upload "/totara/hierarchy/tests/behat/fixtures/logo.png" file to "File 1" filemanager
   And I press "Complete Stage"
@@ -464,4 +493,7 @@ Scenario: Verify personal goal data can be added to an appraisal.
   And the field "Select 3" matches value "0"
   And the field "Text area 1" matches value "Text area 1 updated"
   And the field "Text input 1" matches value "Text input 1 updated"
+  And the field "customfield_url1_1[url]" matches value "https://www.totaralearning.com"
+  And the field "customfield_url1_1[text]" matches value "Totara Learning"
+  And the field "customfield_url1_1[target]" matches value "1"
   And I should see "Not bad."

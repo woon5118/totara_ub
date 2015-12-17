@@ -3965,6 +3965,13 @@ abstract class rb_base_source {
                     $column_options['outputformat'] = 'text';
                     break;
 
+                case 'url':
+                    $filtertype = 'url';
+                    $column_options['dbdatatype'] = 'text';
+                    $column_options['outputformat'] = 'text';
+                    $column_options['displayfunc'] = 'customfield_url';
+                    break;
+
                 default:
                     // Unsupported customfields.
                     continue 2;

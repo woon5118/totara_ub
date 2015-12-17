@@ -383,6 +383,9 @@ class rb_source_goal_custom extends rb_base_source {
                     "{$type}_all_custom_field_{$customgoal->id}_itemid" => "{$type}_goalrecord{$customgoal->id}.id"
                 );
                 break;
+            case 'url':
+                $displayfunc = 'customfield_url';
+                break;
         }
 
         return new rb_column(

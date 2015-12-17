@@ -637,6 +637,11 @@ function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = tru
                 $extradata = array('prefix' => $prefix, 'itemid' => $field->dataid);
                 $data = \customfield_textarea::display_item_data($data, $extradata);
                 break;
+            case 'url':
+                require_once($CFG->dirroot.'/totara/customfield/field/url/field.class.php');
+                $extradata = array('prefix' => $prefix, 'itemid' => $field->dataid);
+                $data = \customfield_url::display_item_data($data, $extradata);
+                break;
 
         }
         $index = ($indexfullname) ? 'fullname' : 'shortname';

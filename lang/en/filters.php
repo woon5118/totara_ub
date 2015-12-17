@@ -81,13 +81,22 @@ The filter has the following options:
 * No - this option only returns records where the user is not enrolled in the specified course';
 $string['filterselect'] = 'Select filter';
 $string['filterselect_help'] = '
-This filter allows you to filter information based on a drop down list.
+This filter allows you to filter information via a drop down list of options.
 
 The filter has the following options:
 
 * is any value - this option disables the filter (i.e. all information is accepted by this filter)
 * is equal to - this option allows only information that is equal to the value selected from the list
 * is not equal to - this option allows only information that is different from the value selected from the list';
+$string['filterurl'] = 'URL filter';
+$string['filterurl_help'] = '
+This filter allows you to filter information based on a drop down list.
+
+The filter has the following options:
+
+* is any value - this option disables the filter (i.e. all information is accepted by this filter)
+* is empty - this option allows only information that is equal to an empty string
+* is not empty (NOT NULL) - this option allows only information that is not equal to an empty string';
 $string['contains'] = 'contains';
 $string['content'] = 'Content';
 $string['contentandheadings'] = 'Content and headings';

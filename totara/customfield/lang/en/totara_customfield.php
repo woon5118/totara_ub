@@ -87,6 +87,23 @@ $string['customfieldtypemenu'] = 'Menu of choices';
 $string['customfieldtypemultiselect'] = 'Multi-select';
 $string['customfieldtypetext'] = 'Text input';
 $string['customfieldtypetextarea'] = 'Text area';
+$string['customfieldtypeurl'] = 'URL';
+$string['customfieldtypeurltext'] = 'Text';
+$string['customfieldtypeurltarget'] = 'Open in new window';
+$string['customfielddefaultdataurl'] = 'Default URL';
+$string['customfielddefaultdataurl_help'] = 'Default link text to be shown. If empty the URL will be displayed.';
+$string['customfielddefaultdataurltext'] = 'Default text';
+$string['customfielddefaultdataurltext_help'] = 'Default link text to be displayed. If empty the URL will be used.';
+$string['customfielddefaultdataurltarget'] = 'Open in a new window';
+$string['customfieldurl'] = 'URL';
+$string['customfieldurl_help'] = '
+The URL is split into three inputs.
+
+* URL - Must start with http://, https:// or /
+* Text - Optional link text. If left empty, the URL will be displayed
+* Open in new window or tab
+';
+$string['customfieldurlformaterror'] = 'The URL needs to start with http://, https:// or /';
 $string['defaultchecked'] = 'Checked by default';
 $string['defaultdata'] = 'Default value';
 $string['defaultmake'] = 'Make selected by default';
