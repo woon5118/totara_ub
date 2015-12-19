@@ -42,7 +42,7 @@ class customfield_multiselect extends customfield_base {
     public function __construct($fieldid=0, $itemid=0, $prefix, $tableprefix, $addsuffix = false) {
         global $DB;
         // First call parent constructor.
-        $this->customfield_base($fieldid, $itemid, $prefix, $tableprefix, $addsuffix);
+        parent::__construct($fieldid, $itemid, $prefix, $tableprefix, $addsuffix);
         $this->tableprefix = $tableprefix;
 
         // Param 1 for menu type is the options.

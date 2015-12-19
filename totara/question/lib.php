@@ -1084,8 +1084,8 @@ class MoodleQuickForm_staticcallback extends MoodleQuickForm_static {
      * @param string $elementlabel (optional) text field label
      * @param string $callback (optional) function that returns value to display
      */
-    public function MoodleQuickForm_staticcallback($elementname = null, $elementlabel = null, $callback = null) {
-        parent::MoodleQuickForm_static($elementname, $elementlabel, '');
+    public function __construct($elementname = null, $elementlabel = null, $callback = null) {
+        parent::__construct($elementname, $elementlabel, '');
         $this->callback = $callback;
         $this->_text = html_writer::tag('em', get_string('notanswered', 'totara_question'));
     }

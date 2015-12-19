@@ -2249,17 +2249,20 @@ function totara_theme_generate_autocolors($css, $theme, $substitutions) {
  */
 function encrypt_data($plaintext, $key = '') {
     global $CFG;
-    require_once($CFG->dirroot.'/totara/core/lib/phpseclib/Crypt/RSA.php');
+    require_once($CFG->dirroot . '/totara/core/lib/phpseclib/Crypt/RSA.php');
+    require_once($CFG->dirroot . '/totara/core/lib/phpseclib/Crypt/Hash.php');
+    require_once($CFG->dirroot . '/totara/core/lib/phpseclib/Crypt/Random.php');
+    require_once($CFG->dirroot . '/totara/core/lib/phpseclib/Math/BigInteger.php');
 
-    $rsa = new Crypt_RSA();
-    if ($key == '') {
+    $rsa = new \phpseclib\Crypt\RSA();
+    if ($key === '') {
         $key = file_get_contents(PUBLIC_KEY_PATH);
     }
     if (!$key) {
         return false;
     }
     $rsa->loadKey($key);
-    $rsa->setEncryptionMode(CRYPT_RSA_ENCRYPTION_PKCS1);
+    $rsa->setEncryptionMode(\phpseclib\Crypt\RSA::ENCRYPTION_PKCS1);
     $ciphertext = $rsa->encrypt($plaintext);
     return $ciphertext;
 }

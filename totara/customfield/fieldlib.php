@@ -51,7 +51,7 @@ class customfield_base {
      * @param string $tableprefix The database table name prefix.
      * @param boolean $addsuffix If the custom field should have a suffix added.
      */
-    function customfield_base($fieldid=0, &$item, $prefix, $tableprefix, $addsuffix = false) {
+    function __construct($fieldid=0, &$item, $prefix, $tableprefix, $addsuffix = false) {
         $this->set_fieldid($fieldid);
         $this->set_itemid($item->id);
         $this->set_addsuffix($addsuffix);

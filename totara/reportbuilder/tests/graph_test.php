@@ -52,7 +52,7 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $this->assertSame(12.0,   totara_reportbuilder\local\graph::normalize_numeric_value('012')); // No octal support in strings - cast to float.
         $this->assertSame(800.0,  totara_reportbuilder\local\graph::normalize_numeric_value('0800')); // No octal support in strings - cast to float.
         $this->assertSame(496,    totara_reportbuilder\local\graph::normalize_numeric_value(0x1f0));
-        $this->assertSame(0.0,    totara_reportbuilder\local\graph::normalize_numeric_value('0x1f0')); // No hexadecimal support in strings - cast to float.
+        $this->assertEquals(0,    totara_reportbuilder\local\graph::normalize_numeric_value('0x1f0')); // No hexadecimal support in strings - cast to float. PHP7 returns 0, older 0.0.
         $this->assertSame(255,    totara_reportbuilder\local\graph::normalize_numeric_value(0b11111111));
         $this->assertSame(0,      totara_reportbuilder\local\graph::normalize_numeric_value('0b11111111')); // No binary support in strings.
     }

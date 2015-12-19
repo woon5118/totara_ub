@@ -277,7 +277,7 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
         $datarows = array();    // holds csv row data
         $dbpersist = TOTARA_SYNC_DBROWS;  // # of rows to insert into db at a time
         $rowcount = 0;
-        $fieldcount = new object();
+        $fieldcount = new stdClass();
         $fieldcount->headercount = count($fields);
         $fieldcount->rownum = 0;
         $csvdateformat = (isset($CFG->csvdateformat)) ? $CFG->csvdateformat : get_string('csvdateformatdefault', 'totara_core');

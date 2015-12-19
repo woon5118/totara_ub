@@ -99,7 +99,7 @@ function auth_gauth_authenticate_user_login($username, $password) {
 
 
         $auths = $authsenabled;
-        $user = new object();
+        $user = new stdClass();
         $user->id = 0;     // User does not exist
     }
 

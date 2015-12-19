@@ -4412,7 +4412,7 @@ function facetoface_get_session_involvement($user, $info) {
     global $USER;
 
     // Data to pass to lang string
-    $data = new object();
+    $data = new stdClass();
 
     // Session time data
     $data->timestart = userdate($info->timestart, get_string('strftimetime'), $info->sessiontimezone);
