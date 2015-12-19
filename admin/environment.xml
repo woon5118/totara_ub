@@ -768,7 +768,6 @@
       <VENDOR name="oracle" version="10.2" />
     </DATABASE>
     <PHP version="5.5.9" level="required">
-      <RESTRICT function="restrict_php_version_7" message="unsupportedphpversion7" />
     </PHP>
     <PCREUNICODE level="optional">
       <FEEDBACK>
