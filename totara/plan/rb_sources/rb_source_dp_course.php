@@ -391,12 +391,7 @@ class rb_source_dp_course extends rb_base_source {
                 'course_completion',
                 'statusandapproval',
                 get_string('completionstatusandapproval', 'rb_source_dp_course'),
-                "CASE WHEN dp_course.planstatus = " . DP_PLAN_STATUS_COMPLETE . "
-                THEN
-                    dp_course.completionstatus
-                ELSE
-                    course_completion.status
-                END",
+                "course_completion.status",
                 array(
                     'joins' => array('course_completion', 'dp_course'),
                     'displayfunc' => 'course_completion_progress_and_approval',
