@@ -138,6 +138,8 @@ if ($action == 'snapshot') {
             $content = $pdf->output();
         } catch (Exception $e) {
             // Ignore.
+        } catch (Throwable $e) {
+            // Ignore.
         }
         if ($content === null) {
             try {
@@ -147,6 +149,8 @@ if ($action == 'snapshot') {
                 $pdf->render();
                 $content = $pdf->output();
             } catch (Exception $e) {
+                // Ignore.
+            } catch (Throwable $e) {
                 // Ignore.
             }
         }

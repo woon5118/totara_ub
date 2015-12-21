@@ -1401,6 +1401,8 @@ function prog_courseset_group_complete($courseset_group, $userid, $updatecomplet
     // Keep track of the state of the last run of "and"ed courses.
     $accumulator = true;
 
+    $last = end($courseset_group); // PHP7 do not use end() inside foreach!
+
     foreach ($courseset_group as $courseset) {
         // First check if the course set is already marked as complete.
         if ($courseset->is_courseset_complete($userid)) {
@@ -1436,7 +1438,6 @@ function prog_courseset_group_complete($courseset_group, $userid, $updatecomplet
                 break;
             case NEXTSETOPERATOR_THEN:
             default:
-                $last = end($courseset_group);
                 if ($courseset == $last) {
                     // This is the last course set. The final result is determined by the last run of "and"ed course sets.
                     return $accumulator;
