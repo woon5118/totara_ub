@@ -187,7 +187,12 @@ class rb_source_facetoface_sessions extends rb_base_source {
     }
 
     protected function define_columnoptions() {
-        global $DB;
+        global $DB, $CFG;
+        $intimezone = '';
+        if (!empty($CFG->facetoface_displaysessiontimezones)) {
+            $intimezone = '_in_timezone';
+        }
+
         $usernamefieldscreator = totara_get_all_user_name_fields_join('creator');
         $usernamefieldsbooked  = totara_get_all_user_name_fields_join('bookedby');
         $columnoptions = array(
@@ -320,7 +325,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' =>'sessiondate',
-                    'displayfunc' => 'nice_date_in_timezone',
+                    'displayfunc' => 'nice_date' . $intimezone,
                     'dbdatatype' => 'timestamp'
                 )
             ),
@@ -345,7 +350,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_date_in_timezone',
+                    'displayfunc' => 'nice_date' . $intimezone,
                     'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
@@ -356,7 +361,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_time_in_timezone',
+                    'displayfunc' => 'nice_time' . $intimezone,
                     'dbdatatype' => 'timestamp'
                 )
             ),
@@ -368,7 +373,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_time_in_timezone',
+                    'displayfunc' => 'nice_time' . $intimezone,
                     'dbdatatype' => 'timestamp'
                 )
             ),
@@ -1022,10 +1027,10 @@ class rb_source_facetoface_sessions extends rb_base_source {
 
     // convert a f2f date into a link to that session
     function rb_display_link_f2f_session($date, $row) {
-        global $OUTPUT;
+        global $OUTPUT, $CFG;
         $sessionid = $row->session_id;
         if ($date && is_numeric($date)) {
-            if (empty($row->timezone)) {
+            if (empty($row->timezone) or empty($CFG->facetoface_displaysessiontimezones)) {
                 $targetTZ = core_date::get_user_timezone();
             } else {
                 $targetTZ = core_date::normalise_timezone($row->timezone);

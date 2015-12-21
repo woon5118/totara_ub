@@ -102,6 +102,12 @@ class rb_source_facetoface_summary extends rb_base_source {
     }
 
     function define_columnoptions() {
+        global $CFG;
+        $intimezone = '';
+        if (!empty($CFG->facetoface_displaysessiontimezones)) {
+            $intimezone = '_in_timezone';
+        }
+
         $columnoptions = array(
             new rb_column_option(
                 'session',
@@ -249,7 +255,7 @@ class rb_source_facetoface_summary extends rb_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' =>'sessiondate',
-                    'displayfunc' => 'nice_date_in_timezone',
+                    'displayfunc' => 'nice_date' . $intimezone,
                     'dbdatatype' => 'timestamp'
                 )
             ),
@@ -356,10 +362,10 @@ class rb_source_facetoface_summary extends rb_base_source {
      * @return string Display html
      */
     function rb_display_link_f2f_session($date, $row) {
-        global $OUTPUT;
+        global $OUTPUT, $CFG;
         $sessionid = $row->session_id;
         if ($date && is_numeric($date)) {
-            if (empty($row->timezone)) {
+            if (empty($row->timezone) or empty($CFG->facetoface_displaysessiontimezones)) {
                 $targetTZ = core_date::get_user_timezone();
             } else {
                 $targetTZ = core_date::normalise_timezone($row->timezone);
