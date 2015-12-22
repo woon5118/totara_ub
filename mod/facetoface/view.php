@@ -117,20 +117,39 @@ if (count($locations) > 2) {
 
 $rooms = facetoface_get_rooms($facetoface->id);
 if (count($rooms) > 3 || !empty($roomid)) {
-    $roomselect = array();
+    $roomselect = array(0 => get_string('allrooms', 'facetoface'));
+    $onlyrooms = $roomselect;
+    $notonlytrooms = false;
     foreach ($rooms as $rid => $room) {
-        $roomdetails = '';
-        $roomdetails .= format_string($room->name);
-        if (!empty($room->building)) {
-            $roomdetails .= ' - '.get_string('building', 'facetoface').': '.format_string($room->building);
+        $roomname = format_string($room->name);
+        if ($roomname === '') {
+            $roomname = get_string('notspecified', 'facetoface');
         }
-        if (!empty($room->address)) {
-            $roomdetails .= ' - '.get_string('address', 'facetoface').': '.format_string($room->address);
+        $roomdetails = array();
+        $building = format_string($room->building);
+        if ($building === '') {
+            $building = get_string('notspecified', 'facetoface');
+        } else {
+            $notonlytrooms = true;
         }
-        $roomselect[$rid] = $roomdetails;
+        $roomdetails[] = get_string('building', 'facetoface') . ': ' . $building;
+        $address = format_string($room->address);
+        if ($address === '') {
+            $address = get_string('notspecified', 'facetoface');
+        } else {
+            $notonlytrooms = true;
+        }
+        $roomdetails[] = get_string('address', 'facetoface') . ': ' . $address;
+        $roomdetails = implode(' - ', $roomdetails);
+        $roomselect[sha1($roomdetails)][$roomdetails][$rid] = get_string('room', 'facetoface') . ': ' . $roomname;
+        $onlyrooms[$rid] = $roomname;
+    }
+    if (!$notonlytrooms) {
+        // There are only N/As in buildings and rooms, let's just show room names.
+        $roomselect = $onlyrooms;
     }
 
-    echo $OUTPUT->single_select($PAGE->url, 'roomid', $roomselect, $roomid, array('' => get_string('filterbyroom', 'facetoface').'...'));
+    echo $OUTPUT->single_select($PAGE->url, 'roomid', $roomselect, $roomid, null, null, array('label' => get_string('filterbyroom', 'facetoface')));
 }
 
 $sessions = facetoface_get_sessions($facetoface->id, $location, $roomid);

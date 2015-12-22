@@ -5977,7 +5977,8 @@ function facetoface_get_rooms($facetofaceid) {
     $sql = "SELECT DISTINCT r.id, r.name, r.building, r.address
         FROM {facetoface_sessions} s
         JOIN {facetoface_room} r ON s.roomid = r.id
-        WHERE s.facetoface = ?";
+        WHERE s.facetoface = ?
+     ORDER BY r.address ASC, r.building ASC, r.name ASC";
 
     return $DB->get_records_sql($sql, array($facetofaceid));
 }
