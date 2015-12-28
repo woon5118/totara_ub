@@ -1610,7 +1610,12 @@ class core_renderer extends renderer_base {
             if (empty($zones)) {
                 // There are no zones, probably because there are no blocks.
                 $regions = $this->page->theme->get_all_block_regions();
-                $position = get_string('moveblockinregion', 'block', $regions[$region]);
+                if (isset($regions[$region])) {
+                    $position = get_string('moveblockinregion', 'block', $regions[$region]);
+                } else {
+                    // Totara: this must be a custom block region such as in Dashboard, let's not localise the custom region name, nobody will see it anyway.
+                    $position = get_string('moveblockinregion', 'block', $region);
+                }
             } else {
                 $position = get_string('moveblockbefore', 'block', $zones[0]);
             }
