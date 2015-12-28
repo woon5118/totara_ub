@@ -54,6 +54,34 @@ define('TOCFULLURL', 2);
 // Local Library of functions for module scorm.
 
 /**
+ * Totara: this resolves problems with non-standard PHP.ini settings that
+ * try to force caching everywhere which may break scorm badly.
+ *
+ * send_headers() is not used because it does too much and may change at any time.
+ */
+function scorm_send_headers_totara() {
+    global $CFG;
+
+    // No need to set content type here, it is already set in lib/setuplib.php.
+    // No 'X-UA-Compatible' here yet, see TL-7814.
+
+    // Do everything we can to always prevent clients and proxies caching.
+    @header('Cache-Control: no-store, no-cache, must-revalidate');
+    @header('Cache-Control: post-check=0, pre-check=0, no-transform', false);
+    @header('Pragma: no-cache');
+    @header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // From datamodel.php, why change it?
+    @header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+
+    // No byte-serving
+    @header('Accept-Ranges: none');
+
+    // Prevent click-jacking.
+    if (empty($CFG->allowframembedding)) {
+        @header('X-Frame-Options: sameorigin');
+    }
+}
+
+/**
  * @package   mod_scorm
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

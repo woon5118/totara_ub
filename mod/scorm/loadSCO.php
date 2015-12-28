@@ -50,6 +50,7 @@ if (!empty($id)) {
 $PAGE->set_url('/mod/scorm/loadSCO.php', array('scoid' => $scoid, 'id' => $cm->id));
 
 if (!isloggedin()) { // Prevent login page from being shown in iframe.
+    scorm_send_headers_totara();
     // Using simple html instead of exceptions here as shown inside iframe/object.
     echo html_writer::start_tag('html');
     echo html_writer::tag('head', '');
@@ -59,6 +60,7 @@ if (!isloggedin()) { // Prevent login page from being shown in iframe.
 }
 
 require_login($course, false, $cm, false); // Call require_login anyway to set up globals correctly.
+scorm_send_headers_totara();
 
 // Check if SCORM is available.
 scorm_require_available($scorm);
@@ -158,7 +160,8 @@ $event->add_record_snapshot('scorm', $scorm);
 $event->add_record_snapshot('scorm_scoes', $sco);
 $event->trigger();
 
-header('Content-Type: text/html; charset=UTF-8');
+// Totara: already headers fixed above.
+//header('Content-Type: text/html; charset=UTF-8');
 
 if ($sco->scormtype == 'asset') {
     // HTTP 302 Found => Moved Temporarily.
