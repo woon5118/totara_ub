@@ -225,6 +225,7 @@ class phpunit_util extends testing_util {
         core_user::reset_internal_users();
 
         // Totara specific resets.
+        \totara_core\hook\manager::phpunit_reset();
         if (class_exists('totara_core\jsend', false)) {
             \totara_core\jsend::set_phpunit_testdata(null);
         }

@@ -56,6 +56,7 @@ $string['bookings'] = 'Bookings';
 $string['bookingsfor'] = 'Bookings for ';
 $string['browse'] = 'Browse';
 $string['browsecategories'] = 'Browse Categories';
+$string['cachedef_hookwatchers'] = 'Hook watchers';
 $string['calendar'] = 'Calendar';
 $string['cannotdownloadtotaralanguageupdatelist'] = 'Cannot download list of language updates from download.totaralms.com';
 $string['cannotundeleteuser'] = 'Cannot undelete user';
