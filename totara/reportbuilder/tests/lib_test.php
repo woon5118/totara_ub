@@ -1120,6 +1120,34 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
+    public function test_get_report_sort() {
+        global $SESSION, $DB;
+        $this->resetAfterTest();
+
+        unset($SESSION->flextable);
+        $rb = new reportbuilder($this->rb->_id);
+        $this->assertSame(' ORDER BY base.id', $rb->get_report_sort());
+        $this->assertSame(' ORDER BY base.id', $rb->get_report_sort(false));
+
+        unset($SESSION->flextable);
+        $DB->set_field('report_builder', 'defaultsortcolumn', 'user_position', array('id' => $this->rb->_id));
+        $DB->set_field('report_builder', 'defaultsortorder', SORT_DESC, array('id' => $this->rb->_id));
+        $rb = new reportbuilder($this->rb->_id);
+        $this->assertSame(' ORDER BY user_position DESC, base.id', $rb->get_report_sort());
+        $this->assertSame(' ORDER BY user_position DESC, base.id', $rb->get_report_sort(false));
+
+        $SESSION->flextable[$this->rb->get_uniqueid('rb')] = array(
+            'collapse' => array(),
+            'sortby'   => array('user_organisation' => SORT_ASC),
+            'i_first'  => '',
+            'i_last'   => '',
+            'textsort' => array(),
+        );
+        $rb = new reportbuilder($this->rb->_id);
+        $this->assertSame(' ORDER BY user_organisation ASC, base.id', $rb->get_report_sort());
+        $this->assertSame(' ORDER BY user_position DESC, base.id', $rb->get_report_sort(false));
+    }
+
     // skipping tests for the following as they just print HTML
     // export_select()
     // view_button()

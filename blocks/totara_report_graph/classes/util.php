@@ -46,11 +46,8 @@ class util {
 
         $graph = new \totara_reportbuilder\local\graph($graphrecord, $report, false);
         list($sql, $params, $cache) = $report->build_query(false, true);
+        $order = $report->get_report_sort(false);
 
-        $order = '';
-        if ($report->defaultsortcolumn) {
-            $order = $report->get_report_sort();
-        }
         if ($records = $DB->get_recordset_sql($sql.$order, $params, 0, $graph->get_max_records())) {
             foreach ($records as $record) {
                 $graph->add_record($record);

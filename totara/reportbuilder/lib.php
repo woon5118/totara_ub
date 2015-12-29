@@ -3037,7 +3037,7 @@ class reportbuilder {
      *
      * @param object $table Flexible table object to use to find the sort parameters (optional)
      *                      If not provided a new object will be created based on the report's
-     *                      shortname
+     *                      shortname, false means use default sort only
      *
      * @return string SQL string to order the report to be appended to the main query
      */
@@ -3050,7 +3050,9 @@ class reportbuilder {
 
         // unless the table object is provided we need to call get_sql_sort() statically
         // and pass in the report's unique id (shortname)
-        if (!isset($table)) {
+        if ($table === false) {
+            $sort = '';
+        } else if ($table === null) {
             $sort = trim(flexible_table::get_sort_for_table($this->get_uniqueid('rb')));
         } else {
             $sort = trim($table->get_sql_sort());
