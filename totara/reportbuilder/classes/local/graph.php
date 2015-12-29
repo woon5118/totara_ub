@@ -406,16 +406,32 @@ class graph {
      * Try to fix the SVG data somehow to make it work with RTL languages.
      *
      * @param string $data
-     * @return string
+     * @param null|bool $rtl apply RTL hacks, NULL means detect RTL from current language
+     * @param null|bool $msrtlhack true means hack text anchors, NULL means true if IE/Edge detected
+     * @return string SVG markup
      */
-    protected function fix_svg_rtl($data) {
-        if (!right_to_left()) {
+    public static function fix_svg_rtl($data, $rtl = null, $msrtlhack = null) {
+        if ($rtl === null) {
+            $rtl = right_to_left();
+        }
+        if (!$rtl) {
             return $data;
         }
+
         $data = str_replace('<svg ', '<svg direction="rtl" ', $data);
-        $data = str_replace('text-anchor="end"', 'text-anchor="xxx"', $data);
-        $data = str_replace('text-anchor="start"', 'text-anchor="end"', $data);
-        $data = str_replace('text-anchor="xxx"', 'text-anchor="start"', $data);
+
+        if ($msrtlhack === null) {
+            // NOTE: Silly MS devs always read the standards in a different way, oh well...
+            //       Ignore lower IE versions because they do not support SVG,
+            //       we fallback to PDF rendering that does not support RTL anyway.
+            $msrtlhack = (\core_useragent::check_ie_version(9) || \core_useragent::is_edge());
+        }
+
+        if (!$msrtlhack) {
+            $data = str_replace('text-anchor="end"', 'text-anchor="xxx"', $data);
+            $data = str_replace('text-anchor="start"', 'text-anchor="end"', $data);
+            $data = str_replace('text-anchor="xxx"', 'text-anchor="start"', $data);
+        }
 
         return $data;
     }
@@ -466,6 +482,11 @@ class graph {
         return $settings;
     }
 
+    /**
+     * Get SVG image markup suitable for embedding in report page.
+     *
+     * @return string SVG markup
+     */
     public function fetch_svg() {
         $this->init_svggraph();
         if (!$this->svggraphtype) {
@@ -477,10 +498,17 @@ class graph {
         $svggraph->Colours($this->svggraphcolours);
         $svggraph->Values($this->shorten_labels($this->values, $settings));
         $data = $svggraph->Fetch($this->svggraphtype, false, false);
-        $data = $this->fix_svg_rtl($data);
+        $data = self::fix_svg_rtl($data, null, null);
         return $data;
     }
 
+    /**
+     * Get SVG image markup intended for graph block.
+     *
+     * NOTE: the RTL fixes are not applied because we need to cache the results.
+     *
+     * @return string SVG markup without RTL hacks
+     */
     public function fetch_block_svg() {
         $this->init_svggraph();
         if (!$this->svggraphtype) {
@@ -502,16 +530,17 @@ class graph {
         $svggraph->Colours($this->svggraphcolours);
         $svggraph->Values($this->shorten_labels($this->values, $settings));
         $data = $svggraph->Fetch($this->svggraphtype, false, false);
-        $data = $this->fix_svg_rtl($data);
         return $data;
     }
 
     /**
-     * Get SVG image markup.
+     * Get SVG image markup suitable for general export.
+     *
+     * Note: the result is NOT intended for displaying in MS browsers!
      *
      * @param int $w width of the SVG
      * @param int $h height of SVG
-     * @return string
+     * @return string SVG markup
      */
     public function fetch_export_svg($w, $h) {
         $this->init_svggraph();
@@ -524,7 +553,7 @@ class graph {
         $svggraph->Colours($this->svggraphcolours);
         $svggraph->Values($this->shorten_labels($this->values, $settings));
         $data = $svggraph->Fetch($this->svggraphtype, false, false);
-        $data = $this->fix_svg_rtl($data);
+        $data = self::fix_svg_rtl($data, null, false);
         return $data;
     }
 }

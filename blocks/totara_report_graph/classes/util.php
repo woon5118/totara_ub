@@ -72,7 +72,7 @@ class util {
             $reportfor = $USER->id;
         }
 
-        return 'r' . str_replace('-', '_', $reportorsavedid) . 'f' . $reportfor;
+        return 'r' . str_replace('-', '_', $reportorsavedid) . 'f' . $reportfor . 'l' . current_language();
     }
 
     /**
@@ -193,6 +193,9 @@ class util {
      * @void does not return
      */
     public static function send_svg($svgdata) {
+        // Try to fix RTL header as the last step because we cache the data.
+        $svgdata = \totara_reportbuilder\local\graph::fix_svg_rtl($svgdata, null, null);
+
         send_headers('image/svg+xml', false);
         echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' . "\n";
         echo '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' . "\n";
@@ -207,6 +210,9 @@ class util {
      */
     public static function send_pdf($svgdata) {
         global $CFG;
+
+        // Try to fix RTL header as the last step because we cache the data.
+        $svgdata = \totara_reportbuilder\local\graph::fix_svg_rtl($svgdata, null, false);
 
         // TODO: we could add some pdf caching here
         require_once $CFG->libdir . '/pdflib.php';
