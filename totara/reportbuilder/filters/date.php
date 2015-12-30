@@ -154,6 +154,14 @@ class rb_filter_date extends rb_filter_type {
             $mform->disabledIf($this->name.'_sdt[minute]', $this->name.'_sck', 'notchecked');
             $mform->disabledIf($this->name.'_edt[hour]', $this->name.'_eck', 'notchecked');
             $mform->disabledIf($this->name.'_edt[minute]', $this->name.'_eck', 'notchecked');
+            $mform->disabledIf($this->name.'_sdt[hour]', $this->name.'daysafterchkbox', 'checked');
+            $mform->disabledIf($this->name.'_sdt[minute]', $this->name.'daysafterchkbox', 'checked');
+            $mform->disabledIf($this->name.'_edt[hour]', $this->name.'daysafterchkbox', 'checked');
+            $mform->disabledIf($this->name.'_edt[minute]', $this->name.'daysafterchkbox', 'checked');
+            $mform->disabledIf($this->name.'_sdt[hour]', $this->name.'daysbeforechkbox', 'checked');
+            $mform->disabledIf($this->name.'_sdt[minute]', $this->name.'daysbeforechkbox', 'checked');
+            $mform->disabledIf($this->name.'_edt[hour]', $this->name.'daysbeforechkbox', 'checked');
+            $mform->disabledIf($this->name.'_edt[minute]', $this->name.'daysbeforechkbox', 'checked');
         }
 
         // set default values
@@ -179,6 +187,41 @@ class rb_filter_date extends rb_filter_type {
             }
         }
 
+    }
+
+    /**
+     * @param MoodleQuickForm $mform
+     */
+    public function definition_after_data(&$mform) {
+        // This idiotic hack is required because there is no proper validation support for grouped elements,
+        // all we want is to force numbers > 0 and disable any invalid filters.
+        // Please note that errors on filter forms result in showing of all data - surprising, right?
+
+        $values = $mform->getElementValue($this->name . '_grp');
+        $changed = false;
+
+        if (!empty($values[$this->name . 'daysbeforechkbox'])) {
+            $val = $values[$this->name . 'daysbefore'];
+            if ($val <= 0) {
+                $changed = true;
+                $values[$this->name . 'daysbeforechkbox'] = 0;
+                $values[$this->name . 'daysbefore'] = '';
+            }
+        }
+        if (!empty($values[$this->name . 'daysafterchkbox'])) {
+            $val = $values[$this->name . 'daysafter'];
+            if ($val <= 0) {
+                $changed = true;
+                $values[$this->name . 'daysafterchkbox'] = 0;
+                $values[$this->name . 'daysafter'] = '';
+            }
+        }
+
+        if ($changed) {
+            /** @var HTML_QuickForm_group $group */
+            $group = $mform->getElement($this->name . '_grp');
+            $group->setValue($values);
+        }
     }
 
     /**
@@ -259,14 +302,14 @@ class rb_filter_date extends rb_filter_type {
         $datetodayobj = new DateTime('now', core_date::get_user_timezone_object());
         $datetodayobj->setTime(0, 0, 0);
         $datetoday = $datetodayobj->getTimestamp();
-        if ($data['daysafter']) {
+        if ($data['daysafter'] and $data['daysafter'] > 0) {
             $interval = new DateInterval('P' . $data['daysafter'] . 'D');
             $daysafter = $datetodayobj->add($interval)->getTimestamp();
             $datetodayobj->sub($interval);
         } else {
             $daysafter = 0;
         }
-        if ($data['daysbefore']) {
+        if ($data['daysbefore'] and $data['daysbefore'] > 0) {
             $interval = new DateInterval('P' . $data['daysbefore'] . 'D');
             $daysbefore = $datetodayobj->sub($interval)->getTimestamp();
             $datetodayobj->add($interval);
