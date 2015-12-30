@@ -92,7 +92,7 @@ echo $OUTPUT->doctype() ?>
           </div>
           <?php } ?>
       <?php } ?>
-      <div class="footer-powered"><a href="http://www.totaralms.com/" target="_blank"><img class="logo" src="<?php echo $CFG->wwwroot.'/theme/'.$PAGE->theme->name ?>/pix/logo-ftr.png" alt="Logo" /></a></div>
+      <div class="footer-powered"><a href="http://www.totaralms.com/" target="_blank"><img class="logo" src="<?php echo $OUTPUT->pix_url('logo-ftr', 'theme_kiwifruitresponsive'); ?>" alt="Logo" /></a></div>
     <div class="footer-backtotop"><a href="#">Back to top</a></div>
       <div class="footnote">
         <div class="footer-links">
