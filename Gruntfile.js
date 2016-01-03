@@ -117,6 +117,10 @@ module.exports = function(grunt) {
                 args.push('--lint-stderr');
             }
 
+            if (grunt.option('no-color')) {
+                args.push('--color=false');
+            }
+
             var execShifter = function() {
 
                 shifter = exec("node", args, {

@@ -40,8 +40,12 @@ class core_repositorylib_testcase extends advanced_testcase {
 
         $this->resetAfterTest(true);
 
-        $this->setAdminUser();
+        $syscontext = context_system::instance();
         $repositorypluginname = 'boxnet';
+        // override repository permission
+        $capability = 'repository/' . $repositorypluginname . ':view';
+        $guestroleid = $DB->get_field('role', 'id', array('shortname' => 'guest'));
+        assign_capability($capability, CAP_ALLOW, $guestroleid, $syscontext->id, true);
 
         $plugintype = new repository_type($repositorypluginname);
         $pluginid = $plugintype->create(false);
