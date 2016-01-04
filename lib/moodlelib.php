@@ -5664,16 +5664,12 @@ function get_mailer($action='get') {
  */
 function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', $attachment = '', $attachname = '',
                        $usetrueaddress = true, $replyto = '', $replytoname = '', $wordwrapwidth = 79) {
-    global $CFG, $FULLME;
 
-    // TODO: use ical library instead
-    if (strpos($attachname, ".ics") !== false) {
-        $is_this_an_ical_request = TRUE;
-    } else {
-        $is_this_an_ical_request = FALSE;
-        if ($messagehtml && right_to_left()) {
-            $messagehtml = '<div style="text-align:right;" dir="rtl">'.$messagehtml.'</div>';
-        }
+    global $CFG;
+
+    // Totara: RTL hack that is not in upstream...
+    if ($messagehtml && right_to_left()) {
+        $messagehtml = '<div style="text-align:right;" dir="rtl">'.$messagehtml.'</div>';
     }
 
     if (empty($user) or empty($user->id)) {
@@ -5872,7 +5868,16 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
                 $attachmentpath = $CFG->dataroot . '/' . $attachmentpath;
             }
 
-            $mail->addAttachment($attachmentpath, $attachname, 'base64', $mimetype);
+            // Totara: make sure the file exists and add ical data if ics file specified as attachment.
+            if (!file_exists($attachmentpath)) {
+                debugging('Invalid file specified as attachment', DEBUG_DEVELOPER);
+
+            } else if (substr($attachname, -4) === ".ics") {
+                $mail->Ical = file_get_contents($attachmentpath);
+
+            } else {
+                $mail->addAttachment($attachmentpath, $attachname, 'base64', $mimetype);
+            }
         }
     }
 
@@ -5911,14 +5916,6 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     }
     foreach ($tempreplyto as $values) {
         $mail->addReplyTo($values[0], $values[1]);
-    }
-
-    if ($is_this_an_ical_request) {
-        $mail->ContentType = "text/calendar; name={$attachname}; method=REQUEST; charset=UTF-8";
-        $mail->Encoding = '8bit';
-        $mail->LE = "\r\n";
-        $mail->AddCustomHeader("Content-class: urn:content-classes:calendarmessage\r\n");
-        // Do not add transfer encoding here because PHPMailer does it now.
     }
 
     if ($mail->send()) {
