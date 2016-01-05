@@ -626,13 +626,10 @@ function prog_get_programs_page($categoryid="all", $sort="sortorder ASC",
         }
         if ($visible) {
             $totalcount++;
-            if ($totalcount > $limitfrom) {
+            if ($totalcount > $limitfrom && (!$limitnum || $visiblecount < $limitnum)) {
                 unset($program->isvisibletouser);
                 $visibleprograms [] = $program;
                 $visiblecount++;
-            }
-            if ($limitnum && $visiblecount == $limitnum) {
-                break;
             }
         }
     }
