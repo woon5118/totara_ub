@@ -1208,6 +1208,8 @@ class core_course_renderer extends plugin_renderer_base {
         $content .= html_writer::start_tag('div', array('class' => 'info'));
 
         // course name
+        require_once($CFG->dirroot . "/totara/core/utils.php");
+        require_once($CFG->dirroot . "/totara/coursecatalog/lib.php");
         $coursename = $chelper->get_course_formatted_name($course);
         $dimmed = totara_get_style_visibility($course);
         $coursenamelink = html_writer::link(

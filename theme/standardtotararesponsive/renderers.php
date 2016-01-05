@@ -247,6 +247,7 @@ class theme_standardtotararesponsive_core_course_renderer extends core_course_re
     protected function coursecat_coursebox(coursecat_helper $chelper, $course, $additionalclasses = '') {
         global $CFG;
 
+        require_once($CFG->dirroot . "/totara/core/utils.php");
         require_once($CFG->dirroot . "/totara/coursecatalog/lib.php");
 
         if (!isset($this->strings->summary)) {
