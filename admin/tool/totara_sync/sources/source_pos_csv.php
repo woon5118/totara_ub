@@ -114,7 +114,8 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
     }
 
     function config_save($data) {
-        $this->set_config('delimiter', $data->{'delimiter'});
+        // Make sure we use a tab character for the delimiter, if a tab is selected.
+        $this->set_config('delimiter', $data->{'delimiter'} == '\t' ? "\t" : $data->{'delimiter'});
         $this->set_config('csvposencoding', $data->{'csvposencoding'});
 
         parent::config_save($data);

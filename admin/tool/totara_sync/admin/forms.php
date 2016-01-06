@@ -105,6 +105,11 @@ class totara_sync_source_settings_form extends moodleform {
         unset($data->import_idnumber);
         unset($data->import_timemodified);
 
+        // All the other's delimiter characters will work as they are but tab need to be converted.
+        if (isset($data->delimiter) && $data->delimiter == "\t") {
+            $data->delimiter = '\t';
+        }
+
         if ($this->elementname == 'pos' || $this->elementname == 'org') {
             unset($data->import_fullname);
             unset($data->import_frameworkidnumber);
