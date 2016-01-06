@@ -76,41 +76,44 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
          */
         totaraDialog_handler_addremoveattendees.prototype.submit = function() {
 
-            var handler = this;
-            var url = M.cfg.wwwroot + '/mod/facetoface/editattendees.php?s=' + M.totara_f2f_attendees.config.sessionid + '&action=' + M.totara_f2f_attendees.config.action + '&onlycontent=1&save=1';
-
-            // Grab new attendees list
-            var attendees = $('input[name=attendees]', handler._container);
-            url += '&attendees='+attendees.val();
+            var handler = this,
+                url = M.cfg.wwwroot + '/mod/facetoface/editattendees.php',
+                attendees = $('input[name=attendees]', handler._container),
+                params = {
+                    s: M.totara_f2f_attendees.config.sessionid,
+                    action: M.totara_f2f_attendees.config.action,
+                    onlycontent: 1,
+                    save: 1,
+                    attendees: attendees.val(),
+                    sesskey: M.cfg.sesskey
+                };
 
             // check if screen errored. If it has, change nothing!
-            if ($('input[name=attendees]').length == 0)
-            {
-                url += '&clear=true';
-            } // end if - attendee field does not exist
+            if (attendees.length == 0) {
+                params.clear = 'true';
+            }
 
             // Grab suppressemail value.
             if ($('#suppressemail:checked', handler._container).length) {
-                url += '&suppressemail=1';
+                params.suppressemail = 1;
             }
 
             // Grab suppressccmanager value.
             if ($('#suppressccmanager:checked', handler._container).length) {
-                url += '&suppressccmanager=1';
+                params.suppressccmanager = 1;
             }
 
             // Grab ignoreapproval value
             if ($('input#ignoreapproval:checked', handler._container).length) {
-                url += '&ignoreapproval=1';
+                params.ignoreapproval = 1;
             }
 
             this._dialog._request(
-                    url,
-                    {
-                        object: handler,
-                        method: '_updatePage'
-                    }
-                );
+                url,
+                {object: handler, method: '_updatePage'},
+                'POST',
+                params
+            );
         };
 
         /**
