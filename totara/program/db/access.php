@@ -181,7 +181,7 @@ $capabilities = array(
     ),
 
     'totara/program:markstaffcoursecomplete' => array(
-        'riskbitmask' => RISK_DATALOSS || RISK_PERSONAL,
+        'riskbitmask' => RISK_DATALOSS | RISK_PERSONAL,
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
