@@ -969,6 +969,7 @@ $string['type_course_custom_fields'] = 'Course Custom Fields';
 $string['type_facetoface'] = 'Face to face';
 $string['type_org_type'] = 'Organisation custom fields';
 $string['type_pos_type'] = 'Position custom fields';
+$string['type_dp_plan_evidence'] = 'Evidence';
 $string['type_prog'] = 'Program';
 $string['type_statistics'] = 'Statistics';
 $string['type_tags'] = 'Tags';

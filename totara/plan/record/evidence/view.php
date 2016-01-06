@@ -38,10 +38,6 @@ if (totara_feature_disabled('recordoflearning')) {
 }
 
 $evidenceid = required_param('id', PARAM_INT); // evidence assignment id
-$rolstatus = optional_param('status', 'all', PARAM_ALPHA);
-if (!in_array($rolstatus, array('active','completed','all'))) {
-    $rolstatus = 'all';
-}
 
 if (!$evidence = $DB->get_record('dp_plan_evidence', array('id' => $evidenceid))) {
     print_error('error:evidenceidincorrect', 'totara_plan');
@@ -91,14 +87,14 @@ $PAGE->navbar->add(get_string('allevidence', 'totara_plan'));
 
 $PAGE->set_title($strheading);
 $PAGE->set_heading(format_string($SITE->fullname));
-dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', $rolstatus);
+dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', 'none', false);
 echo $OUTPUT->header();
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
 
 echo $OUTPUT->heading($strheading);
 
-dp_print_rol_tabs($rolstatus, 'evidence', $userid);
+dp_print_rol_tabs(null, 'evidence', $userid);
 
 echo html_writer::tag('p', $OUTPUT->action_link($indexurl,
         get_string('backtoallx', 'totara_plan', get_string('evidenceplural', 'totara_plan'))));

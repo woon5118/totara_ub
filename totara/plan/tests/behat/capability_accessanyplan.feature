@@ -39,15 +39,13 @@ Feature: Verify capability accessanyplan.
     And I click on "Record of Learning" in the totara menu
     And I press "Add evidence"
     And I set the following fields to these values:
-      | Evidence name        | Website 1                  |
-      | Evidence Link        | http://www.website1.com    |
+      | Evidence name        | My Evidence 1                  |
     And I press "Add evidence"
     Then I should see "Evidence created"
 
     When I press "Add evidence"
     And I set the following fields to these values:
-      | Evidence name        | Website 2                  |
-      | Evidence Link        | http://www.website2.com    |
+      | Evidence name        | My Evidence 2                  |
     And I press "Add evidence"
     Then I should see "Evidence created"
 

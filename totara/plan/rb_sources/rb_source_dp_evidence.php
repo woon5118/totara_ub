@@ -59,16 +59,8 @@ class rb_source_dp_evidence extends rb_base_source {
             (SELECT
                 e.id,
                 e.name,
-                e.description,
                 e.userid,
-                e.evidencelink,
-                e.institution,
-                e.datecompleted,
                 e.readonly,
-                CASE
-                    WHEN e.datecompleted > 0 THEN 'completed'
-                    ELSE 'active'
-                END AS rolstatus,
                 e.evidencetypeid,
                 et.name AS evidencetypename,
                 CASE
@@ -124,10 +116,17 @@ class rb_source_dp_evidence extends rb_base_source {
     private function define_joinlist() {
         global $CFG;
 
-        $joinlist = array();
-
         // to get access to position type constants
         require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_join.php');
+
+        $joinlist = array();
+        $joinlist[] = new rb_join(
+            'dp_plan_evidence',
+            'LEFT',
+            '{dp_plan_evidence}',
+            'dp_plan_evidence.id = base.id',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE
+        );
 
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
         $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
@@ -171,61 +170,17 @@ class rb_source_dp_evidence extends rb_base_source {
         );
 
         $columnoptions[] = new rb_column_option(
-                'evidence',
-                'description',
-                get_string('description'),
-                'base.description',
-                array(
-                    'displayfunc' => 'description',
-                    'nosort' => true,
-                    'dbdatatype' => 'text',
-                    'outputformat' => 'text',
-                    'extrafields' => array(
-                        'evidence_id' => 'base.id',
-                    ),
-                )
-        );
-
-        $columnoptions[] = new rb_column_option(
-                'evidence',
-                'attachmentlink',
-                get_string('attachment', 'rb_source_dp_evidence'),
-                'base.id',
-                array(
-                    'displayfunc' => 'attachmentlink',
-                    'extrafields' => array(
-                        'userid' => 'base.userid',
-                        'evidenceid' => 'base.id',
-                    ),
-                    'nosort' => true,
-                )
-        );
-
-        $columnoptions[] = new rb_column_option(
             'evidence',
-            'evidencelink',
-            get_string('evidencelink', 'rb_source_dp_evidence'),
-            'base.evidencelink',
+            'viewevidencelink',
+            get_string('viewevidencelink', 'rb_source_dp_evidence'),
+            'base.name',
             array(
-                'displayfunc' => 'evidencelink',
+                'defaultheading' => get_string('viewevidence', 'rb_source_dp_evidence'),
+                'displayfunc' => 'viewevidencelink',
+                'extrafields' => array(
+                    'evidence_id' => 'base.id',
+                ),
             )
-        );
-
-        $columnoptions[] = new rb_column_option(
-            'evidence',
-            'institution',
-            get_string('institution', 'rb_source_dp_evidence'),
-            'base.institution',
-            array('dbdatatype' => 'char',
-                  'outputformat' => 'text')
-        );
-
-        $columnoptions[] = new rb_column_option(
-            'evidence',
-            'datecompleted',
-            get_string('datecompleted', 'rb_source_dp_evidence'),
-            'base.datecompleted',
-            array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -295,13 +250,6 @@ class rb_source_dp_evidence extends rb_base_source {
 
         $filteroptions[] = new rb_filter_option(
                 'evidence',
-                'description',
-                get_string('evidencedescription', 'rb_source_dp_evidence'),
-                'textarea'
-        );
-
-        $filteroptions[] = new rb_filter_option(
-                'evidence',
                 'evidencetypeid',
                 get_string('evidencetype', 'rb_source_dp_evidence'),
                 'select',
@@ -327,15 +275,7 @@ class rb_source_dp_evidence extends rb_base_source {
             array(
                 'type' => 'evidence',
                 'value' => 'namelink',
-            ),
-            array(
-                'type' => 'evidence',
-                'value' => 'description',
-            ),
-            array(
-                'type' => 'evidence',
-                'value' => 'datecompleted',
-            ),
+            )
         );
         return $defaultcolumns;
     }
@@ -385,12 +325,19 @@ class rb_source_dp_evidence extends rb_base_source {
                 'base.userid',
                 'base'
         );
-        $paramoptions[] = new rb_param_option(
-                'rolstatus',
-                'base.rolstatus'
-        );
 
         return $paramoptions;
+    }
+
+    /**
+     * Generate the evidence link to the details page
+     * @param string $evidence evidence name
+     * @param object $row Object containing other fields
+     * @return string
+     */
+    public function rb_display_viewevidencelink($evidence, $row) {
+        $url = new moodle_url('/totara/plan/record/evidence/view.php', array('id' => $row->evidence_id ));
+        return html_writer::link($url, get_string('viewevidence', 'rb_source_dp_evidence'));
     }
 
     /**
@@ -400,18 +347,19 @@ class rb_source_dp_evidence extends rb_base_source {
      * @param object $row Object containing other fields
      * @return string
      */
-    public function rb_display_evidenceview($evidence, $row) {
-        $url = new moodle_url('/totara/plan/record/evidence/view.php', array('id' => $row->evidence_id ));
-        return html_writer::link($url, $evidence);
+    public function rb_display_evidenceview($evidencename, $row, $isexport) {
+        if ($isexport) {
+            return $evidencename;
+        } else {
+            $url = new moodle_url('/totara/plan/record/evidence/view.php', array('id' => $row->evidence_id ));
+            $evidencename = empty($evidencename) ? '(' .get_string('viewevidence', 'rb_source_dp_evidence') . ')' : $evidencename;
+            return html_writer::link($url, $evidencename);
+        }
     }
 
     public function rb_display_evidencelink($evidencelink, $row) {
         global $OUTPUT;
         return $OUTPUT->action_link(new moodle_url($evidencelink), $evidencelink);
-    }
-
-    public function rb_display_attachmentlink($attachment, $row) {
-        return evidence_display_attachment($row->userid, $row->evidenceid);
     }
 
     public function rb_display_actionlinks($evidenceid, $row) {

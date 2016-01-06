@@ -56,6 +56,9 @@ class customfield_file extends base {
                 case 'pos_type':
                     $prefix = 'position';
                     break;
+                case 'dp_plan_evidence':
+                    $prefix = 'evidence';
+                    break;
                 case 'comp_type':
                     $prefix = 'competency';
                     break;

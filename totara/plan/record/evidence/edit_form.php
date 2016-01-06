@@ -19,6 +19,7 @@
  *
  * @author Aaron Wells <aaronw@catalyst.net.nz>
  * @author Russell England <russell.england@totaralms.com>
+ * @author Simon Player <simon.player@totaralms.com>
  * @package totara
  * @subpackage plan
  */
@@ -44,15 +45,15 @@ class plan_evidence_edit_form extends moodleform {
      * @global object $DB
      */
     function definition() {
-        global $DB, $TEXTAREA_OPTIONS, $FILEPICKER_OPTIONS;
+        global $DB;
 
         $mform =& $this->_form;
+        $item = $this->_customdata['item'];
 
         // Determine permissions from evidence
         $evidenceid = isset($this->_customdata['evidenceid']) ? $this->_customdata['evidenceid'] : 0;
         $userid = isset($this->_customdata['userid']) ? $this->_customdata['userid'] : 0;
         $evidencetypeid = isset($this->_customdata['evidencetypeid']) ? $this->_customdata['evidencetypeid'] : null;
-        $fileoptions = isset($this->_customdata['fileoptions']) ? $this->_customdata['fileoptions'] : $FILEPICKER_OPTIONS;
 
         $mform->addElement('hidden', 'id', $evidenceid);
         $mform->setType('id', PARAM_INT);
@@ -62,10 +63,6 @@ class plan_evidence_edit_form extends moodleform {
 
         $mform->addElement('text', 'name', get_string('evidencename', 'totara_plan'));
         $mform->setType('name', PARAM_TEXT);
-        $mform->addRule('name', get_string('err_required', 'form'), 'required', '', 'client', false, false);
-
-        $mform->addElement('editor', 'description_editor', get_string('evidencedescription', 'totara_plan'), null, $TEXTAREA_OPTIONS);
-        $mform->setType('description_editor', PARAM_RAW);
 
         // Evidence type
         $selectoptions = $DB->get_records_select_menu('dp_evidence_type', null, null, 'sortorder', 'id, name');
@@ -82,38 +79,11 @@ class plan_evidence_edit_form extends moodleform {
                     get_string('evidencetype', 'totara_plan'), get_string('noevidencetypesdefined', 'totara_plan'));
         }
 
-        $mform->addElement('text', 'evidencelink', get_string('evidencelink', 'totara_plan'));
-        $mform->setType('evidencelink', PARAM_URL);
-
-        $mform->addElement('text', 'institution', get_string('evidenceinstitution', 'totara_plan'));
-        $mform->setType('institution', PARAM_TEXT);
-
-        $mform->addElement('date_selector', 'datecompleted',
-                get_string('evidencedatecompleted', 'totara_plan'), array('optional' => true));
-
-        $mform->addElement('filemanager', 'attachment_filemanager',
-                get_string('attachment', 'totara_plan'), null, $fileoptions);
+        // Next show the custom fields.
+        customfield_definition($mform, $item, 'evidence', 0, 'dp_plan_evidence', true);
 
         $this->add_action_buttons(true, empty($this->_customdata['id']) ?
                 get_string('addevidence', 'totara_plan') : get_string('updateevidence', 'totara_plan'));
     }
 
-    /**
-     * Check the unlisted URL is a URL
-     */
-    function validation($data, $files) {
-
-        $errors = parent::validation($data, $files);
-
-        $evidencelink = $this->_form->_submitValues['evidencelink'];
-
-        if (!empty($evidencelink)) {
-            $evidencelinktotest = clean_param($evidencelink, PARAM_URL);
-            if (empty($evidencelinktotest)) {
-                $errors['evidencelink'] = get_string('evidencelinkerror', 'totara_plan');
-            }
-        }
-
-        return $errors;
-    }
 }

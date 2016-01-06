@@ -136,6 +136,9 @@ abstract class rb_base_source {
                 case '{goal_personal}':
                     $joindata['add_custom_personal_goal_fields'] = 'goal_personal';
                     break;
+                case '{dp_plan_evidence}':
+                    $joindata['add_custom_evidence_fields'] = 'dp_plan_evidence';
+                    break;
             }
         }
         //now ensure customfields fields are added if there are no joins but the base table is customfield-related
@@ -163,6 +166,10 @@ abstract class rb_base_source {
                 break;
             case '{goal_personal}':
                 $joindata['add_custom_personal_goal_fields'] = 'base';
+                break;
+            case '{dp_plan_evidence}':
+                $joindata['add_custom_evidence_fields'] = 'base';
+                break;
         }
         //and then use the flags to call the appropriate add functions
         foreach ($joindata as $joinfunction => $jointable) {
@@ -4072,6 +4079,17 @@ abstract class rb_base_source {
                                             $filteroptions);
     }
 
+
+
+    protected function add_custom_evidence_fields(array &$joinlist, array &$columnoptions,
+        array &$filteroptions, $basetable = 'dp_plan_evidence') {
+        return $this->add_custom_fields_for('dp_plan_evidence',
+                                            $basetable,
+                                            'evidenceid',
+                                            $joinlist,
+                                            $columnoptions,
+                                            $filteroptions);
+    }
 
     /**
      * Adds course custom fields to the report

@@ -23,6 +23,7 @@
  */
 
 $string['actiondoesnotexist'] = 'The action specified does not exist.';
+$string['availableevdiencecustomfields'] = 'Available Evidence Custom Fields';
 $string['commonsettings'] = 'Common settings';
 $string['confirmfielddeletionnodata'] = 'Are you sure you want to delete this field?';
 $string['confirmfielddeletionplural'] = 'There are {$a} records for this field which will be deleted. <br />Do you still wish to delete this field?';

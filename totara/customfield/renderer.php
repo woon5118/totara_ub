@@ -189,6 +189,9 @@ class totara_customfield_renderer extends plugin_renderer_base {
             case 'course':
                 $strheading = get_string('coursecustomfields', 'totara_customfield');
                 break;
+            case 'evidence':
+                $strheading = get_string('availableevdiencecustomfields', 'totara_customfield');
+                break;
             default:
                 $strheading = format_string($heading);
                 break;

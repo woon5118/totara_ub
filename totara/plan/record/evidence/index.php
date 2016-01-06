@@ -36,12 +36,7 @@ if (totara_feature_disabled('recordoflearning')) {
 $userid = optional_param('userid', $USER->id, PARAM_INT); // Which user to show, default to current user.
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT); // Export format.
-$rolstatus = optional_param('status', 'all', PARAM_ALPHA);
 $debug  = optional_param('debug', 0, PARAM_INT);
-
-if (!in_array($rolstatus, array('active','completed','all'))) {
-    $rolstatus = 'all';
-}
 
 if (!$user = $DB->get_record('user', array('id' => $userid))) {
     print_error('error:usernotfound', 'totara_plan');
@@ -50,7 +45,7 @@ if (!$user = $DB->get_record('user', array('id' => $userid))) {
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('report');
-$PAGE->set_url('/totara/plan/record/evidence/index.php', array('userid' => $userid, 'format' => $format, 'status' => $rolstatus));
+$PAGE->set_url('/totara/plan/record/evidence/index.php', array('userid' => $userid, 'format' => $format));
 
 if ($USER->id == $userid) {
     $strheading = get_string('recordoflearning', 'totara_core');
@@ -73,9 +68,6 @@ if ($USER->id == $userid) {
 }
 
 $reportfilters = array('userid' => $userid);
-if ($rolstatus != 'all') {
-    $reportfilters['rolstatus'] = $rolstatus;
-}
 $report = reportbuilder_get_embedded_report('plan_evidence', $reportfilters, false, $sid);
 
 if ($debug) {
@@ -103,7 +95,7 @@ $PAGE->set_title($strheading);
 $PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_button($report->edit_button());
 $PAGE->set_totara_menu_selected($menuitem);
-dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', $rolstatus);
+dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', 'none', false);
 
 echo $OUTPUT->header();
 
@@ -111,7 +103,7 @@ echo $OUTPUT->container_start('', 'dp-plan-content');
 
 echo $OUTPUT->heading($strheading.' : '.$strsubheading);
 
-dp_print_rol_tabs($rolstatus, 'evidence', $userid);
+dp_print_rol_tabs(null, 'evidence', $userid);
 
 $report->display_restrictions();
 
