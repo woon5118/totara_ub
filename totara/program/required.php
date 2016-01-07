@@ -67,7 +67,7 @@ if ($programid) {
     $program = new program($programid);
 }
 
-if (isset($program) && prog_required_for_user($programid, $userid)) {
+if (isset($program) && $program->user_is_assigned($userid)) {
     if (prog_is_accessible($program)) {
 
         // Apply course enrolments before redirecting here.

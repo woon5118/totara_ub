@@ -2025,17 +2025,17 @@ function prog_required_for_user($progid, $userid) {
 function prog_display_link_icon($progid, $userid = null) {
     global $OUTPUT, $USER, $DB;
 
-    $prog = $DB->get_record('prog', array('id' => $progid));
+    $prog = new program($progid);
     $user = isset($userid) ? $DB->get_record('user', array('id' => $userid)) : $USER;
 
     $accessibility = prog_check_availability($prog->availablefrom, $prog->availableuntil);
     $accessible = $accessibility == AVAILABILITY_TO_STUDENTS;
-    $required = prog_required_for_user($prog->id, $user->id);
+    $assigned = $prog->user_is_assigned($user->id);
 
     $progicon = totara_get_icon($prog->id, TOTARA_ICON_TYPE_PROGRAM);
     $icon = html_writer::empty_tag('img', array('src' => $progicon, 'class' => 'course_icon', 'alt' => ''));
 
-    if ($required && $accessible) {
+    if ($assigned && $accessible) {
         $url = new moodle_url('/totara/program/required.php', array('id' => $prog->id, 'userid' => $user->id));
         $html = $OUTPUT->action_link($url, $icon . $prog->fullname);
     } else if ($accessible) {
