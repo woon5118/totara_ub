@@ -1679,8 +1679,6 @@ function assign_archive_completion($userid, $courseid, $windowopens = NULL) {
 
             // Reset viewed.
             $completion->set_module_viewed_reset($cm, $userid);
-            // And reset completion, in case viewed is not a required condition.
-            $completion->update_state($cm, COMPLETION_INCOMPLETE, $userid);
         }
         $completion->invalidatecache($courseid, $userid, true);
     }

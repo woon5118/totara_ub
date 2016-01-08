@@ -542,6 +542,7 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals(16, count($progcompletionzeropost));
     }
 
+<<<<<<< HEAD
     public function test_prog_update_available_enrolments_with_one_program() {
         global $DB;
 
@@ -2573,4 +2574,176 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
         $this->assertArrayHasKey($program3->id, $programs2);
         $this->assertArrayNotHasKey($program4->id, $programs2);
     }
-}
+
+    public function test_prog_set_status_complete() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        /* @var totara_program_generator $programgenerator */
+        $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        /* @var core_completion_generator $completiongenerator */
+        $completiongenerator = $this->getDataGenerator()->get_plugin_generator('core_completion');
+
+        // Set up some stuff.
+        $user1 = $this->getDataGenerator()->create_user(); // Control user.
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $prog1 = $this->getDataGenerator()->create_program();
+        $prog2 = $this->getDataGenerator()->create_program(); // Control program.
+
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $course3 = $this->getDataGenerator()->create_course();
+        $course4 = $this->getDataGenerator()->create_course(); // Control course.
+
+        $programgenerator->add_courses_and_courseset_to_program($prog1, array(array($course1), array($course2), array($course3)), CERTIFPATH_STD);
+        $programgenerator->add_courses_and_courseset_to_program($prog2, array(array($course4)), CERTIFPATH_STD);
+
+        $this->getDataGenerator()->assign_to_program($prog1->id, ASSIGNTYPE_INDIVIDUAL, $user1->id);
+        $this->getDataGenerator()->assign_to_program($prog1->id, ASSIGNTYPE_INDIVIDUAL, $user2->id);
+        $this->getDataGenerator()->assign_to_program($prog2->id, ASSIGNTYPE_INDIVIDUAL, $user2->id);
+
+        // Create some course set group completion records (with timecompleted).
+        $now = time();
+        $user1course1timecompleted = $now - DAYSECS * 10; // Recent, other user.
+        $user2course4timecompleted = $now - DAYSECS * 10; // Recent, other course.
+        $user2course1timecompleted = $now - DAYSECS * 30;
+        $user2course2timecompleted = $now - DAYSECS * 20; // Expected timecompleted - most recent relevant.
+        // Capture all events, so that we're not prematurely triggering program completion.
+        $completiongenerator->complete_course($course1, $user1, $user1course1timecompleted);
+        $completiongenerator->complete_course($course4, $user2, $user2course4timecompleted);
+        $completiongenerator->complete_course($course1, $user2, $user2course1timecompleted);
+        $completiongenerator->complete_course($course2, $user2, $user2course2timecompleted);
+        // Don't complete the third course, because it would mark the program complete.
+
+        // Before doing the positive test, check that the function will fail correctly.
+        $prefailprogcompletion = prog_load_completion($prog1->id, $user2->id);
+
+        // First with some invalid data - timecompleted can only be > 0 if status is complete.
+        $DB->set_field('prog_completion', 'timecompleted', 123, array('programid' => $prog1->id, 'userid' => $user2->id, 'coursesetid' => 0));
+        $this->assertFalse(prog_set_status_complete($prog1->id, $user2->id, 'Testing fail 1 prog_set_status_complete'));
+        $latestlog = $DB->get_records('prog_completion_log', array(), 'id DESC', '*', 0, 1);
+        $latestlog = reset($latestlog);
+        $this->assertEquals($prog1->id, $latestlog->programid);
+        $this->assertEquals($user2->id, $latestlog->userid);
+        $this->assertStringStartsWith('Tried to set status to Complete, but failed because current completion data is invlaid', $latestlog->description);
+
+        // Second when the status is already complete.
+        $DB->set_field('prog_completion', 'status', STATUS_PROGRAM_COMPLETE, array('programid' => $prog1->id, 'userid' => $user2->id, 'coursesetid' => 0));
+        $this->assertFalse(prog_set_status_complete($prog1->id, $user2->id, 'Testing fail 2 prog_set_status_complete'));
+        $latestlog = $DB->get_records('prog_completion_log', array(), 'id DESC', '*', 0, 1);
+        $latestlog = reset($latestlog);
+        $this->assertEquals($prog1->id, $latestlog->programid);
+        $this->assertEquals($user2->id, $latestlog->userid);
+        $this->assertStringStartsWith('Tried to set status to Complete, but current status is not Incomplete', $latestlog->description);
+
+        // Now do the positive test. Before we start, put the program completion record back to the way it should be.
+        prog_write_completion($prefailprogcompletion);
+        $progcompletion = prog_load_completion($prog1->id, $user2->id);
+        $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status);
+        $this->assertEquals(0, $progcompletion->timecompleted);
+
+        // Run the function and capture the event.
+        $sink = $this->redirectEvents();
+        $this->assertTrue(prog_set_status_complete($prog1->id, $user2->id, 'Testing pass prog_set_status_complete'));
+        $events = $sink->get_events();
+
+        // Check the prog_completion record has been updated to complete.
+        $progcompletion = prog_load_completion($prog1->id, $user2->id);
+        $this->assertEquals(STATUS_PROGRAM_COMPLETE, $progcompletion->status);
+        $this->assertEquals($user2course2timecompleted, $progcompletion->timecompleted); // Correct timecompleted was selected.
+
+        // Check the event.
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $this->assertInstanceOf('\totara_program\event\program_completed', $event);
+        $this->assertEquals($prog1->id, $event->objectid);
+        $this->assertEquals($user2->id, $event->userid);
+
+        // Check the log.
+        $latestlog = $DB->get_records('prog_completion_log', array(), 'id DESC', '*', 0, 1);
+        $latestlog = reset($latestlog);
+        $this->assertEquals($prog1->id, $latestlog->programid);
+        $this->assertEquals($user2->id, $latestlog->userid);
+        $this->assertStringStartsWith('Testing pass prog_set_status_complete', $latestlog->description);
+    }
+
+    public function test_prog_create_completion() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        // Set up some stuff.
+        $user = $this->getDataGenerator()->create_user();
+
+        $prog = $this->getDataGenerator()->create_program();
+        $cert = $this->getDataGenerator()->create_certification();
+
+        // Record created successfully.
+        $timebefore = time();
+        prog_create_completion($prog->id, $user->id);
+        $timeafter = time();
+        $progcompletion = prog_load_completion($prog->id, $user->id);
+        $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status);
+        $this->assertEquals(0, $progcompletion->timecompleted);
+        $this->assertEquals(COMPLETION_TIME_NOT_SET, $progcompletion->timedue);
+        $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
+        $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+
+        // Check the log.
+        $latestlog = $DB->get_records('prog_completion_log', array(), 'id DESC', '*', 0, 1);
+        $latestlog = reset($latestlog);
+        $this->assertEquals($prog->id, $latestlog->programid);
+        $this->assertEquals($user->id, $latestlog->userid);
+        $this->assertStringStartsWith('Created prog_completion in prog_create_completion', $latestlog->description);
+
+        // Shift the prog_completion record to a non-zero courseset, then try creating the record again, to see that
+        // having a non-zero courseset record does not interfere.
+        $DB->set_field('prog_completion', 'coursesetid', 789,
+            array('programid' => $prog->id, 'userid' => $user->id, 'coursesetid' => 0));
+
+        // Record created successfully.
+        $timebefore = time();
+        prog_create_completion($prog->id, $user->id);
+        $timeafter = time();
+        $progcompletion = prog_load_completion($prog->id, $user->id);
+        $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status);
+        $this->assertEquals(0, $progcompletion->timecompleted);
+        $this->assertEquals(COMPLETION_TIME_NOT_SET, $progcompletion->timedue);
+        $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
+        $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+
+        // Check the log.
+        $oldlog = $latestlog;
+        $latestlog = $DB->get_records('prog_completion_log', array(), 'id DESC', '*', 0, 1);
+        $latestlog = reset($latestlog);
+        $this->assertEquals($prog->id, $latestlog->programid);
+        $this->assertEquals($user->id, $latestlog->userid);
+        $this->assertStringStartsWith('Created prog_completion in prog_create_completion', $latestlog->description);
+        $this->assertNotEquals($oldlog->id, $latestlog->id);
+
+        // Check that nothing happens if the record already exists.
+        $progcompletion->status = 123;
+        $progcompletion->timestarted = 234;
+        $progcompletion->timedue = 345;
+        $progcompletion->timecompleted = 456;
+        $DB->update_record('prog_completion', $progcompletion); // Make the existing record unique so we will know it is unchanged.
+        prog_create_completion($prog->id, $user->id);
+        $newprogcompletion = prog_load_completion($prog->id, $user->id);
+        $this->assertEquals($progcompletion, $newprogcompletion);
+
+        // Check that no new log has been created.
+        $newlatestlog = $DB->get_records('prog_completion_log', array(), 'id DESC', '*', 0, 1);
+        $newlatestlog = reset($newlatestlog);
+        $this->assertEquals($latestlog, $newlatestlog);
+
+        // Check that we get an exception if we try to do it with a certification.
+        try {
+            prog_create_completion($cert->id, $user->id);
+            $this->fail('Expected exception!');
+        } catch (coding_exception $e) {
+            $this->assertEquals('Coding error detected, it must be fixed by a programmer: Tried to create a prog_completion record for a certification using prog_create_completion',
+                $e->getMessage());
+        }
+    }

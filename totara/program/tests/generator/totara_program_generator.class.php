@@ -578,7 +578,7 @@ class totara_program_generator extends component_generator_base {
             $rawdata->{$prefix.'label'} = "Course Set {$coursesetnum}";
             $rawdata->{$prefix.'sortorder'} = $sortorder;
             $rawdata->{$prefix.'contenttype'} = 1;
-            $rawdata->{$prefix.'nextsetoperator'} = '';
+            $rawdata->{$prefix.'nextsetoperator'} = NEXTSETOPERATOR_THEN;
             $rawdata->{$prefix.'completiontype'} = 1;
             $rawdata->{$prefix.'timeallowedperiod'} = 2;
             $rawdata->{$prefix.'timeallowednum'} = 1;

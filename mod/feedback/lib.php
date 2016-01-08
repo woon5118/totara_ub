@@ -3404,8 +3404,6 @@ function feedback_archive_completion($userid, $courseid, $windowopens = NULL) {
                 $course_module = get_coursemodule_from_instance('feedback', $completed->feedback, $courseid);
                 // Reset viewed
                 $completion->set_module_viewed_reset($course_module, $userid);
-                // And reset completion, in case viewed is not a required condition
-                $completion->update_state($course_module, COMPLETION_INCOMPLETE, $userid);
             }
         }
         $completion->invalidatecache($courseid, $userid, true);

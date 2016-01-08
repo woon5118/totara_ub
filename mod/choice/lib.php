@@ -133,8 +133,6 @@ function choice_archive_completion($userid, $courseid, $windowopens = NULL) {
             $DB->delete_records('choice_answers', array('id' => $submission->answerid));
             // Reset viewed.
             $completion->set_module_viewed_reset($cm, $userid);
-            // And reset completion, in case viewed is not a required condition.
-            $completion->update_state($cm, COMPLETION_INCOMPLETE, $userid);
         }
         $completion->invalidatecache($courseid, $userid, true);
     }

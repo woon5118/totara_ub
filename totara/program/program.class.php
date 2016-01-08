@@ -865,39 +865,41 @@ class program {
 
         $now = time();
 
-        // insert a completion record to store the status of the user's progress on the program
-        // TO DO: eventually we need to have multiple completion records, linked to the assignment that made them
-        $prog_completions = array();
-        $progcompletionlogs = array();
-        foreach ($users as $userid => $assigndata) {
-            // Only create program completion records if needed.
-            if (empty($assigndata['needscompletionrecord'])) {
-                continue;
-            }
-            $pc = new stdClass();
-            $pc->programid = $this->id;
-            $pc->userid = $userid;
-            $pc->coursesetid = 0;
-            $pc->status = STATUS_PROGRAM_INCOMPLETE;
-            $pc->timecreated = $now;
-            $pc->timestarted = 0;
-            $pc->timecompleted = 0;
-            $pc->timedue = $assigndata['timedue'];
-            $prog_completions[] = $pc;
+        // Create prog_completion records. For certifications, this is done by certif_create_completion, which is
+        // run in response to the \totara_program\event\program_assigned events.
+        if (!$this->certifid) {
+            // insert a completion record to store the status of the user's progress on the program
+            // TO DO: eventually we need to have multiple completion records, linked to the assignment that made them
+            $prog_completions = array();
+            $progcompletionlogs = array();
+            foreach ($users as $userid => $assigndata) {
+                // Only create program completion records if needed.
+                if (empty($assigndata['needscompletionrecord'])) {
+                    continue;
+                }
+                $pc = new stdClass();
+                $pc->programid = $this->id;
+                $pc->userid = $userid;
+                $pc->coursesetid = 0;
+                $pc->status = STATUS_PROGRAM_INCOMPLETE;
+                $pc->timestarted = $now;
+                $pc->timedue = $assigndata['timedue'];
+                $prog_completions[] = $pc;
 
-            // Prepare a program log which can be written to the db in bulk, by bypassing the program log function.
-            $pcl = new stdClass();
-            $pcl->programid = $this->id;
-            $pcl->userid = $userid;
-            $pcl->changeuserid = $USER->id;
-            $pcl->description = prog_calculate_completion_description($pc, 'Program completion created in assign_learners_bulk');
-            $pcl->timemodified = $now;
-            $progcompletionlogs[] = $pcl;
+                // Prepare a program log which can be written to the db in bulk, by bypassing the program log function.
+                $pcl = new stdClass();
+                $pcl->programid = $this->id;
+                $pcl->userid = $userid;
+                $pcl->changeuserid = $USER->id;
+                $pcl->description = prog_calculate_completion_description($pc, 'Program completion created in assign_learners_bulk');
+                $pcl->timemodified = $now;
+                $progcompletionlogs[] = $pcl;
+            }
+            $DB->insert_records_via_batch('prog_completion', $prog_completions);
+            unset($prog_completions);
+            $DB->insert_records_via_batch('prog_completion_log', $progcompletionlogs);
+            unset($progcompletionlogs);
         }
-        $DB->insert_records_via_batch('prog_completion', $prog_completions);
-        unset($prog_completions);
-        $DB->insert_records_via_batch('prog_completion_log', $progcompletionlogs);
-        unset($progcompletionlogs);
 
         // Insert a user assignment record to store the details of how this user was assigned to the program.
         $user_assignments = array();
@@ -1273,8 +1275,13 @@ class program {
      * @param int $userid
      * @param array $completionsettings Contains the field values for the record
      * @return bool|int
+     *
+     * @deprecated since Totara 10. See TL-9072. Instead use prog_set_status_complete, certif_set_status_xxx.
      */
     public function update_program_complete($userid, $completionsettings) {
+        debugging('program::update_program_complete has been deprecated since Totara 10.',
+            DEBUG_DEVELOPER);
+
         global $CFG, $DB;
 
         $progcompleted_eventtrigger = false;

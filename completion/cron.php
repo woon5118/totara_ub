@@ -210,7 +210,7 @@ function completion_cron_criteria() {
 /**
  * Aggregate each user's criteria completions
  */
-function completion_cron_completions() {
+function completion_cron_completions($userid = 0) {
     global $DB;
 
     if (debugging()) {
@@ -239,8 +239,13 @@ function completion_cron_completions() {
         AND crc.reaggregate > 0
         AND crc.reaggregate < :timestarted
     ';
+    $params = array('timestarted' => $timestarted);
 
-    $rs = $DB->get_recordset_sql($sql, array('timestarted' => $timestarted));
+    if ($userid) {
+        $sql .= "AND crc.userid = :userid";
+        $params['userid'] = $userid;
+    }
+    $rs = $DB->get_recordset_sql($sql, $params);
 
     // Grab records for current user/course
     foreach ($rs as $record) {

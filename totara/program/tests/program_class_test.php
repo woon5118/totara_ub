@@ -410,13 +410,14 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
     /**
      * Tests the program->display_completion_record_reason method when a user is assigned via a learning plan.
      *
-     * Note that we use the dataProvider to test this with certifications as well as programs.
-     * Certifications are currently not supported by learning plans (at the time of writing this test),
-     * but I've included certs for now since it is still passing.
-     *
      * @dataProvider program_type
      */
     public function test_display_completion_record_reason_learningplan($type) {
+        // If certifications are ever added to learning plans then we should test them here. Some changes will be needed.
+        if ($type == 'certification') {
+            return;
+        }
+
         $this->resetAfterTest(true);
 
         /** @var program $program1 */
@@ -1542,10 +1543,11 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->assertEquals(0, $program->get_progress($user->id));
 
         // Mark the program complete for the user, and check it is now 100% complete.
-        $program->update_program_complete($user->id, [
-            'status' => STATUS_PROGRAM_COMPLETE,
-            'timecompleted' => time()
-        ]);
+        $progcompletion = prog_load_completion($program->id, $user->id);
+        $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $progcompletion->timestarted = time();
+        $progcompletion->timecompleted = time();
+        prog_write_completion($progcompletion);
         $this->assertEquals(100, $program->get_progress($user->id));
 
         // Lets test completing the first course set.
@@ -1593,10 +1595,11 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->program_generator->assign_program($program->id, [$user_complete->id, $user_incomplete->id]);
 
         // Mark one user as complete.
-        $program->update_program_complete($user_complete->id, [
-            'status' => STATUS_PROGRAM_COMPLETE,
-            'timecompleted' => time()
-        ]);
+        $progcompletion = prog_load_completion($program->id, $user_complete->id);
+        $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $progcompletion->timestarted = time();
+        $progcompletion->timecompleted = time();
+        prog_write_completion($progcompletion);
 
         // Test fetching just the all users.
         $learners = $program->get_program_learners();
@@ -1640,10 +1643,11 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $this->program_generator->assign_program($program->id, [$user_complete->id, $user_incomplete->id]);
 
         // Mark one user as complete.
-        $program->update_program_complete($user_complete->id, [
-            'status' => STATUS_PROGRAM_COMPLETE,
-            'timecompleted' => time()
-        ]);
+        $progcompletion = prog_load_completion($program->id, $user_complete->id);
+        $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $progcompletion->timestarted = time();
+        $progcompletion->timecompleted = time();
+        prog_write_completion($progcompletion);
 
         // Mark the other user as started.
         $program->update_program_complete($user_incomplete->id, [
@@ -1696,10 +1700,11 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $program = new program($program->id);
 
         // Mark one user as complete.
-        $program->update_program_complete($user_complete->id, [
-            'status' => STATUS_PROGRAM_COMPLETE,
-            'timecompleted' => time()
-        ]);
+        $progcompletion = prog_load_completion($program->id, $user_complete->id);
+        $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $progcompletion->timestarted = time();
+        $progcompletion->timecompleted = time();
+        prog_write_completion($progcompletion);
 
         // Now we want to mark the incomplete user complete in courses in the first courseset.
         $coursesets = $program->get_content()->get_course_sets();
@@ -1849,10 +1854,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $certification = new program($certificationid);
 
         // Mark one user as complete.
-        $certification->update_program_complete($user_complete->id, [
-            'status' => STATUS_PROGRAM_COMPLETE,
-            'timecompleted' => time()
-        ]);
+        certif_set_state_certified($certification->id, $user_complete->id);
 
         // Now we want to mark the incomplete user complete in courses in the first courseset.
         $coursesets = $certification->get_content()->get_course_sets();

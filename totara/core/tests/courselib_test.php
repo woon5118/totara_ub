@@ -378,6 +378,14 @@ class totara_core_courselib_testcase extends reportcache_advanced_testcase {
         $twodaysago = time() - DAYSECS * 2;
         $onehourago = time() - HOURSECS;
         $onedayinfuture = time() + DAYSECS;
+
+        // Run course completion archive for all users, so that activities can trigger completion again.
+        archive_course_completion($this->user1->id, $course1->id);
+        archive_course_completion($this->user2->id, $course1->id);
+        archive_course_completion($this->user3->id, $course1->id);
+        archive_course_completion($this->user4->id, $course1->id);
+        archive_course_completion($this->user5->id, $course1->id);
+
         // Run the function for all users in the certification.
         archive_course_activities($this->user1->id, $course1->id, $twodaysago);
         archive_course_activities($this->user2->id, $course1->id, $onedayinfuture);
@@ -386,14 +394,32 @@ class totara_core_courselib_testcase extends reportcache_advanced_testcase {
         archive_course_activities($this->user5->id, $course1->id, $onedayinfuture);
 
         // Now check all that those that should have been reset were, and those that shouldn't are still in the same state.
-        // First of all the modules in course1.
         $f2fmodulecompletions =
             $DB->get_records('course_modules_completion', array('coursemoduleid' => $facetoface1->cmid), '', 'userid, completionstate');
-        // User1's window was before the f2f, so it shouldn't have been reset.
-        $this->assertEquals(COMPLETION_COMPLETE, $f2fmodulecompletions[$this->user1->id]->completionstate);
+        // User1's window was before the f2f. The module completion record was reset, but the f2f session was not marked archived.
+        $this->assertFalse(isset($f2fmodulecompletions[$this->user1->id]));
         $this->assertFalse(isset($f2fmodulecompletions[$this->user2->id]));
         $this->assertFalse(isset($f2fmodulecompletions[$this->user3->id]));
         // User4's window was in the past but will have definitely been after the f2f. It should have been reset.
+        $this->assertFalse(isset($f2fmodulecompletions[$this->user4->id]));
+        $this->assertFalse(isset($f2fmodulecompletions[$this->user5->id]));
+        // User6's module completion record wasn't reset at all.
+        $this->assertEquals(COMPLETION_COMPLETE, $f2fmodulecompletions[$this->user6->id]->completionstate);
+
+        // Create new course_completions records (they will have the reaggregate flag set).
+        completion_start_user_bulk();
+
+        // Aggregate completion. This will recreate user1's module completion record, based on their non-archived f2f session.
+        completion_cron_completions();
+
+        // Check again. This time, user1 has been reaggreagted to complete.
+        $f2fmodulecompletions =
+            $DB->get_records('course_modules_completion', array('coursemoduleid' => $facetoface1->cmid), '', 'userid, completionstate');
+        // User1's module completion was recreated, because the f2f session was not marked archived.
+        $this->assertEquals(COMPLETION_COMPLETE, $f2fmodulecompletions[$this->user1->id]->completionstate);
+        // None of the others were changed.
+        $this->assertFalse(isset($f2fmodulecompletions[$this->user2->id]));
+        $this->assertFalse(isset($f2fmodulecompletions[$this->user3->id]));
         $this->assertFalse(isset($f2fmodulecompletions[$this->user4->id]));
         $this->assertFalse(isset($f2fmodulecompletions[$this->user5->id]));
         $this->assertEquals(COMPLETION_COMPLETE, $f2fmodulecompletions[$this->user6->id]->completionstate);

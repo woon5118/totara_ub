@@ -206,7 +206,11 @@ class totara_plan_lib_testcase extends advanced_testcase {
 
         $program_generator->assign_to_program($program->id, ASSIGNTYPE_INDIVIDUAL, $user->id, null, true);
 
-        $program->update_program_complete($user->id, array('status' => STATUS_PROGRAM_COMPLETE));
+        $progcompletion = prog_load_completion($program->id, $user->id);
+        $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $progcompletion->timestarted = time();
+        $progcompletion->timecompleted = time();
+        prog_write_completion($progcompletion);
 
         $visible_tabs = dp_get_rol_tabs_visible($user->id);
         $this->assertContains('programs', $visible_tabs);

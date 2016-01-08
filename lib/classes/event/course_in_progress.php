@@ -35,8 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  * @author     David Curry <david.curry@totaralearning.com>
  * @since      Totara 9.1
  */
-class course_in_progress extends \core\event\base {
-
+class course_in_progress extends base {
     /**
      * Initialise required event data properties.
      */

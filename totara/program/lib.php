@@ -29,6 +29,7 @@ require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/totara/program/program.class.php');
 require_once($CFG->dirroot . '/totara/certification/lib.php'); // For the constants
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 
 /**
  * Can logged in user view user's required learning
@@ -1293,6 +1294,9 @@ function prog_process_extensions($extensionslist, $reasonfordecision = array()) 
 /**
  * Update program completion status for particular user
  *
+ * This function also results in the creation of prog_completion courseset group records, which will be marked
+ * complete where appropriate.
+ *
  * @param int $userid
  * @param program $program if not set - all programs will be updated
  * @param int $courseid if provided (and $program is not) then only programs related to this course will be updated
@@ -1301,8 +1305,6 @@ function prog_process_extensions($extensionslist, $reasonfordecision = array()) 
  *     This argument is ignored if no program was provided.
  */
 function prog_update_completion($userid, program $program = null, $courseid = null, $useriscomplete = null) {
-    global $DB;
-
     if (!$program) {
         // Well they can't possibly have completed it.
         $useriscomplete = null; // As noted this is ignored.
@@ -1354,13 +1356,16 @@ function prog_update_completion($userid, program $program = null, $courseid = nu
 
         // Go through the course set groups to determine the user's completion status.
         foreach ($courseset_groups as $courseset_group) {
+            // Get the status of this course set group. If the prog_completion courseset group record
+            // is not already complete then its completion status will be recalculated and updated.
             $courseset_group_completed = prog_courseset_group_complete($courseset_group, $userid);
 
             if (!$courseset_group_completed) {
-                // If the user has not completed the course group the program is not complete.
+                // If the user has not completed the course group then the program is not complete.
                 // Set the timedue for the course set in this group with the shortest
                 // time allowance so that course set due reminders will be triggered
-                // at the appropriate time.
+                // at the appropriate time. Will create a prog_completion courseset group record if
+                // it does not exist, otherwise it will do nothing.
                 $program_content->set_courseset_group_timedue($courseset_group, $userid);
                 break;
             }
@@ -1368,21 +1373,89 @@ function prog_update_completion($userid, program $program = null, $courseid = nu
 
         // Courseset_group_completed will be true if all the course groups in the program have been completed.
         if ($courseset_group_completed) {
-            // Get maximum completion date of the coursesets in the current path.
-            $sql = "SELECT MAX(pc.timecompleted) AS timecompleted
-                      FROM {prog_completion} pc
-                      JOIN {prog_courseset} pcs ON pcs.id = pc.coursesetid
-                     WHERE pc.programid = ? AND pc.userid = ? AND pcs.certifpath = ?";
-            $params = array($program->id, $userid, $path);
-            $coursesetcompletion = $DB->get_record_sql($sql, $params);
-
-            $completionsettings = array(
-                'status'        => STATUS_PROGRAM_COMPLETE,
-                'timecompleted' => $coursesetcompletion->timecompleted
-            );
-            $program->update_program_complete($userid, $completionsettings);
+            if ($program->certifid) {
+                certif_create_completion($program->id, $userid); // In case the records are missing.
+                certif_set_state_certified($program->id, $userid);
+            } else {
+                prog_create_completion($program->id, $userid); // In case the record is missing.
+                prog_set_status_complete($program->id, $userid);
+            }
         }
     }
+}
+
+/**
+ * Mark a user's program as complete.
+ *
+ * This action is only valid if the user is currently incomplete.
+ * If called while in any other state then the action will be logged but no debugging or exception will be triggered.
+ *
+ * @param int $programid
+ * @param int $userid
+ * @param string $message If provided, will override the default program completion log message.
+ * @return bool true if the record was successfully updated
+ */
+function prog_set_status_complete($programid, $userid, $message = '') {
+    global $DB;
+
+    $progcompletion = prog_load_completion($programid, $userid);
+
+    // Ensure that the existing data is valid (don't modify invalid data, because we'll just make it worse).
+    $errors = prog_get_completion_errors($progcompletion);
+    if (!empty($errors)) {
+        prog_write_completion_log($programid, $userid,
+            'Tried to set status to Complete, but failed because current completion data is invlaid. Message was:<br>' . $message);
+        return false;
+    }
+
+    // State can only be changed to completed if it is incomplete.
+    if ($progcompletion->status != STATUS_PROGRAM_INCOMPLETE) {
+        prog_write_completion_log($programid, $userid,
+            'Tried to set status to Complete, but current status is not Incomplete. Message was:<br>' . $message);
+        return false;
+    }
+
+    // Get the completion date of the last courseset to use in program completion.
+    // Note: this differs from certs, which use course timecompleted, although the result should be the same.
+    $sql = "SELECT MAX(timecompleted) AS timecompleted
+              FROM {prog_completion}
+             WHERE programid = :programid AND userid = :userid AND coursesetid <> 0";
+    $params = array('programid' => $programid, 'userid' => $userid);
+    $coursesetcompletion = $DB->get_field_sql($sql, $params);
+
+    $jobassignment = \totara_job\job_assignment::get_first($userid, false);
+
+    $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+    $progcompletion->timecompleted = $coursesetcompletion;
+    if ($jobassignment) {
+        $progcompletion->positionid = $jobassignment->positionid;
+        $progcompletion->organisationid = $jobassignment->organisationid;
+    } else {
+        $progcompletion->positionid = null;
+        $progcompletion->organisationid = null;
+    }
+
+    if (empty($message)) {
+        $message = 'User completed program';
+    }
+
+    // Save the change (performs data validation and logging).
+    prog_write_completion($progcompletion, $message);
+
+    // Trigger an event to notify any listeners that this program has been completed.
+    $event = \totara_program\event\program_completed::create(
+        array(
+            'objectid' => $programid,
+            'context' => context_program::instance($programid),
+            'userid' => $userid,
+            'other' => array(
+                'certifid' => 0,
+            ),
+        )
+    );
+    $event->trigger();
+
+    return true;
 }
 
 /**
@@ -2483,10 +2556,16 @@ function prog_get_completion_errors($progcompletion) {
             if ($progcompletion->timecompleted > 0) {
                 $errors['error:stateincomplete-timecompletednotempty'] = 'timecompleted';
             }
+            if (!empty($progcompletion->coursesetid)) {
+                $errors['error:stateincomplete-coursesetidnotzero'] = 'coursesetid';
+            }
             break;
         case STATUS_PROGRAM_COMPLETE:
             if ($progcompletion->timecompleted <= 0) {
                 $errors['error:statecomplete-timecompletedempty'] = 'timecompleted';
+            }
+            if (!empty($progcompletion->coursesetid)) {
+                $errors['error:stateincomplete-coursesetidnotzero'] = 'coursesetid';
             }
             break;
         default:
@@ -2863,6 +2942,7 @@ function prog_write_completion($progcompletion, $message = '', $ignoreproblemkey
 
     // Ensure the record matches the database records.
     if ($isinsert) {
+        // Checks that the program exists and the prog_completion doesn't already exist.
         $sql = "SELECT prog.id, prog.certifid, pc.id AS pcid
                   FROM {prog} prog
              LEFT JOIN {prog_completion} pc
@@ -2883,6 +2963,7 @@ function prog_write_completion($progcompletion, $message = '', $ignoreproblemkey
             $message = "Completion record created";
         }
     } else {
+        // Checks that the prog_completion exists, is for the correct user and program (not cert).
         $sql = "SELECT pc.id, prog.certifid
                   FROM {prog_completion} pc
                   JOIN {prog} prog
@@ -3001,7 +3082,7 @@ function prog_calculate_completion_description($progcompletion, $message = '') {
     }
 
     if (empty($message)) {
-        $message = 'Completion record edited';
+        $message = 'Completion record logged';
     }
 
     $description = $message . '<br>' .
@@ -3092,7 +3173,12 @@ function prog_write_courseset_completion($cscompletion, $message = '') {
 }
 
 /**
- * Delete program course set completion records, logging it in the prog completion log.
+ * Delete program course set group completion records, logging it in the prog completion log.
+ *
+ * This function is intended to be used by the program and certification completion editors. It allows course set group
+ * completion records to be reset when a user is changed from some complete state to some incomplete state, thus allowing
+ * the state of those records to be automatically recalculated (happens as part of prog_update_completion). The user will
+ * then be required to complete the earliest incomplete course set group before they can continue to later ones.
  *
  * Note that the $path param should only be used for certifications, not normal programs. This is not checked by the function.
  *
@@ -3723,6 +3809,8 @@ function prog_find_orphaned_exceptions($programid = 0, $userid = 0, $progorcert 
  * If $data is specified, the resulting prog_completion record must be error-free, or else the record will
  * not be created! Check the result of this function to ensure that the record was successfully created.
  *
+ * This function does not work with certifications. Use certif_create_completion instead.
+ *
  * @param int $programid
  * @param int $userid
  * @param array $data containing any field => values that should be set, overriding the defaults
@@ -3730,7 +3818,20 @@ function prog_find_orphaned_exceptions($programid = 0, $userid = 0, $progorcert 
  * @return true if the record was successfully created or updated.
  */
 function prog_create_completion($programid, $userid, $data = array(), $message = '') {
+    global $DB;
     $now = time();
+
+    // Check that the prog_completion record doesn't already exist.
+    if ($DB->record_exists('prog_completion', array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0))) {
+        // If it already exists then do nothing.
+        return;
+    }
+
+    // Check that this is not a certification.
+    $program = $DB->get_record('prog', array('id' => $programid));
+    if (!empty($program->certifid)) {
+        throw new coding_exception('Tried to create a prog_completion record for a certification using prog_create_completion');
+    }
 
     $progcompletion = new stdClass();
     $progcompletion->programid = $programid;

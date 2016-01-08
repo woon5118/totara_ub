@@ -455,7 +455,7 @@ class completion_completion extends data_object {
             //Auto plan completion hook
             dp_plan_item_updated($this->userid, 'course', $this->course);
 
-            // Program completion hook.
+            // Program completion hook. Ideally this would be removed and programs would have an event listener.
             prog_update_completion($this->userid, null, $this->course);
         }
 
@@ -1047,9 +1047,11 @@ function completion_status_aggregate($method, $data, &$state) {
  * This function bulk creates course completion records.
  *
  * @param   integer     $courseid       Course ID default 0 indicates update all courses
+ * @param   integer     $userid         User ID default 0 indicates update all users
+ * @return  bool
  */
-function completion_start_user_bulk($courseid = 0) {
-    global $CFG, $DB, $USER;
+function completion_start_user_bulk($courseid = 0, $userid = 0) {
+    global $CFG, $DB;
 
     if (empty($CFG->enablecompletion)) {
         // Never create completion records if site completion is disabled.
@@ -1064,6 +1066,12 @@ function completion_start_user_bulk($courseid = 0) {
 
     $now = time();
     $nowstring = \core_completion\helper::format_log_date($now);
+
+    if ($userid) {
+        $usersql = "AND ui.userid = :userid";
+    } else {
+        $usersql = "";
+    }
 
     /*
      * A quick explaination of this horrible looking query
@@ -1151,6 +1159,7 @@ function completion_start_user_bulk($courseid = 0) {
             c.enablecompletion = 1
         AND crc.id IS NULL
         {$coursesql}
+        {$usersql}
         AND ue.status = :userenrolstatus
         AND e.status = :instanceenrolstatus
         AND (ue.timeend > :timeendafter OR ue.timeend = 0)
@@ -1169,6 +1178,9 @@ function completion_start_user_bulk($courseid = 0) {
     );
     if ($courseid) {
         $params['courseid'] = $courseid;
+    }
+    if ($courseid) {
+        $params['userid'] = $userid;
     }
 
     $transaction = $DB->start_delegated_transaction();

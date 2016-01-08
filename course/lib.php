@@ -3564,11 +3564,15 @@ function compare_activities_by_time_asc($a, $b) {
 /**
  * Archives activities, with the archive feature, for a specified user and course
  *
+ * In the past, this function could trigger re-completion, but now it must not. You should re-check completion after
+ * this function has finished.
+ *
  * @global moodle_database $DB
  * @global object $CFG
  * @param int $userid
  * @param int $courseid
  * @param int $windowopens  The time the window opens, so we can act differently for historic uploads
+ * @return bool true (always)
  */
 function archive_course_activities($userid, $courseid, $windowopens = NULL) {
     global $DB, $CFG;
@@ -3642,13 +3646,7 @@ function archive_course_activities($userid, $courseid, $windowopens = NULL) {
                     }
 
                     $completion->invalidatecache($courseid, $userid, true);
-
-                    // Still running update_state despite the deletion above, as there may be activity-specific
-                    // records that were not archived by the _archive_completion function above that
-                    // should lead to re-completion.
-                    $completion->update_state($cm, COMPLETION_UNKNOWN, $userid);
                 }
-
             }
         }
     }
@@ -3678,6 +3676,7 @@ function course_change_visibility($courseid, $show = true) {
  * @global object $CFG
  * @param int $userid
  * @param int $courseid
+ * @return bool true if course completions existed, else false
  */
 function archive_course_completion($userid, $courseid) {
     global $DB, $CFG, $COMPLETION_STATUS;

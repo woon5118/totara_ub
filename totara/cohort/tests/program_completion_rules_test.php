@@ -192,13 +192,11 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
         foreach ($this->userprograms as $programid => $users) {
             $program = new program($programid);
             foreach ($users as $userid) {
-                $completionsettings = array(
-                    'status'        => STATUS_PROGRAM_COMPLETE,
-                    'timecreated'   => $timecreated[$userid],
-                    'timestarted'   => $timestarted[$userid],
-                    'timecompleted' => $timecompleted[$userid],
-                );
-                $program->update_program_complete($userid, $completionsettings);
+                $progcompletion = prog_load_completion($programid, $userid);
+                $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+                $progcompletion->timestarted = $timestarted[$userid];
+                $progcompletion->timecompleted = $timecompleted[$userid];
+                prog_write_completion($progcompletion);
             }
         }
 
@@ -206,42 +204,32 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
         $j = 1;
         foreach ($usersprogram3 as $userid) {
             if ($j <= 4) {
-                $completionsettings = array(
-                    'status' => STATUS_PROGRAM_COMPLETE,
-                    'timecreated' => $timecreated[$userid],
-                    'timestarted'   => $timestarted[$userid],
-                    'timecompleted' => $timecompleted[$userid],
-                );
+                $progcompletion = prog_load_completion($program->id, $userid);
+                $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+                $progcompletion->timestarted = $timestarted[$userid];
+                $progcompletion->timecompleted = $timecompleted[$userid];
+                prog_write_completion($progcompletion);
             } else {
-                $completionsettings = array(
-                    'status' => STATUS_PROGRAM_INCOMPLETE,
-                    'timecreated' => $timecreated[$userid],
-                    'timestarted'   => $timestarted[$userid],
-                    'timecompleted' => 0,
-                );
+                $progcompletion = prog_load_completion($program->id, $userid);
+                $progcompletion->timestarted = $timestarted[$userid];
+                prog_write_completion($progcompletion);
             }
-            $program->update_program_complete($userid, $completionsettings);
             $j++;
         }
         $program = new program($this->program4->id);
         $j = 1;
         foreach ($usersprogram3 as $userid) {
             if ($j <= 2) {
-                $completionsettings = array(
-                    'status' => STATUS_PROGRAM_COMPLETE,
-                    'timecreated' => $timecreated[$userid],
-                    'timestarted'   => $timestarted[$userid],
-                    'timecompleted' => $timecompleted[$userid],
-                );
+                $progcompletion = prog_load_completion($program->id, $userid);
+                $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+                $progcompletion->timestarted = $timestarted[$userid];
+                $progcompletion->timecompleted = $timecompleted[$userid];
+                prog_write_completion($progcompletion);
             } else {
-                $completionsettings = array(
-                    'status' => STATUS_PROGRAM_INCOMPLETE,
-                    'timecreated' => $timecreated[$userid],
-                    'timestarted'   => $timestarted[$userid],
-                    'timecompleted' => 0,
-                );
+                $progcompletion = prog_load_completion($program->id, $userid);
+                $progcompletion->timestarted = $timestarted[$userid];
+                prog_write_completion($progcompletion);
             }
-            $program->update_program_complete($userid, $completionsettings);
             $j++;
         }
 
@@ -303,16 +291,14 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
             // Make completion in the future to test this rule.
             $days = 1;
             $users = $this->userprograms[$this->program2->id];
-            foreach ($users as $user) {
-                $timecreated = $this->teststart - ($days * DAYSECS);
-                $timecompleted = $this->teststart + ($days * DAYSECS);
-                $program = new program($this->program2->id);
-                $completionsettings = array(
-                    'status'        => STATUS_PROGRAM_COMPLETE,
-                    'timecreated'   => $timecreated,
-                    'timecompleted' => $timecompleted
-                );
-                $program->update_program_complete($user, $completionsettings);
+            foreach ($users as $userid) {
+                $timestarted = $now - ($days * DAYSECS);
+                $timecompleted = $now + ($days * DAYSECS);
+                $progcompletion = prog_load_completion($this->program2->id, $userid);
+                $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+                $progcompletion->timestarted = $timestarted;
+                $progcompletion->timecompleted = $timecompleted;
+                prog_write_completion($progcompletion);
                 $days= $days + 2;
             }
         }

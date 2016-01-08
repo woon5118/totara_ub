@@ -1671,9 +1671,6 @@ function scorm_archive_completion($userid, $courseid, $windowopens = NULL) {
         // Reset viewed.
         $course_module = get_coursemodule_from_instance('scorm', $scorm->id, $courseid);
         $completion->set_module_viewed_reset($course_module, $userid);
-
-        // And reset completion, as a fail safe.
-        $completion->update_state($course_module, COMPLETION_INCOMPLETE, $userid);
     }
     $completion->invalidatecache($courseid, $userid, true);
 }

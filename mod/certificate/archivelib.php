@@ -64,8 +64,6 @@ function certificate_archive_completion($userid, $courseid, $windowopens = NULL)
 
                 // Reset viewed
                 $completion->set_module_viewed_reset($course_module, $userid);
-                // And reset completion, in case viewed is not a required condition
-                $completion->update_state($course_module, COMPLETION_INCOMPLETE, $userid);
 
                 // Delete original
                 $DB->delete_records('certificate_issues', array('id' => $cert->id));

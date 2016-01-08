@@ -40,9 +40,16 @@ define('COMPLETION_TEST_COURSES_CREATED', 3);
 
 class core_completion_course_completion_testcase extends reportcache_advanced_testcase {
 
+    public $user1, $user2, $user3, $users;
+    public $program;
+    public $course1, $course2, $course3;
+    public $certificate1, $certificate2, $certificate3;
+    public $coursemodule1, $coursemodule2, $coursemodule3;
+    public $completioninfo1, $completioninfo2, $completioninfo3;
+
     /** This setUp will create: three users (user1, user2, user3), three courses (course1, course2, course3),
      *  one certification program with course1 as certification content path and course2 as re-certification path.
-     *  Each course will have a certification activity which will be used as a criterion for completion.
+     *  Each course will have a certificate activity which will be used as a criterion for completion.
      *  The enrollments will be as follow:
      *  user1 will be enrolled to course1 and course2 via certification program and course3 via manual,
      *  user2 will be enrolled to course1 and course2 via certification program and
@@ -79,9 +86,6 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
             $this->assertEquals(COMPLETION_ENABLED, $this->{"completioninfo".$i}->is_enabled());
         }
 
-        // Courses to complete.
-        $this->coursestocomplete = array($this->course1->id, $this->course3->id);
-
         // Verify there isn't any certificate activity.
         $this->assertEquals(0, $DB->count_records('certificate'));
 
@@ -103,16 +107,12 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         $this->assertEquals(3, $DB->count_records('certificate'));
 
         // Create completion based on the certificate activity that each course has.
+        /* @var core_completion_generator $cgen */
+        $cgen = $this->getDataGenerator()->get_plugin_generator('core_completion');
+
         for ($i = 1; $i <= COMPLETION_TEST_COURSES_CREATED; $i++) {
-            $courseid = $this->{"course".$i}->id;
-            $activityid = $this->{"certificate".$i}->id;
-            $data = new stdClass();
-            $data->course = $courseid;
-            $data->id = $activityid;
-            $data->overall_aggregation = COMPLETION_AGGREGATION_ANY;
-            $data->criteria_activity_value = array($activityid => 1);
-            $criterion = new completion_criteria_activity();
-            $criterion->update_config($data);
+            $cgen->enable_completion_tracking($this->{"course".$i});
+            $cgen->set_activity_completion($this->{"course".$i}->id, array($this->{"certificate".$i}));
         }
 
         // Create a certification program.
@@ -120,7 +120,7 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
             'cert_learningcomptype' => CERTIFTYPE_PROGRAM,
             'cert_activeperiod' => '3 day',
             'cert_windowperiod' => '3 day',
-            'cert_recertifydatetype' => CERTIFRECERT_EXPIRY,
+            'cert_recertifydatetype' => CERTIFRECERT_COMPLETION,
             'cert_timemodified' => time(),
             'prog_fullname' => 'Certification Program1',
             'prog_shortname' => 'CP1',
@@ -150,6 +150,32 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         $this->assertEquals(5, $DB->count_records('user_enrolments'), 'Record count mismatch for enrollments');
     }
 
+
+    /**
+     * Make sure that mark_inprogress triggers the course_in_progress event.
+     */
+    public function test_course_in_progress() {
+        $this->resetAfterTest();
+
+        $ccdetails = array(
+            'course' => $this->course2->id,
+            'userid' => $this->user3->id,
+        );
+
+        $cc = new completion_completion($ccdetails);
+
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        $cc->mark_inprogress(time());
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        $this->assertInstanceOf('\core\event\course_in_progress', $event);
+        $this->assertEquals($this->course2->id, $event->courseid);
+        $this->assertEquals($this->user3->id, $event->relateduserid);
+    }
+
     /** This function will make users to complete the courses via criteria completion by viewing the certificate activity,
      *  make the user1 to complete the certification program one day before today and run the certification_cron to open
      *  the re-certification window. So, we can test that criteria completion records are deleted (when the cron runs)
@@ -164,14 +190,13 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         // Check there isn't data in course_completion_crit_compl.
         $this->assertEquals(0, $DB->count_records('course_completion_crit_compl'),'Record count mismatch for completion');
 
-        // Make all users complete courses by viewing the certifications.
+        // Add user1 to course2 - this will also be reset when the window opens.
+        $this->getDataGenerator()->enrol_user($this->user1->id, $this->course2->id);
+
+        // Make all users complete in their courses by viewing the certificates.
         $this->assertEquals(0, $DB->count_records('certificate_issues'));
         for ($i = 1; $i <= COMPLETION_TEST_COURSES_CREATED; $i++) {
             $courseid = $this->{"course".$i}->id;
-            // Verify the course is in the courses group we want to complete.
-            if (!in_array($courseid, $this->coursestocomplete)) {
-                continue;
-            }
 
             $coursecontext = context_course::instance($courseid);
             foreach ($this->users as $user) {
@@ -189,49 +214,54 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
                 // Complete the certificate.
                 $this->{"completioninfo".$i}->set_module_viewed($this->{"coursemodule".$i}, $user->id);
 
-                // Check its completed.
+                // Check it is completed.
                 $completionstate = $DB->get_field('course_modules_completion', 'completionstate', $params, MUST_EXIST);
                 $this->assertEquals(COMPLETION_COMPLETE, $completionstate);
-
-                // Call function to complete the activities for the courses.
-                $params = array(
-                    'userid'     => $user->id,
-                    'course'     => $courseid,
-                    'criteriaid' => COMPLETION_CRITERIA_TYPE_ACTIVITY
-                );
-                $completion = new completion_criteria_completion($params);
-                $completion->mark_complete();
             }
         }
-        // Check records in course_completion_crit_compl.
-        $this->assertEquals(5, $DB->count_records('course_completion_crit_compl'), 'Record count mismatch for crit_compl');
 
-        // Make user1 to complete the certification with completion date 1 day before today.
-        $paramscompletion = array('userid' => $this->user1->id, 'course' => $this->course1->id);
-        $completion_completion = new completion_completion($paramscompletion);
-        $completion_completion->mark_complete(time() - DAYSECS);
+        // When marking certificates complete using "set_module_viewed()" (above), it used the current date as
+        // completion date. To cause window open, we need to move the window open date backwards. Also move
+        // timecompleted backwards to prevent certification validation errors.
+        $backsecs = 30 * DAYSECS;
+        $DB->execute('UPDATE {certif_completion}
+                         SET timewindowopens = timewindowopens - ' . $backsecs .',
+                             timecompleted = timecompleted - ' . $backsecs);
+        $DB->execute('UPDATE {prog_completion}
+                         SET timecompleted = timecompleted - ' . $backsecs);
+
+        // Check records in course_completion_crit_compl.
+        $this->assertEquals(6, $DB->count_records('course_completion_crit_compl'), 'Record count mismatch for crit_compl');
+        $completions = array(
+            $this->user1->id => $this->course1->id,
+            $this->user1->id => $this->course2->id,
+            $this->user1->id => $this->course3->id,
+            $this->user2->id => $this->course1->id,
+            $this->user3->id => $this->course3->id,
+            $this->user3->id => $this->course1->id
+        );
+        foreach ($completions as $key => $value) {
+            $conditions = array('userid' => $key, 'course' => $value);
+            $this->assertTrue($DB->record_exists('course_completions', $conditions));
+            $this->assertTrue($DB->record_exists('course_completion_crit_compl', $conditions));
+        }
 
         // Verify timecomplete for the certification is not null.
         $certification = $DB->get_record('certif_completion', array('certifid' => $this->program->certifid, 'userid' => $this->user1->id));
         $this->assertNotNull($certification->timecompleted, 'Time completed is NULL');
 
         // Run the cron.
-        ob_start();
         $certcron = new \totara_certification\task\update_certification_task();
         $certcron->execute();
-        ob_end_clean();
 
-        /* As the re-certification windows is opened, the completion record for user1-course1 should be deleted
-         * because it is part of the certification program and user1 already complete course1.
-         * So we should see completion records just for user2-course1, user1-course3, user3-course3 and user3-course1. */
-        $this->assertEquals(4, $DB->count_records('course_completion_crit_compl'));
+        // The course completion crit compl records for user1 and user2 in the courses that are in the
+        // certification should have been removed.
+        $this->assertEquals(3, $DB->count_records('course_completion_crit_compl'));
         $completions = array(
             $this->user1->id => $this->course3->id,
-            $this->user2->id => $this->course1->id,
             $this->user3->id => $this->course3->id,
             $this->user3->id => $this->course1->id
         );
-
         foreach ($completions as $key => $value) {
             $conditions = array('userid' => $key, 'course' => $value);
             $this->assertTrue($DB->record_exists('course_completions', $conditions));
@@ -271,10 +301,12 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
             $this->assertEquals(COMPLETION_COMPLETE, $completionstate);
 
             // Call function to complete the activities for the courses.
+            $criteria = $DB->get_record('course_completion_criteria',
+                array('course' => $course->id, 'criteriatype' => COMPLETION_CRITERIA_TYPE_ACTIVITY));
             $params = array(
                 'userid'     => $user->id,
                 'course'     => $course->id,
-                'criteriaid' => COMPLETION_CRITERIA_TYPE_ACTIVITY
+                'criteriaid' => $criteria->id
             );
             $completion = new completion_criteria_completion($params);
             $completion->mark_complete();
@@ -317,10 +349,12 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         // Case #3: Activity completion made via RPL.
         // Let's complete activities via RPL for all users in course1.
         foreach ($this->users as $user) {
+            $criteria = $DB->get_record('course_completion_criteria',
+                array('course' => $this->course1->id, 'criteriatype' => COMPLETION_CRITERIA_TYPE_ACTIVITY));
             $completionrpl = new completion_criteria_completion(array(
                 'userid' => $user->id,
                 'course' => $this->course1->id,
-                'criteriaid' => COMPLETION_CRITERIA_TYPE_ACTIVITY
+                'criteriaid' => $criteria->id
             ));
             $completionrpl->rpl = 'Activity completed via RPL';
             $completionrpl->mark_complete();
@@ -373,10 +407,12 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
             $this->assertEquals(COMPLETION_COMPLETE, $completionstate);
 
             // Call function to complete the activities for the courses.
+            $criteria = $DB->get_record('course_completion_criteria',
+                array('course' => $course->id, 'criteriatype' => COMPLETION_CRITERIA_TYPE_ACTIVITY));
             $params = array(
                 'userid'     => $user->id,
                 'course'     => $course->id,
-                'criteriaid' => COMPLETION_CRITERIA_TYPE_ACTIVITY
+                'criteriaid' => $criteria->id
             );
             $completion = new completion_criteria_completion($params);
             $completion->mark_complete();
@@ -427,10 +463,12 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         // Case #3: Activity completion made via RPL.
         // Let's complete activities via RPL for user1 and user3 in course3.
         foreach ($userstocomplete as $user) {
+            $criteria = $DB->get_record('course_completion_criteria',
+                array('course' => $this->course3->id, 'criteriatype' => COMPLETION_CRITERIA_TYPE_ACTIVITY));
             $completionrpl = new completion_criteria_completion(array(
                 'userid' => $user->id,
                 'course' => $this->course3->id,
-                'criteriaid' => COMPLETION_CRITERIA_TYPE_ACTIVITY
+                'criteriaid' => $criteria->id
             ));
             $completionrpl->rpl = 'Activity completed via RPL';
             $completionrpl->mark_complete();

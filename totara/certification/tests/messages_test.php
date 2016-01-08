@@ -712,7 +712,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $coursesetwhere = "programid = :programid AND userid = :userid AND coursesetid > 0";
         $coursesetparams = array('programid' => $this->cert1->id, 'userid' => $this->user1->id);
         $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions);
+        $this->assertCount(1, $coursesetcompletions); // Only for primary path.
         $coursesetcompletion = reset($coursesetcompletions);
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
@@ -752,7 +752,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $completion = new completion_completion(array('userid' => $this->user1->id, 'course' => $course1->id));
         $completion->mark_complete();
 
-        // Reopen the window for user1 - move all dates back nine months.
+        // Open the window for user1 - move all dates back nine months.
         list($certcompletion, $progcompletion) = certif_load_completion($this->cert1->id, $this->user1->id);
         $certcompletion->timewindowopens -= DAYSECS * 30 * 9;
         $certcompletion->timeexpires -= DAYSECS * 30 * 9;
@@ -767,7 +767,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
 
         // Before we hack the course set due dates, make sure that they are currently valid.
         $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions);
+        $this->assertCount(1, $coursesetcompletions); // Only for recert path, primary was deleted.
         $coursesetcompletion = reset($coursesetcompletions);
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
@@ -821,7 +821,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
 
         // Before we hack the course set due dates, make sure that they are currently valid.
         $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions);
+        $this->assertCount(1, $coursesetcompletions); // Only for recert path, primary was deleted.
         $coursesetcompletion = reset($coursesetcompletions);
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
@@ -961,7 +961,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $coursesetwhere = "programid = :programid AND userid = :userid AND coursesetid > 0";
         $coursesetparams = array('programid' => $this->cert1->id, 'userid' => $this->user1->id);
         $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions);
+        $this->assertCount(1, $coursesetcompletions); // Only for primary path.
         $coursesetcompletion = reset($coursesetcompletions);
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
@@ -1016,7 +1016,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
 
         // Before we hack the course set due dates, make sure that they are currently valid.
         $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions);
+        $this->assertCount(1, $coursesetcompletions); // Only for recert path, primary was deleted.
         $coursesetcompletion = reset($coursesetcompletions);
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
@@ -1070,7 +1070,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
 
         // Before we hack the course set due dates, make sure that they are currently valid.
         $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions);
+        $this->assertCount(1, $coursesetcompletions); // Only for recert path, primary was deleted.
         $coursesetcompletion = reset($coursesetcompletions);
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
