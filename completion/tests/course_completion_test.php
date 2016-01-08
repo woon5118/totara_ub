@@ -262,14 +262,16 @@ class core_completion_course_completion_testcase extends advanced_testcase {
         $certcron->execute();
 
         // The course completion crit compl records for user1 and user2 in the courses that are in the
-        // certification should have been removed.
-        $this->assertEquals(3, $DB->count_records('course_completion_crit_compl'));
+        // recertification path of the certification should have been removed (course 2, users 1 and 2).
+        $this->assertEquals(5, $DB->count_records('course_completion_crit_compl'));
         $completions = [
-            ['user' => $data->user1->id, 'course' => $data->course3->id],
-            ['user' => $data->user3->id, 'course' => $data->course3->id],
-            ['user' => $data->user3->id, 'course' => $data->course1->id]
+            [$data->user1->id => $data->course1->id],
+            [$data->user1->id => $data->course3->id],
+            [$data->user2->id => $data->course1->id],
+            [$data->user3->id => $data->course3->id],
+            [$data->user3->id => $data->course1->id]
         ];
-        foreach ($completions as $completion) {
+        foreach ($completions as $key => $value) {
             $conditions = array('userid' => $completion['user'], 'course' => $completion['course']);
             $this->assertTrue($DB->record_exists('course_completions', $conditions));
             $this->assertTrue($DB->record_exists('course_completion_crit_compl', $conditions));

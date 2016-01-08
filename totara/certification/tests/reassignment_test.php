@@ -258,15 +258,15 @@ class totara_certification_reassignment_testcase extends advanced_testcase {
 
         // Check the primary-path-only course completions are still there and marked as complete, the other is gone.
         $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id));
-        $this->assertEquals(0, count($comprecs));
+        $this->assertEquals(2, count($comprecs));
         $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
-        $this->assertEquals(0, count($comprecs));
+        $this->assertEquals(2, count($comprecs));
 
         // Only the recert path course was archived.
         $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id));
-        $this->assertEquals(3, count($comphistrecs));
+        $this->assertEquals(1, count($comphistrecs));
         $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
-        $this->assertEquals(3, count($comphistrecs));
+        $this->assertEquals(1, count($comphistrecs));
     }
 
     /**
@@ -361,10 +361,10 @@ class totara_certification_reassignment_testcase extends advanced_testcase {
         $expiretime = $completetime + (6 * MONTHSECS);
 
         // Check that the recert path course was reset.
-        $comprec = $DB->record_exists('course_completions', array('course' => $data->courses[1]->id, 'userid' => $data->users[1]->id));
-        $this->assertEquals(false, $comprec);
-        $comprec = $DB->record_exists('course_completions', array('course' => $data->courses[2]->id, 'userid' => $data->users[1]->id));
-        $this->assertEquals(false, $comprec);
+        $comprec = $DB->get_record('course_completions', array('course' => $data->courses[1]->id, 'userid' => $data->users[1]->id));
+        $this->assertEquals($times['complete'], $comprec->timecompleted);
+        $comprec = $DB->get_record('course_completions', array('course' => $data->courses[2]->id, 'userid' => $data->users[1]->id));
+        $this->assertEquals($times['complete'], $comprec->timecompleted);
         $comprec = $DB->record_exists('course_completions', array('course' => $data->courses[3]->id, 'userid' => $data->users[1]->id));
         $this->assertEquals(false, $comprec);
 
@@ -415,7 +415,7 @@ class totara_certification_reassignment_testcase extends advanced_testcase {
         $progid = $data->program->id;
         $times = $this->setup_recertified_state($data, time() - (3 * MONTHSECS)); // Setup with recertification 3 months ago.
 
-        // Unassign.
+        // Unassign user 1
         $program_generator->assign_program($progid, [$data->users[2]->id]);
 
         // Run the certification task.
@@ -471,11 +471,11 @@ class totara_certification_reassignment_testcase extends advanced_testcase {
 
         // Check the course completions are still there and still marked as complete.
         $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id));
-        $this->assertEquals(1, count($comprecs));
+        $this->assertEquals(3, count($comprecs));
         $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
         $this->assertEquals(1, count($comprecs));
         $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['oldcomplete']));
-        $this->assertEquals(0, count($comprecs));
+        $this->assertEquals(2, count($comprecs));
     }
 
     /**
@@ -552,9 +552,9 @@ class totara_certification_reassignment_testcase extends advanced_testcase {
 
         // Check the primary-path-only course completions are still there and marked as complete, the other is gone.
         $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id));
-        $this->assertEquals(0, count($comprecs));
+        $this->assertEquals(2, count($comprecs));
         $comprecs = $DB->get_records('course_completions', array('userid' => $data->users[1]->id, 'timecompleted' => $times['oldcomplete']));
-        $this->assertEquals(0, count($comprecs));
+        $this->assertEquals(2, count($comprecs));
 
         // Course 3 was archived with the new completion time.
         $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['complete']));
@@ -562,7 +562,7 @@ class totara_certification_reassignment_testcase extends advanced_testcase {
 
         // Course 3 was archived with the old completion time (from first window open).
         $comphistrecs = $DB->get_records('course_completion_history', array('userid' => $data->users[1]->id, 'timecompleted' => $times['oldcomplete']));
-        $this->assertEquals(3, count($comphistrecs));
+        $this->assertEquals(1, count($comphistrecs));
     }
 
     /**

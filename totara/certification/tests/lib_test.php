@@ -2491,10 +2491,13 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
 
         // Check that the correct courses have been reset.
         $records = $DB->get_records('course_completions');
-        $this->assertEquals(10, count($records));
+        $this->assertEquals(15, count($records));
         foreach ($records as $record) {
             // Removed 3-6, 3-7, 6-3, 6-4, 6-7.
-            if ($record->userid == $users[4]->id && $record->course == $courses[2]->id ||
+            if ($record->userid == $users[3]->id && $record->course == $courses[2]->id ||
+                $record->userid == $users[3]->id && $record->course == $courses[3]->id ||
+                $record->userid == $users[3]->id && $record->course == $courses[4]->id ||
+                $record->userid == $users[4]->id && $record->course == $courses[2]->id ||
                 $record->userid == $users[4]->id && $record->course == $courses[3]->id ||
                 $record->userid == $users[4]->id && $record->course == $courses[4]->id ||
                 $record->userid == $users[5]->id && $record->course == $courses[2]->id ||
@@ -2503,6 +2506,8 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
                 $record->userid == $users[5]->id && $record->course == $courses[6]->id ||
                 $record->userid == $users[5]->id && $record->course == $courses[8]->id ||
                 $record->userid == $users[5]->id && $record->course == $courses[9]->id ||
+                $record->userid == $users[6]->id && $record->course == $courses[2]->id ||
+                $record->userid == $users[6]->id && $record->course == $courses[6]->id ||
                 $record->userid == $users[7]->id && $record->course == $courses[6]->id) {
                 $this->assertEquals(COMPLETION_STATUS_COMPLETE, $record->status);
             } else {
@@ -2545,10 +2550,13 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
 
         // Check that the correct courses have been reset.
         $records = $DB->get_records('course_completions');
-        $this->assertEquals(12, count($records));
+        $this->assertEquals(17, count($records));
         foreach ($records as $record) {
             // Added back 3-6 and 6-3.
-            if ($record->userid == $users[3]->id && $record->course == $courses[6]->id ||
+            if ($record->userid == $users[3]->id && $record->course == $courses[2]->id ||
+                $record->userid == $users[3]->id && $record->course == $courses[3]->id ||
+                $record->userid == $users[3]->id && $record->course == $courses[4]->id ||
+                $record->userid == $users[3]->id && $record->course == $courses[6]->id ||
                 $record->userid == $users[4]->id && $record->course == $courses[2]->id ||
                 $record->userid == $users[4]->id && $record->course == $courses[3]->id ||
                 $record->userid == $users[4]->id && $record->course == $courses[4]->id ||
@@ -2558,7 +2566,9 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
                 $record->userid == $users[5]->id && $record->course == $courses[6]->id ||
                 $record->userid == $users[5]->id && $record->course == $courses[8]->id ||
                 $record->userid == $users[5]->id && $record->course == $courses[9]->id ||
+                $record->userid == $users[6]->id && $record->course == $courses[2]->id ||
                 $record->userid == $users[6]->id && $record->course == $courses[3]->id ||
+                $record->userid == $users[6]->id && $record->course == $courses[6]->id ||
                 $record->userid == $users[7]->id && $record->course == $courses[6]->id) {
                 $this->assertEquals(COMPLETION_STATUS_COMPLETE, $record->status);
             } else {
@@ -5100,6 +5110,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $programgenerator->add_courses_and_courseset_to_program($cert1, array(array($course1)), CERTIFPATH_CERT);
         $programgenerator->add_courses_and_courseset_to_program($cert1, array(array($course2)), CERTIFPATH_RECERT);
         $programgenerator->add_courses_and_courseset_to_program($cert2, array(array($course3)), CERTIFPATH_CERT);
+        $programgenerator->add_courses_and_courseset_to_program($cert2, array(array($course3)), CERTIFPATH_RECERT);
 
         $this->getDataGenerator()->assign_to_program($cert1->id, ASSIGNTYPE_INDIVIDUAL, $user1->id);
         $this->getDataGenerator()->assign_to_program($cert1->id, ASSIGNTYPE_INDIVIDUAL, $user2->id);
@@ -5120,6 +5131,12 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
             MESSAGETYPE_RECERT_WINDOWDUECLOSE,
             MESSAGETYPE_RECERT_FAILRECERT,
         );
+        $coursesetmessagetypes = [
+            MESSAGETYPE_COURSESET_DUE,
+            MESSAGETYPE_COURSESET_OVERDUE,
+            MESSAGETYPE_COURSESET_COMPLETED,
+        ];
+        $messagetypetotal = count($allmessagetypes) + count($coursesetmessagetypes);
 
         // Set up the program messages.
         $programmessagemanager = $cert1->get_messagesmanager();
@@ -5221,7 +5238,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
         $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
 
-        // Check the state of the non-zero course set group records before we run the function.
+        // Check the state of the non-zero course set group records before we run the function (all primary path).
         $where = "programid = :programid AND userid = :userid AND coursesetid > 0 AND status = " . STATUS_COURSESET_COMPLETE;
         $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
         $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
@@ -5256,22 +5273,34 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals(1, $DB->count_records('prog_messagelog', array('userid' => $user2->id, 'messageid' => $cert2messageprogcompleteid)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog', array('userid' => $user2->id, 'messageid' => $cert2messagecsgcompleteid)));
 
-        // Rather than setting up all the message types and triggering them, we're just going to create them manually.
+        // Rather than setting up all the message types and triggering them, we're just going to create the logs manually.
         $DB->execute('DELETE FROM {prog_messagelog}');
         $allmessages = $DB->get_records('prog_message');
         $messagelog = new stdClass();
-        $messagelog->coursesetid = 0;
-        $messagelog->timeisued = time();
+        $messagelog->timeissued = time();
         foreach ($allmessages as $message) {
             $messagelog->messageid = $message->id;
+            if (in_array($message->messagetype, $coursesetmessagetypes)) {
+                // Create one log for each path.
+                $params = array('programid' => $message->programid, 'certifpath' => CERTIFPATH_CERT);
+                $messagelog->coursesetid = $DB->get_field('prog_courseset', 'id', $params);
+                $messagelog->userid = $user1->id;
+                $DB->insert_record('prog_messagelog', $messagelog);
+                $messagelog->userid = $user2->id;
+                $DB->insert_record('prog_messagelog', $messagelog);
+                $params = array('programid' => $message->programid, 'certifpath' => CERTIFPATH_RECERT);
+                $messagelog->coursesetid = $DB->get_field('prog_courseset', 'id', $params);
+            } else {
+                $messagelog->coursesetid = 0;
+            }
             $messagelog->userid = $user1->id;
             $DB->insert_record('prog_messagelog', $messagelog);
             $messagelog->userid = $user2->id;
             $DB->insert_record('prog_messagelog', $messagelog);
         }
-        $this->assertEquals(count($allmessagetypes) * 4, $DB->count_records('prog_messagelog'));
-        $this->assertEquals(count($allmessagetypes) * 2, $DB->count_records('prog_messagelog', array('userid' => $user1->id)));
-        $this->assertEquals(count($allmessagetypes) * 2, $DB->count_records('prog_messagelog', array('userid' => $user2->id)));
+        $this->assertEquals($messagetypetotal * 4, $DB->count_records('prog_messagelog'));
+        $this->assertEquals($messagetypetotal * 2, $DB->count_records('prog_messagelog', array('userid' => $user1->id)));
+        $this->assertEquals($messagetypetotal * 2, $DB->count_records('prog_messagelog', array('userid' => $user2->id)));
 
         // Run the function, catching messages.
         $sink = $this->redirectMessages();
@@ -5294,23 +5323,24 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id))); // Reset.
         $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
 
-        // Check only the expected non-zero course set group record was affected.
+        // Check that no non-zero course set group record were affected - only recert path course set groups should be reset by
+        // window open. A new recert path record is created.
         $where = "programid = :programid AND userid = :userid AND coursesetid > 0 AND status = " . STATUS_COURSESET_COMPLETE;
         $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
-        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id))); // Reset.
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id))); // Not reset!
         $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
         $where = "programid = :programid AND userid = :userid AND coursesetid > 0 AND status = " . STATUS_COURSESET_INCOMPLETE;
         $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
-        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id))); // Reset.
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id))); // New record!
         $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
 
-        // Check only the expected message logs were deleted. Ten were deleted (there are ten types that should be deleted) for
-        // user2. cert1, then one new log was created (matching the window open message sent).
-        $this->assertEquals(count($allmessagetypes) * 3 + 3, $DB->count_records('prog_messagelog'));
-        $this->assertEquals(count($allmessagetypes) * 2,     $DB->count_records('prog_messagelog', array('userid' => $user1->id)));
-        $this->assertEquals(count($allmessagetypes) * 1 + 3, $DB->count_records('prog_messagelog', array('userid' => $user2->id)));
+        // Check only the expected message logs were deleted. There are ten types that should be deleted. One new log is
+        // created (window open). So there should be 9 gone.
+        $this->assertEquals($messagetypetotal * 4 - 9, $DB->count_records('prog_messagelog'));
+        $this->assertEquals($messagetypetotal * 2,     $DB->count_records('prog_messagelog', array('userid' => $user1->id)));
+        $this->assertEquals($messagetypetotal * 2 - 9, $DB->count_records('prog_messagelog', array('userid' => $user2->id)));
 
-        // Check that the nine missing records are the ones we were expecting to be deleted.
+        // Check that the six missing records are the ones we were expecting to be deleted.
         $sql = "SELECT pml.*
                   FROM {prog_messagelog} pml
                   JOIN {prog_message} pm
@@ -5318,14 +5348,12 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
                  WHERE pm.programid = :programid
                    AND pml.userid = :userid";
         $params = array('programid' => $cert1->id, 'userid' => $user2->id);
-        $this->assertCount(3, $DB->get_records_sql($sql, $params));
+        $this->assertCount(6, $DB->get_records_sql($sql, $params));
         $resettypes = array(
             MESSAGETYPE_PROGRAM_COMPLETED,
             MESSAGETYPE_PROGRAM_DUE,
             MESSAGETYPE_PROGRAM_OVERDUE,
-            MESSAGETYPE_COURSESET_DUE,
-            MESSAGETYPE_COURSESET_OVERDUE,
-            MESSAGETYPE_COURSESET_COMPLETED,
+            // Exclude course set message types, because they belong to the primary path.
             // Exclude MESSAGETYPE_RECERT_WINDOWOPEN because it should have been sent after reset.
             MESSAGETYPE_RECERT_WINDOWDUECLOSE,
             MESSAGETYPE_RECERT_FAILRECERT,
@@ -5335,20 +5363,20 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $sql = $sql . ' AND pm.messagetype ' . $insql;
         $this->assertCount(0, $DB->get_records_sql($sql, array_merge($params, $inparams)));
 
-        // Check only the expected course completion records were deleted.
+        // Check only the expected course completion record was deleted - primary path course in cert1.
         $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course1->id, 'userid' => $user1->id)));
         $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course2->id, 'userid' => $user1->id)));
         $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course3->id, 'userid' => $user1->id)));
-        $this->assertEquals(0, $DB->count_records('course_completions', array('course' => $course1->id, 'userid' => $user2->id)));
-        $this->assertEquals(0, $DB->count_records('course_completions', array('course' => $course2->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course1->id, 'userid' => $user2->id)));
+        $this->assertEquals(0, $DB->count_records('course_completions', array('course' => $course2->id, 'userid' => $user2->id))); // Gone.
         $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course3->id, 'userid' => $user2->id)));
 
-        // Check only the expected course completion history records were created.
+        // Check only the expected course completion history records were created - primary path course in cert1.
         $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course1->id, 'userid' => $user1->id)));
         $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course2->id, 'userid' => $user1->id)));
         $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course3->id, 'userid' => $user1->id)));
-        $this->assertEquals(1, $DB->count_records('course_completion_history', array('courseid' => $course1->id, 'userid' => $user2->id)));
-        $this->assertEquals(1, $DB->count_records('course_completion_history', array('courseid' => $course2->id, 'userid' => $user2->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course1->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records('course_completion_history', array('courseid' => $course2->id, 'userid' => $user2->id))); // Appeared.
         $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course3->id, 'userid' => $user2->id)));
 
         // Check only the expected prog_completion and certif_completion records were affected.
@@ -5384,6 +5412,41 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $message = reset($messages);
         $this->assertEquals($user2->id, $message->useridto);
         $this->assertStringEndsWith('totara/program/view.php?id=' . $cert1->id, $message->contexturl);
+
+        // We'll do one additional check, that non-zero course set group completion records relating to the recertification
+        // path are reset on window open.
+
+        // Catch up the two control records.
+        $this->assertTrue(certif_set_state_windowopen($cert1->id, $user1->id, 'Testing pass certif_set_state_windowopen'));
+        $this->assertTrue(certif_set_state_windowopen($cert2->id, $user2->id, 'Testing pass certif_set_state_windowopen'));
+
+        // Mark the users certified again. This time, recertification path non-zero course set records will be created.
+        $completiongenerator->complete_course($course2, $user1);
+        $completiongenerator->complete_course($course2, $user2);
+        $completiongenerator->complete_course($course3, $user2);
+
+        // Check the record status before running the function.
+        $where = "programid = :programid AND userid = :userid AND coursesetid > 0 AND status = " . STATUS_COURSESET_COMPLETE;
+        $this->assertEquals(2, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(2, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
+        $this->assertEquals(2, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
+        $where = "programid = :programid AND userid = :userid AND coursesetid > 0 AND status = " . STATUS_COURSESET_INCOMPLETE;
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
+
+        // Run the function.
+        $this->assertTrue(certif_set_state_windowopen($cert1->id, $user2->id, 'Testing pass certif_set_state_windowopen'));
+
+        // Check that only the correct record was reset.
+        $where = "programid = :programid AND userid = :userid AND coursesetid > 0 AND status = " . STATUS_COURSESET_COMPLETE;
+        $this->assertEquals(2, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id))); // One reset!
+        $this->assertEquals(2, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
+        $where = "programid = :programid AND userid = :userid AND coursesetid > 0 AND status = " . STATUS_COURSESET_INCOMPLETE;
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id))); // One reset!
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
     }
 
     public function test_certif_set_state_expired() {
@@ -5409,28 +5472,50 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $programgenerator->add_courses_and_courseset_to_program($cert1, array(array($course1)), CERTIFPATH_CERT);
         $programgenerator->add_courses_and_courseset_to_program($cert1, array(array($course2)), CERTIFPATH_RECERT);
         $programgenerator->add_courses_and_courseset_to_program($cert2, array(array($course3)), CERTIFPATH_CERT);
+        $programgenerator->add_courses_and_courseset_to_program($cert2, array(array($course3)), CERTIFPATH_RECERT);
 
         $this->getDataGenerator()->assign_to_program($cert1->id, ASSIGNTYPE_INDIVIDUAL, $user1->id);
         $this->getDataGenerator()->assign_to_program($cert1->id, ASSIGNTYPE_INDIVIDUAL, $user2->id);
         $this->getDataGenerator()->assign_to_program($cert2->id, ASSIGNTYPE_INDIVIDUAL, $user2->id);
         $this->getDataGenerator()->assign_to_program($cert1->id, ASSIGNTYPE_INDIVIDUAL, $user3->id);
 
+        $allmessagetypes = [
+            MESSAGETYPE_ENROLMENT,
+            MESSAGETYPE_UNENROLMENT,
+            MESSAGETYPE_PROGRAM_DUE,
+            MESSAGETYPE_PROGRAM_OVERDUE,
+            MESSAGETYPE_PROGRAM_COMPLETED,
+            MESSAGETYPE_COURSESET_DUE,
+            MESSAGETYPE_COURSESET_OVERDUE,
+            MESSAGETYPE_COURSESET_COMPLETED,
+            MESSAGETYPE_LEARNER_FOLLOWUP,
+            MESSAGETYPE_RECERT_WINDOWOPEN,
+            MESSAGETYPE_RECERT_WINDOWDUECLOSE,
+            MESSAGETYPE_RECERT_FAILRECERT,
+        ];
+        $coursesetmessagetypes = [
+            MESSAGETYPE_COURSESET_DUE,
+            MESSAGETYPE_COURSESET_OVERDUE,
+            MESSAGETYPE_COURSESET_COMPLETED,
+        ];
+        $messagetypetotal = count($allmessagetypes) + count($coursesetmessagetypes);
+
         // Set up the program messages.
         $programmessagemanager = $cert1->get_messagesmanager();
         $programmessagemanager->delete();
-        $programmessagemanager->add_message(MESSAGETYPE_RECERT_FAILRECERT);
+        foreach ($allmessagetypes as $messagetype) {
+            $programmessagemanager->add_message($messagetype);
+        }
         $programmessagemanager->save_messages();
         prog_messages_manager::get_program_messages_manager($cert1->id, true); // Causes static cache to be reset.
-        $cert1messageid = $DB->get_field('prog_message', 'id',
-            array('programid' => $cert1->id, 'messagetype' => MESSAGETYPE_RECERT_FAILRECERT));
 
         $programmessagemanager = $cert2->get_messagesmanager();
         $programmessagemanager->delete();
-        $programmessagemanager->add_message(MESSAGETYPE_RECERT_FAILRECERT);
+        foreach ($allmessagetypes as $messagetype) {
+            $programmessagemanager->add_message($messagetype);
+        }
         $programmessagemanager->save_messages();
         prog_messages_manager::get_program_messages_manager($cert2->id, true); // Causes static cache to be reset.
-        $cert2messageid = $DB->get_field('prog_message', 'id',
-            array('programid' => $cert2->id, 'messagetype' => MESSAGETYPE_RECERT_FAILRECERT));
 
         // Before doing the positive test, check that the function will fail correctly.
 
@@ -5475,19 +5560,111 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
 
         // Start testing what happens when there are no problems.
 
-        // Clear out the prog_messagelogs that might have been create earlier when investigating problems.
-        $DB->execute('DELETE FROM {prog_messagelog}');
-
-        // Use the functions to set the test data into the Window open state.
-        $this->assertTrue(certif_set_state_certified($cert1->id, $user1->id));
-        $this->assertTrue(certif_set_state_certified($cert1->id, $user2->id));
-        $this->assertTrue(certif_set_state_certified($cert2->id, $user2->id));
+        // Set the test data into the Window open state.
+        $completiongenerator->complete_course($course1, $user1);
+        $completiongenerator->complete_course($course2, $user1);
+        $completiongenerator->complete_course($course3, $user1);
+        $completiongenerator->complete_course($course1, $user2);
+        $completiongenerator->complete_course($course2, $user2);
+        $completiongenerator->complete_course($course3, $user2);
         $this->assertTrue(certif_set_state_windowopen($cert1->id, $user1->id));
         $this->assertTrue(certif_set_state_windowopen($cert1->id, $user2->id));
         $this->assertTrue(certif_set_state_windowopen($cert2->id, $user2->id));
         list($user1cert1precertcompletion, $user1cert1preprogcompletion) = certif_load_completion($cert1->id, $user1->id);
         list($user2cert1precertcompletion, $user2cert1preprogcompletion) = certif_load_completion($cert1->id, $user2->id);
         list($user2cert2precertcompletion, $user2cert2preprogcompletion) = certif_load_completion($cert2->id, $user2->id);
+
+        // Rather than setting up all the message types and triggering them, we're just going to create the logs manually.
+        $DB->execute('DELETE FROM {prog_messagelog}');
+        $allmessages = $DB->get_records('prog_message');
+        $messagelog = new stdClass();
+        $messagelog->timeissued = time();
+        foreach ($allmessages as $message) {
+            if ($message->messagetype == MESSAGETYPE_RECERT_FAILRECERT) {
+                // Don't create a log for the expiry message, or else it won't send an expiry message!
+                continue;
+            }
+            $messagelog->messageid = $message->id;
+            if (in_array($message->messagetype, $coursesetmessagetypes)) {
+                // Create one log for each path.
+                $params = array('programid' => $message->programid, 'certifpath' => CERTIFPATH_CERT);
+                $messagelog->coursesetid = $DB->get_field('prog_courseset', 'id', $params);
+                $messagelog->userid = $user1->id;
+                $DB->insert_record('prog_messagelog', $messagelog);
+                $messagelog->userid = $user2->id;
+                $DB->insert_record('prog_messagelog', $messagelog);
+                $params = array('programid' => $message->programid, 'certifpath' => CERTIFPATH_RECERT);
+                $messagelog->coursesetid = $DB->get_field('prog_courseset', 'id', $params);
+            } else {
+                $messagelog->coursesetid = 0;
+            }
+            $messagelog->userid = $user1->id;
+            $DB->insert_record('prog_messagelog', $messagelog);
+            $messagelog->userid = $user2->id;
+            $DB->insert_record('prog_messagelog', $messagelog);
+        }
+        $messagetypetotal -= 1; // We skipped one type of message - expiry.
+        $this->assertEquals($messagetypetotal * 4, $DB->count_records('prog_messagelog'));
+        $this->assertEquals($messagetypetotal * 2, $DB->count_records('prog_messagelog', array('userid' => $user1->id)));
+        $this->assertEquals($messagetypetotal * 2, $DB->count_records('prog_messagelog', array('userid' => $user2->id)));
+
+        // Check the state of the prog_completion records before we run the function.
+        $where = "programid = :programid AND userid = :userid AND coursesetid = 0 AND status = " . STATUS_PROGRAM_COMPLETE;
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
+        $where = "programid = :programid AND userid = :userid AND coursesetid = 0 AND status = " . STATUS_PROGRAM_INCOMPLETE;
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
+
+        // Check the state of the non-zero course set group records before we run the function.
+        $where = "programid = :programid AND userid = :userid AND coursesetid > 0 AND status = " . STATUS_COURSESET_COMPLETE;
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
+        $where = "programid = :programid AND userid = :userid AND coursesetid > 0 AND status = " . STATUS_COURSESET_INCOMPLETE;
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
+
+        // Check the state of the course completion records before we run the function.
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course1->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records('course_completions', array('course' => $course2->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course3->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course1->id, 'userid' => $user2->id)));
+        $this->assertEquals(0, $DB->count_records('course_completions', array('course' => $course2->id, 'userid' => $user2->id)));
+        $this->assertEquals(0, $DB->count_records('course_completions', array('course' => $course3->id, 'userid' => $user2->id)));
+
+        // Check the state of the course completion history records before we run the function.
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course1->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records('course_completion_history', array('courseid' => $course2->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course3->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course1->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records('course_completion_history', array('courseid' => $course2->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records('course_completion_history', array('courseid' => $course3->id, 'userid' => $user2->id)));
+
+        // We want to be sure that recert path courses are not reset during expiration, so move the history records back into current.
+        $DB->execute("INSERT INTO {course_completions} (userid, course, timeenrolled, timestarted, reaggregate, status)
+                           SELECT userid, courseid, 0, 0, 0, " . COMPLETION_STATUS_COMPLETE . "
+                             FROM {course_completion_history}");
+        $DB->delete_records('course_completion_history');
+
+        // Re-check the state of the course completion records before we run the function.
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course1->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course2->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course3->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course1->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course2->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course3->id, 'userid' => $user2->id)));
+
+        // Re-check the state of the course completion history records before we run the function.
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course1->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course2->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course3->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course1->id, 'userid' => $user2->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course2->id, 'userid' => $user2->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course3->id, 'userid' => $user2->id)));
 
         // Run the function, catching messages.
         $sink = $this->redirectMessages();
@@ -5521,12 +5698,54 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals($user2->id, $latestlog->userid);
         $this->assertStringStartsWith('Testing pass certif_set_state_expired', $latestlog->description);
 
+        // Check only the expected message logs were deleted. There are three types that should be deleted. One message was
+        // created, failed recert. So 2 total.
+        $this->assertEquals($messagetypetotal * 4 - 2, $DB->count_records('prog_messagelog'));
+        $this->assertEquals($messagetypetotal * 2,     $DB->count_records('prog_messagelog', array('userid' => $user1->id)));
+        $this->assertEquals($messagetypetotal * 2 - 2, $DB->count_records('prog_messagelog', array('userid' => $user2->id)));
+
         // Check a program completion message has been sent. Note that this test isn't specific about the message content, it
         // just makes sure a message was sent.
         $this->assertCount(1, $messages);
         $message = reset($messages);
         $this->assertEquals($user2->id, $message->useridto);
         $this->assertStringEndsWith('totara/program/view.php?id=' . $cert1->id, $message->contexturl);
+
+        // Check the state of the prog_completion records after we run the function.
+        $where = "programid = :programid AND userid = :userid AND coursesetid = 0 AND status = " . STATUS_PROGRAM_COMPLETE;
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
+        $where = "programid = :programid AND userid = :userid AND coursesetid = 0 AND status = " . STATUS_PROGRAM_INCOMPLETE;
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
+
+        // Check the state of the non-zero course set group records after we run the function.
+        $where = "programid = :programid AND userid = :userid AND coursesetid > 0 AND status = " . STATUS_COURSESET_COMPLETE;
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
+        $where = "programid = :programid AND userid = :userid AND coursesetid > 0 AND status = " . STATUS_COURSESET_INCOMPLETE;
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert1->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, array('programid' => $cert2->id, 'userid' => $user2->id)));
+
+        // Check the state of the course completion records after we run the function.
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course1->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course2->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course3->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records('course_completions', array('course' => $course1->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course2->id, 'userid' => $user2->id)));
+        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $course3->id, 'userid' => $user2->id)));
+
+        // Check the state of the course completion history records after we run the function.
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course1->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course2->id, 'userid' => $user1->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course3->id, 'userid' => $user1->id)));
+        $this->assertEquals(1, $DB->count_records('course_completion_history', array('courseid' => $course1->id, 'userid' => $user2->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course2->id, 'userid' => $user2->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_history', array('courseid' => $course3->id, 'userid' => $user2->id)));
     }
 
     public function test_certif_set_in_progress() {

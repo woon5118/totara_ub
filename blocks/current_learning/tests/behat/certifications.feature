@@ -112,7 +112,6 @@ Feature: User certifications and their courses appear correctly in the current l
     # Courses should now be displayed in the block as stand alone courses.
     Given I log in as "user001"
     And I click on "Dashboard" in the totara menu
-    And I should see "Certify Course 1" in the "Current Learning" "block"
     And I should see "Certify Course 2" in the "Current Learning" "block"
 
     # The certification should still contain the correct content.

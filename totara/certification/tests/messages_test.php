@@ -485,7 +485,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
     /**
      * Make sure that courseset completed messages are resent when a user completes the content.
      *
-     * Overall patern is: Primary, Recert, Recert, Primery (due to expiry).
+     * Overall patern is: Primary, Recert, Recert, Primary (due to expiry).
      *
      * This test works with just one course set, so it's pretty much the same as the program complete test.
      * The program tests make sure that multiple courseset messages are sent within a single program.
@@ -524,6 +524,10 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
             ),
         );
         $this->getDataGenerator()->create_coursesets_in_program($this->cert1, $coursesetdata);
+        $params = array('programid' => $this->cert1->id, 'certifpath' => CERTIFPATH_CERT);
+        $primarycoursesetid = $DB->get_field('prog_courseset', 'id', $params);
+        $params = array('programid' => $this->cert1->id, 'certifpath' => CERTIFPATH_RECERT);
+        $recertcoursesetid = $DB->get_field('prog_courseset', 'id', $params);
 
         // Assign users to program.
         $usersprogram = array($this->user1->id, $this->user2->id);
@@ -569,10 +573,12 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $this->assertCount(0, $emails);
         $this->sink->clear();
 
-        // Check that only the log for user2 is still there - the log for user1 was deleted when their window opened.
-        $this->assertEquals(1, $DB->count_records('prog_messagelog'));
+        // Check that logs for both users are still there - they belong to the primary cert path, so shouldn't be touched.
+        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
 
         // Recertify user1.
         $completion = new completion_completion(array('userid' => $this->user1->id, 'course' => $course2->id));
@@ -583,12 +589,14 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $this->assertCount(1, $emails);
         $this->sink->clear();
 
-        // Check both users now have message logs (user2's is old, user1's is new).
-        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        // Check that we've added another record for the test user, for the recert path.
+        $this->assertEquals(3, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
 
         // Reopen the window for user1 - move all dates back nine months.
         list($certcompletion, $progcompletion) = certif_load_completion($this->cert1->id, $this->user1->id);
@@ -600,6 +608,13 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $this->assertTrue(certif_write_completion($certcompletion, $progcompletion));
         $certcron = new \totara_certification\task\update_certification_task();
         $certcron->execute();
+
+        // The test user's recert path log was removed.
+        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
 
         // Check that no new messages were sent.
         $emails = $this->sink->get_messages();
@@ -615,14 +630,22 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $this->assertCount(1, $emails);
         $this->sink->clear();
 
-        // Check both users now have message logs (user2's is old, user1's is new).
-        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        // The test user's recert path log was created again.
+        $this->assertEquals(3, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
 
-        // Reopen the window for user1 - move all dates back FIFTEEN months.
+        // To ensure that the control's recert message log record is not deleted, we'll create it artificially now.
+        $messagelog = $DB->get_record('prog_messagelog', array('userid' => $this->user2->id));
+        unset($messagelog->id);
+        $messagelog->coursesetid = $recertcoursesetid;
+        $DB->insert_record('prog_messagelog', $messagelog);
+
+        // Expire user1 - move all dates back FIFTEEN months.
         list($certcompletion, $progcompletion) = certif_load_completion($this->cert1->id, $this->user1->id);
         $certcompletion->timewindowopens -= DAYSECS * 30 * 15;
         $certcompletion->timeexpires -= DAYSECS * 30 * 15;
@@ -638,6 +661,13 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $this->assertCount(0, $emails);
         $this->sink->clear();
 
+        // The test user's primary and recert path logs were removed (because window opened then expired). User2's are both there.
+        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+
         // Recertify user1 on primary path again.
         $completion = new completion_completion(array('userid' => $this->user1->id, 'course' => $course1->id));
         $completion->mark_complete();
@@ -647,18 +677,20 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $this->assertCount(1, $emails);
         $this->sink->clear();
 
-        // Check both users now have message logs (user2's is old, user1's is new).
-        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        // The test user's primary path log was created again.
+        $this->assertEquals(3, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
     }
 
     /**
      * Make sure that courseset due messages are resent when a user's due date is nearly reached.
      *
-     * Overall patern is: Primary, Recert, Recert, Primery (due to expiry).
+     * Overall patern is: Primary, Recert, Recert, Primary (due to expiry).
      *
      * This test works with just one course set, so it's pretty much the same as the program due test.
      * The program tests make sure that multiple courseset messages are sent within a single program.
@@ -701,19 +733,21 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
             ),
         );
         $this->getDataGenerator()->create_coursesets_in_program($this->cert1, $coursesetdata);
+        $params = array('programid' => $this->cert1->id, 'certifpath' => CERTIFPATH_CERT);
+        $primarycoursesetid = $DB->get_field('prog_courseset', 'id', $params);
+        $params = array('programid' => $this->cert1->id, 'certifpath' => CERTIFPATH_RECERT);
+        $recertcoursesetid = $DB->get_field('prog_courseset', 'id', $params);
 
-        // Assign users to program.
+        // Assign users to cert.
         $usersprogram = array($this->user1->id, $this->user2->id);
         $timebefore = time();
         $this->programgenerator->assign_program($this->cert1->id, $usersprogram);
         $timeafter = time();
 
         // Before we hack the course set due dates, make sure that they are currently valid.
-        $coursesetwhere = "programid = :programid AND userid = :userid AND coursesetid > 0";
-        $coursesetparams = array('programid' => $this->cert1->id, 'userid' => $this->user1->id);
-        $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions); // Only for primary path.
-        $coursesetcompletion = reset($coursesetcompletions);
+        $this->assertEquals(2, $DB->count_records('prog_completion', array('userid' => $this->user1->id)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => 0)));
+        $coursesetcompletion = $DB->get_record('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $primarycoursesetid));
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
         $this->assertEquals($coursesetcompletion->timecreated + 100 * DAYSECS, $coursesetcompletion->timedue);
@@ -765,22 +799,25 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $certcron->execute();
         $timeafter = time();
 
+        // Check that logs for both users are still there - they belong to the primary cert path, so shouldn't be touched.
+        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+
         // Before we hack the course set due dates, make sure that they are currently valid.
-        $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions); // Only for recert path, primary was deleted.
-        $coursesetcompletion = reset($coursesetcompletions);
+        $this->assertEquals(3, $DB->count_records('prog_completion', array('userid' => $this->user1->id)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => 0)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $primarycoursesetid)));
+        $coursesetcompletion = $DB->get_record('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $recertcoursesetid));
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
         $this->assertEquals($coursesetcompletion->timecreated + 100 * DAYSECS, $coursesetcompletion->timedue);
 
         // Hack the course set due dates again, 10 days from now.
         $duedate = time() + DAYSECS * 10;
-        $DB->set_field_select('prog_completion', 'timedue', $duedate, $coursesetwhere, $coursesetparams);
-
-        // Before the test, check that only the log for user2 is still there - the log for user1 was deleted when their window opened.
-        $this->assertEquals(1, $DB->count_records('prog_messagelog'));
-        $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+        $DB->set_field('prog_completion', 'timedue', $duedate, array('userid' => $this->user1->id, 'coursesetid' => $recertcoursesetid));
 
         // Second course set due message, recert path. Course set due messages go out 20 days before due date.
         $this->waitForSecond(); // Messages are only sent if they were created before "now", so we need to wait one second.
@@ -795,12 +832,14 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         // Check that just user1 received a new message.
         $this->assertCount(1, $emails);
 
-        // Check both users now have message logs (user2's is old, user1's is new).
-        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        // Check that we've added another record for the test user, for the recert path.
+        $this->assertEquals(3, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
 
         // Mark user1 recertified.
         $completion = new completion_completion(array('userid' => $this->user1->id, 'course' => $course2->id));
@@ -819,22 +858,25 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $certcron->execute();
         $timeafter = time();
 
+        // The test user's recert path log was removed.
+        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+
         // Before we hack the course set due dates, make sure that they are currently valid.
-        $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions); // Only for recert path, primary was deleted.
-        $coursesetcompletion = reset($coursesetcompletions);
+        $this->assertEquals(3, $DB->count_records('prog_completion', array('userid' => $this->user1->id)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => 0)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $primarycoursesetid)));
+        $coursesetcompletion = $DB->get_record('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $recertcoursesetid));
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
         $this->assertEquals($coursesetcompletion->timecreated + 100 * DAYSECS, $coursesetcompletion->timedue);
 
         // Hack the course set due dates again, 10 days from now.
         $duedate = time() + DAYSECS * 10;
-        $DB->set_field_select('prog_completion', 'timedue', $duedate, $coursesetwhere, $coursesetparams);
-
-        // Before the test, check that only the log for user2 is still there - the log for user1 was deleted when their window opened.
-        $this->assertEquals(1, $DB->count_records('prog_messagelog'));
-        $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+        $DB->set_field('prog_completion', 'timedue', $duedate, array('userid' => $this->user1->id, 'coursesetid' => $recertcoursesetid));
 
         // Third course set due message, repeat on recert path. Course set due messages go out 20 days before due date.
         $this->waitForSecond(); // Messages are only sent if they were created before "now", so we need to wait one second.
@@ -849,12 +891,20 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         // Check that just user1 received a new message.
         $this->assertCount(1, $emails);
 
-        // Check both users now have message logs (user2's is old, user1's is new).
-        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        // The test user's recert path log was created again.
+        $this->assertEquals(3, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+
+        // To ensure that the control's recert message log record is not deleted, we'll create it artificially now.
+        $messagelog = $DB->get_record('prog_messagelog', array('userid' => $this->user2->id));
+        unset($messagelog->id);
+        $messagelog->coursesetid = $recertcoursesetid;
+        $DB->insert_record('prog_messagelog', $messagelog);
 
         // Expire the user - move all dates back an additional six month (on top of 9 months earlier) months.
         list($certcompletion, $progcompletion) = certif_load_completion($this->cert1->id, $this->user1->id);
@@ -865,23 +915,31 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         // No progcompletion->timecompleted because the window is already open.
         $this->assertTrue(certif_write_completion($certcompletion, $progcompletion));
         $certcron = new \totara_certification\task\update_certification_task();
+        $timebefore = time();
         $certcron->execute();
+        $timeafter = time();
 
-        // Before we hack the course set due dates, make sure that they are currently valid.
-        $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(2, $coursesetcompletions); // Because there is now one for each path.
-        // Skip the date checks - we've already done that thoroughly earlier.
+        // Only user1's recert path log was removed (because we've only expired). User2's are both there.
+        $this->assertEquals(3, $DB->count_records('prog_messagelog'));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+
+        // Before we hack the course set due dates, make sure that they are currently valid. This time, primary is reset!
+        $this->assertEquals(3, $DB->count_records('prog_completion', array('userid' => $this->user1->id)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => 0)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $recertcoursesetid)));
+        $coursesetcompletion = $DB->get_record('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $primarycoursesetid));
+        $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
+        $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
+        $this->assertEquals($coursesetcompletion->timecreated + 100 * DAYSECS, $coursesetcompletion->timedue);
 
         // Hack the course set due dates again, 10 days from now.
         $duedate = time() + DAYSECS * 10;
-        $DB->set_field_select('prog_completion', 'timedue', $duedate, $coursesetwhere, $coursesetparams);
-
-        // Check both users now have message logs (user2's is old, user1's is for the recert path!).
-        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
-        $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $messageid)));
-        $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+        $DB->set_field('prog_completion', 'timedue', $duedate, array('userid' => $this->user1->id, 'coursesetid' => $primarycoursesetid));
 
         // Fourth course set due message, repeat on primary path. Course set due messages go out 20 days before due date.
         $this->waitForSecond(); // Messages are only sent if they were created before "now", so we need to wait one second.
@@ -896,18 +954,22 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         // Check that just user1 received a new message.
         $this->assertCount(1, $emails);
 
-        // Check both users now have message logs (user2's is old, user1 has one for each path!).
-        $this->assertEquals(3, $DB->count_records('prog_messagelog'));
-        $this->assertEquals(2, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $messageid)));
+        // The test user's primary path log was created again.
+        $this->assertEquals(4, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
     }
 
     /**
      * Make sure that courseset overdue messages are resent when a user's due date is nearly reached.
      *
-     * Overall patern is: Primary, Recert, Recert, Primery (due to expiry).
+     * Overall patern is: Primary, Recert, Recert, Primary (due to expiry).
      *
      * This test works with just one course set, so it's pretty much the same as the program overdue test.
      * The program tests make sure that multiple courseset messages are sent within a single program.
@@ -950,6 +1012,10 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
             ),
         );
         $this->getDataGenerator()->create_coursesets_in_program($this->cert1, $coursesetdata);
+        $params = array('programid' => $this->cert1->id, 'certifpath' => CERTIFPATH_CERT);
+        $primarycoursesetid = $DB->get_field('prog_courseset', 'id', $params);
+        $params = array('programid' => $this->cert1->id, 'certifpath' => CERTIFPATH_RECERT);
+        $recertcoursesetid = $DB->get_field('prog_courseset', 'id', $params);
 
         // Assign users to program.
         $usersprogram = array($this->user1->id, $this->user2->id);
@@ -958,11 +1024,9 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $timeafter = time();
 
         // Before we hack the course set due dates, make sure that they are currently valid.
-        $coursesetwhere = "programid = :programid AND userid = :userid AND coursesetid > 0";
-        $coursesetparams = array('programid' => $this->cert1->id, 'userid' => $this->user1->id);
-        $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions); // Only for primary path.
-        $coursesetcompletion = reset($coursesetcompletions);
+        $this->assertEquals(2, $DB->count_records('prog_completion', array('userid' => $this->user1->id)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => 0)));
+        $coursesetcompletion = $DB->get_record('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $primarycoursesetid));
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
         $this->assertEquals($coursesetcompletion->timecreated + 100 * DAYSECS, $coursesetcompletion->timedue);
@@ -1001,7 +1065,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $completion = new completion_completion(array('userid' => $this->user1->id, 'course' => $course1->id));
         $completion->mark_complete();
 
-        // Reopen the window for user1 - move all dates back nine months.
+        // Open the window for user1 - move all dates back nine months.
         list($certcompletion, $progcompletion) = certif_load_completion($this->cert1->id, $this->user1->id);
         $certcompletion->timewindowopens -= DAYSECS * 30 * 9;
         $certcompletion->timeexpires -= DAYSECS * 30 * 9;
@@ -1014,22 +1078,25 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $certcron->execute();
         $timeafter = time();
 
+        // Check that logs for both users are still there - they belong to the primary cert path, so shouldn't be touched.
+        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+
         // Before we hack the course set due dates, make sure that they are currently valid.
-        $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions); // Only for recert path, primary was deleted.
-        $coursesetcompletion = reset($coursesetcompletions);
+        $this->assertEquals(3, $DB->count_records('prog_completion', array('userid' => $this->user1->id)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => 0)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $primarycoursesetid)));
+        $coursesetcompletion = $DB->get_record('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $recertcoursesetid));
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
         $this->assertEquals($coursesetcompletion->timecreated + 100 * DAYSECS, $coursesetcompletion->timedue);
 
         // Hack the course set due dates again, 20 days ago.
         $duedate = time() - DAYSECS * 20;
-        $DB->set_field_select('prog_completion', 'timedue', $duedate, $coursesetwhere, $coursesetparams);
-
-        // Before the test, check that only the log for user2 is still there - the log for user1 was deleted when their window opened.
-        $this->assertEquals(1, $DB->count_records('prog_messagelog'));
-        $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+        $DB->set_field('prog_completion', 'timedue', $duedate, array('userid' => $this->user1->id, 'coursesetid' => $recertcoursesetid));
 
         // Second course set overdue message, recert path. Course set overdue messages go out 10 days after due date.
         $this->waitForSecond(); // Messages are only sent if they were created before "now", so we need to wait one second.
@@ -1044,12 +1111,14 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         // Check that just user1 received a new message.
         $this->assertCount(1, $emails);
 
-        // Check both users now have message logs (user2's is old, user1's is new).
-        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        // Check that we've added another record for the test user, for the recert path.
+        $this->assertEquals(3, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
 
         // Mark user1 recertified.
         $completion = new completion_completion(array('userid' => $this->user1->id, 'course' => $course2->id));
@@ -1068,22 +1137,25 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $certcron->execute();
         $timeafter = time();
 
+        // The test user's recert path log was removed.
+        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+
         // Before we hack the course set due dates, make sure that they are currently valid.
-        $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(1, $coursesetcompletions); // Only for recert path, primary was deleted.
-        $coursesetcompletion = reset($coursesetcompletions);
+        $this->assertEquals(3, $DB->count_records('prog_completion', array('userid' => $this->user1->id)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => 0)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $primarycoursesetid)));
+        $coursesetcompletion = $DB->get_record('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $recertcoursesetid));
         $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
         $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
         $this->assertEquals($coursesetcompletion->timecreated + 100 * DAYSECS, $coursesetcompletion->timedue);
 
         // Hack the course set due dates again, 20 days ago.
         $duedate = time() - DAYSECS * 20;
-        $DB->set_field_select('prog_completion', 'timedue', $duedate, $coursesetwhere, $coursesetparams);
-
-        // Before the test, check that only the log for user2 is still there - the log for user1 was deleted when their window opened.
-        $this->assertEquals(1, $DB->count_records('prog_messagelog'));
-        $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+        $DB->set_field('prog_completion', 'timedue', $duedate, array('userid' => $this->user1->id, 'coursesetid' => $recertcoursesetid));
 
         // Third course set overdue message, repeat on recert path. Course set overdue messages go out 10 days after due date.
         $this->waitForSecond(); // Messages are only sent if they were created before "now", so we need to wait one second.
@@ -1098,12 +1170,20 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         // Check that just user1 received a new message.
         $this->assertCount(1, $emails);
 
-        // Check both users now have message logs (user2's is old, user1's is new).
-        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
+        // The test user's recert path log was created again.
+        $this->assertEquals(3, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+
+        // To ensure that the control's recert message log record is not deleted, we'll create it artificially now.
+        $messagelog = $DB->get_record('prog_messagelog', array('userid' => $this->user2->id));
+        unset($messagelog->id);
+        $messagelog->coursesetid = $recertcoursesetid;
+        $DB->insert_record('prog_messagelog', $messagelog);
 
         // Expire the user - move all dates back an additional six month (on top of 9 months earlier) months.
         list($certcompletion, $progcompletion) = certif_load_completion($this->cert1->id, $this->user1->id);
@@ -1114,25 +1194,33 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         // No progcompletion->timecompleted because the window is already open.
         $this->assertTrue(certif_write_completion($certcompletion, $progcompletion));
         $certcron = new \totara_certification\task\update_certification_task();
+        $timebefore = time();
         $certcron->execute();
+        $timeafter = time();
+
+        // Only user1's recert path log was removed (because we've only expired). User2's are both there.
+        $this->assertEquals(3, $DB->count_records('prog_messagelog'));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
 
         // Before we hack the course set due dates, make sure that they are currently valid.
-        $coursesetcompletions = $DB->get_records_select('prog_completion', $coursesetwhere, $coursesetparams);
-        $this->assertCount(2, $coursesetcompletions); // Because there is now one for each path.
-        // Skip the date checks - we've already done that thoroughly earlier.
+        $this->assertEquals(3, $DB->count_records('prog_completion', array('userid' => $this->user1->id)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => 0)));
+        $this->assertEquals(1, $DB->count_records('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $recertcoursesetid)));
+        $coursesetcompletion = $DB->get_record('prog_completion', array('userid' => $this->user1->id, 'coursesetid' => $primarycoursesetid));
+        $this->assertGreaterThanOrEqual($timebefore, $coursesetcompletion->timecreated);
+        $this->assertLessThanOrEqual($timeafter, $coursesetcompletion->timecreated);
+        $this->assertEquals($coursesetcompletion->timecreated + 100 * DAYSECS, $coursesetcompletion->timedue);
 
         // Hack the course set due dates again, 20 days ago.
         $duedate = time() - DAYSECS * 20;
-        $DB->set_field_select('prog_completion', 'timedue', $duedate, $coursesetwhere, $coursesetparams);
+        $DB->set_field('prog_completion', 'timedue', $duedate, array('userid' => $this->user1->id, 'coursesetid' => $primarycoursesetid));
 
-        // Check both users now have message logs (user2's is old, user1's is for the recert path!).
-        $this->assertEquals(2, $DB->count_records('prog_messagelog'));
-        $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $messageid)));
-        $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
-
-        // Third course set overdue message, repeat on recert path. Course set overdue messages go out 10 days after due date.
+        // Fourth course set overdue message, repeat on primary path. Course set overdue messages go out 10 days after due date.
         $this->waitForSecond(); // Messages are only sent if they were created before "now", so we need to wait one second.
         ob_start();
         $task = new \totara_program\task\send_messages_task();
@@ -1145,12 +1233,16 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         // Check that just user1 received a new message.
         $this->assertCount(1, $emails);
 
-        // Check both users now have message logs (user2's is old, user1 has one for each path!).
-        $this->assertEquals(3, $DB->count_records('prog_messagelog'));
-        $this->assertEquals(2, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $messageid)));
+        // The test user's primary path log was created again.
+        $this->assertEquals(4, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $messageid)));
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user1->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $primarycoursesetid)));
+        $this->assertEquals(1, $DB->count_records('prog_messagelog',
+            array('userid' => $this->user2->id, 'messageid' => $messageid, 'coursesetid' => $recertcoursesetid)));
     }
 
     /**

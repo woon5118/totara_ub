@@ -47,5 +47,5 @@ Feature: Completion logs are created
     When I run the scheduled task "\totara_certification\task\update_certification_task"
     Then I should see "Completion manually edited"
     And I should see "Certification completion copied to new completion history"
-    And I should see "Window opened, current certification completion archived, all courses reset"
+    And I should see "Window opened, current certification completion archived, recert path courses reset"
     And I should see "Certification expired, changed to primary certification path"

@@ -1698,11 +1698,13 @@ function certif_set_state_windowopen(int $programid, int $userid, string $logmes
                AND userid = :userid
                AND coursesetid IN (SELECT pc2.id
                                      FROM {prog_courseset} pc2
-                                    WHERE pc2.programid = :programid2)";
+                                    WHERE pc2.programid = :programid2
+                                      AND pc2.certifpath = :certifpathrecert)";
     $params = [
         'programid1' => $programid,
         'programid2' => $programid,
         'userid' => $userid,
+        'certifpathrecert' => CERTIFPATH_RECERT,
     ];
     $DB->execute($sql, $params);
 
@@ -1716,7 +1718,7 @@ function certif_set_state_windowopen(int $programid, int $userid, string $logmes
     }
 
     if (empty($logmessage)) {
-        $logmessage = 'Window opened, current certification completion archived, all courses reset';
+        $logmessage = 'Window opened, current certification completion archived, recert path courses reset';
     }
 
     // Change the cert and prog completion records.
@@ -1724,8 +1726,9 @@ function certif_set_state_windowopen(int $programid, int $userid, string $logmes
     $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;
     $progcompletion->timecompleted = 0;
 
-    // Reset courses. In the past, this function could trigger re-completion, but now it must not.
-    $courses = find_courses_for_certif($certcompletion->certifid, 'c.id');
+    // Reset courses which are in the recert path.
+    // In the past, this function could trigger re-completion, but now it must not.
+    $courses = find_courses_for_certif($certcompletion->certifid, 'c.id', CERTIFPATH_RECERT);
     certif_archive_courses_completion(array_keys($courses), $userid, $certcompletion->timewindowopens);
 
     // Save the change (performs data validation and logging).
@@ -1735,18 +1738,15 @@ function certif_set_state_windowopen(int $programid, int $userid, string $logmes
     certif_delete_messagelog($programid, $userid, MESSAGETYPE_PROGRAM_COMPLETED);
     certif_delete_messagelog($programid, $userid, MESSAGETYPE_PROGRAM_DUE);
     certif_delete_messagelog($programid, $userid, MESSAGETYPE_PROGRAM_OVERDUE);
-    certif_delete_messagelog($programid, $userid, MESSAGETYPE_COURSESET_DUE);
-    certif_delete_messagelog($programid, $userid, MESSAGETYPE_COURSESET_OVERDUE);
-    certif_delete_messagelog($programid, $userid, MESSAGETYPE_COURSESET_COMPLETED);
+    certif_delete_messagelog($programid, $userid, MESSAGETYPE_COURSESET_DUE, CERTIFPATH_RECERT);
+    certif_delete_messagelog($programid, $userid, MESSAGETYPE_COURSESET_OVERDUE, CERTIFPATH_RECERT);
+    certif_delete_messagelog($programid, $userid, MESSAGETYPE_COURSESET_COMPLETED, CERTIFPATH_RECERT);
     certif_delete_messagelog($programid, $userid, MESSAGETYPE_RECERT_WINDOWOPEN);
     certif_delete_messagelog($programid, $userid, MESSAGETYPE_RECERT_WINDOWDUECLOSE);
     certif_delete_messagelog($programid, $userid, MESSAGETYPE_RECERT_FAILRECERT);
     certif_delete_messagelog($programid, $userid, MESSAGETYPE_LEARNER_FOLLOWUP);
 
     $transaction->allow_commit();
-
-    // It's safe to send window open messages even if re-completion occurred, because, at worst, they will be sent
-    // to the user out of order, a few seconds apart, and they would all have been sent anyway.
 
     // Get the messages for the certification, using the message manager cache.
     $messagesmanager = prog_messages_manager::get_program_messages_manager($programid);
@@ -1799,8 +1799,27 @@ function certif_set_state_expired(int $programid, int $userid, string $logmessag
         return false;
     }
 
+    // All DB changes happen inside a transaction.
+    $transaction = $DB->start_delegated_transaction();
+
+    // Reset courseset records for the certification path.
+    $sql = "DELETE FROM {prog_completion}
+             WHERE programid = :programid1
+               AND userid = :userid
+               AND coursesetid IN (SELECT pc2.id
+                                     FROM {prog_courseset} pc2
+                                    WHERE pc2.programid = :programid2
+                                      AND pc2.certifpath = :certifpathcert)";
+    $params = [
+        'programid1' => $programid,
+        'programid2' => $programid,
+        'userid' => $userid,
+        'certifpathcert' => CERTIFPATH_CERT,
+    ];
+    $DB->execute($sql, $params);
+
     if (empty($logmessage)) {
-        $logmessage = 'Certification expired, changed to primary certification path';
+        $logmessage = 'Certification expired, changed to primary certification path, primary/non-recert path courses reset';
     }
 
     // Change the cert and prog completion records.
@@ -1815,6 +1834,21 @@ function certif_set_state_expired(int $programid, int $userid, string $logmessag
 
     // Save the change (performs data validation and logging).
     certif_write_completion($certcompletion, $progcompletion, $logmessage);
+
+    // Remove mesages for prog/user for the primary path so we can resend them.
+    certif_delete_messagelog($programid, $userid, MESSAGETYPE_COURSESET_DUE, CERTIFPATH_CERT);
+    certif_delete_messagelog($programid, $userid, MESSAGETYPE_COURSESET_OVERDUE, CERTIFPATH_CERT);
+    certif_delete_messagelog($programid, $userid, MESSAGETYPE_COURSESET_COMPLETED, CERTIFPATH_CERT);
+
+    // Reset courses which are in the primary path but not in the recert path.
+    // This happens after the completion record is written to db, because it's possible that this function will
+    // trigger re-completion, and we need to save the changes before that occurs.
+    $primarycourses = find_courses_for_certif($certcompletion->certifid, 'c.id, c.fullname', CERTIFPATH_CERT);
+    $recertcourses = find_courses_for_certif($certcompletion->certifid, 'c.id, c.fullname', CERTIFPATH_RECERT);
+    $courses = array_diff(array_keys($primarycourses), array_keys($recertcourses));
+    certif_archive_courses_completion($courses, $userid, $certcompletion->timeexpires);
+
+    $transaction->allow_commit();
 
     // Get the messages for the certification, using the message manager cache.
     $messagesmanager = prog_messages_manager::get_program_messages_manager($programid);
@@ -1926,8 +1960,9 @@ function certif_delete($learningcomptype, $certifid) {
  * @param integer $progid
  * @param integer $userid
  * @param integer $messagetype
+ * @param integer $path If specified, only message logs with coursesetid belonging to the specified path will be deleted.
  */
-function certif_delete_messagelog($progid, $userid, $messagetype) {
+function certif_delete_messagelog($progid, $userid, $messagetype, $path = null) {
     global $DB;
 
     // Get all the messages that match the given params.
@@ -1936,10 +1971,22 @@ function certif_delete_messagelog($progid, $userid, $messagetype) {
         'pid' => $progid,
         'mtype' => $messagetype,
     );
+
+    if (!is_null($path)) {
+        $params['path'] = $path;
+        $pathsql = "JOIN {prog_courseset} pcs
+                      ON pcs.programid = pm.programid AND pcs.id = pml.coursesetid AND pcs.certifpath = :path";
+    } else {
+        $pathsql = "";
+    }
+
     $sql = "SELECT DISTINCT pml.id
-            FROM {prog_messagelog} pml
-            JOIN {prog_message} pm ON pm.id = pml.messageid AND pm.programid = :pid AND pm.messagetype = :mtype
-            WHERE pml.userid = :uid";
+              FROM {prog_messagelog} pml
+              JOIN {prog_message} pm
+                ON pm.id = pml.messageid AND pm.programid = :pid AND pm.messagetype = :mtype
+              {$pathsql}
+             WHERE pml.userid = :uid";
+
     $messages = $DB->get_recordset_sql($sql, $params);
 
     // Put them into an array of ids for the sql statement.
