@@ -463,7 +463,7 @@ abstract class question_base {
         $this->formsent = true;
 
         // Adding the header causes a new div to start in the output, containing all following elements until the next header.
-        $form->addElement('header', 'question', $this->name);
+        $form->addElement('header', 'question', format_string($this->name));
 
         if ($this->cananswer) {
             if ($this->viewonly) {
@@ -577,7 +577,7 @@ abstract class question_base {
                     $name = $field->getName();
                 }
                 if (isset($data->$name)) {
-                    $this->values[$elem] = $data->$name;
+                    $this->values[$elem] = format_string($data->$name);
                 } else {
                     $this->values[$elem] = null;
                 }

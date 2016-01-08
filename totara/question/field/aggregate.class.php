@@ -65,7 +65,7 @@ class question_aggregate extends question_base{
         if ($readonly) {
             $questions = html_writer::start_tag('ul');
             foreach (explode(',', $this->param1) as $qid) {
-                $questions .= html_writer::tag('li', $options[$qid]);
+                $questions .= html_writer::tag('li', format_string($options[$qid]));
             }
             $questions .= html_writer::end_tag('ul');
 
@@ -75,7 +75,12 @@ class question_aggregate extends question_base{
             $form->addElement('advcheckbox', 'aggregatemedian', get_string('aggregatemedian', 'totara_question'), null, array('disabled' => 'disabled'));
         } else {
             if (!empty($options)) {
-                $select = &$form->addElement('select', 'multiselectfield', get_string('aggregate', 'totara_question'), $options, array('class' => 'aggregateselector'));
+                $questions = array();
+                foreach ($options as $key => $option) {
+                    $questions[$key] = format_string($option);
+                }
+
+                $select = &$form->addElement('select', 'multiselectfield', get_string('aggregate', 'totara_question'), $questions, array('class' => 'aggregateselector'));
                 $select->setMultiple(true);
             } else {
                 $form->addElement('static', '', get_string('aggregate', 'totara_question'), get_string('aggregatenooptions', 'totara_question'));
@@ -220,7 +225,7 @@ class question_aggregate extends question_base{
         }
 
         // Set up the header for the question.
-        $form->addElement('header', 'question', $this->name);
+        $form->addElement('header', 'question', format_string($this->name));
 
         foreach ($answers as $roletype => $answer) {
             $rolekey = get_string($rolestringkeys[$roletype], "totara_{$module}");

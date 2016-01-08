@@ -68,7 +68,7 @@ class question_redisplay extends question_base{
         $module = $this->prefix;
 
         if ($readonly) {
-            $form->addElement('static', '', get_string('redisplay', 'totara_question'), $this->get_name());
+            $form->addElement('static', '', get_string('redisplay', 'totara_question'), format_string($this->get_name()));
         } else {
             $list = $module::get_redisplay_question_list($moduleinfo);
 
@@ -83,12 +83,12 @@ class question_redisplay extends question_base{
 
             foreach ($list as $item) {
                 if ($item->isheading) {
-                    $select->addOptGroup($item->name, array());
+                    $select->addOptGroup(format_string($item->name), array());
                     $group++;
                 } else if ($item->disabled) {
-                    $select->addOption($group, $item->name, $item->id, array('disabled' => 'disabled'));
+                    $select->addOption($group, format_string($item->name), $item->id, array('disabled' => 'disabled'));
                 } else {
-                    $select->addOption($group, $item->name, $item->id);
+                    $select->addOption($group, format_string($item->name), $item->id);
                 }
             }
 

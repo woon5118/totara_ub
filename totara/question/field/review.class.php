@@ -324,7 +324,7 @@ abstract class review extends multichoice {
         } else {
             $requiredstr = '';
         }
-        $form->addElement('header', 'question', $this->name . $requiredstr);
+        $form->addElement('header', 'question', format_string($this->name) . $requiredstr);
 
         if ($canasnweritems) {
             $form->addElement('hidden', $this->get_prefix_form() . 'reviewitems')->setValue('');

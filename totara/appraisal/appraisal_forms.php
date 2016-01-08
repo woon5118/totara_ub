@@ -682,6 +682,7 @@ class appraisal_quest_edit_form extends question_base_form {
      * @param stdClass|array $data
      */
     public function set_data($default_values) {
+        $default_values->name = format_string($default_values->name);
         if (is_object($default_values)) {
             $default_values = (array) $default_values;
         }
