@@ -25,9 +25,9 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name                                    | facetoface1                                       |
       | Description                             | Test facetoface description                       |
+      | Allow multiple events signup per user   | 1                                                 |
       | Completion tracking                     | Show activity as complete when conditions are met |
       | completionstatusrequired[100]           | 1                                                 |
-      | Allow multiple events signup per user   | 1                                                 |
 
     # Set course completion to f2f completion.
     And I navigate to "Course completion" node in "Course administration"

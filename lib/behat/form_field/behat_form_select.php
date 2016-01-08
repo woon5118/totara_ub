@@ -48,157 +48,76 @@ class behat_form_select extends behat_form_field {
      * @return void
      */
     public function set_value($value) {
+        // Totara: Moodle hacks were prone to double clicking which breaks Totara tests very badly...
 
-        // In some browsers we select an option and it triggers all the
-        // autosubmits and works as expected but not in all of them, so we
-        // try to catch all the possibilities to make this function work as
-        // expected.
-
-        // Get the internal id of the element we are going to click.
-        // This kind of internal IDs are only available in the selenium wire
-        // protocol, so only available using selenium drivers, phantomjs and family.
-        if ($this->running_javascript()) {
-            $currentelementid = $this->get_internal_field_id();
-        }
-
-        // Is the select multiple?
+        // Multiple-selects should not have any JS magic attached, let's use the selectOption() always.
         $multiple = $this->field->hasAttribute('multiple');
 
-        // By default, assume the passed value is a non-multiple option.
-        $options = array(trim($value));
-
-        // Here we select the option(s).
-        if ($multiple) {
-            // Split and decode values. Comma separated list of values allowed. With valuable commas escaped with backslash.
-            $options = preg_replace('/\\\,/', ',',  preg_split('/(?<!\\\),/', $value));
-            // This is a multiple select, let's pass the multiple flag after first option.
-            $afterfirstoption = false;
-            foreach ($options as $option) {
-                $this->field->selectOption(trim($option), $afterfirstoption);
-                $afterfirstoption = true;
-            }
-        } else {
-            // If value is already set then don't set it again.
-            if ($this->field->getValue() == $value) {
-                return;
-            } else {
-                $opt = $this->field->find('named', array(
-                    'option', $this->field->getSession()->getSelectorsHandler()->xpathLiteral($value)
-                ));
-                if ($opt && ($this->field->getValue() == $opt->getValue())) {
-                    return;
-                }
-            }
-
-            // If not running JS or not a singleselect then use selectOption.
-            // For singleselect only click event is enough.
-            if (!$this->running_javascript() ||
-                !($this->field->hasClass('singleselect') || $this->field->hasClass('urlselect'))) {
-
-                // This is a single select, let's pass the last one specified.
-                $this->field->selectOption(end($options));
-            }
-        }
-
-        // With JS disabled this is enough and we finish here.
-        if (!$this->running_javascript()) {
-            return;
-        }
-
-        // With JS enabled we add more clicks as some selenium
-        // drivers requires it to fire JS events.
-
-        // In some browsers the selectOption actions can perform a form submit or reload page
-        // so we need to ensure the element is still available to continue interacting
-        // with it. We don't wait here.
-        // getXpath() does not send a query to selenium, so we don't need to wrap it in a try & catch.
-        $selectxpath = $this->field->getXpath();
-        if (!$this->session->getDriver()->find($selectxpath)) {
-            return;
-        }
-
-        // We also check the selenium internal element id, if it have changed
-        // we are dealing with an autosubmit that was already executed, and we don't to
-        // execute anything else as the action we wanted was already performed.
-        if ($currentelementid != $this->get_internal_field_id()) {
-            return;
-        }
-
-        // Wait for all the possible AJAX requests that have been
-        // already triggered by selectOption() to be finished.
-        $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
-
-        // Wrapped in try & catch as the element may disappear if an AJAX request was submitted.
-        try {
-            $multiple = $this->field->hasAttribute('multiple');
-        } catch (Exception $e) {
-            // We do not specify any specific Exception type as there are
-            // different exceptions that can be thrown by the driver and
-            // we can not control them all, also depending on the selenium
-            // version the exception type can change.
-            return;
-        }
-
-        // Single select sometimes needs an extra click in the option.
-        if (!$multiple) {
-
-            // Var $options only contains 1 option.
-            $optionxpath = $this->get_option_xpath(end($options), $selectxpath);
-
-            // Using the driver direcly because Element methods are messy when dealing
-            // with elements inside containers.
-            if ($optionnodes = $this->session->getDriver()->find($optionxpath)) {
-
-                // Wrapped in a try & catch as we can fall into race conditions
-                // and the element may not be there.
-                try {
-                    current($optionnodes)->click();
-                } catch (Exception $e) {
-                    // We continue and return as this means that the element is not there or it is not the same.
-                    return;
-                }
-            }
-
-        } else {
-
-            // Wrapped in a try & catch as we can fall into race conditions
-            // and the element may not be there.
-            try {
-                // Multiple ones needs the click in the select.
-                $this->field->click();
-            } catch (Exception $e) {
-                // We continue and return as this means that the element is not there or it is not the same.
-                return;
-            }
-
-            // We also check that the option(s) are still there. We neither wait.
-            foreach ($options as $option) {
-                $optionxpath = $this->get_option_xpath($option, $selectxpath);
-                if (!$this->session->getDriver()->find($optionxpath)) {
-                    return;
-                }
-            }
-
-            // Wait for all the possible AJAX requests that have been
-            // already triggered by clicking on the field to be finished.
-            $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
-
-            // Wrapped in a try & catch as we can fall into race conditions
-            // and the element may not be there.
-            try {
-
-                // Repeating the select(s) as some drivers (chrome that I know) are moving
-                // to another option after the general select field click above.
+        if ($multiple or !$this->running_javascript()) {
+            if ($multiple) {
+                // Split and decode values. Comma separated list of values allowed. With valuable commas escaped with backslash.
+                $options = preg_replace('/\\\,/', ',',  preg_split('/(?<!\\\),/', $value));
+                // This is a multiple select, let's pass the multiple flag after first option.
                 $afterfirstoption = false;
                 foreach ($options as $option) {
                     $this->field->selectOption(trim($option), $afterfirstoption);
                     $afterfirstoption = true;
                 }
-            } catch (Exception $e) {
-                // We continue and return as this means that the element is not there or it is not the same.
-                return;
+            } else {
+                // This is a single select, let's pass the last one specified.
+                $this->field->selectOption(trim($value));
             }
+
+            return;
         }
+
+        $autosubmit = $this->field->hasClass('autosubmit');
+        if ($autosubmit) {
+            $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
+        }
+
+        // Make sure the option actually exists!
+        $selectxpath = $this->field->getXpath();
+        $optionxpath = $this->get_option_xpath(trim($value), $selectxpath);
+        if (!$optionnodes = $this->session->getDriver()->find($optionxpath)) {
+            // We do want to know when tests contain invalid select options!
+            throw new \Behat\Mink\Exception\ExpectationException('Cannot find select value "' . $value .'" in field' . $selectxpath, $this->session);
+        }
+        /** @var \Behat\Mink\Element\NodeElement $option */
+        $option = reset($optionnodes);
+
+        $browser = '';
+        $driver = $this->session->getDriver();
+        if (method_exists($driver, 'getBrowser')) {
+            $browser = $driver->getBrowser();
+        }
+
+        if ($browser === 'firefox') {
+            // Firefox is a total nightmare, recent versions cannot even click properly,
+            // sometimes first click on select option breaks click on the next element,
+            // the reason is that the select box is kept expanded after the click on option.
+
+            $currentelementid = $this->get_internal_field_id();
+            $option->click();
+            try {
+                $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
+                if ($currentelementid === $this->get_internal_field_id()) {
+                    if ($option->hasAttribute('selected')) {
+                        // This click on the select field should not change value, it should only collapse the select box.
+                        $this->field->click();
+                    }
+                }
+            } catch (Exception $e) {
+                // Do nothing, we are likely on a different page now.
+            }
+
+        } else {
+            // Do a click because selectOption() may not always trigger all JS events.
+            $option->click();
+        }
+
+        // In case there was some ajax or redirect triggered make sure we are ready to continue.
+        $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
     }
 
     /**

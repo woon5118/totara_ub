@@ -111,13 +111,15 @@ Feature: Edit quiz page - adding things
     And I follow "Course 1"
     And I navigate to "Categories" node in "Course administration > Question bank"
     Then I should see "Add category"
-    Then I set the field "Parent category" to "Default for C1"
+    # Totara: add non-breakable space to fool xpath search
+    Then I set the field "Parent category" to "   Default for C1"
     And I set the field "Name" to "Subcat 1"
     And I set the field "Category info" to "This is sub category 1"
     Then I press "id_submitbutton"
     And I should see "Subcat 1"
 
-    Then I set the field "Parent category" to "Default for C1"
+    # Totara: add non-breakable space to fool xpath search
+    Then I set the field "Parent category" to "   Default for C1"
     And I set the field "Name" to "Subcat 2"
     And I set the field "Category info" to "This is sub category 2"
     Then I press "id_submitbutton"
@@ -140,7 +142,8 @@ Feature: Edit quiz page - adding things
 
     # Create the Essay 02 question.
     And I should see "Select a category"
-    And I set the field "Select a category:" to "Subcat 1"
+    # Totara: add non-breakable space to fool xpath search
+    And I set the field "Select a category:" to "   Subcat 1"
     When I press "Create a new question ..."
     And I set the field "qtype_qtype_essay" to "1"
     And I press "Add"
@@ -152,7 +155,8 @@ Feature: Edit quiz page - adding things
     And I should see "Essay 02"
 
     # Create the Essay 03 question.
-    And I set the field "Select a category" to "Default for C1"
+    # Totara: we require full option match
+    And I set the field "Select a category" to "Default for C1 (1)"
     When I press "Create a new question ..."
     And I set the field "qtype_qtype_essay" to "1"
     And I press "Add"
@@ -210,7 +214,8 @@ Feature: Edit quiz page - adding things
     And I open the "Page 1" add to quiz menu
     And I follow "from question bank"
     And I should see "Select a category"
-    And I set the field "Select a category" to "Subcat 1"
+    # Totara: we require full option match including non-breaking spaces
+    And I set the field "Select a category" to "   Subcat 1 (1)"
     And I click on "Add to quiz" "link" in the "Essay 02" "table_row"
     Then I should see "Editing quiz: Quiz 1"
     And I should see "Essay 03" on quiz page "1"

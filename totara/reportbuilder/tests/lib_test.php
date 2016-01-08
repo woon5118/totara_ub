@@ -1454,11 +1454,6 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // Make sure the delete SQL does not throw any exceptions.
         $this->assertTrue($DB->record_exists('report_builder', array('id' => $rb->_id)));
         reportbuilder_delete_report($rb->_id);
-        $debugging = $this->getDebuggingMessages();
-        if ($debugging && count($debugging) == 1) {
-            $this->assertEquals('Cannot purge cache. Seems it is already clean.', $debugging[0]->message);
-            $this->resetDebugging();
-        }
         $this->assertFalse($DB->record_exists('report_builder', array('id' => $rb->_id)));
     }
 

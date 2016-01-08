@@ -143,8 +143,8 @@ Scenario: Verify custom fields can be successfully added to a company goal type 
   And I set the following fields to these values:
     | Checkbox 1                     | 1            |
     | customfield_datetime1[enabled] | 1            |
-    | customfield_datetime1[day]     | 31           |
     | customfield_datetime1[month]   | December     |
+    | customfield_datetime1[day]     | 31           |
     | customfield_datetime1[year]    | 2035         |
     | customfield_menuofchoices1     | Choice 1     |
     | Select 1                       | 1            |

@@ -65,7 +65,8 @@ Feature: A teacher can put questions in categories in the question bank
   @javascript
   Scenario: Move a question between categories via the question page
     When I navigate to "Questions" node in "Course administration > Question bank"
-    And I set the field "Select a category" to "Used category"
+    #Totara: field options must be exact match!
+    And I set the field "Select a category" to "Used category (1)"
     And I click on "Test question to be moved" "checkbox" in the "Test question to be moved" "table_row"
     And I set the field "Question category" to "Subcategory"
     And I press "Move to >>"
@@ -77,7 +78,8 @@ Feature: A teacher can put questions in categories in the question bank
   @javascript
   Scenario: Move a question between categories via the question settings page
     When I navigate to "Questions" node in "Course administration > Question bank"
-    And I set the field "Select a category" to "Used category"
+    #Totara: field options must be exact match!
+    And I set the field "Select a category" to "Used category (1)"
     And I click on "Edit" "link" in the "Test question to be moved" "table_row"
     And I click on "Use this category" "checkbox"
     And I set the field "Save in category" to "Subcategory"

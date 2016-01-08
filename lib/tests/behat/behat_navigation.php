@@ -227,13 +227,6 @@ class behat_navigation extends behat_base {
      */
     public function i_navigate_to_node_in($nodetext, $parentnodes) {
 
-        // Totara: compatibility hacks.
-        $browser = '';
-        $driver = $this->getSession()->getDriver();
-        if (method_exists($driver, 'getBrowser')) {
-            $browser = $driver->getBrowser();
-        }
-
         // Site admin is different and needs special treatment.
         $siteadminstr = get_string('administrationsite');
 

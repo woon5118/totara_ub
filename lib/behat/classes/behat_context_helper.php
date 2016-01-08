@@ -66,7 +66,7 @@ class behat_context_helper {
     public static function get($classname) {
 
         if (!$subcontext = self::$maincontext->getSubcontextByClassName($classname)) {
-            throw coding_exception('The required "' . $classname . '" class does not exist');
+            throw new coding_exception('The required "' . $classname . '" class does not exist');
         }
 
         return $subcontext;

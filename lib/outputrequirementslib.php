@@ -1620,6 +1620,11 @@ class page_requirements_manager {
         // Add other requested modules.
         $output .= $this->get_extra_modules_code();
 
+        // Totara: kill the jQuery datepicker that only obscures other elements during testing!
+        if (defined('BEHAT_SITE_RUNNING')) {
+            $this->js_init_code('(function(){jQuery.fn.datepicker = function(){}})();');
+        }
+
         $this->js_init_code('M.util.js_complete("init");', true);
 
         // All the other linked scripts - there should be as few as possible.

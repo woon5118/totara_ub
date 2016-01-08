@@ -4,6 +4,8 @@ Feature: Settings form fields disabled if not required
   As a teacher
   I don't need to to use certain form fields.
 
+  #Totara: the select options must be exact match and the field-sets must be expanded!
+
   Background:
     Given the following "users" exist:
       | username | firstname |
@@ -55,10 +57,11 @@ Feature: Settings form fields disabled if not required
     And I navigate to "User overrides" node in "Quiz administration"
     And I press "Add user override"
     And I set the following fields to these values:
-        | Override user    | Student1 |
+        | Override user    | Student1 Lastname2, student1@example.com |
         | Attempts allowed | 3        |
     And I press "Save"
     And I navigate to "Edit settings" node in "Quiz administration"
+    And I expand all fieldsets
     And I set the field "Attempts allowed" to "1"
     Then the "Grading method" "field" should be enabled
     And the "Each attempt builds on the last" "field" should be enabled
@@ -71,6 +74,7 @@ Feature: Settings form fields disabled if not required
     And I set the field "Attempts allowed" to "2"
     And I press "Save"
     And I navigate to "Edit settings" node in "Quiz administration"
+    And I expand all fieldsets
     And I set the field "Attempts allowed" to "1"
     Then the "Grading method" "field" should be enabled
     And the "Each attempt builds on the last" "field" should be enabled
@@ -81,10 +85,11 @@ Feature: Settings form fields disabled if not required
     And I navigate to "User overrides" node in "Quiz administration"
     And I press "Add user override"
     And I set the following fields to these values:
-        | Override user    | Student2  |
+        | Override user    | Student2 Lastname3, student2@example.com |
         | Attempts allowed | Unlimited |
     And I press "Save"
     And I navigate to "Edit settings" node in "Quiz administration"
+    And I expand all fieldsets
     And I set the field "Attempts allowed" to "1"
     Then the "Grading method" "field" should be enabled
     And the "Each attempt builds on the last" "field" should be enabled

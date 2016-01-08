@@ -82,7 +82,7 @@ Feature: Face-to-face Select position with Manager approval
     And I follow "Sign-up"
     And I should see "Manager Approval"
     And I set the following fields to these values:
-      | Select a position | Position2 |
+      | Select a position | Secondary position (Position2) |
     And I press "Request approval"
     And I should see "Your booking has been completed but requires approval from your manager."
     And I log out

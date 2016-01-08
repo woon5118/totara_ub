@@ -57,6 +57,8 @@ Feature: Random glossary entry block is used in a course
     And I should see "Definition1" in the "AutoGlossaryblock" "block"
     And I should not see "There are no entries yet in the chosen glossary" in the "AutoGlossaryblock" "block"
     And I click on "Add a new entry" "link" in the "AutoGlossaryblock" "block"
+    # Totara: we MUST wait here so that the concept 1 and 2 have different timestamp!
+    And I force sleep "1" seconds
     And I set the following fields to these values:
       | Concept    | Concept2    |
       | Definition | Definition2 |

@@ -22,25 +22,25 @@ Feature: Record of learning evidence report
     When I click on "Record of Learning" in the totara menu
     And I press "Add evidence"
     And I set the following fields to these values:
-      | Evidence name | Test evidence 1 |
-      | Checkbox test | 1               |
+      | Evidence name   | Test evidence 1 |
+      | Checkbox test 1 | 1               |
     And I press "Add evidence"
     And I press "Add evidence"
     And I set the following fields to these values:
-      | Evidence name | Test evidence 2 |
-      | Checkbox test | 0               |
+      | Evidence name   | Test evidence 2 |
+      | Checkbox test 1 | 0               |
     And I press "Add evidence"
     And I click on "Record of Learning" in the totara menu
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
     And I follow "Record of Learning: Evidence"
     And I follow "Columns"
-    And I set the field "newcolumns" to "Checkbox test"
+    And I set the field "newcolumns" to "Checkbox test 1"
     And I press "Add"
     And I press "Save changes"
     Then I should see "Columns updated"
 
     When I follow "Filters"
-    And I set the field "newstandardfilter" to "Checkbox test"
+    And I set the field "newstandardfilter" to "Checkbox test 1"
     And I press "Add"
     And I press "Save changes"
     Then I should see "Filters updated"
@@ -49,7 +49,7 @@ Feature: Record of learning evidence report
     Then I should see "Yes" in the "Test evidence 1" "table_row"
     And I should see "No" in the "Test evidence 2" "table_row"
 
-    When I set the field "Checkbox test" to "Yes"
+    When I set the field "Checkbox test 1" to "Yes"
     And I press "submitgroupstandard[addfilter]"
     Then I should see "Test evidence 1"
     And I should not see "Test evidence 2"

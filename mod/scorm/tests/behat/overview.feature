@@ -105,6 +105,8 @@ Feature: Scorm my learning overview
       | key1b0 | 1 |
 
     When I click on "submitB" "button"
+    # Must wait here to let it save results, otherwise alert may popup.
+    And I wait "2" seconds
     And I am on site homepage
     And I click on "My Learning" in the totara menu
     Then I should see "You have SCORM packages that need attention"
@@ -122,6 +124,8 @@ Feature: Scorm my learning overview
       | key4b0 | 1 |
 
     When I click on "submitB" "button"
+    # Must wait here to let it save results, otherwise alert may popup.
+    And I wait "2" seconds
     And I am on site homepage
     And I click on "My Learning" in the totara menu
     Then I should not see "You have SCORM packages that need attention"

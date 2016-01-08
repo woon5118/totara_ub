@@ -53,12 +53,13 @@ class behat_forms extends behat_base {
      * @When /^I press "(?P<button_string>(?:[^"]|\\")*)"$/
      * @throws ElementNotFoundException Thrown by behat_base::find
      * @param string $button
+     * @returns array
      */
     public function press_button($button) {
-
-        // Ensures the button is present.
-        $buttonnode = $this->find_button($button);
-        $buttonnode->press();
+        // Totara: use alias to "I click on" because we need to wait for page to load.
+        return array(
+            new Given('I click on "' . $button . '" "button"'),
+        );
     }
 
     /**
@@ -149,6 +150,8 @@ class behat_forms extends behat_base {
 
     /**
      * Sets the specified value to the field.
+     *
+     * Totara: the select options must be exact match and containing field-set must be already expanded.
      *
      * @Given /^I set the field "(?P<field_string>(?:[^"]|\\")*)" to "(?P<field_value_string>(?:[^"]|\\")*)"$/
      * @throws ElementNotFoundException Thrown by behat_base::find

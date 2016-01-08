@@ -10,8 +10,8 @@ Feature: Create plan from template.
     And I navigate to "Manage templates" node in "Site administration > Learning Plans"
     And I set the following fields to these values:
       | Name              | test template |
-      | id_enddate_day    | 31            |
       | id_enddate_month  | December      |
+      | id_enddate_day    | 31            |
       | id_enddate_year   | 2020          |
     And I press "Save changes"
 

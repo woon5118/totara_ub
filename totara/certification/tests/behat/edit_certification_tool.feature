@@ -90,8 +90,8 @@ Scenario: Confirm that the Certified, before window opens state is saved correct
   And the field "Certification path" matches value "Recertification"
   And the "Program status" "field" should be disabled
   And the field "Program status" matches value "Program complete"
+  # Note: "In progress" should be a static element with "Not applicable"
   And I set the following fields to these values:
-    | In progress             | Yes       |
     | timecompleted[day]      | 3         |
     | timecompleted[month]    | September |
     | timecompleted[year]     | 2030      |

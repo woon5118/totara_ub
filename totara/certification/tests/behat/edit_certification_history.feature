@@ -81,8 +81,8 @@ Scenario: Confirm that a historical Certified, before window opens state is save
   And the field "Renewal status" matches value "Not due for renewal"
   And the "Certification path" "field" should be disabled
   And the field "Certification path" matches value "Recertification"
+  # Note: "In progress" should be a static element with "Not applicable"
   And I set the following fields to these values:
-    | In progress             | Yes       |
     | timecompleted[day]      | 3         |
     | timecompleted[month]    | September |
     | timecompleted[year]     | 2030      |

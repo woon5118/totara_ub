@@ -425,6 +425,16 @@ abstract class testing_util {
      * @return int The value the sequence should be set to.
      */
     private static function get_next_sequence_starting_value($records, $table) {
+        if (defined('BEHAT_UTIL') or defined('BEHAT_TEST')) {
+            // Totara still relies on ids in behat - see TL-8981.
+            if (empty($records)) {
+                return 1;
+            } else {
+                $lastrecord = end($records);
+                return $lastrecord->id + 1;
+            }
+        }
+
         if (isset(self::$tablesequences[$table])) {
             return self::$tablesequences[$table];
         }

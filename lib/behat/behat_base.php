@@ -635,6 +635,20 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                 $width = (int) $size[0];
                 $height = (int) $size[1];
         }
+
+        // Totara: Firefox is notoriously bad with scrolling these days, use a taller standard screen.
+        //         This resolves problems with clicking of things that are close to the bottom end of page,
+        //         also it somehow prevents Totara menu from popping up randomly.
+        $driver = $this->getSession()->getDriver();
+        if (method_exists($driver, 'getBrowser')) {
+            $browser = $driver->getBrowser();
+            if ($browser === 'firefox') {
+                if ($height == 768) {
+                    $height = 1600;
+                }
+            }
+        }
+
         $this->getSession()->getDriver()->resizeWindow($width, $height);
     }
 }

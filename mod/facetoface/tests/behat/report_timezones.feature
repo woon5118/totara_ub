@@ -119,7 +119,7 @@ Feature: Facetoface timezones in reports
 
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "F2F sessions"
-    And I set the field "Source" to "Sign ups"
+    And I set the field "Source" to "Face-to-face Sign ups"
     And I press "Create report"
     And I click on "Columns" "link" in the ".tabtree" "css_element"
     And I add the "Event Finish Time" column to the report

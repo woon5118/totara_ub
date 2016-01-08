@@ -61,8 +61,7 @@ Feature: Add a face to face with select position
     Then I should see "Your booking has been completed."
 
   @javascript
-  Scenario: Add and configure a facetoface activity with a single session and position asked for but not mandated then
-            sign in as user with two positions and check attendee list reflects this and the selected position can be updated
+  Scenario: Add and configure a facetoface activity with a single session and position asked for but not mandated then sign in as user with two positions and check attendee list reflects this and the selected position can be updated
     Given the following "position" frameworks exist:
       | fullname      | idnumber |
       | PosHierarchy1 | FW001    |
@@ -106,7 +105,7 @@ Feature: Add a face to face with select position
     And I follow "View all events"
     And I follow "Sign-up"
     And I set the following fields to these values:
-      | Select a position | Position2 |
+      | Select a position | Secondary position (Position2) |
     And I press "Sign-up"
     And I log out
     And I log in as "teacher1"
@@ -124,7 +123,7 @@ Feature: Add a face to face with select position
     And I should see "Position2"
     And I click on ".attendee-edit-position" "css_element"
     And I set the following fields to these values:
-      | selectposition | Position1 |
+      | selectposition | Primary position (Position1) |
     And I press "Update position"
     And I should see "Position1"
 
@@ -209,7 +208,7 @@ Feature: Add a face to face with select position
     And I follow "View all events"
     And I follow "Sign-up"
     And I set the following fields to these values:
-      | Select a position | Position2 |
+      | Select a position | Secondary position (Position2) |
     And I press "Sign-up"
     And I log out
     And I log in as "teacher1"

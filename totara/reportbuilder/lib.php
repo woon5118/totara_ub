@@ -5156,7 +5156,6 @@ function reportbuilder_purge_cache($cache, $unschedule = false) {
         $cache = $DB->get_record('report_builder_cache', array('reportid' => $cache));
     }
     if (!is_object($cache) || !isset($cache->reportid)) {
-        debugging('Cannot purge cache. Seems it is already clean.', DEBUG_DEVELOPER);
         return false;
     }
     if ($cache->cachetable) {

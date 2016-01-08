@@ -45,7 +45,8 @@ Feature: View gradebook when single item scales are used
     And I press "Save and display"
     And I follow "View/grade all submissions"
     And I click on "Grade Student 1" "link" in the "Student 1" "table_row"
-    And I set the field "Grade" to "A"
+    # Totara requires exact match when selecting options!
+    And I set the field "Grade" to "Ace!"
     And I press "Save changes"
     And I follow "Course 1"
     And I navigate to "Grades" node in "Course administration"

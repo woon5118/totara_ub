@@ -4,6 +4,8 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
   As a user
   I need to distinct the unread posts from the read ones
 
+  #Totara: select options must be exact match!
+
   Background:
     Given the following "users" exist:
       | username | firstname | lastname | email | trackforums |
@@ -87,7 +89,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | Forum name | Test forum name |
       | Forum type | Standard forum for general use |
       | Description | Test forum description |
-      | Read tracking | Force |
+      | Read tracking | Forced |
     And I add a new discussion to "Test forum name" forum with:
       | Subject | Test post subject |
       | Message | Test post message |
@@ -110,7 +112,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | Forum name | Test forum name |
       | Forum type | Standard forum for general use |
       | Description | Test forum description |
-      | Read tracking | Force |
+      | Read tracking | Forced |
     And I add a new discussion to "Test forum name" forum with:
       | Subject | Test post subject |
       | Message | Test post message |
@@ -133,7 +135,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | Forum name | Test forum name |
       | Forum type | Standard forum for general use |
       | Description | Test forum description |
-      | Read tracking | Force |
+      | Read tracking | Forced |
     And I add a new discussion to "Test forum name" forum with:
       | Subject | Test post subject |
       | Message | Test post message |
@@ -164,7 +166,7 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
       | Forum name | Test forum name |
       | Forum type | Standard forum for general use |
       | Description | Test forum description |
-      | Read tracking | Force |
+      | Read tracking | Forced |
     And I add a new discussion to "Test forum name" forum with:
       | Subject | Test post subject |
       | Message | Test post message |

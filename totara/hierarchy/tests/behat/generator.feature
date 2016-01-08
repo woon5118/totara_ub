@@ -12,7 +12,7 @@ Feature: Behat generators for hierarchies work
       | user002  | fn_002    | ln_002   | user002@example.com |
 
   @javascript
-  Scenario: Verify the program generators work
+  Scenario: Verify the hierarchy generators work
     Given the following "organisation frameworks" exist in "totara_hierarchy" plugin:
       | fullname               | idnumber |
       | Organisation Framework | oframe   |
@@ -69,7 +69,7 @@ Feature: Behat generators for hierarchies work
     And I should see "fn_001 ln_001" in the "#region-main" "css_element"
 
   @javascript
-  Scenario: Verify the user interface works the same as program generators
+  Scenario: Verify the user interface works the same as hierarchy generators
     Given I log in as "admin"
 
     When I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"

@@ -79,7 +79,7 @@ Feature: Users can enrol themself in courses with selected position where face t
     And I click on "Course 1" "link"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I set the following fields to these values:
-      | Select a position | Position2 |
+      | Select a position | Secondary position (Position2) |
     And I press "Sign-up"
     Then I should see "Topic 1"
     And I log out
@@ -97,7 +97,7 @@ Feature: Users can enrol themself in courses with selected position where face t
     And I follow "Course 1"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I set the following fields to these values:
-      | Select a position | Position2 |
+      | Select a position | Secondary position (Position2) |
     And I press "Sign-up"
     Then I should see "Your booking has been completed."
     And I log out

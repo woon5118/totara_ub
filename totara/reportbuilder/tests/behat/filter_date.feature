@@ -10,7 +10,7 @@ Feature: Use the reportbuilder date filter
     And I log in as "admin"
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "Test user report"
-    And I set the field "Source" to "Users"
+    And I set the field "Source" to "User"
     And I press "Create report"
     And I click on "Filters" "link" in the ".tabtree" "css_element"
     And I select "User Last Login" from the "newstandardfilter" singleselect

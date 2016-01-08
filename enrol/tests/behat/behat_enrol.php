@@ -71,28 +71,15 @@ class behat_enrol extends behat_base {
      */
     public function i_enrol_user_as($userfullname, $rolename) {
 
-        $steps = array(
-            // Totara does not go to list of users to enrol after course creation.
-            new Given('I navigate to "Enrolled users" node in "Course administration > Users"'),
-            new Given('I press "' . get_string('enrolusers', 'enrol') . '"')
-        );
+        // Totara 2.7 and above does not go to list of users to enrol after course creation.
+        // New JS UI is not very reliable, use the old non-JS always.
+        $steps = array();
 
-        if ($this->running_javascript()) {
-
-            // We have a div here, not a tr.
-            $userliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($userfullname);
-            $userrowxpath = "//div[contains(concat(' ',normalize-space(@class),' '),' user ')][contains(., $userliteral)]";
-
-            $steps[] = new Given('I set the field "' . get_string('assignroles', 'role') . '" to "' . $rolename . '"');
-            $steps[] = new Given('I click on "' . get_string('enrol', 'enrol') . '" "button" in the "' . $userrowxpath . '" "xpath_element"');
-            $steps[] = new Given('I press "' . get_string('finishenrollingusers', 'enrol') . '"');
-
-        } else {
-
-            $steps[] = new Given('I set the field "' . get_string('assignrole', 'role') . '" to "' . $rolename . '"');
-            $steps[] = new Given('I set the field "addselect" to "' . $userfullname . '"');
-            $steps[] = new Given('I press "add"');
-        }
+        $steps[] = new Given('I navigate to "Enrolment methods" node in "Course administration > Users"');
+        $steps[] = new Given('I click on "Enrol users" "link" in the "Manual enrolments" "table_row"');
+        $steps[] = new Given('I set the field "' . get_string('assignrole', 'role') . '" to "' . $rolename . '"');
+        $steps[] = new Given('I set the field "addselect" to "' . $userfullname . '"');
+        $steps[] = new Given('I press "add"');
 
         return $steps;
     }
