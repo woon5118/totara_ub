@@ -24,6 +24,8 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once("{$CFG->dirroot}/completion/completion_completion.php");
 
 /**
  * A report builder source for the "user" table.
