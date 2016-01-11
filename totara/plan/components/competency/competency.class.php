@@ -908,7 +908,7 @@ class dp_competency_component extends dp_base_component {
 
         $currenturl = qualified_me();
 
-        $oldrecords = $DB->get_records_list('dp_plan_competency_assign', 'planid', array($this->plan->id), null, 'id, planid, competencyid, approved');
+        $oldrecords = $DB->get_records_list('dp_plan_competency_assign', 'planid', array($this->plan->id), null, 'id, planid, competencyid, approved, priority');
         $status = true;
         $stored_records = array();
         if (!empty($evidences)) {
