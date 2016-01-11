@@ -932,6 +932,9 @@ function import_course($importname, $importtime) {
                     $deletedcompletions[] = $course->coursecompletionid;
                     $completions[$priorkey] = $completion;
                     $stats[$priorkey] = $stat;
+                } else if ($completion->timecompleted != $course->currenttimecompleted) {
+                    // As long as the timecompleted doesn't match the currenttimecompleted put it in history.
+                    $historyrecord = $completion;
                 }
             } else {
                 $historyrecord = $completion;
