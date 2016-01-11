@@ -79,7 +79,7 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
             // Update when form elements change.
             jQuery('table.dp-plan-component-items input, table.dp-plan-component-items select').change(function() {
                 var data = {
-                    submitbutton: "1",
+                    updatesettings: "1",
                     ajax: "1",
                     sesskey: mdlconfig.sesskey,
                     page: component.config.page

@@ -37,7 +37,7 @@ check_learningplan_enabled();
 //
 $id = required_param('id', PARAM_INT); // plan id
 $componentname = required_param('c', PARAM_ALPHA); // component type
-$submitted = optional_param('submitbutton', null, PARAM_TEXT); // form submitted
+$submitted = optional_param('updatesettings', null, PARAM_TEXT); // form submitted
 $ajax = optional_param('ajax', false, PARAM_BOOL); // ajax call
 
 require_login();
@@ -120,7 +120,7 @@ if ($can_manage && $can_update) {
         } else {
             $display = 'block';
         }
-        $button = html_writer::empty_tag('input', array('type' => "submit", 'name' => "submitbutton",
+        $button = html_writer::empty_tag('input', array('type' => "submit", 'name' => "updatesettings",
                                             'value' => get_string('updatesettings', 'totara_plan')));
         $form .= html_writer::tag('noscript', $OUTPUT->container($button, array('id' => "dp-component-update-submit",
                                             'style' => "display: {$display};")));
