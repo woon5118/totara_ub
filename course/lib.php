@@ -99,6 +99,7 @@ function make_log_url($module, $url) {
             $url = $url;
             break;
         case 'coursetags':
+        case 'cohort':
             $url = '/'.$url;
             break;
         case 'library':

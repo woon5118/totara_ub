@@ -67,11 +67,17 @@ class totara_cohort_events_testcase extends advanced_testcase {
         cohort_rules_approve_changes($this->cohort);
 
         $events = $sink->get_events();
-        $event = $events[0]->get_data();
-        $this->assertEquals('cohort', $event['objecttable']);
-        $this->assertEquals($this->cohort->id, $event['objectid']);
-        $this->assertEquals('u', $event['crud']);
-        $this->assertSame(null, $event['other']);
+        $this->assertCount(2, $events);
+        $event = $events[0];
+        $this->assertInstanceOf('totara_cohort\event\draftcollection_saved', $event);
+        $this->assertEventContextNotUsed($event);
+        $eventdata = $event->get_data();
+        $this->assertEquals('cohort', $eventdata['objecttable']);
+        $this->assertEquals($this->cohort->id, $eventdata['objectid']);
+        $this->assertEquals('u', $eventdata['crud']);
+        $this->assertSame(null, $eventdata['other']);
+        $event = $events[1];
+        $this->assertInstanceOf('totara_cohort\event\members_updated', $event);
 
         // Modify cohort again and cancel changes.
         $cohort = $DB->get_record('cohort', array('id' => $this->cohort->id));
@@ -80,11 +86,15 @@ class totara_cohort_events_testcase extends advanced_testcase {
         cohort_rules_cancel_changes($cohort);
 
         $events = $sink->get_events();
-        $event = $events[0]->get_data();
-        $this->assertEquals('cohort', $event['objecttable']);
-        $this->assertEquals($cohort->id, $event['objectid']);
-        $this->assertEquals('u', $event['crud']);
-        $this->assertSame(null, $event['other']);
+        $this->assertCount(1, $events);
+        $event = $events[0];
+        $eventdata = $event->get_data();
+        $this->assertInstanceOf('totara_cohort\event\draftcollection_discarded', $event);
+        $this->assertEventContextNotUsed($event);
+        $this->assertEquals('cohort', $eventdata['objecttable']);
+        $this->assertEquals($cohort->id, $eventdata['objectid']);
+        $this->assertEquals('u', $eventdata['crud']);
+        $this->assertSame(null, $eventdata['other']);
     }
 
     /**
@@ -108,12 +118,14 @@ class totara_cohort_events_testcase extends advanced_testcase {
         $events = $sink->get_events();
         $this->assertCount(2, $events);
         $this->assertInstanceOf('core\event\enrol_instance_created', $events[0]);
-        $this->assertInstanceOf('totara_cohort\event\enrolled_course_item_added', $events[1]);
-        $event = $events[1]->get_data();
-        $this->assertEquals('enrol', $event['objecttable']);
-        $this->assertEquals($assncourseid, $event['objectid']);
-        $this->assertEquals('c', $event['crud']);
-        $this->assertSame(array('cohortid' => $cohortid), $event['other']);
+        $event = $events[1];
+        $eventdata = $event->get_data();
+        $this->assertInstanceOf('totara_cohort\event\enrolled_course_item_added', $event);
+        $this->assertEventContextNotUsed($event);
+        $this->assertEquals('enrol', $eventdata['objecttable']);
+        $this->assertEquals($assncourseid, $eventdata['objectid']);
+        $this->assertEquals('c', $eventdata['crud']);
+        $this->assertSame(array('cohortid' => $cohortid), $eventdata['other']);
 
         // Delete course item.
         $sink->clear();
@@ -121,13 +133,14 @@ class totara_cohort_events_testcase extends advanced_testcase {
         $events = $sink->get_events();
         $this->assertCount(2, $events);
         $this->assertInstanceOf('core\event\enrol_instance_deleted', $events[0]);
-        $this->assertInstanceOf('totara_cohort\event\enrolled_course_item_deleted', $events[1]);
-
-        $event = $events[1]->get_data();
-        $this->assertEquals('enrol', $event['objecttable']);
-        $this->assertEquals($assncourseid, $event['objectid']);
-        $this->assertEquals('d', $event['crud']);
-        $this->assertSame(array('cohortid' => $cohortid), $event['other']);
+        $event = $events[1];
+        $eventdata = $event->get_data();
+        $this->assertInstanceOf('totara_cohort\event\enrolled_course_item_deleted', $event);
+        $this->assertEventContextNotUsed($event);
+        $this->assertEquals('enrol', $eventdata['objecttable']);
+        $this->assertEquals($assncourseid, $eventdata['objectid']);
+        $this->assertEquals('d', $eventdata['crud']);
+        $this->assertSame(array('cohortid' => $cohortid), $eventdata['other']);
         $sink->close();
     }
 
@@ -150,22 +163,29 @@ class totara_cohort_events_testcase extends advanced_testcase {
 
         // Assertions.
         $events = $sink->get_events();
-        $event = $events[0]->get_data();
-        $this->assertEquals('prog_assignment', $event['objecttable']);
-        $this->assertEquals($assnprogid, $event['objectid']);
-        $this->assertEquals('c', $event['crud']);
-        $this->assertSame(array('cohortid' => $cohortid), $event['other']);
+        $this->assertCount(1, $events);
+        $event = $events[0];
+        $eventdata = $event->get_data();
+        $this->assertInstanceOf('totara_cohort\event\enrolled_program_item_added', $event);
+        $this->assertEventContextNotUsed($event);
+        $this->assertEquals('prog_assignment', $eventdata['objecttable']);
+        $this->assertEquals($assnprogid, $eventdata['objectid']);
+        $this->assertEquals('c', $eventdata['crud']);
+        $this->assertSame(array('cohortid' => $cohortid), $eventdata['other']);
 
         // Delete program item.
         $sink->clear();
         totara_cohort_delete_association($cohortid, $assnprogid, COHORT_ASSN_ITEMTYPE_PROGRAM, $value);
         $events = $sink->get_events();
-
-        $event = $events[0]->get_data();
-        $this->assertSame('prog_assignment', $event['objecttable']);
-        $this->assertSame($assnprogid, $event['objectid']);
-        $this->assertSame('d', $event['crud']);
-        $this->assertSame(array('cohortid' => $cohortid), $event['other']);
+        $this->assertCount(1, $events);
+        $event = $events[0];
+        $eventdata = $event->get_data();
+        $this->assertInstanceOf('totara_cohort\event\enrolled_program_item_deleted', $event);
+        $this->assertEventContextNotUsed($event);
+        $this->assertSame('prog_assignment', $eventdata['objecttable']);
+        $this->assertSame($assnprogid, $eventdata['objectid']);
+        $this->assertSame('d', $eventdata['crud']);
+        $this->assertSame(array('cohortid' => $cohortid), $eventdata['other']);
         $sink->close();
     }
 
@@ -188,22 +208,29 @@ class totara_cohort_events_testcase extends advanced_testcase {
 
         // Assertions.
         $events = $sink->get_events();
-        $event = $events[0]->get_data();
-        $this->assertEquals('prog_assignment', $event['objecttable']);
-        $this->assertEquals($assncertifid, $event['objectid']);
-        $this->assertEquals('c', $event['crud']);
-        $this->assertSame(array('cohortid' => $cohortid), $event['other']);
+        $this->assertCount(1, $events);
+        $event = $events[0];
+        $eventdata = $event->get_data();
+        $this->assertInstanceOf('totara_cohort\event\enrolled_program_item_added', $event);
+        $this->assertEventContextNotUsed($event);
+        $this->assertEquals('prog_assignment', $eventdata['objecttable']);
+        $this->assertEquals($assncertifid, $eventdata['objectid']);
+        $this->assertEquals('c', $eventdata['crud']);
+        $this->assertSame(array('cohortid' => $cohortid), $eventdata['other']);
 
         // Delete certification item.
         $sink->clear();
         totara_cohort_delete_association($cohortid, $assncertifid, COHORT_ASSN_ITEMTYPE_CERTIF, $value);
         $events = $sink->get_events();
-
-        $event = $events[0]->get_data();
-        $this->assertEquals('prog_assignment', $event['objecttable']);
-        $this->assertEquals($assncertifid, $event['objectid']);
-        $this->assertEquals('d', $event['crud']);
-        $this->assertSame(array('cohortid' => $cohortid), $event['other']);
+        $this->assertCount(1, $events);
+        $event = $events[0];
+        $eventdata = $event->get_data();
+        $this->assertInstanceOf('totara_cohort\event\enrolled_program_item_deleted', $event);
+        $this->assertEventContextNotUsed($event);
+        $this->assertEquals('prog_assignment', $eventdata['objecttable']);
+        $this->assertEquals($assncertifid, $eventdata['objectid']);
+        $this->assertEquals('d', $eventdata['crud']);
+        $this->assertSame(array('cohortid' => $cohortid), $eventdata['other']);
         $sink->close();
     }
 
@@ -379,22 +406,29 @@ class totara_cohort_events_testcase extends advanced_testcase {
         $assid = totara_cohort_add_association($cohortid, $program->id, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
 
         $events = $sink->get_events();
-        $event = $events[0]->get_data();
-        $this->assertEquals('cohort_visibility', $event['objecttable']);
-        $this->assertEquals($assid, $event['objectid']);
-        $this->assertEquals('c', $event['crud']);
-        $this->assertSame(array('cohortid' => $cohortid), $event['other']);
+        $this->assertCount(1, $events);
+        $event = $events[0];
+        $eventdata = $event->get_data();
+        $this->assertInstanceOf('totara_cohort\event\visible_learning_item_added', $event);
+        $this->assertEventContextNotUsed($event);
+        $this->assertEquals('cohort_visibility', $eventdata['objecttable']);
+        $this->assertEquals($assid, $eventdata['objectid']);
+        $this->assertEquals('c', $eventdata['crud']);
+        $this->assertSame(array('cohortid' => $cohortid), $eventdata['other']);
         $sink->clear();
 
         // Delete association.
         totara_cohort_delete_association($cohortid, $assid, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
 
         $events = $sink->get_events();
-        $event = $events[0]->get_data();
-        $this->assertEquals('cohort_visibility', $event['objecttable']);
-        $this->assertEquals($assid, $event['objectid']);
-        $this->assertEquals('d', $event['crud']);
-        $this->assertSame(array('cohortid' => $cohortid), $event['other']);
+        $event = $events[0];
+        $eventdata = $event->get_data();
+        $this->assertInstanceOf('totara_cohort\event\visible_learning_item_deleted', $event);
+        $this->assertEventContextNotUsed($event);
+        $this->assertEquals('cohort_visibility', $eventdata['objecttable']);
+        $this->assertEquals($assid, $eventdata['objectid']);
+        $this->assertEquals('d', $eventdata['crud']);
+        $this->assertSame(array('cohortid' => $cohortid), $eventdata['other']);
         $sink->close();
     }
 }

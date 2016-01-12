@@ -49,8 +49,8 @@ class enrolled_course_item_added extends \core\event\base {
      * Create event from data.
      *
      * @param   int $instanceid enrol instance ID.
-     * @param   stdClass $cohort instance.
-     * @return  new event
+     * @param   \stdClass $cohort instance.
+     * @return  enrolled_course_item_added
      */
     public static function create_from_data($instanceid, $cohort) {
         $data = array(
@@ -90,7 +90,7 @@ class enrolled_course_item_added extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The Course {$this->other['instanceid']} has been added to the cohort {$this->other['cohortid']}";
+        return "The Course {$this->objectid} has been added to the cohort {$this->other['cohortid']}";
     }
 
     /**

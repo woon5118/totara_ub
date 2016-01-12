@@ -49,8 +49,8 @@ class enrolled_program_item_deleted extends \core\event\base {
      * Create event from data.
      *
      * @param   int $instanceid prog_assignment instance ID.
-     * @param   stdClass $cohort instance.
-     * @return  new event
+     * @param   \stdClass $cohort instance.
+     * @return  enrolled_program_item_deleted
      */
     public static function create_from_data($instanceid, $cohort) {
         $data = array(

@@ -52,8 +52,8 @@ class visible_learning_item_added extends \core\event\base {
      * Create event from data.
      *
      * @param   int $instanceid cohort_visible instance ID.
-     * @param   stdClass $cohort instance.
-     * @return  new event
+     * @param   \stdClass $cohort instance.
+     * @return  visible_learning_item_added
      */
     public static function create_from_data($instanceid, $cohort) {
         $data = array(
@@ -93,8 +93,7 @@ class visible_learning_item_added extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $iteminfo = "The learning item {$this->other['instanceid']} of type {$this->other['type']}";
-        return "{$iteminfo} has been added to the cohort {$this->other['cohortid']}";
+        return "The learning item {$this->objectid} has been added to the cohort {$this->other['cohortid']}";
     }
 
     /**
