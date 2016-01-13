@@ -242,20 +242,22 @@ function completion_cron_completions() {
 
     $rs = $DB->get_recordset_sql($sql, array('timestarted' => $timestarted));
 
-    // Check if result is not empty
-    if ($rs->valid()) {
+    // Grab records for current user/course
+    foreach ($rs as $record) {
+        // Recalculate course's criteria
+        completion_handle_criteria_recalc($record->course, $record->userid);
+    }
 
-        // Grab records for current user/course
-        foreach ($rs as $record) {
-            // Load completion object (without hitting db again)
-            $completion = new completion_completion((array) $record, false);
+    $rs->close();
 
-            // Recalculate course's criteria
-            completion_handle_criteria_recalc($completion->course, $completion->userid);
+    // Reload the data from the db, because the previous function might have changed it.
+    $rs = $DB->get_recordset_sql($sql, array('timestarted' => $timestarted));
 
-            // Aggregate the criteria and complete if necessary
-            $completion->aggregate();
-        }
+    foreach ($rs as $record) {
+        $completion = new completion_completion((array) $record, false);
+
+        // Aggregate the criteria and complete if necessary
+        $completion->aggregate();
     }
 
     $rs->close();
