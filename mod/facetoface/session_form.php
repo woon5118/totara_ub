@@ -542,7 +542,7 @@ class mod_facetoface_session_form extends moodleform {
             }
         }
 
-        if (!empty($data['pdroomid'])) {
+        if (!empty($data['pdroomid']) && $data['datetimeknown'] === '1') {
             // Ensure room is available (if the session date is known).
             $timeslots = array();
             foreach ($dates as $d) {

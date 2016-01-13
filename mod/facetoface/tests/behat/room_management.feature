@@ -200,6 +200,12 @@ Feature: Manage pre-defined rooms
     And I press "Save changes"
     And I should see "There is a room conflict - another session is using the room at the same time"
 
+    When I set the following fields to these values:
+      | datetimeknown         | No |
+    And I press "Save changes"
+    Then I should see "Room 1" in the "1 January 2020" "table_row"
+    And I should see "Room 1" in the "Wait-listed" "table_row"
+
   Scenario: Clash a room with different timezones
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -286,3 +292,9 @@ Feature: Manage pre-defined rooms
     And I wait "1" seconds
     And I press "Save changes"
     And I should see "There is a room conflict - another session is using the room at the same time"
+
+    When I set the following fields to these values:
+      | datetimeknown         | No |
+    And I press "Save changes"
+    Then I should see "Room 1" in the "1 January 2020" "table_row"
+    And I should see "Room 1" in the "Wait-listed" "table_row"
