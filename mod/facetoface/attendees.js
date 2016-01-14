@@ -248,7 +248,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     title: '<h2>' + M.util.get_string('addremoveattendees', 'facetoface') + '</h2>',
                     height: 705
                 },
-                M.cfg.wwwroot + '/mod/facetoface/editattendees.php?s=' + M.totara_f2f_attendees.config.sessionid + '&clear=1',
+                M.cfg.wwwroot + '/mod/facetoface/editattendees.php?s=' + M.totara_f2f_attendees.config.sessionid + '&clear=1&sesskey=' + M.cfg.sesskey,
                 handler
                 );
         })();

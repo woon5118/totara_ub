@@ -46,6 +46,8 @@ $save           = optional_param('save', false, PARAM_BOOL);
 $interested     = optional_param('interested', false, PARAM_BOOL); // Declare interest.
 $suppressccmanager  = optional_param('suppressccmanager', false, PARAM_BOOL); // Send copy manager notifications.
 
+require_sesskey();
+
 if (!$session = facetoface_get_session($s)) {
     print_error('error:incorrectcoursemodulesession', 'facetoface');
 }
