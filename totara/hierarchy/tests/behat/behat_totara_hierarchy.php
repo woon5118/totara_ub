@@ -177,6 +177,7 @@ class behat_totara_hierarchy extends behat_base {
             'appraiser', // Username.
             'organisation', // ID number.
             'position', // ID number.
+            'positiontitle', // position assignment title.
         );
 
         $data = $table->getHash();
@@ -253,6 +254,15 @@ class behat_totara_hierarchy extends behat_base {
                 $record['type'] = $POSITION_CODES[$record['type']];
             } else {
                 unset($record['type']);
+            }
+
+            // Map position assignment title.
+            if (!empty($record['positiontitle'])) {
+                $title = $record['positiontitle'];
+                $record['fullname'] = $title;
+                $record['shortname'] = $title;
+
+                unset($record['positiontitle']);
             }
 
             // Internally, the userid, managerid, etc. specified inside $record take priority over those specified as parameters.

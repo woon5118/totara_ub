@@ -502,3 +502,34 @@ class cohort_rule_sqlhandler_in_listofids_org extends cohort_rule_sqlhandler_in_
         return $sqlhandler;
     }
 }
+
+/**
+ * SQL snippet for a field of mdl_pos_assignment, representing the user's primary position.
+ * @author Aldo Paradiso (aparadiso@multamedio.de)
+ */
+class cohort_rule_sqlhandler_in_posassignfield extends cohort_rule_sqlhandler_in {
+    protected function construct_sql_snippet($field, $not, $lov) {
+        global $DB;
+
+        $sql = "EXISTS (
+                        SELECT 1
+                        FROM {pos_assignment} pa
+                        WHERE pa.userid = u.id
+                          AND pa.type = ". POSITION_TYPE_PRIMARY . "
+                          AND ( ";
+
+        $query = "pa.{$field}";
+
+        if ($this->ischarfield) {
+            $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
+            $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
+        } else {
+            $sqlhandler = new stdClass();
+            list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'iu'.$this->ruleid, ($not != 'not'));
+            $sqlhandler->sql = "{$sql} {$query} {$sqlin} ) ) ";
+            $sqlhandler->params = $params;
+        }
+
+        return $sqlhandler;
+    }
+}

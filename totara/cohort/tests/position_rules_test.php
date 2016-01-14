@@ -267,6 +267,53 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
     }
 
     /**
+     * Test position title rule (Positions > Position title (fullname)).
+     * This rule matches users based on the position title (fullname) assigned to them.
+     * @author Aldo Paradiso (aparadiso@multamedio.de)
+     */
+    public function test_position_title_rule() {
+        global $DB, $USER;
+
+        $this->resetAfterTest ( true );
+        $this->setAdminUser ();
+
+        // first create four users:
+        $my_users = array ();
+
+        for($i = 0; $i <= 3; $i ++) {
+            $my_users [$i] = $this->getDataGenerator ()->create_user ();
+        }
+        // create and assign position data:
+        $timecreated = time();
+        $timemodified = time();
+        $fullname = 'Campaign Manager Online Marketing';
+        $shortname = 'Campaign Manager Online Marketing';
+        $data = array ('fullname'=>$fullname, 'shortname'=> $shortname, 'timecreated' => $timecreated,'timemodified' => $timemodified);
+        // Assign positions:
+        $this->hierarchy_generator->assign_primary_position($my_users[0]->id, null, null, null, $data);
+        $fullname = 'Account Manager';
+        $shortname = 'Account Manager';
+        $data = array ('fullname'=>$fullname, 'shortname'=> $shortname, 'timecreated' => $timecreated,'timemodified' => $timemodified);
+        $this->hierarchy_generator->assign_primary_position($my_users[1]->id, null, null, null,$data);
+        $fullname = 'Inside Sales Representative';
+        $shortname = 'Inside Sales Representative';
+        $data = array ('fullname'=>$fullname, 'shortname'=> $shortname, 'timecreated' => $timecreated,'timemodified' => $timemodified);
+        $this->hierarchy_generator->assign_primary_position($my_users[2]->id, null, null, null, $data);
+        $this->hierarchy_generator->assign_primary_position($my_users[3]->id, null, null, null, $data);
+
+        // Add a rule that matches users for the position 'Inside Sales Representative'. It should match 2 users.
+        $this->cohort_generator->create_cohort_rule_params ( $this->ruleset, 'pos', 'postitle',
+                array ('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array ('Inside Sales Representative') );
+        // where is the doc of the next method? I assume, it will check if the rule is correctly defined and executable.
+        cohort_rules_approve_changes ( $this->cohort );
+        $members = $DB->get_fieldset_select ( 'cohort_members', 'userid', 'cohortid = ?', array ($this->cohort->id
+        ) );
+
+        $this->assertEquals ( 2, count ( $members ) );
+    }
+
+
+    /**
      * Data provider for the reports to rule.
      */
     public function data_reportsto() {

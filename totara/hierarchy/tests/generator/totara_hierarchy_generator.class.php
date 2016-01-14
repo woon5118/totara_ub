@@ -518,6 +518,14 @@ class totara_hierarchy_generator extends component_generator_base {
             $data->timevalidto = $record['timevalidto'];
         }
 
+        if (isset($record['fullname'])) {
+            $data->fullname = $record['fullname'];
+        }
+
+        if (isset($record['shortname'])) {
+            $data->shortname = $record['shortname'];
+        }
+
         // Attempt to load the assignment.
         $position_assignment = new position_assignment(
             array(

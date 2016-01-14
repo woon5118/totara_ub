@@ -412,6 +412,17 @@ function cohort_rules_list($reset = false){
             new cohort_rule_sqlhandler_in_posfield('typeid', false)
         );
 
+        $rules[] = new cohort_rule_option(
+                'pos',
+                'postitle',
+                new cohort_rule_ui_text(
+                        get_string('ruledesc-pos-postitle', 'totara_cohort'),
+                        get_string('rulehelp-pos-postitle', 'totara_cohort')
+                ),
+                new cohort_rule_sqlhandler_in_posassignfield('fullname', true)
+        );
+
+
         // Organizations!
         // Organization by direct selection
         $rules[] = new cohort_rule_option(
