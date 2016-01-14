@@ -34,44 +34,53 @@ require_once($CFG->libdir  . '/coursecatlib.php');
 
 /**
  * Test audience visibility in courses.
- *
- * To test, run this from the command line from the $CFG->dirroot
- * vendor/bin/phpunit totara_cohort_course_audiencevisibility_testcase
- *
  */
 class totara_cohort_course_audiencevisibility_testcase extends reportcache_advanced_testcase {
-
+    /** @var stdClass $user1 */
     private $user1 = null;
+    /** @var stdClass $user2 */
     private $user2 = null;
+    /** @var stdClass $user3 */
     private $user3 = null;
+    /** @var stdClass $user4 */
     private $user4 = null;
+    /** @var stdClass $user5 */
     private $user5 = null;
+    /** @var stdClass $user6 */
     private $user6 = null;
+    /** @var stdClass $user7 */
     private $user7 = null;
+    /** @var stdClass $user8 */
     private $user8 = null;
+    /** @var stdClass $user9 */
     private $user9 = null;
+    /** @var stdClass $user10 */
     private $user10 = null;
+    /** @var stdClass $course1 */
     private $course1 = null;
+    /** @var stdClass $course2 */
     private $course2 = null;
+    /** @var stdClass $course3 */
     private $course3 = null;
+    /** @var stdClass $course4 */
     private $course4 = null;
+    /** @var stdClass $course5 */
     private $course5 = null;
+    /** @var stdClass $course6 */
     private $course6 = null;
+    /** @var stdClass $audience1 */
     private $audience1 = null;
+    /** @var stdClass $audience2 */
     private $audience2 = null;
-    private $cohort_generator = null;
 
     /**
      * Setup.
      */
-    public function setUp() {
+    protected function setUp() {
         global $DB;
         parent::setup();
         $this->resetAfterTest(true);
         $this->setAdminUser();
-
-        // Set totara_cohort generator.
-        $this->cohort_generator = $this->getDataGenerator()->get_plugin_generator('totara_cohort');
 
         // Create some users.
         $this->user1 = $this->getDataGenerator()->create_user();
@@ -86,24 +95,26 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
         $this->user10 = $this->getDataGenerator()->create_user(); // User with view hidden courses cap in the course context.
 
         // Create audience1.
-        $this->audience1 = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_STATIC));
+        $this->audience1 = $this->getDataGenerator()->create_cohort();
         $this->assertTrue($DB->record_exists('cohort', array('id' => $this->audience1->id)));
         $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $this->audience1->id)));
 
         // Assign user3 and user4 to the audience1.
-        $this->cohort_generator->cohort_assign_users($this->audience1->id, array($this->user3->id, $this->user4->id));
+        cohort_add_member($this->audience1->id, $this->user3->id);
+        cohort_add_member($this->audience1->id, $this->user4->id);
         $this->assertEquals(2, $DB->count_records('cohort_members', array('cohortid' => $this->audience1->id)));
 
         // Create audience2.
-        $this->audience2 = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_STATIC));
+        $this->audience2 = $this->getDataGenerator()->create_cohort();
         $this->assertTrue($DB->record_exists('cohort', array('id' => $this->audience2->id)));
         $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $this->audience2->id)));
 
         // Assign user5 and user6 to the audience2.
-        $this->cohort_generator->cohort_assign_users($this->audience2->id, array($this->user5->id, $this->user6->id));
+        cohort_add_member($this->audience2->id, $this->user5->id);
+        cohort_add_member($this->audience2->id, $this->user6->id);
         $this->assertEquals(2, $DB->count_records('cohort_members', array('cohortid' => $this->audience2->id)));
 
-        // Create 4 couses.
+        // Create 4 courses.
         $paramscourse1 = array('fullname' => 'Visall', 'summary' => '', 'visible' => 0, 'audiencevisible' => COHORT_VISIBLE_ALL);
         $paramscourse2 = array('fullname' => 'Visenronly', 'summary' => '', 'audiencevisible' => COHORT_VISIBLE_ENROLLED);
         $paramscourse3 = array('fullname' => 'Visenrandmemb', 'summary' => '', 'visible' => 0,
@@ -144,7 +155,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
         $maninstance = $DB->get_record('enrol', array('courseid'=>$this->course3->id, 'enrol'=>'manual'), '*', MUST_EXIST);
         $manualplugin->enrol_user($maninstance, $this->user10->id, $roleeditingtrainer->id);
 
-        // Assig audience1 and audience2 to course2.
+        // Assign audience1 and audience2 to course2.
         totara_cohort_add_association($this->audience1->id, $this->course2->id,
                                         COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
         totara_cohort_add_association($this->audience2->id, $this->course2->id,
@@ -205,7 +216,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
      * @param string $user User that will login to see the courses
      * @param array $coursesvisible Array of courses visible to the user
      * @param array $coursesnotvisible Array of courses not visible to the user
-     * @param $audvisibilityon Setting for audience visibility (1 => ON, 0 => OFF)
+     * @param bool $audvisibilityon Setting for audience visibility (1 => ON, 0 => OFF)
      * @dataProvider users_audience_visibility
      */
     public function test_audiencevisibility($user, $coursesvisible, $coursesnotvisible, $audvisibilityon) {
@@ -221,18 +232,21 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
             $this->create_courses_old_visibility();
         }
 
-        // Make the test toogling the new catalog.
+        $user = $this->{$user};
+
+        // Make the test toggling the new catalog.
         for ($i = 1; $i <= 2; $i++) {
-            // Toogle enhanced catalog.
+            // Toggle enhanced catalog.
             $newvalue = ($CFG->enhancedcatalog == 1) ? 0 : 1;
             set_config('enhancedcatalog', $newvalue);
             $this->assertEquals($CFG->enhancedcatalog, $newvalue);
 
             // Test #1: Login as $user and see what courses he can see.
-            self::setUser($this->{$user});
+            self::setUser($user);
             if ($CFG->enhancedcatalog) {
                 $content = $this->get_report_result('catalogcourses', array(), false, array());
             } else {
+                /** @var core_course_renderer $courserenderer */
                 $courserenderer = $PAGE->get_renderer('core', 'course');
                 $content = $courserenderer->course_category(0);
             }
@@ -266,25 +280,58 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
                     $this->assertInternalType('int', strpos($search, 'No courses were found'));
                 }
             }
+
+            // Repeat as different user.
+            $this->setGuestUser();
+            // Courses visible to the user.
+            foreach ($coursesvisible as $course) {
+                list($visible, $access, $search) = $this->get_visible_info($CFG->audiencevisibility, $content, $this->{$course}, $user->id);
+                $this->assertTrue($visible);
+                // Test #2: Try to access them.
+                $this->assertTrue($access);
+                // Test #3: Try to do a search for courses.
+                if ($CFG->enhancedcatalog) {
+                    $this->assertCount(1, $search);
+                    $r = array_shift($search);
+                    $this->assertEquals($this->{$course}->fullname, $r->course_courseexpandlink);
+                } else {
+                    $this->assertInternalType('int', strpos($search, $this->{$course}->fullname));
+                }
+            }
+
+            // Courses not visible to the user.
+            foreach ($coursesnotvisible as $course) {
+                list($visible, $access, $search) = $this->get_visible_info($CFG->audiencevisibility, $content, $this->{$course}, $user->id);
+                $this->assertFalse($visible);
+                // Test #2: Try to access them.
+                $this->assertFalse($access);
+                // Test #3: Try to do a search for courses.
+                if ($CFG->enhancedcatalog) {
+                    $this->assertCount(0, $search);
+                } else {
+                    $this->assertInternalType('int', strpos($search, 'No courses were found'));
+                }
+            }
         }
     }
 
     /**
      * Determine visibility of a course based on the content.
-     * @param $audiencevisibility
-     * @param $content Content when a user access to find certifications
-     * @param $course The course to evaluate
+     * @param bool $audiencevisibility
+     * @param array $content Content when a user access to find certifications
+     * @param stdClass $course The course to evaluate
+     * @param int $userid
      * @return array Array that contains values related to the visibility of the course
      */
-    protected function get_visible_info($audiencevisibility, $content, $course) {
+    protected function get_visible_info($audiencevisibility, $content, $course, $userid = null) {
         global $PAGE, $CFG;
         $visible = false;
 
         if ($audiencevisibility) {
-            $access = check_access_audience_visibility('course', $course);
+            $access = check_access_audience_visibility('course', $course, $userid);
         } else {
             $access = $course->visible ||
-                has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id));
+                has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id), $userid);
         }
 
         if ($CFG->enhancedcatalog) { // New catalog.
@@ -295,6 +342,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
             }
         } else { // Old Catalog.
             $visible = (strpos($content, $course->fullname) != false);
+            /** @var core_course_renderer $courserenderer */
             $courserenderer = $PAGE->get_renderer('core', 'course');
             $search = $courserenderer->search_courses(array('search' => $course->fullname));
         }
@@ -315,7 +363,7 @@ class totara_cohort_course_audiencevisibility_testcase extends reportcache_advan
         $this->getDataGenerator()->enrol_user($this->user1->id, $this->course5->id);
         $this->getDataGenerator()->enrol_user($this->user1->id, $this->course6->id);
         $this->getDataGenerator()->enrol_user($this->user2->id, $this->course6->id);
-        // Assig audience1 and audience2 to course6 and course 5 respectively.
+        // Assign audience1 and audience2 to course6 and course 5 respectively.
         totara_cohort_add_association($this->audience2->id, $this->course6->id, COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
         totara_cohort_add_association($this->audience1->id, $this->course5->id, COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
     }

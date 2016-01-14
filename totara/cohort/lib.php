@@ -1952,13 +1952,13 @@ function check_access_audience_visibility($type, $instance, $userid = null) {
     context_helper::preload_from_record($record);
     if ($itemcontext == CONTEXT_COURSE) {
         $context = context_course::instance($object->id);
-        if (has_capability('moodle/course:viewhiddencourses', $context)) {
+        if (has_capability('moodle/course:viewhiddencourses', $context, $userid)) {
             return true;
         }
     } else {
         $context = context_program::instance($object->id);
-        if (empty($object->certifid) && has_capability('totara/program:viewhiddenprograms', $context) ||
-            !empty($object->certifid) && has_capability('totara/certification:viewhiddencertifications', $context)) {
+        if (empty($object->certifid) && has_capability('totara/program:viewhiddenprograms', $context, $userid) ||
+            !empty($object->certifid) && has_capability('totara/certification:viewhiddencertifications', $context, $userid)) {
             return true;
         }
     }
