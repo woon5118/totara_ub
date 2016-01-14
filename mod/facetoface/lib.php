@@ -329,7 +329,6 @@ function facetoface_add_instance($facetoface) {
         }
     }
 
-
     list($defaultnotifications, $missingtemplates) = facetoface_get_default_notifications($facetoface->id);
 
     // Create default notifications for activity.
@@ -1101,6 +1100,44 @@ function facetoface_notify_under_capacity() {
             $eventdata->userto = $recipient;
             tm_alert_send($eventdata);
         }
+    }
+}
+
+/**
+ * Send out email notifications for all sessions where registration period has ended.
+ */
+function facetoface_notify_registration_ended() {
+    global $CFG, $DB;
+
+    if (empty($CFG->facetoface_session_rolesnotify)) {
+        return;
+    }
+
+    $conditions = array('component' => 'mod_facetoface', 'classname' => '\mod_facetoface\task\send_notifications_task');
+    $lastcron = $DB->get_field('task_scheduled', 'lastruntime', $conditions);
+    $time = time();
+
+    $params = array(
+        'lastcron' => $lastcron,
+        'now'      => $time
+    );
+
+    $sql = "SELECT s.*, minstart
+            FROM {facetoface_sessions} s
+                INNER JOIN (
+                    SELECT s.id AS sessid, MIN(timestart) AS minstart
+                    FROM {facetoface_sessions} s
+                    INNER JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
+                    GROUP BY s.id
+                ) dates ON dates.sessid = s.id
+            WHERE registrationtimefinish < :now
+            AND registrationtimefinish >= :lastcron";
+
+    $tocheck = $DB->get_records_sql($sql, $params);
+
+    foreach ($tocheck as $session) {
+        $notification = new \facetoface_notification((array)$session, false);
+        $notification->send_notification_registration_expired($session);
     }
 }
 
@@ -2771,11 +2808,50 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     // Finished session, don't display.
                     continue;
                 } else {
-                    $signup_url   = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
-                    $signuptext   = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
-                    $moreinfolink = html_writer::link($signup_url, get_string($signuptext, 'facetoface'), array('class' => 'f2fsessionlinks f2fsessioninfolink'));
+                    // Signup period status.
+                    if ($session->registrationtimestart < $timenow) {
+                        $registrationopen = true;
+                    } else {
+                        $registrationopen = false;
+                    }
 
-                    $span = html_writer::tag('span', get_string('options', 'facetoface').':', array('class' => 'f2fsessionnotice'));
+                    if ($timenow > $session->registrationtimefinish && $session->registrationtimefinish != '0') {
+                        $registrationclosed = true;
+                    } else {
+                        $registrationclosed = false;
+                    }
+
+                    $span = html_writer::span(get_string('optionscolon', 'facetoface'), 'f2fsessionnotice');
+                    if ($registrationopen == true && $registrationclosed == false) {
+                        // Ok to register.
+                        $signupurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
+                        $signuptext = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
+                        $moreinfolink = html_writer::link($signupurl, get_string($signuptext, 'facetoface'), array('class' => 'f2fsessionlinks f2fsessioninfolink'));
+                    } else {
+                        // Display text on hover (tooltip) that shows registration dates.
+                        $tooltip = '';
+                        if (!empty($session->registrationtimestart)) {
+                            $opendate = userdate($session->registrationtimestart, get_string('strftimedate', 'langconfig'));
+                            $tooltip .= get_string('registrationhoverhintstart', 'facetoface', $opendate);
+                        }
+                        if (!empty($session->registrationtimefinish)) {
+                            if (!empty($tooltip)) {
+                                $tooltip .=  "<br />";
+                            }
+                            $closedate = userdate($session->registrationtimefinish, get_string('strftimedate', 'langconfig'));
+                            $tooltip .= get_string('registrationhoverhintend', 'facetoface', $closedate);
+                        }
+                        if ($registrationclosed == true) {
+                            // Registration has closed for this session.
+                            $moreinfolink = html_writer::span(get_string('signupunavailable', 'facetoface'), 'f2fsessionlinks f2fsessioninfolink',
+                                array('title' => $tooltip, 'aria-describedby' => $tooltip));
+                        } else {
+                            // Registration date not yet reached.
+                            $moreinfolink = html_writer::span(get_string('signupunavailable', 'facetoface'), 'f2fsessionlinks f2fsessioninfolink',
+                                array('title' => $tooltip, 'aria-describedby' => $tooltip));
+                        }
+                    }
+
                 }
 
                 $multidate = '';

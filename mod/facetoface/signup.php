@@ -120,6 +120,12 @@ if ($fromform = $mform->get_data()) { // Form submitted
         print_error('alreadysignedup', 'facetoface', $returnurl);
     } else if (facetoface_manager_needed($facetoface) && empty($manager->email) && !$hasselfapproval) {
         print_error('error:manageremailaddressmissing', 'facetoface', $returnurl);
+    } else if (!empty($session->registrationtimestart) && ($session->registrationtimestart > time())) {
+        $refresh = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
+        redirect($refresh);
+    } else if (!empty($session->registrationtimefinish) && ($session->registrationtimefinish < time())) {
+        $refresh = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
+        redirect($refresh);
     }
 
     $params = array();
@@ -251,6 +257,18 @@ else if (facetoface_manager_needed($facetoface) && empty($manager->email) && !$h
 } else if ($facetoface->forceselectposition && !get_position_assignments($facetoface->approvalreqd)) {
     echo html_writer::tag('p', html_writer::tag('strong', get_string('error:nopositionselectedactivity', 'facetoface')));
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
+} else if (!empty($session->registrationtimestart) && ($session->registrationtimestart > time())) {
+    $datetimetz = new stdClass();
+    $datetimetz->date = userdate($session->registrationtimestart, get_string('strftimedate', 'langconfig'));
+    $datetimetz->time = userdate($session->registrationtimestart,  get_string('strftimetime', 'langconfig'));
+    $datetimetz->timezone = core_date::get_user_timezone();
+    echo html_writer::span(get_string('signupregistrationnotyetopen', 'facetoface', $datetimetz));
+} else if (!empty($session->registrationtimefinish) && ($session->registrationtimefinish < time())) {
+    $datetimetz = new stdClass();
+    $datetimetz->date = userdate($session->registrationtimefinish, get_string('strftimedate', 'langconfig'));
+    $datetimetz->time = userdate($session->registrationtimefinish,  get_string('strftimetime', 'langconfig'));
+    $datetimetz->timezone = core_date::get_user_timezone();
+    echo html_writer::span(get_string('signupregistrationclosed', 'facetoface', $datetimetz));
 } else {
     // Signup form.
     $mform->display();

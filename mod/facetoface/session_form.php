@@ -224,6 +224,11 @@ class mod_facetoface_session_form extends moodleform {
         $mform->setType('croomcapacity', PARAM_INT);
         $mform->addElement('html', '</div>');
 
+        $mform->addElement('date_time_selector', 'registrationtimestart', get_string('registrationtimestart', 'facetoface'), array('optional' => true, 'showtimezone' => true));
+        $mform->addHelpButton('registrationtimestart', 'registrationtimestart', 'facetoface');
+        $mform->addElement('date_time_selector', 'registrationtimefinish', get_string('registrationtimefinish', 'facetoface'), array('optional' => true, 'showtimezone' => true));
+        $mform->addHelpButton('registrationtimefinish', 'registrationtimefinish', 'facetoface');
+
         $mform->addElement('text', 'capacity', get_string('capacity', 'facetoface'), array('size' => 5));
         $mform->addRule('capacity', null, 'required', null, 'client');
         $mform->setType('capacity', PARAM_INT);
@@ -439,6 +444,21 @@ class mod_facetoface_session_form extends moodleform {
                     }
                 }
             }
+
+            // Registration cannot open once session has started.
+            if (!empty($data['registrationtimestart'])) {
+                if ($data['registrationtimestart'] >= $starttime) {
+                    $errors['registrationtimestart'] = get_string('registrationstartsession', 'facetoface');
+                }
+            }
+
+            // Registration close date must be on or before session has started.
+            if (!empty($data['registrationtimefinish'])) {
+                if ($data['registrationtimefinish'] > $starttime) {
+                    $errors['registrationtimefinish'] = get_string('registrationfinishsession', 'facetoface');
+                }
+            }
+
             // If valid date, add to array.
             $date = new stdClass();
             $date->timestart = $starttime;
@@ -448,6 +468,16 @@ class mod_facetoface_session_form extends moodleform {
 
         if ($data['datetimeknown'] and $datecount == $deletecount) {
             $errors['datedelete[0]'] = get_string('validation:needatleastonedate', 'facetoface');
+        }
+
+        if(!empty($data['registrationtimestart']) && !empty($data['registrationtimefinish'])) {
+            $start = $data['registrationtimestart'];
+            $finish = $data['registrationtimefinish'];
+            if ($start >= $finish) {
+                // Registration opening time cannot be after registration close time.
+                $errors['registrationtimestart'] = get_string('registrationerrorstartfinish', 'facetoface');
+                $errors['registrationtimefinish'] = get_string('registrationerrorstartfinish', 'facetoface');
+            }
         }
 
         // Check the availabilty of trainers if scheduling not allowed

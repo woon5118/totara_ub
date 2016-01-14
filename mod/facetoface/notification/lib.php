@@ -61,6 +61,7 @@ define('MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE',     64);
 define('MDL_F2F_CONDITION_TRAINER_CONFIRMATION',        128);
 define('MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION', 256);
 define('MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT', 512);
+define('MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED',    1024);
 define('MDL_F2F_CONDITION_RESERVATION_CANCELLED',        16384);
 define('MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED',    32768);
 
@@ -478,6 +479,60 @@ class facetoface_notification extends data_object {
         $recordset->close();
     }
 
+    /**
+     * Sends messages for face to face sessions where registration has expired
+     *
+     * @access  public
+     * @return  void
+     * @param \stdClass $notif
+     */
+    public function send_notification_registration_expired($notif) {
+        global $CFG, $DB;
+
+        if (!empty(get_config(null, 'facetoface_notificationdisable'))) {
+            return;
+        }
+
+        mtrace(get_string('signupexpired', 'facetoface'));
+
+        // Find User to be notified.
+        $userid = $notif->usermodified;
+        $user = $DB->get_record('user', array('id' => $userid));
+        if (!$user) {
+            return;
+        }
+
+        $params = array(
+            "facetofaceid" => $notif->facetoface,
+            "type" => MDL_F2F_NOTIFICATION_AUTO,
+            "conditiontype" => MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED
+        );
+
+        $facetoface = $DB->get_record('facetoface', array('id' => $notif->facetoface));
+        $notice = new facetoface_notification($params);
+
+        $notificationhistory = $DB->get_record('facetoface_notification_sent', array('notificationid' => $notice->id, 'sessionid' => $notif->id, 'userid' => $userid));
+        if($notificationhistory != null){
+            //Notification already sent.
+            return;
+        }
+
+        if (isset($facetoface->ccmanager)) {
+            $notice->ccmanager = $facetoface->ccmanager;
+        }
+
+        $notice->set_facetoface($facetoface);
+        $notice->_sessions = facetoface_get_sessions($facetoface->id);
+        $notice->set_newevent($user, $notif->id);
+
+        if (!isset($notif->notifyuser)) {
+            $notif->notifyuser = true;
+        }
+
+        if ($notif->notifyuser) {
+            $notice->send_to_user($user, $notif->id);
+        }
+    }
 
     /**
      * Send to all matching users

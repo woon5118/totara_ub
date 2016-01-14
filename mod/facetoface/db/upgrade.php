@@ -3238,5 +3238,25 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016022301, 'facetoface');
     }
 
+    if ($oldversion < 2016022400) {
+
+        // Define field registrationtimestart to be added to facetoface_sessions.
+        $table = new xmldb_table('facetoface_sessions');
+
+        $field = new xmldb_field('registrationtimestart', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'sendcapacityemail');
+        // Conditionally launch add field registrationtimestart.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('registrationtimefinish', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'registrationtimestart');
+        // Conditionally launch add field registrationtimefinish.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2016022400, 'facetoface');
+    }
+
     return $result;
 }

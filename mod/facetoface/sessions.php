@@ -269,6 +269,10 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $todb->selfapproval = $facetoface->approvalreqd ? $fromform->selfapproval : 0;
     $todb->availablesignupnote = $fromform->availablesignupnote;
 
+    // Sign-Up fields added.
+    $todb->registrationtimestart = $fromform->registrationtimestart;
+    $todb->registrationtimefinish = $fromform->registrationtimefinish;
+
     // If min capacity is not provided or unset default to 0.
     if ($fromform->mincapacity < 0) {
         $fromform->mincapacity = 0;

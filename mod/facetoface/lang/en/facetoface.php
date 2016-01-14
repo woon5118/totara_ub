@@ -655,6 +655,7 @@ $string['odsformat'] = 'OpenDocument';
 $string['onehour'] = '1 hour';
 $string['oneminute'] = '1 minute';
 $string['options'] = 'Options';
+$string['optionscolon'] = 'Options:';
 $string['or'] = 'or';
 $string['order'] = 'Order';
 $string['otherbookedby'] = 'Booked by another manager';
@@ -1027,6 +1028,25 @@ Room:   [session:room]
 ';
 $string['setting:defaultdatetimechangesubject'] = 'Default subject line for date/time change emails.';
 $string['setting:defaultdatetimechangesubject_caption'] = 'Date/time change subject';
+$string['setting:defaultregistrationexpiredsubjectdefault'] = 'Face-to-face registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultregistrationexpiredmessagedefault'] = 'The registration period for the following session has been closed:
+
+Course: [coursename]
+
+Face-to-face: [facetofacename]
+
+Duration: [duration]
+
+Date(s):
+
+[alldates]
+
+Location: [session:location]
+
+Venue: [session:venue]
+
+Room: [session:room]
+';
 $string['setting:defaultdatetimechangesubjectdefault'] = 'Face-to-face booking date/time changed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultminbookings'] = 'Default minimum bookings';
 $string['setting:defaultminbookings_help'] = 'Global default value for all Face-to-face sessions. All sessions can still have a custom minimum bookings when setting up a new Face-to-face session.';
@@ -1240,6 +1260,7 @@ $string['signups'] = 'Sign-ups';
 $string['signupfor'] = 'Sign-up for {$a}';
 $string['signupforsession'] = 'Sign-up for an available upcoming session';
 $string['signupforthissession'] = 'Sign-up for this Face-to-face session';
+$string['signupunavailable'] = 'Sign-up unavailable';
 $string['sign-ups'] = 'Sign-ups';
 $string['sitenoticesheading'] = 'Site Notices';
 $string['spacesreserved'] = 'Spaces reserved';
@@ -1533,21 +1554,45 @@ $string['usernote_help'] = 'Any specific requirements that the session organiser
 * Disabilities';
 
 //Totara Messaging strings
-$string['requestattendsession_message'] = 'Request to attend session {$a->linkname} {$a->status}';
-$string['requestattendsession_subject'] = 'Request to attend session {$a->name} {$a->status} by {$a->user}';
-$string['requestattendsessionsent'] = 'Request to attend session {$a} sent to manager';
-
-$string['bookedforsession'] = 'Booked for session {$a}';
-$string['waitlistedforsession'] = 'Waitlisted for session {$a}';
-$string['cancelledforsession'] = 'Cancelled for session {$a}';
-
-$string['requestuserattendsession'] = 'Request for {$a->usermsg} to attend session {$a->url}';
-$string['cancelusersession'] = 'Cancelled for {$a->usermsg} session {$a->url}';
-
 $string['approveinstruction'] = 'To approve session registration, press accept';
+$string['bookedforsession'] = 'Booked for session {$a}';
+$string['cancelledforsession'] = 'Cancelled for session {$a}';
+$string['cancelusersession'] = 'Cancelled for {$a->usermsg} session {$a->url}';
 $string['rejectinstruction'] = 'To reject session registration, press reject';
+$string['registrationnotopen'] = 'Signup period not open';
+$string['registrationnotopenalert'] = 'The Signup period for your selected session is currently not open, it opens on the {$a}';
+$string['registrationclosed'] = 'Signup period is now closed';
+$string['registrationclosedalert'] = 'The Signup period for your selected session has closed, please select another session';
+$string['registrationhoverhintstart'] = 'Signup period opens: {$a}';
+$string['registrationhoverhintend'] = 'Sign up period closes: {$a}';
+$string['registrationdatetime'] = 'Signup period date/time';
+$string['registrationtimestart'] = 'Sign-up opens';
+$string['registrationtimestart_help'] = 'If enabled, learners will not be able to sign up for this session until this time has arrived.';
+$string['registrationtimefinish'] = 'Sign-up closes';
+$string['registrationtimefinish_help'] = 'If enabled, learners will not be able to sign up for this session once this time has passed.';
+$string['registrationerrorstartfinish'] = 'Signup period start time must be before signup finish time';
+$string['registrationstartsession'] = 'Signup period opening time must be before session start time';
+$string['registrationfinishsession'] = 'Signup period closing time must be on or before session start time';
+$string['registrationdetails'] = 'Signup period';
+$string['registrationopens'] = 'Opens';
+$string['registrationcloses'] = 'Closes';
+$string['registrationclosingblurb'] = 'The following people have indicated their interest. You may wish to inform them if you create a new session.';
+$string['registrationclosingconfirmation'] = 'Are you sure you want to close the sign up period for this session?';
+$string['requestattendsession'] = 'Request to attend session {$a}';
+$string['requestattendsessionsent'] = 'Request to attend session {$a} sent to manager';
+$string['requestuserattendsession'] = 'Request for {$a->usermsg} to attend session {$a->url}';
+$string['nosignupperiodopendate'] = 'Now';
+$string['nosignupperiodclosedate'] = 'Session start date';
 $string['sessiondate_help'] = 'Session date is the date on which the session occurs.';
+$string['signupexpired'] = 'Sending expired sign up period date notifications to the admin user of that session';
+$string['signupperiodheader'] = 'Signup period';
+$string['signupregistrationclosed'] = 'The sign-up period for your selected session closed on the {$a->date}, {$a->time} {$a->timezone}. Please select another session.';
+$string['signupregistrationnotyetopen'] = 'The sign-up period for your selected session is currently not open, it opens on the {$a->date}, {$a->time} {$a->timezone}.';
+$string['signupstartend'] = '{$a->startdate} {$a->starttime} {$a->timezone} to {$a->enddate} {$a->endtime} {$a->timezone}';
+$string['signupstartsonly'] = 'After {$a->startdate}  {$a->starttime} {$a->timezone}';
+$string['signupendsonly'] = 'Before {$a->enddate} {$a->endtime} {$a->timezone}';
 $string['waitlistcancelled'] = 'Your place on the waitlist has been cancelled.';
 $string['waitlistcancellationconfirm'] = 'Are you sure you want to cancel your place on the waiting list for this session?';
+$string['waitlistedforsession'] = 'Waitlisted for session {$a}';
 $string['waitlistfor'] = 'Waitlist for {$a}';
 $string['waitliststatus'] = 'You have a place on the waitlist of the following session';

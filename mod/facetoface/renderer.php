@@ -52,6 +52,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $tableheader[] = get_string('seatsavailable', 'facetoface');
         }
         $tableheader[] = get_string('status', 'facetoface');
+        $tableheader[] = get_string('signupperiodheader', 'facetoface');
         $tableheader[] = get_string('options', 'facetoface');
 
         $timenow = time();
@@ -84,7 +85,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 }
             }
 
-            // Dates/times
+            // Dates/times.
             $allsessiondates = '';
             $allsessiontimes = '';
             if ($session->datetimeknown) {
@@ -158,10 +159,50 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $status = get_string('bookingfull', 'facetoface');
                 $sessionfull = true;
             }
+
+            // Registration status.
+            if (!empty($session->registrationtimestart) && $session->registrationtimestart > $timenow) {
+                $status = get_string('registrationnotopen', 'facetoface');
+                $registrationopen = false;
+            } else {
+                $registrationopen = true;
+            }
+
+            if (!empty($session->registrationtimefinish) && $timenow > $session->registrationtimefinish) {
+                $status = get_string('registrationclosed', 'facetoface');
+                $registrationclosed = true;
+            } else {
+                $registrationclosed = false;
+            }
+
             // Check if the user is allowed to cancel his booking.
             $allowcancellation = facetoface_allow_user_cancellation($session);
 
             $sessionrow[] = $status;
+
+            // Signup Start Dates/times.
+            if(!empty($session->registrationtimestart)) {
+                if(!empty($session->registrationtimefinish)) {
+                    $sessionobj = facetoface_format_session_times($session->registrationtimestart, $session->registrationtimefinish, '');
+                    $sessionrow[] = get_string('signupstartend', 'facetoface', $sessionobj);
+                } else {
+                    $start = new stdClass();
+                    $start->startdate = userdate($session->registrationtimestart, get_string('strftimedate', 'langconfig'));
+                    $start->starttime = userdate($session->registrationtimestart, get_string('strftimetime', 'langconfig'));
+                    $start->timezone = core_date::get_user_timezone();
+                    $sessionrow[] = get_string('signupstartsonly', 'facetoface', $start);
+                }
+            } else {
+                if(!empty($session->registrationtimefinish)) {
+                    $finish = new stdClass();
+                    $finish->enddate = userdate($session->registrationtimefinish, get_string('strftimedate', 'langconfig'));
+                    $finish->endtime = userdate($session->registrationtimefinish, get_string('strftimetime', 'langconfig'));
+                    $finish->timezone = core_date::get_user_timezone();
+                    $sessionrow[] = get_string('signupendsonly', 'facetoface', $finish);
+                } else {
+                    $sessionrow[] = "";
+                }
+            }
 
             // Options.
             $options = '';
@@ -229,9 +270,22 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 if (!facetoface_session_has_capacity($session, $this->context, MDL_F2F_STATUS_WAITLISTED) && !$session->allowoverbook) {
                     $options .= get_string('none', 'facetoface');
                 } else {
-                    $signupurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
-                    $signuptext = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
-                    $options .= html_writer::link($signupurl, get_string($signuptext, 'facetoface'));
+                    if ($registrationopen == true && $registrationclosed == false) {
+                        // Ok to register.
+                        $signupurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
+                        $signuptext = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
+                        $options .= html_writer::link($signupurl, get_string($signuptext, 'facetoface'));
+                    } else if ($registrationclosed == true) {
+                        // Registration has closed for this session.
+                        $tooltip = get_string('registrationclosed', 'facetoface');
+                        $options .= html_writer::span(get_string('signupunavailable', 'facetoface'), '',
+                            array('title' => $tooltip, 'aria-describedby' => $tooltip));
+                    } else {
+                        // Registration date not yet reached.
+                        $tooltip = get_string('registrationnotopen', 'facetoface');
+                        $options .= html_writer::span(get_string('signupunavailable', 'facetoface'), '',
+                            array('title' => $tooltip, 'aria-describedby' => $tooltip));
+                    }
                 }
             }
             if (empty($options)) {
