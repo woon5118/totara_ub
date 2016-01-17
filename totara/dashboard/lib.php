@@ -410,6 +410,86 @@ class totara_dashboard {
     }
 
     /**
+     * Clones the current dashboard.
+     *
+     * This method clones the dashboard including its blocks, their configuration, and any assigned audiences.
+     * It does NOT clone any user customisations of this dashboard.
+     *
+     * @return int The id of the newly created dashboard.
+     */
+    public function clone_dashboard() {
+        global $DB;
+
+        // First create the dashboard record.
+        $dashboard = $DB->get_record('totara_dashboard', array('id' => $this->id));
+        unset($dashboard->id);
+        $dashboard->name = $this->generate_clone_name();
+        $dashboard->id = $DB->insert_record('totara_dashboard', $dashboard);
+        // Move the newly created dashboard to the end of the list.
+        db_reorder($dashboard->id, -1, 'totara_dashboard');
+
+        // Now copy across the blocks and their content.
+        $context = context_system::instance();
+        $blocks = $DB->get_records('block_instances', array(
+            'parentcontextid' => $context->id,
+            'pagetypepattern' => 'my-totara-dashboard-' . $this->id
+        ));
+        if ($blocks) {
+            foreach ($blocks as $block) {
+                $originalid = $block->id;
+                unset($block->id);
+
+                // Amend the page type pattern to the newly cloned dashboard.
+                $block->pagetypepattern = 'my-totara-dashboard-' . $dashboard->id;
+                // Create the new block record.
+                $block->id = $DB->insert_record('block_instances', $block);
+
+                // Force the creation of the block context.
+                context_block::instance($block->id);
+                // Copy the block content from one to the next.
+                $block = block_instance($block->blockname, $block);
+                if (!$block->instance_copy($originalid)) {
+                    debugging("Unable to copy block data for original block instance: $originalid to new block instance: $block->id", DEBUG_DEVELOPER);
+                }
+            }
+        }
+
+        // Finally copy across any assigned audiences.
+        $assignedcohorts = $DB->get_records('totara_dashboard_cohort', array('dashboardid' => $this->id));
+        foreach ($assignedcohorts as $cohort) {
+            $cohort->dashboardid = $dashboard->id;
+            $DB->insert_record('totara_dashboard_cohort', $cohort);
+        }
+
+        return $dashboard->id;
+    }
+
+    /**
+     * Generates a new name to use for the dashboard when it is being cloned.
+     *
+     * @return string
+     * @throws coding_exception
+     */
+    protected function generate_clone_name() {
+        global $DB;
+        $count = 1;
+        $name = get_string('clonename', 'totara_dashboard', array('name' => $this->name, 'count' => $count));
+        $stop = false;
+        while ($DB->record_exists('totara_dashboard', array('name' => $name)) && !$stop) {
+            $count++;
+            if ($count > 25) {
+                // This is getting mad. 25 is plenty, we'll stop here.
+                $stop = true;
+                // Append a + to show that there are more. This probably won't translate perfectly but it should be a very rare
+                // edge case to end up with 25 clones.
+                $count = '25+';
+            }
+            $name = get_string('clonename', 'totara_dashboard', array('name' => $this->name, 'count' => $count));
+        }
+        return $name;
+    }
+
+    /**
      * Check if user has own modification of dashboard
      *
      * @param int $userid

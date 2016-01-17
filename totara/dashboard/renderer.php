@@ -64,6 +64,7 @@ class totara_dashboard_renderer extends plugin_renderer_base {
         $strunpublish = get_string('unpublish', 'totara_dashboard');
         $strdelete = get_string('delete', 'totara_dashboard');
         $stredit = get_string('editdashboard', 'totara_dashboard');
+        $strclone = get_string('clonedashboard', 'totara_dashboard');
 
         $data = array();
         foreach ($dashboards as $dashboard) {
@@ -71,6 +72,7 @@ class totara_dashboard_renderer extends plugin_renderer_base {
             $name = format_string($dashboard->name);
             $urllayout = new moodle_url('/totara/dashboard/layout.php', array('id' => $id));
             $urledit = new moodle_url('/totara/dashboard/edit.php', array('id' => $id));
+            $urlclone = new moodle_url('/totara/dashboard/manage.php', array('action' => 'clone', 'id' => $id, 'sesskey' => sesskey()));
             $urlpublish = new moodle_url('/totara/dashboard/manage.php', array('action' => 'publish', 'id' => $id, 'sesskey' => sesskey()));
             $urlunpublish = new moodle_url('/totara/dashboard/manage.php', array('action' => 'unpublish', 'id' => $id, 'sesskey' => sesskey()));
             $urlup = new moodle_url('/totara/dashboard/manage.php', array('action' => 'up', 'id' => $id, 'sesskey' => sesskey()));
@@ -84,6 +86,9 @@ class totara_dashboard_renderer extends plugin_renderer_base {
             $options = '';
             $options .= $this->output->action_icon($urledit, new pix_icon('/t/edit', $stredit, 'moodle'), null,
                     array('class' => 'action-icon edit'));
+
+            $options .= $this->output->action_icon($urlclone, new pix_icon('/t/copy', $strclone, 'moodle'), null,
+                array('class' => 'action-icon clone'));
 
             if ($dashboard->is_published()) {
                 $options .= $this->output->action_icon($urlunpublish, new pix_icon('/t/hide', $strunpublish, 'moodle'), null,

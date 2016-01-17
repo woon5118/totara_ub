@@ -105,6 +105,96 @@ class totara_dashboard_testcase extends advanced_testcase {
     }
 
     /**
+     * Test that you can clone a dashboard, its blocks and its audiences.
+     */
+    public function test_dashboard_clone() {
+        global $CFG;
+        // Blocklib must be included for this.
+        require_once($CFG->libdir . '/blocklib.php');
+        // We have to reset as we add dashboards, cohorts and blocks.
+        $this->resetAfterTest();
+
+        $cohorts_gen = $this->getDataGenerator()->get_plugin_generator('totara_cohort');
+        $cohorts = array($cohorts_gen->create_cohort()->id, $cohorts_gen->create_cohort()->id, $cohorts_gen->create_cohort()->id);
+
+        $data = array(
+            'name' => 'Test',
+            'locked' => 1,
+            'published' => 1,
+            'cohorts' => $cohorts
+        );
+        /* @var totara_dashboard $dashboard */
+        $dashboard = $this->getDataGenerator()->get_plugin_generator('totara_dashboard')->create_dashboard($data);
+        $dashboard->name = 'Original';
+        $dashboard->unlock();
+        $dashboard->unpublish();
+        $dashboard->save();
+
+        // Add an HTML block to this dashboard.
+        $page = new moodle_page();
+        $page->set_context(context_system::instance());
+        $page->set_pagelayout('mydashboard');
+        $page->set_pagetype('my-totara-dashboard-' . $dashboard->get_id());
+        $page->set_subpage('default');
+        $page->blocks->add_block('html', $page->blocks->get_default_region(), -1, false, null, 'default');
+
+        // Clone the dashboard and verify its state.
+        $cloneid = $dashboard->clone_dashboard();
+        $clone = new totara_dashboard($cloneid);
+        $this->assertEquals('Original copy 1', $clone->name);
+        $this->assertEquals($cloneid, $clone->get_id());
+        $this->assertFalse($clone->is_locked());
+        $this->assertFalse($clone->is_published());
+        foreach ($cohorts as $cohort) {
+            $this->assertContains($cohort, $clone->get_cohorts());
+        }
+
+        // Edit the cloned dashboard to make it unique from the original.
+        $clone->name = 'Clone';
+        $clone->publish();
+        $clone->lock();
+        $clone->save();
+
+        // Test that the two are truly independent by destroying them and reinitialising them.
+        $originalid = $dashboard->get_id();
+        unset($dashboard);
+        unset($clone);
+        $original = new totara_dashboard($originalid);
+        $clone = new totara_dashboard($cloneid);
+
+        // Is the original truly original.
+        $this->assertEquals('Original', $original->name);
+        $this->assertEquals($originalid, $original->get_id());
+        $this->assertFalse($original->is_locked());
+        $this->assertFalse($original->is_published());
+        foreach ($cohorts as $cohort) {
+            $this->assertContains($cohort, $original->get_cohorts());
+        }
+        // Is the clone also original?
+        $this->assertEquals('Clone', $clone->name);
+        $this->assertEquals($cloneid, $clone->get_id());
+        $this->assertTrue($clone->is_locked());
+        $this->assertTrue($clone->is_published());
+        foreach ($cohorts as $cohort) {
+            $this->assertContains($cohort, $clone->get_cohorts());
+        }
+
+        // Finally check the blocks.
+        $page->blocks->load_blocks(false);
+        $blocks = $page->blocks->get_blocks_for_region($page->blocks->get_default_region());
+        // We only need to check these exist, we don't check an explicit list as if anything else changes about the
+        // default blocks we don't care.
+        $expected = array('block_totara_dashboard', 'block_html');
+        $actual = array();
+        foreach ($blocks as $block) {
+            $actual[] = get_class($block);
+        }
+        foreach ($expected as $block) {
+            $this->assertContains($block, $actual);
+        }
+    }
+
+    /**
      * Get manage list test
      * Make list of published, unpublised, locked, unlocked dashboards with and without cohorts.
      * Check that they all received

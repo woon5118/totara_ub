@@ -25,6 +25,11 @@
 
 $string['assigncohorts'] = 'Assign new audiences';
 $string['assignedcohorts'] = 'Assigned audiences';
+$string['clonename'] = '{$a->name} copy {$a->count}';
+$string['clonedashboard'] = 'Clone dashboard';
+$string['clonedashboardconfirm'] = 'Do you really want to clone dashboard {$a}?
+
+Cloning will create a copy of this dashboard including the blocks that have been added to it and any audience assignments.';
 $string['configenabletotaradashboard'] = 'This option will let you: Enable(show)/Disable Totara Dashboard feature on this site.
 
 * If Show is chosen, all links, menus, tabs and option related to Totara Dashboard will be accessible.
@@ -34,6 +39,7 @@ $string['createdashboard'] = 'Create dashboard';
 $string['dashboard'] = 'Dashboard';
 $string['dashboard:manage'] = 'Manage dashboard';
 $string['dashboard:manageblocks'] = 'Manage dashboard blocks';
+$string['dashboardclonesuccess'] = 'Dashboard \'{$a->original}\' successfully cloned to \'{$a->clone}\'';
 $string['dashboarddeletesuccess'] = 'Dashboard deleted';
 $string['dashboardresetsuccess'] = 'Dashboard reset successful';
 $string['dashboards'] = 'Dashboards';
