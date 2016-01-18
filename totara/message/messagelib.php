@@ -35,17 +35,6 @@ require_once($CFG->dirroot . '/totara/message/lib.php');
 require_once($CFG->dirroot . '/totara/core/lib.php');
 require_once($CFG->libdir  . '/eventslib.php');
 
-if (!isset($CFG->message_contacts_refresh)) {  // Refresh the contacts list every 60 seconds
-    $CFG->message_contacts_refresh = 60;
-}
-if (!isset($CFG->message_chat_refresh)) {      // Look for new comments every 5 seconds
-    $CFG->message_chat_refresh = 5;
-}
-if (!isset($CFG->message_offline_time)) {
-    $CFG->message_offline_time = 300;
-}
-
-
 // message status constants
 define('TOTARA_MSG_STATUS_UNDECIDED', 0);
 define('TOTARA_MSG_STATUS_OK', 1);
