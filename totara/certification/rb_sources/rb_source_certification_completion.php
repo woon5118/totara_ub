@@ -70,7 +70,7 @@ class rb_source_certification_completion extends rb_source_program_completion {
 
         $joinlist[] = new rb_join(
             'certif_completion',
-            'LEFT',
+            'INNER',
             '{certif_completion}',
             "certif_completion.userid = base.userid AND certif_completion.certifid = program.certifid",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
@@ -87,6 +87,11 @@ class rb_source_certification_completion extends rb_source_program_completion {
         );
 
         return $joinlist;
+    }
+
+    protected function get_source_joins() {
+        $parentjoins = parent::get_source_joins();
+        return array_merge(array('certif_completion'), $parentjoins);
     }
 
     protected function define_columnoptions() {
