@@ -29,7 +29,13 @@ require_once($CFG->dirroot . '/totara/program/lib.php');
 $debug = optional_param('debug', 0, PARAM_INT);
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_totara_menu_selected('programs');
+
+$enhancedcatalogenabled = get_config('core', 'enhancedcatalog');
+
+if ($enhancedcatalogenabled) {
+    $PAGE->set_totara_menu_selected('programs');
+}
+
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_url('/totara/coursecatalog/programs.php');
 if ($CFG->forcelogin) {

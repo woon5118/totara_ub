@@ -30,12 +30,11 @@ $debug = optional_param('debug', 0, PARAM_INT);
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('noblocks');
 
-$enhancedcatalogenabled = get_config('totara_core', 'enhancedcatalog');
+$enhancedcatalogenabled = get_config('core', 'enhancedcatalog');
 
-if ($enhancedcatalogenabled === true) {
+if ($enhancedcatalogenabled) {
     $PAGE->set_totara_menu_selected('courses');
 }
-
 
 $PAGE->set_url('/totara/coursecatalog/courses.php');
 
