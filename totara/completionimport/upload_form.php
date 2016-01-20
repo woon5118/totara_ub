@@ -34,6 +34,22 @@ class upload_form extends moodleform {
 
         $data = $this->_customdata;
 
+        switch ($data->importname) {
+            case 'course':
+                $upload_label = 'choosecoursefile';
+                $upload_field = 'course_uploadfile';
+                break;
+            case 'certification':
+                $upload_label = 'choosecertificationfile';
+                $upload_field = 'certification_uploadfile';
+                break;
+            default:
+                $upload_label = 'choosefile';
+                $upload_field = 'uploadfile';
+        }
+
+        $upload_label = get_string($upload_label, 'totara_completionimport');
+
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'filesource');
@@ -46,11 +62,11 @@ class upload_form extends moodleform {
             $mform->addRule('sourcefile', get_string('sourcefilerequired', 'totara_completionimport'), 'required');
         } else if ($data->filesource == TCI_SOURCE_UPLOAD) {
             $mform->addElement('filepicker',
-                    'uploadfile',
-                    get_string('choosefile', 'totara_completionimport'),
+                    $upload_field,
+                    $upload_label,
                     null,
                     array('accepted_types' => array('csv')));
-            $mform->addRule('uploadfile', get_string('uploadfilerequired', 'totara_completionimport'), 'required');
+            $mform->addRule($upload_field, get_string('uploadfilerequired', 'totara_completionimport'), 'required');
         }
 
         // Evidence type.

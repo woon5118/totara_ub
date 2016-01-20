@@ -97,5 +97,67 @@ function xmldb_totara_completionimport_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015030202, 'totara', 'completionimport');
     }
 
+    // TL-8118 Extend the Completion Import tool to support uploading evidence with custom fields.
+    // This adds customfield field to the totara_compl_import_course table.
+    if ($oldversion < 2016020800) {
+
+        $table = new xmldb_table('totara_compl_import_course');
+        $field = new xmldb_field('customfields', XMLDB_TYPE_TEXT, null, null, null, null, null, 'grade');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2016020800, 'totara', 'completionimport');
+    }
+
+    // TL-8118 Extend the Completion Import tool to support uploading evidence with custom fields.
+    // This adds evidenceid field to the totara_compl_import_course table.
+    if ($oldversion < 2016020801) {
+
+        $table = new xmldb_table('totara_compl_import_course');
+        $field = new xmldb_field('evidenceid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'importevidence');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('totacompimpocour_evi_ix', XMLDB_INDEX_UNIQUE, array('evidenceid'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        upgrade_plugin_savepoint(true, 2016020801, 'totara', 'completionimport');
+    }
+
+    // TL-8118 Extend the Completion Import tool to support uploading evidence with custom fields.
+    // This adds customfield field to the totara_compl_import_cert table.
+    if ($oldversion < 2016020802) {
+
+        $table = new xmldb_table('totara_compl_import_cert');
+        $field = new xmldb_field('customfields', XMLDB_TYPE_TEXT, null, null, null, null, null, 'completiondate');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2016020802, 'totara', 'completionimport');
+    }
+
+    // TL-8118 Extend the Completion Import tool to support uploading evidence with custom fields.
+    // This adds evidenceid field to the totara_compl_import_cert table.
+    if ($oldversion < 2016020803) {
+
+        $table = new xmldb_table('totara_compl_import_cert');
+        $field = new xmldb_field('evidenceid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'importevidence');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('totacompimpocert_evi_ix', XMLDB_INDEX_UNIQUE, array('evidenceid'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        upgrade_plugin_savepoint(true, 2016020803, 'totara', 'completionimport');
+    }
+
     return true;
 }

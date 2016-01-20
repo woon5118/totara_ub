@@ -106,7 +106,7 @@ if (!empty($importname)) {
     } else if ($filesource == TCI_SOURCE_UPLOAD) {
         // Uploading via a form.
         if ($importname == 'course') {
-            if (!$courseform->save_file('uploadfile', $tempfilename, true)) {
+            if (!$courseform->save_file('course_uploadfile', $tempfilename, true)) {
                 echo $OUTPUT->notification(get_string('cannotsaveupload', 'totara_completionimport', $tempfilename),
                         'notifyproblem');
                 echo $OUTPUT->footer();
@@ -114,7 +114,7 @@ if (!empty($importname)) {
                 exit;
             }
         } else if ($importname == 'certification') {
-            if (!$certform->save_file('uploadfile', $tempfilename, true)) {
+            if (!$certform->save_file('certification_uploadfile', $tempfilename, true)) {
                 echo $OUTPUT->notification(get_string('cannotsaveupload', 'totara_completionimport', $tempfilename),
                         'notifyproblem');
                 echo $OUTPUT->footer();
@@ -142,6 +142,16 @@ if (!empty($importname)) {
 echo $OUTPUT->heading(get_string('uploadcourse', 'totara_completionimport'), 3);
 $columnnames = implode(',', get_columnnames('course'));
 echo format_text(get_string('uploadcourseintro', 'totara_completionimport', $columnnames));
+
+// Get any evidence custom fields.
+$evidence_customfields = get_evidence_customfields();
+
+// If any available evidence custom fields, show them as a option.
+if ($evidence_customfields) {
+    $columnnames = implode(',', $evidence_customfields);
+    echo format_text(get_string('uploadcoursecustomfieldsintro', 'totara_completionimport', $columnnames));
+}
+
 $courseform->display();
 
 // Display upload certification heading + fields to import.
@@ -149,6 +159,13 @@ if (totara_feature_visible('certifications')) {
     echo $OUTPUT->heading(get_string('uploadcertification', 'totara_completionimport'), 3);
     $columnnames = implode(',', get_columnnames('certification'));
     echo format_text(get_string('uploadcertificationintro', 'totara_completionimport', $columnnames));
+
+    // If any available evidence custom fields, show them as a option.
+    if ($evidence_customfields) {
+        $columnnames = implode(',', $evidence_customfields);
+        echo format_text(get_string('uploadcoursecustomfieldsintro', 'totara_completionimport', $columnnames));
+    }
+
     $certform->display();
 }
 

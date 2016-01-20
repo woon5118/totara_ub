@@ -53,6 +53,8 @@ $string['certificationblankrefs'] = 'Blank certification shortname and certifica
 $string['certificationexpired'] = 'Import certification expired, skipping importing';
 $string['certificationdueforrecert'] = 'Import certification due for renewal, skipping import';
 $string['choosefile'] = 'Choose file to upload';
+$string['choosecoursefile'] = 'Choose course file to upload';
+$string['choosecertificationfile'] = 'Choose certification file to upload';
 $string['completiondatesame'] = 'Record completion date exists';
 $string['completionimport'] = 'Upload Completion Records';
 $string['completionimport_certification'] = 'Completion import: Certification status';
@@ -153,6 +155,11 @@ $string['uploadcourseintro'] = 'This will import historical completion records f
 Any courses that do not exist in the current system will be created as evidence in the record of learning.
 
 The csv file should contain the following columns in the first line of the file
+
+{$a}
+';
+$string['uploadcoursecustomfieldsintro'] = '
+Additional columns below can also be included in the CSV to allow custom field data to be uploaded for evidence
 
 {$a}
 ';
