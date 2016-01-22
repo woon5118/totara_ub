@@ -131,6 +131,14 @@ div.plan_box {
     padding-left: 40px;
 }
 
+@media screen and (max-width: 640px) {
+    #dp-plans-list-active-plans table td.c0,
+    #dp-plans-list-unapproved-plans table td.c0,
+    #dp-plans-list-completed-plans table td.c0 {
+        padding-left: 8px;
+    }
+}
+
 .dir-rtl #dp-plans-list-active-plans table td.c0,
 .dir-rtl #dp-plans-list-unapproved-plans table td.c0,
 .dir-rtl #dp-plans-list-completed-plans table td.c0 {
@@ -161,6 +169,7 @@ table.planpermissions select {
 }
 .dp-summary-widget-component-name {
     padding-top: 3px;
+    display: inline-block;
 }
 .dir-ltr .dp-summary-widget-component-name {
     margin-right: 4px;
