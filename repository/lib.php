@@ -3075,17 +3075,18 @@ final class repository_type_form extends moodleform {
 /**
  * Generate all options needed by filepicker
  *
- * @param array $args including following keys
+ * @param stdClass $args including following keys
  *          context
  *          accepted_types
  *          return_types
+ * @param bool $returntemplates Totara: true means add templates to the return object instead of M.core_filepicker.set_templates
  *
  * @return array the list of repository instances, including meta infomation, containing the following keys
  *          externallink
  *          repositories
  *          accepted_types
  */
-function initialise_filepicker($args) {
+function initialise_filepicker($args, $returntemplates=false) {
     global $CFG, $USER, $PAGE, $OUTPUT;
     static $templatesinitialized = array();
     require_once($CFG->libdir . '/licenselib.php');
@@ -3169,6 +3170,15 @@ function initialise_filepicker($args) {
             $templatesinitialized['uploadform_' . $meta->type] = true;
         }
     }
+
+    if ($returntemplates) {
+        // Totara forms hack.
+        /** @var core_files_renderer $fprenderer */
+        $fprenderer = $PAGE->get_renderer('core', 'files');
+        $return->fptemplates = array_merge($templates, $fprenderer->filepicker_js_templates());
+        return $return;
+    }
+
     if (!array_key_exists('core', $templatesinitialized)) {
         // we need to send each filepicker template to the browser just once
         $fprenderer = $PAGE->get_renderer('core', 'files');

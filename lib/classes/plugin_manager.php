@@ -1942,7 +1942,7 @@ class core_plugin_manager {
             'totara' => array(
                 'appraisal', 'cohort', 'core', 'coursecatalog', 'customfield', 'dashboard', 'feedback360', 'flavour',
                 'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
-                'certification', 'completionimport', 'mssql', 'generator', 'connect',
+                'certification', 'completionimport', 'mssql', 'generator', 'connect', 'form',
             ),
             'tabexport' => array(
                 'csv', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',

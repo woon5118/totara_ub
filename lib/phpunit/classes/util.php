@@ -102,6 +102,7 @@ class phpunit_util extends testing_util {
      */
     public static function reset_all_data($detectchanges = false) {
         global $DB, $CFG, $USER, $SITE, $COURSE, $PAGE, $OUTPUT, $SESSION, $FULLME;
+        global $ME, $SCRIPT; // Totara: fix global resets.
 
         // Stop any message redirection.
         self::stop_message_redirection();

@@ -229,6 +229,7 @@ $string['title'] = 'Choose a file...';
 $string['type'] = 'Type';
 $string['typenotvisible'] = 'Type not visible';
 $string['unknownoriginal'] = 'Unknown';
+$string['unknownsource'] = 'Unknown'; // Totara: used from upstream repo stuff
 $string['upload'] = 'Upload this file';
 $string['uploading'] = 'Uploading...';
 $string['uploadsucc'] = 'The file has been uploaded successfully';

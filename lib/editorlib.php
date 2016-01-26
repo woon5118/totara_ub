@@ -238,4 +238,16 @@ abstract class texteditor {
      */
     public function head_setup() {
     }
+
+    /**
+     * Allow editor to customise template and init itself in Totara forms.
+     *
+     * @param array $result
+     * @param array $editoroptions
+     * @param array $fpoptions
+     * @param array $fptemplates
+     * @return void the $result parameter is modified if necessary
+     */
+    public function totara_form_use_editor(&$result, array $editoroptions, array $fpoptions, array $fptemplates) {
+    }
 }

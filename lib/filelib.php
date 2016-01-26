@@ -781,7 +781,7 @@ function file_restore_source_field_from_draft_file($storedfile) {
  *
  * @category files
  * @global stdClass $USER
- * @param int $draftitemid the id of the draft area to use. Normally obtained
+ * @param int|stored_file[] $draftitemid the id of the draft area to use. Normally obtained
  *      from file_get_submitted_draft_itemid('elementname') or similar.
  * @param int $contextid This parameter and the next two identify the file area to save to.
  * @param string $component
@@ -820,15 +820,27 @@ function file_save_draft_area_files($draftitemid, $contextid, $component, $filea
         $allowreferences = false;
     }
 
-    // Check if the draft area has exceeded the authorised limit. This should never happen as validation
-    // should have taken place before, unless the user is doing something nauthly. If so, let's just not save
-    // anything at all in the next area.
-    if (file_is_draft_area_limit_reached($draftitemid, $options['areamaxbytes'])) {
-        return null;
-    }
+    // Totara:  allow array of files instead of draftitemid
+    if (is_array($draftitemid)) {
+        $draftfiles = $draftitemid;
+        if ($draftfiles) {
+            $somefile = reset($draftfiles);
+            $draftitemid = $somefile->get_itemid();
+        } else {
+            // This should not happen because at least the root '.' dir should exist.
+            $draftitemid = -1;
+        }
 
-    $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id');
-    $oldfiles   = $fs->get_area_files($contextid, $component, $filearea, $itemid, 'id');
+    } else {
+        // Check if the draft area has exceeded the authorised limit. This should never happen as validation
+        // should have taken place before, unless the user is doing something nauthly. If so, let's just not save
+        // anything at all in the next area.
+        if (file_is_draft_area_limit_reached($draftitemid, $options['areamaxbytes'])) {
+            return null;
+        }
+        $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id');
+    }
+    $oldfiles = $fs->get_area_files($contextid, $component, $filearea, $itemid, 'id');
 
     // One file in filearea means it is empty (it has only top-level directory '.').
     if (count($draftfiles) > 1 || count($oldfiles) > 1) {

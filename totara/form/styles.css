@@ -1,0 +1,303 @@
+.totara_form span.error {
+    display: inline-block;
+    padding: 4px;
+    margin-bottom: 4px;
+    background-color: #F2DEDE;
+    border: 1px solid #EED3D7;
+    border-radius: 4px;
+}
+
+.totara_form div.requirednote {
+    width: 100%;
+    text-align: right;
+}
+
+.totara_form .tf_element {
+    width: 100%;
+    overflow: hidden;
+    margin-top: 5px;
+    margin-bottom: 1px;
+    clear: right;
+    border: none;
+}
+
+.totara_form div.tf_element_title {
+    width: 25%;
+    text-align: left;
+    float: left;
+}
+
+.totara_form div.tf_element_title .legend {
+    font-weight: bold;
+    float: left;
+}
+
+.totara_form div.tf_element_title .legend .required {
+    cursor: help;
+}
+
+.totara_form div.tf_element_input {
+    width: 74%;
+    float: right;
+    margin-left: 0;
+}
+
+.totara_form .totara_form_element_filemanager object {
+    height: 160px;
+    width: 600px;
+    border: 1px solid #000;
+}
+
+.totara_form .totara_form_element_checkboxes .tf_element_input label,
+.totara_form .totara_form_element_radios .tf_element_input label,
+.totara_form .totara_form_element_yesno .tf_element_input label {
+    padding-right: .6em
+}
+
+.totara_form .totara_form_validation_errors {
+    color: red;
+}
+
+.totara_form div.totara_form_group_buttons {
+    width: 74%;
+    float: right;
+    margin-left: 0;
+    margin-top: 20px;
+    text-align: left;
+}
+
+.totara_form .totara_form_group_buttons div {
+    display: inline;
+}
+
+.totara_form .totara_form_group_section legend {
+    width: 100%;
+    color: #333;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #BFBFBF;
+    margin-left: 0;
+    margin-bottom: 0;
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: bold;
+}
+
+.totara_form .totara_form_group_section legend a,
+.totara_form .totara_form_group_section legend a:hover {
+    text-decoration: none;
+}
+
+.totara_form .totara_form_group_section fieldset.collapsible legend a {
+    padding: 0 5px 0 20px;
+    margin-left: -20px;
+    background: url([[pix:t/expanded]]) 2px center no-repeat;
+}
+
+.totara_form .totara_form_group_section fieldset.collapsed legend a {
+    padding: 0 5px 0 20px;
+    margin-left: -20px;
+    background: url([[pix:t/collapsed]]) 2px center no-repeat;
+}
+
+.totara_form .totara_form_group_section fieldset.collapsed div.tf_section_items {
+    display: none;
+}
+
+.totara_form .totara_form_validation_errors {
+    width: 74%;
+    float: right;
+    margin-left: 0;
+    clear: right;
+}
+
+.totara_form [data-item-classification][data-hidden] {
+    display: none;
+}
+
+/* HTML5 Number polyfill | Jonathan Stipe | https://github.com/jonstipe/number-polyfill*/
+.totara_form_element_number div.number-spin-btn-container {
+    display: inline-block;
+    position: relative;
+    vertical-align: bottom;
+    margin: 0 0 0 -7px;
+    padding: 0 0 10px 0;
+}
+
+.totara_form_element_number div.number-spin-btn {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border-width: 2px;
+    border-color: #ededed #777777 #777777 #ededed;
+    border-style: solid;
+    background-color: #cccccc;
+    width: 1.2em;
+}
+
+.totara_form_element_number div.number-spin-btn:hover {
+    cursor: pointer;
+}
+
+.totara_form_element_number div.number-spin-btn:active {
+    border-width: 2px;
+    border-color: #5e5e5e #d8d8d8 #d8d8d8 #5e5e5e;
+    border-style: solid;
+    background-color: #999999;
+}
+
+.totara_form_element_number div.number-spin-btn-up {
+    border-bottom-width: 1px;
+    -moz-border-radius: 3px 3px 0 0;
+    -webkit-border-radius: 3px 3px 0 0;
+    border-radius: 3px 3px 0 0;
+}
+
+.totara_form_element_number div.number-spin-btn-up:before {
+    border-width: 0 0.3em 0.3em 0.3em;
+    border-color: transparent transparent black transparent;
+    top: 25%;
+}
+
+.totara_form_element_number div.number-spin-btn-up:active {
+    border-bottom-width: 1px;
+}
+
+.totara_form_element_number div.number-spin-btn-up:active:before {
+    border-bottom-color: white;
+    top: 26%;
+    left: 51%;
+}
+
+.totara_form_element_number div.number-spin-btn-down {
+    border-top-width: 1px;
+    padding-bottom: 2px;
+    -moz-border-radius: 0 0 3px 3px;
+    -webkit-border-radius: 0 0 3px 3px;
+    border-radius: 0 0 3px 3px;
+}
+
+.totara_form_element_number div.number-spin-btn-down:before {
+    border-width: 0.3em 0.3em 0 0.3em;
+    border-color: black transparent transparent transparent;
+    top: 50%;
+}
+
+.totara_form_element_number div.number-spin-btn-down:active {
+    border-top-width: 1px;
+}
+
+.totara_form_element_number div.number-spin-btn-down:active:before {
+    border-top-color: white;
+    top: 51%;
+    left: 51%;
+}
+
+.totara_form_element_number div.number-spin-btn-up:before,
+.totara_form_element_number div.number-spin-btn-down:before {
+    content: "";
+    width: 0;
+    height: 0;
+    border-style: solid;
+    position: absolute;
+    left: 50%;
+    margin: -0.15em 0 0 -0.3em;
+    padding: 0;
+}
+
+.totara_form_element_number input:disabled + div.number-spin-btn-container > div.number-spin-btn-up:active,
+.totara_form_element_number input:disabled + div.number-spin-btn-container > div.number-spin-btn-down:active {
+    border-color: #ededed #777777 #777777 #ededed;
+    border-style: solid;
+    background-color: #cccccc;
+}
+
+.totara_form_element_number input:disabled + div.number-spin-btn-container > div.number-spin-btn-up:before,
+.totara_form_element_number input:disabled + div.number-spin-btn-container > div.number-spin-btn-up:active:before {
+    border-bottom-color: #999999;
+    top: 25%;
+    left: 50%;
+}
+
+.totara_form_element_number input:disabled + div.number-spin-btn-container > div.number-spin-btn-down:before,
+.totara_form_element_number input:disabled + div.number-spin-btn-container > div.number-spin-btn-down:active:before {
+    border-top-color: #999999;
+    top: 75%;
+    left: 50%;
+}
+
+.totara_form_element_passwordunmask .unmask-option {
+    display: none;
+}
+.jsenabled .totara_form_element_passwordunmask .unmask-option {
+    display: inline-block;
+    vertical-align: text-top;
+}
+.jsenabled .totara_form_element_passwordunmask input {
+    font-family: "Courier New", Courier, monospace;
+}
+
+.jsenabled .totara_form_element_passwordunmask .wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.jsenabled .totara_form_element_passwordunmask .passwordinput {
+    color: transparent;
+    background-color: transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+
+.jsenabled .totara_form_element_passwordunmask .inputmask {
+    overflow: hidden;
+    z-index: 0;
+}
+
+.jsenabled .totara_form_element_passwordunmask.unmask .passwordinput {
+    color: initial;
+    background-color: initial;
+    position: initial;
+    font-family: inherit;
+}
+.jsenabled .totara_form_element_passwordunmask.unmask .inputmask {
+    display: none;
+}
+
+/*****************************************************************************
+ * Date polyfill - note this adds an overlay outside of the form element     *
+ *****************************************************************************/
+.totara_form_element_datetime.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+.totara_form_element_datetime.ui-timepicker-div dl { text-align: left; }
+.totara_form_element_datetime.ui-timepicker-div dl dt { float: left; clear:left; padding: 0 0 0 5px; }
+.totara_form_element_datetime.ui-timepicker-div dl dd { margin: 0 10px 10px 40%; }
+.totara_form_element_datetime.ui-timepicker-div td { font-size: 90%; }
+.totara_form_element_datetime.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+.totara_form_element_datetime.ui-timepicker-div .ui_tpicker_unit_hide{ display: none; }
+
+.totara_form_element_datetime.ui-timepicker-div .ui_tpicker_time .ui_tpicker_time_input { background: none; color: inherit; border: none; outline: none; border-bottom: solid 1px #555; width: 95%; }
+.totara_form_element_datetime.ui-timepicker-div .ui_tpicker_time .ui_tpicker_time_input:focus { border-bottom-color: #aaa; }
+
+.totara_form_element_datetime.ui-timepicker-rtl{ direction: rtl; }
+.totara_form_element_datetime.ui-timepicker-rtl dl { text-align: right; padding: 0 5px 0 0; }
+.totara_form_element_datetime.ui-timepicker-rtl dl dt{ float: right; clear: right; }
+.totara_form_element_datetime.ui-timepicker-rtl dl dd { margin: 0 40% 10px 10px; }
+
+/* Shortened version style */
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine { padding-right: 2px; }
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine .ui_tpicker_time,
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine dt { display: none; }
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine .ui_tpicker_time_label { display: block; padding-top: 2px; }
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine dl { text-align: right; }
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine dl dd,
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine dl dd > div { display:inline-block; margin:0; }
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine dl dd.ui_tpicker_minute:before,
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine dl dd.ui_tpicker_second:before { content:':'; display:inline-block; }
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine dl dd.ui_tpicker_millisec:before,
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine dl dd.ui_tpicker_microsec:before { content:'.'; display:inline-block; }
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine .ui_tpicker_unit_hide,
+.totara_form_element_datetime.ui-timepicker-div.ui-timepicker-oneLine .ui_tpicker_unit_hide:before{ display: none; }
+
+/* Placeholder Polyfill */
+.tf_element .placeholder { color: #aaa; }
