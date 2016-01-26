@@ -185,6 +185,16 @@ class completion_criteria_activity extends completion_criteria {
                     // Otherwise current time will set.
                     $timecompleted = null;
                 }
+
+                // Totara Hack - Reload the completion criteria object, it may be outdated after the get_data() call.
+                // NOTE:: In the future if you want to use the completion object higher up in the funtion you should move this hack.
+                $params = array(
+                    'course' => $completion->course,
+                    'userid' => $completion->userid,
+                    'criteriaid' => $completion->criteriaid
+                );
+                $completion = new completion_criteria_completion($params);
+
                 $completion->mark_complete($timecompleted);
             }
 
