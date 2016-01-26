@@ -866,10 +866,23 @@ function totara_print_report_manager() {
     global $CFG, $USER, $PAGE;
     require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
-    $reportbuilder_permittedreports = reportbuilder::get_user_permitted_reports();
-
     $context = context_system::instance();
     $canedit = has_capability('totara/reportbuilder:managereports',$context);
+
+    $reportbuilder_permittedreports = get_my_reports_list();
+
+    if (count($reportbuilder_permittedreports) > 0) {
+        $renderer = $PAGE->get_renderer('totara_core');
+        $returnstr = $renderer->report_list($reportbuilder_permittedreports, $canedit);
+    } else {
+        $returnstr = get_string('nouserreports', 'totara_reportbuilder');
+    }
+    return $returnstr;
+}
+
+
+function get_my_reports_list() {
+    $reportbuilder_permittedreports = reportbuilder::get_user_permitted_reports();
 
     foreach ($reportbuilder_permittedreports as $key => $reportrecord) {
         if ($reportrecord->embedded) {
@@ -887,33 +900,52 @@ function totara_print_report_manager() {
         }
     }
 
-    if (count($reportbuilder_permittedreports) > 0) {
-        $renderer = $PAGE->get_renderer('totara_core');
-        $returnstr = $renderer->report_list($reportbuilder_permittedreports, $canedit);
-    } else {
-        $returnstr = get_string('nouserreports', 'totara_reportbuilder');
-    }
-    return $returnstr;
+    return $reportbuilder_permittedreports;
 }
+
 
 /**
 * Returns markup for displaying saved scheduled reports
 *
 * Optionally without the options column and add/delete form
 * Optionally with an additional sql WHERE clause
-* @access  public
-* @param   $showoptions   bool
-* @param   $showaddform   bool
-* @param   $sqlclause     array in the form array($where, $params)
-
+* @access public
+* @param boolean $showoptions SHow icons to edit and delete scheduled reports.
+* @param boolean $showaddform Show a simple form to allow reports to be scheduled.
+* @param array $sqlclause In the form array($where, $params)
 */
 function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $sqlclause=array()) {
-    global $CFG, $DB, $USER, $PAGE, $REPORT_BUILDER_EXPORT_FILESYSTEM_OPTIONS;
+    global $CFG, $PAGE;
 
     require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
     require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
     require_once($CFG->dirroot . '/calendar/lib.php');
     require_once($CFG->dirroot . '/totara/reportbuilder/scheduled_forms.php');
+
+    $scheduledreports = get_my_scheduled_reports_list();
+
+    // If we want the form generate the content so it can be used into the templated.
+    if ($showaddform) {
+        $mform = new scheduled_reports_add_form($CFG->wwwroot . '/totara/reportbuilder/scheduled.php', array());
+        $addform = $mform->render();
+    } else {
+        $addform = '';
+    }
+
+    $renderer = $PAGE->get_renderer('totara_core');
+    echo $renderer->scheduled_reports($scheduledreports, $showoptions, $addform);
+}
+
+
+/**
+ * Build a list of scheduled reports for display in a table.
+ *
+ * @param array $sqlclause In the form array($where, $params)
+ * @return array
+ * @throws coding_exception
+ */
+function get_my_scheduled_reports_list($sqlclause=array()) {
+    global $DB, $REPORT_BUILDER_EXPORT_FILESYSTEM_OPTIONS, $USER;
 
     $myreports = reportbuilder::get_user_permitted_reports();
 
@@ -975,15 +1007,7 @@ function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $s
         $sched->schedule = $formatted;
     }
 
-    if ($showaddform) {
-        $mform = new scheduled_reports_add_form($CFG->wwwroot . '/totara/reportbuilder/scheduled.php', array());
-        $addform = $mform->render();
-    } else {
-        $addform = '';
-    }
-
-    $renderer = $PAGE->get_renderer('totara_core');
-    echo $renderer->scheduled_reports($scheduledreports, $showoptions, $addform);
+    return $scheduledreports;
 }
 
 function totara_print_my_courses() {

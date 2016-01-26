@@ -876,4 +876,32 @@ class totara_core_renderer extends plugin_renderer_base {
         return print_tabs(array($toprow), $currenttab, $disabled, null, true);
     }
 
+
+    /**
+     * The renderer for the My Reports page.
+     */
+    public function my_reports_page() {
+        global $CFG;
+
+        // This is required for scheduled_reports_add_form.
+        require_once($CFG->dirroot . '/totara/reportbuilder/scheduled_forms.php');
+
+        // Prepare the data for the list of reports.
+        $reports = get_my_reports_list();
+        $context = context_system::instance();
+        $canedit = has_capability('totara/reportbuilder:managereports',$context);
+
+        // Prepare the data for the list of scheduled reports.
+        $scheduledreports = get_my_scheduled_reports_list();
+
+        // Get the form that allow you to select a report to schedule.
+        $mform = new scheduled_reports_add_form($CFG->wwwroot . '/totara/reportbuilder/scheduled.php', array());
+        $addform = $mform->render();
+
+        // Build the template data.
+        $template_data = $this->scheduled_reports_export_for_template($scheduledreports, true, $addform);
+        $template_data->report_list = $this->report_list_export_for_template($reports, $canedit);
+
+        return $this->render_from_template('totara_core/myreports', $template_data);
+    }
 }
