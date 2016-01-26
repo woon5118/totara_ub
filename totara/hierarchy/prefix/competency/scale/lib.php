@@ -218,18 +218,20 @@ function competency_scale_display_table($scales) {
         }
     }
 
-    echo $OUTPUT->heading(get_string('competencyscales', 'totara_hierarchy'));
+    $templatedata = new stdClass();
+    $templatedata->heading = get_string('competencyscales', 'totara_hierarchy');
 
     if ($scales) {
-        echo html_writer::table($table);
+        $templatedata->scales = $table->export_for_template(null);
     } else {
-        echo html_writer::tag('p', get_string('noscalesdefined', 'totara_hierarchy'));
+        $templatedata->scales = false;
     }
 
     if ($can_add) {
-        echo html_writer::tag('div',
-            $OUTPUT->single_button(new moodle_url('/totara/hierarchy/prefix/competency/scale/edit.php',
-            array('prefix' => 'competency')), get_string('scalescompcustomcreate', 'totara_hierarchy'), 'get') .
-            $OUTPUT->help_icon('competencyscalesgeneral', 'totara_hierarchy'), array('class' => 'buttons'));
+        $templatedata->add = $OUTPUT->single_button(new moodle_url('/totara/hierarchy/prefix/competency/scale/edit.php',
+            array('prefix' => 'competency')), get_string('scalescompcustomcreate', 'totara_hierarchy'), 'get');
+        $templatedata->add .= $OUTPUT->help_icon('competencyscalesgeneral', 'totara_hierarchy');
     }
+
+    echo $OUTPUT->render_from_template('totara_hierarchy/admin_scales', $templatedata);
 }
