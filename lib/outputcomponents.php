@@ -2444,7 +2444,7 @@ class html_table implements renderable, templatable {
             foreach ($this->head as $key => $cell) {
                 // Tell the cell which column it is in.
                 $cell->column = $key;
-                $data->head[] = $cell->export_for_template($output);;
+                $data->head[] = $cell->export_for_template($output);
             }
         }
 
