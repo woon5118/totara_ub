@@ -25,16 +25,26 @@ class reminder_edit_form extends moodleform {
 
         $choices = array();
         $choices[0] = get_string('coursecompletion');
-        foreach ($activities as $a) {
-            $choices[$a->id] = get_string('modulename', $a->modname).' - '.$a->name;
+
+        // Get modules that are part of completion criteria.
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_activity.php');
+        $completioncriteria = completion_criteria_activity::fetch_all(array('course' => $course->id, 'criteriatype' => COMPLETION_CRITERIA_TYPE_ACTIVITY));
+
+        $coursemodinfo = get_fast_modinfo($course);
+
+        if ($completioncriteria) {
+            foreach ($completioncriteria as $criterion) {
+                $module = $coursemodinfo->get_cm($criterion->moduleinstance);
+                $choices[$module->id] = get_string('modulename', $module->modname) . ' - ' . $module->name;
+            }
         }
 
         // Get feedback activities in the course
-        $mods = get_coursemodules_in_course('feedback', $course->id);
+        $feedbackmods = $coursemodinfo->get_instances_of('feedback');
         $rchoices = array('' => get_string('select').'...');
-        if ($mods) {
-            foreach ($mods as $mod) {
-                $rchoices[$mod->id] = $mod->name;
+        if (!empty($feedbackmods)) {
+            foreach ($feedbackmods as $feedbackmod) {
+                $rchoices[$feedbackmod->id] = $feedbackmod->name;
             }
         }
 
