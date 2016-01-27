@@ -137,6 +137,8 @@ class rules_form extends moodleform {
         $mform->addHelpButton('audience_aggregation', 'menuitem:audienceaggregation', 'totara_core');
 
         $visibleaudiences = $item->get_setting('audience_access', 'active_audiences');
+        // The setting gets retrieved as a string which PARAM_SEQUENCE doesn't like.
+        $visibleaudiences = str_replace("'", '', $visibleaudiences);
         $mform->addElement('hidden', 'cohortsvisible', $visibleaudiences);
         $mform->setType('cohortsvisible', PARAM_SEQUENCE);
 

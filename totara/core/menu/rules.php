@@ -56,15 +56,15 @@ local_js(array(
 
 $PAGE->requires->strings_for_js(array('menucohortsvisible'), 'totara_cohort');
 $jsmodule = array(
-    'name' => 'totara_visiblecohort',
-    'fullpath' => '/totara/cohort/dialog/visiblecohort.js',
+    'name' => 'totara_restrictcohort',
+    'fullpath' => '/totara/core/menu/rules.js',
     'requires' => array('json')
 );
 
 $visibleselected = $item->get_setting('audience_access', 'active_audiences');
 $args = array('args'=>'{"visibleselected":"' . $visibleselected . '", "type":"menu", "instancetype":"' .
     COHORT_ASSN_ITEMTYPE_MENU . '", "instanceid":"' . $id . '"}');
-$PAGE->requires->js_init_call('M.totara_visiblecohort.init', $args, true, $jsmodule);
+$PAGE->requires->js_init_call('M.totara_restrictcohort.init', $args, true, $jsmodule);
 unset($visibleselected);
 
 $customdata = array(
@@ -175,7 +175,7 @@ if ($data = $mform->get_data()) {
 
         \totara_core\event\menuitem_updated::create_from_item($data->id)->trigger();
 
-        totara_set_notification(get_string('menuitem:updateaccesssuccess', 'totara_core'), $redirecturl, array('class' => 'notifysuccess'));
+        totara_set_notification(get_string('menuitem:updateaccesssuccess', 'totara_core'), $url, array('class' => 'notifysuccess'));
     } catch (moodle_exception $e) {
         totara_set_notification($e->getMessage());
     }
