@@ -138,7 +138,7 @@ if ($nojs) {
         $item = $competency;
 
         $renderer = $PAGE->get_renderer('totara_hierarchy');
-        echo $renderer->print_competency_view_evidence($item, $evidence, $can_edit);
+        echo $renderer->competency_view_evidence($item, $evidence, $can_edit);
 
     } else {  //resource-level evidence functionality
         // If $newevidenceid is false, it means the evidence item wasn't added, so

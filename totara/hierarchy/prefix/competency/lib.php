@@ -494,7 +494,7 @@ class competency extends hierarchy {
         if (!$section || $section == 'evidence') {
             // Display evidence
             $evidence = $this->get_evidence($item);
-            echo $renderer->print_competency_view_evidence($item, $evidence, $can_edit);
+            echo $renderer->competency_view_evidence($item, $evidence, $can_edit);
         }
     }
 

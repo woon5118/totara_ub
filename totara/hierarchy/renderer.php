@@ -34,6 +34,8 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
 
     /**
      * Outputs a table containing evidence for a this item
+     *
+     * @deprecated since 9.0 - please use competency_view_evidence instead
     *
     * @param object $item competency item
     * @param boolean $can_edit If the user has edit permissions
@@ -41,10 +43,23 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
     * @return string HTML to output.
     */
     public function print_competency_view_evidence($item, $evidence=null, $can_edit=false) {
+        debugging('print_competency_view_evidence has been deprecated. Please use competency_view_evidence instead', DEBUG_DEVELOPER);
+        return $this->competency_view_evidence($item, $evidence, $can_edit);
+    }
+
+    /**
+     * Outputs a table containing evidence for a this item
+     *
+     * @param object $item competency item
+     * @param boolean $can_edit If the user has edit permissions
+     * @param array $evidence array of evidence ids
+     * @return string HTML to output.
+     */
+    public function competency_view_evidence($item, $evidence=null, $can_edit=false) {
         global $CFG, $PAGE;
         require_once($CFG->dirroot . '/totara/plan/lib.php');
-        $out = html_writer::start_tag('div', array('id' => 'evidence-list-container'));
-        $out .= $this->output->heading(get_string('evidenceitems', 'totara_hierarchy'));
+
+        $templatedata = new stdClass();
 
         $table = new html_table();
         $table->id = 'list-evidence';
@@ -117,38 +132,29 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             $row->attributes['class'] = 'noitems-evidence';
             $table->data[] = $row;
         }
-        $out .= html_writer::table($table);
-
-        $out .= html_writer::end_tag('div');
-        // Navigation / editing buttons
-        $out .= html_writer::start_tag('div', array('class' => 'buttons'));
+        $templatedata->linkedevidence = $table->export_for_template($this);
 
         $context = context_system::instance();
         $can_edit = has_capability('totara/hierarchy:updatecompetency', $context);
         // Display add evidence item button
         if ($can_edit) {
-            $out .= html_writer::start_tag('div', array('class' => 'singlebutton'));
+            $templatedata->canedit = true;
 
             $action = new moodle_url('/totara/hierarchy/prefix/competency/evidenceitem/edit.php', array('id' => $item->id));
-            $out .= html_writer::start_tag('form', array('action' => $action->out(), 'method' => 'get'));
-            $out .= html_writer::start_tag('div');
+            $templatedata->formaction = $action->out();
+
             if (!empty($CFG->competencyuseresourcelevelevidence)) {
-                $btnstr = get_string('assignnewevidenceitem', 'totara_hierarchy');
+                $templatedata->evidencestring = get_string('assignnewevidenceitem', 'totara_hierarchy');
             } else {
-                $btnstr = get_string('assigncoursecompletions', 'totara_hierarchy');
+                $templatedata->evidencestring = get_string('assigncoursecompletions', 'totara_hierarchy');
             }
-            $out .= html_writer::empty_tag('input', array('type' => 'submit', 'id' => "show-evidence-dialog", 'value' => $btnstr));
-            $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "id", 'value' => $item->id));
-            $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "nojs", 'value' => '1'));
-            $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "returnurl", 'value' => qualified_me()));
-            $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "s", 'value' => sesskey()));
-            $out .= html_writer::end_tag('div');
-            $out .= html_writer::end_tag('form');
-            $out .= html_writer::end_tag('div');
+
+            $templatedata->id = $item->id;
+            $templatedata->returnurl = qualified_me();
+            $templatedata->sesskey = sesskey();
         }
 
-        $out .= html_writer::end_tag('div');
-        return $out;
+        return $this->render_from_template('totara_hierarchy/competency_view_evidence', $templatedata);
     }
 
     /**
