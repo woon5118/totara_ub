@@ -48,5 +48,27 @@ function xmldb_totara_feedback360_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015090400, 'totara_feedback360');
     }
 
+    if ($oldversion < 2015100201) {
+
+        // Changing precision of field sortorder on table feedback360_quest_field to (10).
+        $table = new xmldb_table('feedback360_quest_field');
+        $field = new xmldb_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'descriptionformat');
+
+        // This field was indexed, we'll need to drop it and then re-index after updating the field.
+        $index = new xmldb_index('feequesfiel_sor_ix', XMLDB_INDEX_NOTUNIQUE, array('sortorder'));
+
+        // Conditionally launch drop index feequesfiel_sor_ix.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $dbman->change_field_precision($table, $field);
+
+        // We know the index doesn't exist by this point, so no need to check for it first.
+        $dbman->add_index($table, $index);
+
+        totara_upgrade_mod_savepoint(true, 2015100201, 'totara_feedback360');
+    }
+
     return true;
 }
