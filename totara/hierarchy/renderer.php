@@ -160,14 +160,28 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
     /**
     * Outputs a table containing competencies that are related to this item
     *
+    * @deprecated since 9.0 - please use competency_view_related instead
+    *
     * @param object $item competency item
     * @param boolean $can_edit If the user has edit permissions
     * @param array $related array of related items
     * @return string HTML to output.
     */
     public function print_competency_view_related($item, $can_edit=false, $related=null) {
+        debugging('print_competency_view_related has been deprecated. Please use competency_view_related instead');
+        return $this->competency_view_related($item, $can_edit, $related);
+    }
 
-        $out = $this->output->heading(get_string('relatedcompetencies', 'totara_hierarchy'));
+    /**
+    * Outputs a table containing competencies that are related to this item
+    *
+    * @param object $item competency item
+    * @param boolean $can_edit If the user has edit permissions
+    * @param array $related array of related items
+    * @return string HTML to output.
+    */
+    public function competency_view_related($item, $can_edit=false, $related=null) {
+        $templatedata = new stdClass();
 
         $table = new html_table();
         $table->attributes = array('id' => 'list-related', 'class' => 'generaltable boxaligncenter');
@@ -224,29 +238,19 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             $row->attributes['class'] = 'noitems-related';
             $table->data[] = $row;
         }
-        $out .= html_writer::table($table);
+        $templatedata->relatedcompetencies = $table->export_for_template($this);
 
         // Add related competencies button
+        $templatedata->canedit = $can_edit;
         if ($can_edit) {
-            $out .= html_writer::start_tag('div', array('class' => 'buttons'));
-            $out .= html_writer::start_tag('div', array('class' => 'singlebutton'));
-
             $action = new moodle_url('/totara/hierarchy/prefix/competency/related/find.php', array('id' => $item->id, 'frameworkid' => $item->frameworkid));
-            $out .= html_writer::start_tag('form', array('action' => $action->out(), 'method' => 'get'));
-            $out .= html_writer::start_tag('div');
-            $out .= html_writer::empty_tag('input', array('type' => 'submit', 'id' => "show-related-dialog", 'value' => get_string('assignrelatedcompetencies', 'totara_hierarchy')));
-            $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "id", 'value' => $item->id));
-            $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "nojs", 'value' => '1'));
-            $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "returnurl", 'value' => qualified_me()));
-            $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "s", 'value' => sesskey()));
-            $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "frameworkid", 'value' => $item->frameworkid));
-            $out .= html_writer::end_tag('div');
-            $out .= html_writer::end_tag('form');
-            $out .= html_writer::end_tag('div');
-            $out .= html_writer::end_tag('div');
+            $templatedata->action = $action->out();
+            $templatedata->returnurl = qualified_me();
+            $templatedata->sesskey = sesskey();
+            $templatedata->id = $item->frameworkid;
         }
 
-        return $out;
+        return $this->render_from_template('totara_hierarchy/competency_view_related', $templatedata);
     }
 
     /**

@@ -487,7 +487,7 @@ class competency extends hierarchy {
             // Display related competencies
             echo html_writer::start_tag('div', array('class' => 'list-related'));
             $related = $this->get_related($item);
-            echo $renderer->print_competency_view_related($item, $can_edit, $related);
+            echo $renderer->competency_view_related($item, $can_edit, $related);
             echo html_writer::end_tag('div');
         }
 
