@@ -49,30 +49,11 @@ function latest_runid() {
 /**
  * Sync Totara elements with external sources
  *
- * @param boolean $forcerun force sync to run, ignoring configured schedule
  * @access public
  * @return bool success
  */
-function tool_totara_sync_run($forcerun=false) {
+function tool_totara_sync_run() {
     global $CFG;
-
-    if (!$forcerun) {
-        // Check if the time is ripe for the sync to run.
-        $config = get_config('totara_sync');
-        if (empty($config->cronenable)) {
-            return false;
-        }
-        if (!empty($config->nextcron) && $config->nextcron > time()) {
-            // Sync should not be run yet.
-            return false;
-        } else {
-            // Set time for next run and allow to proceed.
-            require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
-            $scheduler = new scheduler($config, array('nextevent' => 'nextcron'));
-            $scheduler->next(time(), true, core_date::get_server_timezone());
-            set_config('nextcron', $scheduler->get_scheduled_time(), 'totara_sync');
-        }
-    }
 
     // First run through the sanity checks.
     $configured = true;

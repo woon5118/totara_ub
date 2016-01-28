@@ -184,5 +184,34 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015121800, 'tool', 'totara_sync');
     }
 
+    if ($oldversion < 2016012000) {
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/locallib.php');
+
+        // Convert old setting to scheduled task if the scheduled task hasn't been changed from default.
+        $task = new \totara_core\task\tool_totara_sync_task();
+        if (!$task->is_customised()) {
+            // Do conversion
+            $schedule = get_config('totara_sync', 'schedule');
+            $frequency = get_config('totara_sync', 'frequency');
+            $cronenable = get_config('totara_sync', 'cronenable');
+
+            $data = new stdClass();
+            $data->schedule = $schedule;
+            $data->frequency = $frequency;
+            $data->cronenable = $cronenable;
+
+            // Save old schedule to scheduled task.
+            save_scheduled_task_from_form($data);
+        }
+
+        // Remove old scheduling settings (we are now using scheduled tasks).
+        unset_config('cronenable', 'totara_sync');
+        unset_config('frequency', 'totara_sync');
+        unset_config('schedule', 'totara_sync');
+        unset_config('nextcron', 'totara_sync');
+
+        upgrade_plugin_savepoint(true, 2016012000, 'tool', 'totara_sync');
+    }
+
     return true;
 }
