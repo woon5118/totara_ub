@@ -256,6 +256,8 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
     /**
      * Outputs a table containing all of the assignments for a given goal ($item)
      *
+     * @deprecated since 9.0 - please use goal_view_assignments instead
+     *
      * @param object $item          The goal object to show the assignments for
      * @param bool $can_edit        Whether or not the viewing user can delete/add assignments
      * @param array $assignments    A list of current assignments for the goal
@@ -263,15 +265,26 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
      * @return string HTML to output
      */
     public function print_goal_view_assignments($item, $can_edit = false, $assignments = null, $dialog_box = false) {
-        global $DB, $CFG;
+        debugging('print_goal_view_assignments has been deprecated. Please use goal_view_assignments instead', DEBUG_DEVELOPER);
+        return $this->goal_view_assignments($item, $can_edit, $assignments, $dialog_box);
+    }
+    /**
+     * Outputs a table containing all of the assignments for a given goal ($item)
+     *
+     * @param object $item          The goal object to show the assignments for
+     * @param bool $can_edit        Whether or not the viewing user can delete/add assignments
+     * @param array $assignments    A list of current assignments for the goal
+     * @param bool $dialog_box      Is the function called from ajax/dialog or when the page is loaded
+     * @return string HTML to output
+     */
+    public function goal_view_assignments($item, $can_edit = false, $assignments = null, $dialog_box = false) {
+        global $CFG;
 
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
+        $templatedata = new stdClass();
 
         // Display table heading.
-        $heading = '';
-        if (!$dialog_box) {
-            $heading = $this->output->heading(get_string('goalassignments', 'totara_hierarchy'), 3);
-        }
+        $templatedata->dialog = $dialog_box;
 
         // Initialise table and add header row.
         $table = new html_table();
@@ -324,7 +337,9 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             $table->data[] = $row;
         }
 
-        return $heading . $this->output->container(html_writer::table($table), 'clearfix', 'assignedgroups');
+        $templatedata->assignments = $table->export_for_template($this);
+
+        return $this->render_from_template('totara_hierarchy/goal_view_assignments', $templatedata);
     }
 
     /**

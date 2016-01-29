@@ -196,7 +196,7 @@ class goal extends hierarchy {
 
         // Display the assignments table.
         echo html_writer::start_tag('div', array('class' => 'list-assigned'));
-        echo $renderer->print_goal_view_assignments($item, $can_assign, $assignments);
+        echo $renderer->goal_view_assignments($item, $can_assign, $assignments);
         echo html_writer::end_tag('div');
 
         // Display the assignments selector.
