@@ -570,8 +570,6 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
     public function mygoals_company_table($userid, $can_edit, $display = false) {
         global $CFG, $DB, $PAGE;
 
-        $out = '';
-
         $bgcolour = true;
         $bglighter = 'mygoals_lighter';
         $bgdarker = 'mygoals_darker';
@@ -665,11 +663,10 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             $company_table->attributes = array('class' => 'company_table fullwidth generaltable');
         }
 
-        $out .= html_writer::start_tag('div', array('id' => 'company_goals_table', 'class' => 'individual'));
-        $out .= html_writer::table($company_table);
-        $out .= html_writer::end_tag('div');
+        $templatedata = new stdClass();
+        $templatedata->data = $company_table->export_for_template($this);
 
-        return $out;
+        return $this->render_from_template('totara_hierarchy/mygoals_company_table', $templatedata);
     }
 
     /**
