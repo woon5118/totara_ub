@@ -677,8 +677,6 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         global $CFG, $PAGE;
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
-        $out = '';
-
         $bgcolour = true;
         $bglighter = 'mygoals_lighter';
         $bgdarker = 'mygoals_darker';
@@ -806,10 +804,9 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             $personal_table->attributes = array('class' => 'personal_table fullwidth generaltable');
         }
 
-        $out .= html_writer::start_tag('div', array('id' => 'personal_goals_table'));
-        $out .= html_writer::table($personal_table);
-        $out .= html_writer::end_tag('div');
+        $templatedata = new stdClass();
+        $templatedata->personalgoals = $personal_table->export_for_template($this);
 
-        return $out;
+        return $this->render_from_template('totara_hierarchy/mygoals_personal_table', $templatedata);
     }
 }
