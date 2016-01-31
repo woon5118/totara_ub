@@ -878,6 +878,11 @@ function calendar_top_controls($type, $data) {
 
     switch ($type) {
         case 'frontpage':
+            // Frontpage has special parameter to force site frontpage instead of home page set in user settings.
+            $redirect = optional_param('redirect', null, PARAM_INT);
+            if (!is_null($redirect)) {
+                $urlbase->param('redirect', $redirect);
+            }
             $prevlink = calendar_get_link_previous(get_string('monthprev', 'access'), $urlbase, false, false, false, true, $prevmonthtime);
             $nextlink = calendar_get_link_next(get_string('monthnext', 'access'), $urlbase, false, false, false, true, $nextmonthtime);
             $calendarlink = calendar_get_link_href(new moodle_url(CALENDAR_URL.'view.php', array('view' => 'month')), false, false, false, $time);
