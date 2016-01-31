@@ -440,6 +440,22 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         return $out;
     }
 
+
+    /**
+     * Print out the table of assigned goals for a given pos/org
+     *
+     * @deprecated since 9.0
+     *
+     * @param string  $prefix       The prefix of the hierarchy type
+     * @param string  $shortprefix  The short prefix of the hierarhcy type
+     * @param string  $addgoalurl   The url used to add goal assignments to the hierarchy type
+     * @param int     $itemid       The id of the hierarchy instance
+     */
+    public function print_assigned_goals($prefix, $shortprefix, $addgoalurl, $itemid) {
+        debugging('print_assigned_goals has been deprecated. Please use goal_view_assignments instead', DEBUG_DEVELOPER);
+        return $this->assigned_goals($prefix, $shortprefix, $addgoalurl, $itemid);
+    }
+
     /**
      * Print out the table of assigned goals for a given pos/org
      *
@@ -448,8 +464,9 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
      * @param string  $addgoalurl   The url used to add goal assignments to the hierarchy type
      * @param int     $itemid       The id of the hierarchy instance
      */
-    public function print_assigned_goals($prefix, $shortprefix, $addgoalurl, $itemid) {
+    public function assigned_goals($prefix, $shortprefix, $addgoalurl, $itemid) {
         global $CFG;
+        $templatedata = new stdClass();
 
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
@@ -460,17 +477,12 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         $level_only = get_string('goalassignthislevelonly', 'totara_hierarchy');
         $level_below = get_string('goalassignthislevelbelow', 'totara_hierarchy');
         $can_edit = has_capability('totara/hierarchy:managegoalassignments', context_system::instance());
-        $out = html_writer::start_tag('div', array('id' => 'print_assigned_goals', 'class' => $prefix));
+        $templatedata->prefix = $prefix;
 
         $assignment_type = goal::grp_type_to_assignment($shortprefix);
         $assigned_goals = goal::get_modules_assigned_goals($assignment_type, $itemid);
 
-        if (empty($assigned_goals)) {
-            // Don't show the table just print No Competencies Assigned.
-            $out .= html_writer::start_tag('div', array('class' => 'nogoals'));
-            $out .= html_writer::tag('p', get_string('noassignedgoals', 'totara_hierarchy'));
-            $out .= html_writer::end_tag('div');
-        } else {
+        if (!empty($assigned_goals)) {
             // Initialise table and add header row.
             $table = new html_table();
             $table->head = array(
@@ -524,41 +536,20 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 $table->data[] = $row;
             }
 
-            $out .= html_writer::table($table);
+            $templatedata->assignedgoals = $table->export_for_template($this);
         }
 
+        $templatedata->can_edit = $can_edit;
         if ($can_edit) {
             // Need to be done manually (not with single_button) to get correct ID on input button element.
-            $add_button_text = get_string('addgoal', 'totara_hierarchy');
-            $out .= html_writer::start_tag('div',
-                    array('class' => 'buttons'));
-            $out .= html_writer::start_tag('div',
-                    array('class' => 'singlebutton'));
-            $out .= html_writer::start_tag('form',
-                    array('action' => $addgoalurl, 'method' => 'get'));
-            $out .= html_writer::start_tag('div');
-            $out .= html_writer::empty_tag('input',
-                    array('type' => 'submit', 'id' => "show-assignedgoals-dialog", 'value' => $add_button_text));
-            $out .= html_writer::empty_tag('input',
-                    array('type' => 'hidden', 'name' => "assignto", 'value' => $itemid));
-            $out .= html_writer::empty_tag('input',
-                    array('type' => 'hidden', 'name' => "assigntype", 'value' => $assignment_type));
-            $out .= html_writer::empty_tag('input',
-                    array('type' => 'hidden', 'name' => "nojs", 'value' => '1'));
-            $out .= html_writer::empty_tag('input',
-                    array('type' => 'hidden', 'name' => "returnurl", 'value' => qualified_me()));
-            $out .= html_writer::empty_tag('input',
-                    array('type' => 'hidden', 'name' => "s", 'value' => sesskey()));
-            $out .= html_writer::end_tag('div');
-            $out .= html_writer::end_tag('form');
-            $out .= html_writer::end_tag('div');
-            $out .= html_writer::end_tag('div');
+            $templatedata->addgoalurl = $addgoalurl->out();
+            $templatedata->itemid = $itemid;
+            $templatedata->assignmenttype = $assignment_type;
+            $templatedata->returnval = qualified_me();
+            $templatedata->sesskey = sesskey();
         }
 
-        // Close the print_assigned_goals div.
-        $out .= html_writer::end_tag('div');
-
-        return $out;
+        return $this->render_from_template('totara_hierarchy/assigned_goals', $templatedata);
     }
 
     /**

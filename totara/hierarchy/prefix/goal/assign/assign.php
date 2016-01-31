@@ -209,7 +209,7 @@ if ($add) {
                 $renderer = $PAGE->get_renderer('totara_hierarchy');
                 $addgoalurl = new moodle_url('/totara/hierarchy/prefix/goal/assign/find.php',
                         array('assignto' => $assignto, 'assigntype' => GOAL_ASSIGNMENT_POSITION));
-                $out .= $renderer->print_assigned_goals($type->fullname, $type->shortname, $addgoalurl, $assignto);
+                $out .= $renderer->assigned_goals($type->fullname, $type->shortname, $addgoalurl, $assignto);
                 break;
         }
 

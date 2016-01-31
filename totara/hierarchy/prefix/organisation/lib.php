@@ -187,7 +187,7 @@ class organisation extends hierarchy {
             $addgoalurl = new moodle_url('/totara/hierarchy/prefix/goal/assign/find.php', $addgoalparam);
             echo html_writer::start_tag('div', array('class' => 'list-assigned-goals'));
             echo $OUTPUT->heading(get_string('goalsassigned', 'totara_hierarchy'));
-            echo $renderer->print_assigned_goals($this->prefix, $this->shortprefix, $addgoalurl, $item->id);
+            echo $renderer->assigned_goals($this->prefix, $this->shortprefix, $addgoalurl, $item->id);
             echo html_writer::end_tag('div');
         }
     }
