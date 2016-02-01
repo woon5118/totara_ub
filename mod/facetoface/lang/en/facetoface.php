@@ -20,26 +20,30 @@
  * @package mod_facetoface
  */
 
+$string['actions'] = 'Actions';
 $string['activate'] = 'Activate';
+$string['activitydefaults'] = 'Activity defaults';
+$string['addattendees'] = 'Add users';
 $string['addattendeestep1'] = "Select users to add (step 1 of 2)";
 $string['addattendeestep2'] = "Add users (step 2 of 2)";
-$string['activitydefaults'] = 'Activity defaults';
+$string['addasset'] = 'Add an asset';
 $string['addeditattendeeserror'] = 'Add/edit attendees error';
 $string['addeditattendeesresults'] = 'Add/edit attendees results';
 $string['addeditattendeessuccess'] = 'Add/edit attendees success';
 $string['addedsuccessfully'] = 'Added successfully';
+$string['addingsession'] = 'Adding a new event in {$a}';
 $string['additionalfeaturesheading'] = 'Additional features';
+$string['addnewasset'] = 'Add a new asset';
+$string['addnewfield'] = 'Add a new custom field';
+$string['addnewfieldlink'] = 'Create a new custom field';
+$string['addnewroom'] = 'Add a new room';
 $string['addnotification'] = 'Add notification';
 $string['addnotificationtemplate'] = 'Add notification template';
 $string['address'] = 'Address';
-$string['addsession'] = 'Add a new event';
-$string['addingsession'] = 'Adding a new event in {$a}';
-$string['addnewfield'] = 'Add a new custom field';
-$string['addnewfieldlink'] = 'Create a new custom field';
-$string['addattendees'] = 'Add users';
 $string['addremoveattendees'] = 'Add/remove attendees';
 $string['addremoveattendeeswaitlisted'] = 'Please Note: Attendees added will be automatically added to the waiting list';
 $string['addroom'] = 'Add a room';
+$string['addsession'] = 'Add a new event';
 $string['addstudent'] = 'Add student';
 $string['afterendofsession'] = 'after end of event';
 $string['alllocations'] = 'All locations';
@@ -54,7 +58,7 @@ $string['allowcancellations'] = 'Allow booking cancellations';
 $string['allowcancellationsdefault'] = 'Allow booking cancellations default';
 $string['allowcancellationsdefault_help'] = 'Whether events in this activity will allow booking cancellations by default, can be overridden in the event settings';
 $string['allowcancellations_help'] = 'Whether event attendees will be able to cancel their bookings';
-$string['allowconflicts'] = 'Allow conflicts';
+$string['allowconflicts'] = 'Allow scheduling conflicts';
 $string['allowconflicts_help'] = 'This will allow scheduling conflicts to exist';
 $string['allowoverbook'] = 'Allow overbooking';
 $string['allowschedulingconflicts'] = 'Override user conflicts';
@@ -65,6 +69,7 @@ $string['allowsignupnotedefault_help'] = 'Whether events in this activity will a
 $string['allrooms'] = 'All rooms';
 $string['allsessionsin'] = 'All events in {$a}';
 $string['alreadysignedup'] = 'You have already signed-up for this Face-to-face activity.';
+$string['anytime'] = 'Any time';
 $string['answer'] = 'Sign in';
 $string['answercancel'] = 'Sign out';
 $string['approvalreqd'] = 'Approval required';
@@ -99,7 +104,21 @@ $string['approved'] = 'Approved';
 $string['approvername'] = 'Approver name';
 $string['areyousureconfirmwaitlist'] = 'This will be over the event capacity allowance. Are you sure you want to continue?';
 $string['assessmentyour'] = 'Your assessment';
+$string['assetalreadybooked'] = ' (asset unavailable on selected dates)';
+$string['assetcreatesuccess'] = 'Successfully created asset';
+$string['assetcustomfieldtab'] =' Asset';
+$string['assetdeleted'] = 'Asset deleted';
+$string['assetdescription'] = 'Asset description';
+$string['assetdoesnotexist'] = 'Asset does not exist';
+$string['assethide'] = 'Hide from users when choosing a asset on the Add/Edit event page';
+$string['assethidden'] = 'Asset hidden successfully';
+$string['assetname'] = 'Asset name';
 $string['assets'] = 'Assets';
+$string['assetshow'] = 'Show to users when choosing a asset on the Add/Edit event page';
+$string['assetshown'] = 'Asset shown successfully';
+$string['assettype'] = 'Asset type';
+$string['assettype_help'] = 'The asset type is used to determine if the system should try and prevent asset booking conflicts. This will prevent a asset from being assigned to 2 sessions that are running at the same time.';
+$string['assetupdatesuccess'] = 'Successfully updated asset';
 $string['attendance'] = 'Attendance';
 $string['attendanceinstructions'] = 'Select users who attended the event:';
 $string['attendancerequestsupdated'] = 'Attendance requests updated';
@@ -115,6 +134,9 @@ $string['attendeestablesummary'] = 'People planning on or having attended this e
 $string['availablesignupnote'] = 'User sign-up note';
 $string['requeststablesummary'] = 'People requesting to attended this event.';
 $string['beforestartofsession'] = 'before start of event';
+$string['backtoassets'] = 'Back to assets';
+$string['backtorooms'] = 'Back to rooms';
+$string['beforestartofsession'] = 'before start of session';
 $string['body'] = 'Body';
 $string['body_help'] = 'This is the body of the notification to be sent.
 
@@ -125,7 +147,6 @@ Available Face to Face placholders:
 * [coursename] - Name of course
 * [facetofacename] - Name of Face to face activity
 * [cost] - Cost of event
-* [alldates] - All sessions for the Face to face
 * [reminderperiod] - Amount of time before the event that the reminder message is sent
 * [sessiondate] - Date of the event the learner is booked on
 * [startdate] - Date at the start of the event. If there are multiple sessions it will use the first one.
@@ -135,15 +156,26 @@ Available Face to Face placholders:
 * [duration] - Length of the event
 * [details] - Details about the event
 * [attendeeslink] - Link to the attendees page for the event
-* [session:location] - Location of the event
-* [session:venue] - Venue the event is being held in
-* [session:room] - Room the event is being held in
 * [lateststarttime] - Start time of the event. If there are multiple sessions it will use the last one.
 * [lateststartdate] - Date at the start of the event. If there are multiple sessions it will use the last one.
 * [latestfinishtime] - Finish time of the event. If there are multiple sessions it will use the last one.
 * [latestfinishdate] - Date at the end of the event. If there are multiple sessions it will use the last one.
 
 There are also placeholders available for event custom fields and they follow the format [session:shortname]. Where "shortname" is the shortname of the Face to face custom field.
+
+To include the details of each session, a segment of the notification can be repeated to include the details of each individual sesison. To do this, add [#sessions] where you would like the loop to start, add [/sessions] where you would like it to end.
+
+You can then add the following placeholders for each session:
+
+* [session:starttime] - start time of the session.
+* [session:startdate] - start date of the session.
+* [session:finishtime] - finish time of the session.
+* [session:finishdate] - finish date of the session.
+* [session:timezone] - timezone of the session.
+* [session:room:name] - name of room assigned to this session.
+* [session:room:link] - link to details page for this room.
+
+You can add room custom field values. If a room custom field has the shortname, \'shortname\', the placeholder would have the following format: [session:room:cf_shortname].
 
 Available user placeholders:
 
@@ -183,6 +215,7 @@ $string['bookingcompleted_approvalrequired'] = 'Your booking has been completed 
 $string['bookingcompleted_roleapprovalrequired'] = 'Your request to attend this session has been received. You should immediately receive a confirmation email. Each {$a} associated with this session has been notified about your request. You should receive a notification about the decision soon.';
 $string['bookingfull'] = 'Booking full';
 $string['bookingopen'] = 'Booking open';
+$string['bookings'] = 'Bookings';
 $string['bookingstatus'] = 'You are booked for the following event';
 $string['bookingopen'] = 'Booking open';
 $string['bookingsessioncancelled'] = 'Session cancelled';
@@ -231,9 +264,10 @@ $string['ccmanager'] = 'Manager copy';
 $string['ccmanager_note'] = 'Send a copy of this notification to the user\'s manager';
 $string['changeselectedusers'] = 'Change selected users';
 $string['chooseapprovers'] = 'Select activity level approvers';
-$string['chooseroom'] = 'Choose a room';
-$string['choosepredefinedroom'] = 'Choose a pre-defined room';
 $string['cannotapproveatcapacity'] = 'You cannot approve any more attendees as this event is full.';
+$string['chooseassets'] = 'Choose assets';
+$string['chooseroom'] = 'Choose a room';
+$string['cannotapproveatcapacity'] = 'You cannot approve any more attendees as this session is full.';
 $string['cleanuptask'] = 'Cleanup facetoface';
 $string['clearall'] = 'Clear all';
 $string['close'] = 'Close';
@@ -266,7 +300,9 @@ $string['cutoffnote'] = 'before event starts';
 $string['cutoff_help'] = 'The amount of time before the first event that messages about minimum capacity will be sent.
 This must be at least 24 hours before the event.
 The start date of the earliest event must be at least this far in the future.';
-
+$string['created'] = 'Created';
+$string['createnewasset'] = 'Create new asset';
+$string['createnewroom'] = 'Create new room';
 $string['csvtextfile'] = 'Text file';
 $string['scvtextfile_help'] = '*File format information*
 
@@ -286,14 +322,16 @@ $string['csvtextinput'] = 'CSV text input';
 $string['currentallocations'] = 'Current allocations ({$a->allocated} / {$a->max})';
 $string['currentattendees'] = 'Current attendees';
 $string['currentmanager'] = 'Current manager: ';
+$string['currentlyassigned'] = 'Currently assigned to an event';
 $string['currentstatus'] = 'Current status';
 $string['customfieldsheading'] = 'Custom fields';
 $string['customfieldsheadingaction'] = '{$a} Custom Event Fields';
 $string['date'] = 'Date';
 $string['dateadd'] = 'Add a new date';
+$string['dateandtime'] = 'Date and time';
 $string['dateremove'] = 'Remove this date';
+$string['dateselect'] = 'Select date';
 $string['datetext'] = 'You are signed in for date';
-$string['datetimeknownhinttext'] = '';
 $string['deactivate'] = 'Deactivate';
 $string['decidelater'] = 'Decide Later';
 $string['declareinterest'] = 'Declare interest';
@@ -325,6 +363,7 @@ $string['defaultdaystosession'] = 'Number of days in future to default for new e
 $string['defaultdaystosession_desc'] = 'When creating a new event it\'s start and finish dates will default to this many days in the future.';
 $string['delete'] = 'Delete';
 $string['deleteall'] = 'Delete all';
+$string['deleteassetconfirm'] = 'Are you sure you want to delete asset <strong>"{$a}"</strong>:';
 $string['deletenotificationconfirm'] = 'Confirm you would like to delete the notification <strong>"{$a}"</strong>:';
 $string['deletenotificationtemplateconfirm'] = 'Confirm you would like to delete the notification template <strong>"{$a}"</strong>:';
 $string['deletereservation'] = 'Delete reservations';
@@ -347,6 +386,8 @@ $string['due'] = 'due';
 $string['duration'] = 'Duration';
 $string['early'] = '{$a} early';
 $string['edit'] = 'Edit';
+$string['editasset'] = 'Edit asset';
+$string['editdate'] = 'Edit date';
 $string['editmessagerecipientsindividually'] = 'Edit recipients individually';
 $string['editnotificationx'] = 'Edit "{$a}"';
 $string['editnotificationtemplate'] = 'Edit notification template';
@@ -366,6 +407,7 @@ $string['error:addalreadysignedupattendee'] = 'This user is already signed-up fo
 $string['error:addalreadysignedupattendeeaddself'] = 'You are already signed-up for this Face-to-face activity.';
 $string['error:addattendee'] = 'Could not add {$a} to the event.';
 $string['error:approvernotselected'] = 'Please select an approver';
+$string['error:assetisinuse'] = 'This asset is used in one or more events';
 $string['error:cancellationsnotallowed'] = 'You are not allowed to cancel this booking.';
 $string['error:cancelbooking'] = 'There was a problem cancelling your booking';
 $string['error:cannotdeclareinterest'] = 'Cannot declare interest in this face-to-face activity.';
@@ -412,6 +454,7 @@ $string['error:csvnorequiredcf'] = 'You did not provide a column called \'{$a}\'
 $string['error:csvtoomanyidfields'] = 'Your file contained more than one of the following columns: \'username\', \'email\', \'idnumber\'';
 $string['error:cutofftooclose'] = 'The cut-off time for minimum capacity is too close to the events earliest start date, please set at least a 24 hours cut-off';
 $string['error:cutofftoolate'] = 'The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect.';
+$string['error:datesunavailablestuff'] = 'The new dates you have selected are unavailable due to a scheduling conflict with the following resources:<br/>{$a}<br/>Please choose different dates or change the selected room/assets.';
 $string['error:emailnotfound'] = 'No users were found with the following emails: {$a}';
 $string['error:emptylocation'] = 'Location was empty.';
 $string['error:emptyvenue'] = 'Venue was empty.';
@@ -421,13 +464,16 @@ $string['error:facetofacenotfound'] = 'Face-to-face activity is no longer availa
 $string['error:fieldidincorrect'] = 'Field ID is incorrect: {$a}';
 $string['error:f2ffailedupdatestatus'] = 'Face-to-face failed to update the user\'s status';
 $string['error:idnumbernotfound'] = 'No users were found with the following ID numbers: {$a}';
+$string['error:incorrectassetid'] = 'Asset ID was incorrect';
 $string['error:incorrectcoursemodule'] = 'Course module is incorrect';
 $string['error:incorrectcoursemoduleid'] = 'Course Module ID was incorrect';
 $string['error:incorrectcoursemodulesession'] = 'Course Module Face-to-face Event was incorrect';
 $string['error:incorrectfacetofaceid'] = 'Face-to-face ID was incorrect';
 $string['error:incorrectnotificationtype'] = 'Incorrect notification type supplied';
 $string['error:invalidstatus'] = 'Invalid signup status';
+$string['error:incorrectroomid'] = 'Room ID was incorrect';
 $string['error:invaliduserid'] = 'Invalid user ID';
+$string['error:isalreadybooked'] = '{$a} is already booked';
 $string['error:manageremailaddressmissing'] = 'You are currently not assigned to a manager in the system. Please contact the site administrator.';
 $string['error:mincapacitymissing'] = 'Session minimum bookings value is missing';
 $string['error:mincapacitynotnumeric'] = 'Event minimum capacity is not a number';
@@ -442,6 +488,7 @@ $string['error:nomanagersemailset'] = 'No manager email is set';
 $string['error:nopermissiontosignup'] = 'You don\'t have permission to signup to this facetoface event.';
 $string['error:nopositionselected'] = 'You must have a suitable position assigned to sign up for this facetoface event.';
 $string['error:nopositionselectedactivity'] = 'You must have a suitable position assigned to sign up for this facetoface activity.';
+$string['error:nopredefinedassets'] = 'No pre-defined assets';
 $string['error:nopredefinedrooms'] = 'No pre-defined rooms';
 $string['error:norecipientsselected'] = 'You must choose which learners will receive this notification';
 $string['error:noticeidincorrect'] = 'Notice ID is incorrect: {$a}';
@@ -449,6 +496,7 @@ $string['error:notificationtitletoolong'] = 'The title you have used is too long
 $string['error:notificationtemplatemissing'] = 'The following notification templates are missing (notifications could not be created for them):';
 $string['error:problemsigningup'] = 'There was a problem signing you up.';
 $string['error:removeattendee'] = 'Could not remove {$a} from the event.';
+$string['error:roomisinuse'] = 'Room is in use';
 $string['error:sessionnotfound'] = 'The session is no longer available.';
 $string['error:selfapprovalupgrade'] = 'Self approval has been moved from sessions to a facetoface setting, please run the admin tool to resolve any conflicts before upgrading.';
 $string['error:sessionstartafterend'] = 'Event start date/time is after end.';
@@ -546,6 +594,7 @@ $string['filterbyroom'] = 'Filter by Room';
 $string['floor'] = 'Floor';
 $string['forceselectposition'] = 'Prevent signup if no position is selected or can be found';
 $string['format'] = 'Format';
+$string['freebetween'] = 'Free between the following times';
 $string['full'] = 'Date is fully occupied';
 $string['generalsettings'] = 'General settings';
 $string['gettointerestreport'] = 'To view the declare interest report go to the facetoface activity and follow the \'Declared interest report\' link in the module admin menu.';
@@ -564,12 +613,14 @@ $string['import'] = 'Import';
 $string['individuals'] = 'Individuals';
 $string['info'] = 'Info';
 $string['internal'] = 'Prevent room conflicts';
+$string['itemstoadd'] = 'Items to add';
 $string['joinwaitlist'] = 'Join waitlist';
 $string['joinwaitlistcompleted'] = 'You have been placed on the waitlist for this event.';
 $string['lastreservation'] = 'Last reservations are {$a->reservedays} days before the event starts. Unallocated reservations will be deleted {$a->reservecanceldays} days before the event starts.';
 $string['late'] = '\{$a} late';
 $string['location'] = 'Location';
 $string['lookfor'] = 'Search';
+$string['manageassets'] = 'Manage assets';
 $string['managenotificationtemplates'] = 'Manage notification templates';
 $string['managerooms'] = 'Manage rooms';
 $string['managerbookings'] = 'Bookings / reservations made by {$a}';
@@ -615,6 +666,7 @@ $string['namewithmanager'] = '{$a->attendeename} ({$a->managername})';
 $string['noactionableunapprovedrequests'] = 'No actionable unapproved requests';
 $string['nocancellations'] = 'There have been no cancellations';
 $string['nocustomfields'] = '<p>No custom fields are defined.</p>';
+$string['nodatesyet'] = 'This event has no sessions. Attendees can sign-up to the waitlist for this event and will be booked automatically once one or more sessions are added.';
 $string['nofacetofaces'] = 'There are no Face-to-face activities';
 $string['nonapplicable'] = 'N/A';
 $string['none'] = 'None';
@@ -636,6 +688,7 @@ $string['nosignedupusersnumrequests'] = 'No users are fully booked for this even
 $string['nosignedupusersonerequest'] = 'No users are fully booked for this event. 1 user is awaiting approval.';
 $string['nostarttime'] = 'No dates specified';
 $string['notallowedtocancel'] = 'You are not allowed to cancel your booking in this event.';
+$string['notapplicable'] = 'N/A';
 $string['note'] = 'Note';
 $string['notefull'] = 'Even if the event is fully booked you can still register. You will be queued (marked in red). If someone signs out, the first student in the queue will be moved into registeres students and a notification will be sent to him/her by mail.';
 $string['notificationalreadysent'] = 'This notification has already been sent, so can no longer be edited.';
@@ -669,6 +722,8 @@ $string['notspecified'] = 'N/A';
 $string['notsubmittedyet'] = 'Not yet evaluated';
 $string['noupcoming'] = '<p><i>No upcoming events</i></p>';
 $string['numberofattendees'] = 'Number of Attendees';
+$string['noupcomingsessionsinroom'] = 'No upcoming events in this room';
+$string['numberofattendees'] = 'Number of attendees';
 $string['uploadfile'] = 'Upload file';
 $string['occuredonx'] = 'Occured on {$a}';
 $string['occurswhenenabled'] = 'Occurs when enabled';
@@ -689,7 +744,6 @@ $string['order'] = 'Order';
 $string['otherbookedby'] = 'Booked by another manager';
 $string['otherroom'] = 'Other room';
 $string['othersession'] = 'Other event(s) in this activity';
-$string['pdroomcapacityexceeded'] = '<strong>Warning:</strong> Note that pre-defined room capacity is being exceeded by event capacity';
 $string['place'] = 'Room';
 $string['placeholder:address'] = '[address]';
 $string['placeholder:aim'] = '[aim]';
@@ -712,6 +766,16 @@ $string['placeholder:middlename'] = '[middlename]';
 $string['placeholder:msn'] = '[msn]';
 $string['placeholder:phone1'] = '[phone1]';
 $string['placeholder:phone2'] = '[phone2]';
+$string['placeholder:session:finishdate'] = '[session:finishdate]';
+$string['placeholder:session:finishtime'] = '[session:finishtime]';
+$string['placeholder:session:startdate'] = '[session:startdate]';
+$string['placeholder:session:starttime'] = '[session:starttime]';
+$string['placeholder:session:timezone'] = '[session:timezone]';
+$string['placeholder:sessions:loopend'] = '[/sessions]';
+$string['placeholder:sessions:loopstart'] = '[#sessions]';
+$string['placeholder:room:name'] = '[session:room:name]';
+$string['placeholder:room:customfield'] = '[session:room:cf_{$a->shortname}]';
+$string['placeholder:room:link'] = '[session:room:link]';
 $string['placeholder:skype'] = '[skype]';
 $string['placeholder:timezone'] = '[timezone]';
 $string['placeholder:url'] = '[url]';
@@ -719,6 +783,7 @@ $string['placeholder:username'] = '[username]';
 $string['placeholder:yahoo'] = '[yahoo]';
 $string['playlottery'] = 'Play Lottery';
 $string['position'] = 'Position';
+$string['publishreuse'] = 'Publish for reuse by other events';
 $string['reserve'] = 'Reserve spaces for team';
 $string['reserveallallocated'] = 'You have already allocated the maximum number of spaces you are able for this activity, you cannot reserve any more';
 $string['reserveallallocatedother'] = 'This manager has already allocated the maximum number of spaces they are able to for this activity, you cannot reserve any more for them';
@@ -740,15 +805,19 @@ $string['restoremissingdefaultnotifications'] = 'Restore missing default notific
 $string['restoremissingdefaultnotificationsconfirm'] = 'This will restore any missing default notifications for "{$a}" these notifications are used by built in Face-to-face functionality and may result in messages being sent to users. Do you want to continue?';
 $string['result'] = 'Result';
 $string['return'] = 'Return';
+$string['room'] = 'Room';
 $string['roomdeleted'] = 'Room deleted';
 $string['roomdetails'] = '{$a->name},<br/>{$a->building},<br/>{$a->address}';
 $string['roomdoesnotexist'] = 'Room does not exist';
 $string['roomisinuse'] = 'Room is in use';
 $string['roomdescription'] = 'Room description';
+$string['roomdetails'] = 'Room details';
+$string['roomhidden'] = 'Room hidden successfully';
 $string['roommustbebookedtoexternalcalendar'] = 'Note: Please ensure that this room is available before creating this booking.';
 $string['roomname'] = 'Room name';
 $string['room'] = 'Room';
 $string['rooms'] = 'Rooms';
+$string['roomshown'] = 'Room shown successfully';
 $string['roomcreatesuccess'] = 'Successfully created room';
 $string['roomtype'] = 'Room type';
 $string['roomtype_help'] = 'The room type is used to determine if the system should try and prevent room booking conflicts. This will prevent a room from being booked for 2 events that are running at the same time.';
@@ -783,7 +852,6 @@ $string['points'] = 'Points';
 $string['pointsplural'] = 'Points';
 $string['potentialallocations'] = 'Potential allocations ({$a} left)';
 $string['potentialrecipients'] = 'Potential recipients';
-$string['predefinedroom'] = '{$a->name}, {$a->building}, {$a->address}, {$a->description} (Capacity: {$a->capacity})';
 $string['previoussessions'] = 'Previous events';
 $string['previoussessionslist'] = 'List of all past events for this Face-to-face activity';
 $string['printversionid'] = 'Print version: without name';
@@ -834,11 +902,13 @@ $string['selectedpositiontype'] = 'Position Type on sign up';
 $string['selectpositiononsignup'] = 'Select position on signup';
 $string['selectnone'] = 'Select none';
 $string['selectallop'] = 'All';
+$string['selectassets'] = 'Select assets';
 $string['selectmanager'] = 'Select manager';
 $string['selectnoneop'] = 'None';
 $string['selectnotsetop'] = 'Not Set';
 $string['selectoptionbefore'] = ' Please choose an option (All, Set or Not set) before selecting this option';
 $string['selectposition'] = 'Select a position';
+$string['selectroom'] = 'Select room';
 $string['selectsetop'] = 'Set';
 $string['selfauthorisation'] = 'Self authorisation';
 $string['selfauthorisation_help'] = 'You must read and agree to the terms and conditions before signing up for the session.';
@@ -866,11 +936,16 @@ $string['sentreminderuser'] = 'Sent reminder email to user';
 $string['sessionattendees'] = 'Session attendees';
 $string['sessioncancelled'] = 'Event cancellation';
 $string['sessioncustomfieldtab'] = 'Event';
+$string['roomcustomfieldtab'] = 'Room';
+$string['roomhide'] = 'Hide from users when choosing a room on the Add/Edit event page';
+$string['roomshow'] = 'Show to users when choosing a room on the Add/Edit event page';
 $string['sessiondate'] = 'Session';
+$string['sessiondatecolumn_html'] = '{$a->startdate} {$a->starttime} -<br>{$a->enddate} {$a->endtime}<br>{$a->timezone}';
 $string['sessiondatetime'] = 'Event date/time';
 $string['sessiondatetimecourseformat'] = '{$a->startdate}, {$a->starttime} - {$a->endtime} (time zone: {$a->timezone})';
 $string['sessiondatetimecourseformatwithouttimezone'] = '{$a->startdate}, {$a->starttime} - {$a->endtime}';
 $string['sessiondatetimeknown'] = 'Event date/time known';
+$string['sessiondates'] = 'Sessions';
 $string['sessiondefaults'] = 'Event defaults';
 $string['sessionenddate'] = 'Session end date';
 $string['sessionenddatewithtime'] = '{$a->enddate}, {$a->endtime} {$a->timezone}';
@@ -962,6 +1037,25 @@ Location:   [session:location]
 Venue:   [session:venue]
 Room:   [session:room]
 ';
+$string['setting:defaultcancellationmessagedefault_v9'] = 'This is to advise that your booking on the following course has been cancelled:
+
+***BOOKING CANCELLED***
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+
+Duration:   [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
+';
 $string['setting:defaultcancellationsubject'] = 'Default subject line for cancellation emails.';
 $string['setting:defaultcancellationsubject_caption'] = 'Cancellation subject';
 $string['setting:defaultcancellationsubjectdefault'] = 'Face-to-face booking cancellation';
@@ -980,6 +1074,23 @@ Location:   [session:location]
 Venue:   [session:venue]
 Room:   [session:room]
 ';
+$string['setting:defaultcancelallreservationsmessagedefault_v9'] = 'This is to advise you that all unallocated reservations for the following course have been automatically cancelled, as the course will be starting soon:
+
+***ALL RESERVATIONS CANCELLED***
+
+Course:   [facetofacename]
+
+Duration:   [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
+';
 $string['setting:defaultcancelreservationsubjectdefault'] = 'Reservation cancellation';
 $string['setting:defaultcancelreservationmessagedefault'] = 'This is to advise you that your reservation for the following course has been cancelled:
 
@@ -994,6 +1105,23 @@ Date(s):
 Location:   [session:location]
 Venue:   [session:venue]
 Room:   [session:room]';
+$string['setting:defaultcancelreservationmessagedefault_v9'] = 'This is to advise you that your reservation for the following course has been cancelled:
+
+***RESERVATION CANCELLED***
+
+Course:   [facetofacename]
+
+Duration:   [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
+';
 $string['setting:defaultdeclineinstrmngr'] = 'Default decline message sent to managers.';
 $string['setting:defaultdeclineinstrmngr_caption'] = 'Decline message (managers)';
 $string['setting:defaultdeclineinstrmngrdefault'] = '*** Advice only ****
@@ -1019,6 +1147,25 @@ Date(s):
 Location:   [session:location]
 Venue:   [session:venue]
 Room:   [session:room]
+';
+$string['setting:defaultdeclinemessagedefault_v9'] = 'This is to advise that your booking on the following course has been declined:
+
+***BOOKING DECLINED***
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+
+Duration:   [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
 ';
 $string['setting:defaultdeclinesubject'] = 'Default subject line for decline emails.';
 $string['setting:defaultdeclinesubject_caption'] = 'Decline subject';
@@ -1053,6 +1200,31 @@ Room:   [session:room]
 ***Please arrive ten minutes before the course starts***
 
 To re-schedule or cancel your booking
+To re-schedule your booking you need to cancel this booking and then re-book a new session.  To cancel your booking, return to the site, then to the page for this course, and then select \'cancel\' from the booking information screen.
+
+[details]
+';
+$string['setting:defaultconfirmationmessagedefault_v9'] = 'This is to confirm that you are now booked on the following course:
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+Cost:   [cost]
+
+Duration:    [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
+
+***Please arrive ten minutes before the course starts***
+
+To re-schedule or cancel your booking
 To re-schedule your booking you need to cancel this booking and then re-book a new event.  To cancel your booking, return to the site, then to the page for this course, and then select \'cancel\' from the booking information screen.
 
 [details]
@@ -1060,7 +1232,7 @@ To re-schedule your booking you need to cancel this booking and then re-book a n
 $string['setting:defaultconfirmationsubject'] = 'Default subject line for confirmation emails.';
 $string['setting:defaultconfirmationsubject_caption'] = 'Confirmation subject';
 $string['setting:defaultconfirmationsubjectdefault'] = 'Face-to-face booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
-$string['setting:defaultdatetimechangemessagedefault'] = 'Your session has changed:
+$string['setting:defaultdatetimechangemessagedefault'] = 'Your session date/time has changed:
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
@@ -1073,6 +1245,23 @@ Date(s):
 Location:   [session:location]
 Venue:   [session:venue]
 Room:   [session:room]
+';
+$string['setting:defaultdatetimechangemessagedefault_v9'] = 'Your session has changed:
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+
+Duration:   [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
 ';
 $string['setting:defaultdatetimechangesubject'] = 'Default subject line for date/time change emails.';
 $string['setting:defaultdatetimechangesubject_caption'] = 'Date/time change subject';
@@ -1094,6 +1283,23 @@ Location: [session:location]
 Venue: [session:venue]
 
 Room: [session:room]
+';
+$string['setting:defaultregistrationexpiredmessagedefault_v9'] = 'The registration period for the following session has been closed:
+
+Course: [coursename]
+
+Face-to-face: [facetofacename]
+
+Duration: [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
 ';
 $string['setting:defaultdatetimechangesubjectdefault'] = 'Face-to-face booking date/time changed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultminbookings'] = 'Default minimum bookings';
@@ -1128,6 +1334,31 @@ Room:   [session:room]
 ***Please arrive ten minutes before the course starts***
 
 To re-schedule or cancel your booking
+To re-schedule your booking you need to cancel this booking and then re-book a new session.  To cancel your booking, return to the site, then to the page for this course, and then select \'cancel\' from the booking information screen.
+
+[details]
+';
+$string['setting:defaultremindermessagedefault_v9'] = 'This is a reminder that you are booked on the following course:
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+Cost:   [cost]
+
+Duration:   [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
+
+***Please arrive ten minutes before the course starts***
+
+To re-schedule or cancel your booking
 To re-schedule your booking you need to cancel this booking and then re-book a new event.  To cancel your booking, return to the site, then to the page for this course, and then select \'cancel\' from the booking information screen.
 
 [details]
@@ -1157,6 +1388,24 @@ Location:   [session:location]
 Venue:   [session:venue]
 Room:   [session:room]
 ';
+$string['setting:defaultrequestmessagedefault_v9'] = 'Your request to book into the following course has been sent to your manager:
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+Cost:   [cost]
+
+Duration:   [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
+';
 $string['setting:defaultrequestsubjectdefault'] = 'Face-to-face booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultrolerequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as a [sessionrole] for the session.
 
@@ -1179,6 +1428,24 @@ Date(s):
 Location:   [session:location]
 Venue:   [session:venue]
 Room:   [session:room]
+';
+$string['setting:defaultrolerequestmessagedefault_v9'] = 'Your request to book into the following course has been sent to the sessions [sessionrole](s):
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+Cost:   [cost]
+
+Duration:   [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
 ';
 $string['setting:defaultrolerequestsubjectdefault'] = 'Face-to-face booking role request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultadminrequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as an approver for the session.
@@ -1203,6 +1470,24 @@ Location:   [session:location]
 Venue:   [session:venue]
 Room:   [session:room]
 ';
+$string['setting:defaultadminrequestmessagedefault_v9'] = 'Your request to book into the following course has been sent to the sessions approvers:
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+Cost:   [cost]
+
+Duration:   [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
+';
 $string['setting:defaultadminrequestsubjectdefault'] = 'Face-to-face booking admin request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaulttrainerconfirmationmessage'] = 'Default message sent to trainers when assigned to an event.';
 $string['setting:defaulttrainerconfirmationmessage_caption'] = 'Trainer confirmation message';
@@ -1224,13 +1509,50 @@ Room:   [session:room]
 
 [details]
 ';
+$string['setting:defaulttrainerconfirmationmessagedefault_v9'] = 'This is to confirm that you are now assigned to deliver training on the following course:
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+
+Duration:    [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
+
+***Please arrive ten minutes before the course starts***
+
+[details]
+';
 $string['setting:defaulttrainerconfirmationsubject'] = 'Default subject line for trainer confirmation emails.';
 $string['setting:defaulttrainerconfirmationsubject_caption'] = 'Trainer confirmation subject';
 $string['setting:defaulttrainerconfirmationsubjectdefault'] = 'Face-to-face trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 
 $string['setting:defaulttrainersessioncancellationmessage'] = 'Default event cancellation message sent to the trainer.';
 $string['setting:defaulttrainersessioncancellationmessage_caption'] = 'Trainer event cancellation message';
-$string['setting:defaulttrainersessioncancellationmessagedefault'] = 'This is to advise that your assigned training event the following course has been cancelled:
+$string['setting:defaulttrainersessioncancellationmessagedefault'] = 'This is to advise that your assigned training session the following course has been cancelled:
+
+***SESSION CANCELLED***
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+
+Duration:   [duration]
+Date(s):
+[alldates]
+
+Location:   [session:location]
+Venue:   [session:venue]
+Room:   [session:room]
+';
+$string['setting:defaulttrainersessioncancellationmessagedefault_v9'] = 'This is to advise that your assigned training event the following course has been cancelled:
 
 ***EVENT CANCELLED***
 
@@ -1239,14 +1561,16 @@ Course:   [coursename]
 Face-to-face:   [facetofacename]
 
 Duration:   [duration]
-Date(s):
-[alldates]
 
-Location:   [session:location]
-Venue:   [session:venue]
-Room:   [session:room]
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
 ';
-
 $string['setting:defaulttrainersessioncancellationsubject'] = 'Default subject line for trainer event cancellation emails.';
 $string['setting:defaulttrainersessioncancellationsubject_caption'] = 'Trainer event cancellation subject';
 $string['setting:defaulttrainersessioncancellationsubjectdefault'] = 'Face-to-face event trainer cancellation';
@@ -1255,7 +1579,7 @@ $string['setting:defaulttrainersessionunassignedmessage'] = 'Default event unass
 $string['setting:defaulttrainersessionunassignedmessage_caption'] = 'Trainer event unassigned message';
 $string['setting:defaulttrainersessionunassignedmessagedefault'] = 'This is to advise that you have been unassigned from training for following course:
 
-***EVENT UNASSIGNED***
+***SESSION UNASSIGNED***
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
@@ -1269,7 +1593,25 @@ Location:   [session:location]
 Venue:   [session:venue]
 Room:   [session:room]
 ';
+$string['setting:defaulttrainersessionunassignedmessagedefault_v9'] = 'This is to advise that you have been unassigned from training for following course:
 
+***EVENT UNASSIGNED***
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+
+Duration:   [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
+';
 $string['setting:defaulttrainersessionunassignedsubject'] = 'Default subject line for trainer event unassigned emails.';
 $string['setting:defaulttrainersessionunassignedsubject_caption'] = 'Trainer event unassigned subject';
 $string['setting:defaulttrainersessionunassignedsubjectdefault'] = 'Face-to-face event trainer unassigned';
@@ -1282,6 +1624,26 @@ Course:   [coursename]
 Face-to-face:   [facetofacename]
 Location:  [session:location]
 Participant:   [firstname] [lastname]
+
+***Please note this is not a course booking confirmation***
+
+By waitlisting you have registered your interest in this course and will be contacted directly when sessions become available.
+
+To remove yourself from this waitlist please return to this course and click Cancel waitlist. Please note there is no waitlist removal confirmation email.
+';
+$string['setting:defaultwaitlistedmessagedefault_v9'] = 'This is to advise that you have been added to the waitlist for:
+
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+Participant:   [firstname] [lastname]
+
+Location(s):
+[#sessions]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
 
 ***Please note this is not a course booking confirmation***
 
@@ -1306,6 +1668,24 @@ Date(s):
 Location:   [session:location]
 Venue:   [session:venue]
 Room:   [session:room]
+';
+$string['setting:defaultsessioncancellationmessagedefault_v9'] = 'This is to advise that the following session has been cancelled:
+
+***SESSION CANCELLED***
+
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+
+Duration:   [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
 ';
 $string['setting:defaultsessioncancellationsubject'] = 'Default subject line for session cancellation emails.';
 $string['setting:defaultsessioncancellationsubject_caption'] = 'Session cancellation subject';
@@ -1422,8 +1802,10 @@ $string['timestart'] = 'Start time';
 $string['timecancelled'] = 'Time Cancelled';
 $string['timerequested'] = 'Time Requested';
 $string['timesignedup'] = 'Time Signed Up';
+$string['timestampbyuser'] = '{$a->time} by {$a->user}';
 $string['title'] = 'Title';
 $string['timezoneupgradeinfomessage'] = 'WARNING : This upgrade to Facetoface adds the ability to specify the timezone in which a Facetoface event will occur.<br /><br />It is <b>strongly</b> recommended that you check the event timezones, start times and end times for all upcoming Facetoface events that were created prior to this upgrade.';
+$string['tutor'] = 'Tutor';
 $string['datesignedup'] = 'Date Signed Up';
 $string['thirdpartyemailaddress'] = 'Third-party email address(es)';
 $string['thirdpartywaitlist'] = 'Notify third-party about wait-listed events';
@@ -1433,6 +1815,9 @@ $string['unknowndate'] = '(unknown date)';
 $string['unknowntime'] = '(unknown time)';
 $string['upcomingsessions'] = 'Upcoming events';
 $string['upcomingsessionslist'] = 'List of all upcoming events for this Face-to-face activity';
+$string['upcomingsessionsinasset'] = 'Upcoming sessions in this asset';
+$string['upcomingsessionsinroom'] = 'Upcoming sessions in this room';
+$string['upcomingsessionsinroomlist'] = 'A list of upcoming sessions taking place in this room';
 $string['updateactivities'] = 'Update all activities';
 $string['updateactivities_help'] = 'When checked, saving and updating the template will update all activities that have notifications based on this template.';
 $string['updateactivitieswarning'] = '<b>Warning:</b> If you choose to update all activies then all facetoface activities that have notifications based off this template will be updated with the changes that have been made.';
@@ -1448,6 +1833,7 @@ $string['upgradeprocessinggrades'] = 'Processing Face-to-face grades, this may t
 $string['usercancelledon'] = 'User cancelled on {$a}';
 $string['userdoesnotexist'] = 'User with {$a->fieldname} "{$a->value}" does not exist';
 $string['useriddoesnotexist'] = 'User with ID "{$a}" does not exist';
+$string['useroomcapacity'] = 'Use room capacity';
 $string['userstoadd'] = 'Users to add';
 $string['userstoaddcomment'] = 'Enter one user per line:';
 $string['userstobeadded'] = 'Users to be added';
@@ -1472,8 +1858,11 @@ $string['usersignedupon'] = 'User signed up on {$a}';
 $string['userwillbewaitlisted'] = 'This event is currently full. By clicking the "Join waitlist" button, you will be placed on the event\'s wait-list.';
 $string['validation:needatleastonedate'] = 'You need to provide at least one date, or else mark the event as wait-listed.';
 $string['venue'] = 'Venue';
+$string['versioncontrol'] = 'Version control';
 $string['viewallsessions'] = 'View all events';
+$string['viewasset'] = 'View asset';
 $string['viewresults'] = 'View results';
+$string['viewroom'] = 'View room';
 $string['viewsubmissions'] = 'View submissions';
 $string['waitlistedmessage'] = 'Wait-listed message';
 $string['waitlisteveryone'] = 'Send all bookings to the waiting list';
@@ -1607,25 +1996,6 @@ The **Request message** section displays the notices sent to the learner and the
 $string['room_help'] = '**Room** is the name/number/identifier of the room being used for the training event.
 
 The **Room** displays on the \'Sign-up\' page, the \'View all events\' page and in all email notifications.';
-
-$string['sessiondatetimeknown_help'] = '**If a event\'s date/time is known**
-
-If "Yes" is entered for this setting, the session and time will be displayed on the course page (if the event is upcoming and available), the "View all events page", the event sign-up page, as well as all email notifications related to the event.
-
-When a staff member signs up for a event with a known date and time:
-
-* The staff member and the staff member\'s manager will be sent a confirmation email (i.e., the one formatted per the "Confirmation message" section of the face-to-face instance\'s settings).
-* The staff member will be sent a reminder email message (i.e., the one formatted per the "Reminder message" section of the face-to-face instance\'s settings). The reminder will be sent a number of days before the event, according to the "Days before message is sent" setting also found in the "Reminder message" section of the face-to-face instance\'s settings.
-
-**If a event\'s date/time is not known (or wait-listed)**
-
-If "No" is entered for this setting, the text "wait-listed" will be displayed on the course page, the "View all events page", the event sign-up page, as well as all email notifications related to the event.
-
-When a staff member signs up for a wait-listed event:
-
-* The staff member will be sent a confirmation email (i.e. the one formatted per the "Wait-listed message" section of the face-to-face instance\'s settings).
-* The staff member will not be sent a reminder email message.
-* The staff member\'s manager will not be sent confirmation and cancellation email messages.';
 
 $string['sessionsoncoursepage_help'] = 'This is the number of events for each face-to-face activity that will be shown on the main course page.';
 
@@ -1763,3 +2133,29 @@ $string['setting:manageraddressformatreadabledefault'] = 'firstname.lastname@com
 $string['setting:sitenotices'] = 'Notices only appear on the Face-to-face Calendar found {$a}';
 $string['setting:sitenoticeshere'] = 'here';
 $string['sitenoticesheading'] = 'Site Notices';
+$string['waitliststatus'] = 'You have a place on the waitlist of the following session';
+
+# Deprecated
+$string['datetimeknownhinttext'] = '';
+$string['duration_help'] = '**Duration** is the total length of the training in hours.
+If the training occurs over two or more time periods, the duration is the combined total.
+If the session date is known then this value is automatically recalculated when the session is saved.';
+$string['sessiondatetimeknown'] = 'Session date/time known';
+$string['sessiondatetimeknown_help'] = '**If a session\'s date/time is known**
+
+If "Yes" is entered for this setting, the session date and time will be displayed on the course page (if the session is upcoming and available), the "View all sessions page", the session sign-up page, as well as all email notifications related to the session.
+
+When a staff member signs up for a session with a known date and time:
+
+* The staff member and the staff member\'s manager will be sent a confirmation email (i.e., the one formatted per the "Confirmation message" section of the face-to-face instance\'s settings).
+* The staff member will be sent a reminder email message (i.e., the one formatted per the "Reminder message" section of the face-to-face instance\'s settings). The reminder will be sent a number of days before the session, according to the "Days before message is sent" setting also found in the "Reminder message" section of the face-to-face instance\'s settings.
+
+**If a session\'s date/time is not known (or wait-listed)**
+
+If "No" is entered for this setting, the text "wait-listed" will be displayed on the course page, the "View all sessions page", the session sign-up page, as well as all email notifications related to the session.
+
+When a staff member signs up for a wait-listed session:
+
+* The staff member will be sent a confirmation email (i.e. the one formatted per the "Wait-listed message" section of the face-to-face instance\'s settings).
+* The staff member will not be sent a reminder email message.
+* The staff member\'s manager will not be sent confirmation and cancellation email messages.';

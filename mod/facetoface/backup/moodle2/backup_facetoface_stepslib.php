@@ -85,8 +85,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $sessions = new backup_nested_element('sessions');
 
         $session = new backup_nested_element('session', array('id'), array(
-            'facetoface', 'capacity', 'allowoverbook', 'details', 'datetimeknown', 'duration', 'normalcost',
-            'discountcost', 'roomid', 'room_name', 'room_building', 'room_address', 'room_custom', 'timecreated',
+            'facetoface', 'capacity', 'allowoverbook', 'details', 'duration', 'normalcost', 'discountcost', 'timecreated',
             'timemodified', 'selfapproval', 'mincapacity', 'cutoff', 'waitlisteveryone', 'allowcancellations',
             'cancellationcutoff', 'availablesignupnote'));
 
@@ -122,7 +121,12 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $sessions_dates = new backup_nested_element('sessions_dates');
 
         $sessions_date = new backup_nested_element('sessions_date', array('id'), array(
-            'sessionid', 'sessiontimezone', 'timestart', 'timefinish'));
+            'sessionid', 'roomid', 'sessiontimezone', 'timestart', 'timefinish', 'room_name', 'room_type', 'room_capacity',
+            'room_hidden', 'room_custom', 'room_description', 'room_custom_building', 'room_custom_location'));
+
+        $asset_dates = new backup_nested_element('asset_dates');
+        $asset_date =  new backup_nested_element('asset_date', array('id'), array(
+            'sessionsdateid', 'assetid', 'asset_name', 'asset_type', 'asset_description', 'asset_custom', 'asset_hidden'));
 
         $interests = new backup_nested_element('interests');
 
@@ -157,6 +161,9 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session->add_child($sessions_dates);
         $sessions_dates->add_child($sessions_date);
 
+        $sessions_dates->add_child($asset_dates);
+        $asset_dates->add_child($asset_date);
+
         $facetoface->add_child($interests);
         $interests->add_child($interest);
 
@@ -165,16 +172,29 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
 
         $notification->set_source_table('facetoface_notification', array('facetofaceid' => backup::VAR_PARENTID));
 
-        $session->set_source_sql('SELECT s.id, s.facetoface, s.capacity, s.allowoverbook, s.details, s.datetimeknown,
-                                         s.duration, s.normalcost, s.discountcost, s.roomid, r.name AS room_name,
-                                         r.building AS room_building, r.custom AS room_custom, r.address AS room_address,
-                                         s.timecreated, s.timemodified, s.usermodified, s.mincapacity, s.cutoff,
-                                         s.allowcancellations, s.cancellationcutoff, s.availablesignupnote
-                                        FROM {facetoface_sessions} s
-                                        LEFT JOIN {facetoface_room} r ON s.roomid = r.id
-                                       WHERE s.facetoface = ?', array(backup::VAR_PARENTID));
+        $session->set_source_table('facetoface_sessions', array('facetoface' => backup::VAR_PARENTID));
 
-        $sessions_date->set_source_table('facetoface_sessions_dates', array('sessionid' => backup::VAR_PARENTID));
+        $sessions_date->set_source_sql('
+            SELECT fsd.*, r.name AS room_name, r.type AS room_type, r.capacity AS room_capacity, r.hidden AS room_hidden,
+                r.custom AS room_custom, r.description AS room_description,
+                (SELECT data FROM {facetoface_room_info_data} rd
+                    LEFT JOIN {facetoface_room_info_field} rf ON rd.fieldid = rf.id
+                    WHERE rf.shortname = \'building\' AND rd.facetofaceroomid = r.id) AS room_custom_building,
+                (SELECT data FROM {facetoface_room_info_data} rd
+                    LEFT JOIN {facetoface_room_info_field} rf ON rd.fieldid = rf.id
+                    WHERE rf.shortname = \'location\' AND rd.facetofaceroomid = r.id) AS  room_custom_location
+            FROM {facetoface_sessions_dates} fsd
+            LEFT JOIN {facetoface_room} r ON (fsd.roomid = r.id)
+            WHERE fsd.sessionid = :sessionid
+            ', array('sessionid' => backup::VAR_PARENTID));
+
+        $asset_date->set_source_sql('
+            SELECT fad.*, fa.name AS asset_name, fa.type AS asset_type, fa.description AS asset_description, fa.custom AS asset_custom,
+                fa.hidden AS asset_hidden
+            FROM {facetoface_asset_dates} fad
+            LEFT JOIN {facetoface_asset} fa ON (fa.id = fad.assetid)
+            WHERE fad.sessionsdateid = :sessionsdateid
+            ', array('sessionsdateid' => backup::VAR_PARENTID));
 
         if ($userinfo) {
             $signup->set_source_table('facetoface_signups', array('sessionid' => backup::VAR_PARENTID));

@@ -63,7 +63,7 @@ Feature: Manage pre-defined rooms
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
-    When I press "Choose a pre-defined room"
+    When I press "Select room"
     Then I should see "Room 1, That house, 123 here street,  (Capacity: 5)" in the "Choose a room" "totaradialogue"
     And I should see "Room 2, Your house, 123 near street,  (Capacity: 6)" in the "Choose a room" "totaradialogue"
 
@@ -76,20 +76,22 @@ Feature: Manage pre-defined rooms
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | datetimeknown         | Yes  |
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 11   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 12   |
-      | timefinish[0][minute] | 00   |
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I press "OK"
+    And I set the following fields to these values:
       | capacity              | 7    |
-    When I press "Choose a pre-defined room"
+    When I press "Select room"
     And I wait "1" seconds
     And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
@@ -135,20 +137,22 @@ Feature: Manage pre-defined rooms
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | datetimeknown         | Yes  |
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 11   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 12   |
-      | timefinish[0][minute] | 00   |
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 0    |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I press "OK"
+    And I set the following fields to these values:
       | capacity              | 7    |
-    When I press "Choose a pre-defined room"
+    When I press "Select room"
     And I wait "1" seconds
     And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
@@ -156,54 +160,59 @@ Feature: Manage pre-defined rooms
     And I press "Save changes"
 
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | datetimeknown         | Yes  |
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 11   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 12   |
-      | timefinish[0][minute] | 00   |
-    When I press "Choose a pre-defined room"
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 0    |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I press "OK"
+    When I press "Select room"
     And I wait "1" seconds
     Then I should see "(room unavailable on selected dates)" in the "Choose a room" "totaradialogue"
     And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 14   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 15   |
-      | timefinish[0][minute] | 00   |
-    When I press "Choose a pre-defined room"
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 14   |
+      | timestart[minute]  | 0    |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 15   |
+      | timefinish[minute] | 0    |
+    And I press "OK"
+    When I press "Select room"
     And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 11   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 12   |
-      | timefinish[0][minute] | 00   |
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 0    |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 0    |
+    And I press "OK"
     And I press "Save changes"
     And I should see "There is a room conflict - another event is using the room at the same time"
 
     When I set the following fields to these values:
-      | datetimeknown         | No |
+    And I click on "Delete" "link"
     And I press "Save changes"
     Then I should see "Room 1" in the "1 January 2020" "table_row"
     And I should see "Room 1" in the "Wait-listed" "table_row"
@@ -217,22 +226,24 @@ Feature: Manage pre-defined rooms
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | datetimeknown           | Yes              |
-      | timestart[0][day]       | 1                |
-      | timestart[0][month]     | 1                |
-      | timestart[0][year]      | 2020             |
-      | timestart[0][hour]      | 19               |
-      | timestart[0][minute]    | 00               |
-      | timestart[0][timezone]  | Pacific/Auckland |
-      | timefinish[0][day]      | 1                |
-      | timefinish[0][month]    | 1                |
-      | timefinish[0][year]     | 2020             |
-      | timefinish[0][hour]     | 20               |
-      | timefinish[0][minute]   | 00               |
-      | timefinish[0][timezone] | Pacific/Auckland |
+      | timestart[day]       | 1                |
+      | timestart[month]     | 1                |
+      | timestart[year]      | 2020             |
+      | timestart[hour]      | 19               |
+      | timestart[minute]    | 0                |
+      | timestart[timezone]  | Pacific/Auckland |
+      | timefinish[day]      | 1                |
+      | timefinish[month]    | 1                |
+      | timefinish[year]     | 2020             |
+      | timefinish[hour]     | 20               |
+      | timefinish[minute]   | 0                |
+      | timefinish[timezone] | Pacific/Auckland |
+    And I press "OK"
+    And I set the following fields to these values:
       | capacity                | 7                |
-    When I press "Choose a pre-defined room"
+    When I press "Select room"
     And I wait "1" seconds
     And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
@@ -240,62 +251,70 @@ Feature: Manage pre-defined rooms
     And I press "Save changes"
 
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | datetimeknown           | Yes           |
-      | timestart[0][day]       | 1             |
-      | timestart[0][month]     | 1             |
-      | timestart[0][year]      | 2020          |
-      | timestart[0][hour]      | 6             |
-      | timestart[0][minute]    | 00            |
-      | timestart[0][timezone]  | Europe/London |
-      | timefinish[0][day]      | 1             |
-      | timefinish[0][month]    | 1             |
-      | timefinish[0][year]     | 2020          |
-      | timefinish[0][hour]     | 7             |
-      | timefinish[0][minute]   | 00            |
-      | timefinish[0][timezone] | Europe/London |
+      | timestart[day]       | 1             |
+      | timestart[month]     | 1             |
+      | timestart[year]      | 2020          |
+      | timestart[hour]      | 6             |
+      | timestart[minute]    | 0             |
+      | timestart[timezone]  | Europe/London |
+      | timefinish[day]      | 1             |
+      | timefinish[month]    | 1             |
+      | timefinish[year]     | 2020          |
+      | timefinish[hour]     | 7             |
+      | timefinish[minute]   | 0             |
+      | timefinish[timezone] | Europe/London |
+    And I press "OK"
+    And I set the following fields to these values:
       | capacity                | 7             |
-    When I press "Choose a pre-defined room"
+    When I press "Select room"
     And I wait "1" seconds
     Then I should see "(room unavailable on selected dates)" in the "Choose a room" "totaradialogue"
     And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 14   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 15   |
-      | timefinish[0][minute] | 00   |
+      | timestart[day]       | 1    |
+      | timestart[month]     | 1    |
+      | timestart[year]      | 2020 |
+      | timestart[hour]      | 14   |
+      | timestart[minute]    | 0    |
+      | timefinish[day]      | 1    |
+      | timefinish[month]    | 1    |
+      | timefinish[year]     | 2020 |
+      | timefinish[hour]     | 15   |
+      | timefinish[minute]   | 0    |
+    And I press "OK"
+    And I set the following fields to these values:
       | capacity              | 7    |
-    When I press "Choose a pre-defined room"
+    When I press "Select room"
     And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[0][day]       | 1             |
-      | timestart[0][month]     | 1             |
-      | timestart[0][year]      | 2020          |
-      | timestart[0][hour]      | 6             |
-      | timestart[0][minute]    | 00            |
-      | timestart[0][timezone]  | Europe/London |
-      | timefinish[0][day]      | 1             |
-      | timefinish[0][month]    | 1             |
-      | timefinish[0][year]     | 2020          |
-      | timefinish[0][hour]     | 7             |
-      | timefinish[0][minute]   | 00            |
-      | timefinish[0][timezone] | Europe/London |
-      | capacity                | 7             |
+      | timestart[day]       | 1             |
+      | timestart[month]     | 1             |
+      | timestart[year]      | 2020          |
+      | timestart[hour]      | 6             |
+      | timestart[minute]    | 0             |
+      | timestart[timezone]  | Europe/London |
+      | timefinish[day]      | 1             |
+      | timefinish[month]    | 1             |
+      | timefinish[year]     | 2020          |
+      | timefinish[hour]     | 7             |
+      | timefinish[minute]   | 0             |
+      | timefinish[timezone] | Europe/London |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity             | 7             |
     And I press "Save changes"
     And I wait "1" seconds
     And I press "Save changes"
     And I should see "There is a room conflict - another event is using the room at the same time"
     When I set the following fields to these values:
-      | datetimeknown         | No |
+    And I click on "Delete" "link"
     And I press "Save changes"
     Then I should see "Room 1" in the "1 January 2020" "table_row"
     And I should see "Room 1" in the "Wait-listed" "table_row"

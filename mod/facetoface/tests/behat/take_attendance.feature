@@ -43,19 +43,20 @@ Feature: Take attendance for Face to face sessions
     And I press "Save changes"
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I fill facetoface session with relative date in form data:
-      | datetimeknown         | Yes              |
-      | sessiontimezone[0]    | Pacific/Auckland |
-      | timestart[0][day]     | -1               |
-      | timestart[0][month]   | 0                |
-      | timestart[0][year]    | 0                |
-      | timestart[0][hour]    | 0                |
-      | timestart[0][minute]  | 0                |
-      | timefinish[0][day]    | 0                |
-      | timefinish[0][month]  | 0                |
-      | timefinish[0][year]   | 0                |
-      | timefinish[0][hour]   | 0                |
-      | timefinish[0][minute] | -30              |
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | -1               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | 0                |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | 0                |
+      | timefinish[minute] | -30              |
+    And I press "OK"
     And I press "Save changes"
     And I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"

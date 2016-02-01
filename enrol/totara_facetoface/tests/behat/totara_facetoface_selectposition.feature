@@ -42,7 +42,6 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I follow "Test facetoface name 1"
     And I follow "Add a new event"
     And I set the following fields to these values:
-      | datetimeknown | Yes |
       | timestart[0][day] | 1 |
       | timestart[0][month] | 1 |
       | timestart[0][year] | 2020 |
@@ -66,7 +65,6 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I follow "Test facetoface name 1"
     And I follow "Add a new event"
     And I set the following fields to these values:
-      | datetimeknown | Yes |
       | timestart[0][day] | 1 |
       | timestart[0][month] | 1 |
       | timestart[0][year] | 2020 |

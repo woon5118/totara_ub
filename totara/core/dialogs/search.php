@@ -393,31 +393,90 @@ switch ($searchtype) {
         break;
 
     /**
+     * Facetoface asset search
+     */
+    case 'facetoface_asset':
+        $sessionid = $this->customdata['sessionid'];
+
+        $formdata['hidden']['facetofaceid'] = $this->customdata['facetofaceid'];
+        $formdata['hidden']['sessionid'] = $sessionid;
+        $formdata['hidden']['timestart'] = $this->customdata['timestart'];
+        $formdata['hidden']['timefinish'] = $this->customdata['timefinish'];
+        $formdata['hidden']['selected'] = $this->customdata['selected'];
+        $formdata['hidden']['offset'] = $this->customdata['offset'];
+
+        // Generate search SQL.
+        $keywords = totara_search_parse_keywords($query);
+        $fields = array('a.name');
+        list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields);
+
+        // Custom assets for session id.
+        $sqlsess = '';
+        $joinsess = '';
+        if ($sessionid) {
+            $joinsess = 'LEFT JOIN {facetoface_asset_dates} fad ON (a.id = fad.assetid)
+                LEFT JOIN {facetoface_sessions_dates} fsd ON (fad.sessionsdateid = fsd.id)';
+            $sqlsess = 'OR a.custom > 0 AND fsd.id = :sessionid';
+            $params = array_merge($params, array($sessionid));
+        }
+        $search_info->fullname = $DB->sql_concat(
+                'a.name', "', '",
+                'faid.data', "', '",
+                'a.description');
+        $search_info->sql = "
+            FROM {facetoface_asset} a
+            {$joinsess}
+            LEFT JOIN {facetoface_asset_info_data} faid ON (a.id = faid.facetofaceassetid)
+            WHERE
+            {$searchsql}
+            AND (a.custom = 0 {$sqlsess})
+            AND a.hidden = 0
+        ";
+
+        $search_info->order = " ORDER BY a.name ASC";
+        $search_info->params = $params;
+        break;
+
+    /**
      * Facetoface room search
      */
     case 'facetoface_room':
         $formdata['hidden']['facetofaceid'] = $this->customdata['facetofaceid'];
         $formdata['hidden']['sessionid'] = $this->customdata['sessionid'];
-        $formdata['hidden']['timeslots'] = $this->customdata['timeslots'];
-        $formdata['hidden']['datetimeknown'] = $this->customdata['datetimeknown'];
+        $formdata['hidden']['timestart'] = $this->customdata['timestart'];
+        $formdata['hidden']['timefinish'] = $this->customdata['timefinish'];
+        $formdata['hidden']['selected'] = $this->customdata['selected'];
+        $formdata['hidden']['offset'] = $this->customdata['offset'];
 
         // Generate search SQL
         $keywords = totara_search_parse_keywords($query);
-        $fields = array('r.name', 'r.building', 'r.address');
+        $fields = array('r.name');
         list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields);
 
-        $search_info->fullname = $DB->sql_concat('r.name', "', '",
-                'r.building', "', '",
-                'r.address', "', '",
-                'r.description',
+        // Custom rooms for session id.
+        $sqlsess = '';
+        $joinsess = '';
+        if ($sessionid) {
+            $joinsess = 'LEFT JOIN {facetoface_sessions_dates} fsd ON (r.id = fsd.roomid)';
+            $sqlsess = 'OR r.custom > 0 AND fsd.id = :sessionid';
+            $params = array_merge($params, array($sessionid));
+        }
+
+        $search_info->fullname = $DB->sql_concat(
+                'r.name', "', '",
+                'frid.data', "', '",
+                'r.description', "', '",
                 "' (".get_string('capacity', 'facetoface').": '", 'r.capacity', "')'");
 
         $search_info->sql = "
             FROM
                 {facetoface_room} r
+                {$joinsess}
+                LEFT JOIN {facetoface_room_info_data} frid ON (r.id = frid.facetofaceroomid)
             WHERE
                 {$searchsql}
-                AND r.custom = 0
+                AND (r.custom = 0 {$sqlsess})
+                AND r.hidden = 0
         ";
 
         $search_info->order = " ORDER BY r.name ASC";

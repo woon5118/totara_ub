@@ -18,34 +18,38 @@ Feature: Confirm overlapping sessions can be removed
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
-    And I press "Add a new date"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | datetimeknown           | Yes              |
-      | timestart[0][day]       | 15               |
-      | timestart[0][month]     | 7                |
-      | timestart[0][year]      | 2020             |
-      | timestart[0][hour]      | 15               |
-      | timestart[0][minute]    | 00               |
-      | timestart[0][timezone]  | Pacific/Auckland |
-      | timefinish[0][day]      | 15               |
-      | timefinish[0][month]    | 7                |
-      | timefinish[0][year]     | 2020             |
-      | timefinish[0][hour]     | 16               |
-      | timefinish[0][minute]   | 00               |
-      | timefinish[0][timezone] | Pacific/Auckland |
-      | timestart[1][day]       | 15               |
-      | timestart[1][month]     | 7                |
-      | timestart[1][year]      | 2020             |
-      | timestart[1][hour]      | <starthour>      |
-      | timestart[1][minute]    | <startminute>    |
-      | timestart[1][timezone]  | <timezone>       |
-      | timefinish[1][day]      | 15               |
-      | timefinish[1][month]    | 7                |
-      | timefinish[1][year]     | 2020             |
-      | timefinish[1][hour]     | <finishhour>     |
-      | timefinish[1][minute]   | <finishminute>   |
-      | timefinish[1][timezone] | <timezone>       |
-      | datedelete[1]           | 1                |
+      | timestart[day]       | 15               |
+      | timestart[month]     | 7                |
+      | timestart[year]      | 2020             |
+      | timestart[hour]      | 15               |
+      | timestart[minute]    | 0                |
+      | timestart[timezone]  | Pacific/Auckland |
+      | timefinish[day]      | 15               |
+      | timefinish[month]    | 7                |
+      | timefinish[year]     | 2020             |
+      | timefinish[hour]     | 16               |
+      | timefinish[minute]   | 0                |
+      | timefinish[timezone] | Pacific/Auckland |
+    And I press "OK"
+    And I press "Add a new date"
+    And I click on "Edit date" "link" in the ".f2fmanagedates .lastrow" "css_element"
+    And I set the following fields to these values:
+      | timestart[day]       | 15             |
+      | timestart[month]     | 7              |
+      | timestart[year]      | 2020           |
+      | timestart[hour]      | <starthour>    |
+      | timestart[minute]    | <startminute>  |
+      | timestart[timezone]  | <timezone>     |
+      | timefinish[day]      | 15             |
+      | timefinish[month]    | 7              |
+      | timefinish[year]     | 2020           |
+      | timefinish[hour]     | <finishhour>   |
+      | timefinish[minute]   | <finishminute> |
+      | timefinish[timezone] | <timezone>     |
+    And I press "OK"
+    And I click on "Delete" "link" in the ".f2fmanagedates .lastrow" "css_element"
     And I press "Save changes"
     Then I should not see "This date conflicts with an earlier date in this event"
     And I should see "Upcoming events"

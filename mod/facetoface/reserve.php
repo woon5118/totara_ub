@@ -89,7 +89,7 @@ if ($reserveinfo[$action] === false) { // Current user does not have permission 
         print_error('nopermissionreserve', 'mod_facetoface'); // Not allowed to reserve/allocate spaces.
     }
 }
-if ($session->datetimeknown) {
+if ($session->cntdates) {
     $signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_BOOKED);
 } else {
     $signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_APPROVED);

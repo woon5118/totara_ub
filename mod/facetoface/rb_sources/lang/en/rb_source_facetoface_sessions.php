@@ -21,7 +21,7 @@
  */
 
 // lang file for mod/facetoface/rb_sources/rb_source_facetoface_sessions.php
-$string['sourcetitle'] = 'Face-to-face events';
+$string['sourcetitle'] = 'Sign ups';
 // columns
 $string['address'] = 'Address';
 $string['allsignupcustomfields'] = 'All sign up custom fields';
@@ -77,14 +77,16 @@ $string['audit'] = 'Audit';
 $string['coursedelivery'] = 'Course Delivery';
 
 // column types for this source, as strings
+$string['type_asset'] = 'Asset';
 $string['type_approver'] = 'Approver';
 $string['type_session'] = 'Event';
 $string['type_status'] = 'Status';
 $string['type_role'] = 'Role';
 $string['type_room'] = 'Room';
 $string['type_facetoface'] = 'Face-to-face';
+$string['type_facetoface_cancellation'] = 'Cancellation note customfields';
+$string['type_facetoface_room'] = 'Room';
 $string['type_facetoface_session'] = 'Event customfields';
 $string['type_facetoface_signup'] = 'Signup note customfields';
-$string['type_facetoface_cancellation'] = 'Cancellation note customfields';
 $string['type_facetoface_sessioncancel'] = 'Session cancellation customfields';
 $string['type_date'] = 'Date';

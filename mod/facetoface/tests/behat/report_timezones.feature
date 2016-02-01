@@ -28,42 +28,42 @@ Feature: Facetoface timezones in reports
       | Description | Test facetoface description |
     And I follow "Test facetoface name"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | Other room              | 1               |
-      | Room name               | Room 1          |
-      | datetimeknown           | Yes             |
-      | sessiontimezone[0]      | Europe/Prague   |
-      | timestart[0][day]       | 2               |
-      | timestart[0][month]     | 1               |
-      | timestart[0][year]      | 2020            |
-      | timestart[0][hour]      | 1               |
-      | timestart[0][minute]    | 15              |
-      | timestart[0][timezone]  | Australia/Perth |
-      | timefinish[0][day]      | 2               |
-      | timefinish[0][month]    | 1               |
-      | timefinish[0][year]     | 2020            |
-      | timefinish[0][hour]     | 3               |
-      | timefinish[0][minute]   | 45              |
-      | timefinish[0][timezone] | Australia/Perth |
+      | sessiontimezone      | Europe/Prague   |
+      | timestart[day]       | 2               |
+      | timestart[month]     | 1               |
+      | timestart[year]      | 2020            |
+      | timestart[hour]      | 1               |
+      | timestart[minute]    | 15              |
+      | timestart[timezone]  | Australia/Perth |
+      | timefinish[day]      | 2               |
+      | timefinish[month]    | 1               |
+      | timefinish[year]     | 2020            |
+      | timefinish[hour]     | 3               |
+      | timefinish[minute]   | 45              |
+      | timefinish[timezone] | Australia/Perth |
+    And I press "OK"
+    # TODO create custom room names "Room 1"
     And I press "Save changes"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | Other room              | 1               |
-      | Room name               | Room 2          |
-      | datetimeknown           | Yes             |
-      | sessiontimezone[0]      | User timezone   |
-      | timestart[0][day]       | 4               |
-      | timestart[0][month]     | 2               |
-      | timestart[0][year]      | 2021            |
-      | timestart[0][hour]      | 1               |
-      | timestart[0][minute]    | 00              |
-      | timestart[0][timezone]  | Australia/Perth |
-      | timefinish[0][day]      | 4               |
-      | timefinish[0][month]    | 2               |
-      | timefinish[0][year]     | 2021            |
-      | timefinish[0][hour]     | 2               |
-      | timefinish[0][minute]   | 30              |
-      | timefinish[0][timezone] | Australia/Perth |
+      | sessiontimezone      | User timezone   |
+      | timestart[day]       | 4               |
+      | timestart[month]     | 2               |
+      | timestart[year]      | 2021            |
+      | timestart[hour]      | 1               |
+      | timestart[minute]    | 0               |
+      | timestart[timezone]  | Australia/Perth |
+      | timefinish[day]      | 4               |
+      | timefinish[month]    | 2               |
+      | timefinish[year]     | 2021            |
+      | timefinish[hour]     | 2               |
+      | timefinish[minute]   | 30              |
+      | timefinish[timezone] | Australia/Perth |
+    And I press "OK"
+    # TODO create custom room names "Room 2"
     And I press "Save changes"
     And I should see "6:15 PM - 8:45 PM Europe/Prague" in the "Room 1" "table_row"
     And I should see "1 January 2020" in the "Room 1" "table_row"
@@ -134,23 +134,23 @@ Feature: Facetoface timezones in reports
       | Description | Test facetoface 1 description |
     And I follow "Test facetoface 1 name"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | Other room              | 1               |
-      | Room name               | Room 1          |
-      | datetimeknown           | Yes             |
-      | sessiontimezone[0]      | Europe/Prague   |
-      | timestart[0][day]       | 2               |
-      | timestart[0][month]     | 1               |
-      | timestart[0][year]      | 2020            |
-      | timestart[0][hour]      | 1               |
-      | timestart[0][minute]    | 15              |
-      | timestart[0][timezone]  | Australia/Perth |
-      | timefinish[0][day]      | 2               |
-      | timefinish[0][month]    | 1               |
-      | timefinish[0][year]     | 2020            |
-      | timefinish[0][hour]     | 3               |
-      | timefinish[0][minute]   | 45              |
-      | timefinish[0][timezone] | Australia/Perth |
+      | sessiontimezone      | Europe/Prague   |
+      | timestart[day]       | 2               |
+      | timestart[month]     | 1               |
+      | timestart[year]      | 2020            |
+      | timestart[hour]      | 1               |
+      | timestart[minute]    | 15              |
+      | timestart[timezone]  | Australia/Perth |
+      | timefinish[day]      | 2               |
+      | timefinish[month]    | 1               |
+      | timefinish[year]     | 2020            |
+      | timefinish[hour]     | 3               |
+      | timefinish[minute]   | 45              |
+      | timefinish[timezone] | Australia/Perth |
+    And I press "OK"
+    # TODO create custom room names "Room 1"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -159,23 +159,23 @@ Feature: Facetoface timezones in reports
       | Description | Test facetoface 2 description |
     And I follow "Test facetoface 2 name"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | Other room              | 1               |
-      | Room name               | Room 2          |
-      | datetimeknown           | Yes             |
-      | sessiontimezone[0]      | User timezone   |
-      | timestart[0][day]       | 4               |
-      | timestart[0][month]     | 2               |
-      | timestart[0][year]      | 2021            |
-      | timestart[0][hour]      | 1               |
-      | timestart[0][minute]    | 00              |
-      | timestart[0][timezone]  | Australia/Perth |
-      | timefinish[0][day]      | 4               |
-      | timefinish[0][month]    | 2               |
-      | timefinish[0][year]     | 2021            |
-      | timefinish[0][hour]     | 2               |
-      | timefinish[0][minute]   | 30              |
-      | timefinish[0][timezone] | Australia/Perth |
+      | sessiontimezone      | User timezone   |
+      | timestart[day]       | 4               |
+      | timestart[month]     | 2               |
+      | timestart[year]      | 2021            |
+      | timestart[hour]      | 1               |
+      | timestart[minute]    | 0               |
+      | timestart[timezone]  | Australia/Perth |
+      | timefinish[day]      | 4               |
+      | timefinish[month]    | 2               |
+      | timefinish[year]     | 2021            |
+      | timefinish[hour]     | 2               |
+      | timefinish[minute]   | 30              |
+      | timefinish[timezone] | Australia/Perth |
+    And I press "OK"
+    # TODO create custom room names "Room 1"
     And I press "Save changes"
 
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"

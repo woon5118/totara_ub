@@ -59,6 +59,7 @@ class totara_customfield_generator extends testing_data_generator {
             $data->id = 0;
             $data->datatype = 'text';
             $data->fullname = $name;
+            $data->shortname = preg_replace('/\s+/', '', $name); // A shortname shouldn't have spaces.
             $data->description = '';
             $data->defaultdata = '';
             $data->forceunique = 0;
@@ -156,5 +157,93 @@ class totara_customfield_generator extends testing_data_generator {
         }
         $data->cftest = $cfdata;
         $field->edit_save_data($data, $prefix, $tableprefix);
+    }
+
+    /**
+     * Create datetime customfields with settings as given in $cfdef.
+     *
+     * @param string $tableprefix - prefix for the type of customfield in the database.
+     * @param array $cfdef array of customfield settings in the form of array('fullname' => array('setting' => value, ...)
+     */
+    public function create_datetime($tableprefix, $cfdef) {
+        global $DB;
+        $results = array();
+
+        // Default values if not specified in the options for each custom field.
+        $defaultstartyear = 2000;
+        $defaultendyear = 2030;
+
+        foreach ($cfdef as $name => $options) {
+            $cfsettings = new stdClass();
+            // param1 is the start year for this field's dropdown box.
+            $cfsettings->param1 = isset($options['startyear']) ? $options['startyear'] : $defaultstartyear;
+            // param2 is the end year for this field's dropdown box.
+            $cfsettings->param2 = isset($options['endyear']) ? $options['endyear'] : $defaultendyear;
+            $cfsettings->shortname = isset($options['shortname']) ? $options['shortname'] : $name;
+            $cfsettings->fullname = $name;
+            $cfsettings->required = isset($options['required']) ? isset($options['required']) : 0;
+            $cfsettings->hidden = isset($options['hidden']) ? isset($options['hidden']) : 0;
+            $cfsettings->locked  = isset($options['locked']) ? isset($options['locked']) : 0;
+            $cfsettings->forceunique = isset($options['forceunique']) ? isset($options['forceunique']) : 0;
+            $cfsettings->description_editor = array('text' => '', 'format' => '');
+            $cfsettings->datatype = 'datetime';
+            $cf = new customfield_define_datetime();
+            $cf->define_save($cfsettings, 'facetoface_room');
+            // define_save does not presently return the saved record or id.
+            $results[$name] = $DB->get_field($tableprefix.'_info_field', 'id', array('fullname' => $name), IGNORE_MULTIPLE);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Set a value for a datetime customfield, with a timestamp.
+     *
+     * @param stdClass $item - what this customfield relates to, e.g. could be a face-to-face session.
+     * @param int $cfid - id of the customfield from the relevant _info_field table.
+     * @param int $value - timestamp of the date to be set for this customfield.
+     * @param string $prefix - check the relevant _info_data table, there you might see e.g. facetofacesessionid,
+     * in which case this would be facetofacesession.
+     * @param string $tableprefix - for the tables relating to this type of custom field.
+     */
+    public function set_datetime($item, $cfid, $value, $prefix, $tableprefix) {
+        $thiscf = new customfield_datetime($cfid, $item, $prefix, $tableprefix);
+        $item->{$thiscf->inputname} = $value;
+        $thiscf->edit_save_data($item, $prefix, $tableprefix);
+    }
+
+    public function create_location($tableprefix, $cfdef) {
+        global $DB;
+        $results = array();
+
+        foreach ($cfdef as $name => $options) {
+            $cfsettings = new stdClass();
+            $cfsettings->fullname = $name;
+            $cfsettings->shortname = isset($options['shortname']) ? $options['shortname'] : $name;
+            $cfsettings->latitude = isset($options['latitude']) ? $options['latitude'] : '';
+            $cfsettings->longitude = isset($options['longitude']) ? $options['longitude'] : '';
+            $cfsettings->address = isset($options['address']) ? $options['address'] : '';
+            $cfsettings->size = isset($options['size']) ? $options['size'] : '';
+            $cfsettings->view = isset($options['view']) ? $options['view'] : '';
+            $cfsettings->display = isset($options['display']) ? $options['display'] : '';
+            $cfsettings->required = isset($options['required']) ? $options['required'] : 0;
+            $cfsettings->hidden = isset($options['hidden']) ? $options['hidden'] : 0;
+            $cfsettings->locked  = isset($options['locked']) ? $options['locked'] : 0;
+            $cfsettings->forceunique = isset($options['forceunique']) ? $options['forceunique'] : 0;
+            $cfsettings->description_editor = array('text' => '', 'format' => '');
+            $cfsettings->datatype = 'location';
+            $cf = new customfield_define_location();
+            $cf->define_save($cfsettings, 'facetoface_room');
+            // define_save does not presently return the saved record or id.
+            $results[$name] = $DB->get_field($tableprefix.'_info_field', 'id', array('fullname' => $name), IGNORE_MULTIPLE);
+        }
+
+        return $results;
+    }
+
+    public function set_location_address($item, $cfid, $value, $prefix, $tableprefix) {
+        $thiscf = new customfield_location($cfid, $item, $prefix, $tableprefix);
+        $item->{$thiscf->inputname.'address'} = $value;
+        $thiscf->edit_save_data($item, $prefix, $tableprefix);
     }
 }

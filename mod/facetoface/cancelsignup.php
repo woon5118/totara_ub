@@ -112,12 +112,12 @@ if ($fromform = $mform->get_data()) { // Form submitted.
         $strmessage = $userisinwaitlist ? 'waitlistcancelled' : 'bookingcancelled';
         $message = get_string($strmessage, 'facetoface');
 
-        if ($session->datetimeknown) {
+        if ($session->mintimestart) {
             // Users in waitlist should not receive a cancellation email.
             if ($userisinwaitlist === false) {
                 $error = facetoface_send_cancellation_notice($facetoface, $session, $USER->id);
                 if (empty($error)) {
-                    if ($session->datetimeknown && isset($facetoface->cancellationinstrmngr) && !empty($facetoface->cancellationstrmngr)) {
+                    if ($session->mintimestart && isset($facetoface->cancellationinstrmngr) && !empty($facetoface->cancellationstrmngr)) {
                         $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('cancellationsentmgr', 'facetoface');
                     } else {
                         $msg = ($CFG->facetoface_notificationdisable ? 'cancellationnotsent' : 'cancellationsent');

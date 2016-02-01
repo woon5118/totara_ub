@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is part of Totara LMS
  *
  * Copyright (C) 2016 onwards Totara Learning Solutions LTD
@@ -17,29 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Alastair Munro <alastair.munro@totaralms.com>
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
  * @package mod_facetoface
  */
 
-namespace mod_facetoface\rb\display;
+define('AJAX_SCRIPT', true);
 
-/**
- * Class describing column display formatting.
- *
- * @author Alastair Munro <alastair.munro@totaralms.com>
- * @package mod_facetoface
- */
-class f2f_status extends \totara_reportbuilder\rb\display\base {
-    public static function display($status, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $CFG, $MDL_F2F_STATUS;
+require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
+require_once($CFG->dirroot . '/mod/facetoface/session_forms.php');
 
-        include_once($CFG->dirroot.'/mod/facetoface/lib.php');
+$timestart = optional_param('timestart', 0, PARAM_INT);
+$timefinish = optional_param('timefinish', 0, PARAM_INT);
+$sesiontimezone = optional_param('sesiontimezone', '99', PARAM_TIMEZONE);
 
-        // if status doesn't exist just return the status code
-        if (!isset($MDL_F2F_STATUS[$status])) {
-            return $status;
-        }
+require_sesskey();
 
-        return get_string('status_'.facetoface_get_status($status),'facetoface');
-    }
+$PAGE->set_context(context_system::instance());
+$PAGE->set_url('/mod/facetoface/room/ajax/date_item.php');
+
+// Render date string.
+$out = '';
+if ($timestart && $timefinish) {
+    $out = session_date_form::render_dates($timestart, $timefinish, $sesiontimezone);
 }
+
+echo json_encode($out);

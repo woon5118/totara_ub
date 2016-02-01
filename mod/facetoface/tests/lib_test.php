@@ -69,14 +69,14 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     );
 
     protected $facetoface_sessions_data = array(
-        array('id', 'facetoface', 'capacity', 'allowoverbook', 'details', 'datetimeknown',
+        array('id', 'facetoface', 'capacity', 'allowoverbook', 'details',
               'duration', 'normalcost', 'discountcost', 'timecreated', 'timemodified', 'usermodified'),
-        array(1,    1,   100,    1,  'dtl1',     1,     14400,    '$75',     '$60',     1500,   1600, 2),
-        array(2,    2,    50,    0,  'dtl2',     0,     3600,    '$90',     '$0',     1400,   1500, 2),
-        array(3,    3,    10,    1,  'dtl3',     1,     25200,    '$100',    '$80',     1500,   1500, 2),
-        array(4,    4,    1,     0,  'dtl4',     0,     25200,    '$10',     '$8',      500,   1900, 2),
-        array(5,    5,    10,    0,  'dtl5',     0,     25200,    '$10',     '$8',      500,   1900, 2),
-        array(6,    6,    10,    0,  'dtl6',     1,     25200,    '$10',     '$8',      500,   1900, 2),
+        array(1,    1,   100,    1,  'dtl1',     14400,    '$75',     '$60',     1500,   1600, 2),
+        array(2,    2,    50,    0,  'dtl2',     0,        '$90',     '$0',     1400,   1500, 2),
+        array(3,    3,    10,    1,  'dtl3',     25200,    '$100',    '$80',     1500,   1500, 2),
+        array(4,    4,    1,     0,  'dtl4',     0,        '$10',     '$8',      500,   1900, 2),
+        array(5,    5,    10,    0,  'dtl5',     0,        '$10',     '$8',      500,   1900, 2),
+        array(6,    6,    10,    0,  'dtl6',     25200,    '$10',     '$8',      500,   1900, 2),
         );
 
     protected $session_info_field = array(
@@ -665,7 +665,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 0,
             'allowoverbook' => 1,
             'details' => 'details1',
-            'datetimeknown' => 1,
             'sessiondates' => array(
                 array(
                     'id' => 20,
@@ -685,14 +684,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 0,
             'details' => 'details2',
-            'datetimeknown' => 0,
-            'sessiondates' => array(
-                array(
-                    'id' => 20,
-                    'timestart' => 0,
-                    'timefinish' => 0,
-                )
-            ),
+            'sessiondates' => array(),
             'duration' => 21600,
             'normalcost' => '$100',
             'discountcost' => '$75',
@@ -987,7 +979,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1',
             'mincapacity' => '1',
             'cutoff' => DAYSECS - 60
         );
@@ -997,18 +988,15 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 5,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1',
             'mincapacity' => '1',
             'cutoff' => DAYSECS
         );
         $session1id = $facetofacegenerator->add_session($session1data);
         $session2id = $facetofacegenerator->add_session($session2data);
 
-        $session1 = $DB->get_record('facetoface_sessions', array('id' => $session1id));
-        $session1->sessiondates = facetoface_get_session_dates($session1->id);
+        $session1 = facetoface_get_session($session1id);
 
-        $session2 = $DB->get_record('facetoface_sessions', array('id' => $session2id));
-        $session2->sessiondates = facetoface_get_session_dates($session2->id);
+        $session2 = facetoface_get_session($session2id);
 
         // Add customfields data to these facetoface sessions.
         $cfgenerator->set_text($session1, $textids['text1'], 'value1', 'facetofacesession', 'facetoface_session');
@@ -1266,7 +1254,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1',
             'mincapacity' => '1',
             'cutoff' => DAYSECS - 60
         );
@@ -1341,7 +1328,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1'
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $session = facetoface_get_session($sessionid);
@@ -1447,7 +1433,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1',
             'mincapacity' => '1',
             'cutoff' => DAYSECS - 60
         );
@@ -1547,7 +1532,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1'
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $session = facetoface_get_session($sessionid);
@@ -1644,7 +1628,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1'
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $session = facetoface_get_session($sessionid);
@@ -1726,7 +1709,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1'
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $session = facetoface_get_session($sessionid);
@@ -1773,21 +1755,23 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $sessiondate1->timestart = time() + (DAYSECS * 4) + (HOURSECS);
         $sessiondate1->timefinish = time() + (DAYSECS * 5) + (HOURSECS * 4);
         $sessiondate1->sessiontimezone = 'Pacific/Auckland';
+        $sessiondate1->assetids = array();
         $sessiondate2 = new stdClass();
         $sessiondate2->timestart = time() + (HOURSECS);
         $sessiondate2->timefinish = time() + (HOURSECS * 2);
         $sessiondate2->sessiontimezone = 'Pacific/Auckland';
+        $sessiondate2->assetids = array();
         $sessiondate3 = new stdClass();
         $sessiondate3->timestart = time() + (DAYSECS) + (HOURSECS * 3);
         $sessiondate3->timefinish = time() + (DAYSECS) + (HOURSECS * 6);
         $sessiondate3->sessiontimezone = 'Pacific/Auckland';
+        $sessiondate3->assetids = array();
 
         $sessiondata = array(
             'facetoface' => $facetoface->id,
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate1, $sessiondate2, $sessiondate3),
-            'datetimeknown' => '1',
             // arbitrary duration as this is a setting that is not automatically adjusted by generator when adding session dates
             'duration' => 97200
         );
@@ -1795,8 +1779,10 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $session = facetoface_get_session($sessionid);
 
         // set up a notification that uses all current placeholders
-        $fields = array('coursename', 'facetofacename', 'firstname', 'lastname', 'cost', 'alldates', 'sessiondate',
-            'startdate', 'finishdate', 'starttime', 'finishtime', 'lateststartdate', 'latestfinishdate', 'lateststarttime',
+        $fields = array('coursename', 'facetofacename', 'firstname', 'lastname', 'cost',
+            'sessions:loopstart', 'session:starttime', 'session:startdate', 'session:finishtime', 'session:finishdate',
+            'session:timezone', 'sessions:loopend',
+            'sessiondate', 'startdate', 'finishdate', 'starttime', 'finishtime', 'lateststartdate', 'latestfinishdate', 'lateststarttime',
             'latestfinishtime', 'duration');
         $noticebody = '';
         foreach ($fields as $field) {
@@ -1842,23 +1828,18 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertContains('cost '.$session->normalcost, $fullmessage);
         $this->assertContains('cost '.$session->normalcost, $fullmessagehtml);
 
-        $alldates = '';
-        $alldateshtml = '';
         foreach($session->sessiondates as $sessiondate) {
-            $alldates_segment = ltrim(date_format_string($sessiondate->timestart, "%e %B %Y", 'Pacific/Auckland'));
-            if (date_format_string($sessiondate->timestart, "%e %B %Y", 'Pacific/Auckland') !== date_format_string($sessiondate->timefinish, "%e %B %Y", 'Pacific/Auckland')){
-                $alldates_segment .= ' - '.ltrim(date_format_string($sessiondate->timefinish, "%e %B %Y", 'Pacific/Auckland'));
-            }
-            $alldates_segment .= ', '.ltrim(date_format_string($sessiondate->timestart, "%l:%M %p", 'Pacific/Auckland')).' - ';
-            $alldates_segment .= ltrim(date_format_string($sessiondate->timefinish, "%l:%M %p", 'Pacific/Auckland')).' Pacific/Auckland';
-            $alldates .= $alldates_segment.' ';
-            $alldateshtml .= $alldates_segment;
-            if ($sessiondate !== end($session->sessiondates)){
-                $alldateshtml .= "\n";
-            }
+            $this->assertContains('session:starttime '.ltrim(date_format_string($sessiondate->timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
+            $this->assertContains('session:starttime '.ltrim(date_format_string($sessiondate->timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
+            $this->assertContains('session:startdate '.ltrim(date_format_string($sessiondate->timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
+            $this->assertContains('session:startdate '.ltrim(date_format_string($sessiondate->timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
+            $this->assertContains('session:finishtime '.ltrim(date_format_string($sessiondate->timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
+            $this->assertContains('session:finishtime '.ltrim(date_format_string($sessiondate->timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
+            $this->assertContains('session:finishdate '.ltrim(date_format_string($sessiondate->timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
+            $this->assertContains('session:finishdate '.ltrim(date_format_string($sessiondate->timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
+            $this->assertContains('session:timezone Pacific/Auckland', $fullmessage);
+            $this->assertContains('session:timezone Pacific/Auckland', $fullmessagehtml);
         }
-        $this->assertContains('alldates '.$alldates, $fullmessage);
-        $this->assertContains('alldates '.$alldateshtml, $fullmessagehtml);
 
         // sessiondate2 is the earliest of the three session dates.
         $firstsessiondate = ltrim(date_format_string($sessiondate2->timestart, "%e %B %Y", 'Pacific/Auckland'));
@@ -2216,7 +2197,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate, $sessiondate2),
-            'datetimeknown' => '1',
             'mincapacity' => '1',
             'cutoff' => DAYSECS - 60
         );
@@ -2233,7 +2213,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1',
             'mincapacity' => '1',
             'cutoff' => DAYSECS + 60
         );
@@ -2290,7 +2269,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1',
             'mincapacity' => '1',
             'cutoff' => ""
         );
@@ -2342,7 +2320,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 10,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1',
             'mincapacity' => '4',
             'cutoff' => "86400"
         );
@@ -2401,7 +2378,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 1,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1'
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $session = facetoface_get_session($sessionid);
@@ -2562,7 +2538,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'capacity' => 3,
             'allowoverbook' => 1,
             'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1'
         );
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $session = facetoface_get_session($sessionid);
@@ -2615,7 +2590,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'facetoface' => $facetoface->id,
             'capacity' => 10,
             'sessiondates' => array($sessiondate1),
-            'datetimeknown' => '1',
         );
         $sessionid1 = $facetofacegenerator->add_session($sessiondata1);
         $session1 = facetoface_get_session($sessionid1);
@@ -2629,7 +2603,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'facetoface' => $facetoface->id,
             'capacity' => 10,
             'sessiondates' => array($sessiondate2),
-            'datetimeknown' => '1',
         );
         $sessionid2 = $facetofacegenerator->add_session($sessiondata2);
         $session2 = facetoface_get_session($sessionid2);
@@ -2643,7 +2616,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'facetoface' => $facetoface->id,
             'capacity' => 10,
             'sessiondates' => array($sessiondate3),
-            'datetimeknown' => '1',
         );
         $sessionid3 = $facetofacegenerator->add_session($sessiondata3);
         $session3 = facetoface_get_session($sessionid3);

@@ -35,17 +35,16 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
     And I follow "View all events"
     And I follow "Add a new event"
     And I set the following fields to these values:
-      | datetimeknown         | Yes  |
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 11   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 12   |
-      | timefinish[0][minute] | 00   |
+      | timestart[0][day] | 1 |
+      | timestart[0][month] | 1 |
+      | timestart[0][year] | 2020 |
+      | timestart[0][hour] | 11 |
+      | timestart[0][minute] | 00 |
+      | timefinish[0][day] | 1 |
+      | timefinish[0][month] | 1 |
+      | timefinish[0][year] | 2020 |
+      | timefinish[0][hour] | 12 |
+      | timefinish[0][minute] | 00 |
     And I press "Save changes"
     And I log out
 

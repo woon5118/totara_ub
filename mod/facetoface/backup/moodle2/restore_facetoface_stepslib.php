@@ -34,6 +34,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $paths[] = new restore_path_element('facetoface_notification', '/activity/facetoface/notifications/notification');
         $paths[] = new restore_path_element('facetoface_session', '/activity/facetoface/sessions/session');
         $paths[] = new restore_path_element('facetoface_sessions_dates', '/activity/facetoface/sessions/session/sessions_dates/sessions_date');
+        $paths[] = new restore_path_element('facetoface_asset_dates', '/activity/facetoface/sessions/session/sessions_dates/asset_dates/asset_date');
         $paths[] = new restore_path_element('facetoface_session_custom_fields', '/activity/facetoface/sessions/session/custom_fields/custom_field');
         if ($userinfo) {
             $paths[] = new restore_path_element('facetoface_signup', '/activity/facetoface/sessions/session/signups/signup');
@@ -89,32 +90,6 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
         $data->usermodified = isset($USER->id) ? $USER->id : get_admin()->id;
-        // Check if the session has any predefined or custom room.
-        if ((int)$data->roomid > 0) {
-            // If it is a custom room, create a new record.
-            if ((int)$data->room_custom == 1) {
-                $data->roomid = $this->create_facetoface_room($data);
-            } else {
-                // Check if a predefined room exists.
-                $rooms = $DB->get_records('facetoface_room', array('name' => $data->room_name,
-                    'building' => $data->room_building, 'address' => $data->room_address, 'custom' => 0), '', 'id');
-                if (count($rooms) > 0) {
-                    if (count($rooms) > 1) {
-                        debugging("Room [{$data->room_name}, {$data->room_building}, {$data->room_address}] matches more ".
-                            "than one predefined room and we can't identify which - arbitrarily selecting one of them");
-                    }
-                    $data->roomid = reset($rooms)->id;
-                } else {
-                    // Create a new predefined room record.
-                    debugging("Room [{$data->room_name}, {$data->room_building}, {$data->room_address}] ".
-                        "in face to face session does not exist - creating as predefined room");
-                    $data->roomid = $this->create_facetoface_room($data);
-                }
-            }
-        } else {
-            // F2F session has no room.
-            $data->roomid = 0;
-        }
 
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_sessions', $data);
@@ -122,16 +97,36 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
     }
 
     private function create_facetoface_room($data) {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
+        $now = time();
+
         $customroom = new stdClass();
         $customroom->name = $data->room_name;
-        $customroom->building = $data->room_building;
-        $customroom->address = $data->room_address;
-        $customroom->capacity = $data->capacity;
+        $customroom->description = $data->room_description;
+        $customroom->type = $data->room_type;
+        $customroom->capacity = $data->room_capacity;
         $customroom->custom = (int)$data->room_custom;
-        $customroom->timecreated = $data->timecreated;
-        $customroom->timemodified = $data->timemodified;
+        $customroom->hidden = (int)$data->room_hidden;
+        $customroom->timecreated = isset($data->timecreated) ? $data->timecreated : $now;
+        $customroom->timemodified = isset($data->timemodified) ? $data->timemodified : $now;
         $roomid = $DB->insert_record('facetoface_room', $customroom);
+
+        $customroom->id = $roomid;
+        // If the backup contains the custom fields for location and building.
+        $customroom->customfield_building = $data->room_custom_building;
+        $customroom->customfield_location = $data->room_custom_location;
+        // But perhaps the backup is an old-style backup.
+        if (isset($data->building)) {
+            $customroom->customfield_building = $data->building;
+        }
+        if (isset($data->address)) {
+            customfield_define_location::prepare_form_location_data_for_db($data, 'customfield_location');
+            $customroom->customfield_location = $data->address;
+        }
+        customfield_save_data($customroom, 'facetofaceroom', 'facetoface_room');
+
+
         return $roomid;
     }
 
@@ -348,10 +343,131 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $data->timestart = $this->apply_date_offset($data->timestart);
         $data->timefinish = $this->apply_date_offset($data->timefinish);
 
+        if (!isset($data->room_name)) {
+            $data->room_name = '';
+        }
+
+        // Check if the session has any predefined or custom room.
+        if ((int)$data->roomid > 0 && $data->room_name != '') {
+            // If it is a custom room, create a new record.
+            if (isset($data->room_custom) && (int)$data->room_custom == 1) {
+                $data->roomid = $this->create_facetoface_room($data);
+            } else {
+                // Check if a predefined room exists.
+                // First, standardise the building and address fields.
+                $building = '';
+                if (isset($data->room_building)) {
+                    $building = $data->room_building;
+                } else if (isset($data->room_custom_building)) {
+                    $building = $data->room_custom_building;
+                }
+
+                $location = '';
+                if (isset($data->room_address)) {
+                    $location = $data->room_address;
+                } else if (isset($data->room_custom_location)) {
+                    $location = $data->room_custom_location;
+                }
+
+                $rooms = $DB->get_records_sql(
+                    'SELECT r.id, r.name, r.custom,
+                        (SELECT rid.data
+                            FROM {facetoface_room_info_data} rid
+                            LEFT JOIN {facetoface_room_info_field} rif ON rid.fieldid = rif.id
+                            WHERE rif.shortname = \'location\' AND rid.facetofaceroomid = r.id) AS location,
+                        (SELECT rid.data
+                            FROM {facetoface_room_info_data} rid
+                            LEFT JOIN {facetoface_room_info_field} rif ON rid.fieldid = rif.id
+                            WHERE rif.shortname = \'building\' AND rid.facetofaceroomid = r.id) AS building
+                        FROM {facetoface_room} r
+                        WHERE name = :name AND custom = :custom
+                        GROUP BY r.id, r.name, r.custom
+                        HAVING (
+                        (SELECT rid.data
+                            FROM {facetoface_room_info_data} rid
+                            LEFT JOIN {facetoface_room_info_field} rif ON rid.fieldid = rif.id
+                            WHERE rif.shortname = \'building\' AND rid.facetofaceroomid = r.id) = :building
+                        AND
+                        (SELECT rid.data
+                            FROM {facetoface_room_info_data} rid
+                            LEFT JOIN {facetoface_room_info_field} rif ON rid.fieldid = rif.id
+                            WHERE rif.shortname = \'location\' AND rid.facetofaceroomid = r.id) LIKE :location)',
+                    array(
+                        'name' => $data->room_name,
+                        'building' => $building,
+                        'location' => '%' . $location . '%',
+                        'custom' => 0
+                    )
+                );
+                if (count($rooms) > 0) {
+                    if (count($rooms) > 1) {
+                        debugging("Room [{$data->room_name}, {$building}, {$location}] matches more ".
+                            "than one predefined room and we can't identify which - arbitrarily selecting one of them");
+                    }
+                    $data->roomid = reset($rooms)->id;
+                } else {
+                    // Create a new predefined room record.
+                    debugging("Room [{$data->room_name}, {$building}, {$location}] ".
+                        "in face to face session does not exist - creating as predefined room");
+                    $data->roomid = $this->create_facetoface_room($data);
+                }
+            }
+        } else {
+            // F2F session has no room.
+            $data->roomid = 0;
+        }
+
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_sessions_dates', $data);
     }
 
+    protected function process_facetoface_asset_dates($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->sessionsdateid = $this->get_new_parentid('facetoface_sessions_date');
+
+        if ((int)$data->asset_custom == 1) {
+            $data->assetid = $this->create_facetoface_asset($data);
+        } else {
+            // Search for existing asset.
+            $assets = $DB->get_records('facetoface_asset', array('name' => $data->asset_name, 'custom' => $data->asset_custom,
+                'type' => $data->asset_type));
+
+            if (count($assets) > 0) {
+                if (count($assets) > 1) {
+                    debugging("Asset {$data->asset_name}, matches more than one asset - arbitrarily selecting one of them");
+                }
+                $data->assetid = reset($assets)->id;
+            } else {
+                $data->assetid = $this->create_facetoface_asset($data);
+            }
+        }
+        // Insert the entry record.
+        $DB->insert_record('facetoface_asset_dates', $data);
+    }
+
+    /**
+     * Create custom asset
+     * @param array $data
+     * @return int asset id
+     */
+    private function create_facetoface_asset($data) {
+        global $DB;
+
+        $now = time();
+
+        $customasset = new stdClass();
+        $customasset->name = $data->asset_name;
+        $customasset->custom = (int)$data->asset_custom;
+        $customasset->timecreated = isset($data->timecreated) ? $data->timecreated : $now;
+        $customasset->timemodified = isset($data->timemodified) ? $data->timemodified : $now;
+        $assetid = $DB->insert_record('facetoface_asset', $customasset);
+
+        return $assetid;
+    }
 
     protected function process_facetoface_interest($data) {
         global $DB;

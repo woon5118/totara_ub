@@ -104,7 +104,7 @@ class mod_facetoface_generator extends testing_module_generator {
             throw new coding_exception('Session generator requires $record->facetoface');
         }
 
-        if (empty($record->sessiondates)) {
+        if (!isset($record->sessiondates) && empty($record->sessiondates)) {
             $time = time();
             $sessiondate = new stdClass();
             $sessiondate->timestart = $time;
@@ -115,9 +115,6 @@ class mod_facetoface_generator extends testing_module_generator {
             $sessiondates = $record->sessiondates;
         }
 
-        if (!isset($record->datetimeknown)) {
-            $record->datetimeknown = 1;
-        }
         if (!isset($record->capacity)) {
             $record->capacity = 10;
         }
@@ -135,9 +132,6 @@ class mod_facetoface_generator extends testing_module_generator {
         }
         if (!isset($record->discountcost)) {
             $record->discountcost = FORMAT_MOODLE;
-        }
-        if (!isset($record->roomid)) {
-            $record->roomid = 0;
         }
         if (!isset($record->timemodified)) {
             $record->timemodified = time();

@@ -21,10 +21,9 @@
  * @author Alastair Munro <alastair.munro@totaralms.com>
  * @package mod_facetoface
  */
+global $CFG;
 
 defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
 
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 
@@ -95,9 +94,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_join(
                 'sessiondate',
-                'LEFT',
+                'INNER',
                 '{facetoface_sessions_dates}',
-                '(sessiondate.sessionid = base.sessionid AND sessions.datetimeknown = 1)',
+                '(sessiondate.sessionid = base.sessionid)',
                 REPORT_BUILDER_RELATION_ONE_TO_MANY,
                 'sessions'
             ),
@@ -134,9 +133,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'room',
                 'LEFT',
                 '{facetoface_room}',
-                'sessions.roomid = room.id',
+                'sessiondate.roomid = room.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                'sessions'
+                'sessiondate'
             ),
             new rb_join(
                 'bookedby',
@@ -178,6 +177,22 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'base.id = approver.signupid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
+            new rb_join(
+                'assetdate',
+                'LEFT',
+                '{facetoface_asset_dates}',
+                'assetdate.sessionsdateid = base.id',
+                REPORT_BUILDER_RELATION_MANY_TO_ONE,
+                'sessiondate'
+            ),
+            new rb_join(
+                'asset',
+                'LEFT',
+                '{facetoface_asset}',
+                'assetdate.assetid = asset.id',
+                REPORT_BUILDER_RELATION_MANY_TO_ONE,
+                'assetdate'
+            )
         );
 
 
@@ -249,7 +264,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'session',
                 'duration',
                 get_string('sessduration', 'rb_source_facetoface_sessions'),
-                'CASE WHEN sessions.datetimeknown = 1
+                'CASE WHEN sessiondate.timestart > 0
                     THEN
                         (sessiondate.timefinish-sessiondate.timestart)/' . MINSECS . '
                     ELSE
@@ -412,49 +427,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 )
             ),
             new rb_column_option(
-                'room',
-                'name',
-                get_string('roomname', 'rb_source_facetoface_sessions'),
-                'room.name',
-                array('joins' => 'room',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text')
-            ),
-            new rb_column_option(
-                'room',
-                'building',
-                get_string('building', 'rb_source_facetoface_sessions'),
-                'room.building',
-                array('joins' => 'room',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text')
-            ),
-            new rb_column_option(
-                'room',
-                'address',
-                get_string('address', 'rb_source_facetoface_sessions'),
-                'room.address',
-                array('joins' => 'room',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text')
-            ),
-            new rb_column_option(
-                'room',
-                'capacity',
-                get_string('roomcapacity', 'rb_source_facetoface_sessions'),
-                'room.capacity',
-                array('joins' => 'room', 'dbdatatype' => 'integer')
-            ),
-            new rb_column_option(
-                'room',
-                'description',
-                get_string('roomdescription', 'rb_source_facetoface_sessions'),
-                'room.description',
-                array('joins' => 'room',
-                      'dbdatatype' => 'text',
-                      'outputformat' => 'text')
-            ),
-            new rb_column_option(
                 'session',
                 'positionname',
                 get_string('selectedposition', 'mod_facetoface'),
@@ -545,6 +517,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_tag_fields_to_columns('course', $columnoptions);
 
         $this->add_facetoface_session_roles_to_columns($columnoptions);
+        $this->add_assets_fields_to_columns($columnoptions);
+        $this->add_rooms_fields_to_columns($columnoptions);
 
         $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_course_fields_to_columns($columnoptions);
@@ -648,18 +622,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'room',
                 'name',
                 get_string('roomname', 'rb_source_facetoface_sessions'),
-                'text'
-            ),
-            new rb_filter_option(
-                'room',
-                'building',
-                get_string('building', 'rb_source_facetoface_sessions'),
-                'text'
-            ),
-            new rb_filter_option(
-                'room',
-                'address',
-                get_string('address', 'rb_source_facetoface_sessions'),
                 'text'
             ),
             new rb_filter_option(
@@ -917,6 +879,26 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_custom_fields_for('facetoface_signup', 'status', 'facetofacesignupid', $this->joinlist, $this->columnoptions, $this->filteroptions);
         $this->add_custom_fields_for('facetoface_cancellation', 'cancellationstatus', 'facetofacecancellationid', $this->joinlist, $this->columnoptions, $this->filteroptions);
         $this->add_custom_fields_for('facetoface_sessioncancel', 'sessions', 'facetofacecancellationid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+
+        $this->add_custom_fields_for(
+            'facetoface_room',
+            'room',
+            'facetofaceroomid',
+            $this->joinlist,
+            $this->columnoptions,
+            $this->filteroptions,
+            true
+        );
+
+        $this->add_custom_fields_for(
+            'facetoface_asset',
+            'asset',
+            'facetofaceassetid',
+            $this->joinlist,
+            $this->columnoptions,
+            $this->filteroptions,
+            true
+        );
     }
 
     //

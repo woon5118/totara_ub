@@ -23,7 +23,7 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
                 foreach ($userstoadd as $newuser) {
                     $fullname = fullname($newuser, true);
 
-                    if ($session->datetimeknown && ($newuser->statuscode > MDL_F2F_STATUS_BOOKED)) {
+                    if ($session->cntdates && ($newuser->statuscode > MDL_F2F_STATUS_BOOKED)) {
                         echo "<option value=\"$newuser->id\">".$fullname." (".
                             get_string('status_'.$MDL_F2F_STATUS[$newuser->statuscode], 'facetoface')."), ".$newuser->email."</option>\n";
                     } else {
@@ -58,7 +58,7 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
                         foreach ($availableusers as $user) {
                             $idx++;
                             $fullname = fullname($user, true);
-                            if ($session->datetimeknown && ($user->statuscode == MDL_F2F_STATUS_WAITLISTED)) {
+                            if ($session->cntdates && ($user->statuscode == MDL_F2F_STATUS_WAITLISTED)) {
                                 echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname." (".
                                     get_string('status_'.$MDL_F2F_STATUS[$user->statuscode], 'facetoface')."), ".$user->email."</option>\n";
                             } else {
@@ -83,7 +83,7 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
                         foreach ($availableusers as $user) {
                             $idx++;
                             $fullname = fullname($user, true);
-                            if ($session->datetimeknown && ($user->statuscode == MDL_F2F_STATUS_WAITLISTED)) {
+                            if ($session->cntdates && ($user->statuscode == MDL_F2F_STATUS_WAITLISTED)) {
                                 echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname." (".
                                 get_string('status_'.$MDL_F2F_STATUS[$user->statuscode], 'facetoface')."), ".$user->email."</option>\n";
                             } else {

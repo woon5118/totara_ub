@@ -648,7 +648,8 @@ function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = tru
                 $data = \customfield_file::display_item_data($data, $extradata);
                 break;
             case 'datetime':
-                $data = userdate($data, get_string('strfdateshortmonth', 'langconfig'));
+                require_once($CFG->dirroot.'/totara/customfield/field/datetime/field.class.php');
+                $data = \customfield_datetime::display_item_data($data);
                 break;
             case 'textarea':
                 require_once($CFG->dirroot.'/totara/customfield/field/textarea/field.class.php');
@@ -659,9 +660,11 @@ function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = tru
                 require_once($CFG->dirroot.'/totara/customfield/field/url/field.class.php');
                 $extradata = array('prefix' => $prefix, 'itemid' => $field->dataid);
                 $data = \customfield_url::display_item_data($data, $extradata);
+                break;
             case 'location':
                 require_once($CFG->dirroot.'/totara/customfield/field/location/field.class.php');
                 $extradata = array('prefix' => $prefix, 'itemid' => $field->dataid);
+                $data = json_decode($data);
                 $data = \customfield_location::display_item_data($data, $extradata);
                 break;
 

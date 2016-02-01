@@ -79,8 +79,7 @@ class enrol_totara_facetoface_external_testcase extends externallib_advanced_tes
             'facetoface' => $facetoface->id,
             'capacity' => 3,
             'allowoverbook' => 1,
-            'sessiondates' => array($sessiondate),
-            'datetimeknown' => '1'
+            'sessiondates' => array($sessiondate)
         );
         $facetofacegenerator->add_session($sessiondata);
 

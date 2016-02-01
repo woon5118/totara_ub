@@ -41,24 +41,16 @@ function facetoface_get_unmailed_reminders() {
             se.duration,
             se.normalcost,
             se.discountcost,
-            se.details,
-            se.datetimeknown
-        FROM
-            {facetoface_signups} su
-        INNER JOIN
-            {facetoface_signups_status} sus
-         ON su.id = sus.signupid
-        AND sus.superceded = 0
-        AND sus.statuscode = ?
-        JOIN
-            {facetoface_sessions} se
-         ON su.sessionid = se.id
-        JOIN
-            {facetoface} f
-         ON se.facetoface = f.id
+            se.details
+        FROM {facetoface_signups} su
+        INNER JOIN {facetoface_signups_status} sus ON su.id = sus.signupid AND sus.superceded = 0 AND sus.statuscode = ?
+        JOIN {facetoface_sessions} se ON su.sessionid = se.id
+        JOIN {facetoface} f ON se.facetoface = f.id
+        JOIN (
+            SELECT DISTINCT sessionid FROM {facetoface_sessions_dates}
+        ) dates ON dates.sessionid = se.id
         WHERE
             su.mailedreminder = 0
-        AND se.datetimeknown = 1
     ", array(MDL_F2F_STATUS_BOOKED));
 
     if ($submissions) {
@@ -88,8 +80,14 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user) {
         $session->sessiondates = $DB->get_records('facetoface_sessions_dates', array('sessionid' => $session->id), 'timestart');
     }
 
+    // Date is unknown, no calendar.
+    if (empty($session->sessiondate)) {
+        return null;
+    }
+
     // First, generate all the VEVENT blocks
     $VEVENTS = '';
+    $rooms = facetoface_get_session_rooms($session->id);
     foreach ($session->sessiondates as $date) {
         // Date that this representation of the calendar information was created -
         // we use the time the session was created
@@ -126,25 +124,27 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user) {
         }
         $DESCRIPTION = facetoface_ical_escape($icaldescription, true);
 
-        // Get the location data from custom fields if they exist
-        $room = facetoface_get_session_room($session->id);
+        // Get the location data from custom fields if they exist.
         $locationstring = '';
-        if (!empty($room->name)) {
-            $locationstring .= $room->name;
-        }
-        if (!empty($room->building)) {
-            if (!empty($locationstring)) {
-                $locationstring .= "\n";
-            }
-            $locationstring .= $room->building;
-        }
-        if (!empty($room->address)) {
-            if (!empty($locationstring)) {
-                $locationstring .= "\n";
-            }
-            $locationstring .= $room->address;
-        }
 
+        if (!empty($date->roomid) && isset($rooms[$date->roomid])) {
+            $room = $rooms[$date->roomid];
+            if (!empty($room->name)) {
+                $locationstring .= $room->name;
+            }
+            if (!empty($room->customfield_building)) {
+                if (!empty($locationstring)) {
+                    $locationstring .= "\n";
+                }
+                $locationstring .= $room->customfield_building;
+            }
+            if (!empty($room->customfield_location->address)) {
+                if (!empty($locationstring)) {
+                    $locationstring .= "\n";
+                }
+                $locationstring .= $room->customfield_location->address;
+            }
+        }
         // NOTE: Newlines are meant to be encoded with the literal sequence
         // '\n'. But evolution presents a single line text field for location,
         // and shows the newlines as [0x0A] junk. So we switch it for commas

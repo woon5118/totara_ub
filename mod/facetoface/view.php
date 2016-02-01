@@ -133,11 +133,14 @@ if (count($rooms) > 3 || !empty($roomid)) {
     $onlyrooms = $roomselect;
     $notonlytrooms = false;
     foreach ($rooms as $rid => $room) {
+
         $roomname = format_string($room->name);
         if ($roomname === '') {
             $roomname = get_string('notspecified', 'facetoface');
         }
         $roomdetails = array();
+        /*
+         * Todo: Set room building and address values to use the customfields before uncommenting the below code.
         $building = format_string($room->building);
         if ($building === '') {
             $building = get_string('notspecified', 'facetoface');
@@ -152,6 +155,7 @@ if (count($rooms) > 3 || !empty($roomid)) {
             $notonlytrooms = true;
         }
         $roomdetails[] = get_string('address', 'facetoface') . ': ' . $address;
+        */
         $roomdetails = implode(' - ', $roomdetails);
         $roomselect[sha1($roomdetails)][$roomdetails][$rid] = get_string('room', 'facetoface') . ': ' . $roomname;
         $onlyrooms[$rid] = $roomname;
@@ -159,6 +163,7 @@ if (count($rooms) > 3 || !empty($roomid)) {
     if (!$notonlytrooms) {
         // There are only N/As in buildings and rooms, let's just show room names.
         $roomselect = $onlyrooms;
+        $roomselect[$rid] = format_string($room->name);
     }
 
     echo $OUTPUT->single_select($PAGE->url, 'roomid', $roomselect, $roomid, null, null, array('label' => get_string('filterbyroom', 'facetoface')));
@@ -197,6 +202,7 @@ echo $OUTPUT->footer($course);
 function print_session_list($courseid, $facetoface, $sessions) {
     global $CFG, $USER, $DB, $OUTPUT, $PAGE;
 
+    /** @var mod_facetoface_renderer $f2f_renderer */
     $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
 
     $timenow = time();
@@ -234,21 +240,16 @@ function print_session_list($courseid, $facetoface, $sessions) {
             }
             $sessiondata->bookedsession = $bookedsession;
 
-            if ($session->roomid) {
-                $room = $DB->get_record('facetoface_room', array('id' => $session->roomid));
-                $sessiondata->room = $room;
-            }
-
             // Is session waitlisted
-            if (!$session->datetimeknown) {
+            if (!$session->cntdates ) {
                 $sessionwaitlisted = true;
             }
 
             // Check if session is started
-            if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
+            if ($session->cntdates  && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
                 $sessionstarted = true;
             }
-            elseif ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
+            elseif ($session->cntdates  && facetoface_has_session_started($session, $timenow)) {
                 $sessionstarted = true;
             }
 
@@ -271,8 +272,7 @@ function print_session_list($courseid, $facetoface, $sessions) {
     echo $OUTPUT->heading(get_string('upcomingsessions', 'facetoface'));
     if (empty($upcomingarray) && empty($upcomingtbdarray)) {
         print_string('noupcoming', 'facetoface');
-    }
-    else {
+    } else {
         $upcomingarray = array_merge($upcomingarray, $upcomingtbdarray);
         $reserveinfo = array();
         if (!empty($facetoface->managerreserve)) {
@@ -280,17 +280,27 @@ function print_session_list($courseid, $facetoface, $sessions) {
             $reserveinfo = facetoface_can_reserve_or_allocate($facetoface, $sessions, $context);
             echo html_writer::tag('p', get_string('lastreservation', 'mod_facetoface', $facetoface));
         }
-        echo $f2f_renderer->print_session_list_table($upcomingarray, $viewattendees, $editsessions, $displaytimezones, $reserveinfo);
+
+        echo $f2f_renderer->print_session_list_table(
+            $upcomingarray, $viewattendees, $editsessions, $displaytimezones, $reserveinfo, $PAGE->url
+        );
     }
 
     if ($editsessions) {
-        echo html_writer::tag('p', html_writer::link(new moodle_url('sessions.php', array('f' => $facetoface->id)), get_string('addsession', 'facetoface')));
+        echo html_writer::tag(
+            'p',
+            html_writer::link(
+                new moodle_url('sessions.php', array('f' => $facetoface->id)), get_string('addsession', 'facetoface')
+            )
+        );
     }
 
     // Previous sessions
     if (!empty($previousarray)) {
         echo $OUTPUT->heading(get_string('previoussessions', 'facetoface'));
-        echo $f2f_renderer->print_session_list_table($previousarray, $viewattendees, $editsessions, $displaytimezones);
+        echo $f2f_renderer->print_session_list_table(
+            $previousarray, $viewattendees, $editsessions, $displaytimezones, [], $PAGE->url
+        );
     }
 }
 

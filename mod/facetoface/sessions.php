@@ -20,13 +20,13 @@
  * @author Alastair Munro <alastair.munro@totaralms.com>
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
  * @author Francois Marier <francois@catalyst.net.nz>
- * @package modules
- * @subpackage facetoface
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package mod_facetoface
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once('lib.php');
-require_once('session_form.php');
+require_once('session_forms.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
@@ -36,8 +36,15 @@ $c = optional_param('c', 0, PARAM_INT); // copy session
 $ca = optional_param('ca', 0, PARAM_INT); // copy session
 $d = optional_param('d', 0, PARAM_INT); // delete session
 $confirm = optional_param('confirm', false, PARAM_BOOL); // delete confirmation
+$cntdates = optional_param('cntdates', 0, PARAM_INT); // Number of events to set.
 
 $session = null;
+
+// Offer one date for new sessions by default.
+if (!$s && $cntdates < 1) {
+    $cntdates = 1;
+}
+
 if ($id && !$s) {
     if (!$cm = get_coursemodule_from_id('facetoface', $id)) {
         print_error('error:incorrectcoursemoduleid', 'facetoface');
@@ -45,26 +52,11 @@ if ($id && !$s) {
     if (!$course = $DB->get_record('course', array('id' => $cm->course))) {
         print_error('error:coursemisconfigured', 'facetoface');
     }
-    if (!$facetoface =$DB->get_record('facetoface',array('id' => $cm->instance))) {
+    if (!$facetoface = $DB->get_record('facetoface',array('id' => $cm->instance))) {
         print_error('error:incorrectcoursemodule', 'facetoface');
     }
 } else if ($s) {
-     if (!$session = facetoface_get_session($s)) {
-         print_error('error:incorrectcoursemodulesession', 'facetoface');
-     }
-     if (!$facetoface = $DB->get_record('facetoface',array('id' => $session->facetoface))) {
-         print_error('error:incorrectfacetofaceid', 'facetoface');
-     }
-     if (!$course = $DB->get_record('course', array('id'=> $facetoface->course))) {
-         print_error('error:coursemisconfigured', 'facetoface');
-     }
-     if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
-         print_error('error:incorrectcoursemoduleid', 'facetoface');
-     }
-     if (!$session->roomid == 0 && !$sroom = $DB->get_record('facetoface_room', array('id' => $session->roomid))) {
-        print_error('error:incorrectroomid', 'facetoface');
-     }
-
+    list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 } else {
     if (!$facetoface = $DB->get_record('facetoface', array('id' => $f))) {
         print_error('error:incorrectfacetofaceid', 'facetoface');
@@ -83,25 +75,31 @@ require_capability('mod/facetoface:editsessions', $context);
 
 $errorstr = '';
 
-
 local_js(array(
     TOTARA_JS_DIALOG,
     TOTARA_JS_TREEVIEW
 ));
 $PAGE->set_url('/mod/facetoface/sessions.php', array('f' => $f));
-$PAGE->requires->string_for_js('save', 'totara_core');
-$PAGE->requires->string_for_js('error:addpdroom-dialognotselected', 'totara_core');
-$PAGE->requires->strings_for_js(array('cancel', 'ok'), 'moodle');
-$PAGE->requires->strings_for_js(array('chooseroom', 'pdroomcapacityexceeded'), 'facetoface');
+$PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
+$PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
+$PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
+    'createnewasset', 'createnewroom'), 'facetoface');
 
-$display_selected = dialog_display_currently_selected(get_string('selected', 'facetoface'), 'addpdroom-dialog');
-$jsconfig = array('sessionid' => $s, 'display_selected_item' => $display_selected, 'facetofaceid' => $facetoface->id);
+$jsconfig = array('sessionid' => $s, 'can_edit' => 'true', 'facetofaceid' => $facetoface->id);
+if (!empty($session)) {
+    $cntdates = max($cntdates, $session->cntdates);
+}
+
+for ($offset = 0; $offset < $cntdates; $offset++) {
+    $display_selected = dialog_display_currently_selected(get_string('selected', 'facetoface'), "selectroom{$offset}-dialog");
+    $jsconfig['display_selected_item' . $offset] = $display_selected;
+}
+
 $jsmodule = array(
     'name' => 'totara_f2f_room',
     'fullpath' => '/mod/facetoface/sessions.js',
     'requires' => array('json', 'totara_core'));
 $PAGE->requires->js_init_call('M.totara_f2f_room.init', array($jsconfig), false, $jsmodule);
-$PAGE->requires->js_init_call('M.facetoface_datelinkage.init', null, false, $jsmodule);
 
 $returnurl = "view.php?f=$facetoface->id";
 
@@ -142,13 +140,14 @@ $sessionid = isset($session->id) ? $session->id : 0;
 $canconfigurecancellation = has_capability('mod/facetoface:configurecancellation', $context);
 
 $defaulttimezone = '99';
+
 if (!isset($session)) {
     $sessiondata = new stdClass();
     $sessiondata->id = 0;
     $sessiondata->allowcancellations = $facetoface->allowcancellationsdefault;
     $sessiondata->cancellationcutoff = $facetoface->cancellationscutoffdefault;
+    $sessiondata->cntdates = $cntdates;
     $nbdays = 1;
-
 } else {
     if (!empty($session->sessiondates[0]->sessiontimezone) and $session->sessiondates[0]->sessiontimezone != '99') {
         $defaulttimezone = core_date::normalise_timezone($session->sessiondates[0]->sessiontimezone);
@@ -162,17 +161,16 @@ if (!isset($session)) {
         unset($sessiondata->sessiondates);
     }
 
-    if (isset($sessiondata->roomid)) {
-        unset($sessiondata->roomid);
-    }
-
     $sessiondata->detailsformat = FORMAT_HTML;
     $editoroptions = $TEXTAREA_OPTIONS;
     $editoroptions['context'] = $context;
     $sessiondata = file_prepare_standard_editor($sessiondata, 'details', $editoroptions, $editoroptions['context'],
         'mod_facetoface', 'session', $session->id);
 
-    $sessiondata->datetimeknown = (int)(1 == $session->datetimeknown);
+    // Let form know how many dates to process.
+    if ($cntdates > $sessiondata->cntdates) {
+        $sessiondata->cntdates = $cntdates;
+    }
 
     $nbdays = count($session->sessiondates);
     if ($session->sessiondates) {
@@ -182,6 +180,9 @@ if (!isset($session)) {
             $timestartfield = "timestart[$i]";
             $timefinishfield = "timefinish[$i]";
             $timezonefield = "sessiontimezone[$i]";
+            $roomidfield = "roomid[$i]";
+            $roomcapacityfield = "roomcapacity[$i]";
+            $assetsfield = "assetids[$i]";
 
             if ($date->sessiontimezone === '') {
                 $date->sessiontimezone = '99';
@@ -193,6 +194,9 @@ if (!isset($session)) {
             $sessiondata->$timestartfield = $date->timestart;
             $sessiondata->$timefinishfield = $date->timefinish;
             $sessiondata->$timezonefield = $date->sessiontimezone;
+            $sessiondata->$roomidfield = $date->roomid;
+            $sessiondata->$roomcapacityfield = $date->roomid;
+            $sessiondata->$assetsfield = $date->assetids;
             $i++;
         }
     }
@@ -246,38 +250,31 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
     //check dates and calculate total duration
     $sessiondates = array();
-    if ($fromform->datetimeknown === '1') {
-        $fromform->duration = 0;
-    }
-    for ($i = 0; $i < $fromform->date_repeats; $i++) {
+    $fromform->duration = 0;
+    for ($i = 0; $i < $fromform->cntdates; $i++) {
         if (!empty($fromform->datedelete[$i])) {
             continue; // skip this date
         }
-        $timestartfield = "timestart[$i]";
-        $timefinishfield = "timefinish[$i]";
-        if (!empty($fromform->$timestartfield) && !empty($fromform->$timefinishfield)) {
+        if (!empty($fromform->timestart[$i]) && !empty($fromform->timefinish[$i])) {
             $date = new stdClass();
             $date->sessiontimezone = $fromform->sessiontimezone[$i];
-            $date->timestart = $fromform->$timestartfield;
-            $date->timefinish = $fromform->$timefinishfield;
-            if ($fromform->datetimeknown === '1') {
-                $fromform->duration += ($date->timefinish - $date->timestart);
-            }
+            $date->timestart = $fromform->timestart[$i];
+            $date->timefinish = $fromform->timefinish[$i];
+            $date->roomid = $fromform->roomid[$i];
+            $date->assetids = !empty($fromform->assetids[$i]) ? explode(',', $fromform->assetids[$i]) : array();
+            $fromform->duration += ($date->timefinish - $date->timestart);
             $sessiondates[] = $date;
         }
     }
 
     $todb = new stdClass();
     $todb->facetoface = $facetoface->id;
-    $todb->datetimeknown = $fromform->datetimeknown;
     $todb->capacity = $fromform->capacity;
     $todb->allowoverbook = $fromform->allowoverbook;
     $todb->waitlisteveryone = $fromform->waitlisteveryone;
-    $todb->duration = $fromform->duration;
     $todb->normalcost = $fromform->normalcost;
     $todb->discountcost = $fromform->discountcost;
     $todb->usermodified = $USER->id;
-    $todb->roomid = (isset($session->roomid)) ? $session->roomid : 0;
     $todb->availablesignupnote = $fromform->availablesignupnote;
 
     // Sign-Up fields added.
@@ -330,21 +327,12 @@ if ($fromform = $mform->get_data()) { // Form submitted
             print_error('error:couldnotupdatesession', 'facetoface', $returnurl);
         }
     } else {
-        // If we are duplicating a session with a custom room, clear the roomid.
-        if ($c && !empty($fromform->customroom)) {
-            $todb->roomid = 0;
-        }
-
         // Create or Duplicate the session.
         if (!$sessionid = facetoface_add_session($todb, $sessiondates)) {
             print_error('error:couldnotaddsession', 'facetoface', $returnurl);
         }
     }
 
-    // Save session room info.
-    if (!facetoface_save_session_room($sessionid, $fromform)) {
-        print_error('error:couldnotsaveroom', 'facetoface');
-    }
     $fromform->id = $sessionid;
     customfield_save_data($fromform, 'facetofacesession', 'facetoface_session');
 
@@ -359,11 +347,8 @@ if ($fromform = $mform->get_data()) { // Form submitted
         // Now that we have updated the session record fetch the rest of the data we need.
         facetoface_update_attendees($session);
 
-        // Get datetimeknown value from form.
-        $datetimeknown = $fromform->datetimeknown == 1;
-
         // Send any necessary datetime change notifications but only if date/time is known.
-        if ($datetimeknown && facetoface_session_dates_check($olddates, $sessiondates)) {
+        if (facetoface_session_dates_check($olddates, $sessiondates)) {
             $attendees = facetoface_get_attendees($session->id);
             foreach ($attendees as $user) {
                 facetoface_send_datetime_change_notice($facetoface, $session, $user->id);

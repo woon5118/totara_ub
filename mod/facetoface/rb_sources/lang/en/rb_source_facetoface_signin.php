@@ -22,7 +22,7 @@
  */
 
 // Lang file for mod/facetoface/rb_sources/rb_source_facetoface_signin.php
-$string['sourcetitle'] = 'Face-to-face signin';
+$string['sourcetitle'] = 'Sign in sheet';
 
 // Columns.
 $string['address'] = 'Address';

@@ -22,7 +22,207 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+
 abstract class rb_facetoface_base_source extends rb_base_source {
+    /**
+     * Add common facetoface columns
+     * Requires 'sessions' and 'facetoface' joins
+     * @param array $columnoptions
+     */
+    public function add_facetoface_common_to_columns(&$columnoptions) {
+                $columnoptions[] = new rb_column_option(
+            'facetoface',
+            'facetofaceid',
+            get_string('ftfid', 'rb_source_facetoface_room_assignments'),
+            'facetoface.id',
+            array(
+                'joins' => array('facetoface'),
+                'dbdatatype' => 'integer'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'facetoface',
+            'name',
+            get_string('ftfname', 'rb_source_facetoface_sessions'),
+            'facetoface.name',
+            array(
+                'joins' => array('facetoface')
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'facetoface',
+            'namelink',
+            get_string('ftfnamelink', 'rb_source_facetoface_sessions'),
+            "facetoface.name",
+            array(
+                'joins' => array('facetoface', 'sessions'),
+                'displayfunc' => 'link_f2f',
+                'defaultheading' => get_string('ftfname', 'rb_source_facetoface_sessions'),
+                'extrafields' => array('activity_id' => 'sessions.facetoface'),
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'facetoface',
+            'approvaltype',
+            get_string('f2f_approvaltype', 'rb_source_facetoface_summary'),
+            "facetoface.approvaltype",
+            array(
+                'joins' => 'facetoface',
+                'displayfunc' => 'f2f_approval',
+                'defaultheading' => get_string('approvaltype', 'rb_source_facetoface_sessions'),
+                'extrafields' => array(
+                    'approvalrole' => 'facetoface.approvalrole'
+                )
+            )
+        );
+    }
+
+   /**
+     * Add common facetoface session columns
+     * Requires 'sessions' join and custom named join to {facetoface_sessions_dates} (by default 'base')
+     * @param array $columnoptions
+     * @param string $sessiondatejoin Join that provides {facetoface_sessions_dates}
+     */
+    public function add_session_common_to_columns(&$columnoptions, $sessiondatejoin = 'base') {
+        global $CFG;
+
+        $intimezone = '';
+        if (!empty($CFG->facetoface_displaysessiontimezones)) {
+            $intimezone = '_in_timezone';
+        }
+
+        $columnoptions[] = new rb_column_option(
+            'facetoface',
+            'sessionid',
+            get_string('sessionid', 'rb_source_facetoface_room_assignments'),
+            'sessions.id',
+            array(
+                'joins' => 'sessions',
+                'dbdatatype' => 'integer'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'capacity',
+            get_string('sesscapacity', 'rb_source_facetoface_sessions'),
+            'sessions.capacity',
+            array(
+                'joins' => 'sessions',
+                'dbdatatype' => 'integer'
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'date',
+            'sessionstartdate',
+            get_string('sessstartdatetime', 'rb_source_facetoface_room_assignments'),
+            "{$sessiondatejoin}.timestart",
+            array(
+                'joins' => array($sessiondatejoin),
+                'extrafields' => array('timezone' => "{$sessiondatejoin}.sessiontimezone"),
+                'displayfunc' => 'nice_datetime' . $intimezone,
+                'dbdatatype' => 'timestamp'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'date',
+            'sessionfinishdate',
+            get_string('sessfinishdatetime', 'rb_source_facetoface_room_assignments'),
+            "{$sessiondatejoin}.timefinish",
+            array(
+                'joins' => array($sessiondatejoin),
+                'extrafields' => array('timezone' => "{$sessiondatejoin}.sessiontimezone"),
+                'displayfunc' => 'nice_datetime' . $intimezone,
+                'dbdatatype' => 'timestamp'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'numattendees',
+            get_string('numattendees', 'rb_source_facetoface_sessions'),
+            'attendees.number',
+            array(
+                'joins' => 'attendees',
+                'dbdatatype' => 'integer'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'numattendeeslink',
+            get_string('numattendeeslink', 'rb_source_facetoface_summary'),
+            'attendees.number',
+            array(
+                'joins' => array('attendees', 'sessions'),
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'numattendeeslink',
+                'defaultheading' => get_string('numattendees', 'rb_source_facetoface_sessions'),
+                'extrafields' => array(
+                    'session' => 'sessions.id'
+                )
+            )
+        );
+    }
+
+    /**
+     * Provides 'sessions', 'attendess', 'facetoface', 'room' joins to join list
+     * Requires join that provides relevant "sessionid" field (by default used 'base')
+     * @param array $joinlist
+     * @param string $sessiondatejoin join to {facetoface_sessions_dates}
+     */
+    public function add_session_common_to_joinlist(&$joinlist, $sessiondatejoin = 'base') {
+        $global_restriction_join_su = $this->get_global_report_restriction_join('su', 'userid');
+
+        $joinlist[] = new rb_join(
+            'sessions',
+            'INNER',
+            '{facetoface_sessions}',
+            "(sessions.id = {$sessiondatejoin}.sessionid)",
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            $sessiondatejoin
+        );
+
+        $joinlist[] = new rb_join(
+            'attendees',
+            'LEFT',
+            "(SELECT su.sessionid, count(ss.id) AS number
+                FROM {facetoface_signups} su
+                {$global_restriction_join_su}
+                JOIN {facetoface_signups_status} ss
+                    ON su.id = ss.signupid
+                WHERE ss.superceded=0 AND ss.statuscode >= " . MDL_F2F_STATUS_APPROVED ."
+                GROUP BY su.sessionid)",
+            "attendees.sessionid = {$sessiondatejoin}.sessionid",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            $sessiondatejoin
+        );
+
+        $joinlist[] = new rb_join(
+            'facetoface',
+            'LEFT',
+            '{facetoface}',
+            '(facetoface.id = sessions.facetoface)',
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            'sessions'
+        );
+
+        $joinlist[] = new rb_join(
+            'room',
+            'LEFT',
+            '{facetoface_room}',
+            "room.id = {$sessiondatejoin}.roomid",
+            REPORT_BUILDER_RELATION_MANY_TO_ONE,
+            $sessiondatejoin
+        );
+    }
+
     /*
      * Adds any facetoface session roles to the $joinlist array
      *
@@ -30,7 +230,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
      *                         Passed by reference and updated if
      *                         any session roles exist
      */
-    function add_facetoface_session_roles_to_joinlist(&$joinlist, $sessionidfield = 'base.sessionid') {
+    public function add_facetoface_session_roles_to_joinlist(&$joinlist, $sessionidfield = 'base.sessionid') {
         global $DB;
         // add joins for the following roles as "session_role_X" and
         // "session_role_user_X"
@@ -135,6 +335,84 @@ abstract class rb_facetoface_base_source extends rb_base_source {
     }
 
     /**
+     * Add session booking and overall status columns
+     * Requires 'sessions' join, and 'cntbookings' join provided by @see rb_facetoface_base_source::add_session_status_to_joinlist()
+     * @param array $columnoptions
+     * @param string $join Join name that provide {facetoface_sessions_dates}
+     */
+    public function add_session_status_to_columns(&$columnoptions, $join = 'base') {
+        $now = time();
+            // TODO: TL-8187 Cancellation status ("Face-to-face cancellations" specification).
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'overallstatus',
+            get_string('overallstatus', 'rb_source_facetoface_summary'),
+
+            "( CASE WHEN cancelledstatus <> 0 THEN 'cancelled'
+                    WHEN timestart IS NULL OR timestart = 0 OR timestart > {$now} THEN 'upcoming'
+                    WHEN {$now} > timestart AND {$now} < timefinish THEN 'started'
+                    WHEN {$now} > timefinish THEN 'ended'
+                    ELSE NULL END
+             )",
+            array(
+                'joins' => array($join, 'sessions'),
+                'displayfunc' => 'overallstatus',
+                'extrafields' => array(
+                    'timestart' => "{$join}.timestart",
+                    'timefinish' => "{$join}.timefinish",
+                    'timezone' => "{$join}.sessiontimezone",
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'bookingstatus',
+            get_string('bookingstatus', 'rb_source_facetoface_summary'),
+            "(CASE WHEN cntsignups < sessions.mincapacity THEN 'underbooked'
+                   WHEN cntsignups < sessions.capacity THEN 'available'
+                   WHEN cntsignups = sessions.capacity THEN 'fullybooked'
+                   WHEN cntsignups > sessions.capacity THEN 'overbooked'
+                   ELSE NULL END)",
+            array(
+                'joins' => array('cntbookings', 'sessions'),
+                'displayfunc' => 'bookingstatus',
+                'dbdatatype' => 'char',
+                'extrafields' => array(
+                    'mincapacity' => 'sessions.mincapacity',
+                    'capacity' => 'sessions.capacity'
+                )
+            )
+        );
+    }
+
+    /**
+     * Add joins required by @see rb_facetoface_base_source::add_session_status_to_columns()
+     * Requires 'sessions' join
+     * @param array $joinlist
+     * @param string $sessionidfield
+     */
+    public function add_session_status_to_joinlist(&$joinlist, $sessionidfield = 'sessions.id') {
+        // No global restrictions here because status is absolute (e.g if it is overbooked then it is overbooked, even if user
+        // cannot see all participants.
+        $joinlist[] =  new rb_join(
+            'cntbookings',
+            'LEFT',
+            "(SELECT s.id sessionid, COUNT(ss.id) cntsignups
+                FROM {facetoface_sessions} s
+                LEFT JOIN {facetoface_signups} su ON (su.sessionid = s.id)
+                LEFT JOIN {facetoface_signups_status} ss
+                    ON (su.id = ss.signupid AND ss.superceded = 0 AND ss.statuscode >= " . MDL_F2F_STATUS_BOOKED . ")
+                WHERE 1=1
+                GROUP BY s.id)",
+
+            "cntbookings.sessionid = {$sessionidfield}",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            'sessions'
+        );
+    }
+
+    /**
      * Return list of user names linked to their profiles from string of concatenated user names, their ids,
      * and length of every name with id
      * @param string $name Concatenated list of names, ids, and lengths
@@ -220,5 +498,508 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             return array();
         }
         return $sessionroles;
+    }
+
+    /**
+     * Convert a f2f approvaltype into a human readable string
+     *
+     * @param int $approvaltype
+     * @param object $row
+     * @return string
+     */
+    function rb_display_f2f_approval($approvaltype, $row) {
+        return facetoface_get_approvaltype_string($approvaltype, $row->approvalrole);
+    }
+
+    /**
+     * Room name linked to room details
+     *
+     * @param string $roomname
+     * @param stdClass $row
+     * @param bool $isexport
+     */
+    public function rb_display_room_name_link($roomname, $row, $isexport = false) {
+        if ($isexport) {
+            return $roomname;
+        }
+        return html_writer::link(
+            new moodle_url('/mod/facetoface/room.php', array('r' => $row->roomid)),
+            $roomname
+        );
+    }
+
+    /**
+     * Room name linked to room details
+     *
+     * @param string $roomname
+     * @param stdClass $row
+     * @param bool $isexport
+     */
+    public function rb_display_asset_name_link($roomname, $row, $isexport = false) {
+        if ($isexport) {
+            return $roomname;
+        }
+        return html_writer::link(
+            new moodle_url('/mod/facetoface/asset.php', array('id' => $row->assetid)),
+            $roomname
+        );
+    }
+
+    /**
+     * Display opposite to rb_display_yes_no. E.g. zero value will be 'yes', and non-zero 'no'
+     *
+     * @param scalar $no
+     * @param stdClass $row
+     * @param bool $isexport
+     */
+    public function rb_display_no_yes($no, $row, $isexport = false) {
+        return ($no) ? get_string('no') : get_string('yes');
+    }
+
+    /**
+     * Display if room allows scheduling conflicts
+     * @param string $type
+     * @param stdClass $row
+     * @param bool $isexport
+     */
+    public function rb_display_conflicts($type, $row, $isexport = false) {
+        return ($type == 'external') ? get_string('yes') : get_string('no');
+    }
+
+    /**
+     * Display count of attendees and link to session attendees report page.
+     *
+     * @param string $status
+     * @param stdClass $row
+     * @param bool $isexport
+     */
+    public function rb_display_overallstatus($status, $row, $isexport = false) {
+        switch($status) {
+            case 'cancelled':
+                $str = get_string('status:cancelled', 'rb_source_facetoface_summary');
+                $class = 'cancelled';
+                break;
+            case 'upcoming':
+                $str = get_string('status:upcoming', 'rb_source_facetoface_summary');
+                $class = 'upcoming';
+                break;
+            case 'started':
+                $str = get_string('status:started', 'rb_source_facetoface_summary');
+                $class = 'started';
+                break;
+            case 'ended':
+                $str = get_string('status:ended', 'rb_source_facetoface_summary');
+                $class = 'ended';
+                break;
+            default:
+                $str = get_string('status:notavailable', 'rb_source_facetoface_summary');
+                $class = 'notavailable';
+        }
+
+        if ($isexport) {
+            return $str;
+        }
+        return html_writer::div(html_writer::span($str), $class);
+    }
+
+    /**
+     * Display count of attendees and link to session attendees report page.
+     *
+     * @param int $cntattendees
+     * @param stdClass $row
+     * @param bool $isexport
+     */
+    public function rb_display_numattendeeslink($cntattendees, $row, $isexport = false) {
+        if ($isexport) {
+            return $cntattendees;
+        }
+        return html_writer::link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $row->session)), $cntattendees);
+    }
+
+    /**
+     * Display booking status according number of bookings and capacities
+     *
+     * @param string $status
+     * @param stdClass $row
+     * @param bool $isexport
+     * @return type
+     */
+    public function rb_display_bookingstatus($status, $row, $isexport = false){
+        switch($status) {
+            case 'underbooked':
+                $str = get_string('status:underbooked', 'rb_source_facetoface_summary');
+                $class = 'underbooked';
+                break;
+            case 'available':
+                $str = get_string('status:available', 'rb_source_facetoface_summary');
+            $class = 'available';
+                break;
+            case 'fullybooked':
+                $str = get_string('status:fullybooked', 'rb_source_facetoface_summary');
+                $class = 'fullybooked';
+                break;
+            case 'overbooked':
+                $str = get_string('status:overbooked', 'rb_source_facetoface_summary');
+                $class = 'overbooked';
+                break;
+            default:
+                $str = get_string('status:notavailable', 'rb_source_facetoface_summary');
+                $class = 'notavailable';
+        }
+
+        if ($isexport) {
+            return $str;
+        }
+        return html_writer::div(html_writer::span($str), $class);
+    }
+
+    /**
+     * Get currently supported booking status filter options
+     * @return array
+     */
+    protected static function get_bookingstatus_options() {
+        $statusopts = array(
+            'underbooked' => get_string('status:underbooked', 'rb_source_facetoface_summary'),
+            'available' => get_string('status:available', 'rb_source_facetoface_summary'),
+            'fullybooked' => get_string('status:fullybooked', 'rb_source_facetoface_summary'),
+            'overbooked' => get_string('status:overbooked', 'rb_source_facetoface_summary'),
+        );
+        return $statusopts;
+    }
+
+    /**
+     * Filter by session overall status
+     * @return array of options
+     */
+    public function rb_filter_overallstatus() {
+        $statusopts = array(
+            'upcoming' => get_string('status:upcoming', 'rb_source_facetoface_summary'),
+            'cancelled' => get_string('status:cancelled', 'rb_source_facetoface_summary'),
+            'started' => get_string('status:started', 'rb_source_facetoface_summary'),
+            'ended' => get_string('status:ended', 'rb_source_facetoface_summary'),
+        );
+        return $statusopts;
+    }
+
+    /**
+     * Add common room column options (excluding custom fields)
+     *
+     * @param array $columnoptions
+     * @param string $join alias of join or table that provides room fields
+     */
+    protected function add_rooms_fields_to_columns(array &$columnoptions, $join = 'room') {
+        $columnoptions[] = new rb_column_option(
+            'room',
+            'id',
+            get_string('roomid', 'rb_source_facetoface_rooms'),
+            "$join.id",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'integer',
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'room',
+            'name',
+            get_string('name', 'rb_source_facetoface_rooms'),
+            "$join.name",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'text'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'room',
+            'namelink',
+            get_string('namelink', 'rb_source_facetoface_rooms'),
+            "$join.name",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'text',
+                'displayfunc' => 'room_name_link',
+                'defaultheading' => get_string('name', 'rb_source_facetoface_rooms'),
+                'extrafields' => array('roomid' => "$join.id")
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'room',
+            'published',
+            get_string('published', 'rb_source_facetoface_rooms'),
+            "CASE WHEN $join.custom > 0 THEN 1 ELSE 0 END",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'no_yes',
+            )
+        );
+
+        $this->usedcomponents[] = 'mod_facetoface';
+        $columnoptions[] = new rb_column_option(
+            'room',
+            'description',
+            get_string('description', 'rb_source_facetoface_rooms'),
+            "$join.description",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'text',
+                'displayfunc' => 'room_description',
+                'extrafields' => array('roomid' => "$join.id")
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'room',
+            'visible',
+            get_string('visible', 'rb_source_facetoface_rooms'),
+            "$join.hidden",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'no_yes'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'room',
+            'capacity',
+            get_string('capacity', 'rb_source_facetoface_rooms'),
+            "$join.capacity",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'integer',
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'room',
+            'allowconflicts',
+            get_string('allowconflicts', 'rb_source_facetoface_rooms'),
+            "CASE WHEN $join.type = 'external' THEN 'external' ELSE 'internal' END",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'text',
+                'displayfunc' => 'conflicts',
+            )
+        );
+    }
+
+    /**
+     * Add common room filter options (excluding custom fields)
+     * @param array $filteroptions
+     */
+    protected function add_rooms_fields_to_filters(array &$filteroptions) {
+        $filteroptions[] = new rb_filter_option(
+            'room',
+            'id',
+            get_string('roomid', 'rb_source_facetoface_rooms'),
+            'number'
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'room',
+            'name',
+            get_string('name', 'rb_source_facetoface_rooms'),
+            'text'
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'room',
+            'published',
+            get_string('published', 'rb_source_facetoface_rooms'),
+            'select',
+            array(
+                'simplemode' => true,
+                'selectchoices' => array('0' => get_string('yes'), '1' => get_string('no'))
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'room',
+            'description',
+            get_string('description', 'rb_source_facetoface_rooms'),
+            'text'
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'room',
+            'visible',
+            get_string('visible', 'rb_source_facetoface_rooms'),
+            'select',
+            array(
+                'simplemode' => true,
+                'selectchoices' => array('0' => get_string('yes'), '1' => get_string('no'))
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'room',
+            'allowconflicts',
+            get_string('allowconflicts', 'rb_source_facetoface_rooms'),
+            'select',
+            array(
+                'simplemode' => true,
+                'selectchoices' => array('external' => get_string('yes'), 'internal' => get_string('no'))
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'room',
+            'capacity',
+            get_string('capacity', 'rb_source_facetoface_rooms'),
+            'number'
+        );
+    }
+
+    /**
+     * Add common assets column options (excluding custom fields)
+     * @param array $columnoptions
+     * @param string $join alias of join or table that provides assets fields
+     */
+    protected function add_assets_fields_to_columns(array &$columnoptions, $join = 'asset') {
+        $columnoptions[] = new rb_column_option(
+            'asset',
+            'id',
+            get_string('assetid', 'rb_source_facetoface_asset'),
+            "$join.id",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'integer'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'asset',
+            'name',
+            get_string('name', 'rb_source_facetoface_asset'),
+            "$join.name",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'text'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'asset',
+            'namelink',
+            get_string('namelink', 'rb_source_facetoface_asset'),
+            "$join.name",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'text',
+                'displayfunc' => 'asset_name_link',
+                'defaultheading' => get_string('name', 'rb_source_facetoface_asset'),
+                'extrafields' => array('assetid' => "$join.id")
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'asset',
+            'published',
+            get_string('published', 'rb_source_facetoface_asset'),
+            "CASE WHEN $join.custom > 0 THEN 1 ELSE 0 END",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'no_yes',
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'asset',
+            'description',
+            get_string('description', 'rb_source_facetoface_asset'),
+            "$join.description",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'text'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'asset',
+            'visible',
+            get_string('visible', 'rb_source_facetoface_asset'),
+            "$join.hidden",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'no_yes'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'asset',
+            'allowconflicts',
+            get_string('allowconflicts', 'rb_source_facetoface_asset'),
+            "CASE WHEN $join.type = 'external' THEN 'external' ELSE 'internal' END",
+            array(
+                'joins' => $join,
+                'dbdatatype' => 'text',
+                'displayfunc' => 'conflicts',
+            )
+        );
+    }
+
+    /**
+     * Add common room filter options (excluding custom fields)
+     * @param array $filteroptions
+     */
+    protected function add_assets_fields_to_filters(array &$filteroptions) {
+        $filteroptions[] = new rb_filter_option(
+            'asset',
+            'id',
+            get_string('assetid', 'rb_source_facetoface_asset'),
+            'number'
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'asset',
+            'name',
+            get_string('name', 'rb_source_facetoface_asset'),
+            'text'
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'asset',
+            'published',
+            get_string('published', 'rb_source_facetoface_asset'),
+            'select',
+            array(
+                'simplemode' => true,
+                'selectchoices' => array('0' => get_string('yes'), '1' => get_string('no'))
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'asset',
+            'description',
+            get_string('description', 'rb_source_facetoface_asset'),
+            'text'
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'asset',
+            'visible',
+            get_string('visible', 'rb_source_facetoface_asset'),
+            'select',
+            array(
+                'simplemode' => true,
+                'selectchoices' => array('0' => get_string('yes'), '1' => get_string('no'))
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'asset',
+            'allowconflicts',
+            get_string('allowconflicts', 'rb_source_facetoface_asset'),
+            'select',
+            array(
+                'simplemode' => true,
+                'selectchoices' => array('external' => get_string('yes'), 'internal' => get_string('no'))
+            )
+        );
     }
 }

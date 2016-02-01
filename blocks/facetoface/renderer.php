@@ -81,7 +81,7 @@ class block_facetoface_renderer extends plugin_renderer_base {
                 $daterow->cells[] = format_string($location);
             }
 
-            if ($date->datetimeknown) {
+            if (!empty($date->alldates)) {
                 $sessiondates = $date->alldates;
                 $datestrings = '';
                 foreach ($sessiondates as $sessiondate) {

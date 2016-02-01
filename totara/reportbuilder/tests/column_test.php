@@ -211,11 +211,11 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
     protected $f2f_session_data = array(
         'id' => 1, 'facetoface' => 1, 'capacity' => 10, 'details' => 'details', 'duration' => 60,
-        'datetimeknown' => 1, 'normalcost' => 100, 'discountcost' => 90, 'usermodified' => 2, 'roomid' => 1
+        'normalcost' => 100, 'discountcost' => 90, 'usermodified' => 2
     );
 
     protected $f2f_session_dates_data = array(
-        'id' => 1, 'sessionid' => 1, 'timestart' => 1140519599, 'timefinish' => 114051960,
+        'id' => 1, 'sessionid' => 1, 'timestart' => 1140519599, 'timefinish' => 114051960, 'roomid' => 1
     );
 
     protected $f2f_signups_data = array(
@@ -229,6 +229,10 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     protected $f2f_session_roles_data = array(
         'id' => 1, 'sessionid' => 1, 'roleid' => 1, 'userid' => 2,
     );
+
+    protected $f2f_asset_data = array('id' => 1, 'name' => 'Asset');
+
+    protected $f2f_asset_dates = array('id' => 1, 'assetid' => 1, 'sessionsdateid' => 1);
 
     protected $f2f_interest_data = array(
         'id' => 1, 'facetoface' => 1, 'userid' => 2, 'timedeclared' => 114051960, 'reason' => 'A good reason.'
@@ -620,6 +624,8 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'facetoface_signups' => array($this->f2f_signups_data),
             'facetoface_signups_status' => array($this->f2f_signup_status_data),
             'facetoface_session_roles' => array($this->f2f_session_roles_data),
+            'facetoface_asset' => array($this->f2f_asset_data),
+            'facetoface_asset_dates' => array($this->f2f_asset_dates),
             'facetoface_interest' => array($this->f2f_interest_data),
             'scorm_scoes' => array($this->scorm_scoes_data),
             'scorm_scoes_track' => $this->scorm_scoes_track_data,

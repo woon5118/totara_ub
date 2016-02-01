@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2016 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,33 +17,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Eugene Venter <eugene@catalyst.net.nz>
- * @package totara
- * @subpackage facetoface
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package mod_facetoface
  */
 
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
-require_once($CFG->dirroot.'/mod/facetoface/room/room_form.php');
+require_once($CFG->dirroot . '/mod/facetoface/room/lib.php');
+
+$id = optional_param('id', 0, PARAM_INT);   // Room id.
 
 $system_context = context_system::instance();
-
 require_login(0, false);
+require_sesskey();
 require_capability('moodle/site:config', $system_context);
 
 // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
 send_headers('text/html; charset=utf-8', false);
 
 $PAGE->set_context($system_context);
+$PAGE->set_url('/mod/facetoface/room/ajax/room_edit.php');
 
-$id = optional_param('id', 0, PARAM_INT);   // roomid
+$form = process_room_form(
+    $id,
+    function($room) {
+        echo json_encode(array('id' => $room->id, 'name' => $room->name, 'capacity' => $room->capacity, 'custom' => $room->custom));
+        exit();
+    },
+    null,
+    array('noactionbuttons' => true, 'custom' => true)
+);
 
-$form = new f2f_room_form(null, null, 'post', '', null, true, 'ajaxmform');
-
-if (!empty($id) && $room = $DB->get_record('facetoface_room', array('id' => $id))) {
-    $form->set_data($room);
-}
-
-echo '<div id="f2froomform">';
 $form->display();
-echo '</div>';
-
+echo $PAGE->requires->get_end_code(false);

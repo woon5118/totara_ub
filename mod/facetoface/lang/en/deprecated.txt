@@ -13,6 +13,8 @@ confirmmanageremailaddressquestion,mod_facetoface
 confirmmanageremailinstruction1,mod_facetoface
 confirmmanageremailinstruction2,mod_facetoface
 costheading,mod_facetoface
+datetimeknownhinttext,mod_facetoface
+duration_help,mod_facetoface
 error:couldnotupdatemanageremail,mod_facetoface
 error:emptymanageremail,mod_facetoface
 error:nomanageremail,mod_facetoface
@@ -32,6 +34,8 @@ newmanageremailaddress,mod_facetoface
 nositenotices,mod_facetoface
 noticedeleteconfirm,mod_facetoface
 noticetext,mod_facetoface
+sessiondatetimeknown,mod_facetoface
+sessiondatetimeknown_help,mod_facetoface
 setting:addchangemanageremail,mod_facetoface
 setting:addchangemanageremaildefault,mod_facetoface
 setting:addchangemanageremail_caption,mod_facetoface
@@ -46,4 +50,3 @@ setting:manageraddressformatreadabledefault,mod_facetoface
 setting:sitenotices,mod_facetoface
 setting:sitenoticeshere,mod_facetoface
 sitenoticesheading,mod_facetoface
-

@@ -182,7 +182,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
      * @param bool $force Option "Do not sign up" will not be displayed if true
      */
     private function enrol_totara_facetoface_addsessrows($mform, $sessions, $facetoface, $force = false) {
-        global $DB;
+        global $DB, $PAGE;
 
         $mform->addElement('html', html_writer::start_tag('table'));
         $mform->addElement('html', html_writer::start_tag('thead'));
@@ -214,7 +214,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
             $mform->addElement('html', html_writer::end_tag('td'));
 
             // Dates/times.
-            if ($session->datetimeknown) {
+            if ($session->cntdates) {
                 $allsessiondates = html_writer::start_tag('ul', array('class' => 'unlist'));
                 foreach ($session->sessiondates as $date) {
                     $allsessiondates .= html_writer::start_tag('li');
@@ -238,7 +238,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
 
             // Room.
             if (isset($session->room)) {
-                $roomhtml = facetoface_room_html($session->room);
+                $roomhtml = facetoface_room_html($session->room, $PAGE->url);
             } else {
                 $roomhtml = '';
             }

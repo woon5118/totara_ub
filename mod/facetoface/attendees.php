@@ -167,7 +167,7 @@ if (has_capability('mod/facetoface:takeattendance', $context)) {
     $allowed_actions[] = 'takeattendance';
     $allowed_actions[] = 'messageusers';
 
-    if ($has_attendees && $session->datetimeknown && facetoface_has_session_started($session, time())) {
+    if ($has_attendees && $session->mintimestart && facetoface_has_session_started($session, time())) {
         $available_actions[] = 'takeattendance';
     }
 
@@ -318,7 +318,7 @@ if (empty($allowed_actions) && ($approved == 1) && !empty($staff)) {
 // If this is true then we need to show attendees but limit it to just those attendees that are also staff.
 if (!in_array('attendees', $allowed_actions) && !empty($staff)) {
     // Check if any staff are attending.
-    if ($session->datetimeknown) {
+    if ($session->mintimestart) {
         $get_attendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_NO_SHOW,
             MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
     } else {
@@ -373,7 +373,7 @@ if ($action == 'attendees') {
     $heading = get_string('attendees', 'facetoface');
 
     // Check if any dates are set
-    if (!$session->datetimeknown) {
+    if (!$session->mintimestart) {
         $heading_message = get_string('sessionnoattendeesaswaitlist', 'facetoface');
     }
 
@@ -1130,7 +1130,7 @@ if ($show_table) {
     }
 
     // Session downloadable sign in sheet.
-    if (($action === 'attendees') && $session->datetimeknown && has_capability('mod/facetoface:exportsessionsigninsheet', $context)) {
+    if (($action === 'attendees') && $session->cntdates && has_capability('mod/facetoface:exportsessionsigninsheet', $context)) {
         $downloadsheetattendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_FULLY_ATTENDED, MDL_F2F_STATUS_NOT_SET,
             MDL_F2F_STATUS_NO_SHOW, MDL_F2F_STATUS_PARTIALLY_ATTENDED));
         if (!empty($downloadsheetattendees)) {

@@ -80,9 +80,9 @@ class rb_source_facetoface_interest extends rb_base_source {
             ),
             new rb_join(
                 'sessiondate',
-                'LEFT',
+                'INNER',
                 '{facetoface_sessions_dates}',
-                '(sessiondate.sessionid = sessions.id AND sessions.datetimeknown = 1)',
+                '(sessiondate.sessionid = sessions.id)',
                 REPORT_BUILDER_RELATION_ONE_TO_MANY,
                 'sessions'
             ),

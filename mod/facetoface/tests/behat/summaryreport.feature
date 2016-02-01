@@ -49,18 +49,20 @@ Feature: Face to face summary report overview
       | Manager Approval | 1                           |
     And I follow "Test facetoface name 1"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | datetimeknown         | Yes  |
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 11   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 12   |
-      | timefinish[0][minute] | 00   |
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 0    |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 0    |
+    And I press "OK"
+    And I set the following fields to these values:
       | capacity              | 2    |
       | mincapacity           | 1    |
       | sendcapacityemail     | 1    |
@@ -78,30 +80,34 @@ Feature: Face to face summary report overview
     And I follow "Test facetoface name 2"
     And I follow "Add a new event"
     And I press "Add a new date"
-    # Relative date fail to work with two dates, hence set absolute date.
+    And I click on "Edit date" "link"
     And I fill facetoface session with relative date in form data:
-      | datetimeknown         | Yes              |
-      | sessiontimezone[0]    | Pacific/Auckland |
-      | timestart[0][day]     | -1               |
-      | timestart[0][month]   | 0                |
-      | timestart[0][year]    | 0                |
-      | timestart[0][hour]    | 0                |
-      | timestart[0][minute]  | 0                |
-      | timefinish[0][day]    | 0                |
-      | timefinish[0][month]  | 0                |
-      | timefinish[0][year]   | 0                |
-      | timefinish[0][hour]   | 0                |
-      | timefinish[0][minute] | +30              |
-      | timestart[1][day]     | 1                |
-      | timestart[1][month]   | 1                |
-      | timestart[1][year]    | 2030             |
-      | timestart[1][hour]    | 0                |
-      | timestart[1][minute]  | 0                |
-      | timefinish[1][day]    | 1                |
-      | timefinish[1][month]  | 1                |
-      | timefinish[1][year]   | 2030             |
-      | timefinish[1][hour]   | 0                |
-      | timefinish[1][minute] | 30               |
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | -1               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | 0                |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | 0                |
+      | timefinish[minute] | +30              |
+    And I press "OK"
+    And I click on "Edit date" "link" in the ".f2fmanagedates .lastrow" "css_element"
+    And I set the following fields to these values:
+      | timestart[day]     | 1                |
+      | timestart[month]   | 1                |
+      | timestart[year]    | 2030             |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | 1                |
+      | timefinish[month]  | 1                |
+      | timefinish[year]   | 2030             |
+      | timefinish[hour]   | 0                |
+      | timefinish[minute] | 30               |
+    And I press "OK"
+    And I set the following fields to these values:
       | capacity              | 1                |
       | normalcost           | 2.22              |
       | discountcost         | 2.10              |
@@ -119,18 +125,20 @@ Feature: Face to face summary report overview
 
     # 3: (2nd activity of C1) Bookings available, upcoming
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | datetimeknown         | Yes  |
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 11   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 12   |
-      | timefinish[0][minute] | 00   |
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I press "OK"
+    And I set the following fields to these values:
       | capacity              | 2    |
       | normalcost            | 3.33 |
       | discountcost          | 1.50 |
@@ -152,19 +160,21 @@ Feature: Face to face summary report overview
       | Description       | Test facetoface description |
     And I follow "Test facetoface name 3"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I fill facetoface session with relative date in form data:
-      | datetimeknown         | Yes              |
-      | sessiontimezone[0]    | Pacific/Auckland |
-      | timestart[0][day]     | -2               |
-      | timestart[0][month]   | 0                |
-      | timestart[0][year]    | 0                |
-      | timestart[0][hour]    | 0                |
-      | timestart[0][minute]  | 0                |
-      | timefinish[0][day]    | -1               |
-      | timefinish[0][month]  | 0                |
-      | timefinish[0][year]   | 0                |
-      | timefinish[0][hour]   | 0                |
-      | timefinish[0][minute] | 0                |
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | -2               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | -1               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | 0                |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I set the following fields to these values:
       | capacity              | 1                |
       | normalcost            | 4.44             |
     And I click on "Sam4 Student4" "checkbox"

@@ -36,20 +36,22 @@ Feature: Cancellation for session
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I fill facetoface session with relative date in form data:
-      | datetimeknown         | Yes              |
-      | sessiontimezone[0]    | Pacific/Auckland |
-      | timestart[0][day]     | +1               |
-      | timestart[0][month]   | 0                |
-      | timestart[0][year]    | 0                |
-      | timestart[0][hour]    | 0                |
-      | timestart[0][minute]  | 0                |
-      | timefinish[0][day]    | +1               |
-      | timefinish[0][month]  | 0                |
-      | timefinish[0][year]   | 0                |
-      | timefinish[0][hour]   | +1               |
-      | timefinish[0][minute] | 0                |
-      | capacity              | 3                |
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | +1               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | +1               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | +1               |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity           | 3                |
     And I click on "Allow at any time" "radio"
     And I press "Save changes"
     And I log out
@@ -74,20 +76,22 @@ Feature: Cancellation for session
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I fill facetoface session with relative date in form data:
-      | datetimeknown         | Yes              |
-      | sessiontimezone[0]    | Pacific/Auckland |
-      | timestart[0][day]     | +2               |
-      | timestart[0][month]   | 0                |
-      | timestart[0][year]    | 0                |
-      | timestart[0][hour]    | 0                |
-      | timestart[0][minute]  | 0                |
-      | timefinish[0][day]    | +2               |
-      | timefinish[0][month]  | 0                |
-      | timefinish[0][year]   | 0                |
-      | timefinish[0][hour]   | +1               |
-      | timefinish[0][minute] | 0                |
-      | capacity              | 3                |
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | +2               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | +2               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | +1               |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity           | 3                |
     And I click on "Never allow" "radio"
     And I press "Save changes"
     And I log out
@@ -109,20 +113,22 @@ Feature: Cancellation for session
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I fill facetoface session with relative date in form data:
-      | datetimeknown         | Yes              |
-      | sessiontimezone[0]    | Pacific/Auckland |
-      | timestart[0][day]     | +3               |
-      | timestart[0][month]   | 0                |
-      | timestart[0][year]    | 0                |
-      | timestart[0][hour]    | 0                |
-      | timestart[0][minute]  | 0                |
-      | timefinish[0][day]    | +3               |
-      | timefinish[0][month]  | 0                |
-      | timefinish[0][year]   | 0                |
-      | timefinish[0][hour]   | +1               |
-      | timefinish[0][minute] | 0                |
-      | capacity              | 3                |
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | +3               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | +3               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | +1               |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity           | 3                |
     And I click on "Allow until cut-off reached" "radio"
     And I press "Save changes"
     And I log out
@@ -142,21 +148,23 @@ Feature: Cancellation for session
     And I follow "Course 1"
     And I follow "View all events"
     And I click on "Edit event" "link"
+    And I click on "Edit date" "link"
     And I fill facetoface session with relative date in form data:
-      | datetimeknown                | Yes              |
-      | sessiontimezone[0]           | Pacific/Auckland |
-      | timestart[0][day]            | +1               |
-      | timestart[0][month]          | 0                |
-      | timestart[0][year]           | 0                |
-      | timestart[0][hour]           | -1               |
-      | timestart[0][minute]         | 0                |
-      | timefinish[0][day]           | +1               |
-      | timefinish[0][month]         | 0                |
-      | timefinish[0][year]          | 0                |
-      | timefinish[0][hour]          | -1               |
-      | timefinish[0][minute]        | 0                |
-      | cancellationcutoff[number]   | 2                |
-      | cancellationcutoff[timeunit] | days             |
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | +1               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | -1               |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | +1               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | -1               |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I set the following fields to these values:
+      | cancellationcutoff[number]   | 2      |
+      | cancellationcutoff[timeunit] | days   |
     And I press "Save changes"
     And I log out
 

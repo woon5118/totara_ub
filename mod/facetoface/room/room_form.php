@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once("{$CFG->dirroot}/lib/formslib.php");
+require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
 
 class mod_facetoface_room_form extends moodleform {
 
@@ -32,10 +33,15 @@ class mod_facetoface_room_form extends moodleform {
      * Definition of the room form
      */
     public function definition() {
+        global $DB;
+
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'custom');
+        $mform->setType('custom', PARAM_INT);
 
         $mform->addElement('hidden', 'page');
         $mform->setType('page', PARAM_INT);
@@ -43,29 +49,73 @@ class mod_facetoface_room_form extends moodleform {
         $mform->addElement('text', 'name', get_string('roomname', 'facetoface'), array('size' => '45'));
         $mform->setType('name', PARAM_TEXT);
 
-        $mform->addElement('text', 'building', get_string('building', 'facetoface'), array('size' => '45'));
-        $mform->setType('building', PARAM_TEXT);
-
-        $mform->addElement('text', 'address', get_string('address', 'facetoface'), array('size' => '45'));
-        $mform->setType('address', PARAM_TEXT);
-
         $mform->addElement('text', 'capacity', get_string('capacity', 'facetoface'));
         $mform->setType('capacity', PARAM_INT);
         $mform->addRule('capacity', null, 'required', null, 'client');
         $mform->addRule('capacity', null, 'numeric', null, 'client');
 
-        $typelist = array('internal' => get_string('internal', 'facetoface'), 'external' => get_string('external', 'facetoface'));
-        $mform->addElement('select', 'type', get_string('type', 'facetoface'), $typelist);
-        $mform->addHelpButton('type', 'roomtype', 'facetoface');
+        $mform->addElement('checkbox', 'allowconflicts', get_string('allowconflicts', 'mod_facetoface'));
+        $mform->addHelpButton('allowconflicts', 'roomtype', 'facetoface');
 
         $mform->addElement('editor', 'description_editor', get_string('roomdescription', 'facetoface'), null, $this->_customdata['editoroptions']);
 
-        if ($this->_customdata['id']) {
-            $label = null;
+        if ($this->_customdata['room']) {
+            $room = $this->_customdata['room'];
         } else {
-            $label = get_string('addroom', 'facetoface');
+            $room = new stdClass();
+            $room->id = 0;
         }
 
-        $this->add_action_buttons(true, $label);
+        customfield_definition($mform, $room, 'facetofaceroom', 0, 'facetoface_room');
+
+        if (!empty($room->custom) || !isset($room->custom) && !empty($this->_customdata['custom'])) {
+            $mform->addElement('checkbox', 'notcustom', get_string('publishreuse', 'mod_facetoface'));
+        }
+
+        if ($room->id) {
+            $mform->addElement('header', 'versions', get_string('versioncontrol', 'mod_facetoface'));
+
+            $created = new stdClass();
+            $created->user = get_string('unknownuser');
+            if (!empty($room->usercreated)) {
+                $created->user = html_writer::link(
+                    new moodle_url('/user/view.php', array('id' => $room->usercreated)),
+                    fullname($DB->get_record('user', array('id' => $room->usercreated)))
+                );
+            }
+            $created->time = empty($room->timecreated) ? '' : userdate($room->timecreated);
+            $mform->addElement(
+                    'static',
+                    'versioncreated',
+                    get_string('created', 'mod_facetoface'),
+                    get_string('timestampbyuser', 'mod_facetoface', $created)
+            );
+
+            if (!empty($room->timemodified)) {
+                $modified = new stdClass();
+                $modified->user = get_string('unknownuser');
+                if (!empty($room->usermodified)) {
+                    $modified->user = html_writer::link(
+                        new moodle_url('/user/view.php', array('id' => $room->usermodified)),
+                        fullname($DB->get_record('user', array('id' => $room->usermodified)))
+                    );
+                }
+                $modified->time = empty($room->timemodified) ? '' : userdate($room->timemodified);
+                $mform->addElement(
+                        'static',
+                        'versionmodified',
+                        get_string('modified'),
+                        get_string('timestampbyuser', 'mod_facetoface', $modified)
+                );
+            }
+        }
+
+        if (empty($this->_customdata['noactionbuttons'])) {
+            $label = null;
+            if (!$room->id) {
+                $label = get_string('addroom', 'facetoface');
+            }
+            $this->add_action_buttons(true, $label);
+        }
     }
 }

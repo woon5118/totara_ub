@@ -79,19 +79,21 @@ Feature: Face to face signup periods
       | registrationtimefinish[hour]     | <periodendhour>    |
       | registrationtimefinish[minute]   | 00                 |
       | registrationtimefinish[timezone] | <periodendzone>    |
-      | datetimeknown                    | Yes                |
-      | timestart[0][day]                | <sessionstartday>  |
-      | timestart[0][month]              | June               |
-      | timestart[0][year]               | 2030               |
-      | timestart[0][hour]               | <sessionstarthour> |
-      | timestart[0][minute]             | 00                 |
-      | timestart[0][timezone]           | <sessionstartzone> |
-      | timefinish[0][day]               | <sessionendday>    |
-      | timefinish[0][month]             | June               |
-      | timefinish[0][year]              | 2030               |
-      | timefinish[0][hour]              | <sessionendhour>   |
-      | timefinish[0][minute]            | 00                 |
-      | timefinish[0][timezone]          | Pacific/Auckland   |
+    And I click on "Edit date" "link"
+    And I set the following fields to these values:
+      | timestart[day]       | <sessionstartday>  |
+      | timestart[month]     | June               |
+      | timestart[year]      | 2030               |
+      | timestart[hour]      | <sessionstarthour> |
+      | timestart[minute]    | 00                 |
+      | timestart[timezone]  | <sessionstartzone> |
+      | timefinish[day]      | <sessionendday>    |
+      | timefinish[month]    | June               |
+      | timefinish[year]     | 2030               |
+      | timefinish[hour]     | <sessionendhour>   |
+      | timefinish[minute]   | 00                 |
+      | timefinish[timezone] | Pacific/Auckland   |
+    And I press "OK"
     And I press "Save changes"
     Then I should see "<message>"
 

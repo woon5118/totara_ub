@@ -114,7 +114,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'sessiondate',
                 'LEFT',
                 '{facetoface_sessions_dates}',
-                '(sessiondate.sessionid = base.sessionid AND sessions.datetimeknown = 1)',
+                '(sessiondate.sessionid = base.sessionid)',
                 REPORT_BUILDER_RELATION_ONE_TO_MANY,
                 'sessions'
             ),
@@ -141,9 +141,9 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'room',
                 'LEFT',
                 '{facetoface_room}',
-                'sessions.roomid = room.id',
+                'sessiondate.roomid = room.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                'sessions'
+                'sessiondate'
             ),
             new rb_join(
                 'bookedby',
@@ -230,11 +230,11 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'session',
                 'duration',
                 get_string('sessduration', 'rb_source_facetoface_signin'),
-                'CASE WHEN sessions.datetimeknown = 1
+                'CASE WHEN sessiondate.timestart IS NOT NULL
                     THEN
                         (sessiondate.timefinish-sessiondate.timestart)/' . MINSECS . '
                     ELSE
-                        sessions.duration/' . MINSECS . '
+                        0
                     END',
                 array(
                     'joins' => array('sessiondate','sessions'),
@@ -372,49 +372,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                     'extrafields' => array_merge(array('user_id' => 'bookedby.id')), $usernamefieldsbooked)
             ),
             new rb_column_option(
-                'room',
-                'name',
-                get_string('roomname', 'rb_source_facetoface_signin'),
-                'room.name',
-                array('joins' => 'room',
-                    'dbdatatype' => 'char',
-                    'outputformat' => 'text')
-            ),
-            new rb_column_option(
-                'room',
-                'building',
-                get_string('building', 'rb_source_facetoface_signin'),
-                'room.building',
-                array('joins' => 'room',
-                    'dbdatatype' => 'char',
-                    'outputformat' => 'text')
-            ),
-            new rb_column_option(
-                'room',
-                'address',
-                get_string('address', 'rb_source_facetoface_signin'),
-                'room.address',
-                array('joins' => 'room',
-                    'dbdatatype' => 'char',
-                    'outputformat' => 'text')
-            ),
-            new rb_column_option(
-                'room',
-                'capacity',
-                get_string('roomcapacity', 'rb_source_facetoface_signin'),
-                'room.capacity',
-                array('joins' => 'room', 'dbdatatype' => 'integer')
-            ),
-            new rb_column_option(
-                'room',
-                'description',
-                get_string('roomdescription', 'rb_source_facetoface_signin'),
-                'room.description',
-                array('joins' => 'room',
-                    'dbdatatype' => 'text',
-                    'outputformat' => 'text')
-            ),
-            new rb_column_option(
                 'session',
                 'positionname',
                 get_string('selectedposition', 'mod_facetoface'),
@@ -453,6 +410,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         );
 
         // Include some standard columns.
+        $this->add_rooms_fields_to_columns($columnoptions, 'room');
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_course_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions);
@@ -564,36 +522,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'base.userid'
             ),
             new rb_filter_option(
-                'room',
-                'name',
-                get_string('roomname', 'rb_source_facetoface_signin'),
-                'text'
-            ),
-            new rb_filter_option(
-                'room',
-                'building',
-                get_string('building', 'rb_source_facetoface_signin'),
-                'text'
-            ),
-            new rb_filter_option(
-                'room',
-                'address',
-                get_string('address', 'rb_source_facetoface_signin'),
-                'text'
-            ),
-            new rb_filter_option(
-                'room',
-                'capacity',
-                get_string('roomcapacity', 'rb_source_facetoface_signin'),
-                'number'
-            ),
-            new rb_filter_option(
-                'room',
-                'description',
-                get_string('roomdescription', 'rb_source_facetoface_signin'),
-                'text'
-            ),
-            new rb_filter_option(
                 'session',
                 'positionname',
                 get_string('selectedpositionname', 'mod_facetoface'),
@@ -628,6 +556,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         );
 
         // Include some standard filters.
+        $this->add_rooms_fields_to_filters($filteroptions);
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);

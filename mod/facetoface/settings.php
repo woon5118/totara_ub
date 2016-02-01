@@ -75,7 +75,10 @@ if ($ADMIN->fulltree) { // Improve performance.
 
 // Create array with existing custom fields (if any), empty array otherwise.
     $customfields = array();
-    $allcustomfields = facetoface_get_session_customfields();
+    $allcustomfields = array_merge(
+      facetoface_get_session_customfields(),
+      facetoface_get_room_customfields()
+    );
     // Exclude customfields type file.
     $allcustomfields = totara_search_for_value($allcustomfields, 'datatype', TOTARA_SEARCH_OP_NOT_EQUAL, 'file');
     foreach ($allcustomfields as $fieldid => $fielname) {
@@ -194,6 +197,7 @@ $customfieldurl = new moodle_url('/mod/facetoface/customfields.php', array('pref
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacecustomfields', new lang_string('customfieldsheading','facetoface'), $customfieldurl, 'mod/facetoface:managecustomfield'));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacetemplates', new lang_string('notificationtemplates','facetoface'), "$CFG->wwwroot/mod/facetoface/notification/template/index.php"));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacerooms', new lang_string('rooms','facetoface'), "$CFG->wwwroot/mod/facetoface/room/manage.php"));
+$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofaceassets', new lang_string('assets','facetoface'), "$CFG->wwwroot/mod/facetoface/asset/manage.php"));
 
 // Tell core we already added the settings structure.
 $settings = null;

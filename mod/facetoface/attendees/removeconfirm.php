@@ -83,7 +83,7 @@ if ($fromform = $mform->get_data()) {
     $removed  = array();
     $errors = array();
     // Original booked attendees plus those awaiting approval
-    if ($session->datetimeknown) {
+    if ($session->cntdates) {
         $original = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_NO_SHOW,
             MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
     } else {

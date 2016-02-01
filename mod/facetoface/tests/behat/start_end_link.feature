@@ -21,18 +21,18 @@ Feature: Confirm end date is adjusted when start date is altered
       | Maximum reservations                    | 10                          |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | datetimeknown         | Yes  |
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 11   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 12   |
-      | timefinish[0][minute] | 00   |
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 0    |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 0    |
 
   Scenario Outline: Alter time by dropdown
     Given I set the following fields to these values:
@@ -40,12 +40,12 @@ Feature: Confirm end date is adjusted when start date is altered
     Then I should see "<end_value>" in the "#<end_field>" "css_element"
 
   Examples:
-    | field                | start_value | end_value | end_field              |
-    | timestart[0][day]    | 2           | 2         | id_timefinish_0_day    |
-    | timestart[0][month]  | 2           | February  | id_timefinish_0_month  |
-    | timestart[0][year]   | 2021        | 2021      | id_timefinish_0_year   |
-    | timestart[0][hour]   | 12          | 13        | id_timefinish_0_hour   |
-    | timestart[0][minute] | 30          | 30        | id_timefinish_0_minute |
+    | field             | start_value | end_value | end_field            |
+    | timestart[day]    | 2           | 2         | id_timefinish_day    |
+    | timestart[month]  | 2           | February  | id_timefinish_month  |
+    | timestart[year]   | 2021        | 2021      | id_timefinish_year   |
+    | timestart[hour]   | 12          | 13        | id_timefinish_hour   |
+    | timestart[minute] | 30          | 30        | id_timefinish_minute |
 
   Scenario: Alter date by calendar
     Given I click on "Calendar" "link" in the "#fitem_id_timestart_0" "css_element"

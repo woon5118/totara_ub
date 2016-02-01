@@ -95,7 +95,7 @@ $waitlist = 0;
 // until a date and time is applied to the session and they are displayed in the attendees list
 // rather than the waitlist. So, only enable the waitlist tab when the date and time for the
 // session is known and there are attendees with the waitlist status.
-if ($session->datetimeknown) {
+if ($session->cntdates) {
     $waitlistcount = count(facetoface_get_attendees($session->id,array(MDL_F2F_STATUS_WAITLISTED)));
     if ($waitlistcount > 0) {
         $waitlist = 1;
@@ -103,7 +103,7 @@ if ($session->datetimeknown) {
 }
 
 // Setup attendees array
-if ($session->datetimeknown) {
+if ($session->cntdates) {
     $attendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_NO_SHOW,
         MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
 } else {

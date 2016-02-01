@@ -83,7 +83,7 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
     this.dialog;
 
     /**
-     * Default URL
+     * Default URL (can be callback)
      */
     this.default_url = default_url;
 
@@ -191,18 +191,22 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
 
     /**
      * Load an external page in the dialog
-     * @param   string      Url of page
+     * @param   string|callback      Url of page
      * @param   string      Type of request ('GET', 'POST') (optional, GET is default)
      * @param   string      GET or POST query string style data, also accepts an object (optional)
      * @return  void
      */
-    this.load = function(url, type, query_data) {
+    this.load = function(urlsrc, type, query_data) {
         // Add loading animation
         this.dialog.html('');
         this.showLoading();
 
-        // Save url
-        this.url = url;
+        // Save url.
+        if (typeof urlsrc === 'function') {
+            this.url = urlsrc();
+        } else {
+            this.url = urlsrc;
+        }
 
         // Load page
         this._request(this.url, {}, type, query_data);
@@ -1127,7 +1131,7 @@ totaraDialog_handler_treeview_singleselect.prototype.setup_delete = function() {
     this.deletable = true;
 
     var textel = $('#'+this.text_element_id);
-    var idel = $('input[name='+this.value_element_name+']');
+    var idel = $('input[name="'+this.value_element_name+'"]');
     var deletebutton = $('<a href="#" class="dialog-singleselect-deletable">'+M.util.get_string('delete', 'totara_core')+'</a>');
     var handler = this;
 
@@ -1171,7 +1175,7 @@ totaraDialog_handler_treeview_singleselect.prototype.every_load = function() {
 }
 
 totaraDialog_handler_treeview_singleselect.prototype._set_current_selected = function() {
-    var current_val = $('input[name='+this.value_element_name+']').val();
+    var current_val = $('input[name="'+this.value_element_name+'"]').val();
     var current_text = $('#'+this.text_element_id).clone();
 
     // Strip delete button from current text
@@ -1222,7 +1226,7 @@ totaraDialog_handler_treeview_singleselect.prototype._save = function() {
 
     // Update value element
     if (this.value_element_name) {
-        $('input[name='+this.value_element_name+']').val(selected_val);
+        $('input[name="'+this.value_element_name+'"]').val(selected_val);
     }
 
     // Update text element

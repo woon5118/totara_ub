@@ -286,7 +286,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 $message = get_string('bookingcompleted', 'facetoface');
             }
 
-            if ($session->datetimeknown
+            if ($session->cntdates
                 && isset($facetoface->confirmationinstrmngr)
                 && !empty($facetoface->confirmationstrmngr)) {
                 $message .= html_writer::start_tag('p');
@@ -444,29 +444,55 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
      * @return string html text, usually a form in a text box
      */
     public function enrol_page_hook(stdClass $instance) {
-        global $CFG, $OUTPUT, $DB;
+        global $CFG, $DB, $PAGE;
 
         require_once($CFG->dirroot . '/enrol/totara_facetoface/signup_form.php');
 
         $enrolstatus = $this->can_self_enrol($instance);
 
         // Don't show enrolment instance form, if user can't enrol using it.
-        if (true === $enrolstatus) {
-            $form = new enrol_totara_facetoface_signup_form(null, $instance);
+        if ($enrolstatus === true) {
+            /** @var mod_facetoface_renderer $f2frenderer */
+            $f2frenderer = $PAGE->get_renderer('mod_facetoface');
 
-            $instanceid = optional_param('instance', 0, PARAM_INT);
-            if ($instance->id == $instanceid) {
-                if ($data = $form->get_data()) {
-                    $course = $DB->get_record('course', array('id' => $instance->courseid), '*', MUST_EXIST);
-                    $returnurl = new moodle_url('/enrol/index.php', array('id' => $course->id));
-                    $this->enrol_totara_facetoface($instance, $data, $course, $returnurl);
+            $viewattendees = false;
+
+            $sessions = $this->get_enrolable_sessions($instance->courseid);
+
+            // Sort sessions into face-to-face activities.
+            $f2fsessionarrays = array();
+            foreach($sessions as $session) {
+                if (!isset($f2fsessionarrays[$session->facetoface])) {
+                    $f2fsessionarrays[$session->facetoface] = array();
+                }
+                $f2fsessionarrays[$session->facetoface][] = $session;
+            }
+
+            $output = '';
+
+            foreach($f2fsessionarrays as $id => $f2fsessionarray) {
+                if (!empty($f2fsessionarray)) {
+                    $f2f = $DB->get_record('facetoface', array('id' => $id));
+
+                    $cm = get_coursemodule_from_instance("facetoface", $f2f->id, $f2f->course);
+                    $contextmodule = context_module::instance($cm->id);
+                    $viewattendees = has_capability('mod/facetoface:viewattendees', $contextmodule);
+                    $editsessions = has_capability('mod/facetoface:editsessions', $contextmodule);
+                    $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+                    $reserveinfo = array();
+                    if (!empty($f2f->managerreserve)) {
+                        // Include information about reservations when drawing the list of sessions.
+                        $reserveinfo = facetoface_can_reserve_or_allocate($f2f, $f2fsessionarray, $contextmodule);
+                    }
+
+                    $f2fsessionarray = array_slice($f2fsessionarray, 0, $f2f->display, true);
+                    $output .= html_writer::tag('h4', format_string($f2f->name));
+                    $output .= $f2frenderer->print_session_list_table($f2fsessionarray, $viewattendees, $editsessions,
+                        $displaytimezones, $reserveinfo, null, true);
                 }
             }
 
-            ob_start();
-            $form->display();
-            $output = ob_get_clean();
-            return $OUTPUT->box($output);
+            return $output;
         }
 
         // This is a hack, unfortunately can_self_enrol returns error strings, an in this case it returns a string wrapped
@@ -517,7 +543,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
      * @return moodleform Instance of the enrolment form if successful, else false.
      */
     public function course_expand_get_form_hook($instance) {
-        global $CFG;
+        global $CFG, $PAGE, $DB;
 
         require_once("$CFG->dirroot/enrol/totara_facetoface/signup_form.php");
 
@@ -525,7 +551,45 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
 
         // Don't show enrolment instance form, if user can't enrol using it.
         if ($enrolstatus === true) {
-            return new enrol_totara_facetoface_signup_form(null, $instance);
+            /** @var mod_facetoface_renderer $f2frenderer */
+            $f2frenderer = $PAGE->get_renderer('mod_facetoface');
+
+            $sessions = $this->get_enrolable_sessions($instance->courseid);
+
+            // Sort sessions into face-to-face activities.
+            $f2fsessionarrays = array();
+            foreach($sessions as $session) {
+                if (!isset($f2fsessionarrays[$session->facetoface])) {
+                    $f2fsessionarrays[$session->facetoface] = array();
+                }
+                $f2fsessionarrays[$session->facetoface][] = $session;
+            }
+
+            $output = '';
+
+            foreach($f2fsessionarrays as $id => $f2fsessionarray) {
+                if (!empty($f2fsessionarray)) {
+                    $f2f = $DB->get_record('facetoface', array('id' => $id));
+
+                    $cm = get_coursemodule_from_instance("facetoface", $f2f->id, $f2f->course);
+                    $contextmodule = context_module::instance($cm->id);
+                    $viewattendees = has_capability('mod/facetoface:viewattendees', $contextmodule);
+                    $editsessions = has_capability('mod/facetoface:editsessions', $contextmodule);
+                    $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+                    $reserveinfo = array();
+                    if (!empty($f2f->managerreserve)) {
+                        // Include information about reservations when drawing the list of sessions.
+                        $reserveinfo = facetoface_can_reserve_or_allocate($f2f, $f2fsessionarray, $contextmodule);
+                    }
+
+                    $f2fsessionarray = array_slice($f2fsessionarray, 0, $f2f->display, true);
+                    $output .= html_writer::tag('h4', format_string($f2f->name));
+                    $output .= $f2frenderer->print_session_list_table($f2fsessionarray, $viewattendees, $editsessions,
+                        $displaytimezones, $reserveinfo, null, true);
+                }
+            }
+
+            return $output;
         }
 
         return $enrolstatus;
@@ -990,11 +1054,16 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         );
 
         $sql = "
-        SELECT ssn.*, f2f.id AS f2fid, f2f.approvaltype
+        SELECT ssn.*, f2f.id AS f2fid, f2f.approvaltype, dates.cntdates, dates.mintimestart, dates.maxtimefinish
         FROM {course_modules} cm
         JOIN {modules} m ON (m.name = :modulename AND m.id = cm.module)
         JOIN {facetoface} f2f ON (f2f.id = cm.instance)
         JOIN {facetoface_sessions} ssn ON (ssn.facetoface = f2f.id)
+        LEFT JOIN (
+            SELECT fsd.sessionid, COUNT(*) AS cntdates, MIN(timestart) AS mintimestart, MAX(timefinish) AS maxtimefinish
+            FROM {facetoface_sessions_dates} fsd
+            GROUP BY fsd.sessionid
+        ) dates ON (dates.sessionid = ssn.id)
         WHERE cm.visible = :visible";
 
         if ($courseid != null) {
@@ -1027,6 +1096,10 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         $sessiondates = $DB->get_records_select('facetoface_sessions_dates', "sessionid $idin", $params, 'timestart ASC');
         foreach ($sessiondates as $sessiondate) {
             $sessions[$sessiondate->sessionid]->sessiondates[] = $sessiondate;
+            if ($sessiondate->roomid) {
+                $room = $DB->get_record('facetoface_room', array('id' => $sessiondate->roomid));
+                $sessiondate->room = $room;
+            }
         }
 
         $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
@@ -1037,14 +1110,9 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         }
 
         foreach ($sessions as $session) {
-            if ($session->roomid) {
-                $room = $DB->get_record('facetoface_room', array('id' => $session->roomid));
-                $session->room = $room;
-            }
-
             $session->signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_REQUESTED);
 
-            if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
+            if (!empty($session->sessiondates) && facetoface_has_session_started($session, $timenow)) {
                 continue;
             }
 
@@ -1065,7 +1133,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 continue;
             }
 
-            if ($session->datetimeknown) {
+            if (!empty($session->sessiondates)) {
                 $session->timestartsort = $session->sessiondates[0]->timestart;
             } else {
                 // If datetime is unknown make timestartsort in the future and store at the end of the records.
@@ -1290,17 +1358,17 @@ function enrol_totara_facetoface_find_best_session($totara_facetoface, $facetofa
             }
         } // If they both have capacity then we carry on to look at dates.
 
-        if (!$best->datetimeknown && $session->datetimeknown) { // If best has no date and contender does then it wins.
+        if (!$best->cntdates && $session->cntdates) { // If best has no date and contender does then it wins.
             $best = $session;
             continue;
-        } else if ($best->datetimeknown && !$session->datetimeknown) { // If best has date and contender doesn't we don't want it.
+        } else if ($best->cntdates && !$session->cntdates) { // If best has date and contender doesn't we don't want it.
             continue;
-        } else if (!$best->datetimeknown && !$session->datetimeknown) { // If neither have date go for most capacity.
+        } else if (!$best->cntdates && !$session->cntdates) { // If neither have date go for most capacity.
             if ($best->spaces < $session->spaces) {
                 $best = $session;
             }
             continue;
-        } else if ($best->datetimeknown && $session->datetimeknown) { // If session is before best then it wins.
+        } else if ($best->cntdates && $session->cntdates) { // If session is before best then it wins.
             $bestearliestsession = null;
             $sessionearliestsession = null;
 

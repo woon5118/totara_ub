@@ -46,3 +46,15 @@ form fieldset.multiselect span {
         height: 40%;
     }
 }
+
+dd .mapaddresslookup .map_small {
+    height: 200px;
+}
+
+dd .mapaddresslookup .map_medium {
+    height: 300px;
+}
+
+dd .mapaddresslookup .map_large {
+    height: 400px;
+}

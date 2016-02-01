@@ -888,7 +888,8 @@ class facetoface_notification extends data_object {
         }
 
         // Third-party notification.
-        if (!empty($this->_facetoface->thirdparty) && ($this->_sessions[$sessionid]->datetimeknown || !empty($this->_facetoface->thirdpartywaitlist))) {
+        if (!empty($this->_facetoface->thirdparty) && (!empty($this->_sessions[$sessionid]->sessiondates)
+                || !empty($this->_facetoface->thirdpartywaitlist))) {
             $event = clone $this->_event;
             $event->attachment = null; // Leave out the ical attachments in the third-parties notification.
             $event->fullmessage       = $event->manager->fullmessage . $event->fullmessage;
@@ -1418,7 +1419,6 @@ function facetoface_send_adminrequest_notice($facetoface, $session, $recipientid
  * Subsitute the placeholders in message templates for the actual data
  *
  * Expects the following parameters in the $data object:
- * - datetimeknown
  * - details
  * - discountcost
  * - duration
@@ -1444,40 +1444,22 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     // Get timezone setting.
     $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
 
-    if ($data->datetimeknown) {
+    if (!empty($data->sessiondates)) {
         // Scheduled session
         $strftimedate = get_string('strftimedate');
         $strftimetime = get_string('strftimetime');
-        $alldates = '';
-        foreach ($data->sessiondates as $date) {
-            if ($alldates != '') {
-                $alldates .= "\n";
-            }
-            $startdate = userdate($date->timestart, $strftimedate, $date->sessiontimezone);
-            $finishdate = userdate($date->timefinish, $strftimedate, $date->sessiontimezone);
-            if ($startdate == $finishdate) {
-                $alldates .= $startdate . ', ';
-            } else {
-                $alldates .= $startdate . ' - ' . $finishdate . ', ';
-            }
-            $starttime = userdate($date->timestart, $strftimetime, $date->sessiontimezone);
-            $finishtime = userdate($date->timefinish, $strftimetime, $date->sessiontimezone);
-            $timestr = $starttime . ' - ' . $finishtime . ' ';
-            $timestr .= $displaytimezones ? core_date::get_user_timezone($date->sessiontimezone) : '';
-            $alldates .= $timestr;
-        }
 
-        $startdate = userdate($data->sessiondates[0]->timestart, $strftimedate, $date->sessiontimezone);
-        $finishdate = userdate($data->sessiondates[0]->timefinish, $strftimedate, $date->sessiontimezone);
+        $startdate = userdate($data->sessiondates[0]->timestart, $strftimedate, $data->sessiondates[0]->sessiontimezone);
+        $finishdate = userdate($data->sessiondates[0]->timefinish, $strftimedate, $data->sessiondates[0]->sessiontimezone);
         $sessiondate = ($startdate == $finishdate) ? $startdate : $startdate . ' - ' . $finishdate;
-        $starttime = userdate($data->sessiondates[0]->timestart, $strftimetime, $date->sessiontimezone);
-        $finishtime = userdate($data->sessiondates[0]->timefinish, $strftimetime, $date->sessiontimezone);
+        $starttime = userdate($data->sessiondates[0]->timestart, $strftimetime, $data->sessiondates[0]->sessiontimezone);
+        $finishtime = userdate($data->sessiondates[0]->timefinish, $strftimetime, $data->sessiondates[0]->sessiontimezone);
         // On a session with multiple-dates, variables above are finish dates etc for first date.
         // Below variables give dates and times for last date.
-        $lateststarttime = userdate(end($data->sessiondates)->timestart, $strftimetime, $date->sessiontimezone);
-        $lateststartdate = userdate(end($data->sessiondates)->timestart, $strftimedate, $date->sessiontimezone);
-        $latestfinishtime = userdate(end($data->sessiondates)->timefinish, $strftimetime, $date->sessiontimezone);
-        $latestfinishdate = userdate(end($data->sessiondates)->timefinish, $strftimedate, $date->sessiontimezone);
+        $lateststarttime = userdate(end($data->sessiondates)->timestart, $strftimetime, end($data->sessiondates)->sessiontimezone);
+        $lateststartdate = userdate(end($data->sessiondates)->timestart, $strftimedate, end($data->sessiondates)->sessiontimezone);
+        $latestfinishtime = userdate(end($data->sessiondates)->timefinish, $strftimetime, end($data->sessiondates)->sessiontimezone);
+        $latestfinishdate = userdate(end($data->sessiondates)->timefinish, $strftimedate, end($data->sessiondates)->sessiontimezone);
 
     } else {
         // Wait-listed session
@@ -1486,7 +1468,6 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $startdate   = $str_unknowndate;
         $finishdate  = $str_unknowndate;
         $sessiondate = $str_unknowndate;
-        $alldates    = $str_unknowndate;
         $starttime   = $str_unknowntime;
         $finishtime  = $str_unknowntime;
         $lateststarttime = $str_unknowntime;
@@ -1508,7 +1489,6 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = str_replace(get_string('placeholder:firstname', 'facetoface'), $user->firstname, $msg);
     $msg = str_replace(get_string('placeholder:lastname', 'facetoface'), $user->lastname, $msg);
     $msg = str_replace(get_string('placeholder:cost', 'facetoface'), facetoface_cost($user->id, $sessionid, $data), $msg);
-    $msg = str_replace(get_string('placeholder:alldates', 'facetoface'), $alldates, $msg);
     $msg = str_replace(get_string('placeholder:sessiondate', 'facetoface'), $sessiondate, $msg);
     $msg = str_replace(get_string('placeholder:startdate', 'facetoface'), $startdate, $msg);
     $msg = str_replace(get_string('placeholder:finishdate', 'facetoface'), $finishdate, $msg);
@@ -1520,23 +1500,15 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = str_replace(get_string('placeholder:latestfinishdate', 'facetoface'), $latestfinishdate, $msg);
     $msg = str_replace(get_string('placeholder:duration', 'facetoface'), format_time($data->duration), $msg);
 
-    // add placeholders that somehow have been forgetten since moodle
-    $roomnull = 'N/A';  // Displayed if empty.
-
-    // Defaults if values are empty
-    $strlocation = $roomnull;
-    $strvenue = $roomnull;
-    $strroom = $roomnull;
-
-    if ($room = facetoface_get_session_room($sessionid)) {
-        $strlocation = isset($room->address) ? $room->address : $roomnull;
-        $strvenue = isset($room->building) ? $room->building : $roomnull;
-        $strroom = isset($room->name) ? $room->name : $roomnull;
+    if (!empty($data->sessiondates)) {
+        $rooms = facetoface_get_session_rooms($data->id);
+        // Get data for room custom fields.
+        $roomcustomfields = array();
+        foreach($rooms as $room) {
+            $roomcustomfields[$room->id] = customfield_get_data($room, 'facetoface_room', 'facetofaceroom', false);
+        }
+        $msg = facetoface_notification_loop_session_placeholders($msg, $data, $rooms, $roomcustomfields);
     }
-
-    $msg = str_replace(get_string('placeholder:location', 'facetoface'), $strlocation, $msg);
-    $msg = str_replace(get_string('placeholder:venue', 'facetoface'), $strvenue, $msg);
-    $msg = str_replace(get_string('placeholder:room', 'facetoface'), $strroom, $msg);
 
     if (empty($data->details)) {
         $msg = str_replace(get_string('placeholder:details', 'facetoface'), '', $msg);
@@ -1573,6 +1545,155 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     }
 
     $msg = facetoface_message_substitutions_userfields($msg, $user);
+
+    return $msg;
+}
+
+/**
+ * Replaces a section in a notification string that begins with the loop start tag (by default this is '[#sessions]')
+ * and ends with the loop end tag (by default this is '[/sessions]') for sessions. The section will be replaced with
+ * placeholders substituted and will be repeated for each session.
+ *
+ * Properties in $session that may be required are:
+ * $session->sessiondates
+ *
+ * @param string $msg - the string for the notification.
+ * @param stdClass $session - an object that includes the sessiondates and also room data if that's necessary.
+ * @param array $rooms - array of room objects, including any custom fields.
+ * @return string the message with the looped replacements added.
+ */
+function facetoface_notification_loop_session_placeholders($msg, $session, $rooms = array(), $roomcustomfields = array()) {
+    global $DB;
+
+    $prevendposition = 0;
+    $startposition = 0;
+    while($startposition !== false) {
+
+        // Check that msg contains a start tag (e.g. '[#sessions]').
+        $starttag = get_string('placeholder:sessions:loopstart', 'facetoface');
+        $startposition = strpos($msg, $starttag, $prevendposition);
+        if (!$startposition) {
+            return $msg;
+        }
+
+        // Check that msg contains an end tag (e.g. '[/sessions]').
+        $endtag = get_string('placeholder:sessions:loopend', 'facetoface');
+        $endposition = strpos($msg, $endtag, $startposition);
+        if (!$endposition) {
+            return $msg;
+        }
+
+        if (empty($rooms)) {
+            // $rooms may be empty with value of false or null, in which case, we want to use an empty array.
+            $rooms = array();
+        }
+
+        // Get the segment that will be repeated for each session.
+        $templatesegment = substr($msg, $startposition + strlen($starttag), $endposition - $startposition - strlen($starttag));
+
+        // Define the fixed (non-customfield) placeholders.
+        $fixed_placeholders = array(
+            'session:startdate',
+            'session:starttime',
+            'session:finishdate',
+            'session:finishtime',
+            'session:timezone',
+            'room:name',
+            'room:link');
+
+        // We will use the above strings as keys.
+        $fixed_placeholders = array_flip($fixed_placeholders);
+        foreach ($fixed_placeholders as $key => $placeholder) {
+            $placeholderstring = get_string('placeholder:' . $key, 'facetoface');
+            // Check if the placeholder is present in this segment.
+            if (strpos($templatesegment, $placeholderstring) !== false) {
+                $fixed_placeholders[$key] = $placeholderstring;
+            } else {
+                // Remove if not present in template segment, which saves the processing involved
+                // in determining the value when it's not necessary.
+                unset($fixed_placeholders[$key]);
+            }
+        }
+
+        // Now add the room custom field placeholders.
+        $room_cf_placeholders = array();
+        $room_cf_names = $DB->get_records('facetoface_room_info_field', array('hidden' => 0), '', 'shortname');
+        foreach ($room_cf_names as $room_cf_name) {
+            $placeholderstring = get_string('placeholder:room:customfield', 'facetoface', $room_cf_name);
+            // Check if the placeholder is present in this segment.
+            if (strpos($templatesegment, $placeholderstring) !== false) {
+                $room_cf_placeholders[$room_cf_name->shortname] = $placeholderstring;
+            }
+        }
+
+        $returnedsegments = array();
+
+        $strftimedate = get_string('strftimedate');
+        $strftimetime = get_string('strftimetime');
+
+        foreach ($session->sessiondates as $key => $sessiondate) {
+            $returnedsegments[$key] = $templatesegment;
+            foreach ($fixed_placeholders as $type => $fixed_placeholder) {
+                $value = '';
+                switch ($type) {
+                    case 'session:startdate':
+                        $value = userdate($sessiondate->timestart, $strftimedate, $sessiondate->sessiontimezone);
+                        break;
+                    case 'session:starttime':
+                        $value = userdate($sessiondate->timestart, $strftimetime, $sessiondate->sessiontimezone);
+                        break;
+                    case 'session:finishdate':
+                        $value = userdate($sessiondate->timefinish, $strftimedate, $sessiondate->sessiontimezone);
+                        break;
+                    case 'session:finishtime':
+                        $value = userdate($sessiondate->timefinish, $strftimetime, $sessiondate->sessiontimezone);
+                        break;
+                    case 'session:timezone':
+                        $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+                        $value = $displaytimezones ? core_date::get_user_timezone($sessiondate->sessiontimezone) : '';
+                        break;
+                    case 'room:name':
+                        if (!empty($sessiondate->roomid) && isset($rooms[$sessiondate->roomid])) {
+                            $room = $rooms[$sessiondate->roomid];
+                            $value = $room->name;
+                        }
+                        break;
+                    case 'room:link':
+                        if (!empty($sessiondate->roomid)) {
+                            $roomdetailsurl = new moodle_url('/mod/facetoface/room.php', ['r' => $sessiondate->roomid]);
+                            $value = html_writer::link($roomdetailsurl, $roomdetailsurl, ['title' => get_string('roomdetails', 'facetoface')]);
+                        }
+                        break;
+                    default:
+                        $value = '';
+                }
+                // If the value for this field for this session is false or null, we'll use an empty string.
+                if (is_null($value) or ($value === false)) {
+                    $value = '';
+                }
+                $returnedsegments[$key] = str_replace($fixed_placeholder, $value, $returnedsegments[$key]);
+            }
+            foreach ($room_cf_placeholders as $type => $room_cf_placeholder) {
+                $value = '';
+                if (!empty($sessiondate->roomid) && isset($rooms[$sessiondate->roomid])) {
+                    if (!empty($roomcustomfields[$sessiondate->roomid][$type])) {
+                        $value = $roomcustomfields[$sessiondate->roomid][$type];
+                    }
+                }
+                // If the value for this field for this session is false or null, we'll use an empty string.
+                if (is_null($value) or ($value === false)) {
+                    $value = '';
+                }
+                $returnedsegments[$key] = str_replace($room_cf_placeholder, $value, $returnedsegments[$key]);
+            }
+        }
+
+        $prestartloop = substr($msg, 0, $startposition);
+        $postendloop = substr($msg, $endposition + strlen($endtag));
+        $combinedsegments = implode('', $returnedsegments);
+
+        $msg = $prestartloop . $combinedsegments . $postendloop;
+    }
 
     return $msg;
 }

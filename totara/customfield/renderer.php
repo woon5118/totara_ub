@@ -399,4 +399,26 @@ class totara_customfield_renderer extends plugin_renderer_base {
             $fieldform->display();
         }
     }
+
+    public function customfield_render($datatype, $fielddata, $options = array()) {
+        global $CFG;
+
+        if (empty($datatype)) {
+            return "";
+        }
+        $customfieldclassfile = $CFG->dirroot . '/totara/customfield/field/' . $datatype . '/define.class.php';
+        if (!file_exists($customfieldclassfile)) {
+            return "";
+        }
+        require_once($customfieldclassfile);
+
+        $fieldname = 'customfield_define_'. $datatype;
+        $field = new $fieldname();
+
+        if (method_exists($field, "render")) {
+            return $field::render($fielddata, $options);
+        }
+
+        return "";
+    }
 }

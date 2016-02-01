@@ -152,18 +152,17 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
         // Add session
         $sessiondata = new stdClass();
         $sessiondata->facetoface = $facetoface1->id;
-        $sessiondata->datetimeknown = 1;
         $sessiondata->capacity = 10;
         $sessiondata->allowoverbook = 0;
         $sessiondata->duration = 1;
         $sessiondata->normalcost = 0;
         $sessiondata->discountcost = 0;
-        $sessiondata->roomid = 1;
         $sessiondata->usermodified = 2;
 
         $delta = ($timeinverse) ? -1 * $this->delta : $this->delta;
         $dates = new stdClass();
         $dates->sessionid = self::$ind;
+        $dates->roomid = 1;
         $dates->timestart = time() + $delta;
         $dates->timefinish = time() + $delta + abs($delta) * 0.5;
         $dates->sessiontimezone = 'Europe/London';

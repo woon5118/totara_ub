@@ -188,7 +188,6 @@ $string['enabletempmanagers'] = 'Enable temporary managers';
 $string['enabletempmanagersdesc'] = 'Enable functionality that allows for assigning a temporary manager to a user. Disabling this will cause all current temporary managers to be unassigned on next cron run.';
 $string['enhancedcatalog'] = 'Enhanced catalog';
 $string['enrolled'] = 'Enrolled';
-$string['error:addpdroom-dialognotselected'] = 'Please select a room';
 $string['error:appraisernotselected'] = 'Please select an appraiser';
 $string['error:assigncannotdeletegrouptypex'] = 'You cannot delete groups of type {$a}';
 $string['error:assignmentbadparameters'] = 'Bad parameter array passed to dialog set_parameters';

@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package modules
- * @subpackage facetoface
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package mod_facetoface
  */
 
 require_once '../../config.php';
@@ -41,9 +41,22 @@ if (!$cm = get_coursemodule_from_instance("facetoface", $facetoface->id, $course
     print_error('error:incorrectcoursemoduleid', 'facetoface');
 }
 $context = context_module::instance($cm->id);
+$PAGE->set_context($context);
 
-require_login($course, false, $cm);
-require_capability('mod/facetoface:view', $context);
+/** @var enrol_totara_facetoface_plugin $enrol */
+$enrol = enrol_get_plugin('totara_facetoface');
+$sessions = $enrol->get_enrolable_sessions($course->id);
+$sessionkeys = array_keys($sessions);
+$candirectenrol = in_array($s, $sessionkeys);
+if ($candirectenrol) {
+    // F2f direct enrolment is enabled for this session.
+    require_login();
+} else {
+    // F2f direct enrolment is not enabled here, the user must have the ability to sign up for sessions
+    // in this f2f as normal.
+    require_login($course, false, $cm);
+    require_capability('mod/facetoface:view', $context);
+}
 
 $returnurl = "$CFG->wwwroot/course/view.php?id=$course->id";
 if ($backtoallsessions) {
@@ -196,7 +209,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
                 break;
         }
 
-        if ($session->datetimeknown
+        if ($session->cntdates
             && isset($facetoface->confirmationinstrmngr)
             && !empty($facetoface->confirmationstrmngr)) {
             $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') .
@@ -244,7 +257,7 @@ if ($bookedsession = facetoface_get_user_submissions($facetoface->id, $USER->id,
     $session->bookedsession = reset($bookedsession);
 }
 
-if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
+if ($session->cntdates && facetoface_has_session_started($session, $timenow)) {
     $inprogress_str = get_string('cannotsignupsessioninprogress', 'facetoface');
     $over_str = get_string('cannotsignupsessionover', 'facetoface');
 
@@ -281,7 +294,7 @@ if ($signedup) {
 
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
 // Don't allow signup to proceed if a manager is required.
-} else if (!has_capability('mod/facetoface:signup', $context)) {
+} else if (!has_capability('mod/facetoface:signup', $context) && !$candirectenrol) {
     echo html_writer::tag('p', html_writer::tag('strong', get_string('error:nopermissiontosignup', 'facetoface')));
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
 } else if ($facetoface->forceselectposition && !get_position_assignments(facetoface_approval_required($facetoface))) {

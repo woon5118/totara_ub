@@ -208,6 +208,12 @@ class totara_dialog_content {
     public $urlparams = array();
 
     /**
+     * Keys to be added as data-$key attribute to items DOM. Values will be taken from provided items objects (if exist)
+     * @var array
+     */
+    protected $datakeys = array();
+
+    /**
      * Generate markup from configuration and return
      *
      * @access  public
@@ -301,6 +307,15 @@ class totara_dialog_content {
         return !$this->show_treeview_only;
     }
 
+    /**
+     * Also add data-$key attributes to items.
+     * It allows convenient addition of meta data added to element's DOM and accessible by JS dialog handlers
+     * Keys must be alpha-numeric strings.
+     * @param array $keys
+     */
+    public function proxy_dom_data(array $keys = null) {
+        $this->datakeys = $keys;
+    }
 
     /**
      * Generate treeview markup
@@ -371,9 +386,17 @@ class totara_dialog_content {
                         $span_class .= ' clickable';
                     }
 
+                    $datalist = array();
+                    foreach ($this->datakeys as $key) {
+                        if (isset($element->$key)) {
+                            $datalist[] = 'data-' . $key .'="' . htmlspecialchars($element->$key) . '"';
+                        }
+                    }
+                    $datahtml = implode(' ', $datalist);
+
                     $html .= '<li class="'.trim($li_class).'" id="item_list_'.$element->id.'">';
                     $html .= '<div class="'.trim($div_class).'"></div>';
-                    $html .= '<span id="item_'.$element->id.'" class="'.trim($span_class).'">';
+                    $html .= '<span id="item_'.$element->id.'" class="'.trim($span_class).'" ' . $datahtml . '>';
 
                     // Grab item display name
                     if (isset($element->fullname)) {

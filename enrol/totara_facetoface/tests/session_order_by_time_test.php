@@ -40,7 +40,6 @@ class enrol_totara_facetoface_session_order_by_time_testcase extends advanced_te
         // Session 1
         $session = new stdClass();
         $session->facetoface = $facetoface->id;
-        $session->datetimeknown = 1;
         $time = time();
         $sessiondate = new stdClass();
         $sessiondate->timestart = $time + DAYSECS;
@@ -52,14 +51,12 @@ class enrol_totara_facetoface_session_order_by_time_testcase extends advanced_te
         // Session 2
         $session = new stdClass();
         $session->facetoface = $facetoface->id;
-        $session->datetimeknown = 0;
         $session->sessiondates = array();
         $sid = $facetofacegenerator->add_session($session);
 
         // Session 3
         $session = new stdClass();
         $session->facetoface = $facetoface->id;
-        $session->datetimeknown = 1;
         $time = time();
         $sessiondate = new stdClass();
         $sessiondate->timestart = $time + WEEKSECS;
@@ -71,7 +68,6 @@ class enrol_totara_facetoface_session_order_by_time_testcase extends advanced_te
         // Session 4
         $session = new stdClass();
         $session->facetoface = $facetoface->id;
-        $session->datetimeknown = 1;
         $time = time();
         $sessiondate = new stdClass();
         $sessiondate->timestart = $time + MINSECS;
@@ -84,6 +80,10 @@ class enrol_totara_facetoface_session_order_by_time_testcase extends advanced_te
         $enrolablesessions = $totara_facetoface->get_enrolable_sessions($course->id, null, $facetoface->id);
 
         foreach ($sessions as $session) {
+            // Enrolable sessions don't need info about assets.
+            if (isset($session->sessiondates[0]->assetids)) {
+                unset($session->sessiondates[0]->assetids);
+            }
             $this->assertEquals($session->sessiondates, $enrolablesessions[$session->id]->sessiondates);
         }
     }

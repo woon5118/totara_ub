@@ -161,14 +161,14 @@ table.reportbuilder-table tr {
     height: 100%;
 }
 
-.reportbuilder-table .session_bookingstatus,
-.reportbuilder-table .session_overallstatus {
+.reportbuilder-table td.session_bookingstatus,
+.reportbuilder-table td.session_overallstatus {
     padding: 0;
     height: 100%;
 }
 
-.reportbuilder-table .session_bookingstatus div,
-.reportbuilder-table .session_overallstatus div {
+.reportbuilder-table td.session_bookingstatus div,
+.reportbuilder-table td.session_overallstatus div {
     display: inline-block;
     text-align: center;
     height: 100%;
@@ -189,25 +189,25 @@ table.reportbuilder-table tr {
 
 .reportbuilder-table .session_bookingstatus div.underbooked,
 .reportbuilder-table .session_overallstatus div.ended {
-    background-color: #ff1493;
+    background-color: #ffffc0;
 }
 
 .reportbuilder-table .session_bookingstatus div.available,
 .reportbuilder-table .session_overallstatus div.upcoming {
-    background-color: #adff2f;
+    background-color: #daead3;
 }
 
 .reportbuilder-table .session_bookingstatus div.overbooked {
-    background-color: #ffc200;
+    background-color: #f2d9b3;
 }
 
 .reportbuilder-table .session_overallstatus div.cancelled {
-    background-color: #f08080;
+    background-color: #e6bdbc;
 }
 
 .reportbuilder-table .session_bookingstatus div.fullybooked,
 .reportbuilder-table .session_overallstatus div.started {
-    background-color: #90ee90;
+    background-color: #b3dab6;
 }
 
 textarea[name="csvinput"] {
@@ -259,4 +259,22 @@ dl.f2fline {
 
 #assignform .user-multiselect select {
     height: 400px;
+}
+
+a.show-selectdate-dialog {
+    float: right;
+}
+
+.dir-rtl a.show-selectdate-dialog {
+    float: none;
+}
+
+ul.assetlist {
+    list-style-type: none;
+    margin: 0;
+}
+
+.ui-dialog .dialog-footer {
+    position: absolute;
+    bottom: 0;
 }

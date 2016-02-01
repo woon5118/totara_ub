@@ -380,7 +380,7 @@ function get_matches_defaultfields($events) {
         $sql = "SELECT fsd.id AS sessiondateid, fsd.timestart, fsd.timefinish, fs.id AS sessionid
                 FROM {facetoface_sessions} fs
                 LEFT JOIN {facetoface_sessions_dates} fsd ON fs.id = fsd.sessionid
-                LEFT JOIN {facetoface_room} fr ON fs.roomid = fr.id
+                LEFT JOIN {facetoface_room} fr ON fsd.roomid = fr.id
                 WHERE fs.id $sessionids ";
 
         // Check that at least one filter is not empty.
@@ -730,10 +730,10 @@ function get_sessions_by_date($sessionids, $displayinfo) {
     $params[] = $timestart;
     $params[] = $timeend;
 
-    $sessions = $DB->get_records_sql("SELECT d.id, s.id AS sessionid, f.id AS facetofaceid, f.name, s.datetimeknown, d.timestart, d.timefinish, d.sessiontimezone
+    $sessions = $DB->get_records_sql("SELECT d.id, s.id AS sessionid, f.id AS facetofaceid, f.name, d.timestart, d.timefinish, d.sessiontimezone
                                    FROM {facetoface} f
                                    JOIN {facetoface_sessions} s ON f.id = s.facetoface
-                                   JOIN {facetoface_sessions_dates} d ON d.sessionid = s.id
+                                   LEFT JOIN {facetoface_sessions_dates} d ON d.sessionid = s.id
                                   WHERE s.id {$insql} AND d.timestart >= ? AND d.timestart <= ?
                                ORDER BY d.timestart", $params);
 
@@ -767,14 +767,14 @@ function get_sessions_by_course($sessionids, $displayinfo, $waitlistedsessions) 
     list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'c.id', 'c.visible', 'c.audiencevisible');
     $params = array_merge($params, $visibilityparams);
 
-    $sessions = $DB->get_records_sql("SELECT d.id, s.id AS sessionid, f.id AS facetofaceid, f.name, s.datetimeknown, d.timestart, d.timefinish, d.sessiontimezone
+    $sessions = $DB->get_records_sql("SELECT d.id, s.id AS sessionid, f.id AS facetofaceid, f.name, d.timestart, d.timefinish, d.sessiontimezone
                                    FROM {facetoface} f
                                    JOIN {facetoface_sessions} s ON f.id = s.facetoface
-                                   JOIN {facetoface_sessions_dates} d ON d.sessionid = s.id
+                                   LEFT JOIN {facetoface_sessions_dates} d ON d.sessionid = s.id
                                    JOIN {course} c ON c.id = f.course
                                    JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE . "
                                   WHERE s.id {$insql}
-                                   AND ((d.timestart >= :timestart AND d.timestart <= :timeend) OR s.datetimeknown = 0)
+                                   AND ((d.timestart >= :timestart AND d.timestart <= :timeend))
                                    AND {$visibilitysql}
                                ORDER BY f.name, d.timestart", $params);
 
@@ -839,7 +839,7 @@ function print_sessions($sessions, $tab) {
 
         $signuplink = html_writer::link(new moodle_url('/mod/facetoface/signup.php', array('s' => $session->sessionid)), get_string('moreinfo', 'facetoface'));
 
-        if ($session->datetimeknown) {
+        if ($timestart) {
             // Scheduled sessions
             if ('c' == $tab) {
                 $sessionrow[] = userdate($timestart, get_string('strftimedate'));
@@ -955,8 +955,9 @@ function get_matching_waitlisted_sessions($activefilters) {
     $sessions = $DB->get_records_sql("SELECT s.id, s.facetoface, f.name
                                       FROM {facetoface} f
                                       JOIN {facetoface_sessions} s ON f.id = s.facetoface
+                                      LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.sessionid = s.id)
                                       $filterjoins
-                                      WHERE s.datetimeknown = 0
+                                      WHERE fsd.id IS NULL
                                       $filterwhere", $filterparams);
 
     foreach ($sessions as $session) {

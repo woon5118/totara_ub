@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @author Learning Pool
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
  * @package totara_customfield
  */
 
@@ -273,8 +275,16 @@ class customfield_define_location extends customfield_define_base {
         $args->defaultzoomlevel = $CFG->gmapsdefaultzoomlevel;
         $args->mapparams = $mapparams;
 
-        $PAGE->requires->js(new moodle_url('https://maps.googleapis.com/maps/api/js?' . $mapparams));
-        $PAGE->requires->js_call_amd('totara_customfield/field_location', 'init', array($args));
+        // This will be loaded in location.js.
+        //$PAGE->requires->js(new moodle_url('https://maps.googleapis.com/maps/api/js?' . $mapparams));
+        $jsmodule = array(
+            'name' => 'totara_customfield_location',
+            'fullpath' => '/totara/customfield/field/location/location.js',
+            //'requires' => array('json')
+        );
+        $PAGE->requires->js_init_call('M.totara_customfield_location.init', array($args), false, $jsmodule);
+        // We cannot do AMD here, because AMD is not supported in ajax forms, while customfields actively used in ajax form.
+        //$PAGE->requires->js_call_amd('totara_customfield/field_location', 'init', array($args));
     }
 
     public function define_save_preprocess($data, $old = null) {
@@ -329,10 +339,13 @@ class customfield_define_location extends customfield_define_base {
 
     public static function prepare_db_location_data_for_form($data) {
 
-        if (is_null($data)) {
+        if (empty($data)) {
             return null;
         }
-        $data = json_decode($data);
+
+        if (is_string($data)) {
+            $data = json_decode($data);
+        }
 
         $newdata = new stdClass();
 
@@ -370,15 +383,15 @@ class customfield_define_location extends customfield_define_base {
 
     }
 
-    public static function render($fielddata, $extradata) {
+    public static function render($fielddata, $extradata = array()) {
         $output = array();
 
         if (empty($fielddata)) {
             return "";
         }
 
+        //$fielddata = self::prepare_db_location_data_for_form($fielddata);
 
-        $fielddata = self::prepare_db_location_data_for_form($fielddata);
         // Enable extended display (Maps etc.).
         // Disabled by default, since custom fields are typically rendered in tables or within <dd> elements.
         if (!isset($extradata['extended']) || $extradata['extended'] == false) {
@@ -419,31 +432,34 @@ class customfield_define_location extends customfield_define_base {
             }
         }
 
+        if (!isset($extradata['itemid'])) {
+            $extradata['itemid'] = '';
+        }
         if ($displaytype === GMAP_DISPLAY_MAP_ONLY || $displaytype === GMAP_DISPLAY_MAP_AND_ADDRESS) {
             $output[] = html_writer::div(
                 '',
                 '',
                 array(
-                    'id' => 'location_' . $extradata['itemid'] . '_location_map',
+                    'id' => $extradata['itemid'] . 'location_map',
                     'class' => 'map_' . $fielddata->size
                 )
             );
         }
 
         $output[] = html_writer::empty_tag('input',
-            ['type' => 'hidden', 'id' => 'location_' . $extradata['itemid'] . '_address', 'value' => $fielddata->address]
+            array('type' => 'hidden', 'id' => $extradata['itemid'] . 'address', 'value' => $fielddata->address)
         );
         $output[] = html_writer::empty_tag('input',
-            ['type' => 'hidden', 'id' => 'location_' . $extradata['itemid'] . '_latitude', 'value' => $fielddata->location->latitude]
+            array('type' => 'hidden', 'id' => $extradata['itemid'] . 'latitude', 'value' => $fielddata->location->latitude)
         );
         $output[] = html_writer::empty_tag('input',
-            ['type' => 'hidden', 'id' => 'location_' . $extradata['itemid'] . '_longitude', 'value' => $fielddata->location->longitude]
+            array('type' => 'hidden', 'id' => $extradata['itemid'] . 'longitude', 'value' => $fielddata->location->longitude)
         );
         $output[] = html_writer::empty_tag('input',
-            ['type' => 'hidden', 'id' => 'location_' . $extradata['itemid'] . '_room-location-view', 'value' => $view]
+            array('type' => 'hidden', 'id' => $extradata['itemid'] . 'room-location-view', 'value' => $view)
         );
 
-        $output = implode("", $output);
+        $output = html_writer::div(implode("", $output), 'mapaddresslookup');
 
         return $output;
     }

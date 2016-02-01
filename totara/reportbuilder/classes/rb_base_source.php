@@ -635,6 +635,26 @@ abstract class rb_base_source {
     }
 
     /**
+     * Display address from location stored as json object
+     * @param string $location
+     * @param stdClass $row
+     * @param bool $isexport
+     */
+    public function rb_display_location($location, $row, $isexport = false) {
+        $output = array();
+
+        $location = customfield_define_location::convert_location_json_to_object($location);
+
+        if (is_null($location)){
+            return get_string('notapplicable', 'facetoface');
+        }
+
+        $output[] = $location->address;
+
+        return implode('', $output);
+    }
+
+    /**
      * Display correct course grade via grade or RPL as a percentage string
      *
      * @param string $item A number to convert
@@ -3785,9 +3805,11 @@ abstract class rb_base_source {
      * @param array $joinlist - array of joins passed by reference
      * @param array $columnoptions - array of columnoptions, passed by reference
      * @param array $filteroptions - array of filters, passed by reference
+     * @param bool $useshortname - instead of custom_field_{$id}, column name will be custom_field_{$shortname}
+     *                           Where $shortname is customfield unique shortname
      */
     protected function add_custom_fields_for($cf_prefix, $join, $joinfield,
-        array &$joinlist, array &$columnoptions, array &$filteroptions) {
+        array &$joinlist, array &$columnoptions, array &$filteroptions, $useshortname = false) {
 
         global $CFG, $DB;
 
@@ -3828,9 +3850,12 @@ abstract class rb_base_source {
         }
 
         foreach ($items as $record) {
-            $id   = $record->id;
+            $id = $record->id;
             $joinname = "{$cf_prefix}_{$id}";
             $value = "custom_field_{$id}";
+            if ($useshortname) {
+                $value = "custom_field_{$record->shortname}";
+            }
             $name = isset($record->fullname) ? $record->fullname : $record->name;
             $column_options = array('joins' => $joinname);
             // If profile field isn't available to everyone require a capability to display the column.
@@ -4051,6 +4076,11 @@ abstract class rb_base_source {
                     $column_options['displayfunc'] = 'customfield_url';
                     break;
 
+                case 'location':
+                    $column_options['displayfunc'] = 'location';
+                    $column_options['outputformat'] = 'text';
+                    break;
+
                 default:
                     // Unsupported customfields.
                     continue 2;
@@ -4105,7 +4135,7 @@ abstract class rb_base_source {
             if ($existingcolumn->type == $columnoption->type && empty($existingcolumn->columngenerator)) {
                 $result[] = new rb_column(
                     $existingcolumn->type,
-                    $existingcolumn->value,
+                    $existingcolumn->value . '_all',
                     $existingcolumn->name,
                     $existingcolumn->field,
                     array(

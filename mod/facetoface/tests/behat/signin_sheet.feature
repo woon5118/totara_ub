@@ -30,18 +30,19 @@ Feature: Download a signin sheet
       | Description       | Test facetoface description |
     And I follow "Test facetoface name"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | datetimeknown         | Yes  |
-      | timestart[0][day]     | 10   |
-      | timestart[0][month]   | 2    |
-      | timestart[0][year]    | 2030 |
-      | timestart[0][hour]    | 11   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 10   |
-      | timefinish[0][month]  | 2    |
-      | timefinish[0][year]   | 2030 |
-      | timefinish[0][hour]   | 12   |
-      | timefinish[0][minute] | 00   |
+      | timestart[day]     | 10   |
+      | timestart[month]   | 2    |
+      | timestart[year]    | 2030 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 0    |
+      | timefinish[day]    | 10   |
+      | timefinish[month]  | 2    |
+      | timefinish[year]   | 2030 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 0    |
+    And I press "OK"
     And I press "Save changes"
     And I click on the link "Attendees" in row 1
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"

@@ -38,38 +38,37 @@ Feature: Take attendance for a Face to face with multiple sessions
     # Add sessions to f2f.
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I fill facetoface session with relative date in form data:
-      | datetimeknown         | Yes              |
-      | sessiontimezone[0]    | Pacific/Auckland |
-      | timestart[0][day]     | -10              |
-      | timestart[0][month]   | 0                |
-      | timestart[0][year]    | 0                |
-      | timestart[0][hour]    | 0                |
-      | timestart[0][minute]  | -30              |
-      | timefinish[0][day]    | -10              |
-      | timefinish[0][month]  | 0                |
-      | timefinish[0][year]   | 0                |
-      | timefinish[0][hour]   | 0                |
-      | timefinish[0][minute] | 0                |
-      | customroom            | 1                |
-      | croomname             | later session    |
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | -10              |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | -30              |
+      | timefinish[day]    | -10              |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | 0                |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    # TODO create custom room names "later session"
     And I press "Save changes"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I fill facetoface session with relative date in form data:
-      | datetimeknown         | Yes              |
-      | sessiontimezone[0]    | Pacific/Auckland |
-      | timestart[0][day]     | -40              |
-      | timestart[0][month]   | 0                |
-      | timestart[0][year]    | 0                |
-      | timestart[0][hour]    | 0                |
-      | timestart[0][minute]  | -30              |
-      | timefinish[0][day]    | -40              |
-      | timefinish[0][month]  | 0                |
-      | timefinish[0][year]   | 0                |
-      | timefinish[0][hour]   | 0                |
-      | timefinish[0][minute] | 0                |
-      | customroom            | 1                |
-      | croomname             | earlier session  |
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | -40              |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | -30              |
+      | timefinish[day]    | -40              |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | 0                |
+      | timefinish[minute] | 0                |
+    # TODO create custom room names "earlier session"
     And I press "Save changes"
 
     # Create the certification and add the course.

@@ -24,19 +24,21 @@ Feature: Add - Remove Face to face attendees
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | datetimeknown         | Yes  |
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 11   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 12   |
-      | timefinish[0][minute] | 00   |
-      | capacity              | 1    |
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity           | 1    |
     And I press "Save changes"
 
     When I click on "Attendees" "link"
@@ -58,8 +60,8 @@ Feature: Add - Remove Face to face attendees
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Delete" "link"
     And I set the following fields to these values:
-      | datetimeknown         | No   |
       | capacity              | 1    |
     And I press "Save changes"
 
@@ -84,7 +86,6 @@ Feature: Add - Remove Face to face attendees
     And I follow "View all events"
     And I follow "Add a new event"
     And I set the following fields to these values:
-      | datetimeknown         | No   |
       | capacity              | 1    |
     And I press "Save changes"
 
@@ -116,7 +117,6 @@ Feature: Add - Remove Face to face attendees
     And I follow "View all events"
     And I follow "Add a new event"
     And I set the following fields to these values:
-      | datetimeknown         | No   |
       | capacity              | 1    |
     And I press "Save changes"
 
@@ -148,20 +148,22 @@ Feature: Add - Remove Face to face attendees
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I fill facetoface session with relative date in form data:
-      | datetimeknown         | Yes              |
-      | sessiontimezone[0]    | Pacific/Auckland |
-      | timestart[0][day]     | +1               |
-      | timestart[0][month]   | 0                |
-      | timestart[0][year]    | 0                |
-      | timestart[0][hour]    | 0                |
-      | timestart[0][minute]  | 0                |
-      | timefinish[0][day]    | +1               |
-      | timefinish[0][month]  | 0                |
-      | timefinish[0][year]   | 0                |
-      | timefinish[0][hour]   | +1               |
-      | timefinish[0][minute] | 00               |
-      | capacity              | 2                |
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | +1               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | +1               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | +1               |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity           | 2                |
     And I press "Save changes"
 
     When I click on "Attendees" "link"
