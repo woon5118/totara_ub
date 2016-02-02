@@ -5995,7 +5995,11 @@ function setnew_password_and_mail($user, $fasthash = false) {
     update_internal_user_password($user, $newpassword, $fasthash);
 
     $a = new stdClass();
+    // Totara: Keep the firstname because it is used in language packs.
     $a->firstname   = fullname($user, true);
+    $a->fullname    = $a->firstname;
+    // Totara: New first_name is intended for language pack customisations.
+    $a->first_name  = $user->firstname;
     $a->sitename    = format_string($site->fullname);
     $a->username    = $user->username;
     $a->newpassword = $newpassword;
