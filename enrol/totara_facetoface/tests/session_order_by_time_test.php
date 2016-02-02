@@ -74,7 +74,7 @@ class enrol_totara_facetoface_session_order_by_time_testcase extends advanced_te
         $session->datetimeknown = 1;
         $time = time();
         $sessiondate = new stdClass();
-        $sessiondate->timestart = $time;
+        $sessiondate->timestart = $time + MINSECS;
         $sessiondate->timefinish = $time + (DAYSECS * 2);
         $sessiondate->sessiontimezone = 'Pacific/Auckland';
         $session->sessiondates = array($sessiondate);
