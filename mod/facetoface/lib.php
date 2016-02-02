@@ -419,13 +419,26 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
                             // Approve any pending requests.
                             $status = array(MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_REQUESTEDADMIN);
                             $pending = facetoface_get_attendees($session->id, $status);
+                            // Sort pending attendees by singup datetime ASC.
+                            core_collator::asort_objects_by_property($pending, 'timecreated', core_collator::SORT_NUMERIC);
+                            // Get number of attendees which are already booked.
+                            $booked = count(facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED)));
                             foreach ($pending as $signup) {
                                 foreach ($pending as $i => $attendee) {
-                                    if (facetoface_update_signup_status($attendee->submissionid, MDL_F2F_STATUS_BOOKED, $USER->id, '', $attendee->grade)) {
+                                    // If we reached session capacity change the status code from MDL_F2F_STATUS_REQUESTED to MDL_F2F_STATUS_WAITLISTED.
+                                    if ($session->capacity > $booked) {
+                                        $statuscode = MDL_F2F_STATUS_BOOKED;
+                                        $iswaitlisted = 0;
+                                    } else {
+                                        $statuscode = MDL_F2F_STATUS_WAITLISTED;
+                                        $iswaitlisted = 1;
+                                    }
+                                    if (facetoface_update_signup_status($attendee->submissionid, $statuscode, $USER->id, '', $attendee->grade)) {
+                                        $booked++;
                                         // Don't send confirmation notice if the session is in the past.
                                         if (!facetoface_has_session_started($session, $now)) {
-                                            // Send confirmation email that an user is booked and cc to user's manager if exists.
-                                            facetoface_send_confirmation_notice($facetoface, $session, $attendee->id, 0, 0);
+                                            // Send confirmation email that an user is booked/waitlisted and cc to user's manager if exists.
+                                            facetoface_send_confirmation_notice($facetoface, $session, $attendee->id, 0, $iswaitlisted);
                                         }
                                     }
                                 }
@@ -434,12 +447,25 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
                         case APPROVAL_MANAGER:
                             // Approve any 2 step requests in the second step, since they already have manager approval.
                             $pending = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_REQUESTEDADMIN));
+                            // Sort pending attendees by singup datetime ASC.
+                            core_collator::asort_objects_by_property($pending, 'timecreated', core_collator::SORT_NUMERIC);
+                            // Get number of attendees which are already booked.
+                            $booked = count(facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED)));
                             foreach ($pending as $attendee) {
-                                if (facetoface_update_signup_status($attendee->submissionid, MDL_F2F_STATUS_BOOKED, $USER->id, '', $attendee->grade)) {
+                                // If we reached session capacity change the status code from MDL_F2F_STATUS_REQUESTED to MDL_F2F_STATUS_WAITLISTED.
+                                if ($session->capacity > $booked) {
+                                    $statuscode = MDL_F2F_STATUS_BOOKED;
+                                    $iswaitlisted = 0;
+                                } else {
+                                    $statuscode = MDL_F2F_STATUS_WAITLISTED;
+                                    $iswaitlisted = 1;
+                                }
+                                if (facetoface_update_signup_status($attendee->submissionid, $statuscode, $USER->id, '', $attendee->grade)) {
+                                    $booked++;
                                     // Don't send confirmation notice if the session is in the past.
                                     if (!facetoface_has_session_started($session, $now)) {
-                                        // Send confirmation email that an user is booked and cc to user's manager if exists.
-                                        facetoface_send_confirmation_notice($facetoface, $session, $attendee->id, 0, 0);
+                                        // Send confirmation email that an user is booked/waitlisted and cc to user's manager if exists.
+                                        facetoface_send_confirmation_notice($facetoface, $session, $attendee->id, 0, $iswaitlisted);
                                     }
                                 }
                             }
