@@ -145,7 +145,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
             // Status.
             $status  = get_string('bookingopen', 'facetoface');
-            if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
+            if (!empty($session->cancelledstatus)) {
+                $status = get_string('bookingsessioncancelled', 'facetoface');
+            } else if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
                 $status = get_string('sessioninprogress', 'facetoface');
                 $sessionstarted = true;
             } else if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
@@ -207,7 +209,14 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             // Options.
             $options = '';
             if ($editsessions) {
-                $options .= $this->output->action_icon(new moodle_url('sessions.php', array('s' => $session->id)), new pix_icon('t/edit', get_string('edit', 'facetoface')), null, array('title' => get_string('editsession', 'facetoface'))) . ' ';
+                if (empty($session->cancelledstatus)) {
+                    $options .= $this->output->action_icon(new moodle_url('sessions.php', array('s' => $session->id)), new pix_icon('t/edit', get_string('edit', 'facetoface')), null, array('title' => get_string('editsession', 'facetoface'))) . ' ';
+                    if (!$sessionstarted) {
+                        $options .= $this->output->action_icon(new moodle_url('cancelsession.php', array('s' => $session->id, 'ca' => 1)), new pix_icon('t/block', get_string('cancel', 'facetoface')), null, array('title' => get_string('cancelsession', 'facetoface'))) . ' ';
+                    }
+                } else {
+                    $options .= $this->output->action_icon(new moodle_url('sessions.php', array('s' => $session->id)), new pix_icon('t/edit_gray', get_string('edit', 'facetoface')), null, array('title' => get_string('editsession', 'facetoface'), 'disabled' => true)) . ' ';
+                }
                 $options .= $this->output->action_icon(new moodle_url('sessions.php', array('s' => $session->id, 'c' => 1)), new pix_icon('t/copy', get_string('copy', 'facetoface')), null, array('title' => get_string('copysession', 'facetoface'))) . ' ';
                 $options .= $this->output->action_icon(new moodle_url('sessions.php', array('s' => $session->id, 'd' => 1)), new pix_icon('t/delete', get_string('delete', 'facetoface')), null, array('title' => get_string('deletesession', 'facetoface'))) . ' ';
                 $options .= html_writer::empty_tag('br');
@@ -270,7 +279,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 if (!facetoface_session_has_capacity($session, $this->context, MDL_F2F_STATUS_WAITLISTED) && !$session->allowoverbook) {
                     $options .= get_string('none', 'facetoface');
                 } else {
-                    if ($registrationopen == true && $registrationclosed == false) {
+                    if (empty($session->cancelledstatus) && $registrationopen == true && $registrationclosed == false) {
                         // Ok to register.
                         $signupurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
                         $signuptext = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
@@ -302,7 +311,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $row = new html_table_row($sessionrow);
 
             // Set the CSS class for the row.
-            if ($sessionstarted) {
+            if ($sessionstarted || !empty($session->cancelledstatus)) {
                 $row->attributes = array('class' => 'dimmed_text');
             } else if ($isbookedsession) {
                 $row->attributes = array('class' => 'highlight');
@@ -311,7 +320,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             }
 
             // Add row to table.
-            $table->data[] = $row;
+            if (!$editsessions && empty($session->cancelledstatus) || $editsessions) {
+                $table->data[] = $row;
+            }
         }
 
         $output .= html_writer::table($table);
@@ -577,6 +588,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             get_string('signupcustomfieldtab', 'facetoface'));
         $row[] = new tabobject('facetofacecancellation', new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacecancellation')),
             get_string('cancellationcustomfieldtab', 'facetoface'));
+        $row[] = new tabobject('facetofacesessioncancel', new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacesessioncancel')),
+            get_string('sessioncancellationcustomfieldtab', 'facetoface'));
 
         $tabs[] = $row;
         $activated[] = $currenttab;

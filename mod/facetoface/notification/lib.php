@@ -62,6 +62,7 @@ define('MDL_F2F_CONDITION_TRAINER_CONFIRMATION',         128);
 define('MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION', 256);
 define('MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT', 512);
 define('MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED',    1024);
+define('MDL_F2F_CONDITION_SESSION_CANCELLATION',         2048);
 define('MDL_F2F_CONDITION_RESERVATION_CANCELLED',        16384);
 define('MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED',    32768);
 define('MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE',         65536);
@@ -1556,6 +1557,12 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $msg = str_replace($placeholder, $cfvalue, $msg);
     }
 
+    $sessioncancellationcustomfields = customfield_get_data($session, 'facetoface_sessioncancel', 'facetofacecancellation', false);
+    foreach ($sessioncancellationcustomfields as $cftitle => $cfvalue) {
+        $placeholder = "[sessioncancel:{$cftitle}]";
+        $msg = str_replace($placeholder, $cfvalue, $msg);
+    }
+
     $msg = facetoface_message_substitutions_userfields($msg, $user);
 
     return $msg;
@@ -2078,6 +2085,19 @@ function facetoface_get_default_notifications($facetofaceid) {
         $notifications[MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED] = $cancelallreservations;
     } else {
         $missingtemplates[] = 'allreservationcancel';
+    }
+
+    if (isset($templates['sessioncancellation'])) {
+        $template = $templates['sessioncancellation'];
+        $sessioncancellation = new facetoface_notification($defaults, false);
+        $sessioncancellation->title = $template->title;
+        $sessioncancellation->body = $template->body;
+        $sessioncancellation->conditiontype = MDL_F2F_CONDITION_SESSION_CANCELLATION;
+        $sessioncancellation->cancelled = 1;
+        $sessioncancellation->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_SESSION_CANCELLATION] = $sessioncancellation;
+    } else {
+        $missingtemplates[] = 'sessioncancellation';
     }
 
     return array($notifications, $missingtemplates);

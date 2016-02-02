@@ -39,8 +39,8 @@ $s = optional_param('s', 0, PARAM_INT);
 $takeattendance    = optional_param('takeattendance', false, PARAM_BOOL);
 // Cancel request
 $cancelform        = optional_param('cancelform', false, PARAM_BOOL);
-// Action being performed
-$action            = optional_param('action', 'attendees', PARAM_ALPHA);
+// Action being performed, a proper default will be set shortly.
+$action            = optional_param('action', '', PARAM_ALPHA);
 // Only return content
 $onlycontent        = optional_param('onlycontent', false, PARAM_BOOL);
 // Export download.
@@ -83,6 +83,17 @@ if ($action == 'approvalrequired') {
     require_login();
 } else {
     require_login($course, false, $cm);
+}
+
+if ($action === '') {
+    // We're performing the default action.
+    if (!empty($session->cancelledstatus)) {
+        // The session is cancelled, default action is to show cancellations.
+        $action = 'cancellations';
+    } else {
+        // The default is to show attendees.
+        $action = 'attendees';
+    }
 }
 
 // Setup urls
@@ -134,7 +145,10 @@ if (has_capability('mod/facetoface:viewattendees', $context)) {
     $allowed_actions[] = 'attendees';
     $allowed_actions[] = 'waitlist';
     $allowed_actions[] = 'addattendees';
-    $available_actions[] = 'attendees';
+
+    if (empty($session->cancelledstatus)) {
+        $available_actions[] = 'attendees';
+    }
 
     if (facetoface_get_users_by_status($s, MDL_F2F_STATUS_WAITLISTED)) {
         $available_actions[] = 'waitlist';
@@ -144,7 +158,7 @@ if (has_capability('mod/facetoface:viewattendees', $context)) {
 if (has_capability('mod/facetoface:viewcancellations', $context)) {
     $allowed_actions[] = 'cancellations';
 
-    if (facetoface_get_users_by_status($s, MDL_F2F_STATUS_USER_CANCELLED)) {
+    if (!empty($session->cancelledstatus) || facetoface_get_users_by_status($s, MDL_F2F_STATUS_USER_CANCELLED)) {
         $available_actions[] = 'cancellations';
     }
 }
@@ -364,11 +378,13 @@ if ($action == 'attendees') {
     }
 
     // Get list of actions
-    if (in_array('addattendees', $allowed_actions)) {
-        $actions['add']    = get_string('addattendees', 'facetoface');
-        $actions['bulkaddfile']  = get_string('bulkaddattendeesfromfile', 'facetoface');
-        $actions['bulkaddinput'] = get_string('bulkaddattendeesfrominput', 'facetoface');
-        $actions['remove']    = get_string('removeattendees', 'facetoface');
+    if (empty($session->cancelledstatus)) {
+        if (in_array('addattendees', $allowed_actions)) {
+            $actions['add']    = get_string('addattendees', 'facetoface');
+            $actions['bulkaddfile']  = get_string('bulkaddattendeesfromfile', 'facetoface');
+            $actions['bulkaddinput'] = get_string('bulkaddattendeesfrominput', 'facetoface');
+            $actions['remove']    = get_string('removeattendees', 'facetoface');
+        }
     }
 
     // Verify global restrictions and process report early before any output is done (required for export).
@@ -429,6 +445,7 @@ if ($action == 'cancellations') {
         array('user', 'idnumber'),
         array('user', 'namelink'),
         array('session', 'cancellationdate'),
+        array('session', 'cancellationtype'),
         array('session', 'cancellationreason'),
     );
 
@@ -664,6 +681,23 @@ if (!$onlycontent && !$download) {
 
     if ($can_view_session) {
         echo facetoface_print_session($session, true);
+
+        // Print customfields.
+        $customfields = customfield_get_data($session, 'facetoface_sessioncancel', 'facetofacecancellation');
+
+        if (!empty($customfields)) {
+
+            $output = html_writer::start_tag('dl', array('class' => 'f2f'));
+
+            foreach ($customfields as $cftitle => $cfvalue) {
+                $output .= html_writer::tag('dt', str_replace(' ', '&nbsp;', format_string($cftitle)));
+                $output .= html_writer::tag('dd', $cfvalue);
+            }
+
+            $output .= html_writer::end_tag('dl');
+
+            echo $output;
+        }
     }
 
     include('attendee_tabs.php'); // If needed include tabs
@@ -683,7 +717,18 @@ if ($show_table) {
             if ($cancellations) {
                 $rows = $cancellations;
             } else {
-                $rows = facetoface_get_cancellations($session->id);
+                if (empty($session->cancelledstatus)) {
+                    $rows = facetoface_get_cancellations($session->id);
+                } else {
+                    $rows = facetoface_get_attendees($session->id, array(
+                        MDL_F2F_STATUS_BOOKED,
+                        MDL_F2F_STATUS_NO_SHOW,
+                        MDL_F2F_STATUS_PARTIALLY_ATTENDED,
+                        MDL_F2F_STATUS_FULLY_ATTENDED,
+                        MDL_F2F_STATUS_USER_CANCELLED,
+                        MDL_F2F_STATUS_SESSION_CANCELLED
+                    ));
+                }
             }
             break;
 
@@ -754,6 +799,8 @@ if ($show_table) {
             } else {
                 echo $OUTPUT->notification(get_string('nosignedupusersnumrequests', 'facetoface', count($requests)));
             }
+        } else if ($action == 'cancellations') {
+            echo $OUTPUT->notification(get_string('nocancellations', 'facetoface'));
         } else {
             echo $OUTPUT->notification(get_string('nosignedupusers', 'facetoface'));
         }
@@ -813,6 +860,8 @@ if ($show_table) {
         } else if ($action == 'cancellations') {
             $headers[] = get_string('timecancelled', 'facetoface');
             $columns[] = 'timecancelled';
+            $headers[] = get_string('canceltype', 'facetoface');
+            $columns[] = 'cancellationtype';
             $headers[] = get_string('cancelreason', 'facetoface');
             $columns[] = 'cancellationreason';
         } else {
@@ -967,7 +1016,17 @@ if ($show_table) {
                     $data[] = get_string('status_' . facetoface_get_status($attendee->statuscode), 'facetoface');
                 }
             } else if ($action == 'cancellations') {
-                $data[] = userdate($attendee->timecancelled, get_string('strftimedatetime'));
+                $timecancelled = isset($attendee->timecancelled) ? $attendee->timecancelled : $attendee->timecreated;
+                $data[] = userdate($timecancelled, get_string('strftimedatetime'));
+                if ($attendee->statuscode == MDL_F2F_STATUS_USER_CANCELLED) {
+                    $data[] = get_string('usercancelled', 'facetoface');
+                } else if ($attendee->statuscode == MDL_F2F_STATUS_SESSION_CANCELLED) {
+                    $data[] = get_string('sessioncancelled', 'facetoface');
+                } else {
+                    // Who knows!
+                    debugging('Unexpected cancellation type encountered.', DEBUG_DEVELOPER);
+                    $data[] = get_string('usercancelled', 'facetoface');
+                }
                 $showpix = new pix_icon('/t/preview', get_string('showcancelreason', 'facetoface'));
                 $url = new moodle_url('/mod/facetoface/cancellation_note.php',
                     array('s' => $session->id, 'userid' => $attendee->id, 'sesskey' => sesskey()));

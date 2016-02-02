@@ -523,6 +523,17 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 array('joins' => 'approver',
                       'displayfunc' => 'nice_datetime')
             ),
+            new rb_column_option(
+                'session',
+                'cancelledstatus',
+                get_string('cancelledstatus', 'mod_facetoface'),
+                'sessions.cancelledstatus',
+                array(
+                    'displayfunc' => 'show_cancelled_status',
+                    'joins' => 'sessions',
+                    'dbdatatype' => 'integer'
+                )
+            ),
         );
 
         // include some standard columns
@@ -701,6 +712,16 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 ),
                 'base.positiontype'
             ),
+            new rb_filter_option(
+                'session',
+                'cancelledstatus',
+                get_string('cancelledstatus', 'facetoface'),
+                'select',
+                array(
+                    'selectfunc' => 'cancel_status',
+                    'attributes' => rb_filter_option::select_width_limiter(),
+                )
+            ),
         );
 
         // include some standard filters
@@ -726,6 +747,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         include_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 
         return $POSITION_TYPES;
+    }
+
+    public function rb_filter_cancel_status() {
+        $selectchoices = array(
+            '1' => get_string('cancelled', 'rb_source_facetoface_sessions')
+        );
+
+        return $selectchoices;
     }
 
     protected function define_contentoptions() {
@@ -887,6 +916,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_custom_fields_for('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
         $this->add_custom_fields_for('facetoface_signup', 'status', 'facetofacesignupid', $this->joinlist, $this->columnoptions, $this->filteroptions);
         $this->add_custom_fields_for('facetoface_cancellation', 'cancellationstatus', 'facetofacecancellationid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+        $this->add_custom_fields_for('facetoface_sessioncancel', 'sessions', 'facetofacecancellationid', $this->joinlist, $this->columnoptions, $this->filteroptions);
     }
 
     //
@@ -1065,6 +1095,21 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $coursedelivery['Internal'] = 'Internal';
         $coursedelivery['External'] = 'External';
         return $coursedelivery;
+    }
+
+    /**
+     * Reformat a timestamp and timezone into a date, showing nothing if invalid or null
+     *
+     * @param integer $date Unix timestamp
+     * @param object $row Object containing all other fields for this row (which should include a timezone field)
+     *
+     * @return string Date in a nice format
+     */
+    function rb_display_show_cancelled_status($status) {
+        if ($status == 1) {
+            return get_string('cancelled', 'rb_source_facetoface_sessions');
+        }
+        return "";
     }
 
     public function post_config(reportbuilder $report) {

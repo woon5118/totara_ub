@@ -60,6 +60,7 @@ $string['type_role'] = 'Role';
 $string['type_session'] = 'Event';
 $string['type_facetoface_session'] = 'Event custom fields';
 $string['type_facetoface'] = 'Face to face';
+$string['type_facetoface_sessioncancel'] = 'Session cancellation customfields';
 $string['type_date'] = 'Date';
 $string['unknowndate'] = 'Unknown';
 $string['waitlistattendees'] = 'Number of wait-listed';

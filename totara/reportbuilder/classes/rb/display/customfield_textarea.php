@@ -79,6 +79,9 @@ class customfield_textarea extends base {
                 case 'facetoface_cancellation':
                     $prefix = 'facetofacecancellation';
                     break;
+                case 'facetoface_sessioncancel':
+                    $prefix = 'facetofacesessioncancel';
+                    break;
                 case 'dp_plan_evidence':
                     $prefix = 'dp_plan_evidence';
                     break;

@@ -210,8 +210,8 @@ function print_session_list($courseid, $facetoface, $sessions) {
     $bookedsession = null;
     $submissions = facetoface_get_user_submissions($facetoface->id, $USER->id);
     if (!$facetoface->multiplesessions) {
-         $submission = array_shift($submissions);
-         $bookedsession = $submission;
+        $submission = array_shift($submissions);
+        $bookedsession = $submission;
     }
 
     $upcomingarray = array();

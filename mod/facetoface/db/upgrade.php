@@ -3432,5 +3432,112 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016030100, 'facetoface');
     }
 
+    if ($oldversion < 2016030900) {
+
+        // We only want to add the notification once, as its the last step we'll only
+        // add it if we are making any XMLDB changes.
+        // As they are only made once if this step is re-run no structure changes will be made
+        // and we'll skip adding the notification.
+        $adjustingstructure = false;
+
+        // Define field sendcapacityemail to be added to facetoface_sessions.
+        $table = new xmldb_table('facetoface_sessions');
+
+        // Define field cancelledstatus to be added to facetoface_sessions.
+        $field = new xmldb_field('cancelledstatus', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'registrationtimefinish');
+        // Conditionally launch add field cancelledstatus.
+        if (!$dbman->field_exists($table, $field)) {
+            $adjustingstructure = true;
+            $dbman->add_field($table, $field);
+        }
+
+        // Define table facetoface_sessioncancel_info_field to be created.
+        $table = new xmldb_table('facetoface_sessioncancel_info_field');
+
+        // Adding fields to table facetoface_sessioncancel_info_field.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('datatype', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('hidden', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('locked', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('required', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('forceunique', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('defaultdata', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param1', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param2', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param3', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param4', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param5', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fullname', XMLDB_TYPE_CHAR, '1024', null, null, null, null);
+
+        // Adding keys to table facetoface_sessioncancel_info_field.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for facetoface_sessioncancel_info_field.
+        if (!$dbman->table_exists($table)) {
+            $adjustingstructure = true;
+            $dbman->create_table($table);
+        }
+
+        // Define table facetoface_sessioncancel_info_data to be created.
+        $table = new xmldb_table('facetoface_sessioncancel_info_data');
+
+        // Adding fields to table facetoface_sessioncancel_info_data.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('data', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fieldid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('facetofacecancellationid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table facetoface_sessioncancel_info_data.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('cancellationinfodata_fieldid_fk', XMLDB_KEY_FOREIGN, array('fieldid'), 'facetoface_sessioncancel_info_field', array('id'));
+        $table->add_key('cancellationinfodata_cancellationid_fk', XMLDB_KEY_FOREIGN, array('facetofacecancellationid'), 'facetoface_signups_status', array('id'));
+
+        // Conditionally launch create table for facetoface_sessioncancel_info_data.
+        if (!$dbman->table_exists($table)) {
+            $adjustingstructure = true;
+            $dbman->create_table($table);
+        }
+
+        // Define table facetoface_sessioncancel_info_data_param to be created.
+        $table = new xmldb_table('facetoface_sessioncancel_info_data_param');
+
+        // Adding fields to table facetoface_sessioncancel_info_data_param.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table facetoface_sessioncancel_info_data_param.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('cancellationinfodatapara_dataid_fk', XMLDB_KEY_FOREIGN, array('dataid'), 'facetoface_sessioncancel_info_data', array('id'));
+
+        // Adding indexes to table facetoface_sessioncancel_info_data_param.
+        $table->add_index('cancellationinfodatapara_value_ix', XMLDB_INDEX_NOTUNIQUE, array('value'));
+
+        // Conditionally launch create table for facetoface_sessioncancel_info_data_param.
+        if (!$dbman->table_exists($table)) {
+            $adjustingstructure = true;
+            $dbman->create_table($table);
+        }
+
+        // Add session cancellation notification template.
+        if ($adjustingstructure && $dbman->table_exists('facetoface_notification_tpl')) {
+            $sessioncancel = new stdClass();
+            $sessioncancel->reference = 'sessioncancellation';
+            $sessioncancel->status = 1;
+            $sessioncancel->title = get_string('setting:defaultsessioncancellationsubjectdefault', 'facetoface');
+            $sessioncancel->body = text_to_html(get_string('setting:defaultsessioncancellationmessagedefault', 'facetoface'));
+            $sessioncancel->managerprefix = text_to_html(get_string('setting:defaultsessioncancellationinstrmngrcopybelow', 'facetoface'));
+            $DB->insert_record('facetoface_notification_tpl', $sessioncancel);
+        }
+
+        // Unset the var - no need to keep it around.
+        unset($adjustingstructure);
+
+        upgrade_mod_savepoint(true, 2016030900, 'facetoface');
+    }
+
     return $result;
 }

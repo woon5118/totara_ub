@@ -41,7 +41,8 @@ function xmldb_facetoface_install() {
         'setting:defaulttrainersessioncancellationsubjectdefault' => get_string('setting:defaulttrainersessioncancellationsubjectdefault', 'facetoface'),
         'setting:defaulttrainersessionunassignedsubjectdefault' => get_string('setting:defaulttrainersessionunassignedsubjectdefault', 'facetoface'),
         'setting:defaultcancelreservationsubjectdefault' => get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface'),
-        'setting:defaultcancelallreservationssubjectdefault' => get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface')
+        'setting:defaultcancelallreservationssubjectdefault' => get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface'),
+        'setting:defaultsessioncancellationsubjectdefault' => get_string('setting:defaultsessioncancellationsubjectdefault', 'facetoface')
     );
 
     foreach ($titles as $key => $title) {
@@ -158,6 +159,14 @@ function xmldb_facetoface_install() {
     $tpl_reservationcancel->title = $titles['setting:defaultcancelreservationsubjectdefault'];
     $tpl_reservationcancel->body = text_to_html(get_string('setting:defaultcancelreservationmessagedefault', 'facetoface'));
     $DB->insert_record('facetoface_notification_tpl', $tpl_reservationcancel);
+
+    $tpl_sessioncancel = new stdClass();
+    $tpl_sessioncancel->reference = 'sessioncancellation';
+    $tpl_sessioncancel->status = 1;
+    $tpl_sessioncancel->title = $titles['setting:defaultsessioncancellationsubjectdefault'];
+    $tpl_sessioncancel->body = text_to_html(get_string('setting:defaultsessioncancellationmessagedefault', 'facetoface'));
+    $tpl_sessioncancel->managerprefix = text_to_html(get_string('setting:defaultsessioncancellationinstrmngrcopybelow', 'facetoface'));
+    $DB->insert_record('facetoface_notification_tpl', $tpl_sessioncancel);
 
     // Setting room, building, and address as default filters.
     set_config('facetoface_calendarfilters', 'room,building,address');

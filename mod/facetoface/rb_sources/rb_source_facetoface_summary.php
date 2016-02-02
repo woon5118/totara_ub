@@ -278,7 +278,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 'session',
                 'overallstatus',
                 get_string('overallstatus', 'rb_source_facetoface_summary'),
-                "( CASE WHEN datetimeknown = 0 OR timestart IS NULL OR timestart = 0 OR timestart > {$now} THEN 'upcoming'
+                "( CASE WHEN cancelledstatus <> 0 THEN 'cancelled'
+                        WHEN datetimeknown = 0 OR timestart IS NULL OR timestart = 0 OR timestart > {$now} THEN 'upcoming'
                         WHEN {$now} > timestart AND {$now} < timefinish THEN 'started'
                         WHEN {$now} > timefinish THEN 'ended'
                         ELSE NULL END
@@ -712,8 +713,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
     public function rb_filter_overallstatus() {
         $statusopts = array(
             'upcoming' => get_string('status:upcoming', 'rb_source_facetoface_summary'),
-            // TODO: TL-8187 Uncomment when implemented according Session cancellations specification.
-            //'cancelled' => get_string('status:cancelled', 'rb_source_facetoface_summary'),
+            'cancelled' => get_string('status:cancelled', 'rb_source_facetoface_summary'),
             'started' => get_string('status:started', 'rb_source_facetoface_summary'),
             'ended' => get_string('status:ended', 'rb_source_facetoface_summary'),
         );
@@ -740,5 +740,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
 
     protected function add_customfields() {
         $this->add_custom_fields_for('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+        $this->add_custom_fields_for('facetoface_sessioncancel', 'sessions', 'facetofacecancellationid', $this->joinlist, $this->columnoptions, $this->filteroptions);
     }
 }

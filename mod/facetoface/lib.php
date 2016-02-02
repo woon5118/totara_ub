@@ -72,7 +72,6 @@ define('F2F_CAL_SITE',      2);
 
 // Signup status codes (remember to update $MDL_F2F_STATUS)
 define('MDL_F2F_STATUS_USER_CANCELLED',     10);
-// SESSION_CANCELLED is not yet implemented
 define('MDL_F2F_STATUS_SESSION_CANCELLED',  20);
 define('MDL_F2F_STATUS_DECLINED',           30);
 define('MDL_F2F_STATUS_REQUESTED',          40);
@@ -107,8 +106,7 @@ define('APPROVAL_ADMIN', 8);
 global $MDL_F2F_STATUS, $F2F_SELECT_OPTIONS;
 $MDL_F2F_STATUS = array(
     MDL_F2F_STATUS_USER_CANCELLED       => 'user_cancelled',
-//  SESSION_CANCELLED is not yet implemented
-//    MDL_F2F_STATUS_SESSION_CANCELLED    => 'session_cancelled',
+    MDL_F2F_STATUS_SESSION_CANCELLED    => 'session_cancelled',
     MDL_F2F_STATUS_DECLINED             => 'declined',
     MDL_F2F_STATUS_REQUESTED            => 'requested',
     MDL_F2F_STATUS_REQUESTEDADMIN       => 'requestedadmin',
@@ -779,6 +777,66 @@ function facetoface_get_facetoface_menu() {
     } else {
         return '';
     }
+}
+
+/**
+ * Cancel entry from the facetoface_sessions table
+ *
+ * @param stdClass $session Record from facetoface_sessions
+ * @return bool
+ */
+function facetoface_cancel_session($session) {
+    global $DB, $USER;
+
+    $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
+
+    // Update record cancelledstatus
+    $DB->set_field('facetoface_sessions', 'cancelledstatus', 1, array('id' => $session->id));
+
+    // Notify users that session is cancelled
+    $sql = "SELECT DISTINCT userid, s.id as signupid
+              FROM {facetoface_signups} s
+         LEFT JOIN {facetoface_signups_status} ss ON ss.signupid = s.id
+             WHERE s.sessionid = :sessionid AND
+                   ss.superceded = 0 AND
+                   ss.statuscode >= :status";
+    $params = array(
+        'sessionid' => $session->id,
+        'status' => MDL_F2F_STATUS_SESSION_CANCELLED,
+    );
+    $signedupusers = $DB->get_records_sql($sql, $params);
+    foreach ($signedupusers as $user) {
+        // We record this change as being triggered by the current user.
+        facetoface_update_signup_status($user->signupid, MDL_F2F_STATUS_SESSION_CANCELLED, $USER->id);
+        facetoface_send_cancellation_notice($facetoface, $session, $user->userid, MDL_F2F_CONDITION_SESSION_CANCELLATION);
+    }
+
+    // Send cancellations for trainers assigned to the session.
+    $trainers = $DB->get_records("facetoface_session_roles", array("sessionid" => $session->id));
+    foreach ($trainers as $trainer) {
+        facetoface_send_cancellation_notice($facetoface, $session, $trainer->userid, MDL_F2F_CONDITION_SESSION_CANCELLATION);
+    }
+
+    // Notify managers who had reservations.
+    facetoface_notify_reserved_session_deleted($facetoface, $session);
+
+    // Remove entries from the teacher calendars
+    $select = $DB->sql_like('description', ':attendess');
+    $select .= " AND modulename = 'facetoface' AND eventtype = 'facetofacesession' AND instance = :facetofaceid";
+    $params = array(
+        'attendess' => "%attendees.php?s={$session->id}%",
+        'facetofaceid' => $facetoface->id
+    );
+    $DB->delete_records_select('event', $select, $params);
+    if ($facetoface->showoncalendar == F2F_CAL_COURSE) {
+        // Remove entry from course calendar.
+        facetoface_remove_session_from_calendar($session, $facetoface->course);
+    } else if ($facetoface->showoncalendar == F2F_CAL_SITE) {
+        // Remove entry from site-wide calendar.
+        facetoface_remove_session_from_calendar($session, SITEID);
+    }
+
+    return true;
 }
 
 /**
@@ -2899,7 +2957,9 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     }
 
                     $span = html_writer::span(get_string('optionscolon', 'facetoface'), 'f2fsessionnotice');
-                    if ($registrationopen == true && $registrationclosed == false) {
+                    if (!empty($session->cancelledstatus)) {
+                        $moreinfolink = get_string('bookingsessioncancelled', 'facetoface');
+                    } else if ($registrationopen == true && $registrationclosed == false) {
                         // Ok to register.
                         $signupurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
                         $signuptext = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
@@ -3197,7 +3257,7 @@ function facetoface_get_user_submissions($facetofaceid, $userid, $minimumstatus=
     global $DB;
 
     $whereclause = "s.facetoface = ? AND su.userid = ? AND ss.superceded != 1
-            AND ss.statuscode >= ? AND ss.statuscode <= ?";
+            AND ss.statuscode >= ? AND ss.statuscode <= ? AND s.cancelledstatus != 1";
     $whereparams = array($facetofaceid, $userid, $minimumstatus, $maximumstatus);
 
     if (!empty($sessionid)) {
@@ -3213,6 +3273,7 @@ function facetoface_get_user_submissions($facetofaceid, $userid, $minimumstatus=
             s.id as sessionid,
             su.userid,
             0 as mailedconfirmation,
+            s.cancelledstatus,
             su.discountcode,
             ss.timecreated,
             ss.timecreated as timegraded,
@@ -4097,6 +4158,9 @@ function facetoface_get_cancellations($sessionid) {
 
     $usernamefields = get_all_user_name_fields(true, 'u');
 
+    $cancelledstatus = array(MDL_F2F_STATUS_USER_CANCELLED, MDL_F2F_STATUS_SESSION_CANCELLED);
+    list($cancelledinsql, $cancelledinparams) = $DB->get_in_or_equal($cancelledstatus);
+
     $instatus = array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, MDL_F2F_STATUS_REQUESTED);
     list($insql, $inparams) = $DB->get_in_or_equal($instatus);
     // Nasty SQL follows:
@@ -4121,7 +4185,7 @@ function facetoface_get_cancellations($sessionid) {
             JOIN
                 {facetoface_signups_status} c
              ON su.id = c.signupid
-            AND c.statuscode = ?
+            AND c.statuscode $cancelledinsql
             AND c.superceded = 0
             LEFT JOIN
                 {facetoface_signups_status} ss
@@ -4149,7 +4213,7 @@ function facetoface_get_cancellations($sessionid) {
                 {$usernamefields},
                 c.timecreated
     ";
-    $params = array_merge(array(MDL_F2F_STATUS_USER_CANCELLED), $inparams);
+    $params = array_merge($cancelledinparams, $inparams);
     $params[] = $sessionid;
     return $DB->get_records_sql($sql, $params);
 }

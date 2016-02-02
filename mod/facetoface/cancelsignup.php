@@ -56,9 +56,10 @@ $PAGE->set_url('/mod/facetoface/cancelsignup.php', array('s' => $s, 'backtoallse
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
 
-$returnurl = "$CFG->wwwroot/course/view.php?id=$course->id";
+$returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
+
 if ($backtoallsessions) {
-    $returnurl = "$CFG->wwwroot/mod/facetoface/view.php?f=$backtoallsessions";
+    $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $backtoallsessions));
 }
 
 // Add booking information.

@@ -69,6 +69,7 @@ $string['currentpos'] = 'The user\'s current position';
 $string['user'] = 'The user';
 $string['reserved'] = 'Reserved';
 $string['thedate'] = 'The session';
+$string['cancelled'] = 'Cancelled';
 
 // filters
 $string['pilot'] = 'Pilot';
@@ -85,4 +86,5 @@ $string['type_facetoface'] = 'Face-to-face';
 $string['type_facetoface_session'] = 'Event customfields';
 $string['type_facetoface_signup'] = 'Signup note customfields';
 $string['type_facetoface_cancellation'] = 'Cancellation note customfields';
+$string['type_facetoface_sessioncancel'] = 'Session cancellation customfields';
 $string['type_date'] = 'Date';

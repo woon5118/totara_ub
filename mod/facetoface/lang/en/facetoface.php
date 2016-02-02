@@ -99,6 +99,7 @@ $string['approved'] = 'Approved';
 $string['approvername'] = 'Approver name';
 $string['areyousureconfirmwaitlist'] = 'This will be over the event capacity allowance. Are you sure you want to continue?';
 $string['assessmentyour'] = 'Your assessment';
+$string['assets'] = 'Assets';
 $string['attendance'] = 'Attendance';
 $string['attendanceinstructions'] = 'Select users who attended the event:';
 $string['attendancerequestsupdated'] = 'Attendance requests updated';
@@ -183,6 +184,8 @@ $string['bookingcompleted_roleapprovalrequired'] = 'Your request to attend this 
 $string['bookingfull'] = 'Booking full';
 $string['bookingopen'] = 'Booking open';
 $string['bookingstatus'] = 'You are booked for the following event';
+$string['bookingopen'] = 'Booking open';
+$string['bookingsessioncancelled'] = 'Session cancelled';
 $string['building'] = 'Building';
 $string['bulkactions'] = 'Bulk actions';
 $string['bulkaddattendeeserror'] = 'Bulk add attendees error';
@@ -198,6 +201,12 @@ $string['bulkremoveattendeessuccess'] = 'Bulk remove users success';
 $string['calendareventdescriptionbooking'] = 'You are booked for this <a href="{$a}">Face-to-face event</a>.';
 $string['calendareventdescriptionsession'] = 'You have created this <a href="{$a}">Face-to-face event</a>.';
 $string['calendaroptions'] = 'Calendar options';
+$string['cancel'] = 'Cancel';
+$string['cancelsession'] = 'Cancel session';
+$string['cancelingsession'] = 'Canceling session in {$a}';
+$string['cancelsessionconfirm'] = 'Are you completely sure you want to cancel this session? All attendees will be notified. This action cannot be un-done.';
+$string['cancelledstatus'] = 'Cancelled status';
+$string['eventsessioncancelled'] = 'Session cancelled';
 $string['cancelbooking'] = 'Cancel booking';
 $string['cancelbookingfor'] = 'Cancel booking for {$a}';
 $string['cancellationreasoncourseunenrollment'] = '{$a->username} has been unenrolled from the course {$a->coursename}.';
@@ -245,10 +254,11 @@ $string['copy'] = 'Copy';
 $string['cost'] = 'Cost';
 $string['cancelbooking'] = 'Cancel booking';
 $string['cancellation'] = 'Cancellation';
-$string['cancellationcustomfieldtab'] = 'Cancellation note';
+$string['cancellationcustomfieldtab'] = 'User cancellation';
 $string['cancellations'] = 'Cancellations';
 $string['cancellationmessage'] = 'Cancellation message';
 $string['cancellationconfirm'] = 'Are you sure you want to cancel your booking to this event?';
+$string['canceltype'] = 'Cancellation type';
 $string['close'] = 'Close';
 $string['currentlyselected'] = 'Currently selected';
 $string['cutoff'] = 'Cut-off';
@@ -382,6 +392,7 @@ $string['error:couldnotcopysession'] = 'Could not copy event';
 $string['error:couldnotdeletefield'] = 'Could not delete custom event field';
 $string['error:couldnotdeletenotice'] = 'Could not delete site notice';
 $string['error:couldnotdeletesession'] = 'Could not delete event';
+$string['error:couldnotcancelsession'] = 'Could not cancel session';
 $string['error:couldnotdeletetrainer'] = 'Could not delete a face-to-face event trainer';
 $string['error:couldnotfindsession'] = 'Could not find the newly inserted event';
 $string['error:couldnotsavecustomfield'] = 'Could not save custom field';
@@ -602,6 +613,7 @@ $string['multidate'] = '(multi-date)';
 $string['multiplesessions'] = 'Allow multiple events signup per user';
 $string['namewithmanager'] = '{$a->attendeename} ({$a->managername})';
 $string['noactionableunapprovedrequests'] = 'No actionable unapproved requests';
+$string['nocancellations'] = 'There have been no cancellations';
 $string['nocustomfields'] = '<p>No custom fields are defined.</p>';
 $string['nofacetofaces'] = 'There are no Face-to-face activities';
 $string['nonapplicable'] = 'N/A';
@@ -735,6 +747,7 @@ $string['roomisinuse'] = 'Room is in use';
 $string['roomdescription'] = 'Room description';
 $string['roommustbebookedtoexternalcalendar'] = 'Note: Please ensure that this room is available before creating this booking.';
 $string['roomname'] = 'Room name';
+$string['room'] = 'Room';
 $string['rooms'] = 'Rooms';
 $string['roomcreatesuccess'] = 'Successfully created room';
 $string['roomtype'] = 'Room type';
@@ -851,6 +864,7 @@ $string['sentxnotifications'] = 'Send {$a} notifications';
 $string['sentremindermanager'] = 'Sent reminder email to user manager';
 $string['sentreminderuser'] = 'Sent reminder email to user';
 $string['sessionattendees'] = 'Session attendees';
+$string['sessioncancelled'] = 'Event cancellation';
 $string['sessioncustomfieldtab'] = 'Event';
 $string['sessiondate'] = 'Session';
 $string['sessiondatetime'] = 'Event date/time';
@@ -888,6 +902,7 @@ $string['sessiontimezone'] = 'Timezone';
 $string['sessiontimezone_help'] = 'Select the timezone you want this event to be displayed in e.g. "Pacific/Auckland". This will display the start time, finish time and timezone in accordance with the timezone selected. If you choose "User timezone", this will display the start time, finish date and timezone in relation to the timezone of the user viewing the event.';
 $string['sessiontimezoneunknown'] = 'Unknown Timezone';
 $string['sessionundercapacity'] = 'Event under capacity for: {$a}';
+$string['sessioncancellationcustomfieldtab'] = 'Event cancellation';
 $string['sessionundercapacity_body'] = 'The following event is under capacity:
 
 Name: {$a->name}
@@ -1274,6 +1289,27 @@ By waitlisting you have registered your interest in this course and will be cont
 
 To remove yourself from this waitlist please return to this course and click Cancel waitlist. Please note there is no waitlist removal confirmation email.
 ';
+$string['setting:defaultsessioncancellationinstrmngrcopybelow'] = '*** [firstname] [lastname]\'s session cancellation is copied below ****';
+$string['setting:defaultsessioncancellationmessage'] = 'Default session cancellation message sent to the user.';
+$string['setting:defaultsessioncancellationmessage_caption'] = 'Session cancellation message';
+$string['setting:defaultsessioncancellationmessagedefault'] = 'This is to advise that the following session has been cancelled:
+
+***SESSION CANCELLED***
+
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+
+Duration:   [duration]
+Date(s):
+[alldates]
+
+Location:   [session:location]
+Venue:   [session:venue]
+Room:   [session:room]
+';
+$string['setting:defaultsessioncancellationsubject'] = 'Default subject line for session cancellation emails.';
+$string['setting:defaultsessioncancellationsubject_caption'] = 'Session cancellation subject';
+$string['setting:defaultsessioncancellationsubjectdefault'] = 'Face-to-face session cancellation';
 $string['setting:defaultwaitlistedsubject'] = 'Default subject line for wait-listed emails.';
 $string['setting:defaultwaitlistedsubject_caption'] = 'Wait-listed subject';
 $string['setting:defaultwaitlistedsubjectdefault'] = 'Waitlisting advice for [facetofacename]';
@@ -1421,6 +1457,7 @@ $string['allowbookingscancellationsdefault'] = 'Default booking cancellation set
 $string['allowbookingscancellations_help'] = 'Allow users to cancel their bookings at any time, never or until cut-off reached (x amount of time before the event starts).';
 $string['allowbookingscancellationsdefault_help'] = 'Set the default cancellation settings for this facetoface and allow users to cancel their bookings at any time, never or until cut-off reached (x amount of time before the event starts).';
 $string['usercalentry'] = 'Show entry on user\'s calendar';
+$string['usercancelled'] = 'User cancellation';
 $string['usercancellationnoteheading'] = '{$a} - Cancellation note';
 $string['userdeletedcancel'] = 'User has been deleted';
 $string['usersuspendedcancel'] = 'User has been suspended';
