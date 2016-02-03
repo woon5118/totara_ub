@@ -745,7 +745,7 @@ class facetoface_notification extends data_object {
         $this->_event->subject     = $subject;
         $this->_event->fullmessage       = $plaintext;
         $this->_event->fullmessageformat = FORMAT_PLAIN;
-        $this->_event->fullmessagehtml   = nl2br($body);
+        $this->_event->fullmessagehtml   = $body;
         $this->_event->smallmessage      = $plaintext;
 
         $this->_event->icon        = 'facetoface-regular';
@@ -753,7 +753,7 @@ class facetoface_notification extends data_object {
         $plaintext = format_text_email($managerprefix, FORMAT_HTML);
         $this->_event->manager = new stdClass();
         $this->_event->manager->fullmessage       = $plaintext;
-        $this->_event->manager->fullmessagehtml   = nl2br($managerprefix);
+        $this->_event->manager->fullmessagehtml   = $managerprefix;
         $this->_event->manager->smallmessage      = $plaintext;
 
         // Speciality icons.

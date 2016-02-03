@@ -1854,7 +1854,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             $alldates .= $alldates_segment.' ';
             $alldateshtml .= $alldates_segment;
             if ($sessiondate !== end($session->sessiondates)){
-                $alldateshtml .= "<br />\n";
+                $alldateshtml .= "\n";
             }
         }
         $this->assertContains('alldates '.$alldates, $fullmessage);
