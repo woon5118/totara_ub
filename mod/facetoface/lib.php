@@ -3039,11 +3039,17 @@ function facetoface_is_signup_by_waitlist($session) {
         return true;
     }
 
+    if (!$cm = get_coursemodule_from_instance('facetoface', $session->facetoface)) {
+        print_error('error:incorrectcoursemoduleid', 'facetoface');
+    }
+    $context = context_module::instance($cm->id);
     // Get waitlisteveryone setting for the session.
     $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
     $waitlisteveryone = !empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone;
+    // If user has capability to overbook?
+    $overbook = has_capability('mod/facetoface:overbook', $context);
     if ($waitlisteveryone || facetoface_get_num_attendees($session->id) >= $session->capacity) {
-        return true;
+        return ($overbook ? false : true);
     }
 
     return false;
