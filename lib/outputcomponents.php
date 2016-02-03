@@ -1811,7 +1811,7 @@ class js_writer {
  * @package core
  * @category output
  */
-class html_table implements renderable {
+class html_table implements renderable, templatable {
 
     /**
      * @var string Value to use for the id attribute of the table
@@ -2290,9 +2290,10 @@ class html_table implements renderable {
      *   - tableclasses string
      *   - width string
      *
+     * @param renderer_base $output
      * @return stdClass Object containing the data structure
      */
-    public function export_for_template($output) {
+    public function export_for_template(renderer_base $output) {
         // First up convert all bits to html_table objects.
         $this->normalise_head();
         $this->normalise_data();
