@@ -77,3 +77,27 @@ function report_completion_page_type_list($pagetype, $parentcontext, $currentcon
     );
     return $array;
 }
+
+/**
+ * Add nodes to myprofile page.
+ *
+ * Added in as part of TL-8365
+ *
+ * @param \core_user\output\myprofile\tree $tree Tree object
+ * @param stdClass $user user object
+ * @param bool $iscurrentuser
+ * @param stdClass $course Course object
+ *
+ * @return bool
+ */
+function report_completion_myprofile_navigation(core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
+    if (empty($course)) {
+        // We want to display these reports under the site context.
+        $course = get_fast_modinfo(SITEID)->get_course();
+    }
+    if (completion_can_view_data($user->id, $course->id)) {
+        $url = new moodle_url('/report/completion/user.php', array('id'=>$user->id, 'course'=>$course->id));
+        $node = new core_user\output\myprofile\node('reports', 'completetion', get_string('coursecompletion'), null, $url);
+        $tree->add_node($node);
+    }
+}
