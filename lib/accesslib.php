@@ -2064,6 +2064,9 @@ function role_unassign_all_bulk(array $params, $subcontexts = false, $includeman
         list($sqlin, $sqlinparams) = $DB->get_in_or_equal($params['userids'], SQL_PARAMS_NAMED);
         $wheresql .= "userid {$sqlin} AND ";
         unset($params['userids']);
+    } else if (isset($params['userids']) and empty($params['userids'])) {
+        // The list of users is present and empty, this means nothing to do!
+        return;
     }
     $wheresql .= implode(' AND ', array_map(function ($iname) { return "{$iname} = :{$iname}"; }, array_keys($params)));
     $params = array_merge($sqlinparams, $params);

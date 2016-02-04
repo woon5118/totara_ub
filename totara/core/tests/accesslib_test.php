@@ -33,4 +33,65 @@ class totara_core_accesslib_testcase extends advanced_testcase {
             $this->assertNotContains('???', $name, "Unexpected problem when getting name of capability {$capability->name}");
         }
     }
+
+    public function test_role_unassign_all_bulk() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $student = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
+        $teacher = $DB->get_record('role', array('shortname' => 'editingteacher'), '*', MUST_EXIST);
+
+        $course1 = $this->getDataGenerator()->create_course();
+        $context1 = context_course::instance($course1->id);
+        $course2 = $this->getDataGenerator()->create_course();
+        $context2 = context_course::instance($course2->id);
+        $catcontext = context_coursecat::instance($course1->category);
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user1->id, $course1->id, $teacher->id);
+        $this->getDataGenerator()->enrol_user($user1->id, $course2->id, $teacher->id);
+
+        $user2 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user2->id, $course1->id, $student->id);
+        $this->getDataGenerator()->enrol_user($user2->id, $course2->id, $student->id);
+
+        $user3 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user3->id, $course1->id, $student->id);
+        $this->getDataGenerator()->enrol_user($user3->id, $course2->id, $student->id);
+
+        $user4 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user4->id, $course1->id, $student->id);
+        $this->getDataGenerator()->enrol_user($user4->id, $course2->id, $student->id);
+
+        $this->assertCount(8, $DB->get_records('role_assignments'));
+
+        // Empty user list.
+        role_unassign_all_bulk(array('contextid' => $context1->id, 'userids' => array()));
+        $this->assertCount(8, $DB->get_records('role_assignments'));
+
+        role_unassign_all_bulk(array('contextid' => $context1->id, 'roleid' => $student->id, 'userids' => array($user4->id)));
+        $this->assertCount(7, $DB->get_records('role_assignments'));
+        $this->assertCount(0, $DB->get_records('role_assignments', array('userid' => $user4->id, 'contextid' => $context1->id)));
+        $this->assertCount(1, $DB->get_records('role_assignments', array('userid' => $user4->id, 'contextid' => $context2->id)));
+
+        role_unassign_all_bulk(array('contextid' => $catcontext->id, 'userids' => array($user2->id, $user3->id)), true);
+        $this->assertCount(3, $DB->get_records('role_assignments'));
+        $this->assertCount(0, $DB->get_records('role_assignments', array('userid' => $user3->id)));
+        $this->assertCount(0, $DB->get_records('role_assignments', array('userid' => $user2->id)));
+
+        try {
+            role_unassign_all_bulk(array());
+            $this->fail('Exception expected when contextid parameter missing.');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf('coding_exception', $e);
+        }
+
+        try {
+            role_unassign_all_bulk(array('contextid' => $catcontext->id, 'xxx' => 1));
+            $this->fail('Exception expected when unknown parameter present.');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf('coding_exception', $e);
+        }
+    }
 }
