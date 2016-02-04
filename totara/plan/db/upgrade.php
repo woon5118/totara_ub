@@ -845,5 +845,25 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016021506, 'totara', 'plan');
     }
 
+    if ($oldversion < 2016021507) {
+        // Clean up deleted courses still assigned to plans.
+        $transaction = $DB->start_delegated_transaction();
+
+        $sql = "DELETE FROM {dp_plan_course_assign} WHERE courseid NOT IN (SELECT id FROM {course})";
+
+        $DB->execute($sql);
+
+        $sql = "DELETE FROM {dp_plan_component_relation} WHERE
+                    (component1 = 'course' AND itemid1 NOT IN (SELECT id FROM {dp_plan_course_assign}))
+                OR
+                    (component2 = 'course' AND itemid2 NOT IN (SELECT id FROM {dp_plan_course_assign}))";
+
+        $DB->execute($sql);
+
+        $transaction->allow_commit();
+
+        upgrade_plugin_savepoint(true, 2016021507, 'totara', 'plan');
+    }
+
     return true;
 }

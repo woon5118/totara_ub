@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author David Curry <david.curry@totaralms.com>
+ * @author Alastair Munro <alastair.munro@totaralms.com>
  * @package totara_plan
  */
 
@@ -43,5 +44,38 @@ class totara_plan_observer {
         foreach ($evidenceitems as $evidence) {
             evidence_delete($evidence->id);
         }
+    }
+
+    /*
+     * This function is to clean up any references to courses within
+     * programs when they are deleted. Any coursesets that become empty
+     * due to this are also deleted as programs does not allow empty
+     * coursesets.
+     *
+     * @param \core\event\course_deleted $event
+     * @return boolean True if all references to the course are deleted correctly
+     */
+    public static function course_deleted(\core\event\course_deleted $event) {
+        global $DB;
+
+        $courseid = $event->objectid;
+
+        $transaction = $DB->start_delegated_transaction();
+
+        // Remove relations.
+        $sql = "DELETE FROM {dp_plan_component_relation} WHERE
+                    (component1 = 'course' AND itemid1 IN (SELECT id FROM {dp_plan_course_assign} WHERE courseid = :courseid1))
+                OR
+                    (component2 = 'course' AND itemid2 IN (SELECT id FROM {dp_plan_course_assign} WHERE courseid = :courseid2))";
+
+        $params = array('courseid1' => $courseid, 'courseid2' => $courseid);
+        $DB->execute($sql, $params);
+
+        // Remove records of courses assigned to plans.
+        $DB->delete_records('dp_plan_course_assign', array('courseid' => $courseid));
+
+        $transaction->allow_commit();
+
+        return true;
     }
 }

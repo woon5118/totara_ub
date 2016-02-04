@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author David Curry <david.curry@totaralms.com>
+ * @author Alastair Munro <alastair.munro@totaralms.com>
  * @package totara_plan
  */
 
@@ -32,5 +33,9 @@ $observers = array(
     array(
         'eventname' => '\core\event\user_deleted',
         'callback' => 'totara_plan_observer::user_deleted',
+    ),
+    array(
+        'eventname' => '\core\event\course_deleted',
+        'callback'  => 'totara_plan_observer::course_deleted',
     ),
 );
