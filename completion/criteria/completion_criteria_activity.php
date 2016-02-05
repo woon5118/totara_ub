@@ -292,12 +292,33 @@ class completion_criteria_activity extends completion_criteria {
             $details['status'][] = get_string('completion-y', 'completion');
         } else {
             if ($cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
+                // [TL 8078] The code originally used the 'viewedactivity' and
+                // 'achievedgrade' language strings for all activity completion
+                // scenarios. This is conceptually wrong since at this point, an
+                // activity could be partially completed - which makes it not
+                // completed but "started". Hence the checks to see which lang
+                // strings to emit.
+                $course = new \stdClass();
+                $course->id = $completion->course;
+                $info = new completion_info($course);
+                $data = $info->get_data($cm, false, $completion->userid);
+
                 if ($cm->completionview) {
-                    $details['status'][] = get_string('viewedactivity', 'completion', $this->module);
+                    $lang_str = $data->viewed == COMPLETION_VIEWED ? 'viewedactivity' : 'notviewedactivity';
+                    $details['status'][] = get_string($lang_str, 'completion', $this->module);
                 }
 
                 if (!is_null($cm->completiongradeitemnumber)) {
-                    $details['status'][] = get_string('achievedgrade', 'completion');
+                    $lang_str = 'achievedgrade';
+                    if ($data->completionstate == COMPLETION_INCOMPLETE
+                        || $data->completionstate == COMPLETION_COMPLETE_FAIL) {
+                        // Unfortunately there is one more completion state enum
+                        // COMPLETION_COMPLETE which does not indicate whether
+                        // the student passed or failed. Hence the code does not
+                        // consider it here.
+                        $lang_str = 'notachievedgrade';
+                    }
+                    $details['status'][] = get_string($lang_str, 'completion', $this->module);
                 }
             }
 

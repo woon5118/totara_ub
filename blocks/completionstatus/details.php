@@ -123,10 +123,21 @@ if ($coursecomplete) {
         $statusstring = get_string('complete');
     }
 
-} else if (!$criteriacomplete && !$ccompletion->timestarted) {
-    $statusstring = html_writer::tag('i', get_string('notyetstarted', 'completion'));
-} else {
-    $statusstring = html_writer::tag('i', get_string('inprogress', 'completion'));
+}
+else {
+    // [TL 8078] the original code computed status text by checking for criteria
+    // completion AND the time the course started. However, for some reason when
+    // a SCORM activity was already in progress (or at least viewed), the time
+    // started was still 0. Which then caused the status to show "not started".
+    // So now the code has been changed to show a generic "incomplete" - which
+    // is always correct because of the 'if' condition this else is attached to.
+    //
+    // The fundamental problem here is not the SCORM module or any of the other
+    // activity modules. The problem is the disconnect and the fragility of the
+    // implied contracts and assumptions between courses and the activities it
+    // contains. Fixing the faulty interactions between the course and activity
+    // is out of scope for this fix.
+    $statusstring = html_writer::tag('i', get_string('notcompleted', 'completion'));
 }
 
 echo get_string('status', 'block_completionstatus', $statusstring);
