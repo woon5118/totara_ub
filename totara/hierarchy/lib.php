@@ -1414,7 +1414,6 @@ class hierarchy {
         // and the table format would break anyway if indented too much
         $itemdepth = ($indicate_depth) ? 'depth' . min(10, $record->depthlevel) : 'depth1';
         // @todo get based on item type or better still, don't use inline styles :-(
-        $itemicon = $OUTPUT->pix_url('/i/item');
         $cssclass = !$record->visible ? 'dimmed' : '';
         $out = html_writer::start_tag('div', array('class' => 'hierarchyitem ' . $itemdepth));
         $out .= $OUTPUT->action_link(new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => $this->prefix, 'id' => $record->id)), format_string($record->fullname), null, array('class' => $cssclass));

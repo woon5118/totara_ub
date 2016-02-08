@@ -2004,6 +2004,22 @@ class theme_config {
         // Default it to blocks.
         return 'blocks';
     }
+
+    /**
+     * Return an array of paths to potential icons.json files for a given theme.
+     *
+     * The returned array is in order of precedence highest first to lowest last.
+     *
+     * @param string $themename Name of the theme to get candidates for.
+     * @return array
+     */
+    public static function flex_icon_get_file_candidate_paths($themename) {
+
+        $themeconfig = self::load($themename);
+        return core\flex_icon_helper::get_file_candidate_paths(array_merge(array($themeconfig), array_values($themeconfig->parent_configs)));
+
+    }
+
 }
 
 /**

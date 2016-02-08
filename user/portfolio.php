@@ -112,12 +112,16 @@ if ($display) {
     $table->head = array($namestr, $pluginstr, $showhide);
     $table->data = array();
 
+    $editicon = $OUTPUT->flex_icon('cog', ['alt' => get_string('configure')]);
+    $showicon = $OUTPUT->flex_icon('eye', ['alt' => get_string('show')]);
+    $hideicon = $OUTPUT->flex_icon('eye-slash', ['alt' => get_string('hide')]);
+
     foreach ($instances as $i) {
         $visible = $i->get_user_config('visible', $USER->id);
         $table->data[] = array($i->get('name'), $i->get('plugin'),
             ($i->has_user_config()
-                ? '<a href="' . $baseurl . '?config=' . $i->get('id') . '"><img src="' . $OUTPUT->pix_url('t/edit') . '" alt="' . get_string('configure') . '" /></a>' : '') .
-                   ' <a href="' . $baseurl . '?hide=' . $i->get('id') . '"><img src="' . $OUTPUT->pix_url('t/' . (($visible) ? 'hide' : 'show')) . '" alt="' . get_string($visible ? 'hide' : 'show') . '" /></a><br />'
+                ? '<a href="' . $baseurl . '?config=' . $i->get('id') . '">' . $editicon . '</a>' : '') .
+                   ' <a href="' . $baseurl . '?hide=' . $i->get('id') . '">' . ($visible ? $hideicon : $showicon) . '</a><br />'
         );
     }
 

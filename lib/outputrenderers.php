@@ -1835,6 +1835,20 @@ class core_renderer extends renderer_base {
      * @return string HTML fragment
      */
     protected function render_pix_icon(pix_icon $icon) {
+        $themename = $this->page->theme->name;
+        $flexidentifier = \core\output\flex_icon::legacy_identifier_from_pix_data($icon->pix, $icon->component);
+
+        $useflexicons = \core\flex_icon_helper::flex_icon_should_replace_pix_icon($themename, $flexidentifier);
+
+        if ($useflexicons === true) {
+            $customdata = \core\output\flex_icon::get_customdata_by_legacy_identifier($flexidentifier);
+            if (isset($icon->attributes['alt'])) {
+                $customdata['alt'] = $icon->attributes['alt'];
+            }
+            $flexicon = new \core\output\flex_icon($flexidentifier, $customdata);
+            return $this->render($flexicon);
+        }
+
         $data = $icon->export_for_template($this);
         return $this->render_from_template('core/pix_icon', $data);
     }
@@ -1849,6 +1863,35 @@ class core_renderer extends renderer_base {
         $attributes = $emoticon->attributes;
         $attributes['src'] = $this->pix_url($emoticon->pix, $emoticon->component);
         return html_writer::empty_tag('img', $attributes);
+    }
+
+    /**
+     * Return HTML for a flex_icon.
+     *
+     * Theme developers: DO NOT OVERRIDE! Please override function
+     * {@link core_renderer::render_pix_icon()} instead.
+     *
+     * @param string $identifier
+     * @param array $customdata Optional.
+     * @return string
+     */
+    public function flex_icon($identifier, $customdata = array()) {
+        $icon = new core\output\flex_icon($identifier, $customdata);
+        return $this->render($icon);
+    }
+
+    /**
+     * Renders a flex_icon.
+     *
+     * @param core\output\flex_icon $flexicon
+     * @return string
+     */
+    protected function render_flex_icon(core\output\flex_icon $flexicon) {
+
+        $contextdata = $flexicon->export_for_template($this);
+        $template = $flexicon->get_template();
+
+        return $this->render_from_template($template, $contextdata);
     }
 
     /**

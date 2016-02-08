@@ -26,7 +26,7 @@
  * Javascript file containing JQuery bindings for processing changes to instant report
  */
 
-define(['jquery', 'core/config'], function ($, mdlconfig) {
+define(['jquery', 'core/config', 'core/templates'], function ($, mdlconfig, templates) {
    var report_table = {
         /**
          * Change links behaviour to load report pages in ajax mode
@@ -55,15 +55,16 @@ define(['jquery', 'core/config'], function ($, mdlconfig) {
 
                     // Add the wait icon if it is not already attached to the clicked item.
                     if ($(e.target).siblings('.instantreportwait').length === 0) {
-                        var splash = '<div class="instantreportwait"><img src="' +
-                                M.util.image_url('waitbig', 'totara_reportbuilder') +
-                                '"/></div>',
-                            $splash = $(splash).insertBefore($(e.target).parent().children().last()),
-                            $content = $('.block_totara_report_table.' + uniqueid + ' .content .rb-display-table-container'),
-                            offset = $content.offset();
-                        $splash.css(offset);
-                        $splash.height($content.height());
-                        $splash.width($content.width());
+                        templates.renderFlexIcon('spinner-pulse', '', 'ft-size-600').done(function (html) {
+                            var $splash = $('<div class="instantreportwait">' + html +'</div>'),
+                                $content = $('.block_totara_report_table.' + uniqueid + ' .content .rb-display-table-container'),
+                                offset = $content.offset();
+
+                            $(e.target).closest('.rb-display-table-container').append($splash);
+                            offset.left += $content.width()/2 - $splash.width()/2;
+                            offset.top += $content.height()/2 - $splash.height()/2;
+                            $splash.css(offset);
+                        });
                     }
 
                     xhr = report_table.refresh_results(uniqueid, querystring, function() {

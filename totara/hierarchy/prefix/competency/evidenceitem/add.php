@@ -153,7 +153,7 @@ if ($nojs) {
                 $str_remove = get_string('remove');
 
                 $link = $OUTPUT->action_icon(new moodle_url('prefix/competency/evidenceitem/remove.php', array('id' => $evidence->id, 'title' => $str_remove)),
-                         new pix_url('t/delete'), array('class' => 'iconsmall', 'alt' => '$str_remove'));
+                         new pix_icon('t/delete'), array('class' => 'iconsmall', 'alt' => '$str_remove'));
 
                 $cell4 = new html_table_cell($link);
                 $cell4->attributes['style'] = 'text-align: center';

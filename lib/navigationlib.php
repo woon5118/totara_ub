@@ -4948,6 +4948,8 @@ class navigation_json {
      * @return string JSON
      */
     protected function convert_child($child, $depth=1) {
+        global $OUTPUT, $PAGE;
+
         if (!$child->display) {
             return '';
         }
@@ -4959,6 +4961,17 @@ class navigation_json {
         $attributes['class'] = $child->get_css_type();
 
         if ($child->icon instanceof pix_icon) {
+
+            // TOTARA: convert the icon to a flex icon, if we can.
+            $themename = $PAGE->theme->name;
+            $flexidentifier = \core\output\flex_icon::legacy_identifier_from_pix_data($child->icon->pix, $child->icon->component);
+            $useflexicons = \core\flex_icon_helper::flex_icon_should_replace_pix_icon($themename, $flexidentifier);
+            if ($useflexicons === true) {
+                $customdata = \core\output\flex_icon::get_customdata_by_legacy_identifier($flexidentifier);
+                $flexicon = new \core\output\flex_icon($flexidentifier, $customdata);
+                $attributes['flex_icon'] = $OUTPUT->render($flexicon);
+            }
+
             $attributes['icon'] = array(
                 'component' => $child->icon->component,
                 'pix' => $child->icon->pix,

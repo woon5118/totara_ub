@@ -1213,8 +1213,7 @@ class totara_program_renderer extends plugin_renderer_base {
         if ($chelper->get_show_programs() < self::COURSECAT_SHOW_PROGRAMS_EXPANDED) {
             if ($program->has_summary() || $program->has_program_overviewfiles()) {
                 $url = new moodle_url('/totara/program/info.php', array('id' => $program->id));
-                $image = html_writer::empty_tag('img', array('src' => $this->output->pix_url('i/info'),
-                                'alt' => $this->strings->summary));
+                $image = $this->output->flex_icon('info-circle');
                 $content .= html_writer::link($url, $image, array('title' => $this->strings->summary));
             }
         }

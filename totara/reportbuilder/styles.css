@@ -3,7 +3,10 @@
 .multicheck-items .felement span {
     display: block;
     float: left;
-    width: 30%;
+}
+
+.multicheck-items .felement span.flex-icon {
+    display: inline-block;
 }
 
 div.globalrestrictionsnotice {
@@ -162,7 +165,6 @@ form[id^="toolbarsearch"].mform .fsubmit {
 }
 .rb-sidebar .multicheck-items .felement span {
     float: none;
-    width: auto;
 }
 
 /* Simplemode select */

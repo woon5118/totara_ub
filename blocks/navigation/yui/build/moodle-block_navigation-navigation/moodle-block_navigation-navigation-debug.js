@@ -513,16 +513,26 @@ BRANCH.prototype = {
         var branchicon = false;
         var icon = this.get('icon');
         if (icon && (!isbranch || this.get('type') === NODETYPE.ACTIVITY || this.get('type') === NODETYPE.RESOURCE)) {
-            branchicon = Y.Node.create('<img alt="" />');
-            branchicon.setAttribute('src', M.util.image_url(icon.pix, icon.component));
+
+            var flexicon = this.get('flex_icon');
+
+            if (typeof flexicon === 'string') {
+                branchicon = Y.Node.create(flexicon);
+            } else {
+                branchicon = Y.Node.create('<img alt="" />');
+                branchicon.setAttribute('src', M.util.image_url(icon.pix, icon.component));
+
+                if (icon.alt) {
+                    branchicon.setAttribute('alt', icon.alt);
+                }
+                if (icon.title) {
+                    branchicon.setAttribute('title', icon.title);
+                }
+            }
+
             branchli.addClass('item_with_icon');
             branchp.addClass('hasicon');
-            if (icon.alt) {
-                branchicon.setAttribute('alt', icon.alt);
-            }
-            if (icon.title) {
-                branchicon.setAttribute('title', icon.title);
-            }
+
             if (icon.classes) {
                 icon.classes.forEach(function(element) {
                     branchicon.addClass(element);

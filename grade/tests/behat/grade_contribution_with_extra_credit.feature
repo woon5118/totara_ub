@@ -68,14 +68,14 @@ Feature: Extra credit contributions are normalised when going out of bounds
     And I set the field "Grade report" to "User report"
     And I set the field "Select all or one user" to "Student 1"
     Then the following should exist in the "user-grade" table:
-      | Grade item    | Calculated weight | Grade  | Contribution to course total |
-      | Manual item 1 | <m1w>             | 80.00  | <m1c>                        |
-      | Manual item 2 | <m2w>             | 10.00  | <m2c>                        |
-      | Manual item 3 | <m3w>             | 70.00  | <m3c>                        |
-      | Manual item 4 | 0.00 %            | 90.00  | 0.00 %                       |
+      | Grade item               | Calculated weight | Grade  | Contribution to course total |
+      | Manual itemManual item 1 | <m1w>             | 80.00  | <m1c>                        |
+      | Manual itemManual item 2 | <m2w>             | 10.00  | <m2c>                        |
+      | Manual itemManual item 3 | <m3w>             | 70.00  | <m3c>                        |
+      | Manual itemManual item 4 | 0.00 %            | 90.00  | 0.00 %                       |
 
     Examples:
-      | aggregation                         | m1w      | m1c   | m2w      | m2c   | m3w     | m3c   |
-      | Natural                             | 100.00 % | 53.33 % | 66.67 %  | 6.67 % | 57.14 % | 40.00 % |
-      | Simple weighted mean of grades      | 100.00 % | 53.33 % | 66.67 %  | 6.67 % | 57.14 % | 40.00 % |
+      | aggregation                         | m1w      | m1c     | m2w      | m2c     | m3w     | m3c     |
+      | Natural                             | 100.00 % | 53.33 % | 66.67 %  | 6.67 %  | 57.14 % | 40.00 % |
+      | Simple weighted mean of grades      | 100.00 % | 53.33 % | 66.67 %  | 6.67 %  | 57.14 % | 40.00 % |
       | Mean of grades (with extra credits) | 100.00 % | 53.33 % | 100.00 % | 10.00 % | 52.38 % | 36.67 % |

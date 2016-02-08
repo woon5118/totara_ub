@@ -795,9 +795,10 @@ class core_course_renderer extends plugin_renderer_base {
         $groupinglabel = $mod->get_grouping_label($textclasses);
 
         // Display link itself.
-        $activitylink = html_writer::empty_tag('img', array('src' => $mod->get_icon_url(),
-                'class' => 'iconlarge activityicon', 'alt' => ' ', 'role' => 'presentation')) . $accesstext .
-                html_writer::tag('span', $instancename . $altname, array('class' => 'instancename'));
+        $activitylink  = $mod->get_icon();
+        $activitylink .= $accesstext;
+        $activitylink .= html_writer::tag('span', $instancename . $altname, array('class' => 'instancename'));
+
         if ($mod->uservisible) {
             $output .= html_writer::link($url, $activitylink, array('class' => $linkclasses, 'onclick' => $onclick)) .
                     $groupinglabel;
@@ -1179,6 +1180,7 @@ class core_course_renderer extends plugin_renderer_base {
      */
     protected function coursecat_coursebox(coursecat_helper $chelper, $course, $additionalclasses = '') {
         global $CFG;
+
         if (!isset($this->strings->summary)) {
             $this->strings->summary = get_string('summary');
         }

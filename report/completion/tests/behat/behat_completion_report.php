@@ -52,7 +52,7 @@ class behat_completion_report extends behat_base {
         $xpath = "//td[@class='completion-progresscell rpl-course']";
         $td = $tr->find('xpath', $xpath);
 
-        $xpath = "//a/img";
+        $xpath = "//a";
         $tick = $td->find('xpath', $xpath);
         $tick->click();
 
@@ -79,11 +79,11 @@ class behat_completion_report extends behat_base {
         $xpath = "//td[@class='completion-progresscell rpl-course']";
         $td = $tr->find('xpath', $xpath);
 
-        $xpath = "//a/img";
+        $xpath = "//a";
         $tick = $td->find('xpath', $xpath);
         $tick->click();
 
-        $xpath = "//a/img[@alt='Delete']";
+        $xpath = "//a[@title='Delete this RPL']";
         $delete = $td->find('xpath', $xpath);
         $delete->click();
     }

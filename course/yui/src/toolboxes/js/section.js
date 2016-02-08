@@ -48,8 +48,7 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         // Get the section we're working on.
         var section = e.target.ancestor(M.course.format.get_section_selector(Y)),
             button = e.target.ancestor('a', true),
-            hideicon = button.one('img'),
-            buttontext = button.one('span'),
+            buttontext = button.one('.menu-action-text'),
 
         // The value to submit
             value,
@@ -71,10 +70,21 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         }
 
         var newstring = M.util.get_string(nextaction + 'fromothers', 'format_' + this.get('format'));
-        hideicon.setAttrs({
-            'alt' : newstring,
-            'src'   : M.util.image_url('i/' + nextaction)
-        });
+
+        var hideicon = button.one('.flex-icon');
+
+        if (hideicon === null) {
+            // Traditional style of icon
+            button.one('img').setAttrs({
+                'alt' : newstring,
+                'src' : M.util.image_url('i/' + nextaction)
+            });
+        } else {
+            // Font style icon
+            require(['core/templates'], function (templates) {
+                templates.replacePix(hideicon.getDOMNode(), 'i/' + nextaction, 'core', newstring);
+            });
+        }
         button.set('title', newstring);
         if (buttontext) {
             buttontext.set('text', newstring);
@@ -124,8 +134,7 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         // Get the section we're working on.
         var section = e.target.ancestor(M.course.format.get_section_selector(Y));
         var button = e.target.ancestor('a', true);
-        var buttonicon = button.one('img');
-        var buttontext = button.one('span');
+        var buttontext = button.one('.menu-action-text');
 
         // Determine whether the marker is currently set.
         var togglestatus = section.hasClass('current');
@@ -139,12 +148,23 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
             .all(M.course.format.get_section_selector(Y) + '.current ' + SELECTOR.HIGHLIGHT)
             .set('title', old_string);
         selectedpage
-            .all(M.course.format.get_section_selector(Y) + '.current ' + SELECTOR.HIGHLIGHT + ' span')
+            .all(M.course.format.get_section_selector(Y) + '.current ' + SELECTOR.HIGHLIGHT + ' .menu-action-text')
             .set('text', M.util.get_string('highlight', 'moodle'));
+
         selectedpage
             .all(M.course.format.get_section_selector(Y) + '.current ' + SELECTOR.HIGHLIGHT + ' img')
             .set('alt', old_string)
             .set('src', M.util.image_url('i/marker'));
+
+        var nodes = selectedpage.all(M.course.format.get_section_selector(Y) + '.current ' + SELECTOR.HIGHLIGHT + ' .flex-icon');
+
+
+        require(['core/templates'], function (templates) {
+            nodes.each(function (node) {
+                // Font style icon
+                templates.replacePix(node.getDOMNode(), 'i/marker', 'core', old_string);
+            });
+        });
 
         // Remove the highlighting from all sections.
         selectedpage.all(M.course.format.get_section_selector(Y))
@@ -155,11 +175,23 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
             section.addClass('current');
             value = Y.Moodle.core_course.util.section.getId(section.ancestor(M.course.format.get_section_wrapper(Y), true));
             var new_string = M.util.get_string('markedthistopic', 'moodle');
+
+            var buttonicon = button.one('img');
             button
                 .set('title', new_string);
-            buttonicon
-                .set('alt', new_string)
-                .set('src', M.util.image_url('i/marked'));
+
+            var highlighticon = button.one('.flex-icon');
+            if (highlighticon === null) {
+                // Traditional style of icon
+                buttonicon
+                    .set('alt', new_string)
+                    .set('src', M.util.image_url('i/marked'));
+            } else {
+                // Font style icon
+                require(['core/templates'], function (templates) {
+                    templates.replacePix(highlighticon.getDOMNode(), 'i/marked', 'core', new_string);
+                });
+            }
             if (buttontext) {
                 buttontext
                     .set('text', M.util.get_string('highlightoff', 'moodle'));

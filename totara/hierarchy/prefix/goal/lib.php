@@ -1423,7 +1423,6 @@ class goal extends hierarchy {
         // The table format would break anyway if indented too much.
         $itemdepth = ($indicate_depth) ? 'depth' . min(10, $record->depthlevel) : 'depth1';
         // @todo Get based on item type or better still, don't use inline styles :-(.
-        $itemicon = $OUTPUT->pix_url('/i/item');
         $cssclass = !$record->visible ? 'dimmed' : '';
         $out = html_writer::start_tag('div', array('class' => 'hierarchyitem ' . $itemdepth));
 

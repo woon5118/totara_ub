@@ -927,8 +927,14 @@ function item(category, element, isexistingitem) {
                 } else {
                     //add deletedate link if it does not exist
                     if (deletecompletiondatelink.length == 0) {
-                        var newlink = $('<a href="#" class="deletecompletiondatelink"><img class="smallicon" src="'+M.util.image_url('t/delete', 'moodle')+'" alt="'+M.util.get_string('removecompletiondate', 'totara_program')+'" title="'+M.util.get_string('removecompletiondate', 'totara_program')+'" /></a>');
+                        var newlink = $('<a href="#" class="deletecompletiondatelink" title="' + M.util.get_string('removecompletiondate', 'totara_program') + '"></a>');
                         self.completionlink.parent().append(newlink);
+
+                        require(['core/templates'], function (templates) {
+                            templates.renderFlexIcon('times-danger', M.util.get_string('removecompletiondate', 'totara_program')).done(function (html) {
+                                newlink.html(html);
+                            });
+                        });
                     }
                 }
                 self.completionlink.html(data);
@@ -1054,6 +1060,7 @@ function item(category, element, isexistingitem) {
 
         this.users = count;
         this.usersElement.html(this.users);
+        this.usersElement.data('complete', true);
         this.category.update_user_count();
 
     };
@@ -1063,6 +1070,7 @@ function item(category, element, isexistingitem) {
     this.get_user_count = function(includechildren) {
 
         var url = this.category.url + 'get_item_count.php?cat=' + this.category.name + '&itemid=' + this.itemid + '&include=' + includechildren;
+        this.usersElement.data('complete', false);
 
         this.set_loading();
 
@@ -1073,8 +1081,14 @@ function item(category, element, isexistingitem) {
     };
 
     this.set_loading = function() {
-        var loadingImg = '<img src="'+M.util.image_url('i/loading_small', 'moodle')+'" alt="'+M.util.get_string('loading', 'admin')+'"/>';
-        this.usersElement.html(loadingImg);
+        var that = this;
+        require(['core/templates'], function (templates) {
+            templates.renderFlexIcon('spinner-pulse', M.util.get_string('loading', 'admin')).done(function (html) {
+                if (that.usersElement.data('complete') === false) {
+                    that.usersElement.html(html);
+                }
+            });
+        });
     };
 
     // Add handler to remove this element

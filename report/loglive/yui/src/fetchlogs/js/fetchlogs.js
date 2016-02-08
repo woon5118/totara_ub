@@ -18,7 +18,7 @@ function FetchLogs() {
 
 var CSS = {
         NEWROW: 'newrow',
-        SPINNER: 'spinner',
+        SPINNER: 'fa-spinner',
         ICONSMALL: 'iconsmall'
     },
     SELECTORS = {

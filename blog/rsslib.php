@@ -80,8 +80,7 @@ function blog_rss_print_link($context, $filtertype, $filterselect=0, $tagid=0, $
     }
 
     $url = blog_rss_get_url($context->id, $userid, $filtertype, $filterselect, $tagid);
-    $rsspix = $OUTPUT->pix_url('i/rss');
-    print '<div class="mdl-right"><a href="'. $url .'"><img src="'. $rsspix .'" title="'. strip_tags($tooltiptext) .'" alt="'.get_string('rss').'" /></a></div>';
+    print '<div class="mdl-right"><a href="'. $url .'">' . $OUTPUT->flex_icon('rss', array('alt' => strip_tags($tooltiptext))) . '</a></div>';
 }
 
 /**

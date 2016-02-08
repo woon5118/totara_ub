@@ -83,8 +83,11 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
                     ruleid: ruleid
                 }),
                 beforeSend: function() {
-                    var loadingimg = '<img src="' + M.util.image_url('i/ajaxloader', 'moodle') + '" alt="' + M.util.get_string('savingrule', 'totara_cohort') + '" class="iconsmall" />';
-                    link.replaceWith(loadingimg);
+                    require(['core/templates'], function (templates) {
+                        templates.renderFlexIcon('spinner-pulse', M.util.get_string('savingrule', 'totara_cohort')).done(function (html) {
+                            link.replaceWith(html);
+                        });
+                    });
                 },
                 success: function(o) {
                     if (o.action == 'delrule'){
@@ -129,8 +132,11 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
                     ruleparamid: ruleparamid
                 }),
                 beforeSend: function() {
-                    var loadingimg = '<img src="' + M.util.image_url('i/ajaxloader', 'moodle') + '" alt="' + M.util.get_string('savingrule', 'totara_cohort') + '" class="iconsmall" />';
-                    link.replaceWith(loadingimg);
+                    require(['core/templates'], function (templates) {
+                        templates.renderFlexIcon('spinner-pulse', M.util.get_string('savingrule', 'totara_cohort')).done(function (html) {
+                            link.replaceWith(html);
+                        });
+                    });
                 },
                 success: function(o) {
                     if (o.action == 'delruleparam') {

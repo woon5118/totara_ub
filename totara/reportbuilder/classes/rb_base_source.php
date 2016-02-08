@@ -285,11 +285,11 @@ abstract class rb_base_source {
         $attributes['class'] = 'rb-display-expand';
         $attributes['data-name'] = $expandname;
         $attributes['data-param'] = $paramstring;
-        $attributes['style'] = 'background-image:url(' . $OUTPUT->pix_url('i/info') . ')';
+        $infoicon = $OUTPUT->flex_icon('info-circle', ['classes' => 'ft-state-info']);
 
         // Create the result.
         $link = html_writer::link($alternateurl, format_string($columnvalue), array('class' => $class_link));
-        return html_writer::div($link, 'rb-display-expand', $attributes);
+        return html_writer::div($infoicon . $link, 'rb-display-expand', $attributes);
     }
 
 

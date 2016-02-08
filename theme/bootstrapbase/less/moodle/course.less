@@ -118,10 +118,10 @@
     }
 
     .filler {
-        width: 16px;
+        width: 1.3em;
         height: 16px;
-        padding: 0.3em;
         display: inline-block;
+        font-size: 16px;
     }
 
     .activity.editor_displayed {
@@ -991,14 +991,14 @@ span.editinstructions {
         }
 
         // Tree item indenting to represent depth.
-        .tree-icon {margin-left:0;}
-        li .tree-icon {margin-left:1em;}
-        li li .tree-icon {margin-left:2em;}
-        li li li .tree-icon {margin-left:3em;}
-        li li li li .tree-icon {margin-left:4em;}
-        li li li li li .tree-icon {margin-left:4.5em;}
-        li li li li li li .tree-icon {margin-left:5em;}
-        li li li li li li li .tree-icon {margin-left:5.5em;}
+        .tree-icon, flex-icon {margin-left:0;}
+        li {.tree-icon, .float-left .flex-icon {margin-left:1em;}}
+        li li {.tree-icon, .float-left .flex-icon {margin-left:2em;}}
+        li li li {.tree-icon, .float-left .flex-icon {margin-left:3em;}}
+        li li li li {.tree-icon, .float-left .flex-icon {margin-left:4em;}}
+        li li li li li {.tree-icon, .float-left .flex-icon {margin-left:4.5em;}}
+        li li li li li li {.tree-icon, .float-left .flex-icon {margin-left:5em;}}
+        li li li li li li li {.tree-icon, .float-left .flex-icon {margin-left:5.5em;}}
     }
 
     .item-actions {

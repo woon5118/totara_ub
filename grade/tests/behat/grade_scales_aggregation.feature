@@ -50,10 +50,10 @@ Feature: Control the aggregation of the scales
     And I follow "User report"
     And I set the field "Select all or one user" to "Student 1"
     Then the following should exist in the "user-grade" table:
-      | Grade item             | Grade          | Percentage  | Contribution to course total |
-      | Grade me               | 10.00          | 10.00 %     | <gradecontrib>               |
-      | Scale me               | B              | 75.00 %     | <scalecontrib>               |
-      | Course total<totalstr> | <coursetotal>  | <coursepc>  | -                            |
+      | Grade item                          | Grade          | Percentage  | Contribution to course total |
+      | Manual itemGrade me                 | 10.00          | 10.00 %     | <gradecontrib>               |
+      | Manual itemScale me                 | B              | 75.00 %     | <scalecontrib>               |
+      | <aggregation>Course total<totalstr> | <coursetotal>  | <coursepc>  | -                            |
     And I log out
     And I log in as "admin"
     And I set the following administration settings values:
@@ -65,10 +65,10 @@ Feature: Control the aggregation of the scales
     And I follow "User report"
     And I set the field "Select all or one user" to "Student 1"
     And the following should exist in the "user-grade" table:
-      | Grade item             | Grade          | Percentage  | Contribution to course total |
-      | Grade me               | 10.00          | 10.00 %     | <gradecontrib2>              |
-      | Scale me               | B              | 75.00 %     | <scalecontrib2>              |
-      | Course total<totalstr> | <coursetotal2> | <coursepc2> | -                            |
+      | Grade item                          | Grade          | Percentage  | Contribution to course total |
+      | Manual itemGrade me                 | 10.00          | 10.00 %     | <gradecontrib2>              |
+      | Manual itemScale me                 | B              | 75.00 %     | <scalecontrib2>              |
+      | <aggregation>Course total<totalstr> | <coursetotal2> | <coursepc2> | -                            |
 
     Examples:
       | aggregation                         | totalstr                             | coursetotal | coursepc | gradecontrib | scalecontrib | coursetotal2 | coursepc2 | gradecontrib2 | scalecontrib2 |

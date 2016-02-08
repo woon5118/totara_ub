@@ -319,7 +319,7 @@ Feature: Evidence custom fields.
     And I upload "totara/plan/tests/fixtures/textfile.txt" file to "File test" filemanager
     And I press "Add evidence"
     And I follow "File evidence"
-    Then I should see "File test : textfile.txt"
+    Then I should see "Filetextfile.txt"
 
   Scenario: As a learner I need to select a predefined value when creating an evidence record so that I can categorise evidence
 

@@ -92,5 +92,43 @@ class external extends external_api {
     public static function load_template_returns() {
         return new external_value(PARAM_RAW, 'template');
     }
+
+    /**
+     * Returns the required parameters
+     * @return external_function_parameters
+     */
+    public static function load_flex_icons_cache_parameters() {
+
+        $description = 'The theme to return the icons cache for.';
+
+        return new external_function_parameters(array('themename' => new external_value(PARAM_SAFEDIR, $description)));
+
+    }
+
+    /**
+     * Return the flexible icons cache for the given theme.
+     *
+     * @param string $themename
+     * @return string
+     */
+    public static function load_flex_icons_cache($themename) {
+
+        $params = array('themename' => $themename);
+        $definition = self::load_flex_icons_cache_parameters();
+        $validated = self::validate_parameters($definition, $params);
+
+        return \core\flex_icon_helper::get_cache($validated['themename']);
+
+    }
+
+    /**
+     * Returns description of load_flex_icons_cache() result value.
+     *
+     * @return external_value
+     */
+    public static function load_flex_icons_cache_returns() {
+        return new external_value(PARAM_RAW, 'template');
+    }
+
 }
 

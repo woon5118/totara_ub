@@ -98,10 +98,7 @@ class block_course_overview_renderer extends plugin_renderer_base {
             $html .= html_writer::start_tag('div', array('class' => 'course_title'));
             // If user is editing, then add move icons.
             if ($userediting && !$ismovingcourse) {
-                $moveicon = html_writer::empty_tag('img',
-                        array('src' => $this->pix_url('t/move')->out(false),
-                            'alt' => get_string('movecourse', 'block_course_overview', $course->fullname),
-                            'title' => get_string('move')));
+                $moveicon = $this->flex_icon('arrows-v', array('alt' => get_string('movecourse', 'block_course_overview', $course->fullname)));
                 $moveurl = new moodle_url($this->page->url, array('sesskey' => sesskey(), 'movecourse' => 1, 'courseid' => $course->id));
                 $moveurl = html_writer::link($moveurl, $moveicon);
                 $html .= html_writer::tag('div', $moveurl, array('class' => 'move'));

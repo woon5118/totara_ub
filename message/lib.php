@@ -1615,20 +1615,20 @@ function message_contact_link($userid, $linktype='add', $return=false, $script=n
         $iconpath = null;
         switch ($linktype) {
             case 'block':
-                $iconpath = 't/block';
+                $iconpath = 'block';
                 break;
             case 'unblock':
-                $iconpath = 't/unblock';
+                $iconpath = 'check';
                 break;
             case 'remove':
-                $iconpath = 't/removecontact';
+                $iconpath = 'contact-remove';
                 break;
             case 'add':
             default:
-                $iconpath = 't/addcontact';
+                $iconpath = 'contact-add';
         }
 
-        $img = '<img src="'.$OUTPUT->pix_url($iconpath).'" class="iconsmall" alt="'.$safealttext.'" />';
+        $img = $OUTPUT->flex_icon($iconpath, array('alt' => $safealttext, 'classes' => 'flex-icon-post'));
     }
 
     $output = '<span class="'.$linktype.'contact">'.
@@ -1672,9 +1672,9 @@ function message_history_link($userid1, $userid2, $return=false, $keywords='', $
     }
 
     if ($linktext == 'icon') {  // Icon only
-        $fulllink = '<img src="'.$OUTPUT->pix_url('t/messages') . '" class="iconsmall" alt="'.$strmessagehistory.'" />';
+        $fulllink = $OUTPUT->flex_icon('comments', array('alt' => $strmessagehistory));
     } else if ($linktext == 'both') {  // Icon and standard name
-        $fulllink = '<img src="'.$OUTPUT->pix_url('t/messages') . '" class="iconsmall" alt="" />';
+        $fulllink = $OUTPUT->flex_icon('comments');
         $fulllink .= '&nbsp;'.$strmessagehistory;
     } else if ($linktext) {    // Custom name
         $fulllink = $linktext;
@@ -2162,8 +2162,8 @@ function message_print_message_history($user1, $user2 ,$search = '', $messagelim
     echo $OUTPUT->box_end();
     echo $OUTPUT->box_end();
 
-    $imgattr = array('src' => $OUTPUT->pix_url('i/twoway'), 'alt' => '', 'width' => 16, 'height' => 16);
-    echo $OUTPUT->box(html_writer::empty_tag('img', $imgattr), 'between');
+    $imgattr = $OUTPUT->flex_icon('arrows-h');
+    echo $OUTPUT->box($imgattr, 'between');
 
     echo $OUTPUT->box_start('user');
     echo $OUTPUT->box_start('generalbox', 'user2');

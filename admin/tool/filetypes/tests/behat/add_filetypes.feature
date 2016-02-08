@@ -21,7 +21,7 @@ Feature: Add customised file types
     Then I should see "Froggy file" in the "application/x-frog" "table_row"
     And I should see "document" in the "application/x-frog" "table_row"
     And I should see "frog" in the "application/x-frog" "table_row"
-    And "//img[contains(@src, 'archive')]" "xpath_element" should exist in the "application/x-frog" "table_row"
+    And "//span[contains(@class, 'ft-box-alt')]" "xpath_element" should exist in the "application/x-frog" "table_row"
 
   Scenario: Update an existing file type
     Given I log in as "admin"
@@ -103,7 +103,7 @@ Feature: Add customised file types
     And I press "Save changes"
     When I follow "Restore 7z to defaults"
     And I press "Yes"
-    Then "//img[contains(@src, 'archive')]" "xpath_element" should exist in the "7z" "table_row"
+    Then "//span[contains(@class, 'ft-box-alt')]" "xpath_element" should exist in the "7z" "table_row"
 
   @javascript @_file_upload
   Scenario: Create a resource activity which contains a customised file type

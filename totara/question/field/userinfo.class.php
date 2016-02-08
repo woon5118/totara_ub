@@ -146,8 +146,7 @@ class question_userinfo extends question_base{
     protected function add_field_specific_settings_elements(MoodleQuickForm $form, $readonly, $moduleinfo) {
         global $OUTPUT;
 
-        $requiredstr = html_writer::empty_tag('img', array('title' => get_string('requiredelement', 'form'),
-                'src' => $OUTPUT->pix_url('req'), 'alt' => get_string('requiredelement', 'form'), 'class'=>'req'));
+        $requiredstr = $OUTPUT->flex_icon('asterisk', ['classes' => 'ft-state-danger']);
         $form->addElement('header', 'infoheader', get_string('infotodisplay', 'totara_question') . $requiredstr);
         $form->setExpanded('infoheader');
 

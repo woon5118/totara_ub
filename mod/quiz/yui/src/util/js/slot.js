@@ -416,13 +416,32 @@ Y.Moodle.mod_quiz.util.slot = {
         if (requiresprevious) {
             link.set('title', M.util.get_string('questiondependencyremove', 'quiz', a));
             link.setData('action', 'removedependency');
-            icon.set('alt', M.util.get_string('questiondependsonprevious', 'quiz'));
-            icon.set('src', M.util.image_url('t/locked', 'moodle'));
+            var newstring = M.util.get_string('questiondependsonprevious', 'quiz');
+            if (icon != null) {
+                icon.set('alt', newstring);
+                icon.set('src', M.util.image_url('t/locked', 'moodle'));
+            } else {
+                // Font style icon
+                require(['core/templates'], function (templates) {
+                    icon = link.one('.flex-icon');
+                    templates.replacePix(icon.getDOMNode(), 't/locked', 'core', newstring);
+                });
+            }
         } else {
             link.set('title', M.util.get_string('questiondependencyadd', 'quiz', a));
             link.setData('action', 'adddependency');
-            icon.set('alt', M.util.get_string('questiondependencyfree', 'quiz'));
-            icon.set('src', M.util.image_url('t/unlocked', 'moodle'));
+            var newstring = M.util.get_string('questiondependencyfree', 'quiz');
+            if (icon != null) {
+                icon.set('alt', newstring);
+                icon.set('src', M.util.image_url('t/unlocked', 'moodle'));
+            }
+            else {
+                // Font style icon
+                require(['core/templates'], function (templates) {
+                    icon = link.one('.flex-icon');
+                    templates.replacePix(icon.getDOMNode(), 't/unlocked', 'core', newstring);
+                });
+            }
         }
     }
 };

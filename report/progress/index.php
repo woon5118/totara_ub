@@ -329,9 +329,8 @@ foreach($activities as $activity) {
         print '<th scope="col" class="'.$datepassedclass.'">'.
             '<a href="'.$CFG->wwwroot.'/mod/'.$activity->modname.
             '/view.php?id='.$activity->id.'" title="' . s($displayname) . '">'.
-            '<img src="'.$OUTPUT->pix_url('icon', $activity->modname).'" alt="'.
-            s(get_string('modulename', $activity->modname)).
-                '" /> <span class="completion-activityname">'.
+            $OUTPUT->flex_icon('mod_' . $activity->modname . '-icon', array('alt' => s(get_string('modulename', $activity->modname)))) .
+            '<span class="completion-activityname">'.
             $shortenedname.'</span></a>';
         if ($activity->completionexpected) {
             print '<div class="completion-expected"><span>'.$datetext.'</span></div>';
@@ -408,9 +407,8 @@ foreach($progress as $user) {
         if ($csv) {
             print $sep.csv_quote($describe).$sep.csv_quote($date);
         } else {
-            print '<td class="completion-progresscell '.$formattedactivities[$activity->id]->datepassedclass.'">'.
-                '<img src="'.$OUTPUT->pix_url('i/'.$completionicon).
-                '" alt="'.s($describe).'" title="'.s($fulldescribe).'" /></td>';
+            $icon = $OUTPUT->flex_icon(\core\flex_icon_helper::resolve_identifier($CFG->theme, "core-i/" . $completionicon), array('alt' => $fulldescribe));
+            echo '<td class="completion-progresscell ' . $formattedactivities[$activity->id]->datepassedclass . '">' . $icon . '</td>';
         }
     }
 

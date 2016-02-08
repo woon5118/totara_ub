@@ -391,7 +391,7 @@ class behat_course extends behat_base {
         $xpath = $this->section_exists($sectionnumber);
 
         // The important checking, we can not check the img.
-        $xpath = $xpath . "/descendant::img[contains(@src, 'marked')]";
+        $xpath = $xpath . "/descendant::*[@class='menu-action-text'][text()='Remove highlight']";
         $exception = new ExpectationException('The "' . $sectionnumber . '" section is not highlighted', $this->getSession());
         $this->find('xpath', $xpath, $exception);
     }
@@ -639,7 +639,7 @@ class behat_course extends behat_base {
         // Ensure the destination is valid.
         $sectionxpath = $this->section_exists($sectionnumber);
 
-        $activitynode = $this->get_activity_element('.editing_move img', 'css_element', $activityname);
+        $activitynode = $this->get_activity_element('.editing_move', 'css_element', $activityname);
 
         // JS enabled.
         if ($this->running_javascript()) {
@@ -981,7 +981,7 @@ class behat_course extends behat_base {
         // Checking the show button alt text and show icon.
         $showtext = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('showfromothers', $courseformat));
         $linkxpath = $xpath . "/descendant::a[@title=$showtext]";
-        $imgxpath = $linkxpath . "/descendant::img[contains(@src, 'show')]";
+        $imgxpath = $linkxpath . "/descendant::*[contains(@class, 'fa-eye')]";
 
         $exception = new ElementNotFoundException($this->getSession(), 'Show section icon ');
         $this->find('xpath', $imgxpath, $exception);
@@ -1008,7 +1008,7 @@ class behat_course extends behat_base {
         // Checking the hide button alt text and hide icon.
         $hidetext = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('hidefromothers', $courseformat));
         $linkxpath = $xpath . "/descendant::a[@title=$hidetext]";
-        $imgxpath = $linkxpath . "/descendant::img[contains(@src, 'hide')]";
+        $imgxpath = $linkxpath . "/descendant::*[contains(@class, 'fa-eye-slash')]";
 
         $exception = new ElementNotFoundException($this->getSession(), 'Hide section icon ');
         $this->find('xpath', $imgxpath, $exception);

@@ -111,7 +111,7 @@ class block_site_main_menu extends block_list {
         $editbuttons = '';
 
         if ($ismoving) {
-            $this->content->icons[] = '<img src="'.$OUTPUT->pix_url('t/move') . '" class="iconsmall" alt="" />';
+            $this->content->icons[] = $OUTPUT->flex_icon('arrows-v');
             $this->content->items[] = $USER->activitycopyname.'&nbsp;(<a href="'.$CFG->wwwroot.'/course/mod.php?cancelcopy=true&amp;sesskey='.sesskey().'">'.$strcancel.'</a>)';
         }
 

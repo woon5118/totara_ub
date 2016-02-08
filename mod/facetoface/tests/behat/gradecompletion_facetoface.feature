@@ -42,6 +42,6 @@ Feature: Give a grade to a student for a seminar
         And I press "Save changes"
         And I navigate to "Course completion" node in "Course administration > Reports"
         And I should see "Sam1 Student1"
-        And "//tr[@id='user-4']/td[2]/img[@alt='Completed']" "xpath_element" should exist
-        And "//tr[@id='user-4']/td[3]/img[@alt='Completed']" "xpath_element" should exist
+        And "//tr[@id='user-4']/td[2]/span[contains(.,'Completed')]" "xpath_element" should exist
+        And "//tr[@id='user-4']/td[3]/span[contains(.,'Completed')]" "xpath_element" should exist
 

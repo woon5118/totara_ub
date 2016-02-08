@@ -25,7 +25,7 @@
 /**
  * Javascript file containing JQuery bindings for processing changes to instant filters
  */
-define(['jquery', 'core/config'], function ($, mdlcfg) {
+define(['jquery', 'core/config', 'core/templates'], function ($, mdlcfg, templates) {
     var instantfilter = {
 
         xhr: null,
@@ -45,9 +45,9 @@ define(['jquery', 'core/config'], function ($, mdlcfg) {
                 }
                 // Add the wait icon if it is not already attached to the clicked item.
                 if ($(event.target).siblings('.instantfilterwait').length === 0) {
-                    var loadingimg = '<img src="' + M.util.image_url('wait', 'totara_reportbuilder') +
-                            '" class="iconsmall instantfilterwait" />';
-                    $(loadingimg).insertAfter($(event.target).parent().children().last());
+                    templates.renderFlexIcon('spinner-pulse', 'loading', 'instantfilterwait').done(function (html) {
+                        $(html).insertAfter($(event.target).parent().children().last());
+                    });
                 }
                 instantfilter.xhr = instantfilter.refresh_results();
             });
@@ -111,7 +111,9 @@ define(['jquery', 'core/config'], function ($, mdlcfg) {
                 $('.rb-sidebar').serialize()
             ).done( function (data) {
                 // Clear all waiting icons.
-                $('.instantfilterwait').remove();
+                var instantfilter = $('.instantfilterwait');
+                instantfilter.siblings('.sr-only').remove();
+                instantfilter.remove();
                 // Replace contents.
                 $('.rb-display-table-container').replaceWith($(data).find('.rb-display-table-container'));
                 $('.rb-record-count').replaceWith($(data).find('.rb-record-count'));

@@ -1995,6 +1995,57 @@ class cm_info implements IteratorAggregate {
         $this->call_mod_function('cm_info_view');
         $this->state = self::STATE_VIEW;
     }
+
+    /**
+     * Return a rendered icon (flex icon or pix icon).
+     */
+    public function get_icon() {
+
+        global $OUTPUT, $PAGE;
+
+        $pixicon = new pix_icon('icon', '', $this->modname, array(
+            'class' => 'iconlarge activityicon',
+            'role' => 'presentation',
+        ));
+
+        // TODO note that the following does not work for activity icons
+        // and that an update to the API has been agreed on. We must duplicate
+        // some of the logic from get_icon_url and update so that the icon may
+        // be set as a flex icon in the activity lib.php hook <mod>_get_coursemodule_info().
+
+        // Respect icon overrides.
+        // The following comparison seems a little convoluted
+        // the reason for this approach is so that we do not
+        // need to refactor get_icon_url() which would make
+        // merging upstream changes more difficult going forward.
+        $iconpixurl = $this->get_icon_url()->out();
+        $defaultpixurl = $OUTPUT->pix_url('icon', $this->modname)->out();
+
+        if ($iconpixurl !== $defaultpixurl) {
+            // We manually generate the output as pix_icon()
+            // doesn't provide a way to explicitly pass a URL.
+            // This is how the course renderer was already
+            // handling this situation meaning this icon is not
+            // compatible with templating.
+            return html_writer::img($iconpixurl, '', $pixicon->attributes);
+        }
+
+        $themename = $PAGE->theme->name;
+        $flexidentifier = \core\output\flex_icon::legacy_identifier_from_pix_data('icon', $this->modname);
+
+        $useflexicons = \core\flex_icon_helper::flex_icon_should_replace_pix_icon($themename, $flexidentifier);
+
+        if ($useflexicons === true) {
+            $customdata = array_merge(array('classes' => ''), \core\output\flex_icon::get_customdata_by_legacy_identifier($flexidentifier));
+            $customdata['classes'] .= ' activityicon';
+            $flexicon = new \core\output\flex_icon($flexidentifier, $customdata);
+            return $OUTPUT->render($flexicon);
+        }
+
+        $data = $pixicon->export_for_template($OUTPUT);
+        return $OUTPUT->render_from_template('core/pix_icon', $data);
+
+    }
 }
 
 

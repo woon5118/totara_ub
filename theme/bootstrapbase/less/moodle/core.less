@@ -2246,12 +2246,8 @@ img#persona_signin {
         .border-radius(5px);
         .box-shadow(5px 5px 20px 0 #666);
 
-        a {
-            display: block;
-            color: @dropdownLinkColor;
-            padding:2px 1em 2px 28px;
+        li {
             &:hover {
-                color: @dropdownLinkColorHover;
                 background-color: @dropdownLinkBackgroundHover;
             }
             &:first-child {
@@ -2259,6 +2255,18 @@ img#persona_signin {
             }
             &:last-child {
                 .border-bottom-radius(4px);
+            }
+        }
+
+        a {
+            height: 1.8em;
+            width: 150px;
+            display: inline-block;
+            color: @dropdownLinkColor;
+            padding:2px 1em 2px 28px;
+
+            &:hover {
+                color: @dropdownLinkColorHover;
             }
         }
         a.hidden {

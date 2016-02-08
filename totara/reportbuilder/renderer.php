@@ -344,7 +344,6 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      * @return string
      */
     public function confirm_clone(reportbuilder $report) {
-        global $OUTPUT;
         // Prepare list of supported clonable properties.
         $supportedproperties = array('clonereportfilters', 'clonereportcolumns', 'clonereportsearchcolumns',
             'clonereportsettings', 'clonereportgraph');
@@ -359,7 +358,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
 
         $out = '';
         if ($report->embedded){
-            $out .= $OUTPUT->notification(get_string('clonereportaccesswarning', 'totara_reportbuilder'), 'notifynotice');
+            $out .= $this->output->notification(get_string('clonereportaccesswarning', 'totara_reportbuilder'), 'notifynotice');
         }
 
         $info = new stdClass();
@@ -642,15 +641,9 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         }
 
         if ($icon) {
-            $html = html_writer::start_tag('div', array('class' => 'action-icon rb-inline'));
-            $html .= html_writer::empty_tag('img', array(
-                'src' => $this->pix_url('/t/cache', 'moodle'),
-                'class' => 'show-cachenow-dialog iconsmall rb-hidden rb-genicon',
-                'data-id' => $reportid,
-                'name' => 'show-cachenow-dialog-' . $reportid,
-                'id' => 'show-cachenow-dialog-' . $reportid,
-                'title' => $strcache
-                ));
+            $html = html_writer::start_tag('div', array('class' => 'show-cachenow-dialog', 'id' => 'show-cachenow-dialog-' . $reportid, 'data-id' => $reportid));
+            $cacheicon = $this->output->flex_icon('cache', ['classes' => 'rb-genicon']);
+            $html .= $cacheicon;
             $html .= html_writer::end_tag('div');
         } else {
             $html = html_writer::empty_tag('input', array('type' => 'button',

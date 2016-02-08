@@ -290,8 +290,7 @@ class data_field_base {     // Base class for Database Field Types (see field/*/
         $str = '<div title="' . s($this->field->description) . '">';
         $str .= '<label for="field_'.$this->field->id.'"><span class="accesshide">'.$this->field->name.'</span>';
         if ($this->field->required) {
-            $image = html_writer::img($OUTPUT->pix_url('req'), get_string('requiredelement', 'form'),
-                                     array('class' => 'req', 'title' => get_string('requiredelement', 'form')));
+            $image = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger', 'alt' => get_string('requiredelement', 'form')));
             $str .= html_writer::div($image, 'inline-req');
         }
         $str .= '</label><input class="basefieldinput mod-data-input" type="text" name="field_'.$this->field->id.'"';
@@ -485,14 +484,7 @@ class data_field_base {     // Base class for Database Field Types (see field/*/
      * @return string
      */
     function image() {
-        global $OUTPUT;
-
-        $params = array('d'=>$this->data->id, 'fid'=>$this->field->id, 'mode'=>'display', 'sesskey'=>sesskey());
-        $link = new moodle_url('/mod/data/field.php', $params);
-        $str = '<a href="'.$link->out().'">';
-        $str .= '<img src="'.$OUTPUT->pix_url('field/'.$this->type, 'data') . '" ';
-        $str .= 'height="'.$this->iconheight.'" width="'.$this->iconwidth.'" alt="'.$this->type.'" title="'.$this->type.'" /></a>';
-        return $str;
+        return '';
     }
 
     /**
@@ -1253,10 +1245,14 @@ function data_print_template($template, $records, $data, $search='', $page=0, $r
         $patterns[]='##edit##';
         $patterns[]='##delete##';
         if (data_user_can_manage_entry($record, $data, $context)) {
+
+            $flexicon = $image = $OUTPUT->flex_icon('cog', array('alt' => get_string('edit')));
             $replacement[] = '<a href="'.$CFG->wwwroot.'/mod/data/edit.php?d='
-                             .$data->id.'&amp;rid='.$record->id.'&amp;sesskey='.sesskey().'"><img src="'.$OUTPUT->pix_url('t/edit') . '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
+                .$data->id.'&amp;rid='.$record->id.'&amp;sesskey='.sesskey().'">' . $flexicon . '</a>';
+
+            $flexicon = $image = $OUTPUT->flex_icon('times-danger', array('alt' => get_string('delete')));
             $replacement[] = '<a href="'.$CFG->wwwroot.'/mod/data/view.php?d='
-                             .$data->id.'&amp;delete='.$record->id.'&amp;sesskey='.sesskey().'"><img src="'.$OUTPUT->pix_url('t/delete') . '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
+                .$data->id.'&amp;delete='.$record->id.'&amp;sesskey='.sesskey().'">' . $flexicon . '</a>';
         } else {
             $replacement[] = '';
             $replacement[] = '';
@@ -1267,9 +1263,9 @@ function data_print_template($template, $records, $data, $search='', $page=0, $r
             $moreurl .= '&amp;filter=1';
         }
         $patterns[]='##more##';
-        $replacement[] = '<a href="'.$moreurl.'"><img src="'.$OUTPUT->pix_url('t/preview').
-                        '" class="iconsmall" alt="'.get_string('more', 'data').'" title="'.get_string('more', 'data').
-                        '" /></a>';
+
+        $flexicon = $image = $OUTPUT->flex_icon('eye', array('alt' => get_string('more', 'data')));
+        $replacement[] = '<a href="'.$moreurl.'">' . $flexicon . '</a>';
 
         $patterns[]='##moreurl##';
         $replacement[] = $moreurl;

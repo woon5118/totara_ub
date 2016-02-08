@@ -153,11 +153,13 @@ function totara_message_dismiss_action($id) {
     // TODO SCANMSG: Check this still outputs required markup in no/script render
     // Construct HTML for dismiss button
     $str = get_string('dismiss', 'block_totara_alerts');
-    $out = html_writer::empty_tag('input', array('id' => 'dismissmsg'.$id.'-dialog', 'type' => 'image', 'name' => 'tm_dismiss_msg', 'class' => 'iconsmall action', 'src' => $OUTPUT->pix_url('t/delete_grey', 'totara_core'), 'title' => $str, 'alt' => $str));
+    $deleteicon = $OUTPUT->flex_icon('times-disabled', ['alt' => $str, 'classes' => 'ft-size-300']);
+    $out = html_writer::tag('a', $deleteicon, array('href' => '#', 'id' => 'dismissmsg'.$id.'-dialog', 'name' => 'tm_dismiss_msg'));
 
     $out .= html_writer::tag('noscript',
         html_writer::tag('form',
             html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'id', 'value' => $id)) .
+            html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey())) .
             html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'returnto', 'value' => $clean_fullme)) .
             html_writer::empty_tag('input', array('type' => 'image', 'class' => 'iconsmall', 'src' => $OUTPUT->pix_url('t/delete_grey', 'totara_core'), 'title' => $str, 'alt' => $str)),
         array('action' => $CFG->wwwroot . '/totara/message/dismiss.php?id=' . $id, 'method' => 'post'))

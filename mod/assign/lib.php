@@ -928,8 +928,8 @@ function assign_print_recent_mod_activity($activity, $courseid, $detail, $modnam
     if ($detail) {
         $modname = $modnames[$activity->type];
         echo '<div class="title">';
-        echo '<img src="' . $OUTPUT->pix_url('icon', 'assign') . '" '.
-             'class="icon" alt="' . $modname . '">';
+        echo $OUTPUT->flex_icon('assign', array('alt' => $modname, 'classes' => 'flex-icon-post'));
+
         echo '<a href="' . $CFG->wwwroot . '/mod/assign/view.php?id=' . $activity->cmid . '">';
         echo $activity->name;
         echo '</a>';

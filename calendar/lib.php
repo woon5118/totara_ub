@@ -644,18 +644,17 @@ function calendar_add_event_metadata($event) {
         } else {
             $eventtype = '';
         }
-        $icon = $OUTPUT->pix_url('icon', $event->modulename) . '';
 
-        $event->icon = '<img src="'.$icon.'" alt="'.$eventtype.'" title="'.$modulename.'" class="icon" />';
+        $event->icon = $OUTPUT->flex_icon('mod_' . $event->modulename . '-icon', array('alt' => $eventtype));
         $event->referer = '<a href="'.$CFG->wwwroot.'/mod/'.$event->modulename.'/view.php?id='.$module->id.'">'.$event->name.'</a>';
         $event->courselink = calendar_get_courselink($module->course);
         $event->cmid = $module->id;
 
     } else if($event->courseid == SITEID) {                              // Site event
-        $event->icon = '<img src="'.$OUTPUT->pix_url('i/siteevent') . '" alt="'.get_string('globalevent', 'calendar').'" class="icon" />';
+        $event->icon = $OUTPUT->flex_icon('calendar', array('alt' => get_string('globalevent', 'calendar')));
         $event->cssclass = 'calendar_event_global';
     } else if($event->courseid != 0 && $event->courseid != SITEID && $event->groupid == 0) {          // Course event
-        $event->icon = '<img src="'.$OUTPUT->pix_url('i/courseevent') . '" alt="'.get_string('courseevent', 'calendar').'" class="icon" />';
+        $event->icon = $OUTPUT->flex_icon('course-event', array('alt' => get_string('courseevent', 'calendar')));
         $event->courselink = calendar_get_courselink($event->courseid);
         $event->cssclass = 'calendar_event_course';
     } else if ($event->groupid) {                                    // Group event
@@ -664,12 +663,11 @@ function calendar_add_event_metadata($event) {
         } else {
             $groupname = '';
         }
-        $event->icon = html_writer::empty_tag('image', array('src' => $OUTPUT->pix_url('i/groupevent'),
-            'alt' => get_string('groupevent', 'calendar'), 'title' => $groupname, 'class' => 'icon'));
+        $event->icon = $OUTPUT->flex_icon('group-event', array('alt' => get_string('groupevent', 'calendar')));
         $event->courselink = calendar_get_courselink($event->courseid) . ', ' . $groupname;
         $event->cssclass = 'calendar_event_group';
     } else if($event->userid) {                                      // User event
-        $event->icon = '<img src="'.$OUTPUT->pix_url('i/userevent') . '" alt="'.get_string('userevent', 'calendar').'" class="icon" />';
+        $event->icon = $OUTPUT->flex_icon('user-event', array('alt' => get_string('userevent', 'calendar')));
         $event->cssclass = 'calendar_event_user';
     }
     return $event;

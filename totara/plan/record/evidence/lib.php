@@ -53,9 +53,7 @@ function evidence_display_attachment($userid, $evidenceid) {
             $fileurl = moodle_url::make_file_url('/pluginfile.php', $path);
 
             $mimetype = $file->get_mimetype();
-            $fileicon = html_writer::empty_tag('img', array('class' => 'icon',
-                'src' => $OUTPUT->pix_url(file_mimetype_icon($mimetype)),
-                'alt' => $mimetype));
+            $fileicon = file_mimetype_flex_icon($mimetype, $mimetype);
 
             $out .= html_writer::tag('a', $fileicon . s($filename), array('href' => $fileurl));
             $out .= html_writer::empty_tag('br');

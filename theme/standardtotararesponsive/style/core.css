@@ -1500,3 +1500,31 @@ div.criteria-description {
 .dl-horizontal dd {
     margin-bottom: 5px;
 }
+
+.moodle-actionmenu[data-enhanced].show .menu a {
+    padding: 2px 1em;
+}
+
+.moodle-actionmenu[data-enhanced].show .menu a .flex-icon {
+    margin-right: 4px;
+}
+
+.dir-rtl .moodle-actionmenu[data-enhanced].show .menu a .flex-icon {
+    margin-left: 4px;
+}
+
+#plugins-control-panel .displayname .flex-icon {
+    margin-right: 4px;
+}
+
+.dir-rtl #plugins-control-panel .displayname .flex-icon {
+    margin-left: 4px;
+}
+
+#plugins-control-panel .pluginname .action-icon {
+    margin-left: 4px;
+}
+
+.dir-rtl #plugins-control-panel .pluginname .action-icon {
+    margin-right: 4px;
+}

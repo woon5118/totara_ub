@@ -146,7 +146,7 @@ class behat_files extends behat_base {
                 $locatorprefix .
                     "//descendant::*[self::div | self::a][contains(concat(' ', normalize-space(@class), ' '), ' fp-file ')]" .
                     "[contains(concat(' ', normalize-space(@class), ' '), ' fp-folder ')]" .
-                    "[normalize-space(.)=$name]" .
+                    "[contains(normalize-space(.),$name)]" .
                     "//descendant::a[contains(concat(' ', normalize-space(@class), ' '), ' fp-contextmenu ')]",
                 $exception,
                 $containernode
@@ -159,7 +159,7 @@ class behat_files extends behat_base {
                 'xpath',
                 $locatorprefix .
                 "//descendant::*[self::div | self::a][contains(concat(' ', normalize-space(@class), ' '), ' fp-file ')]" .
-                "[normalize-space(.)=$name]" .
+                "[contains(normalize-space(.),$name)]" .
                 "//descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-filename-field ')]",
                 false,
                 $containernode

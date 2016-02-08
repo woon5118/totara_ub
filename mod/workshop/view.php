@@ -492,10 +492,7 @@ case workshop::PHASE_EVALUATION:
         echo $output->container_start('toolboxaction');
         echo $output->render($btn);
         echo $output->help_icon('clearassessments', 'workshop');
-        echo html_writer::empty_tag('img', array('src' => $output->pix_url('i/risk_dataloss'),
-                                                 'title' => get_string('riskdatalossshort', 'admin'),
-                                                 'alt' => get_string('riskdatalossshort', 'admin'),
-                                                 'class' => 'workshop-risk-dataloss'));
+        echo $output->flex_icon('database-risk', array ('alt' => get_string('riskdatalossshort', 'admin')));
         echo $output->container_end();
 
         echo $output->box_end();

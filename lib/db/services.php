@@ -1082,6 +1082,16 @@ $functions = array(
         'ajax'        => true,
     ),
 
+    // TOTARA: support for getting the flex icon cache.
+    'core_output_load_flex_icons_cache' => array(
+        'classname'   => 'core\output\external',
+        'methodname'  => 'load_flex_icons_cache',
+        'description' => 'Load the flexible icons cache for the current theme',
+        'type'        => 'read',
+        'loginrequired' => false,
+        'ajax'        => true,
+    ),
+
     // Completion related functions.
     'core_completion_update_activity_completion_status_manually' => array(
         'classname'   => 'core_completion_external',

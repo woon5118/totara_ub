@@ -27,8 +27,14 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
     // optional php params and defaults defined here, args passed to init method
     // below will override these values
     config: {},
-    loadingimg: '<img src="'+M.util.image_url('i/ajaxloader', 'moodle')+'" alt="'+M.util.get_string('saving', 'totara_reportbuilder')+'" class="iconsmall" />',
+    loadingimg: '',
     advoptionshtml : '',
+    hideicon: '',
+    showicon: '',
+    deleteicon: '',
+    upicon: '',
+    downicon: '',
+    spacer: '',
 
     /**
      * module initialisation method called by php js_init_call()
@@ -52,8 +58,29 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
         // store all options for adv selector for later
         this.advoptionshtml = $('select.new_advanced_selector').html();
 
-        // do setup
-        this.rb_init_col_rows();
+        var that = this;
+        require(['core/templates'], function (templates) {
+            var iconscache = [];
+            iconscache.push(templates.renderFlexIcon('spinner-pulse', M.util.get_string('saving', 'totara_reportbuilder')));
+            iconscache.push(templates.renderFlexIcon('eye', M.util.get_string('hide', 'totara_reportbuilder')));
+            iconscache.push(templates.renderFlexIcon('eye-slash', M.util.get_string('show', 'totara_reportbuilder')));
+            iconscache.push(templates.renderFlexIcon('times-danger', M.util.get_string('delete', 'totara_reportbuilder')));
+            iconscache.push(templates.renderFlexIcon('arrow-up', M.util.get_string('moveup', 'totara_reportbuilder')));
+            iconscache.push(templates.renderFlexIcon('arrow-down', M.util.get_string('movedown', 'totara_reportbuilder')));
+            iconscache.push(templates.renderFlexIcon('spacer'));
+
+            $.when.apply($, iconscache).then(function (loadingicon, hideicon, showicon, deleteicon, upicon, downicon, spacer) {
+                that.loadingimg = loadingicon;
+                that.hideicon = hideicon;
+                that.showicon = showicon;
+                that.deleteicon = deleteicon;
+                that.upicon = upicon;
+                that.downicon = downicon;
+                that.spacer = spacer;
+                // Do setup.
+                that.rb_init_col_rows();
+            });
+        });
     },
 
     /**
@@ -646,19 +673,16 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
         }
         hideshowbtn = hideshowbtn.closest('a');
 
-        // Remove all option buttons
-        //optionbox.find('a:not(.hidecolbtn):not(.showcolbtn)').remove();
-        optionbox.find('a').remove();
-        optionbox.find('img').remove();
+        optionbox.empty();
 
         // Replace with btns with updated ones
         var colid = colrow.attr('colid');
         var deletebtn = this.rb_get_btn_delete(this.config.rb_reportid, colid);
-        var upbtn = '<img src="' + M.util.image_url('spacer', 'moodle') +'" alt="" class="spacer" width="11px" height="11px"/>';
+        var upbtn = this.spacer;
         if (colrow.prev('tr').find('select.column_selector').length > 0) {
             upbtn = this.rb_get_btn_up(this.config.rb_reportid, colid);
         }
-        var downbtn = '<img src="' + M.util.image_url('spacer', 'moodle') +'" alt="" class="spacer" width="11px" height="11px"/>';
+        var downbtn = this.spacer;
         if (colrow.next('tr').next('tr').find('select.column_selector').length > 0) {
             downbtn = this.rb_get_btn_down(this.config.rb_reportid, colid);
         }
@@ -670,23 +694,23 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
      *
      */
     rb_get_btn_hide: function(reportid, colid) {
-        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&h=1" class="hidecolbtn action-icon"><img src="' + M.util.image_url('t/hide', 'moodle') +'" alt="' + M.util.get_string('hide', 'totara_reportbuilder') + '" class="iconsmall" /></a>');
+        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&h=1" class="hidecolbtn action-icon">' + this.hideicon +'</a>');
     },
 
     rb_get_btn_show: function(reportid, colid) {
-        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&h=0" class="showcolbtn action-icon"><img src="' + M.util.image_url('t/show', 'moodle') +'" alt="' + M.util.get_string('show', 'totara_reportbuilder') + '" class="iconsmall" /></a>');
+        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&h=0" class="showcolbtn action-icon">' + this.showicon + '</a>');
     },
 
     rb_get_btn_delete: function(reportid, colid) {
-        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&d=1" class="deletecolbtn action-icon"><img src="' + M.util.image_url('t/delete', 'moodle') +'" alt="' + M.util.get_string('delete', 'totara_reportbuilder') + '" class="iconsmall" /></a>');
+        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&d=1" class="deletecolbtn action-icon">' + this.deleteicon + '</a>');
     },
 
     rb_get_btn_up: function(reportid, colid) {
-        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&m=up" class="movecolupbtn action-icon"><img src="' + M.util.image_url('t/up', 'moodle') +'" alt="' + M.util.get_string('moveup', 'totara_reportbuilder') + '" class="iconsmall" /></a>');
+        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&m=up" class="movecolupbtn action-icon">' + this.upicon + '</a>');
     },
 
     rb_get_btn_down: function(reportid, colid) {
-        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&m=down" class="movecoldownbtn action-icon"><img src="' + M.util.image_url('t/down', 'moodle') +'" alt="' + M.util.get_string('movedown', 'totara_reportbuilder') + '" class="iconsmall" /></a>');
+        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&m=down" class="movecoldownbtn action-icon">' + this.downicon + '</a>');
     },
 
     rb_get_btn_add: function(reportid) {
