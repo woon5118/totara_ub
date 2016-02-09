@@ -1331,12 +1331,12 @@ function prog_update_completion($userid, program $program = null) {
 
         if ($program->certifid) {
             // If this is a certification program get course sets for groups on the path the user is on.
-            $certificationpath = get_certification_path_user($program->certifid, $userid);
-            $courseset_groups = $program_content->get_courseset_groups($certificationpath);
+            $path = get_certification_path_user($program->certifid, $userid);
         } else {
             // If standard program get the courseset groups (just one path).
-            $courseset_groups = $program_content->get_courseset_groups(CERTIFPATH_STD);
+            $path = CERTIFPATH_STD;
         }
+        $courseset_groups = $program_content->get_courseset_groups($path);
 
         // First check if the program is already marked as complete for this user and do nothing if it is.
         if (prog_is_complete($program->id, $userid)) {
@@ -1368,10 +1368,11 @@ function prog_update_completion($userid, program $program = null) {
         // Courseset_group_completed will be true if all the course groups in the program have been completed.
         if ($courseset_group_completed) {
             //Get the completion date of the last courseset to use in program completion
-            $sql = "SELECT MAX(timecompleted) as timecompleted
-                    FROM {prog_completion}
-                    WHERE coursesetid != 0 AND programid = ? AND userid = ?";
-            $params = array($program->id, $userid);
+            $sql = "SELECT MAX(pc.timecompleted) AS timecompleted
+                      FROM {prog_completion} pc
+                      JOIN {prog_courseset} pcs ON pcs.id = pc.coursesetid
+                     WHERE pc.programid = ? AND pc.userid = ? AND pcs.certifpath = ?";
+            $params = array($program->id, $userid, $path);
             $coursesetcompletion = $DB->get_record_sql($sql, $params);
 
             $completionsettings = array(

@@ -564,11 +564,12 @@ function certification_fix_missing_certif_completions() {
  *
  * @param integer $certificationid
  * @param integer $userid
+ * @param int $path null if courses in both paths should be considered, else CERTIFPATH_CERT or CERTIFPATH_RECERT
  * @return integer
  */
-function certif_get_content_completion_time($certificationid, $userid) {
+function certif_get_content_completion_time($certificationid, $userid, $path = null) {
     global $DB;
-    $courses = find_courses_for_certif($certificationid, 'c.id');
+    $courses = find_courses_for_certif($certificationid, 'c.id', $path);
     $courselist = array_keys($courses);
     list($incourse, $params) = $DB->get_in_or_equal($courselist, SQL_PARAMS_NAMED);
 
@@ -613,7 +614,8 @@ function write_certif_completion($certificationid, $userid, $certificationpath =
     $todb->certifpath = $certificationpath;
     if ($certificationpath == CERTIFPATH_RECERT) { // The user has just certified, so their new path is recert.
         $todb->status = CERTIFSTATUS_COMPLETED;
-        $lastcompleted = certif_get_content_completion_time($certificationid, $userid);
+        // Note: this differs from programs, which use courseSET timecompleted, although the result should be the same.
+        $lastcompleted = certif_get_content_completion_time($certificationid, $userid, $certificationcompletion->certifpath);
         // If no courses completed, maintain default behaviour.
         if (!$lastcompleted) {
             $lastcompleted = time();
@@ -948,9 +950,10 @@ function find_certif_from_course($courseid, $fields='cf.id') {
  *
  * @param integer $certifid
  * @param string $fields
+ * @param int $path null if courses in both paths are required, else CERTIFPATH_CERT or CERTIFPATH_RECERT
  * @return array
  */
-function find_courses_for_certif($certifid, $fields='c.id, c.fullname') {
+function find_courses_for_certif($certifid, $fields='c.id, c.fullname', $path = null) {
     global $DB;
 
     $sql = "SELECT DISTINCT $fields
@@ -960,7 +963,14 @@ function find_courses_for_certif($certifid, $fields='c.id, c.fullname') {
             JOIN {prog_courseset_course} pcc on pcc.coursesetid = pc.id
             JOIN {course} c on c.id = pcc.courseid
             WHERE cf.id = ? ";
-    $certificationrecords = $DB->get_records_sql($sql, array($certifid));
+    $params = array($certifid);
+
+    if ($path != null) {
+        $sql .= " AND pc.certifpath = ?";
+        $params[] = $path;
+    }
+
+    $certificationrecords = $DB->get_records_sql($sql, $params);
 
     return $certificationrecords;
 }
