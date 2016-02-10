@@ -508,7 +508,7 @@ class multi_course_set extends course_set {
         $this->coursesumfieldtotal = 0;
 
         if (is_object($setob)) {
-            $courseset_courses = $DB->get_records('prog_courseset_course', array('coursesetid' => $this->id));
+            $courseset_courses = $DB->get_records('prog_courseset_course', array('coursesetid' => $this->id), 'id asc');
             foreach ($courseset_courses as $courseset_course) {
                 $course = $DB->get_record('course', array('id' => $courseset_course->courseid));
                 if (!$course) {
