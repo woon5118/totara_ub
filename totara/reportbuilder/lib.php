@@ -3947,9 +3947,18 @@ class reportbuilder {
         }
 
         $searchedstandard = optional_param_array('submitgroupstandard', array(), PARAM_ALPHANUM);
-        $searchedsidebar = optional_param_array('submitgroupstandard', array(), PARAM_ALPHANUM);
+        $searchedsidebar = optional_param_array('submitgroupsidebar', array(), PARAM_ALPHANUM);
         $toolbarsearch = optional_param('toolbarsearchbutton', false, PARAM_TEXT);
-        $overrideinitial = isset($searchedstandard['addfilter']) || isset($searchedsidebar['addfilter']) || $toolbarsearch;
+        $ssort = optional_param('ssort', false, PARAM_TEXT);
+        // Totara hack to overcome limitations of the pagination library:
+        // the pagination bar with 1st page link has a $spage=0 param which is returning 1st page of the report.
+        // we have to know exactly if the pagination bar was used.
+        $spage = optional_param('spage', '', PARAM_TEXT);
+        // If $spage is empty, means we used report title to see the report,
+        // if $spage is equal to 0, means we used 1st page link of the pagination bar.
+        $spage = ($spage === '' ? false : true);
+        $overrideinitial = isset($searchedstandard['addfilter']) || isset($searchedsidebar['addfilter']) ||
+            $toolbarsearch || $ssort || $spage;
 
         $this->_isinitiallyhidden = ($this->initialdisplay == RB_INITIAL_DISPLAY_HIDE &&
                 !$overrideinitial &&
