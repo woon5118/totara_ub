@@ -366,18 +366,19 @@ class feedback_item_numeric extends feedback_item_base {
         echo '</label>';
         echo '</div>';
 
-        //print the presentation
-        echo '<div class="feedback_item_presentation_'.$align.'">';
-        echo '<span class="feedback_item_textfield">';
-        echo '<input type="text" '.
-                     'id="'.$inputname.'" '.
-                     'name="'.$item->typ.'_'.$item->id.'" '.
-                     'size="10" '.
-                     'maxlength="10" '.
-                     'value="'.$value.'" />';
-
-        echo '</span>';
-        echo '</div>';
+        // Print the presentation.
+        echo html_writer::start_div('feedback_item_presentation_'.$align);
+        echo html_writer::start_span('feedback_item_textfield');
+        echo html_writer::empty_tag('input', array(
+            'type' => 'text',
+            'id' => $inputname,
+            'name' => $item->typ.'_'.$item->id,
+            'size' => 10,
+            'maxlength' => 10,
+            'value' => $value
+        ));
+        echo html_writer::end_span();
+        echo html_writer::end_div();
     }
 
     /**
@@ -436,7 +437,8 @@ class feedback_item_numeric extends feedback_item_base {
         echo '<div class="feedback_item_presentation_'.$align.'">';
         echo $OUTPUT->box_start('generalbox boxalign'.$align);
         if (is_numeric($value)) {
-            $str_num_value = number_format($value, 2, $this->sep_dec, $this->sep_thous);
+            // Cast to float just ensure nothing slips past is_numeric.
+            $str_num_value = number_format((float)$value, 2, $this->sep_dec, $this->sep_thous);
         } else {
             $str_num_value = '&nbsp;';
         }
@@ -556,7 +558,8 @@ class feedback_item_numeric extends feedback_item_base {
             if ($value == '') {
                 return null; //an empty string should be null
             } else {
-                return clean_param($value, PARAM_TEXT); //we have to know the value if it is wrong
+                // Who knows what this is, but we need to keep it in tact and just make it safe for output.
+                return s($value); //we have to know the value if it is wrong
             }
         }
         return clean_param($value, $this->value_type());

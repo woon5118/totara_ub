@@ -259,7 +259,7 @@ class feedback_item_captcha extends feedback_item_base {
      * @return void
      */
     public function print_item_show_value($item, $value = '') {
-        global $DB;
+        global $DB, $OUTPUT;
 
         $align = right_to_left() ? 'right' : 'left';
 

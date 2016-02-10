@@ -282,6 +282,7 @@ class feedback_item_textarea extends feedback_item_base {
                        'name="'.$inputname.'" '.
                        'cols="'.$presentation[0].'" '.
                        'rows="'.$presentation[1].'">';
+        // Value has been cleaned here using s() already by {@link feedback_item_textarea::clean_input_value()}.
         echo $value;
         echo '</textarea>';
         echo '</span>';
