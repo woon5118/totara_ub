@@ -674,16 +674,24 @@ function xmldb_totara_cohort_upgrade($oldversion) {
         $field = new xmldb_field('certifid');
         if ($dbman->field_exists($table, $field)) {
             // Find and fix all certification type records in cohort_visibility table.
-            $sql = "SELECT cv.id FROM {cohort_visibility} cv
-                    INNER JOIN {prog} p ON cv.instanceid = p.id
-                    WHERE cv.instancetype = ?
-                      AND p.certifid IS NOT NULL";
-            if ($certifications = $DB->get_fieldset_sql($sql, array(COHORT_ASSN_ITEMTYPE_PROGRAM))) {
-                list($insql, $inparams) = $DB->get_in_or_equal($certifications);
-                $update = "UPDATE {cohort_visibility}
-                           SET instancetype = " . COHORT_ASSN_ITEMTYPE_CERTIF ."
-                           WHERE id $insql";
-                $DB->execute($update, $inparams);
+            $sql = "SELECT cvprog.id AS id, cvcert.id AS correctid
+                      FROM {cohort_visibility} cvprog
+                      JOIN {prog} p
+                        ON cvprog.instanceid = p.id AND cvprog.instancetype = :instancetypeprog
+                 LEFT JOIN {cohort_visibility} cvcert
+                        ON cvcert.instanceid = cvprog.instanceid AND cvcert.instancetype = :instancetypecert
+                     WHERE p.certifid IS NOT NULL";
+            $certifications = $DB->get_records_sql($sql,
+                array('instancetypeprog' => COHORT_ASSN_ITEMTYPE_PROGRAM, 'instancetypecert' => COHORT_ASSN_ITEMTYPE_CERTIF));
+            foreach ($certifications as $cohort_visibility) {
+                if (!empty($cohort_visibility->correctid)) {
+                    // If record already exists just delete the duplicate/incorrect one.
+                    $sql = "DELETE FROM {cohort_visibility} WHERE instancetype = ? AND id = ?";
+                    $DB->execute($sql, array(COHORT_ASSN_ITEMTYPE_PROGRAM, $cohort_visibility->id));
+                } else {
+                    $sql = "UPDATE {cohort_visibility} SET instancetype = ? WHERE id = ?";
+                    $DB->execute($sql, array(COHORT_ASSN_ITEMTYPE_CERTIF, $cohort_visibility->id));
+                }
             }
         }
         upgrade_plugin_savepoint(true, 2014090300, 'totara', 'cohort');
