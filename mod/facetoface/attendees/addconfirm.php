@@ -54,7 +54,8 @@ $users = $DB->get_records_sql("SELECT id, $usernamefields, email, idnumber, user
 $enableattendeenote = $session->availablesignupnote;
 $showcustomfields = $enableattendeenote && !$list->has_user_data();
 
-$mform = new addconfirm_form(null, array('s' => $s, 'listid' => $listid, 'approvalreqd' => $facetoface->approvalreqd,
+$approvalreqd = facetoface_approval_required($facetoface);
+$mform = new addconfirm_form(null, array('s' => $s, 'listid' => $listid, 'approvalreqd' => $approvalreqd,
         'enablecustomfields' => $showcustomfields));
 
 $returnurl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $s, 'backtoallsessions' => 1));
@@ -86,7 +87,7 @@ if ($fromform = $mform->get_data()) {
             MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
     }
 
-    $approvalrequired = !empty($fromform->ignoreapproval) ? 0 : $facetoface->approvalreqd;
+    $approvalrequired = !empty($fromform->ignoreapproval) ? APPROVAL_NONE  : $facetoface->approvaltype;
 
     // Add those awaiting approval
     foreach ($waitingapproval as $waiting) {

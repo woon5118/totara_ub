@@ -266,7 +266,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $todb->discountcost = $fromform->discountcost;
     $todb->usermodified = $USER->id;
     $todb->roomid = (isset($session->roomid)) ? $session->roomid : 0;
-    $todb->selfapproval = $facetoface->approvalreqd ? $fromform->selfapproval : 0;
     $todb->availablesignupnote = $fromform->availablesignupnote;
 
     // Sign-Up fields added.

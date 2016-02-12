@@ -50,20 +50,22 @@ define('MDL_F2F_SCHEDULE_UNIT_WEEK',     4);
 /**
  * Notification conditions for system generated notificaitons.
  */
-define('MDL_F2F_CONDITION_BEFORE_SESSION',              1);
-define('MDL_F2F_CONDITION_AFTER_SESSION',               2);
-define('MDL_F2F_CONDITION_BOOKING_CONFIRMATION',        4);
-define('MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION',   8);
-define('MDL_F2F_CONDITION_DECLINE_CONFIRMATION',        12);
-define('MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION',     16);
-define('MDL_F2F_CONDITION_BOOKING_REQUEST',             32);
-define('MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE',     64);
-define('MDL_F2F_CONDITION_TRAINER_CONFIRMATION',        128);
+define('MDL_F2F_CONDITION_BEFORE_SESSION',               1);
+define('MDL_F2F_CONDITION_AFTER_SESSION',                2);
+define('MDL_F2F_CONDITION_BOOKING_CONFIRMATION',         4);
+define('MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION',    8);
+define('MDL_F2F_CONDITION_DECLINE_CONFIRMATION',         12);
+define('MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION',      16);
+define('MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER',      32);
+define('MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE',      64);
+define('MDL_F2F_CONDITION_TRAINER_CONFIRMATION',         128);
 define('MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION', 256);
 define('MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT', 512);
 define('MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED',    1024);
 define('MDL_F2F_CONDITION_RESERVATION_CANCELLED',        16384);
 define('MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED',    32768);
+define('MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE',         65536);
+define('MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN',        131072);
 
 /**
  * Notification sent state
@@ -691,6 +693,10 @@ class facetoface_notification extends data_object {
             $fromuser = $USER;
         }
 
+        if (empty($this->_facetoface->approvalrole)) {
+            $this->_facetoface->approvalrole = (int)$DB->get_field('facetoface', 'approvalrole', array('id' => $this->_facetoface->id));
+        }
+
         // If Facetoface from address is set, then all f2f messages should come from there.
         if (!empty($CFG->facetoface_fromaddress)) {
             $fromuser = \mod_facetoface\facetoface_user::get_facetoface_user();
@@ -706,7 +712,8 @@ class facetoface_notification extends data_object {
             $this->_facetoface->name,
             $user,
             $this->_sessions[$sessionid],
-            $sessionid
+            $sessionid,
+            $this->_facetoface->approvalrole
         );
         $body = facetoface_message_substitutions(
             $this->body,
@@ -714,7 +721,8 @@ class facetoface_notification extends data_object {
             $this->_facetoface->name,
             $user,
             $this->_sessions[$sessionid],
-            $sessionid
+            $sessionid,
+            $this->_facetoface->approvalrole
         );
         $managerprefix = facetoface_message_substitutions(
             $this->managerprefix,
@@ -722,7 +730,8 @@ class facetoface_notification extends data_object {
             $this->_facetoface->name,
             $user,
             $this->_sessions[$sessionid],
-            $sessionid
+            $sessionid,
+            $this->_facetoface->approvalrole
         );
         $plaintext = format_text_email($body, FORMAT_HTML);
 
@@ -814,8 +823,9 @@ class facetoface_notification extends data_object {
 
         $params = array('userid'=>$user->id, 'sessionid'=>$sessionid);
         $positiontype = $DB->get_field('facetoface_signups', 'positiontype', $params);
+        $manager = facetoface_get_session_manager($user->id, $sessionid, $positiontype);
 
-        if ($this->ccmanager && $manager = totara_get_manager($user->id, $positiontype)) {
+        if ($this->ccmanager && !empty($manager)) {
 
             $event = clone $this->_event;
 
@@ -827,7 +837,8 @@ class facetoface_notification extends data_object {
             // Do not send iCal attachment.
             $event->attachment = $event->attachname = null;
 
-            if ($this->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST) {
+            if ($this->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER ||
+                $this->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN) {
                 // Do the facetoface workflow event.
                 $strmgr = get_string_manager();
                 $onaccept = new stdClass();
@@ -844,6 +855,7 @@ class facetoface_notification extends data_object {
                 $event->name = 'task';
                 message_send($event);
             } else {
+                $event->name = 'alert';
                 message_send($event);
             }
         }
@@ -878,6 +890,80 @@ class facetoface_notification extends data_object {
                 message_send($event);
             }
         }
+    }
+
+    /**
+     * Send to users with the appropriate session role to approve
+     *
+     * @access  public
+     * @param   object     $facetoface  The facetoface object
+     * @param   object     $session     The session object
+     * @return  boolean
+     */
+    public function send_to_roleapprovers($facetoface, $session) {
+        if ($this->conditiontype != MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE) {
+            return false;
+        }
+
+        $event = clone $this->_event;
+        $event->roleid = $facetoface->approvalrole;
+        $event->fullmessage       = $event->manager->fullmessage . $event->fullmessage;
+        $event->fullmessagehtml   = $event->manager->fullmessagehtml . $event->fullmessagehtml;
+        $event->smallmessage      = $event->manager->smallmessage . $event->smallmessage;
+        $event->attachment = null; // Leave out the ical attachments for roleapprovers.
+
+        $event->name = 'alert';
+
+        // Send the booking request to all users with the approvalrole set in the session.
+        $sessionroles = facetoface_get_trainers($session->id, $facetoface->approvalrole);
+        foreach ($sessionroles as $recipient) {
+            if (!empty($recipient)) {
+                $event->userto = $recipient;
+                message_send($event);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Send to users set as sitewide or facetoface approvers
+     *
+     * @access  public
+     * @param   object     $facetoface  The facetoface object
+     * @return  boolean
+     */
+    public function send_to_adminapprovers($facetoface) {
+        if ($this->conditiontype != MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN) {
+            return false;
+        }
+
+        $event = clone $this->_event;
+        $event->fullmessage       = $event->manager->fullmessage . $event->fullmessage;
+        $event->fullmessagehtml   = $event->manager->fullmessagehtml . $event->fullmessagehtml;
+        $event->smallmessage      = $event->manager->smallmessage . $event->smallmessage;
+        $event->attachment = null; // Leave out the ical attachments for adminapprovers.
+
+        $event->name = 'alert';
+
+        // Send the booking request to all site & activity level adminapprovers.
+        $systemapprovers = get_users_from_config(get_config(null, 'facetoface_adminapprovers'), 'mod/facetoface:approveanyrequest');
+        foreach ($systemapprovers as $approver) {
+            if (!empty($approver)) {
+                $event->userto = $approver;
+                message_send($event);
+            }
+        }
+
+        $activityapprovers = explode(',', $facetoface->approvaladmins);
+        foreach ($activityapprovers as $approver) {
+            if (!empty($approver)) {
+                $event->userto = core_user::get_user($approver);
+                message_send($event);
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -926,7 +1012,9 @@ class facetoface_notification extends data_object {
                     case MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION:
                         $html .= get_string('occurswhenuserwaitlistssession', 'facetoface');
                         break;
-                    case MDL_F2F_CONDITION_BOOKING_REQUEST:
+                    case MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER:
+                    case MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE:
+                    case MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN:
                         $html .= get_string('occurswhenuserrequestssessionwithmanagerapproval', 'facetoface');
                         break;
                     case MDL_F2F_CONDITION_DECLINE_CONFIRMATION:
@@ -1055,6 +1143,9 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
             }
             $notice->send_to_manager($user, $session->id);
             $notice->send_to_thirdparty($user, $session->id);
+            $notice->send_to_roleapprovers($facetoface, $session);
+            $notice->send_to_adminapprovers($facetoface);
+
             $notice->delete_ical_attachment();
         }
         // Restore session dates.
@@ -1070,6 +1161,9 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
         }
         $notice->send_to_manager($user, $session->id);
         $notice->send_to_thirdparty($user, $session->id);
+        $notice->send_to_roleapprovers($facetoface, $session);
+        $notice->send_to_adminapprovers($facetoface);
+
         $notice->delete_ical_attachment();
     }
     return '';
@@ -1265,12 +1359,50 @@ function facetoface_send_request_notice($facetoface, $session, $userid) {
     $params = array(
         'facetofaceid'  => $facetoface->id,
         'type'          => MDL_F2F_NOTIFICATION_AUTO,
-        'conditiontype' => MDL_F2F_CONDITION_BOOKING_REQUEST
+        'conditiontype' => MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER
     );
 
     return facetoface_send_notice($facetoface, $session, $userid, $params);
 }
 
+/**
+ * Send booking request notice to user and all users with the specified sessionrole
+ *
+ * @param object $facetoface    Facetoface instance
+ * @param object $session       Session instance
+ * @param int    $recipientid   The id of the user requesting a booking
+ */
+function facetoface_send_rolerequest_notice($facetoface, $session, $recipientid) {
+    global $DB, $USER;
+
+    $params = array(
+        'facetofaceid'  => $facetoface->id,
+        'type'          => MDL_F2F_NOTIFICATION_AUTO,
+        'conditiontype' => MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE
+    );
+
+    return facetoface_send_notice($facetoface, $session, $recipientid, $params);
+}
+
+/**
+ * Send booking request notice to user, manager, all session admins.
+ *
+ * @param object $facetoface    Facetoface instance
+ * @param object $session       Session instance
+ * @param array  $admins        An array of admin userids
+ * @param int    $recipientid   The id of the user requesting a booking
+ */
+function facetoface_send_adminrequest_notice($facetoface, $session, $recipientid) {
+    global $DB, $USER;
+
+    $params = array(
+        'facetofaceid'  => $facetoface->id,
+        'type'          => MDL_F2F_NOTIFICATION_AUTO,
+        'conditiontype' => MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN
+    );
+
+    return facetoface_send_notice($facetoface, $session, $recipientid, $params);
+}
 
 /**
  * Subsitute the placeholders in message templates for the actual data
@@ -1289,9 +1421,10 @@ function facetoface_send_request_notice($facetoface, $session, $userid) {
  * @param   obj     $user           The subject of the message
  * @param   obj     $data           Session data
  * @param   int     $sessionid      Session ID
+ * @param   int     $approvalrole   The id of the role set to approve the facetoface (optional)
  * @return  string
  */
-function facetoface_message_substitutions($msg, $coursename, $facetofacename, $user, $data, $sessionid) {
+function facetoface_message_substitutions($msg, $coursename, $facetofacename, $user, $data, $sessionid, $approvalrole = null) {
     global $CFG, $DB;
 
     if (empty($msg)) {
@@ -1350,6 +1483,14 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $lateststartdate = $str_unknowndate;
         $latestfinishtime = $str_unknowntime;
         $latestfinishdate = $str_unknowndate;
+    }
+
+    if (!empty($approvalrole)) {
+        $rolenames = role_fix_names(get_all_roles());
+        $rolename = $rolenames[$approvalrole]->localname;
+        $msg = str_replace(get_string('placeholder:sessionrole', 'facetoface'), $rolename, $msg);
+    } else {
+        $msg = str_replace(get_string('placeholder:sessionrole', 'facetoface'), '', $msg);
     }
 
     $msg = str_replace(get_string('placeholder:coursename', 'facetoface'), $coursename, $msg);
@@ -1794,7 +1935,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $decline->managerprefix = $template->managerprefix;
         $decline->conditiontype = MDL_F2F_CONDITION_DECLINE_CONFIRMATION;
         $decline->ccmanager = 0;
-        $decline->status = $facetoface->approvalreqd ? 1 : 0;
+        $decline->status = facetoface_approval_required($facetoface) ? 1 : 0;
         $decline->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_DECLINE_CONFIRMATION] = $decline;
     } else {
@@ -1818,18 +1959,49 @@ function facetoface_get_default_notifications($facetofaceid) {
         $missingtemplates[] = 'reminder';
     }
 
+    // Manager approval request.
     if (isset($templates['request'])) {
         $template = $templates['request'];
         $request = new facetoface_notification($defaults, false);
         $request->title = $template->title;
         $request->body = $template->body;
         $request->managerprefix = $template->managerprefix;
-        $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST;
+        $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER;
         $request->ccmanager = 1;
         $request->templateid = $template->id;
-        $notifications[MDL_F2F_CONDITION_BOOKING_REQUEST] = $request;
+        $notifications[MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER] = $request;
     } else {
         $missingtemplates[] = 'request';
+    }
+
+    // Role approval request.
+    if (isset($templates['rolerequest'])) {
+        $template = $templates['rolerequest'];
+        $rolerequest = new facetoface_notification($defaults, false);
+        $rolerequest->title = $template->title;
+        $rolerequest->body = $template->body;
+        $rolerequest->managerprefix = $template->managerprefix;
+        $rolerequest->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE;
+        $rolerequest->ccmanager = 0;
+        $rolerequest->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE] = $rolerequest;
+    } else {
+        $missingtemplates[] = 'rolerequest';
+    }
+
+    // Manager & Admin approval request.
+    if (isset($templates['adminrequest'])) {
+        $template = $templates['adminrequest'];
+        $adminrequest = new facetoface_notification($defaults, false);
+        $adminrequest->title = $template->title;
+        $adminrequest->body = $template->body;
+        $adminrequest->managerprefix = $template->managerprefix;
+        $adminrequest->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN;
+        $adminrequest->ccmanager = 1;
+        $adminrequest->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN] = $adminrequest;
+    } else {
+        $missingtemplates[] = 'adminrequest';
     }
 
     if (isset($templates['timechange'])) {

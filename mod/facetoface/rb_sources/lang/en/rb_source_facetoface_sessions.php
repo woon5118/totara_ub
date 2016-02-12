@@ -25,6 +25,7 @@ $string['sourcetitle'] = 'Face-to-face sessions';
 // columns
 $string['address'] = 'Address';
 $string['allsignupcustomfields'] = 'All sign up custom fields';
+$string['approvaltype'] = 'Approval Type';
 $string['bookedby'] = 'Booked by';
 $string['building'] = 'Building';
 $string['createdby'] = 'Actioned By';
@@ -73,6 +74,7 @@ $string['audit'] = 'Audit';
 $string['coursedelivery'] = 'Course Delivery';
 
 // column types for this source, as strings
+$string['type_approver'] = 'Approver';
 $string['type_session'] = 'Session';
 $string['type_status'] = 'Status';
 $string['type_role'] = 'Role';

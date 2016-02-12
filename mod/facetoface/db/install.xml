@@ -18,7 +18,6 @@
         <FIELD NAME="timemodified" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="showoncalendar" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
-        <FIELD NAME="approvalreqd" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="usercalentry" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="multiplesessions" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="completionstatusrequired" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
@@ -26,7 +25,6 @@
         <FIELD NAME="maxmanagerreserves" TYPE="int" LENGTH="7" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="How many reservations can each manager make"/>
         <FIELD NAME="reservecanceldays" TYPE="int" LENGTH="7" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="Number days before the session when all unconfirmed reservations are deleted"/>
         <FIELD NAME="reservedays" TYPE="int" LENGTH="7" NOTNULL="false" DEFAULT="2" SEQUENCE="false" COMMENT="Number days before the session when reservations are closed"/>
-        <FIELD NAME="selfapprovaltandc" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Terms and conditions to display when to users when self approval is enabled"/>
         <FIELD NAME="declareinterest" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Allow users to declare interest in the facetoface"/>
         <FIELD NAME="interestonlyiffull" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"  COMMENT="Only allow users to declare interest if all sessions are full"/>
         <FIELD NAME="allowcancellationsdefault" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
@@ -34,6 +32,10 @@
         <FIELD NAME="selectpositiononsignup" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Users with multiple positions will select one on signup"/>
         <FIELD NAME="forceselectposition" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Error if no suitable position is available when signing up"/>
         <FIELD NAME="allowsignupnotedefault" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Allow 'User sign-up note' default"/>
+        <FIELD NAME="approvaltype" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="approvalrole" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="approvalterms" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="approvaladmins" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for facetoface"/>
@@ -111,6 +113,7 @@
         <FIELD NAME="positionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="If required, the position the user is doing the training for"/>
         <FIELD NAME="positiontype" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="If required, the position type (prim, sec, asp) the user is doing the training for"/>
         <FIELD NAME="positionassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="If required, the position assignment the user is doing the training for"/>
+        <FIELD NAME="managerid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="primary key of the table, please edit me"/>

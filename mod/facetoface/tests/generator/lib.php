@@ -62,7 +62,7 @@ class mod_facetoface_generator extends testing_module_generator {
         $defaults['thirdpartywaitlist'] = 0;
         $defaults['display'] = 6;
         $defaults['showoncalendar'] = '1';
-        $defaults['approvalreqd'] = 0;
+        $defaults['approvaloptions'] = 'approval_none';
         $defaults['usercalentry'] = 1;
         $defaults['multiplesessions'] = 0;
         $defaults['completionstatusrequired'] = '{"100":1}';

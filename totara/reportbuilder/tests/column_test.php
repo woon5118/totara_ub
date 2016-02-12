@@ -206,7 +206,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $f2f_data = array(
-        'id' => 1, 'course' => 1, 'name' => 'F2F name', 'shortname' => 'f2f', 'details' => 'details',
+        'id' => 1, 'course' => 1, 'name' => 'F2F name', 'shortname' => 'f2f', 'details' => 'details', 'approvaltype' => 0
     );
 
     protected $f2f_session_data = array(

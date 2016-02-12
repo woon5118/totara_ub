@@ -167,6 +167,17 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'pos_assignment.id = base.positionassignmentid',
                 REPORT_BUILDER_RELATION_MANY_TO_ONE
             ),
+            new rb_join(
+                'approver',
+                'LEFT',
+                // Subquery as table - statuscode 50 = approved.
+                "(SELECT status.signupid, status.createdby as approverid, status.timecreated as approvaltime
+                    FROM {facetoface_signups_status} status
+                   WHERE status.statuscode = 50
+                 )",
+                'base.id = approver.signupid',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
         );
 
 
@@ -487,7 +498,31 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     'displayfunc' => 'nice_datetime',
                     'dbdatatype' => 'timestamp'
                 )
-            )
+            ),
+            new rb_column_option(
+                'approver',
+                'approvername',
+                get_string('approvername', 'mod_facetoface'),
+                'approver.approverid',
+                array('joins' => 'approver',
+                      'displayfunc' => 'approvername')
+            ),
+            new rb_column_option(
+                'approver',
+                'approveremail',
+                get_string('approveremail', 'mod_facetoface'),
+                'approver.approverid',
+                array('joins' => 'approver',
+                      'displayfunc' => 'approveremail')
+            ),
+            new rb_column_option(
+                'approver',
+                'approvaltime',
+                get_string('approvertime', 'mod_facetoface'),
+                'approver.approvaltime',
+                array('joins' => 'approver',
+                      'displayfunc' => 'nice_datetime')
+            ),
         );
 
         // include some standard columns
@@ -960,6 +995,38 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             return parent::rb_display_link_user_icon($user, $row, $isexport);
         }
         return get_string('reserved', 'rb_source_facetoface_sessions');
+    }
+
+    /**
+     * Display the email address of the approver
+     *
+     * @param int $approverid
+     * @param object $row
+     * @return string
+     */
+    function rb_display_approveremail($approverid, $row) {
+        if (empty($approverid)) {
+            return '';
+        } else {
+            $approver = core_user::get_user($approverid);
+            return $approver->email;
+        }
+    }
+
+    /**
+     * Display the full name of the approver
+     *
+     * @param int $approverid
+     * @param object $row
+     * @return string
+     */
+    function rb_display_approvername($approverid, $row) {
+        if (empty($approverid)) {
+            return '';
+        } else {
+            $approver = core_user::get_user($approverid);
+            return fullname($approver);
+        }
     }
 
     // Override user display function to show 'Reserved' for reserved spaces.

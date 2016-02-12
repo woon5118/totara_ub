@@ -78,7 +78,7 @@ if ($data = data_submitted()) {
         $params['ignoreconflicts'] = true;
         $params['bulkaddsource']   = $bulkaddsource;
         // Do not need the approval, change the status
-        $params['approvalreqd'] = 0;
+        $params['approvalreqd'] = APPROVAL_NONE;
         // If it is a list of user, do not need to notify manager
         $params['ccmanager'] = 0;
 

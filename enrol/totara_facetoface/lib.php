@@ -216,7 +216,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
      * @return boolean|string true or error message
      */
     protected function validate_totara_facetoface_sid($facetoface, $session, $selfapprovaltc) {
-        $hasselfapproval = facetoface_session_has_selfapproval($facetoface, $session);
+        $hasselfapproval = $facetoface->approvaltype == APPROVAL_SELF;
         if ($hasselfapproval && !$selfapprovaltc) {
             return get_string('selfapprovalrequired', 'enrol_totara_facetoface');
         }
@@ -242,7 +242,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         $multisessionid = ($facetoface->multiplesessions ? $session->id : null);
         $context = context_course::instance($course->id);
 
-        $hasselfapproval = facetoface_session_has_selfapproval($facetoface, $session);
+        $hasselfapproval = $facetoface->approvaltype == APPROVAL_SELF;
 
         // Manager.
         $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
@@ -279,7 +279,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             }
 
             $needapproval = false;
-            if (!empty($facetoface->approvalreqd) && !$hasselfapproval) {
+            if (facetoface_approval_required($facetoface)) {
                 $message = get_string('bookingcompleted_approvalrequired', 'facetoface');
                 $needapproval = true;
             } else {
@@ -990,7 +990,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         );
 
         $sql = "
-        SELECT ssn.*, f2f.id AS f2fid, f2f.approvalreqd
+        SELECT ssn.*, f2f.id AS f2fid, f2f.approvaltype
         FROM {course_modules} cm
         JOIN {modules} m ON (m.name = :modulename AND m.id = cm.module)
         JOIN {facetoface} f2f ON (f2f.id = cm.instance)
@@ -1059,7 +1059,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             if (!$hascapacity && !$session->allowoverbook && !$canforceoverbook) {
                 continue;
             }
-            $session->hasselfapproval = $session->approvalreqd && $session->selfapproval;
+            $session->hasselfapproval = $session->approvaltype == APPROVAL_SELF;
             if (!$ignoreapprovals && facetoface_manager_needed($session) && empty($manager->email) && !$session->hasselfapproval) {
                 $this->removednomanager = true;
                 continue;
@@ -1351,7 +1351,7 @@ function enrol_totara_facetoface_get_sessions_to_autoenrol($totara_facetoface, $
 
     foreach ($sessionstochoosefrom as $facetofaceid => $facetofacesessions) {
         $facetoface = $facetofaces[$facetofaceid];
-        $facetoface->approvalreqd = false; // No approval is ever required if you are being auto enrolled on sessions.
+        $facetoface->approvaltype = APPROVAL_NONE; // No approval is ever required if you are being auto enrolled on sessions.
 
         $submissions = facetoface_get_user_submissions($facetofaceid, $user->id, MDL_F2F_STATUS_REQUESTED);
 

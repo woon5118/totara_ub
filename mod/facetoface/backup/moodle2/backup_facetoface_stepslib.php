@@ -70,8 +70,9 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         // Define each element separated
         $facetoface = new backup_nested_element('facetoface', array('id'), array(
             'name', 'intro', 'introformat', 'thirdparty', 'thirdpartywaitlist', 'display',
-            'timecreated', 'timemodified', 'shortname', 'showoncalendar', 'approvalreqd', 'usercalentry',
-            'multiplesessions', 'completionstatusrequired', 'managerreserve', 'maxmanagerreserves', 'reservecanceldays',
+            'timecreated', 'timemodified', 'shortname', 'showoncalendar', 'usercalentry',
+            'approvaltype', 'approvalterms', 'approvalrole', 'approvaladmins', 'multiplesessions',
+            'completionstatusrequired', 'managerreserve', 'maxmanagerreserves', 'reservecanceldays',
             'reservedays', 'selfapprovaltandc', 'declareinterest', 'interestonlyiffull', 'selectpositiononsignup',
             'forceselectposition', 'allowcancellationsdefault', 'cancellationscutoffdefault', 'allowsignupnotedefault'));
         $notifications = new backup_nested_element('notifications');
@@ -167,7 +168,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session->set_source_sql('SELECT s.id, s.facetoface, s.capacity, s.allowoverbook, s.details, s.datetimeknown,
                                          s.duration, s.normalcost, s.discountcost, s.roomid, r.name AS room_name,
                                          r.building AS room_building, r.custom AS room_custom, r.address AS room_address,
-                                         s.timecreated, s.timemodified, s.usermodified, s.selfapproval, s.mincapacity, s.cutoff,
+                                         s.timecreated, s.timemodified, s.usermodified, s.mincapacity, s.cutoff,
                                          s.allowcancellations, s.cancellationcutoff, s.availablesignupnote
                                         FROM {facetoface_sessions} s
                                         LEFT JOIN {facetoface_room} r ON s.roomid = r.id

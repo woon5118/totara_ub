@@ -40,31 +40,31 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     protected $facetoface_data = array(
         array('id',                     'course',           'name',                     'thirdparty',
               'thirdpartywaitlist',     'display',          'timecreated',              'timemodified',
-              'shortname',              'description',      'showoncalendar',           'approvalreqd'
+              'shortname',              'description',      'showoncalendar',           'approvaltype'
             ),
         array(1,                        1,                  'name1',                    'thirdparty1',
               0,                        0,                  0,                          0,
-              'short1',                 'desc1',            1,                          0
+              'short1',                 'desc1',            1,                          APPROVAL_NONE
             ),
         array(2,                        2,                  'name2',                    'thirdparty2',
               0,                        0,                  0,                          0,
-              'short2',                 'desc2',            1,                          0
+              'short2',                 'desc2',            1,                          APPROVAL_NONE
             ),
         array(3,                        3,                  'name3',                    'thirdparty3',
               0,                        0,                  0,                          0,
-              'short3',                 'desc3',            1,                          0
+              'short3',                 'desc3',            1,                          APPROVAL_NONE
             ),
         array(4,                        4,                  'name4',                    'thirdparty4',
               0,                        0,                  0,                          0,
-              'short4',                 'desc4',            1,                          0
+              'short4',                 'desc4',            1,                          APPROVAL_NONE
             ),
         array(5,                        4,                  'name5',                    'thirdparty5',
               0,                        0,                  0,                          0,
-             'short5',                  'desc5',            1,                          1
+             'short5',                  'desc5',            1,                          APPROVAL_MANAGER
             ),
         array(6,                        4,                  'name6',                    'thirdparty6',
               0,                        0,                  0,                          0,
-             'short6',                  'desc6',            1,                          1
+             'short6',                  'desc6',            1,                          APPROVAL_MANAGER
             ),
     );
 
@@ -616,7 +616,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'emailmanagerreminder' => 'test2',
             'emailmanagercancellation' => 'test3',
             'showcalendar' => 1,
-            'approvalreqd' => 0,
+            'approvaloptions' => 'approval_none',
+            'approvaltype' => APPROVAL_NONE,
             'requestsubject' => 'reqsub1',
             'requestmessage' => 'reqmsg1',
             'requestinstrmngr' => '',
@@ -651,7 +652,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'emailmanagerreminder' => 'test2',
             'emailmanagercancellation' => 'test3',
             'showcalendar' => 1,
-            'approvalreqd' => 1,
+            'approvaloptions' => 'approval_manager',
+            'approvaltype' => APPROVAL_MANAGER,
             'requestsubject' => 'reqsub2',
             'requestmessage' => 'reqmsg2',
             'requestinstrmngr' => 'reqinstmngr2',
@@ -1388,6 +1390,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
                 $foundmanager = true;
             }
         }
+
+        // TODO - the manager isnt being found.
         $this->assertTrue($foundstudent);
         $this->assertTrue($foundmanager);
     }

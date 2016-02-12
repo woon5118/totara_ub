@@ -273,17 +273,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                     'displayfunc' => 'yes_or_no'
                 )
             ),
-            // TODO: Approval options will be extended in TL-7465.
-            new rb_column_option(
-                'session',
-                'approvalby',
-                get_string('approvalby', 'rb_source_facetoface_summary'),
-                'facetoface.approvalreqd',
-                array(
-                    'joins' => 'facetoface',
-                    'displayfunc' => 'approver'
-                )
-            ),
             // TODO: TL-8187 Cancellation status ("Face-to-face cancellations" specification).
             new rb_column_option(
                 'session',
@@ -413,6 +402,20 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 array(
                     'joins' => 'sessions',
                     'dbdatatype' => 'integer'
+                )
+            ),
+            new rb_column_option(
+                'facetoface',
+                'approvaltype',
+                get_string('f2f_approvaltype', 'rb_source_facetoface_summary'),
+                "facetoface.approvaltype",
+                array(
+                    'joins' => 'facetoface',
+                    'displayfunc' => 'f2f_approval',
+                    'defaultheading' => get_string('approvaltype', 'rb_source_facetoface_sessions'),
+                    'extrafields' => array(
+                        'approvalrole' => 'facetoface.approvalrole'
+                    )
                 )
             ),
             new rb_column_option(
@@ -563,6 +566,17 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             }
             return $OUTPUT->action_link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessionid)), $unknownstr);
         }
+    }
+
+    /**
+     * Convert a f2f approvaltype into a human readable string
+     *
+     * @param int $approvaltype
+     * @param object $row
+     * @return string
+     */
+    function rb_display_f2f_approval($approvaltype, $row) {
+        return facetoface_get_approvaltype_string($approvaltype, $row->approvalrole);
     }
 
     /**

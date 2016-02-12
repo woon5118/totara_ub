@@ -993,7 +993,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                     $request = new facetoface_notification($defaults, false);
                     $request->title = $facetoface->requestsubject;
                     $request->body = text_to_html($facetoface->requestmessage);
-                    $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST;
+                    $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER;
                     if (!empty($facetoface->requestinstrmngr)) {
                         $request->ccmanager = 1;
                         $request->managerprefix = text_to_html($facetoface->requestinstrmngr);
@@ -1441,7 +1441,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                     $request = new facetoface_notification($defaults, false);
                     $request->title = $facetoface->requestsubject;
                     $request->body = text_to_html($facetoface->requestmessage);
-                    $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST;
+                    $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER;
                     if (!empty($facetoface->requestinstrmngr)) {
                         $request->ccmanager = 1;
                         $request->managerprefix = text_to_html($facetoface->requestinstrmngr);
@@ -2045,7 +2045,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                             $recipients = $DB->get_fieldset_select('facetoface_session_roles', 'userid', $params);
                         } else if ($notification->conditiontype == MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION) {
                             $status[] = MDL_F2F_STATUS_USER_CANCELLED;
-                        } else if ($notification->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST) {
+                        } else if ($notification->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER) {
                             $status[] = MDL_F2F_STATUS_REQUESTED;
                         } else if ($notification->conditiontype == MDL_F2F_CONDITION_BOOKING_CONFIRMATION) {
                             $status[] = MDL_F2F_STATUS_APPROVED;
@@ -3256,6 +3256,163 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         }
 
         upgrade_mod_savepoint(true, 2016022400, 'facetoface');
+    }
+
+    /* Approval changes
+     *
+     * define('APPROVAL_NONE', 0);
+     * define('APPROVAL_SELF', 1);
+     * define('APPROVAL_ROLE', 2);
+     * define('APPROVAL_MANAGER', 4);
+     * define('APPROVAL_ADMIN', 8);
+     */
+    if ($oldversion < 2016022900) {
+        $f2f_table = new xmldb_table('facetoface');
+        $f2fsign_table = new xmldb_table('facetoface_signups');
+
+        // Create new columns.
+
+        $field = new xmldb_field('approvaltype');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        if (!$dbman->field_exists($f2f_table, $field)) {
+            $dbman->add_field($f2f_table, $field);
+        }
+
+        $field = new xmldb_field('approvalrole');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        if (!$dbman->field_exists($f2f_table, $field)) {
+            $dbman->add_field($f2f_table, $field);
+        }
+
+        $field = new xmldb_field('approvalterms');
+        $field->set_attributes(XMLDB_TYPE_TEXT, null, null, null, null, null);
+        if (!$dbman->field_exists($f2f_table, $field)) {
+            $dbman->add_field($f2f_table, $field);
+        }
+
+        $field = new xmldb_field('approvaladmins');
+        $field->set_attributes(XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        if (!$dbman->field_exists($f2f_table, $field)) {
+            $dbman->add_field($f2f_table, $field);
+        }
+
+        $field = new xmldb_field('managerid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        if (!$dbman->field_exists($f2fsign_table, $field)) {
+            $dbman->add_field($f2fsign_table, $field);
+        }
+
+
+
+        // Migrate settings to the new fields then drop the outdated columns.
+        $field = new xmldb_field('approvalreqd', XMLDB_TYPE_INTEGER, 1, null, XMLDB_NOTNULL, null, '0');
+        if ($dbman->field_exists($f2f_table, $field)) {
+
+            // Set approvaltype to self approval where every session has self approval enabled.
+            $selfappsql = 'UPDATE {facetoface}
+                              SET approvaltype = 1
+                            WHERE approvalreqd = 1
+                              AND id NOT IN (SELECT DISTINCT(facetoface)
+                                               FROM {facetoface_sessions}
+                                              WHERE selfapproval = 0
+                                            )';
+            $DB->execute($selfappsql);
+
+            // Then update the sessions that have been successfully ported.
+            $sessionsql = 'UPDATE {facetoface_sessions}
+                              SET selfapproval = 0
+                            WHERE facetoface IN (SELECT id
+                                                   FROM {facetoface}
+                                                  WHERE approvaltype = 1
+                                                )';
+            $DB->execute($sessionsql);
+
+            // Set manager approval for all Face-to-face with approval required that haven't been set to self approval.
+            $manappsql = 'UPDATE {facetoface} SET approvaltype = 4 WHERE approvalreqd = 1 AND approvaltype != 1';
+            $DB->execute($manappsql);
+
+            // Set no approval for the rest of the Face-to-face that didn't have approval required.
+            $noappsql = 'UPDATE {facetoface} SET approvaltype = 0 WHERE approvalreqd = 0';
+            $DB->execute($noappsql);
+
+            $dbman->drop_field($f2f_table, $field);
+        }
+
+        $field = new xmldb_field('selfapprovaltandc', XMLDB_TYPE_TEXT, 'big', null, null, null, null);
+        if ($dbman->field_exists($f2f_table, $field)) {
+            // Migrate settings to the new fields.
+            $termsandcon = 'UPDATE {facetoface} SET approvalterms = selfapprovaltandc';
+            $DB->execute($termsandcon); // Copy the terms and conditions to the new field.
+
+            $dbman->drop_field($f2f_table, $field);
+        }
+
+        // Now add the new notification templates.
+        $newtemplates = array();
+        if (!$DB->record_exists('facetoface_notification_tpl', array('reference' => 'rolerequest'))) {
+            $tpl_role = new stdClass();
+            $tpl_role->reference = 'rolerequest';
+            $tpl_role->title = get_string('setting:defaultrolerequestsubjectdefault', 'facetoface');
+            $tpl_role->body = text_to_html(get_string('setting:defaultrolerequestmessagedefault', 'facetoface'));
+            $tpl_role->managerprefix = text_to_html(get_string('setting:defaultrolerequestinstrmngrdefault', 'facetoface'));
+            $tpl_role->status = 1;
+
+            // Return ID so we can use it when creating notifications.
+            $tpl_role->id = $DB->insert_record('facetoface_notification_tpl', $tpl_role);
+
+            $newtemplates[] = $tpl_role;
+        }
+
+        if (!$DB->record_exists('facetoface_notification_tpl', array('reference' => 'adminrequest'))) {
+            $tpl_admin = new stdClass();
+            $tpl_admin->reference = 'adminrequest';
+            $tpl_admin->title = get_string('setting:defaultadminrequestsubjectdefault', 'facetoface');
+            $tpl_admin->body = text_to_html(get_string('setting:defaultadminrequestmessagedefault', 'facetoface'));
+            $tpl_admin->managerprefix = text_to_html(get_string('setting:defaultadminrequestinstrmngrdefault', 'facetoface'));
+            $tpl_admin->status = 1;
+
+            // Return ID so we can use it when creating notifications.
+            $tpl_admin->id = $DB->insert_record('facetoface_notification_tpl', $tpl_admin);
+
+            $newtemplates[] = $tpl_admin;
+        }
+
+        if (!empty($newtemplates)) {
+            $facetofacerecords = $DB->get_records('facetoface');
+            foreach ($newtemplates as $template) {
+                $defaults = array();
+                $defaults['type'] = MDL_F2F_NOTIFICATION_AUTO;
+                $defaults['booked'] = 0;
+                $defaults['waitlisted'] = 0;
+                $defaults['cancelled'] = 0;
+                $defaults['issent'] = 0;
+                $defaults['status'] = 1;
+                $defaults['ccmanager'] = $template->reference == 'rolerequest' ? 0 : 1;
+                $defaults['templateid'] = $template->id;
+
+                $condition = $template->reference == 'rolerequest' ? MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE : MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN;
+
+                // Add a default notification to all existing facetofaces.
+                foreach ($facetofacerecords as $facetoface) {
+                    $defaults['facetofaceid'] = $facetoface->id;
+                    $defaults['courseid'] = $facetoface->course;
+
+                    $notification = new facetoface_notification($defaults, false);
+                    $notification->title = $template->title;
+                    $notification->body = $template->body;
+                    $notification->managerprefix = $template->managerprefix;
+                    $notification->conditiontype = $condition;
+
+                    $notification->save();
+                }
+            }
+
+            // Set the facetoface_approvaloptions setting to the options existing in previous versions
+            set_config('facetoface_approvaloptions', 'approval_none,approval_self,approval_manager');
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2016022900, 'facetoface');
     }
 
     return $result;

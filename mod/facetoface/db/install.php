@@ -34,6 +34,8 @@ function xmldb_facetoface_install() {
         'setting:defaultdeclinesubjectdefault' => get_string('setting:defaultdeclinesubjectdefault', 'facetoface'),
         'setting:defaultremindersubjectdefault' => get_string('setting:defaultremindersubjectdefault', 'facetoface'),
         'setting:defaultrequestsubjectdefault' => get_string('setting:defaultrequestsubjectdefault', 'facetoface'),
+        'setting:defaultrolerequestsubjectdefault' => get_string('setting:defaultrolerequestsubjectdefault', 'facetoface'),
+        'setting:defaultadminrequestsubjectdefault' => get_string('setting:defaultadminrequestsubjectdefault', 'facetoface'),
         'setting:defaultdatetimechangesubjectdefault' => get_string('setting:defaultdatetimechangesubjectdefault', 'facetoface'),
         'setting:defaulttrainerconfirmationsubjectdefault' => get_string('setting:defaulttrainerconfirmationsubjectdefault', 'facetoface'),
         'setting:defaulttrainersessioncancellationsubjectdefault' => get_string('setting:defaulttrainersessioncancellationsubjectdefault', 'facetoface'),
@@ -90,6 +92,22 @@ function xmldb_facetoface_install() {
     $tpl_request->body = text_to_html(get_string('setting:defaultrequestmessagedefault', 'facetoface'));
     $tpl_request->managerprefix = text_to_html(get_string('setting:defaultrequestinstrmngrdefault', 'facetoface'));
     $DB->insert_record('facetoface_notification_tpl', $tpl_request);
+
+    $tpl_rolerequest = new stdClass();
+    $tpl_rolerequest->status = 1;
+    $tpl_rolerequest->reference = 'rolerequest';
+    $tpl_rolerequest->title = $titles['setting:defaultrolerequestsubjectdefault'];
+    $tpl_rolerequest->body = text_to_html(get_string('setting:defaultrolerequestmessagedefault', 'facetoface'));
+    $tpl_rolerequest->managerprefix = text_to_html(get_string('setting:defaultrolerequestinstrmngrdefault', 'facetoface'));
+    $DB->insert_record('facetoface_notification_tpl', $tpl_rolerequest);
+
+    $tpl_adminrequest = new stdClass();
+    $tpl_adminrequest->status = 1;
+    $tpl_adminrequest->reference = 'adminrequest';
+    $tpl_adminrequest->title = $titles['setting:defaultadminrequestsubjectdefault'];
+    $tpl_adminrequest->body = text_to_html(get_string('setting:defaultadminrequestmessagedefault', 'facetoface'));
+    $tpl_adminrequest->managerprefix = text_to_html(get_string('setting:defaultadminrequestinstrmngrdefault', 'facetoface'));
+    $DB->insert_record('facetoface_notification_tpl', $tpl_adminrequest);
 
     $tpl_decline = new stdClass();
     $tpl_decline->status = 1;

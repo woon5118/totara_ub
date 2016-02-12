@@ -86,6 +86,16 @@ $baseurl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $session
  *   - Show only staff awaiting approval
  *   - Show any staff who have cancelled
  *   - Shouldn't throw an error if there are previously declined attendees
+ *
+ * 5) A user with the specified role in the session to approve the pending requests
+ *  - The user with the role does not neccesarily have any capabilities in this course
+ *  - Show all users with pending requests for the session
+ *  - Do not show any other tabs
+ *
+ * 6) A sitewide or actitivity level Approver
+ *  - The approver does not neccesarily have any capabilities in this course
+ *  - Show all users with pending requests for the session
+ *  - Do not show any other tabs
  */
 // Allowed actions are actions the user has permissions to do
 $allowed_actions = array();
@@ -137,14 +147,29 @@ $cancellations = array();
 $requests = array();
 
 $staff = null;
-if ($facetoface->approvalreqd) {
+if ($facetoface->approvaltype == APPROVAL_MANAGER || $facetoface->approvaltype == APPROVAL_ADMIN) {
+    $managerselect = get_config(null, 'facetoface_managerselect');
     $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
     if (!empty($selectpositiononsignupglobal) && !empty($facetoface->selectpositiononsignup)) {
+        if ($managerselect) {
+            // If they are set as the session manager, or there is no session manager but they are the position manager.
+            $managersql = '(fs.managerid = :managerid OR (fs.managerid IS NULL AND pa.managerid = :managerid))';
+        } else {
+            $managersql = 'pa.managerid = :managerid';
+        }
+
         // Check if the user is manager of a position selected by staff signed up to this session.
-        $requestssql = "SELECT fs.userid FROM {facetoface_signups} fs
-                      JOIN {pos_assignment} pa ON fs.positionassignmentid = pa.id
-                     WHERE sessionid = :sessionid AND managerid = :managerid";
-        $params = array('sessionid' => $session->id, 'managerid' => $USER->id);
+        $requestssql = "SELECT fs.userid
+                          FROM {facetoface_signups} fs
+                          JOIN {pos_assignment} pa
+                            ON fs.positionassignmentid = pa.id
+                          JOIN {facetoface_signups_status} fss
+                            ON fss.signupid = fs.id AND fss.superceded = 0
+                         WHERE fs.sessionid = :sessionid
+                           AND {$managersql}
+                           AND fss.statuscode = :status
+                           AND fss.superceded = 0";
+        $params = array('sessionid' => $session->id, 'managerid' => $USER->id, 'status' => MDL_F2F_STATUS_REQUESTED);
         $staff = $DB->get_fieldset_sql($requestssql, $params);
 
         // Get temporary staff.
@@ -155,22 +180,90 @@ if ($facetoface->approvalreqd) {
             $staff = array_unique(array_merge($staff, $tempstaff));
         }
     } else {
-        // Get the staff the user is primary manager of.
-        $staff = totara_get_staff();
-        if (!$staff) {
-            $staff = array();
+        if ($managerselect) {
+            // If they are set as the session manager, or there is no session manager but they are the position manager.
+            $requestssql = "SELECT fs.userid
+                              FROM {facetoface_signups} fs
+                              JOIN {pos_assignment} pa
+                                ON fs.userid = pa.userid AND pa.type = :ptype
+                              JOIN {facetoface_signups_status} fss
+                                ON fss.signupid = fs.id AND fss.superceded = 0
+                             WHERE fs.sessionid = :sessionid
+                               AND (fs.managerid = :manid1 OR (fs.managerid IS NULL AND pa.managerid = :manid2))
+                               AND fss.statuscode = :status
+                               AND fss.superceded = 0";
+           $params = array('ptype' => POSITION_TYPE_PRIMARY,
+                            'sessionid' => $session->id,
+                            'manid1' => $USER->id,
+                            'manid2' => $USER->id,
+                            'status' => MDL_F2F_STATUS_REQUESTED
+            );
+            $staff = $DB->get_fieldset_sql($requestssql, $params);
+        } else {
+            // Get the staff the user is primary manager of.
+            $staff = totara_get_staff();
+            if (!$staff) {
+                $staff = array();
+            }
         }
+    }
+}
+
+if ($facetoface->approvaltype == APPROVAL_ROLE) {
+    $sessionroles = facetoface_get_trainers($session->id, $facetoface->approvalrole);
+    foreach ($sessionroles as $user) {
+        if ($user->id == $USER->id) {
+            // The current user is one of the role approvers.
+            $allowed_actions[] = 'approvalrequired';
+            $available_actions[] = 'approvalrequired';
+            // Set everyone as their staff.
+            $staff = array_keys(facetoface_get_requests($session->id));
+            break;
+        }
+    }
+}
+
+$admin_requests = array();
+if ($facetoface->approvaltype == APPROVAL_ADMIN) {
+    $sysapprovers = get_users_from_config(get_config(null, 'facetoface_adminapprovers'), 'mod/facetoface:approveanyrequest');
+    $systemapprover = false;
+
+    foreach ($sysapprovers as $sysapprover) {
+        if ($sysapprover->id == $USER->id) {
+            $systemapprover = true;
+        }
+    }
+
+    $activityapprover = in_array($USER->id, explode(',', $facetoface->approvaladmins));
+
+    if ($systemapprover || $activityapprover) {
+        // The current user is one of the admin approvers.
+        $allowed_actions[] = 'approvalrequired';
+        $available_actions[] = 'approvalrequired';
+        // Set everyone in the second step as their staff.
+        $requestssql = "SELECT fs.userid
+                          FROM {facetoface_signups} fs
+                          JOIN {facetoface_signups_status} fss
+                            ON fss.signupid = fs.id AND fss.superceded = 0
+                         WHERE fs.sessionid = :sessionid
+                           AND fss.statuscode = :status";
+        $params = array('sessionid' => $session->id, 'status' => MDL_F2F_STATUS_REQUESTEDADMIN);
+        $adminreqs = $DB->get_fieldset_sql($requestssql, $params);
+        if (isset($staff)) {
+            $staff = array_merge($staff, $adminreqs); // Display both just in case they are managers & approvers.
+        }
+        $staff = $adminreqs;
     }
 }
 
 $canapproveanyrequest = has_capability('mod/facetoface:approveanyrequest', $context);
 if ($canapproveanyrequest || !empty($staff)) {
     // Check if any staff have requests awaiting approval.
-    $get_requests = facetoface_get_requests($session->id);
-    if ($get_requests) {
+    $get_requests = $facetoface->approvaltype == APPROVAL_ADMIN ? facetoface_get_adminrequests($session->id) : facetoface_get_requests($session->id);
+
+    if ($get_requests || !empty($admin_requests)) {
         // Calculate which requesting users are relevant to the viewer.
         $requests = ($canapproveanyrequest ? $get_requests : array_intersect_key($get_requests, array_flip($staff)));
-
         if ($requests) {
             $allowed_actions[] = 'approvalrequired';
             $available_actions[] = 'approvalrequired';
@@ -487,7 +580,7 @@ if (!$onlycontent) {
     $args = array('args' => '{"sessionid":'.$session->id.','.
         '"action":'.$json_action.','.
         '"sesskey":"'.sesskey().'",'.
-        '"approvalreqd":"'.$facetoface->approvalreqd.'"}');
+        '"approvalreqd":"'.facetoface_approval_required($facetoface).'"}');
 
     $jsmodule = array(
         'name' => 'totara_f2f_attendees',
@@ -520,7 +613,7 @@ if (!$onlycontent) {
             '"courseid":"'.$course->id.'",'.
             '"facetofaceid":"'.$facetoface->id.'",'.
             '"notsetop":"'.MDL_F2F_STATUS_NOT_SET.'",'.
-            '"approvalreqd":"'.$facetoface->approvalreqd.'"}');
+            '"approvalreqd":"'.facetoface_approval_required($facetoface).'"}');
 
         $PAGE->requires->js_init_call('M.totara_f2f_attendees.init', $args, false, $jsmodule);
     }
@@ -633,7 +726,7 @@ if ($show_table) {
         $output->export_select($report, $sid);
 
     } else if (empty($rows)) {
-        if ($facetoface->approvalreqd) {
+        if (facetoface_approval_required($facetoface)) {
             if (count($requests) == 1) {
                 echo $OUTPUT->notification(get_string('nosignedupusersonerequest', 'facetoface'));
             } else {
@@ -651,7 +744,7 @@ if ($show_table) {
             echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => $USER->sesskey));
             echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 's', 'value' => $s));
 
-            // Prepare status options array
+            // Prepare status options array.
             $statusoptions = get_attendance_status();
         }
 
@@ -701,6 +794,21 @@ if ($show_table) {
             $headers[] = get_string('cancelreason', 'facetoface');
             $columns[] = 'cancellationreason';
         } else {
+            // Additional approval columns for the attendees tab.
+            if ($facetoface->approvaltype == APPROVAL_ROLE) {
+                $rolenames = role_fix_names(get_all_roles());
+                $headers[] = get_string('approverrolename', 'mod_facetoface');
+                $columns[] = 'approverrolename';
+            }
+
+            if ($facetoface->approvaltype > APPROVAL_SELF) {
+                // Display approval columns for anything except none and self approval.
+                $headers[] = get_string('approvername', 'mod_facetoface');
+                $columns[] = 'approvername';
+                $headers[] = get_string('approvaltime', 'mod_facetoface');
+                $columns[] = 'approvaltime';
+            }
+
             if (!$hidecost) {
                 $headers[] = get_string('cost', 'facetoface');
                 $columns[] = 'cost';
@@ -791,7 +899,7 @@ if ($show_table) {
 
             $timesignedup = userdate($attendee->timesignedup, get_string('strftimedatetime'));
 
-            // Strip the comma if we are exporting to CSV
+            // Strip the comma if we are exporting to CSV.
             $data[] = $download == 'csv' ? str_replace(',', '', $timesignedup) : $timesignedup;
 
             if ($showpositions) {
@@ -812,7 +920,7 @@ if ($show_table) {
                 $optionid = 'submissionid_' . $attendee->submissionid;
                 $checkoptionid = 'check_submissionid_' . $attendee->submissionid;
 
-                // Show current status
+                // Show current status.
                 if ($attendee->statuscode == MDL_F2F_STATUS_BOOKED) {
                     $attendee->statuscode = (string) MDL_F2F_STATUS_NOT_SET;
                 }
@@ -855,6 +963,30 @@ if ($show_table) {
                 $note = html_writer::span($datanote, 'cancellationnote' . $attendee->id, array('id' => 'cancellationnote' . $attendee->id));
                 $data[] = ($download) ? $datanote : $icon . $note;
             } else {
+                // To get the right approver & approval time we will need to get the approved status record.
+                $sql = 'SELECT fss.id, fss.signupid, fs.userid, fss.createdby, fss.timecreated
+                          FROM {facetoface_signups} fs
+                          JOIN {facetoface_signups_status} fss
+                            ON fss.signupid = fs.id
+                         WHERE fs.id = :sid
+                           AND fs.userid = :uid
+                           AND fss.statuscode = :status
+                      ORDER BY fss.timecreated DESC';
+                $params = array('sid' => $attendee->submissionid, 'uid' => $attendee->id, 'status' => MDL_F2F_STATUS_APPROVED); // TODO - in 2 step should this be manager or admin?
+
+                $apprecords = $DB->get_records_sql($sql, $params);
+                $apprecord = array_shift($apprecords);
+
+                // Additional approval columns for the attendees tab.
+                if ($facetoface->approvaltype == APPROVAL_ROLE) {
+                    $data[] = $rolenames[$facetoface->approvalrole]->localname;
+                }
+
+                if ($facetoface->approvaltype > APPROVAL_SELF) {
+                    $data[] = fullname($DB->get_record('user', array('id'=>$apprecord->createdby)));;
+                    $data[] = userdate($apprecord->timecreated);
+                }
+
                 if (!$hidecost) {
                     $data[] = facetoface_cost($attendee->id, $session->id, $session);
                     if (!$hidediscount) {
@@ -945,7 +1077,7 @@ if ($show_table) {
         }
         echo $OUTPUT->container_start('actions last');
         if ($exports) {
-            // Action selector
+            // Action selector.
             echo html_writer::select($exports, 'f2f-actions', '', array('' => get_string('export', 'totara_reportbuilder')));
         }
         echo $OUTPUT->container_end();
@@ -962,7 +1094,7 @@ if ($action == 'messageusers') {
     $mform->display();
 }
 
-// Go back
+// Go back.
 $url = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
 echo html_writer::link($url, get_string('goback', 'facetoface')) . html_writer::end_tag('p');
 
@@ -1011,6 +1143,16 @@ if ($action == 'approvalrequired') {
         // The user has to hold specific permissions to view this.
         $headings[] = get_string('attendeenote', 'facetoface');
     }
+
+    // Additional approval columns for the approval tab.
+    if ($facetoface->approvaltype == APPROVAL_MANAGER || $facetoface->approvaltype == APPROVAL_ADMIN) {
+        $headings[] = get_string('header:managername', 'facetoface');
+        if ($facetoface->approvaltype == APPROVAL_ADMIN) {
+            $headings[] = get_string('header:approvalstate', 'facetoface');
+            $headings[] = get_string('header:approvaltime', 'facetoface');
+        }
+    }
+
     $headings[] = get_string('decidelater', 'facetoface');
     $headings[] = get_string('decline', 'facetoface');
     $headings[] = get_string('approve', 'facetoface');
@@ -1048,6 +1190,31 @@ if ($action == 'approvalrequired') {
                 $data[] = $icon . $note;
             }
         }
+
+        // Additional approval columns for the approval tab.
+        if ($facetoface->approvaltype == APPROVAL_MANAGER || $facetoface->approvaltype == APPROVAL_ADMIN) {
+            $manager = facetoface_get_session_manager($attendee->id, $session->id);
+            $data[] = html_writer::span($manager->fullname, 'managername' . $attendee->id, array('id' => 'managername' . $attendee->id));
+            if ($facetoface->approvaltype == APPROVAL_ADMIN) {
+                switch ($attendee->statuscode) {
+                    case MDL_F2F_STATUS_REQUESTED:
+                        $state = get_string('none', 'mod_facetoface');
+                        $time = '';
+                        break;
+                    case MDL_F2F_STATUS_REQUESTEDADMIN:
+                        $state = get_string('approved', 'mod_facetoface');
+                        $time = userdate($attendee->timerequested);
+                        break;
+                    default:
+                        print_error('error:invalidstatus', 'mod_facetoface');
+                        break;
+                }
+                $data[] = html_writer::span($state, 'approvalstate' . $attendee->id, array('id' => 'approvalstate' . $attendee->id));
+                $data[] = html_writer::span($time, 'approvaltime' . $attendee->id, array('id' => 'approvaltime' . $attendee->id));
+        }
+    }
+
+
         $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '0', 'checked' => 'checked')));
         $data[] = html_writer::empty_tag('input',array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '1')));
         $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '2')));

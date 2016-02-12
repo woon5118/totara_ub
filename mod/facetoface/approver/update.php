@@ -17,16 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @author David Curry <david.curry@totaralms.com>
  * @package mod_facetoface
  */
 
-////////////////////////////////////////////////////////////////////////////////
-//  Code fragment to define the module version etc.
-//  This fragment is called by /admin/index.php
-////////////////////////////////////////////////////////////////////////////////
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
-$plugin->version  = 2016022900;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2015051102;       // Requires this Moodle version.
-$plugin->release   = '2.4.0 (2012112900)'; // User-friendly version number
-$plugin->component = 'mod_facetoface';
-$plugin->maturity  = MATURITY_STABLE;
+ajax_require_login();
+
+$users = required_param('users', PARAM_SEQUENCE);
+$fid = required_param('fid', PARAM_INT);
+
+$PAGE->set_context(context_system::instance());
+
+$out = html_writer::start_tag('div', array('id' => 'activityapproverbox', 'class' => 'activity_approvers'));
+
+foreach (explode(',', trim($users, ',')) as $userid) {
+    $user = core_user::get_user($userid);
+    $out .= facetoface_display_approver($user, true);
+}
+
+$out .= html_writer::end_tag('div');
+
+echo "DONE{$out}";
+exit();

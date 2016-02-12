@@ -28,6 +28,7 @@ $string['cancelledattendees'] = 'Number of cancelled bookings';
 $string['declinedattendees'] = 'Number of declined attendees';
 $string['discountcost'] = 'Discount cost';
 $string['duration'] = 'Duration';
+$string['f2f_approvaltype'] = 'Approval Type';
 $string['f2fdesc'] = 'Face to Face Description';
 $string['f2fid'] = 'Face to Face ID';
 $string['fullyattended'] = 'Number fully attended';

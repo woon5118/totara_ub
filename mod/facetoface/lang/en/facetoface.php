@@ -71,7 +71,35 @@ $string['answer'] = 'Sign in';
 $string['answercancel'] = 'Sign out';
 $string['approvalreqd'] = 'Approval required';
 $string['applyfilter'] = 'Apply filter';
+$string['approval_activityapprover'] = '{$a} (activity level approver)';
+$string['approval_addapprover'] = 'Add approver';
+$string['approval_admin'] = 'Admin Approval';
+$string['approval_manager'] = 'Manager Approval';
+$string['approval_managerselect'] = 'Users Select Manager';
+$string['approval_none'] = 'No Approval';
+$string['approval_role'] = 'Role Approval';
+$string['approval_self'] = 'Learner accepts terms and conditions';
+$string['approval_siteapprover'] = '{$a} (site level approver)';
+$string['approvalusers'] = 'Approval Administrators';
+$string['approvalusers_help'] = 'The approval administrators will receive a notification about your request to book into this session. If there are none displayed, please contact the Site Administrator.';
+$string['approvertime'] = 'Approval Time';
+$string['approvername'] = 'Approved By';
+$string['approveremail'] = 'Approver Email';
+$string['approvaloptions'] = 'Require approval by';
+$string['approvaloptions_help'] = 'Available options are defined by the approvaloptions setting on the facetoface administration settings page:
+<br />
+<br /> <b>No approval</b> - Users will be able to freely sign up to sessions
+<br /> <b>Self approval</b> - Users will be able to sign up to sessions after agreeing to the Terms and Conditions specified in the text box below the setting
+<br /> <b>Role approval</b> - Users will be able to request access to a session, users with the role will then be emailed and will approve/decline the requests
+<br /> <b>Manager approval</b> - Users will be able to request access to a session, their user will then be emailed and will approve/decline the requests
+<br /> <b>Admin approval</b> - Users will be able to request access to a session, their managers and the approvers selected by the add approver option below will then be emailed. This is a two step approval process, the manager will first approve/decline the request, then one of the approvers will also have to approve/decline.';
+$string['approvaloptionsheader'] = 'Approval Options';
+$string['approvalrequiredby'] = 'Approval required by: ';
+$string['approvalterms'] = 'Terms and conditions';
+$string['approvaltime'] = 'Time approved';
 $string['approve'] = 'Approve';
+$string['approved'] = 'Approved';
+$string['approvername'] = 'Approver name';
 $string['areyousureconfirmwaitlist'] = 'This will be over the session capacity allowance. Are you sure you want to continue?';
 $string['assessmentyour'] = 'Your assessment';
 $string['attendance'] = 'Attendance';
@@ -154,6 +182,7 @@ $string['booked'] = 'Booked';
 $string['bookingcancelled'] = 'Your booking has been cancelled.';
 $string['bookingcompleted'] = 'Your booking has been completed.';
 $string['bookingcompleted_approvalrequired'] = 'Your booking has been completed but requires approval from your manager.';
+$string['bookingcompleted_roleapprovalrequired'] = 'Your request to attend this session has been received. You should immediately receive a confirmation email. Each {$a} associated with this session has been notified about your request. You should receive a notification about the decision soon.';
 $string['bookingfull'] = 'Booking full';
 $string['bookingopen'] = 'Booking open';
 $string['bookingstatus'] = 'You are booked for the following session';
@@ -199,6 +228,7 @@ $string['cannotapproveatcapacity'] = 'You cannot approve any more attendees as t
 $string['ccmanager'] = 'Manager copy';
 $string['ccmanager_note'] = 'Send a copy of this notification to the user\'s manager';
 $string['changeselectedusers'] = 'Change selected users';
+$string['chooseapprovers'] = 'Select activity level approvers';
 $string['chooseroom'] = 'Choose a room';
 $string['choosepredefinedroom'] = 'Choose a pre-defined room';
 $string['cannotapproveatcapacity'] = 'You cannot approve any more attendees as this session is full.';
@@ -234,6 +264,7 @@ $string['cancellationmessage'] = 'Cancellation message';
 $string['cancellationconfirm'] = 'Are you sure you want to cancel your booking to this session?';
 $string['close'] = 'Close';
 $string['costheading'] = 'Session Cost';
+$string['currentlyselected'] = 'Currently selected';
 $string['cutoff'] = 'Cut-off';
 $string['cutoffnote'] = 'before session starts';
 $string['cutoff_help'] = 'The amount of time before the first session that messages about minimum bookings will be sent.
@@ -257,6 +288,7 @@ The following fields must be provided:
 $string['csvtextinput'] = 'CSV text input';
 $string['currentallocations'] = 'Current allocations ({$a->allocated} / {$a->max})';
 $string['currentattendees'] = 'Current attendees';
+$string['currentmanager'] = 'Current manager: ';
 $string['currentstatus'] = 'Current status';
 $string['customfieldsheading'] = 'Custom Fields';
 $string['customfieldsheadingaction'] = '{$a} Custom Session Fields';
@@ -311,6 +343,8 @@ $string['discardmessage'] = 'Discard message';
 $string['discountcode'] = 'Discount code';
 $string['discountcost'] = 'Discount cost';
 $string['discountcosthinttext'] = '';
+$string['dismiss'] = 'Dismiss';
+$string['dismissedwarning'] = 'The warning will no longer be displayed for this face-to-face';
 $string['downloadsigninsheet'] = 'Download sign-in sheet';
 $string['due'] = 'due';
 $string['duration'] = 'Duration';
@@ -334,6 +368,7 @@ $string['enrolled'] = 'enrolled';
 $string['error:addalreadysignedupattendee'] = 'This user is already signed-up for this Face-to-face activity.';
 $string['error:addalreadysignedupattendeeaddself'] = 'You are already signed-up for this Face-to-face activity.';
 $string['error:addattendee'] = 'Could not add {$a} to the session.';
+$string['error:approvernotselected'] = 'Please select an approver';
 $string['error:cancellationsnotallowed'] = 'You are not allowed to cancel this booking.';
 $string['error:cancelbooking'] = 'There was a problem cancelling your booking';
 $string['error:cannotdeclareinterest'] = 'Cannot declare interest in this face-to-face activity.';
@@ -395,11 +430,15 @@ $string['error:incorrectcoursemoduleid'] = 'Course Module ID was incorrect';
 $string['error:incorrectcoursemodulesession'] = 'Course Module Face-to-face Session was incorrect';
 $string['error:incorrectfacetofaceid'] = 'Face-to-face ID was incorrect';
 $string['error:incorrectnotificationtype'] = 'Incorrect notification type supplied';
+$string['error:invalidstatus'] = 'Invalid signup status';
 $string['error:invaliduserid'] = 'Invalid user ID';
 $string['error:manageremailaddressmissing'] = 'You are currently not assigned to a manager in the system. Please contact the site administrator.';
 $string['error:mincapacitymissing'] = 'Session minimum bookings value is missing';
 $string['error:mincapacitynotnumeric'] = 'Session minimum bookings is not a number';
 $string['error:mincapacitytoolarge'] = 'Session minimum bookings cannot be greater than the capacity';
+$string['error:mincapacityzero'] = 'Session minimum capacity cannot be zero';
+$string['error:missingrequiredmanager'] = 'This Face-to-face requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator.';
+$string['error:missingselectedmanager'] = 'This Face-to-face requires manager approval, please select a manager to request approval';
 $string['error:mustspecifycoursemodulefacetoface'] = 'Must specify a course module or a facetoface ID';
 $string['error:mustspecifytimezone'] = 'You must set the timezone for each date';
 $string['error:nodatasupplied'] = 'No data supplied';
@@ -416,12 +455,14 @@ $string['error:notificationtemplatemissing'] = 'The following notification templ
 $string['error:problemsigningup'] = 'There was a problem signing you up.';
 $string['error:removeattendee'] = 'Could not remove {$a} from the session.';
 $string['error:sessionnotfound'] = 'The session is no longer available.';
+$string['error:selfapprovalupgrade'] = 'Self approval has been moved from sessions to a facetoface setting, please run the admin tool to resolve any conflicts before upgrading.';
 $string['error:sessionstartafterend'] = 'Session start date/time is after end.';
 $string['error:sessiondatesconflict'] = 'This date conflicts with an earlier date in this session';
 $string['error:signedupinothersession'] = 'You are already signed up in another session for this activity. You can only sign up for one session per Face-to-face activity.';
 $string['error:takeattendance'] = 'An error occurred while taking attendance';
 $string['error:therearexconflicts'] = 'There are ({$a}) conflicts with the proposed time period.';
 $string['error:thereisaconflict'] = 'There is a conflict with the proposed time period.';
+$string['error:unrecognisedapprovaltype'] = 'Unrecognised approval type passed to facetoface_get_approvaltype_string()';
 $string['error:unknownbuttonclicked'] = 'No action associated with the button that was clicked';
 $string['error:unknownuserfield'] = 'This field is not supported for user search.';
 $string['error:userassignedsessionconflictsameday'] = '{$a->fullname} is already assigned as a \'{$a->participation}\' for {$a->session} at {$a->timestart} to {$a->timefinish} on {$a->datestart}. Please select another user or change the session date';
@@ -517,10 +558,13 @@ $string['gettointerestreport'] = 'To view the declare interest report go to the 
 $string['gettosigninreport'] = 'To view the sign-in sheet go to the facetoface session and follow the download link available.';
 $string['goback'] = 'Go back';
 $string['guestsno'] = 'Sorry, guests are not allowed to sign up for sessions.';
+$string['header:approvalstate'] = 'Manager Approval';
+$string['header:approvaltime'] = 'Approval Time';
+$string['header:managername'] = 'Manager\'s Name';
 $string['icalendarheading'] = 'iCalendar Attachments';
 $string['id'] = 'Id';
 $string['icaldescription'] = 'This calendar event is for the "{$a->name}" face-to-face session you have been booked on to.';
-$string['ignoreapprovalwhenaddingattendees'] = 'Ignore manager approval when adding attendees';
+$string['ignoreapprovalwhenaddingattendees'] = 'Ignore approval when adding attendees';
 $string['import'] = 'Import';
 $string['individuals'] = 'Individuals';
 $string['info'] = 'Info';
@@ -543,6 +587,7 @@ $string['manageremailheading'] = 'Manager Emails';
 $string['manageremailinstruction'] = 'In order to sign-up for a training session, a confirmation email must be sent to your email address and copied to your manager\'s email address.';
 $string['manageremailinstructionconfirm'] = 'Please confirm that this is your manager\'s email address:';
 $string['managername'] = 'Manager\'s name';
+$string['managername_help'] = 'Your manager will receive a notification about your request to book into this session. If the name and email address shown here do not belong not your manager, please contact the Site Administrator.';
 $string['managereservations'] = 'Manage reservations';
 $string['managerprefix'] = 'Manager copy prefix';
 $string['managerreservationdeleted'] = 'Manager reservation deleted successfully';
@@ -588,7 +633,7 @@ $string['nocustomfields'] = '<p>No custom fields are defined.</p>';
 $string['nofacetofaces'] = 'There are no Face-to-face activities';
 $string['nositenotices'] = '<p>No site notices are defined.</p>';
 $string['nonapplicable'] = 'N/A';
-$string['none'] = 'none';
+$string['none'] = 'None';
 $string['nonotifications'] = 'No notifications';
 $string['nonotificationsmatchingsearch'] = 'No notifications matching search';
 $string['nonotificationsofthistype'] = 'No notifications of this type';
@@ -732,6 +777,7 @@ $string['placeholder:cost'] = '[cost]';
 $string['placeholder:alldates'] = '[alldates]';
 $string['placeholder:reminderperiod'] = '[reminderperiod]';
 $string['placeholder:sessiondate'] = '[sessiondate]';
+$string['placeholder:sessionrole'] = '[sessionrole]';
 $string['placeholder:startdate'] = '[startdate]';
 $string['placeholder:finishdate'] = '[finishdate]';
 $string['placeholder:starttime'] = '[starttime]';
@@ -810,6 +856,9 @@ $string['selectnotsetop'] = 'Not Set';
 $string['selectoptionbefore'] = ' Please choose an option (All, Set or Not set) before selecting this option';
 $string['selectposition'] = 'Select a position';
 $string['selectsetop'] = 'Set';
+$string['selfauthorisation'] = 'Self authorisation';
+$string['selfauthorisation_help'] = 'You must read and agree to the terms and conditions before signing up for the session.';
+$string['selfauthorisationdesc'] = 'By checking this box, I confirm that I have read and agreed to the {$a} (opens a new window).';
 $string['selfapproval'] = 'Self Approval';
 $string['selfapproval_help'] = 'This setting allows a user to confirm that they have sought approval to attend the session. Instead of their manager needing to approve their booking the user is presented with a check box when signing up and must confirm they have met the specified terms and conditions.
 This setting will be disabled unless "Requires approval" is enabled in the Face-to-face activity settings.';
@@ -877,9 +926,24 @@ Capacity: {$a->booked} / {$a->capacity} (minimum: {$a->mincapacity})
 $string['sessionvenue'] = 'Session venue';
 $string['setactive'] = 'Set active';
 $string['setinactive'] = 'Set inactive';
-$string['setting:addchangemanageremail'] = 'Ask users for their manager\'s email address.';
-$string['setting:addchangemanageremaildefault'] = 'Ask users for their manager\'s email address.';
-$string['setting:addchangemanageremail_caption'] = 'Manager\'s email:';
+$string['setting:signupapproval_header'] = 'Signup Approvals';
+$string['setting:approvaloptions_caption'] = 'Available Approval Options';
+$string['setting:approvaloptions_default'] = 'The options selected above will be available in the \'require approval by\' setting for all Face-to-face activities. Text entered below the \'Learner accepts terms and conditions\' option will be default for all activities and can be edited for each activity. Selected \'site level administrative approvers\' are automatically added to all Face-to-face activities and can not be removed from within any given activity (note: other administrative approvers can be added to each Face-to-face activity)';
+$string['setting:managerselect_caption'] = 'Users Select Manager';
+$string['setting:managerselect_format'] = 'Recommended when manager assignment data is not available. When enabled and an activity requires approval by Manager, the session sign-up page will force users to search for and select a user to approve their request to attend a session each time they sign-up. The selected user will receive a notificaqtion about the request and instructions on how to approve or decline it.';
+$string['setting:termsandconditions_caption'] = 'Terms and conditions';
+$string['setting:termsandconditions_format'] = 'Text entered in this setting will be the default for the \'Learner accepts terms and conditions\' setting but can be edited for each activity.';
+$string['setting:termsandconditions_default'] = 'By checking the box you confirm that permission to sign up to this Face to Face activity has been granted by your manager.
+
+Falsely claiming that approval has been granted can result in non-admittance and disciplinary action.
+';
+$string['setting:adminapprovers_caption'] = 'Site level administrative approvers';
+$string['setting:adminapprovers_format'] = 'Selected users \'site level administrative approvers\' are automatically added to all Face-to-face activities and can not be removed from within any given activity (note: other administrative approvers can be added to each Face-to-face activity)';
+$string['setting:approval_none'] = 'No approval required';
+$string['setting:approval_self'] = 'Learner accepts terms and conditions';
+$string['setting:approval_role'] = 'TODO - session role name?';
+$string['setting:approval_manager'] = 'Manager approval';
+$string['setting:approval_admin'] = 'Manager and Administrative approval';
 $string['setting:allowschedulingconflicts_caption'] = 'Allow scheduling conflicts:';
 $string['setting:allowschedulingconflicts'] = 'Allow or disallow scheduling conflicts to exist while creating a new session.';
 $string['setting:allowwaitlisteveryone_caption'] = 'Enable everyone on waiting list option';
@@ -1110,6 +1174,52 @@ Venue:   [session:venue]
 Room:   [session:room]
 ';
 $string['setting:defaultrequestsubjectdefault'] = 'Face-to-face booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultrolerequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as a [sessionrole] for the session.
+
+Please follow the link below to approve the request:
+[attendeeslink]
+
+';
+$string['setting:defaultrolerequestinstrmngrcopybelow'] = '*** [firstname] [lastname]\'s booking request is copied below ****';
+$string['setting:defaultrolerequestmessagedefault'] = 'Your request to book into the following course has been sent to the sessions [sessionrole](s):
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+Cost:   [cost]
+
+Duration:   [duration]
+Date(s):
+[alldates]
+
+Location:   [session:location]
+Venue:   [session:venue]
+Room:   [session:room]
+';
+$string['setting:defaultrolerequestsubjectdefault'] = 'Face-to-face booking role request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultadminrequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as an approver for the session.
+
+Please follow the link below to approve the request:
+[attendeeslink]
+
+';
+$string['setting:defaultadminrequestinstrmngrcopybelow'] = '*** [firstname] [lastname]\'s booking request is copied below ****';
+$string['setting:defaultadminrequestmessagedefault'] = 'Your request to book into the following course has been sent to the sessions approvers:
+
+Participant:   [firstname] [lastname]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+Cost:   [cost]
+
+Duration:   [duration]
+Date(s):
+[alldates]
+
+Location:   [session:location]
+Venue:   [session:venue]
+Room:   [session:room]
+';
+$string['setting:defaultadminrequestsubjectdefault'] = 'Face-to-face booking admin request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaulttrainerconfirmationmessage'] = 'Default message sent to trainers when assigned to a session.';
 $string['setting:defaulttrainerconfirmationmessage_caption'] = 'Trainer confirmation message';
 $string['setting:defaulttrainerconfirmationmessagedefault'] = 'This is to confirm that you are now assigned to deliver training on the following course:
@@ -1239,7 +1349,7 @@ $string['setting:reservedays'] = 'Reservation deadline (default)';
 $string['setting:reservedays_desc'] = 'The number of days before the session starts after which no more reservations are allowed (must be greater than the cancellation days)';
 $string['setting:showinsummary'] = 'Show in exports and lists';
 $string['setting:sessionroles'] = 'Users assigned to the selected roles in a course can be tracked with each face-to-face session';
-$string['setting:sessionrolesnotify'] = 'The roles that will recieve the automated notifications for facetoface sessions, for example the minimum bookings warning';
+$string['setting:sessionrolesnotify'] = 'The roles that will receive the automated notifications for facetoface sessions, for example the minimum bookings warning';
 $string['setting:sessionroles_caption'] = 'Session roles:';
 $string['setting:sessionrolesnotify_caption'] = 'Notification Recipients';
 $string['setting:type'] = 'Field type';
@@ -1252,6 +1362,8 @@ $string['showoncalendar'] = 'Calendar display settings';
 $string['signature'] = 'Signature';
 $string['signinsheetreport'] = 'Session attendance sheet';
 $string['signup'] = 'Sign-up';
+$string['signupandaccept'] = 'Agree and submit';
+$string['signupandrequest'] = 'Request approval';
 $string['signupcustomfieldtab'] = 'Sign-up note';
 $string['signupdata'] = 'Sign-up data';
 $string['signupfields'] = 'Sign-up fields';
@@ -1280,6 +1392,7 @@ $string['status_no_show'] = 'No show';
 $string['status_not_set'] = 'Not set';
 $string['status_partially_attended'] = 'Partially attended';
 $string['status_requested'] = 'Requested';
+$string['status_requestedadmin'] = 'Requested (2step)';
 $string['status_user_cancelled'] = 'User Cancelled';
 $string['status_waitlisted'] = 'Wait-listed';
 $string['status_approved'] = 'Approved';
@@ -1290,13 +1403,15 @@ $string['successfullyaddededitedxattendees'] = 'Successfully added/edited {$a} a
 $string['summary'] = 'Summary';
 $string['takeattendance'] = 'Take attendance';
 $string['template'] = 'Template';
+$string['templateadminrequest'] = 'Booking admin request';
 $string['templateallreservationcancel'] = 'All reservations cancelled';
 $string['templatecancellation'] = 'Cancellation';
 $string['templateconfirmation'] = 'Booking request confirmation';
 $string['templatedecline'] = 'Booking request declined';
+$string['templatemanagerrequest'] = 'Booking manager request';
 $string['templatereminder'] = 'Reminder';
-$string['templaterequest'] = 'Booking request';
 $string['templatereservationcancel'] = 'Reservation cancelled';
+$string['templaterolerequest'] = 'Booking role request';
 $string['templatetimechange'] = 'Time changed';
 $string['templatetrainercancel'] = 'Trainer cancelled';
 $string['templatetrainerconfirm'] = 'Trainer confirmed';
@@ -1596,3 +1711,4 @@ $string['waitlistcancellationconfirm'] = 'Are you sure you want to cancel your p
 $string['waitlistedforsession'] = 'Waitlisted for session {$a}';
 $string['waitlistfor'] = 'Waitlist for {$a}';
 $string['waitliststatus'] = 'You have a place on the waitlist of the following session';
+$string['warning:mixedapprovaltypes'] = 'This facetoface was previously using mixed approval types, it is currently set to manager approval. Please check all self approval sessions.';

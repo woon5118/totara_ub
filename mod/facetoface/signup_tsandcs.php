@@ -46,7 +46,7 @@ $context = context_module::instance($cm->id);
 
 require_login();
 
-if (!$facetoface->approvalreqd or !$session->selfapproval) {
+if ($facetoface->approvaltype != APPROVAL_SELF) {
     // This should not happen unless there is a concurrent change of settings.
     print_error('error');
 }
@@ -78,7 +78,7 @@ if (is_enrolled($context, null, '', true)) {
 
 $pagetitle = format_string($facetoface->name);
 
-$mform = new signup_tsandcs_form(null, array('tsandcs' => $facetoface->selfapprovaltandc, 's' => $s));
+$mform = new signup_tsandcs_form(null, array('tsandcs' => $facetoface->approvalterms, 's' => $s));
 
 // This should be json_encoded, but for now we need to use html content
 // type to not break $.get().

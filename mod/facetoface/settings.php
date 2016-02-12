@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Alastair Munro <alastair.munro@totaralms.com>
+ * @author David Curry <david.curry@totaralms.com>
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
  * @author Francois Marier <francois@catalyst.net.nz>
  * @package modules
@@ -83,13 +84,33 @@ if ($ADMIN->fulltree) { // Improve performance.
 
     $settings->add(new admin_setting_configcheckbox('facetoface_multiplesessions', get_string('setting:multiplesessions_caption', 'facetoface'), get_string('setting:multiplesessions', 'facetoface'), 0));
 
-    $settings->add(new admin_setting_heading('facetoface_manageremail_header', new lang_string('manageremailheading', 'facetoface'), ''));
+    $settings->add(new admin_setting_heading('facetoface_signupapproval_header', new lang_string('setting:signupapproval_header', 'facetoface'), ''));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_addchangemanageremail', new lang_string('setting:addchangemanageremail_caption', 'facetoface'), new lang_string('setting:addchangemanageremail', 'facetoface'), 0));
+    $available = explode(',', get_config(null, 'facetoface_session_roles'));
+    $rolenames = role_fix_names(get_all_roles());
+    $options = array();
+    $options['approval_none'] =  new lang_string('setting:approval_none', 'facetoface');
+    $options['approval_self'] =  new lang_string('setting:approval_self', 'facetoface');
+    foreach ($available as $roleid) {
+        if (!empty($roleid)) { // This makes it work when empty on installation.
+            $options["approval_role_{$roleid}"] = $rolenames[$roleid]->localname;
+        }
+    }
+    $options['approval_manager'] =  new lang_string('setting:approval_manager', 'facetoface');
+    $options['approval_admin'] =  new lang_string('setting:approval_admin', 'facetoface');
 
-    $settings->add(new admin_setting_configtext('facetoface_manageraddressformat', new lang_string('setting:manageraddressformat_caption', 'facetoface'), new lang_string('setting:manageraddressformat', 'facetoface'), new lang_string('setting:manageraddressformatdefault', 'facetoface'), PARAM_TEXT));
+    $settings->add(new admin_setting_configmulticheckbox('facetoface_approvaloptions', new lang_string('setting:approvaloptions_caption', 'facetoface'),
+        new lang_string('setting:approvaloptions_default', 'facetoface'), array('approval_none' => 1, 'approval_self' => 1,'approval_manager' => 1), $options));
 
-    $settings->add(new admin_setting_configtext('facetoface_manageraddressformatreadable', new lang_string('setting:manageraddressformatreadable_caption', 'facetoface'), new lang_string('setting:manageraddressformatreadable', 'facetoface'), new lang_string('setting:manageraddressformatreadabledefault', 'facetoface'), PARAM_NOTAGS));
+    $settings->add(new admin_setting_configtextarea('facetoface_termsandconditions', new lang_string('setting:termsandconditions_caption', 'facetoface'),
+        new lang_string('setting:termsandconditions_format', 'facetoface'), new lang_string('setting:termsandconditions_default', 'facetoface')));
+
+    $settings->add(new admin_setting_users_with_capability('facetoface_adminapprovers', new lang_string('setting:adminapprovers_caption', 'facetoface'),
+        new lang_string('setting:adminapprovers_format', 'facetoface'), array(), 'mod/facetoface:approveanyrequest'));
+
+    $settings->add(new admin_setting_configcheckbox('facetoface_managerselect',
+        new lang_string('setting:managerselect_caption', 'facetoface'),
+        new lang_string('setting:managerselect_format', 'facetoface'), 0));
 
     $settings->add(new admin_setting_heading('facetoface/managerreserveheader',
         new lang_string('setting:managerreserveheader', 'mod_facetoface'), ''));

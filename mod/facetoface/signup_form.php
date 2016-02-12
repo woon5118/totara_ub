@@ -17,37 +17,122 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @author David Curry <david.curry@totaralms.com>
  * @package modules
  * @subpackage facetoface
  */
 
 require_once "$CFG->dirroot/lib/formslib.php";
+require_once "$CFG->dirroot/mod/facetoface/lib.php";
 
 class mod_facetoface_signup_form extends moodleform {
     function definition() {
         global $CFG;
 
         $mform =& $this->_form;
-        $manageremail = $this->_customdata['manageremail'];
         $showdiscountcode = $this->_customdata['showdiscountcode'];
         $enableattendeenote = $this->_customdata['enableattendeenote'];
+        $approvaltype = $this->_customdata['approvaltype'];
+        $approvaladmins = $this->_customdata['approvaladmins'];
+        $managerid = $this->_customdata['managerid'];
+        $manager = core_user::get_user($managerid);
 
         $mform->addElement('hidden', 's', $this->_customdata['s']);
         $mform->setType('s', PARAM_INT);
         $mform->addElement('hidden', 'backtoallsessions', $this->_customdata['backtoallsessions']);
         $mform->setType('backtoallsessions', PARAM_INT);
 
-        if ($manageremail === false) {
-            $mform->addElement('hidden', 'manageremail', '');
-        } else {
-            $mform->addElement('html', get_string('manageremailinstructionconfirm', 'facetoface')); // instructions
+        $mform->addElement('hidden', 'managerid');
+        $mform->setType('managerid', PARAM_INT);
+        $mform->setDefault('managerid', $managerid);
 
-            $mform->addElement('text', 'manageremail', get_string('manageremail', 'facetoface'), 'size="35"');
-            $mform->addRule('manageremail', null, 'required', null, 'client');
-            $mform->addRule('manageremail', null, 'email', null, 'client');
+        // Do nothing if approval is set to none or role.
+        if ($approvaltype == APPROVAL_SELF) {
+            global $PAGE;
+
+            $url = new moodle_url('/mod/facetoface/signup_tsandcs.php', array('s' => $this->_customdata['s']));
+            $tandcurl = html_writer::link($url, get_string('approvalterms', 'mod_facetoface'), array("class"=>"tsandcs ajax-action"));
+
+            $PAGE->requires->strings_for_js(array('approvalterms', 'close'), 'mod_facetoface');
+            $PAGE->requires->yui_module('moodle-mod_facetoface-signupform', 'M.mod_facetoface.signupform.init');
+
+            $mform->addElement('checkbox', 'authorisation', get_string('selfauthorisation', 'mod_facetoface'),
+                               get_string('selfauthorisationdesc', 'mod_facetoface', $tandcurl));
+            $mform->addRule('authorisation', get_string('required'), 'required', null, 'client', true);
+            $mform->addHelpButton('authorisation', 'selfauthorisation', 'facetoface');
+        } else if ($approvaltype == APPROVAL_MANAGER) {
+            $mform->addElement('hidden', 'managerid');
+            $mform->setType('managerid', PARAM_INT);
+            $mform->setDefault('managerid', $managerid);
+
+            $select = get_config(null, 'facetoface_managerselect');
+            if ($select) {
+                $manager_title = fullname($manager);
+                $manager_class = strlen($manager_title) ? 'nonempty' : '';
+                $mform->addElement(
+                    'static',
+                    'managerselector',
+                    get_string('manager', 'totara_hierarchy'),
+                    html_writer::tag('span', format_string($manager_title), array('class' => $manager_class, 'id' => 'managertitle'))
+                    . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_hierarchy'), 'id' => 'show-manager-dialog'))
+                );
+
+                $mform->addHelpButton('managerselector', 'choosemanager', 'totara_hierarchy');
+            } else {
+                // Display the average manager approval string.
+                $mform->addElement('static', 'managername', get_string('managername', 'mod_facetoface'), fullname($manager));
+                $mform->setType('managername', PARAM_TEXT);
+                $mform->addHelpButton('managername', 'managername', 'facetoface');
+            }
+        } else if ($approvaltype == APPROVAL_ADMIN) {
+            $select = get_config(null, 'facetoface_managerselect');
+            if ($select) {
+                $manager_title = fullname($manager);
+                $manager_class = strlen($manager_title) ? 'nonempty' : '';
+                $mform->addElement(
+                    'static',
+                    'managerselector',
+                    get_string('manager', 'totara_hierarchy'),
+                    html_writer::tag('span', format_string($manager_title), array('class' => $manager_class, 'id' => 'managertitle'))
+                    . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_hierarchy'), 'id' => 'show-manager-dialog'))
+                );
+
+                $mform->addHelpButton('managerselector', 'choosemanager', 'totara_hierarchy');
+            } else {
+                // Display the average manager&admin approval string.
+                $mform->addElement('static', 'managername', get_string('managername', 'mod_facetoface'), fullname($manager));
+                $mform->setType('managername', PARAM_TEXT);
+                $mform->addHelpButton('managername', 'managername', 'facetoface');
+            }
+
+            // Display a list of approval administrators.
+            $approvallist = html_writer::start_tag('ul', array('class' => 'approvallist'));
+
+            // System approvers.
+            $sysapps = get_users_from_config(get_config(null, 'facetoface_adminapprovers'), 'mod/facetoface:approveanyrequest');
+            foreach ($sysapps as $approver) {
+                if (!empty($approver)) {
+                    $approvallist .= html_writer::tag('li', fullname($approver));
+                    $approvers = get_users_from_config(get_config(null, 'facetoface_adminapprovers'), 'mod/facetoface:approveanyrequest');
+                }
+            }
+
+            // Activity approvers.
+            $actapps = explode(',', $approvaladmins);
+            foreach ($actapps as $approverid) {
+                if (!empty($approverid)) {
+                     $approver = core_user::get_user($approverid);
+                     $approvallist .= html_writer::tag('li', fullname($approver));
+                }
+            }
+            $approvallist .= html_writer::end_tag('ul');
+
+            $mform->addElement('static', 'approvalusers', get_string('approvalusers', 'mod_facetoface'), $approvallist);
+            $mform->setType('approvalusers', PARAM_TEXT);
+            $mform->addHelpButton('approvalusers', 'approvalusers', 'facetoface');
         }
-        $mform->setType('manageremail', PARAM_TEXT);
 
+        $showdiscountcode = true;
         if ($showdiscountcode) {
             $mform->addElement('text', 'discountcode', get_string('discountcode', 'facetoface'), 'size="6"');
             $mform->addHelpButton('discountcode', 'discountcodelearner', 'facetoface');
@@ -77,20 +162,6 @@ class mod_facetoface_signup_form extends moodleform {
         }
         $mform->setType('notificationtype', PARAM_INT);
 
-        if ($this->_customdata['hasselfapproval']) {
-            $url = new moodle_url('/mod/facetoface/signup_tsandcs.php', array('s' => $this->_customdata['s']));
-            $tandcurl = html_writer::link($url, get_string('selfapprovaltandc', 'mod_facetoface'), array("class"=>"tsandcs ajax-action"));
-
-            global $PAGE;
-            $PAGE->requires->strings_for_js(array('selfapprovaltandc', 'close'), 'mod_facetoface');
-            $PAGE->requires->yui_module('moodle-mod_facetoface-signupform', 'M.mod_facetoface.signupform.init');
-
-            $mform->addElement('checkbox', 'selfapprovaltc', get_string('selfapprovalsought', 'mod_facetoface'),
-                               get_string('selfapprovalsoughtdesc', 'mod_facetoface', $tandcurl));
-            $mform->addRule('selfapprovaltc', get_string('required'), 'required', null, 'client', true);
-
-        }
-
         self::add_position_selection_formelem($mform, $this->_customdata['f2fid'], $this->_customdata['s']);
 
         if ($this->_customdata['waitlisteveryone']) {
@@ -102,8 +173,16 @@ class mod_facetoface_signup_form extends moodleform {
             );
         }
 
+        if ($approvaltype == APPROVAL_NONE) {
+            $signupstr = 'signup';
+        } else if ($approvaltype == APPROVAL_SELF) {
+            $signupstr = 'signupandaccept';
+        } else {
+            $signupstr = 'signupandrequest';
+        }
+
         $strsignup = $this->_customdata['signupbywaitlist'] ? 'joinwaitlist' : 'signup';
-        $this->add_action_buttons(true, get_string($strsignup, 'facetoface'));
+        $this->add_action_buttons(true, get_string($signupstr, 'facetoface'));
     }
 
     public static function add_position_selection_formelem ($mform, $f2fid, $sessionid) {
@@ -123,7 +202,7 @@ class mod_facetoface_signup_form extends moodleform {
 
         $controlname = 'selectedposition_'.$f2fid;
 
-        $managerrequired = $facetoface->approvalreqd && !$session->selfapproval;
+        $managerrequired = facetoface_manager_needed($facetoface);
         $applicablepositions = get_position_assignments($managerrequired);
 
         if (count($applicablepositions) > 1) {
@@ -138,14 +217,20 @@ class mod_facetoface_signup_form extends moodleform {
         }
     }
 
-    function validation($data, $files)
-    {
+    function validation($data, $files) {
         $errors = parent::validation($data, $files);
+        $approvaltype = $this->_customdata['approvaltype'];
 
-        $manageremail = $data['manageremail'];
-        if (!empty($manageremail)) {
-            if (!facetoface_check_manageremail($manageremail)) {
-                $errors['manageremail'] = facetoface_get_manageremailformat();
+        // Manager validation if approval type requires it.
+        if ($approvaltype == APPROVAL_MANAGER || $approvaltype == APPROVAL_ADMIN) {
+            $manager = isset($data['managerid']) ? $data['managerid'] : null;
+            if (empty($manager)) {
+                $select = get_config(null, 'facetoface_managerselect');
+                if ($select) {
+                    $errors['managerselector'] = get_string('error:missingselectedmanager', 'mod_facetoface');
+                } else {
+                    $errors['managername'] = get_string('error:missingrequiredmanager', 'mod_facetoface');
+                }
             }
         }
 

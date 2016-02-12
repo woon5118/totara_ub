@@ -76,6 +76,7 @@ define('MDL_F2F_STATUS_USER_CANCELLED',     10);
 define('MDL_F2F_STATUS_SESSION_CANCELLED',  20);
 define('MDL_F2F_STATUS_DECLINED',           30);
 define('MDL_F2F_STATUS_REQUESTED',          40);
+define('MDL_F2F_STATUS_REQUESTEDADMIN',     45); // For 2 step approval.
 define('MDL_F2F_STATUS_APPROVED',           50);
 define('MDL_F2F_STATUS_WAITLISTED',         60);
 define('MDL_F2F_STATUS_BOOKED',             70);
@@ -95,6 +96,12 @@ define('MDL_F2F_ALLOW_CANCELLATION_NEVER', 0);
 define('MDL_F2F_ALLOW_CANCELLATION_ANY_TIME', 1);
 define('MDL_F2F_ALLOW_CANCELLATION_CUT_OFF', 2);
 
+define('APPROVAL_NONE', 0);
+define('APPROVAL_SELF', 1);
+define('APPROVAL_ROLE', 2);
+define('APPROVAL_MANAGER', 4);
+define('APPROVAL_ADMIN', 8);
+
 // This array must match the status codes above, and the values
 // must equal the end of the constant name but in lower case
 global $MDL_F2F_STATUS, $F2F_SELECT_OPTIONS;
@@ -104,6 +111,7 @@ $MDL_F2F_STATUS = array(
 //    MDL_F2F_STATUS_SESSION_CANCELLED    => 'session_cancelled',
     MDL_F2F_STATUS_DECLINED             => 'declined',
     MDL_F2F_STATUS_REQUESTED            => 'requested',
+    MDL_F2F_STATUS_REQUESTEDADMIN       => 'requestedadmin',
     MDL_F2F_STATUS_APPROVED             => 'approved',
     MDL_F2F_STATUS_WAITLISTED           => 'waitlisted',
     MDL_F2F_STATUS_BOOKED               => 'booked',
@@ -285,9 +293,6 @@ function facetoface_fix_settings($facetoface) {
     if (empty($facetoface->thirdpartywaitlist)) {
         $facetoface->thirdpartywaitlist = 0;
     }
-    if (empty($facetoface->approvalreqd)) {
-        $facetoface->approvalreqd = 0;
-    }
     if (!empty($facetoface->shortname)) {
         $facetoface->shortname = core_text::substr($facetoface->shortname, 0, CALENDAR_MAX_NAME_LENGTH);
     }
@@ -309,6 +314,35 @@ function facetoface_fix_settings($facetoface) {
 }
 
 /**
+ * Given a facetoface object from the edit form this function
+ * transforms the approvaloptions data into the database friendly format.
+ *
+ * @param object $facetoface
+ */
+function facetoface_approval_settings($facetoface) {
+
+    if ($facetoface->approvaloptions == 'approval_none') {
+        $facetoface->approvaltype = APPROVAL_NONE;
+    } else if ($facetoface->approvaloptions == 'approval_self') {
+        $facetoface->approvaltype = APPROVAL_SELF;
+    } else if (preg_match('/approval_role_/', $facetoface->approvaloptions)) {
+        $split = explode('_', $facetoface->approvaloptions);
+        $facetoface->approvaltype = APPROVAL_ROLE;
+        $facetoface->approvalrole = $split[2];
+    } else if ($facetoface->approvaloptions == 'approval_manager') {
+        $facetoface->approvaltype = APPROVAL_MANAGER;
+    } else if ($facetoface->approvaloptions == 'approval_admin') {
+        $facetoface->approvaltype = APPROVAL_ADMIN;
+        $selected = empty($facetoface->selectedapprovers) ? array() : explode(',', $facetoface->selectedapprovers);
+        $facetoface->approvaladmins = implode(',', $selected);
+    }
+
+    if (isset($facetoface->approval_termsandconds)) {
+        $facetoface->approvalterms = s($facetoface->approval_termsandconds);
+    }
+}
+
+/**
  * Given an object containing all the necessary data, (defined by the
  * form in mod.html) this function will create a new instance and
  * return the id number of the new instance.
@@ -317,6 +351,7 @@ function facetoface_add_instance($facetoface) {
     global $DB;
     $facetoface->timemodified = time();
 
+    facetoface_approval_settings($facetoface);
     facetoface_fix_settings($facetoface);
     if ($facetoface->id = $DB->insert_record('facetoface', $facetoface)) {
         facetoface_grade_item_update($facetoface);
@@ -363,8 +398,11 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
         $facetoface->id = $facetoface->instance;
     }
 
-   facetoface_fix_settings($facetoface);
-   if ($return = $DB->update_record('facetoface', $facetoface)) {
+    $previousapproval = $DB->get_field('facetoface', 'approvaltype', array('id' => $facetoface->id));
+    facetoface_approval_settings($facetoface);
+
+    facetoface_fix_settings($facetoface);
+    if ($return = $DB->update_record('facetoface', $facetoface)) {
         facetoface_grade_item_update($facetoface);
 
         //Get time.
@@ -375,20 +413,62 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
             foreach ($sessions as $session) {
                 facetoface_update_calendar_entries($session, $facetoface);
                 // If manager changed from approval required to not
-                if ($facetoface->approvalreqd == 0) {
-                    // Check if we have the users who need approval
-                    $attendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_REQUESTED));
-                    if (count($attendees) > 0) {
-                        // Update user status code from MDL_F2F_STATUS_REQUESTED to MDL_F2F_STATUS_BOOKED, otherwise these users will be hidden
-                        foreach ($attendees as $i => $attendee) {
-                            if (facetoface_update_signup_status($attendee->submissionid, MDL_F2F_STATUS_BOOKED, $USER->id, '', $attendee->grade)) {
-                                // Don't send confirmation notice if the session is in the past.
-                                if (!facetoface_has_session_started($session, $now)) {
-                                    // Send confirmation email that an user is booked and cc to user's manager if exists.
-                                    facetoface_send_confirmation_notice($facetoface, $session, $attendee->id, 0, 0);
+                if ($facetoface->approvaltype != $previousapproval) {
+                    // TODO - the spec says "clean slate" it, so we might just approve everyone. Pending question on the jira.
+                    switch ($facetoface->approvaltype) {
+                        case APPROVAL_NONE:
+                        case APPROVAL_SELF:
+                            // Approve any pending requests.
+                            $status = array(MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_REQUESTEDADMIN);
+                            $pending = facetoface_get_attendees($session->id, $status);
+                            foreach ($pending as $signup) {
+                                foreach ($pending as $i => $attendee) {
+                                    if (facetoface_update_signup_status($attendee->submissionid, MDL_F2F_STATUS_BOOKED, $USER->id, '', $attendee->grade)) {
+                                        // Don't send confirmation notice if the session is in the past.
+                                        if (!facetoface_has_session_started($session, $now)) {
+                                            // Send confirmation email that an user is booked and cc to user's manager if exists.
+                                            facetoface_send_confirmation_notice($facetoface, $session, $attendee->id, 0, 0);
+                                        }
+                                    }
                                 }
                             }
-                        }
+                            break;
+                        case APPROVAL_MANAGER:
+                            // Approve any 2 step requests in the second step, since they already have manager approval.
+                            $pending = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_REQUESTEDADMIN));
+                            foreach ($pending as $attendee) {
+                                if (facetoface_update_signup_status($attendee->submissionid, MDL_F2F_STATUS_BOOKED, $USER->id, '', $attendee->grade)) {
+                                    // Don't send confirmation notice if the session is in the past.
+                                    if (!facetoface_has_session_started($session, $now)) {
+                                        // Send confirmation email that an user is booked and cc to user's manager if exists.
+                                        facetoface_send_confirmation_notice($facetoface, $session, $attendee->id, 0, 0);
+                                    }
+                                }
+                            }
+                        case APPROVAL_ROLE:
+                            // Resend notifications for any pending requests.
+                            $status = array(MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_REQUESTEDADMIN);
+                            $pending = facetoface_get_attendees($session->id, $status);
+
+                            // Don't re-send request notifications if the session is in the past.
+                            if (!facetoface_has_session_started($session, $now)) {
+                                foreach ($pending as $attendee) {
+                                    facetoface_send_rolerequest_notice($facetoface, $session, $attendee->id);
+                                }
+                            }
+                            break;
+                        case APPROVAL_ADMIN:
+                            // Resend notifications for any pending requests.
+                            $status = array(MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_REQUESTEDADMIN);
+                            $pending = facetoface_get_attendees($session->id, $status);
+
+                            // Don't re-send request notifications if the session is in the past.
+                            if (!facetoface_has_session_started($session, $now)) {
+                                foreach ($pending as $attendee) {
+                                    facetoface_send_adminrequest_notice($facetoface, $session, $attendee->id);
+                                }
+                            }
+                            break;
                     }
                 }
             }
@@ -2010,11 +2090,13 @@ function facetoface_get_user_customfields($userid, $fieldstoinclude=null) {
  * @param bool $notifyuser whether or not to send an email confirmation
  * @param object $fromuser User object describing who the email is from.
  * @param string $usernote
- * @param class $positionassignment object containing information on selected position (positionid, type, assignmnetid)
+ * @param class $positionassignment object containing information on selected position (positionid, type, assignmentid)
+ * @param int   $managerid          The id of the user selected as the session manager when managerselect is enabled.
  */
 function facetoface_user_signup($session, $facetoface, $course, $discountcode,
                                 $notificationtype, $statuscode, $userid = false,
-                                $notifyuser = true, $fromuser = null, $usernote = '', $positionassignment = null) {
+                                $notifyuser = true, $fromuser = null, $usernote = '',
+                                $positionassignment = null, $managerid = null) {
 
     global $DB, $USER;
 
@@ -2066,6 +2148,11 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
         $usersignup->positionassignmentid = null;
     }
 
+    $managerselect = get_config(null, 'facetoface_managerselect');
+    if ($managerselect && !empty($managerid)) {
+        $usersignup->managerid = $managerid;
+    }
+
     $usersignup->discountcode = trim(strtoupper($discountcode));
     if (empty($usersignup->discountcode)) {
         $usersignup->discountcode = null;
@@ -2086,7 +2173,7 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
     // Work out which status to use
 
     // If approval not required or self approval enabled.
-    if (!$facetoface->approvalreqd || facetoface_session_has_selfapproval($facetoface, $session)) {
+    if (!facetoface_approval_required($facetoface)) {
         $new_status = $statuscode;
     } else {
         // Manager approval is required.
@@ -2154,7 +2241,15 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
             break;
 
         case MDL_F2F_STATUS_REQUESTED:
-            $error = facetoface_send_request_notice($facetoface, $session, $userid);
+            if ($facetoface->approvaltype == APPROVAL_ROLE) {
+                // Send the booking requested message to the user.
+                $error = facetoface_send_rolerequest_notice($facetoface, $session, $userid);
+            } else if ($facetoface->approvaltype == APPROVAL_ADMIN) {
+                // Send the booking requested message to the user.
+                $error = facetoface_send_adminrequest_notice($facetoface, $session, $userid);
+            } else {
+                $error = facetoface_send_request_notice($facetoface, $session, $userid);
+            }
             break;
     }
 
@@ -2504,15 +2599,22 @@ function facetoface_approve_requests($data) {
             continue;
         }
 
-        // Double-check request exists and not already approved or declined.
         $params = array(
             'signupid' => $attendee->submissionid,
-            'statuscode' => MDL_F2F_STATUS_REQUESTED,
-            'superceded' => 0);
-        if (!$DB->record_exists('facetoface_signups_status', $params)) {
-            $errors[$attendee->id] = 'norequest';
+            'superceded' => 0
+        );
+        if ($signupstatus = $DB->get_record('facetoface_signups_status', $params)) {
+            if ($signupstatus->statuscode == MDL_F2F_STATUS_REQUESTED || $signupstatus->statuscode == MDL_F2F_STATUS_REQUESTEDADMIN) {
+                $currentstatus = $signupstatus->statuscode;
+            } else {
+                $errors[$attendee->id] = 'norequest';
+                continue;
+            }
+        } else {
+            $errors[$attendee->id] = 'nostatus';
             continue;
         }
+
         // Update status
         switch ($value) {
 
@@ -2533,55 +2635,63 @@ function facetoface_approve_requests($data) {
 
             // Approve
             case 2:
-                // Check if there is capacity
-                if (facetoface_session_has_capacity($session, $context)) {
-                    $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
-                    if (!empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone) {
-                        // If waitlist everyone is set then send all users to waitlist.
-                        $status = MDL_F2F_STATUS_WAITLISTED;
-                    } else if ($session->datetimeknown) {
-                        // If there is a session date/time set then user is booked.
-                        $status = MDL_F2F_STATUS_BOOKED;
-                    } else {
-                        // If not then they are waitlisted.
-                        $status = MDL_F2F_STATUS_WAITLISTED;
-                    }
+                if ($facetoface->approvaltype == APPROVAL_ADMIN && $currentstatus == MDL_F2F_STATUS_REQUESTED) {
+                    // The user is on the first step of the 2 step approval process.
+                    facetoface_update_signup_status(
+                        $attendee->submissionid,
+                        MDL_F2F_STATUS_REQUESTEDADMIN,
+                        $USER->id
+                    );
                 } else {
-                    if ($session->allowoverbook) {
-                        $status = MDL_F2F_STATUS_WAITLISTED;
+                    // Check if there is capacity
+                    if (facetoface_session_has_capacity($session, $context)) {
+                        $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
+                        if (!empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone) {
+                            // If waitlist everyone is set then send all users to waitlist.
+                            $status = MDL_F2F_STATUS_WAITLISTED;
+                        } else if ($session->datetimeknown) {
+                            // If there is a session date/time set then user is booked.
+                            $status = MDL_F2F_STATUS_BOOKED;
+                        } else {
+                            // If not then they are waitlisted.
+                            $status = MDL_F2F_STATUS_WAITLISTED;
+                        }
                     } else {
-                        $url = new moodle_url('/mod/facetoface/attendees.php',
-                            array('s' => $sessionid, 'action' => 'approvalrequired'));
-                        totara_set_notification(get_string('error:cannotapprovefull', 'facetoface'), $url);
+                        if ($session->allowoverbook) {
+                            $status = MDL_F2F_STATUS_WAITLISTED;
+                        } else {
+                            $url = new moodle_url('/mod/facetoface/attendees.php',
+                                array('s' => $sessionid, 'action' => 'approvalrequired'));
+                            totara_set_notification(get_string('error:cannotapprovefull', 'facetoface'), $url);
+                        }
                     }
+
+                    facetoface_update_signup_status(
+                        $attendee->submissionid,
+                        MDL_F2F_STATUS_APPROVED,
+                        $USER->id
+                    );
+
+                    // Signup user
+                    if (!facetoface_user_signup(
+                            $session,
+                            $facetoface,
+                            $course,
+                            $attendee->discountcode,
+                            $attendee->notificationtype,
+                            $status,
+                            $attendee->id,
+                            true,
+                            null,
+                            $attendee->usernote
+                        )) {
+                        continue;
+                    }
+
+                    // Approved users.
+                    $approved[$attendee->id] = $attendee->id;
+                    break;
                 }
-
-                facetoface_update_signup_status(
-                    $attendee->submissionid,
-                    MDL_F2F_STATUS_APPROVED,
-                    $USER->id
-                );
-
-                // Signup user
-                if (!facetoface_user_signup(
-                        $session,
-                        $facetoface,
-                        $course,
-                        $attendee->discountcode,
-                        $attendee->notificationtype,
-                        $status,
-                        $attendee->id,
-                        true,
-                        null,
-                        $attendee->usernote
-                    )) {
-                    continue;
-                }
-
-                // Approved users.
-                $approved[$attendee->id] = $attendee->id;
-                break;
-
             case 0:
             default:
                 // Change nothing
@@ -3546,10 +3656,6 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     // Display requires approval notification
     $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
 
-    if ($facetoface->approvalreqd) {
-        $output .= html_writer::tag('dd', get_string('sessionrequiresmanagerapproval', 'facetoface'));
-    }
-
     // Display waitlist notification
     if (!$hidesignup && $session->allowoverbook && $placesleft < 1) {
         $output .= html_writer::tag('dd', get_string('userwillbewaitlisted', 'facetoface'));
@@ -3579,6 +3685,12 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
 
         $output .= html_writer::tag('dt', get_string('room', 'facetoface'));
         $output .= html_writer::tag('dd', $roomstring);
+    }
+
+    if ($facetoface->approvaltype != APPROVAL_NONE && $facetoface->approvaltype != APPROVAL_SELF) {
+        $output .= html_writer::tag('dt', get_string('approvalrequiredby', 'facetoface'));
+        $approver = facetoface_get_approvaltype_string($facetoface->approvaltype, $facetoface->approvalrole);
+        $output .= html_writer::tag('dd', $approver);
     }
 
     if (!empty($session->normalcost)) {
@@ -3633,6 +3745,30 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     $output .= html_writer::end_tag('dl');
 
     return $output;
+}
+
+/**
+ * Return the approval type of a facetoface as a human readable string
+ *
+ * @param int approvaltype  The $facetoface->approvaltype value
+ * @param int approvalrole  The $facetoface->approvalrole value, only required for role approval
+ */
+function facetoface_get_approvaltype_string($approvaltype, $approvalrole = null) {
+    switch ($approvaltype) {
+        case APPROVAL_NONE:
+            return get_string('approval_none', 'mod_facetoface');
+        case APPROVAL_SELF:
+            return get_string('approval_self', 'mod_facetoface');
+        case APPROVAL_ROLE:
+            $rolenames = role_fix_names(get_all_roles());
+            return $rolenames[$approvalrole]->localname;
+        case APPROVAL_MANAGER:
+            return get_string('approval_manager', 'mod_facetoface');
+        case APPROVAL_ADMIN:
+            return get_string('approval_admin', 'mod_facetoface');
+        default:
+            print_error('error:unrecognisedapprovaltype', 'mod_facetoface');
+    }
 }
 
 /**
@@ -3967,21 +4103,19 @@ function facetoface_get_trainers($sessionid, $roleid = null) {
  * @return boolean whether a person needs a manager to sign up for that activity
  */
 function facetoface_manager_needed($facetoface){
-    return $facetoface->approvalreqd
-        || (isset($facetoface->confirmationinstrmngr) && !empty($facetoface->confirmationinstrmngr))
-        || (isset($facetoface->reminderinstrmngr) && !empty($facetoface->reminderinstrmngr))
-        || (isset($facetoface->cancellationinstrmngr) && !empty($facetoface->cancellationinstrmngr));
+    return $facetoface->approvaltype == APPROVAL_MANAGER || $facetoface->approvaltype == APPROVAL_ADMIN;
 }
 
 /**
- * Determines whether a session has the self-approval option
+ * Determines whether an activity requires the user to recieve approval before signup.
  *
  * @param  object $facetoface A database fieldset object for the facetoface activity
- * @param  object $session    A database fieldset object for the facetoface session
- * @return boolean whether a person needs a manager to sign up for that activity
+ * @return boolean whether a person needs someones approval to sign up
  */
-function facetoface_session_has_selfapproval($facetoface, $session) {
-    return $facetoface->approvalreqd && $session->selfapproval;
+function facetoface_approval_required($facetoface) {
+    return $facetoface->approvaltype == APPROVAL_MANAGER
+        || $facetoface->approvaltype == APPROVAL_ROLE
+        || $facetoface->approvaltype == APPROVAL_ADMIN;
 }
 
 /**
@@ -4071,6 +4205,25 @@ function facetoface_get_requests($sessionid) {
 }
 
 /**
+ * Similar to facetoface_get_requests except this returns 2stage requests in:
+ * Stage One - pending manager approval
+ * Stage Two - pending admin approval
+ *
+ * @access  public
+ * @param   integer $sessionid
+ * @return  array|false
+ */
+function facetoface_get_adminrequests($sessionid) {
+    $usernamefields = get_all_user_name_fields(true, 'u');
+
+    $select = "u.id, su.id AS signupid, ss.note as usernote, {$usernamefields}, u.email,
+        ss.statuscode, ss.timecreated AS timerequested";
+
+    $status = array(MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_REQUESTEDADMIN);
+    return facetoface_get_users_by_status($sessionid, $status, $select);
+}
+
+/**
  * Get session attendees by status
  *
  * @access  public
@@ -4099,20 +4252,26 @@ function facetoface_get_users_by_status($sessionid, $status, $select = '', $incl
 
     // Make string from array of statuses
     if (is_array($status)) {
-        $status = implode(',', $status);
+        list($insql, $params) = $DB->get_in_or_equal($status, SQL_PARAMS_NAMED);
+        $statussql = "ss.statuscode {$insql}";
+    } else {
+        $statussql = 'ss.statuscode = :status';
+        $params = array('status' => $status);
     }
 
     $sql = "
         SELECT {$select}
           FROM {facetoface_signups} su
           JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
-          $userjoin {user} u ON u.id = su.userid
-         WHERE su.sessionid = ? AND ss.superceded != 1
-           AND ss.statuscode = ?
-         ORDER BY {$usernamefields}, ss.timecreated
+     $userjoin {user} u ON u.id = su.userid
+         WHERE su.sessionid = :sid
+           AND ss.superceded != 1
+           AND {$statussql}
+      ORDER BY {$usernamefields}, ss.timecreated
     ";
+    $params['sid'] = $sessionid;
 
-    return $DB->get_records_sql($sql, array($sessionid, $status));
+    return $DB->get_records_sql($sql, $params);
 }
 
 
@@ -4579,7 +4738,7 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
 
     if (isset($params['approvalreqd'])) {
         // Overwrite default behaviour as bulkadd_* is requested
-        $facetoface->approvalreqd = $params['approvalreqd'];
+        $facetoface->approvaltype = $params['approvalreqd'];
         $facetoface->ccmanager = (isset($params['ccmanager']) ? $params['ccmanager'] : 0);
     }
 
@@ -4716,6 +4875,12 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         }
     }
 
+    $managerselect = get_config(null, 'facetoface_managerselect');
+    $managerid = null;
+    if ($managerselect && isset($params['managerselect'])) {
+        $managerid = $params['managerselect'];
+    }
+
     // Finally attempt to enrol
     if (!facetoface_user_signup(
         $session,
@@ -4728,7 +4893,8 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         !$suppressemail,
         null,
         $usernote,
-        $positionassignment)) {
+        $positionassignment,
+        $managerid)) {
             $result['result'] = get_string('error:addattendee', 'facetoface', fullname($user));
             return $result;
     }
@@ -5812,7 +5978,7 @@ function facetoface_replace_reservations($session, $facetoface, $course, $booked
 function facetoface_allocate_spaces($session, $facetoface, $course, $bookedby, $userids, $capacityleft) {
     global $DB, $CFG;
 
-    $facetoface->approvalreqd = false; // Make sure they are directly signed-up.
+    $facetoface->approvaltype = APPROVAL_NONE; // Make sure they are directly signed-up.
 
     foreach ($userids as $userid) {
         // Make sure that the user is enroled in the course
@@ -5984,6 +6150,36 @@ function facetoface_user_can_be_unallocated(&$user, $managerid) {
     }
 
     return true;
+}
+
+/**
+ *
+ * @param int   $userid     The user whose manager we are looking for
+ * @param int   $sessionid  The session where the manager is assigned
+ * @param int   $postype    The position type when users are allowed to select their secondary positions
+ * @return object   The user object (including fullname) of the user assigned as the learners manager
+ */
+function facetoface_get_session_manager($userid, $sessionid, $postype = null) {
+    global $DB;
+
+    $managerselect = get_config(null, 'facetoface_managerselect');
+    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+    $signup = $DB->get_record('facetoface_signups', array('userid' => $userid, 'sessionid' => $sessionid));
+
+    if ($managerselect && !empty($signup->managerid)) {
+        // Check if they selected a manager for their signup.
+        $manager = $DB->get_record('user', array('id' => $signup->managerid));
+    } else if ($selectpositiononsignupglobal && !empty($postype)) {
+        $manager = totara_get_manager($userid, $postype);
+    } else {
+        $manager = totara_get_manager($userid);
+    }
+
+    if ($manager) {
+        $manager->fullname = fullname($manager);
+    }
+
+    return $manager;
 }
 
 /**
@@ -6415,4 +6611,30 @@ function facetoface_get_env_session($sessionid) {
     $context = context_module::instance($cm->id);
 
     return array($session, $facetoface, $course, $cm, $context);
+}
+
+/**
+ * Output for a removable approver in the facetoface mod_form.
+ *
+ * @param int       $user           The user object for the approver being displayed
+ * @param boolean   $activity       Whether the approver is activity level or site level
+ * @return string                   The html output for the approver
+ */
+function facetoface_display_approver($user, $activity = false) {
+    global $PAGE;
+
+    $renderer = $PAGE->get_renderer('mod_facetoface');
+
+    $uniqueid = "facetoface_approver_{$user->id}";
+    if ($activity) {
+        $classname = 'activity_approver';
+        $delete = $renderer->action_icon('', new pix_icon('/t/delete', get_string('remove')), null,
+                        array('class' => 'activity_approver_del', 'id' => $user->id));
+        $content = get_string('approval_activityapprover', 'mod_facetoface', fullname($user)) . ' ' . $delete;
+    } else {
+        $classname = 'system_approver';
+        $content = get_string('approval_siteapprover', 'mod_facetoface', fullname($user));
+    }
+
+    return html_writer::tag('div', $content, array('id' => $uniqueid, 'class' => $classname));
 }

@@ -124,7 +124,8 @@ class enrol_totara_facetoface_signup_form extends moodleform {
                 $mform->addElement('html', html_writer::start_div('f2factivity', array('id' => 'f2factivity' . $facetofaceid)));
                 $mform->addElement('html', $OUTPUT->heading($facetoface->name, 3));
 
-                if ($facetoface->forceselectposition && !get_position_assignments($facetoface->approvalreqd)) {
+                $managerreqd = facetoface_manager_needed($facetoface);
+                if ($facetoface->forceselectposition && !get_position_assignments($managerreqd)) {
                     $msg = get_string('error:nopositionselectedactivity', 'facetoface');
                     $mform->addElement('html', html_writer::tag('div', $msg));
                 } else {
@@ -272,7 +273,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
             }
 
             // Display T&Cs for self approval.
-            if (facetoface_session_has_selfapproval($facetoface, $session)) {
+            if ($facetoface->approvaltype == APPROVAL_SELF) {
                 $elementname = 'selfapprovaltandc_' . $facetoface->id;
                 $selfapprovaljsparams[$elementname] = $facetoface->selfapprovaltandc;
 

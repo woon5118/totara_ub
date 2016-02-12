@@ -309,12 +309,6 @@ class mod_facetoface_session_form extends moodleform {
         $mform->addHelpButton('availablesignupnote', 'availablesignupnote', 'facetoface');
         $mform->setDefault('availablesignupnote', $this->_customdata['facetoface']->allowsignupnotedefault);
 
-        $mform->addElement('checkbox', 'selfapproval', get_string('selfapproval', 'facetoface'));
-        $mform->addHelpButton('selfapproval', 'selfapproval', 'facetoface');
-        if (!$this->_customdata['facetoface']->approvalreqd) {
-            $mform->hardFreeze('selfapproval');
-        }
-
         $mform->addElement('editor', 'details_editor', get_string('details', 'facetoface'), null, $editoroptions);
         $mform->setType('details_editor', PARAM_RAW);
         $mform->addHelpButton('details_editor', 'details', 'facetoface');

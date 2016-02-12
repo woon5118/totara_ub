@@ -673,4 +673,18 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         }
         return $out;
     }
+
+    /**
+     * Displays the dismiss action icon the the mismatched approval types notice
+     *
+     * @param int $f2fid    The id of the facetoface currently being viewed
+     * @return string       The html for the icon
+     */
+    public function dismiss_selfapproval_notice($f2fid) {
+
+        $attributes = array('class' => 'smallicon dismissicon');
+        $dismissstr = get_string('dismiss', 'mod_facetoface');
+        $dismissurl = new moodle_url('/mod/facetoface/approver/dismiss.php', array('fid' => $f2fid));
+        return $this->output->action_icon($dismissurl, new pix_icon('/t/delete', $dismissstr), null, $attributes);
+    }
 }

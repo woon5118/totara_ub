@@ -106,6 +106,17 @@ if (!empty($facetoface->intro)) {
     echo $OUTPUT->box(format_module_intro('facetoface', $facetoface, $cm->id), 'generalbox', 'intro');
 }
 
+// Display a warning about previously mismatched self approval sessions.
+$approvalcountsql = "SELECT selfapproval, count(selfapproval)
+                    FROM {facetoface_sessions}
+                    WHERE facetoface = :fid
+                    GROUP BY selfapproval";
+$approvalcount = $DB->get_records_sql($approvalcountsql, array('fid' => $facetoface->id));
+if (count($approvalcount) > 1) {
+    $message = get_string('warning:mixedapprovaltypes', 'mod_facetoface') . $f2f_renderer->dismiss_selfapproval_notice($facetoface->id);
+    echo $OUTPUT->notification($message, 'notifynotice');
+}
+
 $locations = get_locations($facetoface->id);
 if (count($locations) > 2) {
 
