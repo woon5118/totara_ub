@@ -130,7 +130,7 @@ class copy_recurring_courses_task extends \core\task\scheduled_task {
                 // Unzip backup to a temporary folder.
                 $tempfolder = time() . $USER->id;
                 check_dir_exists($CFG->dataroot . '/temp/backup');
-                $backupfile->extract_to_pathname(get_file_packer(), $CFG->dataroot . '/temp/backup/' . $tempfolder);
+                $backupfile->extract_to_pathname(get_file_packer('application/vnd.moodle.backup'), $CFG->dataroot . '/temp/backup/' . $tempfolder);
 
                 // Execute in transaction to prevent course creation if restore fails.
                 $transaction = $DB->start_delegated_transaction();
