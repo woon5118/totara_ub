@@ -89,9 +89,10 @@ class dp_competency_component extends dp_base_component {
      * @param   string  $orderby    (optional)
      * @param   int     $limitfrom  (optional)
      * @param   int     $limitnum   (optional)
+     * @param   bool    $linkedcounts (optional) If linked counts should be returned
      * @return  array
      */
-    public function get_assigned_items($approved = null, $orderby='', $limitfrom='', $limitnum='') {
+    public function get_assigned_items($approved = null, $orderby='', $limitfrom='', $limitnum='', $linkedcounts=false) {
         global $DB;
 
         // Generate where clause
@@ -129,13 +130,10 @@ class dp_competency_component extends dp_base_component {
         list($visibilitysql, $visibilityparams) = totara_visibility_where($this->plan->userid, 'c2.id', 'c2.visible', 'c2.audiencevisible', 'c2', 'course');
         $params = array_merge($params, $visibilityparams);
 
-        return  $DB->get_records_sql(
-            "
-            SELECT
-                a.*,
-                csv.sortorder AS progress,
-                c.fullname,
-                c.fullname AS name,
+        $countselect = '';
+        $countjoin = '';
+        if ($linkedcounts) {
+            $countselect = '
                 CASE WHEN linkedcourses.count IS NULL
                     THEN 0 ELSE linkedcourses.count
                 END AS linkedcourses,
@@ -143,14 +141,9 @@ class dp_competency_component extends dp_base_component {
                     WHEN linkedevidence.count IS NULL THEN 0
                     ELSE linkedevidence.count
                 END AS linkedevidence,
-                csv.id AS profscalevalueid,
-                csv.name AS status,
-                csv.sortorder AS profsort
-            FROM
-                {dp_plan_competency_assign} a
-            INNER JOIN
-                {comp} c
-                ON c.id = a.competencyid
+                ';
+
+            $countjoin = "
             LEFT JOIN
                 (SELECT itemid1 AS assignid,
                     COUNT(cr.id) AS count
@@ -170,16 +163,36 @@ class dp_competency_component extends dp_base_component {
                     WHERE component = 'competency'
                     GROUP BY itemid) linkedevidence
                 ON linkedevidence.itemid = a.id
+                ";
+        }
+
+        $sql = "
+            SELECT
+                a.*,
+                csv.sortorder AS progress,
+                c.fullname,
+                c.fullname AS name,
+                $countselect
+                csv.id AS profscalevalueid,
+                csv.name AS status,
+                csv.sortorder AS profsort
+            FROM
+                {dp_plan_competency_assign} a
+            INNER JOIN
+                {comp} c
+                ON c.id = a.competencyid
+            $countjoin
             $status
             WHERE
                 $where
                 $orderby
-            ",
-            $params,
-            $limitfrom,
-            $limitnum
-        );
+            ";
+
+        $records = $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
+
+        return $records;
     }
+
 
     /**
      * Search information for search dialog box

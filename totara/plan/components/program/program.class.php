@@ -94,7 +94,7 @@ class dp_program_component extends dp_base_component {
      * @param   int     $limitnum   (optional)
      * @return  array
      */
-    public function get_assigned_items($approved = null, $orderby='', $limitfrom='', $limitnum='') {
+    public function get_assigned_items($approved = null, $orderby='', $limitfrom='', $limitnum='', $linkedcounts=false) {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
@@ -131,28 +131,40 @@ class dp_program_component extends dp_base_component {
         $params = array_merge($params, $visibilityparams);
         $where .= " AND {$visibilitysql} ";
 
-        return $DB->get_records_sql(
-            "
-            SELECT
-                a.*,
-                $completion_field
-                p.fullname,
-                p.fullname AS name,
-                p.icon,
+        $countselect = '';
+        $countjoin = '';
+
+        if ($linkedcounts) {
+            $countselect = "
                 CASE
                     WHEN linkedevidence.count IS NULL THEN 0
                     ELSE linkedevidence.count
-                END AS linkedevidence
-            FROM
-                {dp_plan_program_assign} a
-                $completion_joins
-            LEFT JOIN
+                END AS linkedevidence,
+                ";
+
+            $countjoin = "
+                LEFT JOIN
                 (SELECT itemid,
                     COUNT(id) AS count
                     FROM {dp_plan_evidence_relation}
                     WHERE component = 'program'
                     GROUP BY itemid) linkedevidence
                 ON linkedevidence.itemid = a.id
+                ";
+        }
+
+        $sql = "
+            SELECT
+                a.*,
+                $completion_field
+                p.fullname,
+                p.fullname AS name,
+                $countselect
+                p.icon
+            FROM
+                {dp_plan_program_assign} a
+                $completion_joins
+            $countjoin
             INNER JOIN
                 {prog} p
              ON p.id = a.programid
@@ -160,12 +172,11 @@ class dp_program_component extends dp_base_component {
             WHERE
                 $where
                 $orderby
-            ",
-            $params,
-            $limitfrom,
-            $limitnum
-        );
+            ";
 
+        $records = $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
+
+        return $records;
     }
 
     /**

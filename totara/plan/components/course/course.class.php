@@ -127,9 +127,10 @@ class dp_course_component extends dp_base_component {
      * @param   string  $orderby    (optional)
      * @param   int     $limitfrom  (optional)
      * @param   int     $limitnum   (optional)
+     * @param   bool    $linkedcounts (optional) If linked counts should be returned
      * @return  array
      */
-    public function get_assigned_items($approved = null, $orderby='', $limitfrom='', $limitnum='') {
+    public function get_assigned_items($approved = null, $orderby='', $limitfrom='', $limitnum='', $linkedcounts=false) {
         global $DB;
 
         // Generate where clause (using named parameters because of how query is built)
@@ -171,22 +172,57 @@ class dp_course_component extends dp_base_component {
                                                                           'c.audiencevisible',
                                                                           'c',
                                                                           'course');
+
+        $countselect = '';
+        $countjoin = '';
+
+        if ($linkedcounts) {
+            $countselect = "
+                CASE WHEN linkedcompetencies.count IS NULL
+                    THEN 0 ELSE linkedcompetencies.count
+                END AS linkedcompetencies,
+                CASE
+                    WHEN linkedevidence.count IS NULL THEN 0
+                    ELSE linkedevidence.count
+                END AS linkedevidence,
+                ";
+
+            $countjoin = "
+            LEFT JOIN
+                (SELECT itemid2 AS assignid,
+                    count(id) AS count
+                    FROM {dp_plan_component_relation}
+                    WHERE component2 = :comp1 AND
+                        component1 = :comp2
+                    GROUP BY itemid2) linkedcompetencies
+                ON linkedcompetencies.assignid = a.id
+            LEFT JOIN
+                (SELECT itemid,
+                    COUNT(id) AS count
+                    FROM {dp_plan_evidence_relation}
+                    WHERE component = 'course'
+                    GROUP BY itemid) linkedevidence
+                ON linkedevidence.itemid = a.id
+                ";
+
+            $params['comp1'] = 'course';
+            $params['comp2'] = 'competency';
+        }
+
+
         $params = array_merge($params, $visibilityparams);
         $where .= " AND {$visibilitysql} ";
 
-        return $DB->get_records_sql(
-            "
+        $sql = "
             SELECT
                 a.*,
+                a.id AS omgid,
                 {$completion_field}
                 c.fullname,
                 c.fullname AS name,
                 c.icon,
-                c.enablecompletion,
-                CASE
-                    WHEN linkedevidence.count IS NULL THEN 0
-                    ELSE linkedevidence.count
-                END AS linkedevidence
+                {$countselect}
+                c.enablecompletion
             FROM
                 {dp_plan_course_assign} a
                 {$completion_joins}
@@ -196,22 +232,15 @@ class dp_course_component extends dp_base_component {
             INNER JOIN
                 {context} ctx
              ON c.id = ctx.instanceid AND ctx.contextlevel = " . CONTEXT_COURSE . "
-            LEFT JOIN
-                (SELECT itemid,
-                    COUNT(id) AS count
-                    FROM {dp_plan_evidence_relation}
-                    WHERE component = 'course'
-                    GROUP BY itemid) linkedevidence
-                ON linkedevidence.itemid = a.id
+            {$countjoin}
             WHERE
                 $where
                 $orderby
-            ",
-            $params,
-            $limitfrom,
-            $limitnum
-        );
+            ";
 
+        $records = $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
+
+        return $records;
     }
 
     /**

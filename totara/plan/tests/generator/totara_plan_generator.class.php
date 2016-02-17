@@ -166,9 +166,20 @@ class totara_plan_generator extends component_generator_base {
         $plan->role = $plan->get_user_role($plan->viewas);
         $componentname = 'competency';
         $component = $plan->get_component($componentname);
+
+        // Get the currently assigned competency IDs.
+        $currentcompetencies = $DB->get_records('dp_plan_competency_assign', array('planid' => $planid), '', 'competencyid');
+        $currentcompetencies = array_keys($currentcompetencies);
+
         $comps_added = array($competencyid);
+
         // Get linked courses for newly added competencies.
         $evidence = $component->get_course_evidence_items($comps_added);
+
+        // We need to give the full list of assigned competencies otherwise existing
+        // competencies will be removed from the plan.
+        $comps_added = array_merge($currentcompetencies, $comps_added);
+
         // Add them all.
         $comp_mandatory = array();
         foreach ($evidence as $compid => $linkedcourses) {
@@ -197,6 +208,74 @@ class totara_plan_generator extends component_generator_base {
 
         return true;
     }
+
+
+    /**
+     * Add a course to a learning plan.
+     *
+     * @param int $planid
+     * @param int $courseid
+     */
+    public function add_learning_plan_course($planid, $courseid) {
+        global $DB, $USER;
+
+        $plan = new development_plan($planid);
+        $plan->viewas = $USER->id;
+        $plan->load_roles();
+        $plan->load_components();
+        $plan->initialize_settings();
+        $plan->role = $plan->get_user_role($plan->viewas);
+
+        $componentname = 'course';
+        $component = $plan->get_component($componentname);
+
+        // Get the currently assigned course IDs.
+        $currentcourses = $DB->get_records('dp_plan_course_assign', array('planid' => $planid), '', 'courseid');
+        $currentcourses = array_keys($currentcourses);
+
+        $coursesadded = array($courseid);
+
+        $coursesadded = array_merge($currentcourses, $coursesadded);
+
+        // Get linked competencies for the newly added course.
+        //$comps = $component->get_
+
+        $component->update_assigned_items($coursesadded);
+
+        return true;
+    }
+
+
+    /**
+     * Add a program to a learning plan.
+     *
+     * @param int $planid
+     * @param int $programid
+     */
+    public function add_learning_plan_program($planid, $programid) {
+        global $DB, $USER;
+
+        $plan = new development_plan($planid);
+        $plan->viewas = $USER->id;
+        $plan->load_roles();
+        $plan->load_components();
+        $plan->initialize_settings();
+        $plan->role = $plan->get_user_role($plan->viewas);
+
+        $component = $plan->get_component('program');
+
+        // Get the currently assigned program IDs.
+        $currentprograms = $DB->get_records('dp_plan_program_assign', array('planid' => $planid), '', 'programid');
+        $currentprograms = array_keys($currentprograms);
+
+        $programsadded = array($programid);
+        $programsadded = array_merge($currentprograms, $programsadded);
+
+        $component->update_assigned_items($programsadded);
+
+        return true;
+    }
+
 
     /**
      * Create an objective for a learning plan.
@@ -318,12 +397,12 @@ class totara_plan_generator extends component_generator_base {
 
         $i = ++$this->evidencecount;
 
-        if (empty($record['evidencetypeid'])) {
-            throw new coding_exception('missing evidencetypeid');
-        }
-
         if (empty($record['userid'])) {
             throw new coding_exception('missing userid');
+        }
+
+        if (!isset($record['evidencetypeid'])) {
+            $record['evidencetypeid'] = 0;
         }
 
         if (!isset($record['name'])) {

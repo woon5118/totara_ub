@@ -211,9 +211,10 @@ abstract class dp_base_component {
      * @param   string  $orderby    (optional)
      * @param   int     $limitfrom  (optional)
      * @param   int     $limitnum   (optional)
+     * @param   bool    $linkedcounts (optional) If linked counts should be returned
      * @return  array
      */
-    abstract public function get_assigned_items($approved = null, $orderby='', $limitfrom='', $limitnum='');
+    abstract public function get_assigned_items($approved = null, $orderby='', $limitfrom='', $limitnum='', $linkedcounts=false);
 
 
     /**
@@ -367,7 +368,7 @@ abstract class dp_base_component {
         $page_start = $table->get_page_start();
         $page_size = $table->get_page_size();
         $sort = $table->get_sql_sort();
-        $items = $this->get_assigned_items($restrict, $sort, $page_start, $page_size);
+        $items = $this->get_assigned_items($restrict, $sort, $page_start, $page_size, true);
 
         // Collect the rows/columns to display
         $rows = array();

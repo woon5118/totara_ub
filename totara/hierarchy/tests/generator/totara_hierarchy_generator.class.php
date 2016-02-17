@@ -530,6 +530,26 @@ class totara_hierarchy_generator extends component_generator_base {
 
 
     /**
+     * Assign linked course to a competency.
+     *
+     * @param stdClass $competency Competency to add linked course to
+     * @param stdClass $course Course to add
+     *
+     * @return true
+     */
+    public function assign_linked_course_to_competency($competency, $course) {
+        global $CFG, $DB;
+
+        $evidence = competency_evidence_type::factory(array('itemtype' => 'coursecompletion'));
+
+        $evidence->iteminstance = $course->id;
+        $newevidenceid = $evidence->add($competency);
+
+        return true;
+    }
+
+
+    /**
      * Assigns random courses to competencies.
      *
      * @param $size int number of items to process.

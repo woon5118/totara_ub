@@ -80,9 +80,10 @@ class dp_objective_component extends dp_base_component {
      * @param   string  $orderby    (optional)
      * @param   int     $limitfrom  (optional)
      * @param   int     $limitnum   (optional)
+     * @param   bool    $linkedcounts (optional) If linked counts should be returned
      * @return  array
      */
-    public function get_assigned_items($approved = null, $orderby='', $limitfrom='', $limitnum='') {
+    public function get_assigned_items($approved = null, $orderby='', $limitfrom='', $limitnum='', $linkedcounts=false) {
         global $DB;
 
         // Generate where clause
@@ -99,12 +100,11 @@ class dp_objective_component extends dp_base_component {
             $orderby = "ORDER BY $orderby";
         }
 
-        // Generate status code
-        $status = "LEFT JOIN {dp_objective_scale_value} osv ON a.scalevalueid = osv.id ";
-        $sql = "SELECT
-                a.*,
-                a.scalevalueid AS progress,
-                a.fullname AS name,
+        $countselect = "";
+        $countjoin = "";
+
+        if ($linkedcounts) {
+            $countselect = "
                 CASE WHEN linkedcourses.count IS NULL
                     THEN 0 ELSE linkedcourses.count
                 END AS linkedcourses,
@@ -112,9 +112,9 @@ class dp_objective_component extends dp_base_component {
                     WHEN linkedevidence.count IS NULL THEN 0
                     ELSE linkedevidence.count
                 END AS linkedevidence,
-                osv.achieved
-            FROM
-                {dp_plan_objective} a
+                ";
+
+            $countjoin = "
             LEFT JOIN
                 (SELECT itemid2 AS assignid,
                     count(id) AS count
@@ -130,16 +130,35 @@ class dp_objective_component extends dp_base_component {
                     WHERE component = 'objective'
                     GROUP BY itemid) linkedevidence
                 ON linkedevidence.itemid = a.id
+                ";
+
+            $params['comp1'] = 'objective';
+            $params['comp2'] = 'course';
+        }
+
+        // Generate status code
+        $status = "LEFT JOIN {dp_objective_scale_value} osv ON a.scalevalueid = osv.id ";
+        $sql = "SELECT
+                a.*,
+                a.scalevalueid AS progress,
+                a.fullname AS name,
+                {$countselect}
+                osv.achieved
+            FROM
+                {dp_plan_objective} a
+            $countjoin
             $status
             WHERE
                 $where
                 $orderby
             ";
-        $params['comp1'] = 'objective';
-        $params['comp2'] = 'course';
-        return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
 
+        $records = $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
+
+        return $records;
     }
+
+
     /**
      * Search information for search dialog box
      *
