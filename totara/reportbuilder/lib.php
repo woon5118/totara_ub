@@ -4198,7 +4198,7 @@ class reportbuilder {
         }
 
         foreach ($filters as $filter) {
-            if (!$onlyinstant || in_array($filter->filtertype, array('date', 'select', 'multicheck'))) {
+            if (!$onlyinstant || in_array($filter->filtertype, array('date', 'select', 'menuofchoices', 'multicheck'))) {
                 $langstr = 'type_' . $filter->type;
                 if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
                     // Is there a type string in the source file?
