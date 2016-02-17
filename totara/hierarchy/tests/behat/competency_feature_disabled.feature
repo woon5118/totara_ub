@@ -1,4 +1,4 @@
-@totara_hierarchy @totara
+@totara @totara_hierarchy @totara_hierarchy_competency @javascript
 Feature: The competencies can be disabled
   In order to check the correct behaviour related to the visibility settings for the competency feature
   As a admin
@@ -41,7 +41,6 @@ Feature: The competencies can be disabled
     And I click on "Competency 1" "link"
     And I click on "Save" "button" in the "Add linked competencies" "totaradialogue"
 
-  @javascript
   Scenario: Show competency feature. All links and options related to the feature should be in place.
     Given I navigate to "Advanced features" node in "Site administration"
     And I set the field "Enable Competencies" to "Show"
@@ -75,7 +74,6 @@ Feature: The competencies can be disabled
     And I click on "Content" "link"
     And the "contenttype_ce" select box should contain "Competency"
 
-  @javascript
   Scenario: Disable competency feature. All links and options related to the feature should not be in available anywhere.
     Given I navigate to "Advanced features" node in "Site administration"
     And I set the field "Enable Competencies" to "Disable"

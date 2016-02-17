@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @javascript
+@totara @totara_hierarchy @totara_hierarchy_competency @javascript
 Feature: Test competencies achieved is updated
   In order to test the competencies achieved is updated
   As a user
@@ -23,7 +23,6 @@ Feature: Test competencies achieved is updated
       | framework | fullname        | idnumber | description                                        |
       | CFW001    | Kill the Smaug  | COMP001  | The dragon who invaded the Dwarf kingdom of Erebor |
 
-  @javascript
   Scenario: Add a choice activity and complete the activity as a user
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu

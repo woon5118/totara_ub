@@ -191,6 +191,7 @@ class update_competencies_task extends \core\task\scheduled_task {
             SELECT DISTINCT
                 cr.id AS evidenceid,
                 cr.userid,
+                cr.proficiency AS currentproficiency,
                 c.id AS competencyid,
                 c.path,
                 c.aggregationmethod,
@@ -318,6 +319,13 @@ class update_competencies_task extends \core\task\scheduled_task {
                         $item_value = null;
                     }
 
+                    // Get item's current proficiency scale value so we know if a proficiency has been set.
+                    if (isset($scale_values[$params->currentproficiency])) {
+                        $current_value = $scale_values[$params->currentproficiency];
+                    } else {
+                        $current_value = null;
+                    }
+
                     // Get the competencies minimum proficiency.
                     $min_value = $scale_values[$params->proficiencyexpected];
 
@@ -327,10 +335,15 @@ class update_competencies_task extends \core\task\scheduled_task {
                     // Handle different aggregation types.
                     switch ($params->aggregationmethod) {
                         case $COMP_AGGREGATION['ALL']:
-                            // Check for no proficient flag.
+                            // Learner is not yet proficient so no action required.
                             if (!$item_value || $item_value->proficient == 0) {
                                 $aggregated_status = null;
                                 $stop_agg = true;
+                            // If a proficiency level has already been set - don't update it.
+                            } else if ($current_value && $current_value->proficient == 1) {
+                                $aggregated_status = null;
+                                $stop_agg = true;
+                            // User is now proficient so set status to minimum proficiency value.
                             } else {
                                 $aggregated_status = $min_value->id;
                             }
