@@ -59,7 +59,7 @@ Feature: Completion report rpl
     And I click on "Record of Learning" in the totara menu
     # Click on the course progress bar to see the completion progress details.
     And I follow "In progress"
-    Then I should see "Not yet started"
+    Then I should see "Not completed"
     And I log out
 
   @javascript
@@ -107,7 +107,7 @@ Feature: Completion report rpl
     When I log in as "student1"
     And I click on "Record of Learning" in the totara menu
     And I follow "In progress"
-    Then I should see "In progress"
+    Then I should see "Not completed"
     And I log out
 
   @javascript
@@ -140,7 +140,7 @@ Feature: Completion report rpl
     When I log in as "student1"
     And I click on "Record of Learning" in the totara menu
     And I follow "In progress"
-    Then I should see "Not yet started"
+    Then I should see "Not completed"
     And I log out
 
   @javascript
@@ -184,5 +184,5 @@ Feature: Completion report rpl
     When I log in as "student1"
     And I click on "Record of Learning" in the totara menu
     And I follow "In progress"
-    Then I should see "In progress"
+    Then I should see "Not completed"
     And I log out
