@@ -257,6 +257,7 @@ $string['error:couldnotsavesearch'] = 'Could not save search';
 $string['error:couldnotupdateglobalsettings'] = 'There was an error while updating the global settings';
 $string['error:couldnotupdatereport'] = 'Could not update report';
 $string['error:creatingembeddedrecord'] = 'Error creating embedded record: {$a}';
+$string['error:emailrequired'] = 'At least one recipient email address is required for export option you selected';
 $string['error:emptyexportfilesystempath'] = 'If you enabled export to file system, you need to specify file system path.';
 $string['error:failedtoremovetempfile'] = 'Failed to remove temporary report export file';
 $string['error:filter_not_deleted'] = 'There was a problem deleting that filter';

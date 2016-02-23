@@ -107,6 +107,7 @@ class scheduled_reports_new_form extends moodleform {
 
         // Email to, setting for the schedule reports.
         $mform->addElement('header', 'emailto', get_string('scheduledemailtosettings', 'totara_reportbuilder'));
+        $mform->addElement('static', 'emailrequired', '', '');
 
         // Input hidden fields for system_users and audiences.
         $mform->addElement('hidden', 'systemusers');
@@ -205,6 +206,22 @@ class scheduled_reports_new_form extends moodleform {
             $mform->getElement('externalemailsgrp')->getElements()[0]->setValue($divcontainer);
             $mform->getElement('externalemails')->setValue(implode(',', $extusers));
         }
+    }
+
+    public function validation($data, $files) {
+
+        $errors = parent::validation($data, $files);
+
+        $audiences = $data['audiences'];
+        $sysusers  = $data['systemusers'];
+        $extusers  = $data['externalemails'];
+        $emailsaveorboth = $data['emailsaveorboth'];
+
+        if (empty($audiences) && empty($sysusers) && empty($extusers) && $emailsaveorboth != REPORT_BUILDER_EXPORT_SAVE) {
+            $errors['emailrequired'] = get_string('error:emailrequired', 'totara_reportbuilder');
+        }
+
+        return $errors;
     }
 }
 
