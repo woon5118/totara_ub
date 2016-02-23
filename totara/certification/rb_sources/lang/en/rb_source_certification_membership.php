@@ -28,4 +28,4 @@ $string['iscertified'] = 'Is currently certified';
 $string['sourcetitle'] = 'Certification Membership';
 $string['status'] = 'Status';
 $string['type_certif'] = 'Certification';
-$string['type_certcompletion'] = 'User completion';
+$string['type_certmembership'] = 'Certification Membership';
