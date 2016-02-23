@@ -1543,35 +1543,50 @@ class core_renderer extends renderer_base {
      * @return string HTML fragment
      */
     protected function render_single_button(single_button $button) {
-        $attributes = array('type'     => 'submit',
-                            'value'    => $button->label,
-                            'disabled' => $button->disabled ? 'disabled' : null,
-                            'title'    => $button->tooltip);
+        $data = new stdClass();
+        $data->class = $button->class;
+        $data->formattributes = array();
+        $data->inputitems = array();
+
+        // The button.
+        $buttonattributes = array();
+        $buttonattributes[] = array('name' => 'type', 'value' => 'submit');
+        $buttonattributes[] = array('name' => 'value', 'value' => $button->label);
+        if ($button->disabled) {
+            $buttonattributes[] = array('name' => 'disabled', 'value' => 'disabled');
+        }
+        if ($button->tooltip) {
+            $buttonattributes[] = array('name' => 'title', 'value' => $button->tooltip);
+        }
 
         if ($button->actions) {
             $id = html_writer::random_id('single_button');
-            $attributes['id'] = $id;
+            $buttonattributes[] = array('name' => 'id', 'value' => $id);
             foreach ($button->actions as $action) {
                 $this->add_action_handler($action, $id);
             }
         }
 
-        // first the input element
-        $output = html_writer::empty_tag('input', $attributes);
+        $data->inputitems[] = array(
+            'attributes' => $buttonattributes
+        );
 
-        // then hidden fields
+        // The hidden fields.
         $params = $button->url->params();
         if ($button->method === 'post') {
             $params['sesskey'] = sesskey();
         }
         foreach ($params as $var => $val) {
-            $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $var, 'value' => $val));
+            $data->inputitems[] = array(
+               'attributes' => array(
+                   array('name' => 'type', 'value' => 'hidden'),
+                   array('name' => 'name', 'value' => $var),
+                   array('name' => 'value', 'value' => $val)
+               )
+            );
         }
 
-        // then div wrapper for xhtml strictness
-        $output = html_writer::tag('div', $output);
-
-        // now the form itself around it
+        // The form.
         if ($button->method === 'get') {
             $url = $button->url->out_omit_querystring(true); // url without params, the anchor part allowed
         } else {
@@ -1580,13 +1595,14 @@ class core_renderer extends renderer_base {
         if ($url === '') {
             $url = '#'; // there has to be always some action
         }
-        $attributes = array('method' => $button->method,
-                            'action' => $url,
-                            'id'     => $button->formid);
-        $output = html_writer::tag('form', $output, $attributes);
 
-        // and finally one more wrapper with class
-        return html_writer::tag('div', $output, array('class' => $button->class));
+        $data->formattributes[] = array('name' => 'method', 'value' => $button->method);
+        $data->formattributes[] = array('name' => 'action', 'value' => $url);
+        if ($button->formid) {
+            $data->formattributes[] = array('name' => 'id', 'value' => $button->formid);
+        }
+
+        return $this->render_from_template('core/single_button', $data);
     }
 
     /**
