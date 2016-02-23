@@ -1400,5 +1400,30 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015120700, 'totara', 'hierarchy');
     }
 
+    if ($oldversion < 2016030300) {
+
+        // TL-8381 - Hierarchy custom field data is not being fully deleted when the Hierarchy item is deleted.
+        // This will remove all redundant data from the custom field info_data_param table created prior to this patch.
+
+        // Positions.
+        $DB->execute("DELETE FROM {pos_type_info_data_param}
+              WHERE dataid NOT IN (SELECT id FROM {pos_type_info_data})");
+
+        // Organisations.
+        $DB->execute("DELETE FROM {org_type_info_data_param}
+              WHERE dataid NOT IN (SELECT id FROM {org_type_info_data})");
+
+        // Competencies.
+        $DB->execute("DELETE FROM {comp_type_info_data_param}
+              WHERE dataid NOT IN (SELECT id FROM {comp_type_info_data})");
+
+        // Company Goals
+        $DB->execute("DELETE FROM {goal_type_info_data_param}
+              WHERE dataid NOT IN (SELECT id FROM {goal_type_info_data})");
+
+        // Hierarchy savepoint reached.
+        upgrade_plugin_savepoint(true, 2016030300, 'totara', 'hierarchy');
+    }
+
     return true;
 }

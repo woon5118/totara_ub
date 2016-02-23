@@ -1131,9 +1131,16 @@ class hierarchy {
         $items_sql = 'id ' . $insql;
         $DB->delete_records_select($this->shortprefix, $items_sql, $inparams);
 
-        // delete custom field data associated with the items
-        $data_sql = $this->prefix . 'id ' . $insql;
-        $DB->delete_records_select("{$this->shortprefix}_type_info_data", $data_sql, $inparams);
+        // Delete custom field data associated with the items.
+        $table = '{' . $this->shortprefix. '_type_info_data}';
+        $idfield = $this->prefix . 'id';
+        $fields = $DB->get_fieldset_sql("SELECT id FROM {$table} WHERE $idfield $insql", $inparams);
+
+        if (!empty($fields)) {
+            list($sqlin, $paramsin) = $DB->get_in_or_equal($fields);
+            $DB->delete_records_select("{$this->shortprefix}_type_info_data_param", "dataid {$sqlin}", $paramsin);
+            $DB->delete_records_select("{$this->shortprefix}_type_info_data", "id {$sqlin}", $paramsin);
+        }
 
         return true;
     }
