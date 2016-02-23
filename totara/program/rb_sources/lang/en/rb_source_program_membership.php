@@ -27,4 +27,4 @@ $string['isassigned'] = 'Is currently assigned';
 $string['sourcetitle'] = 'Program Membership';
 $string['status'] = 'Status';
 $string['type_prog'] = 'Program';
-$string['type_progcompletion'] = 'User completion';
+$string['type_progmembership'] = 'Program Membership';
