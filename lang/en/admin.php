@@ -547,10 +547,17 @@ $string['gdrequired'] = 'The GD extension is now required by Totara for image co
 $string['generalsettings'] = 'General settings';
 $string['geoipfile'] = 'GeoIP city data file';
 $string['getremoteaddrconf'] = 'Logged IP address source';
+$string['gmapsdefaultzoomlevel'] = 'Default zoom level';
+$string['gmapsdefaultzoomlevel_help'] = 'Sets the initial zoom level of the map. Accepted values range from 0 (the whole world) to 21 (individual buildings). The upper limit can vary depending on the map data available at the selected location.';
+$string['gmapsforcemaplanguage'] = 'Force map language';
+$string['gmapsforcemaplanguage_help'] = 'If empty, map text will be displayed using the user\'s browser\'s language. Set this setting to force all users to see map text in the specified language. Visit <a href="https://developers.google.com/maps/faq#languagesupport" target="_blank">this page</a> for a list of supported languages.';
+$string['gmapsregionbias'] = 'Region bias';
+$string['gmapsregionbias_help'] = 'Google Maps address returns results influenced by your region/country. For example, searches for "San Francisco" may return different results if sent from a domain within the United States than one sent from Spain. This should be the <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements" target="_blank">ISO 3166-1</a> code for the appropriate region/country.';
 $string['groupenrolmentkeypolicy'] = 'Group enrolment key policy';
 $string['groupenrolmentkeypolicy_desc'] = 'Turning this on will make Totara check group enrolment keys against a valid password policy.';
 $string['googlemapkey3'] = 'Google Maps API V3 key';
 $string['googlemapkey3_help'] = 'You need to enter a special key to use Google Maps for IP address lookup visualization. You can obtain the key free of charge at <a href="https://developers.google.com/maps/documentation/javascript/tutorial#api_key" target="_blank">https://developers.google.com/maps/documentation/javascript/tutorial#api_key</a>';
+$string['googlemaps'] = 'Google Maps';
 $string['gotofirst'] = 'Go to first missing string';
 $string['gradebook'] = 'Gradebook';
 $string['gradebookroles'] = 'Graded roles';

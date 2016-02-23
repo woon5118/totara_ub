@@ -659,6 +659,10 @@ function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = tru
                 require_once($CFG->dirroot.'/totara/customfield/field/url/field.class.php');
                 $extradata = array('prefix' => $prefix, 'itemid' => $field->dataid);
                 $data = \customfield_url::display_item_data($data, $extradata);
+            case 'location':
+                require_once($CFG->dirroot.'/totara/customfield/field/location/field.class.php');
+                $extradata = array('prefix' => $prefix, 'itemid' => $field->dataid);
+                $data = \customfield_location::display_item_data($data, $extradata);
                 break;
 
         }

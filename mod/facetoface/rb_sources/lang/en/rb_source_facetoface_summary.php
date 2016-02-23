@@ -23,6 +23,7 @@
 */
 $string['approvalby'] = 'Approval by';
 $string['bookingstatus'] = 'Booking Status';
+$string['actions'] = 'Actions';
 $string['cancelledattendees'] = 'Number of cancelled bookings';
 $string['declinedattendees'] = 'Number of declined attendees';
 $string['discountcost'] = 'Discount cost';

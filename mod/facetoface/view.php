@@ -24,6 +24,7 @@
 require_once '../../config.php';
 require_once 'lib.php';
 require_once 'renderer.php';
+require_once($CFG->dirroot . '/totara/customfield/field/location/field.class.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
 $f = optional_param('f', 0, PARAM_INT); // facetoface ID
@@ -307,7 +308,8 @@ function get_locations($facetofaceid) {
 
         $i=1;
         foreach ($records as $record) {
-            $locationmenu[$record->location] = $record->location;
+            $locationobject = customfield_define_location::convert_location_json_to_object($record->location);
+            $locationmenu[$record->location] = $locationobject->address;
             $i++;
         }
 
