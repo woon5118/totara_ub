@@ -48,7 +48,7 @@ class dp_objective_scale_value_edit_form extends moodleform {
         $mform->addElement('static', 'scalename', get_string('objectivescale', 'totara_plan'));
         $mform->addHelpButton('scalename', 'objectivescaleassign', 'totara_plan', '', true);
 
-        $mform->addElement('text', 'name', get_string('objectivescalevaluename', 'totara_plan'), 'maxlength="100" size="20"');
+        $mform->addElement('text', 'name', get_string('objectivescalevaluename', 'totara_plan'), 'maxlength="255" size="20"');
         $mform->addHelpButton('name', 'objectivescalevaluename', 'totara_plan', '', true);
         $mform->addRule('name', get_string('missingobjectivescalevaluename', 'totara_plan'), 'required', null, 'client');
         $mform->setType('name', PARAM_MULTILANG);

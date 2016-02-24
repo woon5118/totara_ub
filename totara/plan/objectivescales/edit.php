@@ -95,7 +95,7 @@ if ($mform->is_cancelled()) {
         $sortorder = 1;
         $objectiveidlist = array();
         foreach ($objectivevalues as $objectiveval) {
-            if (strlen(trim($objectiveval)) != 0) {
+            if (core_text::strlen(trim($objectiveval)) != 0 && core_text::strlen(trim($objectiveval)) <= 255) { // 255 is the DB field size.
                 $objectivevalrec = new stdClass();
                 $objectivevalrec->objscaleid = $objectivenew->id;
                 $objectivevalrec->name = trim($objectiveval);
