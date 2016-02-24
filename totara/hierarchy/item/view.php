@@ -127,6 +127,7 @@ if ($cfdata) {
         $cf_class = "customfield_{$cf->datatype}";
         require_once($CFG->dirroot.'/totara/customfield/field/'.$cf->datatype.'/field.class.php');
         $data[] = array(
+            'type' => $cf->datatype,
             'title' => $cf->fullname,
             'value' => call_user_func(array($cf_class, 'display_item_data'), $cf->data, array('prefix' => $prefix, 'itemid' => $cf->id))
         );
@@ -143,7 +144,8 @@ foreach ($data as $ditem) {
     }
 
     echo html_writer::tag('dt', format_string($ditem['title']));
-    echo html_writer::tag('dd', format_string($ditem['value']));
+    $value = (isset($ditem['type']) &&  $ditem['type'] === 'url') ? $ditem['value'] : format_string($ditem['value']);
+    echo html_writer::tag('dd', $value);
 }
 
 echo html_writer::end_tag('dl');
