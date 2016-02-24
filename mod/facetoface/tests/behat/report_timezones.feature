@@ -27,7 +27,7 @@ Feature: Facetoface timezones in reports
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
     And I follow "Test facetoface name"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | Other room              | 1               |
       | Room name               | Room 1          |
@@ -46,7 +46,7 @@ Feature: Facetoface timezones in reports
       | timefinish[0][minute]   | 45              |
       | timefinish[0][timezone] | Australia/Perth |
     And I press "Save changes"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | Other room              | 1               |
       | Room name               | Room 2          |
@@ -87,13 +87,13 @@ Feature: Facetoface timezones in reports
 
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "F2F sessions"
-    And I set the field "Source" to "Face-to-face sessions"
+    And I set the field "Source" to "Face-to-face events"
     And I press "Create report"
     And I click on "Columns" "link" in the ".tabtree" "css_element"
-    And I add the "Session Finish Date" column to the report
-    And I add the "Session Start Time" column to the report
-    And I add the "Session Finish Time" column to the report
-    And I add the "Session Start Date (linked to activity)" column to the report
+    And I add the "Event Finish Time" column to the report
+    And I add the "Event Start Time" column to the report
+    #And I add the "Event Finish Time" column to the report
+    And I add the "Session Start (linked to activity)" column to the report
 
     When I navigate to my "F2F sessions" report
     Then I should see "1 January 2020" in the "First User" "table_row"
@@ -133,7 +133,7 @@ Feature: Facetoface timezones in reports
       | Name        | Test facetoface 1 name        |
       | Description | Test facetoface 1 description |
     And I follow "Test facetoface 1 name"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | Other room              | 1               |
       | Room name               | Room 1          |
@@ -158,7 +158,7 @@ Feature: Facetoface timezones in reports
       | Name        | Test facetoface 2 name        |
       | Description | Test facetoface 2 description |
     And I follow "Test facetoface 2 name"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | Other room              | 1               |
       | Room name               | Room 2          |
@@ -183,14 +183,14 @@ Feature: Facetoface timezones in reports
     And I set the field "Source" to "Face-to-face Summary"
     And I press "Create report"
     And I click on "Columns" "link" in the ".tabtree" "css_element"
-    And I add the "Session Start Date" column to the report
-    And I add the "Session Start Date (linked to activity)" column to the report
+    And I add the "Session Start" column to the report
+    And I add the "Session Start Date/Time (linked to attendees page)" column to the report
 
     When I navigate to my "F2F summary" report
     Then I should see "1 January 2020" in the "Test facetoface 1 name" "table_row"
     And I should see "4 February 2021" in the "Test facetoface 2 name" "table_row"
-    And I should not see "Prague"
-    And I should not see "Perth"
+    And I should see "Europe/Prague" in the "Test facetoface 1 name" "table_row"
+    And I should see "Australia/Perth" in the "Test facetoface 2 name" "table_row"
     And I should not see "2 January 2020"
 
     When I am on homepage

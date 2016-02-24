@@ -113,7 +113,7 @@ Feature: Manage pre-defined rooms
     And I should see "User Three"
     And I should see "User Four"
     And I should see "User Five"
-    And I should see "Add/edit attendees success"
+    And I should see "Bulk add attendees success - Successfully added/edited 5 attendees."
     And I should not see "This event is overbooked"
 
     And I set the field "menuf2f-actions" to "Add users"

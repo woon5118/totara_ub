@@ -34,8 +34,9 @@ Feature: Signup Role Approval
       | timmy | manager |
       | sammy | manager |
     And I log in as "admin"
-    And I navigate to "General Settings" node in "Site administration > Plugins > Activity modules > Face-to-face"
-    And I click on "s__facetoface_session_roles_4"
+    And I navigate to "Global settings" node in "Site administration > Face-to-face"
+    #TODO: fix this up
+    And I click on "s__facetoface_session_roles[4]" "checkbox"
     And I press "Save changes"
     And I click on "s__facetoface_approvaloptions[approval_role_4]" "checkbox"
     And I press "Save changes"
@@ -47,7 +48,7 @@ Feature: Signup Role Approval
       | Description         | Classroom Connect Tests |
       | approvaloptions     | approval_admin          |
     And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |

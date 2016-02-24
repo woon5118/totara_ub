@@ -16,8 +16,8 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
       | fullname | shortname | format |
       | Course 1 | C1 | topics |
     And the following "course enrolments" exist:
-      | user | course | role |
-      | teacher1 | C1 | editingteacher |
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
 
     Given I log in as "admin"
     And I expand "Site administration" node
@@ -26,7 +26,7 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     And I follow "Manage enrol plugins"
     And I click on "Enable" "link" in the "Face-to-face direct enrolment" "table_row"
     And I set the following administration settings values:
-      | Enhanced catalog | 1 |
+      | Enhanced catalog   | 1    |
       | Guest login button | Show |
     And I log out
 
@@ -34,46 +34,46 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
 
     Given I follow "Course 1"
     When I add "Self enrolment" enrolment method with:
-      | Enrolment key | moodle_rules |
-      | Use group enrolment keys | Yes |
+      | Enrolment key            | moodle_rules |
+      | Use group enrolment keys | Yes          |
     And I follow "Groups"
     And I press "Create group"
     And I set the following fields to these values:
-      | Group name | Group 1 |
+      | Group name    | Group 1             |
       | Enrolment key | Test-groupenrolkey1 |
     And I press "Save changes"
 
     Given I follow "Course 1"
     And I turn editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
-      | Forum name | Test forum name |
+      | Forum name  | Test forum name        |
       | Description | Test forum description |
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     And I click on "Edit" "link" in the "Guest access" "table_row"
     And I set the following fields to these values:
-      | Allow guest access | Yes |
-      | Password | moodle_rules |
+      | Allow guest access | Yes          |
+      | Password           | moodle_rules |
     And I press "Save changes"
 
     Given I follow "Course 1"
     And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name 2        |
-      | Description | Test facetoface description 2 |
-      | Approval required | 0                     |
+      | Name             | Test facetoface name 2        |
+      | Description      | Test facetoface description 2 |
+      | Manager Approval | 0                             |
     And I follow "Test facetoface name 2"
     And I follow "Add a new event"
     And I set the following fields to these values:
-      | datetimeknown | Yes |
-      | timestart[0][day] | 1 |
-      | timestart[0][month] | 1 |
-      | timestart[0][year] | 2020 |
-      | timestart[0][hour] | 11 |
-      | timestart[0][minute] | 00 |
-      | timefinish[0][day] | 1 |
-      | timefinish[0][month] | 1 |
-      | timefinish[0][year] | 2020 |
-      | timefinish[0][hour] | 12 |
-      | timefinish[0][minute] | 00 |
+      | datetimeknown         | Yes  |
+      | timestart[0][day]     | 1    |
+      | timestart[0][month]   | 1    |
+      | timestart[0][year]    | 2020 |
+      | timestart[0][hour]    | 11   |
+      | timestart[0][minute]  | 00   |
+      | timefinish[0][day]    | 1    |
+      | timefinish[0][month]  | 1    |
+      | timefinish[0][year]   | 2020 |
+      | timefinish[0][hour]   | 12   |
+      | timefinish[0][minute] | 00   |
     And I press "Save changes"
     And I follow "Course 1"
     And I add "Face-to-face direct enrolment" enrolment method with:

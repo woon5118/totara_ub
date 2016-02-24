@@ -44,7 +44,7 @@ Feature: Manager approval
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name                                                               | Test declareinterestfullybooked |
       | Description                                                        | Test facetoface description     |
-      | Approval required                                                  | 1                               |
+      | Manager Approval                                                   | 1                               |
       | Enable "Declare Interest" option                                   | 1                               |
     And I click on "View all events" "link" in the "declareinterestfullybooked" activity
     And I follow "Add a new event"

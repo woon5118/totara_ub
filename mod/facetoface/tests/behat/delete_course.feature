@@ -29,8 +29,8 @@ Feature: Delete a course with a facetoface
       | Description         | Test facetoface description                       |
       | Completion tracking | Show activity as complete when conditions are met |
       | Require grade       | 1                                                 |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |

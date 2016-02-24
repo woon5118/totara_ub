@@ -29,7 +29,7 @@ Feature: Download a signin sheet
       | Name              | Test facetoface name        |
       | Description       | Test facetoface description |
     And I follow "Test facetoface name"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 10   |

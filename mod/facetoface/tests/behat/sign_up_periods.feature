@@ -22,26 +22,26 @@ Feature: Face to face signup periods
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
-    And I follow "View all sessions"
+    And I follow "View all events"
 
   @javascript
   Scenario Outline: Sign up students regardless of sign in period status
-    Given I follow "Add a new session"
+    Given I follow "Add a new event"
     And I set the following fields to these values:
-      | Enable sign up period open       | <periodopen>  |
-      | registrationtimestart[day]       | 30            |
-      | registrationtimestart[month]     | June          |
-      | registrationtimestart[year]      | <startyear>   |
-      | registrationtimestart[hour]      | 01            |
-      | registrationtimestart[minute]    | 00            |
-      | registrationtimestart[timezone]  | <startzone>   |
-      | Enable sign up period close      | <periodclose> |
-      | registrationtimefinish[day]      | 30            |
-      | registrationtimefinish[month]    | June          |
-      | registrationtimefinish[year]     | <endyear>     |
-      | registrationtimefinish[hour]     | 01            |
-      | registrationtimefinish[minute]   | 00            |
-      | registrationtimefinish[timezone] | <endzone>     |
+      | registrationtimestart[enabled]  | <periodopen>  |
+      | registrationtimestart[day]      | 30            |
+      | registrationtimestart[month]    | June          |
+      | registrationtimestart[year]     | <startyear>   |
+      | registrationtimestart[hour]     | 01            |
+      | registrationtimestart[minute]   | 00            |
+      | registrationtimestart[timezone] | <startzone>   |
+      | registrationtimefinish[enabled] | <periodclose> |
+      | registrationtimefinish[day]     | 30            |
+      | registrationtimefinish[month]   | June          |
+      | registrationtimefinish[year]    | <endyear>     |
+      | registrationtimefinish[hour]    | 01            |
+      | registrationtimefinish[minute]  | 00            |
+      | registrationtimefinish[timezone]| <endzone>     |
     And I press "Save changes"
     And I click on "Attendees" "link"
     And I set the field "f2f-actions" to "Add users"
@@ -62,18 +62,17 @@ Feature: Face to face signup periods
     | 1          | 2029      | Pacific/Auckland | 0           | 2030    | Pacific/Auckland |
     | 0          | 2029      | Pacific/Auckland | 1           | 2030    | Pacific/Auckland |
 
-
   Scenario Outline: Test signup period validation
-    Given I follow "Add a new session"
+    Given I follow "Add a new event"
     And I set the following fields to these values:
-      | Enable sign up period open       | <periodopen>       |
+      | registrationtimestart[enabled]   | 1                  |
       | registrationtimestart[day]       | <periodstartday>   |
       | registrationtimestart[month]     | June               |
       | registrationtimestart[year]      | 2030               |
       | registrationtimestart[hour]      | <periodstarthour>  |
       | registrationtimestart[minute]    | 00                 |
       | registrationtimestart[timezone]  | <periodstartzone>  |
-      | Enable sign up period close      | <periodclose>      |
+      | registrationtimefinish[enabled]  | 1                  |
       | registrationtimefinish[day]      | <periodendday>     |
       | registrationtimefinish[month]    | June               |
       | registrationtimefinish[year]     | 2030               |
@@ -92,44 +91,45 @@ Feature: Face to face signup periods
       | timefinish[0][year]              | 2030               |
       | timefinish[0][hour]              | <sessionendhour>   |
       | timefinish[0][minute]            | 00                 |
-      | timefinish[0][timezone]          | <sessionendzone>   |
+      | timefinish[0][timezone]          | Pacific/Auckland   |
     And I press "Save changes"
     Then I should see "<message>"
 
   Examples:
-    | periodopen | periodstartday | periodstarthour | periodstartzone  | periodclose | periodendday | periodendhour | periodendzone    | sessionstartday | sessionstarthour | sessionstartzone | sessionendday | sessionendhour | sessionendzone   | message                                                    | description unused |
-    | 1          | 1              | 01              | Pacific/Auckland | 1           | 15           | 01            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Pacific/Auckland | Upcoming sessions                                          | Normal case |
-    | 1          | 16             | 01              | Pacific/Auckland | 1           | 15           | 01            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Pacific/Auckland | Signup period start time must be before signup finish time | Clear start signup > end signup |
-    | 1          | 15             | 01              | Pacific/Auckland | 1           | 15           | 01            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Pacific/Auckland | Signup period start time must be before signup finish time | Start signup = End Signup |
-    | 1          | 1              | 01              | Pacific/Auckland | 1           | 15           | 01            | Pacific/Auckland | 10              | 09               | Pacific/Auckland | 20            | 10             | Pacific/Auckland | Upcoming sessions                                          | session date inside signup range |
-    | 1          | 12             | 01              | Pacific/Auckland | 1           | 15           | 01            | Pacific/Auckland | 10              | 09               | Pacific/Auckland | 10            | 10             | Pacific/Auckland | Signup period start time must be before Session start      | Clear session start before signup start |
-    | 1          | 10             | 09              | Pacific/Auckland | 1           | 15           | 01            | Pacific/Auckland | 10              | 09               | Pacific/Auckland | 10            | 10             | Pacific/Auckland | Signup period start time must be before Session start      | Signup start = session start |
-    | 1          | 1              | 01              | Pacific/Auckland | 1           | 20           | 09            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Pacific/Auckland | Upcoming sessions                                          | End signup = session start |
+    | periodstartday | periodstarthour | periodstartzone  | periodendday | periodendhour | periodendzone    | sessionstartday | sessionstarthour | sessionstartzone | sessionendday | sessionendhour | message                                                            | description unused                      |
+    | 1              | 01              | Pacific/Auckland | 15           | 01            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Upcoming events                                                  | Normal case                             |
+    | 16             | 01              | Pacific/Auckland | 15           | 01            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Signup period start time must be before signup finish time         | Clear start signup > end signup         |
+    | 15             | 01              | Pacific/Auckland | 15           | 01            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Signup period start time must be before signup finish time         | Start signup = End Signup               |
+    | 1              | 01              | Pacific/Auckland | 15           | 01            | Pacific/Auckland | 10              | 09               | Pacific/Auckland | 20            | 10             | Signup period closing time must be on or before session start time | session date inside signup range        |
+    | 12             | 01              | Pacific/Auckland | 15           | 01            | Pacific/Auckland | 10              | 09               | Pacific/Auckland | 10            | 10             | Signup period opening time must be before session start time       | Clear session start before signup start |
+    | 10             | 09              | Pacific/Auckland | 15           | 01            | Pacific/Auckland | 10              | 09               | Pacific/Auckland | 10            | 10             | Signup period opening time must be before session start time       | Signup start = session start            |
+    | 1              | 01              | Pacific/Auckland | 20           | 09            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Upcoming events                                                    | End signup = session start              |
     # And now for some timezone fun
-    | 1          | 15             | 01              | Europe/London    | 1           | 15           | 13            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Pacific/Auckland | Upcoming sessions                                          | Normal case |
-    | 1          | 15             | 02              | Europe/London    | 1           | 15           | 13            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Pacific/Auckland | Signup period start time must be before signup finish time | Start signup = End Signup |
-    | 1          | 15             | 03              | Europe/London    | 1           | 15           | 13            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Pacific/Auckland | Signup period start time must be before signup finish time | Clear start signup > end signup |
-    | 1          | 15             | 01              | Europe/London    | 1           | 15           | 23            | Pacific/Auckland | 15              | 12               | Pacific/Auckland | 20            | 13             | Pacific/Auckland | Upcoming sessions                                          | Normal case |
-    | 1          | 15             | 02              | Europe/London    | 1           | 15           | 23            | Pacific/Auckland | 15              | 12               | Pacific/Auckland | 20            | 13             | Pacific/Auckland | Signup period start time must be before Session start      | Start signup = start session |
-    | 1          | 15             | 03              | Europe/London    | 1           | 15           | 23            | Pacific/Auckland | 15              | 12               | Pacific/Auckland | 20            | 13             | Pacific/Auckland | Signup period start time must be before Session start      | Start signup > start session |
-    | 1          | 15             | 13              | Pacific/Auckland | 1           | 15           | 01            | Europe/London    | 20              | 09               | Pacific/Auckland | 20            | 10             | Pacific/Auckland | Signup period start time must be before signup finish time | Normal case |
-    | 1          | 15             | 14              | Pacific/Auckland | 1           | 15           | 01            | Europe/London    | 20              | 09               | Pacific/Auckland | 20            | 10             | Pacific/Auckland | Signup period start time must be before signup finish time | Start signup = End Signup |
-    | 1          | 15             | 15              | Pacific/Auckland | 1           | 15           | 01            | Europe/London    | 20              | 09               | Pacific/Auckland | 20            | 10             | Pacific/Auckland | Signup period start time must be before signup finish time | Clear start signup > end signup |
-    | 1          | 15             | 13              | Pacific/Auckland | 1           | 20           | 01            | Pacific/Auckland | 15              | 01               | Europe/London    | 20            | 10             | Pacific/Auckland | Signup period start time must be before Session start      | Clear session start before signup start |
-    | 1          | 15             | 14              | Pacific/Auckland | 1           | 20           | 01            | Pacific/Auckland | 15              | 01               | Europe/London    | 20            | 10             | Pacific/Auckland | Signup period start time must be before Session start      | Signup start = session start |
-    | 1          | 15             | 15              | Pacific/Auckland | 1           | 20           | 01            | Pacific/Auckland | 15              | 01               | Europe/London    | 20            | 10             | Pacific/Auckland | Upcoming sessions                                          | Signup start > session start |
+    | 15             | 01              | Europe/London    | 15           | 13            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Upcoming events                                                    | Normal case                             |
+    | 15             | 02              | Europe/London    | 15           | 13            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Signup period start time must be before signup finish time         | Start signup = End Signup               |
+    | 15             | 03              | Europe/London    | 15           | 13            | Pacific/Auckland | 20              | 09               | Pacific/Auckland | 20            | 10             | Signup period start time must be before signup finish time         | Clear start signup > end signup         |
+    | 15             | 01              | Europe/London    | 15           | 23            | Pacific/Auckland | 20              | 12               | Pacific/Auckland | 20            | 13             | Upcoming events                                                    | Normal case                             |
+    | 15             | 02              | Europe/London    | 15           | 23            | Pacific/Auckland | 15              | 12               | Pacific/Auckland | 20            | 13             | Signup period opening time must be before session start time       | Start signup = start session            |
+    | 15             | 03              | Europe/London    | 15           | 23            | Pacific/Auckland | 15              | 12               | Pacific/Auckland | 20            | 13             | Signup period opening time must be before session start time       | Start signup > start session            |
+    | 15             | 13              | Pacific/Auckland | 15           | 01            | Europe/London    | 20              | 09               | Pacific/Auckland | 20            | 10             | Signup period start time must be before signup finish time         | Normal case                             |
+    | 15             | 14              | Pacific/Auckland | 15           | 01            | Europe/London    | 20              | 09               | Pacific/Auckland | 20            | 10             | Signup period start time must be before signup finish time         | Start signup = End Signup               |
+    | 15             | 15              | Pacific/Auckland | 15           | 01            | Europe/London    | 20              | 09               | Pacific/Auckland | 20            | 10             | Signup period start time must be before signup finish time         | Clear start signup > end signup         |
+    | 15             | 11              | Pacific/Auckland | 15           | 12            | Pacific/Auckland | 15              | 01               | Europe/London    | 20            | 10             | Upcoming events                                                    | Normal case                             |
+    | 15             | 12              | Pacific/Auckland | 20           | 01            | Pacific/Auckland | 15              | 01               | Europe/London    | 20            | 10             | Signup period opening time must be before session start time       | Signup start = session start            |
+    | 15             | 13              | Pacific/Auckland | 20           | 01            | Pacific/Auckland | 15              | 01               | Europe/London    | 20            | 10             | Signup period opening time must be before session start time       | Signup start > session start            |
 
+@javascript
   Scenario Outline: Check the correct text is displayed in various states when there is a signup period
-    Given I follow "Add a new session"
+    Given I follow "Add a new event"
     And I set the following fields to these values:
-      | Enable sign up period open       | <periodopen>  |
+      | registrationtimestart[enabled]   | <periodopen>  |
       | registrationtimestart[day]       | 30            |
       | registrationtimestart[month]     | June          |
       | registrationtimestart[year]      | <startyear>   |
       | registrationtimestart[hour]      | 01            |
       | registrationtimestart[minute]    | 00            |
       | registrationtimestart[timezone]  | <startzone>   |
-      | Enable sign up period close      | <periodclose> |
+      | registrationtimefinish[enabled]  | <periodclose> |
       | registrationtimefinish[day]      | 30            |
       | registrationtimefinish[month]    | June          |
       | registrationtimefinish[year]     | <endyear>     |
@@ -144,19 +144,19 @@ Feature: Face to face signup periods
     And I follow "Course 1"
     Then I should see "<signupavailable>"
 
-    When I follow "View all sessions"
+    When I follow "View all events"
     Then I should see "<bookingstatus>"
     And I should see "<signupperiod>"
 
   Examples:
-    | periodopen | startyear | startzone        | periodclose | endyear | endzone          | signupavailable     | bookingstatus               | signupperiod                                                                   |
-    | 1          | 2014      | Pacific/Auckland | 1           | 2015    | Pacific/Auckland | Sign-up unavailable | Signup period is now closed | 30 June 2014 1:00 AM Pacific/Auckland to 30 June 2014 1:00 AM Pacific/Auckland |
-    | 1          | 2014      | Pacific/Auckland | 1           | 2030    | Pacific/Auckland | Join waitlist       | Booking open                | 30 June 2014 1:00 AM Pacific/Auckland to 30 June 2030 1:00 AM Pacific/Auckland |
-    | 1          | 2029      | Pacific/Auckland | 1           | 2030    | Pacific/Auckland | Sign-up unavailable | Signup period not open      | 30 June 2029 1:00 AM Pacific/Auckland to 30 June 2030 1:00 AM Pacific/Auckland |
-    | 1          | 2029      | Pacific/Honolulu | 1           | 2030    | Pacific/Fiji     | Sign-up unavailable | Signup period not open      | 30 June 2029 1:00 AM Pacific/Honolulu to 30 June 2030 1:00 AM Pacific/Fiji     |
-    | 0          | 2029      | Pacific/Auckland | 0           | 2030    | Pacific/Auckland | Join waitlist       | Booking open                | Booking Open                                                                   |
-    | 1          | 2029      | Pacific/Auckland | 0           | 2030    | Pacific/Auckland | Sign-up unavailable | Signup period not open      | After 30 June 2029 1:00 AM Pacific/Auckland                                    |
-    | 0          | 2029      | Pacific/Auckland | 1           | 2030    | Pacific/Auckland | Join waitlist       | Booking open                | Before 30 June 2030 1:00 AM Pacific/Auckland                                   |
+    | periodopen | startyear | startzone        | periodclose | endyear | endzone         | signupavailable     | bookingstatus               | signupperiod                                                                 |
+    | 1          | 2014      | Australia/Perth  | 1           | 2015    | Australia/Perth | Sign-up unavailable | Signup period is now closed | 30 June 2014 1:00 AM Australia/Perth to 30 June 2015 1:00 AM Australia/Perth |
+    | 1          | 2014      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open                | 30 June 2014 1:00 AM Australia/Perth to 30 June 2030 1:00 AM Australia/Perth |
+    | 1          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Sign-up unavailable | Signup period not open      | 30 June 2029 1:00 AM Australia/Perth to 30 June 2030 1:00 AM Australia/Perth |
+    | 1          | 2029      | Pacific/Honolulu | 1           | 2030    | Pacific/Fiji    | Sign-up unavailable | Signup period not open      | 30 June 2029 7:00 PM Australia/Perth to 29 June 2030 9:00 PM Australia/Perth |
+    | 0          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Join waitlist       | Booking open                | Booking open                                                                 |
+    | 1          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Sign-up unavailable | Signup period not open      | After 30 June 2029 1:00 AM Australia/Perth                                   |
+    | 0          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open                | Before 30 June 2030 1:00 AM Australia/Perth                                  |
 
 
 

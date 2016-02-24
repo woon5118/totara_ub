@@ -81,15 +81,15 @@ Feature: Add - Remove Face to face attendees
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | No   |
       | capacity              | 1    |
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users via list of IDs" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Bulk add attendees from text input" "option" in the "#menuf2f-actions" "css_element"
     # By default user is expected to separate ID's by newline, but comma is also supported.
     And I set the following fields to these values:
       | User identifier | Username |
@@ -113,15 +113,15 @@ Feature: Add - Remove Face to face attendees
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | No   |
       | capacity              | 1    |
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users via list of IDs" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Bulk add attendees from text input" "option" in the "#menuf2f-actions" "css_element"
     # By default user separate ID's by newline, but comma is also supported.
     And I set the following fields to these values:
       | User identifier | Email address |
@@ -146,8 +146,8 @@ Feature: Add - Remove Face to face attendees
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name        | Test facetoface name        |
       | Description | Test facetoface description |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I fill facetoface session with relative date in form data:
       | datetimeknown         | Yes              |
       | sessiontimezone[0]    | Pacific/Auckland |
@@ -165,7 +165,7 @@ Feature: Add - Remove Face to face attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Bulk add attendees from file" "option" in the "#menuf2f-actions" "css_element"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "Text file" filemanager
     And I press "Continue"
     And I press "Confirm"

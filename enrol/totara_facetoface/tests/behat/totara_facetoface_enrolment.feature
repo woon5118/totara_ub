@@ -7,15 +7,15 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
   Background:
     Given I am on a totara site
     And the following "users" exist:
-      | username | firstname | lastname | email |
-      | teacher1 | Teacher | 1 | teacher1@asd.com |
-      | student1 | Student | 1 | student1@asd.com |
+      | username | firstname | lastname | email                |
+      | teacher1 | Teacher   | 1        | teacher1@example.com |
+      | student1 | Student   | 1        | student1@example.com |
     And the following "courses" exist:
       | fullname | shortname | format |
-      | Course 1 | C1 | topics |
+      | Course 1 | C1        | topics |
     And the following "course enrolments" exist:
-      | user | course | role |
-      | teacher1 | C1 | editingteacher |
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
 
     And I log in as "admin"
     And I expand "Site administration" node
@@ -29,23 +29,23 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
-      | Approval required | 0                     |
+      | Name             | Test facetoface name        |
+      | Description      | Test facetoface description |
+      | Manager Approval | 0                           |
     And I follow "View all events"
     And I follow "Add a new event"
     And I set the following fields to these values:
-      | datetimeknown | Yes |
-      | timestart[0][day] | 1 |
-      | timestart[0][month] | 1 |
-      | timestart[0][year] | 2020 |
-      | timestart[0][hour] | 11 |
-      | timestart[0][minute] | 00 |
-      | timefinish[0][day] | 1 |
-      | timefinish[0][month] | 1 |
-      | timefinish[0][year] | 2020 |
-      | timefinish[0][hour] | 12 |
-      | timefinish[0][minute] | 00 |
+      | datetimeknown         | Yes  |
+      | timestart[0][day]     | 1    |
+      | timestart[0][month]   | 1    |
+      | timestart[0][year]    | 2020 |
+      | timestart[0][hour]    | 11   |
+      | timestart[0][minute]  | 00   |
+      | timefinish[0][day]    | 1    |
+      | timefinish[0][month]  | 1    |
+      | timefinish[0][year]   | 2020 |
+      | timefinish[0][hour]   | 12   |
+      | timefinish[0][minute] | 00   |
     And I press "Save changes"
     And I log out
 

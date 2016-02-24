@@ -35,7 +35,7 @@ Feature: Signup Admin Approval
       | timmy | manager |
       | sammy | manager |
     And I log in as "admin"
-    And I navigate to "General Settings" node in "Site administration > Plugins > Activity modules > Face-to-face"
+    And I navigate to "Global settings" node in "Site administration > Face-to-face"
     And I click on "s__facetoface_approvaloptions[approval_none]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_manager]" "checkbox"
@@ -55,7 +55,7 @@ Feature: Signup Admin Approval
     And I click on "Larry Lar" "link" in the "Select activity level approvers" "totaradialogue"
     And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
     And I press "Save and display"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |

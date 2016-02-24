@@ -16,7 +16,7 @@ Background:
       | Name              | Test facetoface name        |
       | Description       | Test facetoface description |
     And I turn editing mode off
-    And I navigate to "Rooms" node in "Site administration > Plugins > Activity modules > Face-to-face"
+    And I navigate to "Rooms" node in "Site administration > Face-to-face"
     And I press "Add a room"
     And I set the following fields to these values:
       | Room name | Room 1          |
@@ -51,7 +51,7 @@ Background:
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Test facetoface name"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -71,7 +71,7 @@ Background:
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -91,7 +91,7 @@ Background:
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -111,7 +111,7 @@ Background:
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |

@@ -328,7 +328,7 @@ Feature: Record of learning evidence report
     Then I should see "Test evidence 1"
     And I should not see "Test evidence 2"
 
-    When I follow "/my/index.php"
+    When I click on "My Learning" in the totara menu
     Then I should see "My learning" in the ".active_tree_node" "css_element"
 
 

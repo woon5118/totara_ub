@@ -32,7 +32,7 @@ Feature: Face to face summary report overview
     And I log in as "admin"
 
     # Enable roles for student and trainer
-    And I navigate to "General Settings" node in "Site administration > Plugins > Activity modules > Face-to-face"
+    And I navigate to "Global settings" node in "Site administration > Face-to-face"
     And I click on "Learner" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
     # Trainer is ambigous with Editing Trainer
     And I click on "s__facetoface_session_roles[4]" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
@@ -44,11 +44,11 @@ Feature: Face to face summary report overview
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name              | Test facetoface name 1      |
-      | Description       | Test facetoface description |
-      | Approval required | 1                           |
+      | Name             | Test facetoface name 1      |
+      | Description      | Test facetoface description |
+      | Manager Approval | 1                           |
     And I follow "Test facetoface name 1"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -64,6 +64,7 @@ Feature: Face to face summary report overview
       | capacity              | 2    |
       | mincapacity           | 1    |
       | sendcapacityemail     | 1    |
+      | cutoff[number]        | 25   |
       | normalcost            | 1.11 |
       | discountcost          | 1.00 |
     And I press "Save changes"
@@ -74,9 +75,8 @@ Feature: Face to face summary report overview
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name              | Test facetoface name 2      |
       | Description       | Test facetoface description |
-      | Approval required | 0                           |
     And I follow "Test facetoface name 2"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I press "Add a new date"
     # Relative date fail to work with two dates, hence set absolute date.
     And I fill facetoface session with relative date in form data:
@@ -118,7 +118,7 @@ Feature: Face to face summary report overview
     And I follow "Go back"
 
     # 3: (2nd activity of C1) Bookings available, upcoming
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I set the following fields to these values:
       | datetimeknown         | Yes  |
       | timestart[0][day]     | 1    |
@@ -150,9 +150,8 @@ Feature: Face to face summary report overview
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name              | Test facetoface name 3      |
       | Description       | Test facetoface description |
-      | Approval required | 0                           |
     And I follow "Test facetoface name 3"
-    And I follow "Add a new session"
+    And I follow "Add a new event"
     And I fill facetoface session with relative date in form data:
       | datetimeknown         | Yes              |
       | sessiontimezone[0]    | Pacific/Auckland |
@@ -186,11 +185,12 @@ Feature: Face to face summary report overview
       | Source      | Face-to-face Summary |
     And I press "Create report"
     And I click on "Columns" "link"
+
     And I set the field "newcolumns" to "Number of Attendees"
     And I press "Add"
     And I set the field "newcolumns" to "Overbooking allowed"
     And I press "Add"
-    And I set the field "newcolumns" to "Approval by"
+    And I set the field "newcolumns" to "Approval Type"
     And I press "Add"
     And I set the field "newcolumns" to "Overall status"
     And I press "Add"
@@ -204,13 +204,13 @@ Feature: Face to face summary report overview
     And I press "Add"
     And I set the field "newcolumns" to "Duration"
     And I press "Add"
-    And I set the field "newcolumns" to "Session Learner"
+    And I set the field "newcolumns" to "Event Learner"
     And I press "Add"
-    And I set the field "newcolumns" to "Session Learner (linked to profile)"
+    And I set the field "newcolumns" to "Event Learner (linked to profile)"
     And I press "Add"
-    And I set the field "newcolumns" to "Session Trainer"
+    And I set the field "newcolumns" to "Event Trainer"
     And I press "Add"
-    And I set the field "newcolumns" to "Session Trainer (linked to profile)"
+    And I set the field "newcolumns" to "Event Trainer (linked to profile)"
     And I press "Add"
     And I press "Save changes"
 
@@ -219,37 +219,37 @@ Feature: Face to face summary report overview
     And I press "Add"
     And I set the field "newstandardfilter" to "Overall status"
     And I press "Add"
-    And I set the field "newstandardfilter" to "Session Learner"
+    And I set the field "newstandardfilter" to "Event Learner"
     And I press "Add"
-    And I set the field "newstandardfilter" to "Session Trainer"
+    And I set the field "newstandardfilter" to "Event Trainer"
     And I press "Add"
     And I press "Save changes"
 
     When I click on "View This Report" "link"
     Then I should see "Course 1" in the "2.22" "table_row"
     And I should see "No" in the "1.11" "table_row"
-    And I should see "Manager" in the "1.11" "table_row"
+    And I should see "Manager Approval" in the "1.11" "table_row"
     And I should see "Underbooked" in the "1.11" "table_row"
     And I should see "Upcoming" in the "1.11" "table_row"
     And I should see "1.00" in the "1.11" "table_row"
 
     And I should see "Course 1" in the "2.22" "table_row"
     And I should see "No" in the "2.22" "table_row"
-    And I should see "No one" in the "2.22" "table_row"
+    And I should see "No Approval" in the "2.22" "table_row"
     And I should see "Overbooked" in the "2.22" "table_row"
     And I should see "Started" in the "2.22" "table_row"
     And I should see "2.10" in the "2.22" "table_row"
 
     And I should see "Course 1" in the "3.33" "table_row"
     And I should see "No" in the "3.33" "table_row"
-    And I should see "No one" in the "3.33" "table_row"
+    And I should see "No Approval" in the "3.33" "table_row"
     And I should see "Bookings available" in the "3.33" "table_row"
     And I should see "Upcoming" in the "3.33" "table_row"
     And I should see "1.50" in the "3.33" "table_row"
 
     And I should see "Course 2" in the "4.44" "table_row"
     And I should see "No" in the "4.44" "table_row"
-    And I should see "No one" in the "4.44" "table_row"
+    And I should see "No Approval" in the "4.44" "table_row"
     And I should see "Fully booked" in the "4.44" "table_row"
     And I should see "Ended" in the "4.44" "table_row"
     And "Sam4 Student4" "link" should exist in the "4.44" "table_row"
@@ -357,8 +357,8 @@ Feature: Face to face summary report overview
     And I should not see "4.44"
     And I press "Clear"
 
-    When I set the field "Session Learner field limiter" to "contains"
-    And I set the field "Session Learner value" to "Sam"
+    When I set the field "Event Learner field limiter" to "contains"
+    And I set the field "Event Learner value" to "Sam"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "4.44"
     And I should not see "1.11"
@@ -367,20 +367,20 @@ Feature: Face to face summary report overview
     And I press "Clear"
 
     # Disable teacher role, and ensure that column and filter disappeared
-    Given "Session Trainer" "link" should exist in the ".reportbuilder-table" "css_element"
+    Given "Event Trainer" "link" should exist in the ".reportbuilder-table" "css_element"
     And I click on "Home" in the totara menu
-    When I navigate to "General Settings" node in "Site administration > Plugins > Activity modules > Face-to-face"
+    When I navigate to "Global settings" node in "Site administration > Face-to-face"
     # Trainer is ambigous with Editing Trainer
     And I click on "s__facetoface_session_roles[4]" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
     And I press "Save changes"
     And I click on "My Reports" in the totara menu
     And I follow "F2F Summary"
-    Then "Session Learner" "link" should exist in the ".reportbuilder-table" "css_element"
-    And "Session Trainer" "link" should not exist in the ".reportbuilder-table" "css_element"
+    Then "Event Learner" "link" should exist in the ".reportbuilder-table" "css_element"
+    And "Event Trainer" "link" should not exist in the ".reportbuilder-table" "css_element"
     And I press "Edit this report"
     And I follow "Columns"
-    And I should see "Session Learner"
-    And I should not see "Session Trainer"
+    And I should see "Event Learner"
+    And I should not see "Event Trainer"
     And I follow "Filters"
-    And I should see "Session Learner"
-    And I should not see "Session Trainer"
+    And I should see "Event Learner"
+    And I should not see "Event Trainer"

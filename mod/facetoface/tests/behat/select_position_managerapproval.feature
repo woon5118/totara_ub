@@ -39,7 +39,7 @@ Feature: Manager approval
     And I add a "Face-to-face" to section "1" and I fill the form with:
       | Name                      | Test facetoface name        |
       | Description               | Test facetoface description |
-      | Approval required         | 1                           |
+      | Manager Approval          | 1                           |
       | Select position on signup | 1                           |
     And I follow "View all events"
     And I follow "Add a new event"
@@ -78,10 +78,10 @@ Feature: Manager approval
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
-    And I should see "This event requires manager approval to book."
+    And I should see "Manager Approval"
     And I set the following fields to these values:
       | Select a position | Position2 |
-    And I press "Sign-up"
+    And I press "Request approval"
     And I should see "Your booking has been completed but requires approval from your manager."
     And I log out
     And I log in as "teacher1"
@@ -89,13 +89,13 @@ Feature: Manager approval
     And I follow "Course 1"
     And I follow "Test facetoface name"
     And I follow "Attendees"
-    And I should not see "Approval required"
+    And I should not see "Approval required" in the ".tabtree" "css_element"
     And I log out
     And I log in as "teacher2"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Test facetoface name"
     And I follow "Attendees"
-    And I follow "Approval required"
+    And I click on "Approval required" "link" in the ".tabtree" "css_element"
     And I click on "input[value='2']" "css_element" in the "Sam1 Student1" "table_row"
     And I press "Update requests"

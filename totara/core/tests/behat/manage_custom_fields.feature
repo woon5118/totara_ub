@@ -166,7 +166,7 @@ Feature: Test new custom field capabilities
       # Check all access of Site Manager
       When I log in as "sitemanuser"
       # Face-to-face: allowed
-      And I navigate to "Custom Fields" node in "Site administration > Face-to-face"
+      And I navigate to "Custom fields" node in "Site administration > Face-to-face"
       And I should see "Create a new custom field"
       # Course: allowed
       And I navigate to "Custom fields" node in "Site administration > Courses"
@@ -199,8 +199,10 @@ Feature: Test new custom field capabilities
       # Check face-to-face managecustomfield access
       When I log in as "faceuser"
       # Face-to-face: allowed
-      And I navigate to "Custom Fields" node in "Site administration > Face-to-face"
+      And I navigate to "Custom fields" node in "Site administration > Face-to-face"
       And I should see "Create a new custom field"
+      # Avoid seeing Custom fields in the Face-to-face section
+      And I click on "Face-to-face" "text" in the "Administration" "block"
       # Course: prevented & Program: prevented
       And I click on "Courses" "text" in the "Administration" "block"
       Then I should not see "Custom fields" in the "Administration" "block"
@@ -393,8 +395,10 @@ Feature: Test new custom field capabilities
       # Check position and face-to-face managecustomfield access
       When I log in as "posfaceuser"
       # Face-to-face: allowed
-      And I navigate to "Custom Fields" node in "Site administration > Face-to-face"
+      And I navigate to "Custom fields" node in "Site administration > Face-to-face"
       And I should see "Create a new custom field"
+      # Avoid seeing Custom fields in the Face-to-face section
+      And I click on "Face-to-face" "text" in the "Administration" "block"
       # Course: prevented & Program: prevented
       And I click on "Courses" "text" in the "Administration" "block"
       Then I should not see "Custom fields" in the "Administration" "block"
