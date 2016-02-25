@@ -66,6 +66,16 @@ class cleanup_task extends \core\task\scheduled_task {
             }
         }
 
-        mtrace(" Deleted old log records from standard store.");
+        // Totara: do tell ppl why their data was not purged properly, otherwise they are confused.
+        $loglifetimedays = (int)get_config('logstore_standard', 'loglifetime');
+        $min = $DB->get_field_select("logstore_standard_log", "MIN(timecreated)", "timecreated < ?", $lifetimep);
+        if ($min) {
+            $donedays = (int)((time() - $min) / (3600 * 24));
+            if ($donedays > $loglifetimedays) {
+                mtrace(" Deleted log records older than $donedays days from standard store, next execution will try to delete records older than $loglifetimedays days.");
+                return;
+            }
+        }
+        mtrace(" Deleted log records older than $loglifetimedays days from standard store.");
     }
 }

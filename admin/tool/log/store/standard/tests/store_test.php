@@ -306,7 +306,8 @@ class logstore_standard_store_testcase extends advanced_testcase {
         // Remove all logs before "today".
         set_config('loglifetime', 1, 'logstore_standard');
 
-        $this->expectOutputString(" Deleted old log records from standard store.\n");
+        // Totara: we tell admins the exact status of cleanup.
+        $this->expectOutputString(" Deleted log records older than 1 days from standard store.\n");
         $clean = new \logstore_standard\task\cleanup_task();
         $clean->execute();
 
