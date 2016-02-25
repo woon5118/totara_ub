@@ -149,7 +149,7 @@ if ($deleteyes) {
                 $data->fullname,
                 isset($data->description) ? $data->description : null,
                 isset($data->priority) ? $data->priority : null,
-                !empty($data->duedate) ? totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $data->duedate) : null,
+                !empty($data->duedate) ? $data->duedate : null,
                 isset($data->scalevalueid) ? $data->scalevalueid : null
         );
         if (!$result) {
@@ -172,7 +172,7 @@ if ($deleteyes) {
         $record->fullname = $data->fullname;
         $record->description = $data->description;
         $record->priority = isset($data->priority)?$data->priority:null;
-        $record->duedate = !empty($data->duedate)? totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $data->duedate):null;
+        $record->duedate = !empty($data->duedate) ? $data->duedate : null;
         $record->scalevalueid = $data->scalevalueid;
         $record->approved = $component->approval_status_after_update();
 
