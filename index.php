@@ -37,6 +37,19 @@ $urlparams = array();
 if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_MY) && optional_param('redirect', 1, PARAM_BOOL) === 0) {
     $urlparams['redirect'] = 0;
 }
+
+$redirect = optional_param('redirect', 1, PARAM_BOOL);
+// If adding, editing, hiding, showing, moving or deleting a Block, we don't want to redirect.
+if (!empty(optional_param('bui_addblock', '', PARAM_TEXT))  ||
+    !empty(optional_param('bui_editid', '', PARAM_INT))     ||
+    !empty(optional_param('bui_hideid', '', PARAM_INT))     ||
+    !empty(optional_param('bui_showid', '', PARAM_INT))     ||
+    !empty(optional_param('bui_moveid', '', PARAM_INT))     ||
+    !empty(optional_param('bui_deleteid', '', PARAM_INT))) {
+    $urlparams['redirect'] = 0;
+    $redirect = 0;
+}
+
 $PAGE->set_url('/', $urlparams);
 $PAGE->set_course($SITE);
 $PAGE->set_other_editing_capability('moodle/course:update');
@@ -65,7 +78,6 @@ if ($hassiteconfig && moodle_needs_upgrading()) {
 
 if (get_home_page() != HOMEPAGE_SITE) {
     // Redirect logged-in users to My Moodle overview if required.
-    $redirect = optional_param('redirect', 1, PARAM_BOOL);
     if (optional_param('setdefaulthome', false, PARAM_BOOL)) {
         set_user_preference('user_home_page_preference', HOMEPAGE_SITE);
     } else if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_MY) && $redirect === 1) {
