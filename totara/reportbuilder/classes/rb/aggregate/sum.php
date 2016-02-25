@@ -31,6 +31,10 @@ class sum extends base {
         return "SUM($field)";
     }
 
+    public static function get_displayfunc(\rb_column $column) {
+        return $column->displayfunc;
+    }
+
     public static function is_column_option_compatible(\rb_column_option $option) {
         return ($option->dbdatatype === 'integer' or $option->dbdatatype === 'decimal' or $option->dbdatatype === 'boolean');
     }
