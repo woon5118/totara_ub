@@ -11,7 +11,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -212,7 +212,13 @@ function tooltip(e,callback,on,param) {
     bh = Math.ceil(brect.height + {$dpad});
     setattr(rect, 'width', bw + 'px');
     setattr(rect, 'height', bh + 'px');
-    setattr(inner, 'transform', 'translate(' + (bw / 2) + ',0)');
+    // TL-8407 IE & Edge do something different here
+    if (navigator.userAgent.indexOf('Trident') > -1 || navigator.userAgent.indexOf('Edge') > -1) {
+        setattr(inner, 'text-anchor', 'right');
+    } else {
+        setattr(inner, 'transform', 'translate(' + (bw / 2) + ' 0)');
+    }
+
     if(shadow) {
       setattr(shadow, 'width', (bw + {$this->tooltip_stroke_width}) + 'px');
       setattr(shadow, 'height', (bh + {$this->tooltip_stroke_width}) + 'px');
