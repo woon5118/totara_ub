@@ -61,11 +61,11 @@
 }}
 <ul>
     {{#menuitems}}<li class="menu-{{class_name}}{{#haschildren}} haschildren{{/haschildren}}{{#class_isfirst}} first{{/class_isfirst}}{{#class_islast}} last{{/class_islast}}{{#class_isselected}} selected{{/class_isselected}}">
-        <a target="{{target}}" href="{{url}}">{{linktext}}</a>
+        <a target="{{target}}" href="{{url}}">{{{linktext}}}</a>
         {{#haschildren}}
             <ul>
                 {{#children}}<li class="menu-{{class_name}}{{#class_isfirst}} first{{/class_isfirst}}{{#class_islast}} last{{/class_islast}}{{#class_isselected}} selected{{/class_isselected}}">
-                    <a target="{{target}}" href="{{url}}">{{linktext}}</a>
+                    <a target="{{target}}" href="{{url}}">{{{linktext}}}</a>
                 </li>{{/children}}
             </ul>
         {{/haschildren}}
