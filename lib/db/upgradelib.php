@@ -187,12 +187,12 @@ function upgrade_mssql_nvarcharmax() {
 
         $columns = array();
 
-        $sql = "SELECT column_name
+        $sql = "SELECT column_name, is_nullable
                   FROM INFORMATION_SCHEMA.COLUMNS
                  WHERE table_name = '{{$table}}' AND UPPER(data_type) = 'NTEXT'";
         $rs = $DB->get_recordset_sql($sql);
         foreach ($rs as $column) {
-            $columns[] = $column->column_name;
+            $columns[] = $column;
         }
         $rs->close();
 
@@ -204,9 +204,18 @@ function upgrade_mssql_nvarcharmax() {
             upgrade_set_timeout($timeout);
 
             $updates = array();
-            foreach ($columns as $column) {
+            foreach ($columns as $column_info) {
+                $column = $column_info->column_name;
+                if (strtoupper($column_info->is_nullable) === 'YES') {
+                    $nullable = "NULL";
+                } else if (strtoupper($column_info->is_nullable) === 'NO') {
+                    $nullable = "NOT NULL";
+                } else {
+                    // This should not happen.
+                    $nullable = '';
+                }
                 // Change the definition.
-                $sql = "ALTER TABLE {$prefix}$table ALTER COLUMN $column NVARCHAR(MAX)";
+                $sql = "ALTER TABLE {$prefix}$table ALTER COLUMN $column NVARCHAR(MAX) $nullable";
                 $DB->change_database_structure($sql);
                 $updates[] = "$column = $column";
             }
