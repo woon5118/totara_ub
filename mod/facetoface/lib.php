@@ -2892,7 +2892,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                         $registrationopen = false;
                     }
 
-                    if ($timenow > $session->registrationtimefinish && $session->registrationtimefinish != '0') {
+                    if (!empty($session->registrationtimefinish) && $timenow > $session->registrationtimefinish) {
                         $registrationclosed = true;
                     } else {
                         $registrationclosed = false;
