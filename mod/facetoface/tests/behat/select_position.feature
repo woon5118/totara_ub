@@ -218,3 +218,17 @@ Feature: Add a face to face with select position
     And I follow "View all events"
     And I follow "Attendees"
     Then I should see "Position2"
+    And I log out
+
+    And I log in as "admin"
+    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I set the field "Report Name" to "F2F sessions"
+    And I set the field "Source" to "Face-to-face sessions"
+    And I press "Create report"
+    And I click on "Columns" "link" in the ".tabtree" "css_element"
+    And I add the "Position on sign up" column to the report
+    And I add the "Position Type on sign up" column to the report
+
+    When I navigate to my "F2F sessions" report
+    Then I should see "Position2"
+    And I should see "Secondary position"

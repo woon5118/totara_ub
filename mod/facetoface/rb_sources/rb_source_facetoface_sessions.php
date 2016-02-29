@@ -1028,11 +1028,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     }
 
     public function rb_display_position_type($position, $row) {
-        global $CFG, $POSITION_TYPES;
+        global $POSITION_TYPES;
 
-        include_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
-
-        return get_string('type'.$POSITION_TYPES[$position], 'totara_hierarchy');
+        // If position type does not exists just return the value.
+        if (!isset($POSITION_TYPES[$position])) {
+            return $position;
+        }
+        // Otherwise return the string.
+        return get_string('type' . $POSITION_TYPES[$position], 'totara_hierarchy');
     }
 
     // convert a f2f activity name into a link to that activity
