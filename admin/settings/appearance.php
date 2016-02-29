@@ -247,8 +247,9 @@ preferences,moodle|/user/preferences.php|preferences',
             array('totara/core:appearance'));
     $ADMIN->add('appearance', $temp);
 
+    // Dashboard settings.
     $temp = new admin_externalpage('totaradashboard', new lang_string('dashboards', 'totara_dashboard'),
-        $CFG->wwwroot . '/totara/dashboard/manage.php', array('totara/core:appearance'), totara_feature_disabled('totaradashboard'));
+        $CFG->wwwroot . '/totara/dashboard/manage.php', array('totara/dashboard:manage'), totara_feature_disabled('totaradashboard'));
     $ADMIN->add('appearance', $temp);
 
     // coursecontact is the person responsible for course - usually manages enrolments, receives notification, etc.

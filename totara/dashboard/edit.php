@@ -34,13 +34,10 @@ if ($action != 'new') {
     $id = required_param('id', PARAM_INT);
 }
 
-admin_externalpage_setup('totaradashboard');
+admin_externalpage_setup('totaradashboard', '', array('id' => $id), new moodle_url('/totara/dashboard/edit.php'));
 
 // Check Totara Dashboard is enable.
 totara_dashboard::check_feature_enabled();
-
-$systemcontext = context_system::instance();
-require_capability('totara/dashboard:manage', $systemcontext);
 
 $dashboard = new totara_dashboard($id);
 

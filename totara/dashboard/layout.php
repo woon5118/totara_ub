@@ -26,21 +26,16 @@ require_once($CFG->dirroot . '/my/lib.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/dashboard/lib.php');
 
-require_login();
+$id = required_param('id', PARAM_INT);
+admin_externalpage_setup('totaradashboard', '', array('id' => $id),
+    new moodle_url('/totara/dashboard/layout.php'), array('pagelayout' => 'mydashboard'));
 
 // Check Totara Dashboard is enable.
 totara_dashboard::check_feature_enabled();
 
-$systemcontext = context_system::instance();
-require_capability('totara/dashboard:manage', $systemcontext);
-
-$id = required_param('id', PARAM_INT);
 $header = $SITE->shortname . ': ' . get_string('editdashboard', 'totara_dashboard');
 
 $PAGE->set_blocks_editing_capability('moodle/my:configsyspages');
-admin_externalpage_setup('totaradashboard', '', array('id' => $id),
-        new moodle_url('/totara/dashboard/layout.php'), array('pagelayout' => 'mydashboard'));
-
 // Override pagetype to show blocks properly.
 $PAGE->set_pagetype('my-totara-dashboard-' . $id);
 $PAGE->set_subpage('default');
