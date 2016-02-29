@@ -54,7 +54,7 @@ require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
 class mod_lti_edit_types_form extends moodleform{
     public function definition() {
-        global $CFG;
+        global $CFG, $OUTPUT;
 
         $mform    =& $this->_form;
 
@@ -99,8 +99,8 @@ class mod_lti_edit_types_form extends moodleform{
         $mform->addHelpButton('lti_customparameters', 'custom', 'lti');
 
         if (!$istool && !empty($this->_customdata->isadmin)) {
-            $mform->addElement('checkbox', 'lti_coursevisible', '&nbsp;', ' ' . get_string('show_in_course', 'lti'));
-            $mform->addHelpButton('lti_coursevisible', 'show_in_course', 'lti');
+            // TL-8482 removed '&nbsp;' as it was causing an empty label to be displayed
+            $mform->addElement('checkbox', 'lti_coursevisible', '', get_string('show_in_course', 'lti') . $OUTPUT->help_icon('show_in_course', 'lti'));
         } else {
             $mform->addElement('hidden', 'lti_coursevisible', '1');
         }
@@ -160,7 +160,8 @@ class mod_lti_edit_types_form extends moodleform{
             $mform->setDefault('lti_acceptgrades', '2');
             $mform->addHelpButton('lti_acceptgrades', 'accept_grades_admin', 'lti');
 
-            $mform->addElement('checkbox', 'lti_forcessl', '&nbsp;', ' ' . get_string('force_ssl', 'lti'), $options);
+            // TL-8482 removed '&nbsp;' as it was causing an empty label to be displayed
+            $mform->addElement('checkbox', 'lti_forcessl', '', get_string('force_ssl', 'lti') . $OUTPUT->help_icon('force_ssl', 'lti'), $options);
             $mform->setType('lti_forcessl', PARAM_BOOL);
             if (!empty($CFG->mod_lti_forcessl)) {
                 $mform->setDefault('lti_forcessl', '1');
@@ -168,7 +169,6 @@ class mod_lti_edit_types_form extends moodleform{
             } else {
                 $mform->setDefault('lti_forcessl', '0');
             }
-            $mform->addHelpButton('lti_forcessl', 'force_ssl', 'lti');
 
             if (!empty($this->_customdata->isadmin)) {
                 // Add setup parameters fieldset.
