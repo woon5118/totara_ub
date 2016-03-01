@@ -2375,8 +2375,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         // There should be one messages received.
         $this->assertCount(1, $messages);
         $message = array_pop($messages);
-        $this->assertSame('Session under capacity for: facetoface1', $message->subject);
-        $this->assertContains('The following session is under capacity:', $message->fullmessage);
+        $this->assertSame('Event under capacity for: facetoface1', $message->subject);
+        $this->assertContains('The following event is under capacity:', $message->fullmessage);
         $this->assertContains('Capacity: 1 / 10 (minimum: 4)', $message->fullmessage);
     }
 

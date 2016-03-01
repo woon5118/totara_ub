@@ -892,7 +892,7 @@ $string['sessionundercapacity_body'] = 'The following event is under capacity:
 
 Name: {$a->name}
 Event start: {$a->starttime}
-Event: {$a->booked} / {$a->capacity} (minimum: {$a->mincapacity})
+Capacity: {$a->booked} / {$a->capacity} (minimum: {$a->mincapacity})
 {$a->link}';
 $string['sessionvenue'] = 'Event venue';
 $string['setactive'] = 'Set active';
