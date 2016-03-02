@@ -110,6 +110,8 @@ $string['totaraaddonnotice'] = 'Totara LMS does not include an add-on installer,
 Before installing any additional plugins please make sure the code was tested with Totara LMS, is secure, is maintained by authors and contains phpunit and behat tests.
 
 Totara Learning Solutions support does not cover plugins that are not included in the standard distribution.';
+$string['type_antivirus'] = 'Antivirus plugin';
+$string['type_antivirus_plural'] = 'Antivirus plugins';
 $string['type_auth'] = 'Authentication method';
 $string['type_auth_plural'] = 'Authentication methods';
 $string['type_availability'] = 'Availability restriction';
