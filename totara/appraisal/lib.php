@@ -2040,7 +2040,7 @@ class appraisal {
                     ON app.id = userscomplete.appraisalid
                   LEFT JOIN (SELECT COUNT(aua.userid) AS userscancelled, aua.appraisalid
                                FROM {appraisal_user_assignment} aua
-                               WHERE aua.status = ?
+                               WHERE aua.status = :statusclosed
                             GROUP BY aua.appraisalid) userscancelled
                     ON app.id = userscancelled.appraisalid
                   LEFT JOIN (SELECT COUNT(aua.userid) AS usersoverdue, ast.appraisalid
@@ -2048,11 +2048,17 @@ class appraisal {
                                JOIN {appraisal_stage} ast
                                  ON aua.activestageid = ast.id
                               WHERE aua.timecompleted IS NULL
-                                AND ast.timedue < ?
-                              GROUP BY ast.appraisalid) usersoverdue
+                                AND ast.timedue < :timedue
+                                AND aua.status = :statusactive1
+                                GROUP BY ast.appraisalid) usersoverdue
                     ON app.id = usersoverdue.appraisalid
-                 WHERE app.status = ?';
-        $appraisals = $DB->get_records_sql($sql, array(self::STATUS_CLOSED, time(), self::STATUS_ACTIVE));
+                 WHERE app.status = :statusactive2';
+        $params = array('statusclosed' => self::STATUS_CLOSED,
+                        'timedue' => time(),
+                        'statusactive1' => self::STATUS_ACTIVE,
+                        'statusactive2' => self::STATUS_ACTIVE
+                    );
+        $appraisals = $DB->get_records_sql($sql, $params);
 
         return $appraisals;
     }
