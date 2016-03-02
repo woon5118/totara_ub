@@ -27,8 +27,6 @@ require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_hierarchy.class.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 
-position::check_feature_enabled();
-
 $userid = required_param('userid', PARAM_INT);
 
 /*
@@ -38,8 +36,6 @@ $userid = required_param('userid', PARAM_INT);
 // Setup page.
 $PAGE->set_context(context_system::instance());
 require_login(null, false, null, false, true);
-
-position::check_feature_enabled();
 
 // First check that the user really does exist and that they're not a guest.
 $userexists = !isguestuser($userid) && $DB->record_exists('user', array('id' => $userid, 'deleted' => 0));

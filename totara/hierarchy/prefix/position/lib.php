@@ -711,10 +711,6 @@ class position_assignment extends data_object {
 function pos_add_node_positions_links($course, $user, $tree) {
     global $POSITION_CODES, $POSITION_TYPES;
 
-    if (!totara_feature_visible('positions')) {
-        return;
-    }
-
     $userid = $user->id;
     $canedit = pos_can_edit_position_assignment($userid);
     $positionsenabled = get_config('totara_hierarchy', 'positionsenabled');

@@ -445,8 +445,8 @@ $string['enablecompetencies_desc'] = 'This option will let you: Enable(show)/Dis
 * If Disable is chosen, competencies will disappear from any menu on the site and will not be accessible.
 ';
 $string['enablegoals'] = 'Enable Goals';
-$string['enablepositions'] = 'Enable Positions';
-$string['enablepositions_desc'] = 'This option will let you: enable (show) or disable Positions features on this site.
+$string['enablepositions'] = 'Enable positions hierarchies';
+$string['enablepositions_desc'] = 'This option will let you: enable (show) or disable the position hierarchy feature on this site.
 
 * If Show is selected, all features related to positions will be visible and accessible.
 * If Disable is selected, no position features will be visible or accessible.';

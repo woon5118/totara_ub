@@ -37,8 +37,6 @@ if (!$manageronsignup) {
     require_login(null, false, null, false, true);
 }
 
-position::check_feature_enabled();
-
 // First check that the user really does exist and that they're not a guest.
 $userexists = !isguestuser($userid) && $DB->record_exists('user', array('id' => $userid, 'deleted' => 0));
 
