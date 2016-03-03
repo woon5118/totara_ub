@@ -32,38 +32,40 @@ $s = required_param('s', PARAM_INT); // Facetoface session ID.
 if (!$session = facetoface_get_session($s)) {
     print_error('error:incorrectcoursemodulesession', 'facetoface');
 }
-if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface))) {
-    print_error('error:incorrectfacetofaceid', 'facetoface');
-}
-if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
-    print_error('error:coursemisconfigured', 'facetoface');
-}
-if (!$cm = get_coursemodule_from_instance("facetoface", $facetoface->id, $course->id)) {
-    print_error('error:incorrectcoursemoduleid', 'facetoface');
-}
-$context = context_module::instance($cm->id);
-
-require_login();
+$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $facetoface->course), '*', MUST_EXIST);
+$cm = get_coursemodule_from_instance("facetoface", $facetoface->id, $course->id);
 
 if ($facetoface->approvaltype != APPROVAL_SELF) {
     // This should not happen unless there is a concurrent change of settings.
     print_error('error');
 }
 
-if (is_enrolled($context, null, '', true)) {
+// It needs to be possible for users who cannot access the course to see this so that they can signup.
+// This is only true if they are not enrolled AND there is a direct enrolment instance in the course.
+// If they can access the course then we check there access normally using require_login with the course and cm.
+// Otherwise we require them to login but not the course and try a direct enrolment access.
+if (can_access_course($course)) {
     // User is already enrolled, let them view the text again.
     require_login($course, true, $cm);
-    require_capability('mod/facetoface:view', $context);
+    require_capability('mod/facetoface:view', context_module::instance($cm->id));
 
 } else {
+    // EVERYONE must login.
+    require_login();
     // Can user self enrol via any instance?
-    if (!totara_course_is_viewable($course->id)) {
+    // First check that they can view the course, and that direct enrolment is enabled.
+    if (!totara_course_is_viewable($course->id) || !enrol_is_enabled('totara_facetoface')) {
+        // They can't access the course.
         print_error('error');
     }
-    /** @var enrol_totara_facetoface_plugin $enrol */
-    $enrol = enrol_get_plugin('totara_facetoface');
+    // Now check if there is a direct enrolment instance that will let them in.
     $allow = false;
     $instances = $DB->get_records('enrol', array('courseid' => $course->id, 'enrol' => 'totara_facetoface'));
+    if (count($instances)) {
+        /** @var enrol_totara_facetoface_plugin $enrol */
+        $enrol = enrol_get_plugin('totara_facetoface');
+    }
     foreach ($instances as $instance) {
         if ($enrol->can_self_enrol($instance, true) === true) {
             $allow = true;
@@ -74,8 +76,6 @@ if (is_enrolled($context, null, '', true)) {
         print_error('cannotenrol', 'enrol_totara_facetoface');
     }
 }
-
-$pagetitle = format_string($facetoface->name);
 
 $mform = new signup_tsandcs_form(null, array('tsandcs' => $facetoface->approvalterms, 's' => $s));
 

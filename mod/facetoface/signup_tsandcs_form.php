@@ -36,6 +36,7 @@ class signup_tsandcs_form extends moodleform {
         $mform->addElement('html', format_text($tsandcs, FORMAT_PLAIN));
 
         $mform->addElement('hidden', 's', $s);
+        $mform->setType('s', PARAM_INT);
 
         $mform->addElement('submit', 'confirm', get_string('close', 'mod_facetoface'));
     }
