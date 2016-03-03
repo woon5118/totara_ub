@@ -107,10 +107,10 @@ class totara_reportbuilder_admin_setting_configdaymonthpicker extends admin_sett
 
         $return = html_writer::start_tag('div', array('class' => 'form-daymonth defaultsnext'));
         $return .= html_writer::tag('label', get_string('financialyeardaystart', 'totara_reportbuilder', $this->visiblename),
-            array('for' => $this->get_full_name() . '[d]', 'class' => 'accesshide'));
+            array('for' => 'menu' . $this->get_full_name() . 'd', 'class' => 'accesshide'));
         $return .= html_writer::select($days, $this->get_full_name() . '[d]' , (int)$day);
         $return .= html_writer::tag('label', get_string('financialyearmonthstart', 'totara_reportbuilder', $this->visiblename),
-            array('for' => $this->get_full_name() . '[m]', 'class' => 'accesshide'));
+            array('for' => 'menu' . $this->get_full_name() . 'm', 'class' => 'accesshide'));
         $return .= html_writer::select($months, $this->get_full_name() . '[m]', (int)$month);
         $return .= html_writer::end_tag('div');
 
