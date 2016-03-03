@@ -199,22 +199,19 @@ Feature: Test reaggregating completion data when changing course completion sett
     And I log in as "user1"
     And I click on "Record of Learning" in the totara menu
     Then I should see "Complete" in the "Course 1" "table_row"
-    # TL-6593 The next line should show "In progress".
-    And I should see "Not yet started" in the "Course 2" "table_row"
+    And I should see "In progress" in the "Course 2" "table_row"
     And I should see "Complete" in the "Course 3" "table_row"
     # Confirm the status of the courses for user2.
     Then I log out
     And I log in as "user2"
     And I click on "Record of Learning" in the totara menu
     Then I should see "Complete" in the "Course 1" "table_row"
-    # TL-6593 The next line should show "In progress".
-    And I should see "Not yet started" in the "Course 2" "table_row"
+    And I should see "In progress" in the "Course 2" "table_row"
     And I should see "Complete" in the "Course 3" "table_row"
     # Confirm the status of the courses for user3.
     Then I log out
     And I log in as "user3"
     And I click on "Record of Learning" in the totara menu
     Then I should see "Not yet started" in the "Course 1" "table_row"
-    # TL-6593 The next line is correct.
     And I should see "Not yet started" in the "Course 2" "table_row"
     And I should see "Not yet started" in the "Course 3" "table_row"
