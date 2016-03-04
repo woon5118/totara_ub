@@ -1022,5 +1022,12 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015072800, 'totara_reportbuilder');
     }
 
+    if ($oldversion < 2015100901) {
+        // Set global setting for global restriction records per page.
+        // Default: 40.
+        set_config('globalrestrictionrecordsperpage', 40, 'reportbuilder');
+        totara_upgrade_mod_savepoint(true, 2015100901, 'totara_reportbuilder');
+    }
+
     return true;
 }

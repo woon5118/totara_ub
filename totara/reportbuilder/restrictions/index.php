@@ -34,51 +34,40 @@ require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_global_restrictio
 $id = optional_param('id', null, PARAM_INT); // Restriction id.
 $action = optional_param('action', null, PARAM_ALPHA);
 $confirm = optional_param('confirm', 0, PARAM_INT);
+$page = optional_param('page', 0, PARAM_INT);
 
 admin_externalpage_setup('rbmanageglobalrestrictions');
 
 $restriction = new rb_global_restriction($id);
-$returnurl = new moodle_url('/totara/reportbuilder/restrictions/index.php');
+$returnurl = new moodle_url('/totara/reportbuilder/restrictions/index.php', array('page' => $page));
 
-if ($action) {
+if ($action && $restriction->id) {
     require_sesskey();
     switch ($action) {
         case 'up':
-            if ($restriction->id) {
-                require_sesskey();
-                $restriction->up();
-                redirect($returnurl);
-            }
+            $restriction->up();
+            redirect($returnurl);
             break;
+
         case 'down':
-            if ($restriction->id) {
-                require_sesskey();
-                $restriction->down();
-                redirect($returnurl);
-            }
+            $restriction->down();
+            redirect($returnurl);
             break;
 
         case 'activate':
-            if ($restriction->id) {
-                require_sesskey();
-                $restriction->activate();
-                totara_set_notification(get_string('restrictionactivated', 'totara_reportbuilder', $restriction->name),
-                    $returnurl, array('class' => 'notifysuccess'));
-            }
+            $restriction->activate();
+            totara_set_notification(get_string('restrictionactivated', 'totara_reportbuilder', $restriction->name),
+                $returnurl, array('class' => 'notifysuccess'));
             break;
 
         case 'deactivate':
-            if ($restriction->id) {
-                require_sesskey();
-                $restriction->deactivate();
-                totara_set_notification(get_string('restrictiondeactivated', 'totara_reportbuilder', $restriction->name),
-                    $returnurl, array('class' => 'notifysuccess'));
-            }
+            $restriction->deactivate();
+            totara_set_notification(get_string('restrictiondeactivated', 'totara_reportbuilder', $restriction->name),
+                $returnurl, array('class' => 'notifysuccess'));
             break;
 
         case 'delete':
-            if ($confirm and $restriction->id) {
-                require_sesskey();
+            if ($confirm) {
                 $restriction->delete();
                 totara_set_notification(get_string('restrictiondeleted', 'totara_reportbuilder', $restriction->name),
                     $returnurl, array('class' => 'notifysuccess'));
@@ -97,7 +86,7 @@ if ($action === 'delete' && !$confirm) {
     echo html_writer::tag('p', get_string('confirmdeleterestriction', 'totara_reportbuilder'));
 
     $buttons = $output->single_button(
-        new moodle_url('/totara/reportbuilder/restrictions/index.php', array('action' => 'delete', 'confirm' => 1, 'id' => $id)),
+        new moodle_url('/totara/reportbuilder/restrictions/index.php', array('action' => 'delete', 'confirm' => 1, 'id' => $id, 'page' => $page)),
         get_string('delete', 'totara_reportbuilder'), 'post'
     );
     $buttons .= $output->single_button(
@@ -123,7 +112,14 @@ if ($action === 'delete' && !$confirm) {
         get_string('globalrestrictionnew', 'totara_reportbuilder')
     );
 
-    echo $output->global_restrictions_table(rb_global_restriction::get_all());
+
+    $count = 0;
+    $perpage = get_config('reportbuilder', 'globalrestrictionrecordsperpage');
+    $globalrestrictions = rb_global_restriction::get_all($page, $perpage, $count);
+    $paging = new paging_bar($count, $page, $perpage, $returnurl);
+    echo $output->render($paging);
+    echo $output->global_restrictions_table($globalrestrictions);
+    echo $output->render($paging);
 }
 
 echo $output->footer();
