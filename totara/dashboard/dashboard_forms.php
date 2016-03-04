@@ -112,6 +112,39 @@ class totara_cohort_dashboard_cohorts extends totara_cohort_course_cohorts {
     }
 
     /**
+     * Creates each row for the table.
+     *
+     * @param stdClass|int $item the dashboard object
+     * @param bool $readonly prevents deleting rows
+     * @return string html
+     */
+    public function build_row($item, $readonly = false) {
+        global $OUTPUT;
+
+        // If its not an object it must be an id. Treat it as such.
+        if (!is_object($item)) {
+            $item = $this->get_item((int)$item);
+        }
+
+        $cohorttypes = cohort::getCohortTypes();
+        $cohortstring = $cohorttypes[$item->cohorttype];
+
+        $row = array();
+        $delete = '';
+        if (!$readonly) {
+            $delete = '&nbsp;' . html_writer::link('#', $OUTPUT->pix_icon('t/delete', get_string('delete')),
+                      array('title' => get_string('delete'), 'class'=>'dashboardcohortdeletelink'));
+        }
+        $row[] = html_writer::start_tag('div', array('id' => 'cohort-item-'.$item->id, 'class' => 'item')) .
+                 format_string($item->fullname) . $delete . html_writer::end_tag('div');
+
+        $row[] = $cohortstring;
+        $row[] = $this->user_affected_count($item);
+
+        return $row;
+    }
+
+    /**
      * Prints out the actual html
      *
      * @param bool $return

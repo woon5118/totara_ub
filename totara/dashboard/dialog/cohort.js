@@ -78,8 +78,6 @@ M.totara_dashboardcohort = M.totara_dashboardcohort || {
                 title: '<h2>' + M.util.get_string('assignedcohorts', 'totara_dashboard') + '</h2>'
             },
             url+'cohort.php?selected=' + this.config.selected
-                    + '&instancetype=0' // These are required by the dialog zero means
-                    + '&instanceid=0'   // that the capability checks are all done at system context.
                     + '&sesskey=' + this.config.sesskey,
             ehandler
         );
@@ -132,7 +130,7 @@ totaraDialog_handler_dashboardcohorts.prototype._update = function(response) {
     if (newids.length > 0) {
         this._dialog.showLoading();
 
-        var ajax_url = M.cfg.wwwroot + '/totara/cohort/dialog/cohort_item.php?itemid=' + newids.join(',') + params;
+        var ajax_url = M.cfg.wwwroot + '/totara/dashboard/dialog/cohort_item.php?itemid=' + newids.join(',') + params;
         $.getJSON(ajax_url, function(data) {
             if (data.error) {
                 self._dialog.hide();
@@ -173,11 +171,11 @@ totaraDialog_handler_dashboardcohorts.prototype.check_table_hidden_status = func
 
 totaraDialog_handler_dashboardcohorts.prototype.add_cohort_delete_event_handlers = function() {
     // Remove previous click event handlers.
-    $('.coursecohortdeletelink', this.cohort_table).unbind('click');
+    $('.dashboardcohortdeletelink', this.cohort_table).unbind('click');
 
     // Add fresh event handlers.
     var self = this;
-    this.cohort_table.on('click', '.coursecohortdeletelink', function(event) {
+    this.cohort_table.on('click', '.dashboardcohortdeletelink', function(event) {
         event.preventDefault();
         self.remove_cohort_item(this);
     });
