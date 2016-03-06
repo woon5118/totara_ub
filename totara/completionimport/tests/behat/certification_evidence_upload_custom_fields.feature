@@ -70,9 +70,9 @@ Feature: Verify certification completion data with custom fields can be successf
     And I navigate to "Evidence custom fields" node in "Site administration > Learning Plans"
     When I set the field "Create a new custom field" to "URL"
     And I set the following fields to these values:
-      | Full name         | URL 1                   |
-      | Short name        | url1                    |
-      | Default URL value | http://www.starwars.com |
+      | Full name   | URL 1                   |
+      | Short name  | url1                    |
+      | Default URL | http://www.starwars.com |
     And I press "Save changes"
     Then I should see "URL 1"
     And I log out
