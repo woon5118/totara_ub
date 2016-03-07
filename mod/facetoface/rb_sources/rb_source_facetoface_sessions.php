@@ -557,7 +557,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_filter_option(
                 'facetoface',
                 'name',
-                'Face to face name',
+                get_string('ftfname', 'rb_source_facetoface_sessions'),
                 'text'
             ),
             new rb_filter_option(
