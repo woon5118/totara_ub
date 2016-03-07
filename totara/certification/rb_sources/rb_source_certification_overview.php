@@ -248,6 +248,7 @@ class rb_source_certification_overview extends rb_source_program_overview {
                 'displayfunc' => 'certif_completion_progress',
                 'grouping' => 'comma_list',
                 'joins' => array('prog_completion', 'certif_completion', 'history'),
+                'nosort' => true,
             )
         );
 

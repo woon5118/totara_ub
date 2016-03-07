@@ -320,6 +320,7 @@ class rb_source_program_overview extends rb_base_source {
                     'displayfunc' => 'program_completion_progress',
                     'grouping' => 'comma_list',
                     'joins' => 'prog_completion',
+                    'nosort' => true,
                 )
             );
         }
