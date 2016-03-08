@@ -1124,32 +1124,58 @@ function scorm_print_overview($courses, &$htmlarray) {
     $strduedate = get_string('duedate', 'scorm');
 
     foreach ($scorms as $scorm) {
-        $time = time();
-        $showattemptstatus = false;
-        if ($scorm->timeopen) {
-            $isopen = ($scorm->timeopen <= $time && $time <= $scorm->timeclose);
+        // Stop block_course_overview_renderer::course_overview() from
+        // displaying a canned (and unchangeable) SCORM activity overview if...
+        //
+        // 1) The settings say "don't show SCORM overview" in the first place...
+        if ($scorm->displayattemptstatus != SCORM_DISPLAY_ATTEMPTSTATUS_ALL
+            && $scorm->displayattemptstatus != SCORM_DISPLAY_ATTEMPTSTATUS_MY) {
+            continue;
         }
-        if ($scorm->displayattemptstatus == SCORM_DISPLAY_ATTEMPTSTATUS_ALL ||
-                $scorm->displayattemptstatus == SCORM_DISPLAY_ATTEMPTSTATUS_MY) {
-            $showattemptstatus = true;
+
+        // 2) OR if SCORM is not available for viewing yet...
+        $now = time();
+        if (!empty($scorm->timeopen) && $now < $scorm->timeopen) {
+            continue;
         }
-        if ($showattemptstatus || !empty($isopen) || !empty($scorm->timeclose)) {
-            $str = html_writer::start_div('scorm overview').html_writer::div($strscorm. ': '.
-                    html_writer::link($CFG->wwwroot.'/mod/scorm/view.php?id='.$scorm->coursemodule, $scorm->name,
-                                        array('title' => $strscorm, 'class' => $scorm->visible ? '' : 'dimmed')), 'name');
-            if ($scorm->timeclose) {
-                $str .= html_writer::div($strduedate.': '.userdate($scorm->timeclose), 'info');
-            }
-            if ($showattemptstatus) {
-                require_once($CFG->dirroot.'/mod/scorm/locallib.php');
-                $str .= html_writer::div(scorm_get_attempt_status($USER, $scorm), 'details');
-            }
-            $str .= html_writer::end_div();
-            if (empty($htmlarray[$scorm->course]['scorm'])) {
-                $htmlarray[$scorm->course]['scorm'] = $str;
-            } else {
-                $htmlarray[$scorm->course]['scorm'] .= $str;
-            }
+
+        if (!empty($scorm->timeclose) > 0 && $now > $scorm->timeclose) {
+            continue;
+        }
+
+        // 3) OR if SCORM completion tracking is not enabled...
+        $course_id = $scorm->course;
+        $cm = get_fast_modinfo($course_id)->get_cm($scorm->id);
+        if ($cm->completion == COMPLETION_TRACKING_NONE) {
+            continue;
+        }
+
+        // 4) OR if the user has already completed SCORM activity...
+        $course = new \stdClass();
+        $course->id = $course_id;
+
+        $info = new completion_info($course);
+        $data = $info->get_data($cm, false, $USER->id);
+
+        if ($data->completionstate != COMPLETION_INCOMPLETE) {
+            continue;
+        }
+
+        // If it gets here, the user still has a "SCORM package that needs attention".
+        $str = html_writer::start_div('scorm overview').html_writer::div($strscorm. ': '.
+                html_writer::link($CFG->wwwroot.'/mod/scorm/view.php?id='.$scorm->coursemodule, $scorm->name,
+                                    array('title' => $strscorm, 'class' => $scorm->visible ? '' : 'dimmed')), 'name');
+        if ($scorm->timeclose) {
+            $str .= html_writer::div($strduedate.': '.userdate($scorm->timeclose), 'info');
+        }
+
+        require_once($CFG->dirroot.'/mod/scorm/locallib.php');
+        $str .= html_writer::div(scorm_get_attempt_status($USER, $scorm), 'details');
+        $str .= html_writer::end_div();
+        if (empty($htmlarray[$scorm->course]['scorm'])) {
+            $htmlarray[$scorm->course]['scorm'] = $str;
+        } else {
+            $htmlarray[$scorm->course]['scorm'] .= $str;
         }
     }
 }
