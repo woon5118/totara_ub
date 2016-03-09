@@ -124,6 +124,9 @@ abstract class rb_base_source {
                 case '{course}':
                     $joindata['add_custom_course_fields'] = 'course';
                     break;
+                case '{prog}':
+                    $joindata['add_custom_prog_fields'] = 'prog';
+                    break;
                 case '{org}':
                     $joindata['add_custom_organisation_fields'] = 'org';
                     break;

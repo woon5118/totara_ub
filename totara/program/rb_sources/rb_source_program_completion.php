@@ -125,6 +125,14 @@ class rb_source_program_completion extends rb_base_source {
                 '{prog_user_assignment}',
                 'prog_user_assignment.programid = base.programid AND prog_user_assignment.userid = base.userid'
             ),
+            // This join is required to keep the joining of program custom fields happy.
+            new rb_join(
+                'prog',
+                'LEFT',
+                '{prog}',
+                'prog.id = base.programid',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
         );
 
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
