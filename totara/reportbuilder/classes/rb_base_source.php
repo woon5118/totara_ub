@@ -565,6 +565,49 @@ abstract class rb_base_source {
         }
     }
 
+
+    /**
+     * Reformat two timestamps and timezones into a datetime, showing only one date if only one is present and
+     * nothing if invalid or null.
+     *
+     * @param integer $date Unix timestamp
+     * @param object $row Object containing all other fields for this row (which should include a timezone field)
+     *
+     * @return string Date and time in a nice format
+     */
+    function rb_display_nice_two_datetime_in_timezone($startdate, $row) {
+
+        $finishdate = $row->finishdate;
+        $startdatetext = $finishdatetext = $returntext = '';
+
+        if (empty($row->timezone)) {
+            $targetTZ = core_date::get_user_timezone();
+            $tzstring = get_string('nice_time_unknown_timezone', 'totara_reportbuilder');
+        } else {
+            $targetTZ = core_date::normalise_timezone($row->timezone);
+            $tzstring = core_date::get_localised_timezone($targetTZ);
+        }
+
+        if ($startdate && is_numeric($startdate)) {
+            $startdatetext = userdate($startdate, get_string('strftimedatetime', 'langconfig'), $targetTZ) . ' ' . $targetTZ;
+        }
+
+        if ($finishdate && is_numeric($finishdate)) {
+            $finishdatetext = userdate($finishdate, get_string('strftimedatetime', 'langconfig'), $targetTZ) . ' ' . $targetTZ;
+        }
+
+        if ($startdatetext && $finishdatetext) {
+            $returntext = get_string('datebetween', 'totara_reportbuilder', array('from' => $startdatetext, 'to' => $finishdatetext));
+        } else if ($startdatetext) {
+            $returntext = get_string('dateafter', 'totara_reportbuilder', $startdatetext);
+        } else if ($finishdatetext) {
+            $returntext = get_string('datebefore', 'totara_reportbuilder', $finishdatetext);
+        }
+
+        return $returntext;
+    }
+
+
     /**
      * Reformat a timestamp into a date and time (including seconds), showing nothing if invalid or null
      *

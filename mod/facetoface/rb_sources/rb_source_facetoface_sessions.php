@@ -277,6 +277,43 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 )
             ),
             new rb_column_option(
+                'session',
+                'signupperiod',
+                get_string('signupperiod', 'rb_source_facetoface_sessions'),
+                'sessions.registrationtimestart',
+                array(
+                    'joins' => array('sessions','sessiondate'),
+                    'dbdatatype' => 'timestamp',
+                    'displayfunc' => 'nice_two_datetime_in_timezone',
+                    'extrafields' => array('finishdate' => 'sessions.registrationtimefinish', 'timezone' => 'sessiondate.sessiontimezone'),
+                    'outputformat' => 'text'
+                )
+            ),
+            new rb_column_option(
+                'session',
+                'signupstartdate',
+                get_string('signupstartdate', 'rb_source_facetoface_sessions'),
+                'sessions.registrationtimestart',
+                array(
+                    'joins' => array('sessions','sessiondate'),
+                    'dbdatatype' => 'timestamp',
+                    'displayfunc' => 'nice_datetime_in_timezone',
+                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
+                    'outputformat' => 'text'
+                )            ),
+            new rb_column_option(
+                'session',
+                'signupenddate',
+                get_string('signupenddate', 'rb_source_facetoface_sessions'),
+                'sessions.registrationtimefinish',
+                array(
+                    'joins' => array('sessions','sessiondate'),
+                    'dbdatatype' => 'timestamp',
+                    'displayfunc' => 'nice_datetime_in_timezone',
+                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
+                    'outputformat' => 'text'
+)            ),
+            new rb_column_option(
                 'status',
                 'statuscode',
                 get_string('status', 'rb_source_facetoface_sessions'),
@@ -617,6 +654,18 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                      )
                 ),
                 'base.userid'
+            ),
+            new rb_filter_option(
+                'session',
+                'signupstartdate',
+                get_string('signupstartdate', 'rb_source_facetoface_summary'),
+                'date'
+            ),
+            new rb_filter_option(
+                'session',
+                'signupenddate',
+                get_string('signupenddate', 'rb_source_facetoface_summary'),
+                'date'
             ),
             new rb_filter_option(
                 'room',

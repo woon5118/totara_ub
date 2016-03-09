@@ -226,6 +226,45 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 )
             ),
             new rb_column_option(
+                'session',
+                'signupperiod',
+                get_string('signupperiod', 'rb_source_facetoface_summary'),
+                'sessions.registrationtimestart',
+                array(
+                    'joins' => array('sessions'),
+                    'dbdatatype' => 'timestamp',
+                    'displayfunc' => 'nice_two_datetime_in_timezone',
+                    'extrafields' => array('finishdate' => 'sessions.registrationtimefinish', 'timezone' => 'base.sessiontimezone'),
+                    'outputformat' => 'text'
+                )
+            ),
+            new rb_column_option(
+                'session',
+                'signupstartdate',
+                get_string('signupstartdate', 'rb_source_facetoface_summary'),
+                'sessions.registrationtimestart',
+                array(
+                    'joins' => array('sessions'),
+                    'dbdatatype' => 'timestamp',
+                    'displayfunc' => 'nice_datetime_in_timezone',
+                    'extrafields' => array('timezone' => 'base.sessiontimezone'),
+                    'outputformat' => 'text'
+                )
+            ),
+            new rb_column_option(
+                'session',
+                'signupenddate',
+                get_string('signupenddate', 'rb_source_facetoface_summary'),
+                'sessions.registrationtimefinish',
+                array(
+                    'joins' => array('sessions'),
+                    'dbdatatype' => 'timestamp',
+                    'displayfunc' => 'nice_datetime_in_timezone',
+                    'extrafields' => array('timezone' => 'base.sessiontimezone'),
+                    'outputformat' => 'text'
+                )
+            ),
+            new rb_column_option(
                 'facetoface',
                 'normalcost',
                 get_string('normalcost', 'rb_source_facetoface_summary'),
@@ -309,6 +348,18 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 'date',
                 'sessionstartdate',
                 get_string('sessdate', 'rb_source_facetoface_sessions'),
+                'date'
+            ),
+            new rb_filter_option(
+                'session',
+                'signupstartdate',
+                get_string('signupstartdate', 'rb_source_facetoface_summary'),
+                'date'
+            ),
+            new rb_filter_option(
+                'session',
+                'signupenddate',
+                get_string('signupenddate', 'rb_source_facetoface_summary'),
                 'date'
             ),
             new rb_filter_option(
