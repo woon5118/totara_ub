@@ -3253,15 +3253,29 @@ function facetoface_get_user_submissions($facetofaceid, $userid, $minimumstatus=
 function facetoface_user_cancel_submission($sessionid, $userid, $cancelreason='') {
     global $DB, $USER;
 
-    $signup = $DB->get_record('facetoface_signups', array('sessionid' => $sessionid, 'userid' => $userid));
-    if (!$signup) {
+    if (!$session = facetoface_get_session($sessionid)) {
+        debugging("Could not load Face-to-face session with ID: {$sessionid}", DEBUG_DEVELOPER);
+        return false;
+    }
+    if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface))) {
+        debugging("Could not load Face-to-face instance with ID: {$session->facetoface}", DEBUG_DEVELOPER);
+        return false;
+    }
+
+    if (!$signup = $DB->get_record('facetoface_signups', array('sessionid' => $sessionid, 'userid' => $userid))) {
+        debugging("No user with ID: {$userid} has signed-up for the session ID: {$sessionid}.", DEBUG_DEVELOPER);
         return true; // not signed up, nothing to do
     }
 
-    // Result is the signupstatusid or false.
-    $result = facetoface_update_signup_status($signup->id, MDL_F2F_STATUS_USER_CANCELLED, $USER->id);
+    // If user status already changed to cancelled.
+    $sql = "signupid = ? AND superceded = ? AND statuscode = ? ORDER BY id DESC";
+    $params = array($signup->id, 0, MDL_F2F_STATUS_USER_CANCELLED);
+    if ($signupstatus = $DB->get_record_select('facetoface_signups_status', $sql, $params, 'id')) {
+        debugging('User status already changed to cancelled.', DEBUG_DEVELOPER);
+        return true;
+    }
 
-    if ($result) {
+    if ($result = facetoface_update_signup_status($signup->id, MDL_F2F_STATUS_USER_CANCELLED, $USER->id)) {
         // Save cancellation note if cancellation note exists to keep the function working as before.
         if (!empty($cancelreason)) {
             $params = array('shortname' => 'cancellationnote', 'datatype' => 'text');
@@ -3277,16 +3291,6 @@ function facetoface_user_cancel_submission($sessionid, $userid, $cancelreason=''
                     $DB->insert_record('facetoface_cancellation_info_data', $todb);
                 }
             }
-        }
-
-        // Notify cancelled.
-        if (!$session = facetoface_get_session($sessionid)) {
-            error_log('F2F: Could not load facetoface session');
-            return false;
-        }
-        if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface))) {
-            error_log('F2F: Could not load facetoface instance');
-            return false;
         }
     }
 

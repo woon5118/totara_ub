@@ -1497,6 +1497,71 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
+    function test_facetoface_user_cancel_submission() {
+        global $DB;
+
+        $student1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id, $studentrole->id);
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface1',
+            'course' => $course1->id
+        );
+        $facetoface1 = $facetofacegenerator->create_instance($facetofacedata);
+
+        // Session that starts in 24hrs time.
+        // This session should trigger a mincapacity warning now as cutoff is 24:01 hrs before start time.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + DAYSECS;
+        $sessiondate->timefinish = time() + DAYSECS + 60;
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+
+        $sessiondata = array(
+            'facetoface' => $facetoface1->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1',
+            'mincapacity' => '1',
+            'cutoff' => DAYSECS - 60
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+
+        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
+        $session->sessiondates = facetoface_get_session_dates($session->id);
+
+        $discountcode1 = 'disc1';
+        $notificationtype1 = 1;
+        $statuscode1 = MDL_F2F_STATUS_REQUESTED;
+
+        $this->setUser($student1);
+        facetoface_user_signup($session, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1);
+        $this->assertDebuggingCalled(get_string('error:nomanagersemailset', 'facetoface'));
+
+        $sink = $this->redirectMessages();
+        $cancelreason = 'PHPUnit facetoface user cancellation submission test';
+        // Normal test.
+        $this->assertTrue((bool)facetoface_user_cancel_submission($sessionid, $student1->id, $cancelreason), $this->msgtrue);
+
+        // Test - No user has signed-up for this session.
+        $this->assertTrue((bool)facetoface_user_cancel_submission($sessionid, '999', $cancelreason), $this->msgtrue);
+        $this->assertDebuggingCalled("No user with ID: 999 has signed-up for the session ID: {$sessionid}.");
+
+        // Test - user status already changed to cancelled.
+        $this->assertTrue((bool)facetoface_user_cancel_submission($sessionid, $student1->id, $cancelreason), $this->msgtrue);
+        $this->assertDebuggingCalled('User status already changed to cancelled.');
+
+        $sink->close();
+
+        $this->resetAfterTest(true);
+    }
+
     // Test sending an adhoc notice using message substitution to the users signed for a session.
     function test_facetoface_send_notice() {
         $this->resetAfterTest();
