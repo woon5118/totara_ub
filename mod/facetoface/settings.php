@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once "$CFG->dirroot/mod/facetoface/lib.php";
 
-$ADMIN->add('root', new admin_category('modfacetofacefolder', new lang_string('pluginname', 'mod_facetoface'), $module->is_enabled() === false));
+$ADMIN->add('root', new admin_category('modfacetofacefolder', new lang_string('pluginname', 'mod_facetoface'), $module->is_enabled() === false), 'grades');
 
 $sessionreporturl = new moodle_url('/mod/facetoface/sessionreport.php');
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacesessionreport', new lang_string('managesessions','mod_facetoface'), $sessionreporturl, 'mod/facetoface:viewallsessions'));
