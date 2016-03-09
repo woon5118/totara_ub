@@ -498,41 +498,50 @@ class facetoface_notification extends data_object {
 
         mtrace(get_string('signupexpired', 'facetoface'));
 
-        // Find User to be notified.
-        $userid = $notif->usermodified;
-        $user = $DB->get_record('user', array('id' => $userid));
-        if (!$user) {
+        if (empty($CFG->facetoface_session_rolesnotify)) {
+            // No roles set.
             return;
         }
 
-        $params = array(
+        $roleids = explode(",", $CFG->facetoface_session_rolesnotify);
+        list($sqlin, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED);
+        $params["sessionid"] = $notif->id;
+
+        $sql = "SELECT u.*
+                FROM {user} u
+                JOIN {facetoface_session_roles} sr
+                    ON u.id = sr.userid
+                WHERE sr.roleid $sqlin
+                AND sr.sessionid = :sessionid
+                AND u.suspended = 0";
+        $users = $DB->get_records_sql($sql, $params);
+
+        if (!$users) {
+            return;
+        }
+
+        $notificationparams = array(
             "facetofaceid" => $notif->facetoface,
             "type" => MDL_F2F_NOTIFICATION_AUTO,
             "conditiontype" => MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED
         );
 
         $facetoface = $DB->get_record('facetoface', array('id' => $notif->facetoface));
-        $notice = new facetoface_notification($params);
 
-        $notificationhistory = $DB->get_record('facetoface_notification_sent', array('notificationid' => $notice->id, 'sessionid' => $notif->id, 'userid' => $userid));
-        if($notificationhistory != null){
-            //Notification already sent.
-            return;
-        }
+        foreach ($users as $user) {
 
-        if (isset($facetoface->ccmanager)) {
-            $notice->ccmanager = $facetoface->ccmanager;
-        }
+            $notice = new facetoface_notification($notificationparams);
 
-        $notice->set_facetoface($facetoface);
-        $notice->_sessions = facetoface_get_sessions($facetoface->id);
-        $notice->set_newevent($user, $notif->id);
+            // Check notification hasn't already need sent.
+            $notificationhistory = $DB->get_record('facetoface_notification_sent', array('notificationid' => $notice->id, 'sessionid' => $notif->id, 'userid' => $user->id));
+            if($notificationhistory != null){
+                // Notification has already  been sent.
+                return;
+            }
 
-        if (!isset($notif->notifyuser)) {
-            $notif->notifyuser = true;
-        }
-
-        if ($notif->notifyuser) {
+            $notice->set_facetoface($facetoface);
+            $notice->_sessions = facetoface_get_sessions($facetoface->id);
+            $notice->set_newevent($user, $notif->id);
             $notice->send_to_user($user, $notif->id);
         }
     }
@@ -2098,6 +2107,18 @@ function facetoface_get_default_notifications($facetofaceid) {
         $notifications[MDL_F2F_CONDITION_SESSION_CANCELLATION] = $sessioncancellation;
     } else {
         $missingtemplates[] = 'sessioncancellation';
+    }
+
+    if (isset($templates['registrationexpired'])) {
+        $template = $templates['registrationexpired'];
+        $registrationexpired = new facetoface_notification($defaults, false);
+        $registrationexpired->title = $template->title;
+        $registrationexpired->body = $template->body;
+        $registrationexpired->conditiontype = MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED;
+        $registrationexpired->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED] = $registrationexpired;
+    } else {
+        $missingtemplates[] = 'registrationexpired';
     }
 
     return array($notifications, $missingtemplates);

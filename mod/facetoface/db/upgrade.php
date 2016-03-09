@@ -3539,5 +3539,48 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016030900, 'facetoface');
     }
 
+    if ($oldversion < 2016031000) {
+        // Add Sign Up period expired notification.
+
+        // Add the template.
+        $tpl_expired = new stdClass();
+        $tpl_expired->reference = 'registrationexpired';
+        $tpl_expired->status = 1;
+        $tpl_expired->title = get_string('setting:defaultregistrationexpiredsubjectdefault', 'facetoface');
+        $tpl_expired->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
+        $tpl_expired->managerprefix = text_to_html(get_string('setting:defaultregistrationexpiredmessagedefault', 'facetoface'));
+        $templateid = $DB->insert_record('facetoface_notification_tpl', $tpl_expired, true);
+
+        // Add the noticifations to existing facetoface activities.
+        $facetofaces = $DB->get_records('facetoface');
+        if ($facetofaces) {
+            // Loop over facetofaces.
+            foreach ($facetofaces as $facetoface) {
+
+                // Get each message and create notification.
+                $defaults = array();
+                $defaults['facetofaceid'] = $facetoface->id;
+                $defaults['courseid'] = $facetoface->course;
+                $defaults['type'] = MDL_F2F_NOTIFICATION_AUTO;
+                $defaults['booked'] = 0;
+                $defaults['waitlisted'] = 0;
+                $defaults['cancelled'] = 0;
+                $defaults['issent'] = 0;
+                $defaults['status'] = 1;
+                $defaults['ccmanager'] = 0;
+                $defaults['templateid'] = $templateid;
+
+                $signupperiodexpired = new facetoface_notification($defaults, false);
+                $signupperiodexpired->title = get_string('setting:defaultregistrationexpiredsubjectdefault', 'facetoface');
+                $signupperiodexpired->body = text_to_html(get_string('setting:defaultregistrationexpiredmessagedefault', 'facetoface'));
+                $signupperiodexpired->conditiontype = MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED;
+                $result = $result && $signupperiodexpired->save();
+            }
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2016031000, 'facetoface');
+    }
+
     return $result;
 }

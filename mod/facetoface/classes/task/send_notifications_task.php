@@ -86,9 +86,7 @@ class send_notifications_task extends \core\task\scheduled_task {
         if (!$this->testing) {
             mtrace('Checking for expired Face-to-face sign-up period dates');
         }
-
-        // Added in TL-7458, function in below line and functions it calls need to be corrected.
-        // facetoface_notify_registration_ended();
+        facetoface_notify_registration_ended();
 
         // Find any reservations that are too close to the start of the session and delete them.
         facetoface_remove_reservations_after_deadline($this->testing);

@@ -42,7 +42,8 @@ function xmldb_facetoface_install() {
         'setting:defaulttrainersessionunassignedsubjectdefault' => get_string('setting:defaulttrainersessionunassignedsubjectdefault', 'facetoface'),
         'setting:defaultcancelreservationsubjectdefault' => get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface'),
         'setting:defaultcancelallreservationssubjectdefault' => get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface'),
-        'setting:defaultsessioncancellationsubjectdefault' => get_string('setting:defaultsessioncancellationsubjectdefault', 'facetoface')
+        'setting:defaultsessioncancellationsubjectdefault' => get_string('setting:defaultsessioncancellationsubjectdefault', 'facetoface'),
+        'setting:defaultregistrationexpiredmessagedefault' => get_string('setting:defaultregistrationexpiredmessagedefault', 'facetoface')
     );
 
     foreach ($titles as $key => $title) {
@@ -167,6 +168,14 @@ function xmldb_facetoface_install() {
     $tpl_sessioncancel->body = text_to_html(get_string('setting:defaultsessioncancellationmessagedefault', 'facetoface'));
     $tpl_sessioncancel->managerprefix = text_to_html(get_string('setting:defaultsessioncancellationinstrmngrcopybelow', 'facetoface'));
     $DB->insert_record('facetoface_notification_tpl', $tpl_sessioncancel);
+
+    $tpl_expired = new stdClass();
+    $tpl_expired->reference = 'registrationexpired';
+    $tpl_expired->status = 1;
+    $tpl_expired->title = get_string('setting:defaultregistrationexpiredsubjectdefault', 'facetoface');
+    $tpl_expired->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
+    $tpl_expired->managerprefix = text_to_html(get_string('setting:defaultregistrationexpiredmessagedefault', 'facetoface'));
+    $DB->insert_record('facetoface_notification_tpl', $tpl_expired);
 
     // Setting room, building, and address as default filters.
     set_config('facetoface_calendarfilters', 'room,building,address');
