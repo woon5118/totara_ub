@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
  * Load and validate base data
  */
 // Face-to-face session ID
-$s = required_param('s', PARAM_INT);
+$s = optional_param('s', 0, PARAM_INT);
 // Take attendance
 $takeattendance    = optional_param('takeattendance', false, PARAM_BOOL);
 // Cancel request
@@ -53,6 +53,28 @@ $format = optional_param('format','',PARAM_TEXT);
 $sid = optional_param('sid', '0', PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);
 
+// If there's no sessionid specified 
+if (!$s) {
+    $syscontext = context_system::instance();
+    require_login();
+
+    $syscontext = context_system::instance();
+    if (!has_capability('mod/facetoface:viewallsessions', $syscontext)) {
+        // They can't view the sessionreport, essentially this makes s a required param.
+        // As its not been set, throw the same error required_param would.
+        print_error('missingparam', '', '', 's');
+    }
+
+    $PAGE->set_context($syscontext);
+    $PAGE->set_url('/mod/facetoface/attendees.php');
+
+    echo $OUTPUT->header();
+    $url = new moodle_url('/mod/facetoface/sessionreport.php');
+    echo $OUTPUT->heading(get_string('selectaneventheading', 'rb_source_facetoface_sessions'));
+    echo html_writer::tag('p', html_writer::link($url, get_string('selectanevent', 'rb_source_facetoface_sessions')));
+    echo $OUTPUT->footer();
+    exit;
+}
 
 list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 
