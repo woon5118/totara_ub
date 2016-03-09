@@ -493,6 +493,8 @@ class comment {
 
                 $html .= html_writer::start_tag('div', array('class' => 'comment-area'));
                 $html .= html_writer::start_tag('div', array('class' => 'db'));
+                // TL-8532 Added label.
+                $html .= html_writer::tag('label', get_string('addcomment', 'core'), array('for' => $textareaattrs['id'], 'class' => 'accesshide'));
                 $html .= html_writer::tag('textarea', '', $textareaattrs);
                 $html .= html_writer::end_tag('div'); // .db
 
