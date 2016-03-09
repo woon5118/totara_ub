@@ -718,42 +718,40 @@ class dp_course_component extends dp_base_component {
         }
 
         $out = '';
+        $outdata = new stdClass();
 
         // get the priority values used for competencies in this plan
         $priorityvalues = $DB->get_records('dp_priority_scale_value', array('priorityscaleid' => $priorityscaleid), 'sortorder', 'id,name,sortorder');
 
         if ($this->is_item_approved($item->approved)) {
-            $action_link = $OUTPUT->action_link(new moodle_url('/course/view.php', array('id' => $item->courseid)), get_string('launchcourse', 'totara_plan'));
-            $out = $OUTPUT->container($action_link, "plan-launch-course-button");
+            $outdata->launch = true;
+            $url = new moodle_url('/course/view.php', array('id' => $item->courseid));
+            $outdata->launchurl = $url->out();
         }
 
-        $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($item->courseid, TOTARA_ICON_TYPE_COURSE),
+        $outdata->title = format_string($item->fullname);
+        $outdata->icon = html_writer::empty_tag('img', array('src' => totara_get_icon($item->courseid, TOTARA_ICON_TYPE_COURSE),
             'class' => 'course_icon', 'alt' => ''));
-        $out .= $OUTPUT->heading($icon . format_string($item->fullname), 3);
-        $cell = array();
 
+        $outdata->extras = array();
         if ($priorityenabled && !empty($item->priority)) {
-            $cell[] = new html_table_cell(get_string('priority', 'totara_plan') . ': ' . $this->display_priority_as_text($item->priority, $item->priorityname, $priorityvalues));
+            $outdata->extras[] = get_string('priority', 'totara_plan') . ': ' . $this->display_priority_as_text($item->priority, $item->priorityname, $priorityvalues);
         }
         if ($duedateenabled && !empty($item->duedate)) {
-            $cell[] = new html_table_cell(get_string('duedate', 'totara_plan') . ': ' . $this->display_duedate_as_text($item->duedate) . html_writer::empty_tag('br') . $this->display_duedate_highlight_info($item->duedate));
+            $outdata->extras[] = get_string('duedate', 'totara_plan') . ': ' . $this->display_duedate_as_text($item->duedate) . html_writer::empty_tag('br') . $this->display_duedate_highlight_info($item->duedate);
         }
         if ($progressbar = $this->display_status_as_progress_bar($item)) {
             unset($completionstatus);
-            $cell[] = new html_table_cell(get_string('progress', 'totara_plan'));
-            $cell[] = new html_table_cell($progressbar);
+            $outdata->extras[] = get_string('progress', 'totara_plan');
+            $outdata->extras[] = $progressbar;
         }
-        $row = new html_table_row($cell);
-        $table = new html_table();
-        $table->data = array($row);
-        $table->attributes = array('class' => 'planiteminfobox');
-        $out .= html_writer::table($table);
+        $outdata->has_extra_information = count($outdata->extras) > 0;
 
         $item->summary = file_rewrite_pluginfile_urls($item->summary, 'pluginfile.php',
             context_course::instance($item->id)->id, 'course', 'summary', NULL);
-        $out .= html_writer::tag('p', format_text($item->summary, FORMAT_HTML));
+        $outdata->description = format_text($item->summary, FORMAT_HTML);
 
-        return $out;
+        return $OUTPUT->render_from_template('totara_plan/view_plan_component', $outdata) . $out;
     }
 
 

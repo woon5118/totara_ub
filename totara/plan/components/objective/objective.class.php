@@ -1214,12 +1214,10 @@ class dp_objective_component extends dp_base_component {
         // get the priority values used for competencies in this plan
         $priorityvalues = $DB->get_records('dp_priority_scale_value', array('priorityscaleid' => $priorityscaleid), 'sortorder', 'id,name,sortorder');
 
+        $outdata = new stdClass();
+        $outdata->title = format_string($item->fullname);
         $icon = $this->determine_item_icon($item);
-        $icon = $OUTPUT->pix_icon("/msgicons/" . $icon, format_string($item->fullname), 'totara_core', array('class' => 'objective_state_icon'));
-        $row = new html_table_row(array(new html_table_cell($OUTPUT->heading($icon . format_string($item->fullname), 3))));
-        $table = new html_table();
-        $table->data = array($row);
-        $out .= html_writer::table($table);
+        $outdata->icon = $OUTPUT->pix_icon("/msgicons/" . $icon, '', 'totara_core', array('class' => 'objective_state_icon'));
 
         $plancompleted = $this->plan->status == DP_PLAN_STATUS_COMPLETE;
 
@@ -1229,36 +1227,34 @@ class dp_objective_component extends dp_base_component {
             } else {
                 $buttonlabel = get_string('editdetails', 'totara_plan');
             }
-            $out .= $OUTPUT->container($OUTPUT->single_button(new moodle_url("/totara/plan/components/objective/edit.php", array('id' => $this->plan->id, 'itemid' => $objectiveid)), $buttonlabel), 'add-linked-course');
+            $single_button = new single_button(new moodle_url("/totara/plan/components/objective/edit.php", array('id' => $this->plan->id, 'itemid' => $objectiveid)), $buttonlabel);
+            $outdata->edit_objective = $single_button->export_for_template($OUTPUT);
         }
 
-        $row = new html_table_row();
+        $outdata->extras = array();
         if ($priorityenabled && !empty($item->priority)) {
-            $row->cells[] = get_string('priority', 'totara_plan') . ': ' . $this->display_priority_as_text($item->priority, $item->priorityname, $priorityvalues);
+            $outdata->extras[] = get_string('priority', 'totara_plan') . ': ' . $this->display_priority_as_text($item->priority, $item->priorityname, $priorityvalues);
         }
         if ($duedateenabled && !empty($item->duedate)) {
-            $cell = get_string('duedate', 'totara_plan') . ': ' . $this->display_duedate_as_text($item->duedate);
+            $extra = get_string('duedate', 'totara_plan') . ': ' . $this->display_duedate_as_text($item->duedate);
             if (!$item->achieved) {
-                $cell .= html_writer::empty_tag('br') . $this->display_duedate_highlight_info($item->duedate);
+                $extra .= html_writer::empty_tag('br') . $this->display_duedate_highlight_info($item->duedate);
             }
-            $row->cells[] = $cell;
+            $outdata->extras[] = $extra;
         }
         if (!empty($item->profname)) {
-            $row->cells[] = get_string('status', 'totara_plan') .": \n" . "  {$item->profname}\n";
+            $outdata->extras[] = get_string('status', 'totara_plan') .": \n" . "  {$item->profname}\n";
         }
 
         if ($requiresapproval) {
-            $row->cells[] = get_string('status') .": \n" . $this->display_approval($item, false, false)."\n";
+            $outdata->extras[] = get_string('status') .": \n" . $this->display_approval($item, false, false)."\n";
         }
-        $table = new html_table();
-        $table->border = "0";
-        $table->attributes = array('class' => 'planiteminfobox');
-        $table->data = array($row);
-        $out .= html_writer::table($table);
-        $item->description = file_rewrite_pluginfile_urls($item->description, 'pluginfile.php', context_system::instance()->id, 'totara_plan', 'dp_plan_objective', $item->id);
-        $out .= html_writer::tag('p', format_text($item->description, FORMAT_HTML));
+        $outdata->has_extra_information = count($outdata->extras) > 0;
 
-        print $out;
+        $item->description = file_rewrite_pluginfile_urls($item->description, 'pluginfile.php', context_system::instance()->id, 'totara_plan', 'dp_plan_objective', $item->id);
+        $outdata->description = format_text($item->description, FORMAT_HTML);
+
+        print $OUTPUT->render_from_template('totara_plan/view_plan_component', $outdata) . $out;
     }
 
 

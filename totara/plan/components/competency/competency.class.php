@@ -829,35 +829,33 @@ class dp_competency_component extends dp_base_component {
             return get_string('error:competencynotfound', 'totara_plan');
         }
 
+        $outdata = new stdClass();
+        $outdata->title = format_string($item->fullname);
         $out = '';
 
         // get the priority values used for competencies in this plan
         $priorityvalues = $DB->get_records('dp_priority_scale_value', array('priorityscaleid' => $priorityscaleid), 'sortorder', 'id,name,sortorder');
 
         $icon = $this->determine_item_icon($item);
-        $icon = $OUTPUT->pix_icon("/msgicons/" . $icon, format_string($item->fullname), 'totara_core', array('class' => "competency_state_icon"));
-        $out .= $OUTPUT->heading($icon . format_string($item->fullname), 3);
-        $t = new html_table();
-        $t->class = "planiteminfobox";
-        $cells = array();
+        $outdata->icon = $OUTPUT->pix_icon("/msgicons/" . $icon, '', 'totara_core', array('class' => "competency_state_icon"));
+        $outdata->extras = array();
 
         if ($priorityenabled && !empty($item->priority)) {
-            $cells[] = new html_table_cell(get_string('priority', 'totara_plan') . ': ' . $this->display_priority_as_text($item->priority, $item->priorityname, $priorityvalues));
+            $outdata->extras[] = get_string('priority', 'totara_plan') . ': ' . $this->display_priority_as_text($item->priority, $item->priorityname, $priorityvalues);
         }
         if ($duedateenabled && !empty($item->duedate)) {
-            $cells[] = new html_table_cell(get_string('duedate', 'totara_plan') . ': ' . $this->display_duedate_as_text($item->duedate) . html_writer::empty_tag('br') . $this->display_duedate_highlight_info($item->duedate));
+            $outdata->extras[] = get_string('duedate', 'totara_plan') . ': ' . $this->display_duedate_as_text($item->duedate) . html_writer::empty_tag('br') . $this->display_duedate_highlight_info($item->duedate);
         }
         if ($status = $this->get_status($item->competencyid)) {
-            $cells[] = new html_table_cell(get_string('status', 'totara_plan'). ': ' . format_string($status));
+            $outdata->extras[] = get_string('status', 'totara_plan'). ': ' . format_string($status);
         }
-        $rows = new html_table_row($cells);
-        $t->data = array($rows);
-        $out .= html_writer::table($t);
+        $outdata->has_extra_information = count($outdata->extras) > 0;
+
         $item->description = file_rewrite_pluginfile_urls($item->description, 'pluginfile.php',
             context_system::instance()->id, 'totara_hierarchy', 'comp', $item->id);
-        $out .= html_writer::tag('p', format_text($item->description, FORMAT_HTML));
+        $outdata->description = format_text($item->description, FORMAT_HTML);
 
-        return $out;
+        return $OUTPUT->render_from_template('totara_plan/view_plan_component', $outdata) . $out;
     }
 
 
