@@ -36,7 +36,14 @@ $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacesessionr
 $settings = new admin_settingpage($section, get_string('globalsettings', 'mod_facetoface'), 'moodle/site:config', $module->is_enabled() === false);
 $ADMIN->add('modfacetofacefolder', $settings);
 
+// Provide a link from the legacy location to global settings.
+// Under the current architecture there is not an accessible
+// method to retrieve the URL of a settings page dynamically.
+$globalsettingsurl = new moodle_url('/admin/settings.php', array('section' => 'modsettingfacetoface'));
+$ADMIN->add('modsettings', new admin_externalpage('modfacetofaceredirect', new lang_string('pluginname','mod_facetoface'), $globalsettingsurl, 'mod/facetoface:viewallsessions'));
+
 if ($ADMIN->fulltree) { // Improve performance.
+
     $settings->add(new admin_setting_heading('facetoface_general_header', get_string('generalsettings', 'facetoface'), ''));
 
     $settings->add(new admin_setting_pickroles('facetoface_session_roles', new lang_string('setting:sessionroles_caption', 'facetoface'),
