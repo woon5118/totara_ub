@@ -26,8 +26,6 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once "$CFG->dirroot/mod/facetoface/lib.php";
-
 $ADMIN->add('root', new admin_category('modfacetofacefolder', new lang_string('pluginname', 'mod_facetoface'), $module->is_enabled() === false), 'grades');
 
 $sessionreporturl = new moodle_url('/mod/facetoface/sessionreport.php');
@@ -43,11 +41,30 @@ $globalsettingsurl = new moodle_url('/admin/settings.php', array('section' => 'm
 $ADMIN->add('modsettings', new admin_externalpage('modfacetofaceredirect', new lang_string('pluginname','mod_facetoface'), $globalsettingsurl, 'mod/facetoface:viewallsessions'));
 
 if ($ADMIN->fulltree) { // Improve performance.
+    require_once "$CFG->dirroot/mod/facetoface/lib.php";
 
     $settings->add(new admin_setting_heading('facetoface_general_header', get_string('generalsettings', 'facetoface'), ''));
 
     $settings->add(new admin_setting_pickroles('facetoface_session_roles', new lang_string('setting:sessionroles_caption', 'facetoface'),
         new lang_string('setting:sessionroles', 'facetoface'), array()));
+
+    $options = array();
+    $options['approval_none'] =  new lang_string('setting:approval_none', 'facetoface');
+    $options['approval_self'] =  new lang_string('setting:approval_self', 'facetoface');
+    if (!during_initial_install()) {
+        // Roles can only be set after installation has completed.
+        $available = explode(',', get_config(null, 'facetoface_session_roles'));
+        $rolenames = role_fix_names(get_all_roles());
+        foreach ($available as $roleid) {
+            if (!empty($roleid)) { // This makes it work when empty on installation.
+                $options["approval_role_{$roleid}"] = $rolenames[$roleid]->localname;
+            }
+        }
+    }
+    $options['approval_manager'] =  new lang_string('setting:approval_manager', 'facetoface');
+    $options['approval_admin'] =  new lang_string('setting:approval_admin', 'facetoface');
+    $settings->add(new admin_setting_configmulticheckbox('facetoface_approvaloptions', new lang_string('setting:approvaloptions_caption', 'facetoface'),
+        new lang_string('setting:approvaloptions_default', 'facetoface'), array('approval_none' => 1, 'approval_self' => 1,'approval_manager' => 1), $options));
 
     $settings->add(new admin_setting_configcheckbox('facetoface_allowschedulingconflicts', new lang_string('setting:allowschedulingconflicts_caption', 'facetoface'),
         new lang_string('setting:allowschedulingconflicts', 'facetoface'), 0));
@@ -132,22 +149,6 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_heading('facetoface_signupapproval_header', new lang_string('setting:signupapproval_header', 'facetoface'), ''));
 
-    $available = explode(',', get_config(null, 'facetoface_session_roles'));
-    $rolenames = role_fix_names(get_all_roles());
-    $options = array();
-    $options['approval_none'] =  new lang_string('setting:approval_none', 'facetoface');
-    $options['approval_self'] =  new lang_string('setting:approval_self', 'facetoface');
-    foreach ($available as $roleid) {
-        if (!empty($roleid)) { // This makes it work when empty on installation.
-            $options["approval_role_{$roleid}"] = $rolenames[$roleid]->localname;
-        }
-    }
-    $options['approval_manager'] =  new lang_string('setting:approval_manager', 'facetoface');
-    $options['approval_admin'] =  new lang_string('setting:approval_admin', 'facetoface');
-
-    $settings->add(new admin_setting_configmulticheckbox('facetoface_approvaloptions', new lang_string('setting:approvaloptions_caption', 'facetoface'),
-        new lang_string('setting:approvaloptions_default', 'facetoface'), array('approval_none' => 1, 'approval_self' => 1,'approval_manager' => 1), $options));
-
     $settings->add(new admin_setting_configtextarea('facetoface_termsandconditions', new lang_string('setting:termsandconditions_caption', 'facetoface'),
         new lang_string('setting:termsandconditions_format', 'facetoface'), new lang_string('setting:termsandconditions_default', 'facetoface')));
 
@@ -189,10 +190,10 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtime('facetoface/defaultfinishtime_hours', 'facetoface/defaultfinishtime_minutes', new lang_string('defaultfinishtime', 'facetoface'), new lang_string('defaultfinishtimehelp', 'facetoface'), array('h' => 10, 'm' => 0)));
 }
 
-// Tell core we already added the settings structure.
-$settings = null;
-
 $customfieldurl = new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacesession'));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacecustomfields', new lang_string('customfieldsheading','facetoface'), $customfieldurl, 'mod/facetoface:managecustomfield'));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacetemplates', new lang_string('notificationtemplates','facetoface'), "$CFG->wwwroot/mod/facetoface/notification/template/index.php"));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacerooms', new lang_string('rooms','facetoface'), "$CFG->wwwroot/mod/facetoface/room/manage.php"));
+
+// Tell core we already added the settings structure.
+$settings = null;
