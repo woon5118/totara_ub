@@ -86,7 +86,7 @@ $string['allowedtimeforprogramviewing'] = 'A learner is allowed {$a->num} {$a->p
 $string['allowextensionrequests'] = 'Allow extension requests';
 $string['allowextensionrequests_help'] = 'When enabled users can submit extension requests for this program which can then be approved or denied by their manager.
 This option will appear before the due date (when it is close).';
-$string['allowextensionrequestsdisabled'] = 'Program extension requests are disabled. Plase make sure it is enable site wide and for the program';
+$string['allowextensionrequestsdisabled'] = 'Program extension requests are disabled. To approve or deny the request, enable extension requests site-wide and for the program.';
 $string['allowtimeforprogram'] = 'Allow at least {$a->num} {$a->periodstr} to complete this program.';
 $string['allowtimeforprograminfinity'] = 'There is no time limit to complete this program.';
 $string['allowtimeforset'] = 'Allow at least {$a->num} {$a->periodstr} to complete this set.';
