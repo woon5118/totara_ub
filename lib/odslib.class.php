@@ -1216,8 +1216,8 @@ class MoodleODSWriter {
                         if (isset($cell->formula)) {
                             $buffer .= '<table:table-cell table:formula="of:'.$cell->formula.'"'.$extra.'></table:table-cell>'."\n";
                         } else if ($cell->type == 'date') {
-                            $buffer .= '<table:table-cell office:value-type="date" office:date-value="' . strftime('%Y-%m-%dT%H:%M:%S', $cell->value) . '"'.$extra.'>'
-                                     . $pretext . strftime('%Y-%m-%dT%H:%M:%S', $cell->value) . $posttext
+                            $buffer .= '<table:table-cell office:value-type="date" office:date-value="' . $this->format_time($cell->value) . '"'.$extra.'>'
+                                     . $pretext . $this->format_time($cell->value) . $posttext
                                      . '</table:table-cell>'."\n";
                         } else if ($cell->type == 'float') {
                             $buffer .= '<table:table-cell office:value-type="float" office:value="' . htmlspecialchars($cell->value, ENT_QUOTES, 'utf-8') . '"'.$extra.'>'
@@ -1306,10 +1306,21 @@ class MoodleODSWriter {
     <office:meta>
         <meta:generator>Moodle '.$CFG->release.'</meta:generator>
         <meta:initial-creator>'.fullname($USER, true).'</meta:initial-creator>
-        <meta:creation-date>'.strftime('%Y-%m-%dT%H:%M:%S').'</meta:creation-date>
+        <meta:creation-date>'.$this->format_time(time()).'</meta:creation-date>
         <meta:document-statistic meta:table-count="1" meta:cell-count="0" meta:object-count="0"/>
     </office:meta>
 </office:document-meta>';
+    }
+
+    /**
+     * TL-8538: get the date time string in user timezone the same way as excel export.
+     * @param int $timestamp
+     * @return string
+     */
+    protected function format_time($timestamp) {
+        $date = new DateTime('@' . $timestamp);
+        $date->setTimezone(core_date::get_user_timezone_object());
+        return $date->format('Y-m-d\TH:i:s');
     }
 
     protected function get_ods_styles() {
