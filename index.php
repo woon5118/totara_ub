@@ -40,12 +40,13 @@ if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_MY) && o
 
 $redirect = optional_param('redirect', 1, PARAM_BOOL);
 // If adding, editing, hiding, showing, moving or deleting a Block, we don't want to redirect.
-if (!empty(optional_param('bui_addblock', '', PARAM_TEXT))  ||
-    !empty(optional_param('bui_editid', '', PARAM_INT))     ||
-    !empty(optional_param('bui_hideid', '', PARAM_INT))     ||
-    !empty(optional_param('bui_showid', '', PARAM_INT))     ||
-    !empty(optional_param('bui_moveid', '', PARAM_INT))     ||
-    !empty(optional_param('bui_deleteid', '', PARAM_INT))) {
+$bui_addblock = optional_param('bui_addblock', '', PARAM_TEXT);
+$bui_editid   = optional_param('bui_editid', '', PARAM_INT);
+$bui_hideid   = optional_param('bui_hideid', '', PARAM_INT);
+$bui_showid   = optional_param('bui_showid', '', PARAM_INT);
+$bui_moveid   = optional_param('bui_moveid', '', PARAM_INT);
+$bui_deleteid = optional_param('bui_deleteid', '', PARAM_INT);
+if (!empty($bui_addblock) || !empty($bui_editid) || !empty($bui_hideid) || !empty($bui_showid) || !empty($bui_moveid) || !empty($bui_deleteid)) {
     $urlparams['redirect'] = 0;
     $redirect = 0;
 }
