@@ -1943,6 +1943,11 @@ abstract class rb_base_source {
         return sql_group_concat($field);
     }
 
+    // Return list as single field, without a separator delimiter.
+    function rb_group_list_nodelimiter($field) {
+        return sql_group_concat($field, '');
+    }
+
     // return unique list items as single field, separated by commas
     function rb_group_comma_list_unique($field) {
         return sql_group_concat($field, ', ', true);

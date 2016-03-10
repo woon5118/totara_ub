@@ -408,10 +408,10 @@ class rb_source_program_overview extends rb_base_source {
                 'course',
                 'shortname',
                 get_string('courseshortname', 'rb_source_program_overview'),
-                'COALESCE('.$DB->sql_concat_join("'|'", array('course.shortname', sql_cast2char('course.id'))).', \'-\')',
+                'COALESCE('.$DB->sql_concat('course.id', "'|'", 'course.shortname', "'\n'").', \'-\')',
                 array(
                     'joins' => 'course',
-                    'grouping' => 'comma_list',
+                    'grouping' => 'list_nodelimiter',
                     'displayfunc' => 'list_to_newline_coursename',
                     'style' => array('white-space' => 'pre'),
                 )
@@ -708,9 +708,9 @@ class rb_source_program_overview extends rb_base_source {
     }
 
     function rb_display_list_to_newline_coursename($date, $row) {
-         $items = explode(', ', $date);
+         $items = array_filter(explode("\n", $date));
          foreach ($items as $key => $item) {
-             list($coursename, $id) = explode('|', $item);
+             list($id, $coursename) = explode('|', $item);
              $url = new moodle_url('/course/view.php', array('id' => $id));
              $items[$key] = html_writer::link($url, format_string($coursename));
          }

@@ -255,10 +255,10 @@ class rb_source_certification_overview extends rb_source_program_overview {
             'course',
             'shortname',
             get_string('courseshortname', 'rb_source_program_overview'),
-            'COALESCE('.$DB->sql_concat_join("'|'", array('course.shortname', sql_cast2char('course.id'))).', \'-\')',
+            'COALESCE('.$DB->sql_concat('course.id', "'|'", 'course.shortname', "'\n'").', \'-\')',
             array(
                 'joins' => 'course',
-                'grouping' => 'comma_list',
+                'grouping' => 'list_nodelimiter',
                 'displayfunc' => 'list_to_newline_coursename',
                 'style' => array('white-space' => 'pre'),
             )
