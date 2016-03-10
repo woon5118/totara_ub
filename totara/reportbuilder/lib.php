@@ -2189,7 +2189,7 @@ class reportbuilder {
                 $value = $param->value;
 
                 // don't include if param not set to anything
-                if (empty($value) || (!is_array($value) && strlen(trim($value)) == 0) || $param->field == '') {
+                if (!isset($value) || (!is_array($value) && strlen(trim($value)) == 0) || $param->field == '') {
                     continue;
                 }
 
