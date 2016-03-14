@@ -691,6 +691,69 @@ class single_button implements renderable {
     public function add_action(component_action $action) {
         $this->actions[] = $action;
     }
+
+    public function export_for_template(renderer_base $output) {
+        $data = new stdClass();
+        $data->class = $this->class;
+        $data->formattributes = array();
+        $data->inputitems = array();
+
+        // The button.
+        $buttonattributes = array();
+        $buttonattributes[] = array('name' => 'type', 'value' => 'submit');
+        $buttonattributes[] = array('name' => 'value', 'value' => $this->label);
+        if ($this->disabled) {
+            $buttonattributes[] = array('name' => 'disabled', 'value' => 'disabled');
+        }
+        if ($this->tooltip) {
+            $buttonattributes[] = array('name' => 'title', 'value' => $this->tooltip);
+        }
+
+        if ($this->actions) {
+            $id = html_writer::random_id('single_button');
+            $buttonattributes[] = array('name' => 'id', 'value' => $id);
+            foreach ($this->actions as $action) {
+                $output->add_action_handler($action, $id);
+            }
+        }
+
+        $data->inputitems[] = array(
+            'attributes' => $buttonattributes
+        );
+
+        // The hidden fields.
+        $params = $this->url->params();
+        if ($this->method === 'post') {
+            $params['sesskey'] = sesskey();
+        }
+        foreach ($params as $var => $val) {
+            $data->inputitems[] = array(
+               'attributes' => array(
+                   array('name' => 'type', 'value' => 'hidden'),
+                   array('name' => 'name', 'value' => $var),
+                   array('name' => 'value', 'value' => $val)
+               )
+            );
+        }
+
+        // The form.
+        if ($this->method === 'get') {
+            $url = $this->url->out_omit_querystring(true); // url without params, the anchor part allowed
+        } else {
+            $url = $this->url->out_omit_querystring();     // url without params, the anchor part not allowed
+        }
+        if ($url === '') {
+            $url = '#'; // there has to be always some action
+        }
+
+        $data->formattributes[] = array('name' => 'method', 'value' => $this->method);
+        $data->formattributes[] = array('name' => 'action', 'value' => $url);
+        if ($this->formid) {
+            $data->formattributes[] = array('name' => 'id', 'value' => $this->formid);
+        }
+
+        return $data;
+    }
 }
 
 

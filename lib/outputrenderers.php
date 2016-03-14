@@ -1543,66 +1543,7 @@ class core_renderer extends renderer_base {
      * @return string HTML fragment
      */
     protected function render_single_button(single_button $button) {
-        $data = new stdClass();
-        $data->class = $button->class;
-        $data->formattributes = array();
-        $data->inputitems = array();
-
-        // The button.
-        $buttonattributes = array();
-        $buttonattributes[] = array('name' => 'type', 'value' => 'submit');
-        $buttonattributes[] = array('name' => 'value', 'value' => $button->label);
-        if ($button->disabled) {
-            $buttonattributes[] = array('name' => 'disabled', 'value' => 'disabled');
-        }
-        if ($button->tooltip) {
-            $buttonattributes[] = array('name' => 'title', 'value' => $button->tooltip);
-        }
-
-        if ($button->actions) {
-            $id = html_writer::random_id('single_button');
-            $buttonattributes[] = array('name' => 'id', 'value' => $id);
-            foreach ($button->actions as $action) {
-                $this->add_action_handler($action, $id);
-            }
-        }
-
-        $data->inputitems[] = array(
-            'attributes' => $buttonattributes
-        );
-
-        // The hidden fields.
-        $params = $button->url->params();
-        if ($button->method === 'post') {
-            $params['sesskey'] = sesskey();
-        }
-        foreach ($params as $var => $val) {
-            $data->inputitems[] = array(
-               'attributes' => array(
-                   array('name' => 'type', 'value' => 'hidden'),
-                   array('name' => 'name', 'value' => $var),
-                   array('name' => 'value', 'value' => $val)
-               )
-            );
-        }
-
-        // The form.
-        if ($button->method === 'get') {
-            $url = $button->url->out_omit_querystring(true); // url without params, the anchor part allowed
-        } else {
-            $url = $button->url->out_omit_querystring();     // url without params, the anchor part not allowed
-        }
-        if ($url === '') {
-            $url = '#'; // there has to be always some action
-        }
-
-        $data->formattributes[] = array('name' => 'method', 'value' => $button->method);
-        $data->formattributes[] = array('name' => 'action', 'value' => $url);
-        if ($button->formid) {
-            $data->formattributes[] = array('name' => 'id', 'value' => $button->formid);
-        }
-
-        return $this->render_from_template('core/single_button', $data);
+        return $this->render_from_template('core/single_button', $button->export_for_template($this));
     }
 
     /**
