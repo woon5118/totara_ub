@@ -4017,6 +4017,13 @@ abstract class rb_base_source {
                     }
                     break;
 
+                case 'date': // Midday in UTC, date without timezone.
+                    $filtertype = 'date';
+                    $columnsql = "CASE WHEN {$columnsql} = '' THEN NULL ELSE " . $DB->sql_cast_char2int($columnsql, true) . " END";
+                    $column_options['displayfunc'] = 'nice_date_no_timezone';
+                    $column_options['dbdatatype'] = 'timestamp';
+                    break;
+
                 case 'text':
                     $default = $record->defaultdata;
                     if ($default !== '' and $default !== null) {
