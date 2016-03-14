@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara
+@mod @mod_facetoface @totara @javascript
 Feature: Signup Self Approval
   In order to signup to classroom connect
   As a learner
@@ -25,6 +25,7 @@ Feature: Signup Self Approval
       | user    | course | role           |
       | teacher | CCC    | editingteacher |
       | trainer | CCC    | teacher        |
+      | manager | CCC    | teacher        |
       | jimmy   | CCC    | student        |
       | timmy   | CCC    | student        |
       | sammy   | CCC    | student        |
@@ -36,18 +37,21 @@ Feature: Signup Self Approval
       | sammy | manager |
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Face-to-face"
-    And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
+    And I click on "s__facetoface_approvaloptions[approval_none]" "checkbox"
+    And I click on "s__facetoface_approvaloptions[approval_manager]" "checkbox"
+    And I press "Save changes"
+    And I navigate to "Activity defaults" node in "Site administration > Face-to-face"
     And I set the following fields to these values:
-      | facetoface_termsandconditions | Custom terms and conditions |
+      | Terms and conditions | Blah Blah Blah, agree? |
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                | Classroom Connect       |
-      | Description         | Classroom Connect Tests |
-      | approvaloptions     | approval_admin          |
-    And I follow "View all sessions"
+      | Name              | Classroom Connect       |
+      | Description       | Classroom Connect Tests |
+      | approvaloptions   | approval_admin          |
+    And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -64,31 +68,34 @@ Feature: Signup Self Approval
     And I press "OK"
     And I set the following fields to these values:
       | capacity              | 10   |
-  And I press "Save changes"
+    And I press "Save changes"
 
-
-  @javascript
   Scenario: Student signs up and self approves
-    When I log in as "jimmy"
+    When I click on "Find Learning" in the totara menu
+    And I follow "Classroom Connect Course"
+    And I follow "View all events"
+    And I follow "Edit settings"
+    And I expand all fieldsets
+    Then I should see "Blah Blah Blah, agree?"
+
+    When I set the following fields to these values:
+        | approval_termsandconds | Do the work, don't be a nuisance. agreed? |
+    And I press "Save and display"
+    And I log out
+    And I log in as "jimmy"
     And I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"
-    And I should see "Self Approval"
-    And I log out
+    Then I should see "Self authorisation"
 
-    When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I follow "Course 1"
-    And I should see "Sign-up"
-    And I follow "Sign-up"
-    And I should see "This session requires manager approval to book."
-    And I press "Sign-up"
-    And I should see "Required"
-    And I follow "Self Approval Terms and Conditions"
-    And I should see "Test terms and conditions"
-    And I press "Close"
-    And I set the following fields to these values:
-      | id_selfapprovaltc | 1 |
-    And I press "Sign-up"
-    And I should see "Your booking has been completed."
+    When I press "Agree and submit"
+    Then I should see "Required"
+
+    When I follow "Terms and conditions"
+    Then I should see "Do the work, don't be a nuisance. agreed?"
+
+    When I press "Close"
+    And I click on "authorisation" "checkbox"
+    When I press "Agree and submit"
+    Then I should see "Your booking has been completed."

@@ -929,7 +929,7 @@ class facetoface_notification extends data_object {
         $sessionroles = facetoface_get_trainers($session->id, $facetoface->approvalrole);
         foreach ($sessionroles as $recipient) {
             if (!empty($recipient)) {
-                $event->userto = $recipient;
+                $event->userto = core_user::get_user($recipient->id);
                 message_send($event);
             }
         }
@@ -1354,14 +1354,9 @@ function facetoface_send_trainer_session_unassignment_notice($facetoface, $sessi
 function facetoface_send_request_notice($facetoface, $session, $userid) {
     global $DB, $USER;
 
-    $positiontype = $DB->get_field('facetoface_signups', 'positiontype', array('userid' => $userid, 'sessionid' => $session->id));
-
-    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-    if ($selectpositiononsignupglobal && empty($positiontype)) {
-        $manager = totara_get_most_primary_manager($userid);
-    } else {
-        $manager = totara_get_manager($userid, $positiontype);
-    }
+    $params = array('userid' => $userid, 'sessionid' => $session->id);
+    $positiontype = $DB->get_field('facetoface_signups', 'positiontype', $params);
+    $manager = facetoface_get_session_manager($userid, $session->id, $positiontype);
 
     if (empty($manager->email)) {
         return 'error:nomanagersemailset';

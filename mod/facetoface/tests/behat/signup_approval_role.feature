@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara
+@mod @mod_facetoface @totara @javascript
 Feature: Signup Role Approval
   In order to signup to classroom connect
   As a learner
@@ -24,6 +24,7 @@ Feature: Signup Role Approval
       | user    | course | role           |
       | teacher | CCC    | editingteacher |
       | trainer | CCC    | teacher        |
+      | manager | CCC    | teacher        |
       | jimmy   | CCC    | student        |
       | timmy   | CCC    | student        |
       | sammy   | CCC    | student        |
@@ -35,19 +36,20 @@ Feature: Signup Role Approval
       | sammy | manager |
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Face-to-face"
-    #TODO: fix this up
-    And I click on "s__facetoface_session_roles[4]" "checkbox"
+    And I click on "s__facetoface_session_roles[3]" "checkbox"
+    And I click on "s__facetoface_approvaloptions[approval_none]" "checkbox"
+    And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
+    And I click on "s__facetoface_approvaloptions[approval_manager]" "checkbox"
     And I press "Save changes"
-    And I click on "s__facetoface_approvaloptions[approval_role_4]" "checkbox"
+    And I click on "s__facetoface_approvaloptions[approval_role_3]" "checkbox"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                | Classroom Connect       |
-      | Description         | Classroom Connect Tests |
-      | approvaloptions     | approval_admin          |
-    And I follow "View all sessions"
+      | Name              | Classroom Connect       |
+      | Description       | Classroom Connect Tests |
+    And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -64,40 +66,56 @@ Feature: Signup Role Approval
     And I press "OK"
     And I set the following fields to these values:
       | capacity              | 10   |
-  And I press "Save changes"
+    And I click on "Freddy Fred" "checkbox" in the "#id_trainerroles" "css_element"
+    And I press "Save changes"
+    And I log out
 
-  @javascript
   Scenario: Student signs up a with no roles assigned
-    When I log in as "student1"
+    When I log in as "sally"
     And I click on "Find Learning" in the totara menu
-    And I follow "Course 1"
+    And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"
-    And I should see "Manager Approval"
-    # And I click request approval
-    And I should see "You are currently not assigned to a manager in the system. Please contact the site administrator."
-    # TODO - should this throw errors?
+    And I should see "Editing Trainer"
+    And I press "Request approval"
+    Then I should see "Your request to attend this session has been received. You should immediately receive a confirmation email."
 
-
-  @javascript
   Scenario: Student gets approved through role approval
     When I log in as "jimmy"
     And I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"
-    And I should see "Admin Approval"
-    And I log out
+    Then I should see "Editing Trainer"
+    And I should see "Freddy Fred"
 
+    When I press "Request approval"
+    Then I should see "Your request to attend this session has been received. You should immediately receive a confirmation email."
+
+    And I log out
     And I log in as "manager"
-    # TODO - and I confirm I can't see anything
-    # TODO - and I no longer have any staff on the approval page
-    And I log out
+    And I click on "My Learning" in the totara menu
+    Then I should not see "Face-to-face trainer confirmation"
 
-    And I log in as "trainer"
-    # TODO - and I approve jimmy
-    And I log out
+    When I log out
+    And I log in as "teacher"
+    And I click on "My Learning" in the totara menu
+    Then I should see "Face-to-face trainer confirmation"
 
-    And I log in as "admin"
-    # TODO - and I check jimmy is an attendee
+    When I click on "View all alerts" "link"
+    And I click on "Attendees" "link"
+    Then I should see "Jimmy Jim"
 
+    When I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
+    And I click on "Update requests" "button"
+    Then I should not see "Jimmy Jim"
+
+    When I log out
+    And I log in as "jimmy"
+    And I click on "My Learning" in the totara menu
+    Then I should see "Face-to-face booking confirmation"
+
+    When I click on "Find Learning" in the totara menu
+    And I follow "Classroom Connect Course"
+    And I follow "View all events"
+    Then I should see "Booked" in the "1 January 2020" "table_row"

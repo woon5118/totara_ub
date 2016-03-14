@@ -189,9 +189,11 @@ if ($facetoface->approvaltype == APPROVAL_MANAGER || $facetoface->approvaltype =
     if (!empty($selectpositiononsignupglobal) && !empty($facetoface->selectpositiononsignup)) {
         if ($managerselect) {
             // If they are set as the session manager, or there is no session manager but they are the position manager.
-            $managersql = '(fs.managerid = :managerid OR (fs.managerid IS NULL AND pa.managerid = :managerid))';
+            $managersql = '(fs.managerid = :manid OR (fs.managerid IS NULL AND pa.managerid = :manid2))';
+            $managerparams = array('manid' => $USER->id, 'manid2' => $USER->id);
         } else {
-            $managersql = 'pa.managerid = :managerid';
+            $managersql = 'pa.managerid = :manid';
+            $managerparams = array('manid' => $USER->id);
         }
 
         // Check if the user is manager of a position selected by staff signed up to this session.
@@ -205,7 +207,7 @@ if ($facetoface->approvaltype == APPROVAL_MANAGER || $facetoface->approvaltype =
                            AND {$managersql}
                            AND fss.statuscode = :status
                            AND fss.superceded = 0";
-        $params = array('sessionid' => $session->id, 'managerid' => $USER->id, 'status' => MDL_F2F_STATUS_REQUESTED);
+        $params = array_merge($managerparams, array('sessionid' => $session->id, 'status' => MDL_F2F_STATUS_REQUESTED));
         $staff = $DB->get_fieldset_sql($requestssql, $params);
 
         // Get temporary staff.
@@ -218,29 +220,38 @@ if ($facetoface->approvaltype == APPROVAL_MANAGER || $facetoface->approvaltype =
     } else {
         if ($managerselect) {
             // If they are set as the session manager, or there is no session manager but they are the position manager.
-            $requestssql = "SELECT fs.userid
-                              FROM {facetoface_signups} fs
-                              JOIN {pos_assignment} pa
-                                ON fs.userid = pa.userid AND pa.type = :ptype
-                              JOIN {facetoface_signups_status} fss
-                                ON fss.signupid = fs.id AND fss.superceded = 0
-                             WHERE fs.sessionid = :sessionid
-                               AND (fs.managerid = :manid1 OR (fs.managerid IS NULL AND pa.managerid = :manid2))
-                               AND fss.statuscode = :status
-                               AND fss.superceded = 0";
-           $params = array('ptype' => POSITION_TYPE_PRIMARY,
-                            'sessionid' => $session->id,
-                            'manid1' => $USER->id,
-                            'manid2' => $USER->id,
-                            'status' => MDL_F2F_STATUS_REQUESTED
-            );
-            $staff = $DB->get_fieldset_sql($requestssql, $params);
+            $managersql = '(fs.managerid = :manid OR (fs.managerid IS NULL AND pa.managerid = :manid2))';
+            $managerparams = array('manid' => $USER->id, 'manid2' => $USER->id);
         } else {
-            // Get the staff the user is primary manager of.
-            $staff = totara_get_staff();
-            if (!$staff) {
-                $staff = array();
-            }
+            $managersql = 'pa.managerid = :manid';
+            $managerparams = array('manid' => $USER->id);
+        }
+
+        $requestssql = "SELECT fs.userid
+                          FROM {facetoface_signups} fs
+                     LEFT JOIN {pos_assignment} pa
+                            ON fs.userid = pa.userid AND pa.type = :ptype
+                          JOIN {facetoface_signups_status} fss
+                            ON fss.signupid = fs.id AND fss.superceded = 0
+                         WHERE fs.sessionid = :sessionid
+                           AND {$managersql}
+                           AND fss.statuscode = :status
+                           AND fss.superceded = 0";
+
+        $params = array('ptype' => POSITION_TYPE_PRIMARY,
+                        'sessionid' => $session->id,
+                        'status' => MDL_F2F_STATUS_REQUESTED
+                       );
+        $params = array_merge($managerparams, $params);
+
+        $staff = $DB->get_fieldset_sql($requestssql, $params);
+
+        // Get temporary staff.
+        if (!empty($CFG->enabletempmanagers)) {
+            $tempstaff = $DB->get_fieldset_select('temporary_manager', 'userid', 'tempmanagerid = ? AND expirytime > ?',
+                array($USER->id, time()));
+
+            $staff = array_unique(array_merge($staff, $tempstaff));
         }
     }
 }

@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara
+@mod @mod_facetoface @totara @javascript
 Feature: Signup No Approval
   In order to signup to classroom connect
   As a learner
@@ -36,6 +36,7 @@ Feature: Signup No Approval
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration >  Face-to-face"
     And I click on "s__facetoface_approvaloptions[approval_manager]" "checkbox"
+    And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"
@@ -44,8 +45,8 @@ Feature: Signup No Approval
       | Name                | Classroom Connect       |
       | Description         | Classroom Connect Tests |
       | approvaloptions     | approval_admin          |
-    And I follow "View all sessions"
-    And I follow "Add a new session"
+    And I follow "View all events"
+    And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -61,10 +62,9 @@ Feature: Signup No Approval
     And I press "OK"
     And I set the following fields to these values:
       | capacity              | 10   |
-  And I press "Save changes"
+    And I press "Save changes"
+    And I log out
 
-
-  @javascript
   Scenario: Student signs up and is instantly booked
     When I log in as "jimmy"
     And I click on "Find Learning" in the totara menu
@@ -72,8 +72,11 @@ Feature: Signup No Approval
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I should not see "Approval"
-    And I click "Sign up"
-    And I log out
+    And I press "Sign-up"
+    Then I should see "Your booking has been completed."
 
-    And I log in as "admin"
-    # TODO - and I check jimmy is an attendee
+
+    When I click on "Find Learning" in the totara menu
+    And I follow "Classroom Connect Course"
+    And I follow "View all events"
+    Then I should see "Booked"

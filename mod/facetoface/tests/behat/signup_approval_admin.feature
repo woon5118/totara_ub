@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara
+@mod @mod_facetoface @totara @javascript
 Feature: Signup Admin Approval
   In order to signup to a classroom connect
   As a learner
@@ -48,7 +48,7 @@ Feature: Signup Admin Approval
       | Name              | Classroom Connect       |
       | Description       | Classroom Connect Tests |
       | approvaloptions   | approval_admin          |
-    And I follow "View all sessions"
+    And I follow "View all events"
     And I navigate to "Edit settings" node in "Facetoface administration"
     And I expand all fieldsets
     And I click on "addapprovaladmins" "button"
@@ -70,18 +70,21 @@ Feature: Signup Admin Approval
       | timefinish[minute] | 0    |
     And I press "OK"
     And I set the following fields to these values:
-      #      | Enable sign up period open       | <periodopen>  |
-      #      | registrationtimestart[day]       | 30            |
-      #      | registrationtimestart[month]     | June          |
-      #      | registrationtimestart[year]      | <startyear>   |
-      #      | registrationtimestart[hour]      | 01            |
-      #      | registrationtimestart[minute]    | 00            |
-      #      | registrationtimestart[timezone]  | <startzone>   |
+      | datetimeknown         | Yes  |
+      | timestart[0][day]     | 1    |
+      | timestart[0][month]   | 1    |
+      | timestart[0][year]    | 2020 |
+      | timestart[0][hour]    | 10   |
+      | timestart[0][minute]  | 00   |
+      | timefinish[0][day]    | 1    |
+      | timefinish[0][month]  | 1    |
+      | timefinish[0][year]   | 2020 |
+      | timefinish[0][hour]   | 12   |
+      | timefinish[0][minute] | 00   |
       | capacity              | 10   |
     And I press "Save changes"
     And I log out
 
-  @javascript
   Scenario: Student signs up with no manager assigned
     When I log in as "sally"
     And I click on "Find Learning" in the totara menu
@@ -92,14 +95,12 @@ Feature: Signup Admin Approval
     And I press "Request approval"
     Then I should see "This Face-to-face requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
 
-  @javascript
   Scenario: Student signs up with no manager assigned with manager select enabled
     When I log in as "admin"
-    And I navigate to "General Settings" node in "Site administration > Plugins > Activity modules > Face-to-face"
+    And I navigate to "Global settings" node in "Site administration > Face-to-face"
     And I click on "s__facetoface_managerselect" "checkbox"
     And I press "Save changes"
     And I log out
-
     And I log in as "sally"
     And I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"
@@ -115,17 +116,25 @@ Feature: Signup Admin Approval
     And I press "Request approval"
     Then I should see "Your booking has been completed but requires approval from your manager"
 
-    And I log out
+    When I log out
     And I log in as "manager"
     And I click on "My Learning" in the totara menu
     And I click on "View all tasks" "link"
-    And I click on "Attendees" "link" in the "1 January 2020" "table_row"
-    # Then I should see "Sally Sal"
-    # And I approve Sally
-    # And I check she is on the attendees list
-    And I pause
+    And I click on "Attendees" "link"
 
-  @javascript @RUNME
+    Then I should see "Sally Sal"
+    When I click on "requests[11]" "radio" in the ".lastrow .lastcol" "css_element"
+    And I click on "Update requests" "button"
+    Then I should not see "Sally Sal"
+
+    When I log out
+    And I log in as "actapprover"
+    And I click on "My Learning" in the totara menu
+    Then I should see "Face-to-face booking admin request"
+    And I click on "View all alerts" "link"
+    And I click on "Attendees" "link" in the "1 January 2020" "table_row"
+    Then I should see "Sally Sal"
+
   Scenario: Student gets approved through both steps of the 2 stage approval
     When I log in as "jimmy"
     And I click on "Find Learning" in the totara menu
@@ -143,26 +152,30 @@ Feature: Signup Admin Approval
     And I click on "Attendees" "link" in the "1 January 2020" "table_row"
     Then I should see "Jimmy Jim" in the ".lastrow" "css_element"
 
-    And I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
-    And I pause
-    # And I approve jimmy
-    # Then I no longer have any staff on the approval page
-    And I log out
+    When I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
+    And I click on "Update requests" "button"
+    Then I should not see "Jimmy Jim"
+    And I click on "Attendees" "link" in the ".tabtree" "css_element"
+    Then I should not see "Jimmy Jim"
 
+    When I log out
     And I log in as "actapprover"
     And I click on "My Learning" in the totara menu
     Then I should see "Face-to-face booking admin request"
-    And I click on "View all tasks" "link"
+    And I click on "View all alerts" "link"
     And I click on "Attendees" "link" in the "1 January 2020" "table_row"
     Then I should see "Jimmy Jim"
 
-    And I pause
-    # And I approve jimmy
-    # Then I no longer have any staff on the approval page
-    And I log out
+    When I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
+    And I click on "Update requests" "button"
+    Then I should not see "Jimmy Jim"
 
-    And I log in as "admin"
+    When I log out
+    And I log in as "jimmy"
     And I click on "My Learning" in the totara menu
-    Then I should see "Face-to-face booking admin request"
-    And I click on "View all tasks" "link"
-    And I click on "Attendees" "link" in the "1 January 2020" "table_row"
+    Then I should see "Face-to-face booking confirmation"
+
+    When I click on "Find Learning" in the totara menu
+    And I follow "Classroom Connect Course"
+    And I follow "View all events"
+    Then I should see "Booked" in the "1 January 2020" "table_row"
