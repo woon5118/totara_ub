@@ -3795,6 +3795,10 @@ class settings_navigation extends navigation_node {
             if ($CFG->enablecompletion && $course->enablecompletion) {
                 $url = new moodle_url('/course/completion.php', array('id'=>$course->id));
                 $coursenode->add(get_string('coursecompletion', 'completion'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/settings', ''));
+
+                // TOTARA CHANGE - manual archive course completions link.
+                $url = new moodle_url('/course/archivecompletions.php', array('id' => $course->id));
+                $coursenode->add(get_string('archivecompletions', 'completion'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/settings', ''));
             }
 
             if (totara_feature_visible('competencies')) {

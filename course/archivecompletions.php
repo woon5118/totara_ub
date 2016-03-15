@@ -62,16 +62,76 @@ $users = $DB->get_records_sql($sql, $params);
 $category = $DB->get_record('course_categories', array('id' => $course->category));
 $courseshortname = format_string($course->shortname, true, array('context' => context_course::instance($course->id)));
 $categoryname = format_string($category->name, true, array('context' => context_coursecat::instance($category->id)));
+$strarchivecheck = get_string('archivecheck', 'completion', $courseshortname);
 
 $PAGE->navbar->add(get_string('administration'), new moodle_url('/admin/index.php/'));
 $PAGE->navbar->add(get_string('categories'), new moodle_url('/course/index.php'));
 $PAGE->navbar->add($categoryname, new moodle_url('/course/index.php', array('categoryid' => $course->category)));
 $PAGE->navbar->add($courseshortname, new moodle_url('/course/view.php', array('id' => $course->id)));
 
+// Archiving restricted when course is part of a program or certification.
+$cssql = "SELECT p.id, p.fullname, p.certifid
+          FROM {prog_courseset_course} pcc
+          JOIN {prog_courseset} pc
+            ON pcc.coursesetid = pc.id
+          JOIN {prog} p
+            ON pc.programid = p.id
+         WHERE pcc.courseid = :cid
+      GROUP BY p.id";
+$csparams = array('cid' => $course->id);
+$coursesets = $DB->get_records_sql($cssql, $csparams);
+if (!empty($coursesets)) {
+    // The course is part of one or more program(s) or cert(s).
+    $prognames = array();
+    $certnames = array();
+
+    foreach ($coursesets as $cs) {
+        if ($cs->certifid) {
+            $certnames[$cs->id] = s($cs->fullname);
+        } else {
+            $prognames[$cs->id] = s($cs->fullname);
+        }
+    }
+
+    $PAGE->navbar->add($strarchivecheck);
+    $PAGE->set_title($site->shortname .': '. $strarchivecheck);
+    $PAGE->set_heading($site->fullname);
+
+    echo $OUTPUT->header();
+
+    // Print generic error message.
+    echo $OUTPUT->notification(get_string('error:cannotarchiveprogcourse', 'completion'), 'notifyproblem');
+
+    // Print list of programs.
+    if (!empty($prognames)) {
+        echo html_writer::start_tag('div', array('class' => 'programlist'));
+        echo get_string('programs', 'totara_program');
+        echo html_writer::start_tag('ul');
+        foreach ($prognames as $progname) {
+            echo html_writer::tag('li', $progname);
+        }
+        echo html_writer::end_tag('ul');
+        echo html_writer::end_tag('div');
+    }
+
+    // Print list of certifications.
+    if (!empty($certnames)) {
+        echo html_writer::start_tag('div', array('class' => 'certificationlist'));
+        echo get_string('certifications', 'totara_certification');
+        echo html_writer::start_tag('ul');
+        foreach ($certnames as $certname) {
+            echo html_writer::tag('li', $certname);
+        }
+        echo html_writer::end_tag('ul');
+        echo html_writer::end_tag('div');
+    }
+
+    echo $OUTPUT->footer();
+    die();
+}
 
 // first time round - get confirmation
 if (!$archive) {
-    $strarchivecheck = get_string('archivecheck', 'completion', $courseshortname);
     $strarchivecompletionscheck = get_string('archivecompletionscheck', 'completion');
 
     $PAGE->navbar->add($strarchivecheck);

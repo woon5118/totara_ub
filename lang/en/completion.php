@@ -142,6 +142,7 @@ $string['err_nousers'] = 'There are no students on this course or group for whom
 $string['err_settingslocked'] = 'One or more students have already completed a criterion so the settings have been locked. Unlocking the completion criteria settings will delete any existing user data and may cause confusion.';
 $string['err_settingsunlockable'] = '<p>Modifying course completion criteria after some users have already completed the course is not recommended since it means different users will be marked as complete for different reasons.</p><p>At this point you can choose to delete all completion records for users who have already achieved this course. Their completion status will be recalculated using the new criteria next time the cron runs, so they may be marked as complete again.</p><p>Alternatively you can choose to keep all existing course completion records and accept that different users may have received their status for different accomplishments.</p>';
 $string['err_system'] = 'An internal error occurred in the completion system. (System administrators can enable debugging information to see more detail.)';
+$string['error:cannotarchiveprogcourse'] = 'Courses which are part of Program(s) or Certification(s) can not be manually archived';
 $string['error:databaseupdatefailed'] = 'Database update failed';
 $string['error:rplsaredisabled'] = 'Record of Prior Learning has been disabled by an Administrator';
 $string['eventcoursecompleted'] = 'Course completed';
