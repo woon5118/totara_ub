@@ -1368,7 +1368,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                 $participant = $rolestring . ": " . fullname($user);
             }
 
-            $dynamic = !empty($CFG->dynamicappraisals) && $appraisal->status == appraisal::STATUS_ACTIVE;
+            $dynamic = !empty($CFG->dynamicappraisals) && $userassignment->status == appraisal::STATUS_ACTIVE;
             if ($dynamic && $roleassignments[$role]->userid != $actual[$role]) {
                 $participant .= $this->container(get_string('rolehaschanged', 'totara_appraisal'), 'rolechangedwarning');
             }
