@@ -45,14 +45,12 @@ class question_compfromplan extends reviewrating {
 
     /**
      * Check that competencies and learning plans are enabled.
+     *
+     * @return boolean
      */
     public static function check_enabled() {
 
-        if (totara_feature_visible('competencies')) {
-            return true;
-        }
-
-        return false;
+        return !totara_feature_disabled('learningplans') && !totara_feature_disabled('competencies');
     }
 
     /**
