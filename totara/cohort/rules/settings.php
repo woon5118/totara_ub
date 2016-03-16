@@ -36,6 +36,7 @@ require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/manager.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/userstatus.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/cohortmember.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/option.php');
+require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/custom_fields/custom_field_sqlhandler.php');
 
 /* Constants to identify if the rule comes from a menu or a text input */
 define('COHORT_RULES_TYPE_MENU', 1);
@@ -188,7 +189,7 @@ function cohort_rules_list($reset = false){
                         get_string('usersx', 'totara_cohort', format_string($field->name)),
                         array_combine($options, $options)
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_in_usercustomfield($id, $field->datatype);
+                    $sqlhandler = new custom_field_sqlhandler($id, $field->datatype, true);
                     break;
                 case 'text':
                     // text input
@@ -198,7 +199,7 @@ function cohort_rules_list($reset = false){
                     );
                     $dialogui->selectoptionstr = format_string($field->name) . ' (' . get_string('text', 'totara_cohort') . ')';
                     $dialogs[] = $dialogui;
-                    $sqlhandler_text = new cohort_rule_sqlhandler_in_usercustomfield($field->name, $field->datatype);
+                    $sqlhandler_text = new custom_field_sqlhandler($id, $field->datatype, false);
 
                     // choose from distinct customfield values
                     $sql = new stdClass;
@@ -215,7 +216,7 @@ function cohort_rules_list($reset = false){
                     $dialogui->selectoptionstr = format_string($field->name) . ' (' . get_string('choose', 'totara_cohort') . ')';
                     $dialogs[] = $dialogui;
 
-                    $sqlhandler = new cohort_rule_sqlhandler_in_usercustomfield($id, $field->datatype);
+                    $sqlhandler = new custom_field_sqlhandler($id, $field->datatype, true);
                     unset($dialogui);
                     break;
                 case 'datetime':
@@ -232,7 +233,7 @@ function cohort_rules_list($reset = false){
                             0 => get_string('checkboxno', 'totara_cohort')
                         )
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_in_usercustomfield($id, $field->datatype);
+                    $sqlhandler = new custom_field_sqlhandler($id, $field->datatype, true);
                     break;
                 case 'date':
                     $dialogs[] = new cohort_rule_ui_date_no_timezone(

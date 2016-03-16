@@ -66,6 +66,10 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'custom_program_field',
                 'required' => array('datatype'),
             ),
+            'custom profile field assignments' => array(
+                'datagenerator' => 'profile_custom_field_assignment',
+                'required' => array('username', 'fieldname', 'value'),
+            ),
         ),
         'totara_cohort' => array(
             'cohort enrolments' => array(

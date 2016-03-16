@@ -185,12 +185,15 @@ class cohort_rule_sqlhandler_in_userfield_int extends cohort_rule_sqlhandler_in_
 /**
  * SQL snippet for a user custom field
  * @author aaronw
+ * @deprecated use custom_field_sqlhandler instead.
  */
 class cohort_rule_sqlhandler_in_usercustomfield extends cohort_rule_sqlhandler_in {
 
     protected $fielddatatype;
 
     public function __construct($field, $datatype) {
+        debugging('cohort_rule_sqlhandler_in_usercustomfield deprecated; use custom_field_sqlhandler instead', DEBUG_DEVELOPER);
+
         $this->fielddatatype = $datatype;
         // Always a char field
         parent::__construct($field, true);
