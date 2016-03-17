@@ -101,7 +101,7 @@ $jsmodule = array(
     'fullpath' => '/mod/facetoface/sessions.js',
     'requires' => array('json', 'totara_core'));
 $PAGE->requires->js_init_call('M.totara_f2f_room.init', array($jsconfig), false, $jsmodule);
-$PAGE->requires->js_init_call('M.facetoface_datelinkage.init', null, true);
+$PAGE->requires->js_init_call('M.facetoface_datelinkage.init', null, false, $jsmodule);
 
 $returnurl = "view.php?f=$facetoface->id";
 
