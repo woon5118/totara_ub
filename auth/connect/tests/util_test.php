@@ -1091,7 +1091,8 @@ class auth_connect_util_testcase extends advanced_testcase {
         $sid = md5('yyyyy');
 
         session_id($sid);
-        $this->setAdminUser();
+        $admin = get_admin();
+        \core\session\manager::set_user($admin); // Note setAdminUser() clears session now.
         jsend::set_phpunit_testdata(array(array('status' => 'success', 'data' => $serveruser)));
 
         try {

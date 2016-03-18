@@ -187,6 +187,8 @@ class MoodleExcelWorksheet {
             if ($name === false) {
                 $name = '';
             }
+            // After the substr, we might now have a single quote on the end.
+            $name = trim($name, "'");
         }
 
         if ($name === '') {

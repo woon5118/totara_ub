@@ -777,7 +777,7 @@ function message_get_recent_conversations($user, $limitfrom=0, $limitto=100) {
                    ) messagesubset ON messagesubset.messageid = message.id
               JOIN {user} otheruser ON (message.useridfrom = :userid4 AND message.useridto = otheruser.id)
                 OR (message.useridto   = :userid5 AND message.useridfrom   = otheruser.id)
-         LEFT JOIN {message_contacts} contact ON contact.userid  = :userid3 AND contact.userid = otheruser.id
+         LEFT JOIN {message_contacts} contact ON contact.userid  = :userid3 AND contact.contactid = otheruser.id
              WHERE otheruser.deleted = 0 AND message.notification = 0
                    AND md.id IS NULL
           ORDER BY message.timecreated DESC";
@@ -1543,11 +1543,7 @@ function message_print_user ($user=false, $iscontact=false, $isblocked=false, $i
 
     if ($user === false) {
         echo $OUTPUT->user_picture($USER, $userpictureparams);
-    } else if (core_user::is_real_user($user->id)) { // If not real user, then don't show any links.
-        $userpictureparams['link'] = false;
-        echo $OUTPUT->user_picture($USER, $userpictureparams);
-        echo fullname($user);
-    } else {
+    } else if (core_user::is_real_user($user->id)) {
         echo $OUTPUT->user_picture($user, $userpictureparams);
 
         $link = new moodle_url("/message/index.php?id=$user->id");
@@ -1567,6 +1563,10 @@ function message_print_user ($user=false, $iscontact=false, $isblocked=false, $i
         } else {
             message_contact_link($user->id, 'block', $return, $script, $includeicontext);
         }
+    } else { // If not real user, then don't show any links.
+        $userpictureparams['link'] = false;
+        echo $OUTPUT->user_picture($USER, $userpictureparams);
+        echo fullname($user);
     }
 }
 
@@ -2784,6 +2784,7 @@ function message_page_type_list($pagetype, $parentcontext, $currentcontext) {
 
 /**
  * Get messages sent or/and received by the specified users.
+ * Please note that this function return deleted messages too.
  *
  * @param  int      $useridto       the user id who received the message
  * @param  int      $useridfrom     the user id who sent the message. -10 or -20 for no-reply or support user

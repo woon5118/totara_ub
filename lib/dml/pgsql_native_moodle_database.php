@@ -478,7 +478,7 @@ class pgsql_native_moodle_database extends moodle_database {
                 $info->scale         = null;
                 $info->not_null      = ($rawcolumn->attnotnull === 't');
                 if ($info->has_default) {
-                    // Totara: PG 9.5 uses ::integer syntax for some defaults.
+                    // PG 9.5+ uses ::<TYPE> syntax for some defaults.
                     $parts = explode('::', $rawcolumn->adsrc);
                     if (count($parts) > 1) {
                         $info->default_value = reset($parts);
@@ -503,7 +503,7 @@ class pgsql_native_moodle_database extends moodle_database {
                 $info->not_null      = ($rawcolumn->attnotnull === 't');
                 $info->has_default   = ($rawcolumn->atthasdef === 't');
                 if ($info->has_default) {
-                    // Totara: PG 9.5 uses ::integer syntax for some defaults.
+                    // PG 9.5+ uses ::<TYPE> syntax for some defaults.
                     $parts = explode('::', $rawcolumn->adsrc);
                     if (count($parts) > 1) {
                         $info->default_value = reset($parts);
@@ -528,7 +528,7 @@ class pgsql_native_moodle_database extends moodle_database {
                 $info->not_null      = ($rawcolumn->attnotnull === 't');
                 $info->has_default   = ($rawcolumn->atthasdef === 't');
                 if ($info->has_default) {
-                    // Totara: PG 9.5 uses ::integer syntax for some defaults.
+                    // PG 9.5+ uses ::<TYPE> syntax for some defaults.
                     $parts = explode('::', $rawcolumn->adsrc);
                     if (count($parts) > 1) {
                         $info->default_value = reset($parts);
