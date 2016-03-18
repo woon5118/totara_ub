@@ -553,9 +553,16 @@ class behat_hooks extends behat_base {
      * @see Moodle\BehatExtension\Tester\MoodleStepTester
      */
     public function i_look_for_exceptions() {
-
-        // Look for exceptions displayed on page.
         $this->look_for_exceptions();
+    }
+
+    /**
+     * Converts HTML tags to line breaks to display the info in CLI
+     *
+     * @param string $html
+     * @return string
+     */
+    protected function get_debug_text($html) {
 
     }
 

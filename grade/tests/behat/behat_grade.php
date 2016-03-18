@@ -27,8 +27,7 @@
 
 require_once(__DIR__ . '/../../../lib/behat/behat_base.php');
 
-use Moodle\BehatExtension\Context\Step\Given as Given,
-    Behat\Gherkin\Node\TableNode as TableNode;
+use Behat\Gherkin\Node\TableNode as TableNode;
 
 class behat_grade extends behat_base {
 
@@ -39,13 +38,12 @@ class behat_grade extends behat_base {
      * @param int $grade
      * @param string $userfullname the user's fullname as returned by fullname()
      * @param string $itemname
-     * @return Given
      */
     public function i_give_the_grade($grade, $userfullname, $itemname) {
         $gradelabel = $userfullname . ' ' . $itemname;
         $fieldstr = get_string('useractivitygrade', 'gradereport_grader', $gradelabel);
 
-        return new Given('I set the field "' . $this->escape($fieldstr) . '" to "' . $grade . '"');
+        $this->execute('behat_forms::i_set_the_field_to', array($this->escape($fieldstr), $grade));
     }
 
     /**
@@ -56,13 +54,12 @@ class behat_grade extends behat_base {
      * @param string $feedback
      * @param string $userfullname the user's fullname as returned by fullname()
      * @param string $itemname
-     * @return Given
      */
     public function i_give_the_feedback($feedback, $userfullname, $itemname) {
         $gradelabel = $userfullname . ' ' . $itemname;
         $fieldstr = get_string('useractivityfeedback', 'gradereport_grader', $gradelabel);
 
-        return new Given('I set the field "' . $this->escape($fieldstr) . '" to "' . $this->escape($feedback) . '"');
+        $this->execute('behat_forms::i_set_the_field_to', array($this->escape($fieldstr), $this->escape($feedback)));
     }
 
     /**
@@ -73,7 +70,6 @@ class behat_grade extends behat_base {
      * @Given /^I set the following settings for grade item "(?P<grade_item_string>(?:[^"]|\\")*)":$/
      * @param string $gradeitem
      * @param TableNode $data
-     * @return Given[]
      */
     public function i_set_the_following_settings_for_grade_item($gradeitem, TableNode $data) {
 
@@ -103,7 +99,6 @@ class behat_grade extends behat_base {
      * @param string $calculation The calculation.
      * @param string $gradeitem The grade item name.
      * @param TableNode $TableNode The grade item name - idnumbers relation.
-     * @return Given[]
      */
     public function i_set_calculation_for_grade_item_with_idnumbers($calculation, $gradeitem, TableNode $data) {
 
@@ -131,7 +126,7 @@ class behat_grade extends behat_base {
                 "parent::li[@class='item'][text()='" . $gradeitem . "']" .
                 " or " .
                 "parent::li[@class='categoryitem' or @class='courseitem']/parent::ul/parent::li[starts-with(text(),'" . $gradeitem . "')]" .
-                "]";
+            "]";
             $this->execute('behat_forms::i_set_the_field_with_xpath_to', array($inputxpath, $idnumber));
         }
 
@@ -148,7 +143,6 @@ class behat_grade extends behat_base {
      * @param string $calculation The calculation.
      * @param string $gradeitem The grade item name.
      * @param TableNode $data The grade item name - idnumbers relation.
-     * @return Given[]
      */
     public function i_set_calculation_for_grade_category_with_idnumbers($calculation, $gradeitem, TableNode $data) {
 
@@ -179,7 +173,7 @@ class behat_grade extends behat_base {
                 " | " .
                 "parent::li[@class='categoryitem' | @class='courseitem']" .
                 "/parent::ul/parent::li[starts-with(text(),'" . $gradeitem . "')]" .
-                "]";
+            "]";
             $this->execute('behat_forms::i_set_the_field_with_xpath_to', array($inputxpath, $idnumber));
         }
 
@@ -196,7 +190,6 @@ class behat_grade extends behat_base {
      *
      * @Given /^I reset weights for grade category "(?P<grade_item_string>(?:[^"]|\\")*)"$/
      * @param $gradeitem
-     * @return array
      */
     public function i_reset_weights_for_grade_category($gradeitem) {
 
@@ -220,7 +213,6 @@ class behat_grade extends behat_base {
      * @Given /^gradebook calculations for the course "(?P<coursename_string>(?:[^"]|\\")*)" are frozen at version "(?P<version_string>(?:[^"]|\\")*)"$/
      * @param string $coursename
      * @param string $version
-     * @return Given
      */
     public function gradebook_calculations_for_the_course_are_frozen_at_version($coursename, $version) {
         global $DB;
