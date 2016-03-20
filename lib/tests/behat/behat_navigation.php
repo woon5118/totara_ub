@@ -227,6 +227,13 @@ class behat_navigation extends behat_base {
      */
     public function i_navigate_to_node_in($nodetext, $parentnodes) {
 
+        // Totara: compatibility hacks.
+        $browser = '';
+        $driver = $this->getSession()->getDriver();
+        if (method_exists($driver, 'getBrowser')) {
+            $browser = $driver->getBrowser();
+        }
+
         // Site admin is different and needs special treatment.
         $siteadminstr = get_string('administrationsite');
 
@@ -282,7 +289,8 @@ class behat_navigation extends behat_base {
                     $jscondition = '(document.evaluate("' . $nodetoexpand->getXpath() . '", document, null, '.
                         'XPathResult.ANY_TYPE, null).iterateNext().getAttribute(\'data-loaded\') == 1)';
 
-                    $this->getSession()->wait(self::EXTENDED_TIMEOUT * 1000, $jscondition);
+                    // Totara: the first access of all settings may take a very long time!
+                    $this->getSession()->wait(self::EXTENDED_TIMEOUT * 1000 * 3, $jscondition);
                 }
             }
         }

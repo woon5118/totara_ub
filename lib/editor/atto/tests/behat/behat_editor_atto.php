@@ -57,6 +57,29 @@ class behat_editor_atto extends behat_base {
         $field->select_text();
     }
 
+    /**
+     * Totara hack!
+     *
+     * Checks, that page contains specified text. It also checks if the text is visible when running Javascript tests.
+     *
+     * @Then /^I should see "(?P<text_string>(?:[^"]|\\")*)" list from Atto$/
+     * @throws Behat\Mink\Exception\ExpectationException
+     * @param string $text
+     * @return array
+     */
+    public function assert_page_contains_list_from_atto($text) {
+        $driver = $this->getSession()->getDriver();
+        if (method_exists($driver, 'getBrowser')) {
+            $browser = $driver->getBrowser();
+            if ($browser === 'chrome' or $browser === 'safari') {
+                $text = str_replace('<ol><li>', '<ol><li><span style=\\"color:rgb(51,51,51);\\">', $text);
+                $text = str_replace('<ul><li>', '<ul><li><span style=\\"color:rgb(51,51,51);\\">', $text);
+            }
+        }
 
+        return array(
+            new Behat\Behat\Context\Step\Given('I should see "' . $text . '"')
+        );
+    }
 }
 

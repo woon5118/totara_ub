@@ -16,5 +16,5 @@ Feature: Atto ordered list button
     And I set the field "Text editor" to "Plain text area"
     And I press "Save changes"
     And I follow "Edit profile"
-    Then I should see "<ol><li>Have you heard the news everyone's talking"
+    Then I should see "<ol><li>Have you heard the news everyone's talking" list from Atto
 

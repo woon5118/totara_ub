@@ -16,5 +16,5 @@ Feature: Atto unordered list button
     And I set the field "Text editor" to "Plain text area"
     And I press "Save changes"
     And I follow "Edit profile"
-    Then I should see "<ul><li>Things, dogs, clogs"
+    Then I should see "<ul><li>Things, dogs, clogs" list from Atto
 
