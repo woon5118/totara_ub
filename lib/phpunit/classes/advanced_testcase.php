@@ -425,7 +425,7 @@ abstract class advanced_testcase extends base_testcase {
      * array in the returned phpmailer sink instance. The redirection
      * can be stopped by calling $sink->close();
      *
-     * @return phpunit_message_sink
+     * @return phpunit_phpmailer_sink
      */
     public function redirectEmails() {
         return phpunit_util::start_phpmailer_redirection();

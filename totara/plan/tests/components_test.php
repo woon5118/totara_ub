@@ -26,15 +26,21 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 class totara_plan_components_testcase extends advanced_testcase {
+    /** @var phpunit_message_sink $messagesink */
+    private $messagesink;
 
     protected function setUp() {
-        global $DB, $CFG;
-
-        parent::setup();
-
-        $this->resetAfterTest(true);
+        parent::setUp();
+        $this->resetAfterTest();
+        $this->messagesink = $this->redirectMessages();
     }
 
+    protected function tearDown() {
+        $this->messagesink->clear();
+        $this->messagesink->close();
+        $this->messagesink = null;
+        parent::tearDown();
+    }
 
     /**
      * Test get_assigned_items for a competency.
