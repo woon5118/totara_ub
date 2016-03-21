@@ -957,7 +957,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             if ($showcfdatawarning) {
                 $out .= $OUTPUT->notification(get_string('removecfdatawarning', 'facetoface'), 'notifymessage');
             }
-            $out .= html_writer::table($table);
+            $out .= $OUTPUT->render($table);
         }
         return $out;
     }

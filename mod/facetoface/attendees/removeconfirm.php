@@ -24,8 +24,12 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 require_once($CFG->dirroot.'/mod/facetoface/attendees/forms.php');
 
+// The number of users that should be shown per page.
+define('USERS_PER_PAGE', 50);
+
 $s      = required_param('s', PARAM_INT); // facetoface session ID
 $listid = required_param('listid', PARAM_ALPHANUM); // Session key to list of users to add.
+$page   = optional_param('page', 0, PARAM_INT); // Current page number.
 
 list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 
@@ -33,8 +37,9 @@ list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session
 require_login($course, false, $cm);
 require_capability('mod/facetoface:removeattendees', $context);
 
+$currenturl = new moodle_url('/mod/facetoface/attendees/removeconfirm.php', array('s' => $s, 'listid' => $listid, 'page' => $page));
 $PAGE->set_context($context);
-$PAGE->set_url('/mod/facetoface/attendees/removeconfirm.php', array('s' => $s, 'listid' => $listid));
+$PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
 
@@ -46,19 +51,6 @@ if (empty($userlist)) {
     totara_set_notification(get_string('updateattendeesunsuccessful', 'facetoface'),
             new moodle_url('/mod/facetoface/attendees.php', array('s' => $s, 'backtoallsessions' => 1)));
 }
-
-$usernamefields = get_all_user_name_fields(true, 'u');
-list($idsql, $params) = $DB->get_in_or_equal($userlist, SQL_PARAMS_NAMED);
-$params['sessionid'] = $s;
-$users = $DB->get_records_sql("
-        SELECT u.id, $usernamefields, u.email, u.idnumber, u.username, count(fsid.id) as cntcfdata
-        FROM {user} u
-        LEFT JOIN {facetoface_signups} fs  ON (fs.userid = u.id AND fs.sessionid = :sessionid)
-        LEFT JOIN {facetoface_signups_status} fss ON (fss.signupid = fs.id)
-        LEFT JOIN {facetoface_signup_info_data} fsid ON (fsid.facetofacesignupid = fss.id)
-        WHERE u.id {$idsql}
-        GROUP BY u.id, $usernamefields, u.email, u.idnumber, u.username
-        ", $params);
 
 $mform = new removeconfirm_form(null, array('s' => $s, 'listid' => $listid));
 
@@ -100,6 +92,7 @@ if ($fromform = $mform->get_data()) {
 
     // Removing old attendees.
     // Check if we need to remove anyone.
+    $users = $mform->get_user_list($userlist);
     $attendeestoremove = array_intersect_key($original, $users);
     if (!empty($attendeestoremove)) {
         foreach ($attendeestoremove as $attendee) {
@@ -144,7 +137,15 @@ echo facetoface_print_session($session, false, true, true, false, 'f2fline');
 
 // Table.
 $f2frenderer = $PAGE->get_renderer('mod_facetoface');
+
+$users = $mform->get_user_list($userlist, $page, USERS_PER_PAGE);
+$paging = new paging_bar(count($userlist), $page, USERS_PER_PAGE, $currenturl);
+
+echo $f2frenderer->render($paging);
 echo $f2frenderer->print_user_table($users);
+echo $f2frenderer->render($paging);
+
+echo html_writer::empty_tag('br');
 
 $returnurl = $list->get_returnurl();
 echo html_writer::link($returnurl, get_string('changeselectedusers', 'facetoface'), array('class'=>'link-as-button'));
