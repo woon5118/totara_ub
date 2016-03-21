@@ -168,7 +168,6 @@ class certif_edit_completion_history_form extends moodleform {
         $mform->setType('unassigned', PARAM_INT);
         $mform->addHelpButton('unassigned', 'completionunassigned', 'totara_certification');
         $mform->disabledIf('unassigned', 'state', 'eq', CERTIFCOMPLETIONSTATE_INVALID);
-        $mform->disabledIf('unassigned', 'currentlyassigned', 'eq', 1);
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'savechanges', get_string('savechanges'));
