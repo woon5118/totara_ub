@@ -25,6 +25,8 @@ Feature: Test that report builder reports can be scheduled
     And the "schedulegroup[hourly]" "select" should be disabled
     And the "schedulegroup[minutely]" "select" should be disabled
     And I set the field "schedulegroup[daily]" to "03:00"
+    And I set the field "externalemailsgrp[emailexternals]" to "admin@example.com"
+    And I click on "Add email" "button"
     When I press "Save changes"
     Then I should see "Daily at 03:00"
 
@@ -40,6 +42,8 @@ Feature: Test that report builder reports can be scheduled
     And the "schedulegroup[hourly]" "select" should be disabled
     And the "schedulegroup[minutely]" "select" should be disabled
     And I set the field "schedulegroup[weekly]" to "Tuesday"
+    And I set the field "externalemailsgrp[emailexternals]" to "admin@example.com"
+    And I click on "Add email" "button"
     When I press "Save changes"
     Then I should see "Weekly on Tuesday"
 
@@ -55,6 +59,8 @@ Feature: Test that report builder reports can be scheduled
     And the "schedulegroup[hourly]" "select" should be disabled
     And the "schedulegroup[minutely]" "select" should be disabled
     And I set the field "schedulegroup[monthly]" to "7"
+    And I set the field "externalemailsgrp[emailexternals]" to "admin@example.com"
+    And I click on "Add email" "button"
     When I press "Save changes"
     Then I should see "Monthly on the 7th"
 
@@ -70,6 +76,8 @@ Feature: Test that report builder reports can be scheduled
     And the "schedulegroup[hourly]" "select" should be enabled
     And the "schedulegroup[minutely]" "select" should be disabled
     And I set the field "schedulegroup[hourly]" to "6"
+    And I set the field "externalemailsgrp[emailexternals]" to "admin@example.com"
+    And I click on "Add email" "button"
     When I press "Save changes"
     Then I should see "Every 6 hour(s) from midnight"
 
@@ -85,6 +93,8 @@ Feature: Test that report builder reports can be scheduled
     And the "schedulegroup[hourly]" "select" should be disabled
     And the "schedulegroup[minutely]" "select" should be enabled
     And I set the field "schedulegroup[minutely]" to "15"
+    And I set the field "externalemailsgrp[emailexternals]" to "admin@example.com"
+    And I click on "Add email" "button"
     When I press "Save changes"
     Then I should see "Every 15 minute(s) from the start of the hour"
 
@@ -94,6 +104,8 @@ Feature: Test that report builder reports can be scheduled
     And I press "Add scheduled report"
     Then I should see "Schedulable Report"
     When I set the field "Export" to "CSV"
+    And I set the field "externalemailsgrp[emailexternals]" to "admin@example.com"
+    And I click on "Add email" "button"
     And I press "Save changes"
     Then I should see "CSV" in the "Schedulable Report" "table_row"
 
