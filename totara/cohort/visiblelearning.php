@@ -33,9 +33,32 @@ require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_login();
 
 $sid    = optional_param('sid', '0', PARAM_INT);
-$id     = required_param('id', PARAM_INT);
+$id     = optional_param('id', false, PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT);
 $debug  = optional_param('debug', false, PARAM_BOOL);
+
+if (!$id) {
+    $context = context_system::instance();
+    $url = new moodle_url('/cohort/index.php');
+    $PAGE->set_context($context);
+    $PAGE->set_url($url);
+
+    echo $OUTPUT->header();
+    echo $OUTPUT->container(get_string('cohortvisiblelearningselect', 'totara_cohort', $url->out()));
+    echo $OUTPUT->footer();
+    exit;
+}
+
+if (empty($CFG->audiencevisibility)) {
+    $context = context_system::instance();
+    $PAGE->set_context($context);
+    $PAGE->set_url(new moodle_url('/totara/cohort/visiblelearning.php', array('id' => $id, 'format' => $format)));
+
+    echo $OUTPUT->header();
+    echo $OUTPUT->notification(get_string('error:visiblelearningdisabled', 'totara_cohort'));
+    echo $OUTPUT->footer();
+    exit;
+}
 
 $cohort = $DB->get_record('cohort', array('id' => $id), '*', MUST_EXIST);
 $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
@@ -61,23 +84,6 @@ if ($context->contextlevel == CONTEXT_SYSTEM) {
     $PAGE->set_pagelayout('report');
     $PAGE->set_url($url);
 }
-
-if (empty($CFG->audiencevisibility)) {
-    echo $OUTPUT->header();
-    echo $OUTPUT->notification(get_string('error:visiblelearningdisabled', 'totara_cohort'));
-    echo $OUTPUT->footer();
-    exit;
-}
-
-if (!$id) {
-    echo $OUTPUT->header();
-    $url = new moodle_url('/cohort/index.php');
-    echo $OUTPUT->container(get_string('cohortvisiblelearningselect', 'totara_cohort', $url->out()));
-    echo $OUTPUT->footer();
-    exit;
-}
-
-$cohort = $DB->get_record('cohort', array('id' => $id), '*', MUST_EXIST);
 
 $report = reportbuilder_get_embedded_report('cohort_associations_visible', array('cohortid' => $id), false, $sid);
 $report->include_js();
