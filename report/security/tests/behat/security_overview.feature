@@ -16,7 +16,6 @@ Feature: security overview
   Scenario: Check status correct on security overview report
     Given I navigate to "Security overview" node in "Site administration > Reports"
     And I should see "OK" in the "Insecure dataroot" "table_row"
-    And I should see "OK" in the "Displaying of PHP errors" "table_row"
     And I should see "OK" in the "No authentication" "table_row"
     And I should see "OK" in the "Allow EMBED and OBJECT" "table_row"
     And I should see "OK" in the "Enabled .swf media filter" "table_row"
