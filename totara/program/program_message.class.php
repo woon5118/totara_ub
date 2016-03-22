@@ -256,7 +256,8 @@ abstract class prog_message {
                     break;
                 case 'duedate';
                     // Get completion date.
-                    $completiontime = $DB->get_field('prog_completion', 'timedue', array('programid' => $programid, 'userid' => $userid));
+                    $completiontime = $DB->get_field('prog_completion', 'timedue',
+                        array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0));
                     $duedate = get_string('duedatenotset', 'totara_program');
                     if ($completiontime && $completiontime != COMPLETION_TIME_NOT_SET) {
                         $duedate = userdate($completiontime, $formatdate, core_date::get_user_timezone($recipient), false);
