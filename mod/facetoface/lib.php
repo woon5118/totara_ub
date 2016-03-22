@@ -4105,7 +4105,8 @@ function facetoface_get_cancellations($sessionid) {
                 pa.type as positiontype,
                 MAX(ss.timecreated) AS timesignedup,
                 c.timecreated AS timecancelled,
-                " . $DB->sql_compare_text('c.note', 255) . " AS cancelreason
+                " . $DB->sql_compare_text('c.note', 255) . " AS cancelreason,
+                c.statuscode
             FROM
                 {facetoface_signups} su
             JOIN
@@ -4137,7 +4138,8 @@ function facetoface_get_cancellations($sessionid) {
                 " . $DB->sql_compare_text('c.note', 255) . ",
                 p.fullname,
                 pa.type,
-                pa.fullname
+                pa.fullname,
+                c.statuscode
             ORDER BY
                 {$usernamefields},
                 c.timecreated
