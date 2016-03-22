@@ -98,6 +98,8 @@ class customfield_define_multiselect extends customfield_define_base {
                         $itemdata = json_decode($option->data, true);
                         if (isset($itemdata[$oldhash])) {
                             unset($itemdata[$oldhash]);
+                            $item['option'] = $data->multiselectitem[$ind]['option'];
+                            $item['icon'] = $data->multiselectitem[$ind]['icon'];
                             $itemdata[$newhash] = $item;
                             $option->data = json_encode($itemdata);
                             $DB->update_record($tableprefix.'_info_data', $option);
