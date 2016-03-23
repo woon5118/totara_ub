@@ -2023,11 +2023,13 @@ class appraisal {
     public static function get_active_with_stats() {
         global $DB;
 
+        $now = time();
         $sql = 'SELECT app.*,
                        userstotal.userstotal,
                        userscomplete.userscomplete,
                        userscancelled.userscancelled,
-                       usersoverdue.usersoverdue
+                       usersoverdue.usersoverdue,
+                       usersontarget.usersontarget
                   FROM {appraisal} app
                   LEFT JOIN (SELECT COUNT(aua.userid) AS userstotal, aua.appraisalid
                                FROM {appraisal_user_assignment} aua
@@ -2036,6 +2038,7 @@ class appraisal {
                   LEFT JOIN (SELECT COUNT(aua.userid) AS userscomplete, aua.appraisalid
                                FROM {appraisal_user_assignment} aua
                               WHERE aua.timecompleted IS NOT NULL
+                               AND aua.status = :statuscompleted
                               GROUP BY aua.appraisalid) userscomplete
                     ON app.id = userscomplete.appraisalid
                   LEFT JOIN (SELECT COUNT(aua.userid) AS userscancelled, aua.appraisalid
@@ -2052,11 +2055,22 @@ class appraisal {
                                 AND aua.status = :statusactive1
                                 GROUP BY ast.appraisalid) usersoverdue
                     ON app.id = usersoverdue.appraisalid
+                   LEFT JOIN (SELECT COUNT(aua.userid) as usersontarget, aua.appraisalid
+                               FROM {appraisal_user_assignment} aua
+                               JOIN {appraisal_stage} ast2
+                                 ON aua.activestageid = ast2.id
+                               WHERE ast2.timedue >= :timedue2
+                               AND aua.status = :statusontarget
+                               GROUP BY aua.appraisalid) usersontarget
+                    ON app.id = usersontarget.appraisalid
                  WHERE app.status = :statusactive2';
-        $params = array('statusclosed' => self::STATUS_CLOSED,
-                        'timedue' => time(),
+        $params = array('statuscompleted' => self::STATUS_COMPLETED,
+                        'statusclosed' => self::STATUS_CLOSED,
+                        'timedue' => $now,
                         'statusactive1' => self::STATUS_ACTIVE,
-                        'statusactive2' => self::STATUS_ACTIVE
+                        'timedue2' => $now,
+                        'statusactive2' => self::STATUS_ACTIVE,
+                        'statusontarget' => self::STATUS_ACTIVE
                     );
         $appraisals = $DB->get_records_sql($sql, $params);
 

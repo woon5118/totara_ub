@@ -363,7 +363,6 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             if (!($appraisal->usersoverdue > 0)) {
                 $appraisal->usersoverdue = 0;
             }
-            $appraisal->usersontarget = $appraisal->userstotal - $appraisal->userscomplete - $appraisal->usersoverdue - $appraisal->userscancelled;
             if ($appraisal->usersoverdue > 0) {
                 $statusreporturl->param('filterstatus', 'statusoverdue');
                 $row[] = html_writer::link($statusreporturl, $appraisal->usersoverdue);

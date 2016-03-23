@@ -176,7 +176,7 @@ class rb_source_appraisal extends rb_base_source {
                      "WHEN base.status = " . appraisal::STATUS_CLOSED . " AND appraisal.status = " . appraisal::STATUS_ACTIVE . " THEN 'statuscancelled' " .
                      "WHEN base.status = " . appraisal::STATUS_CLOSED . " AND (appraisal.status = " . appraisal::STATUS_CLOSED .
                             " OR appraisal.status = " . appraisal::STATUS_COMPLETED . " ) THEN 'statusincomplete' " .
-                     "WHEN base.status = " . appraisal::STATUS_ACTIVE . " AND activestage.timedue < " . time() . " THEN 'statusoverdue' " .
+                     "WHEN base.status = " . appraisal::STATUS_ACTIVE . " AND activestage.timedue < " . time() . " AND base.timecompleted IS NULL THEN 'statusoverdue' " .
                      "WHEN base.status = " . appraisal::STATUS_ACTIVE . " AND activestage.timedue >= " . time() . " THEN 'statusontarget' " .
                      "ELSE 'statusdraft' " .
                 "END",
@@ -292,7 +292,7 @@ class rb_source_appraisal extends rb_base_source {
                      "WHEN base.status = " . appraisal::STATUS_CLOSED . " AND appraisal.status = " . appraisal::STATUS_ACTIVE . " THEN 'statuscancelled' " .
                      "WHEN base.status = " . appraisal::STATUS_CLOSED . " AND (appraisal.status = " . appraisal::STATUS_CLOSED .
                             " OR appraisal.status = " . appraisal::STATUS_COMPLETED . " ) THEN 'statusincomplete' " .
-                     "WHEN base.status = " . appraisal::STATUS_ACTIVE . " AND activestage.timedue < " . time() . " THEN 'statusoverdue' " .
+                     "WHEN base.status = " . appraisal::STATUS_ACTIVE . " AND activestage.timedue < " . time() . " AND base.timecompleted IS NULL THEN 'statusoverdue' " .
                      "WHEN base.status = " . appraisal::STATUS_ACTIVE . " AND activestage.timedue >= " . time() . " THEN 'statusontarget' " .
                      "ELSE 'statusdraft' " .
                 "END", array('appraisal', 'activestage'), 'string')
