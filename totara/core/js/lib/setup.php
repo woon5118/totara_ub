@@ -35,6 +35,9 @@ define('TOTARA_JS_DATEPICKER',     3);
 define('TOTARA_JS_PLACEHOLDER',    4);
 define('TOTARA_JS_ICON_PREVIEW',   5);
 define('TOTARA_JS_UI',             6);
+/**
+ * @deprecated deprecated since 9.0
+ */
 define('TOTARA_JS_DATATABLES',     7);
 /**
  * Load appropriate JS and CSS files for lightbox
@@ -133,7 +136,8 @@ function local_js($options = array()) {
     }
 
     if (in_array(TOTARA_JS_DATATABLES, $options)) {
-        $PAGE->requires->js('/totara/core/js/lib/' . $directory . '/jquery.dataTables' . $min . '.js');
+        debugging('TOTARA_JS_DATATABLES has been deprecated and may cause unexpected results - please convert your JS to an AMD version', DEBUG_DEVELOPER);
+        $PAGE->requires->js('/totara/core/js/lib/jquery.dataTables' . $min . '.js');
     }
 }
 
