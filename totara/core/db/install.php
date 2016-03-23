@@ -517,6 +517,15 @@ function xmldb_totara_core_install() {
         $dbman->add_field($table, $field);
     }
 
+    // Define field reaggregate to be added to course_modules_completion.
+    $table = new xmldb_table('course_modules_completion');
+    $field = new xmldb_field('reaggregate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecompleted');
+
+    // Conditionally launch add field reaggregate.
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
+    }
+
     // Backport MDL-47830 from Moodle 2.9dev.
     // Define table user_password_history to be created.
     $table = new xmldb_table('user_password_history');

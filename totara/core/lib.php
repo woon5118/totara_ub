@@ -634,3 +634,175 @@ function totara_get_categoryid_with_capability($capability) {
 
     return $recordid;
 }
+
+/**
+ * Run any required changes to completion data when updating activity settings.
+ *
+ * Ideally, this function would occur in a completion/lib.php file if it existed. But for now, exists here to
+ * avoid potential Moodle merge conflicts.
+ *
+ * @param object|cm_info $cm - an object representing a course module. Could be object returned by get_coursemodule_from_id()
+ * @param object $moduleinfo - e.g. data from form in course/modedit.php
+ * @param object $course
+ * @param completion_info $completion
+ */
+function totara_core_update_module_completion_data($cm, $moduleinfo, $course, $completion) {
+    global $DB;
+
+    if ($completion->is_enabled()) {
+        if (!empty($moduleinfo->completionunlocked) && empty($moduleinfo->completionunlockednoreset)) {
+            // This will wipe all user completion data.
+            // It will be recalculated when completion_cron_completions() is next run.
+            totara_core_uncomplete_course_modules_completion($cm, $completion);
+
+            // Bulk start users (creates missing course_completion records for all active participants).
+            completion_start_user_bulk($cm->course);
+
+            // Trigger module_completion_reset event here.
+            \totara_core\event\module_completion_reset::create_from_module($moduleinfo)->trigger();
+        }
+
+        // TL-6981 Fix reaggregation of course completion after activity completion unlock.
+        // Mark all users for reaggregation (regardless of what happens just above, in case something was missed).
+        $sql = "UPDATE {course_completions}
+                   SET reaggregate = :now
+                 WHERE course = :courseid
+                   AND status < :statuscomplete";
+        $params = array('now' => time(), 'courseid' => $course->id, 'statuscomplete' => COMPLETION_STATUS_COMPLETE);
+        $DB->execute($sql, $params);
+
+        // Trigger module_completion_criteria_updated event here.
+        \totara_core\event\module_completion_criteria_updated::create_from_module($moduleinfo)->trigger();
+    }
+}
+
+/**
+ * Used in the completion_regular_task scheduled task. This reaggregates any activity completion records
+ * in the course_modules_completion table that have a reaggregate flag set (as long as that flag is not a timestamp in
+ * the future).  It then sets the reaggregate flag to zero for all of those records.
+ *
+ * Ideally, this function would occur in a completion/lib.php file if it existed. But for now, exists here to
+ * avoid potential Moodle merge conflicts.
+ */
+function totara_core_reaggregate_course_modules_completion() {
+    global $DB;
+
+    $now = time();
+
+    // Get records in course_modules_completion that require aggregation, as long as they are for
+    // course modules that have completion enabled.
+    $completionsql = '
+        SELECT cmc.*, cm.course as courseid
+          FROM {course_modules_completion} cmc
+          JOIN {course_modules} cm
+            ON cmc.coursemoduleid = cm.id
+         WHERE cm.completion <> 0
+           AND cmc.reaggregate > 0
+           AND cmc.reaggregate < :now';
+    $completionparams = array('now' => $now);
+
+    $completions = $DB->get_records_sql($completionsql, $completionparams);
+
+    if (empty($completions)) {
+        // Nothing to reaggregate. No need to continue.
+        return;
+    }
+
+    if (debugging() && !PHPUNIT_TEST && !defined('BEHAT_TEST')) {
+        mtrace('Aggregating activity completions in course_modules_completions table.');
+    }
+
+    $cms = array();
+
+    foreach($completions as $completion) {
+        if (!isset($cms[$completion->coursemoduleid])) {
+            $cms[$completion->coursemoduleid] = $DB->get_record('course_modules', array('id' => $completion->coursemoduleid));
+        }
+
+        $course = new stdClass();
+        $course->id = $completion->courseid;
+        $completioninfo = new completion_info($course);
+        $completioninfo->update_state($cms[$completion->coursemoduleid], COMPLETION_UNKNOWN, $completion->userid);
+    }
+
+    // Reset all reaggregate flags that would have been covered above to zero.
+    // Note that this will additionally reset any reaggregate flags between 0 and time() where
+    // activity completion is not enabled.
+    // IMPORTANT: This does not update the timemodified field of the course_modules_completion record
+    // on purpose. This is because timemodified is currently used to get the completion time in various
+    // cases in Totara and Moodle code.
+    $resetsql = '
+        UPDATE {course_modules_completion}
+           SET reaggregate = 0
+         WHERE reaggregate > 0
+           AND reaggregate < :now';
+    $resetparams = array('now' => $now);
+    $DB->execute($resetsql, $resetparams);
+
+    if (debugging() && !PHPUNIT_TEST && !defined('BEHAT_TEST')) {
+        mtrace('Finished aggregating activity completions.');
+    }
+
+    return;
+}
+
+/**
+ * Sets all activity completion records in the course_modules_completion to be incomplete. It also sets timecompleted to null
+ * and flags the records for reaggregation when the totara_core_reaggregate_course_modules_completion function is next run in cron.
+ *
+ * This will also delete course completions where the given activity is a criteria for that course completion.
+ *
+ * Ideally, this function would occur in a completion/lib.php file if it existed. But for now, exists here to
+ * avoid potential Moodle merge conflicts.
+ *
+ * @param stdClass|cm_info $cm - an object representing a course module. Could be object returned by get_coursemodule_from_id(),
+ *  or even just a record from the course_modules table.
+ * @param completion_info $completion
+ * @param null|int $now - a timestamp. Leave as null to set reaggregate and timemodified to now. Intended to only be set to
+ *  anything else when unit testing.
+ */
+function totara_core_uncomplete_course_modules_completion($cm, $completion, $now = null) {
+    global $DB, $SESSION;
+
+    if (!isset($now)) {
+        $now = time();
+    }
+
+    // The completion state is set to incomplete. Timecompleted is also set to null at this point.
+    // The timemodified field is also updated. This is consistent with other places where the state changes from complete to incomplete.
+    // Ideally we would not update timemodified when the state was already incomplete, as we are not updating timemodified when
+    // the reaggregate flag is the only thing changing.
+    // But timemodified is not an issue when the record is incomplete and it's better not to complicate the code.
+    $modulecompletionsql = "UPDATE {course_modules_completion}
+                               SET reaggregate = :reaggregate, completionstate = :incomplete, timemodified = :timemodified, timecompleted = NULL
+                             WHERE coursemoduleid = :cmid";
+    $modulecompletionparams = array('reaggregate' => $now, 'incomplete' => COMPLETION_INCOMPLETE, 'timemodified' => $now, 'cmid' => $cm->id);
+    $DB->execute($modulecompletionsql, $modulecompletionparams);
+
+    // The rest of this function is copied from delete_all_state in lib/completionlib.php.
+
+    // Erase cache data for current user if applicable
+    if (isset($SESSION->completioncache) &&
+        array_key_exists($cm->course, $SESSION->completioncache) &&
+        array_key_exists($cm->id, $SESSION->completioncache[$cm->course])) {
+
+        unset($SESSION->completioncache[$cm->course][$cm->id]);
+    }
+
+    // Check if there is an associated course completion criteria
+    $criteria = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
+    $acriteria = false;
+    foreach ($criteria as $criterion) {
+        if ($criterion->moduleinstance == $cm->id) {
+            $acriteria = $criterion;
+            break;
+        }
+    }
+
+    if ($acriteria) {
+        // Delete all criteria completions relating to this activity, but skip any RPL records.
+        $where = "course = ? AND criteriaid = ? AND (rpl = '' OR rpl IS NULL)";
+        $DB->delete_records_select('course_completion_crit_compl', $where, array($cm->course, $acriteria->id));
+        $DB->delete_records_select('course_completions', "course = ? AND (rpl = '' OR rpl IS NULL)", array($cm->course));
+    }
+}

@@ -34,6 +34,8 @@ if (!defined('MOODLE_INTERNAL')) {
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+require_once($CFG->dirroot . '/completion/cron.php');
+require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
 
 class mod_facetoface_lib_testcase extends advanced_testcase {
     // Test database data.
@@ -718,6 +720,9 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
     // message string 2
     protected $msgfalse = 'should be false';
+
+    //Users are created in setUp().
+    protected $user1, $user2, $user3, $user4;
 
     function array_to_object(array $arr) {
         $obj = new stdClass();
@@ -2788,5 +2793,276 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $notification1->send_scheduled();
         $newmessages = $newsink->get_messages();
         $this->assertCount(0, $newmessages);
+    }
+
+    /**
+     * Test the function totara_core_update_module_completion_data works with:
+     * - Course completion disabled.
+     * - Activity completion enabled and based on the learner being fully attended at a session.
+     *
+     * Reaggregation of activity completion is done via totara_core_reaggregate_course_modules_completion().
+     */
+    public function test_totara_core_update_module_completion_data_facetoface_fullyattended() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        set_config('enablecompletion', '1');
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(array('enablecompletion' => 1));
+
+        /** @var mod_facetoface_generator $facetofacegenerator */
+        $facetofacegenerator = $generator->get_plugin_generator('mod_facetoface');
+
+        $f2fdata = new stdClass();
+        $f2fdata->course = $course->id;
+        $f2foptions = array(
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'completionstatusrequired' => json_encode(array(MDL_F2F_STATUS_FULLY_ATTENDED))
+        );
+        $facetoface = $facetofacegenerator->create_instance($f2fdata, $f2foptions);
+
+        $sessiondate1 = $this->array_to_object($this->facetoface_sessions_dates_data);
+        $sessiondata1 = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 10,
+            'sessiondates' => array($sessiondate1),
+            'datetimeknown' => '1',
+        );
+        $sessionid1 = $facetofacegenerator->add_session($sessiondata1);
+        $session1 = facetoface_get_session($sessionid1);
+
+        $generator->enrol_user($this->user1->id, $course->id);
+        facetoface_user_signup($session1, $facetoface, $course, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $this->user1->id, true);
+        // I need the signup id.
+        $signups = facetoface_get_user_submissions($facetoface->id, $this->user1->id);
+        $signupids = array_keys($signups);
+        $signupid = array_shift($signupids);
+
+        // Time to set up what we need to check completion statuses.
+        $completion = new completion_info($course);
+        $modinfo = get_fast_modinfo($course);
+        $cminfo =  $modinfo->instances['facetoface'][$facetoface->id];
+
+        $this->assertEquals(false, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id)));
+
+        $data = new stdClass();
+        $data->s = $sessionid1;
+        // submissionid_ is required at the beginning of each key.
+        $data->{'submissionid_'.$signupid} = MDL_F2F_STATUS_FULLY_ATTENDED;
+
+        facetoface_take_attendance($data);
+
+        $this->assertEquals(true, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id, 'completionstate' => COMPLETION_COMPLETE)));
+
+        // This object is equivalent to what might be returned from a form using $mform->get_data().
+        $moduleinfo = new stdClass();
+        $moduleinfo->course = $course->id;
+        $moduleinfo->coursemodule = $cminfo->id;
+        $moduleinfo->modulename = $cminfo->name;
+        $moduleinfo->instance = $cminfo->instance;
+        $moduleinfo->completionunlocked = 1;
+        $moduleinfo->completionunlockednoreset = 0;
+
+        totara_core_update_module_completion_data($cminfo, $moduleinfo, $course, $completion);
+
+        $this->assertEquals(false, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id, 'completionstate' => COMPLETION_COMPLETE)));
+
+        sleep(1);
+        totara_core_reaggregate_course_modules_completion();
+
+        $this->assertEquals(true, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id, 'completionstate' => COMPLETION_COMPLETE)));
+    }
+
+    /**
+     * Test the function totara_core_update_module_completion_data works with:
+     * - Course completion enabled.
+     * - Activity completion enabled and based on the learner being fully attended at a session.
+     *
+     * Reaggregation of activity completion is done via totara_core_reaggregate_course_modules_completion().
+     */
+    public function test_totara_core_update_module_completion_data_facetoface_fullyattended_course_completion() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        set_config('enablecompletion', '1');
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(array('enablecompletion' => 1));
+
+        /** @var mod_facetoface_generator $facetofacegenerator */
+        $facetofacegenerator = $generator->get_plugin_generator('mod_facetoface');
+
+        $f2fdata = new stdClass();
+        $f2fdata->course = $course->id;
+        $f2foptions = array(
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'completionstatusrequired' => json_encode(array(MDL_F2F_STATUS_FULLY_ATTENDED))
+        );
+        $facetoface = $facetofacegenerator->create_instance($f2fdata, $f2foptions);
+
+        $course_completion_info = new completion_info($course);
+        $this->assertEquals(COMPLETION_ENABLED, $course_completion_info->is_enabled());
+
+        $sessiondate1 = $this->array_to_object($this->facetoface_sessions_dates_data);
+        $sessiondata1 = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 10,
+            'sessiondates' => array($sessiondate1),
+            'datetimeknown' => '1',
+        );
+        $sessionid1 = $facetofacegenerator->add_session($sessiondata1);
+        $session1 = facetoface_get_session($sessionid1);
+
+        $generator->enrol_user($this->user1->id, $course->id);
+
+        facetoface_user_signup($session1, $facetoface, $course, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $this->user1->id, true);
+        // I need the signup id.
+        $signups = facetoface_get_user_submissions($facetoface->id, $this->user1->id);
+        $signupids = array_keys($signups);
+        $signupid = array_shift($signupids);
+
+        // Time to set up what we need to check completion statuses.
+        $completion = new completion_info($course);
+        $modinfo = get_fast_modinfo($course);
+        $cminfo =  $modinfo->instances['facetoface'][$facetoface->id];
+
+        $data = new stdClass();
+        $data->id = $course->id;
+        $data->overall_aggregation = COMPLETION_AGGREGATION_ALL;
+        $data->criteria_activity_value = array($cminfo->id => 1);
+        $criterion = new completion_criteria_activity();
+        $criterion->update_config($data);
+
+        $this->assertEquals(false, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id)));
+
+        // facetoface_take_attendance specifies an array and runs foreach on it, but really it expects an object.
+        $data = new stdClass();
+        $data->s = $sessionid1;
+        // submissionid_ is required at the beginning of each key.
+        $data->{'submissionid_'.$signupid} = MDL_F2F_STATUS_FULLY_ATTENDED;
+
+        facetoface_take_attendance($data);
+
+        $this->assertEquals(true, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id, 'completionstate' => COMPLETION_COMPLETE)));
+
+        // This object is equivalent to what might be returned from a form using $mform->get_data().
+        $moduleinfo = new stdClass();
+        $moduleinfo->course = $course->id;
+        $moduleinfo->coursemodule = $cminfo->id;
+        $moduleinfo->modulename = $cminfo->name;
+        $moduleinfo->instance = $cminfo->instance;
+        $moduleinfo->completionunlocked = 1;
+        $moduleinfo->completionunlockednoreset = 0;
+
+        totara_core_update_module_completion_data($cminfo, $moduleinfo, $course, $completion);
+
+        $this->assertEquals(false, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id, 'completionstate' => COMPLETION_COMPLETE)));
+
+        sleep(1);
+        totara_core_reaggregate_course_modules_completion();
+
+        $this->assertEquals(true, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id, 'completionstate' => COMPLETION_COMPLETE)));
+    }
+
+    /**
+     * Test the function totara_core_update_module_completion_data works with:
+     * - Course completion enabled.
+     * - Activity completion enabled and based on the learner being fully attended at a session and viewing the
+     *   Face-to-face activity.
+     *
+     * Reaggregation of activity completion is done via totara_core_reaggregate_course_modules_completion().
+     */
+    public function test_totara_core_update_module_completion_data_facetoface_fullyattended_viewed() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        set_config('enablecompletion', '1');
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(array('enablecompletion' => 1));
+
+        /** @var mod_facetoface_generator $facetofacegenerator */
+        $facetofacegenerator = $generator->get_plugin_generator('mod_facetoface');
+
+        $f2fdata = new stdClass();
+        $f2fdata->course = $course->id;
+        $f2foptions = array(
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'completionview' => COMPLETION_VIEW_REQUIRED,
+            'completionstatusrequired' => json_encode(array(MDL_F2F_STATUS_FULLY_ATTENDED))
+        );
+        $facetoface = $facetofacegenerator->create_instance($f2fdata, $f2foptions);
+
+        $sessiondate1 = $this->array_to_object($this->facetoface_sessions_dates_data);
+        $sessiondata1 = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 10,
+            'sessiondates' => array($sessiondate1),
+            'datetimeknown' => '1',
+        );
+        $sessionid1 = $facetofacegenerator->add_session($sessiondata1);
+        $session1 = facetoface_get_session($sessionid1);
+
+        $generator->enrol_user($this->user1->id, $course->id);
+        facetoface_user_signup($session1, $facetoface, $course, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $this->user1->id, true);
+        // We need the signup id.
+        $signups = facetoface_get_user_submissions($facetoface->id, $this->user1->id);
+        $signupids = array_keys($signups);
+        $signupid = array_shift($signupids);
+
+        // Time to set up what we need to update and check completion statuses.
+        $completion = new completion_info($course);
+        $modinfo = get_fast_modinfo($course);
+        $cminfo =  $modinfo->instances['facetoface'][$facetoface->id];
+
+        // The user has not attended the course and is not even enrolled, so no completion record should
+        // exist for them yet.
+        $this->assertEquals(false, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id)));
+
+        // Set the user as having fully attended the face-to-face activity.
+        $data = new stdClass();
+        $data->s = $sessionid1;
+        $data->{'submissionid_'.$signupid} = MDL_F2F_STATUS_FULLY_ATTENDED;
+        facetoface_take_attendance($data);
+
+        // Suppressing the debugging message. See TL-8669 for more info - setting $cm->timecompleted in face-to-face.
+        $this->assertDebuggingCalled($completion->set_module_viewed($cminfo, $this->user1->id));
+
+        // The activity has been attended and been viewed. It should now be complete.
+        $this->assertEquals(true, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id, 'completionstate' => COMPLETION_COMPLETE)));
+
+        // This object is equivalent to what might be returned from a form using $mform->get_data().
+        $moduleinfo = new stdClass();
+        $moduleinfo->course = $course->id;
+        $moduleinfo->coursemodule = $cminfo->id;
+        $moduleinfo->modulename = $cminfo->name;
+        $moduleinfo->instance = $cminfo->instance;
+        $moduleinfo->completionunlocked = 1;
+        $moduleinfo->completionunlockednoreset = 0;
+
+        totara_core_update_module_completion_data($cminfo, $moduleinfo, $course, $completion);
+
+        // Immediately after totara_core_update_module_completion_data is called, records for this activity should
+        // be set to incomplete.
+        $this->assertEquals(false, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id, 'completionstate' => COMPLETION_COMPLETE)));
+
+        sleep(1);
+        totara_core_reaggregate_course_modules_completion();
+
+        // The activity should now be complete.
+        $this->assertEquals(true, $DB->record_exists('course_modules_completion',
+            array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id, 'completionstate' => COMPLETION_COMPLETE)));
     }
 }

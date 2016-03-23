@@ -671,6 +671,8 @@ class completion_info {
             if (isset($cm->timecompleted)) {
                 $current->timecompleted = ($newstate == COMPLETION_INCOMPLETE) ? null : $cm->timecompleted;
             }
+            // TOTARA - Whether or not this was 0 before, it should be 0 now as no reaggregation is necessary after this.
+            $current->reaggregate = 0;
             $this->internal_set_data($cm, $current);
         }
 
@@ -1251,6 +1253,7 @@ class completion_info {
                     $data->viewed          = 0;
                     $data->timemodified    = 0;
                     $data->timecompleted   = null;
+                    $data->reaggregate     = 0;
 
                     // TOTARA - Check the criteria in case it should be complete.
                     $coursemodule = $DB->get_record('course_modules' , array('id' => $othercm->id));
@@ -1285,6 +1288,7 @@ class completion_info {
                 $data->viewed          = 0;
                 $data->timemodified    = 0;
                 $data->timecompleted   = null;
+                $data->reaggregate     = 0;
 
                 // TOTARA - Check the criteria in case it should be complete.
                 $coursemodule = $DB->get_record('course_modules' , array('id' => $cm->id));

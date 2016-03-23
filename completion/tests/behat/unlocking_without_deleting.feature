@@ -321,6 +321,9 @@ Feature: Unlocking without deleting course completion data
      | completiondiscussions | 1 |
     And I press "Save and return to course"
     And "Student First" user has not completed "Test forum name" activity
+    And "Student Second" user has not completed "Test forum name" activity
+    When I run the "\core\task\completion_regular_task" task
+    Then "Student First" user has not completed "Test forum name" activity
     And "Student Second" user has completed "Test forum name" activity
 
   @javascript

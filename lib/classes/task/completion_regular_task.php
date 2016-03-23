@@ -50,6 +50,9 @@ class completion_regular_task extends scheduled_task {
             // Regular Completion cron.
             require_once($CFG->dirroot.'/completion/cron.php');
             completion_start_user_bulk(); // Totara: Make sure that all course_completion records exist as required.
+            // TOTARA - reaggregate the course_modules_completion records in case of
+            // such actions such as unlock and delete having been performed.
+            totara_core_reaggregate_course_modules_completion();
             completion_cron_criteria();
             completion_cron_completions();
         }

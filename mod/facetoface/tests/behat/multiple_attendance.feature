@@ -331,9 +331,14 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I press "Unlock completion and delete completion data"
     And I press "Save and return to course"
 
-    # Verify course completed with newer session date.
+    # The unlocked and deleted completions won't be restored until the necessary scheduled task runs.
+    # The session should then be completed with the newer date.
     And I log out
     And I log in as "user1"
+    And I follow "course1"
+    And I click on "More details" "link"
+    Then I should see "Not completed"
+    When I run the "\core\task\completion_regular_task" task
     And I follow "course1"
     And I click on "More details" "link"
     And I should see date "-10 day" formatted "%d %B %Y"
@@ -397,9 +402,14 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I press "Unlock completion and delete completion data"
     And I press "Save and return to course"
 
-    # Verify course completed with newer session date.
+    # The unlocked and deleted completions won't be restored until the necessary scheduled task runs.
+    # The session should then be completed with the newer date.
     And I log out
     And I log in as "user1"
+    And I follow "course1"
+    And I click on "More details" "link"
+    Then I should see "Not completed"
+    When I run the "\core\task\completion_regular_task" task
     And I follow "course1"
     And I click on "More details" "link"
     And I should see date "-10 day" formatted "%d %B %Y"

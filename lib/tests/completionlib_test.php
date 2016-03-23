@@ -196,6 +196,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $changed = clone($current);
         $changed->timemodified = time();
         $changed->completionstate = COMPLETION_INCOMPLETE;
+        $changed->reaggregate = 0;
         $comparewith = new phpunit_constraint_object_is_equal_with_exceptions($changed);
         $comparewith->add_exception('timemodified', 'assertGreaterThanOrEqual');
         $c->expects($this->at(2))
@@ -220,6 +221,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $changed = clone($current);
         $changed->timemodified = time();
         $changed->completionstate = COMPLETION_COMPLETE_PASS;
+        $changed->reaggregate = 0;
         $comparewith = new phpunit_constraint_object_is_equal_with_exceptions($changed);
         $comparewith->add_exception('timemodified', 'assertGreaterThanOrEqual');
         $c->expects($this->at(3))
@@ -434,7 +436,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $result=$c->get_data($cm, true, 123);
         $this->assertEquals((object)array(
             'id'=>'0', 'coursemoduleid'=>13, 'userid'=>123, 'completionstate'=>COMPLETION_INCOMPLETE,
-            'viewed'=>0, 'timemodified'=>0, 'timecompleted'=>null), $result);
+            'viewed'=>0, 'timemodified'=>0, 'timecompleted'=>null, 'reaggregate' =>0), $result);
         $this->assertFalse(isset($SESSION->completioncache));
 
         // 3. Current user, single record, not from cache.
@@ -516,6 +518,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $data->viewed          = 0;
         $data->timemodified    = 0;
         $data->timecompleted   = null;
+        $data->reaggregate     = 0;
         $DB->expects($this->at(2))
             ->method('get_record')
             ->with('course_modules', array('id' => 14))
@@ -543,7 +546,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $SESSION->completioncache[42]['updated'] = $now;
         $this->assertEquals(array(42 => array(13 => $basicrecord, 14 => $crazyrecord, 15 => (object)array(
             'id' => 0, 'coursemoduleid' => 15, 'userid' => 314159, 'completionstate' => COMPLETION_INCOMPLETE,
-            'viewed' => 0, 'timemodified' => 0, 'timecompleted' => null), 'updated' => $now)), $SESSION->completioncache);
+            'viewed' => 0, 'timemodified' => 0, 'timecompleted' => null, 'reaggregate' => 0), 'updated' => $now)), $SESSION->completioncache);
     }
 
     public function test_internal_set_data() {
@@ -565,6 +568,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $data->timemodified = time();
         $data->viewed = COMPLETION_NOT_VIEWED;
         $data->timecompleted = null;
+        $data->reaggregate = 0;
 
         $c->internal_set_data($cm, $data);
         $d1 = $DB->get_field('course_modules_completion', 'id', array('coursemoduleid' => $cm->id));
@@ -585,6 +589,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $d2->timemodified = time();
         $d2->viewed = COMPLETION_NOT_VIEWED;
         $d2->timecompleted = null;
+        $d2->reaggregate = 0;
         $c->internal_set_data($cm2, $d2);
         $this->assertFalse(isset($SESSION->completioncache));
 
@@ -601,6 +606,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $d3->completionstate = COMPLETION_COMPLETE;
         $d3->timemodified = time();
         $d3->viewed = COMPLETION_NOT_VIEWED;
+        $d3->reaggregate = 0;
         $DB->insert_record('course_modules_completion', $d3);
         $c->internal_set_data($cm, $data);
     }
