@@ -97,11 +97,9 @@ JSON;
     /**
      * It should replace hostnames in image src with a placeholder.
      */
-    public function test_to_json_adds_img_src_wwwroot_placeholder() {
+    public function test_to_json_adds_placeholders() {
 
         global $PAGE, $OUTPUT;
-
-        $themename = $PAGE->theme->name;
 
         $imgsrc = $OUTPUT->pix_url('logo', 'totara_core');
 
@@ -115,10 +113,10 @@ JSON;
 
         $expected =<<<JSON
 [
-    "<img src=\"__WWWROOT__/theme/image.php?theme={$themename}&amp;component=totara_core&amp;image=logo&amp;svg=0\" />",
-    "<img src='__WWWROOT__/theme/image.php?theme={$themename}&amp;component=totara_core&amp;image=logo&amp;svg=0' />",
-    "<img src=\"__WWWROOT__/theme/image.php?theme={$themename}&amp;component=totara_core&amp;image=logo&amp;svg=0\" />",
-    "<img src='__WWWROOT__/theme/image.php?theme={$themename}&amp;component=totara_core&amp;image=logo&amp;svg=0' />"
+    "<img src=\"__WWWROOT__/theme/image.php?theme=__THEME__&amp;component=totara_core&amp;image=logo&amp;svg=0\" />",
+    "<img src='__WWWROOT__/theme/image.php?theme=__THEME__&amp;component=totara_core&amp;image=logo&amp;svg=0' />",
+    "<img src=\"__WWWROOT__/theme/image.php?theme=__THEME__&amp;component=totara_core&amp;image=logo&amp;svg=0\" />",
+    "<img src='__WWWROOT__/theme/image.php?theme=__THEME__&amp;component=totara_core&amp;image=logo&amp;svg=0' />"
 ]
 JSON;
         $actual = example_data_formatter::to_json($templatecontext);

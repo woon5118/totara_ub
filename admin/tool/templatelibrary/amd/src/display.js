@@ -90,6 +90,9 @@ define(['jquery', 'core/ajax', 'core/log', 'core/notification', 'core/templates'
         var context = false;
         if (example) {
             var rawJSON = example[1].trim();
+            // Use regular expressions as a string only replaces the first one :(.
+            rawJSON = rawJSON.replace(/__WWWROOT__/g, config.wwwroot);
+            rawJSON = rawJSON.replace(/__THEME__/g, config.theme);
             try {
                 context = $.parseJSON(rawJSON);
             } catch (e) {

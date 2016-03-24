@@ -129,7 +129,12 @@ class example_data_formatter {
 
         $output = json_encode($templatecontext, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $output = self::replace_webroot_in_img_src($output);
+        // Blacklist $CFG->wwwroot.
         $output = str_replace($CFG->wwwroot, 'https://example.com', $output);
+
+        // Whitelist some specific urls.
+        $output = str_replace('https://example.com/theme/image.php', self::token_to_placeholder('WWWROOT') . '/theme/image.php', $output);
+        $output = str_replace('theme=' . $CFG->theme, 'theme=' . self::token_to_placeholder('THEME'), $output);
         $output = self::replace_actionable_attribute_urls($output);
 
         return $output;

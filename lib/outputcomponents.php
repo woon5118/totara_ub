@@ -565,6 +565,7 @@ class pix_icon implements renderable, templatable {
     public function export_for_template(renderer_base $output) {
         $attributes = $this->attributes;
         $attributes['src'] = $output->pix_url($this->pix, $this->component);
+        $attributes['src'] = $attributes['src']->out();
         $templatecontext = array();
         foreach ($attributes as $name => $value) {
             $templatecontext[] = array('name' => $name, 'value' => $value);
