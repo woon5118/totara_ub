@@ -1486,7 +1486,7 @@ class appraisal {
         $anstable = 'appraisal_quest_data_' . $appraisalid;
         $ansfields = '';
 
-        list($insql, $inparams) = $DB->get_in_or_equal(explode(',', $paramids));
+        list($insql, $inparams) = $DB->get_in_or_equal($paramids);
         $sql = "SELECT id, datatype
                   FROM {appraisal_quest_field}
                  WHERE id {$insql}";

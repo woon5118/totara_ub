@@ -101,7 +101,7 @@ class question_aggregate extends question_base{
         if (!isset($toform)) {
             $toform = new stdClass();
         }
-        $toform->multiselectfield = explode(',', $this->param1);
+        $toform->multiselectfield = $this->param1;
         $toform->aggregateaverage = $this->param2;
         $toform->aggregatemedian = $this->param3;
 
@@ -115,11 +115,9 @@ class question_aggregate extends question_base{
      * @return stdClass $fromform
      */
     public function define_set(stdClass $fromform) {
-        $questions = implode(',', $fromform->multiselectfield);
-        $this->param1 = $questions;
+        $this->param1 = $fromform->multiselectfield;
         $this->param2 = (int)$fromform->aggregateaverage;
         $this->param3 = (int)$fromform->aggregatemedian;
-
         return $fromform;
     }
 

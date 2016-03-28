@@ -29,6 +29,7 @@
 
 require_once($CFG->dirroot.'/totara/core/db/utils.php');
 require_once($CFG->dirroot.'/totara/appraisal/lib.php');
+require_once($CFG->dirroot.'/totara/appraisal/db/upgradelib.php');
 
 /**
  * Local database upgrade script
@@ -320,7 +321,18 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         }
 
         // Appraisal savepoint reached.
-        upgrade_plugin_savepoint(true, 2015100201, 'totara', 'appraisal');
+        if ($oldversion < 2015100201) {
+            upgrade_plugin_savepoint(true, 2015100201, 'totara', 'appraisal');
+        }
+    }
+
+    // JSON encode param1 for all aggregate questions.
+    if ($oldversion < 2016041800) {
+
+        appraisals_upgrade_clean_aggregate_params();
+
+        // Appraisal savepoint reached.
+        upgrade_plugin_savepoint(true, 2016041800, 'totara', 'appraisal');
     }
 
     return true;

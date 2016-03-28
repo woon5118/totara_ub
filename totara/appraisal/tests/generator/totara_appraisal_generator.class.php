@@ -18,7 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Maria Torres <maria.torres@totaralms.com>
- * @package totara_cohort
+ * @author David Curry <david.curry@totaralearning.com>
+ * @package totara_appraisal
  * @category test
  */
 
@@ -288,12 +289,163 @@ class totara_appraisal_generator extends component_generator_base {
         // Merge the defaults and the given data and cast into an object.
         $data = (object) array_merge($defaults, (array) $data);
 
+        // Create a new page.
+        $qmanager = new question_manager();
+        $qmanager->reset();
         $question = new appraisal_question();
-        $question->attach_element($data->datatype);
+        $element = $qmanager->create_element($question, $data->datatype);
+        $question->attach_element($element);
         $question->set($data);
         $question->save();
+        $question->get_element()->save();
 
         return $question;
+    }
+
+    /**
+     * Designed for use with create_question_for_behat.
+     *
+     * @param array $data - data array
+     */
+    private function setup_ratingnumeric_question(array &$data) {
+
+        // Make sure we have some default values for things set by $extradata.
+        $data['rangefrom'] = 1;
+        $data['rangeto'] = 10;
+        $data['list'] = "1"; // DISPLAY_SLIDER
+        if (!empty($data['ExtraInfo'])) {
+            $extrainfo = explode(',', $data['ExtraInfo']);
+
+            foreach ($extrainfo as $extra) {
+                list($name, $value) = explode(':', $extra);
+
+                switch($name) {
+                    case 'Range':
+                        // Data should be formatted X-Y
+                        list($min, $max) = explode('-', $value);
+                        $data['rangefrom'] = (int)$min;
+                        $data['rangeto'] = (int)$max;
+                        break;
+                    case 'Display':
+                        // Acceptable values are slider or text.
+                        switch ($value) {
+                            case 'slider':
+                                $data['list'] = "1"; // DISPLAY_SLIDER
+                                break(2);
+                            case 'text':
+                                $data['list'] = "2"; // DISPLAY_INPUT
+                                break(2);
+                            default:
+                                return false;
+                        }
+                    default:
+                        return false;
+                }
+            }
+            unset($data['ExtraInfo']);
+        }
+
+        $data['setdefault'] = null;
+        if (isset($data['default']) && is_numeric($data['default'])) {
+            $data['setdefault'] = true;
+            $data['defaultvalue'] = $data['default'];
+
+            unset($data['default']);
+        }
+    }
+
+    /**
+     * Designed for use with create_question_for_behat.
+     *
+     * @param array $data - data array
+     */
+    private function setup_ratingcustom_question(array &$data) {
+        $choices = array();
+
+        // Set up some default options.
+        for ($index = 1; $index < 6; $index++) {
+            $choice = array();
+            $choice['option'] = 'choice' . $index;
+            $choice['score'] = $index * 2;
+            $choice['default'] = "0";
+
+            $choices[] = $choice;
+        }
+
+        // Make sure we have some default values for things set by $extradata.
+        $data['listtype']['list'] = "1"; //DISPLAY_RADIO
+        if (!empty($data['ExtraInfo'])) {
+            $extrainfo = explode(',', $data['ExtraInfo']);
+
+            foreach ($extrainfo as $extra) {
+                list($name, $value) = explode(':', $extra);
+
+                switch($name) {
+                    case 'Display':
+                        // Acceptable values are radio or menu.
+                        switch ($value) {
+                            case 'slider':
+                                $data['listtype']['list'] = "1"; //DISPLAY_RADIO
+                                break(2);
+                            case 'text':
+                                $data['listtype']['list'] = "2"; // DISPLAY_MENU
+                                break(2);
+                            default:
+                                return false;
+                        }
+                    default:
+                        return false;
+                }
+            }
+            unset($data['ExtraInfo']);
+        }
+
+        if (isset($data['default']) && $data['default'] !== '') {
+            foreach ($choices as $choice) {
+                if ($choice['option'] == $data['default']) {
+                    $choice['default'] = "1";
+                }
+            }
+
+            $data['selectedchoices'] = 1;
+            unset($data['default']);
+        }
+
+        $data['choice'] = $choices;
+        $data['saveoptions'] = 0;
+        $data['multiselectfield'] = 2;
+    }
+
+    /**
+     * Designed for use with create_question_for_behat.
+     *
+     * @param array $data - data array
+     */
+    private function setup_aggregate_question(array &$data) {
+        $options = appraisal::get_aggregation_question_list($data['appraisalstagepageid']);
+
+        // Should contain question names.
+        $selections = array();
+        if (!isset($data['ExtraInfo']) or $data['ExtraInfo'] === '*') {
+            $selections = array_keys($options);
+        } else {
+            // Match the question name on string like "Stagename - Pagename : Questionname".
+            $questions = explode(',', $data['ExtraInfo']);
+            foreach ($questions as $quest) {
+                foreach ($options as $key => $option) {
+                    $pattern = '/.+ - .+ : ' . $quest . '/';
+                    if (preg_match($pattern, $option)) {
+                        $selections[] = $key;
+                        continue(2);
+                    }
+                }
+            }
+        }
+        unset($data['ExtraInfo']);
+
+        $data['multiselectfield'] = $selections;
+        $data['aggregateaverage'] = "1";
+        $data['aggregatemedian'] = "1";
     }
 
     /**
@@ -304,6 +456,9 @@ class totara_appraisal_generator extends component_generator_base {
      */
     public function create_question_for_behat($data = array()) {
         global $DB;
+
+        // Increment the count of questions.
+        $i = ++$this->questioncount;
 
         // We need to know the appraisal name so we can look it up and get the id for the stage.
         if (isset($data['appraisal'])) {
@@ -329,7 +484,42 @@ class totara_appraisal_generator extends component_generator_base {
             return false;
         }
 
-        return $this->create_question($pageid, $data);
+        $data['appraisalstagepageid'] = $pageid;
+
+        if (!isset($data['name'])) {
+            $data['name'] = self::DEFAULT_NAME_QUESTION . ' ' . $i;
+        }
+
+        $data['roles'] = array(
+            appraisal::ROLE_LEARNER => appraisal::ACCESS_CANANSWER,
+            appraisal::ROLE_MANAGER => appraisal::ACCESS_CANANSWER + appraisal::ACCESS_CANVIEWOTHER,
+        );
+
+        if (!isset($data['type'])) {
+            $data['type'] = 'text';
+        }
+
+        // Custom setup functions per question type.
+        $funcname = "setup_{$data['type']}_question";
+        if ($data['type'] != 'text') {
+            if (!is_callable(array($this, $funcname))) {
+                return false;
+            }
+            $this->$funcname($data);
+        }
+
+        // Merge the defaults and the given data and cast into an object.
+        // Create a new page.
+        $qmanager = new question_manager();
+        $qmanager->reset();
+        $question = new appraisal_question();
+        $element = $qmanager->create_element($question, $data['type']);
+        $question->attach_element($element);
+        $question->set((object) $data);
+        $question->save();
+        $question->get_element()->save();
+
+        return true;
     }
 
     /**
