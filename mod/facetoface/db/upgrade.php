@@ -3842,7 +3842,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         }
 
         // Add session cancellation notification template.
-        if ($adjustingstructure && $dbman->table_exists('facetoface_notification_tpl')) {
+        if ($adjustingstructure && !$DB->record_exists('facetoface_notification_tpl', array('reference' => 'sessioncancellation'))) {
             $sessioncancel = new stdClass();
             $sessioncancel->reference = 'sessioncancellation';
             $sessioncancel->status = 1;
@@ -3861,40 +3861,52 @@ function xmldb_facetoface_upgrade($oldversion=0) {
     if ($oldversion < 2016031000) {
         // Add Sign Up period expired notification.
 
-        // Add the template.
-        $tpl_expired = new stdClass();
-        $tpl_expired->reference = 'registrationexpired';
-        $tpl_expired->status = 1;
-        $tpl_expired->title = get_string('setting:defaultregistrationexpiredsubjectdefault', 'facetoface');
-        $tpl_expired->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
-        $tpl_expired->managerprefix = text_to_html(get_string('setting:defaultregistrationexpiredmessagedefault', 'facetoface'));
-        $templateid = $DB->insert_record('facetoface_notification_tpl', $tpl_expired, true);
+        // We need to ensure that this notification does not already exist.
+        // We can check the reference for this.
+        $reference = 'registrationexpired';
+        if (!$DB->record_exists('facetoface_notification_tpl', array('reference' => $reference))) {
 
-        // Add the noticifations to existing facetoface activities.
-        $facetofaces = $DB->get_records('facetoface');
-        if ($facetofaces) {
-            // Loop over facetofaces.
-            foreach ($facetofaces as $facetoface) {
+            // Prepare the common strings.
+            $title = get_string('setting:defaultregistrationexpiredsubjectdefault', 'facetoface');
+            $body = text_to_html(get_string('setting:defaultregistrationexpiredmessagedefault', 'facetoface'));
 
-                // Get each message and create notification.
-                $defaults = array();
-                $defaults['facetofaceid'] = $facetoface->id;
-                $defaults['courseid'] = $facetoface->course;
-                $defaults['type'] = MDL_F2F_NOTIFICATION_AUTO;
-                $defaults['booked'] = 0;
-                $defaults['waitlisted'] = 0;
-                $defaults['cancelled'] = 0;
-                $defaults['issent'] = 0;
-                $defaults['status'] = 1;
-                $defaults['ccmanager'] = 0;
-                $defaults['templateid'] = $templateid;
+            // Add the template.
+            $tpl_expired = new stdClass();
+            $tpl_expired->reference = 'registrationexpired';
+            $tpl_expired->status = 1;
+            $tpl_expired->title = $title;
+            $tpl_expired->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
+            $tpl_expired->managerprefix = $body;
+            $templateid = $DB->insert_record('facetoface_notification_tpl', $tpl_expired, true);
 
-                $signupperiodexpired = new facetoface_notification($defaults, false);
-                $signupperiodexpired->title = get_string('setting:defaultregistrationexpiredsubjectdefault', 'facetoface');
-                $signupperiodexpired->body = text_to_html(get_string('setting:defaultregistrationexpiredmessagedefault', 'facetoface'));
-                $signupperiodexpired->conditiontype = MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED;
-                $result = $result && $signupperiodexpired->save();
+            // Add the noticifations to existing facetoface activities.
+            $facetofaces = $DB->get_records('facetoface', null, '', 'id,course');
+            if ($facetofaces) {
+                // Loop over facetofaces.
+                foreach ($facetofaces as $facetoface) {
+
+                    // Get each message and create notification.
+                    $defaults = array();
+                    $defaults['facetofaceid'] = $facetoface->id;
+                    $defaults['courseid'] = $facetoface->course;
+                    $defaults['type'] = MDL_F2F_NOTIFICATION_AUTO;
+                    $defaults['booked'] = 0;
+                    $defaults['waitlisted'] = 0;
+                    $defaults['cancelled'] = 0;
+                    $defaults['issent'] = 0;
+                    $defaults['status'] = 1;
+                    $defaults['ccmanager'] = 0;
+                    $defaults['templateid'] = $templateid;
+
+                    $signupperiodexpired = new facetoface_notification($defaults, false);
+                    $signupperiodexpired->title = $title;
+                    $signupperiodexpired->body = $body;
+                    $signupperiodexpired->conditiontype = MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED;
+                    $result = $result && $signupperiodexpired->save();
+                }
             }
+            // Unset some of the structures we've used, particularly facetofaces as it may be HUGE.
+            unset($title, $body, $facetofaces, $facetoface, $defaults, $tpl_expired, $signupperiodexpired);
         }
 
         // Facetoface savepoint reached.
