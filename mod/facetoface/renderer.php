@@ -52,10 +52,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param string $currenturl - generally this would be $PAGE->url.
      * @param bool $minimal - setting this to true will not show the customfields and will show the registration dates
      * in a tooltip when hovering over the signup link rather than in a column.
+     * @param bool $returntoallsessions Returns the user to view all sessions after they signup/cancel.
      * @return string containing html for this table.
      * @throws coding_exception
      */
-    public function print_session_list_table($sessions, $viewattendees, $editsessions, $displaytimezones, $reserveinfo = array(), $currenturl=null, $minimal = false) {
+    public function print_session_list_table($sessions, $viewattendees, $editsessions, $displaytimezones, $reserveinfo = array(),
+                                             $currenturl=null, $minimal = false, $returntoallsessions = true) {
         $output = '';
 
         if (empty($sessions)) {
@@ -136,7 +138,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     $sessionrow[] = $this->session_resgistrationperiod_table_cell($session);
                 }
                 $reservelink = $this->session_options_reserve_link($session, $signupcount, $reserveinfo);
-                $signuplink = $this->session_options_signup_link($session, $sessionstarted, $minimal);
+                $signuplink = $this->session_options_signup_link($session, $sessionstarted, $minimal, $returntoallsessions);
                 $sessionrow[] = $this->session_options_table_cell($session, $viewattendees, $editsessions, $reservelink, $signuplink);
 
                 $row = new html_table_row($sessionrow);
@@ -187,7 +189,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                             $sessionrow[] = $this->session_resgistrationperiod_table_cell($session, $datescount);
                         }
                         $reservelink = $this->session_options_reserve_link($session, $signupcount, $reserveinfo);
-                        $signuplink = $this->session_options_signup_link($session, $sessionstarted, $minimal);
+                        $signuplink = $this->session_options_signup_link($session, $sessionstarted, $minimal, $returntoallsessions);
                         $sessionrow[] = $this->session_options_table_cell($session, $viewattendees, $editsessions, $reservelink, $signuplink, $datescount);
                     }
 
@@ -532,10 +534,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @param stdClass $session
      * @param bool $sessionstarted - true if the session has started.
      * @param bool $regdatestooltip - true if we want the dates in a tooltip for the signup link.
+     * @param bool $returntoallsessions True if we want the user to return to view all sessions after an action.
      * @return string to be put into an options cell in the sessions table.
      * @throws coding_exception
      */
-    private function session_options_signup_link($session, $sessionstarted, $regdatestooltip = false) {
+    private function session_options_signup_link($session, $sessionstarted, $regdatestooltip = false, $returntoallsessions = true) {
 
         $signuplink = '';
 
@@ -553,16 +556,22 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $registrationclosed = false;
         }
 
+        // Prepare singup and cancel links.
+        $urlparams = array('s' => $session->id);
+        if ($returntoallsessions) {
+            $urlparams['backtoallsessions'] = $session->facetoface;
+        }
+        $signupurl = new moodle_url('/mod/facetoface/signup.php', $urlparams);
+        $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', $urlparams);
+
         $hasbookedsession = !empty($session->bookedsession);
         $isbookedsession = ($hasbookedsession && ($session->id == $session->bookedsession->sessionid));
         // Check if the user is allowed to cancel his booking.
         $allowcancellation = facetoface_allow_user_cancellation($session);
         if ($isbookedsession) {
-            $signupurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
             $signuplink .= html_writer::link($signupurl, get_string('moreinfo', 'facetoface'), array('title' => get_string('moreinfo', 'facetoface')));
             if ($allowcancellation) {
                 $signuplink .= html_writer::empty_tag('br');
-                $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
                 $canceltext = facetoface_is_user_on_waitlist($session) ? 'cancelwaitlist' : 'cancelbooking';
                 $signuplink .= html_writer::link($cancelurl, get_string($canceltext, 'facetoface'), array('title' => get_string($canceltext, 'facetoface')));
             }
@@ -577,7 +586,6 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     } else {
                         $tooltip = '';
                     }
-                    $signupurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
                     $signuptext = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
                     $signuplink .= html_writer::link($signupurl, get_string($signuptext, 'facetoface'), array('title' => $tooltip, 'aria-describedby' => $tooltip));
                 } else if ($registrationclosed == true) {
@@ -604,7 +612,6 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         if (empty($signuplink)) {
             if ($sessionstarted && $allowcancellation) {
-                $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
                 $canceltext = facetoface_is_user_on_waitlist($session) ? 'cancelwaitlist' : 'cancelbooking';
                 $signuplink = html_writer::link($cancelurl, get_string($canceltext, 'facetoface'), array('title' => get_string($canceltext, 'facetoface')));
             }

@@ -2968,7 +2968,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         $f2frenderer = $PAGE->get_renderer('mod_facetoface');
         $f2frenderer->setcontext($contextmodule);
         $output .= $f2frenderer->print_session_list_table($sessions, $viewattendees, $editsessions,
-            $displaytimezones, $reserveinfo, $PAGE->url, true);
+            $displaytimezones, $reserveinfo, $PAGE->url, true, false);
 
         // Add "view all sessions" row to table.
         $output .= $htmlviewallsessions;
@@ -3000,7 +3000,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
             $f2frenderer = $PAGE->get_renderer('mod_facetoface');
             $f2frenderer->setcontext($contextmodule);
             $output .= $f2frenderer->print_session_list_table($displaysessions, $viewattendees, $editsessions,
-                $displaytimezones, $reserveinfo, $PAGE->url, true);
+                $displaytimezones, $reserveinfo, $PAGE->url, true, false);
 
             $output .= ($iseditor || ($coursemodule->visible && $coursemodule->available)) ? $htmlviewallsessions : $strviewallsessions;
 
