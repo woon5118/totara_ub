@@ -441,20 +441,17 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @throws coding_exception
      */
     private function get_regdates_tooltip_info($session) {
-        $tooltip = '';
+        $tooltip = array();
         if (!empty($session->registrationtimestart)) {
             $opendate = userdate($session->registrationtimestart, get_string('strftimedate', 'langconfig'));
-            $tooltip .= get_string('registrationhoverhintstart', 'facetoface', $opendate);
+            $tooltip[] = get_string('registrationhoverhintstart', 'facetoface', $opendate);
         }
         if (!empty($session->registrationtimefinish)) {
-            if (!empty($tooltip)) {
-                $tooltip .=  "<br />";
-            }
             $closedate = userdate($session->registrationtimefinish, get_string('strftimedate', 'langconfig'));
-            $tooltip .= get_string('registrationhoverhintend', 'facetoface', $closedate);
+            $tooltip[] = get_string('registrationhoverhintend', 'facetoface', $closedate);
         }
 
-        return $tooltip;
+        return implode("\n", $tooltip);
     }
 
     /**
