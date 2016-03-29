@@ -49,6 +49,7 @@ class scheduled_reports_new_form extends moodleform {
         $report = $this->_customdata['report'];
         $savedsearches = $this->_customdata['savedsearches'];
         $exporttofilesystem = $this->_customdata['exporttofilesystem'];
+        $context = context_system::instance();
 
         $mform->addElement('hidden', 'id', $id);
         $mform->setType('id', PARAM_INT);
@@ -119,17 +120,21 @@ class scheduled_reports_new_form extends moodleform {
         $mform->addElement('hidden', 'externalemails');
         $mform->setType('externalemails', PARAM_TEXT);
 
-        // Create a place to show existing audiences.
-        $audiences = array();
-        $audiences[] =& $mform->createElement('static', 'audiences_list', '', html_writer::div('', 'list-audiences'));
-        $audiences[] =& $mform->createElement('button', 'addaudiences', get_string('addcohorts', 'totara_reportbuilder'), array('id' => 'show-audiences-dialog'));
-        $mform->addGroup($audiences, 'audiences_group', get_string('cohorts', 'totara_cohort'), '');
+        if (has_capability('moodle/cohort:view', $context)) {
+            // Create a place to show existing audiences.
+            $audiences = array();
+            $audiences[] =& $mform->createElement('static', 'audiences_list', '', html_writer::div('', 'list-audiences'));
+            $audiences[] =& $mform->createElement('button', 'addaudiences', get_string('addcohorts', 'totara_reportbuilder'), array('id' => 'show-audiences-dialog'));
+            $mform->addGroup($audiences, 'audiences_group', get_string('cohorts', 'totara_cohort'), '');
+        }
 
-        // Create a place to show existing system users.
-        $sysusers = array();
-        $sysusers[] =& $mform->createElement('static', 'systemusers_list', get_string('systemusers', 'totara_reportbuilder'), html_writer::div('', 'list-systemusers'));
-        $sysusers[] =& $mform->createElement('button', 'addsystemusers', get_string('addsystemusers', 'totara_reportbuilder'), array('id' => 'show-systemusers-dialog'));
-        $mform->addGroup($sysusers, 'systemusers_list_group', get_string('systemusers', 'totara_reportbuilder'), '');
+        if (has_capability('moodle/user:viewdetails', $context)) {
+            // Create a place to show existing system users.
+            $sysusers = array();
+            $sysusers[] =& $mform->createElement('static', 'systemusers_list', get_string('systemusers', 'totara_reportbuilder'), html_writer::div('', 'list-systemusers'));
+            $sysusers[] =& $mform->createElement('button', 'addsystemusers', get_string('addsystemusers', 'totara_reportbuilder'), array('id' => 'show-systemusers-dialog'));
+            $mform->addGroup($sysusers, 'systemusers_list_group', get_string('systemusers', 'totara_reportbuilder'), '');
+        }
 
         // Text input to add new emails for external users.
         $objs = array();
