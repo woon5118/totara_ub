@@ -146,7 +146,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     $row->attributes = array('class' => 'dimmed_text');
                 } else if ($isbookedsession) {
                     $row->attributes = array('class' => 'highlight');
-                } else if ($sessionfull) {
+                } else if ($sessionfull && $session->allowoverbook == '0') {
                     $row->attributes = array('class' => 'dimmed_text');
                 }
 
@@ -201,7 +201,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                         $row->attributes = array('class' => 'dimmed_text');
                     } else if ($isbookedsession) {
                         $row->attributes = array('class' => 'highlight');
-                    } else if ($sessionfull) {
+                    } else if ($sessionfull && $session->allowoverbook == '0') {
                         $row->attributes = array('class' => 'dimmed_text');
                     }
 
