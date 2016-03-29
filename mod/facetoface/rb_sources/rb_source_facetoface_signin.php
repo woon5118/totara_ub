@@ -149,7 +149,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'bookedby',
                 'LEFT',
                 '{user}',
-                'bookedby.id = base.bookedby',
+                'bookedby.id = CASE WHEN base.bookedby = 0 THEN base.userid ELSE base.bookedby END',
                 REPORT_BUILDER_RELATION_MANY_TO_ONE
             ),
             new rb_join(
@@ -368,8 +368,11 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'bookedby',
                 get_string('bookedby', 'rb_source_facetoface_signin'),
                 $DB->sql_concat_join("' '", $usernamefieldsbooked),
-                array('joins' => 'bookedby', 'displayfunc' => 'link_f2f_bookedby',
-                    'extrafields' => array_merge(array('user_id' => 'bookedby.id')), $usernamefieldsbooked)
+                array(
+                    'joins' => 'bookedby',
+                    'displayfunc' => 'link_f2f_bookedby',
+                    'extrafields' => array_merge(array('id' => 'bookedby.id'), $usernamefieldsbooked)
+                )
             ),
             new rb_column_option(
                 'session',
