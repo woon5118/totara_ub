@@ -56,7 +56,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="certif_comp_hist_certifid_ix" TYPE="foreign" FIELDS="certifid" REFTABLE="certif" REFFIELDS="id"/>
         <KEY NAME="certif_comp_hist_userid_ix" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="certif_comp_hist_unq_ix" TYPE="unique" FIELDS="certifid, userid, timeexpires"/>
+        <KEY NAME="certif_comp_hist_unq_ix" TYPE="unique" FIELDS="certifid, userid, timecompleted, timeexpires"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="course_completion_history" COMMENT="Course completion history archive">

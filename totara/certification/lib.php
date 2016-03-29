@@ -2233,12 +2233,12 @@ function certif_get_completion_errors($certcompletion, $progcompletion) {
 
     // Unique constraint tests for history records.
     if (empty($progcompletion)) {
-        // History records need to have unique expiry date for a given cert/user.
+        // History records need to have unique pair of completion and expiry date for a given cert/user.
         $sql = "SELECT *
                   FROM {certif_completion_history} cch
-                 WHERE certifid = :certifid AND userid = :userid AND timeexpires = :timeexpires";
+                 WHERE certifid = :certifid AND userid = :userid AND timecompleted = :timecompleted AND timeexpires = :timeexpires";
         $params = array('certifid' => $certcompletion->certifid, 'userid' => $certcompletion->userid,
-            'timeexpires' => $certcompletion->timeexpires);
+            'timecompleted' => $certcompletion->timecompleted, 'timeexpires' => $certcompletion->timeexpires);
         if (!empty($certcompletion->id)) {
             // When update, exclude this record from the check.
             $sql .= " AND id <> :id";
@@ -2246,8 +2246,7 @@ function certif_get_completion_errors($certcompletion, $progcompletion) {
         }
         $otherexists = $DB->record_exists_sql($sql, $params);
         if ($otherexists) {
-            $errors['error:completionhistoryexpirynotunique'] = 'timeexpires';
-            $errors['error:completionhistoryexpirynotunique'] = 'timeexpiresnotapplicable';
+            $errors['error:completionhistorydatesnotunique'] = 'timecompleted';
         }
 
         // History records can only be marked unassigned if the user is not currently assigned, and there should only be 1.

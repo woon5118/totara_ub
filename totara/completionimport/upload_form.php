@@ -102,8 +102,19 @@ class upload_form extends moodleform {
         $mform->setType('csvencoding', PARAM_TEXT);
         $mform->setDefault('csvencoding', 'UTF-8');
 
-        $overrideactivestr = get_string('overrideactive' . $data->importname, 'totara_completionimport');
-        $mform->addElement('advcheckbox', 'overrideactive' . $data->importname, $overrideactivestr);
+        if ($data->importname == 'certification') {
+            $selectoptions = array(
+                COMPLETION_IMPORT_TO_HISTORY => get_string('importactioncertificationhistory', 'totara_completionimport'),
+                COMPLETION_IMPORT_COMPLETE_INCOMPLETE => get_string('importactioncertificationcertify', 'totara_completionimport'),
+                COMPLETION_IMPORT_OVERRIDE_IF_NEWER => get_string('importactioncertificationnewer', 'totara_completionimport'),
+            );
+            $mform->addElement('select', 'importactioncertification', get_string('importactioncertification', 'totara_completionimport'), $selectoptions);
+            $mform->setType('importactioncertification', PARAM_INT);
+            $mform->addHelpButton('importactioncertification', 'importactioncertification', 'totara_completionimport');
+        } else {
+            $overrideactivestr = get_string('overrideactive' . $data->importname, 'totara_completionimport');
+            $mform->addElement('advcheckbox', 'overrideactive' . $data->importname, $overrideactivestr);
+        }
 
         $mform->addElement('advcheckbox', 'forcecaseinsensitive'.$data->importname, get_string('caseinsensitive'.$data->importname, 'totara_completionimport'));
         $mform->addHelpButton('forcecaseinsensitive'.$data->importname, 'caseinsensitive'.$data->importname, 'totara_completionimport');

@@ -34,6 +34,26 @@ define('TCI_CSV_DATE_FORMAT', 'Y-m-d'); // Default date format.
 define('TCI_CSV_ENCODING', 'UTF8'); // Default file encoding.
 
 /**
+ * From 9.0. On upgrade, setting was copied from overrideactivecertification setting, value 0.
+ * Imported completion records should be written directly to history, regardless of the state the user is in.
+ */
+const COMPLETION_IMPORT_TO_HISTORY = 0;
+
+/**
+ * From 9.0.
+ * Imported completion records should mark the user complete if the user is currently incomplete, otherwise
+ * they go into history.
+ */
+const COMPLETION_IMPORT_COMPLETE_INCOMPLETE = 2;
+
+/**
+ * From 9.0. On upgrade, setting was copied from overrideactivecertification setting, value 1.
+ * Imported completion records should mark the user complete if the import completion date is newer than the
+ * user's current completion date, otherwise they go into history.
+ */
+const COMPLETION_IMPORT_OVERRIDE_IF_NEWER = 1;
+
+/**
  * Returns a 3 character prefix for a temporary file name
  *
  * @param string $importname
@@ -1051,461 +1071,511 @@ function import_course($importname, $importtime) {
  * @return array of errors if any
  */
 function import_certification($importname, $importtime) {
-    global $DB, $CFG;
+    global $DB, $CFG, $USER;
     require_once($CFG->dirroot . '/totara/program/program.class.php');
 
-    $errors = array();
-    $updateids = array();
-    $cc = array();
-    $deleted = array();
-    $pc = array();
-    $pchistory = array();
-    $cchistory = array();
-    $pua = array();
-    $users = array();
-    $completionstolog = array();
-    // Arrays to hold info on previously-processed records for program/user pairs in this batch.
-    // In certifications an upload may contain multiple records for a program for one user going back historically.
-    $priorcc = array();
-    $priorpc = array();
-    $priorua = array();
-    $pluginname = 'totara_completionimport_' . $importname;
-    $overrideactivecertification = get_default_config($pluginname, 'overrideactive' . $importname, false);
+    if ($importname !== 'certification') {
+        throw new moodle_exception('error:wrongimportname', 'totara_completionimport', '', $importname);
+    }
 
-    list($sqlwhere, $stdparams) = get_importsqlwhere($importtime);
-    $params = array();
-    $params['assignmenttype2'] = ASSIGNTYPE_INDIVIDUAL;
-    $params = array_merge($params, $stdparams);
+    $importaction = get_default_config('totara_completionimport_certification', 'importactioncertification', COMPLETION_IMPORT_TO_HISTORY);
 
-    $tablename = get_tablename($importname);
+    list($importsqlwhere, $importsqlparams) = get_importsqlwhere($importtime);
 
     // Create missing program assignments for individuals, in a form that will work for insert_records_via_batch().
     // Note: Postgres objects to manifest constants being used as parameters where they are the left hand.
     // of an SQL clause (eg 5 AS assignmenttype) so manifest constants are placed in the query directly (better anyway!).
     $shortnameoridnumber = get_shortnameoridnumber('p', 'i', 'certificationshortname', 'certificationidnumber');
+
+    // First find all programs that have a user who is in the import but who isn't yet assigned.
+    $sql = "SELECT DISTINCT p.id
+              FROM {totara_compl_import_cert} i
+              JOIN {user} u ON u.username = i.username
+              JOIN {prog} p ON {$shortnameoridnumber}
+             {$importsqlwhere}
+               AND NOT EXISTS (SELECT pa.id FROM {prog_user_assignment} pa
+                                WHERE pa.programid = p.id AND pa.userid = u.id)
+               AND NOT EXISTS (SELECT pfa.id FROM {prog_future_user_assignment} pfa
+                                WHERE pfa.programid = p.id AND pfa.userid = u.id)";
+    $programstoupdate = $DB->get_fieldset_sql($sql, $importsqlparams);
+
+    // Then add the individual program assignment records.
     $sql = "SELECT DISTINCT p.id AS programid,
-            ".ASSIGNTYPE_INDIVIDUAL." AS assignmenttype,
-            u.id AS assignmenttypeid,
-            0 AS includechildren,
-            ".COMPLETION_TIME_NOT_SET." AS completiontime,
-            ".COMPLETION_EVENT_NONE." AS completionevent,
-            0 AS completioninstance
-            FROM {{$tablename}} i
-            JOIN {user} u ON u.username = i.username
-            JOIN {prog} p ON {$shortnameoridnumber}
-            {$sqlwhere}
-            AND NOT EXISTS (SELECT pa.id FROM {prog_user_assignment} pa
-                WHERE pa.programid = p.id AND pa.userid = u.id)
-            AND NOT EXISTS (SELECT pfa.id FROM {prog_future_user_assignment} pfa
-                WHERE pfa.programid = p.id AND pfa.userid = u.id )";
-
-    $assignments = $DB->get_recordset_sql($sql, $params);
-
+                   ".ASSIGNTYPE_INDIVIDUAL." AS assignmenttype,
+                   u.id AS assignmenttypeid,
+                   0 AS includechildren,
+                   ".COMPLETION_TIME_NOT_SET." AS completiontime,
+                   ".COMPLETION_EVENT_NONE." AS completionevent,
+                   0 AS completioninstance
+              FROM {totara_compl_import_cert} i
+              JOIN {user} u ON u.username = i.username
+              JOIN {prog} p ON {$shortnameoridnumber}
+             {$importsqlwhere}
+               AND NOT EXISTS (SELECT pa.id FROM {prog_user_assignment} pa
+                                WHERE pa.programid = p.id AND pa.userid = u.id)
+               AND NOT EXISTS (SELECT pfa.id FROM {prog_future_user_assignment} pfa
+                                WHERE pfa.programid = p.id AND pfa.userid = u.id)";
+    $assignments = $DB->get_recordset_sql($sql, $importsqlparams);
     $DB->insert_records_via_batch('prog_assignment', $assignments);
     $assignments->close();
 
-    // Now get the records to import.
-    $params = array_merge(array('assignmenttype' => ASSIGNTYPE_INDIVIDUAL), $stdparams);
+    // Lastly, update the program user assignments, to create the user assignment records.
+    foreach ($programstoupdate as $programid) {
+        $program = new program($programid);
+        $program->update_learner_assignments(true);
+    }
+
+    // Now get the records to import. If one user/cert combination has multiple records, the most recent will be first.
+    $params = array_merge(array('assignmenttype' => ASSIGNTYPE_INDIVIDUAL), $importsqlparams);
     $sql = "SELECT DISTINCT i.id as importid,
-                    i.completiondateparsed,
-                    i.duedate,
+                    i.completiondateparsed AS importcompletiondate,
+                    i.duedate AS importduedate,
                     p.id AS progid,
-                    c.id AS certifid,
+                    c.id AS certid,
                     c.recertifydatetype,
                     c.activeperiod,
                     c.minimumactiveperiod,
                     c.windowperiod,
-                    cc.timeexpires,
+                    cc.id AS ccid,
+                    cc.certifpath AS currentcertifpath,
+                    cc.status AS currentstatus,
+                    cc.renewalstatus AS currentrenewalstatus,
+                    cc.timewindowopens AS currenttimewindowopens,
+                    cc.timeexpires AS currenttimeexpires,
+                    cc.timecompleted AS currenttimecompleted,
+                    pc.id AS pcid,
+                    pc.status AS currentprogstatus,
+                    pc.timedue AS currenttimedue,
+                    pc.timecompleted AS currentprogtimecompleted,
                     u.id AS userid,
                     pa.id AS assignmentid,
-                    cc.id AS ccid,
-                    pc.id AS pcid,
                     pua.id AS puaid,
-                    pfa.id AS pfaid,
-                    cc.timecompleted AS currenttimecompleted
-            FROM {{$tablename}} i
-            LEFT JOIN {prog} p ON {$shortnameoridnumber}
-            LEFT JOIN {certif} c ON c.id = p.certifid
-            LEFT JOIN {user} u ON u.username = i.username
+                    pfa.id AS pfaid
+            FROM {totara_compl_import_cert} i
+            JOIN {prog} p ON {$shortnameoridnumber}
+            JOIN {certif} c ON c.id = p.certifid
+            JOIN {user} u ON u.username = i.username
             LEFT JOIN {prog_assignment} pa ON pa.programid = p.id
             LEFT JOIN {prog_user_assignment} pua ON pua.assignmentid = pa.id AND pua.userid = u.id AND pua.programid = p.id
             LEFT JOIN {prog_future_user_assignment} pfa ON pfa.assignmentid = pa.id AND pfa.userid = u.id AND pfa.programid = p.id
             LEFT JOIN {certif_completion} cc ON cc.certifid = c.id AND cc.userid = u.id
             LEFT JOIN {prog_completion} pc ON pc.programid = p.id AND pc.userid = u.id AND pc.coursesetid = 0
-            {$sqlwhere}
+            {$importsqlwhere}
             AND ((pa.assignmenttype = :assignmenttype AND pa.assignmenttypeid = u.id)
               OR (pfa.userid = u.id AND pfa.assignmentid IS NOT NULL)
               OR (pua.userid = u.id AND pua.assignmentid IS NOT NULL))
-            ORDER BY progid, userid, completiondateparsed DESC";
+            ORDER BY progid, userid, importcompletiondate DESC";
+    $recordstoprocess = $DB->get_recordset_sql($sql, $params);
 
-    $insertcount = 1;
-    $programid = 0;
-    $programs = $DB->get_recordset_sql($sql, $params);
+    // If there are no records to process, return.
+    if (!$recordstoprocess->valid()) {
+        $recordstoprocess->close();
+        return array();
+    }
 
-    $now = time();
+    // Used if one of the records can't be imported (only because the expiry date was a duplicate).
+    $errorsql = "UPDATE {totara_compl_import_cert}
+                    SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . ",
+                        importerror = :importerror
+                        WHERE id = :importid";
 
-    if ($programs->valid()) {
-        foreach ($programs as $program) {
-            if (empty($programid) || ($programid != $program->progid) || (($insertcount++ % BATCH_INSERT_MAX_ROW_COUNT) == 0)) {
-                // Insert a batch for a given programid (as need to insert user roles with program context).
-                if (!empty($deleted)) {
-                    list($deletedidssql, $deletedparams) = $DB->get_in_or_equal($deleted);
-                    $sql = "SELECT cc.id, prog.id AS programid, cc.userid
-                              FROM {certif_completion} cc
-                              JOIN {prog} prog ON prog.certifid = cc.certifid
-                             WHERE cc.id {$deletedidssql}";
-                    $logrecords = $DB->get_records_sql($sql, $deletedparams);
-                    $description = 'Completion deleted by import';
-                    foreach ($logrecords as $logrecord) {
-                        prog_log_completion($logrecord->programid, $logrecord->userid, $description);
-                    }
+    $batchdeletecertcompletion = array();
+    $batchinsertcertcompletion = array();
+    $batchdeletecertcompletionhistory = array();
+    $batchinsertcertcompletionhistory = array();
+    $batchdeleteprogcompletion = array();
+    $batchinsertprogcompletion = array();
+    $batchprogcompletionlog = array();
+    $batchupdateimport = array();
 
-                    $DB->delete_records_list('certif_completion', 'id', $deleted);
-                    unset($deleted);
-                    $deleted = array();
-                }
-                if (!empty($cc)) {
-                    foreach ($cc as $ccrecord) {
-                        $completiontolog = new stdClass();
-                        $completiontolog->programid = $ccrecord->programid;
-                        $completiontolog->userid = $ccrecord->userid;
-                        $completionstolog[$ccrecord->programid . '_' . $ccrecord->userid] = $completiontolog;
-                        unset($ccrecord->programid);
-                    }
+    $countbatch = 0;
+    $lastuserid = -1;
+    $lastprogid = -1;
+    $lasttimecompleted = -123;
+    $csvdateformat = get_default_config('totara_completionimport_certification', 'csvdateformat', TCI_CSV_DATE_FORMAT);
 
-                    $DB->insert_records_via_batch('certif_completion', $cc);
-                    unset($cc);
-                    $cc = array();
-                }
-                if (!empty($cchistory)) {
-                    $message = 'Completion history added by import';
-                    foreach ($cchistory as $newhistoryrecord) {
-                        certif_write_completion_history($newhistoryrecord, $message);
-                    }
-                    unset($cchistory);
-                    $cchistory = array();
-                }
-                if (!empty($pc)) {
-                    foreach ($pc as $pcrecord) {
-                        $completiontolog = new stdClass();
-                        $completiontolog->programid = $pcrecord->programid;
-                        $completiontolog->userid = $pcrecord->userid;
-                        $completionstolog[$pcrecord->programid . '_' . $pcrecord->userid] = $completiontolog;
-                    }
+    $nextrecordtoprocess = $recordstoprocess->current();
+    do {
+        // Get the current record for processing and move the record set pointer forward.
+        $recordtoprocess = $nextrecordtoprocess;
+        $recordstoprocess->next();
+        $islastrecordtoprocess = !$recordstoprocess->valid();
+        $nextrecordtoprocess = $islastrecordtoprocess ? false : $recordstoprocess->current();
 
-                    $DB->insert_records_via_batch('prog_completion', $pc);
-                    unset($pc);
-                    $pc = array();
-                }
-                if (!empty($pchistory)) {
-                    $DB->insert_records_via_batch('prog_completion_history', $pchistory);
-                    unset($pchistory);
-                    $pchistory = array();
-                }
-                if (!empty($pua)) {
-                    $DB->insert_records_via_batch('prog_user_assignment', $pua);
-                    unset($pua);
-                    $pua = array();
-                }
-                if (!empty($users)) {
-                    $context = context_program::instance($programid);
-                    role_assign_bulk($CFG->learnerroleid, $users, $context->id);
-                    unset($users);
-                    $users = array();
-                }
-                if (!empty($updateids)) {
-                    // Update the timeupdated.
-                    list($updateinsql, $params) = $DB->get_in_or_equal($updateids, SQL_PARAMS_NAMED, 'param');
-                    $params['timeupdated'] = $importtime;
-                    $sql = "UPDATE {{$tablename}}
-                            SET timeupdated = :timeupdated
-                            WHERE id {$updateinsql}";
-                    $DB->execute($sql, $params);
-                    unset($updateids);
-                    $updateids = array();
-                }
+        $countbatch++;
 
-                $programid = $program->progid;
-            }
+        // Set up some shortcuts.
+        $userid = $recordtoprocess->userid;
+        $progid = $recordtoprocess->progid;
+        $certid = $recordtoprocess->certid;
+        $sameasprevious = ($progid == $lastprogid && $userid == $lastuserid);
 
-            // Create Certification completion record.
-            $ccdata = new stdClass();
-            $ccdata->programid = $program->progid;
-            $ccdata->certifid = $program->certifid;
-            $ccdata->userid = $program->userid;
-            $ccdata->certifpath = CERTIFPATH_RECERT;
-            $ccdata->status = CERTIFSTATUS_COMPLETED;
-            $ccdata->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        // Create basic completion records in "certified" state, which can be altered for specific purposes later.
+        $certcompletion = new stdClass();
+        $certcompletion->certifid = $certid;
+        $certcompletion->userid = $userid;
+        $certcompletion->certifpath = CERTIFPATH_RECERT;
+        $certcompletion->status = CERTIFSTATUS_COMPLETED;
+        $certcompletion->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $certcompletion->timemodified = $importtime;
 
-            $errorsql = "UPDATE {{$tablename}}
-                SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . ",
-                    importerror = :importerror
-                    WHERE id = :importid";
+        $progcompletion = new stdClass();
+        $progcompletion->programid = $progid;
+        $progcompletion->userid = $userid;
+        $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $progcompletion->timestarted = $importtime;
 
-            // Do recert times.
-            $timecompleted = $program->completiondateparsed;
-            if (!$timecompleted) {
-                $timecompleted = $now;
-            }
-            $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
-            $timedue = totara_date_parse_from_format($csvdateformat, $program->duedate);
-            $base = get_certiftimebase($program->recertifydatetype, $program->timeexpires, $timecompleted, $timedue,
-                                       $program->activeperiod, $program->minimumactiveperiod, $program->windowperiod);
-            $ccdata->timeexpires = get_timeexpires($base, $program->activeperiod);
-            $ccdata->timewindowopens = get_timewindowopens($ccdata->timeexpires, $program->windowperiod);
+        // Calculate completion times.
+        $timecompleted = $recordtoprocess->importcompletiondate;
+        $importtimedue = totara_date_parse_from_format($csvdateformat, $recordtoprocess->importduedate);
+        $base = get_certiftimebase($recordtoprocess->recertifydatetype, $recordtoprocess->currenttimeexpires, $timecompleted, $importtimedue,
+            $recordtoprocess->activeperiod, $recordtoprocess->minimumactiveperiod, $recordtoprocess->windowperiod);
+        $certcompletion->timeexpires = get_timeexpires($base, $recordtoprocess->activeperiod);
+        $certcompletion->timewindowopens = get_timewindowopens($certcompletion->timeexpires, $recordtoprocess->windowperiod);
+        $certcompletion->timecompleted = $timecompleted;
+        $progcompletion->timedue = $certcompletion->timeexpires;
+        $progcompletion->timecompleted = $timecompleted;
 
-            $ccdata->timecompleted = $timecompleted;
-            $ccdata->timemodified = $now;
-            $priorkey = "{$ccdata->certifid}_{$ccdata->userid}";
-            $priorhistorykey = "{$ccdata->certifid}_{$ccdata->userid}_{$ccdata->timeexpires}";
-            $addtopending = false;
-            // Active record not complete, delete the current completion record and
-            // put the imported one in its place.
-            if (empty($program->currenttimecompleted)) {
-                if (!is_null($program->ccid)) {
-                    $deleted[] = $program->ccid;
-                }
-                $addtopending = true;
-            } else if ($ccdata->timecompleted > $program->currenttimecompleted) {
-                // The imported record is newer than the current record.
-                if ($ccdata->timeexpires > $now && $ccdata->timewindowopens > $now) { // Not due.
-                    if (!is_null($program->ccid)) {
-                        $deleted[] = $program->ccid;
-                    }
-                    $addtopending = true;
-                } else if ($ccdata->timeexpires > $now && $ccdata->timewindowopens <= $now) { // Due.
-                    // Check config variable here to see if we want to override.
-                    if ($overrideactivecertification) {
-                        if (!is_null($program->ccid)) {
-                            $deleted[] = $program->ccid;
+        // Figure out which action should be performed with the record.
+        $action = 'notset';
+        if ($sameasprevious && $certcompletion->timecompleted == $lasttimecompleted) {
+            // This record is a duplicate of one already imported (based on timecompleted). It must have the same expiry
+            // date too. We can't import this record.
+            $params = array('errorstring' => 'errorskippedduplicate;', 'importerror' => 1, 'importid' => $recordtoprocess->importid);
+            $DB->execute($errorsql, $params);
+            $action = 'skip';
+
+        } else if ($sameasprevious) {
+            // We've already seen a record for this user and certification. This one MUST have an older expiry date (see sql).
+            $action = 'addtohistory';
+
+        } else if ($importaction == COMPLETION_IMPORT_TO_HISTORY) {
+            // Just stick it in history. Note that this doesn't fix up missing prog or cert completion records.
+            // They should be handled by normal certification code (as opposed to completion upload).
+            $action = 'addtohistory';
+
+        } else if (empty($recordtoprocess->ccid) && empty($recordtoprocess->pcid)) {
+            // Both records are missing. Create them and certify the user using the uploaded record.
+            $action = 'createcertandprog';
+
+        } else if (empty($recordtoprocess->ccid)) {
+            // The certif_completion record is missing. Create it and make sure the prog_completion record is updated.
+            $action = 'createcertupdateprog';
+
+        } else if (empty($recordtoprocess->pcid)) {
+            // The prog_completion record is missing, so create it. It's possible that the certif_completion record contains
+            // some useful information (imagine a user certified then prog_completion disappeared), so archive it before
+            // certifying the user.
+            $action = 'createprogarchiveandupdatecert';
+
+        } else {
+            // From here on, we've got existing completion records to deal with, and import action could
+            // only be COMPLETE_INCOMPLETE or OVERRIDE_IF_NEWER.
+
+            $currentcertcompletion = new stdClass();
+            $currentcertcompletion->status = $recordtoprocess->currentstatus;
+            $currentcertcompletion->renewalstatus = $recordtoprocess->currentrenewalstatus;
+            $currentcertcompletion->certifpath = $recordtoprocess->currentcertifpath;
+            $currentcertcompletion->timecompleted = $recordtoprocess->currenttimecompleted;
+            $currentcertcompletion->timewindowopens = $recordtoprocess->currenttimewindowopens;
+            $currentcertcompletion->timeexpires = $recordtoprocess->currenttimeexpires;
+            $currentprogcompletion = new stdClass();
+            $currentprogcompletion->status = $recordtoprocess->currentprogstatus;
+            $currentprogcompletion->timecompleted = $recordtoprocess->currentprogtimecompleted;
+            $currentprogcompletion->timedue = $recordtoprocess->currenttimedue;
+            $haserrors = certif_get_completion_errors($currentcertcompletion, $currentprogcompletion);
+
+            if ($haserrors) {
+                // In either import action, we want to save the current completion record in history (in case the
+                // data has some meaning) and certify the user. Then they will have a valid current record.
+                $action = 'archivecurrentandcertifyuser';
+                // Recalculate the expiry date, because the date used to calculate it earlier might have been faulty.
+                $base = get_certiftimebase($recordtoprocess->recertifydatetype, 0, $timecompleted, $importtimedue,
+                    $recordtoprocess->activeperiod, $recordtoprocess->minimumactiveperiod, $recordtoprocess->windowperiod);
+                $certcompletion->timeexpires = get_timeexpires($base, $recordtoprocess->activeperiod);
+                $certcompletion->timewindowopens = get_timewindowopens($certcompletion->timeexpires, $recordtoprocess->windowperiod);
+                $progcompletion->timedue = $certcompletion->timeexpires;
+
+            } else {
+                $currentstate = certif_get_completion_state($currentcertcompletion);
+
+                switch ($currentstate) {
+                    case CERTIFCOMPLETIONSTATE_ASSIGNED:
+                        // The user is not certified. Just put the new completion record into current, marking the user
+                        // as certified. Both possible import actions indicate the import should cause certification.
+                        $action = 'certifyuser';
+                        break;
+
+                    case CERTIFCOMPLETIONSTATE_CERTIFIED:
+                        if ($importaction == COMPLETION_IMPORT_COMPLETE_INCOMPLETE) {
+                            // The user already has a completion date, so just record this in history.
+                            $action = 'addtohistory';
+
+                        } else { // Action must be OVERRIDE_IF_NEWER.
+
+                            if ($certcompletion->timecompleted > $recordtoprocess->currenttimecompleted) {
+                                // The new completion expires after the current completion expires. We need to archive the
+                                // current completion before updating it with the new completion data.
+                                $action = 'archivecurrentandcertifyuser';
+
+                            } else {
+                                // The new completion expires before the current completion expires. Just put it in history.
+                                $action = 'addtohistory';
+                            }
                         }
-                        $addtopending = true;
-                    } else {
-                        // Don't override and generate an import error.
-                        $params = array('errorstring' => 'certificationdueforrecert;', 'importerror' => 1, 'importid' => $program->importid);
+                        break;
 
-                        $DB->execute($errorsql, $params);
-                        continue;
-                    }
-                } else {
-                    // Certification has already expired, don't change the active record.
-                    // Flag as error and add an entry to the import log.
-                    $params = array('errorstring' => 'certificationexpired;', 'importerror' => 1, 'importid' => $program->importid);
+                    case CERTIFCOMPLETIONSTATE_WINDOWOPEN:
+                        if ($importaction == COMPLETION_IMPORT_COMPLETE_INCOMPLETE) {
+                            // The user already has a completion date, so just record this in history.
+                            $action = 'addtohistory';
 
-                    $DB->execute($errorsql, $params);
-                    continue;
-                }
-            } else if ($ccdata->timecompleted < $program->currenttimecompleted) {
-                // The imported record is older than the current record.
-                // Put the imported record directly into the history table and
-                // leave the active record unchanged.
-                $chparams = array('certifid'    => $ccdata->certifid,
-                    'userid'      => $ccdata->userid,
-                    'timeexpires' => $ccdata->timeexpires);
+                        } else { // Action must be OVERRIDE_IF_NEWER.
 
-                if (!array_key_exists($priorhistorykey, $cchistory) && !$DB->record_exists('certif_completion_history', $chparams)) {
-                    $cchistory[$priorhistorykey] = $ccdata;
-                }
-            } else {
-                // The imported record and the active record have exactly the same date
-                // Flag as error and add an entry to the import log.
-                $params = array('errorstring' => 'completiondatesame;', 'importerror' => 1, 'importid' => $program->importid);
+                            if ($certcompletion->timecompleted > $recordtoprocess->currenttimecompleted) {
+                                // The new completion expires after the current completion expires. The current completion
+                                // record was was already copied in history, so just update the current completion record,
+                                // marking the user as certified again.
+                                $action = 'certifyuser';
 
-                $DB->execute($errorsql, $params);
-                continue;
-            }
+                            } else {
+                                // The new completion expires before the current completion expires. Just put it in history.
+                                $action = 'addtohistory';
+                            }
+                        }
+                        break;
 
-            if ($addtopending) {
-                // Scan the pending completions in this batch for an existing program/user match
-                // then compare completion dates to make sure older completions go into the cchistory array.
-                if (isset($priorcc[$priorkey])) {
-                    if ($ccdata->timecompleted > $priorcc[$priorkey]->timecompleted) {
-                        // Newer record, swap out and put the existing in history instead.
-                        $cchistory[$priorhistorykey] = $priorcc[$priorkey];
-                        $priorcc[$priorkey] = $ccdata;
-                        $cc[$priorkey] = $ccdata;
-                    } else if ($ccdata->timecompleted < $priorcc[$priorkey]->timecompleted) {
-                        // Older record, put directly in history.
-                        $cchistory[$priorhistorykey] = $ccdata;
-                    }
-                } else {
-                    // No prior matching record exists in this batch, add to pending completions.
-                    $cc[$priorkey] = $ccdata;
-                    $priorcc[$priorkey] = $ccdata;
+                    case CERTIFCOMPLETIONSTATE_EXPIRED:
+                        // The user is not certified. Just put the new completion record into current, marking the user
+                        // as certified. Both possible import actions indicate the import should cause certification.
+                        $action = 'certifyuser';
+                        break;
+
+                    // Case CERTIFCOMPLETIONSTATE_INVALID is not possible, because $haserrors would be true.
                 }
             }
+        }
 
-            // Program completion.
-            $pcdata = new stdClass();
-            $pcdata->programid = $program->progid;
-            $pcdata->userid = $program->userid;
-            $pcdata->coursesetid = 0;
-            $pcdata->status = STATUS_PROGRAM_COMPLETE; // Assume complete.
-            $pcdata->timestarted = $timecompleted;
-            $pcdata->timedue = $ccdata->timeexpires;
-            $pcdata->timecompleted = $timecompleted;
+        switch ($action) {
+            case 'createcertandprog':
+                $batchinsertcertcompletion[] = $certcompletion;
+                $batchinsertprogcompletion[] = $progcompletion;
+                $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
+                    certif_calculate_completion_description($certcompletion, $progcompletion,
+                        'Cert and prog completion records created during import, user certified'));
+                break;
 
-            if (empty($program->pcid)) {
-                // New program completion record.
-                if (isset($priorpc[$priorkey])) {
-                    if ($pcdata->timecompleted > $priorpc[$priorkey]->timecompleted) {
-                        // Newer record, swap out and put the existing in history instead.
-                        $pchistory[] = $priorpc[$priorkey];
-                        $priorpc[$priorkey] = $pcdata;
-                        $pc[$priorkey] = $pcdata;
-                    } else if ($pcdata->timecompleted < $priorcc[$priorkey]->timecompleted) {
-                        // Older record, put directly in history.
-                        $pchistory[] = $pcdata;
-                    }
-                } else {
-                    // No prior matching record exists in this batch, add to pending completions.
-                    $pc[$priorkey] = $pcdata;
-                    $priorpc[$priorkey] = $pcdata;
+            case 'createcertupdateprog':
+                $batchinsertcertcompletion[] = $certcompletion;
+                $batchdeleteprogcompletion[] = $recordtoprocess->pcid;
+                $batchinsertprogcompletion[] = $progcompletion;
+                $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
+                    certif_calculate_completion_description($certcompletion, $progcompletion,
+                        'Cert completion record created during import, user certified'));
+                break;
+
+            case 'createprogarchiveandupdatecert':
+                $matchinghistoryid = $DB->get_field('certif_completion_history', 'id',
+                    array(
+                        'certifid' => $certid,
+                        'userid' => $userid,
+                        'timecompleted' => $recordtoprocess->currenttimecompleted,
+                        'timeexpires' => $recordtoprocess->currenttimeexpires
+                    ));
+                if ($matchinghistoryid) {
+                    $batchdeletecertcompletionhistory[] = $matchinghistoryid;
+                    $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
+                        "Completion history deleted during import<br><ul><li>ID: {$matchinghistoryid}</li></ul>");
                 }
-            } else {
-                // There is an existing record so put into history.
-                $pchistory[] = $pcdata;
-            }
+                $certcompletionhistory = new stdClass(); // Note: The order of these fields must match $certcompletion above!
+                $certcompletionhistory->certifid = $certid;
+                $certcompletionhistory->userid = $userid;
+                $certcompletionhistory->certifpath = $recordtoprocess->currentcertifpath;
+                $certcompletionhistory->status = $recordtoprocess->currentstatus;
+                $certcompletionhistory->renewalstatus = $recordtoprocess->currentrenewalstatus;
+                $certcompletionhistory->timemodified = $importtime;
+                $certcompletionhistory->timeexpires = $recordtoprocess->currenttimeexpires;
+                $certcompletionhistory->timewindowopens = $recordtoprocess->currenttimewindowopens;
+                $certcompletionhistory->timecompleted = $recordtoprocess->currenttimecompleted;
+                $certcompletionhistory->unassigned = 0;
+                $batchinsertcertcompletionhistory[] = $certcompletionhistory;
+                $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
+                    certif_calculate_completion_history_description($certcompletionhistory,
+                        'Completion archived during import'));
+                $batchdeletecertcompletion[] = $recordtoprocess->ccid;
+                $batchinsertcertcompletion[] = $certcompletion;
+                $batchinsertprogcompletion[] = $progcompletion;
+                $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
+                    certif_calculate_completion_description($certcompletion, $progcompletion,
+                        'Prog completion record created during import, user certified'));
+                break;
 
-            // Program user assignment if not already assigned in this batch.
-            $puadata = new stdClass();
-            $puadata->programid = $program->progid;
-            $puadata->userid = $program->userid;
-            $puadata->assignmentid = $program->assignmentid;
-            $puadata->timeassigned = time();
-            $puadata->exceptionstatus = PROGRAM_EXCEPTION_RESOLVED;
-
-            if (empty($program->pfaid)) {
-                if (empty($program->puaid)) {
-                    if (!isset($priorua[$priorkey])) {
-                        $pua[] = $puadata;
-                        $priorua[$priorkey] = $puadata;
-                    }
-                } else {
-                    // Do not waste time updating record again if we have already processed this user.
-                    if (!isset($priorua[$priorkey])) {
-                        $puadata->id = $program->puaid;
-                        $DB->update_record('prog_user_assignment', $puadata);
-                        $priorua[$priorkey] = $puadata;
-                    }
+            case 'addtohistory':
+                // Recalculate expiry date, ignoring the previous expiry date.
+                $base = get_certiftimebase($recordtoprocess->recertifydatetype, 0, $timecompleted, $importtimedue,
+                    $recordtoprocess->activeperiod, $recordtoprocess->minimumactiveperiod, $recordtoprocess->windowperiod);
+                $certcompletion->timeexpires = get_timeexpires($base, $recordtoprocess->activeperiod);
+                $certcompletion->timewindowopens = get_timewindowopens($certcompletion->timeexpires, $recordtoprocess->windowperiod);
+                $progcompletion->timedue = $certcompletion->timeexpires;
+                $matchinghistoryid = $DB->get_field('certif_completion_history', 'id',
+                    array(
+                        'certifid' => $certid,
+                        'userid' => $userid,
+                        'timecompleted' => $certcompletion->timecompleted,
+                        'timeexpires' => $certcompletion->timeexpires
+                    ));
+                if ($matchinghistoryid) {
+                    $batchdeletecertcompletionhistory[] = $matchinghistoryid;
+                    $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
+                        "Completion history deleted during import<br><ul><li>ID: {$matchinghistoryid}</li></ul>");
                 }
+                $certcompletion->unassigned = 0;
+                $batchinsertcertcompletionhistory[] = $certcompletion;
+                $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
+                    certif_calculate_completion_history_description($certcompletion,
+                        'Uploaded completion added to history during import'));
+                break;
+
+            case 'archivecurrentandcertifyuser':
+                $matchinghistoryid = $DB->get_field('certif_completion_history', 'id',
+                    array(
+                        'certifid' => $certid,
+                        'userid' => $userid,
+                        'timecompleted' => $recordtoprocess->currenttimecompleted,
+                        'timeexpires' => $recordtoprocess->currenttimeexpires
+                    ));
+                if ($matchinghistoryid) {
+                    $batchdeletecertcompletionhistory[] = $matchinghistoryid;
+                    $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
+                        "Completion history deleted during import<br><ul><li>ID: {$matchinghistoryid}</li></ul>");
+                }
+                $certcompletionhistory = new stdClass(); // Note: The order of these fields must match $certcompletion above!
+                $certcompletionhistory->certifid = $certid;
+                $certcompletionhistory->userid = $userid;
+                $certcompletionhistory->certifpath = $recordtoprocess->currentcertifpath;
+                $certcompletionhistory->status = $recordtoprocess->currentstatus;
+                $certcompletionhistory->renewalstatus = $recordtoprocess->currentrenewalstatus;
+                $certcompletionhistory->timemodified = $importtime;
+                $certcompletionhistory->timeexpires = $recordtoprocess->currenttimeexpires;
+                $certcompletionhistory->timewindowopens = $recordtoprocess->currenttimewindowopens;
+                $certcompletionhistory->timecompleted = $recordtoprocess->currenttimecompleted;
+                $certcompletionhistory->unassigned = 0;
+                $batchinsertcertcompletionhistory[] = $certcompletionhistory;
+                $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
+                    certif_calculate_completion_history_description($certcompletionhistory,
+                        'Completion archived during import'));
+                // Note: Break is missing here to prevent code duplication.
+
+            case 'certifyuser':
+                $batchdeletecertcompletion[] = $recordtoprocess->ccid;
+                $batchinsertcertcompletion[] = $certcompletion;
+                $batchdeleteprogcompletion[] = $recordtoprocess->pcid;
+                $batchinsertprogcompletion[] = $progcompletion;
+                $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
+                    certif_calculate_completion_description($certcompletion, $progcompletion,
+                        'User certified during import'));
+                break;
+
+            case 'skip':
+                break;
+
+            case 'notset':
+            default:
+                throw new moodle_exception('error:actionnotdefined', 'totara_completionimport', '', $action);
+                break;
+        }
+
+        // Mark the import record as being processed.
+        $batchupdateimport[] = $recordtoprocess->importid;
+
+        // Flush db changes to disk. Done on full batch and last record.
+        if ($countbatch >= BATCH_INSERT_MAX_ROW_COUNT || $islastrecordtoprocess) {
+
+            if (!empty($batchdeletecertcompletion)) {
+                $DB->delete_records_list('certif_completion', 'id', $batchdeletecertcompletion);
+                unset($batchdeletecertcompletion);
+                $batchdeletecertcompletion = array();
             }
 
-            // User array for role addition.
-            if (!in_array($program->userid, $users)) {
-                $users[] = $program->userid;
+            if (!empty($batchinsertcertcompletion)) {
+                $DB->insert_records_via_batch('certif_completion', $batchinsertcertcompletion);
+                unset($batchinsertcertcompletion);
+                $batchinsertcertcompletion = array();
             }
 
-            // Totara_compl_import_cert ids.
-            $updateids[] = $program->importid;
-        }
-    }
-    $programs->close();
+            if (!empty($batchdeletecertcompletionhistory)) {
+                $DB->delete_records_list('certif_completion_history', 'id', $batchdeletecertcompletionhistory);
+                unset($batchdeletecertcompletionhistory);
+                $batchdeletecertcompletionhistory = array();
+            }
 
-    if (!empty($deleted)) {
-        list($deletedidssql, $deletedparams) = $DB->get_in_or_equal($deleted);
-        $sql = "SELECT cc.id, prog.id AS programid, cc.userid
-                  FROM {certif_completion} cc
-                  JOIN {prog} prog ON prog.certifid = cc.certifid
-                 WHERE cc.id {$deletedidssql}";
-        $logrecords = $DB->get_records_sql($sql, $deletedparams);
-        $description = 'Completion deleted by import';
-        foreach ($logrecords as $logrecord) {
-            prog_log_completion($logrecord->programid, $logrecord->userid, $description);
-        }
+            if (!empty($batchinsertcertcompletionhistory)) {
+                $DB->insert_records_via_batch('certif_completion_history', $batchinsertcertcompletionhistory);
+                unset($batchinsertcertcompletionhistory);
+                $batchinsertcertcompletionhistory = array();
+            }
 
-        $DB->delete_records_list('certif_completion', 'id', $deleted);
-        unset($deleted);
-        $deleted = array();
-    }
-    if (!empty($cc)) {
-        foreach ($cc as $ccrecord) {
-            $completiontolog = new stdClass();
-            $completiontolog->programid = $ccrecord->programid;
-            $completiontolog->userid = $ccrecord->userid;
-            $completionstolog[$ccrecord->programid . '_' . $ccrecord->userid] = $completiontolog;
-            unset($ccrecord->programid);
-        }
+            if (!empty($batchdeleteprogcompletion)) {
+                $DB->delete_records_list('prog_completion', 'id', $batchdeleteprogcompletion);
+                unset($batchdeleteprogcompletion);
+                $batchdeleteprogcompletion = array();
+            }
 
-        $DB->insert_records_via_batch('certif_completion', $cc);
-        unset($cc);
-        $cc = array();
-    }
-    if (!empty($cchistory)) {
-        $message = 'Completion history added by import';
-        foreach ($cchistory as $newhistoryrecord) {
-            certif_write_completion_history($newhistoryrecord, $message);
-        }
-        unset($cchistory);
-        $cchistory = array();
-    }
-    if (!empty($pc)) {
-        foreach ($pc as $pcrecord) {
-            $completiontolog = new stdClass();
-            $completiontolog->programid = $pcrecord->programid;
-            $completiontolog->userid = $pcrecord->userid;
-            $completionstolog[$pcrecord->programid . '_' . $pcrecord->userid] = $completiontolog;
+            if (!empty($batchinsertprogcompletion)) {
+                $DB->insert_records_via_batch('prog_completion', $batchinsertprogcompletion);
+                unset($batchinsertprogcompletion);
+                $batchinsertprogcompletion = array();
+            }
+
+            if (!empty($batchprogcompletionlog)) {
+                $DB->insert_records_via_batch('prog_completion_log', $batchprogcompletionlog);
+                unset($batchprogcompletionlog);
+                $batchprogcompletionlog = array();
+            }
+
+            if (!empty($batchupdateimport)) {
+                // Update the timeupdated in the import table.
+                list($updateinsql, $params) = $DB->get_in_or_equal($batchupdateimport, SQL_PARAMS_NAMED, 'param');
+                $params['timeupdated'] = $importtime;
+                $sql = "UPDATE {totara_compl_import_cert}
+                           SET timeupdated = :timeupdated
+                         WHERE id {$updateinsql}";
+                $DB->execute($sql, $params);
+                unset($batchupdateimport);
+                $batchupdateimport = array();
+            }
         }
 
-        $DB->insert_records_via_batch('prog_completion', $pc);
-        unset($pc);
-        $pc = array();
-    }
-    if (!empty($pchistory)) {
-        $DB->insert_records_via_batch('prog_completion_history', $pchistory);
-        unset($pchistory);
-        $pchistory = array();
-    }
-    if (!empty($pua)) {
-        $DB->insert_records_via_batch('prog_user_assignment', $pua);
-        unset($pua);
-        $pua = array();
-    }
-    if (!empty($users)) {
-        $context = context_program::instance($programid);
-        role_assign_bulk($CFG->learnerroleid, $users, $context->id);
-        unset($users);
-        $users = array();
-    }
-    if (!empty($updateids)) {
-        // Update the timeupdated.
-        list($insql, $params) = $DB->get_in_or_equal($updateids, SQL_PARAMS_NAMED, 'param');
-        $params['timeupdated'] = $importtime;
-        $sql = "UPDATE {{$tablename}}
-                SET timeupdated = :timeupdated
-                WHERE id {$insql}";
-        $DB->execute($sql, $params);
-        unset($updateids);
-        $updateids = array();
-    }
+        $lastuserid = $userid;
+        $lastprogid = $progid;
+        $lasttimecompleted = $certcompletion->timecompleted;
 
-    // Copy the timeexpires of new/replaced certif_completion records to their matching prog_completion timedue.
-    $sql = "UPDATE {prog_completion}
-               SET timedue = (SELECT cc.timeexpires
-                                FROM {certif_completion} cc
-                                JOIN {prog} prog
-                                  ON prog.certifid = cc.certifid
-                               WHERE {prog_completion}.programid = prog.id
-                                 AND {prog_completion}.userid = cc.userid)
-             WHERE coursesetid = 0
-               AND EXISTS (SELECT 1
-                             FROM {certif_completion} cc
-                             JOIN {prog} prog
-                               ON prog.certifid = cc.certifid
-                            WHERE {prog_completion}.programid = prog.id
-                              AND {prog_completion}.userid = cc.userid
-                              AND cc.timemodified = :now)";
-    $DB->execute($sql, array('now' => $now));
+        // Keep going until we've processed the last record.
+    } while (!$islastrecordtoprocess);
 
-    // Write the program completion logs. This has to happen last, after all changes have been saved to db.
-    if (!empty($completionstolog)) {
-        $message = 'Completion added by import';
-        foreach ($completionstolog as $completiontolog) {
-            certif_write_completion_log($completiontolog->programid, $completiontolog->userid, $message);
-        }
-    }
+    $recordstoprocess->close();
 
-    return $errors;
+    return array();
+}
+
+/**
+ * Takes the values and puts them into a record which can be written to the program completion log.
+ *
+ * @internal
+ * @param $programid
+ * @param $userid
+ * @param $changeuserid
+ * @param $description
+ * @return stdClass
+ */
+function completionimport_create_prog_completion_log_record($programid, $userid, $changeuserid, $description) {
+    $record = new stdClass();
+    $record->programid = $programid;
+    $record->userid = $userid;
+    $record->changeuserid = $changeuserid;
+    $record->description = $description;
+    $record->timemodified = time();
+    return $record;
 }
 
 /**
@@ -1611,8 +1681,12 @@ function get_config_data($filesource, $importname) {
     $data->csvdelimiter = get_default_config($pluginname, 'csvdelimiter', TCI_CSV_DELIMITER);
     $data->csvseparator = get_default_config($pluginname, 'csvseparator', TCI_CSV_SEPARATOR);
     $data->csvencoding = get_default_config($pluginname, 'csvencoding', TCI_CSV_ENCODING);
-    $overridesetting = 'overrideactive' . $importname;
-    $data->$overridesetting = get_default_config($pluginname, 'overrideactive' . $importname, 0);
+    if ($importname == 'certification') {
+        $data->importactioncertification = get_default_config($pluginname, 'importactioncertification', COMPLETION_IMPORT_TO_HISTORY);
+    } else {
+        $overridesetting = 'overrideactive' . $importname;
+        $data->$overridesetting = get_default_config($pluginname, 'overrideactive' . $importname, 0);
+    }
     $forcecaseinsensitive = 'forcecaseinsensitive' . $importname;
     $data->$forcecaseinsensitive = get_default_config($pluginname, 'forcecaseinsensitive' . $importname, 0);
     return $data;
@@ -1634,8 +1708,12 @@ function set_config_data($data, $importname) {
     set_config('csvdelimiter', $data->csvdelimiter, $pluginname);
     set_config('csvseparator', $data->csvseparator, $pluginname);
     set_config('csvencoding', $data->csvencoding, $pluginname);
-    $overridesetting = 'overrideactive' . $importname;
-    set_config('overrideactive' . $importname, $data->$overridesetting, $pluginname);
+    if ($importname == 'certification') {
+        set_config('importactioncertification', $data->importactioncertification, $pluginname);
+    } else {
+        $overridesetting = 'overrideactive' . $importname;
+        set_config('overrideactive' . $importname, $data->$overridesetting, $pluginname);
+    }
     $forcecaseinsensitive = 'forcecaseinsensitive' . $importname;
     set_config('forcecaseinsensitive' . $importname, $data->$forcecaseinsensitive, $pluginname);
 }

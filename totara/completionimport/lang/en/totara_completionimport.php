@@ -75,10 +75,13 @@ $string['duplicate'] = 'Duplicate';
 $string['duplicateidnumber'] = 'Duplicate ID Number';
 $string['emptyfile'] = 'File is empty : {$a}';
 $string['emptyrow'] = 'Empty row';
+$string['error:actionnotdefined'] = 'Import_certification - code error - the selected action hasn\'t been defined: {$a}';
 $string['error:import_certifications'] = 'Errors while importing the certifications';
 $string['error:import_course'] = 'Errors while importing the courses';
 $string['error:invalidfilesource'] = 'Invalid file source code passed as a parameter';
+$string['error:wrongimportname'] = 'Import_certification - code error - doing something that isn\'t certifications: {$a}';
 $string['erroropeningfile'] = 'Error opening file : {$a}';
+$string['errorskippedduplicate'] = 'Import skipped because it is a duplicate';
 $string['evidence_certificationidnumber'] = 'Certification ID number : {$a}';
 $string['evidence_certificationshortname'] = 'Certification Short name : {$a}';
 $string['evidence_completiondate'] = 'Completion date : {$a}';
@@ -106,6 +109,32 @@ This option allows you to upload a file externally via FTP rather than using a f
 
 Please note the original file will be moved and deleted during the import process';
 $string['sourcefilerequired'] = 'Source file name is required';
+$string['importactioncertification'] = 'Import action';
+$string['importactioncertification_help'] = 'Choose which action should occur with the imported records.
+
+<strong>Save to history</strong>
+
+* The imported records will be added to history.
+* The certification status of users will remain unchanged.
+
+<strong>Certify uncertified users</strong>
+
+* If a user is already certified, the imported record is added to history.
+* If a user is not currently certified, the imported record will be used to mark them certified. If appropriate, the certification window may open and/or expire when cron next runs, causing the completion to be moved to history.
+
+<strong>Certify if more recent</strong>
+
+* If a user is already certified and the import completion date is more recent than the current completion date, then the current completion will be moved to history and the user will be marked certified on the imported completion date.
+* If a user is already certified and the import completion date is further in the past than the current completion date, then the imported record will be added to history.
+* If a user is not currently certified, the imported record will be used to mark them certified. If appropriate, the certification window may open and/or expire when cron next runs, causing the completion to be moved to history.
+
+<strong>Notes</strong>
+
+* If a record is imported for a user who is not assigned to the certification, an individual user assignment will be created for them, causing them to be assigned. Assignment (or reassignment as the case may be) occurs first, then the imported record is processed, regardless of the chosen action or outcome.
+* If a user is marked certified during import and the recertification window opening date is in the past, when cron runs it will open the recertification window and reset current course progress. If this is not the desired outcome then "Save to history" should probably be selected.';
+$string['importactioncertificationcertify'] = 'Certify uncertified users';
+$string['importactioncertificationhistory'] = 'Save to history';
+$string['importactioncertificationnewer'] = 'Certify if more recent';
 $string['importcertification'] = '{$a} Records successfully imported as certifications';
 $string['importcourse'] = '{$a} Records successfully imported as courses';
 $string['importedby'] = 'Imported by';

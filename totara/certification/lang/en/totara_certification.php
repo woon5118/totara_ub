@@ -179,7 +179,7 @@ $string['error:categoryidwasincorrect'] = 'Category ID was incorrect';
 $string['error:categorymustbespecified'] = 'Category must be specified';
 $string['error:certifsnotmoved'] = 'Error, certifications not moved from {$a}!';
 $string['error:complalreadyexists'] = 'Attempting to create certification completion record that already exists for certifid={$a->certifid} userid={$a->userid}';
-$string['error:completionhistoryexpirynotunique'] = 'Expiry date must be unique for this user and certification. Only one history record can have no expiry date.';
+$string['error:completionhistorydatesnotunique'] = 'The combination of completion date and expiry date must be unique for this user and certification.';
 $string['error:completionstatusunset'] = 'Completion status should never be \'Unset\'.';
 $string['error:info_fixcertifiedprogincomplete'] = 'There are two known possible causes for this problem.<br>
 The certification completion record was set to complete, but the program completion record was not.<br>
@@ -352,3 +352,6 @@ $string['windowperiod'] = 'Window Period';
 $string['years'] = 'Year(s)';
 $string['youhaveunsavedchanges'] = 'You have unsaved changes.';
 $string['youareassigned'] = 'You are assigned to this certification';
+
+// Deprecated.
+$string['error:completionhistoryexpirynotunique'] = 'Expiry date must be unique for this user and certification. Only one history record can have no expiry date.';

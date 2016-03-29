@@ -368,5 +368,22 @@ function xmldb_totara_certification_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2016051100, 'totara_certification');
     }
 
+    // TL-8675 Change unique constraint on certif_completion_history from timeexpires to timecompleted and timeexpires.
+    if ($oldversion < 2016082600) {
+
+        // Define key certif_comp_hist_unq_ix (unique) to be dropped form certif_completion_history.
+        $table = new xmldb_table('certif_completion_history');
+        $key = new xmldb_key('certif_comp_hist_unq_ix', XMLDB_KEY_UNIQUE, array('certifid', 'userid', 'timeexpires'));
+        $dbman->drop_key($table, $key);
+
+        // Define key certif_comp_hist_unq_ix (unique) to be added to certif_completion_history.
+        $table = new xmldb_table('certif_completion_history');
+        $key = new xmldb_key('certif_comp_hist_unq_ix', XMLDB_KEY_UNIQUE, array('certifid', 'userid', 'timecompleted', 'timeexpires'));
+        $dbman->add_key($table, $key);
+
+        // Savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2016082600, 'totara_certification');
+    }
+
     return true;
 }

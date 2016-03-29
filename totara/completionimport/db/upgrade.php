@@ -159,5 +159,18 @@ function xmldb_totara_completionimport_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016020803, 'totara', 'completionimport');
     }
 
+    // TL-8675 Change overrideactivecertification setting to importactioncertification.
+    // Note that existing 0/1 (on or off) map to the new constants COMPLETION_IMPORT_TO_HISTORY/COMPLETION_IMPORT_OVERRIDE_IF_NEWER.
+    if ($oldversion < 2016082600) {
+
+        $existingsetting = get_config('totara_completionimport_certification', 'overrideactivecertification');
+        if ($existingsetting !== false) {
+            set_config('importactioncertification', $existingsetting, 'totara_completionimport_certification');
+            unset_config('overrideactivecertification', 'totara_completionimport_certification');
+        }
+
+        upgrade_plugin_savepoint(true, 2016082600, 'totara', 'completionimport');
+    }
+
     return true;
 }

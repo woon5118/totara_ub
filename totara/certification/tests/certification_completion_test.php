@@ -724,7 +724,7 @@ class totara_certification_certification_completion_testcase extends reportcache
      */
     public function test_certif_get_completion_errors_for_current($debugkey, $certcompletion, $progcompletion, $expectederrors) {
         $errors = certif_get_completion_errors((object)$certcompletion, (object)$progcompletion);
-        $this->assertEquals($expectederrors, $errors);
+        $this->assertEquals($expectederrors, $errors, $debugkey);
     }
 
     /**
@@ -738,6 +738,7 @@ class totara_certification_certification_completion_testcase extends reportcache
                     'certifid' => 0,
                     'userid' => 0,
                     'status' => CERTIFSTATUS_UNSET,
+                    'timecompleted' => 0,
                     'timeexpires' => 0),
                 array('error:completionstatusunset' => 'state')
             ),
@@ -1118,7 +1119,7 @@ class totara_certification_certification_completion_testcase extends reportcache
      */
     public function test_certif_get_completion_errors_for_history($debugkey, $certcompletion, $expectederrors) {
         $errors = certif_get_completion_errors((object)$certcompletion, null);
-        $this->assertEquals($expectederrors, $errors);
+        $this->assertEquals($expectederrors, $errors, $debugkey);
     }
 
     /**
@@ -1193,7 +1194,7 @@ class totara_certification_certification_completion_testcase extends reportcache
         $errors = certif_get_completion_errors((object)$completionhistory, null);
         $this->assertEquals(array(), $errors);
 
-        // Test 3 - New history record, existing record has same expiry - error.
+        // Test 3 - New history record, existing record has same time completed and expiry - error.
         $completionhistory = array(
             'id' => 0,
             'certifid' => $certwithhistory->certifid,
@@ -1201,11 +1202,11 @@ class totara_certification_certification_completion_testcase extends reportcache
             'status' => CERTIFSTATUS_COMPLETED,
             'renewalstatus' => CERTIFRENEWALSTATUS_DUE,
             'certifpath' => CERTIFPATH_RECERT,
-            'timecompleted' => $now,
+            'timecompleted' => $now, // Note.
             'timewindowopens' => $now + 1000,
             'timeexpires' => $now + 2000); // As set in shift_completions_to_certified.
         $errors = certif_get_completion_errors((object)$completionhistory, null);
-        $this->assertEquals(array('error:completionhistoryexpirynotunique' => 'timeexpiresnotapplicable'), $errors);
+        $this->assertEquals(array('error:completionhistorydatesnotunique' => 'timecompleted'), $errors);
 
         // Test 4 - Update history record, change expiry - no error.
         $completionhistory = $DB->get_record('certif_completion_history',
@@ -1234,7 +1235,7 @@ class totara_certification_certification_completion_testcase extends reportcache
         // Then update the second record, changing the expiry date to that of the first record.
         $completionhistory->timeexpires = $originaltimeexpires;
         $errors = certif_get_completion_errors($completionhistory, null);
-        $this->assertEquals(array('error:completionhistoryexpirynotunique' => 'timeexpiresnotapplicable'), $errors);
+        $this->assertEquals(array('error:completionhistorydatesnotunique' => 'timecompleted'), $errors);
     }
 
     /**
