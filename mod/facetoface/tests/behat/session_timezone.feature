@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara
-Feature: Facetoface session date management
+Feature: Facetoface session date with timezone management
   In order to set up a session
   As an administrator
   I need to be able to use timezones
@@ -17,10 +17,45 @@ Feature: Facetoface session date management
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | teacher2 | C1     | editingteacher |
-    # TODO: add custom room "Room 1"
+
+    And I log in as "admin"
+    And I navigate to "Rooms" node in "Site administration > Face-to-face"
+    And I press "Add a new room"
+    And I set the following fields to these values:
+      | Room name | Room 1          |
+      | Building  | Building 123    |
+      | Address   | 123 Tory street |
+      | Capacity  | 10              |
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
+    And I press "Add a room"
+
+    And I press "Add a new room"
+    And I set the following fields to these values:
+      | Room name | Room 2          |
+      | Building  | Building 234    |
+      | Address   | 234 Tory street |
+      | Capacity  | 10              |
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
+    And I press "Add a room"
+
+    And I press "Add a new room"
+    And I set the following fields to these values:
+      | Room name | Room 3          |
+      | Building  | Building 345    |
+      | Address   | 345 Tory street |
+      | Capacity  | 10              |
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
+    And I press "Add a room"
+    And I log out
 
   @javascript
-  Scenario:
+  Scenario: Create face-to-face session by teacher in one timezone, check that timezones stored correctly, and check be tecacher in another timezone
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -46,8 +81,12 @@ Feature: Facetoface session date management
       | timefinish[hour]     | 4                |
       | timefinish[minute]   | 0                |
       | timefinish[timezone] | Europe/Prague    |
-    And I press "OK"
-    # TODO: Select room "Room 1"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    When I click on "Select room" "link"
+    And I wait "1" seconds
+    And I click on "Room 1" "text" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+
     And I press "Add a new date"
     And I click on "Edit date" "link" in the ".f2fmanagedates .lastrow" "css_element"
     And I set the following fields to these values:
@@ -64,11 +103,13 @@ Feature: Facetoface session date management
       | timefinish[hour]     | 11            |
       | timefinish[minute]   | 0             |
       | timefinish[timezone] | Europe/Prague |
-    And I press "OK"
-    # TODO: Select room "Room 1"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    When I click on "Select room" "link" in the ".f2fmanagedates .lastrow" "css_element"
+    And I click on "Room 2" "text" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     When I press "Save changes"
     Then I should see "3:00 PM - 4:00 PM Pacific/Auckland" in the "Room 1" "table_row"
-    And I should see "5:00 PM - 6:00 PM Australia/Perth" in the "Room 1" "table_row"
+    And I should see "5:00 PM - 6:00 PM Australia/Perth" in the "Room 2" "table_row"
 
     When I click on "Edit" "link" in the "Room 1" "table_row"
     And I click on "Edit date" "link"
@@ -86,7 +127,9 @@ Feature: Facetoface session date management
       | timefinish[hour]     | 16               |
       | timefinish[minute]   | 00               |
       | timefinish[timezone] | Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    And I press "Save changes"
+    When I click on "Edit" "link" in the "Room 1" "table_row"
     And I click on "Edit date" "link" in the ".f2fmanagedates .lastrow" "css_element"
     Then the following fields match these values:
       | sessiontimezone      | User timezone    |
@@ -102,7 +145,7 @@ Feature: Facetoface session date management
       | timefinish[hour]     | 18               |
       | timefinish[minute]   | 00               |
       | timefinish[timezone] | Australia/Perth  |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     When I press "Add a new date"
     And I click on "Edit date" "link" in the ".f2fmanagedates .lastrow" "css_element"
     Then the following fields match these values:
@@ -112,31 +155,34 @@ Feature: Facetoface session date management
 
     And I set the following fields to these values:
       | timestart[day]       | 4             |
-      | timestart[month]     | 3             |
+      | timestart[month]     | 4             |
       | timestart[year]      | 2022          |
       | timestart[hour]      | 1             |
       | timestart[minute]    | 00            |
       | timefinish[day]      | 4             |
-      | timefinish[month]    | 3             |
+      | timefinish[month]    | 4             |
       | timefinish[year]     | 2022          |
       | timefinish[hour]     | 2             |
       | timefinish[minute]   | 00            |
       | sessiontimezone      | Europe/Prague |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    When I click on "Select room" "link" in the ".f2fmanagedates .lastrow" "css_element"
+    And I click on "Room 3" "text" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
 
     When I press "Save changes"
-    Then I should see "3:00 AM - 4:00 AM Europe/Prague" in the "Room 1" "table_row"
-    And I should see "5:00 PM - 6:00 PM Australia/Perth" in the "Room 1" "table_row"
-    And I should see "1:00 AM - 2:00 AM Pacific/Auckland" in the "Room 1" "table_row"
+    Then I should see "3:00 PM - 4:00 PM Pacific/Auckland" in the "Room 1" "table_row"
+    And I should see "5:00 PM - 6:00 PM Australia/Perth" in the "Room 2" "table_row"
+    And I should see "3:00 PM - 4:00 PM Europe/Prague" in the "Room 3" "table_row"
 
     When I log out
     And I log in as "teacher2"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Test facetoface name"
-    Then I should see "3:00 AM - 4:00 AM Europe/Prague" in the "Room 1" "table_row"
-    And I should see "10:00 AM - 11:00 AM Europe/Prague" in the "Room 1" "table_row"
-    And I should see "1:00 AM - 2:00 AM Pacific/Auckland" in the "Room 1" "table_row"
+    Then I should see "3:00 PM - 4:00 PM Pacific/Auckland" in the "Room 1" "table_row"
+    And I should see "10:00 AM - 11:00 AM Europe/Prague" in the "Room 2" "table_row"
+    And I should see "3:00 PM - 4:00 PM Europe/Prague" in the "Room 3" "table_row"
 
     When I log out
     And I log in as "admin"
@@ -148,5 +194,5 @@ Feature: Facetoface session date management
     And I follow "Course 1"
     And I follow "Test facetoface name"
     Then I should see "10:00 AM - 11:00 AM " in the "Room 1" "table_row"
-    And I should see "5:00 PM - 6:00 PM " in the "Room 1" "table_row"
-    And I should see "8:00 PM - 9:00 PM" in the "Room 1" "table_row"
+    And I should see "5:00 PM - 6:00 PM " in the "Room 2" "table_row"
+    And I should see "9:00 PM - 10:00 PM" in the "Room 3" "table_row"

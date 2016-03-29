@@ -1,5 +1,5 @@
 @javascript @mod @mod_facetoface @totara @totara_reportbuilder
-Feature: Face to face summary report overview
+Feature: Face-to-face summary report overview
   In order to see all required information
   As an admin
   I need to configure face to face summary report and see all required information
@@ -61,7 +61,7 @@ Feature: Face to face summary report overview
       | timefinish[year]   | 2020 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity              | 2    |
       | mincapacity           | 1    |
@@ -79,7 +79,6 @@ Feature: Face to face summary report overview
       | Description       | Test facetoface description |
     And I follow "Test facetoface name 2"
     And I follow "Add a new event"
-    And I press "Add a new date"
     And I click on "Edit date" "link"
     And I fill facetoface session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
@@ -93,7 +92,8 @@ Feature: Face to face summary report overview
       | timefinish[year]   | 0                |
       | timefinish[hour]   | 0                |
       | timefinish[minute] | +30              |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    And I press "Add a new date"
     And I click on "Edit date" "link" in the ".f2fmanagedates .lastrow" "css_element"
     And I set the following fields to these values:
       | timestart[day]     | 1                |
@@ -106,7 +106,7 @@ Feature: Face to face summary report overview
       | timefinish[year]   | 2030             |
       | timefinish[hour]   | 0                |
       | timefinish[minute] | 30               |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity              | 1                |
       | normalcost           | 2.22              |
@@ -137,7 +137,7 @@ Feature: Face to face summary report overview
       | timefinish[year]   | 2020 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity              | 2    |
       | normalcost            | 3.33 |
@@ -173,7 +173,7 @@ Feature: Face to face summary report overview
       | timefinish[year]   | 0                |
       | timefinish[hour]   | 0                |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity              | 1                |
       | normalcost            | 4.44             |

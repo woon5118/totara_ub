@@ -1,5 +1,5 @@
-@mod @mod_facetoface @totara @takeattendance
-Feature: Take attendance for Face to face sessions
+@javascript @mod @mod_facetoface @totara @takeattendance
+Feature: Take attendance for Face-to-face sessions
   In order to take attendance in a Face to face session
   As a teacher
   I need to set attendance status for attendees
@@ -81,7 +81,6 @@ Feature: Take attendance for Face to face sessions
     And I should see "Sam4 Student4"
     And I log out
 
-  @javascript
   Scenario: Set attendance for individual users
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
@@ -102,7 +101,6 @@ Feature: Take attendance for Face to face sessions
     Then I should not see "Completed" in the "#criteriastatus" "css_element"
     And I log out
 
-  @javascript
   Scenario: Set attendance in bulk
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu

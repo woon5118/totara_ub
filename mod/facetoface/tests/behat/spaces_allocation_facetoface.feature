@@ -1,5 +1,5 @@
-@mod @mod_facetoface @totara
-Feature: Allocate spaces for team
+@javascript @mod @mod_facetoface @totara
+Feature: Allocate spaces for team in face-to-face
   In order to test Face to faces allocations
   As a site manager
   I need to allocate spaces for my team
@@ -88,7 +88,6 @@ Feature: Allocate spaces for team
     And I press "Save changes"
     And I log out
 
-  @javascript
   Scenario: Manager can deallocate users that he has allocated in the current session
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
@@ -105,9 +104,7 @@ Feature: Allocate spaces for team
     Then the "Potential allocations" select box should contain "Sam1 Student1"
     And I log out
 
-  @javascript
-  Scenario: Capacity should be unaffected if removing allocation and create reservations
-  when removing allocations is set to Yes
+  Scenario: Capacity should be unaffected if removing allocation and create reservations when removing allocations is set to Yes
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -128,9 +125,7 @@ Feature: Allocate spaces for team
     And the "Potential allocations" select box should contain "Sam1 Student1"
     And I log out
 
-  @javascript
-  Scenario: Capacity should be affected if removing allocation and create reservations
-  when removing allocations is set to No
+  Scenario: Capacity should be affected if removing allocation and create reservations when removing allocations is set to No
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -150,7 +145,6 @@ Feature: Allocate spaces for team
     And the "Potential allocations" select box should contain "Sam1 Student1"
     And I log out
 
-  @javascript
   Scenario: Manager cannot see users allocated from another managers
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
@@ -171,7 +165,6 @@ Feature: Allocate spaces for team
     Then the "Current allocations" select box should not contain "Sam1 Student1"
     And I log out
 
-  @javascript
   Scenario: Manager cannot deallocate self booked users even if he is their manager
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
@@ -194,7 +187,6 @@ Feature: Allocate spaces for team
     Then the "Current allocations" select box should contain "Sam1 Student1 (Self booked)"
     And I log out
 
-  @javascript
   Scenario: Manager cannot deallocate users in another activity even if he is their manager and he allocated the user
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu
@@ -216,7 +208,6 @@ Feature: Allocate spaces for team
     But I should see "Sam1 Student1" in the "Other event(s) in this activity" "optgroup"
     And I log out
 
-  @javascript
   Scenario: Allocate spaces for students in different sessions should be allowed if multiple sessions per signup is On
     Given I log in as "sitemanager1"
     And I click on "Find Learning" in the totara menu

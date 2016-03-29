@@ -286,12 +286,10 @@ M.totara_f2f_room = M.totara_f2f_room || {
                             $roomitem.text(elem.name + ' (' + elem.capacity + ')');
                             $roomitem.addClass('nonempty');
                             // Edit button.
-                            console.log(elem);
                             if (Number(elem.custom) > 0) {
                                 var $editbutton = $('<a href="#" class="dialog-singleselect-editable">'+M.util.get_string('edit', 'moodle')+'</a>');
                                 $editbutton.click(function(e) {
                                     e.preventDefault();
-                                    console.log("id=", elem);
                                     M.totara_f2f_room.config.editroom = elem.id;
                                     totaraDialogs['editcustomroom' + offset].open();
                                 });
@@ -320,6 +318,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                     $input.val(elem.id);
                     load_rooms();
                     editcustomroomhandler._dialog.hide();
+                    $('input[name="defaultcapacity"]').attr('disabled', false);
                 } catch(e) {
                     this._dialog.render(response);
                 }
@@ -351,7 +350,10 @@ M.totara_f2f_room = M.totara_f2f_room || {
 
             // Room dialog.
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok','moodle')] = function() { handler._save(); };
+            buttonsObj[M.util.get_string('ok','moodle')] = function() {
+                handler._save();
+                $('input[name="defaultcapacity"]').attr('disabled', false);
+            };
             buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
 
             totaraDialogs['selectroom'+offset] = new totaraDialog(

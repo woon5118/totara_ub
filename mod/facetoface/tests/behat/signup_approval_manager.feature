@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Signup Manager Approval
+Feature: Face-to-face Signup Manager Approval
   In order to signup to classroom connect
   As a learner
   I need to request approval from my manager

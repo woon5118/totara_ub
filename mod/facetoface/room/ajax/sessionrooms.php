@@ -35,6 +35,7 @@ $timestart = required_param('timestart', PARAM_INT);
 $timefinish = required_param('timefinish', PARAM_INT);
 $offset = optional_param('offset', 0, PARAM_INT);
 $search = optional_param('search', 0, PARAM_INT);
+$selected = optional_param('selected', '', PARAM_SEQUENCE);
 
 if (!$facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid))) {
     print_error('error:incorrectfacetofaceid', 'facetoface');
@@ -133,6 +134,8 @@ $dialog->customdata['facetofaceid'] = $facetofaceid;
 $dialog->customdata['timestart'] = $timestart;
 $dialog->customdata['timefinish'] = $timefinish;
 $dialog->customdata['sessionid'] = $sessionid;
+$dialog->customdata['selected'] = $selected;
+$dialog->customdata['offset'] = $offset;
 $dialog->string_nothingtodisplay = 'error:nopredefinedrooms';
 
 echo $dialog->generate_markup();

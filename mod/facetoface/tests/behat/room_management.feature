@@ -29,20 +29,26 @@ Feature: Manage pre-defined rooms
       | user6    | C1     | student        |
     And I log in as "admin"
     And I navigate to "Rooms" node in "Site administration > Face-to-face"
-    And I press "Add a room"
+    And I press "Add a new room"
     And I set the following fields to these values:
       | Room name | Room 1          |
       | Building  | That house      |
       | Address   | 123 here street |
       | Capacity  | 5               |
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
 
-    And I press "Add a room"
+    And I press "Add a new room"
     And I set the following fields to these values:
       | Room name | Room 2          |
       | Building  | Your house      |
       | Address   | 123 near street |
       | Capacity  | 6               |
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
 
   Scenario: See that the rooms were created correctly
@@ -63,9 +69,9 @@ Feature: Manage pre-defined rooms
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
-    When I press "Select room"
-    Then I should see "Room 1, That house, 123 here street,  (Capacity: 5)" in the "Choose a room" "totaradialogue"
-    And I should see "Room 2, Your house, 123 near street,  (Capacity: 6)" in the "Choose a room" "totaradialogue"
+    When I click on "Select room" "link"
+    Then I should see "Room 1, That house, 123 here street (Capacity: 5)" in the "Choose a room" "totaradialogue"
+    And I should see "Room 2, Your house, 123 near street (Capacity: 6)" in the "Choose a room" "totaradialogue"
 
   Scenario: Fill a room
     Given I click on "Find Learning" in the totara menu
@@ -90,11 +96,13 @@ Feature: Manage pre-defined rooms
       | timefinish[minute] | 00   |
     And I press "OK"
     And I set the following fields to these values:
-      | capacity              | 7    |
-    When I press "Select room"
+      | capacity           | 7   |
+    When I click on "Select room" "link"
     And I wait "1" seconds
-    And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I wait "1" seconds
+    And I press "Use room capacity"
     And I wait "1" seconds
     And I press "Save changes"
 
@@ -116,7 +124,7 @@ Feature: Manage pre-defined rooms
     And I should see "User Four"
     And I should see "User Five"
     And I should see "Bulk add attendees success - Successfully added/edited 5 attendees."
-    And I should not see "This event is overbooked"
+    And I should not see "This session is overbooked"
 
     And I set the field "menuf2f-actions" to "Add users"
     And I wait "1" seconds
@@ -151,10 +159,10 @@ Feature: Manage pre-defined rooms
       | timefinish[minute] | 00   |
     And I press "OK"
     And I set the following fields to these values:
-      | capacity              | 7    |
-    When I press "Select room"
+      | capacity           | 5    |
+    When I click on "Select room" "link"
     And I wait "1" seconds
-    And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
@@ -173,7 +181,7 @@ Feature: Manage pre-defined rooms
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
-    When I press "Select room"
+    When I click on "Select room" "link"
     And I wait "1" seconds
     Then I should see "(room unavailable on selected dates)" in the "Choose a room" "totaradialogue"
     And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
@@ -191,8 +199,8 @@ Feature: Manage pre-defined rooms
       | timefinish[hour]   | 15   |
       | timefinish[minute] | 0    |
     And I press "OK"
-    When I press "Select room"
-    And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
+    When I click on "Select room" "link"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I click on "Edit date" "link"
@@ -208,14 +216,10 @@ Feature: Manage pre-defined rooms
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
     And I press "OK"
-    And I press "Save changes"
-    And I should see "There is a room conflict - another event is using the room at the same time"
-
-    When I set the following fields to these values:
-    And I click on "Delete" "link"
+    And I should see "The new dates you have selected are unavailable due to a scheduling conflict"
+    And I click on "Cancel" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     Then I should see "Room 1" in the "1 January 2020" "table_row"
-    And I should see "Room 1" in the "Wait-listed" "table_row"
 
   Scenario: Clash a room with different timezones
     Given I click on "Find Learning" in the totara menu
@@ -243,9 +247,9 @@ Feature: Manage pre-defined rooms
     And I press "OK"
     And I set the following fields to these values:
       | capacity                | 7                |
-    When I press "Select room"
+    When I click on "Select room" "link"
     And I wait "1" seconds
-    And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
@@ -268,28 +272,28 @@ Feature: Manage pre-defined rooms
     And I press "OK"
     And I set the following fields to these values:
       | capacity                | 7             |
-    When I press "Select room"
+    When I click on "Select room" "link"
     And I wait "1" seconds
     Then I should see "(room unavailable on selected dates)" in the "Choose a room" "totaradialogue"
     And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
-    And I wait "1" seconds
     And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[day]       | 1    |
-      | timestart[month]     | 1    |
-      | timestart[year]      | 2020 |
-      | timestart[hour]      | 14   |
-      | timestart[minute]    | 0    |
-      | timefinish[day]      | 1    |
-      | timefinish[month]    | 1    |
-      | timefinish[year]     | 2020 |
-      | timefinish[hour]     | 15   |
-      | timefinish[minute]   | 0    |
+      | timestart[day]       | 1             |
+      | timestart[month]     | 1             |
+      | timestart[year]      | 2020          |
+      | timestart[hour]      | 14            |
+      | timestart[minute]    | 0             |
+      | timestart[timezone]  | Europe/London |
+      | timefinish[day]      | 1             |
+      | timefinish[month]    | 1             |
+      | timefinish[year]     | 2020          |
+      | timefinish[hour]     | 15            |
+      | timefinish[minute]   | 0             |
+      | timefinish[timezone] | Europe/London |
     And I press "OK"
-    And I set the following fields to these values:
-      | capacity              | 7    |
-    When I press "Select room"
-    And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
+    And I wait "1" seconds
+    When I click on "Select room" "link"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I click on "Edit date" "link"
@@ -307,14 +311,8 @@ Feature: Manage pre-defined rooms
       | timefinish[minute]   | 0             |
       | timefinish[timezone] | Europe/London |
     And I press "OK"
-    And I set the following fields to these values:
-      | capacity             | 7             |
-    And I press "Save changes"
-    And I wait "1" seconds
-    And I press "Save changes"
-    And I should see "There is a room conflict - another event is using the room at the same time"
-    When I set the following fields to these values:
-    And I click on "Delete" "link"
+    And I should see "The new dates you have selected are unavailable due to a scheduling conflict"
+    And I click on "Cancel" "button" in the "Select date" "totaradialogue"
+    And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I press "Save changes"
     Then I should see "Room 1" in the "1 January 2020" "table_row"
-    And I should see "Room 1" in the "Wait-listed" "table_row"

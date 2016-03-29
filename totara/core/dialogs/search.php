@@ -448,6 +448,7 @@ switch ($searchtype) {
         $formdata['hidden']['selected'] = $this->customdata['selected'];
         $formdata['hidden']['offset'] = $this->customdata['offset'];
 
+        $sessionid = $this->customdata['sessionid'];
         // Generate search SQL
         $keywords = totara_search_parse_keywords($query);
         $fields = array('r.name');

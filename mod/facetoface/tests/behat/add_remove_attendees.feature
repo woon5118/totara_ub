@@ -60,7 +60,7 @@ Feature: Add - Remove Face to face attendees
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
-    And I click on "Delete" "link"
+    And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
       | capacity              | 1    |
     And I press "Save changes"
@@ -85,6 +85,7 @@ Feature: Add - Remove Face to face attendees
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
       | capacity              | 1    |
     And I press "Save changes"
@@ -116,6 +117,7 @@ Feature: Add - Remove Face to face attendees
       | Description | Test facetoface description |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
       | capacity              | 1    |
     And I press "Save changes"
@@ -171,7 +173,6 @@ Feature: Add - Remove Face to face attendees
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "Text file" filemanager
     And I press "Continue"
     And I press "Confirm"
-    #And I click on "Wait-list" "link"
     And I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
 

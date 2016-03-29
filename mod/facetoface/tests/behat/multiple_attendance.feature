@@ -52,7 +52,23 @@ Feature: Take attendance for a Face to face with multiple sessions
       | timefinish[hour]   | 0                |
       | timefinish[minute] | 0                |
     And I press "OK"
-    # TODO create custom room names "later session"
+
+    And I click on "Select room" "link"
+    And I click on "Create new room" "link"
+    And I set the following fields to these values:
+      | Room name        | later session   |
+      | id_roomcapacity  | 10              |
+      | Building         | Building 123    |
+      | Address          | 123 Tory street |
+    # It doesn't click when asked just once.
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
+    And I press "Use Address"
+    And I click on "OK" "button" in the "Create new room" "totaradialogue"
+
     And I press "Save changes"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -68,7 +84,23 @@ Feature: Take attendance for a Face to face with multiple sessions
       | timefinish[year]   | 0                |
       | timefinish[hour]   | 0                |
       | timefinish[minute] | 0                |
-    # TODO create custom room names "earlier session"
+    And I press "OK"
+
+    And I click on "Select room" "link" in the ".lastrow" "css_element"
+    And I click on "Create new room" "link"
+    And I set the following fields to these values:
+      | Room name        | earlier session |
+      | id_roomcapacity  | 10              |
+      | Building         | Building 123    |
+      | Address          | 123 Tory street |
+    # It doesn't click when asked just once.
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
+    And I press "Use Address"
+    And I click on "OK" "button" in the "Create new room" "totaradialogue"
     And I press "Save changes"
 
     # Create the certification and add the course.
@@ -173,7 +205,6 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I should see "Certified" in the "Certification program fullname 101" "table_row"
     And I should see "Due for renewal" in the "Certification program fullname 101" "table_row"
     And I should see "Open" in the "Certification program fullname 101" "table_row"
-    And I should see "5 days remaining" in the "Certification program fullname 101" "table_row"
 
   Scenario: Complete newer session, archive cert, complete older session, still see newer completion date on cert
     # Complete newer session.
@@ -207,7 +238,6 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I should see "Certified" in the "Certification program fullname 101" "table_row"
     And I should see "Due for renewal" in the "Certification program fullname 101" "table_row"
     And I should see "Open" in the "Certification program fullname 101" "table_row"
-    And I should see "5 days remaining" in the "Certification program fullname 101" "table_row"
 
     # Complete older session.
     And I log out
@@ -241,7 +271,6 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I should see date "5 day" formatted "%d %b %Y"
     And I should see "Due for renewal" in the "Certification program fullname 101" "table_row"
     And I should see "Open" in the "Certification program fullname 101" "table_row"
-    And I should see "5 days remaining" in the "Certification program fullname 101" "table_row"
 
   Scenario: Complete newer, complete older, see newer completion date, reset activity completion, see newer completion date
     # Complete newer session.

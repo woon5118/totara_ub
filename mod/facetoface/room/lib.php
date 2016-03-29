@@ -107,6 +107,7 @@ function process_room_form($roomid, callable $successhandler, callable $cancelha
         }
     } else {
         $room = $DB->get_record('facetoface_room', array('id' => $roomid), '*', MUST_EXIST);
+        $room->roomcapacity = $room->capacity;
         customfield_load_data($room, 'facetofaceroom', 'facetoface_room');
     }
 
@@ -129,7 +130,7 @@ function process_room_form($roomid, callable $successhandler, callable $cancelha
     if ($data = $form->get_data()) {
         $todb = new stdClass();
         $todb->name = $data->name;
-        $todb->capacity = $data->capacity;
+        $todb->capacity = $data->roomcapacity;
         $todb->type = !empty($data->allowconflicts) ? 'external' : 'internal';
         $todb->custom = 0;
         if (!empty($customdata['custom']) && empty($data->notcustom)) {

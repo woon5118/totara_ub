@@ -49,10 +49,11 @@ class mod_facetoface_room_form extends moodleform {
         $mform->addElement('text', 'name', get_string('roomname', 'facetoface'), array('size' => '45'));
         $mform->setType('name', PARAM_TEXT);
 
-        $mform->addElement('text', 'capacity', get_string('capacity', 'facetoface'));
-        $mform->setType('capacity', PARAM_INT);
-        $mform->addRule('capacity', null, 'required', null, 'client');
-        $mform->addRule('capacity', null, 'numeric', null, 'client');
+        // This form is loaded as ajax into page that has "capacity" so give it different name to avoid conflicts.
+        $mform->addElement('text', 'roomcapacity', get_string('capacity', 'facetoface'));
+        $mform->setType('roomcapacity', PARAM_INT);
+        $mform->addRule('roomcapacity', null, 'required', null, 'client');
+        $mform->addRule('roomcapacity', null, 'numeric', null, 'client');
 
         $mform->addElement('checkbox', 'allowconflicts', get_string('allowconflicts', 'mod_facetoface'));
         $mform->addHelpButton('allowconflicts', 'roomtype', 'facetoface');

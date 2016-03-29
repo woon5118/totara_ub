@@ -1,4 +1,4 @@
-@enrol @totara @enrol_totara_facetoface
+@enrol @javascript @totara @enrol_totara_facetoface
 Feature: Users can enrol themself in courses with selected position where face to face direct enrolment is allowed
   In order to run a seminar
   As a teacher
@@ -56,27 +56,28 @@ Feature: Users can enrol themself in courses with selected position where face t
       | Select position on signup | 1             |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[0][day] | 1 |
-      | timestart[0][month] | 1 |
-      | timestart[0][year] | 2020 |
-      | timestart[0][hour] | 11 |
-      | timestart[0][minute] | 00 |
-      | timefinish[0][day] | 1 |
-      | timefinish[0][month] | 1 |
-      | timefinish[0][year] | 2020 |
-      | timefinish[0][hour] | 12 |
-      | timefinish[0][minute] | 00 |
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I log out
 
-  @javascript
   Scenario: Add and configure a facetoface activity with a single session and position asked for but not mandated then
   sign in as user with two positions and check attendee list reflects this and the selected position can be updated
     And I log in as "student1"
     And I click on "Courses" "link_or_button" in the "Navigation" "block"
     And I click on "Course 1" "link"
-    And I click on "[name^='sid']" "css_element" in the "1 January 2020" "table_row"
+    And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I set the following fields to these values:
       | Select a position | Position2 |
     And I press "Sign-up"
@@ -89,13 +90,12 @@ Feature: Users can enrol themself in courses with selected position where face t
     And I follow "Attendees"
     And I should see "Position2"
 
-  @javascript
   Scenario: Add and configure a facetoface activity with a single session and position asked for but not mandated then
   sign in as user with two positions and check attendee list reflects this and the selected position can be updated
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I click on "[name^='sid']" "css_element" in the "1 January 2020" "table_row"
+    And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I set the following fields to these values:
       | Select a position | Position2 |
     And I press "Sign-up"

@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Signup No Approval
+Feature: Face-to-face Signup No Approval
   In order to signup to classroom connect
   As a learner
   I need to sign click the signup button
@@ -73,9 +73,6 @@ Feature: Signup No Approval
     And I follow "Sign-up"
     And I should not see "Approval"
     And I press "Sign-up"
-    Then I should see "Your booking has been completed."
-
-
     When I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"
     And I follow "View all events"

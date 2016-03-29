@@ -47,17 +47,17 @@ Feature: Confirm end date is adjusted when start date is altered
     | timestart[hour]   | 12          | 13        | id_timefinish_hour   |
     | timestart[minute] | 30          | 30        | id_timefinish_minute |
 
-  Scenario: Alter date by calendar
-    Given I click on "Calendar" "link" in the "#fitem_id_timestart_0" "css_element"
+  Scenario: Alter face-to-face date by calendar
+    Given I click on "Calendar" "link" in the "#fitem_id_timestart" "css_element"
     And I click on "22" "text" in the "#dateselector-calendar-panel" "css_element"
-    Then I should see "22" in the "#id_timefinish_0_day" "css_element"
+    Then I should see "22" in the "#id_timefinish_day" "css_element"
 
-    Given I click on "Calendar" "link" in the "#fitem_id_timestart_0" "css_element"
+    Given I click on "Calendar" "link" in the "#fitem_id_timestart" "css_element"
     And I click on "#dateselector-calendar-panel .yui3-calendarnav-nextmonth" "css_element"
     And I click on "22" "text" in the "#dateselector-calendar-panel" "css_element"
-    Then I should see "February" in the "#id_timefinish_0_month" "css_element"
+    Then I should see "February" in the "#id_timefinish_month" "css_element"
 
-    Given I click on "Calendar" "link" in the "#fitem_id_timestart_0" "css_element"
+    Given I click on "Calendar" "link" in the "#fitem_id_timestart" "css_element"
     And I click on "#dateselector-calendar-panel .yui3-calendarnav-nextmonth" "css_element"
     And I click on "#dateselector-calendar-panel .yui3-calendarnav-nextmonth" "css_element"
     And I click on "#dateselector-calendar-panel .yui3-calendarnav-nextmonth" "css_element"
@@ -71,5 +71,5 @@ Feature: Confirm end date is adjusted when start date is altered
     And I click on "#dateselector-calendar-panel .yui3-calendarnav-nextmonth" "css_element"
     And I click on "#dateselector-calendar-panel .yui3-calendarnav-nextmonth" "css_element"
     And I click on "22" "text" in the "#dateselector-calendar-panel" "css_element"
-    Then I should see "2021" in the "#id_timefinish_0_year" "css_element"
+    Then I should see "2021" in the "#id_timefinish_year" "css_element"
 

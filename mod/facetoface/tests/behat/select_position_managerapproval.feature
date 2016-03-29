@@ -1,5 +1,5 @@
 @mod @totara @mod_facetoface
-Feature: Manager approval
+Feature: Face-to-face Select position with Manager approval
   In order to control seminar attendance
   As a manager
   I need to authorise seminar signups

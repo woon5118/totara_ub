@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara
-Feature: Download a signin sheet
+Feature: Download a face-to-face signin sheet
   In order to take attendance
   As a teacher
   I need to download a signin sheet

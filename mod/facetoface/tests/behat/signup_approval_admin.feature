@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Signup Admin Approval
+Feature: Face-to-face Signup Admin Approval
   In order to signup to a classroom connect
   As a learner
   I need to request approval from the manager and an admin
@@ -70,18 +70,7 @@ Feature: Signup Admin Approval
       | timefinish[minute] | 0    |
     And I press "OK"
     And I set the following fields to these values:
-      | datetimeknown         | Yes  |
-      | timestart[0][day]     | 1    |
-      | timestart[0][month]   | 1    |
-      | timestart[0][year]    | 2020 |
-      | timestart[0][hour]    | 10   |
-      | timestart[0][minute]  | 00   |
-      | timefinish[0][day]    | 1    |
-      | timefinish[0][month]  | 1    |
-      | timefinish[0][year]   | 2020 |
-      | timefinish[0][hour]   | 12   |
-      | timefinish[0][minute] | 00   |
-      | capacity              | 10   |
+      | capacity           | 10   |
     And I press "Save changes"
     And I log out
 

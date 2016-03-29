@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara
-Feature: Manager approval
+Feature: Manager approval and declare of interest
   In order to control seminar attendance
   As a manager
   I need to authorise seminar signups

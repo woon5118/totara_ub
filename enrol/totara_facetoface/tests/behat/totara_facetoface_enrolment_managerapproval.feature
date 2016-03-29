@@ -1,4 +1,4 @@
-@enrol @totara @enrol_totara_facetoface
+@enrol @javascript @totara @enrol_totara_facetoface
 Feature: Users are forced to get manager approval where required
 
   Background:
@@ -30,17 +30,19 @@ Feature: Users are forced to get manager approval where required
       | Manager Approval | 1                           |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[0][day] | 1 |
-      | timestart[0][month] | 1 |
-      | timestart[0][year] | 2020 |
-      | timestart[0][hour] | 11 |
-      | timestart[0][minute] | 00 |
-      | timefinish[0][day] | 1 |
-      | timefinish[0][month] | 1 |
-      | timefinish[0][year] | 2020 |
-      | timefinish[0][hour] | 12 |
-      | timefinish[0][minute] | 00 |
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I log out
 
@@ -50,7 +52,6 @@ Feature: Users are forced to get manager approval where required
       | Custom instance name | Test student enrolment |
     And I log out
 
-  @javascript
   Scenario: Should be unable to enrol using face to face direct without a manager
     Given I log in as "teacher1"
     And I follow "Course 1"
@@ -62,7 +63,6 @@ Feature: Users are forced to get manager approval where required
     And I follow "Course 1"
     And I should see "You can not enrol yourself in this course."
 
-  @javascript
   Scenario: A user with a manager can request access, withdraw request and be granted access
     Given the following "position" frameworks exist:
       | fullname      | idnumber |
@@ -77,8 +77,8 @@ Feature: Users are forced to get manager approval where required
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I click on "[name^='sid']" "css_element" in the "1 January 2020" "table_row"
-    And I press "Sign-up"
+    And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
+    And I press "Request approval"
     Then I should see "Your booking has been completed but requires approval from your manager."
     And I log out
 
@@ -93,10 +93,10 @@ Feature: Users are forced to get manager approval where required
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    Then I should see "It is not possible to sign up for these events (manager request already pending)."
-    And I follow "Withdraw pending request"
-    And I press "Confirm"
-    Then I should see "Enrolment options"
+    Then I should see "Requested"
+    And I follow "Cancel booking"
+    And I press "Yes"
+    Then I should see "Sign-up"
     And I log out
 
     When I log in as "teacher1"
@@ -110,8 +110,8 @@ Feature: Users are forced to get manager approval where required
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I click on "[name^='sid']" "css_element" in the "1 January 2020" "table_row"
-    And I press "Sign-up"
+    And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
+    And I press "Request approval"
     Then I should see "Your booking has been completed but requires approval from your manager."
     And I log out
     And I log in as "teacher1"

@@ -1,5 +1,5 @@
 @mod @totara @mod_facetoface
-Feature: Add a face to face
+Feature: Add a face to face with select position
   In order to run a seminar
   As a teacher
   I need to create a face to face activity

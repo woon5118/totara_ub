@@ -1,4 +1,4 @@
-@enrol @totara @enrol_totara_facetoface
+@enrol @javascript @totara @enrol_totara_facetoface
 Feature: Users can enrol on courses that have several facetoface activities and signup to several sessions
   In order to participate in courses with seminars
   As a user
@@ -33,17 +33,19 @@ Feature: Users can enrol on courses that have several facetoface activities and 
       | Manager Approval | 0                             |
     And I follow "Test facetoface name 1"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[0][day] | 1 |
-      | timestart[0][month] | 1 |
-      | timestart[0][year] | 2020 |
-      | timestart[0][hour] | 11 |
-      | timestart[0][minute] | 00 |
-      | timefinish[0][day] | 1 |
-      | timefinish[0][month] | 1 |
-      | timefinish[0][year] | 2020 |
-      | timefinish[0][hour] | 12 |
-      | timefinish[0][minute] | 00 |
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I follow "Course 1"
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -52,17 +54,19 @@ Feature: Users can enrol on courses that have several facetoface activities and 
       | Manager Approval | 0                             |
     And I follow "Test facetoface name 2"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[0][day] | 2 |
-      | timestart[0][month] | 1 |
-      | timestart[0][year] | 2020 |
-      | timestart[0][hour] | 11 |
-      | timestart[0][minute] | 00 |
-      | timefinish[0][day] | 2 |
-      | timefinish[0][month] | 1 |
-      | timefinish[0][year] | 2020 |
-      | timefinish[0][hour] | 12 |
-      | timefinish[0][minute] | 00 |
+      | timestart[day]     | 2    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 2    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I follow "Course 1"
     When I add "Face-to-face direct enrolment" enrolment method with:
@@ -70,22 +74,15 @@ Feature: Users can enrol on courses that have several facetoface activities and 
       | Automatically sign users up to face to face events | 0                      |
     And I log out
 
-  @javascript
-  Scenario: Enrol using face to face direct
+  Scenario: Enrol using face to face direct to a multisession
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I click on "[name^='sid']" "css_element" in the "1 January 2020" "table_row"
-    And I click on "[name^='sid']" "css_element" in the "2 January 2020" "table_row"
+    And I click on "Sign-up" "link" in the "2 January 2020" "table_row"
     And I press "Sign-up"
-    Then I should see "Test facetoface name 1: Your booking has been completed."
-    And I should see "Test facetoface name 2: Your booking has been completed."
-
-  @javascript
-  Scenario: Cannot enrol without signup to any session
-    And I log in as "student1"
+    Then I should see "Your booking has been completed."
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
+    And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I press "Sign-up"
-    Then I should see "Choose at least one event to enrol."
-    And I should not see "Your booking has been completed."
+    And I should see "Your booking has been completed."

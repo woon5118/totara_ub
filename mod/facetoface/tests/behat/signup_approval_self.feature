@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Signup Self Approval
+Feature: Face-to-face Signup Self Approval
   In order to signup to classroom connect
   As a learner
   I need to aggree to the terms and conditions

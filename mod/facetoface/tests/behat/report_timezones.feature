@@ -44,7 +44,23 @@ Feature: Facetoface timezones in reports
       | timefinish[minute]   | 45              |
       | timefinish[timezone] | Australia/Perth |
     And I press "OK"
-    # TODO create custom room names "Room 1"
+
+    And I click on "Select room" "link"
+    And I click on "Create new room" "link"
+    And I set the following fields to these values:
+      | Room name        | Room 1          |
+      | id_roomcapacity  | 10              |
+      | Building         | Building 123    |
+      | Address          | 123 Tory street |
+    # It doesn't click when asked just once.
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
+    And I press "Use Address"
+    And I click on "OK" "button" in the "Create new room" "totaradialogue"
+
     And I press "Save changes"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -63,7 +79,23 @@ Feature: Facetoface timezones in reports
       | timefinish[minute]   | 30              |
       | timefinish[timezone] | Australia/Perth |
     And I press "OK"
-    # TODO create custom room names "Room 2"
+
+    And I click on "Select room" "link"
+    And I click on "Create new room" "link"
+    And I set the following fields to these values:
+      | Room name        | Room 2          |
+      | id_roomcapacity  | 10              |
+      | Building         | Building 123    |
+      | Address          | 123 Tory street |
+    # It doesn't click when asked just once.
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
+    And I press "Use Address"
+    And I click on "OK" "button" in the "Create new room" "totaradialogue"
+
     And I press "Save changes"
     And I should see "6:15 PM - 8:45 PM Europe/Prague" in the "Room 1" "table_row"
     And I should see "1 January 2020" in the "Room 1" "table_row"
@@ -87,7 +119,7 @@ Feature: Facetoface timezones in reports
 
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "F2F sessions"
-    And I set the field "Source" to "Face-to-face events"
+    And I set the field "Source" to "Sign ups"
     And I press "Create report"
     And I click on "Columns" "link" in the ".tabtree" "css_element"
     And I add the "Event Finish Time" column to the report
@@ -108,10 +140,11 @@ Feature: Facetoface timezones in reports
     And I set the following administration settings values:
       | facetoface_displaysessiontimezones | 0 |
     And I navigate to my "F2F sessions" report
-    Then I should see "2 January 2020" in the "First User" "table_row"
+    # That's a bit strange that w/o timezone date shown in different format, might need to look at that later.
+    Then I should see "2 Jan 2020" in the "First User" "table_row"
     And I should see "01:15" in the "First User" "table_row"
     And I should see "03:45" in the "First User" "table_row"
-    And I should see "4 February 2021" in the "Second User" "table_row"
+    And I should see "4 Feb 2021" in the "Second User" "table_row"
     And I should see "01:00" in the "Second User" "table_row"
     And I should see "02:30" in the "Second User" "table_row"
     And I should not see "Prague"
@@ -150,7 +183,6 @@ Feature: Facetoface timezones in reports
       | timefinish[minute]   | 45              |
       | timefinish[timezone] | Australia/Perth |
     And I press "OK"
-    # TODO create custom room names "Room 1"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -175,7 +207,6 @@ Feature: Facetoface timezones in reports
       | timefinish[minute]   | 30              |
       | timefinish[timezone] | Australia/Perth |
     And I press "OK"
-    # TODO create custom room names "Room 1"
     And I press "Save changes"
 
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
@@ -183,8 +214,8 @@ Feature: Facetoface timezones in reports
     And I set the field "Source" to "Face-to-face Summary"
     And I press "Create report"
     And I click on "Columns" "link" in the ".tabtree" "css_element"
-    And I add the "Session Start" column to the report
     And I add the "Session Start Date/Time (linked to attendees page)" column to the report
+    And I add the "Session Start Date/Time" column to the report
 
     When I navigate to my "F2F summary" report
     Then I should see "1 January 2020" in the "Test facetoface 1 name" "table_row"
@@ -197,8 +228,8 @@ Feature: Facetoface timezones in reports
     And I set the following administration settings values:
       | facetoface_displaysessiontimezones | 0 |
     And I navigate to my "F2F summary" report
-    Then I should see "2 January 2020" in the "Test facetoface 1 name" "table_row"
-    And I should see "4 February 2021" in the "Test facetoface 2 name" "table_row"
+    Then I should see "2 Jan 2020" in the "Test facetoface 1 name" "table_row"
+    And I should see "4 Feb 2021" in the "Test facetoface 2 name" "table_row"
     And I should not see "Prague"
     And I should not see "Perth"
     And I should not see "1 January 2020"

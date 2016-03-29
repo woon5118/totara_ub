@@ -32,7 +32,7 @@ Feature: Confirm overlapping sessions can be removed
       | timefinish[hour]     | 16               |
       | timefinish[minute]   | 0                |
       | timefinish[timezone] | Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Add a new date"
     And I click on "Edit date" "link" in the ".f2fmanagedates .lastrow" "css_element"
     And I set the following fields to these values:
@@ -48,7 +48,7 @@ Feature: Confirm overlapping sessions can be removed
       | timefinish[hour]     | <finishhour>   |
       | timefinish[minute]   | <finishminute> |
       | timefinish[timezone] | <timezone>     |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Delete" "link" in the ".f2fmanagedates .lastrow" "css_element"
     And I press "Save changes"
     Then I should not see "This date conflicts with an earlier date in this event"

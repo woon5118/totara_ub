@@ -17,33 +17,46 @@ Background:
       | Description       | Test facetoface description |
     And I turn editing mode off
     And I navigate to "Rooms" node in "Site administration > Face-to-face"
-    And I press "Add a room"
+    And I press "Add a new room"
     And I set the following fields to these values:
       | Room name | Room 1          |
       | Building  | Building 123    |
       | Address   | 123 Tory street |
       | Capacity  | 10              |
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
-    And I press "Add a room"
+
+    And I press "Add a new room"
     And I set the following fields to these values:
       | Room name | Room 2          |
       | Building  | Building 234    |
       | Address   | 234 Tory street |
       | Capacity  | 10              |
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
-    And I press "Add a room"
+    And I press "Add a new room"
     And I set the following fields to these values:
       | Room name | Room 3          |
       | Building  | Building 345    |
       | Address   | 345 Tory street |
       | Capacity  | 10              |
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
-    And I press "Add a room"
+    And I press "Add a new room"
     And I set the following fields to these values:
       | Room name | Room 4          |
       | Building  | Building 456    |
       | Address   | 456 Tory street |
       | Capacity  | 10              |
+    And I click on "#id_customfield_locationsize_medium" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
 
   @javascript
@@ -67,9 +80,10 @@ Background:
     And I press "OK"
     And I set the following fields to these values:
       | capacity              | 7    |
-    When I press "Select room"
+    When I click on "Select room" "link"
     And I wait "1" seconds
-    And I click on "Room 1, Building 123, 123 Tory street,  (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
+
+    And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
@@ -89,9 +103,9 @@ Background:
     And I press "OK"
     And I set the following fields to these values:
       | capacity              | 7    |
-    When I press "Select room"
+    When I click on "Select room" "link"
     And I wait "1" seconds
-    And I click on "Room 2, Building 234, 234 Tory street,  (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
+    And I click on "Room 2, Building 234, 234 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
@@ -111,9 +125,9 @@ Background:
     And I press "OK"
     And I set the following fields to these values:
       | capacity              | 7    |
-    When I press "Select room"
+    When I click on "Select room" "link"
     And I wait "1" seconds
-    And I click on "Room 3, Building 345, 345 Tory street,  (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
+    And I click on "Room 3, Building 345, 345 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
@@ -133,32 +147,32 @@ Background:
     And I press "OK"
     And I set the following fields to these values:
       | capacity              | 7    |
-    When I press "Select room"
+    When I click on "Select room" "link"
     And I wait "1" seconds
-    And I click on "Room 4, Building 456, 456 Tory street,  (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
+    And I click on "Room 4, Building 456, 456 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
 
-    And I click on "Room: Room 1" "option"
+    And I click on "Room 1" "option"
     And I should see "Room 1" in the "span.room_name" "css_element"
     And I should not see "Room 2" in the "span.room_name" "css_element"
     And I should not see "Room 3" in the "span.room_name" "css_element"
     And I should not see "Room 4" in the "span.room_name" "css_element"
 
-    And I click on "Room: Room 2" "option"
+    And I click on "Room 2" "option"
     And I should see "Room 2" in the "span.room_name" "css_element"
     And I should not see "Room 1" in the "span.room_name" "css_element"
     And I should not see "Room 3" in the "span.room_name" "css_element"
     And I should not see "Room 4" in the "span.room_name" "css_element"
 
-    And I click on "Room: Room 3" "option"
+    And I click on "Room 3" "option"
     And I should see "Room 3" in the "span.room_name" "css_element"
     And I should not see "Room 2" in the "span.room_name" "css_element"
     And I should not see "Room 1" in the "span.room_name" "css_element"
     And I should not see "Room 4" in the "span.room_name" "css_element"
 
-    And I click on "Room: Room 4" "option"
+    And I click on "Room 4" "option"
     And I should see "Room 4" in the "span.room_name" "css_element"
     And I should not see "Room 2" in the "span.room_name" "css_element"
     And I should not see "Room 3" in the "span.room_name" "css_element"
