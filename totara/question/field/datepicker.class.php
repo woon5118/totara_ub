@@ -103,6 +103,17 @@ class question_datepicker extends question_base{
         }
     }
 
+    public function edit_get($dest) {
+        $data = new stdClass();
+        $name = $this->get_prefix_form();
+
+        if ($dest == 'form' && $this->values[$name] == 0) {
+            $data->$name = null;
+        }
+
+        return $data;
+    }
+
     /**
      * Add form elements that represent current field
      *

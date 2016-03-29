@@ -1092,7 +1092,8 @@ class MoodleQuickForm_staticcallback extends MoodleQuickForm_static {
      * @return string
      */
     public function setText($text) {
-        if (empty($text)) {
+        // Allow zero values for ratings questions.
+        if (empty($text) && $text !== '0') {
             return;
         }
         $this->_text = $text;

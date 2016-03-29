@@ -134,6 +134,27 @@ class question_ratingnumeric extends question_base{
     }
 
     /**
+     * Override load answer to object.
+     *
+     * Make sure that empty strings are saved as null.
+     *
+     * @see question_base::set_data()
+     * @param stdClass $data
+     * @param string $source
+     * @return stdClass
+     */
+    public function edit_set(stdClass $data, $source) {
+        $fields = $this->get_xmldb();
+        foreach ($fields as $elem => $field) {
+            if (isset($data->$elem) && $data->$elem === '') {
+                $data->$elem = null;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Validate elements input
      *
      * @see question_base::edit_validate
@@ -142,7 +163,7 @@ class question_ratingnumeric extends question_base{
     public function edit_validate($fromform) {
         $errors = parent::edit_validate($fromform);
 
-        if (!empty($fromform[$this->get_prefix_form()])) {
+        if (isset($fromform[$this->get_prefix_form()])) {
             if ($fromform[$this->get_prefix_form()] < $this->get_min() || $fromform[$this->get_prefix_form()] > $this->get_max()) {
                 $errors[$this->get_prefix_form()] = get_string('valueoutsiderange', 'totara_question');
             }
@@ -187,6 +208,7 @@ class question_ratingnumeric extends question_base{
         $to = $this->param1['rangeto'];
         $from = $this->param1['rangefrom'];
         $default = isset($this->defaultdata) && $this->defaultdata ? $this->defaultdata : null;
+        $prefixform = $this->get_prefix_form();
 
         switch ($this->param2) {
             case self::DISPLAY_SLIDER:
@@ -203,21 +225,22 @@ class question_ratingnumeric extends question_base{
                 for ($i = $from; $i <= $to; $i++) {
                     $elements[$i] = $i;
                 }
-                $form->addElement('select', $this->get_prefix_form(), $this->label, $elements);
+                $form->addElement('select', $prefixform, $this->label, $elements);
                 break;
             case self::DISPLAY_INPUT:
-                $form->addElement('text', $this->get_prefix_form(), $this->label);
-                $form->setType($this->get_prefix_form(), PARAM_INT);
-                $form->addRule($this->get_prefix_form(), get_string('err_numeric', 'form'), 'numeric', null, 'client');
-                $form->addElement('static', $this->get_prefix_form() . '_range', null,
+                $form->addElement('text', $prefixform, $this->label);
+                $form->setType($prefixform, PARAM_INT);
+                $form->addRule($prefixform, get_string('err_numeric', 'form'), 'numeric', null, 'client');
+                $form->addElement('static', $prefixform . '_range', null,
                         get_string('ratingrequiredrange', 'totara_question', array('from' => $from, 'to' => $to)));
                 break;
         }
-        if (!$form->exportValue($this->get_prefix_form())) {
-            $form->setDefault($this->get_prefix_form(), $default);
+
+        if (!$form->exportValue($prefixform) && !isset($form->_defaultValues[$prefixform])) {
+            $form->setDefault($prefixform, $default);
         }
         if ($this->required) {
-            $form->addRule($this->get_prefix_form(), get_string('required'), 'required');
+            $form->addRule($prefixform, get_string('required'), 'required');
         }
     }
 
