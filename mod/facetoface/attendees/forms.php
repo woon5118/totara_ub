@@ -37,6 +37,9 @@ class addconfirm_form extends moodleform {
         $mform->addElement('hidden', 'listid', $this->_customdata['listid']);
         $mform->setType('listid', PARAM_ALPHANUM);
 
+        $mform->addElement('hidden', 'ignoreconflicts', $this->_customdata['ignoreconflicts']);
+        $mform->setType('ignoreconflicts', PARAM_BOOL);
+
         $mform->addElement('header', 'notifications', get_string('notifications', 'facetoface'));
         $mform->addElement('advcheckbox', 'notifyuser', '', get_string('notifynewuser', 'facetoface'));
         $mform->setDefault('notifyuser', 1);
@@ -145,6 +148,9 @@ class facetoface_bulkadd_input_form extends moodleform {
         $mform->addelement('static', 'useraddcomment', get_string('userstoadd', 'facetoface'), get_string('userstoaddcomment', 'facetoface'));
         $mform->addElement('textarea', 'csvinput', '');
 
+        $mform->addElement('advcheckbox', 'ignoreconflicts', get_string('allowscheduleconflicts', 'facetoface'));
+        $mform->setType('ignoreconflicts', PARAM_BOOL);
+
         $this->add_action_buttons(true, get_string('continue'));
     }
 }
@@ -186,6 +192,9 @@ class facetoface_bulkadd_file_form extends moodleform {
 
         $encodings = core_text::get_encodings();
         $mform->addElement('select', 'encoding', get_string('encoding', 'grades'), $encodings);
+
+        $mform->addElement('advcheckbox', 'ignoreconflicts', get_string('allowscheduleconflicts', 'facetoface'));
+        $mform->setType('ignoreconflicts', PARAM_BOOL);
 
         $mform->addelement('html', format_text(get_string('scvtextfile_help', 'facetoface', $customfieldinfo), FORMAT_MARKDOWN));
 

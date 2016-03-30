@@ -191,5 +191,82 @@ Feature: Add - Remove Face to face attendees
     Then I should see "Sam2 Student2"
     And I should not see "Sam1 Student1"
 
+  Scenario: Use the allow scheduling conflicts checkbox
+    Given I log in as "admin"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I turn editing mode on
+    And I add a "Face-to-face" to section "1" and I fill the form with:
+      | Name        | Test facetoface name one    |
+      | Description | Test facetoface description |
+    And I follow "View all events"
+    And I follow "Add a new event"
+    And I click on "Edit date" "link"
+    And I set the following fields to these values:
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity           | 1    |
+    And I press "Save changes"
 
+    When I click on "Attendees" "link"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I press "Add"
+    And I wait "1" seconds
+    And I press "Continue"
+    And I press "Confirm"
+    Then I should see "Sam1 Student1"
 
+    And I follow "Course 1"
+    And I add a "Face-to-face" to section "1" and I fill the form with:
+      | Name        | Test facetoface name two    |
+      | Description | Test facetoface description |
+    And I follow "Test facetoface name two"
+    And I follow "Add a new event"
+    And I click on "Edit date" "link"
+    And I set the following fields to these values:
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity           | 1    |
+    And I press "Save changes"
+
+    When I click on "Attendees" "link"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I press "Add"
+    And I wait "1" seconds
+    And I press "Continue"
+    Then I should see "1 problem(s) encountered during import."
+    When I click on "View results" "link"
+    Then I should see "Sam1 Student1 is already booked to attend Test facetoface name one at 11:00 AM to 12:00 PM on 1 January 2020. Please select another user or change the session"
+    When I press "Close"
+    And I set the following fields to these values:
+      | Allow scheduling conflicts | 1 |
+    And I press "Continue"
+    Then I should see "Add users (step 2 of 2)"
+    When I press "Confirm"
+    Then I should see "Bulk add attendees success - Successfully added/edited 1 attendees."
+    When I click on "(View results)" "link"
+    Then I should see "Added successfully" in the "Bulk add attendees results" "totaradialogue"
+    When I press "Cancel"
+    Then I should see "Sam1 Student1"

@@ -34,8 +34,10 @@ $clearsearch    = optional_param('clearsearch', 0, PARAM_BOOL);
 $next           = optional_param('next', false, PARAM_BOOL);
 $cancel         = optional_param('cancel', false, PARAM_BOOL);
 $interested     = optional_param('interested', false, PARAM_BOOL); // Declare interest.
+$ignoreconflicts = optional_param('ignoreconflicts', false, PARAM_BOOL); // Ignore scheduling conflicts.
 $listid         = optional_param('listid', uniqid('f2f'), PARAM_ALPHANUM); // Session key to list of users to add.
 $currenturl     = new moodle_url('/mod/facetoface/attendees/add.php', array('s' => $s, 'listid' => $listid));
+$action = 'add';
 $attendees = array();
 $notification = '';
 
@@ -50,13 +52,13 @@ $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
 
-$list = new \mod_facetoface\bulk_list($listid, $currenturl, 'add');
+$list = new \mod_facetoface\bulk_list($listid, $currenturl, $action);
 
 if ($frm = data_submitted()) {
     require_sesskey();
+    $userstoadd = array();
     // Process selected user list.
     if (!empty($frm->removeselect)) {
-        $userstoadd = array();
         foreach ($frm->removeselect as $adduser) {
             if (!$adduser = clean_param($adduser, PARAM_INT)) {
                 continue; // invalid userid
@@ -71,11 +73,27 @@ if ($frm = data_submitted()) {
         if (empty($userstoadd)) {
             $notification = get_string('pleaseselectusers', 'mod_facetoface');
         } else {
-            // Redirect to confirmation.
-            redirect(new moodle_url('/mod/facetoface/attendees/addconfirm.php',
-                                array('s' => $s,
-                                      'listid' => $listid)));
-            return;
+            $users = $DB->get_records_list('user', 'id', $userstoadd);
+            $errors  = array();
+            foreach($users as $user) {
+                $error = facetoface_validate_user_import($user, $context, $facetoface, $session, $ignoreconflicts);
+                if (!empty($error)) {
+                    $errors[] = $error;
+                }
+            }
+            if (!empty($errors)) {
+                $errorcount = count($errors);
+                $notification = get_string('xerrorsencounteredduringimport', 'facetoface', $errorcount);
+                $notification .= ' '. html_writer::link('#', get_string('viewresults', 'facetoface'), array('id' => 'viewbulkresults', 'class' => 'viewbulkresults'));
+                $list->set_validaton_results($errors);
+            } else {
+                // Redirect to confirmation.
+                redirect(new moodle_url('/mod/facetoface/attendees/addconfirm.php',
+                    array('s' => $s,
+                        'listid' => $listid,
+                        'ignoreconflicts' => $ignoreconflicts)));
+                return;
+            }
         }
     } else if ($clearsearch) {
         $searchtext = '';
@@ -200,7 +218,8 @@ if ($usercount <= MAX_USERS_PER_PAGE) {
                                        ORDER BY u.lastname ASC, u.firstname ASC", $params);
 }
 
-$PAGE->requires->js_call_amd('mod_facetoface/attendees_addremove', 'init');
+local_js(array(TOTARA_JS_DIALOG));
+$PAGE->requires->js_call_amd('mod_facetoface/attendees_addremove', 'init', array(array('s' => $s, 'listid' => $listid)));
 
 $PAGE->set_title(format_string($facetoface->name));
 $PAGE->set_heading($course->fullname);

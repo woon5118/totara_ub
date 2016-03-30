@@ -118,6 +118,17 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
     </div>
 </div>
 </div>
+    <?php if ($action === 'add') {
+        $strignoreconflicts = get_string('allowscheduleconflicts', 'mod_facetoface');
+        $attrcheckedconflicts = $ignoreconflicts ? 'check="checked"' : '';
+        ?>
+        <div class="f2f-ignoreconflicts-checkbox">
+            <input name="ignoreconflicts" type="hidden" value="0"/>
+            <input name="ignoreconflicts" id="ignoreconflicts" type="checkbox" value="1" <?php echo $attrcheckedconflicts;?>/>
+            <label for="ignoreconflicts"><?php echo $strignoreconflicts; ?></label>
+        </div>
+    <?php } ?>
     <input name="next" id="next" type="submit" value="<?php echo get_string('continue'); ?>"/>
     <input name="cancel" id="cancel" type="submit" value="<?php echo get_string('cancel'); ?>"/>
+
 </form>

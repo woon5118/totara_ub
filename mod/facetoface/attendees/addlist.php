@@ -79,12 +79,13 @@ if ($data = $mform->get_data()) {
             $errstr = 'error:usernamenotfound';
             break;
         default:
-            print_error(get_sring('error:unknownuserfield', 'facetoface'));
+            print_error(get_string('error:unknownuserfield', 'facetoface'));
     }
 
     // Validate every user.
     $notfound = array();
     $userstoadd = array();
+    $validationerrors = array();
     foreach ($addusers as $value) {
         $user = $DB->get_record('user', array($field => $value));
         if (!$user) {
@@ -92,6 +93,10 @@ if ($data = $mform->get_data()) {
             continue;
         }
         $userstoadd[] = $user->id;
+        $validationerror = facetoface_validate_user_import($user, $context, $facetoface, $session, $data->ignoreconflicts);
+        if (!empty($validationerror)) {
+            $validationerrors[] = $validationerror;
+        }
     }
 
     // Check for data.
@@ -100,12 +105,21 @@ if ($data = $mform->get_data()) {
     } else if (!empty($notfound)) {
         $notfoundlist = implode(', ', $notfound);
         totara_set_notification(get_string($errstr, 'facetoface', $notfoundlist), null, array('class' => 'notifyproblem'));
+    } else if (!empty($validationerrors)) {
+        $validationerrorcount = count($validationerrors);
+        $validationnotification = get_string('xerrorsencounteredduringimport', 'facetoface', $validationerrorcount);
+        $validationnotification .= ' '. html_writer::link('#', get_string('viewresults', 'facetoface'), array('id' => 'viewbulkresults', 'class' => 'viewbulkresults'));
+        $list->set_validaton_results($validationerrors);
+        totara_set_notification($validationnotification, null, array('class' => 'notifyproblem'));
     } else {
         $list->set_user_ids($userstoadd);
         $list->set_form_data($data);
-        redirect(new moodle_url('/mod/facetoface/attendees/addconfirm.php', array('s' => $s, 'listid' => $listid)));
+        redirect(new moodle_url('/mod/facetoface/attendees/addconfirm.php', array('s' => $s, 'listid' => $listid, 'ignoreconflicts' => $data->ignoreconflicts)));
     }
 }
+
+local_js(array(TOTARA_JS_DIALOG));
+$PAGE->requires->js_call_amd('mod_facetoface/attendees_addremove', 'init', array(array('s' => $s, 'listid' => $listid)));
 
 $PAGE->set_title(format_string($facetoface->name));
 $PAGE->set_heading($course->fullname);

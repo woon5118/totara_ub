@@ -116,7 +116,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     buttons: buttonsObj,
                     title: '<h2>' + M.util.get_string('bulkaddattendeesresults', 'facetoface') + '</h2>'
                 },
-                M.cfg.wwwroot + '/mod/facetoface/bulkadd_results.php?s=' + M.totara_f2f_attendees.config.sessionid,
+                M.cfg.wwwroot + '/mod/facetoface/attendees/bulkadd_results.php?s=' + M.totara_f2f_attendees.config.sessionid,
                 handler
                 );
         })();

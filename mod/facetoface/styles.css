@@ -278,3 +278,7 @@ ul.assetlist {
     position: absolute;
     bottom: 0;
 }
+
+.f2f-ignoreconflicts-checkbox {
+    padding: 10px;
+}

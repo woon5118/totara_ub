@@ -149,4 +149,16 @@ class bulk_list {
         unset($SESSION->mod_facetoface_attendeeslist[$this->listid]);
     }
 
+    public function set_validaton_results($results) {
+        global $SESSION;
+        $SESSION->mod_facetoface_attendeeslist[$this->listid]['validation'] = $results;
+    }
+
+    public function get_validation_results() {
+        global $SESSION;
+        if (isset($SESSION->mod_facetoface_attendeeslist[$this->listid]['validation'])) {
+            return $SESSION->mod_facetoface_attendeeslist[$this->listid]['validation'];
+        }
+        return array();
+    }
 }

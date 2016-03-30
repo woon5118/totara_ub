@@ -158,6 +158,7 @@ if ($formdata = $mform->get_data()) {
     if (empty($errors)) {
         $inconsistentlines = array();
         $usersnotexist = array();
+        $validationerrors = array();
         $iter = 0;
         while ($signup = $cir->next()) {
             $iter++;
@@ -167,10 +168,15 @@ if ($formdata = $mform->get_data()) {
                 continue;
             }
             // Check that user exists.
-            $userid = $DB->get_field('user', 'id', array($idfield => $data[$idfield]));
-            if (!$userid) {
+            $user = $DB->get_record('user', array($idfield => $data[$idfield]));
+            if (!$user) {
                 $usersnotexist[] = $data[$idfield];
                 continue;
+            } else {
+                $validationerror = facetoface_validate_user_import($user, $context, $facetoface, $session, $formdata->ignoreconflicts);
+                if (!empty($validationerror)) {
+                    $validationerrors[] = $validationerror;
+                }
             }
 
             // Custom fields validate.
@@ -181,13 +187,20 @@ if ($formdata = $mform->get_data()) {
                  continue;
             }
 
-            $addusers[$userid] = $data;
+            $addusers[$user->id] = $data;
         }
         if (!empty($inconsistentlines)) {
             $errors[] = get_string('error:csvinconsistentrows', 'facetoface', implode(', ', $inconsistentlines));
         }
         if (!empty($usersnotexist)) {
             $errors[] = get_string($erridstr, 'facetoface', implode(', ', $usersnotexist));
+        }
+        if (!empty($validationerrors)) {
+            $validationerrorcount = count($validationerrors);
+            $validationnotification = get_string('xerrorsencounteredduringimport', 'facetoface', $validationerrorcount);
+            $validationnotification .= ' '. html_writer::link('#', get_string('viewresults', 'facetoface'), array('id' => 'viewbulkresults', 'class' => 'viewbulkresults'));
+            $list->set_validaton_results($validationerrors);
+            $errors[] = $validationnotification;
         }
     }
 
@@ -197,9 +210,13 @@ if ($formdata = $mform->get_data()) {
         }
     } else {
         $list->set_user_data($addusers);
-        redirect(new moodle_url('/mod/facetoface/attendees/addconfirm.php', array('s' => $s, 'listid' => $listid)));
+        redirect(new moodle_url('/mod/facetoface/attendees/addconfirm.php', array('s' => $s, 'listid' => $listid, 'ignoreconflicts' => $formdata->ignoreconflicts)));
     }
 }
+
+
+local_js(array(TOTARA_JS_DIALOG));
+$PAGE->requires->js_call_amd('mod_facetoface/attendees_addremove', 'init', array(array('s' => $s, 'listid' => $listid)));
 
 $PAGE->set_title(format_string($facetoface->name));
 $PAGE->set_heading($course->fullname);

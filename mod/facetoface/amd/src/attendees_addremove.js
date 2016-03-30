@@ -20,13 +20,19 @@
  * @package mod_facetoface
  */
 
-define(['jquery'], function($) {
+define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
     var addRemove = {
 
         /**
          * module initialisation method called by php js_call_amd()
          */
-        init: function() {
+        init: function(args) {
+
+            // If there is a view bulk results link on the page, we need to have the dialog ready.
+            var viewresultslink = $('a.viewbulkresults:first');
+            if (viewresultslink.length > 0) {
+                addRemove.setupResultsDialog(viewresultslink, args.s, args.listid);
+            }
 
             // Click on "add" button will move selected users from potential to existing.
             $('#add').click(function(evt) {
@@ -124,6 +130,40 @@ define(['jquery'], function($) {
                 evt.preventDefault();
                 $('#searchtoremovetext').val('');
                 $('#searchtoremovetext').trigger('change');
+            });
+        },
+
+        setupResultsDialog: function (viewresultslink, sessionid, listid) {
+            // Work around to re-add id that was cleaned out when link added as part of a notification.
+            viewresultslink.attr('id', 'viewbulkresults');
+
+            var requiredstrings = [];
+            requiredstrings.push({key: 'bulkaddattendeesresults', component: 'facetoface'});
+            requiredstrings.push({key: 'closebuttontitle', component: 'moodle'});
+
+            mdlstrings.get_strings(requiredstrings).done(function (strings) {
+
+                var handler = new totaraDialog_handler();
+
+                var tstr = [];
+                for (var i = 0; i < requiredstrings.length; i++) {
+                    tstr[requiredstrings[i].key] = strings[i];
+                }
+                var name = 'bulkaddvalidation';
+                var buttons = {};
+                buttons[tstr.closebuttontitle] = function () {
+                    handler._cancel()
+                };
+                totaraDialogs[name] = new totaraDialog(
+                    name,
+                    'viewbulkresults',
+                    {
+                        title: '<h2>' + tstr.bulkaddattendeesresults + '</h2>',
+                        buttons: buttons
+                    },
+                    mdlcfg.wwwroot + '/mod/facetoface/attendees/bulkadd_results.php?s=' + sessionid + '&listid=' + listid,
+                    handler
+                );
             });
         }
     };

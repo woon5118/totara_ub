@@ -4682,6 +4682,9 @@ function facetoface_get_sessions_within($times, $userid = null, $extrawhere = ''
 
     if ($times) {
         $where = 'WHERE ((' . implode(') OR (', $twhere) . '))';
+    } else {
+        // No times were given, so we can't supply sessions within any times. Return an empty array.
+        return array();
     }
 
     // If userid supplied, only return sessions they are waitlisted, booked or attendees, or
@@ -4847,18 +4850,6 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         return $result;
     }
 
-    if ($user->deleted) {
-        $result['name'] = fullname($user);
-        $result['result'] = get_string('error:userdeleted', 'facetoface', fullname($user));
-        return $result;
-    }
-
-    if ($user->suspended) {
-        $result['name'] = fullname($user);
-        $result['result'] = get_string('error:usersuspended', 'facetoface', fullname($user));
-        return $result;
-    }
-
     $result['name'] = fullname($user);
 
     if (isguestuser($user)) {
@@ -4880,29 +4871,12 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         }
     }
 
-    // Check if they are already signed up
-    $minimumstatus = ($session->mintimestart) ? MDL_F2F_STATUS_BOOKED : MDL_F2F_STATUS_REQUESTED;
-    // If multiple sessions are allowed then just check against this session
-    // Otherwise check against all sessions
-    $multisessionid = ($facetoface->multiplesessions ? $session->id : null);
-    if (facetoface_get_user_submissions($facetoface->id, $user->id, $minimumstatus, MDL_F2F_STATUS_FULLY_ATTENDED, $multisessionid)) {
-        if ($user->id == $USER->id) {
-            $result['result'] = get_string('error:addalreadysignedupattendeeaddself', 'facetoface');
-        } else {
-            $result['result'] = get_string('error:addalreadysignedupattendee', 'facetoface');
-        }
-        return $result;
-    }
-
     $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
     if ($session->waitlisteveryone && !empty($facetoface_allowwaitlisteveryone)) {
         $status = MDL_F2F_STATUS_WAITLISTED;
     } else if (!facetoface_session_has_capacity($session, $context)) {
         if ($session->allowoverbook) {
             $status = MDL_F2F_STATUS_WAITLISTED;
-        } else {
-            $result['result'] = get_string('full', 'facetoface');
-            return $result;
         }
     }
 
@@ -4910,16 +4884,6 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
     if ($session->mintimestart) {
         if (!isset($status)) {
             $status = MDL_F2F_STATUS_BOOKED;
-        }
-
-        // Check if there are any date conflicts
-        if (!$ignoreconflicts) {
-            $dates = facetoface_get_session_dates($session->id);
-            if ($availability = facetoface_get_sessions_within($dates, $user->id)) {
-                $result['result'] = facetoface_get_session_involvement($user, $availability);
-                $result['conflict'] = true;
-                return $result;
-            }
         }
     } else {
         $status = MDL_F2F_STATUS_WAITLISTED;
@@ -4956,6 +4920,12 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
     $managerid = null;
     if ($managerselect && isset($params['managerselect'])) {
         $managerid = $params['managerselect'];
+    }
+
+    // Do general validation checks for user import to a session.
+    $error = facetoface_validate_user_import($user, $context, $facetoface, $session, $ignoreconflicts);
+    if (!empty($error)) {
+        return $error;
     }
 
     // Finally attempt to enrol
@@ -5002,8 +4972,7 @@ function facetoface_set_bulk_result_notification($results, $type = 'bulkadd') {
             $result_message .= get_string('xerrorsencounteredduringimport', 'facetoface', count($errors));
             $result_message .= ' <a href="#" class="'.$dialogid.'">('.get_string('viewresults', 'facetoface').')</a>';
         }
-    }
-    if ($added) {
+    } else if ($added) {
         $result_message .= get_string($type.'attendeessuccess', 'facetoface') . ' - ';
         $result_message .= get_string('successfullyaddededitedxattendees', 'facetoface', count($added));
         $result_message .= ' <a href="#" class="'.$dialogid.'">('.get_string('viewresults', 'facetoface').')</a>';
@@ -6858,4 +6827,60 @@ function facetoface_room_to_string($room) {
     $stringitems[] = facetoface_room_get_address($room);
 
     return implode(", ", array_filter($stringitems));
+}
+
+function facetoface_validate_user_import($user, $context, $facetoface, $session, $ignoreconflicts = null) {
+    global $USER;
+
+
+    if ($user->deleted) {
+        $result['name'] = fullname($user);
+        $result['result'] = get_string('error:userdeleted', 'facetoface', fullname($user));
+        return $result;
+    }
+
+    if ($user->suspended) {
+        $result['name'] = fullname($user);
+        $result['result'] = get_string('error:usersuspended', 'facetoface', fullname($user));
+        return $result;
+    }
+
+    $result = array(
+        'id' => $user->id,
+        'name' =>fullname($user)
+    );
+
+    // Check if they are already signed up
+    $minimumstatus = ($session->mintimestart) ? MDL_F2F_STATUS_BOOKED : MDL_F2F_STATUS_REQUESTED;
+    // If multiple sessions are allowed then just check against this session
+    // Otherwise check against all sessions
+    $multisessionid = ($facetoface->multiplesessions ? $session->id : null);
+    if (facetoface_get_user_submissions($facetoface->id, $user->id, $minimumstatus, MDL_F2F_STATUS_FULLY_ATTENDED, $multisessionid)) {
+        if ($user->id == $USER->id) {
+            $result['result'] = get_string('error:addalreadysignedupattendeeaddself', 'facetoface');
+        } else {
+            $result['result'] = get_string('error:addalreadysignedupattendee', 'facetoface');
+        }
+        return $result;
+    }
+
+    $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
+    if (empty($session->waitlisteveryone) && empty($facetoface_allowwaitlisteveryone)
+        && !facetoface_session_has_capacity($session, $context) && empty($session->allowoverbook)) {
+            $result['result'] = get_string('full', 'facetoface');
+            return $result;
+    }
+
+    // Check if there are any date conflicts
+    if (empty($ignoreconflicts)) {
+        $dates = facetoface_get_session_dates($session->id);
+        if ($availability = facetoface_get_sessions_within($dates, $user->id)) {
+            $result['result'] = facetoface_get_session_involvement($user, $availability);
+            $result['conflict'] = true;
+            return $result;
+        }
+    }
+
+    // No errors, so just return an empty array.
+    return array();
 }

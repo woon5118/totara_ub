@@ -30,6 +30,7 @@ define('USERS_PER_PAGE', 50);
 $s      = required_param('s', PARAM_INT); // facetoface session ID
 $listid = required_param('listid', PARAM_ALPHANUM); // Session key to list of users to add.
 $page   = optional_param('page', 0, PARAM_INT); // Current page number.
+$ignoreconflicts = optional_param('ignoreconflicts', false, PARAM_BOOL); // Ignore scheduling conflicts.
 
 list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 
@@ -57,7 +58,7 @@ $showcustomfields = $enableattendeenote && !$list->has_user_data();
 
 $approvalreqd = facetoface_approval_required($facetoface);
 $mform = new addconfirm_form(null, array('s' => $s, 'listid' => $listid, 'approvalreqd' => $approvalreqd,
-        'enablecustomfields' => $showcustomfields));
+        'enablecustomfields' => $showcustomfields, 'ignoreconflicts' => $ignoreconflicts));
 
 $returnurl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $s, 'backtoallsessions' => 1));
 if ($mform->is_cancelled()) {
@@ -113,6 +114,7 @@ if ($fromform = $mform->get_data()) {
         } else {
             $params['ccmanager'] = $fromform->notifymanager;
         }
+        $params['ignoreconflicts'] = $ignoreconflicts;
 
         foreach ($attendeestoadd as $attendee) {
             $result = facetoface_user_import($course, $facetoface, $session, $attendee->id, $params);

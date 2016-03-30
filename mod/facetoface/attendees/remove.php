@@ -36,7 +36,7 @@ $cancel         = optional_param('cancel', false, PARAM_BOOL);
 $interested     = optional_param('interested', false, PARAM_BOOL); // Declare interest.
 $listid         = optional_param('listid', uniqid('f2f'), PARAM_ALPHANUM); // Session key to list of users to add.
 $currenturl     = new moodle_url('/mod/facetoface/attendees/remove.php', array('s' => $s, 'listid' => $listid));
-
+$action = 'remove';
 $attendees = array();
 $notification = '';
 
@@ -51,7 +51,7 @@ $PAGE->set_url('/mod/facetoface/attendees/remove.php', array('s' => $s, 'listid'
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
 
-$list = new \mod_facetoface\bulk_list($listid, $currenturl, 'remove');
+$list = new \mod_facetoface\bulk_list($listid, $currenturl, $action);
 
 if ($frm = data_submitted()) {
     require_sesskey();
@@ -176,7 +176,7 @@ if (($searchtext !== '') && !empty($attendees)) {
 $availableusers = $attendees;
 $usercount = count($availableusers);
 
-$PAGE->requires->js_call_amd('mod_facetoface/attendees_addremove', 'init');
+$PAGE->requires->js_call_amd('mod_facetoface/attendees_addremove', 'init', array(array('s' => $s, 'listid' => $listid)));
 
 $PAGE->set_title(format_string($facetoface->name));
 $PAGE->set_heading($course->fullname);

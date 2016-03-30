@@ -61,6 +61,7 @@ $string['allowcancellations_help'] = 'Whether event attendees will be able to ca
 $string['allowconflicts'] = 'Allow scheduling conflicts';
 $string['allowconflicts_help'] = 'This will allow scheduling conflicts to exist';
 $string['allowoverbook'] = 'Allow overbooking';
+$string['allowscheduleconflicts'] = 'Allow scheduling conflicts';
 $string['allowschedulingconflicts'] = 'Override user conflicts';
 $string['allowschedulingconflicts_help'] = 'If trainers or users are already assigned or booked onto another Facetoface event at the same time as this event then the administrator will be warned, but can override such warnings and proceed anyway by selecting "Yes" from the drop-down menu';
 $string['allowselectedschedulingconflicts'] = 'Allow selected scheduling conflicts';
