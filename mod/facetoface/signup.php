@@ -312,6 +312,13 @@ if ($signedup) {
     $datetimetz->time = userdate($session->registrationtimefinish,  get_string('strftimetime', 'langconfig'));
     $datetimetz->timezone = core_date::get_user_timezone();
     echo html_writer::span(get_string('signupregistrationclosed', 'facetoface', $datetimetz));
+} else if ($session->mintimestart and
+           $dates = facetoface_get_session_dates($session->id) and
+           $availability = facetoface_get_sessions_within($dates, $USER->id)) {
+    // There are date conflicts with other session signups.
+    $conflict = facetoface_get_session_involvement($USER, $availability);
+    echo html_writer::tag('p', html_writer::tag('strong', $conflict));
+    echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
 } else {
     // Signup form.
     $mform->display();

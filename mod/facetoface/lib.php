@@ -4669,7 +4669,17 @@ function facetoface_get_sessions_within($times, $userid = null, $extrawhere = ''
 
 
 /**
- * Get session info and role description from get_sessions_within output
+ * Takes result of get_sessions_within and produces message about existing attendance.
+ *
+ * This function returns the strings:
+ * - error:userassignedsessionconflictsameday
+ * - error:userassignedsessionconflictsamedayselfsignup
+ * - error:userbookedsessionconflictsameday
+ * - error:userbookedsessionconflictsamedayselfsignup
+ * - error:userassignedsessionconflictmultiday
+ * - error:userassignedsessionconflictmultidayselfsignup
+ * - error:userbookedsessionconflictmultiday
+ * - error:userbookedsessionconflictmultidayselfsignup
  *
  * @access  public
  * @param   object  $user     User this $info relates to
