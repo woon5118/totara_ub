@@ -139,6 +139,12 @@ class mod_facetoface_generator extends testing_module_generator {
         if (!isset($record->waitlisteveryone)) {
             $record->waitlisteveryone = 0;
         }
+        if (!isset($record->registrationtimestart)) {
+            $record->registrationtimestart = 0;
+        }
+        if (!isset($record->registrationtimefinish)) {
+            $record->registrationtimefinish = 0;
+        }
 
         $record->usermodified = $USER->id;
 

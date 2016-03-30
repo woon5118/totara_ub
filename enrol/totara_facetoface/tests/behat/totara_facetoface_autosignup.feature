@@ -81,5 +81,4 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I click on "Sign-up" "link_or_button"
-    And I click on "Sign-up" "link_or_button"
-    Then I should see "Your booking has been completed."
+    Then I should see "Your booking has been completed and you have been enrolled on 2 event(s)."

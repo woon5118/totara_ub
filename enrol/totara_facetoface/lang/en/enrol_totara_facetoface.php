@@ -33,7 +33,7 @@ $string['autosignup_help'] = 'If set to yes then on enrolling the user will be s
 If multiple enrolment is enabled then the user will be signed up to every event that has availability or a waiting list, otherwise they will be signed up to the earliest event with either a space or waiting list.';
 $string['cannotenrol'] = 'Enrolment is disabled or inactive';
 $string['cannotenrolalreadyrequested'] = 'It is not possible to sign up for these events (manager request already pending).';
-$string['cannotenrolnosessions'] = 'Cannot enrol (no face-fo-face events in this course)';
+$string['cannotenrolnosessions'] = 'Cannot enrol (no face-to-face events in this course)';
 $string['cannnotupdatemanageremail'] = 'Manager email cannot be updated, configure using positions instead.';
 $string['cohortnonmemberinfo'] = 'Only members of cohort \'{$a}\' can use face-to-face enrolment.';
 $string['cohortonly'] = 'Only cohort members';

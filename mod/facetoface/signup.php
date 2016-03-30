@@ -170,6 +170,21 @@ if ($fromform = $mform->get_data()) { // Form submitted
         $params['managerselect'] = $fromform->managerid;
     }
 
+    $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id, false, MUST_EXIST);
+    $context = context_module::instance($cm->id);
+    if (!is_enrolled($context, $USER)) {
+        // Check for and attempt to enrol via the totara_facetoface enrolment plugin.
+        $enrolments = enrol_get_plugins(true);
+        $instances = enrol_get_instances($course->id, true);
+        foreach ($instances as $instance) {
+            if ($instance->enrol === 'totara_facetoface') {
+                $data = clone($fromform);
+                $data->sid = array($session->id);
+                $enrolments[$instance->enrol]->enrol_totara_facetoface($instance, $data, $course, $returnurl);
+            }
+        }
+    }
+
     $result = facetoface_user_import($course, $facetoface, $session, $USER->id, $params);
     if ($result['result'] === true) {
         if ($enableattendeenote) {

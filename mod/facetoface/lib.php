@@ -4872,7 +4872,7 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         return $result;
     }
 
-    // Make sure that the user is enroled in the course
+    // Make sure that the user is enroled in the course.
     $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id, false, MUST_EXIST);
     $context = context_module::instance($cm->id);
     if (!is_enrolled($context, $user) && $autoenrol) {
