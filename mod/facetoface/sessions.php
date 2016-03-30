@@ -124,7 +124,7 @@ if ($d and $confirm) {
     redirect($returnurl);
 }
 
-// Handle deletions
+// Handle cancellations.
 if ($ca and $confirm) {
     require_sesskey();
     if (facetoface_cancel_session($session)) {
