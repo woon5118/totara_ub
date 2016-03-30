@@ -194,10 +194,7 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
             $sql = "SELECT f2fss.id AS signupstatusid, f2fss.statuscode, f2fsd.timefinish, f2fs.archived
                 FROM {facetoface_sessions} f2fses
                 LEFT JOIN {facetoface_signups} f2fs ON (f2fs.sessionid = f2fses.id)
-                LEFT JOIN (SELECT ss.signupid, MAX(ss.id) AS id
-                             FROM {facetoface_signups_status} ss
-                            GROUP BY ss.signupid) ssmax ON (ssmax.signupid = f2fs.id)
-                     JOIN {facetoface_signups_status} f2fss ON (f2fss.id = ssmax.id)
+                LEFT JOIN {facetoface_signups_status} f2fss ON (f2fss.signupid = f2fs.id AND f2fss.superceded = 0)
                 LEFT JOIN {facetoface_sessions_dates} f2fsd ON (f2fsd.sessionid = f2fses.id)
                 WHERE f2fses.facetoface = ? AND f2fs.userid = ?
                   AND f2fss.statuscode $insql
