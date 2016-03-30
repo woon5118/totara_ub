@@ -45,56 +45,111 @@ class behat_facetoface extends behat_base {
     public function i_fill_facetoface_session_with_relative_date_in_form_data(TableNode $data) {
 
         $dataclone = clone $data;
-        $rows = $dataclone->getRows();
+        $rows = array();
+        $timestartday = '';
+        $timestartmonth = '';
+        $timestartyear = '';
+        $timestarthour = '';
+        $timestartmin = '';
+        $timestartzone = '';
+        $timefinishday = '';
+        $timefinishmonth = '';
+        $timefinishyear = '';
+        $timefinishhour = '';
+        $timefinishmin = '';
+        $timefinishzone = '';
 
-        // Setting the timezone. Don't know if there is a better way for this.
-        date_default_timezone_set($rows[1][1]);
+        foreach ($dataclone->getRows() as $row) {
+            switch ($row[0]) {
+                case 'timestart[day]':
+                    $timestartday = (!empty($row[1]) ? $row[1] . ' days': '');
+                    break;
+                case 'timestart[month]':
+                    $timestartmonth = (!empty($row[1]) ? $row[1] . ' months': '');
+                    break;
+                case 'timestart[year]':
+                    $timestartyear = (!empty($row[1]) ? $row[1] . ' years' : '');
+                    break;
+                case 'timestart[hour]':
+                    $timestarthour = (!empty($row[1]) ? $row[1] . ' hours': '');
+                    break;
+                case 'timestart[minute]':
+                    $timestartmin = (!empty($row[1]) ? $row[1] . ' minutes': '');
+                    break;
+                case 'timestart[timezone]':
+                    $timestartzone = (!empty($row[1]) ? $row[1] : '');
+                    $rows[] = $row;
+                    break;
+                case 'timefinish[day]':
+                    $timefinishday = (!empty($row[1]) ? $row[1]  . ' days': '');
+                    break;
+                case 'timefinish[month]':
+                    $timefinishmonth = (!empty($row[1]) ? $row[1]  . ' months': '');
+                    break;
+                case 'timefinish[year]':
+                    $timefinishyear = (!empty($row[1]) ? $row[1]  . ' years' : '');
+                    break;
+                case 'timefinish[hour]':
+                    $timefinishhour = (!empty($row[1]) ? $row[1] . ' hours': '');
+                    break;
+                case 'timefinish[minute]':
+                    $timefinishmin = (!empty($row[1]) ? $row[1] . ' minutes': '');
+                    break;
+                case 'timefinish[timezone]':
+                    $timefinishzone = (!empty($row[1]) ? $row[1] : '');
+                    $rows[] = $row;
+                    break;
+                default:
+                    $rows[] = $row;
+                    break;
+            }
+        }
 
-        // Get timestart and modify its current value.
-        $timestartyear  = (!empty($rows[4][1]) ? $rows[4][1] . ' years' : '');
-        $timestartmonth = (!empty($rows[3][1]) ? $rows[3][1] . ' months': '');
-        $timestartday   = (!empty($rows[2][1]) ? $rows[2][1] . ' days': '');
-        $timestarthour  = (!empty($rows[5][1]) ? $rows[5][1] . ' hours': '');
-        $timestartmin   = (!empty($rows[6][1]) ? $rows[5][1] . ' minutes': '');
-
-        // Get timestart and modify its current value.
-        $timefinishyear  = (!empty($rows[9][1])  ? $rows[9][1]  . ' years' : '');
-        $timefinishmonth = (!empty($rows[8][1])  ? $rows[8][1]  . ' months': '');
-        $timefinishday   = (!empty($rows[7][1])  ? $rows[7][1]  . ' days': '');
-        $timefinishhour  = (!empty($rows[10][1]) ? $rows[10][1] . ' hours': '');
-        $timefinishmin   = (!empty($rows[11][1]) ? $rows[11][1] . ' minutes': '');
-
+        if ($timestartzone !== '') {
+            date_default_timezone_set($timestartzone);
+        }
         $now = time();
         $newdate = strtotime("{$timestartmonth} {$timestartday} {$timestartyear} {$timestarthour} {$timestartmin}" , $now) ;
         $startdate = new DateTime(date('Y-m-d H:i' , $newdate));
 
-        $newdate = strtotime("{$timefinishmonth} {$timefinishday} {$timefinishyear} {$timefinishhour} {$timefinishmin}" , $now) ;
-        $finishdate = new DateTime(date('Y-m-d H:i' , $newdate));
-
         // Values for the minutes field should be multiple of 5 (from 00 to 55). So we need to fix these values.
         $startmin = $startdate->format("i");
         $minutes = (($startmin % 5 ) !== 0) ? floor($startmin / 5) * 5 + 5 : ($startmin / 5) * 5;
-        $minutes = ($minutes > 55) ? 0 : $minutes;
+
+        if ($minutes > 55) {
+            $minutes = 0;
+            $startdate->add(new DateInterval('PT1H'));
+        }
+
         $startdate->setTime($startdate->format('H'), $minutes);
+
+        if ($timefinishzone !== '') {
+            date_default_timezone_set($timefinishzone);
+        }
+        $newdate = strtotime("{$timefinishmonth} {$timefinishday} {$timefinishyear} {$timefinishhour} {$timefinishmin}" , $now) ;
+        $finishdate = new DateTime(date('Y-m-d H:i' , $newdate));
 
         $finishmin = $finishdate->format('i');
         $minutes = (($finishmin % 5 ) !== 0) ? floor($finishmin / 5) * 5 + 5 : ($finishmin / 5) * 5;
-        $minutes = ($minutes > 55) ? 0 : $minutes;
+        if ($minutes > 55) {
+            $minutes = 0;
+            $finishdate->add(new DateInterval('PT1H'));
+        }
         $finishdate->setTime($finishdate->format('H'), $minutes);
 
         // Replace values for timestart.
-        $rows[2][1] = (int) $startdate->format('d');
-        $rows[3][1] = (int) $startdate->format('m');
-        $rows[4][1] = (int) $startdate->format('Y');
-        $rows[5][1] = (int) $startdate->format('H');
-        $rows[6][1] = (int) $startdate->format('i');
+        $rows[] = array('timestart[day]', (int) $startdate->format('d'));
+        $rows[] = array('timestart[month]', (int) $startdate->format('m'));
+        $rows[] = array('timestart[year]', (int) $startdate->format('Y'));
+        $rows[] = array('timestart[hour]', (int) $startdate->format('H'));
+        $rows[] = array('timestart[minute]', (int) $startdate->format('i'));
 
         // Replace values for timefinish.
-        $rows[7][1]  = (int) $finishdate->format('d');
-        $rows[8][1]  = (int) $finishdate->format('m');
-        $rows[9][1]  = (int) $finishdate->format('Y');
-        $rows[10][1] = (int) $finishdate->format('H');
-        $rows[11][1] = (int) $finishdate->format('i');
+        $rows[] = array('timefinish[day]', (int) $finishdate->format('d'));
+        $rows[] = array('timefinish[month]', (int) $finishdate->format('m'));
+        $rows[] = array('timefinish[year]', (int) $finishdate->format('Y'));
+        $rows[] = array('timefinish[hour]', (int) $finishdate->format('H'));
+        $rows[] = array('timefinish[minute]', (int) $finishdate->format('i'));
 
         // Set the the rows back to data.
         $dataclone->setRows($rows);
