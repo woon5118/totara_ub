@@ -745,9 +745,20 @@ class session_date_form extends moodleform {
 
         // Validate assets.
         if (!empty($assetids)) {
+            // Get a list of all available private assets for this session and all public assets.
             $all = facetoface_get_all_assets($sessionid);
             $available = facetoface_get_available_assets(array(array($timestart, $timefinish)), 'id', array($sessionid));
-            $unavailable = array_diff($assetids, array_keys($available));
+            $unavailable = array_diff(array_keys($all), array_keys($available));
+
+            // Remove any unavailable assets that aren't in the list of assets we're validating.
+            // We need to do this if we're creating a new face-to-face event as there'll be no
+            // session id to limit the list of assets retrieved by the above functions.
+            foreach ($unavailable as $index => $id) {
+                if (!in_array($id, $assetids)) {
+                    unset($unavailable[$index]);
+                }
+            }
+
             if (count($unavailable)) {
                 $errors['assetid'] = array();
                 foreach($unavailable as $asset) {

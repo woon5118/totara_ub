@@ -4386,7 +4386,7 @@ function facetoface_task_check_capacity($data) {
 }
 
 /**
- * Get all non-custom assets (+ custom assets belongs to current session)
+ * Get all non-custom (public) and custom (private) assets belonging to current session
  * @param int $sessionid
  * @return array assets
  */
@@ -4419,15 +4419,15 @@ function facetoface_get_all_assets($sessionid = 0) {
 }
 
 /**
- * Get available rooms for the specified time period
+ * Get available assets for the specified time period.
  *
- * Available rooms are rooms where the start- OR end times don't fall within that of another session's room,
- * as well as rooms where the start- AND end times don't encapsulate that of another session's room
+ * Available assets are where the start- OR end times don't fall within that of another session's asset,
+ * as well as assets where the start- AND end times don't encapsulate that of another session's asset
  *
  * @param array $timeslots array of [timestart, timefinish] arrays
  * @param string $fields db fields for which data should be retrieved
  * @param array $excludesessions array of sessionids to exclude in availability checking
- * @return array rooms
+ * @return array assets
  * // TODO: Cover this function by unit tests.
  */
 function facetoface_get_available_assets($timeslots=array(), $fields='*', $excludesessions=array()) {
