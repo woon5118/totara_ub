@@ -317,7 +317,7 @@ class rb_global_restriction {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/totara/reportbuilder/lib/assign/lib.php');
 
-        $restrictions = $DB->get_records('report_builder_global_restriction', array(), 'sortorder ASC', '*', $offset, $limit);
+        $restrictions = $DB->get_records('report_builder_global_restriction', array(), 'sortorder ASC', '*', $offset*$limit, $limit);
         $count = $DB->count_records('report_builder_global_restriction');
 
         foreach ($restrictions as $restriction) {

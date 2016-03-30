@@ -273,7 +273,7 @@ class totara_reportbuilder_rb_global_restriction_testcase extends advanced_testc
         $this->assertCount(5, $all);
 
         // Check pagination support.
-        $page = $all = rb_global_restriction::get_all(2, 2, $count);
+        $page = rb_global_restriction::get_all(1, 2, $count);
         $this->assertCount(2, $page);
         $this->assertEquals($restriction3->id, array_values($page)[0]->id);
         $this->assertEquals($restriction4->id, array_values($page)[1]->id);
