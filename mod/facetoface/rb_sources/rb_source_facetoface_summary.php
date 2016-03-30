@@ -565,8 +565,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             'facetofaceroomid',
             $this->joinlist,
             $this->columnoptions,
-            $this->filteroptions,
-            true
+            $this->filteroptions
         );
 
         $this->add_custom_fields_for(
@@ -575,8 +574,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             'facetofaceassetid',
             $this->joinlist,
             $this->columnoptions,
-            $this->filteroptions,
-            true
+            $this->filteroptions
         );
     }
 

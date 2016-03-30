@@ -687,6 +687,8 @@ abstract class rb_base_source {
      * @param bool $isexport
      */
     public function rb_display_location($location, $row, $isexport = false) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
         $output = array();
 
         $location = customfield_define_location::convert_location_json_to_object($location);
@@ -3857,13 +3859,21 @@ abstract class rb_base_source {
      * @param array $joinlist - array of joins passed by reference
      * @param array $columnoptions - array of columnoptions, passed by reference
      * @param array $filteroptions - array of filters, passed by reference
-     * @param bool $useshortname - instead of custom_field_{$id}, column name will be custom_field_{$shortname}
-     *                           Where $shortname is customfield unique shortname
+     * @param string $suffix - instead of custom_field_{$id}, column name will be custom_field_{$id}{$suffix}. Use short prefixes
+     *                         to avoid hiting column size limitations
+     * @param bool $nofilter - do not create filter for custom fields. It is useful when customfields are dynamically added by
+     *                         column generator
      */
     protected function add_custom_fields_for($cf_prefix, $join, $joinfield,
-        array &$joinlist, array &$columnoptions, array &$filteroptions, $useshortname = false) {
+        array &$joinlist, array &$columnoptions, array &$filteroptions, $suffix = '', $nofilter = false) {
 
         global $CFG, $DB;
+
+        if (strlen($suffix)) {
+            if (!preg_match('/^[a-zA-Z]{1,5}$/', $suffix)) {
+                throw new coding_exception('Suffix for add_custom_fields_for must be letters only up to 5 chars.');
+            }
+        }
 
         $seek = false;
         foreach ($joinlist as $object) {
@@ -3900,14 +3910,10 @@ abstract class rb_base_source {
             $items->close();
             return false;
         }
-
         foreach ($items as $record) {
             $id = $record->id;
-            $joinname = "{$cf_prefix}_{$id}";
-            $value = "custom_field_{$id}";
-            if ($useshortname) {
-                $value = "custom_field_{$record->shortname}";
-            }
+            $joinname = "{$cf_prefix}_{$id}{$suffix}";
+            $value = "custom_field_{$id}{$suffix}";
             $name = isset($record->fullname) ? $record->fullname : $record->name;
             $column_options = array('joins' => $joinname);
             // If profile field isn't available to everyone require a capability to display the column.
@@ -3989,13 +3995,15 @@ abstract class rb_base_source {
                         'dependency' => $join,
                         'dataalias' => "{$cf_prefix}_idpt_{$id}",
                         'datafield' => "value");
-                $filteroptions[] = new rb_filter_option(
+                if (!$nofilter) {
+                    $filteroptions[] = new rb_filter_option(
                         $cf_prefix,
                         $value.'_text',
                         get_string('multiselectcolumntext', 'totara_customfield', $name),
                         $filtertype,
                         $filter_options
                     );
+                }
 
                 $iconselectchoices = array();
                 foreach ($record->multiselectitem as $selectchoice) {
@@ -4014,13 +4022,15 @@ abstract class rb_base_source {
                         'dependency' => $join,
                         'dataalias' => "{$cf_prefix}_idpi_{$id}",
                         'datafield' => "value");
-                $filteroptions[] = new rb_filter_option(
+                if (!$nofilter) {
+                    $filteroptions[] = new rb_filter_option(
                         $cf_prefix,
                         $value.'_icon',
                         get_string('multiselectcolumnicon', 'totara_customfield', $name),
                         $filtertype,
                         $filter_options
                     );
+                }
                 continue;
             }
 
@@ -4028,7 +4038,7 @@ abstract class rb_base_source {
                 case 'file':
                     $column_options['displayfunc'] = 'customfield_file';
                     $column_options['extrafields'] = array(
-                            "{$cf_prefix}_custom_field_{$id}_itemid" => "{$joinname}.id"
+                            "itemid" => "{$joinname}.id"
                     );
                     break;
 
@@ -4040,7 +4050,7 @@ abstract class rb_base_source {
                         $column_options['displayfunc'] = 'customfield_textarea';
                     }
                     $column_options['extrafields'] = array(
-                            "{$cf_prefix}_custom_field_{$id}_itemid" => "{$joinname}.id"
+                        "itemid" => "{$joinname}.id"
                     );
                     if ($cf_prefix === 'user') {
                         $column_options['extrafields']["{$cf_prefix}_custom_field_{$id}_format"] = "{$joinname}.dataformat";
@@ -4158,13 +4168,15 @@ abstract class rb_base_source {
                 // No filter options for files yet.
                 continue;
             } else {
-                $filteroptions[] = new rb_filter_option(
+                if (!$nofilter) {
+                    $filteroptions[] = new rb_filter_option(
                         $cf_prefix,
                         $value,
                         $name,
                         $filtertype,
                         $filter_options
                     );
+                }
             }
 
         }
@@ -4176,29 +4188,36 @@ abstract class rb_base_source {
     }
 
     /**
-     * Dynamically add customfields to columns
+     * Dynamically add all customfields to columns
+     * It uses additional suffix 'all' for column names generation . This means, that if some customfield column was generated using
+     * the same suffix it will be shadowed by this method.
      * @param rb_column_option $columnoption should have public string property "type" which value is the type of customfields to show
      * @param bool $hidden should all these columns be hidden
      * @return array
      */
     public function rb_cols_generator_allcustomfields(rb_column_option $columnoption, $hidden) {
         $result = array();
-        foreach($this->columnoptions as $existingcolumn) {
-            if ($existingcolumn->type == $columnoption->type && empty($existingcolumn->columngenerator)) {
-                $result[] = new rb_column(
-                    $existingcolumn->type,
-                    $existingcolumn->value . '_all',
-                    $existingcolumn->name,
-                    $existingcolumn->field,
-                    array(
-                        'joins' => $existingcolumn->joins,
-                        'hidden' => $hidden,
-                        'displayfunc' => $existingcolumn->displayfunc,
-                        'extrafields' => $existingcolumn->extrafields
-                    )
-                );
-            }
+        $columnoptions = array();
+
+        // add_custom_fields_for requires only one join.
+        if (!empty($columnoption->joins) && !is_string($columnoption->joins)) {
+            throw new coding_exception('allcustomfields column generator requires none or only one join as string');
         }
+
+        $join = empty($columnoption->joins) ? 'base' : $columnoption->joins;
+
+        $this->add_custom_fields_for($columnoption->type, $join, $columnoption->field, $this->joinlist,
+                $columnoptions, $this->filteroptions, 'all', true);
+        foreach($columnoptions as $option) {
+            $result[] = new rb_column(
+                    $option->type,
+                    $option->value,
+                    $option->name,
+                    $option->field,
+                    (array)$option
+            );
+        }
+
         return $result;
     }
 

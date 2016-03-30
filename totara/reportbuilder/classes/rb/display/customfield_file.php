@@ -44,7 +44,7 @@ class customfield_file extends base {
 
         // Hierarchy custom fields are stored in the FileAPI fileareas using the longform of the prefix
         // extract prefix from field name.
-        $pattern = '/(?P<prefix>(.*?))(_all)?_custom_field_(\d*)$/';
+        $pattern = '/(?P<prefix>(.*?))(_all)?_custom_field_([a-zA-Z\d]+)[a-zA-Z]{0,5}$/';
         $matches = array();
         preg_match($pattern, $field, $matches);
         if (!empty($matches)) {
@@ -95,8 +95,7 @@ class customfield_file extends base {
             return '';
         }
 
-        $itemidfield = "{$field}_itemid";
-        $extradata = array('prefix' => $prefix, 'itemid' => $extrafields->$itemidfield, 'isexport' => $isexport);
+        $extradata = array('prefix' => $prefix, 'itemid' => $extrafields->itemid, 'isexport' => $isexport);
 
         $displaytext = \customfield_file::display_item_data($value, $extradata);
 

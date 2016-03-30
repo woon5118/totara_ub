@@ -177,8 +177,7 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
             'facetofaceassetid',
             $this->joinlist,
             $this->columnoptions,
-            $this->filteroptions,
-            true
+            $this->filteroptions
         );
     }
     /**

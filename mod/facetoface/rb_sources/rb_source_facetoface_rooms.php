@@ -178,8 +178,7 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
             'facetofaceroomid',
             $this->joinlist,
             $this->columnoptions,
-            $this->filteroptions,
-            true
+            $this->filteroptions
         );
     }
 
