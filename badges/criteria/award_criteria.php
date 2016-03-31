@@ -69,6 +69,12 @@ define('BADGE_CRITERIA_TYPE_COURSESET', 5);
 define('BADGE_CRITERIA_TYPE_PROFILE', 6);
 
 /*
+ * Audience criteria type
+ * Criteria type constant, primarily for storing criteria type in the database.
+ */
+define('BADGE_CRITERIA_TYPE_COHORT', 7);
+
+/*
  * Program completion criteria type
  * Criteria type constant, primarily for storing criteria type in the database.
  */
@@ -86,6 +92,7 @@ $BADGE_CRITERIA_TYPES = array(
     BADGE_CRITERIA_TYPE_COURSE    => 'course',
     BADGE_CRITERIA_TYPE_COURSESET => 'courseset',
     BADGE_CRITERIA_TYPE_PROFILE   => 'profile',
+    BADGE_CRITERIA_TYPE_COHORT    => 'cohort',
     BADGE_CRITERIA_TYPE_PROGRAM   => 'program'
 );
 

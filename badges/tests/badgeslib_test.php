@@ -702,6 +702,142 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
 
 
     /**
+     * Test cohort observer for a site badge when the criteria is for the user to be a member of all cohorts (and is).
+     */
+    public function test_cohort_observer_for_site_badges_with_user_in_all_cohorts_pass() {
+        global $DB;
+
+        $badge = new badge($this->badgeid);
+
+        // Assert the badge hasn't been issued.
+        $badge->review_all_criteria();
+        $this->assertFalse($badge->is_issued($this->user->id));
+
+        // Create a cohort and add the user to it.
+        $cohort1 = $this->getDataGenerator()->create_cohort();
+        cohort_add_member($cohort1->id, $this->user->id);
+        // Check that the user exists on the cohort.
+        $this->assertTrue($DB->record_exists('cohort_members', array('cohortid'=>$cohort1->id, 'userid'=>$this->user->id)));
+
+        // Create a second cohort and add the user to it.
+        $cohort2 = $this->getDataGenerator()->create_cohort();
+        cohort_add_member($cohort2->id, $this->user->id);
+        // Check that the user exists on the cohort.
+        $this->assertTrue($DB->record_exists('cohort_members', array('cohortid'=>$cohort2->id, 'userid'=>$this->user->id)));
+
+        // Save the criteria for the badge.
+        $criteria_overall = award_criteria::build(array('criteriatype' => BADGE_CRITERIA_TYPE_OVERALL, 'badgeid' => $badge->id));
+        $criteria_overall->save(array('agg' => BADGE_CRITERIA_AGGREGATION_ALL));
+        $criteria_overall1 = award_criteria::build(array('criteriatype' => BADGE_CRITERIA_TYPE_COHORT, 'badgeid' => $badge->id));
+        $criteria_overall1->save(array('agg' => BADGE_CRITERIA_AGGREGATION_ALL, 'cohort_cohorts' => array($cohort1->id, $cohort2->id)));
+
+        // Assert the badge has been issued.
+        $badge = new badge($this->badgeid);
+        $badge->review_all_criteria();
+        $this->assertDebuggingCalled('Error baking badge image!');
+        $this->assertTrue($badge->is_issued($this->user->id));
+    }
+
+    /**
+     * Test cohort observer for a site badge when the criteria is for the user to be a member of all cohorts but isn't.
+     */
+    public function test_cohort_observer_for_site_badges_with_user_in_all_cohorts_fail() {
+        global $DB;
+
+        $badge = new badge($this->badgeid);
+
+        // Assert the badge hasn't been issued.
+        $badge->review_all_criteria();
+        $this->assertFalse($badge->is_issued($this->user->id));
+
+        // Create a cohort and add the user to it.
+        $cohort1 = $this->getDataGenerator()->create_cohort();
+        cohort_add_member($cohort1->id, $this->user->id);
+        // Check that the user exists on the cohort.
+        $this->assertTrue($DB->record_exists('cohort_members', array('cohortid'=>$cohort1->id, 'userid'=>$this->user->id)));
+
+        // Create a second cohort and add a second user to it.
+        $cohort2 = $this->getDataGenerator()->create_cohort();
+        $user = $this->getDataGenerator()->create_user();
+        cohort_add_member($cohort2->id, $user->id);
+        // Check that the user exists on the cohort.
+        $this->assertTrue($DB->record_exists('cohort_members', array('cohortid'=>$cohort2->id, 'userid'=>$user->id)));
+
+        // Save the criteria for the badge.
+        $criteria_overall = award_criteria::build(array('criteriatype' => BADGE_CRITERIA_TYPE_OVERALL, 'badgeid' => $badge->id));
+        $criteria_overall->save(array('agg' => BADGE_CRITERIA_AGGREGATION_ALL));
+        $criteria_overall1 = award_criteria::build(array('criteriatype' => BADGE_CRITERIA_TYPE_COHORT, 'badgeid' => $badge->id));
+        $criteria_overall1->save(array('agg' => BADGE_CRITERIA_AGGREGATION_ALL, 'cohort_cohorts' => array($cohort1->id, $cohort2->id)));
+
+        // Assert the badge has not been issued.
+        $badge = new badge($this->badgeid);
+        $badge->review_all_criteria();
+        $this->assertFalse($badge->is_issued($this->user->id));
+    }
+
+    /**
+     * Test cohort observer for a site badge when the criteria is for the user to be a member of any cohort (and is).
+     */
+    public function test_cohort_observer_for_site_badges_with_user_in_any_cohort_pass() {
+        global $DB;
+
+        $badge = new badge($this->badgeid);
+
+        // Assert the badge hasn't been issued.
+        $badge->review_all_criteria();
+        $this->assertFalse($badge->is_issued($this->user->id));
+
+        // Create a cohort and add the user to it.
+        $cohort1 = $this->getDataGenerator()->create_cohort();
+        cohort_add_member($cohort1->id, $this->user->id);
+        // Check that the user exists on the cohort.
+        $this->assertTrue($DB->record_exists('cohort_members', array('cohortid'=>$cohort1->id, 'userid'=>$this->user->id)));
+
+        // Create a second cohort but don't add the user to it.
+        $cohort2 = $this->getDataGenerator()->create_cohort();
+
+        // Save the criteria for the badge.
+        $criteria_overall = award_criteria::build(array('criteriatype' => BADGE_CRITERIA_TYPE_OVERALL, 'badgeid' => $badge->id));
+        $criteria_overall->save(array('agg' => BADGE_CRITERIA_AGGREGATION_ALL));
+        $criteria_overall1 = award_criteria::build(array('criteriatype' => BADGE_CRITERIA_TYPE_COHORT, 'badgeid' => $badge->id));
+        $criteria_overall1->save(array('agg' => BADGE_CRITERIA_AGGREGATION_ANY, 'cohort_cohorts' => array($cohort1->id, $cohort2->id)));
+
+        // Assert the badge has been issued.
+        $badge = new badge($this->badgeid);
+        $badge->review_all_criteria();
+        $this->assertDebuggingCalled('Error baking badge image!');
+        $this->assertTrue($badge->is_issued($this->user->id));
+    }
+
+    /**
+     * Test cohort observer for a site badge when the criteria is for the user to be a member of any cohort but isn't.
+     */
+    public function test_cohort_observer_for_site_badges_with_user_in_any_cohort_fail() {
+        global $DB;
+
+        $badge = new badge($this->badgeid);
+
+        // Assert the badge hasn't been issued.
+        $badge->review_all_criteria();
+        $this->assertFalse($badge->is_issued($this->user->id));
+
+        // Create a couple of cohorts. Don't add any other users as they'll be awarded badges.
+        $cohort1 = $this->getDataGenerator()->create_cohort();
+        $cohort2 = $this->getDataGenerator()->create_cohort();
+
+        // Save the criteria for the badge.
+        $criteria_overall = award_criteria::build(array('criteriatype' => BADGE_CRITERIA_TYPE_OVERALL, 'badgeid' => $badge->id));
+        $criteria_overall->save(array('agg' => BADGE_CRITERIA_AGGREGATION_ALL));
+        $criteria_overall1 = award_criteria::build(array('criteriatype' => BADGE_CRITERIA_TYPE_COHORT, 'badgeid' => $badge->id));
+        $criteria_overall1->save(array('agg' => BADGE_CRITERIA_AGGREGATION_ANY, 'cohort_cohorts' => array($cohort1->id, $cohort2->id)));
+
+        // Assert the badge has not been issued.
+        $badge = new badge($this->badgeid);
+        $badge->review_all_criteria();
+        $this->assertFalse($badge->is_issued($this->user->id));
+    }
+
+    /**
      * Test badges assertion generated when a badge is issued.
      */
     public function test_badges_assertion() {

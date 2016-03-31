@@ -58,6 +58,14 @@ $observers = array(
         'eventname'   => '\totara_program\event\program_completed',
         'callback'    => 'core_badges_observer::program_criteria_review',
     ),
+    array(
+        'eventname'   => '\totara_cohort\event\members_updated',
+        'callback'    => 'core_badges_observer::cohort_criteria_review',
+    ),
+    array(
+        'eventname'   => '\core\event\cohort_member_added',
+        'callback'    => 'core_badges_observer::cohort_criteria_review',
+    )
 
 );
 
