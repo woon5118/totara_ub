@@ -21,13 +21,17 @@
  * @package totara_customfield
  */
 M.totara_customfield_location = M.totara_customfield_location || {
+
+    loadinggoogle: false,
+    loadqueue: [],
+
     Location: function(args) {
 
         this.addressinfo = {};
         this.formprefix = '';
         var customfield = this;
 
-        this.formprefix = (args.formprefix !== '' && typeof args.formprefix !== "undefined") ? args.formprefix : '';
+        this.formprefix = (args.formprefix !== '' && typeof args.formprefix !== "undefined" && args.formprefix) ? args.formprefix : '';
 
         this.geocode_address = function () {
             var address = this.url_encode_address(this.addressinfo.address);
@@ -154,37 +158,49 @@ M.totara_customfield_location = M.totara_customfield_location || {
             }
         };
 
+        var formprefix = this.formprefix,
+            searchbtn = $('#id_' + this.formprefix + 'searchaddress_btn'),
+            address = $('#id_' + this.formprefix + 'address'),
+            addresslookup = $('#id_' + this.formprefix + 'addresslookup'),
+            useaddressbtn = $('#id_' + this.formprefix + 'useaddress_btn'),
+            radioview = $('.radio_view'),
+            map = $('#' + this.formprefix + 'location_map');
 
-        $('#id_' + this.formprefix + 'searchaddress_btn').on('click', function (e) {
-            e.preventDefault();
-            customfield.addressinfo.address = $('#id_' + customfield.formprefix + 'addresslookup').val().trim();
-            customfield.geocode_address();
-        });
+        if (searchbtn) {
+            searchbtn.on('click', function (e) {
+                e.preventDefault();
+                customfield.addressinfo.address = addresslookup.val().trim();
+                customfield.geocode_address();
+            });
+        }
 
-        var formprefix = this.formprefix;
-        customfield.addressinfo.address = $('#id_' + customfield.formprefix + 'addresslookup').keydown(function(evt) {
-            if (evt.keyCode === 13) {
-                evt.preventDefault();
-                $('#id_' + formprefix + 'searchaddress_btn').click();
-                return false;
-            }
-        });
+        if (addresslookup) {
+            customfield.addressinfo.address = addresslookup.keydown(function (evt) {
+                if (evt.keyCode === 13) {
+                    evt.preventDefault();
+                    searchbtn.click();
+                    return false;
+                }
+            });
+        };
 
-        $('#id_' + this.formprefix + 'useaddress_btn').on('click', function (e) {
-            e.preventDefault();
+        if (useaddressbtn) {
+            useaddressbtn.on('click', function (e) {
+                e.preventDefault();
 
-            customfield.addressinfo.address = $('#id_' + customfield.formprefix + 'address').val().trim();
-            customfield.geocode_address();
-        });
+                customfield.addressinfo.address = address.val().trim();
+                customfield.geocode_address();
+            });
+        }
 
-        $('.radio_view').on('change', function (e) {
-            if (this.id.indexOf(customfield.formprefix) > -1) {
-                customfield.set_map_view();
-                customfield.load_map(true);
-            }
-        });
-
-        var map = $('#' + this.formprefix + 'location_map');
+        if (radioview) {
+            radioview.on('change', function (e) {
+                if (this.id.indexOf(customfield.formprefix) > -1) {
+                    customfield.set_map_view();
+                    customfield.load_map(true);
+                }
+            });
+        }
 
         if (!map.length) {
             return;
@@ -232,13 +248,27 @@ M.totara_customfield_location = M.totara_customfield_location || {
     },
 
     init: function (Y, args) {
-        var module = this;
-        if (typeof google === 'undefined') {
+        // We have to facilitate async loading here, means we need a simple queue and queue processor.
+        // This is required fo cases where there are multiple location fields on the page.
+        if (typeof window.google === 'undefined' && this.loadinggoogle == false) {
+            this.loadinggoogle = true;
+            var module = this;
             $.getScript('https://maps.googleapis.com/maps/api/js?' + args.mapparams, function(){
-                module.Location(args);
+                module.init_load_complete();
             });
+            this.loadqueue.push(args);
+        } else if (typeof window.google === 'undefined' && this.loadinggoogle === true) {
+            this.loadqueue.push(args);
         } else {
-            module.Location(args);
+            this.Location(args);
         }
+    },
+
+    init_load_complete: function() {
+        this.loadinggoogle = null;
+        for (i in this.loadqueue) {
+            this.Location(this.loadqueue[i]);
+        }
+        this.loadqueue = [];
     }
 };

@@ -129,7 +129,7 @@ if ($cfdata) {
         $data[] = array(
             'type' => $cf->datatype,
             'title' => $cf->fullname,
-            'value' => call_user_func(array($cf_class, 'display_item_data'), $cf->data, array('prefix' => $prefix, 'itemid' => $cf->id))
+            'value' => call_user_func(array($cf_class, 'display_item_data'), $cf->data, array('prefix' => $prefix, 'itemid' => $cf->id, 'extended' => true))
         );
     }
 }
@@ -144,7 +144,12 @@ foreach ($data as $ditem) {
     }
 
     echo html_writer::tag('dt', format_string($ditem['title']));
-    $value = (isset($ditem['type']) &&  $ditem['type'] === 'url') ? $ditem['value'] : format_string($ditem['value']);
+    $requirescleaning = array('url', 'location');
+    if (isset($ditem['type']) && in_array($ditem['type'], $requirescleaning)) {
+        $value = $ditem['value'];
+    } else {
+        $value = format_string($ditem['value']);
+    }
     echo html_writer::tag('dd', $value);
 }
 

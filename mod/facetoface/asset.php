@@ -86,5 +86,4 @@ if (has_capability('mod/facetoface:addinstance', $systemcontext)) {
 }
 
 $report->include_js();
-customfield_define_location::define_add_js();
 echo $renderer->footer();

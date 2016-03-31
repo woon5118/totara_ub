@@ -68,6 +68,7 @@ $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
+/** @var mod_facetoface_renderer $renderer */
 $renderer = $PAGE->get_renderer('mod_facetoface');
 echo $renderer->heading($PAGE->title);
 
@@ -101,5 +102,4 @@ if ($report) {
     $report->include_js();
 }
 
-customfield_define_location::define_add_js();
 echo $renderer->footer();

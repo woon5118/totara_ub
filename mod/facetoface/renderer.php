@@ -1013,6 +1013,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         $fields = facetoface_get_room_customfields();
         if (!empty($fields)) {
+            /** @var totara_customfield_renderer $renderer */
             $renderer = $PAGE->get_renderer('totara_customfield');
 
             foreach ($fields as $field) {

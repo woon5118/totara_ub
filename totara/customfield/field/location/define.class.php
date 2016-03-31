@@ -100,7 +100,7 @@ class customfield_define_location extends customfield_define_base {
     }
 
     /**
-     * @param $form
+     * @param MoodleQuickForm $form
      * @param $fielddefinition bool This flag is used to determine if this function is being used for field or instance creation
      * @throws coding_exception
      */
@@ -116,9 +116,7 @@ class customfield_define_location extends customfield_define_base {
             html_writer::tag('h3', $fieldname)
         );
 
-        /*
-         * Address element
-         */
+        // Address element.
         $form->addElement(
             'textarea',
             $formprefix . 'address',
@@ -134,9 +132,7 @@ class customfield_define_location extends customfield_define_base {
             $form->addRule($formprefix . 'address', null, 'required', null, 'client');
         }
 
-        /*
-         * Size element
-         */
+        // Size elements.
         $radiogroupmapsize = array();
         $sizeoptions = [GMAP_SIZE_SMALL, GMAP_SIZE_MEDIUM, GMAP_SIZE_LARGE];
         $mapsizeoptions = self::add_radio_group('size', $radiogroupmapsize, $sizeoptions, $form);
@@ -147,13 +143,13 @@ class customfield_define_location extends customfield_define_base {
             '<br />',
             false
         );
+        // Give it an appropriate default.
+        $form->setDefault($formprefix . 'size', GMAP_SIZE_MEDIUM);
         if (!$fielddefinition) {
             $form->addRule($formprefix . 'size', null, 'required', null, 'client');
         }
 
-        /*
-         * View element
-         */
+        // View elements.
         $radiogroupmapview = array();
         $viewoptions = [GMAP_VIEW_MAP, GMAP_VIEW_SATELLITE, GMAP_VIEW_HYBRID];
         $mapviewoptions = self::add_radio_group('view', $radiogroupmapview, $viewoptions, $form);
@@ -164,13 +160,12 @@ class customfield_define_location extends customfield_define_base {
             '<br />',
             false
         );
+        $form->setDefault($formprefix . 'view', GMAP_VIEW_MAP);
         if (!$fielddefinition) {
             $form->addRule($formprefix . 'view', null, 'required', null, 'client');
         }
 
-        /*
-         * Display element
-         */
+        // Display elements.
         $radiogroupdisplay = array();
         $displayoptions = [GMAP_DISPLAY_MAP_AND_ADDRESS, GMAP_DISPLAY_MAP_ONLY, GMAP_DISPLAY_ADDRESS_ONLY];
         $radiogroupdisplayoptions = self::add_radio_group('display', $radiogroupdisplay, $displayoptions, $form);
@@ -181,6 +176,7 @@ class customfield_define_location extends customfield_define_base {
             '<br />',
             false
         );
+        $form->setDefault($formprefix . 'display', GMAP_DISPLAY_MAP_AND_ADDRESS);
         if (!$fielddefinition) {
             $form->addRule($formprefix . 'display', null, 'required', null, 'client');
         }
@@ -228,9 +224,12 @@ class customfield_define_location extends customfield_define_base {
 
         $form->addElement('html', '<div id="' . $formprefix . 'location_map" class="location_map" ></div>');
 
-        /*
-         * Latitude element
-         */
+
+        $usertz = core_date::get_user_timezone();
+        $tz = new DateTimeZone($usertz);
+        $tzlocation = $tz->getLocation();
+
+        // Latitude element.
         $form->addElement(
             'hidden',
             $formprefix . 'latitude',
@@ -239,11 +238,12 @@ class customfield_define_location extends customfield_define_base {
                 'id' => $formprefix . 'latitude'
             )
         );
+        if (isset($tzlocation['latitude'])) {
+            $form->setDefault($formprefix . 'latitude', $tzlocation['latitude']);
+        }
         $form->setType($formprefix . 'latitude', PARAM_FLOAT);
 
-        /*
-         * Longitude element
-         */
+        // Longitude element.
         $form->addElement(
             'hidden',
             $formprefix . 'longitude',
@@ -252,6 +252,9 @@ class customfield_define_location extends customfield_define_base {
                 'id' => $formprefix . 'longitude'
             )
         );
+        if (isset($tzlocation['longitude'])) {
+            $form->setDefault($formprefix . 'longitude', $tzlocation['longitude']);
+        }
         $form->setType($formprefix . 'longitude', PARAM_FLOAT);
 
         $form->addElement('html', html_writer::end_div());
@@ -384,17 +387,23 @@ class customfield_define_location extends customfield_define_base {
     }
 
     public static function render($fielddata, $extradata = array()) {
-        $output = array();
+
+        static $instancecount = 0;
+        $instancecount++;
 
         if (empty($fielddata)) {
-            return "";
+            return '';
+        }
+        if (is_string($fielddata)) {
+            // Data is json_endoded prior to storage. Lets decode it.
+            $fielddata = json_decode($fielddata);
         }
 
-        //$fielddata = self::prepare_db_location_data_for_form($fielddata);
+        $extended = isset($extradata['extended']) && !empty($extradata['extended']);
 
         // Enable extended display (Maps etc.).
         // Disabled by default, since custom fields are typically rendered in tables or within <dd> elements.
-        if (!isset($extradata['extended']) || $extradata['extended'] == false) {
+        if (!$extended) {
             $options = new stdClass();
             $options->para = false;
             return format_text($fielddata->address, FORMAT_MOODLE, $options);
@@ -424,42 +433,49 @@ class customfield_define_location extends customfield_define_base {
                 break;
         }
 
+        $output = array();
         if ($displaytype === GMAP_DISPLAY_ADDRESS_ONLY || $displaytype === GMAP_DISPLAY_MAP_AND_ADDRESS) {
             $output[] = html_writer::tag('span', $fielddata->address);
-
             if ($displaytype === GMAP_DISPLAY_ADDRESS_ONLY) {
                 return implode("", $output);
             }
         }
 
-        if (!isset($extradata['itemid'])) {
-            $extradata['itemid'] = '';
+        if (isset($extradata['itemid'])) {
+            $formprefix = 'item_'.$extradata['itemid'];
+        } else {
+            $formprefix = 'inst_'.$instancecount;
         }
         if ($displaytype === GMAP_DISPLAY_MAP_ONLY || $displaytype === GMAP_DISPLAY_MAP_AND_ADDRESS) {
             $output[] = html_writer::div(
                 '',
                 '',
                 array(
-                    'id' => $extradata['itemid'] . 'location_map',
+                    'id' => $formprefix . 'location_map',
                     'class' => 'map_' . $fielddata->size
                 )
             );
         }
 
         $output[] = html_writer::empty_tag('input',
-            array('type' => 'hidden', 'id' => $extradata['itemid'] . 'address', 'value' => $fielddata->address)
+            array('type' => 'hidden', 'id' => $formprefix . 'address', 'value' => $fielddata->address)
         );
         $output[] = html_writer::empty_tag('input',
-            array('type' => 'hidden', 'id' => $extradata['itemid'] . 'latitude', 'value' => $fielddata->location->latitude)
+            array('type' => 'hidden', 'id' => $formprefix . 'latitude', 'value' => $fielddata->location->latitude)
         );
         $output[] = html_writer::empty_tag('input',
-            array('type' => 'hidden', 'id' => $extradata['itemid'] . 'longitude', 'value' => $fielddata->location->longitude)
+            array('type' => 'hidden', 'id' => $formprefix . 'longitude', 'value' => $fielddata->location->longitude)
         );
         $output[] = html_writer::empty_tag('input',
-            array('type' => 'hidden', 'id' => $extradata['itemid'] . 'room-location-view', 'value' => $view)
+            array('type' => 'hidden', 'id' => $formprefix . 'room-location-view', 'value' => $view)
         );
 
         $output = html_writer::div(implode("", $output), 'mapaddresslookup');
+
+        $args = new stdClass;
+        $args->formprefix = $formprefix;
+        $args->fordisplay = true;
+        customfield_define_location::define_add_js($args);
 
         return $output;
     }
