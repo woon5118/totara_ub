@@ -156,7 +156,7 @@ class enrol_cohort_handler {
  * Sync all cohort course links.
  * @param progress_trace $trace
  * @param int $courseid one course, empty mean all
- * @param int $cohortid ID of the cohort being synced
+ * @param int $cohortid ID of the cohort being synced (Totara performance only)
  * @return int 0 means ok, 1 means error, 2 means plugin disabled
  */
 function enrol_cohort_sync(progress_trace $trace, $courseid = NULL, $cohortid = NULL) {

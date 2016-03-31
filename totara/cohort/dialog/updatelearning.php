@@ -71,5 +71,5 @@ if (!empty($delid)) {
 }
 
 foreach ($courseids as $courseid) {
-    enrol_cohort_sync(new null_progress_trace(), $courseid);
+    enrol_cohort_sync(new null_progress_trace(), $courseid, $cohortid);
 }
