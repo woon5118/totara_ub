@@ -75,7 +75,7 @@ class cleanup_task extends \core\task\scheduled_task {
         global $DB;
         $lifetime = time() - 86400; // Allow one day for unassigned room as it can be just created and not stored in f2f session yet.
         // Get all custom rooms that are not assigned to any date.
-        $sql = "SELECT id
+        $sql = "SELECT fr.id
                 FROM {facetoface_room} fr
                 LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = fr.id)
                 WHERE fsd.id IS NULL
