@@ -249,7 +249,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'status.statuscode',
                 array(
                     'joins' => 'status',
-                    'displayfunc' => 'f2f_status',
+                    'displayfunc' => 'signup_status',
                 )
             ),
             new rb_column_option(
