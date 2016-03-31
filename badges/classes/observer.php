@@ -137,4 +137,37 @@ class core_badges_observer {
             }
         }
     }
+
+    /**
+     * Triggered when 'program_completed' event happens.
+     *
+     * @param \totara_program\event\program_completed $event event generated when a user completes a program.
+     */
+    public static function program_criteria_review(\totara_program\event\program_completed $event) {
+        global $DB, $CFG;
+
+        if (!empty($CFG->enablebadges)) {
+            require_once($CFG->dirroot.'/lib/badgeslib.php');
+            $userid = $event->userid;
+
+            if ($rs = $DB->get_records('badge_criteria', array('criteriatype' => BADGE_CRITERIA_TYPE_PROGRAM))) {
+                foreach ($rs as $r) {
+                    $badge = new badge($r->badgeid);
+                    if (!$badge->is_active() || $badge->is_issued($userid)) {
+                        continue;
+                    }
+
+                    if ($badge->criteria[BADGE_CRITERIA_TYPE_PROGRAM]->review($userid)) {
+                        $badge->criteria[BADGE_CRITERIA_TYPE_PROGRAM]->mark_complete($userid);
+
+                        if ($badge->criteria[BADGE_CRITERIA_TYPE_OVERALL]->review($userid)) {
+                            $badge->criteria[BADGE_CRITERIA_TYPE_OVERALL]->mark_complete($userid);
+                            $badge->issue($userid);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

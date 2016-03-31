@@ -53,7 +53,11 @@ $observers = array(
     array(
         'eventname'   => '\core\event\user_updated',
         'callback'    => 'core_badges_observer::profile_criteria_review',
-    )
+    ),
+    array(
+        'eventname'   => '\totara_program\event\program_completed',
+        'callback'    => 'core_badges_observer::program_criteria_review',
+    ),
 
 );
 
