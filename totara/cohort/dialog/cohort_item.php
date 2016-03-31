@@ -37,6 +37,7 @@ try {
 
 $instancetype = required_param('instancetype', PARAM_INT);
 $instanceid = required_param('instanceid', PARAM_INT);
+$module = optional_param('module', '', PARAM_TEXT);
 $itemids = required_param('itemid', PARAM_SEQUENCE);
 $itemids = explode(',', $itemids);
 
@@ -60,7 +61,11 @@ if ((!has_capability('moodle/cohort:view', $context)) && (!has_capability('moodl
 $PAGE->set_context($context);
 $PAGE->set_url('/totara/cohort/dialog/cohort_item.php');
 
-$ccohort = new totara_cohort_goal_cohorts();
+if ($module === "course") {
+    $ccohort = new totara_cohort_course_cohorts();
+} else {
+    $ccohort = new totara_cohort_goal_cohorts();
+}
 
 $items = array();
 $rows = array();
