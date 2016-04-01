@@ -335,6 +335,9 @@ if ($signedup) {
     $conflict = facetoface_get_session_involvement($USER, $availability);
     echo html_writer::tag('p', html_writer::tag('strong', $conflict));
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
+// If manager approval is required and no manager is defined, warn the user.
+} else if (!totara_get_manager($USER->id) && !get_config(null, 'facetoface_managerselect') && ($approvaltype == APPROVAL_MANAGER || $approvaltype == APPROVAL_ADMIN)) {
+    echo $OUTPUT->notification(get_string('error:missingrequiredmanager', 'mod_facetoface'), 'notifyproblem');
 } else {
     // Signup form.
     $mform->display();
