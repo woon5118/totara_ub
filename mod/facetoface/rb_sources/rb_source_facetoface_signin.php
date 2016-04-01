@@ -777,12 +777,17 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
     /**
      * Display function for signature column.
      *
+     * This column is used by reports which generate sign-in sheets
+     * (printed PDF exports). The content here increases the space
+     * for an attendee to provide a signature. [Unix] newlines are
+     * converted to linebreak HTML tags.
+     *
      * @param $position
      * @param $row
      * @return string
      */
     public function rb_display_signature($position, $row) {
-        return '';
+        return "\n\n";
     }
 
     /**
