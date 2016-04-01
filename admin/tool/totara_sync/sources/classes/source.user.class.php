@@ -77,10 +77,14 @@ abstract class totara_sync_source_user extends totara_sync_source {
             'auth',
             'password',
             'suspended',
+            'postitle',
+            'posstartdate',
+            'posenddate'
         );
 
-        // We need to be able to disable the position fields if required so keep a copy of them separate.
-        $this->positionfields = array ('postitle', 'posidnumber', 'posstartdate', 'posenddate');
+        // We need to be able to disable the position hierarchy fields if required so keep a copy of them separate.
+        // This is currently only posidnumber.
+        $this->positionfields = array ('posidnumber');
 
         $this->fields = array_merge($this->fields, $this->positionfields);
 
@@ -137,7 +141,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
                 $mform->setType($name, PARAM_INT);
             } else if (in_array($f, $this->positionfields)) {
                 if (totara_feature_disabled('positions')) {
-                    $mform->addElement('hidden', $name, '1');
+                    $mform->addElement('hidden', $name, '0');
                     $mform->setType($name, PARAM_INT);
                 } else {
                     $mform->addElement('checkbox', $name, get_string($f, 'tool_totara_sync'));
@@ -161,7 +165,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
             $name = 'fieldmapping_' . $f;
 
             if (in_array($f, $this->positionfields) && totara_feature_disabled('positions')) {
-                $mform->addElement('hidden', $name, '1');
+                $mform->addElement('hidden', $name, '0');
                 $mform->setType($name, PARAM_INT);
             } else {
                 $mform->addElement('text', $name, $f);

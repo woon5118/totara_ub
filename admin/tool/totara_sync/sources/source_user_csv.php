@@ -70,6 +70,10 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
 
         $filestruct = array();
         foreach ($this->fields as $f) {
+            if (totara_feature_disabled('positions')) {
+                unset($this->config->import_posidnumber);
+            }
+
             if (!empty($this->config->{'import_'.$f})) {
                 $filestruct[] = !empty($fieldmappings[$f]) ? '"'.$fieldmappings[$f].'"' : '"'.$f.'"';
             }
@@ -262,6 +266,11 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         foreach ($this->fields as $f) {
             if (empty($this->config->{'import_'.$f}) || in_array($f, $fieldmappings)) {
                 // Disabled or mapped fields can be ignored
+                continue;
+            }
+            // Disable posidnumber completely if Posiition hierarchies are disabled.
+            if ($f == 'posidnumber' && totara_feature_disabled('positions')) {
+                unset($this->config->import_posidnumber);
                 continue;
             }
             if (!in_array($f, $fields)) {
