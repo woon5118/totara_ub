@@ -30,21 +30,23 @@ class customfield_textarea extends customfield_base {
         $rows = $this->field->param2;
         $context = context_system::instance();
         // Create the form field.
-        if ($this->is_locked()) {
-            if ($this->data == $this->field->defaultdata) {
-                $data = file_rewrite_pluginfile_urls($this->field->defaultdata, 'pluginfile.php', $context->id, 'totara_customfield', 'textarea', $this->fieldid);
-            } else {
-                $data = file_rewrite_pluginfile_urls($this->data, 'pluginfile.php', $context->id, 'totara_customfield', $this->prefix, $this->dataid);
-            }
-            $mform->addElement('static', 'freezedisplay', format_string($this->field->fullname), format_text($data, FORMAT_MOODLE));
-        } else {
+        if ($this->itemid == 0) { // If its new record.
             $mform->addElement('editor', $this->inputname, format_string($this->field->fullname), array('cols' => $cols, 'rows' => $rows), $TEXTAREA_OPTIONS);
-            // Set default if adding new.
-            if ($this->itemid == 0 && !empty($this->field->defaultdata)) {
+            if (!empty($this->field->defaultdata)) {
                 $data = file_rewrite_pluginfile_urls($this->field->defaultdata, 'pluginfile.php', $context->id, 'totara_customfield', 'textarea', $this->fieldid);
                 $mform->setDefault($this->inputname, array('text' => $data));
             }
             $mform->setType($this->inputname, PARAM_CLEANHTML);
+        } else { // If its existing record.
+            if ($this->is_locked()) {
+                $data = file_rewrite_pluginfile_urls($this->data, 'pluginfile.php', $context->id, 'totara_customfield', $this->prefix, $this->dataid);
+                $mform->addElement('static', 'freezedisplay', format_string($this->field->fullname), format_text($data, FORMAT_MOODLE));
+            } else {
+                $mform->addElement('editor', $this->inputname, format_string($this->field->fullname), array('cols' => $cols, 'rows' => $rows), $TEXTAREA_OPTIONS);
+                $data = file_rewrite_pluginfile_urls($this->data, 'pluginfile.php', $context->id, 'totara_customfield', 'textarea', $this->fieldid);
+                $mform->setDefault($this->inputname, array('text' => $data));
+                $mform->setType($this->inputname, PARAM_CLEANHTML);
+            }
         }
     }
 
