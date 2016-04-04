@@ -129,7 +129,7 @@ class rb_source_course_completion extends rb_base_source {
 
         // include some standard joins
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_course_table_to_joinlist($joinlist, 'base', 'course');
+        $this->add_course_table_to_joinlist($joinlist, 'base', 'course', 'INNER');
         // requires the course join
         $this->add_course_category_table_to_joinlist($joinlist,
             'course', 'category');

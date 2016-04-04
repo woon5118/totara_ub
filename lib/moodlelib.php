@@ -4969,6 +4969,9 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
         echo $OUTPUT->notification($strdeleted.get_string('completion', 'completion'), 'notifysuccess');
     }
 
+    // TOTARA - The current completion records have been cleared, but we need to clean up historical completions as well.
+    $DB->delete_records('course_completion_history', array('courseid' => $course->id));
+
     // Remove all data from gradebook - this needs to be done before course modules
     // because while deleting this information, the system may need to reference
     // the course modules that own the grades.

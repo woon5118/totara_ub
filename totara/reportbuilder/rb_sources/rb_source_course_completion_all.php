@@ -105,7 +105,7 @@ class rb_source_course_completion_all extends rb_base_source {
         $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_course_table_to_joinlist($joinlist, 'base', 'courseid');
+        $this->add_course_table_to_joinlist($joinlist, 'base', 'courseid', 'INNER');
 
         return $joinlist;
     }

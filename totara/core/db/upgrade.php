@@ -1577,5 +1577,13 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2016021700, 'totara_core');
     }
 
+    if ($oldversion < 2016040400) {
+        $sql = "DELETE FROM {course_completion_history}
+                WHERE courseid NOT IN (SELECT id FROM {course})";
+        $DB->execute($sql);
+
+        totara_upgrade_mod_savepoint(true, 2016040400, 'totara_core');
+    }
+
     return true;
 }

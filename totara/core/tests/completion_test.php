@@ -316,4 +316,45 @@ class totara_core_completion_testcase extends advanced_testcase {
         $this->assertEquals('', $comp->rpl);
         $this->assertEquals(null, $comp->timecompleted);
     }
+
+    public function test_historical_deletion() {
+        global $DB;
+
+        $histcourse = $this->courses['test'];
+        $histuser = $this->users['man'];
+
+        // Generate a few historical completions for the user-course.
+        $todb = new stdClass();
+        $todb->courseid = $histcourse->id;
+        $todb->userid = $histuser->id;
+
+        $times = array('1262304000' => '75', '1325376000' => '60', '1388534400' => '75');
+        foreach ($times as $time => $grade) {
+            $todb->timecompleted = $time;
+            $todb->grade = $grade;
+
+            $DB->insert_record('course_completion_history', $todb);
+        }
+
+        // And one control historical completion.
+        $contcourse = $this->courses['cont'];
+        $todb->courseid = $contcourse->id;
+        $DB->insert_record('course_completion_history', $todb);
+
+        $this->assertEquals(4, $DB->count_records('course_completion_history'));
+
+        // Now delete the course.
+        delete_course($histcourse, false);
+
+        // Then check the records are gone.
+        $histrecords = $DB->get_records('course_completion_history');
+
+        $this->assertEquals(1, count($histrecords));
+
+        // And any remaining records are for the control course.
+        foreach ($histrecords as $histrecord) {
+            $this->assertEquals($contcourse->id, $histrecord->courseid);
+        }
+    }
+
 }
