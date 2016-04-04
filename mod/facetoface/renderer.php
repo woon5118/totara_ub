@@ -394,13 +394,17 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         // Can edit sessions.
         if ($editsessions) {
-            if (empty($session->cancelledstatus)) {
-                $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id)), new pix_icon('t/edit', get_string('edit', 'facetoface')), null, array('title' => get_string('editsession', 'facetoface'))) . ' ';
+            // NOTE: TL-8718 decide what to do with editing of cancelled sessions
+            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id)), new pix_icon('t/edit', get_string('edit', 'facetoface')), null, array('title' => get_string('editsession', 'facetoface'))) . ' ';
+            if ($session->cancelledstatus == 0) {
                 if (!facetoface_has_session_started($session, $timenow)) {
-                    $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/cancelsession.php', array('s' => $session->id, 'ca' => 1)), new pix_icon('t/block', get_string('cancel', 'facetoface')), null, array('title' => get_string('cancelsession', 'facetoface'))) . ' ';
+                    $bas = 0;
+                    if ($this->page->url->compare(new moodle_url('/mod/facetoface/view.php'), URL_MATCH_BASE)) {
+                        // NOTE: This is not a nice hack, we can only guess where to return because there is no argument above.
+                        $bas = 1;
+                    }
+                    $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/cancelsession.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/block', get_string('cancel', 'facetoface')), null, array('title' => get_string('cancelsession', 'facetoface'))) . ' ';
                 }
-            } else {
-                $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id)), new pix_icon('t/edit', get_string('edit', 'facetoface')), null, array('title' => get_string('editsession', 'facetoface'))) . ' ';
             }
             $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'c' => 1)), new pix_icon('t/copy', get_string('copy', 'facetoface')), null, array('title' => get_string('copysession', 'facetoface'))) . ' ';
             $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'd' => 1)), new pix_icon('t/delete', get_string('delete', 'facetoface')), null, array('title' => get_string('deletesession', 'facetoface'))) . ' ';

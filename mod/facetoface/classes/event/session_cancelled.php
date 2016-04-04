@@ -26,9 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event triggered when a session is cancelled.
  *
- * @property-read array $other Extra information about the event.
- *      facetoface => facetofaceid from the session object.
- *
  * @package mod_facetoface
  */
 class session_cancelled extends \core\event\base {
@@ -52,13 +49,14 @@ class session_cancelled extends \core\event\base {
         $data = array(
             'context' => $context,
             'objectid' => $session->id,
-            'other' => array('facetoface' => $session->facetoface)
         );
 
         self::$preventcreatecall = false;
         $event = self::create($data);
         $event->add_record_snapshot('facetoface_sessions', $session);
         self::$preventcreatecall = true;
+        $event->session = $session;
+
         return $event;
     }
 
@@ -69,8 +67,23 @@ class session_cancelled extends \core\event\base {
      *
      * @return \stdClass session
      */
+    public function get_session() {
+        if ($this->is_restored()) {
+            throw new \coding_exception('get_session is intended for event observers only');
+        }
+
+        return $this->session;
+    }
+
+    /**
+     * Get session instance.
+     *
+     * NOTE: to be used from observers only.
+     *
+     * @return \stdClass session
+     */
     protected function init() {
-        $this->data['crud'] = 'c';
+        $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
         $this->data['objecttable'] = 'facetoface_sessions';
     }

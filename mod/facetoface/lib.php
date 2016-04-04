@@ -811,45 +811,48 @@ function facetoface_get_facetoface_menu() {
 /**
  * Cancel entry from the facetoface_sessions table
  *
- * @param stdClass $session Record from facetoface_sessions
+ * @param stdClass $session Object from facetoface_get_session()
+ * @param stdClass $fromform data from mod_facetoface_cancelsession_form
  * @return bool
  */
-function facetoface_cancel_session($session) {
+function facetoface_cancel_session($session, $fromform) {
     global $DB, $USER;
 
+    if (facetoface_has_session_started($session, time())) {
+        // Session can be cancelled only before it starts.
+        return false;
+    }
+    $sessionobj = $session;
+
+    // Let's get the real DB record, we will need it later for event.
+    $session = $DB->get_record('facetoface_sessions', array('id' => $sessionobj->id), '*', MUST_EXIST);
+    if ($session->cancelledstatus != 0) {
+        // Already cancelled!
+        return false;
+    }
+
     $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('facetoface', $facetoface->id);
+    $context = context_module::instance($cm->id);
 
-    // Update record cancelledstatus
-    $DB->set_field('facetoface_sessions', 'cancelledstatus', 1, array('id' => $session->id));
+    // List of users affected by cancellation.
+    $notifyusers = array();
 
-    // Notify users that session is cancelled
-    $sql = "SELECT DISTINCT userid, s.id as signupid
-              FROM {facetoface_signups} s
-         LEFT JOIN {facetoface_signups_status} ss ON ss.signupid = s.id
-             WHERE s.sessionid = :sessionid AND
-                   ss.superceded = 0 AND
-                   ss.statuscode >= :status";
-    $params = array(
-        'sessionid' => $session->id,
-        'status' => MDL_F2F_STATUS_SESSION_CANCELLED,
-    );
-    $signedupusers = $DB->get_records_sql($sql, $params);
-    foreach ($signedupusers as $user) {
-        // We record this change as being triggered by the current user.
-        facetoface_update_signup_status($user->signupid, MDL_F2F_STATUS_SESSION_CANCELLED, $USER->id);
-        facetoface_send_cancellation_notice($facetoface, $session, $user->userid, MDL_F2F_CONDITION_SESSION_CANCELLATION);
+    // Use transactions here, we need to make sure that all DB updates happen together.
+    $trans = $DB->start_delegated_transaction();
+
+    // Save the custom fields.
+    if ($fromform) {
+        $fromform->id = $session->id;
+        customfield_save_data($fromform, 'facetofacecancellation', 'facetoface_sessioncancel');
     }
 
-    // Send cancellations for trainers assigned to the session.
-    $trainers = $DB->get_records("facetoface_session_roles", array("sessionid" => $session->id));
-    foreach ($trainers as $trainer) {
-        facetoface_send_cancellation_notice($facetoface, $session, $trainer->userid, MDL_F2F_CONDITION_SESSION_CANCELLATION);
-    }
+    // Update field cancelledstatus.
+    $session->cancelledstatus = '1';
+    $sessionobj->cancelledstatus = $session->cancelledstatus;
+    $DB->set_field('facetoface_sessions', 'cancelledstatus', $session->cancelledstatus, array('id' => $session->id));
 
-    // Notify managers who had reservations.
-    facetoface_notify_reserved_session_deleted($facetoface, $session);
-
-    // Remove entries from the teacher calendars
+    // Remove entries from the teacher calendars.
     $select = $DB->sql_like('description', ':attendess');
     $select .= " AND modulename = 'facetoface' AND eventtype = 'facetofacesession' AND instance = :facetofaceid";
     $params = array(
@@ -864,6 +867,48 @@ function facetoface_cancel_session($session) {
         // Remove entry from site-wide calendar.
         facetoface_remove_session_from_calendar($session, SITEID);
     }
+
+    // Change all user sign-up statuses, the only exception is previously cancelled users.
+    $sql = "SELECT DISTINCT s.userid, s.id as signupid
+              FROM {facetoface_signups} s
+              JOIN {facetoface_signups_status} ss ON ss.signupid = s.id
+             WHERE s.sessionid = :sessionid AND
+                   ss.superceded = 0 AND
+                   ss.statuscode <> :statususercanceled";
+    $params = array(
+        'sessionid' => $session->id,
+        'statususercanceled' => MDL_F2F_STATUS_USER_CANCELLED,
+    );
+    $signedupusers = $DB->get_recordset_sql($sql, $params);
+    foreach ($signedupusers as $user) {
+        // We record this change as being triggered by the current user.
+        facetoface_update_signup_status($user->signupid, MDL_F2F_STATUS_SESSION_CANCELLED, $USER->id);
+        $notifyusers[$user->signupid] = $user->signupid;
+    }
+    $signedupusers->close();
+
+    // All necessary DB updates are finished, let's commit.
+    $trans->allow_commit();
+
+    \mod_facetoface\event\session_cancelled::create_from_session($session, $context)->trigger();
+
+    // Notify trainers assigned to the session too.
+    $sql = "SELECT DISTINCT sr.userid
+              FROM {facetoface_session_roles} sr
+              JOIN {user} u ON (u.id = sr.userid)
+             WHERE sr.sessionid = :sessionid AND u.deleted = 0";
+    $trainers = $DB->get_recordset_sql($sql, array('sessionid' => $session->id));
+    foreach ($trainers as $trainer) {
+        $notifyusers[$trainer->userid] = $trainer->userid;
+    }
+    $trainers->close();
+
+    // Notify affected users.
+    foreach ($notifyusers as $userid) {
+        facetoface_send_cancellation_notice($facetoface, $session, $userid, MDL_F2F_CONDITION_SESSION_CANCELLATION);
+    }
+    // Notify managers who had reservations.
+    facetoface_notify_reserved_session_deleted($facetoface, $session);
 
     return true;
 }
@@ -2423,7 +2468,7 @@ function facetoface_update_signup_status($signupid, $statuscode, $createdby, $no
     global $DB;
     $timenow = time();
 
-    $signupstatus = new stdclass;
+    $signupstatus = new stdClass();
     $signupstatus->signupid = $signupid;
     $signupstatus->statuscode = $statuscode;
     $signupstatus->createdby = $createdby;

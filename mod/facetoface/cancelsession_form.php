@@ -23,30 +23,30 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once ("$CFG->dirroot/lib/formslib.php");
+require_once("$CFG->dirroot/lib/formslib.php");
+require_once("$CFG->dirroot/totara/customfield/fieldlib.php");
 
 class mod_facetoface_cancelsession_form extends moodleform {
 
-    public function definition() {
+    protected function definition() {
         $mform = $this->_form;
 
-        $mform->addElement('hidden', 's', $this->_customdata['s']);
+        $session = $this->_customdata['session'];
+
+        $mform->addElement('hidden', 's', $session->id);
         $mform->setType('s', PARAM_INT);
         $mform->addElement('hidden', 'backtoallsessions', $this->_customdata['backtoallsessions']);
         $mform->setType('backtoallsessions', PARAM_INT);
 
-        $session = $this->_customdata['session'];
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
+        customfield_load_data($session, 'facetofacecancellation', 'facetoface_sessioncancel');
         customfield_definition($mform, $session, 'facetofacecancellation', 0, 'facetoface_sessioncancel');
 
         $mform->addElement('html', get_string('cancelsessionconfirm', 'facetoface')); // Instructions.
 
         // We don't use add_action_buttons here because we want to set the cancel button label to No.
-        $buttonarray=array();
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('yes'));
-        $buttonarray[] = &$mform->createElement('cancel', 'cancelbutton', get_string('no'));
+        $buttonarray = array();
+        $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('yes'));
+        $buttonarray[] = $mform->createElement('cancel', 'cancelbutton', get_string('no'));
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
     }
 }

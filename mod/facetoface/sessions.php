@@ -33,7 +33,6 @@ $id = optional_param('id', 0, PARAM_INT); // Course Module ID
 $f = optional_param('f', 0, PARAM_INT); // facetoface Module ID
 $s = optional_param('s', 0, PARAM_INT); // facetoface session ID
 $c = optional_param('c', 0, PARAM_INT); // copy session
-$ca = optional_param('ca', 0, PARAM_INT); // copy session
 $d = optional_param('d', 0, PARAM_INT); // delete session
 $confirm = optional_param('confirm', false, PARAM_BOOL); // delete confirmation
 $cntdates = optional_param('cntdates', 0, PARAM_INT); // Number of events to set.
@@ -120,17 +119,6 @@ if ($d and $confirm) {
         \mod_facetoface\event\session_deleted::create_from_session($session, $context)->trigger();
     } else {
         print_error('error:couldnotdeletesession', 'facetoface', $returnurl);
-    }
-    redirect($returnurl);
-}
-
-// Handle cancellations.
-if ($ca and $confirm) {
-    require_sesskey();
-    if (facetoface_cancel_session($session)) {
-        \mod_facetoface\event\session_cancelled::create_from_session($session, $context)->trigger();
-    } else {
-        print_error('error:couldnotcancelsession', 'facetoface', $returnurl);
     }
     redirect($returnurl);
 }
@@ -291,12 +279,8 @@ if ($fromform = $mform->get_data()) { // Form submitted
         $fromform->sendcapacityemail = 0;
     }
 
-    // If cancelledstatus is empty default to 0
-    if (empty($fromform->cancelledstatus)) {
-        $fromform->cancelledstatus = 0;
-    }
-
-    $todb->cancelledstatus = $fromform->cancelledstatus;
+    // Do not change cancellation here!
+    unset($fromform->cancelledstatus);
 
     $todb->mincapacity = $fromform->mincapacity;
     $todb->sendcapacityemail = $fromform->sendcapacityemail;
@@ -384,10 +368,6 @@ if ($c) {
 else if ($d) {
     $heading = get_string('deletingsession', 'facetoface', $facetoface->name);
 }
-else if ($ca) {
-    $heading = get_string('cancelsession', 'facetoface', $facetoface->name);
-    redirect($CFG->wwwroot ."/mod/facetoface/cancelsession.php?s=" . $session->id);
-}
 else if ($id or $f) {
     $heading = get_string('addingsession', 'facetoface', $facetoface->name);
 }
@@ -415,13 +395,6 @@ if ($d) {
     facetoface_print_session($session, $viewattendees);
     $optionsyes = array('sesskey' => sesskey(), 's' => $session->id, 'd' => 1, 'confirm' => 1);
     echo $OUTPUT->confirm(get_string('deletesessionconfirm', 'facetoface', format_string($facetoface->name)),
-        new moodle_url('sessions.php', $optionsyes),
-        new moodle_url($returnurl));
-} else if ($ca) {
-    $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
-    facetoface_print_session($session, $viewattendees);
-    $optionsyes = array('sesskey' => sesskey(), 's' => $session->id, 'ca' => 1, 'confirm' => 1);
-    echo $OUTPUT->confirm(get_string('cancelsessionconfirm', 'facetoface', format_string($facetoface->name)),
         new moodle_url('sessions.php', $optionsyes),
         new moodle_url($returnurl));
 }
