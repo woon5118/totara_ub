@@ -139,7 +139,7 @@ Scenario: Verify custom fields can be successfully added to a company goal type 
   And I click on "Edit" "link" in the ".totaratable" "css_element"
   And I press "Change type"
   And I press "Choose"
-  And I press "Re-classify items"
+  And I press "Reclassify items"
   And I set the following fields to these values:
     | Checkbox 1                     | 1            |
     | customfield_datetime1[enabled] | 1            |
