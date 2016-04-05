@@ -1,4 +1,4 @@
-@totara @block_facetoface
+@javascript @totara @block_facetoface
 Feature: Confirm Sessions show up in my face to face sessions
   In order for the my sessions page is correct
   As an admin

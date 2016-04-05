@@ -1,4 +1,4 @@
-@totara @totara_coursecatalog @enrol
+@javascript @totara @totara_coursecatalog @enrol
 Feature: Users can auto-enrol themself in courses where self enrolment is allowed
   In order to participate in courses
   As a user
@@ -79,12 +79,9 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     And I follow "Course 1"
     And I add "Face-to-face direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
-
     Given I log out
 
-
-  @javascript
-  Scenario: Self-enrolment through course catalog requiring a group enrolment key
+  Scenario: Self-enrolment through course catalog requiring a group enrolment key or guest access or facetoface
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I click on ".rb-display-expand" "css_element"
@@ -110,6 +107,6 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     And I should see "Courses" in the "Navigation" "block"
     And I click on "Courses" "link_or_button" in the "Navigation" "block"
     And I click on ".rb-display-expand" "css_element"
-    And I click on "[name*='sid']" "css_element" in the "1 January 2020" "table_row"
-    And I press "Enrol with - Face-to-face direct enrolment"
+    And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
+    And I press "Sign-up"
     Then I should see "Topic 1"
