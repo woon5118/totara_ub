@@ -17,12 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara_reportbuilder
+ * @author Oleg Demeshev <oleg.demeshev@totaralms.com>
+ * @package totara
+ * @subpackage reportbuilder
  */
 
-defined('MOODLE_INTERNAL') || die();
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');
+}
 
-$plugin->version  = 2015100902;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2015051102;       // Requires this Moodle version.
-$plugin->component = 'totara_reportbuilder';  // To check on upgrade, that module sits in correct place
+$observers = array(
+    array(
+        'eventname' => '\core\event\user_deleted',
+        'callback' => 'totara_reportbuilder_observer::user_deleted',
+    ),
+);

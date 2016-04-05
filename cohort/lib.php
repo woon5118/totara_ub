@@ -179,6 +179,8 @@ function cohort_delete_cohort($cohort) {
     }
     $DB->delete_records('cohort_rule_collections', array('cohortid' => $cohort->id));
     $DB->delete_records('totara_dashboard_cohort', array('cohortid' => $cohort->id));
+    // Remove audience from scheduled reports.
+    $DB->delete_records('report_builder_schedule_email_audience', array('cohortid' => $cohort->id));
 
     //delete associations
     $associations = totara_cohort_get_associations($cohort->id);
