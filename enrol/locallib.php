@@ -378,6 +378,10 @@ class course_enrolment_manager {
 
         // Add some additional sensible conditions
         $tests = array("u.id <> :guestid", 'u.deleted = 0', 'u.confirmed = 1');
+        // TOTARA - check suspended users capability and if its disabled then do not show suspended users.
+        if (!has_capability('moodle/course:viewsuspendedusers', $this->get_context())) {
+            $tests[] = 'u.suspended = 0';
+        }
         $params = array('guestid' => $CFG->siteguest);
         if (!empty($search)) {
             $conditions = get_extra_user_fields($this->get_context());
