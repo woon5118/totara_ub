@@ -22,7 +22,7 @@
  */
 $string['sourcetitle'] = 'Face-to-face Asset Assignments';
 
-$string['facetofacesummaryasset'] = 'Upcoming Sessions in Asset';
+$string['facetofacesummaryasset'] = 'Upcoming Sessions using Asset';
 $string['type_asset'] = 'Assets';
 $string['type_session'] = 'Sessions';
 $string['type_room'] = 'Rooms';
