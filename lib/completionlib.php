@@ -1195,7 +1195,8 @@ class completion_info {
             // Expire any old data from cache
             foreach ($SESSION->completioncache as $courseid=>$activities) {
                 if (empty($activities['updated']) || $activities['updated'] < time()-COMPLETION_CACHE_EXPIRY ||
-                        !$DB->record_exists('course_completions', array('userid' => $USER->id, 'course' => $courseid, 'invalidatecache' => 0))) {
+                    (!$DB->record_exists('course_completions', array('userid' => $USER->id, 'course' => $courseid, 'invalidatecache' => 0))
+                        && $this->is_tracked_user($USER->id))) {
                     unset($SESSION->completioncache[$courseid]);
                     $this->invalidatecache($courseid, $USER->id, false);
                 }
