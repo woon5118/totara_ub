@@ -102,7 +102,7 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
             array(
                 'noexport' => true,
                 'joins' => 'assigned',
-                'capability' => 'moodle/site:config',
+                'capability' => 'totara/core:modconfig',
                 'extrafields' => array('hidden' => 'base.hidden', 'cntdates' => 'assigned.cntdates'),
                 'displayfunc' => 'actions',
                 'hidden' => false

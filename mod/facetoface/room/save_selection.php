@@ -42,7 +42,7 @@ if (!confirm_sesskey()) {
 $context = context_system::instance();
 
 require_login(0, false);
-require_capability('moodle/site:config', $context);
+require_capability('totara/core:modconfig', $context);
 
 
 // Manage selection data saved in session

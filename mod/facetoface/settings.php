@@ -31,7 +31,7 @@ $ADMIN->add('root', new admin_category('modfacetofacefolder', new lang_string('p
 $sessionreporturl = new moodle_url('/mod/facetoface/sessionreport.php');
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacesessionreport', new lang_string('managesessions','mod_facetoface'), $sessionreporturl, 'mod/facetoface:viewallsessions'));
 
-$settings = new admin_settingpage($section, get_string('globalsettings', 'mod_facetoface'), 'moodle/site:config', $module->is_enabled() === false);
+$settings = new admin_settingpage($section, get_string('globalsettings', 'mod_facetoface'), 'totara/core:modconfig', $module->is_enabled() === false);
 $ADMIN->add('modfacetofacefolder', $settings);
 
 // Provide a link from the legacy location to global settings.
@@ -149,7 +149,7 @@ if ($ADMIN->fulltree) { // Improve performance.
     $settings->add(new admin_setting_configcheckbox('facetoface_hidediscount', new lang_string('setting:hidediscount_caption', 'facetoface'), new lang_string('setting:hidediscount', 'facetoface'), 0));
 }
 // Activity defaults
-$settings = new admin_settingpage('modfacetofacactivitydefaults', get_string('activitydefaults', 'mod_facetoface'), 'moodle/site:config', $module->is_enabled() === false);
+$settings = new admin_settingpage('modfacetofacactivitydefaults', get_string('activitydefaults', 'mod_facetoface'), 'totara/core:modconfig', $module->is_enabled() === false);
 $ADMIN->add('modfacetofacefolder', $settings);
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('facetoface_multiplesessions', get_string('setting:multiplesessions_caption', 'facetoface'), get_string('setting:multiplesessions', 'facetoface'), 0));
@@ -183,7 +183,7 @@ if ($ADMIN->fulltree) {
 }
 
 // Session default settings page.
-$settings = new admin_settingpage('modfacetofacesessiondefaults', get_string('sessiondefaults', 'mod_facetoface'), 'moodle/site:config', $module->is_enabled() === false);
+$settings = new admin_settingpage('modfacetofacesessiondefaults', get_string('sessiondefaults', 'mod_facetoface'), 'totara/core:modconfig', $module->is_enabled() === false);
 $ADMIN->add('modfacetofacefolder', $settings);
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('facetoface/defaultdaystosession', new lang_string('defaultdaystosession', 'facetoface'), new lang_string('defaultdaystosession_desc', 'facetoface'), '1', PARAM_INT));
@@ -194,10 +194,10 @@ if ($ADMIN->fulltree) {
 }
 
 $customfieldurl = new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacesession'));
-$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacecustomfields', new lang_string('customfieldsheading','facetoface'), $customfieldurl, 'mod/facetoface:managecustomfield'));
-$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacetemplates', new lang_string('notificationtemplates','facetoface'), "$CFG->wwwroot/mod/facetoface/notification/template/index.php"));
-$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacerooms', new lang_string('rooms','facetoface'), "$CFG->wwwroot/mod/facetoface/room/manage.php"));
-$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofaceassets', new lang_string('assets','facetoface'), "$CFG->wwwroot/mod/facetoface/asset/manage.php"));
+$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacecustomfields', new lang_string('customfieldsheading','facetoface'), $customfieldurl, 'mod/facetoface:managecustomfield', 'totara/core:modconfig'));
+$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacetemplates', new lang_string('notificationtemplates','facetoface'), "$CFG->wwwroot/mod/facetoface/notification/template/index.php", 'totara/core:modconfig'));
+$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacerooms', new lang_string('rooms','facetoface'), "$CFG->wwwroot/mod/facetoface/room/manage.php", 'totara/core:modconfig'));
+$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofaceassets', new lang_string('assets','facetoface'), "$CFG->wwwroot/mod/facetoface/asset/manage.php", 'totara/core:modconfig'));
 
 // Tell core we already added the settings structure.
 $settings = null;

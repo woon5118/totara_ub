@@ -101,7 +101,7 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
                 array(
                     'joins' => 'assigned',
                     'noexport' => true,
-                    'capability' => 'moodle/site:config',
+                    'capability' => 'totara/core:modconfig',
                     'extrafields' => array('hidden' => 'base.hidden', 'cntdates' => 'assigned.cntdates'),
                     'displayfunc' => 'actions',
                     'hidden' => false

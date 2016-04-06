@@ -29,7 +29,7 @@ $id = optional_param('id', 0, PARAM_INT);   // Room id.
 $system_context = context_system::instance();
 require_login(0, false);
 require_sesskey();
-require_capability('moodle/site:config', $system_context);
+require_capability('totara/core:modconfig', $system_context);
 
 // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
 send_headers('text/html; charset=utf-8', false);

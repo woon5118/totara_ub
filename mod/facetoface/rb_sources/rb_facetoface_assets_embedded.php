@@ -50,6 +50,6 @@ class rb_facetoface_assets_embedded extends rb_base_embedded {
 
     public function is_capable($reportfor, $report) {
         $context = context_system::instance();
-        return has_capability('moodle/site:config', $context, $reportfor);
+        return has_capability('totara/core:modconfig', $context, $reportfor);
     }
 }
