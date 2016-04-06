@@ -65,8 +65,9 @@ class theme_kiwifruitresponsive_core_renderer extends theme_standardtotararespon
             $output .= $totaramenu;
         }
 
-        // Profile Menu.
-        $output.= $OUTPUT->user_menu();
+        // Add profile menu (for logged in) or language menu (not logged in).
+        $haslangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );
+        $output.= ($haslangmenu && (!isloggedin() || isguestuser()) ? $OUTPUT->lang_menu() : '') . $OUTPUT->user_menu();
 
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');

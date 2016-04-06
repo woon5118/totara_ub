@@ -89,7 +89,7 @@ echo $OUTPUT->doctype() ?>
                 <span class="icon-bar"></span>
                 <span class="accesshide"><?php echo get_string('expand'); ?></span>
             </a>
-            <?php echo $OUTPUT->user_menu(); ?>
+            <?php echo ($haslangmenu && (!isloggedin() || isguestuser()) ? $OUTPUT->lang_menu() : '') . $OUTPUT->user_menu() ?>
             <?php echo $OUTPUT->page_heading(); ?>
             <?php if ($hastotaramenu) { ?>
                 <div id="totaramenu" class="nav-collapse collapse"><?php echo $totaramenu; ?></div>

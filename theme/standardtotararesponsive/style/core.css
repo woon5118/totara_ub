@@ -545,6 +545,7 @@ p.errormessage {
 }
 .langmenu select {
     height: 20px;
+    padding: 0;
 }
 .mform select {
     max-width: 250px;
