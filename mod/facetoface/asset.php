@@ -25,19 +25,14 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
 
-$id = required_param('id', PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);
-
-if (!$asset = facetoface_get_asset($id)) {
-    print_error('error:incorrectassetid', 'facetoface');
-}
 
 require_login(0, false);
 
 $systemcontext = context_system::instance();
 $PAGE->set_context($systemcontext);
 
-$baseurl = new moodle_url('/mod/facetoface/asset.php', array('id' => $asset->id));
+$baseurl = new moodle_url('/mod/facetoface/asset.php', array('debug' => $debug));
 $PAGE->set_url($baseurl);
 
 // Verify global restrictions.
@@ -45,9 +40,23 @@ $shortname = 'facetoface_summary_asset';
 $reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
-$report = reportbuilder_get_embedded_report($shortname, array('assetid' => $asset->id), false, 0, $globalrestrictionset);
+$report = reportbuilder_get_embedded_report($shortname, null, false, 0, $globalrestrictionset);
 if (!$report) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
+}
+
+$assetid = $report->get_param_value('assetid');
+
+if (!$assetid) {
+    echo $OUTPUT->header();
+    $manageassetsurl = new moodle_url('/mod/facetoface/asset/manage.php');
+    echo $OUTPUT->container(get_string('selectanasset', 'rb_source_facetoface_asset_assignments', $manageassetsurl->out()));
+    echo $OUTPUT->footer();
+    exit();
+}
+
+if (!$asset = facetoface_get_asset($assetid)) {
+    print_error('error:incorrectassetid', 'facetoface');
 }
 
 $title = get_string('viewasset', 'facetoface');

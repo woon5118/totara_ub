@@ -51,11 +51,6 @@ class rb_facetoface_summary_asset_embedded extends rb_base_embedded {
             )
         );
 
-        $assetid = array_key_exists('assetid', $data) ? $data['assetid'] : null;
-        if ($assetid != null) {
-            $this->embeddedparams['assetid'] = $assetid;
-        }
-
         parent::__construct();
     }
 

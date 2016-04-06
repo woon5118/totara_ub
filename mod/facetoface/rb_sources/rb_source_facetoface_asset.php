@@ -197,7 +197,7 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
         $output = array();
 
         $output[] = $OUTPUT->action_icon(
-            new moodle_url('/mod/facetoface/asset.php', array('id' => $assetid)),
+            new moodle_url('/mod/facetoface/asset.php', array('assetid' => $assetid)),
             new pix_icon('t/calendar', get_string('details', 'mod_facetoface'))
         );
 

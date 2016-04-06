@@ -1660,7 +1660,7 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
                         break;
                     case 'room:link':
                         if (!empty($sessiondate->roomid)) {
-                            $roomdetailsurl = new moodle_url('/mod/facetoface/room.php', ['r' => $sessiondate->roomid]);
+                            $roomdetailsurl = new moodle_url('/mod/facetoface/room.php', ['roomid' => $sessiondate->roomid]);
                             $value = html_writer::link($roomdetailsurl, $roomdetailsurl, ['title' => get_string('roomdetails', 'facetoface')]);
                         }
                         break;

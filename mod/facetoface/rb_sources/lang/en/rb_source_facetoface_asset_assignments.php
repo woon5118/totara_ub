@@ -23,6 +23,7 @@
 $string['sourcetitle'] = 'Face-to-face Asset Assignments';
 
 $string['facetofacesummaryasset'] = 'Upcoming Sessions using Asset';
+$string['selectanasset'] = 'To view this report, first <a href="{$a}">select an asset</a> you want to view.';
 $string['type_asset'] = 'Assets';
 $string['type_session'] = 'Sessions';
 $string['type_room'] = 'Rooms';

@@ -6467,7 +6467,7 @@ function facetoface_room_html($room, $backurl=null) {
 
         //$link = html_writer::link(
         $url = new moodle_url('/mod/facetoface/room.php', array(
-            'r' => $room->id,
+            'roomid' => $room->id,
             'b' => $backurl
         ));
         //    ),

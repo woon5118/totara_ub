@@ -530,7 +530,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             return $roomname;
         }
         return html_writer::link(
-            new moodle_url('/mod/facetoface/room.php', array('r' => $row->roomid)),
+            new moodle_url('/mod/facetoface/room.php', array('roomid' => $row->roomid)),
             $roomname
         );
     }
@@ -547,7 +547,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             return $roomname;
         }
         return html_writer::link(
-            new moodle_url('/mod/facetoface/asset.php', array('id' => $row->assetid)),
+            new moodle_url('/mod/facetoface/asset.php', array('assetid' => $row->assetid)),
             $roomname
         );
     }

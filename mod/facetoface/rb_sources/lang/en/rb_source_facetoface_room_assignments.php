@@ -25,6 +25,7 @@ $string['sourcetitle'] = 'Face-to-face Room Assignments';
 $string['assetnames'] = 'Asset Names';
 $string['assets'] = 'Assets';
 $string['ftfid'] = 'Face-to-face ID';
+$string['selectaroom'] = 'To view this report, first <a href="{$a}">select a room</a> you want to view.';
 $string['sessfinishdatetime'] = 'Session Finish Date/Time';
 $string['sessstartdatetime'] = 'Session Start Date/Time';
 $string['sessionid'] = 'Session ID';

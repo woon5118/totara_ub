@@ -204,7 +204,7 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source
         $output = array();
 
         $output[] = $OUTPUT->action_icon(
-            new moodle_url('/mod/facetoface/room.php', array('r' => $roomid)),
+            new moodle_url('/mod/facetoface/room.php', array('roomid' => $roomid)),
             new pix_icon('t/calendar', get_string('details', 'mod_facetoface'))
         );
 

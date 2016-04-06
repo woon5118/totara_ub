@@ -26,40 +26,46 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_summary_room_embedded.php');
 
-// Face-to-face room id.
-$r = required_param('r', PARAM_INT);
 $backurl = optional_param('b', '', PARAM_URL);
 $debug = optional_param('debug', 0, PARAM_INT);
 $popup = optional_param('popup', 0, PARAM_INT);
 
-if (!$room = facetoface_get_room($r)) {
-    print_error('error:incorrectroomid', 'facetoface');
-}
 
 require_login(0, false);
 
 $systemcontext = context_system::instance();
 $PAGE->set_context($systemcontext);
 
-$baseurl = new moodle_url('/mod/facetoface/room.php', array('r' => $room->id));
+$baseurl = new moodle_url('/mod/facetoface/room.php', array('debug' => $debug));
 $PAGE->set_url($baseurl);
 if ($popup) {
     $PAGE->set_pagelayout('popup');
 }
 
-$report = null;
-if (rb_facetoface_summary_room_embedded::is_capable_static($USER->id)) {
-    // Verify global restrictions.
-    $shortname = 'facetoface_summary_room';
-    $reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
-    $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+// Verify global restrictions.
+$shortname = 'facetoface_summary_room';
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
-    $report = reportbuilder_get_embedded_report($shortname, array('roomid' => $room->id), false, 0, $globalrestrictionset);
-    if (!$report) {
-        print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
-    }
+$report = reportbuilder_get_embedded_report($shortname, null, false, 0, $globalrestrictionset);
+if (!$report) {
+    print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
+}
 
-    $PAGE->set_button($report->edit_button());
+$PAGE->set_button($report->edit_button());
+
+$roomid = $report->get_param_value('roomid');
+
+if (!$roomid) {
+    echo $OUTPUT->header();
+    $manageroomsurl = new moodle_url('/mod/facetoface/room/manage.php');
+    echo $OUTPUT->container(get_string('selectaroom', 'rb_source_facetoface_room_assignments', $manageroomsurl->out()));
+    echo $OUTPUT->footer();
+    exit();
+}
+
+if (!$room = facetoface_get_room($roomid)) {
+    print_error('error:incorrectroomid', 'facetoface');
 }
 
 $title = get_string('viewroom', 'facetoface');

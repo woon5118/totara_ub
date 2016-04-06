@@ -152,7 +152,12 @@ class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source
                 'roomid',
                 'sessiondate.roomid',
                 'room'
-            )
+            ),
+            new rb_param_option(
+                'assetid',
+                'asset.id',
+                'asset'
+            ),
         );
 
         return $paramoptions;

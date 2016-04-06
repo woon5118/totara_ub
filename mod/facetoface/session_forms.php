@@ -740,7 +740,7 @@ class session_date_form extends moodleform {
         if (!empty($roomid)) {
             if (!facetoface_is_room_available($timestart, $timefinish, $roomid, $sessionid)) {
                 $room = facetoface_get_room($roomid);
-                $link = html_writer::link(new moodle_url('/mod/facetoface/room.php', array('r' => $roomid)), $room->name,
+                $link = html_writer::link(new moodle_url('/mod/facetoface/room.php', array('roomid' => $roomid)), $room->name,
                         array('target' => '_blank'));
                 $errors['roomid'] = get_string('error:isalreadybooked', 'facetoface', $link);
             }
@@ -766,7 +766,7 @@ class session_date_form extends moodleform {
                 $errors['assetid'] = array();
                 foreach($unavailable as $asset) {
                     $link = html_writer::link(
-                        new moodle_url('/mod/facetoface/asset.php', array('id' => $all[$asset]->id)),
+                        new moodle_url('/mod/facetoface/asset.php', array('assetid' => $all[$asset]->id)),
                         $all[$asset]->fullname,
                         array('target' => '_blank')
                     );
