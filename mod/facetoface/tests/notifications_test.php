@@ -203,6 +203,163 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
     }
 
     /**
+     * Ensure that ical attachment is updated properly when session dates or sign up status changes
+     */
+    public function test_ical_generation() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $student1 = $this->getDataGenerator()->create_user();
+        $student2 = $this->getDataGenerator()->create_user();
+
+        $course = $this->getDataGenerator()->create_course();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $this->getDataGenerator()->enrol_user($student1->id, $course->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course->id, $studentrole->id);
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface',
+            'course' => $course->id
+        );
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+
+        $date1 = new stdClass();
+        $date1->sessiontimezone = 'Pacific/Auckland';
+        $date1->timestart = time() + WEEKSECS;
+        $date1->timefinish = time() + WEEKSECS + 3600;
+
+        $date2 = new stdClass();
+        $date2->sessiontimezone = 'Pacific/Auckland';
+        $date2->timestart = time() + WEEKSECS + DAYSECS;
+        $date2->timefinish = time() + WEEKSECS + DAYSECS + 3600;
+
+        $sessiondates = array($date1, $date2);
+
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => $sessiondates,
+            'datetimeknown' => '1',
+            'mincapacity' => '1',
+            'cutoff' => DAYSECS - 60
+        );
+
+        $session = facetoface_get_session($facetofacegenerator->add_session($sessiondata));
+
+        $init = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student1);
+        $inituids = $this->get_ical_values($init->content, 'UID');
+        $initseqs = $this->get_ical_values($init->content, 'SEQUENCE');
+        $this->assertNotEquals($inituids[0], $inituids[1]);
+
+        $initother = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student2);
+        $otheruids = $this->get_ical_values($initother->content, 'UID');
+        $otherseqs = $this->get_ical_values($initother->content, 'SEQUENCE');
+        $this->assertNotEquals($inituids[0], $otheruids[0]);
+        $this->assertNotEquals($inituids[0], $otheruids[1]);
+        $this->assertNotEquals($inituids[1], $otheruids[0]);
+        $this->assertNotEquals($inituids[1], $otheruids[1]);
+
+        $this->mock_status_change($student2->id, $session->id);
+        $cancelother = facetoface_get_ical_attachment(MDL_F2F_CANCEL, $facetoface, $session, $student2);
+        $cancelotheruids = $this->get_ical_values($cancelother->content, 'UID');
+        $cancelotherseqs = $this->get_ical_values($cancelother->content, 'SEQUENCE');
+        $cancelstatus = $this->get_ical_values($cancelother->content, "STATUS");
+        $this->assertEquals($cancelotheruids[0], $otheruids[0]);
+        $this->assertEquals($cancelotheruids[1], $otheruids[1]);
+        $this->assertEquals('CANCELLED', $cancelstatus[0]);
+        $this->assertEquals('CANCELLED', $cancelstatus[1]);
+        $this->assertGreaterThan($otherseqs[0], $cancelotherseqs[0]);
+        $this->assertGreaterThan($otherseqs[1], $cancelotherseqs[1]);
+
+        $session->sessiondates[1]->id++;
+        $updatedate = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student1);
+        $updatedateuids = $this->get_ical_values($updatedate->content, 'UID');
+        $updatedateseqs = $this->get_ical_values($updatedate->content, 'SEQUENCE');
+        $this->assertEquals($updatedateuids[0], $inituids[0]);
+        $this->assertEquals($updatedateuids[1], $inituids[1]);
+        $this->assertGreaterThanOrEqual($initseqs[0], $updatedateseqs[0]); // This date was not changed.
+        $this->assertGreaterThan($initseqs[1], $updatedateseqs[1]);
+
+        $this->mock_status_change($student1->id, $session->id);
+        $updatestatus = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student1);
+        $updatestatusuids = $this->get_ical_values($updatestatus->content, 'UID');
+        $updatestatusseqs = $this->get_ical_values($updatestatus->content, 'SEQUENCE');
+        $this->assertEquals($updatestatusuids[0], $inituids[0]);
+        $this->assertEquals($updatestatusuids[1], $inituids[1]);
+        $this->assertGreaterThan($updatedateseqs[0], $updatestatusseqs[0]);
+        $this->assertGreaterThan($updatedateseqs[1], $updatestatusseqs[1]);
+
+        $olddates = $session->sessiondates;
+        array_shift($session->sessiondates);
+        $removedate = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student1, $olddates);
+        $removedateuids = $this->get_ical_values($removedate->content, 'UID');
+        $removedateseqs = $this->get_ical_values($removedate->content, 'SEQUENCE');
+        $removedatestatus = $this->get_ical_values($removedate->content, 'STATUS');
+        $this->assertEquals($removedateuids[0], $inituids[0]);
+        $this->assertEquals($removedateuids[1], $inituids[1]);
+        $this->assertEquals('CANCELLED', $removedatestatus[0]);
+        $this->assertArrayNotHasKey(1, $removedatestatus);
+        $this->assertGreaterThan($updatestatusseqs[0], $removedateseqs[0]);
+        $this->assertGreaterThanOrEqual($updatestatusseqs[1], $removedateseqs[1]);
+
+        $session->sessiondates[0]->id++;
+        $updateafter = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student1);
+        $updateafteruids = $this->get_ical_values($updateafter->content, 'UID');
+        $updateafterseqs = $this->get_ical_values($updateafter->content, 'SEQUENCE');
+        $this->assertEquals($updateafteruids[0], $inituids[0]);
+        $this->assertArrayNotHasKey(1, $updateafteruids);
+        $this->assertGreaterThan($removedateseqs[0], $updateafterseqs[0]);
+        $this->assertArrayNotHasKey(1, $updateafterseqs);
+    }
+
+    /**
+     * Simplified parse $ical content and return values of requested property
+     * @param string $content
+     * @param string $name
+     * @return array of values
+     */
+    private function get_ical_values($content, $name) {
+        $strings = explode("\n", $content);
+        $result = array();
+        foreach($strings as $string) {
+            if (strpos($string, $name.':') === 0) {
+                $result[] = trim(substr($string, strlen($name)+1));
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Add superceeded record to signup status to mock user status change
+     * @param int $userid
+     * @param int $sessionid
+     */
+    private function mock_status_change($userid, $sessionid) {
+        global $DB;
+
+        $signupid = $DB->get_field('facetoface_signups', 'id', array('userid' => $userid, 'sessionid' => $sessionid));
+        if (!$signupid) {
+            $signupmock = new stdClass();
+            $signupmock->userid = $userid;
+            $signupmock->sessionid = $sessionid;
+            $signupmock->notificationtype = 3;
+            $signupmock->bookedby = 2;
+            $signupid = $DB->insert_record('facetoface_signups', $signupmock);
+        }
+
+        $mock = new stdClass();
+        $mock->superceded = 1;
+        $mock->statuscode = 0;
+        $mock->signupid = $signupid;
+        $mock->createdby = 2;
+        $mock->timecreated = time();
+        $DB->insert_record('facetoface_signups_status', $mock);
+    }
+
+    /**
      * Returns the email in the sink.
      *
      * @return array $emails a list of email bodies.

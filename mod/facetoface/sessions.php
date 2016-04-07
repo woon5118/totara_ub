@@ -335,7 +335,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
         if (facetoface_session_dates_check($olddates, $sessiondates)) {
             $attendees = facetoface_get_attendees($session->id);
             foreach ($attendees as $user) {
-                facetoface_send_datetime_change_notice($facetoface, $session, $user->id);
+                facetoface_send_datetime_change_notice($facetoface, $session, $user->id, $olddates);
             }
         }
     }

@@ -1114,9 +1114,10 @@ class facetoface_notification extends data_object {
  * @param int $icalattachmenttype The ical attachment type, or MDL_F2F_TEXT to disable ical attachments
  * @param int $icalattachmentmethod The ical method type: MDL_F2F_INVITE or MDL_F2F_CANCEL
  * @param object $fromuser User object describing who the email is from.
+ * @param array $olddates array of previous dates
  * @return string Error message (or empty string if successful)
  */
-function facetoface_send_notice($facetoface, $session, $userid, $params, $icalattachmenttype = MDL_F2F_TEXT, $icalattachmentmethod = MDL_F2F_INVITE, $fromuser = null) {
+function facetoface_send_notice($facetoface, $session, $userid, $params, $icalattachmenttype = MDL_F2F_TEXT, $icalattachmentmethod = MDL_F2F_INVITE, $fromuser = null, array $olddates = array()) {
     global $DB, $CFG;
 
     $notificationdisable = get_config(null, 'facetoface_notificationdisable');
@@ -1145,7 +1146,7 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
         foreach ($sessiondates as $sessiondate) {
             $session->sessiondates = array($sessiondate); // One day at a time.
             if ((int)$icalattachmenttype == MDL_F2F_BOTH) {
-                $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid);
+                $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid, $olddates);
                 $notice->set_ical_attachment($ical_attach);
             }
             $notice->set_newevent($user, $session->id, $sessiondate);
@@ -1163,7 +1164,7 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
         $session->sessiondates = $sessiondates;
     } else {
         if ((int)$icalattachmenttype == MDL_F2F_BOTH) {
-            $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid);
+            $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid, $olddates);
             $notice->set_ical_attachment($ical_attach);
         }
         $notice->set_newevent($user, $session->id, null, $fromuser);
@@ -1233,9 +1234,10 @@ function facetoface_send_decline_notice($facetoface, $session, $userid) {
  * @param class $facetoface record from the facetoface table
  * @param class $session record from the facetoface_sessions table
  * @param integer $userid ID of the recipient of the email
+ * @param array $olddates array of previous dates
  * @returns string Error message (or empty string if successful)
  */
-function facetoface_send_datetime_change_notice($facetoface, $session, $userid) {
+function facetoface_send_datetime_change_notice($facetoface, $session, $userid, $olddates) {
     global $DB;
 
     $params = array(
@@ -1244,7 +1246,7 @@ function facetoface_send_datetime_change_notice($facetoface, $session, $userid) 
         'conditiontype' => MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE
     );
 
-    return facetoface_send_notice($facetoface, $session, $userid, $params, MDL_F2F_BOTH, MDL_F2F_INVITE);
+    return facetoface_send_notice($facetoface, $session, $userid, $params, MDL_F2F_BOTH, MDL_F2F_INVITE, null, $olddates);
 }
 
 

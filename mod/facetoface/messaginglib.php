@@ -67,9 +67,13 @@ function facetoface_get_unmailed_reminders() {
  * Returns the ICAL data for a facetoface meeting.
  *
  * @param integer $method The method, @see {{MDL_F2F_INVITE}}
+ * @param stdClass $facetoface instance
+ * @param stdClass $session instance
+ * @param stdClass $user instance
+ * @param array $olddates previous session dates
  * @return stdClass Object that contains a filename in dataroot directory and ical template
  */
-function facetoface_get_ical_attachment($method, $facetoface, $session, $user) {
+function facetoface_get_ical_attachment($method, $facetoface, $session, $user, array $olddates = array()) {
     global $CFG, $DB;
 
     // Get user object if only id is given
@@ -80,15 +84,60 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user) {
         $session->sessiondates = $DB->get_records('facetoface_sessions_dates', array('sessionid' => $session->id), 'timestart');
     }
 
-    // Date is unknown, no calendar.
-    if (empty($session->sessiondate)) {
-        return null;
-    }
+    $icalmethod = ($method & MDL_F2F_INVITE) ? 'REQUEST' : 'CANCEL';
 
     // First, generate all the VEVENT blocks
     $VEVENTS = '';
     $rooms = facetoface_get_session_rooms($session->id);
-    foreach ($session->sessiondates as $date) {
+
+    $newdates = $session->sessiondates;
+    $maxdates = max(count($newdates), count($olddates));
+    if ($maxdates == 0) {
+        return null;
+    }
+    $maxdateid = 0;
+
+    // Count user signup changes.
+    $sql = "SELECT COUNT(*)
+        FROM {facetoface_signups} su
+        INNER JOIN {facetoface_signups_status} sus ON su.id = sus.signupid
+        WHERE su.userid = ?
+            AND su.sessionid = ?
+            AND sus.superceded = 1";
+    $params = array($user->id, $session->id, MDL_F2F_STATUS_USER_CANCELLED);
+    $usercnt = $DB->count_records_sql($sql, $params);
+
+    $date = null;
+    for ($i = 0; $i < $maxdates; $i++) {
+        // This is possible only when $olddates are larger than $newdates. Cancel extra dates.
+        if (empty($newdates)) {
+            // Choose right sequence: it should be larger then previous and lower then next.
+            if (is_null($date)) {
+                // We don't have any new dates, reuse id from olddates.
+                foreach ($olddates as $olddate) {
+                    $maxdateid = max($olddate->id, $maxdateid);
+                }
+                $date = array_pop($olddates);
+                $date->timestart = 0;
+                $date->timefinish = 0;
+            } else {
+                $date = clone($date);
+            }
+            $date->id = $maxdateid;
+
+            // Cancel all the rest.
+            $method = MDL_F2F_CANCEL;
+            // So we need to increase sequnce without increasing date id or signup count,
+            // but not make it equal or larger than next increase.
+            $SEQUENCE = ($date->id + $usercnt) * 2 + 1;
+        } else {
+            $date = array_shift($newdates);
+            // This will allow to increase sequence in both cases: when status changes for individual user
+            // and when date changes for all.
+            $SEQUENCE = ($date->id + $usercnt) * 2;
+        }
+        $maxdateid = max($maxdateid, $date->id);
+
         // Date that this representation of the calendar information was created -
         // we use the time the session was created
         // http://www.kanzaki.com/docs/ical/dtstamp.html
@@ -96,26 +145,15 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user) {
 
         // UIDs should be globally unique
         $urlbits = parse_url($CFG->wwwroot);
-        $sql = "SELECT COUNT(*)
-            FROM {facetoface_signups} su
-            INNER JOIN {facetoface_signups_status} sus ON su.id = sus.signupid
-            WHERE su.userid = ?
-                AND su.sessionid = ?
-                AND sus.superceded = 1
-                AND sus.statuscode = ? ";
-        $params = array($user->id, $session->id, MDL_F2F_STATUS_USER_CANCELLED);
+
         $UID =
             $DTSTAMP .
-            '-' . substr(md5($CFG->siteidentifier . $session->id . $date->id), -8) .   // Unique identifier, salted with site identifier
-            '-' . $DB->count_records_sql($sql, $params) .                              // New UID if this is a re-signup ;)
-            '@' . $urlbits['host'];                                                    // Hostname for this moodle installation
+            '-' . substr(md5($CFG->siteidentifier . $session->id . $user->id), -8) . // Unique identifier, salted with site identifier
+            '-' . $i .
+            '@' . $urlbits['host']; // Hostname for this moodle installation
 
         $DTSTART = facetoface_ical_generate_timestamp($date->timestart);
         $DTEND   = facetoface_ical_generate_timestamp($date->timefinish);
-
-        // FIXME: currently we are not sending updates if the times of the
-        // sesion are changed. This is not ideal!
-        $SEQUENCE = ($method & MDL_F2F_CANCEL) ? 1 : 0;
 
         $SUMMARY     = str_replace("\\n", "\\n ", facetoface_ical_escape($facetoface->name, true));
         $icaldescription = get_string('icaldescription', 'facetoface', $facetoface);
@@ -159,8 +197,6 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user) {
             $ROLE = 'NON-PARTICIPANT';
             $CANCELSTATUS = "\nSTATUS:CANCELLED";
         }
-
-        $icalmethod = ($method & MDL_F2F_INVITE) ? 'REQUEST' : 'CANCEL';
 
         // FIXME: if the user has input their name in another language, we need
         // to set the LANGUAGE property parameter here
