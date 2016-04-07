@@ -38,6 +38,8 @@ $progid = optional_param('progid', 0, PARAM_INT);
 $progorcert = optional_param('progorcert', 'program', PARAM_ALPHA);
 $fixkey = optional_param('fixkey', false, PARAM_ALPHANUMEXT);
 
+core_php_time_limit::raise(0);
+
 // Process the param (also cleans it so that only 'program' and 'certification' are possible).
 if ($progorcert == 'program') {
     $checkcertifications = false;
@@ -71,7 +73,6 @@ if ($userid) {
 
 // If a fix key has been provided, fix the corresponding records.
 if ($fixkey) {
-    core_php_time_limit::raise(0);
     if ($progorcert == 'program') {
         prog_fix_completions($fixkey, $progid, $userid);
     } else {

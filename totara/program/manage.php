@@ -362,6 +362,12 @@ echo $OUTPUT->header();
 if (!empty($searchcriteria)) {
     echo $OUTPUT->heading(new lang_string('searchresults'));
 } else if (!$coursecat->id) {
+    if (has_capability('totara/program:editcompletion', context_system::instance())) {
+        $checkallurl = new moodle_url('/totara/program/check_completion.php', array('progorcert' => $viewtype));
+        echo html_writer::tag('ul', html_writer::tag('li', html_writer::link($checkallurl,
+            get_string('checkcompletions', 'totara_program'))));
+    }
+
     $catlist = array(0 => get_string('top')) + coursecat::make_categories_list('moodle/category:manage');
     $catlist = count($catlist) < MAX_MOVE_CATEGORY ? $catlist : false;
 
