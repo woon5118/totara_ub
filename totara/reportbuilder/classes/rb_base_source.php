@@ -1465,10 +1465,11 @@ abstract class rb_base_source {
         if ($mins === null or $mins === '') {
             return '';
         } else {
-            $minutes = abs((int) $mins);
-            $hours = floor($minutes / 60);
-            $decimalMinutes = $minutes - floor($minutes/60) * 60;
-            return sprintf("%dh %02.0fm", $hours, $decimalMinutes);
+            $totalminutes = abs((int) $mins);
+            $hours = floor($totalminutes / 60);
+            $minutes = $totalminutes - ($hours * 60);
+            $a = (object)array('hours' => $hours, 'minutes' => $minutes);
+            return get_string('xhxm', 'facetoface', $a);
         }
     }
 

@@ -1872,6 +1872,7 @@ $string['wait-list'] = 'Wait-list';
 $string['wait-listed'] = 'Wait-listed';
 $string['xerrorsencounteredduringimport'] = '{$a} problem(s) encountered during import.';
 $string['xhours'] = '{$a} hour(s)';
+$string['xhxm'] = '{$a->hours}h {$a->minutes}m';
 $string['xmessagesfailed'] = '{$a} message(s) failed to send';
 $string['xmessagessenttoattendees'] = '{$a} message(s) successfully sent to attendees';
 $string['xmessagessenttoattendeesandmanagers'] = '{$a} message(s) successfully sent to attendees and their managers';
