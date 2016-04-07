@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Matt Clarkson <mattc@catalyst.net.nz>
+ * @author David Curry <david.curry@totaralms.com>
  * @package totara
  * @subpackage reportbuilder
  */
@@ -98,79 +99,50 @@ class rb_source_program_overview extends rb_base_source {
     protected function define_joinlist() {
         global $CFG;
 
+        require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
+
         $joinlist = array();
 
         $this->add_program_table_to_joinlist($joinlist, 'base', 'programid');
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
         $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
-        $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
 
+        // Overridden in certifications overview to limit coursesets to certifpaths.
         if ($this->instancetype == 'program') {
-            // Overridden in certifications overview to limit coursesets to certifpaths.
+
             $joinlist[] = new rb_join(
-                'prog_courseset',
-                'INNER',
-                '{prog_courseset}',
-                "prog_courseset.programid = base.programid AND base.coursesetid = 0",
-                REPORT_BUILDER_RELATION_ONE_TO_MANY,
-                'base'
+                'courseset_fields',
+                'LEFT',
+                "(SELECT pc.programid as programid, pc.id as coursesetid, c.id as courseid, c.shortname as courseshortname,
+                         cat.id as catid, cat.idnumber as catidnum, cat.name as catname
+                    FROM {prog_courseset} pc
+                    LEFT JOIN {prog_courseset_course} pcc ON pcc.coursesetid = pc.id
+                    LEFT JOIN {course} c ON pcc.courseid = c.id
+                    LEFT JOIN {course_categories} cat ON c.category = cat.id
+                    ORDER BY pc.sortorder, pcc.id
+                )",
+                'courseset_fields.programid = base.programid',
+                REPORT_BUILDER_RELATION_ONE_TO_MANY
             );
         }
-
-        $joinlist[] = new rb_join(
-            'prog_completion',
-            'LEFT',
-            '{prog_completion}',
-            "prog_completion.programid = base.programid AND prog_completion.userid = base.userid AND prog_courseset.id = prog_completion.coursesetid",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'prog_courseset'
-        );
-
-        // This join is required to keep the joining of program custom fields happy.
-        $joinlist[] =  new rb_join(
-            'prog',
-            'LEFT',
-            '{prog}',
-            'prog.id = base.programid',
-            REPORT_BUILDER_RELATION_ONE_TO_ONE
-        );
-
-
-        $joinlist[] = new rb_join(
-            'prog_courseset_course',
-            'INNER',
-            '{prog_courseset_course}',
-            "prog_courseset_course.coursesetid = prog_courseset.id",
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            'prog_courseset'
-        );
-
-        $joinlist[] = new rb_join(
-            'course',
-            'INNER',
-            '{course} ', // Intentional space to stop report builder adding unwanted custom course fields.
-            "prog_courseset_course.courseid = course.id",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'prog_courseset_course'
-        );
 
         $joinlist[] = new rb_join(
             'course_completions',
             'LEFT',
             '{course_completions}',
-            "course_completions.course = course.id AND course_completions.userid = base.userid",
+            "course_completions.course = courseset_fields.courseid AND course_completions.userid = base.userid",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'course'
+            'courseset_fields'
         );
 
         $joinlist[] = new rb_join(
             'grade_items',
             'LEFT',
             '{grade_items}',
-            "grade_items.itemtype = 'course' AND grade_items.courseid = course.id",
+            "grade_items.itemtype = 'course' AND grade_items.courseid = courseset_fields.courseid",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'course'
+            'courseset_fields'
         );
 
         $joinlist[] = new rb_join(
@@ -188,9 +160,27 @@ class rb_source_program_overview extends rb_base_source {
             'criteria',
             'LEFT',
             '{course_completion_criteria}',
-            "criteria.course = prog_courseset_course.courseid AND criteria.criteriatype = " . COMPLETION_CRITERIA_TYPE_GRADE,
+            "criteria.course = courseset_fields.courseid AND criteria.criteriatype = " . COMPLETION_CRITERIA_TYPE_GRADE,
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'prog_courseset_course'
+            'courseset_fields'
+        );
+
+        $joinlist[] = new rb_join(
+            'prog_completion',
+            'LEFT',
+            '{prog_completion}',
+            "prog_completion.programid = base.programid AND prog_completion.userid = base.userid AND courseset_fields.coursesetid = prog_completion.coursesetid",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            'courseset_fields'
+        );
+
+        // This join is required to keep the joining of program custom fields happy.
+        $joinlist[] =  new rb_join(
+            'prog',
+            'LEFT',
+            '{prog}',
+            'prog.id = base.programid',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE
         );
 
         $joinlist[] = new rb_join(
@@ -315,11 +305,11 @@ class rb_source_program_overview extends rb_base_source {
                 'program_completion',
                 'progress',
                 get_string('programcompletionprogress', 'rb_source_program_overview'),
-                $DB->sql_concat_join("'|'", array(sql_cast2char('prog_courseset.id'), sql_cast2char("prog_completion.status"))),
+                $DB->sql_concat_join("'|'", array('courseset_fields.coursesetid', 'prog_completion.status')),
                 array(
                     'displayfunc' => 'program_completion_progress',
                     'grouping' => 'comma_list',
-                    'joins' => 'prog_completion',
+                    'joins' => array('courseset_fields', 'prog_completion'),
                     'nosort' => true,
                 )
             );
@@ -403,36 +393,31 @@ class rb_source_program_overview extends rb_base_source {
 
         );
 
-        // Course completion cols.
-        if ($this->instancetype == 'program') {
-            $columnoptions[] = new rb_column_option(
-                'course',
-                'shortname',
-                get_string('courseshortname', 'rb_source_program_overview'),
-                'COALESCE('.$DB->sql_concat('course.id', "'|'", 'course.shortname', "'\n'").', \'-\')',
-                array(
-                    'joins' => 'course',
-                    'grouping' => 'list_nodelimiter',
-                    'displayfunc' => 'list_to_newline_coursename',
-                    'style' => array('white-space' => 'pre'),
-                )
+        $columnoptions[] = new rb_column_option(
+            'course',
+            'shortname',
+            get_string('courseshortname', 'rb_source_program_overview'),
+            'COALESCE('.$DB->sql_concat('courseset_fields.courseid', "'|'", 'courseset_fields.courseshortname', "'\n'").', \'-\')',
+            array(
+                'joins' => 'courseset_fields',
+                'grouping' => 'list_nodelimiter',
+                'displayfunc' => 'list_to_newline_coursename',
+                'style' => array('white-space' => 'pre'),
+            )
+        );
 
-            );
-
-            $columnoptions[] = new rb_column_option(
-                'course',
-                'status',
-                get_string('coursecompletionstatus', 'rb_source_program_overview'),
-                sql_cast2char('COALESCE(course_completions.status, '.COMPLETION_STATUS_NOTYETSTARTED.')'),
-                array(
-                    'joins' => 'course_completions',
-                    'grouping' => 'comma_list',
-                    'displayfunc' => 'course_completion_status',
-                    'style' => array('white-space' => 'pre'),
-                )
-
-            );
-        }
+        $columnoptions[] = new rb_column_option(
+            'course',
+            'status',
+            get_string('coursecompletionstatus', 'rb_source_program_overview'),
+            'COALESCE('.$DB->sql_concat_join("'|'", array('courseset_fields.courseid', 'course_completions.status')).', \'-\')',
+            array(
+                'joins' => array('course_completions', 'courseset_fields'),
+                'grouping' => 'comma_list',
+                'displayfunc' => 'course_completion_status',
+                'style' => array('white-space' => 'pre'),
+            )
+        );
 
         $columnoptions[] = new rb_column_option(
             'course',
@@ -500,15 +485,14 @@ class rb_source_program_overview extends rb_base_source {
             )
         );
 
-
         // Course category.
         $columnoptions[] = new rb_column_option(
             'course',
             'name',
             get_string('coursecategory', 'totara_reportbuilder'),
-            "course_category.name",
+            "courseset_fields.catname",
             array(
-                'joins' => 'course_category',
+                'joins' => 'courseset_fields',
                 'grouping' => 'comma_list',
                 'displayfunc' => 'list_to_newline',
                 'style' => array('white-space' => 'pre'),
@@ -521,15 +505,14 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'namelink',
             get_string('coursecategorylinked', 'totara_reportbuilder'),
-            "course_category.name",
+            $DB->sql_concat_join("'|'", array('courseset_fields.catid', 'courseset_fields.catname')),
             array(
-                'joins' => 'course_category',
-                'displayfunc' => 'link_course_category',
+                'joins' => 'courseset_fields',
+                'displayfunc' => 'courseset_category_link',
                 'defaultheading' => get_string('category', 'totara_reportbuilder'),
-                'extrafields' => array('cat_id' => "course_category.id", 'cat_visible' => "course_category.visible"),
                 'grouping' => 'comma_list',
-                'displayfunc' => 'list_to_newline',
                 'style' => array('white-space' => 'pre'),
+                'nosort' => true,
             )
         );
 
@@ -537,9 +520,9 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'id',
             get_string('coursecategoryid', 'totara_reportbuilder'),
-            "course_category.idnumber",
+            "courseset_fields.catidnum",
             array(
-                'joins' => array('course', 'course_category'),
+                'joins' => 'courseset_fields',
                 'grouping' => 'comma_list',
                 'displayfunc' => 'list_to_newline',
                 'style' => array('white-space' => 'pre'),
@@ -694,18 +677,37 @@ class rb_source_program_overview extends rb_base_source {
         }
     }
 
+    function rb_display_courseset_category_link($data, $row) {
+        $links = array();
+        $items = explode(', ', $data);
+
+        foreach ($items as $item) {
+            list($catid, $catname) = explode('|', $item);
+            $url = new moodle_url('/course/index.php', array('categoryid' => $catid));
+            $links[] = html_writer::link($url, format_string($catname));
+        }
+
+        return implode($links, "\n");
+    }
+
     function rb_display_course_completion_status($status, $row) {
         global $COMPLETION_STATUS;
 
         $items = explode(', ', $status);
-        foreach ($items as $key => $item) {
-            if (in_array($item, array_keys($COMPLETION_STATUS))) {
-                $items[$key] = get_string('coursecompletion_'.$COMPLETION_STATUS[$item], 'rb_source_program_overview');
+        $display = array();
+        foreach ($items as $item) {
+            if ($item == '-') {
+                $display[] = '';
             } else {
-                $items[$key] = get_string('coursecompletion_notyetstarted', 'rb_source_program_overview');
+                list($courseid, $status) = explode( '|', $item);
+                if (in_array($status, array_keys($COMPLETION_STATUS))) {
+                    $display[] = get_string('coursecompletion_'.$COMPLETION_STATUS[$status], 'rb_source_program_overview');
+                } else {
+                    $display[] = get_string('coursecompletion_notyetstarted', 'rb_source_program_overview');
+                }
             }
         }
-        return implode($items, "\n");
+        return implode($display, "\n");
     }
 
     function rb_display_list_to_newline_coursename($date, $row) {
@@ -726,11 +728,15 @@ class rb_source_program_overview extends rb_base_source {
         $tempcompletions = explode(', ', $status);
 
         foreach ($tempcompletions as $completion) {
-            $coursesetstatus = explode("|", $completion);
-            if (isset($coursesetstatus[1])) {
-                $completions[$coursesetstatus[0]] = $coursesetstatus[1];
+            if (!empty($completion)) {
+                list($coursesetid, $completionstatus) = explode("|", $completion);
+                if (isset($completionstatus)) {
+                    $completions[$coursesetid] = $completionstatus;
+                } else {
+                    $completions[$coursesetid] =  STATUS_COURSESET_INCOMPLETE;
+                }
             } else {
-                $completions[$coursesetstatus[0]] =  STATUS_COURSESET_INCOMPLETE;
+                $completions[0] =  STATUS_COURSESET_INCOMPLETE;
             }
         }
 
