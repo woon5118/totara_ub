@@ -2387,6 +2387,12 @@ function certif_get_completion_error_solution($problemkey, $programid = 0, $user
         case 'error:stateassigned-timedueunknown':
             $html = get_string('error:info_timedueunknown', 'totara_program');
             break;
+        case 'error:statecertified-certprogtimecompleteddifferent':
+            $url = clone($baseurl);
+            $url->param('fixkey', 'fixprogcompletiondate');
+            $html = get_string('error:info_fixprogcompletiondatematch', 'totara_certification') . '<br>' .
+                html_writer::link($url, get_string('clicktofixcompletions', 'totara_program'));
+            break;
         default:
             $html = get_string('error:info_unknowncombination', 'totara_program');
             break;
@@ -2513,6 +2519,11 @@ function certif_fix_completions($fixkey, $programid = 0, $userid = 0) {
             case 'fixcertifiedprogincomplete':
                 if ($problemkey == 'error:statecertified-certprogtimecompleteddifferent|error:statecertified-progstatusincorrect|error:statecertified-progtimecompletedempty') {
                     $result = certif_fix_completion_prog_status_set_complete($certcompletion, $progcompletion);
+                }
+                break;
+            case 'fixprogcompletiondate':
+                if ($problemkey == 'error:statecertified-certprogtimecompleteddifferent') {
+                    $result = certif_fix_prog_completion_date($certcompletion, $progcompletion);
                 }
                 break;
         }
@@ -2724,7 +2735,7 @@ function certif_fix_completion_window_reopen(&$certcompletion, &$progcompletion)
 }
 
 /**
- * Fixed program completion records that are complete when the certification window is open. This fix works by
+ * Fixes program completion records that are complete when the certification window is open. This fix works by
  * changing the program status to incomplete and erasing the program completion date.
  *
  * NOTE: This will NOT cause course progress to be reset, so should only be used if course progress was reset
@@ -2744,7 +2755,7 @@ function certif_fix_completion_prog_status_reset(&$certcompletion, &$progcomplet
 }
 
 /**
- * Fixed program completion records that are incomplete when the certification is complete. This fix works by
+ * Fixes program completion records that are incomplete when the certification is complete. This fix works by
  * changing the program status to complete and setting the program completion date to the certification completion date.
  *
  * NOTE: This could potentially cause course progress to be reset, so should only be used if course progress was NOT reset
@@ -2763,6 +2774,23 @@ function certif_fix_completion_prog_status_set_complete(&$certcompletion, &$prog
 
     return 'Automated fix \'certif_fix_completion_prog_status_set_complete\' was applied<br>' .
         '<ul><li>\'Program status\' was set to \'Program complete\'</li>
+        <li>\'Program completion date\' was set to ' . $timecompleted . '</li></ul>';
+}
+
+/**
+ * Copies certification completion date over program completion date.
+ *
+ * @param $certcompletion
+ * @param $progcompletion
+ * @return string message for transaction log
+ */
+function certif_fix_prog_completion_date(&$certcompletion, &$progcompletion) {
+    $progcompletion->timecompleted = $certcompletion->timecompleted;
+
+    $timecompleted = userdate($progcompletion->timecompleted, '%d %B %Y, %H:%M', 0) .
+        ' (' . $progcompletion->timecompleted . ')';
+
+    return 'Automated fix \'certif_fix_prog_completion_date\' was applied<br>
         <li>\'Program completion date\' was set to ' . $timecompleted . '</li></ul>';
 }
 
