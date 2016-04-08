@@ -97,6 +97,11 @@ $string['completionusegrade_desc'] = 'Student must receive a grade to complete t
 $string['completionusegrade_help'] = 'If enabled, the activity is considered complete when a student receives a grade. Pass and fail icons may be displayed if a pass grade for the activity has been set.';
 $string['completionview'] = 'Require view';
 $string['completionview_desc'] = 'Student must view this activity to complete it';
+$string['completionview_help'] = 'If this activity has \'Require view\' in combination with other criteria, the user will only be marked complete if they view the activity at a moment when all other criteria are already complete.
+
+For example, consider an activity with \'Require view\' and \'Require grade\' both enabled. If a user first viewed the activity, then later was granted a grade by an administrator, the user would need to view the activity again (after the grade was received) to trigger activity completion.
+
+For this reason, it is recommended to not use \'Require view\' in combination with other criteria, unless this specific behaviour is required. In most cases, the other criteria should be sufficient. E.g. a user can\'t have been granted a grade without having viewed the activity, so including \'Require view\' would be superfluous.';
 $string['configcompletiondefault'] = 'The default setting for completion tracking when creating new activities.';
 $string['configenablecompletion'] = 'When enabled, this lets you turn on completion tracking (progress) features at course level.';
 $string['configenablecourserpl'] = 'When enabled, a course can be marked as completed by assigning the user a Record of Prior Learning.';

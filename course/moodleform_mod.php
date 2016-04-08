@@ -563,6 +563,7 @@ abstract class moodleform_mod extends moodleform {
                 $mform->addElement('checkbox', 'completionview', get_string('completionview', 'completion'),
                     get_string('completionview_desc', 'completion'));
                 $mform->disabledIf('completionview', 'completion', 'ne', COMPLETION_TRACKING_AUTOMATIC);
+                $mform->addHelpButton('completionview', 'completionview', 'completion');
                 $gotcompletionoptions = true;
             }
 
