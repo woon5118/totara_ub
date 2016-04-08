@@ -120,6 +120,23 @@ class prog_content {
     }
 
     /**
+     * Retrieve the courseset that should have already been loaded on contruction of this object,
+     * according to its id in the prog_courseset table.
+     *
+     * @param int $coursesetid id of courseset from prog_courseset table.
+     * @return stdClass|bool - a courseset or false if none found.
+     */
+    public function get_courseset_by_id($coursesetid) {
+        foreach($this->coursesets as $courseset) {
+            if ($courseset->id == $coursesetid) {
+                 return $courseset;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Deletes all the content for this program
      *
      * @return bool true|Exception
@@ -560,6 +577,18 @@ class prog_content {
 
     public function update_set($set_pos) {
         $this->fix_set_sortorder($this->coursesets);
+    }
+
+    /**
+     * @param int $coursesetid id of the courseset from prog_courseset table.
+     * @return bool true on success, false on failure.
+     */
+    public function delete_courseset_by_id($coursesetid) {
+        $courseset = $this->get_courseset_by_id($coursesetid);
+        if (!empty($courseset)) {
+            return $this->delete_set($courseset->sortorder);
+        }
+        return false;
     }
 
     /**

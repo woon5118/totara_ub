@@ -488,6 +488,10 @@ abstract class course_set {
      */
     abstract public function get_course_text($courseset);
 
+    abstract public function get_courses();
+
+    abstract public function delete_course($courseid);
+
 }
 
 class multi_course_set extends course_set {
@@ -1548,6 +1552,10 @@ class multi_course_set extends course_set {
             return get_string('onecoursesfrom', 'totara_program') . ' "' . format_string($courseset->label) . '"';
         }
     }
+
+    public function get_courses() {
+        return $this->courses;
+    }
 }
 
 
@@ -2092,6 +2100,18 @@ class competency_course_set extends course_set {
             return get_string('onecoursesfrom', 'totara_program') . ' "' . format_string($courseset->label) . '"';
         }
     }
+
+    public function get_courses() {
+        return $this->get_competency_courses();
+    }
+
+    public function delete_course($courseid) {
+        // This is dictated by what courses are connected to competencies so deleting is not possible via
+        // the course set.
+        // This might have been called without knowing what type of courseset this is. So let the script
+        //  carry on, but in case anything needs to know whether it was deleted, return false.
+        return false;
+    }
 }
 
 class recurring_course_set extends course_set {
@@ -2169,10 +2189,16 @@ class recurring_course_set extends course_set {
         }
 
         if (!is_object($this->course)) {
-            return false;
-        }
-
-        if ($ob = $DB->get_record('prog_courseset_course', array('coursesetid' => $this->id))) {
+            // Check for an old record that might need to be removed.
+            $oldrecord = $DB->get_record('prog_courseset_course', array('coursesetid' => $this->id));
+            if ($oldrecord) {
+                $removed_id = $oldrecord->courseid;
+                $DB->delete_records('prog_courseset_course', array('coursesetid' => $this->id));
+            } else {
+                // There was no record and nothing to save.
+                return false;
+            }
+        } else if ($ob = $DB->get_record('prog_courseset_course', array('coursesetid' => $this->id))) {
             if ($this->course->id == $ob->courseid) {
                 // nothing to do
                 return true;
@@ -2197,7 +2223,9 @@ class recurring_course_set extends course_set {
         if ($removed_id) {
             $courses_still_associated = prog_get_courses_associated_with_programs(array($removed_id));
             // don't consider the one we've just added
-            unset($courses_still_associated[$added_id]);
+            if (isset($added_id)) {
+                unset($courses_still_associated[$added_id]);
+            }
             if (empty($courses_still_associated)) {
                 $instance = $program_plugin->get_instance_for_course($removed_id);
                 if ($instance) {
@@ -2206,11 +2234,13 @@ class recurring_course_set extends course_set {
             }
         }
 
-        // if the new course doesn't yet have the enrollment plugin, add it
-        $instance = $program_plugin->get_instance_for_course($added_id);
-        if (!$instance) {
-            $course = $DB->get_record('course', array('id' => $added_id));
-            $program_plugin->add_instance($course);
+        if (isset($added_id)) {
+            // if the new course doesn't yet have the enrollment plugin, add it
+            $instance = $program_plugin->get_instance_for_course($added_id);
+            if (!$instance) {
+                $course = $DB->get_record('course', array('id' => $added_id));
+                $program_plugin->add_instance($course);
+            }
         }
 
         return true;
@@ -2562,5 +2592,23 @@ class recurring_course_set extends course_set {
         } else {
             return get_string('onecoursesfrom', 'totara_program') . ' "' . format_string($courseset->label) . '"';
         }
+    }
+
+    public function get_courses() {
+        if (empty($this->course)) {
+            return array();
+        } else {
+            return array($this->course);
+        }
+    }
+
+    public function delete_course($courseid) {
+        if (!empty($this->course) && $this->course->id == $courseid) {
+            $this->course = false;
+
+            return true;
+        }
+
+        return false;
     }
 }

@@ -575,5 +575,34 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2016021000, 'totara_program');
     }
 
+    if ($oldversion < 2016041400) {
+
+        // This finds the row with the max sortorder value for each programid in the table.
+        // If the nextsetoperator is not 0 nor 1, it returns the id so it can be updated.
+        // where nextsetoperator = 2 or 3 (AND or OR) and the set was the last for that program,
+        // exceptions were being thrown.
+        $coursesetsql =  "SELECT pc.id
+                            FROM {prog_courseset} pc
+                           WHERE pc.nextsetoperator > 1
+                             AND pc.sortorder = (SELECT MAX(pc2.sortorder)
+                                                   FROM {prog_courseset} pc2
+                                                  WHERE pc2.programid = pc.programid)";
+        $coursesetids = $DB->get_fieldset_sql($coursesetsql);
+
+        if ($coursesetids) {
+            // There were coursesets to update.
+            list($insql, $inparams) = $DB->get_in_or_equal($coursesetids);
+            $updatesql = "UPDATE {prog_courseset}
+                             SET nextsetoperator=0
+                           WHERE id " . $insql;
+            $DB->execute($updatesql, $inparams);
+        }
+
+        unset($coursesetsql, $coursesetids, $insql, $inparams);
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2016041400, 'totara_program');
+    }
+
     return true;
 }

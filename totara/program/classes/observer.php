@@ -204,8 +204,7 @@ class totara_program_observer {
     /**
      * This function is to clean up any references to courses within
      * programs when they are deleted. Any coursesets that become empty
-     * due to this are also deleted as programs does not allow empty
-     * coursesets.
+     * due to this are also deleted.
      *
      * @param \core\event\course_deleted $event
      * @return boolean True if all references to the course are deleted correctly
@@ -215,19 +214,32 @@ class totara_program_observer {
 
         $courseid = $event->objectid;
 
-        $transaction = $DB->start_delegated_transaction();
+        // Get coursesets where the course will be removed.
+        $sql = 'SELECT cs.id, cs.programid
+                  FROM {prog_courseset} cs
+                  JOIN {prog_courseset_course} c
+                    ON cs.id = c.coursesetid
+                 WHERE c.courseid = :courseid
+              GROUP BY cs.id';
+        $affectedcoursesets = $DB->get_records_sql($sql, array('courseid' => $courseid));
 
-        $DB->delete_records('prog_courseset_course', array('courseid' => $courseid));
+        foreach($affectedcoursesets as $affectedcourseset) {
+            $content = new prog_content($affectedcourseset->programid);
+            /** @var course_set $courseset */
+            $courseset = $content->get_courseset_by_id($affectedcourseset->id);
 
-        // Get IDs of empty coursesets so we can delete them.
-        $emptycoursesets = $DB->get_fieldset_sql('SELECT cs.id FROM {prog_courseset} cs LEFT JOIN {prog_courseset_course} c ON cs.id = c.coursesetid WHERE c.coursesetid IS NULL GROUP BY cs.id');
+            // There is a delete_course function for prog_content, but this affects all the course from all
+            // coursesets in the program, but it also expects sortorder as a param to identify the courseset,
+            // and sortorder will change.
+            $courseset->delete_course($courseid);
 
-        if (!empty($emptycoursesets)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($emptycoursesets);
-            $DB->delete_records_select('prog_courseset', "id {$insql}", $inparams);
+            if (empty($courseset->get_courses())) {
+                // The method delete_set takes the sortorder value, which may have changed
+                // after deleting the course from a previous courseset.
+                $content->delete_courseset_by_id($affectedcourseset->id);
+            }
+            $content->save_content();
         }
-
-        $transaction->allow_commit();
 
         return true;
     }

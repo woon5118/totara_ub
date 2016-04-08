@@ -99,7 +99,7 @@ class totara_hierarchy_generator extends component_generator_base {
      *
      * @param string $prefix Prefix that identifies the type of hierarchy (position, organisation, etc)
      * @param array $record
-     * @return int hierarchy framework id
+     * @return stdClass hierarchy framework
      *
      * @todo Define an array of default values then use
      *       array_merge($default_values,$record) to
@@ -346,7 +346,7 @@ class totara_hierarchy_generator extends component_generator_base {
      * @param $frameworkid
      * @param $prefix
      * @param null $record
-     * @return bool|int hierarchy item id
+     * @return stdClass hierarchy item
      *
      * @todo Define an array of default values then use
      *       array_merge($default_values,$record) to
@@ -535,7 +535,7 @@ class totara_hierarchy_generator extends component_generator_base {
      * @param stdClass $competency Competency to add linked course to
      * @param stdClass $course Course to add
      *
-     * @return true
+     * @return int
      */
     public function assign_linked_course_to_competency($competency, $course) {
         global $CFG, $DB;
@@ -544,6 +544,22 @@ class totara_hierarchy_generator extends component_generator_base {
 
         $evidence->iteminstance = $course->id;
         $newevidenceid = $evidence->add($competency);
+
+        return $newevidenceid;
+    }
+
+    /**
+     * Remove linked course from a competency.
+     *
+     * @param stdClass $competency Competency to remove linked course from
+     * @param stdClass $course Course to remove
+     *
+     * @return true
+     */
+    public function remove_linked_course_from_competency($competency, $evidenceid) {
+        /** @var competency_evidence_type $evidence */
+        $evidence = competency_evidence_type::factory($evidenceid);
+        $evidence->delete($competency);
 
         return true;
     }
