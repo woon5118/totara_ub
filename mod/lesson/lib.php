@@ -824,6 +824,9 @@ function lesson_process_pre_save(&$lesson) {
     if (!isset($lesson->completed)) {
         $lesson->completed = 0;
     }
+    if (!isset($lesson->completionendreached)) {
+        $lesson->completionendreached = 0;
+    }
     if (empty($lesson->gradebetterthan) or !is_numeric($lesson->gradebetterthan) or $lesson->gradebetterthan < 0) {
         $lesson->gradebetterthan = 0;
     } else if ($lesson->gradebetterthan > 100) {
