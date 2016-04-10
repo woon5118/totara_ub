@@ -93,9 +93,9 @@ Feature: Users are forced to get manager approval where required
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    Then I should see "Requested"
-    And I follow "Cancel booking"
-    And I press "Yes"
+    Then I should see "manager request already pending"
+    And I follow "Withdraw pending request"
+    And I press "Confirm"
     Then I should see "Sign-up"
     And I log out
 
