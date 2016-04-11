@@ -2,7 +2,7 @@
 /*
 * This file is part of Totara LMS
 *
-* Copyright (C) 2010 onwards Totara Learning Solutions LTD
+* Copyright (C) 2016 onwards Totara Learning Solutions LTD
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
-* @package totara
-* @subpackage facetoface
+* @package totara_facetoface
 */
 
 defined('MOODLE_INTERNAL') || die();
@@ -61,7 +60,7 @@ function create_or_update_room($data, $todb) {
 }
 
 /**
- * Delete asset and related information
+ * Delete room and related information
  *
  * @param int $id
  */
@@ -75,7 +74,6 @@ function room_delete($id) {
         ";
     $DB->execute($sqldelparam, array('id' => $id));
     $DB->delete_records('facetoface_room_info_data', array('facetofaceroomid' => $id));
-    $DB->delete_records('facetoface_room_dates', array('roomid' => $id));
     $DB->delete_records('facetoface_room', array('id' => $id));
 }
 
