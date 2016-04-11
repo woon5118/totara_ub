@@ -239,6 +239,27 @@ class reminder extends data_object {
 
         return $formdata;
     }
+
+    /**
+     * TOTARA - delete reminder and related reminder data with course deletion.
+     *
+     * @access public
+     * @return void
+     */
+    public function delete() {
+        global $DB;
+
+        // Get all reminder_message objects
+        if ($messages = reminder_message::fetch_all(array('reminderid' => $this->id))) {
+            foreach ($messages as $message) {
+                $message->delete();
+            }
+        }
+        // Delete all reminder messages which are sent to users.
+        $DB->delete_records('reminder_sent', array('reminderid' => $this->id));
+        // Delete reminder.
+        parent::delete();
+    }
 }
 
 
@@ -464,4 +485,22 @@ function reminder_is_businessday($timestamp){
     //use %w instead of %u for Windows compatability
     $day = userdate($timestamp, '%w');
     return ($day != 0 && $day != 6);
+}
+
+/**
+ * TOTARA - Remove all reminders and related reminder data
+ *
+ * @param int $courseid The course ID
+ */
+function delete_reminders($courseid) {
+
+    // Get all course reminder objects
+    if ($reminders = reminder::fetch_all(array('courseid' => $courseid))) {
+        foreach ($reminders as $reminder) {
+            $reminder->delete();
+            \totara_core\event\reminder_deleted::create_from_reminder($reminder)->trigger();
+        }
+    }
+
+    return true;
 }

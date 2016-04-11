@@ -1585,5 +1585,29 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2016040400, 'totara_core');
     }
 
+    // Delete reminder records for deleted courses.
+    if ($oldversion < 2016041900) {
+
+        $transaction = $DB->start_delegated_transaction();
+
+        $sql = "SELECT r.id
+                  FROM {reminder} r
+                 WHERE NOT EXISTS (
+                           SELECT 1 FROM {course} cs WHERE r.courseid = cs.id
+               )";
+        $reminders = $DB->get_fieldset_sql($sql);
+        if ($reminders) {
+            // Delete reminders and related reminder data.
+            list($sqlin, $sqlparm) = $DB->get_in_or_equal($reminders);
+            $DB->execute("DELETE FROM {reminder_sent} WHERE reminderid $sqlin", $sqlparm);
+            $DB->execute("DELETE FROM {reminder_message} WHERE reminderid $sqlin", $sqlparm);
+            $DB->execute("DELETE FROM {reminder} WHERE id $sqlin", $sqlparm);
+        }
+
+        $transaction->allow_commit();
+
+        totara_upgrade_mod_savepoint(true, 2016041900, 'totara_core');
+    }
+
     return true;
 }

@@ -2755,6 +2755,76 @@ class core_moodlelib_testcase extends advanced_testcase {
     }
 
     /**
+     * TOTARA - Tests the function that deletes a course reminders
+     */
+    public function test_remove_course_reminders() {
+        global $USER, $CFG;
+        require_once("$CFG->dirroot/lib/reminderlib.php");
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create the course.
+        $course = $this->getDataGenerator()->create_course();
+
+        $reminder = new reminder();
+        $reminder->courseid = $course->id;
+        $reminder->timemodified = $reminder->timecreated = time();
+        $reminder->modifierid = $USER->id;
+        $reminder->deleted = '0';
+        $reminder->title = 'some title';
+        $reminder->type = 'completion';
+        $reminder->config = serialize(array());
+        $reminderid = $reminder->insert();
+        $this->assertGreaterThan(0, $reminderid);
+        // Test the reminder structure.
+        $reminders = get_course_reminders($course->id);
+        $this->assertCount(1, $reminders);
+
+        // Create the messages
+        $messageproperties = array(
+            'subject',
+            'message',
+            'period',
+            'dontsend',
+            'copyto', // skipmanager
+            'deleted',
+        );
+        foreach (array('invitation', 'reminder', 'escalation') as $type) {
+            $message = new reminder_message(
+                array(
+                    'reminderid'    => $reminderid,
+                    'type'          => $type,
+                    'deleted'       => 0
+                )
+            );
+            $message->period = 0;
+            $message->copyto = '';
+            $message->subject = 'Subject for type '.$type;
+            $message->message = 'Message for type '.$type;
+            $message->deleted = 0;
+
+            foreach ($messageproperties as $key) {
+                if (isset($messageparams[$key])) {
+                    $message->$key = $messageparams[$key];
+                }
+            }
+            if (!$message->insert()) {
+                throw new coding_exception('Failed to create course reminder message');
+            }
+        }
+        $reminder = reset($reminders);
+        $messages = $reminder->get_messages();
+        $this->assertCount(3, $messages);
+
+        remove_course_contents($course->id, false);
+
+        // Get all course reminder objects
+        $reminders = get_course_reminders($course->id);
+        $this->assertCount(0, $reminders);
+    }
+
+    /**
      * Test function username_load_fields_from_object().
      */
     public function test_username_load_fields_from_object() {

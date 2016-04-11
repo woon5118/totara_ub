@@ -4941,6 +4941,7 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
     require_once($CFG->libdir.'/completionlib.php');
     require_once($CFG->libdir.'/questionlib.php');
     require_once($CFG->libdir.'/gradelib.php');
+    require_once($CFG->libdir.'/reminderlib.php');
     require_once($CFG->dirroot.'/group/lib.php');
     require_once($CFG->dirroot.'/tag/lib.php');
     require_once($CFG->dirroot.'/comment/lib.php');
@@ -5124,6 +5125,11 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
 
     // Delete course tags.
     tag_set('course', $course->id, array(), 'core', $coursecontext->id);
+
+    // TOTARA - Delete course reminders.
+    if (delete_reminders($course->id) === true && $showfeedback) {
+        echo $OUTPUT->notification($strdeleted.get_string('remindersmenuitem', 'totara_coursecatalog'), 'notifysuccess');
+    }
 
     // Delete calendar events.
     $DB->delete_records('event', array('courseid' => $course->id));
