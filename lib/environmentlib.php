@@ -656,6 +656,29 @@ function environment_check_php_settings($version, $env_select) {
                         $result->setStatus($current >= $minlimit);
                     }
                     break;
+                case 'always_populate_raw_post_data':
+                    $current = ini_get('always_populate_raw_post_data');
+                    if ($current === false) {
+                        // Not set, setting removed in PHP 7.
+                        $result->setStatus(true);
+                    } else {
+                        if (version_compare(phpversion(), '5.6', '>')) {
+                            // PHP version higher than 5.6.x
+                            if ($current !== '-1') {
+                                $result->setStatus(false);
+                            } else {
+                                $result->setStatus(true);
+                            }
+                        } else {
+                            // PHP version lower than 5.6.x
+                            if ($current === '1') {
+                                $result->setStatus(false);
+                            } else {
+                                $result->setStatus(true);
+                            }
+                        }
+                    }
+                    break;
                 case 'max_input_vars':
                     $current = ini_get('max_input_vars');
                     if ($current < $setting_value) {

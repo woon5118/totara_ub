@@ -108,6 +108,11 @@
           <ON_CHECK message="settingfileuploads" />
         </FEEDBACK>
       </PHP_SETTING>
+      <PHP_SETTING name="always_populate_raw_post_data" value="-1" level="optional">
+        <FEEDBACK>
+          <ON_CHECK message="settingalwayspopulaterawpostdata" />
+        </FEEDBACK>
+      </PHP_SETTING>
     </PHP_SETTINGS>
   </MOODLE>
   <MOODLE version="2.4" requires="2.2">
@@ -222,6 +227,11 @@
       <PHP_SETTING name="file_uploads" value="1" level="optional">
         <FEEDBACK>
           <ON_CHECK message="settingfileuploads" />
+        </FEEDBACK>
+      </PHP_SETTING>
+      <PHP_SETTING name="always_populate_raw_post_data" value="-1" level="optional">
+        <FEEDBACK>
+          <ON_CHECK message="settingalwayspopulaterawpostdata" />
         </FEEDBACK>
       </PHP_SETTING>
     </PHP_SETTINGS>
@@ -348,6 +358,11 @@
           <ON_CHECK message="maxinputvars" />
         </FEEDBACK>
       </PHP_SETTING>
+      <PHP_SETTING name="always_populate_raw_post_data" value="-1" level="optional">
+        <FEEDBACK>
+          <ON_CHECK message="settingalwayspopulaterawpostdata" />
+        </FEEDBACK>
+      </PHP_SETTING>
     </PHP_SETTINGS>
     <CUSTOM_CHECKS>
       <CUSTOM_CHECK level="required" file="/totara/core/environmentlib.php" function="totara_core_linear_upgrade_check"/>
@@ -465,6 +480,11 @@
       <PHP_SETTING name="file_uploads" value="1" level="optional">
         <FEEDBACK>
           <ON_CHECK message="settingfileuploads" />
+        </FEEDBACK>
+      </PHP_SETTING>
+      <PHP_SETTING name="always_populate_raw_post_data" value="-1" level="optional">
+        <FEEDBACK>
+          <ON_CHECK message="settingalwayspopulaterawpostdata" />
         </FEEDBACK>
       </PHP_SETTING>
       <PHP_SETTING name="opcache.enable" value="1" level="optional">
@@ -594,6 +614,11 @@
           <ON_CHECK message="settingfileuploads" />
         </FEEDBACK>
       </PHP_SETTING>
+      <PHP_SETTING name="always_populate_raw_post_data" value="-1" level="optional">
+        <FEEDBACK>
+          <ON_CHECK message="settingalwayspopulaterawpostdata" />
+        </FEEDBACK>
+      </PHP_SETTING>
       <PHP_SETTING name="opcache.enable" value="1" level="optional">
         <FEEDBACK>
           <ON_CHECK message="opcacherecommended" />
@@ -718,6 +743,11 @@
       <PHP_SETTING name="file_uploads" value="1" level="optional">
         <FEEDBACK>
           <ON_CHECK message="settingfileuploads" />
+        </FEEDBACK>
+      </PHP_SETTING>
+      <PHP_SETTING name="always_populate_raw_post_data" value="-1" level="optional">
+        <FEEDBACK>
+          <ON_CHECK message="settingalwayspopulaterawpostdata" />
         </FEEDBACK>
       </PHP_SETTING>
       <PHP_SETTING name="opcache.enable" value="1" level="optional">
@@ -858,6 +888,11 @@
       <PHP_SETTING name="file_uploads" value="1" level="optional">
         <FEEDBACK>
           <ON_CHECK message="settingfileuploads" />
+        </FEEDBACK>
+      </PHP_SETTING>
+      <PHP_SETTING name="always_populate_raw_post_data" value="-1" level="optional">
+        <FEEDBACK>
+          <ON_CHECK message="settingalwayspopulaterawpostdata" />
         </FEEDBACK>
       </PHP_SETTING>
       <PHP_SETTING name="opcache.enable" value="1" level="optional">

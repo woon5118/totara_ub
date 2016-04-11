@@ -971,6 +971,7 @@ $string['sessioncookiedomain'] = 'Cookie domain';
 $string['sessioncookiepath'] = 'Cookie path';
 $string['sessionhandling'] = 'Session handling';
 $string['sessiontimeout'] = 'Timeout';
+$string['settingalwayspopulaterawpostdata'] = 'The always_populate_raw_post_data setting is known to cause problems when using PHP 5.6 and when you have debugging turned on. We recommended that this setting be set to -1 to avoid any issues and confusion. If you are not running PHP 5.6 then you can ignore this warning.';
 $string['settingfileuploads'] = 'File uploading is required for normal operation, please enable it in PHP configuration.';
 $string['settingmemorylimit'] = 'Insufficient memory detected, please set higher memory limit in PHP settings.';
 $string['settingsafemode'] = 'Totara is not fully compatible with safe mode, please ask server administrator to turn it off. Running Totara under safe mode is not supported, please expect various problems if you do so.';
