@@ -75,7 +75,9 @@ class rb_program_membership_embedded extends rb_base_embedded {
      * @return boolean true if the user can access this report
      */
     public function is_capable($reportfor, $report) {
+        global $CFG;
+
         $context = context_system::instance();
-        return has_capability('totara/program:editcompletion', $context, $reportfor);
+        return !empty($CFG->enableprogramcompletioneditor) && has_capability('totara/program:editcompletion', $context, $reportfor);
     }
 }
