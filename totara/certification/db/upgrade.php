@@ -27,6 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/totara/core/db/utils.php');
+require_once($CFG->dirroot.'/totara/certification/db/upgradelib.php');
 
 /**
  * Certification database upgrade script
@@ -242,6 +243,18 @@ function xmldb_totara_certification_upgrade($oldversion) {
 
         // Savepoint reached.
         totara_upgrade_mod_savepoint(true, 2015111600, 'totara_certification');
+    }
+
+    // TL-8605 Repair completion records affected by bug fixed in TL-6790. Users were "certified" when they were
+    // unassigned, then later reassigned. Their program completion record is complete while their certification
+    // record in newly assigned. Only restore if there is an "unassigned" history record to restore from. If there
+    // is any problem then the records must be fixed manually.
+    if ($oldversion < 2016042900) {
+
+        certif_upgrade_fix_reassigned_users();
+
+        // Savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2016042900, 'totara_certification');
     }
 
     return true;

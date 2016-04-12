@@ -2530,6 +2530,47 @@ class totara_certification_certification_completion_testcase extends reportcache
         $this->assertEquals($expectedprogcompletion, $progcompletion);
     }
 
+    /**
+     * Test certif_fix_completion_prog_incomplete. Set the program completion record to incomplete, to match cert completion.
+     */
+    public function test_certif_fix_completion_prog_incomplete() {
+        // Expected record is certified, before window opens.
+        $expectedcertcompletion = new stdClass();
+        $expectedcertcompletion->id = 1001;
+        $expectedcertcompletion->certifid = 1002;
+        $expectedcertcompletion->userid = 1003;
+        $expectedcertcompletion->certifpath = CERTIFPATH_CERT;
+        $expectedcertcompletion->status = CERTIFSTATUS_ASSIGNED;
+        $expectedcertcompletion->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $expectedcertcompletion->timecompleted = 0;
+        $expectedcertcompletion->timewindowopens = 0;
+        $expectedcertcompletion->timeexpires = 0;
+
+        $expectedprogcompletion = new stdClass();
+        $expectedprogcompletion->id = 1007;
+        $expectedprogcompletion->programid = 1008;
+        $expectedprogcompletion->userid = 1003;
+        $expectedprogcompletion->status = STATUS_PROGRAM_INCOMPLETE;
+        $expectedprogcompletion->timestarted = 1009;
+        $expectedprogcompletion->timedue = 1006;
+        $expectedprogcompletion->timecompleted = 0;
+
+        // Check that the expected test data is in a valid state.
+        $errors = certif_get_completion_errors($expectedcertcompletion, $expectedprogcompletion);
+        $this->assertEquals(array(), $errors);
+
+        $certcompletion = clone($expectedcertcompletion);
+        $progcompletion = clone($expectedprogcompletion);
+        // Change the record so that the program completion record is wrong.
+        $progcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $progcompletion->timecompleted = 12345;
+
+        certif_fix_completion_prog_incomplete($certcompletion, $progcompletion);
+
+        $this->assertEquals($expectedcertcompletion, $certcompletion);
+        $this->assertEquals($expectedprogcompletion, $progcompletion);
+    }
+
     public function test_certif_load_completion() {
         global $DB;
 

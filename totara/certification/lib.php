@@ -2393,6 +2393,12 @@ function certif_get_completion_error_solution($problemkey, $programid = 0, $user
             $html = get_string('error:info_fixprogcompletiondatematch', 'totara_certification') . '<br>' .
                 html_writer::link($url, get_string('clicktofixcompletions', 'totara_program'));
             break;
+        case 'error:stateassigned-progstatusincorrect|error:stateassigned-progtimecompletednotempty':
+            $url = clone($baseurl);
+            $url->param('fixkey', 'fixprogincomplete');
+            $html = get_string('error:info_fixprogincomplete', 'totara_certification') . '<br>' .
+                html_writer::link($url, get_string('clicktofixcompletions', 'totara_program'));
+            break;
         default:
             $html = get_string('error:info_unknowncombination', 'totara_program');
             break;
@@ -2524,6 +2530,11 @@ function certif_fix_completions($fixkey, $programid = 0, $userid = 0) {
             case 'fixprogcompletiondate':
                 if ($problemkey == 'error:statecertified-certprogtimecompleteddifferent') {
                     $result = certif_fix_prog_completion_date($certcompletion, $progcompletion);
+                }
+                break;
+            case 'fixprogincomplete':
+                if ($problemkey == 'error:stateassigned-progstatusincorrect|error:stateassigned-progtimecompletednotempty') {
+                    $result = certif_fix_completion_prog_incomplete($certcompletion, $progcompletion);
                 }
                 break;
         }
@@ -2773,8 +2784,27 @@ function certif_fix_completion_prog_status_set_complete(&$certcompletion, &$prog
         ' (' . $progcompletion->timecompleted . ')';
 
     return 'Automated fix \'certif_fix_completion_prog_status_set_complete\' was applied<br>' .
-        '<ul><li>\'Program status\' was set to \'Program complete\'</li>
-        <li>\'Program completion date\' was set to ' . $timecompleted . '</li></ul>';
+    '<ul><li>\'Program status\' was set to \'Program complete\'</li>
+    <li>\'Program completion date\' was set to ' . $timecompleted . '</li></ul>';
+}
+
+/**
+ * Fixes program completion records that are complete when the certification is incomplete. This fix works by
+ * changing the program status to incomplete and setting the program completion date to 0.
+ *
+ * NOTE: This should only be used if there are no history records that could be restored.
+ *
+ * @param $certcompletion
+ * @param $progcompletion
+ * @return string message for transaction log
+ */
+function certif_fix_completion_prog_incomplete(&$certcompletion, &$progcompletion) {
+    $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;
+    $progcompletion->timecompleted = 0;
+
+    return 'Automated fix \'certif_fix_completion_prog_incomplete\' was applied<br>' .
+    '<ul><li>\'Program status\' was set to \'Program incomplete\'</li>
+    <li>\'Program completion date\' was set to \'empty\' (0)</li></ul>';
 }
 
 /**
