@@ -217,6 +217,7 @@ $string['error:emptyidnumberwithsync'] = 'HR Import is enabled but the ID number
 $string['error:findingmenuitem'] = 'Error finding the menu item';
 $string['error:importtimezonesfailed'] = 'Failed to update timezone information.';
 $string['error:itemhaschildren'] = 'You cannot change the parent of this item while it has children. Please move this items children first.';
+$string['error:itemnotselected'] = 'Please select an item';
 $string['error:managernotselected'] = 'Please select a manager';
 $string['error:menuitemcannotberemoved'] = '"{$a}" item can not be removed, please review your settings.';
 $string['error:menuitemcannotremove'] = '"{$a}" has the children which can not be removed, please review your settings.';
