@@ -978,7 +978,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $label = position::position_label($row);
 
         $url = new moodle_url('/mod/facetoface/attendee_position.php', array('s' => $row->sessionid, 'id' => $row->userid));
-        $pix = new pix_icon('t/edit', get_string('edit', 'facetoface'));
+        $pix = new pix_icon('t/edit', get_string('edit'));
         $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-position pull-right'));
         $positionhtml = html_writer::span($label, 'position'.$row->userid, array('id' => 'position'.$row->userid));
 

@@ -235,8 +235,7 @@ $string['bulkremoveattendeessuccess'] = 'Bulk remove users success';
 $string['calendareventdescriptionbooking'] = 'You are booked for this <a href="{$a}">Face-to-face event</a>.';
 $string['calendareventdescriptionsession'] = 'You have created this <a href="{$a}">Face-to-face event</a>.';
 $string['calendaroptions'] = 'Calendar options';
-$string['cancel'] = 'Cancel';
-$string['cancelsession'] = 'Cancel session';
+$string['cancelsession'] = 'Cancel event';
 $string['cancelingsession'] = 'Canceling session in {$a}';
 $string['cancelsessionconfirm'] = 'Are you completely sure you want to cancel this session? All attendees will be notified. This action cannot be un-done.';
 $string['cancelledstatus'] = 'Cancelled status';
@@ -285,7 +284,6 @@ $string['completionstatusrequired'] = 'Require status';
 $string['completionstatusrequired_help'] = 'Checking one or more statuses will require a user to achieve at least one of the checked statuses in order to be marked complete in this Face to face activity, as well as any other Activity Completion requirements.';
 $string['copyingsession'] = 'Copying as a new event in {$a}';
 $string['copysession'] = 'Copy event';
-$string['copy'] = 'Copy';
 $string['cost'] = 'Cost';
 $string['cancelbooking'] = 'Cancel booking';
 $string['cancellation'] = 'Cancellation';
@@ -362,7 +360,6 @@ $string['defaultdaysskipweekends'] = 'Week days only';
 $string['defaultdaysskipweekends_desc'] = 'When defaulting the start and finish dates only count week days';
 $string['defaultdaystosession'] = 'Number of days in future to default for new events';
 $string['defaultdaystosession_desc'] = 'When creating a new event it\'s start and finish dates will default to this many days in the future.';
-$string['delete'] = 'Delete';
 $string['deleteall'] = 'Delete all';
 $string['deleteassetconfirm'] = 'Are you sure you want to delete asset <strong>"{$a}"</strong>:';
 $string['deletenotificationconfirm'] = 'Confirm you would like to delete the notification <strong>"{$a}"</strong>:';
@@ -386,7 +383,6 @@ $string['downloadsigninsheet'] = 'Download sign-in sheet';
 $string['due'] = 'due';
 $string['duration'] = 'Duration';
 $string['early'] = '{$a} early';
-$string['edit'] = 'Edit';
 $string['editasset'] = 'Edit asset';
 $string['editdate'] = 'Edit date';
 $string['editmessagerecipientsindividually'] = 'Edit recipients individually';
@@ -2138,10 +2134,14 @@ $string['sitenoticesheading'] = 'Site Notices';
 $string['waitliststatus'] = 'You have a place on the waitlist of the following session';
 
 # Deprecated
+$string['cancel'] = 'Cancel';
+$string['copy'] = 'Copy';
 $string['datetimeknownhinttext'] = '';
+$string['delete'] = 'Delete';
 $string['duration_help'] = '**Duration** is the total length of the training in hours.
 If the training occurs over two or more time periods, the duration is the combined total.
 If the session date is known then this value is automatically recalculated when the session is saved.';
+$string['edit'] = 'Edit';
 $string['sessiondatetimeknown'] = 'Session date/time known';
 $string['sessiondatetimeknown_help'] = '**If a session\'s date/time is known**
 

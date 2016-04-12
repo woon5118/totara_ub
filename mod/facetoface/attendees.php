@@ -719,7 +719,7 @@ if (!$onlycontent && !$download) {
 /**
  * Print attendees (if user able to view)
  */
-$pix = new pix_icon('t/edit', get_string('edit', 'facetoface'));
+$pix = new pix_icon('t/edit', get_string('edit'));
 if ($show_table) {
     // Get list of attendees
 
