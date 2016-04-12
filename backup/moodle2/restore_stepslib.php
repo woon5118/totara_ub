@@ -1882,15 +1882,48 @@ class restore_course_structure_step extends restore_structure_step {
                         " - target type = [{$field->datatype}] <> restore type = [{$data->field_type}]");
             } else {
                 if ($customfield = $DB->get_record('course_info_data', array('fieldid' => $field->id, 'courseid' => $this->get_courseid()))) {
+                    $dataid = $customfield->id;
                     $customfield->data = $data->field_data;
                     $DB->update_record('course_info_data', $customfield);
+                    if (!empty($data->paramdatavalue)) {
+                        $param = new stdClass();
+                        $param->dataid = $customfield->id;
+                        $param->value = $data->paramdatavalue;
+                        $params = array('dataid' => $customfield->id, 'value' => $data->paramdatavalue);
+                        if (!$DB->get_record('course_info_data_param', $params)) {
+                            $DB->insert_record('course_info_data_param', $param);
+                        }
+                    }
                 } else {
                     $customfield = new stdClass();
                     $customfield->id = 0;
                     $customfield->courseid = $this->get_courseid();
                     $customfield->fieldid = $field->id;
                     $customfield->data    = $data->field_data;
-                    $DB->insert_record('course_info_data', $customfield);
+                    $dataid = $DB->insert_record('course_info_data', $customfield);
+
+                    // Insert params if exist.
+                    if (!empty($data->paramdatavalue)) {
+                        $param = new stdClass();
+                        $param->dataid = $dataid;
+                        $param->value  = $data->paramdatavalue;
+                        $DB->insert_record('course_info_data_param', $param);
+                    }
+                }
+
+                if (isset($dataid) && isset($data->field_data_id) && (($data->field_type === 'file') || ($data->field_type === 'textarea'))) {
+                    // Custom field files use the id of their course_info_data record to
+                    // identify the file in the files table, so we set the mapping to use
+                    // the new data id for when adding the related files.
+                    $this->set_mapping('totara_course_custom_field', $data->field_data_id, $dataid, true, context_system::instance()->id);
+
+                    if ($data->field_type === 'file') {
+                        // For the same reason above, we update the data field in course_info_data,
+                        // so that the correct record is looked for in the files table.
+                        // This is only necessary for file custom fields, textarea fields use different methods
+                        // to find the file.
+                        $DB->set_field('course_info_data', 'data', $dataid, array('id' => $dataid));
+                    }
                 }
             }
         }
@@ -1902,6 +1935,10 @@ class restore_course_structure_step extends restore_structure_step {
         // Add course related files, without itemid to match
         $this->add_related_files('course', 'summary', null);
         $this->add_related_files('course', 'overviewfiles', null);
+        // Restore files for file custom field types.
+        $this->add_related_files('totara_customfield', 'course_filemgr', 'totara_course_custom_field', context_system::instance()->id);
+        // Restore files for text area custom field types.
+        $this->add_related_files('totara_customfield', 'course', 'totara_course_custom_field', context_system::instance()->id);
 
         // Deal with legacy allowed modules.
         if ($this->legacyrestrictmodules) {
@@ -3007,8 +3044,20 @@ class restore_course_completion_structure_step extends restore_structure_step {
                 'timestarted' => $this->apply_date_offset($data->timestarted),
                 'timecompleted' => $this->apply_date_offset($data->timecompleted),
                 'reaggregate' => $data->reaggregate,
-                'status' => $data->status
             );
+
+            if (!isset($data->status)) {
+                $status = completion_completion::get_status($data);
+                if (!empty($status)) {
+                    $params['status'] = constant('COMPLETION_STATUS_' . strtoupper($status));
+                } else {
+                    // The $status value shouldn't be empty here, but if it is, we'll use the default for
+                    // this field.
+                    $params['status'] = 0;
+                }
+            } else {
+                $params['status'] = $data->status;
+            }
 
             $existing = $DB->get_record('course_completions', array(
                 'userid' => $data->userid,
@@ -4028,7 +4077,9 @@ class restore_userscompletion_structure_step extends restore_structure_step {
         $data->coursemoduleid = $this->task->get_moduleid();
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
-        $data->timecompleted = $this->apply_date_offset($data->timecompleted);
+        if (isset($data->timecompleted)) {
+            $data->timecompleted = $this->apply_date_offset($data->timecompleted);
+        }
 
         // Find the existing record
         $existing = $DB->get_record('course_modules_completion', array(

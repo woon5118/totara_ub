@@ -80,7 +80,7 @@ class moodle1_mod_facetoface_handler extends moodle1_mod_handler {
         $contextid      = $this->converter->get_contextid(CONTEXT_MODULE, $this->moduleid);
 
         // replay the upgrade step 2009042006
-        if ($CFG->texteditors !== 'textarea') {
+        if (($CFG->texteditors !== 'textarea') and (isset($data['description']))) {
             $data['intro']       = text_to_html($data['description'], false, false, true);
             $data['introformat'] = FORMAT_HTML;
         }
@@ -88,10 +88,12 @@ class moodle1_mod_facetoface_handler extends moodle1_mod_handler {
         // get a fresh new file manager for this instance
         $this->fileman = $this->converter->get_file_manager($contextid, 'mod_facetoface');
 
-        // convert course files embedded into the intro
-        $this->fileman->filearea = 'intro';
-        $this->fileman->itemid   = 0;
-        $data['intro'] = moodle1_converter::migrate_referenced_files($data['intro'], $this->fileman);
+        if (isset($data['intro'])) {
+            // convert course files embedded into the intro
+            $this->fileman->filearea = 'intro';
+            $this->fileman->itemid = 0;
+            $data['intro'] = moodle1_converter::migrate_referenced_files($data['intro'], $this->fileman);
+        }
 
         // start writing facetoface.xml
         $this->open_xml_writer("activities/facetoface_{$this->moduleid}/facetoface.xml");

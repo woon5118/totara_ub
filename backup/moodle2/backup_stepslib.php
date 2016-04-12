@@ -379,7 +379,7 @@ class backup_course_structure_step extends backup_structure_step {
         $customfields = new backup_nested_element('custom_fields');
 
         $customfield = new backup_nested_element('custom_field', array('id'), array(
-            'field_name', 'field_type', 'field_data'));
+            'field_name', 'field_type', 'field_data', 'paramdatavalue', 'field_data_id'));
 
         $module = new backup_nested_element('module', array(), array('modulename'));
 
@@ -455,9 +455,11 @@ class backup_course_structure_step extends backup_structure_step {
                                                  backup_helper::is_sqlparam(COHORT_ASSN_ITEMTYPE_COURSE),
                                      ));
 
-        $customfield->set_source_sql('SELECT f.id, f.shortname AS field_name, f.datatype AS field_type, d.data AS field_data
+        $customfield->set_source_sql('SELECT f.id, f.shortname AS field_name, f.datatype AS field_type, d.data AS field_data,
+                                             dp.value AS paramdatavalue, d.id AS field_data_id
                                         FROM {course_info_field} f
                                         JOIN {course_info_data} d ON d.fieldid = f.id
+                                   LEFT JOIN {course_info_data_param} dp ON dp.dataid = d.id
                                        WHERE d.courseid = ?', array(backup::VAR_PARENTID));
 
         $module->set_source_sql('SELECT m.name AS modulename
@@ -472,6 +474,10 @@ class backup_course_structure_step extends backup_structure_step {
         $course->annotate_files('course', 'summary', null);
         $course->annotate_files('course', 'overviewfiles', null);
         $course->annotate_files('course', 'legacy', null);
+        // Annotate files for file custom field types.
+        $customfield->annotate_files('totara_customfield', 'course_filemgr', 'field_data_id', context_system::instance()->id);
+        // Annotate files for text area custom field types.
+        $customfield->annotate_files('totara_customfield', 'course', 'field_data_id', context_system::instance()->id);
 
         // Return root element ($course)
 

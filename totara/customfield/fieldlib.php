@@ -635,9 +635,9 @@ function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = tru
                 $datavalue = json_decode($field->data, true);
                 $values = array();
                 $dataparams = $DB->get_records("{$tableprefix}_info_data_param", array('dataid' => $field->dataid));
-                foreach ($dataparams as $dataparams) {
-                    if (isset($datavalue[$dataparams->value])) {
-                        $option = $datavalue[$dataparams->value];
+                foreach ($dataparams as $dataparam) {
+                    if (isset($datavalue[$dataparam->value])) {
+                        $option = $datavalue[$dataparam->value];
                         $values[] = $option['option'];
                     }
                 }

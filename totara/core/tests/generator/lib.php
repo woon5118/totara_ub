@@ -292,8 +292,7 @@ class totara_core_generator extends component_generator_base {
             }
 
         } else if ($record->datatype === 'file') {
-            throw new coding_exception('Data type "file" is not supported in field generator');
-
+            // No additional settings required for file custom field type.
         } else if ($record->datatype === 'menu') {
             if (!isset($record->param1)) {
                 throw new coding_exception('Menu field requires options in $record->param1');
