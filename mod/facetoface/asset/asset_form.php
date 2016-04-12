@@ -43,6 +43,7 @@ class mod_facetoface_asset_form extends moodleform {
 
         $mform->addElement('text', 'name', get_string('assetname', 'facetoface'), array('size' => '45'));
         $mform->setType('name', PARAM_TEXT);
+        $mform->addRule('name', null, 'required', null, 'client');
 
         $mform->addElement('checkbox', 'allowconflicts', get_string('allowconflicts', 'mod_facetoface'));
         $mform->addHelpButton('allowconflicts', 'assettype', 'facetoface');
