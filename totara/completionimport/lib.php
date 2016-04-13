@@ -203,6 +203,18 @@ function check_fields_exist($filename, $importname, $customfields = array()) {
     } else if (!$handle = fopen($filename, 'r')) {
         $errors[] = get_string('erroropeningfile', 'totara_completionimport', $filename);
     } else {
+        // Hack to overwrite file with one that contains correct new line characters.
+        // Otherwise, the csv_iterator in the import_csv function may not interpret them correctly.
+        $size = filesize($filename);
+        $content = fread($handle, $size);
+        $content = core_text::convert($content, $csvencoding, 'utf-8');
+        // remove Unicode BOM from first line
+        $content = core_text::trim_utf8_bom($content);
+        // Fix mac/dos newlines
+        $content = preg_replace('!\r\n?!', "\n", $content);
+        file_put_contents($filename, $content);
+        $handle = fopen($filename, 'r');
+
         // Read the first line.
         $csvfields = fgetcsv($handle, 0, $csvseparator, $csvdelimiter);
         if (empty($csvfields)) {
@@ -381,7 +393,7 @@ function import_data_checks($importname, $importtime) {
             $timecompleteds = $DB->get_recordset_sql($sql, $stdparams);
             if ($timecompleteds->valid()) {
                 foreach ($timecompleteds as $timecompleted) {
-                    if (!totara_date_parse_from_format($csvdateformat, $timecompleted->completiondate)) {
+                    if (!totara_completionimport_validate_date($csvdateformat, $timecompleted->completiondate)) {
                         $sql = "UPDATE {{$tablename}}
                                 SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . "
                                 WHERE id = :importid";
@@ -1786,4 +1798,43 @@ function update_errors_import($records, $errormessage, $tablename) {
                 importerror = :importerror
             WHERE id {$insql}";
     return $DB->execute($sql, $params);
+}
+
+/**
+ * Checks that a supplied formatted date is valid based on a given format.
+ *
+ * Note that this will allow numbers without leading zeros or otherwise less digits.
+ * So for DD/MM/YYYY, either 31/5/2016 or 31/05/2016 will be seen as valid by this
+ * function. These should also be converted to their expected times by totara_date_parse_from_format.
+ *
+ * For a format with a 4-digit year such as DD/MM/YYYY, 31/05/16 will often also be returned as valid
+ * by this function, but it will be considered to be 31/05/0016, and totara_date_parse_from_format may
+ * return a timestamp representing that also. It may simply be returned as invalid if the
+ * system cannot handle such a timestamp.  E.g. 32-bit systems will not be able to handle a large, negative
+ * timestamp.
+ *
+ * @param string $csvdateformat - format allowed by Totara in completion import, such as d/m/Y.
+ * @param string $completiondate - formatted date, such as 31/05/2016.
+ * @return bool - true if date is valid, false if not.
+ */
+function totara_completionimport_validate_date($csvdateformat, $completiondate) {
+    $dateArray = date_parse_from_format($csvdateformat, $completiondate);
+    if (!is_array($dateArray) or !empty($dateArray['error_count'])) {
+        return false;
+    }
+    if ($dateArray['is_localtime']) {
+        return false;
+    }
+
+    if ($dateArray['month'] > 12) {
+        return false;
+    }
+
+    $calendar = \core_calendar\type_factory::get_calendar_instance();
+    $daysinmonth = $calendar->get_num_days_in_month($dateArray['year'], $dateArray['month']);
+    if ($dateArray['day'] > $daysinmonth) {
+        return false;
+    }
+
+    return true;
 }

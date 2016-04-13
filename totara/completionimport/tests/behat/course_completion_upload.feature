@@ -109,3 +109,26 @@ Feature: Verify course completion data can be successfully uploaded.
     And I should see "Course ID number : notacourse"
     And I should see "Grade : 100"
     And I should see "Date completed : 1 January 2015"
+
+  Scenario: Course completions can be successfully uploaded with a file that uses CR for line endings
+    Given I log in as "admin"
+    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_CR_line_endings.csv" file to "Choose course file to upload" filemanager
+    And I click on "Upload" "button" in the "#mform1" "css_element"
+    Then I should see "CSV import completed"
+    And I should see "Course data imported successfully"
+    And I should see "1 Records successfully imported as courses"
+    And I should see "1 Records created as evidence"
+    And I should see "2 Records in total"
+
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I follow "Bob1 Learner1"
+    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    Then I should see "Complete via rpl" in the "Course 1" "table_row"
+
+    When I follow "Other Evidence"
+    And I click on "Completed course : thisisevidence" "link" in the "tbody" "css_element"
+    Then I should see "Completed course : thisisevidence"
+    And I should see "Course ID number : notacourse"
+    And I should see "Grade : 100"
+    And I should see "Date completed : 1 January 2015"
