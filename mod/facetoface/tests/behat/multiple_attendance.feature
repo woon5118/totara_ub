@@ -45,12 +45,12 @@ Feature: Take attendance for a Face to face with multiple sessions
       | timestart[month]   | 0                |
       | timestart[year]    | 0                |
       | timestart[hour]    | 0                |
-      | timestart[minute]  | -30              |
+      | timestart[minute]  | -25              |
       | timefinish[day]    | -10              |
       | timefinish[month]  | 0                |
       | timefinish[year]   | 0                |
       | timefinish[hour]   | 0                |
-      | timefinish[minute] | 0                |
+      | timefinish[minute] | +5               |
     And I press "OK"
 
     And I click on "Select room" "link"
