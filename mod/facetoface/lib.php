@@ -1320,6 +1320,46 @@ function facetoface_notify_under_capacity() {
 }
 
 /**
+ * Cancel all pending requests for a given session.
+ * Primarily for use with the close_registrations task
+ *
+ * @param stdClass $session - A database record from facetoface_session
+ */
+function facetoface_cancel_pending_requests($session) {
+    global $DB, $CFG, $USER;
+
+    // Find any pending requests for the given session.
+    $requestsql = "SELECT fss.*, fs.userid as recipient
+                     FROM {facetoface_signups} fs
+               INNER JOIN {facetoface_signups_status} fss
+                       ON fss.signupid = fs.id AND fss.superceded = 0
+                    WHERE fs.sessionid = :sess
+                      AND (statuscode = :req OR statuscode = :adreq)";
+    $requestparams = array('req' => MDL_F2F_STATUS_REQUESTED, 'adreq' => MDL_F2F_STATUS_REQUESTEDADMIN);
+
+    $f2fs = array();
+    $notifications = array();
+
+    $requestparams['sess'] = $session->id;
+    $pendingrequests = $DB->get_records_sql($requestsql, $requestparams);
+
+    // Loop through all the pending requests, cancel them, and send a notification to the user.
+    if (!empty($pendingrequests)) {
+        if (!isset($f2fs[$session->facetoface])) {
+            $f2fs[$session->facetoface] = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
+        }
+
+        foreach ($pendingrequests as $pending) {
+            // Mark the request as declined so they can no longer be approved.
+            facetoface_update_signup_status($pending->signupid, MDL_F2F_STATUS_DECLINED, $USER->id);
+
+            // Send a registration expiration message to the user (and their manager).
+            facetoface_send_registration_closure_notice($f2fs[$session->facetoface], $session, $pending->recipient);
+        }
+    }
+}
+
+/**
  * Send out email notifications for all sessions where registration period has ended.
  */
 function facetoface_notify_registration_ended() {
@@ -1332,8 +1372,7 @@ function facetoface_notify_registration_ended() {
     $conditions = array('component' => 'mod_facetoface', 'classname' => '\mod_facetoface\task\send_notifications_task');
     $lastcron = $DB->get_field('task_scheduled', 'lastruntime', $conditions);
     $time = time();
-
-    $params = array(
+   $params = array(
         'lastcron' => $lastcron,
         'now'      => $time
     );

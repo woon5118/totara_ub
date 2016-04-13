@@ -4175,5 +4175,70 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016051100, 'facetoface');
     }
 
+    if ($oldversion < 2016051800) {
+        $table = new xmldb_table('facetoface_notification');
+        $field = new xmldb_field('requested');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Add the registration closure notification.
+
+        // We need to ensure that this notification does not already exist.
+        // We can check the reference for this.
+        $reference = 'registrationclosure';
+        if (!$DB->record_exists('facetoface_notification_tpl', array('reference' => $reference))) {
+
+            // Prepare the common strings.
+            $title = get_string('setting:defaultregistrationclosuresubjectdefault', 'facetoface');
+            $body = text_to_html(get_string('setting:defaultregistrationclosuremessagedefault_v9', 'facetoface'));
+
+            // Add the template.
+            $tpl_regclose = new stdClass();
+            $tpl_regclose->reference = 'registrationclosure';
+            $tpl_regclose->status = 1;
+            $tpl_regclose->title = $title;
+            $tpl_regclose->ccmanager = 1;
+            $tpl_regclose->requested = 1;
+            $tpl_regclose->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
+            $tpl_regclose->managerprefix = $body;
+            $templateid = $DB->insert_record('facetoface_notification_tpl', $tpl_regclose, true);
+
+            // Add the noticifations to existing facetoface activities.
+            $facetofaces = $DB->get_records('facetoface', null, '', 'id,course');
+            if ($facetofaces) {
+                // Loop over facetofaces.
+                foreach ($facetofaces as $facetoface) {
+
+                    // Get each message and create notification.
+                    $defaults = array();
+                    $defaults['facetofaceid'] = $facetoface->id;
+                    $defaults['courseid'] = $facetoface->course;
+                    $defaults['type'] = MDL_F2F_NOTIFICATION_AUTO;
+                    $defaults['booked'] = 0;
+                    $defaults['requested'] = 1;
+                    $defaults['waitlisted'] = 0;
+                    $defaults['cancelled'] = 0;
+                    $defaults['issent'] = 0;
+                    $defaults['status'] = 1;
+                    $defaults['ccmanager'] = 1;
+                    $defaults['templateid'] = $templateid;
+
+                    $registrationclosure = new facetoface_notification($defaults, false);
+                    $registrationclosure->title = $title;
+                    $registrationclosure->body = $body;
+                    $registrationclosure->conditiontype = MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS;
+                    $result = $result && $registrationclosure->save();
+                }
+            }
+            // Unset some of the structures we've used, particularly facetofaces as it may be HUGE.
+            unset($title, $body, $facetofaces, $facetoface, $defaults, $tpl_regclose, $registrationclosure);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2016051800, 'facetoface');
+    }
+
     return $result;
 }

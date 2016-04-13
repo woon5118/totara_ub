@@ -135,6 +135,7 @@ $string['potentialattendees'] = 'Potential Attendees';
 $string['attendeestablesummary'] = 'People planning on or having attended this event.';
 $string['availablesignupnote'] = 'Users can enter requests when signing up';
 $string['requeststablesummary'] = 'People requesting to attended this event.';
+$string['beforeregistrationends'] = 'before registration closes';
 $string['beforestartofsession'] = 'before start of event';
 $string['backtoassets'] = 'Back to assets';
 $string['backtorooms'] = 'Back to rooms';
@@ -162,6 +163,7 @@ Available Seminar placholders:
 * [lateststartdate] - Date at the start of the event. If there are multiple sessions it will use the last one.
 * [latestfinishtime] - Finish time of the event. If there are multiple sessions it will use the last one.
 * [latestfinishdate] - Date at the end of the event. If there are multiple sessions it will use the last one.
+* [registrationcutoff] - The deadline for registrations, if not set this will default to [starttime].
 
 There are also placeholders available for event custom fields and they follow the format [session:shortname]. Where "shortname" is the shortname of the Seminar custom field.
 
@@ -276,6 +278,7 @@ $string['cleanuptask'] = 'Cleanup seminar';
 $string['clearall'] = 'Clear all';
 $string['close'] = 'Close';
 $string['closed'] = 'Closed';
+$string['closeregistrationstask'] = 'Close seminar events registration';
 $string['confirm'] = 'Confirm';
 $string['confirmlotteryheader'] = 'Confirm Play Lottery';
 $string['confirmlotterybody'] = '"Play Lottery" randomly chooses attendees from the selected users in order to fill the event to its capacity. The chosen users will be immediately booked to the event and sent a booking confirmation email. Do you want to continue?';
@@ -787,6 +790,7 @@ $string['placeholder:middlename'] = '[middlename]';
 $string['placeholder:msn'] = '[msn]';
 $string['placeholder:phone1'] = '[phone1]';
 $string['placeholder:phone2'] = '[phone2]';
+$string['placeholder:registrationcutoff'] = '[registrationcutoff]';
 $string['placeholder:session:finishdate'] = '[session:finishdate]';
 $string['placeholder:session:finishtime'] = '[session:finishtime]';
 $string['placeholder:session:startdate'] = '[session:startdate]';
@@ -1289,6 +1293,37 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaultdatetimechangesubject'] = 'Default subject line for date/time change emails.';
 $string['setting:defaultdatetimechangesubject_caption'] = 'Date/time change subject';
+$string['setting:defaultregistrationclosureinstrmngr'] = 'Default registration closure message sent to managers.';
+$string['setting:defaultregistrationclosureinstrmngr_caption'] = 'Registration closure message (managers)';
+$string['setting:defaultregistrationclosureinstrmngrdefault'] = '*** Advice only ****
+Your staff member [firstname] [lastname] had a pending request to attend the above seminar event and has also received this closure email.
+
+If you are not their Team Leader / Manager and believe you have received this email by mistake please reply to this email.
+';
+$string['setting:defaultregistrationclosureinstrmngrcopybelow'] = '*** [firstname] [lastname]\'s registration closure is copied below ****';
+$string['setting:defaultregistrationclosuremessage'] = 'Default cancellation message sent to the user.';
+$string['setting:defaultregistrationclosuremessage_caption'] = 'Registration closure message';
+$string['setting:defaultregistrationclosuremessagedefault_v9'] = 'This is to advise that your pending booking request for the following seminar event has expired:
+This seminar events registration period has closed while your request was pending, please request a booking on a different event.
+
+Course: [coursename]
+
+Seminar: [facetofacename]
+
+Duration: [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
+';
+$string['setting:defaultregistrationclosuresubject'] = 'Default subject line for registration closure emails.';
+$string['setting:defaultregistrationclosuresubject_caption'] = 'registration closure subject';
+$string['setting:defaultregistrationclosuresubjectdefault'] = 'Seminar event registration closure';
 $string['setting:defaultregistrationexpiredsubjectdefault'] = 'Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultregistrationexpiredinstrmngr'] = '
 *** Advice only ****
@@ -1297,6 +1332,23 @@ This is to advise that [firstname] [lastname] has been sent the following email 
 
 If you are not their Team Leader / Manager and believe you have received this email by mistake please reply to this email.
 
+';
+$string['setting:defaultregistrationexpiredmessagedefault'] = 'The registration period for the following session has been closed:
+
+Course: [coursename]
+
+Face-to-face: [facetofacename]
+
+Duration: [duration]
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
 ';
 $string['setting:defaultregistrationexpiredmessagedefault_v9'] = 'The registration period for the following session has been closed:
 
@@ -1382,9 +1434,10 @@ $string['setting:defaultremindersubject_caption'] = 'Reminder subject';
 $string['setting:defaultremindersubjectdefault'] = 'Seminar booking reminder: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultrequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as their Team Leader / Manager.
 
-Please follow the link below to approve the request:
-[attendeeslink]
+Please review this request before registration closes on [registrationcutoff]
 
+Follow the link below to approve the request:
+[attendeeslink]
 ';
 $string['setting:defaultrequestinstrmngrcopybelow'] = '*** [firstname] [lastname]\'s booking request is copied below ****';
 $string['setting:defaultrequestmessagedefault'] = 'Your request to book into the following course has been sent to your manager:
@@ -1419,13 +1472,16 @@ Building: [session:room:cf_building]
 Location: [session:room:cf_location]
 [session:room:link]
 [/sessions]
+
+This request will expire on [registrationcutoff]
 ';
 $string['setting:defaultrequestsubjectdefault'] = 'Seminar booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultrolerequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as a [sessionrole] for the session.
 
-Please follow the link below to approve the request:
-[attendeeslink]
+Please review this request before registration closes on [registrationcutoff]
 
+Follow the link below to review the request:
+[attendeeslink]
 ';
 $string['setting:defaultrolerequestinstrmngrcopybelow'] = '*** [firstname] [lastname]\'s booking request is copied below ****';
 $string['setting:defaultrolerequestmessagedefault'] = 'Your request to book into the following course has been sent to the sessions [sessionrole](s):
@@ -1460,13 +1516,16 @@ Building: [session:room:cf_building]
 Location: [session:room:cf_location]
 [session:room:link]
 [/sessions]
+
+This request will expire on [registrationcutoff]
 ';
 $string['setting:defaultrolerequestsubjectdefault'] = 'Seminar booking role request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultadminrequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as an approver for the session.
 
-Please follow the link below to approve the request:
-[attendeeslink]
+Please review this request before registration closes on [registrationcutoff]
 
+Follow the link below to approve the request:
+[attendeeslink]
 ';
 $string['setting:defaultadminrequestinstrmngrcopybelow'] = '*** [firstname] [lastname]\'s booking request is copied below ****';
 $string['setting:defaultadminrequestmessagedefault'] = 'Your request to book into the following course has been sent to the sessions approvers:
@@ -1501,6 +1560,8 @@ Building: [session:room:cf_building]
 Location: [session:room:cf_location]
 [session:room:link]
 [/sessions]
+
+This request will expire on [registrationcutoff]
 ';
 $string['setting:defaultadminrequestsubjectdefault'] = 'Seminar booking admin request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaulttrainerconfirmationmessage'] = 'Default message sent to trainers when assigned to an event.';
@@ -1781,6 +1842,7 @@ $string['status_fully_attended'] = 'Fully attended';
 $string['status_no_show'] = 'No show';
 $string['status_not_set'] = 'Not set';
 $string['status_partially_attended'] = 'Partially attended';
+$string['status_pending_requests'] = 'Pending Requests';
 $string['status_requested'] = 'Requested';
 $string['status_requestedadmin'] = 'Requested (2step)';
 $string['status_user_cancelled'] = 'User Cancelled';
@@ -1988,8 +2050,9 @@ Please note, when selecting <strong>All booked</strong>, notifications will be i
 
 <strong>Wait-listed</strong> - will send a notification to those who are signed up for a event which allows overbooking, but are not yet booked.
 
-<strong>User cancelled</strong> - will send a notification to users for whom a event was cancelled or users who removed themselves from an event.';
+<strong>User cancelled</strong> - will send a notification to users for whom a event was cancelled or users who removed themselves from an event.
 
+<strong>Pending Requests</strong> - will send a notification to users for whom have requested a booking from their manager/role/admin that has not been approved or declined yet.';
 $string['reminderinstrmngr'] = '# Notice for Manager';
 $string['reminderinstrmngr_help'] = 'When **Send notice to manager** is checked, the text in the **Notice for Manager** field is sent to a learner\'s manager advising that they have signed up for a seminar event.';
 

@@ -67,6 +67,7 @@ define('MDL_F2F_CONDITION_RESERVATION_CANCELLED',        16384);
 define('MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED',    32768);
 define('MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE',         65536);
 define('MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN',        131072);
+define('MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS',     262144);
 
 /**
  * Notification sent state
@@ -115,6 +116,7 @@ class facetoface_notification extends data_object {
         'booked' => 0,
         'waitlisted' => 0,
         'cancelled' => 0,
+        'requested' => 0,
         'status' => 0,
         'issent' => 0,
         'templateid' => 0
@@ -304,6 +306,11 @@ class facetoface_notification extends data_object {
             $status[] = MDL_F2F_STATUS_USER_CANCELLED;
         }
 
+        if ($this->requested) {
+            $status[] = MDL_F2F_STATUS_REQUESTED;
+            $status[] = MDL_F2F_STATUS_REQUESTEDADMIN;
+        }
+
         $where = 'f.id = ? ';
         $params = array($this->facetofaceid);
 
@@ -421,6 +428,7 @@ class facetoface_notification extends data_object {
         $sql = '
             SELECT
                 s.id,
+                s.registrationtimefinish,
                 sd.timestart,
                 sd.timefinish
             FROM
@@ -467,6 +475,12 @@ class facetoface_notification extends data_object {
                 case MDL_F2F_CONDITION_AFTER_SESSION:
                     if ($session->timefinish > $time ||
                        ($session->timefinish + $this->scheduletime) > $time) {
+                        continue 2;
+                    }
+                    break;
+                case MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS:
+                    if ($session->registrationtimefinish < $time ||
+                       ($session->registrationtimefinish - $this->scheduletime) > $time) {
                         continue 2;
                     }
                     break;
@@ -547,7 +561,7 @@ class facetoface_notification extends data_object {
 
             // Check notification hasn't already need sent.
             $notificationhistory = $DB->get_record('facetoface_notification_sent', array('notificationid' => $notice->id, 'sessionid' => $notif->id, 'userid' => $user->id));
-            if($notificationhistory != null){
+            if ($notificationhistory != null) {
                 // Notification has already  been sent.
                 return;
             }
@@ -1461,6 +1475,44 @@ function facetoface_send_adminrequest_notice($facetoface, $session, $recipientid
 }
 
 /**
+ * Send registration closure notice to user, manager, all session admins.
+ *
+ * @param object $facetoface    Facetoface instance
+ * @param object $session       Session instance
+ * @param int    $recipientid   The id of the user requesting a booking
+ */
+function facetoface_send_registration_closure_notice($facetoface, $session, $recipientid) {
+    global $DB, $USER;
+
+
+    $notificationdisable = get_config(null, 'facetoface_notificationdisable');
+    if (!empty($notificationdisable)) {
+        return false;
+    }
+
+    $recipient = $DB->get_record('user', array('id' => $recipientid));
+    if (!$recipient) {
+        return 'userdoesnotexist';
+    }
+
+    $params = array(
+        'facetofaceid'  => $facetoface->id,
+        'type'          => MDL_F2F_NOTIFICATION_AUTO,
+        'conditiontype' => MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS
+    );
+
+    $notice = new facetoface_notification($params);
+    $notice->set_newevent($recipient, $session->id, null, $USER);
+
+//    $notice->_event->name = 'alert';
+
+    $notice->send_to_user($recipient, $session->id);
+    $notice->send_to_manager($recipient, $session->id);
+
+    return '';
+}
+
+/**
  * Subsitute the placeholders in message templates for the actual data
  *
  * Expects the following parameters in the $data object:
@@ -1488,6 +1540,8 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
 
     // Get timezone setting.
     $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+    $str_unknowndate = get_string('unknowndate', 'facetoface');
+    $str_unknowntime = get_string('unknowntime', 'facetoface');
 
     if (!empty($data->sessiondates)) {
         // Scheduled session
@@ -1508,8 +1562,6 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
 
     } else {
         // Wait-listed session
-        $str_unknowndate = get_string('unknowndate', 'facetoface');
-        $str_unknowntime = get_string('unknowntime', 'facetoface');
         $startdate   = $str_unknowndate;
         $finishdate  = $str_unknowndate;
         $sessiondate = $str_unknowndate;
@@ -1544,6 +1596,16 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = str_replace(get_string('placeholder:latestfinishtime', 'facetoface'), $latestfinishtime, $msg);
     $msg = str_replace(get_string('placeholder:latestfinishdate', 'facetoface'), $latestfinishdate, $msg);
     $msg = str_replace(get_string('placeholder:duration', 'facetoface'), format_time($data->duration), $msg);
+
+    if (!empty($data->registrationtimefinish)) {
+        $registrationcutoff = userdate($data->registrationtimefinish, get_string('strftimerecent'));
+    } else if (!empty($data->sessiondates[0]->timestart)) {
+        $registrationcutoff = userdate($data->sessiondates[0]->timestart, get_string('strftimerecent'));
+    } else {
+        $registrationcutoff = $str_unknowndate;
+    }
+
+    $msg = str_replace(get_string('placeholder:registrationcutoff', 'facetoface'), $registrationcutoff, $msg);
 
     if (!empty($data->sessiondates)) {
         $rooms = facetoface_get_session_rooms($data->id);
@@ -2120,6 +2182,7 @@ function facetoface_get_default_notifications($facetofaceid) {
     $defaults['booked'] = 0;
     $defaults['waitlisted'] = 0;
     $defaults['cancelled'] = 0;
+    $defaults['requested'] = 0;
     $defaults['issent'] = 0;
     $defaults['status'] = 1;
     $defaults['ccmanager'] = 0;
@@ -2359,6 +2422,20 @@ function facetoface_get_default_notifications($facetofaceid) {
         $notifications[MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED] = $registrationexpired;
     } else {
         $missingtemplates[] = 'registrationexpired';
+    }
+
+    if (isset($templates['registrationclosure'])) {
+        $template = $templates['registrationclosure'];
+        $registrationclosure = new facetoface_notification($defaults, false);
+        $registrationclosure->title = $template->title;
+        $registrationclosure->body = $template->body;
+        $registrationclosure->conditiontype = MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS;
+        $registrationclosure->ccmanager = 1;
+        $registrationclosure->requested = 1;
+        $registrationclosure->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS] = $registrationclosure;
+    } else {
+        $missingtemplates[] = 'registrationclosure';
     }
 
     return array($notifications, $missingtemplates);
