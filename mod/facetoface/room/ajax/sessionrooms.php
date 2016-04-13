@@ -109,7 +109,8 @@ if ($rooms = $DB->get_records_sql($sql, array('sessionid' => $sessionid))) {
     }
 
     // Disable unavailable rooms.
-    $availablerooms = facetoface_get_available_rooms(array(array($timestart, $timefinish)), 'id', array($sessionid));
+    $excludesessionids = $sessionid ? array($sessionid) : array();
+    $availablerooms = facetoface_get_available_rooms(array(array($timestart, $timefinish)), 'id', $excludesessionids);
     if ($unavailablerooms = array_diff(array_keys($allrooms), array_keys($availablerooms))) {
         // Make array keys and values the same.
         $unavailablerooms = array_combine($unavailablerooms, $unavailablerooms);

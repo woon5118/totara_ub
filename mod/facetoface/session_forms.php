@@ -397,8 +397,9 @@ class mod_facetoface_session_form extends moodleform {
             if (!empty($assetids)) {
                 $assetlist = explode(',', $assetids);
             }
-
-            $errdate = session_date_form::dates_validate($starttime, $endtime, $roomid, $assetlist, $data['s']);
+            // If event is a cloning then remove session id and behave as a new event to get rooms availability.
+            $sessid = ($data['c'] ? 0 : $data['s']);
+            $errdate = session_date_form::dates_validate($starttime, $endtime, $roomid, $assetlist, $sessid);
 
             if (!empty($errdate['timestart'])) {
                 $errdates[] = $errdate['timestart'];
@@ -782,14 +783,18 @@ class session_date_form extends moodleform {
             $items = array();
             if (!empty($errors['roomid'])) {
                 $items[] = html_writer::tag('li', $errors['roomid']);
+                // Don't show duplicate error.
+                unset($errors['roomid']);
             }
             if (!empty($errors['assetid'])) {
                 foreach ($errors['assetid'] as $asseterror) {
                     $items[] = html_writer::tag('li', $asseterror);
                 }
+                // Don't show duplicate error.
+                unset($errors['assetid']);
             }
             $details = html_writer::tag('ul', implode('', $items));
-            $errors['dateunavailable'] = get_string('error:datesunavailablestuff', 'facetoface', $details);
+            $errors['timestart'] = get_string('error:datesunavailablestuff', 'facetoface', $details);
         }
         return $errors;
     }

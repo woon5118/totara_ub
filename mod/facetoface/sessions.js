@@ -356,6 +356,12 @@ M.totara_f2f_room = M.totara_f2f_room || {
             };
             buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
 
+            var sessionid = M.totara_f2f_room.config.sessionid;
+            // If event is a cloning then remove session id and behave as a new event to get rooms availability.
+            if ($('input[name="c"]').val() == 1) {
+                sessionid = 0;
+            }
+
             totaraDialogs['selectroom'+offset] = new totaraDialog(
                 'selectroom'+offset+'-dialog',
                 $(this).attr('id'),
@@ -365,7 +371,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                             M.totara_f2f_room.config['display_selected_item' + offset] + '</h2>'
                 },
                 function() {
-                    return url + 'room/ajax/sessionrooms.php?sessionid=' + M.totara_f2f_room.config.sessionid +
+                    return url + 'room/ajax/sessionrooms.php?sessionid=' + sessionid +
                         '&facetofaceid=' + M.totara_f2f_room.config.facetofaceid +
                         '&timestart=' + $('input[name="timestart[' + offset + ']"]').val() +
                         '&timefinish=' + $('input[name="timefinish[' + offset + ']"]').val() +

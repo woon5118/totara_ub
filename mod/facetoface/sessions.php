@@ -187,6 +187,15 @@ if (!isset($session)) {
             $sessiondata->$timestartfield = $date->timestart;
             $sessiondata->$timefinishfield = $date->timefinish;
             $sessiondata->$timezonefield = $date->sessiontimezone;
+
+            // Cloning session, check if "allow room booking conflicts" is disable.
+            if ($c && $date->roomid) {
+                $room = facetoface_get_room($date->roomid);
+                if ($room->type != 'external') {
+                    $date->roomid = 0;
+                }
+            }
+
             $sessiondata->$roomidfield = $date->roomid;
             $sessiondata->$roomcapacityfield = $date->roomid;
             $sessiondata->$assetsfield = $date->assetids;
