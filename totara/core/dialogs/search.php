@@ -416,17 +416,14 @@ switch ($searchtype) {
         if ($sessionid) {
             $joinsess = 'LEFT JOIN {facetoface_asset_dates} fad ON (a.id = fad.assetid)
                 LEFT JOIN {facetoface_sessions_dates} fsd ON (fad.sessionsdateid = fsd.id)';
-            $sqlsess = 'OR a.custom > 0 AND fsd.id = :sessionid';
+            $sqlsess = 'OR a.custom > 0 AND fsd.id = ?';
             $params = array_merge($params, array($sessionid));
         }
-        $search_info->fullname = $DB->sql_concat(
-                'a.name', "', '",
-                'faid.data', "', '",
-                'a.description');
+        $search_info->id = 'a.id';
+        $search_info->fullname = 'a.name';
         $search_info->sql = "
             FROM {facetoface_asset} a
             {$joinsess}
-            LEFT JOIN {facetoface_asset_info_data} faid ON (a.id = faid.facetofaceassetid)
             WHERE
             {$searchsql}
             AND (a.custom = 0 {$sqlsess})
@@ -459,21 +456,16 @@ switch ($searchtype) {
         $joinsess = '';
         if ($sessionid) {
             $joinsess = 'LEFT JOIN {facetoface_sessions_dates} fsd ON (r.id = fsd.roomid)';
-            $sqlsess = 'OR r.custom > 0 AND fsd.id = :sessionid';
+            $sqlsess = 'OR r.custom > 0 AND fsd.id = ?';
             $params = array_merge($params, array($sessionid));
         }
-
-        $search_info->fullname = $DB->sql_concat(
-                'r.name', "', '",
-                'frid.data', "', '",
-                'r.description', "', '",
-                "' (".get_string('capacity', 'facetoface').": '", 'r.capacity', "')'");
+        $search_info->id = 'r.id';
+        $search_info->fullname = $DB->sql_concat("r.name", "' (" . get_string('capacity', 'facetoface') . ": '", "r.capacity", "')'");
 
         $search_info->sql = "
             FROM
                 {facetoface_room} r
                 {$joinsess}
-                LEFT JOIN {facetoface_room_info_data} frid ON (r.id = frid.facetofaceroomid)
             WHERE
                 {$searchsql}
                 AND (r.custom = 0 {$sqlsess})
