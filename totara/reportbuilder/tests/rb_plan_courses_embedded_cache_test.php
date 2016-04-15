@@ -44,9 +44,7 @@ class totara_reportbuilder_rb_plan_courses_embedded_cache_testcase extends repor
                         array('id' => 52, 'reportid' => 11, 'type' => 'plan', 'value' => 'courseduedate',
                               'heading' => 'D', 'sortorder' => 4),
                         array('id' => 53, 'reportid' => 11, 'type' => 'course_completion', 'value' => 'statusandapproval',
-                              'heading' => 'E', 'sortorder' => 5),
-                        array('id' => 54, 'reportid' => 11, 'type' => 'course', 'value' => 'visible',
-                              'heading' => 'F', 'sortorder' => 6));
+                              'heading' => 'E', 'sortorder' => 5));
 
     protected $report_builder_filters_data = array(
                         array('id' => 22, 'reportid' => 11, 'type' => 'course', 'value' => 'courselink',

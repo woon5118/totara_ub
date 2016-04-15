@@ -685,7 +685,7 @@ class rb_source_dp_course extends rb_base_source {
             $fieldvisible = $report->get_field('course', 'visible', 'course.visible');
             $fieldaudvis = $report->get_field('course', 'audiencevisible', 'course.audiencevisible');
             $report->set_post_config_restrictions(totara_visibility_where($report->get_param_value('userid'),
-                $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'course', $report->is_cached()));
+                $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'course', $report->is_cached(), true));
         }
     }
 
