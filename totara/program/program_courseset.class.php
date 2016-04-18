@@ -170,11 +170,18 @@ abstract class course_set {
             $this->label = get_string('legend:courseset', 'totara_program', $this->sortorder);
         }
 
+        if (empty($this->islastset)) {
+            $nextsetoperator = $this->nextsetoperator;
+        } else {
+            // We should have an empty nextsetoperator if this is the last courseset.
+            $nextsetoperator = 0;
+        }
+
         $todb = new stdClass();
         $todb->programid = $this->programid;
         $todb->sortorder = $this->sortorder;
         $todb->competencyid = $this->competencyid;
-        $todb->nextsetoperator = $this->nextsetoperator;
+        $todb->nextsetoperator = $nextsetoperator;
         $todb->completiontype = $this->completiontype;
         $todb->timeallowed = $this->timeallowed;
         $todb->recurrencetime = $this->recurrencetime;
@@ -594,11 +601,18 @@ class multi_course_set extends course_set {
             $this->label = get_string('legend:courseset', 'totara_program', $this->sortorder);
         }
 
+        if (empty($this->islastset)) {
+            $nextsetoperator = $this->nextsetoperator;
+        } else {
+            // We should have an empty nextsetoperator if this is the last courseset.
+            $nextsetoperator = 0;
+        }
+
         $todb = new stdClass();
         $todb->programid = $this->programid;
         $todb->sortorder = $this->sortorder;
         $todb->competencyid = $this->competencyid;
-        $todb->nextsetoperator = $this->nextsetoperator;
+        $todb->nextsetoperator = $nextsetoperator;
         $todb->completiontype = $this->completiontype;
         $todb->timeallowed = $this->timeallowed;
         $todb->recurrencetime = $this->recurrencetime;

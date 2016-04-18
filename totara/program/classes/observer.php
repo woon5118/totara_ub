@@ -220,7 +220,7 @@ class totara_program_observer {
                   JOIN {prog_courseset_course} c
                     ON cs.id = c.coursesetid
                  WHERE c.courseid = :courseid
-              GROUP BY cs.id';
+              GROUP BY cs.id, cs.programid';
         $affectedcoursesets = $DB->get_records_sql($sql, array('courseid' => $courseid));
 
         foreach($affectedcoursesets as $affectedcourseset) {
@@ -233,7 +233,8 @@ class totara_program_observer {
             // and sortorder will change.
             $courseset->delete_course($courseid);
 
-            if (empty($courseset->get_courses())) {
+            $coursesetcourses = $courseset->get_courses();
+            if (empty($coursesetcourses)) {
                 // The method delete_set takes the sortorder value, which may have changed
                 // after deleting the course from a previous courseset.
                 $content->delete_courseset_by_id($affectedcourseset->id);
