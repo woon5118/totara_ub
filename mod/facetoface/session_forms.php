@@ -51,6 +51,8 @@ class mod_facetoface_session_form extends moodleform {
         $mform->setType('f', PARAM_INT);
         $mform->setType('s', PARAM_INT);
         $mform->setType('c', PARAM_INT);
+        $mform->addElement('hidden', 'backtoallsessions', $this->_customdata['backtoallsessions']);
+        $mform->setType('backtoallsessions', PARAM_BOOL);
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 

@@ -27,7 +27,7 @@ require_once 'cancelsignup_form.php';
 
 $s  = required_param('s', PARAM_INT); // facetoface session ID
 $confirm           = optional_param('confirm', false, PARAM_BOOL);
-$backtoallsessions = optional_param('backtoallsessions', 0, PARAM_INT);
+$backtoallsessions = optional_param('backtoallsessions', 0, PARAM_BOOL);
 
 if (!$session = facetoface_get_session($s)) {
     print_error('error:incorrectcoursemodulesession', 'facetoface');
@@ -56,10 +56,10 @@ $PAGE->set_url('/mod/facetoface/cancelsignup.php', array('s' => $s, 'backtoallse
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
 
-$returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
-
 if ($backtoallsessions) {
-    $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $backtoallsessions));
+    $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
+} else {
+    $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
 }
 
 // Add booking information.

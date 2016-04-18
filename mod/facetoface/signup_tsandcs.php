@@ -28,7 +28,6 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/signup_tsandcs_form.php');
 
 $s = required_param('s', PARAM_INT); // Facetoface session ID.
-$backtoallsessions = optional_param('backtoallsessions', 0, PARAM_INT);
 
 if (!$session = facetoface_get_session($s)) {
     print_error('error:incorrectcoursemodulesession', 'facetoface');

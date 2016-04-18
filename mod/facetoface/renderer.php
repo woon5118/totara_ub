@@ -402,28 +402,29 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $options = '';
         $timenow = time();
 
+        // NOTE: This is not a nice hack, we can only guess where to return because there is no argument above.
+        $bas = 0;
+        if ($this->page->url->compare(new moodle_url('/mod/facetoface/view.php'), URL_MATCH_BASE)) {
+            $bas = 1;
+        }
+
         // Can edit sessions.
         if ($editsessions) {
             // NOTE: TL-8718 decide what to do with editing of cancelled sessions
-            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id)), new pix_icon('t/edit', get_string('editsession', 'facetoface'))) . ' ';
+            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/edit', get_string('editsession', 'facetoface'))) . ' ';
             if ($session->cancelledstatus == 0) {
                 if (!facetoface_has_session_started($session, $timenow)) {
-                    $bas = 0;
-                    if ($this->page->url->compare(new moodle_url('/mod/facetoface/view.php'), URL_MATCH_BASE)) {
-                        // NOTE: This is not a nice hack, we can only guess where to return because there is no argument above.
-                        $bas = 1;
-                    }
                     $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/cancelsession.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/block', get_string('cancelsession', 'facetoface'))) . ' ';
                 }
             }
-            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'c' => 1)), new pix_icon('t/copy', get_string('copysession', 'facetoface'))) . ' ';
-            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'd' => 1)), new pix_icon('t/delete', get_string('deletesession', 'facetoface'))) . ' ';
+            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'c' => 1, 'backtoallsessions' => $bas)), new pix_icon('t/copy', get_string('copysession', 'facetoface'))) . ' ';
+            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'd' => 1, 'backtoallsessions' => $bas)), new pix_icon('t/delete', get_string('deletesession', 'facetoface'))) . ' ';
             $options .= html_writer::empty_tag('br');
         }
 
         // Can view attendees.
         if ($viewattendees) {
-            $options .= html_writer::link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface)), get_string('attendees', 'facetoface'), array('title' => get_string('seeattendees', 'facetoface')));
+            $options .= html_writer::link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $session->id, 'backtoallsessions' => $bas)), get_string('attendees', 'facetoface'), array('title' => get_string('seeattendees', 'facetoface')));
             $options .= html_writer::empty_tag('br');
         }
 
@@ -494,7 +495,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             if (!empty($sessreserveinfo['allocate']) && $sessreserveinfo['maxallocate'][$session->id] > 0) {
                 // Able to allocate and not used all allocations for other sessions.
                 $allocateurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'allocate', 's' => $session->id,
-                    'backtoallsessions' => $session->facetoface));
+                    'backtoallsessions' => 1));
                 $reservelink .= html_writer::link($allocateurl, get_string('allocate', 'mod_facetoface'));
                 $reservelink .= ' ('.$sessreserveinfo['allocated'][$session->id].'/'.$sessreserveinfo['maxallocate'][$session->id].')';
                 $reservelink .= html_writer::empty_tag('br');
@@ -502,14 +503,14 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             if (!empty($sessreserveinfo['reserve']) && $sessreserveinfo['maxreserve'][$session->id] > 0) {
                 if (empty($sessreserveinfo['reservepastdeadline'])) {
                     $reserveurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'reserve', 's' => $session->id,
-                        'backtoallsessions' => $session->facetoface));
+                        'backtoallsessions' => 1));
                     $reservelink .= html_writer::link($reserveurl, get_string('reserve', 'mod_facetoface'));
                     $reservelink .= ' ('.$sessreserveinfo['reserved'][$session->id].'/'.$sessreserveinfo['maxreserve'][$session->id].')';
                     $reservelink .= html_writer::empty_tag('br');
                 }
             } else if (!empty($sessreserveinfo['reserveother']) && empty($sessreserveinfo['reservepastdeadline'])) {
                 $reserveurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'reserve', 's' => $session->id,
-                    'backtoallsessions' => $session->facetoface));
+                    'backtoallsessions' => 1));
                 $reservelink .= html_writer::link($reserveurl, get_string('reserveother', 'mod_facetoface'));
                 $reservelink .= html_writer::empty_tag('br');
             }
@@ -559,7 +560,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         // Prepare singup and cancel links.
         $urlparams = array('s' => $session->id);
         if ($returntoallsessions) {
-            $urlparams['backtoallsessions'] = $session->facetoface;
+            $urlparams['backtoallsessions'] = 1;
         }
         $signupurl = new moodle_url('/mod/facetoface/signup.php', $urlparams);
         $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', $urlparams);

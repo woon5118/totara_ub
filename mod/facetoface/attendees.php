@@ -48,6 +48,8 @@ $download = optional_param('download', '', PARAM_ALPHA);
 // If approval requests have been updated, show a success message.
 $approved = optional_param('approved', 0, PARAM_INT);
 
+$backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
+
 // Report support.
 $format = optional_param('format','',PARAM_TEXT);
 $sid = optional_param('sid', '0', PARAM_INT);
@@ -1180,7 +1182,11 @@ if ($action == 'messageusers') {
 }
 
 // Go back.
-$url = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
+if ($backtoallsessions) {
+    $url = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
+} else {
+    $url = new moodle_url('/course/view.php', array('id' => $course->id));
+}
 echo html_writer::link($url, get_string('goback', 'facetoface')) . html_writer::end_tag('p');
 
 

@@ -26,7 +26,7 @@ require_once(__DIR__ . '/lib.php');
 require_once(__DIR__ . '/cancelsession_form.php');
 
 $s = required_param('s', PARAM_INT); // facetoface session ID
-$backtoallsessions = optional_param('backtoallsessions', 0, PARAM_BOOL);
+$backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 
 if (!$session = facetoface_get_session($s)) {
     print_error('error:incorrectcoursemodulesession', 'facetoface');

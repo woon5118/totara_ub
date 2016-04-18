@@ -36,6 +36,7 @@ $c = optional_param('c', 0, PARAM_INT); // copy session
 $d = optional_param('d', 0, PARAM_INT); // delete session
 $confirm = optional_param('confirm', false, PARAM_BOOL); // delete confirmation
 $cntdates = optional_param('cntdates', 0, PARAM_INT); // Number of events to set.
+$backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 
 $session = null;
 
@@ -78,7 +79,7 @@ local_js(array(
     TOTARA_JS_DIALOG,
     TOTARA_JS_TREEVIEW
 ));
-$PAGE->set_url('/mod/facetoface/sessions.php', array('f' => $f));
+$PAGE->set_url('/mod/facetoface/sessions.php', array('f' => $f, 'backtoallsessions' => $backtoallsessions));
 $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
 $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
 $PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
@@ -100,7 +101,11 @@ $jsmodule = array(
     'requires' => array('json', 'totara_core'));
 $PAGE->requires->js_init_call('M.totara_f2f_room.init', array($jsconfig), false, $jsmodule);
 
-$returnurl = "view.php?f=$facetoface->id";
+if ($backtoallsessions) {
+    $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
+} else {
+    $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
+}
 
 $editoroptions = array(
     'noclean'  => false,
@@ -205,7 +210,7 @@ if (!isset($session)) {
     }
 }
 
-$mform = new mod_facetoface_session_form(null, compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm', 'sessiondata'));
+$mform = new mod_facetoface_session_form(null, compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm', 'sessiondata', 'backtoallsessions'));
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
@@ -393,7 +398,7 @@ if (!empty($errorstr)) {
 if ($d) {
     $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
     facetoface_print_session($session, $viewattendees);
-    $optionsyes = array('sesskey' => sesskey(), 's' => $session->id, 'd' => 1, 'confirm' => 1);
+    $optionsyes = array('sesskey' => sesskey(), 's' => $session->id, 'd' => 1, 'confirm' => 1, 'backtoallsessions' => $backtoallsessions);
     echo $OUTPUT->confirm(get_string('deletesessionconfirm', 'facetoface', format_string($facetoface->name)),
         new moodle_url('sessions.php', $optionsyes),
         new moodle_url($returnurl));

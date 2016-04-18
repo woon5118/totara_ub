@@ -30,7 +30,7 @@ require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 
 $sid = required_param('s', PARAM_INT);
 $action = optional_param('action', 'reserve', PARAM_ALPHA);
-$backtoallsessions = optional_param('backtoallsessions', null, PARAM_INT);
+$backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 $backtosession = optional_param('backtosession', null, PARAM_ALPHA);
 $managerid = optional_param('managerid', null, PARAM_INT);
 
@@ -41,13 +41,7 @@ $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface),
 $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 
-$url = new moodle_url('/mod/facetoface/reserve.php', array('s' => $session->id, 'action' => $action));
-if ($backtoallsessions != $facetoface->id) {
-    $backtoallsessions = null;
-}
-if ($backtoallsessions) {
-    $url->param('backtoallsessions', $backtoallsessions);
-}
+$url = new moodle_url('/mod/facetoface/reserve.php', array('s' => $session->id, 'action' => $action, 'backtoallsessions' => $backtoallsessions));
 if ($backtosession) {
     $url->param('backtosession', $backtosession);
 }
@@ -68,7 +62,7 @@ if (!in_array($action, $validactions)) {
 if ($backtoallsessions) {
     $redir = new moodle_url('/mod/facetoface/view.php', array('id' => $cm->id));
 } else if ($backtosession) {
-    $redir = new moodle_url('/mod/facetoface/attendees.php', array('s' => $session->id, 'backtoallsessions' => $facetoface->id,
+    $redir = new moodle_url('/mod/facetoface/attendees.php', array('s' => $session->id, 'backtoallsessions' => 1,
                                                                   'action' => $backtosession));
 } else {
     $redir = new moodle_url('/course/view.php', array('id' => $course->id));

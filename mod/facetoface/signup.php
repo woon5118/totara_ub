@@ -26,7 +26,7 @@ require_once 'lib.php';
 require_once 'signup_form.php';
 
 $s = required_param('s', PARAM_INT); // facetoface session ID
-$backtoallsessions = optional_param('backtoallsessions', 0, PARAM_INT);
+$backtoallsessions = optional_param('backtoallsessions', 0, PARAM_BOOL);
 
 if (!$session = facetoface_get_session($s)) {
     print_error('error:incorrectcoursemodulesession', 'facetoface');
@@ -58,9 +58,10 @@ if ($candirectenrol) {
     require_capability('mod/facetoface:view', $context);
 }
 
-$returnurl = "$CFG->wwwroot/course/view.php?id=$course->id";
 if ($backtoallsessions) {
-    $returnurl = "$CFG->wwwroot/mod/facetoface/view.php?f=$backtoallsessions";
+    $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
+} else {
+    $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
 }
 
 $pagetitle = format_string($facetoface->name);

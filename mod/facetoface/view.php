@@ -290,7 +290,7 @@ function print_session_list($courseid, $facetoface, $sessions) {
         echo html_writer::tag(
             'p',
             html_writer::link(
-                new moodle_url('sessions.php', array('f' => $facetoface->id)), get_string('addsession', 'facetoface')
+                new moodle_url('sessions.php', array('f' => $facetoface->id, 'backtoallsessions' => 1)), get_string('addsession', 'facetoface')
             )
         );
     }
