@@ -451,7 +451,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * Returns the text containing registration start and end dates if there are any.
      *
      * @param stdClass $session
-     * @return string to add to the tooltip and aria-describedby attributes of an html link.
+     * @return string to add to the tooltip and aria-label attributes of an html link.
      * @throws coding_exception
      */
     private function get_regdates_tooltip_info($session) {
@@ -587,7 +587,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                         $tooltip = '';
                     }
                     $signuptext = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
-                    $signuplink .= html_writer::link($signupurl, get_string($signuptext, 'facetoface'), array('title' => $tooltip, 'aria-describedby' => $tooltip));
+                    $signuplink .= html_writer::link($signupurl, get_string($signuptext, 'facetoface'), array('title' => $tooltip, 'aria-label' => $tooltip));
                 } else if ($registrationclosed == true) {
                     // Registration has closed for this session.
                     if ($regdatestooltip) {
@@ -596,7 +596,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                         $tooltip = get_string('registrationclosed', 'facetoface');
                     }
                     $signuplink .= html_writer::span(get_string('signupunavailable', 'facetoface'), '',
-                        array('title' => $tooltip, 'aria-describedby' => $tooltip));
+                        array('title' => $tooltip, 'aria-label' => $tooltip));
                 } else {
                     // Registration date not yet reached.
                     if ($regdatestooltip) {
@@ -605,7 +605,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                         $tooltip = get_string('registrationnotopen', 'facetoface');
                     }
                     $signuplink .= html_writer::span(get_string('signupunavailable', 'facetoface'), '',
-                        array('title' => $tooltip, 'aria-describedby' => $tooltip));
+                        array('title' => $tooltip, 'aria-label' => $tooltip));
                 }
             }
         }
