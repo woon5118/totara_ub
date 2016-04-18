@@ -80,10 +80,11 @@ class enrol_totara_facetoface_session_order_by_time_testcase extends advanced_te
         $enrolablesessions = $totara_facetoface->get_enrolable_sessions($course->id, null, $facetoface->id);
 
         foreach ($sessions as $session) {
-            // Enrolable sessions don't need info about assets.
-            if (isset($session->sessiondates[0]->assetids)) {
-                unset($session->sessiondates[0]->assetids);
+            // Enrolable sessions don't need info about assets, just add it to compare all other values.
+            if (count($enrolablesessions[$session->id]->sessiondates)) {
+                $enrolablesessions[$session->id]->sessiondates[0]->assetids = null;
             }
+
             $this->assertEquals($session->sessiondates, $enrolablesessions[$session->id]->sessiondates);
         }
     }
