@@ -273,7 +273,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             if ($session->availablesignupnote && $signupnote) {
                 $signupstatus = facetoface_get_attendee($session->id, $USER->id);
                 $signupdata = new stdClass();
-                $signupdata->id = $signupstatus->statusid;
+                $signupdata->id = $signupstatus->submissionid;
                 $signupdata->customfield_signupnote = $signupnote;
                 customfield_save_data($signupdata, 'facetofacesignup', 'facetoface_signup');
             }
@@ -383,6 +383,11 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 $signupparams['notificationtype'] = $notificationtype;
                 $signupparams['autoenrol'] = false;
                 $signupnote = empty($fromform->{'signupnote' . $sid}) ? '' : $fromform->{'signupnote' . $sid};
+
+                if (empty($signupnote)) {
+                    // If this method was called by a signup for an individual session, the signup note may not have an attached $sid.
+                    $signupnote = empty($fromform->customfield_signupnote) ? '' : $fromform->customfield_signupnote;
+                }
 
                 // Selected position choice.
                 if (!empty($fromform->{'selectedposition_' . $session->facetoface})) {
