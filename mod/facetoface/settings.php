@@ -194,7 +194,7 @@ if ($ADMIN->fulltree) {
 }
 
 $customfieldurl = new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacesession'));
-$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacecustomfields', new lang_string('customfieldsheading','facetoface'), $customfieldurl, 'mod/facetoface:managecustomfield', 'totara/core:modconfig'));
+$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacecustomfields', new lang_string('customfieldsheading','facetoface'), $customfieldurl, 'mod/facetoface:managecustomfield'));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacetemplates', new lang_string('notificationtemplates','facetoface'), "$CFG->wwwroot/mod/facetoface/notification/template/index.php", 'totara/core:modconfig'));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacerooms', new lang_string('rooms','facetoface'), "$CFG->wwwroot/mod/facetoface/room/manage.php", 'totara/core:modconfig'));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofaceassets', new lang_string('assets','facetoface'), "$CFG->wwwroot/mod/facetoface/asset/manage.php", 'totara/core:modconfig'));
