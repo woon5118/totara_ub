@@ -65,9 +65,7 @@ class rb_source_certification_overview extends rb_source_program_overview {
     protected function define_joinlist() {
         $joinlist = parent::define_joinlist();
 
-        /**
-         * Overridden in certifications overview to limit coursesets to certifpaths.
-         * Psuedo Explaination:
+        /* Psuedo Explaination:
          *
          * if (window is open) {
          *      Use current record
@@ -82,27 +80,20 @@ class rb_source_certification_overview extends rb_source_program_overview {
         $now = time();
         $path = CERTIFPATH_CERT;
         $joinlist[] = new rb_join(
-            'courseset_fields',
-            'LEFT',
-            "(SELECT pc.programid as programid, pc.id as coursesetid, c.id as courseid, c.shortname as courseshortname,
-                     cat.id as catid, cat.idnumber as catidnum, cat.name as catname, pc.certifpath as certifpath
-                FROM {prog_courseset} pc
-                LEFT JOIN {prog_courseset_course} pcc ON pcc.coursesetid = pc.id
-                LEFT JOIN {course} c ON pcc.courseid = c.id
-                LEFT JOIN {course_categories} cat ON c.category = cat.id
-                ORDER BY pc.sortorder, pcc.id
-            )",
-            "courseset_fields.programid = base.programid
-             AND base.coursesetid = 0
-             AND (
-                 (certif_completion.timewindowopens < {$now} AND courseset_fields.certifpath = certif_completion.certifpath)
-              OR (certif_completion.timewindowopens > {$now} AND history.certifpath IS NOT NULL AND courseset_fields.certifpath = history.certifpath)
-              OR (certif_completion.timewindowopens > {$now} AND history.certifpath IS NULL AND courseset_fields.certifpath = {$path})
-             )",
+            'prog_courseset',
+            'INNER',
+            '{prog_courseset}',
+            "prog_courseset.programid = base.programid
+            AND base.coursesetid = 0
+            AND (
+                   (certif_completion.timewindowopens < {$now} AND prog_courseset.certifpath = certif_completion.certifpath)
+                OR (certif_completion.timewindowopens > {$now} AND history.certifpath IS NOT NULL AND prog_courseset.certifpath = history.certifpath)
+                OR (certif_completion.timewindowopens > {$now} AND history.certifpath IS NULL AND prog_courseset.certifpath = {$path})
+            )
+            ",
             REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            array('certif_completion', 'history')
+            array('base', 'certif_completion', 'history')
         );
-
 
         $joinlist[] = new rb_join(
             'certif_completion',
@@ -246,13 +237,47 @@ class rb_source_certification_overview extends rb_source_program_overview {
             'certif_completion',
             'progress',
             get_string('programcompletionprogress', 'rb_source_program_overview'),
-            $DB->sql_concat_join("'|'", array('courseset_fields.coursesetid', 'prog_completion.status')),
+            $DB->sql_concat_join("'|'", array(sql_cast2char('prog_courseset.id'), sql_cast2char("prog_completion.status"))),
             array(
-                'displayfunc' => 'program_completion_progress',
+                'extrafields' => array(
+                    'completion' => "certif_completion.timecompleted",
+                    'window' => "certif_completion.timewindowopens",
+                    'histpath' => "history.certifpath",
+                    'histcomp' => "history.timecompleted",
+                ),
+                'displayfunc' => 'certif_completion_progress',
                 'grouping' => 'comma_list',
-                'joins' => array('courseset_fields', 'prog_completion'),
+                'joins' => array('prog_completion', 'certif_completion', 'history'),
                 'nosort' => true,
             )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'course',
+            'shortname',
+            get_string('courseshortname', 'rb_source_program_overview'),
+            'COALESCE('.$DB->sql_concat('course.id', "'|'", 'course.shortname', "'\n'").', \'-\')',
+            array(
+                'joins' => 'course',
+                'grouping' => 'list_nodelimiter',
+                'displayfunc' => 'list_to_newline_coursename',
+                'style' => array('white-space' => 'pre'),
+            )
+
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'course',
+            'status',
+            get_string('coursecompletionstatus', 'rb_source_program_overview'),
+            sql_cast2char('COALESCE(course_completions.status, '.COMPLETION_STATUS_NOTYETSTARTED.')'),
+            array(
+                'joins' => 'course_completions',
+                'grouping' => 'comma_list',
+                'displayfunc' => 'course_completion_status',
+                'style' => array('white-space' => 'pre'),
+            )
+
         );
 
         return $columnoptions;
