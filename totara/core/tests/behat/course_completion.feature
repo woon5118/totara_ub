@@ -106,7 +106,6 @@ Feature: Users completion of courses
     And I press "Continue"
     And I click on "My Reports" in the totara menu
     And I click on "Historic Completions Report" "link"
-    And I pause
     Then I should not see "Course 1"
     And I should see "Course 2"
     And I should see "No" in the "Course 2" "table_row"
