@@ -154,10 +154,12 @@ $string['forcecompleted'] = 'Force completed';
 $string['forcecompleted_help'] = 'If enabled, the status of the current attempt is forced to "completed". (Only applicable to SCORM 1.2 packages.)';
 $string['forcecompleteddesc'] = 'This preference sets the default value for the force completed setting';
 $string['forcenewattempt'] = 'Force new attempt';
-$string['forcenewattempt_help'] = 'This setting hides the "Start new attempt" checkbox and prevents review mode.
+$string['forcenewattempt_help'] = 'If "yes", hides the "Start new attempt" checkbox and prevents review mode.
 
-SCORM allows a student to return to the same attempt at any point and a new attempt is not possible unless the previous attempt has been set as "completed", "passed" or "failed". If the SCORM package does not do this, the student will always re-enter the same attempt.';
-$string['forcenewattemptdesc'] = 'This setting hides the "Start new attempt" checkbox and prevents review mode. SCORM allows a student to return to the same attempt at any point and a new attempt is not possible unless the previous attempt has been set as "completed", "passed" or "failed". If the SCORM package does not do this, the student will always re-enter the same attempt.';
+If "no": SCORM allows a student to return to the same attempt at any point and a new attempt is not possible unless the previous attempt has been set as "completed", "passed" or "failed". If the SCORM package does not do this, the student will always re-enter the same attempt.
+
+An attempt is not complete until the "cmi.core.lesson_status" for the attempt is set to either "completed" or "passed". After that, the Start new attempt checkbox is available to the learner.';
+$string['forcenewattemptdesc'] = 'This setting hides the "Start new attempt" checkbox and prevents review mode. SCORM allows a student to return to the same attempt at any point and a new attempt is not possible unless the previous attempt has been set as "completed", "passed" or "failed". If the SCORM package does not do this, the student will always re-enter the same attempt. An attempt is not complete until the "cmi.core.lesson_status" for the attempt is set to either "completed" or "passed". After that, the Start new attempt checkbox is available to the learner.';
 $string['forcejavascript'] = 'Force users to enable JavaScript';
 $string['forcejavascript_desc'] = 'If enabled (recommended) this prevents access to SCORM objects when JavaScript is not supported/enabled in a users browser. If disabled the user may view the SCORM but API communication will fail and no grade information will be saved.';
 $string['forcejavascriptmessage'] = 'JavaScript is required to view this object, please enable JavaScript in your browser and try again.';
