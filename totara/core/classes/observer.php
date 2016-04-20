@@ -174,7 +174,9 @@ class totara_core_observer {
         $eventdata = new stdClass();
         $eventdata->criteriatype = COMPLETION_CRITERIA_TYPE_COURSE;
         $eventdata->courseinstance = $data['courseid'];
-        $eventdata->userid = $data['userid'];
+        // The id for the user that completed the course is in 'relateduserid'.
+        // The value for 'userid' may only be the person who created the completion (e.g. an admin marking complete).
+        $eventdata->userid = $data['relateduserid'];
         $eventdata->timecompleted = time();
 
         $criteria = completion_criteria::factory((array)$eventdata);
@@ -209,7 +211,10 @@ class totara_core_observer {
                 $data['timecompleted'] = $eventdata->timecompleted;
             }
 
-            $completion = new completion_criteria_completion($data);
+            // We need to use the DATA_OBJECT_FETCH_BY_KEY to ensure it finds a record
+            // with matching values for the unique columns (criteriaid, userid, course)
+            // regardless of whether the timecompleted matches or not.
+            $completion = new completion_criteria_completion($data, DATA_OBJECT_FETCH_BY_KEY);
 
             // Review and mark complete if necessary.
             $criterion->review($completion);

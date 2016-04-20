@@ -71,6 +71,40 @@ class core_completion_generator extends component_generator_base {
     }
 
     /**
+     * Sets one or more courses as criteria for completion of another course.
+     *
+     * @param stdClass $course - the course that we are setting completion criteria for.
+     * @param int[] $criteriacourseids - array of course ids to be completion criteria.
+     * @param int $aggregationmethod - COMPLETION_AGGREGATION_ALL or COMPLETION_AGGREGATION_ANY.
+     * @return void.
+     */
+    public function set_course_criteria_course_completion($course, $criteriacourseids, $aggregationmethod = COMPLETION_AGGREGATION_ALL) {
+        global $CFG;
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_course.php');
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria.php');
+
+        if (!empty($criteriacourseids)) {
+            $data = new stdClass();
+            $data->id = $course->id;
+            $data->criteria_course_value = $criteriacourseids;
+
+            // Set completion criteria course.
+            $criterion = new completion_criteria_course();
+            $criterion->update_config($data);
+
+            // Handle course aggregation.
+            $aggdata = array(
+                'course'        => $data->id,
+                'criteriatype'  => COMPLETION_CRITERIA_TYPE_COURSE
+            );
+
+            $aggregation = new completion_aggregation($aggdata);
+            $aggregation->setMethod($aggregationmethod);
+            $aggregation->save();
+        }
+    }
+
+    /**
      * Enable completion tracking for this course.
      *
      * @param object $course
@@ -84,5 +118,23 @@ class core_completion_generator extends component_generator_base {
         $course->completionstartonenrol = 1;
         $course->completionprogressonview = 1;
         update_course($course);
+    }
+
+    /**
+     * Complete a course as a user at a given time.
+     *
+     * @param stdClass $course - the course to complete.
+     * @param stdClass $user - the user completing the course.
+     * @param int|null $time - timestamp for completion time. If null, will use current time.
+     */
+    public function complete_course($course, $user, $time = null) {
+        if (!isset($time)) {
+            $time = time();
+        }
+        $coursecompletion = new completion_completion(array(
+            'course' => $course->id,
+            'userid' => $user->id
+        ));
+        $coursecompletion->mark_complete($time);
     }
 }

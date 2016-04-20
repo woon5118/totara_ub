@@ -109,7 +109,7 @@ class completion_criteria_course extends completion_criteria {
     /**
      * Review this criteria and decide if the user has completed
      *
-     * @param completion_completion $completion The user's completion record
+     * @param completion_criteria_completion $completion The user's completion record
      * @param bool $mark Optionally set false to not save changes to database
      * @return bool
      */
@@ -127,13 +127,17 @@ class completion_criteria_course extends completion_criteria {
             self::$courseinfocache[$this->courseinstance] = new completion_info($course);
             self::$courseinfocount++;
         }
+        /** @var completion_info $info */
         $info = self::$courseinfocache[$this->courseinstance];
 
         // If the course is complete
         if ($info->is_course_complete($completion->userid)) {
 
             if ($mark) {
-                $completion->mark_complete();
+                // TOTARA - Use the completion time of the course as completion time for this criteria.
+                // This may be done upstream if MDL-53532 is merged to moodle.
+                $cc = new completion_completion(array('userid' => $completion->userid, 'course' => $info->course_id));
+                $completion->mark_complete($cc->timecompleted);
             }
 
             return true;

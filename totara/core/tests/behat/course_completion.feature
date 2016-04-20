@@ -110,7 +110,6 @@ Feature: Users completion of courses
     And I should see "Course 2"
     And I should see "No" in the "Course 2" "table_row"
 
-
   @javascript
   Scenario: Test instant and re-aggregation of course completion using activity completion
     When I log in as "user001"
@@ -170,3 +169,24 @@ Feature: Users completion of courses
     And I click on "Record of Learning" in the totara menu
     Then I should see "Complete"
     And I should not see "In progress"
+
+  @javascript
+  Scenario: Test completion of another course criteria when admin completes for learner
+    When the following "course enrolments" exist:
+      | user    | course | role    |
+      | user002 | C2     | student |
+    And I log in as "user002"
+    And I click on "Record of Learning" in the totara menu
+    Then I should not see "Complete" in the "Course 1" "table_row"
+    And I should not see "In progress" in the "Course 2" "table_row"
+    And I log out
+    When I log in as "admin"
+    And I click on "Find Learning" in the totara menu
+    And I click on "Course 1" "link"
+    And I navigate to "Course completion" node in "Course administration > Reports"
+    And I complete the course via rpl for "fn_002 ln_002" with text "Test 1"
+    And I log out
+    And I log in as "user002"
+    And I click on "Record of Learning" in the totara menu
+    Then I should see "Complete" in the "Course 1" "table_row"
+    And I should see "In progress" in the "Course 2" "table_row"
