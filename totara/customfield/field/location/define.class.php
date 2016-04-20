@@ -127,10 +127,6 @@ class customfield_define_location extends customfield_define_base {
             )
         );
         $form->setType($formprefix . 'address', PARAM_TEXT);
-        if (!$fielddefinition) {
-            // Default address is not required, but the address is required when the field is used.
-            $form->addRule($formprefix . 'address', null, 'required', null, 'client');
-        }
 
         // Size elements.
         $radiogroupmapsize = array();
@@ -145,9 +141,6 @@ class customfield_define_location extends customfield_define_base {
         );
         // Give it an appropriate default.
         $form->setDefault($formprefix . 'size', GMAP_SIZE_MEDIUM);
-        if (!$fielddefinition) {
-            $form->addRule($formprefix . 'size', null, 'required', null, 'client');
-        }
 
         // View elements.
         $radiogroupmapview = array();
@@ -161,9 +154,6 @@ class customfield_define_location extends customfield_define_base {
             false
         );
         $form->setDefault($formprefix . 'view', GMAP_VIEW_MAP);
-        if (!$fielddefinition) {
-            $form->addRule($formprefix . 'view', null, 'required', null, 'client');
-        }
 
         // Display elements.
         $radiogroupdisplay = array();
@@ -177,9 +167,6 @@ class customfield_define_location extends customfield_define_base {
             false
         );
         $form->setDefault($formprefix . 'display', GMAP_DISPLAY_MAP_AND_ADDRESS);
-        if (!$fielddefinition) {
-            $form->addRule($formprefix . 'display', null, 'required', null, 'client');
-        }
 
         $form->addElement('html', html_writer::start_div('mapaddresslookup'));
 

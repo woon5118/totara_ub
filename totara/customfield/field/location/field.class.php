@@ -40,7 +40,7 @@ class customfield_location extends customfield_base {
 
     public function edit_field_set_required(&$mform) {
         if ($this->is_required()) {
-            return;
+            $mform->addRule($this->inputname . 'address', get_string('err_required', 'form'), 'required', null, 'client');
         }
     }
 
