@@ -4121,5 +4121,14 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016031102, 'facetoface');
     }
 
+    if ($oldversion < 2016042700) {
+        // Cleanup settings after manageremail removal.
+        unset_config('facetoface_addchangemanageremail');
+        unset_config('facetoface_manageraddressformat');
+        unset_config('facetoface_manageraddressformatreadable');
+
+        upgrade_mod_savepoint(true, 2016042700, 'facetoface');
+    }
+
     return $result;
 }
