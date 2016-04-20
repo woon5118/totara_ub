@@ -82,7 +82,7 @@ class writer extends tabexport_writer {
         $count = 0;
         foreach ($this->source as $record_data) {
             $count++;
-            $tablehtml .= '<tr>';
+            $tablehtml .= '<tr style="page-break-inside: avoid;">'; // Workaround for https://github.com/wkhtmltopdf/wkhtmltopdf/issues/1524
             foreach($record_data as $value) {
                 $tablehtml .= '<td>' . str_replace("\n", '<br />', s($value)) . '</td>';
             }
