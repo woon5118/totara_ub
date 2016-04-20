@@ -182,6 +182,21 @@ function xmldb_facetoface_install() {
 
     facetoface_create_signup_cancellation_customfield_notes();
 
+    // Make sure the upgrade from TL-6962 doesn't run on already fixed data.
+    $configparams = array(
+        'plugin' => 'facetoface',
+        'name' => 'upgrade_customfieldmigration_signup',
+        'value' => 'done',
+    );
+    $DB->insert_record('config_plugins', $configparams);
+
+    $configparams = array(
+        'plugin' => 'facetoface',
+        'name' => 'upgrade_customfieldmigration_cancellation',
+        'value' => 'done',
+    );
+    $DB->insert_record('config_plugins', $configparams);
+
     facetoface_create_room_customfields();
 }
 
