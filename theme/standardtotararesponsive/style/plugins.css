@@ -22,24 +22,24 @@
         width: 100%;
     }
 
-    .stagetitle {
+    .appraisal-stagetitle {
         width: 24%;
     }
-    .stageinfo {
+    .appraisal-stageinfo {
         width: 74%;
     }
-    .dir-ltr .stageinfo {
+    .dir-ltr .appraisal-stageinfo {
         margin: 0 2% 0 0;
     }
-    .dir-rtl .stageinfo {
+    .dir-rtl .appraisal-stageinfo {
         margin: 0 0 0 2%;
     }
 
-    .stageactions {
+    .appraisal-stageactions {
         width: 100%;
     }
 
-    .stageactions .link-as-button {
+    .appraisal-stageactions .link-as-button {
         margin: 0 0 0 5px;
     }
 

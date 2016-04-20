@@ -263,39 +263,39 @@ li.yui3-dd-draggable {
     float: right;
 }
 
-.stagelist {
+.appraisal-stagelist {
     clear: both;
     margin: 15px 0;
 }
 
-.stagetitle {
+.appraisal-stagetitle {
     width: 19%;
 }
 
-.stageinfo {
+.appraisal-stageinfo {
     width: 65%;
     margin: 0 1%;
 }
 
-.stageinfo p {
+.appraisal-stageinfo p {
   margin: 0;
 }
 
-.stageinfo h4 + p {
+.appraisal-stageinfo h4 + p {
   margin-bottom: 10px;
 }
 
-.stageactions {
+.appraisal-stageactions {
     width: 14%;
 }
-.dir-ltr .stageactions > * {
+.dir-ltr .appraisal-stageactions > * {
     float: right;
 }
-.dir-rtl .stageactions > * {
+.dir-rtl .appraisal-stageactions > * {
     float: left;
 }
 
-.stageactions .link-as-button {
+.appraisal-stageactions .link-as-button {
   display: inline-block;
   margin: 5px;
   padding: 4px 0;
@@ -303,7 +303,7 @@ li.yui3-dd-draggable {
   text-align: center;
 }
 
-.stageactions input[type="submit"] {
+.appraisal-stageactions input[type="submit"] {
   width: 120px;
 }
 
@@ -435,7 +435,7 @@ form.print-stages-form .fitem .fitemtitle {
         font-family: "DejaVu Sans";
     }
 
-    .stagetitle h3 {
+    .appraisal-stagetitle h3 {
         margin: 10px 0 5px 0;
     }
 

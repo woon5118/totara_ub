@@ -911,7 +911,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             // Get the list of question types that are supported. We'll ignore if
             // they're disabled in case the feature was enabled when it was added.
             $questtypes = question_manager::get_registered_elements(false);
-            
+
             foreach ($quests as $quest) {
                 $question = new appraisal_question($quest->id);
                 $posuplink = $posdownlink = '';
@@ -1496,7 +1496,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $title .= html_writer::tag('div', get_string('completebydate', 'totara_appraisal',
                     userdate($stage->timedue, get_string('strftimedate', 'langconfig'))));
         }
-        $stagetitle = html_writer::tag('div', $title, array('class' => 'stagetitle'));
+        $stagetitle = html_writer::tag('div', $title, array('class' => 'appraisal-stagetitle'));
 
         // Info block (in middle).
         $info = '';
@@ -1566,7 +1566,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $lines .= $icon . $rolecomplete . '<br>';
         }
         $info .= html_writer::tag('div', $lines);
-        $stageinfo = html_writer::tag('div', $info, array('class' => 'stageinfo'));
+        $stageinfo = html_writer::tag('div', $info, array('class' => 'appraisal-stageinfo'));
 
         return html_writer::tag('div', $stagetitle . $stageinfo . $actions, array('class' => 'appraisal-stage '.$stagestatus));
     }
@@ -1619,7 +1619,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             }
         }
 
-        return html_writer::tag('div', $action, array('class' => 'stageactions'));
+        return html_writer::tag('div', $action, array('class' => 'appraisal-stageactions'));
     }
 
 
@@ -1660,7 +1660,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         }
         $actions .= $this->output->render($completestagebutton);
 
-        return html_writer::tag('div', $actions, array('class' => 'stageactions'));
+        return html_writer::tag('div', $actions, array('class' => 'appraisal-stageactions'));
     }
 
 
@@ -1696,7 +1696,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             return $out . get_string('nostages', 'totara_appraisal');
         }
 
-        $out .= html_writer::start_tag('div', array('class' => 'stagelist'));
+        $out .= html_writer::start_tag('div', array('class' => 'appraisal-stagelist'));
 
         // If appropriate display the missing roles warning above the stages.
         if ($userassignment->status == appraisal::STATUS_ACTIVE) {
