@@ -32,6 +32,7 @@ require_once($CFG->libdir.'/formslib.php');
 class feedback_edit_add_question_form extends moodleform {
     public function definition() {
         $mform = $this->_form;
+        $mform->disable_form_change_checker();
 
         //headline
         $mform->addElement('header', 'general', get_string('content'));
