@@ -1331,6 +1331,9 @@ abstract class enrol_plugin {
                 remove_temp_course_roles($context);
             }
         }
+
+        $cache = cache::make('core', 'coursecontacts');
+        $cache->delete($courseid);
     }
 
     /**
@@ -1410,6 +1413,9 @@ abstract class enrol_plugin {
             unset($USER->enrol['tempguest'][$courseid]);
             remove_temp_course_roles($context);
         }
+
+        $cache = cache::make('core', 'coursecontacts');
+        $cache->delete($courseid);
     }
 
     /**
@@ -1479,6 +1485,9 @@ abstract class enrol_plugin {
         require_once($CFG->libdir . '/coursecatlib.php');
         coursecat::user_enrolment_changed($instance->courseid, $ue->userid,
                 $ue->status, $ue->timestart, $ue->timeend);
+
+        $cache = cache::make('core', 'coursecontacts');
+        $cache->delete($instance->courseid);
     }
 
     /**
@@ -1574,6 +1583,9 @@ abstract class enrol_plugin {
                 remove_temp_course_roles($context);
             }
         }
+
+        $cache = cache::make('core', 'coursecontacts');
+        $cache->delete($courseid);
     }
 
     /**
@@ -1685,6 +1697,9 @@ abstract class enrol_plugin {
 
         // Reset all enrol caches.
         $context->mark_dirty();
+
+        $cache = cache::make('core', 'coursecontacts');
+        $cache->delete($courseid);
     }
 
 
