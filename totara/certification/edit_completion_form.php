@@ -151,13 +151,15 @@ class certif_edit_completion_form extends moodleform {
             get_string('completiontimeexpires', 'totara_certification'),
             get_string('completiondatenotapplicable', 'totara_program'));
 
+        $activeperiod = explode(' ', $certification->activeperiod);
         $mform->addElement('static', 'certificationactiveperiod',
             get_string('completioncertificationactiveperiod', 'totara_certification'),
-            $certification->activeperiod);
+            get_string('period' . $activeperiod[1] . 's', 'totara_certification', $activeperiod[0]));
 
+        $windowperiod = explode(' ', $certification->windowperiod);
         $mform->addElement('static', 'certificationwindowperiod',
             get_string('completioncertificationwindowperiod', 'totara_certification'),
-            $certification->windowperiod);
+            get_string('period' . $windowperiod[1] . 's', 'totara_certification', $windowperiod[0]));
 
         $mform->addElement('html',
             html_writer::tag('div', '', array('id' => 'preapparentactiveperiod', 'class' => 'hidden'))
