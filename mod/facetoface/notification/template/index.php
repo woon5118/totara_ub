@@ -78,6 +78,14 @@ if ($delete) {
 
     $DB->delete_records('facetoface_notification_tpl', array('id' => $delete));
 
+    // Delete the cached data checking for notifications with deprecated placeholders.
+    $cacheoptions = array(
+        'simplekeys' => true,
+        'simpledata' => true
+    );
+    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_facetoface', 'notificationtpl', array(), $cacheoptions);
+    $cache->delete('oldnotifications');
+
     totara_set_notification(get_string('notificationtemplatedeleted', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
 }
 
@@ -124,7 +132,13 @@ $str_deactivate = get_string('deactivate', 'facetoface');
 
 $url = new moodle_url('/admin/settings.php', array('section' => 'modsettingfacetoface'));
 
+// Check for old placeholders.
+$oldnotifcations = facetoface_notification_get_templates_with_old_placeholders();
+
 echo $OUTPUT->header();
+if (!empty($oldnotifcations)) {
+    echo $OUTPUT->notification(get_string('templatesoldplaceholders', 'facetoface'), 'notifynotice');
+}
 echo $OUTPUT->heading(get_string('managenotificationtemplates', 'facetoface'));
 
 $columns = array();
@@ -167,7 +181,14 @@ foreach ($notification_templates as $note_templ) {
     $buttons = array();
     $rowclass = '';
 
-    $row[] = $note_templ->title;
+    $title = '';
+    if (in_array($note_templ->id, $oldnotifcations)) {
+        // This template is one that was found to contain a deprecated placeholder.
+        $warningicon = new pix_icon('i/warning', get_string('templatecontainsoldplaceholders', 'facetoface'));
+        $title .= $OUTPUT->render($warningicon).' ';
+    }
+    $title .= clean_text($note_templ->title);
+    $row[] = $title;
 
     if ($note_templ->status == 1) {
         $status = get_string('active');

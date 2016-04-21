@@ -773,6 +773,9 @@ $string['placeholder:sessions:loopstart'] = '[#sessions]';
 $string['placeholder:room:name'] = '[session:room:name]';
 $string['placeholder:room:customfield'] = '[session:room:cf_{$a->shortname}]';
 $string['placeholder:room:link'] = '[session:room:link]';
+$string['placeholder:location'] = '[session:location]';
+$string['placeholder:venue'] = '[session:venue]';
+$string['placeholder:room'] = '[session:room]';
 $string['placeholder:skype'] = '[skype]';
 $string['placeholder:timezone'] = '[timezone]';
 $string['placeholder:url'] = '[url]';
@@ -1263,23 +1266,13 @@ Location: [session:room:cf_location]
 $string['setting:defaultdatetimechangesubject'] = 'Default subject line for date/time change emails.';
 $string['setting:defaultdatetimechangesubject_caption'] = 'Date/time change subject';
 $string['setting:defaultregistrationexpiredsubjectdefault'] = 'Face-to-face registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
-$string['setting:defaultregistrationexpiredmessagedefault'] = 'The registration period for the following session has been closed:
+$string['setting:defaultregistrationexpiredinstrmngr'] = '
+*** Advice only ****
 
-Course: [coursename]
+This is to advise that [firstname] [lastname] has been sent the following email and you are listed as their Team Leader / Manager.
 
-Face-to-face: [facetofacename]
+If you are not their Team Leader / Manager and believe you have received this email by mistake please reply to this email.
 
-Duration: [duration]
-
-Date(s):
-
-[alldates]
-
-Location: [session:location]
-
-Venue: [session:venue]
-
-Room: [session:room]
 ';
 $string['setting:defaultregistrationexpiredmessagedefault_v9'] = 'The registration period for the following session has been closed:
 
@@ -1780,8 +1773,10 @@ $string['templateadminrequest'] = 'Booking admin request';
 $string['templateallreservationcancel'] = 'All reservations cancelled';
 $string['templatecancellation'] = 'Cancellation';
 $string['templateconfirmation'] = 'Booking request confirmation';
+$string['templatecontainsoldplaceholders'] = 'This template contains a deprecated placeholder';
 $string['templatedecline'] = 'Booking request declined';
 $string['templatemanagerrequest'] = 'Booking manager request';
+$string['templatesoldplaceholders'] = 'Some templates contain deprecated placeholders. Please review the templates marked with a warning icon and update where necessary.';
 $string['templatereminder'] = 'Reminder';
 $string['templatereservationcancel'] = 'Reservation cancelled';
 $string['templaterolerequest'] = 'Booking role request';

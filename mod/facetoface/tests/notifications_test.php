@@ -669,4 +669,304 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
 
         $this->assertEquals($expectedmsg, $replacedmsg);
     }
+
+    /**
+     * Tests the function facetoface_notification_substitute_deprecated_placeholders, ensuring that the values within
+     * the 'location' and 'building' custom fields are substituted where the [session:location]
+     * and [session:venue] placeholders are found.
+     */
+    public function test_facetoface_notification_substitute_deprecated_placeholders_with_customfield_values() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        // We'll use the server timezone otherwise this test will fail in some parts of the world and not others.
+        $timezone = core_date::get_server_timezone();
+
+        $times = $this->create_array_of_times();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        /** @var mod_facetoface_generator $facetofacegenerator */
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        /** @var totara_customfield_generator $customfieldgenerator */
+        $customfieldgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
+
+        $locationfieldid = $DB->get_field('facetoface_room_info_field', 'id', array('shortname' => 'location'));
+        $buildingfieldid = $DB->get_field('facetoface_room_info_field', 'id', array('shortname' => 'building'));
+
+        $facetofacedata = array(
+            'name' => 'facetoface',
+            'course' => $course->id
+        );
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+
+        // Create a room to add to a session date. Ideally this would use an existing function rather than
+        // a direct db insert - none exists while writing this test.
+        $room1 = new stdClass();
+        $room1->name = 'Room One';
+        $room1->capacity = 20;
+        $room1->timemodified = time();
+        $room1->timecreated = $room1->timemodified;
+        $room1->id = $DB->insert_record('facetoface_room', $room1);
+
+        $customfieldgenerator->set_location_address($room1, $locationfieldid, '150 Willis Street', 'facetofaceroom', 'facetoface_room');
+        $customfieldgenerator->set_text($room1, $buildingfieldid, 'Building One', 'facetofaceroom', 'facetoface_room');
+
+        // Create a room to add to a session date. Ideally this would use an existing function rather than
+        // a direct db insert - none exists while writing this test.
+        $room2 = new stdClass();
+        $room2->name = 'Room Two';
+        $room2->capacity = 20;
+        $room2->timemodified = time();
+        $room2->timecreated = $room2->timemodified;
+        $room2->id = $DB->insert_record('facetoface_room', $room2);
+
+        $sessiondate1 = new stdClass();
+        $sessiondate1->sessiontimezone = $timezone;
+        $sessiondate1->timestart = $times['start1'];
+        $sessiondate1->timefinish = $times['end1'];
+        $sessiondate1->roomid = $room1->id;
+        $sessiondate1->assetids = array();
+
+        $sessiondate2 = new stdClass();
+        $sessiondate2->sessiontimezone = $timezone;
+        $sessiondate2->timestart = $times['start2'];
+        $sessiondate2->timefinish = $times['end2'];
+        $sessiondate2->roomid = $room2->id;
+        $sessiondate2->assetids = array();
+
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate1, $sessiondate2),
+            'mincapacity' => '1',
+            'cutoff' => DAYSECS - 60
+        );
+
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+
+        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
+        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $rooms = facetoface_get_session_rooms($session->id);
+        $roomcustomfields = array();
+        foreach($rooms as $room) {
+            $roomcustomfields[$room->id] = customfield_get_data($room, 'facetoface_room', 'facetofaceroom', false);
+        }
+
+        $msg = "Using the old deprecated subsitutions ";
+        $msg .= "Room name: [session:room] ";
+        $msg .= "Building name: [session:venue]. ";
+        $msg .= "Location: [session:location]. ";
+        $msg .= "Those are all the details.";
+
+        $replacedmsg = facetoface_notification_substitute_deprecated_placeholders($msg, $session, $rooms, $roomcustomfields);
+
+        $expectedmsg = "Using the old deprecated subsitutions ";
+        $expectedmsg .= "Room name: Room One ";
+        $expectedmsg .= "Building name: Building One. ";
+        $expectedmsg .= "Location: 150 Willis Street. ";
+        $expectedmsg .= "Those are all the details.";
+
+        $this->assertEquals($expectedmsg, $replacedmsg);
+    }
+
+    /**
+     * Tests the function facetoface_notification_substitute_deprecated_placeholders where there are no values for
+     * the 'location' and 'building' custom fields.  In these cases, the [session:location] and
+     * [session:venue] placeholders should be replaced with empty strings.
+     */
+    public function test_facetoface_notification_substitute_deprecated_placeholders_with_customfields_empty() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        // We'll use the server timezone otherwise this test will fail in some parts of the world and not others.
+        $timezone = core_date::get_server_timezone();
+
+        $times = $this->create_array_of_times();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        /** @var mod_facetoface_generator $facetofacegenerator */
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        /** @var totara_customfield_generator $customfieldgenerator */
+        $customfieldgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
+
+        $facetofacedata = array(
+            'name' => 'facetoface',
+            'course' => $course->id
+        );
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+
+        // Create a room to add to a session date. Ideally this would use an existing function rather than
+        // a direct db insert - none exists while writing this test.
+        $room1 = new stdClass();
+        $room1->name = 'Room One';
+        $room1->capacity = 20;
+        $room1->timemodified = time();
+        $room1->timecreated = $room1->timemodified;
+        $room1->id = $DB->insert_record('facetoface_room', $room1);
+
+        // Create a room to add to a session date. Ideally this would use an existing function rather than
+        // a direct db insert - none exists while writing this test.
+        $room2 = new stdClass();
+        $room2->name = 'Room Two';
+        $room2->capacity = 20;
+        $room2->timemodified = time();
+        $room2->timecreated = $room2->timemodified;
+        $room2->id = $DB->insert_record('facetoface_room', $room2);
+
+        $sessiondate1 = new stdClass();
+        $sessiondate1->sessiontimezone = $timezone;
+        $sessiondate1->timestart = $times['start1'];
+        $sessiondate1->timefinish = $times['end1'];
+        $sessiondate1->roomid = $room1->id;
+        $sessiondate1->assetids = array();
+
+        $sessiondate2 = new stdClass();
+        $sessiondate2->sessiontimezone = $timezone;
+        $sessiondate2->timestart = $times['start2'];
+        $sessiondate2->timefinish = $times['end2'];
+        $sessiondate2->roomid = $room2->id;
+        $sessiondate2->assetids = array();
+
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate1, $sessiondate2),
+            'mincapacity' => '1',
+            'cutoff' => DAYSECS - 60
+        );
+
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+
+        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
+        $session->sessiondates = facetoface_get_session_dates($session->id);
+        $rooms = facetoface_get_session_rooms($session->id);
+        $roomcustomfields = array();
+        foreach($rooms as $room) {
+            $roomcustomfields[$room->id] = customfield_get_data($room, 'facetoface_room', 'facetofaceroom', false);
+        }
+
+        $msg = "Using the old deprecated subsitutions ";
+        $msg .= "Room name: [session:room] ";
+        $msg .= "Building name: [session:venue]. ";
+        $msg .= "Location: [session:location]. ";
+        $msg .= "Those are all the details.";
+
+        $replacedmsg = facetoface_notification_substitute_deprecated_placeholders($msg, $session, $rooms, $roomcustomfields);
+
+        $expectedmsg = "Using the old deprecated subsitutions ";
+        $expectedmsg .= "Room name: Room One ";
+        $expectedmsg .= "Building name: . ";
+        $expectedmsg .= "Location: . ";
+        $expectedmsg .= "Those are all the details.";
+
+        $this->assertEquals($expectedmsg, $replacedmsg);
+    }
+
+    /**
+     * Tests the output of facetoface_get_default_notifications.
+     */
+    public function test_facetoface_get_default_notifications() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course();
+
+        /** @var mod_facetoface_generator $facetofacegenerator */
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface',
+            'course' => $course->id
+        );
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+
+        list($notifications, $missing) = facetoface_get_default_notifications($facetoface->id);
+
+        // Get templates.
+        $templaterecords = $DB->get_records('facetoface_notification_tpl');
+
+        // There should be no missing notifications.
+        $this->assertEmpty($missing);
+
+        // The number of default notifications should equal the number of templates.
+        $this->assertEquals(count($templaterecords), count($notifications));
+    }
+
+    /**
+     * Tests values returned by facetoface_notification_get_templates_with_old_placeholders.
+     */
+    public function test_facetoface_notification_get_templates_with_old_placeholders() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        $oldnotifications = facetoface_notification_get_templates_with_old_placeholders();
+        // There should be no oldplaceholders in templates on a newly installed 9.0 site.
+        // We expect an empty array, rather than false or null.
+        $this->assertEquals(array(), $oldnotifications);
+
+        // A template with the placeholder in the title.
+        $newtemplate1 = new stdClass();
+        $newtemplate1->title = 'Sometitle with an old placeholder [session:location] ...';
+        $newtemplate1->body = 'A body with a new placeholder [session:room:location] ...';
+        $newtemplate1->managerprefix = 'A managerprefix with a new placeholder [session:room:link] ...';
+        $newtemplate1->status = 1;
+        $newtemplate1->id = $DB->insert_record('facetoface_notification_tpl', $newtemplate1);
+
+        // A template with the placeholder in the body.
+        $newtemplate2 = new stdClass();
+        $newtemplate2->title = 'Sometitle with an no placeholders';
+        $newtemplate2->body = 'A body with a new placeholder [session:venue] ...';
+        $newtemplate2->managerprefix = null; // Managerprefix field can be null.
+        $newtemplate2->status = 1;
+        $newtemplate2->id = $DB->insert_record('facetoface_notification_tpl', $newtemplate2);
+
+        // A template with the placeholder in the managerprefix.
+        $newtemplate3 = new stdClass();
+        $newtemplate3->title = 'Sometitle with a new placeholder [session:room:name] ...';
+        $newtemplate3->body = 'A body with no placeholders ...';
+        $newtemplate3->managerprefix = 'A managerprefix with two old placeholders [session:room] and [alldates]...';
+        $newtemplate3->status = 1;
+        $newtemplate3->id = $DB->insert_record('facetoface_notification_tpl', $newtemplate3);
+
+        // Another new template with no old placeholders.
+        $newtemplate4 = new stdClass();
+        $newtemplate4->title = 'Sometitle with a new placeholder [session:room:location] ...';
+        $newtemplate4->body = 'A body with a placeholders that works before and after 9.0 [startdate] ...';
+        $newtemplate4->managerprefix = 'A managerprefix with no placeholders...';
+        $newtemplate4->status = 1;
+        $newtemplate4->id = $DB->insert_record('facetoface_notification_tpl', $newtemplate4);
+
+        // Let's edit an existing template to include an old placeholder.
+        $existingtemplate = $DB->get_record('facetoface_notification_tpl', array('reference' => 'confirmation'));
+        $existingtemplate->body = 'Overwriting the body with a message the includes an old template [session:room] ...';
+        $DB->update_record('facetoface_notification_tpl', $existingtemplate);
+
+        // We need to clear the cache.
+        $cacheoptions = array(
+            'simplekeys' => true,
+            'simpledata' => true
+        );
+        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_facetoface', 'notificationtpl', array(), $cacheoptions);
+        $cache->delete('oldnotifications');
+
+        $oldnotifications = facetoface_notification_get_templates_with_old_placeholders();
+
+        $expected = array(
+            $newtemplate1->id,
+            $newtemplate2->id,
+            $newtemplate3->id,
+            $existingtemplate->id
+        );
+
+        // Order does not matter. Sorting both should set the orders in each to be the same.
+        sort($expected);
+        sort($oldnotifications);
+        $this->assertEquals($expected, $oldnotifications);
+    }
 }

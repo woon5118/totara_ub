@@ -3868,15 +3868,15 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
             // Prepare the common strings.
             $title = get_string('setting:defaultregistrationexpiredsubjectdefault', 'facetoface');
-            $body = text_to_html(get_string('setting:defaultregistrationexpiredmessagedefault', 'facetoface'));
+            $body = text_to_html(get_string('setting:defaultregistrationexpiredmessagedefault_v9', 'facetoface'));
 
             // Add the template.
             $tpl_expired = new stdClass();
             $tpl_expired->reference = 'registrationexpired';
             $tpl_expired->status = 1;
             $tpl_expired->title = $title;
-            $tpl_expired->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
-            $tpl_expired->managerprefix = $body;
+            $tpl_expired->body = $body;
+            $tpl_expired->managerprefix = text_to_html(get_string('setting:defaultregistrationexpiredinstrmngr', 'facetoface'));
             $templateid = $DB->insert_record('facetoface_notification_tpl', $tpl_expired, true);
 
             // Add the noticifations to existing facetoface activities.

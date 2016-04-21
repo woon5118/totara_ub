@@ -1505,6 +1505,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
             $roomcustomfields[$room->id] = customfield_get_data($room, 'facetoface_room', 'facetofaceroom', false);
         }
         $msg = facetoface_notification_loop_session_placeholders($msg, $data, $rooms, $roomcustomfields);
+        $msg = facetoface_notification_substitute_deprecated_placeholders($msg, $data, $rooms, $roomcustomfields);
     }
 
     if (empty($data->details)) {
@@ -1556,7 +1557,9 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
  *
  * @param string $msg - the string for the notification.
  * @param stdClass $session - an object that includes the sessiondates and also room data if that's necessary.
- * @param array $rooms - array of room objects, including any custom fields.
+ * @param array $rooms - array of room objects
+ * @param array $roomcustomfields - array of room custom fields values with room->id as keys,
+ * and for the values: customfield arrays of the format ['shortname' => value].
  * @return string the message with the looped replacements added.
  */
 function facetoface_notification_loop_session_placeholders($msg, $session, $rooms = array(), $roomcustomfields = array()) {
@@ -1764,6 +1767,62 @@ function facetoface_message_substitutions_userfields($msg, $user) {
             $msg = str_replace('[user:'.$field->shortname.']', $value, $msg);
         }
     }
+
+    return $msg;
+}
+
+/**
+ * Substitute values for placeholders that are deprecated since 9.0.
+ *
+ * These placeholders were deprecated when rooms were changed from per-session to per-sessiondate.
+ * Because they may have been left in some notifications, the will subsitute in values for the room
+ * corresponding to the first session date.
+ *
+ * Properties in $session that may be required are:
+ * $session->sessiondates
+ *
+ * @param string $msg - the string for the notification.
+ * @param stdClass $session - an object that includes the sessiondates and also room data if that's necessary.
+ * @param array $rooms - array of room objects
+ * @param array $roomcustomfields - array of room custom fields values with room->id as keys,
+ * and for the values: customfield arrays of the format ['shortname' => value].
+ * @return string the message with the looped replacements added.
+ */
+function facetoface_notification_substitute_deprecated_placeholders($msg, $session, $rooms = array(), $roomcustomfields = array()) {
+
+    $roomcf = false;
+    $roomnamevalue = '';
+    $locationvalue = '';
+    $venuevalue = '';
+
+    // Reset returns the first value in the sessiondates array.
+    $firstsessiondate = reset($session->sessiondates);
+    if (!empty($firstsessiondate->roomid) && isset($rooms[$firstsessiondate->roomid])) {
+        $room = $rooms[$firstsessiondate->roomid];
+        if (isset($room->name)) {
+            $roomnamevalue = $room->name;
+        }
+        if (isset($roomcustomfields[$firstsessiondate->roomid])) {
+            $roomcf = $roomcustomfields[$firstsessiondate->roomid];
+        }
+    }
+
+    if (isset($roomcf['location'])) {
+        $locationvalue = $roomcf['location'];
+    }
+
+    if (isset($roomcf['building'])) {
+        $venuevalue = $roomcf['building'];
+    }
+
+    // Get the deprecated placeholders.
+    $roomnameplaceholder = get_string('placeholder:room', 'facetoface');
+    $locationplaceholder = get_string('placeholder:location', 'facetoface');
+    $venueplaceholder = get_string('placeholder:venue', 'facetoface');
+
+    $msg = str_replace($roomnameplaceholder, $roomnamevalue, $msg);
+    $msg = str_replace($locationplaceholder, $locationvalue, $msg);
+    $msg = str_replace($venueplaceholder, $venuevalue, $msg);
 
     return $msg;
 }
@@ -2234,10 +2293,74 @@ function facetoface_get_default_notifications($facetofaceid) {
         $registrationexpired->body = $template->body;
         $registrationexpired->conditiontype = MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED;
         $registrationexpired->templateid = $template->id;
-        $notifications[MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED] = $registrationexpired;
+        $notifications[MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED] = $registrationexpired;
     } else {
         $missingtemplates[] = 'registrationexpired';
     }
 
     return array($notifications, $missingtemplates);
+}
+
+/**
+ * Used when loading the list of facetoface notification templates.
+ *
+ * This will search the title, body and managerprefix of all notification templates for uses of the
+ * placeholders that were deprecated in 9.0.
+ *
+ * @return array containing the ids of any notifications with old placeholders. Will be an empty array if none found.
+ * @throws coding_exception
+ */
+function facetoface_notification_get_templates_with_old_placeholders() {
+    global $DB;
+
+    $cacheoptions = array(
+        'simplekeys' => true,
+        'simpledata' => true
+    );
+    $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_facetoface', 'notificationtpl', array(), $cacheoptions);
+    $oldnotifcations = $cache->get('oldnotifications');
+
+    if ($oldnotifcations !== false) {
+        return $oldnotifcations;
+    }
+
+    $oldplaceholderroom = '%'.get_string('placeholder:room', 'facetoface').'%';
+    $oldplaceholdervenue = '%'.get_string('placeholder:venue', 'facetoface').'%';
+    $oldplaceholderlocation = '%'.get_string('placeholder:location', 'facetoface').'%';
+    $oldplaceholderalldates = '%'.get_string('placeholder:alldates', 'facetoface').'%';
+
+    $sql = 'SELECT id
+              FROM {facetoface_notification_tpl}
+             WHERE ' . $DB->sql_like('title', ':titleroom') .
+              ' OR ' . $DB->sql_like('title', ':titlevenue') .
+              ' OR ' . $DB->sql_like('title', ':titlelocation') .
+              ' OR ' . $DB->sql_like('title', ':titlealldates') .
+              ' OR ' . $DB->sql_like('body', ':bodyroom') .
+              ' OR ' . $DB->sql_like('body', ':bodyvenue') .
+              ' OR ' . $DB->sql_like('body', ':bodylocation') .
+              ' OR ' . $DB->sql_like('body', ':bodyalldates') .
+              ' OR ' . $DB->sql_like('managerprefix', ':managerprefixroom') .
+              ' OR ' . $DB->sql_like('managerprefix', ':managerprefixvenue') .
+              ' OR ' . $DB->sql_like('managerprefix', ':managerprefixlocation') .
+              ' OR ' . $DB->sql_like('managerprefix', ':managerprefixalldates');
+
+    $params = array(
+        'titleroom' => $oldplaceholderroom,
+        'titlevenue' => $oldplaceholdervenue,
+        'titlelocation' => $oldplaceholderlocation,
+        'titlealldates' => $oldplaceholderalldates,
+        'bodyroom' => $oldplaceholderroom,
+        'bodyvenue' => $oldplaceholdervenue,
+        'bodylocation' => $oldplaceholderlocation,
+        'bodyalldates' => $oldplaceholderalldates,
+        'managerprefixroom' => $oldplaceholderroom,
+        'managerprefixvenue' => $oldplaceholdervenue,
+        'managerprefixlocation' => $oldplaceholderlocation,
+        'managerprefixalldates' => $oldplaceholderalldates,
+    );
+
+    $oldnotifcations = $DB->get_fieldset_sql($sql, $params);
+    $cache->set('oldnotifications', $oldnotifcations);
+
+    return $oldnotifcations;
 }
