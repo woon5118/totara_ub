@@ -232,7 +232,7 @@ class totaralib_test extends advanced_testcase {
         // This object is equivalent to what might be returned from a form using get_data().
         $moduleinfo = new stdClass();
         $moduleinfo->course = $course->id;
-        $moduleinfo->coursemodule = $quiz->id;
+        $moduleinfo->coursemodule = $quiz->cmid;
         $moduleinfo->modulename = $quiz->name;
         $moduleinfo->instance = $cminfo->instance;
         $moduleinfo->completionunlocked = 1;
@@ -292,7 +292,7 @@ class totaralib_test extends advanced_testcase {
         // This object is equivalent to what might be returned from a form using $mform->get_data().
         $moduleinfo = new stdClass();
         $moduleinfo->course = $course->id;
-        $moduleinfo->coursemodule = $quiz->id;
+        $moduleinfo->coursemodule = $quiz->cmid;
         $moduleinfo->modulename = $quiz->name;
         $moduleinfo->instance = $cminfo->instance;
         $moduleinfo->completionunlocked = 1;
@@ -355,7 +355,7 @@ class totaralib_test extends advanced_testcase {
         // This object is equivalent to what might be returned from a form using $mform->get_data().
         $moduleinfo = new stdClass();
         $moduleinfo->course = $course->id;
-        $moduleinfo->coursemodule = $quiz->id;
+        $moduleinfo->coursemodule = $quiz->cmid;
         $moduleinfo->modulename = $quiz->name;
         $moduleinfo->instance = $cminfo->instance;
         $moduleinfo->completionunlocked = 0; // Not unlocking completions.
@@ -369,7 +369,7 @@ class totaralib_test extends advanced_testcase {
 
         $moduleinfo = new stdClass();
         $moduleinfo->course = $course->id;
-        $moduleinfo->coursemodule = $quiz->id;
+        $moduleinfo->coursemodule = $quiz->cmid;
         $moduleinfo->modulename = $quiz->name;
         $moduleinfo->instance = $cminfo->instance;
         $moduleinfo->completionunlocked = 1; // Unlocking completions.
@@ -383,7 +383,7 @@ class totaralib_test extends advanced_testcase {
 
         $moduleinfo = new stdClass();
         $moduleinfo->course = $course->id;
-        $moduleinfo->coursemodule = $quiz->id;
+        $moduleinfo->coursemodule = $quiz->cmid;
         $moduleinfo->modulename = $quiz->name;
         $moduleinfo->instance = $cminfo->instance;
         $moduleinfo->completionunlocked = 1; // Unlocking completions.

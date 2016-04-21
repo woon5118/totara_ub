@@ -152,7 +152,7 @@ class totara_cohort_organisation_profile_field_checkbox_testcase extends advance
             array(0) // Checked.
         );
         $this->assertTrue($DB->record_exists('cohort_rules', array('rulesetid' => $this->ruleset)));
-        $sql = "SELECT count(crp.*)
+        $sql = "SELECT count('x')
                   FROM {cohort_rule_params} crp
                   JOIN {cohort_rules} cr ON cr.id = crp.ruleid
                  WHERE cr.rulesetid = :rulesetid";
@@ -179,7 +179,7 @@ class totara_cohort_organisation_profile_field_checkbox_testcase extends advance
             array(1) // Unchecked.
         );
         $this->assertTrue($DB->record_exists('cohort_rules', array('rulesetid' => $this->ruleset)));
-        $sql = "SELECT count(crp.*)
+        $sql = "SELECT count('x')
                   FROM {cohort_rule_params} crp
                   JOIN {cohort_rules} cr ON cr.id = crp.ruleid
                  WHERE cr.rulesetid = :rulesetid";

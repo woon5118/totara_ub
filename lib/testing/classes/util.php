@@ -425,15 +425,6 @@ abstract class testing_util {
      * @return int The value the sequence should be set to.
      */
     private static function get_next_sequence_starting_value($records, $table) {
-        // TODO: TL-6666 we are not there yet.
-        if (empty($records)) {
-            return 1;
-        } else {
-            $lastrecord = end($records);
-            return $lastrecord->id + 1;
-        }
-        // End of Totara hack.
-
         if (isset(self::$tablesequences[$table])) {
             return self::$tablesequences[$table];
         }

@@ -92,7 +92,7 @@ class coursecompletionimport_testcase extends advanced_testcase {
         // Set up a dummy completion.
         $completiondata = new stdClass();
         $completiondata->userid = $this->user1->id;
-        $completiondata->course = 2;
+        $completiondata->course = $this->course1->id;
         $completiondata->timeenrolled = time();
         $completiondata->timestarted = time();
         $completiondata->timecompleted = time();
