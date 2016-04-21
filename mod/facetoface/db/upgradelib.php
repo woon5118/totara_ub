@@ -33,47 +33,75 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Helper function to aid in the migration of signup custom field data.
  *
+ * $CFG->facetoface_customfield_migration_behaviour is used to determine behaviour.
+ * If facetoface_customfield_migration_behaviour is not set then this will map the last non-empty data as the users current data.
+ * Alternatively facetoface_customfield_migration_behaviour can be set to "latest" in which case the latest record regardless of
+ * whether it is empty or not is restored.
+ *
  * @param moodle_database $db
  * @param database_manager $dbman
- * @param xmldb_table $table
- * @param string $temptablename The name to use for the temporary table.
+ * @param string $tablename The name of the data table.
  * @param string $field The name of the field that is used as the id reference on the table.
- * @param string $where Where claus to limit the signup status selection if need be.
  */
-function mod_facetoface_migrate_session_signup_customdata(moodle_database $db, database_manager $dbman, xmldb_table $table, $temptablename, $field, $where) {
-    // Here we need to change the reference id for all facetoface custom field data records in a given table.
-    // Because this involves all records we are going to use the following process to make this change.
-    //
-    //  1. Rename the data table to a temporary name
-    //  2. Create a new data table
-    //  3. Copy data from the temp table to the new data table fixing it along the way.
-    //  4. Delete temp table
-    //
-    // This essentially only takes the data we want and drops the redundant data from the system as we no longer
-    // want to keep it.
+function mod_facetoface_migrate_session_signup_customdata(moodle_database $db, database_manager $dbman, $tablename, $field) {
+    global $CFG;
 
-    $dbman->rename_table($table, $temptablename);
-    // We don't care to check if the table exists, if it does then the above failed and the upgrade has failed.
-    // They will need to reset and try again.
-    $dbman->create_table($table);
+    $temptable = new xmldb_table('facetoface_migration_temp');
+    $temptable->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $temptable->add_field('signupid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $temptable->add_field('statusid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
 
-    // It may take the database some time to execute this next step.
-    upgrade_set_timeout();
+    $dbman->create_table($temptable);
 
-    $sql = 'INSERT INTO {'.$table->getName().'}
-                            (data, fieldid, '.$field.')
-                     SELECT fsit.data, fsit.fieldid, fss.signupid
-                       FROM {'.$temptablename.'} fsit
-                       JOIN (
-                          SELECT MAX(id) AS statusid, signupid
-                            FROM {facetoface_signups_status}
-                           WHERE '.$where.'
-                        GROUP BY signupid
-                       ) fss ON fss.statusid = fsit.'.$field;
+    if ($field === 'facetofacecancellationid') {
+        $comparison = '=';
+    } else {
+        $comparison = '<>';
+    }
 
-    /** @var moodle_database $DB */
+    $transaction = $db->start_delegated_transaction();
+
+    // Populate the mapping table.
+    if (isset($CFG->facetoface_customfield_migration_behaviour) && $CFG->facetoface_customfield_migration_behaviour === 'latest') {
+        $sql = "INSERT INTO {facetoface_migration_temp} (dataid, statusid, signupid)
+                     SELECT d.id, ss.statusid, ss.signupid
+                       FROM {{$tablename}} d
+                       JOIN (SELECT MAX(s.id) AS statusid, s.signupid
+                                FROM {facetoface_signups_status} s
+                               WHERE s.statuscode {$comparison} 10
+                            GROUP BY s.signupid
+                            ) ss ON ss.statusid = d.{$field}";
+        $db->execute($sql);
+    } else {
+        $sql = "INSERT INTO {facetoface_migration_temp} (dataid, statusid, signupid)
+                     SELECT d.id, ss.statusid, ss.signupid
+                       FROM {{$tablename}} d
+                       JOIN (SELECT MAX(s.id) AS statusid, s.signupid
+                                FROM {facetoface_signups_status} s
+                                JOIN {{$tablename}} t ON t.{$field} = s.id
+                               WHERE s.statuscode {$comparison} 10 AND t.data <> ''
+                            GROUP BY s.signupid
+                            ) ss ON ss.statusid = d.{$field}";
+        $db->execute($sql);
+    }
+
+    // First drop all redundant rows, if we try the update before this then we bust the null constraint for rows that
+    // will be redundant.
+    $sql = "DELETE FROM {{$tablename}}
+                  WHERE id NOT IN (
+                      SELECT dataid
+                        FROM {facetoface_migration_temp})";
     $db->execute($sql);
 
-    $temptable = new xmldb_table($temptablename);
+    // Now update the rows that remain to point to the signupid rather than the statusid.
+    $sql = "UPDATE {{$tablename}}
+               SET {$field} = (
+                    SELECT signupid
+                      FROM {facetoface_migration_temp}
+                     WHERE {facetoface_migration_temp}.dataid = {{$tablename}}.id)";
+    $db->execute($sql);
+
+    $transaction->allow_commit();
+
     $dbman->drop_table($temptable);
 }
