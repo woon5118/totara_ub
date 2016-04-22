@@ -214,7 +214,7 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         $completion_completion->mark_complete(time() - DAYSECS);
 
         // Verify timecomplete for the certification is not null.
-        $certification = $DB->get_record('certif_completion', array('id' => $this->program->certifid, 'userid' => $this->user1->id));
+        $certification = $DB->get_record('certif_completion', array('certifid' => $this->program->certifid, 'userid' => $this->user1->id));
         $this->assertNotNull($certification->timecompleted, 'Time completed is NULL');
 
         // Run the cron.
