@@ -152,7 +152,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
                 var name = 'bulkaddvalidation';
                 var buttons = {};
                 buttons[tstr.closebuttontitle] = function () {
-                    handler._cancel()
+                    handler._cancel();
                 };
                 totaraDialogs[name] = new totaraDialog(
                     name,

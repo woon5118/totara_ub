@@ -46,7 +46,7 @@ define(['core/config', 'core/str'], function (mdlcfg, mdlstrings) {
 
                 var buttonObj = {};
                 buttonObj[tstr.save] = function() { handler._dialog.hide(); };
-                buttonObj[tstr.cancel] = function() { handler._cancel() };
+                buttonObj[tstr.cancel] = function() { handler._cancel(); };
 
                 totaraDialogs[name] = new totaraDialog(
                     'related',

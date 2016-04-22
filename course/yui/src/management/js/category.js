@@ -194,7 +194,7 @@ Category.prototype = {
         });
         if (window.right_to_left()) {
             action.one('img').setAttrs({
-                src : M.util.image_url('t/collapsed_rtl', 'moodle'),
+                src : M.util.image_url('t/collapsed_rtl', 'moodle')
             });
         }
         if (ul) {
