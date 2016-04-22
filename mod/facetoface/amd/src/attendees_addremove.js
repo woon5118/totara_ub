@@ -37,7 +37,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
             // Click on "add" button will move selected users from potential to existing.
             $('#add').click(function(evt) {
                 evt.preventDefault();
-                $selected = $('#addselect').find("option:selected");
+                var $selected = $('#addselect').find("option:selected");
                 // Move to existing.
                 $selected.each(function(_i, elem) {
                     var insidx = 0;
@@ -61,7 +61,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
             // Click on "remove" button will move selected users from potential to existing.
             $('#remove').click(function(evt) {
                 evt.preventDefault();
-                $selected = $('#removeselect').find("option:selected");
+                var $selected = $('#removeselect').find("option:selected");
                 // Move to potential.
                 $selected.each(function(_i, elem) {
                     var insidx = 0;
