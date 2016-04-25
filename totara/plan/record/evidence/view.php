@@ -83,7 +83,8 @@ if ($url) {
 }
 $indexurl = new moodle_url('/totara/plan/record/evidence/index.php', array('userid' => $userid));
 $PAGE->navbar->add($strheading, $indexurl);
-$PAGE->navbar->add(get_string('allevidence', 'totara_plan'));
+$PAGE->navbar->add(get_string('allevidence', 'totara_plan'), new moodle_url('/totara/plan/record/evidence/index.php', array('userid' => $userid)));
+$PAGE->navbar->add(get_string('evidenceview', 'totara_plan'));
 
 $PAGE->set_title($strheading);
 $PAGE->set_heading(format_string($SITE->fullname));
@@ -95,9 +96,6 @@ echo $OUTPUT->container_start('', 'dp-plan-content');
 echo $OUTPUT->heading($strheading);
 
 dp_print_rol_tabs(null, 'evidence', $userid);
-
-echo html_writer::tag('p', $OUTPUT->action_link($indexurl,
-        get_string('backtoallx', 'totara_plan', get_string('evidenceplural', 'totara_plan'))));
 
 echo display_evidence_detail($evidenceid);
 

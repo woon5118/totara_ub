@@ -201,8 +201,6 @@ $string['autocompleteplantext'] = 'Automatically set approved plans to complete 
 $string['autocreated'] = 'Automatically created plans';
 $string['automateddefault'] = 'Automatic (added to plan)';
 $string['awaitingapproval'] = 'Awaiting approval';
-$string['backtoallx'] = '&laquo; Back to all {$a}';
-$string['backtoitem'] = '&laquo; Back to {$a}';
 $string['baddata'] = 'Supplied bad data - non numeric id';
 $string['basicworkflowdesc'] = 'Similar to the manager driven workflow, but with some options disabled to simplify the interface.';
 $string['basicworkflowname'] = 'Basic workflow';
@@ -256,6 +254,7 @@ $string['competencyname'] = 'Competency Name';
 $string['competencypermissions'] = 'Competency permissions';
 $string['competencyplural'] = 'Competencies';
 $string['competencysettings'] = 'Competency settings';
+$string['competencyview'] = 'View competency {$a}';
 $string['complete'] = 'Complete';
 $string['completed'] = 'Completed';
 $string['completedcertifications'] = 'Certifications';
@@ -588,6 +587,7 @@ $string['evidencetypes'] = 'Evidence types';
 $string['evidencetypeupdated'] = 'Evidence type "{$a}" updated';
 $string['evidencetypex'] = 'Evidence type "{$a}"';
 $string['evidenceupdated'] = 'Evidence updated';
+$string['evidenceview'] = 'View Evidence';
 $string['evidencecustomfields'] = 'Evidence custom fields';
 $string['explainobjscalevals'] = 'One value per line (highest to lowest)';
 $string['explainpriorityscalevals'] = 'One priority per line (highest to lowest)';
@@ -1042,3 +1042,11 @@ $string['xitemsunapproved'] = '<a href="{$a->uri}">{$a->number} {$a->name}</a>';
 $string['xslearningplans'] = '{$a}\'s Learning Plans';
 $string['youareviewingxsplan'] = '<strong>You are viewing <a href="{$a->site}/user/view.php?id={$a->userid}">{$a->name}\'s</a> plan.</strong>';
 $string['youareviewingxsplans'] = '<strong>You are viewing <a href="{$a->site}/user/view.php?id={$a->userid}">{$a->name}\'s</a> plans.</strong>';
+
+
+/*
+ * DEPRECATED
+ */
+
+$string['backtoallx'] = '&laquo; Back to all {$a}';
+$string['backtoitem'] = '&laquo; Back to {$a}';

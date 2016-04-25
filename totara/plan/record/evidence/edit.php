@@ -88,8 +88,6 @@ if ($USER->id == $userid) {
 }
 
 $indexurl = new moodle_url('/totara/plan/record/evidence/index.php', array('userid' => $userid));
-$backlink = html_writer::tag('p', $OUTPUT->action_link($indexurl,
-        get_string('backtoallx', 'totara_plan', get_string("evidenceplural", 'totara_plan'))));
 
 if (!empty($evidenceid) || $deleteflag) {
     if ($deleteflag) {
@@ -217,13 +215,11 @@ switch($action){
     case 'add':
     case 'edit':
         echo $OUTPUT->heading(get_string($action . 'evidence', 'totara_plan'));
-        echo $backlink;
         $mform->display();
         break;
 
     case 'delete':
         echo $OUTPUT->heading(get_string($action . 'evidence', 'totara_plan'));
-        echo $backlink;
         echo display_evidence_detail($item->id, true);
         $params = array('id' => $item->id, 'userid'=>$userid, 'd' => '1', 'delete' => '1', 'sesskey' => sesskey());
         $deleteurl = new moodle_url('/totara/plan/record/evidence/edit.php', $params);
