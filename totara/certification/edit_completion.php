@@ -227,7 +227,7 @@ if (!isset($editform) || empty($confirm)) {
           FROM {prog_completion_log} pcl
           LEFT JOIN {user} usr ON usr.id = pcl.changeuserid
          WHERE (pcl.userid = :userid OR pcl.userid IS NULL) AND pcl.programid = :programid
-         ORDER BY pcl.timemodified DESC";
+         ORDER BY pcl.id DESC";
     $transactions = $DB->get_records_sql($sql, array('userid' => $userid, 'programid' => $id));
 
     foreach ($history as $certcomplhistory) {

@@ -63,11 +63,11 @@ $exceptions = $DB->get_records('prog_exception', array('programid' => $id, 'user
 $history = $DB->get_records('prog_completion_history',
     array('userid' => $userid, 'programid' => $id), 'timecompleted DESC');
 
-$sql = "SELECT pcl.timemodified, pcl.changeuserid, pcl.description, " . get_all_user_name_fields(true, 'usr') . "
+$sql = "SELECT pcl.id, pcl.timemodified, pcl.changeuserid, pcl.description, " . get_all_user_name_fields(true, 'usr') . "
           FROM {prog_completion_log} pcl
           LEFT JOIN {user} usr ON usr.id = pcl.changeuserid
          WHERE (pcl.userid = :userid OR pcl.userid IS NULL) AND pcl.programid = :programid
-         ORDER BY pcl.timemodified DESC";
+         ORDER BY pcl.id DESC";
 $transactions = $DB->get_records_sql($sql, array('userid' => $userid, 'programid' => $id));
 
 if ($progcompletion && empty($exceptions)) {
