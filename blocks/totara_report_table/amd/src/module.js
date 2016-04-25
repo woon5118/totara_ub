@@ -55,7 +55,8 @@ define(['jquery', 'core/config'], function ($, mdlconfig) {
 
                     // Add the wait icon if it is not already attached to the clicked item.
                     if ($(e.target).siblings('.instantreportwait').length === 0) {
-                        var splash = '<div class="instantreportwait"><img src="' + M.util.image_url('waitbig', 'totara_reportbuilder') +
+                        var splash = '<div class="instantreportwait"><img src="' +
+                                M.util.image_url('waitbig', 'totara_reportbuilder') +
                                 '"/></div>',
                             $splash = $(splash).insertBefore($(e.target).parent().children().last()),
                             $content = $('.block_totara_report_table.' + uniqueid + ' .content .rb-display-table-container'),
@@ -133,7 +134,8 @@ define(['jquery', 'core/config'], function ($, mdlconfig) {
                         savedListControl.find('option').remove();
 
                         // Add the new options.
-                        savedListControl.append('<option value="">' + M.util.get_string('allavailabledata', 'block_totara_report_table') + '</option>');
+                        savedListControl.append('<option value="">' +
+                            M.util.get_string('allavailabledata', 'block_totara_report_table') + '</option>');
 
                         for (var i in data) {
                             savedListControl.append('<option value="' + i + '">' + data[i] + '</option>');
