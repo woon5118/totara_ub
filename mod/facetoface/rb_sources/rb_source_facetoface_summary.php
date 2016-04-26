@@ -288,11 +288,11 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 'facetoface',
                 'duration',
                 get_string('duration', 'rb_source_facetoface_summary'),
-                'sessions.duration',
+                '(base.timefinish-base.timestart)/' . MINSECS,
                 array(
                     'joins' => 'sessions',
-                    'dbdatatype' => 'integer',
-                    'displayfunc' => 'duration'
+                    'dbdatatype' => 'decimal',
+                    'displayfunc' => 'duration_hours_minutes'
                 )
             ),
             new rb_column_option(

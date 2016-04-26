@@ -1461,18 +1461,18 @@ abstract class rb_base_source {
         return format_time($seconds);
     }
 
-    // convert an integer number of minutes into a
-    // formatted duration (e.g. 90 mins => 1h 30m)
+    /**
+     * Convert an integer number of minutes into a
+     * formatted duration (e.g. 90 mins => 1h 30m).
+     *
+     * @deprecated Since 9.0
+     * @param $mins
+     * @param $row
+     * @return mixed
+     */
     function rb_display_hours_minutes($mins, $row) {
-        if ($mins === null or $mins === '') {
-            return '';
-        } else {
-            $totalminutes = abs((int) $mins);
-            $hours = floor($totalminutes / 60);
-            $minutes = $totalminutes - ($hours * 60);
-            $a = (object)array('hours' => $hours, 'minutes' => $minutes);
-            return get_string('xhxm', 'facetoface', $a);
-        }
+        debugging('The hours_minutes report builder display function has been deprecated and replaced by totara_reportbuilder\rb\display\duration_hours_minutes', DEBUG_DEVELOPER);
+        return $mins;
     }
 
     // convert a 2 digit country code into the country name

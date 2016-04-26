@@ -230,16 +230,11 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'session',
                 'duration',
                 get_string('sessduration', 'rb_source_facetoface_signin'),
-                'CASE WHEN sessiondate.timestart IS NOT NULL
-                    THEN
-                        (sessiondate.timefinish-sessiondate.timestart)/' . MINSECS . '
-                    ELSE
-                        0
-                    END',
+                '(sessiondate.timefinish-sessiondate.timestart)/' . MINSECS,
                 array(
                     'joins' => array('sessiondate','sessions'),
                     'dbdatatype' => 'decimal',
-                    'displayfunc' => 'hours_minutes',
+                    'displayfunc' => 'duration_hours_minutes',
                 )
             ),
             new rb_column_option(

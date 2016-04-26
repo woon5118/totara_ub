@@ -264,16 +264,11 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'session',
                 'duration',
                 get_string('sessduration', 'rb_source_facetoface_sessions'),
-                'CASE WHEN sessiondate.timestart > 0
-                    THEN
-                        (sessiondate.timefinish-sessiondate.timestart)/' . MINSECS . '
-                    ELSE
-                        sessions.duration/' . MINSECS . '
-                    END',
+                '(sessiondate.timefinish-sessiondate.timestart)/' . MINSECS,
                 array(
                     'joins' => array('sessiondate','sessions'),
                     'dbdatatype' => 'decimal',
-                    'displayfunc' => 'hours_minutes',
+                    'displayfunc' => 'duration_hours_minutes',
                 )
             ),
             new rb_column_option(

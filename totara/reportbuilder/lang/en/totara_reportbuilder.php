@@ -220,6 +220,7 @@ $string['deletereport'] = 'Report Deleted';
 $string['deletescheduledreport'] = 'Delete scheduled report?';
 $string['descending'] = 'Descending (Z to A, 9 to 1)';
 $string['disabled'] = 'Disabled?';
+$string['duration_hours_minutes'] = '{$a->hours}h {$a->minutes}m';
 $string['editingsavedsearch'] = 'Editing saved search';
 $string['editreport'] = 'Edit Report \'{$a}\'';
 $string['editrestriction'] = 'Edit restriction \'{$a}\'';
