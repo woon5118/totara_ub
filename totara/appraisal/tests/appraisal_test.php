@@ -391,7 +391,22 @@ class appraisal_test extends appraisal_testcase {
         $this->assertEquals(4, $count);
 
         // Remove one of the groups.
+        $assignedgroups = $assign->get_current_assigned_groups();
+        foreach ($assignedgroups as $assignedgroup) {
+            if ($assignedgroup->sourceid == $cohort->id) {
+                $assign->delete_assigned_group('cohort', $assignedgroup->assignedgroupid);
+            }
+        }
+
         $assign->delete_assigned_group('cohort', $cohort->id);
+
+        // Check appraisal is active, and total user assignments is 4.
+        $this->assertEquals(appraisal::STATUS_ACTIVE, $appraisal->status);
+        $count = $DB->count_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
+        $this->assertEquals(4, $count);
+        // All of them are still active.
+        $count = $DB->count_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id, 'status' => appraisal::STATUS_ACTIVE));
+        $this->assertEquals(4, $count);
 
         // Force user assignments update.
         $appraisal->check_assignment_changes();
@@ -403,7 +418,7 @@ class appraisal_test extends appraisal_testcase {
         // Only 2 user assignments should be active.
         $count = $DB->count_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id, 'status' => appraisal::STATUS_ACTIVE));
         $this->assertEquals(2, $count);
-        // There should be 2 closed user assignments, the removed 2.
+        // There should be 2 closed user assignments, the 2 from the removed group.
         $count = $DB->count_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id, 'status' => appraisal::STATUS_CLOSED));
         $this->assertEquals(2, $count);
     }
@@ -568,10 +583,14 @@ class appraisal_test extends appraisal_testcase {
         foreach ($userassignments as $aua) {
             $countrole = $DB->count_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $aua->id));
             $this->assertEquals(4, $countrole);
+
+            // Find the user assignment for user1.
+            if ($aua->userid == $user1->id) {
+                $userassig = $aua;
+            }
         }
 
         // But user1s role assignments should have the userid set to 0.
-        $userassig = $userassignments[1]->userid == $user1->id ? $userassignments[1] : $userassignments[2];
         $countrole = $DB->count_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $userassig->id, 'userid' => 0));
         $this->assertEquals(3, $countrole);
     }
@@ -694,10 +713,14 @@ class appraisal_test extends appraisal_testcase {
         foreach ($userassignments as $aua) {
             $countrole = $DB->count_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $aua->id));
             $this->assertEquals(4, $countrole);
+
+            // Find the user assignment for user1.
+            if ($aua->userid == $user1->id) {
+                $userassig = $aua;
+            }
         }
 
         // Check user1s role assignments have been swapped to the new users.
-        $userassig = $userassignments[1]->userid == $user1->id ? $userassignments[1] : $userassignments[2];
         $roles = $DB->get_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $userassig->id));
         foreach ($roles as $role) {
             switch ($role->appraisalrole) {
