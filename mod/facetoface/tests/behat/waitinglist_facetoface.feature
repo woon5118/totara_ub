@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara
-Feature: Face-to-face Manager approval of waiting list
+Feature: Seminar Manager approval of waiting list
   In order to control seminar attendance
   As a manager
   I need to authorise seminar signups
@@ -23,7 +23,7 @@ Feature: Face-to-face Manager approval of waiting list
       | student3 | C1     | student        |
 
     And I log in as "admin"
-    And I navigate to "Global settings" node in "Site administration > Face-to-face"
+    And I navigate to "Global settings" node in "Site administration > Seminar"
     And I set the following fields to these values:
       | Everyone on waiting list | Yes  |
     And I press "Save changes"
@@ -35,9 +35,9 @@ Feature: Face-to-face Manager approval of waiting list
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name              | Test facetoface name        |
-      | Description       | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name              | Test seminar name        |
+      | Description       | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -55,7 +55,7 @@ Feature: Face-to-face Manager approval of waiting list
     And I press "OK"
     And I set the following fields to these values:
       | capacity                       | 1    |
-      | Allow overbooking              | 1    |
+      | Enable waitlist                | 1    |
       | Send all bookings to the waiting list | 0    |
     And I press "Save changes"
     And I log out
@@ -91,7 +91,7 @@ Feature: Face-to-face Manager approval of waiting list
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "Test facetoface name"
+    And I follow "Test seminar name"
     And I follow "Attendees"
     Then I should see "Sam1 Student1"
     And I follow "Wait-list"

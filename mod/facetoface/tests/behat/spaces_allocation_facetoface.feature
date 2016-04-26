@@ -1,6 +1,6 @@
 @javascript @mod @mod_facetoface @totara
-Feature: Allocate spaces for team in face-to-face
-  In order to test Face to faces allocations
+Feature: Allocate spaces for team in seminar
+  In order to test seminar allocations
   As a site manager
   I need to allocate spaces for my team
 
@@ -45,12 +45,12 @@ Feature: Allocate spaces for team in face-to-face
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                                    | Test facetoface name        |
-      | Description                             | Test facetoface description |
-      | Allow multiple events signup per user   | 1                           |
-      | Allow manager reservations              | Yes                         |
-      | Maximum reservations                    | 10                          |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                                    | Test seminar name        |
+      | Description                             | Test seminar description |
+      | Users can sign-up to multiple sessions  | 1                        |
+      | Allow manager reservations              | Yes                      |
+      | Maximum reservations                    | 10                       |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"

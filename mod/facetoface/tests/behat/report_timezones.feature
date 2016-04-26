@@ -1,11 +1,11 @@
 @mod @mod_facetoface @totara
-Feature: Facetoface timezones in reports
+Feature: Seminar timezones in reports
   In order to no confuse users with timezones
   As an administrator
-  I need to be able to disable face-to-face timezones in report
+  I need to be able to disable seminar timezones in report
 
   @javascript
-  Scenario: Test timezones in facetoface sessions report
+  Scenario: Test timezones in seminar sessions report
     Given I am on a totara site
     And the following "users" exist:
       | username | firstname | lastname | email                |
@@ -23,10 +23,10 @@ Feature: Facetoface timezones in reports
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
-    And I follow "Test facetoface name"
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
+    And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -48,7 +48,7 @@ Feature: Facetoface timezones in reports
     And I click on "Select room" "link"
     And I click on "Create new room" "link"
     And I set the following fields to these values:
-      | Room name        | Room 1          |
+      | Name             | Room 1          |
       | id_roomcapacity  | 10              |
       | Building         | Building 123    |
       | Address          | 123 Tory street |
@@ -83,7 +83,7 @@ Feature: Facetoface timezones in reports
     And I click on "Select room" "link"
     And I click on "Create new room" "link"
     And I set the following fields to these values:
-      | Room name        | Room 2          |
+      | Name             | Room 2          |
       | id_roomcapacity  | 10              |
       | Building         | Building 123    |
       | Address          | 123 Tory street |
@@ -119,7 +119,7 @@ Feature: Facetoface timezones in reports
 
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "F2F sessions"
-    And I set the field "Source" to "Seminar Sign ups"
+    And I set the field "Source" to "Seminar Sign-ups"
     And I press "Create report"
     And I click on "Columns" "link" in the ".tabtree" "css_element"
     And I add the "Event Finish Time" column to the report
@@ -152,7 +152,7 @@ Feature: Facetoface timezones in reports
     And I should not see "1 January 2020"
 
   @javascript
-  Scenario: Test timezones in facetoface summary report
+  Scenario: Test timezones in seminar summary report
     Given I am on a totara site
     And the following "courses" exist:
       | fullname | shortname | category |
@@ -162,10 +162,10 @@ Feature: Facetoface timezones in reports
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface 1 name        |
-      | Description | Test facetoface 1 description |
-    And I follow "Test facetoface 1 name"
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar 1 name        |
+      | Description | Test seminar 1 description |
+    And I follow "Test seminar 1 name"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -186,10 +186,10 @@ Feature: Facetoface timezones in reports
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface 2 name        |
-      | Description | Test facetoface 2 description |
-    And I follow "Test facetoface 2 name"
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar 2 name        |
+      | Description | Test seminar 2 description |
+    And I follow "Test seminar 2 name"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -218,18 +218,18 @@ Feature: Facetoface timezones in reports
     And I add the "Session Start Date/Time" column to the report
 
     When I navigate to my "F2F summary" report
-    Then I should see "1 January 2020" in the "Test facetoface 1 name" "table_row"
-    And I should see "4 February 2021" in the "Test facetoface 2 name" "table_row"
-    And I should see "Europe/Prague" in the "Test facetoface 1 name" "table_row"
-    And I should see "Australia/Perth" in the "Test facetoface 2 name" "table_row"
+    Then I should see "1 January 2020" in the "Test seminar 1 name" "table_row"
+    And I should see "4 February 2021" in the "Test seminar 2 name" "table_row"
+    And I should see "Europe/Prague" in the "Test seminar 1 name" "table_row"
+    And I should see "Australia/Perth" in the "Test seminar 2 name" "table_row"
     And I should not see "2 January 2020"
 
     When I am on homepage
     And I set the following administration settings values:
       | facetoface_displaysessiontimezones | 0 |
     And I navigate to my "F2F summary" report
-    Then I should see "2 Jan 2020" in the "Test facetoface 1 name" "table_row"
-    And I should see "4 Feb 2021" in the "Test facetoface 2 name" "table_row"
+    Then I should see "2 Jan 2020" in the "Test seminar 1 name" "table_row"
+    And I should see "4 Feb 2021" in the "Test seminar 2 name" "table_row"
     And I should not see "Prague"
     And I should not see "Perth"
     And I should not see "1 January 2020"

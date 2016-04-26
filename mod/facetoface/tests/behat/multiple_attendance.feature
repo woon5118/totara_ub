@@ -1,6 +1,6 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Take attendance for a Face to face with multiple sessions
-  Ensure that the correct session is being used to mark activity completion when a face to face has multiple sessions
+Feature: Take attendance for a seminar with multiple sessions
+  Ensure that the correct session is being used to mark activity completion when a seminar has multiple sessions
   To test whether the old or new session date is the current completion date, we run cron, and the older date will expire,
   whereas the newer date will merely open the recert window.
 
@@ -17,29 +17,29 @@ Feature: Take attendance for a Face to face with multiple sessions
       | user  | course  | role           |
       | user1 | course1 | student        |
 
-    # Create the face to face.
+    # Create the seminar.
     And I log in as "admin"
     And I follow "course1"
     And I turn editing mode on
     And I add the "Course completion status" block
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                                    | facetoface1                                       |
-      | Description                             | Test facetoface description                       |
-      | Allow multiple events signup per user   | 1                                                 |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                                    | seminar1                                          |
+      | Description                             | Test seminar description                          |
       | Completion tracking                     | Show activity as complete when conditions are met |
       | completionstatusrequired[100]           | 1                                                 |
+      | Users can sign-up to multiple sessions  | 1                                                 |
 
     # Set course completion to f2f completion.
     And I navigate to "Course completion" node in "Course administration"
     And I set the following fields to these values:
-      | Face-to-face - facetoface1 | 1 |
+      | Seminar - seminar1 | 1 |
     And I press "Save changes"
 
     # Add sessions to f2f.
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | -10              |
       | timestart[month]   | 0                |
@@ -56,7 +56,7 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I click on "Select room" "link"
     And I click on "Create new room" "link"
     And I set the following fields to these values:
-      | Room name        | later session   |
+      | Name             | later session   |
       | id_roomcapacity  | 10              |
       | Building         | Building 123    |
       | Address          | 123 Tory street |
@@ -72,7 +72,7 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I press "Save changes"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | -40              |
       | timestart[month]   | 0                |
@@ -89,7 +89,7 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I click on "Select room" "link" in the ".lastrow" "css_element"
     And I click on "Create new room" "link"
     And I set the following fields to these values:
-      | Room name        | earlier session |
+      | Name             | earlier session |
       | id_roomcapacity  | 10              |
       | Building         | Building 123    |
       | Address          | 123 Tory street |
@@ -325,8 +325,8 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I log out
     And I log in as "admin"
     And I follow "course1"
-    And I click on "facetoface1" "link"
-    And I navigate to "Edit settings" node in "Facetoface administration"
+    And I click on "seminar1" "link"
+    And I navigate to "Edit settings" node in "Seminar administration"
     And I click on "Activity completion" "link"
     And I press "Unlock completion and delete completion data"
     And I press "Save and return to course"
@@ -396,8 +396,8 @@ Feature: Take attendance for a Face to face with multiple sessions
     And I log out
     And I log in as "admin"
     And I follow "course1"
-    And I click on "facetoface1" "link"
-    And I navigate to "Edit settings" node in "Facetoface administration"
+    And I click on "seminar1" "link"
+    And I navigate to "Edit settings" node in "Seminar administration"
     And I click on "Activity completion" "link"
     And I press "Unlock completion and delete completion data"
     And I press "Save and return to course"

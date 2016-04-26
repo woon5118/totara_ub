@@ -5,6 +5,7 @@ addnewnoticelink,mod_facetoface
 bulkaddheading,mod_facetoface
 calendarfiltersheading,mod_facetoface
 cancel,mod_facetoface
+capacity_help,mod_facetoface
 changemanageremailaddress,mod_facetoface
 changemanageremailinstruction,mod_facetoface
 conditions,mod_facetoface
@@ -16,6 +17,8 @@ confirmmanageremailinstruction2,mod_facetoface
 costheading,mod_facetoface
 copy,mod_facetoface
 datetimeknownhinttext,mod_facetoface
+declareinterestonlyiffull,mod_facetoface
+declareinterestonlyiffull_help,mod_facetoface
 delete,mod_facetoface
 duration_help,mod_facetoface
 edit,mod_facetoface
@@ -23,6 +26,8 @@ error:couldnotupdatemanageremail,mod_facetoface
 error:emptymanageremail,mod_facetoface
 error:nomanageremail,mod_facetoface
 exportheading,mod_facetoface
+facetoface:editsessions,mod_facetoface
+facetoface:overbook,mod_facetoface
 icalendarheading,mod_facetoface
 manageradded,mod_facetoface
 managerchanged,mod_facetoface

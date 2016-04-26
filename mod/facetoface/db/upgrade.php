@@ -4130,5 +4130,14 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016042700, 'facetoface');
     }
 
+    if ($oldversion < 2016050200) {
+        $DB->set_field('facetoface_signup_info_field', 'fullname', 'Requests for session organiser', array(
+            'datatype' => 'text',
+            'shortname' => 'signupnote',
+            'fullname' => 'Signup note'
+        ));
+        upgrade_mod_savepoint(true, 2016050200, 'facetoface');
+    }
+
     return $result;
 }

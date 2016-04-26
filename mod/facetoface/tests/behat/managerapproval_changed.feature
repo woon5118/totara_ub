@@ -1,6 +1,6 @@
 @mod @mod_facetoface @totara
-Feature: Face-to-face Approval required
-  In order to test user's status code when Face-to-face is changed from approval required to not
+Feature: Seminar Approval required
+  In order to test user's status code when seminar is changed from approval required to not
   As a manager
   I need to change approval required value
 
@@ -84,15 +84,15 @@ Feature: Face-to-face Approval required
     And I press "Update position"
 
   @javascript
-  Scenario: Update user's status code depending from session capacity when Face-to-face approval required is changed to false
+  Scenario: Update user's status code depending from session capacity when seminar approval required is changed to false
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name              | Test facetoface name        |
-      | Description       | Test facetoface description |
-    And I click on "Test facetoface name" "link"
-    And I press "Update this Face-to-face"
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name              | Test seminar name        |
+      | Description       | Test seminar description |
+    And I click on "Test seminar name" "link"
+    And I press "Update this Seminar"
     And I click on "Approval Options" "link"
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"
@@ -148,7 +148,7 @@ Feature: Face-to-face Approval required
     Then I should see "Sam1 Student1" in the "#facetoface_sessions" "css_element"
     And I should see "Sam2 Student2" in the "#facetoface_sessions" "css_element"
 
-    Then I navigate to "Edit settings" node in "Facetoface administration"
+    Then I navigate to "Edit settings" node in "Seminar administration"
     And I click on "Approval Options" "link"
     And I click on "#id_approvaloptions_approval_none" "css_element"
     And I press "Save and display"
@@ -171,15 +171,15 @@ Feature: Face-to-face Approval required
     And I should see "Sam6 Student6" in the "table.waitlist" "css_element"
 
   @javascript
-  Scenario: Update user's status code with override enabled when Face-to-face approval required is removed
+  Scenario: Update user's status code with override enabled when seminar approval required is removed
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name              | Test facetoface name        |
-      | Description       | Test facetoface description |
-    And I click on "Test facetoface name" "link"
-    And I press "Update this Face-to-face"
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name              | Test seminar name        |
+      | Description       | Test seminar description |
+    And I click on "Test seminar name" "link"
+    And I press "Update this Seminar"
     And I click on "Approval Options" "link"
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"
@@ -199,7 +199,7 @@ Feature: Face-to-face Approval required
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity           | 4    |
-      | Allow overbooking  | 1    |
+      | Enable waitlist    | 1    |
     And I press "Save changes"
 
     When I click on "Attendees" "link"
@@ -230,7 +230,7 @@ Feature: Face-to-face Approval required
     Then I should see "Sam1 Student1" in the "#facetoface_sessions" "css_element"
     And I should see "Sam2 Student2" in the "#facetoface_sessions" "css_element"
 
-    Then I navigate to "Edit settings" node in "Facetoface administration"
+    Then I navigate to "Edit settings" node in "Seminar administration"
     And I click on "Approval Options" "link"
     And I click on "#id_approvaloptions_approval_none" "css_element"
     And I press "Save and display"

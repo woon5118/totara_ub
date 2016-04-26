@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara
-Feature: Download a face-to-face signin sheet
+Feature: Download a seminar signin sheet
   In order to take attendance
   As a teacher
   I need to download a signin sheet
@@ -25,10 +25,10 @@ Feature: Download a face-to-face signin sheet
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name              | Test facetoface name        |
-      | Description       | Test facetoface description |
-    And I follow "Test facetoface name"
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name              | Test seminar name        |
+      | Description       | Test seminar description |
+    And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -59,6 +59,6 @@ Feature: Download a face-to-face signin sheet
     Given I log in as "teacher1"
     When I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "Test facetoface name"
+    And I follow "Test seminar name"
     And I click on the link "Attendees" in row 1
     Then "Download sign-in sheet" "button" should be visible

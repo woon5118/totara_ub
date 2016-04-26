@@ -19,14 +19,14 @@ Feature: Users are forced to get manager approval where required
     And I expand "Plugins" node
     And I expand "Enrolments" node
     And I follow "Manage enrol plugins"
-    And I click on "Enable" "link" in the "Face-to-face direct enrolment" "table_row"
+    And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I log out
     And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name             | Test facetoface name        |
-      | Description      | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name             | Test seminar name        |
+      | Description      | Test seminar description |
       | Manager Approval | 1                           |
     And I follow "View all events"
     And I follow "Add a new event"
@@ -48,14 +48,14 @@ Feature: Users are forced to get manager approval where required
 
     And I log in as "teacher1"
     And I follow "Course 1"
-    When I add "Face-to-face direct enrolment" enrolment method with:
+    When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
 
-  Scenario: Should be unable to enrol using face to face direct without a manager
+  Scenario: Should be unable to enrol using seminar direct without a manager
     Given I log in as "teacher1"
     And I follow "Course 1"
-    When I add "Face-to-face direct enrolment" enrolment method with:
+    When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
     And I log in as "student1"

@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Face-to-face Signup Manager Approval
+Feature: Seminar Signup Manager Approval
   In order to signup to classroom connect
   As a learner
   I need to request approval from my manager
@@ -34,14 +34,14 @@ Feature: Face-to-face Signup Manager Approval
       | timmy | manager |
       | sammy | manager |
     And I log in as "admin"
-    And I navigate to "Global settings" node in "Site administration > Face-to-face"
+    And I navigate to "Global settings" node in "Site administration > Seminar"
     And I click on "s__facetoface_approvaloptions[approval_none]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
+    And I add a "Seminar" to section "1" and I fill the form with:
       | Name                | Classroom Connect       |
       | Description         | Classroom Connect Tests |
     And I follow "View all events"
@@ -71,10 +71,10 @@ Feature: Face-to-face Signup Manager Approval
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I should see "Manager Approval"
-    And I should see "This Face-to-face requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
+    And I should see "This seminar requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
 
   Scenario: Student signs up with no manager assigned with manager select enabled
-    When I navigate to "Global settings" node in "Site administration > Face-to-face"
+    When I navigate to "Global settings" node in "Site administration > Seminar"
     And I click on "s__facetoface_managerselect" "checkbox"
     And I press "Save changes"
     And I log out
@@ -85,7 +85,7 @@ Feature: Face-to-face Signup Manager Approval
     And I follow "Sign-up"
     And I should see "Manager Approval"
     And I press "Request approval"
-    Then I should see "This Face-to-face requires manager approval, please select a manager to request approval"
+    Then I should see "This seminar requires manager approval, please select a manager to request approval"
 
     And I press "Choose manager"
     And I click on "Cassy Cas" "link" in the "Select manager" "totaradialogue"
@@ -117,7 +117,7 @@ Feature: Face-to-face Signup Manager Approval
 
     And I log in as "manager"
     And I click on "My Learning" in the totara menu
-    Then I should see "Face-to-face booking request"
+    Then I should see "Seminar booking request"
     And I click on "View all tasks" "link"
     And I click on "Attendees" "link" in the "1 January 2020" "table_row"
     Then I should see "Jimmy Jim" in the ".lastrow" "css_element"
@@ -129,7 +129,7 @@ Feature: Face-to-face Signup Manager Approval
     When I log out
     And I log in as "jimmy"
     And I click on "My Learning" in the totara menu
-    Then I should see "Face-to-face booking confirmation"
+    Then I should see "Seminar booking confirmation"
 
     When I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"

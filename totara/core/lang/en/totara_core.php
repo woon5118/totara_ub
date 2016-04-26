@@ -27,7 +27,7 @@
 $string['activitycompletionunlockedtext'] = 'When you save changes, completion state for all students who have completed this activity will be erased. If you change your mind about this, do not save the form.';
 $string['activitycompletionunlockednoresettext'] = 'Completion has been unlocked without deleting activity completion data. After this change different users may have received their completion status for different reasons.';
 $string['addanothercolumn'] = 'Add another column...';
-$string['allf2fbookings'] = 'All Face to Face Bookings';
+$string['allf2fbookings'] = 'All Seminar Bookings';
 $string['alllearningrecords'] = 'All Learning Records';
 $string['allmycourses'] = 'All My Courses';
 $string['allteammembers'] = 'All Team Members';
@@ -273,7 +273,7 @@ $string['eventreminderupdated'] = "Reminder was updated";
 $string['eventundeleted'] = 'User undeleted';
 $string['eventusersuspended'] = 'User suspended';
 $string['exportformat'] = 'Export format';
-$string['facetoface'] = 'Face-to-face';
+$string['facetoface'] = 'Seminar';
 $string['findcourses'] = 'Find Courses';
 $string['findlearning'] = 'Find Learning';
 $string['fontdefault'] = 'Appropriate default';

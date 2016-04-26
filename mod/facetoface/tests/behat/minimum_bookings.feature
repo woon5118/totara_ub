@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Minimum Face-to-face bookings
+Feature: Minimum Seminar bookings
   In order to test minimum bookings work as expected
   As a manager
   I need to change approval required value
@@ -40,7 +40,7 @@ Feature: Minimum Face-to-face bookings
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I click on "Turn editing on" "button"
-    And I add a "Face-to-face" to section "1" and I fill the form with:
+    And I add a "Seminar" to section "1" and I fill the form with:
       | name | test activity |
     And I follow "View all events"
     When I follow "Add a new event"
@@ -66,19 +66,19 @@ Feature: Minimum Face-to-face bookings
     Then the field "Minimum bookings" matches value "2"
 
   Scenario Outline: Confirm notifications are sent out once cutoff has been reached
-    Given I navigate to "Global settings" node in "Site administration > Face-to-face"
+    Given I navigate to "Global settings" node in "Site administration > Seminar"
     And I click on "Editing Trainer" "text" in the "#admin-facetoface_session_rolesnotify" "css_element"
     And I click on "<notification to>" "checkbox" in the "#admin-facetoface_session_rolesnotify" "css_element"
     And I press "Save changes"
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I click on "Turn editing on" "button"
-    And I add a "Face-to-face" to section "1" and I fill the form with:
+    And I add a "Seminar" to section "1" and I fill the form with:
       | name | test activity |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link" in the "Select room" "table_row"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | timestart[day]       | +1 |
       | timestart[month]     | 0  |
       | timestart[year]      | 0  |
@@ -93,7 +93,7 @@ Feature: Minimum Face-to-face bookings
     And I wait "1" seconds
     And I click on "Save changes" "button"
     And I should see "All events in test activity"
-    And I use magic to set Face-to-Face "test activity" to send capacity notification two days ahead
+    And I use magic to set Seminar "test activity" to send capacity notification two days ahead
     And I click on "Attendees" "link"
     And I set the field "f2f-actions" to "Add users"
     And I click on "Student One, student1@example.com" "option"

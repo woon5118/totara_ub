@@ -1,5 +1,5 @@
 @enrol @javascript @totara @enrol_totara_facetoface
-Feature: Users can auto-enrol themself in courses where face to face direct enrolment is allowed
+Feature: Users can auto-enrol themself in courses where seminar direct enrolment is allowed
   In order to participate in courses
   As a user
   I need to auto enrol me in courses
@@ -22,15 +22,15 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
     And I expand "Plugins" node
     And I expand "Enrolments" node
     And I follow "Manage enrol plugins"
-    And I click on "Enable" "link" in the "Face-to-face direct enrolment" "table_row"
+    And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name             | Test facetoface name        |
-      | Description      | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name             | Test seminar name        |
+      | Description      | Test seminar description |
       | Manager Approval | 0                           |
     And I follow "View all events"
     And I follow "Add a new event"
@@ -50,10 +50,10 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
     And I press "Save changes"
     And I log out
 
-  Scenario: Manual enrol using face to face direct
+  Scenario: Manual enrol using seminar direct
     Given I log in as "teacher1"
     And I follow "Course 1"
-    When I add "Face-to-face direct enrolment" enrolment method with:
+    When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
     And I log in as "student1"
@@ -64,7 +64,7 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
     And I press "Sign-up"
     Then I should see "Topic 1"
 
-  Scenario: Face to face direct enrolment disabled
+  Scenario: Seminar direct enrolment disabled
     Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
     When I follow "Course 1"
@@ -79,7 +79,7 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    When I add "Face-to-face direct enrolment" enrolment method with:
+    When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
     And I log in as "student1"

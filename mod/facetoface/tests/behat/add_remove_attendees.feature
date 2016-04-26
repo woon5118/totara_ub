@@ -1,8 +1,8 @@
 @javascript @mod @mod_facetoface @totara
-Feature: Add - Remove Face to face attendees
-  In order to test the add/remove Face to face attendees
+Feature: Add - Remove seminar attendees
+  In order to test the add/remove seminar attendees
   As admin
-  I need to add and remove attendees to/from a face to face session
+  I need to add and remove attendees to/from a seminar session
 
   Background:
     Given I am on a totara site
@@ -14,14 +14,14 @@ Feature: Add - Remove Face to face attendees
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
 
-  Scenario: Add users to a face to face session with dates
+  Scenario: Add users to a seminar session with dates
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -50,14 +50,14 @@ Feature: Add - Remove Face to face attendees
     And I press "Confirm"
     Then I should see "Sam1 Student1"
 
-  Scenario: Add and remove users to a face to face session without dates (waitlist)
+  Scenario: Add and remove users to a Seminar session without dates (waitlist)
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
@@ -80,9 +80,9 @@ Feature: Add - Remove Face to face attendees
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
@@ -112,9 +112,9 @@ Feature: Add - Remove Face to face attendees
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
@@ -145,13 +145,13 @@ Feature: Add - Remove Face to face attendees
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | +1               |
       | timestart[month]   | 0                |
@@ -196,9 +196,9 @@ Feature: Add - Remove Face to face attendees
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name one    |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name one    |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -228,10 +228,10 @@ Feature: Add - Remove Face to face attendees
     Then I should see "Sam1 Student1"
 
     And I follow "Course 1"
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name two    |
-      | Description | Test facetoface description |
-    And I follow "Test facetoface name two"
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name two    |
+      | Description | Test seminar description |
+    And I follow "Test seminar name two"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -258,7 +258,7 @@ Feature: Add - Remove Face to face attendees
     And I press "Continue"
     Then I should see "1 problem(s) encountered during import."
     When I click on "View results" "link"
-    Then I should see "Sam1 Student1 is already booked to attend Test facetoface name one at 11:00 AM to 12:00 PM on 1 January 2020. Please select another user or change the session"
+    Then I should see "Sam1 Student1 is already booked to attend Test seminar name one at 11:00 AM to 12:00 PM on 1 January 2020. Please select another user or change the session"
     When I press "Close"
     And I set the following fields to these values:
       | Allow scheduling conflicts | 1 |

@@ -65,12 +65,12 @@ class mod_facetoface_session_form extends moodleform {
         $mform->addElement('date_time_selector', 'registrationtimefinish', get_string('registrationtimefinish', 'facetoface'), array('optional' => true, 'showtimezone' => true));
         $mform->addHelpButton('registrationtimefinish', 'registrationtimefinish', 'facetoface');
 
-        $mform->addElement('text', 'capacity', get_string('capacity', 'facetoface'), array('size' => 5));
+        $mform->addElement('text', 'capacity', get_string('maxbookings', 'facetoface'), array('size' => 5));
         $mform->addRule('capacity', null, 'required', null, 'client');
         $mform->setType('capacity', PARAM_INT);
         $mform->setDefault('capacity', 10);
         $mform->addRule('capacity', null, 'numeric', null, 'client');
-        $mform->addHelpButton('capacity', 'capacity', 'facetoface');
+        $mform->addHelpButton('capacity', 'maxbookings', 'facetoface');
 
         $mform->addElement('checkbox', 'allowoverbook', get_string('allowoverbook', 'facetoface'));
         $mform->addHelpButton('allowoverbook', 'allowoverbook', 'facetoface');

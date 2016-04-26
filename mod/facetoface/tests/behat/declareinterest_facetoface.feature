@@ -26,9 +26,9 @@ Feature: Manager approval and declare of interest
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name              | Test facetoface name        |
-      | Description       | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name              | Test seminar name        |
+      | Description       | Test seminar description |
     And I log out
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
@@ -41,11 +41,11 @@ Feature: Manager approval and declare of interest
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                                                               | Test declareinterestfullybooked |
-      | Description                                                        | Test facetoface description     |
-      | Manager Approval                                                   | 1                               |
-      | Enable "Declare Interest" option                                   | 1                               |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                       | Test declareinterestfullybooked |
+      | Description                | Test seminar description        |
+      | Manager Approval           | 1                               |
+      | Users can declare interest | Always                          |
     And I click on "View all events" "link" in the "declareinterestfullybooked" activity
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -82,11 +82,10 @@ Feature: Manager approval and declare of interest
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                                                               | Test declareinterestfullybooked |
-      | Description                                                        | Test facetoface description     |
-      | Enable "Declare Interest" option                                   | 1                               |
-      | Show "Declare Interest" link only if all events are closed         | 1                               |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                        | Test declareinterestfullybooked                     |
+      | Description                 | Test seminar description                            |
+      | Users can declare interest  | When no upcoming sessions are available for booking |
     And I click on "View all events" "link" in the "declareinterestfullybooked" activity
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -125,11 +124,10 @@ Feature: Manager approval and declare of interest
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                                                               | Test declareinterestfullybooked |
-      | Description                                                        | Test facetoface description     |
-      | Enable "Declare Interest" option                                   | 1                               |
-      | Show "Declare Interest" link only if all events are closed         | 1                               |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                       | Test declareinterestfullybooked                     |
+      | Description                | Test seminar description                            |
+      | Users can declare interest | When no upcoming sessions are available for booking |
     And I click on "View all events" "link" in the "declareinterestfullybooked" activity
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -146,7 +144,7 @@ Feature: Manager approval and declare of interest
       | timefinish[minute] | 00   |
     And I press "OK"
     And I set the following fields to these values:
-      | Allow overbooking  | Yes  |
+      | Enable waitlist    | Yes  |
       | capacity           | 1    |
     And I press "Save changes"
     And I log out
@@ -169,10 +167,10 @@ Feature: Manager approval and declare of interest
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                                                               | Test f2f 1                      |
-      | Description                                                        | Test facetoface description     |
-      | Enable "Declare Interest" option                                   | 1                               |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                       | Test f2f 1                      |
+      | Description                | Test seminar description        |
+      | Users can declare interest | Always                          |
     And I click on "View all events" "link" in the "Test f2f 1" activity
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -190,10 +188,10 @@ Feature: Manager approval and declare of interest
     And I press "OK"
     And I press "Save changes"
     And I follow "Course 1"
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                                                               | Test f2f 2                      |
-      | Description                                                        | Test facetoface description     |
-      | Enable "Declare Interest" option                                   | 1                               |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                       | Test f2f 2                      |
+      | Description                | Test seminar description        |
+      | Users can declare interest | Always                          |
     And I click on "View all events" "link" in the "Test f2f 2" activity
     And I follow "Add a new event"
     And I click on "Edit date" "link"

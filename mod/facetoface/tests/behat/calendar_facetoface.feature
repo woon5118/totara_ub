@@ -1,8 +1,8 @@
 @mod @mod_facetoface @totara @calendar
-Feature: Face to face calendar
-  In order to verify Face to Face events in the calendar
+Feature: Seminar calendar
+  In order to verify seminar events in the calendar
   As a teacher
-  I need to create and assign Face to face activities
+  I need to create and assign seminar activities
 
   Background:
     Given I am on a totara site
@@ -28,15 +28,15 @@ Feature: Face to face calendar
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                                    | Test facetoface name        |
-      | Description                             | Test facetoface description |
-      | Allow multiple events signup per user   | 1                           |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                                    | Test seminar name        |
+      | Description                             | Test seminar description |
+      | Users can sign-up to multiple sessions  | 1                           |
       | Show entry on user's calendar           | 1                           |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | +1               |
       | timestart[month]   | 0                |

@@ -1,5 +1,5 @@
 @enrol @javascript @totara @enrol_totara_facetoface
-Feature: Users can enrol on courses that have several facetoface activities and signup to several sessions
+Feature: Users can enrol on courses that have several seminar activities and signup to several sessions
   In order to participate in courses with seminars
   As a user
   I need to sign up to seminars when enrolling on the course
@@ -22,16 +22,16 @@ Feature: Users can enrol on courses that have several facetoface activities and 
     And I expand "Plugins" node
     And I expand "Enrolments" node
     And I follow "Manage enrol plugins"
-    And I click on "Enable" "link" in the "Face-to-face direct enrolment" "table_row"
+    And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I log out
     And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name             | Test facetoface name 1        |
-      | Description      | Test facetoface description 1 |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name             | Test seminar name 1        |
+      | Description      | Test seminar description 1 |
       | Manager Approval | 0                             |
-    And I follow "Test facetoface name 1"
+    And I follow "Test seminar name 1"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -48,11 +48,11 @@ Feature: Users can enrol on courses that have several facetoface activities and 
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I follow "Course 1"
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name             | Test facetoface name 2        |
-      | Description      | Test facetoface description 2 |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name             | Test seminar name 2        |
+      | Description      | Test seminar description 2 |
       | Manager Approval | 0                             |
-    And I follow "Test facetoface name 2"
+    And I follow "Test seminar name 2"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -69,12 +69,12 @@ Feature: Users can enrol on courses that have several facetoface activities and 
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I follow "Course 1"
-    When I add "Face-to-face direct enrolment" enrolment method with:
-      | Custom instance name                               | Test student enrolment |
-      | Automatically sign users up to face to face events | 0                      |
+    When I add "Seminar direct enrolment" enrolment method with:
+      | Custom instance name                          | Test student enrolment |
+      | Automatically sign users up to seminar events | 0                      |
     And I log out
 
-  Scenario: Enrol using face to face direct to a multisession
+  Scenario: Enrol using seminar direct to a multisession
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"

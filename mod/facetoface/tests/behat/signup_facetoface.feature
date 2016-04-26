@@ -1,8 +1,8 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Sign up to a face to face
+Feature: Sign up to a seminar
   In order to attend a seminar
   As a student
-  I need to sign up to a face to face session
+  I need to sign up to a seminar session
 
   # This background requires JS as such it has been added to the Feature tags.
   Background:
@@ -26,9 +26,9 @@ Feature: Sign up to a face to face
     And I turn editing mode on
     And I add a "Label" to section "1" and I fill the form with:
       | Label text | Course view page |
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -59,7 +59,7 @@ Feature: Sign up to a face to face
     And I should see "Your booking has been completed."
     # Check the user is back on the course page.
     And I should see "Course view page"
-    And I should not see "All events in Test facetoface name"
+    And I should not see "All events in Test seminar name"
     And I log out
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu
@@ -70,15 +70,15 @@ Feature: Sign up to a face to face
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I should see "Test facetoface name"
-    And I follow "Test facetoface name"
+    And I should see "Test seminar name"
+    And I follow "Test seminar name"
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I press "Sign-up"
     And I should see "Your booking has been completed."
     # Check the user is back on the all events page.
     And I should not see "Course view page"
-    And I should see "All events in Test facetoface name"
+    And I should see "All events in Test seminar name"
     And I log out
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu

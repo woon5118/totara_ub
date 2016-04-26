@@ -1,6 +1,6 @@
 @mod @mod_facetoface @totara @javascript
 Feature: Manage pre-defined rooms
-  In order to test Face to face rooms
+  In order to test seminar rooms
   As a site manager
   I need to create and allocate rooms
 
@@ -28,13 +28,13 @@ Feature: Manage pre-defined rooms
       | user5    | C1     | student        |
       | user6    | C1     | student        |
     And I log in as "admin"
-    And I navigate to "Rooms" node in "Site administration > Face-to-face"
+    And I navigate to "Rooms" node in "Site administration > Seminar"
     And I press "Add a new room"
     And I set the following fields to these values:
-      | Room name | Room 1          |
-      | Building  | That house      |
-      | Address   | 123 here street |
-      | Capacity  | 5               |
+      | Name              | Room 1          |
+      | Building          | That house      |
+      | Address           | 123 here street |
+      | Maximum bookings  | 5               |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
@@ -42,17 +42,17 @@ Feature: Manage pre-defined rooms
 
     And I press "Add a new room"
     And I set the following fields to these values:
-      | Room name | Room 2          |
-      | Building  | Your house      |
-      | Address   | 123 near street |
-      | Capacity  | 6               |
+      | Name              | Room 2          |
+      | Building          | Your house      |
+      | Address           | 123 near street |
+      | Maximum bookings  | 6               |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
 
   Scenario: See that the rooms were created correctly
-    Given I navigate to "Rooms" node in "Site administration > Face-to-face"
+    Given I navigate to "Rooms" node in "Site administration > Seminar"
     Then I should see "That house" in the "Room 1" "table_row"
     And I should see "123 here street" in the "Room 1" "table_row"
     And I should see "5" in the "Room 1" "table_row"
@@ -64,9 +64,9 @@ Feature: Manage pre-defined rooms
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     When I click on "Select room" "link"
@@ -77,9 +77,9 @@ Feature: Manage pre-defined rooms
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -140,9 +140,9 @@ Feature: Manage pre-defined rooms
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -225,9 +225,9 @@ Feature: Manage pre-defined rooms
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"

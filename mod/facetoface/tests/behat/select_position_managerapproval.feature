@@ -1,5 +1,5 @@
 @mod @totara @mod_facetoface
-Feature: Face-to-face Select position with Manager approval
+Feature: Seminar Select position with Manager approval
   In order to control seminar attendance
   As a manager
   I need to authorise seminar signups
@@ -25,8 +25,8 @@ Feature: Face-to-face Select position with Manager approval
     And I expand "Plugins" node
     And I expand "Enrolments" node
     And I follow "Manage enrol plugins"
-    And I click on "Enable" "link" in the "Face-to-face direct enrolment" "table_row"
-    And I navigate to "Global settings" node in "Site administration > Face-to-face"
+    And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
+    And I navigate to "Global settings" node in "Site administration > Seminar"
     And I set the following fields to these values:
       | Select position on signup | 1 |
     And I press "Save changes"
@@ -36,11 +36,11 @@ Feature: Face-to-face Select position with Manager approval
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                      | Test facetoface name        |
-      | Description               | Test facetoface description |
-      | Manager Approval          | 1                           |
-      | Select position on signup | 1                           |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                      | Test seminar name        |
+      | Description               | Test seminar description |
+      | Manager Approval          | 1                        |
+      | Select position on signup | 1                        |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -89,14 +89,14 @@ Feature: Face-to-face Select position with Manager approval
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "Test facetoface name"
+    And I follow "Test seminar name"
     And I follow "Attendees"
     And I should not see "Approval required" in the ".tabtree" "css_element"
     And I log out
     And I log in as "teacher2"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "Test facetoface name"
+    And I follow "Test seminar name"
     And I follow "Attendees"
     And I click on "Approval required" "link" in the ".tabtree" "css_element"
     And I click on "input[value='2']" "css_element" in the "Sam1 Student1" "table_row"

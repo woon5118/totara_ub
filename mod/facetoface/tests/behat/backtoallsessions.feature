@@ -1,6 +1,6 @@
 @javascript @mod @mod_facetoface @totara
-Feature: Return to previous page after actions in Face-to-face
-  In order to use Face-to-face activity comfortably
+Feature: Return to previous page after actions in seminar
+  In order to use seminar activity comfortably
   As a user
   I need to be automatically returned back to course page or sessions page after action
 
@@ -21,16 +21,16 @@ Feature: Return to previous page after actions in Face-to-face
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Save changes" "button"
 
-  Scenario: Course page - Face-to-face edit session actions return to original page
+  Scenario: Course page - Seminar edit session actions return to original page
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     When I click on "Edit" "link" in the "Booking open" "table_row"
@@ -45,7 +45,7 @@ Feature: Return to previous page after actions in Face-to-face
     Then I should see "View all events"
     And I should not see "All events in"
 
-  Scenario: Sessions page - Face-to-face edit session actions return to original page
+  Scenario: Sessions page - Seminar edit session actions return to original page
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
@@ -62,7 +62,7 @@ Feature: Return to previous page after actions in Face-to-face
     Then I should see "All events in"
     And I should not see "View all events"
 
-  Scenario: Course page - Face-to-face cancel session actions return to original page
+  Scenario: Course page - Seminar cancel session actions return to original page
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     When I click on "Cancel event" "link" in the "Booking open" "table_row"
@@ -78,7 +78,7 @@ Feature: Return to previous page after actions in Face-to-face
     And I should not see "All events in"
     And I should see "Session cancelled"
 
-  Scenario: Sessions page - Face-to-face cancel session actions return to original page
+  Scenario: Sessions page - Seminar cancel session actions return to original page
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
@@ -96,7 +96,7 @@ Feature: Return to previous page after actions in Face-to-face
     And I should not see "View all events"
     And I should see "Session cancelled"
 
-  Scenario: Course page - Face-to-face clone session actions return to original page
+  Scenario: Course page - Seminar clone session actions return to original page
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     When I click on "Copy" "link" in the "Booking open" "table_row"
@@ -111,7 +111,7 @@ Feature: Return to previous page after actions in Face-to-face
     Then I should see "View all events"
     And I should not see "All events in"
 
-  Scenario: Sessions page - Face-to-face clone session actions return to original page
+  Scenario: Sessions page - Seminar clone session actions return to original page
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
@@ -128,7 +128,7 @@ Feature: Return to previous page after actions in Face-to-face
     Then I should see "All events in"
     And I should not see "View all events"
 
-  Scenario: Course page - Face-to-face delete session actions return to original page
+  Scenario: Course page - Seminar delete session actions return to original page
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     When I click on "Delete" "link" in the "Booking open" "table_row"
@@ -144,7 +144,7 @@ Feature: Return to previous page after actions in Face-to-face
     And I should not see "All events in"
     And I should not see "Booking open"
 
-  Scenario: Sessions page - Face-to-face delete session actions return to original page
+  Scenario: Sessions page - Seminar delete session actions return to original page
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
@@ -162,7 +162,7 @@ Feature: Return to previous page after actions in Face-to-face
     And I should not see "View all events"
     And I should not see "Booking open"
 
-  Scenario: Course page - Face-to-face singup and cancel actions return to original page
+  Scenario: Course page - Seminar singup and cancel actions return to original page
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     When I click on "Sign-up" "link" in the "Booking open" "table_row"
@@ -191,7 +191,7 @@ Feature: Return to previous page after actions in Face-to-face
     Then I should see "View all events"
     And I should not see "All events in"
 
-  Scenario: Sessions page - Face-to-face singup and cancel actions return to original page
+  Scenario: Sessions page - Seminar singup and cancel actions return to original page
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
@@ -224,7 +224,7 @@ Feature: Return to previous page after actions in Face-to-face
     Then I should see "All events in"
     And I should not see "View all events"
 
-  Scenario: Face-to-face attendees back link return to original page - top level only
+  Scenario: Seminar attendees back link return to original page - top level only
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     When I click on "Attendees" "link" in the "Booking open" "table_row"

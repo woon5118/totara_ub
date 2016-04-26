@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Face-to-face Signup No Approval
+Feature: Seminar Signup No Approval
   In order to signup to classroom connect
   As a learner
   I need to sign click the signup button
@@ -34,14 +34,14 @@ Feature: Face-to-face Signup No Approval
       | timmy | manager |
       | sammy | manager |
     And I log in as "admin"
-    And I navigate to "Global settings" node in "Site administration >  Face-to-face"
+    And I navigate to "Global settings" node in "Site administration >  Seminar"
     And I click on "s__facetoface_approvaloptions[approval_manager]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
+    And I add a "Seminar" to section "1" and I fill the form with:
       | Name                | Classroom Connect       |
       | Description         | Classroom Connect Tests |
       | approvaloptions     | approval_admin          |

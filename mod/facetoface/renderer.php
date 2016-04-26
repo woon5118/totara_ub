@@ -45,7 +45,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      *
      * @param array $sessions - array of session objects.
      * @param bool $viewattendees - true if the current user has this capability ('mod/facetoface:viewattendees').
-     * @param bool $editsessions - true if the current user has this capability ('mod/facetoface:editsessions').
+     * @param bool $editevents - true if the current user has this capability ('mod/facetoface:editevents').
      * @param bool $displaytimezones - true if the timezones should be displayed.
      * @param array $reserveinfo - if managereserve if set to true for the facetoface, use facetoface_can_reserve_or_allocate
      * to fill out this array.
@@ -56,7 +56,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string containing html for this table.
      * @throws coding_exception
      */
-    public function print_session_list_table($sessions, $viewattendees, $editsessions, $displaytimezones, $reserveinfo = array(),
+    public function print_session_list_table($sessions, $viewattendees, $editevents, $displaytimezones, $reserveinfo = array(),
                                              $currenturl=null, $minimal = false, $returntoallsessions = true) {
         $output = '';
 
@@ -139,7 +139,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 }
                 $reservelink = $this->session_options_reserve_link($session, $signupcount, $reserveinfo);
                 $signuplink = $this->session_options_signup_link($session, $sessionstarted, $minimal, $returntoallsessions);
-                $sessionrow[] = $this->session_options_table_cell($session, $viewattendees, $editsessions, $reservelink, $signuplink);
+                $sessionrow[] = $this->session_options_table_cell($session, $viewattendees, $editevents, $reservelink, $signuplink);
 
                 $row = new html_table_row($sessionrow);
 
@@ -190,7 +190,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                         }
                         $reservelink = $this->session_options_reserve_link($session, $signupcount, $reserveinfo);
                         $signuplink = $this->session_options_signup_link($session, $sessionstarted, $minimal, $returntoallsessions);
-                        $sessionrow[] = $this->session_options_table_cell($session, $viewattendees, $editsessions, $reservelink, $signuplink, $datescount);
+                        $sessionrow[] = $this->session_options_table_cell($session, $viewattendees, $editevents, $reservelink, $signuplink, $datescount);
                     }
 
                     // $firsessiondate should only be true on the iteration of this foreach loop.
@@ -392,14 +392,14 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      *
      * @param stdClass $session
      * @param bool $viewattendees - true if the user has this permission.
-     * @param bool $editsessions - true if the user has this permission.
+     * @param bool $editevents - true if the user has this permission.
      * @param string $reservelink - html generated with the method session_options_reserve_link().
      * @param string $signuplink - html generated with the method session_options_signup_link().
      * @param int $datescount - determines the number for the rowspan.
      * @return html_table_cell
      * @throws coding_exception
      */
-    private function session_options_table_cell($session, $viewattendees, $editsessions, $reservelink, $signuplink, $datescount = 0) {
+    private function session_options_table_cell($session, $viewattendees, $editevents, $reservelink, $signuplink, $datescount = 0) {
 
         $options = '';
         $timenow = time();
@@ -411,7 +411,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         }
 
         // Can edit sessions.
-        if ($editsessions) {
+        if ($editevents) {
             // NOTE: TL-8718 decide what to do with editing of cancelled sessions
             $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/edit', get_string('editsession', 'facetoface'))) . ' ';
             if ($session->cancelledstatus == 0) {

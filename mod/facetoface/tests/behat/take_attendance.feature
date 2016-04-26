@@ -1,6 +1,6 @@
 @javascript @mod @mod_facetoface @totara @takeattendance
-Feature: Take attendance for Face-to-face sessions
-  In order to take attendance in a Face to face session
+Feature: Take attendance for seminar sessions
+  In order to take attendance in a seminar session
   As a teacher
   I need to set attendance status for attendees
 
@@ -31,20 +31,20 @@ Feature: Take attendance for Face-to-face sessions
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
       | Completion tracking           | Show activity as complete when conditions are met |
       | completionstatusrequired[100] | 1                                                 |
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the following fields to these values:
-      | Face-to-face - Test facetoface name | 1 |
+      | Seminar - Test seminar name | 1 |
     And I press "Save changes"
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | -1               |
       | timestart[month]   | 0                |

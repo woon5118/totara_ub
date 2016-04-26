@@ -1,8 +1,8 @@
 @mod @mod_facetoface @totara
 Feature: Cancellation for session
-  In order to allow or not cancellations in Face to face sessions
+  In order to allow or not cancellations in seminar sessions
   As a teacher
-  I need to create Face to face sessions with different settings (always/never/cut-off period)
+  I need to create seminar sessions with different settings (always/never/cut-off period)
 
   Background:
     Given I am on a totara site
@@ -23,10 +23,10 @@ Feature: Cancellation for session
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                                    | Test facetoface name        |
-      | Description                             | Test facetoface description |
-      | Allow multiple events signup per user   | 1                           |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                                    | Test seminar name        |
+      | Description                             | Test seminar description |
+      | Users can sign-up to multiple sessions  | 1                           |
     And I log out
 
   @javascript
@@ -37,7 +37,7 @@ Feature: Cancellation for session
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | +1               |
       | timestart[month]   | 0                |
@@ -52,7 +52,7 @@ Feature: Cancellation for session
     And I press "OK"
     And I set the following fields to these values:
       | capacity           | 3                |
-    And I click on "Allow at any time" "radio"
+    And I click on "At any time" "radio"
     And I press "Save changes"
     And I log out
 
@@ -77,7 +77,7 @@ Feature: Cancellation for session
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | +2               |
       | timestart[month]   | 0                |
@@ -92,7 +92,7 @@ Feature: Cancellation for session
     And I press "OK"
     And I set the following fields to these values:
       | capacity           | 3                |
-    And I click on "Never allow" "radio"
+    And I click on "Never" "radio"
     And I press "Save changes"
     And I log out
 
@@ -114,7 +114,7 @@ Feature: Cancellation for session
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | +3               |
       | timestart[month]   | 0                |
@@ -129,7 +129,7 @@ Feature: Cancellation for session
     And I press "OK"
     And I set the following fields to these values:
       | capacity           | 3                |
-    And I click on "Allow until cut-off reached" "radio"
+    And I click on "Until specified period" "radio"
     And I press "Save changes"
     And I log out
 
@@ -149,7 +149,7 @@ Feature: Cancellation for session
     And I follow "View all events"
     And I click on "Edit event" "link"
     And I click on "Edit date" "link"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | +1               |
       | timestart[month]   | 0                |

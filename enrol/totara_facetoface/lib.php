@@ -500,7 +500,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                         $cm = get_coursemodule_from_instance("facetoface", $f2f->id, $f2f->course);
                         $contextmodule = context_module::instance($cm->id);
                         $viewattendees = has_capability('mod/facetoface:viewattendees', $contextmodule);
-                        $editsessions = has_capability('mod/facetoface:editsessions', $contextmodule);
+                        $editevents = has_capability('mod/facetoface:editevents', $contextmodule);
                         $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
                         $reserveinfo = array();
                         if (!empty($f2f->managerreserve)) {
@@ -510,7 +510,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
 
                         $f2fsessionarray = array_slice($f2fsessionarray, 0, $f2f->display, true);
                         $output .= html_writer::tag('h4', format_string($f2f->name));
-                        $output .= $f2frenderer->print_session_list_table($f2fsessionarray, $viewattendees, $editsessions,
+                        $output .= $f2frenderer->print_session_list_table($f2fsessionarray, $viewattendees, $editevents,
                             $displaytimezones, $reserveinfo, null, true);
                     }
                 }
@@ -612,7 +612,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                         $cm = get_coursemodule_from_instance("facetoface", $f2f->id, $f2f->course);
                         $contextmodule = context_module::instance($cm->id);
                         $viewattendees = has_capability('mod/facetoface:viewattendees', $contextmodule);
-                        $editsessions = has_capability('mod/facetoface:editsessions', $contextmodule);
+                        $editevents = has_capability('mod/facetoface:editevents', $contextmodule);
                         $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
                         $reserveinfo = array();
                         if (!empty($f2f->managerreserve)) {
@@ -622,7 +622,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
 
                         $f2fsessionarray = array_slice($f2fsessionarray, 0, $f2f->display, true);
                         $output .= html_writer::tag('h4', format_string($f2f->name));
-                        $output .= $f2frenderer->print_session_list_table($f2fsessionarray, $viewattendees, $editsessions,
+                        $output .= $f2frenderer->print_session_list_table($f2fsessionarray, $viewattendees, $editevents,
                             $displaytimezones, $reserveinfo, null, true);
                     }
                 }
@@ -1166,7 +1166,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
 
             $cm = get_coursemodule_from_instance('facetoface', $session->facetoface);
             $context = context_module::instance($cm->id);
-            $capabilitiesthatcanoverbook = array('mod/facetoface:overbook', 'mod/facetoface:addattendees');
+            $capabilitiesthatcanoverbook = array('mod/facetoface:signupwaitlist', 'mod/facetoface:addattendees');
             $canforceoverbook = has_any_capability($capabilitiesthatcanoverbook, $context, $user);
 
             // If there is no capacity, waitlist and user can't override capacity continue.

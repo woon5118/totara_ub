@@ -1205,7 +1205,7 @@ if ($action == 'approvalrequired') {
     $numwaiting = count($requests);
     $availablespaces = $session->capacity - $numattendees;
     $allowoverbook = $session->allowoverbook;
-    $canoverbook = has_capability('mod/facetoface:overbook', $context);
+    $canoverbook = has_capability('mod/facetoface:signupwaitlist', $context);
     // Are there more users waiting than spaces available?
     // Note this does not apply to people with overbook capability (see facetoface_session_has_capacity).
     if (!$canoverbook && ($numwaiting > $availablespaces)) {

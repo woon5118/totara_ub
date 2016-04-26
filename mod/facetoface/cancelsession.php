@@ -44,7 +44,7 @@ if (!$cm = get_coursemodule_from_instance("facetoface", $facetoface->id, $course
 $context = context_module::instance($cm->id);
 
 require_login($course, false, $cm);
-require_capability('mod/facetoface:editsessions', $context);
+require_capability('mod/facetoface:editevents', $context);
 
 $PAGE->set_url('/mod/facetoface/cancelsession.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions));
 $PAGE->set_title($facetoface->name);

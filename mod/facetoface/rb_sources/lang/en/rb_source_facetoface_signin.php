@@ -35,8 +35,8 @@ $string['discountcost'] = 'Discount cost';
 $string['discountcode'] = 'Discount code';
 $string['endtime'] = 'End Time';
 $string['facilitator'] = 'Facilitator';
-$string['f2fname'] = 'Face to Face Name';
-$string['f2fnamelink'] = 'Face to Face Name (linked to session page)';
+$string['f2fname'] = 'Seminar Name';
+$string['f2fnamelink'] = 'Seminar Name (linked to session page)';
 $string['normalcost'] = 'Normal cost';
 $string['numattendees'] = 'Number of Attendees';
 $string['room'] = 'Room';
@@ -72,7 +72,7 @@ $string['pilot'] = 'Pilot';
 
 // Column types for this source, as strings.
 $string['type_date'] = 'Session Date';
-$string['type_facetoface'] = 'Face-to-face';
+$string['type_facetoface'] = 'Seminar';
 $string['type_facetoface_cancellation'] = 'Cancellation note customfields';
 $string['type_facetoface_session'] = 'Session customfields';
 $string['type_facetoface_signup'] = 'Signup note customfields';

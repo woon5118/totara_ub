@@ -134,14 +134,15 @@ $capabilities = array(
     ),
 
     // Ability to add, edit, copy and delete a session.
-    'mod/facetoface:editsessions' => array(
+    'mod/facetoface:editevents' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
-        )
+        ),
+        'clonepermissionsfrom' => 'mod/facetoface:editsessions'
     ),
 
     // View session cancellations.
@@ -167,7 +168,7 @@ $capabilities = array(
 
     // Ability to overbook a session by signing up for it.
     // Users with mod/facetoface:addattendees can also overbook.
-    'mod/facetoface:overbook' => array(
+    'mod/facetoface:signupwaitlist' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
@@ -175,6 +176,7 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         ),
+        'clonepermissionsfrom' => 'mod/facetoface:overbook'
     ),
 
     // Ability to create a f2f instance.
