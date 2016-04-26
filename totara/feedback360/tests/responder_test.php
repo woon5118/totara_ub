@@ -154,6 +154,8 @@ class feedback360_responder_test extends feedback360_testcase {
     }
 
     public function test_update_timedue() {
+        global $DB;
+
         $this->resetAfterTest();
         list($fdbck, $users) = $this->prepare_feedback_with_users();
         $user = current($users);
@@ -162,7 +164,9 @@ class feedback360_responder_test extends feedback360_testcase {
         $this->assertLessThan(5, abs($response->timedue-time()));
         $respid = $response->id;
         unset($response);
-        feedback360_responder::update_timedue($time, $respid);
+        $userassignment = $DB->get_record('feedback360_user_assignment', array('feedback360id' => $fdbck->id,
+            'userid' => $user->id));
+        feedback360_responder::update_timedue($time, $userassignment->id);
         $resptest = new feedback360_responder($respid);
         $this->assertEquals($time, $resptest->timedue);
     }

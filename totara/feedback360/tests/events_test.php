@@ -51,11 +51,11 @@ class feedback360_event_test extends feedback360_testcase {
 
         // Check the event data meets feedback360_created expectations.
         $eventdata = $events[0]->get_data();
-        $this->assertEquals($eventdata['component'], 'totara_feedback360');
-        $this->assertEquals($eventdata['eventname'], '\totara_feedback360\event\feedback360_created');
-        $this->assertEquals($eventdata['action'], 'created');
-        $this->assertEquals($eventdata['objecttable'], 'feedback360');
-        $this->assertEquals($eventdata['objectid'], 1);
+        $this->assertEquals('totara_feedback360', $eventdata['component']);
+        $this->assertEquals('\totara_feedback360\event\feedback360_created', $eventdata['eventname']);
+        $this->assertEquals('created', $eventdata['action']);
+        $this->assertEquals('feedback360', $eventdata['objecttable']);
+        $this->assertEquals($feedback360->id, $eventdata['objectid']);
 
         // Set the description to throw an update event.
         $feedback360->description = 'Test Description';
@@ -69,11 +69,11 @@ class feedback360_event_test extends feedback360_testcase {
 
         // Check the event data meets feedback360_updated expectations.
         $eventdata = $events[0]->get_data();
-        $this->assertEquals($eventdata['component'], 'totara_feedback360');
-        $this->assertEquals($eventdata['eventname'], '\totara_feedback360\event\feedback360_updated');
-        $this->assertEquals($eventdata['action'], 'updated');
-        $this->assertEquals($eventdata['objecttable'], 'feedback360');
-        $this->assertEquals($eventdata['objectid'], 1);
+        $this->assertEquals('totara_feedback360', $eventdata['component']);
+        $this->assertEquals('\totara_feedback360\event\feedback360_updated', $eventdata['eventname']);
+        $this->assertEquals('updated', $eventdata['action']);
+        $this->assertEquals('feedback360', $eventdata['objecttable']);
+        $this->assertEquals($feedback360->id, $eventdata['objectid']);
 
         // Delete the feedback to throw a deletion event.
         $feedback360->delete();
@@ -86,11 +86,11 @@ class feedback360_event_test extends feedback360_testcase {
 
         // Check the event data meets feedback360_deleted expectations.
         $eventdata = $events[0]->get_data();
-        $this->assertEquals($eventdata['component'], 'totara_feedback360');
-        $this->assertEquals($eventdata['eventname'], '\totara_feedback360\event\feedback360_deleted');
-        $this->assertEquals($eventdata['action'], 'deleted');
-        $this->assertEquals($eventdata['objecttable'], 'feedback360');
-        $this->assertEquals($eventdata['objectid'], 1);
+        $this->assertEquals('totara_feedback360', $eventdata['component']);
+        $this->assertEquals('\totara_feedback360\event\feedback360_deleted', $eventdata['eventname']);
+        $this->assertEquals('deleted', $eventdata['action']);
+        $this->assertEquals('feedback360', $eventdata['objecttable']);
+        $this->assertEquals($feedback360->id, $eventdata['objectid']);
 
         $sink->close();
     }
@@ -126,15 +126,16 @@ class feedback360_event_test extends feedback360_testcase {
 
         // Check the event data meets request_created expectations.
         $eventdata = $events[2]->get_data();
-        $this->assertEquals($eventdata['component'], 'totara_feedback360');
-        $this->assertEquals($eventdata['eventname'], '\totara_feedback360\event\request_created');
-        $this->assertEquals($eventdata['action'], 'created');
-        $this->assertEquals($eventdata['objecttable'], 'feedback360_resp_assignment');
-        $this->assertEquals($eventdata['objectid'], 1);
-        $this->assertEquals($eventdata['relateduserid'], $user_assign->id);
-        $this->assertEquals($eventdata['other']['assignmentid'], $user_assignment->id);
-        $this->assertEquals($eventdata['other']['userid'], $resp_assign->id);
-        $this->assertEquals($eventdata['other']['email'], '');
+        $onlyrespassignment = $DB->get_record('feedback360_resp_assignment', array(), '*', MUST_EXIST);
+        $this->assertEquals('totara_feedback360', $eventdata['component']);
+        $this->assertEquals('\totara_feedback360\event\request_created', $eventdata['eventname']);
+        $this->assertEquals('created', $eventdata['action']);
+        $this->assertEquals('feedback360_resp_assignment', $eventdata['objecttable']);
+        $this->assertEquals($onlyrespassignment->id, $eventdata['objectid']);
+        $this->assertEquals($user_assign->id, $eventdata['relateduserid']);
+        $this->assertEquals($user_assignment->id, $eventdata['other']['assignmentid']);
+        $this->assertEquals($resp_assign->id, $eventdata['other']['userid']);
+        $this->assertEquals('', $eventdata['other']['email']);
 
         $this->unassign_resp($feedback360, $user_assign->id, $resp_assign->id);
 
@@ -147,15 +148,15 @@ class feedback360_event_test extends feedback360_testcase {
 
         // Check the event data meets request_deleted expectations.
         $eventdata = $events[2]->get_data();
-        $this->assertEquals($eventdata['component'], 'totara_feedback360');
-        $this->assertEquals($eventdata['eventname'], '\totara_feedback360\event\request_deleted');
-        $this->assertEquals($eventdata['action'], 'deleted');
-        $this->assertEquals($eventdata['objecttable'], 'feedback360_resp_assignment');
-        $this->assertEquals($eventdata['objectid'], 1);
-        $this->assertEquals($eventdata['relateduserid'], $user_assign->id);
-        $this->assertEquals($eventdata['other']['assignmentid'], $user_assignment->id);
-        $this->assertEquals($eventdata['other']['userid'], $resp_assign->id);
-        $this->assertEquals($eventdata['other']['email'], '');
+        $this->assertEquals('totara_feedback360', $eventdata['component']);
+        $this->assertEquals('\totara_feedback360\event\request_deleted', $eventdata['eventname']);
+        $this->assertEquals('deleted', $eventdata['action']);
+        $this->assertEquals('feedback360_resp_assignment', $eventdata['objecttable']);
+        $this->assertEquals($onlyrespassignment->id, $eventdata['objectid']); // This is no longer in the db, but was in the event.
+        $this->assertEquals($user_assign->id, $eventdata['relateduserid']);
+        $this->assertEquals($user_assignment->id, $eventdata['other']['assignmentid']);
+        $this->assertEquals($resp_assign->id, $eventdata['other']['userid']);
+        $this->assertEquals('', $eventdata['other']['email']);
 
         $sink->close();
     }
