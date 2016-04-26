@@ -63,46 +63,11 @@ class importcertification_testcase extends reportcache_advanced_testcase {
 
         // Create some programs.
         $this->assertEquals(0, $DB->count_records('prog'), "Programs table isn't empty");
-        $programs = array();
-        $now = time();
-        $from = strtotime('-1 day', $now);
-        $until = strtotime('+1 day', $now);
         for ($i = 1; $i <= CERT_HISTORY_IMPORT_CERTIFICATIONS; $i++) {
-            $program = new stdClass();
-            $program->certifid = $i;
-            $program->fullname = 'Certification Program ' . $i;
-            $program->availablefrom = $from;
-            $program->availableuntil = $until;
-            $program->sortorder = $i;
-            $program->timecreated = $now;
-            $program->timemodified = $now;
-            $program->usermodified = 2;
-            $program->category = 1;
-            $program->shortname = 'CP' . $i;
-            $program->idnumber = $i;
-            $program->available = 1;
-            $program->icon = 1;
-            $program->exceptionssent = 0;
-            $program->visible = 1;
-            $program->summary = '';
-            $program->endnote = '';
-            $programs[] = $program;
+            $certifications[$i] = $this->getDataGenerator()->create_certification(array('prog_idnumber' => 'ID' . $i));
         }
-        $DB->insert_records_via_batch('prog', $programs);
         $this->assertEquals(CERT_HISTORY_IMPORT_CERTIFICATIONS, $DB->count_records('prog'),
                 'Record count mismatch in program table');
-
-        // Then some certifications.
-        $this->assertEquals(0, $DB->count_records('certif'), "Certif table isn't empty");
-        $sql = "INSERT INTO {certif}
-                    (learningcomptype, activeperiod, windowperiod, recertifydatetype, timemodified)
-                SELECT  " . CERTIFTYPE_PROGRAM . " AS learningcomptype,
-                        '1 year' AS activeperiod,
-                        '4 week' AS windowperiod,
-                        " . CERTIFRECERT_COMPLETION . " AS recertifydatetype,
-                        " . time() . " AS timemodified
-                FROM {prog}";
-        $DB->execute($sql);
         $this->assertEquals(CERT_HISTORY_IMPORT_CERTIFICATIONS, $DB->count_records('certif'),
                 'Record count mismatch for certif');
 

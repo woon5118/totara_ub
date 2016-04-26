@@ -44,8 +44,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $courses = array();
         $certifications = array();
         for ($i = 1; $i <= 10; $i++) {
-            $course = $this->getDataGenerator()->create_course();
-            $courses[$course->id] = $course; // IDs match array index, to simplify testing.
+            $courses[$i] = $this->getDataGenerator()->create_course();
             $certifications[$i] = $this->getDataGenerator()->create_certification();
         }
 
@@ -82,83 +81,83 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
             array($courses[7]->id), CERTIFPATH_RECERT);
 
         // Call find_courses_for_certif with each of the three params and ensure that the correct courses are returned.
-        $found = array_keys(find_courses_for_certif($certifications[2]->id, 'c.id'));
+        $found = array_keys(find_courses_for_certif($certifications[2]->certifid, 'c.id'));
         sort($found);
-        $this->assertEquals(array(2, 3, 4, 5), $found);
-        $found = array_keys(find_courses_for_certif($certifications[2]->id, 'c.id', CERTIFPATH_CERT));
+        $this->assertEquals(array($courses[2]->id, $courses[3]->id, $courses[4]->id, $courses[5]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[2]->certifid, 'c.id', CERTIFPATH_CERT));
         sort($found);
-        $this->assertEquals(array(2, 3, 4), $found);
-        $found = array_keys(find_courses_for_certif($certifications[2]->id, 'c.id', CERTIFPATH_RECERT));
+        $this->assertEquals(array($courses[2]->id, $courses[3]->id, $courses[4]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[2]->certifid, 'c.id', CERTIFPATH_RECERT));
         sort($found);
-        $this->assertEquals(array(3, 4, 5), $found);
+        $this->assertEquals(array($courses[3]->id, $courses[4]->id, $courses[5]->id), $found);
 
-        $found = array_keys(find_courses_for_certif($certifications[3]->id));
+        $found = array_keys(find_courses_for_certif($certifications[3]->certifid));
         sort($found);
-        $this->assertEquals(array(2, 3, 4, 5), $found); // Note default fields.
-        $found = array_keys(find_courses_for_certif($certifications[3]->id, 'c.id', CERTIFPATH_CERT));
+        $this->assertEquals(array($courses[2]->id, $courses[3]->id, $courses[4]->id, $courses[5]->id), $found); // Note default fields.
+        $found = array_keys(find_courses_for_certif($certifications[3]->certifid, 'c.id', CERTIFPATH_CERT));
         sort($found);
-        $this->assertEquals(array(2, 3, 4), $found);
-        $found = array_keys(find_courses_for_certif($certifications[3]->id, 'c.id', CERTIFPATH_RECERT));
+        $this->assertEquals(array($courses[2]->id, $courses[3]->id, $courses[4]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[3]->certifid, 'c.id', CERTIFPATH_RECERT));
         sort($found);
-        $this->assertEquals(array(3, 4, 5), $found);
+        $this->assertEquals(array($courses[3]->id, $courses[4]->id, $courses[5]->id), $found);
 
-        $found = array_keys(find_courses_for_certif($certifications[4]->id, 'c.id'));
+        $found = array_keys(find_courses_for_certif($certifications[4]->certifid, 'c.id'));
         sort($found);
-        $this->assertEquals(array(2, 3, 4), $found);
-        $found = array_keys(find_courses_for_certif($certifications[4]->id, 'c.id', CERTIFPATH_CERT));
+        $this->assertEquals(array($courses[2]->id, $courses[3]->id, $courses[4]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[4]->certifid, 'c.id', CERTIFPATH_CERT));
         sort($found);
-        $this->assertEquals(array(2, 3, 4), $found);
-        $found = array_keys(find_courses_for_certif($certifications[4]->id, 'c.id', CERTIFPATH_RECERT));
+        $this->assertEquals(array($courses[2]->id, $courses[3]->id, $courses[4]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[4]->certifid, 'c.id', CERTIFPATH_RECERT));
         sort($found);
-        $this->assertEquals(array(2, 3, 4), $found);
+        $this->assertEquals(array($courses[2]->id, $courses[3]->id, $courses[4]->id), $found);
 
-        $found = array_keys(find_courses_for_certif($certifications[5]->id, 'c.id'));
+        $found = array_keys(find_courses_for_certif($certifications[5]->certifid, 'c.id'));
         sort($found);
-        $this->assertEquals(array(8, 9), $found);
-        $found = array_keys(find_courses_for_certif($certifications[5]->id, 'c.id', CERTIFPATH_CERT));
+        $this->assertEquals(array($courses[8]->id, $courses[9]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[5]->certifid, 'c.id', CERTIFPATH_CERT));
         sort($found);
-        $this->assertEquals(array(8, 9), $found);
-        $found = array_keys(find_courses_for_certif($certifications[5]->id, 'c.id', CERTIFPATH_RECERT));
+        $this->assertEquals(array($courses[8]->id, $courses[9]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[5]->certifid, 'c.id', CERTIFPATH_RECERT));
         sort($found);
-        $this->assertEquals(array(8, 9), $found);
+        $this->assertEquals(array($courses[8]->id, $courses[9]->id), $found);
 
-        $found = array_keys(find_courses_for_certif($certifications[6]->id, 'c.id'));
+        $found = array_keys(find_courses_for_certif($certifications[6]->certifid, 'c.id'));
         sort($found);
-        $this->assertEquals(array(6, 7), $found);
-        $found = array_keys(find_courses_for_certif($certifications[6]->id, 'c.id', CERTIFPATH_CERT));
+        $this->assertEquals(array($courses[6]->id, $courses[7]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[6]->certifid, 'c.id', CERTIFPATH_CERT));
         sort($found);
-        $this->assertEquals(array(6), $found);
-        $found = array_keys(find_courses_for_certif($certifications[6]->id, 'c.id', CERTIFPATH_RECERT));
+        $this->assertEquals(array($courses[6]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[6]->certifid, 'c.id', CERTIFPATH_RECERT));
         sort($found);
-        $this->assertEquals(array(7), $found);
+        $this->assertEquals(array($courses[7]->id), $found);
 
-        $found = array_keys(find_courses_for_certif($certifications[7]->id, 'c.id'));
+        $found = array_keys(find_courses_for_certif($certifications[7]->certifid, 'c.id'));
         sort($found);
-        $this->assertEquals(array(6), $found);
-        $found = array_keys(find_courses_for_certif($certifications[7]->id, 'c.id', CERTIFPATH_CERT));
+        $this->assertEquals(array($courses[6]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[7]->certifid, 'c.id', CERTIFPATH_CERT));
         sort($found);
-        $this->assertEquals(array(6), $found);
-        $found = array_keys(find_courses_for_certif($certifications[7]->id, 'c.id', CERTIFPATH_RECERT));
+        $this->assertEquals(array($courses[6]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[7]->certifid, 'c.id', CERTIFPATH_RECERT));
         sort($found);
         $this->assertEquals(array(), $found);
 
-        $found = array_keys(find_courses_for_certif($certifications[8]->id, 'c.id'));
+        $found = array_keys(find_courses_for_certif($certifications[8]->certifid, 'c.id'));
         sort($found);
-        $this->assertEquals(array(7), $found);
-        $found = array_keys(find_courses_for_certif($certifications[8]->id, 'c.id', CERTIFPATH_CERT));
+        $this->assertEquals(array($courses[7]->id), $found);
+        $found = array_keys(find_courses_for_certif($certifications[8]->certifid, 'c.id', CERTIFPATH_CERT));
         sort($found);
         $this->assertEquals(array(), $found);
-        $found = array_keys(find_courses_for_certif($certifications[8]->id, 'c.id', CERTIFPATH_RECERT));
+        $found = array_keys(find_courses_for_certif($certifications[8]->certifid, 'c.id', CERTIFPATH_RECERT));
         sort($found);
-        $this->assertEquals(array(7), $found);
+        $this->assertEquals(array($courses[7]->id), $found);
 
-        $found = array_keys(find_courses_for_certif($certifications[9]->id, 'c.id'));
+        $found = array_keys(find_courses_for_certif($certifications[9]->certifid, 'c.id'));
         sort($found);
         $this->assertEquals(array(), $found);
-        $found = array_keys(find_courses_for_certif($certifications[9]->id, 'c.id', CERTIFPATH_CERT));
+        $found = array_keys(find_courses_for_certif($certifications[9]->certifid, 'c.id', CERTIFPATH_CERT));
         sort($found);
         $this->assertEquals(array(), $found);
-        $found = array_keys(find_courses_for_certif($certifications[9]->id, 'c.id', CERTIFPATH_RECERT));
+        $found = array_keys(find_courses_for_certif($certifications[9]->certifid, 'c.id', CERTIFPATH_RECERT));
         sort($found);
         $this->assertEquals(array(), $found);
     }
@@ -170,8 +169,7 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $courses = array();
         $certifications = array();
         for ($i = 1; $i <= 10; $i++) {
-            $course = $this->getDataGenerator()->create_course();
-            $courses[$course->id] = $course; // IDs match array index, to simplify testing.
+            $courses[$i] = $this->getDataGenerator()->create_course();
             $certifications[$i] = $this->getDataGenerator()->create_certification();
         }
 
@@ -248,18 +246,18 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         // Call the function, checking if the correct times are returned.
 
         // These two check that the correct user's results are being returned.
-        $this->assertEquals(3000, certif_get_content_completion_time($certifications[2]->id, $users[1]->id));
-        $this->assertEquals(8000, certif_get_content_completion_time($certifications[2]->id, $users[2]->id));
+        $this->assertEquals(3000, certif_get_content_completion_time($certifications[2]->certifid, $users[1]->id));
+        $this->assertEquals(8000, certif_get_content_completion_time($certifications[2]->certifid, $users[2]->id));
 
         // These two check that the correct certification's results are being returned.
-        $this->assertEquals(5000, certif_get_content_completion_time($certifications[2]->id, $users[3]->id));
-        $this->assertEquals(4000, certif_get_content_completion_time($certifications[4]->id, $users[3]->id));
+        $this->assertEquals(5000, certif_get_content_completion_time($certifications[2]->certifid, $users[3]->id));
+        $this->assertEquals(4000, certif_get_content_completion_time($certifications[4]->certifid, $users[3]->id));
 
         // These check that the correct certification path results are being returned.
-        $this->assertEquals(4000, certif_get_content_completion_time($certifications[2]->id, $users[3]->id, CERTIFPATH_CERT));
-        $this->assertEquals(5000, certif_get_content_completion_time($certifications[2]->id, $users[3]->id, CERTIFPATH_RECERT));
-        $this->assertEquals(2000, certif_get_content_completion_time($certifications[4]->id, $users[3]->id, CERTIFPATH_CERT));
-        $this->assertEquals(4000, certif_get_content_completion_time($certifications[4]->id, $users[3]->id, CERTIFPATH_RECERT));
+        $this->assertEquals(4000, certif_get_content_completion_time($certifications[2]->certifid, $users[3]->id, CERTIFPATH_CERT));
+        $this->assertEquals(5000, certif_get_content_completion_time($certifications[2]->certifid, $users[3]->id, CERTIFPATH_RECERT));
+        $this->assertEquals(2000, certif_get_content_completion_time($certifications[4]->certifid, $users[3]->id, CERTIFPATH_CERT));
+        $this->assertEquals(4000, certif_get_content_completion_time($certifications[4]->certifid, $users[3]->id, CERTIFPATH_RECERT));
     }
 
     /**
