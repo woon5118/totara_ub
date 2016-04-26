@@ -2466,7 +2466,7 @@ EOD;
 
         $message = '<p class="errormessage">' . $message . '</p>';
 
-        if (empty(!$CFG->docroot)) {
+        if (!empty($CFG->docroot)) {
             $message .= '<p class="errorcode">' . $this->doc_link($moreinfourl, get_string('moreinformation')) . '</p>';
         }
 
