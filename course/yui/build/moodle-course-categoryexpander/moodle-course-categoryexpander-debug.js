@@ -312,8 +312,8 @@ NS.expand_all = function(ancestor) {
     var finalexpansions = [];
 
     ancestor.all(SELECTORS.CATEGORYWITHCOLLAPSEDUNLOADEDCHILDREN).each(function(categorynode) {
-        categoryid = categorynode.getData('categoryid');
-        depth = categorynode.getData('depth');
+        var categoryid = categorynode.getData('categoryid');
+        var depth = categorynode.getData('depth');
         if (typeof categoryid === "undefined" || typeof depth === "undefined") {
             return;
         }

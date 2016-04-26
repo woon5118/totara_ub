@@ -141,7 +141,7 @@ NS._toggle_programbox_expansion = function(e) {
     }
 
     YUI().use('querystring-parse', function(Y) {
-        query = Y.QueryString.parse(window.location.search.substr(1));
+        var query = Y.QueryString.parse(window.location.search.substr(1));
         if (!query.viewtype) {
             query.viewtype = 'program';
         }
@@ -187,7 +187,7 @@ NS._toggle_category_expansion = function(e) {
     depth = categorynode.getData('depth');
 
     YUI().use('querystring-parse', function(Y) {
-        query = Y.QueryString.parse(window.location.search.substr(1));
+        var query = Y.QueryString.parse(window.location.search.substr(1));
         if (!query.viewtype) {
             query.viewtype = 'program';
         }
@@ -213,6 +213,7 @@ NS._toggle_category_expansion = function(e) {
  * @param {Object} config
  */
 NS._toggle_generic_expansion = function(config) {
+    var spinner = {};
     if (config.spinnerhandle) {
       // Add a spinner to give some feedback to the user.
       spinner = M.util.add_spinner(Y, config.parentnode.one(config.spinnerhandle)).show();
@@ -339,8 +340,8 @@ NS.expand_all = function(ancestor) {
     }
 
     ancestor.all(SELECTORS.CATEGORYWITHCOLLAPSEDUNLOADEDCHILDREN).each(function(categorynode) {
-        categoryid = categorynode.getData('categoryid');
-        depth = categorynode.getData('depth');
+        var categoryid = categorynode.getData('categoryid');
+        var depth = categorynode.getData('depth');
         if (typeof categoryid === "undefined" || typeof depth === "undefined") {
             return;
         }
