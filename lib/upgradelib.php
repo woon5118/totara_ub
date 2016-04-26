@@ -404,6 +404,8 @@ function upgrade_stale_php_files_present() {
         '/blocks/admin/block_admin.php',
         '/blocks/admin_tree/block_admin_tree.php',
 
+        // Removed in Totara 9.0.
+        '/blocks/facetoface/lib.php',
         // Removed in Totara 2.7.
         '/admin/bulk-course-restore.php',
     );

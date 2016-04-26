@@ -1658,6 +1658,7 @@ class core_plugin_manager {
         // branch, listed should be no plugins that were removed at 1.9.x - 2.1.x versions as
         // Moodle 2.3 supports upgrades from 2.2.x only.
         $plugins = array(
+            'block' => array('facetoface'),
             'qformat' => array('blackboard', 'learnwise'),
             'enrol' => array('authorize'),
             'tinymce' => array('dragmath'),
@@ -1737,7 +1738,7 @@ class core_plugin_manager {
                 ,'totara_addtoplan', 'totara_alerts',
                 'totara_my_learning_nav', 'totara_my_team_nav', 'totara_quicklinks',
                 'totara_recent_learning', 'totara_report_graph', 'totara_report_manager', 'totara_stats',
-                'totara_tasks', 'facetoface', 'totara_certifications', 'gaccess', 'totara_program_completion',
+                'totara_tasks', 'totara_certifications', 'gaccess', 'totara_program_completion',
                 'totara_dashboard', 'totara_report_table',
             ),
 

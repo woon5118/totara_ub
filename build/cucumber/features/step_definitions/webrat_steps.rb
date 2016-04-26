@@ -311,7 +311,6 @@ def parse_page url
   @@ignore = [
     '/login/logout.php',
     '/calendar/view.php',
-    '/blocks/facetoface/calendar.php',
     # problem pages:
     # won't work for local lookup
     '/iplookup/index.php',
