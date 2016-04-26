@@ -3807,6 +3807,7 @@ class reportbuilder {
         $table->set_attribute('cellspacing', '0');
         $table->set_attribute('id', $shortname);
         $table->set_attribute('class', 'logtable generalbox reportbuilder-table');
+        $table->set_attribute('data-source', clean_param(get_class($this->src), PARAM_ALPHANUMEXT));
         $table->set_control_variables(array(
             TABLE_VAR_SORT    => 'ssort',
             TABLE_VAR_HIDE    => 'shide',

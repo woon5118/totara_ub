@@ -337,6 +337,13 @@ abstract class rb_facetoface_base_source extends rb_base_source {
     /**
      * Add session booking and overall status columns
      * Requires 'sessions' join, and 'cntbookings' join provided by @see rb_facetoface_base_source::add_session_status_to_joinlist()
+     *
+     * If you call this function in order to get the correct highlighting you will need to extend the CSS rules in
+     * mod/facetoface/styles.css and add a line like the following:
+     *     .reportbuilder-table[data-source="rb_source_facetoface_summary"] tr
+     *
+     * Search for that and you'll see what you need to do.
+     *
      * @param array $columnoptions
      * @param string $join Join name that provide {facetoface_sessions_dates}
      */
@@ -356,7 +363,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
              )",
             array(
                 'joins' => array($join, 'sessions'),
-                'displayfunc' => 'overallstatus',
+                'displayfunc' => 'overall_status',
                 'extrafields' => array(
                     'timestart' => "{$join}.timestart",
                     'timefinish' => "{$join}.timefinish",
@@ -376,7 +383,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                    ELSE NULL END)",
             array(
                 'joins' => array('cntbookings', 'sessions'),
-                'displayfunc' => 'bookingstatus',
+                'displayfunc' => 'booking_status',
                 'dbdatatype' => 'char',
                 'extrafields' => array(
                     'mincapacity' => 'sessions.mincapacity',
@@ -569,42 +576,6 @@ abstract class rb_facetoface_base_source extends rb_base_source {
     /**
      * Display count of attendees and link to session attendees report page.
      *
-     * @param string $status
-     * @param stdClass $row
-     * @param bool $isexport
-     */
-    public function rb_display_overallstatus($status, $row, $isexport = false) {
-        switch($status) {
-            case 'cancelled':
-                $str = get_string('status:cancelled', 'rb_source_facetoface_summary');
-                $class = 'cancelled';
-                break;
-            case 'upcoming':
-                $str = get_string('status:upcoming', 'rb_source_facetoface_summary');
-                $class = 'upcoming';
-                break;
-            case 'started':
-                $str = get_string('status:started', 'rb_source_facetoface_summary');
-                $class = 'started';
-                break;
-            case 'ended':
-                $str = get_string('status:ended', 'rb_source_facetoface_summary');
-                $class = 'ended';
-                break;
-            default:
-                $str = get_string('status:notavailable', 'rb_source_facetoface_summary');
-                $class = 'notavailable';
-        }
-
-        if ($isexport) {
-            return $str;
-        }
-        return html_writer::div(html_writer::span($str), $class);
-    }
-
-    /**
-     * Display count of attendees and link to session attendees report page.
-     *
      * @param int $cntattendees
      * @param stdClass $row
      * @param bool $isexport
@@ -614,43 +585,6 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             return $cntattendees;
         }
         return html_writer::link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $row->session)), $cntattendees);
-    }
-
-    /**
-     * Display booking status according number of bookings and capacities
-     *
-     * @param string $status
-     * @param stdClass $row
-     * @param bool $isexport
-     * @return type
-     */
-    public function rb_display_bookingstatus($status, $row, $isexport = false){
-        switch($status) {
-            case 'underbooked':
-                $str = get_string('status:underbooked', 'rb_source_facetoface_summary');
-                $class = 'underbooked';
-                break;
-            case 'available':
-                $str = get_string('status:available', 'rb_source_facetoface_summary');
-            $class = 'available';
-                break;
-            case 'fullybooked':
-                $str = get_string('status:fullybooked', 'rb_source_facetoface_summary');
-                $class = 'fullybooked';
-                break;
-            case 'overbooked':
-                $str = get_string('status:overbooked', 'rb_source_facetoface_summary');
-                $class = 'overbooked';
-                break;
-            default:
-                $str = get_string('status:notavailable', 'rb_source_facetoface_summary');
-                $class = 'notavailable';
-        }
-
-        if ($isexport) {
-            return $str;
-        }
-        return html_writer::div(html_writer::span($str), $class);
     }
 
     /**

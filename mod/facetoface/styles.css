@@ -157,56 +157,74 @@ div.mod-indent form.togglecompletion input[type="image"] {
     display: block;
 }
 
-table.reportbuilder-table tr {
+/** This is a hack to get full height divs for the status columns with background colours */
+.reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
+.reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
+.reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
+    height: 1px;
+}
+/** Firefox requires a different hack **/
+.gecko .reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
+.gecko .reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
+.gecko .reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
     height: 100%;
+}
+/** IE requires quite a bit more hacking! **/
+.ie .reportbuilder-table[data-source="rb_source_facetoface_summary"] tr,
+.ie .reportbuilder-table[data-source="rb_source_facetoface_room_assignments"] tr,
+.ie .reportbuilder-table[data-source="rb_source_facetoface_asset_assignments"] tr {
+    height: 100%;
+}
+.ie .reportbuilder-table td.session_bookingstatus,
+.ie .reportbuilder-table td.session_overallstatus {
+    overflow: hidden;
+}
+.ie .reportbuilder-table td.session_bookingstatus div,
+.ie .reportbuilder-table td.session_overallstatus div {
+    padding-bottom: 9999px;
+    margin-bottom: -9999px;
 }
 
 .reportbuilder-table td.session_bookingstatus,
 .reportbuilder-table td.session_overallstatus {
     padding: 0;
-    height: 100%;
+    /** Part of the full-height hack mentioned above **/
+    height: inherit;
 }
 
-.reportbuilder-table td.session_bookingstatus div,
-.reportbuilder-table td.session_overallstatus div {
-    display: inline-block;
+.reportbuilder-table td.session_bookingstatus > div,
+.reportbuilder-table td.session_overallstatus > div {
     text-align: center;
+    /** Part of the full-height hack mentioned above **/
     height: 100%;
-    width:100%;
-    position: relative;
-    transform-style: preserve-3d;
-    -moz-transform-style: initial;
 }
 
-.reportbuilder-table .session_bookingstatus div span,
-.reportbuilder-table .session_overallstatus div span {
+.reportbuilder-table .session_bookingstatus > div > span,
+.reportbuilder-table .session_overallstatus > div > span {
     display: inline-block;
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
+    margin: 8px;
 }
 
-.reportbuilder-table .session_bookingstatus div.underbooked,
-.reportbuilder-table .session_overallstatus div.ended {
+.reportbuilder-table .session_bookingstatus .underbooked,
+.reportbuilder-table .session_overallstatus .ended {
     background-color: #ffffc0;
 }
 
-.reportbuilder-table .session_bookingstatus div.available,
-.reportbuilder-table .session_overallstatus div.upcoming {
+.reportbuilder-table .session_bookingstatus .available,
+.reportbuilder-table .session_overallstatus .upcoming {
     background-color: #daead3;
 }
 
-.reportbuilder-table .session_bookingstatus div.overbooked {
+.reportbuilder-table .session_bookingstatus .overbooked {
     background-color: #f2d9b3;
 }
 
-.reportbuilder-table .session_overallstatus div.cancelled {
+.reportbuilder-table .session_overallstatus .cancelled {
     background-color: #e6bdbc;
 }
 
-.reportbuilder-table .session_bookingstatus div.fullybooked,
-.reportbuilder-table .session_overallstatus div.started {
+.reportbuilder-table .session_bookingstatus .fullybooked,
+.reportbuilder-table .session_overallstatus .started {
     background-color: #b3dab6;
 }
 
