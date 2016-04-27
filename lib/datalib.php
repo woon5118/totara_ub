@@ -419,10 +419,14 @@ function get_users($get=true, $search='', $confirmed=false, array $exceptions=nu
         $select .= ' AND deleted = 0';
     } else {
         // Get deleted users as well, excluding legacy-deleted ones with md5 hash as email
-        $select .= ' AND (email = \'\' OR ' . $DB->sql_like('email', ':nolegacyemail', false) . ')';
-        $params['nolegacyemail'] = '%@%';
+        if ($DB->sql_regex_supported()) {
+            $select .= ' AND NOT ( ' . $DB->sql_length('email') . ' = 32 AND email ' . $DB->sql_regex(true) . ' :nomd5)';
+            $params['nomd5'] = "^[a-f0-9]{32}$";
+        } else {
+            $select .= ' AND NOT (' . $DB->sql_length('email') . ' = 32 AND ' . $DB->sql_like('email', ':nolegacyemail', false, true, true) . ')';
+            $params['nolegacyemail'] = '%@%';
+        }
     }
-
 
     if (!empty($search)){
         $search = trim($search);
@@ -496,8 +500,13 @@ function get_users_listing($sort='lastaccess', $dir='ASC', $page=0, $recordsperp
         $select .= " AND deleted <> 1";
     } else {
         // Get deleted users as well, excluding legacy-deleted ones with md5 hash as email.
-        $select .= ' AND (email = \'\' OR ' . $DB->sql_like('email', ':nolegacyemail', false) . ')';
-        $params['nolegacyemail'] = '%@%';
+        if ($DB->sql_regex_supported()) {
+            $select .= ' AND NOT ( ' . $DB->sql_length('email') . ' = 32 AND email ' . $DB->sql_regex(true) . ' :nomd5)';
+            $params['nomd5'] = "^[a-f0-9]{32}$";
+        } else {
+            $select .= ' AND NOT (' . $DB->sql_length('email') . ' = 32 AND ' . $DB->sql_like('email', ':nolegacyemail', false, true, true) . ')';
+            $params['nolegacyemail'] = '%@%';
+        }
     }
 
     if (!empty($search)) {
