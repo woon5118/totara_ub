@@ -675,7 +675,7 @@ function profile_signup_position($mform, $nojs, $positionid = 0) {
 
     // Position details.
     if ($nojs) {
-        $allpositions = $DB->get_records_menu('pos', null, 'frameworkid,sortthread', 'id,fullname');
+        $allpositions = $DB->get_records_menu('pos', array('visible' => '1'), 'frameworkid,sortthread', 'id,fullname');
         if (is_array($allpositions) && !empty($allpositions)) {
             $mform->addElement('select', 'positionid', get_string('chooseposition', 'totara_hierarchy'),
                 array(0 => get_string('chooseposition', 'totara_hierarchy')) + $allpositions);
@@ -707,7 +707,7 @@ function profile_signup_organisation($mform, $nojs, $organisationid = 0) {
 
     // Organisation details.
     if ($nojs) {
-        $allorgs = $DB->get_records_menu('org', null, 'frameworkid,sortthread', 'id,fullname');
+        $allorgs = $DB->get_records_menu('org', array('visible' => '1'), 'frameworkid,sortthread', 'id,fullname');
         if (is_array($allorgs) && !empty($allorgs)) {
             $mform->addElement('select', 'organisationid', get_string('chooseorganisation', 'totara_hierarchy'),
                 array(0 => get_string('chooseorganisation', 'totara_hierarchy')) + $allorgs);
