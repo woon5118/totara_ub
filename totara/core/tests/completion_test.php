@@ -71,10 +71,10 @@ class totara_core_completion_testcase extends advanced_testcase {
         $criterion = new completion_criteria_activity();
         $data = new stdClass();
         $data->activity_aggregation = COMPLETION_AGGREGATION_ALL;
-        $data->criteria_activity_value = array($this->modules['test1']->id => 1, $this->modules['test2']->id => 1);
+        $data->criteria_activity_value = array($this->modules['test1']->cmid => 1, $this->modules['test2']->cmid => 1);
         $data->id = $this->courses['test']->id;
         $criterion->update_config($data);
-        $data->criteria_activity_value = array($this->modules['cont1']->id => 1, $this->modules['cont2']->id => 1);
+        $data->criteria_activity_value = array($this->modules['cont1']->cmid => 1, $this->modules['cont2']->cmid => 1);
         $data->id = $this->courses['cont']->id;
         $criterion->update_config($data);
 
@@ -147,9 +147,9 @@ class totara_core_completion_testcase extends advanced_testcase {
         $this->assertEquals(2, count($records));
         foreach ($records as $record) {
             $this->assertEquals(1, $DB->count_records('course_modules_completion',
-                array('coursemoduleid' => $record->id)));
+                array('coursemoduleid' => $record->moduleinstance))); // Moduleinstance contains a coursemoduleid!
             $this->assertEquals(1, $DB->count_records('course_modules_completion',
-                array('coursemoduleid' => $record->id, 'userid' => $this->users['man']->id)));
+                array('coursemoduleid' => $record->moduleinstance, 'userid' => $this->users['man']->id)));
         }
 
         // Check the module criteria completion records (none for RPL user because they just marked course complete).
@@ -269,20 +269,20 @@ class totara_core_completion_testcase extends advanced_testcase {
         $this->assertEquals(2, count($records));
         foreach ($records as $record) {
             $this->assertEquals(1, $DB->count_records('course_modules_completion',
-                array('coursemoduleid' => $record->id)));
+                array('coursemoduleid' => $record->moduleinstance)));
             $this->assertEquals(1, $DB->count_records('course_modules_completion',
-                array('coursemoduleid' => $record->id, 'userid' => $this->users['man']->id)));
+                array('coursemoduleid' => $record->moduleinstance, 'userid' => $this->users['man']->id)));
         }
 
         // Trigger completion reset with delete for one of the course modules.
-        $mod = $DB->get_record('course_modules', array('id' => $this->modules['test1']->id));
+        $mod = $DB->get_record('course_modules', array('id' => $this->modules['test1']->cmid));
         $completion = new completion_info($this->courses['test']);
         $completion->reset_all_state($mod);
 
         // After the reset there should be only one record for the other activity which wasn't removed during the reset.
         $this->assertEquals(1, $DB->count_records('course_completion_crit_compl',
             array('course' => $this->courses['test']->id)));
-        $criteria = $DB->get_record('course_completion_criteria', array('moduleinstance' => $this->modules['test2']->id));
+        $criteria = $DB->get_record('course_completion_criteria', array('moduleinstance' => $this->modules['test2']->cmid));
         $this->assertEquals(1, $DB->count_records('course_completion_crit_compl',
             array('course' => $this->courses['test']->id, 'criteriaid' => $criteria->id)));
 
@@ -290,14 +290,14 @@ class totara_core_completion_testcase extends advanced_testcase {
         $records = $DB->get_records('course_completion_criteria', array('course' => $this->courses['test']->id));
         $this->assertEquals(2, count($records));
         foreach ($records as $record) {
-            if ($record->moduleinstance == $this->modules['test2']->id) {
+            if ($record->moduleinstance == $this->modules['test2']->cmid) {
                 $this->assertEquals(1, $DB->count_records('course_modules_completion',
-                    array('coursemoduleid' => $record->id)));
+                    array('coursemoduleid' => $record->moduleinstance)));
                 $this->assertEquals(1, $DB->count_records('course_modules_completion',
-                    array('coursemoduleid' => $record->id, 'userid' => $this->users['man']->id)));
+                    array('coursemoduleid' => $record->moduleinstance, 'userid' => $this->users['man']->id)));
             } else {
                 $this->assertEquals(0, $DB->count_records('course_modules_completion',
-                    array('coursemoduleid' => $record->id)));
+                    array('coursemoduleid' => $record->moduleinstance)));
             }
         }
 
