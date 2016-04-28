@@ -77,7 +77,7 @@ M.totara_customfield_location = M.totara_customfield_location || {
                 zoomControl: true,
                 mapTypeControl: false,
                 scaleControl: false,
-                streetViewControl: true,
+                streetViewControl: false,
                 rotateControl: false,
                 mapTypeId: this.addressinfo.view,
                 zoom: this.get_zoom_level()
