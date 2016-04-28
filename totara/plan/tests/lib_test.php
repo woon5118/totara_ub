@@ -72,13 +72,13 @@ class totara_plan_lib_testcase extends advanced_testcase {
         // Create a new competency framework and check it exists.
         $comp_fw = $hierarchy_gen->create_framework('competency');
         $exists = $DB->record_exists('comp_framework', array('id' => $comp_fw->id));
-        // Assert the existence of the course.
+        // Assert the existence of the framework.
         $this->assertTrue($exists);
 
-        // Create a new competency framework and check it exists.
+        // Create a new competency and check it exists.
         $comp = $hierarchy_gen->create_hierarchy($comp_fw->id, 'competency', array('fullname' => 'Test Competency'));
-        $exists = $DB->record_exists('comp_framework', array('id' => $comp->id));
-        // Assert the existence of the course.
+        $exists = $DB->record_exists('comp', array('id' => $comp->id));
+        // Assert the existence of the competency.
         $this->assertTrue($exists);
 
         $this->add_component_to_learning_plan($plan->id, 'competency', $comp->id);

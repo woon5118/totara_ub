@@ -38,13 +38,12 @@ class totara_plan_generator_testcase extends advanced_testcase {
         $record = $plangenerator->create_learning_plan();
         $this->assertTrue($DB->record_exists('dp_plan', array('id' => $record->id)));
         $this->assertEquals($USER->id, $record->userid);
-        $this->assertEquals($USER->id, $record->createdby);
+        $this->assertEquals(PLAN_CREATE_METHOD_MANUAL, $record->createdby);
 
-        $this->setUser($user1);
-        $record = $plangenerator->create_learning_plan(array('userid' => $user2->id));
+        $record = $plangenerator->create_learning_plan(array('userid' => $user2->id, 'createdby' => PLAN_CREATE_METHOD_COHORT));
         $this->assertTrue($DB->record_exists('dp_plan', array('id' => $record->id)));
         $this->assertEquals($user2->id, $record->userid);
-        $this->assertEquals($user1->id, $record->createdby);
+        $this->assertEquals(PLAN_CREATE_METHOD_COHORT, $record->createdby);
         $this->assertNotEmpty($record->name);
         $this->assertNotEmpty($record->description);
         $this->assertNotEmpty($record->startdate);
@@ -55,12 +54,12 @@ class totara_plan_generator_testcase extends advanced_testcase {
         $now = time();
         $this->setAdminUser();
         $record = $plangenerator->create_learning_plan(array(
-            'userid' => $user2->id, 'createdby' => $user1->id, 'name' => 'pokus', 'description' => 'lala',
+            'userid' => $user2->id, 'createdby' => PLAN_CREATE_METHOD_MANUAL, 'name' => 'pokus', 'description' => 'lala',
             'startdate' => $now + 10, 'enddate' => $now + 100, 'templateid' => 666,
         ));
         $this->assertTrue($DB->record_exists('dp_plan', array('id' => $record->id)));
         $this->assertEquals($user2->id, $record->userid);
-        $this->assertEquals($user1->id, $record->createdby);
+        $this->assertEquals(PLAN_CREATE_METHOD_MANUAL, $record->createdby);
         $this->assertSame('pokus', $record->name);
         $this->assertSame('lala', $record->description);
         $this->assertEquals($now + 10, $record->startdate);

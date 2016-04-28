@@ -115,14 +115,8 @@ class totara_plan_generator extends component_generator_base {
             $record['status'] = 0;
         }
 
-        // Allow Behat tests to reference a user name for the creator.
-        if (isset($record['createdbyuser'])) {
-            $record['createdby'] = $DB->get_field('user', 'id', array('username' => $record['createdbyuser']), MUST_EXIST);
-            unset ($record['createdbyuser']);
-        }
-
         if (!isset($record['createdby'])) {
-            $record['createdby'] = $USER->id;
+            $record['createdby'] = PLAN_CREATE_METHOD_MANUAL;
         }
 
         // Create a record for the given id or one
