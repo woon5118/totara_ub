@@ -57,193 +57,124 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/organisation/lib.php');
 
 class bulkaddhierarchyitems_test extends advanced_testcase {
 
+    private $orgs = array();
+
     protected function setUp() {
-        global $DB;
         parent::setup();
 
-        $this->org_data = Array();
+        $user = get_admin();
 
-        $this->org1 = new stdClass();
-        $this->org1->id = 1;
-        $this->org1->fullname = 'Organisation A';
-        $this->org1->shortname = 'Org A';
-        $this->org1->description = 'Org Description A';
-        $this->org1->idnumber = 'OA';
-        $this->org1->frameworkid = 1;
-        $this->org1->path = '/1';
-        $this->org1->parentid = 0;
-        $this->org1->sortthread = '01';
-        $this->org1->depthlevel = 1;
-        $this->org1->visible = 1;
-        $this->org1->timecreated = 1234567890;
-        $this->org1->timemodified = 1234567890;
-        $this->org1->usermodified = 2;
-        $this->org1->typeid = 0;
-        $this->org_data[] = $this->org1;
+        $org = new organisation();
 
-        $this->org2 = new stdClass();
-        $this->org2->id = 2;
-        $this->org2->fullname = 'Organisation B';
-        $this->org2->shortname = 'Org B';
-        $this->org2->description = 'Org Description B';
-        $this->org2->idnumber = 'OB';
-        $this->org2->frameworkid = 1;
-        $this->org2->path = '/1/2';
-        $this->org2->parentid = 1;
-        $this->org2->sortthread = '01.01';
-        $this->org2->depthlevel = 2;
-        $this->org2->visible = 1;
-        $this->org2->timecreated = 1234567890;
-        $this->org2->timemodified = 1234567890;
-        $this->org2->usermodified = 2;
-        $this->org2->typeid = 0;
-        $this->org_data[] = $this->org2;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation A';
+        $neworg->shortname = 'Org A';
+        $neworg->description = 'Org Description A';
+        $neworg->idnumber = 'OA';
+        $neworg->typeid = 0;
+        $neworg->visible = 1;
+        $neworg->usermodified = $user->id;
+        $this->orgs[1] = $org->add_hierarchy_item($neworg, 0, 1, false);
+        $this->assertTrue((bool)$this->orgs[1]);
 
-        $this->org3 = new stdClass();
-        $this->org3->id = 3;
-        $this->org3->fullname = 'Organisation C';
-        $this->org3->shortname = 'Org C';
-        $this->org3->description = 'Org Description C';
-        $this->org3->idnumber = 'OC';
-        $this->org3->frameworkid = 1;
-        $this->org3->path = '/1/2/3';
-        $this->org3->parentid = 2;
-        $this->org3->sortthread = '01.01.01';
-        $this->org3->depthlevel = 3;
-        $this->org3->visible = 1;
-        $this->org3->timecreated = 1234567890;
-        $this->org3->timemodified = 1234567890;
-        $this->org3->usermodified = 2;
-        $this->org3->typeid = 0;
-        $this->org_data[] = $this->org3;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation B';
+        $neworg->shortname = 'Org B';
+        $neworg->description = 'Org Description B';
+        $neworg->idnumber = 'OB';
+        $neworg->typeid = 0;
+        $neworg->visible = 1;
+        $neworg->usermodified = $user->id;
+        $this->orgs[2] = $org->add_hierarchy_item($neworg, $this->orgs[1]->id, 1, false);
+        $this->assertTrue((bool)$this->orgs[2]);
 
-        $this->org4 = new stdClass();
-        $this->org4->id = 4;
-        $this->org4->fullname = 'Organisation D';
-        $this->org4->shortname = 'Org D';
-        $this->org4->description = 'Org Description D';
-        $this->org4->idnumber = 'OD';
-        $this->org4->frameworkid = 1;
-        $this->org4->path = '/1/2/4';
-        $this->org4->parentid = 2;
-        $this->org4->sortthread = '01.01.02';
-        $this->org4->depthlevel = 3;
-        $this->org4->visible = 1;
-        $this->org4->timecreated = 1234567890;
-        $this->org4->timemodified = 1234567890;
-        $this->org4->usermodified = 2;
-        $this->org4->typeid = 0;
-        $this->org_data[] = $this->org4;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation C';
+        $neworg->shortname = 'Org C';
+        $neworg->description = 'Org Description C';
+        $neworg->idnumber = 'OC';
+        $neworg->typeid = 0;
+        $neworg->visible = 1;
+        $neworg->usermodified = $user->id;
+        $this->orgs[3] = $org->add_hierarchy_item($neworg, $this->orgs[2]->id, 1, false);
+        $this->assertTrue((bool)$this->orgs[3]);
 
-        $this->org5 = new stdClass();
-        $this->org5->id = 5;
-        $this->org5->fullname = 'Organisation E';
-        $this->org5->shortname = 'Org E';
-        $this->org5->description = 'Org Description E';
-        $this->org5->idnumber = 'OE';
-        $this->org5->frameworkid = 1;
-        $this->org5->path = '/5';
-        $this->org5->parentid = 0;
-        $this->org5->sortthread = '02';
-        $this->org5->depthlevel = 1;
-        $this->org5->visible = 1;
-        $this->org5->timecreated = 1234567890;
-        $this->org5->timemodified = 1234567890;
-        $this->org5->usermodified = 2;
-        $this->org5->typeid = 0;
-        $this->org_data[] = $this->org5;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation D';
+        $neworg->shortname = 'Org D';
+        $neworg->description = 'Org Description D';
+        $neworg->idnumber = 'OD';
+        $neworg->typeid = 0;
+        $neworg->visible = 1;
+        $neworg->usermodified = $user->id;
+        $this->orgs[4] = $org->add_hierarchy_item($neworg, $this->orgs[2]->id, 1, false);
+        $this->assertTrue((bool)$this->orgs[4]);
 
-        $this->org6 = new stdClass();
-        $this->org6->id = 6;
-        $this->org6->fullname = 'Organisation F';
-        $this->org6->shortname = 'Org F';
-        $this->org6->description = 'Org Description F';
-        $this->org6->idnumber = 'OF';
-        $this->org6->frameworkid = 1;
-        $this->org6->path = '/5/6';
-        $this->org6->parentid = 5;
-        $this->org6->sortthread = '02.01';
-        $this->org6->depthlevel = 2;
-        $this->org6->visible = 1;
-        $this->org6->timecreated = 1234567890;
-        $this->org6->timemodified = 1234567890;
-        $this->org6->usermodified = 2;
-        $this->org6->typeid = 0;
-        $this->org_data[] = $this->org6;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation E';
+        $neworg->shortname = 'Org E';
+        $neworg->description = 'Org Description E';
+        $neworg->idnumber = 'OE';
+        $neworg->typeid = 0;
+        $neworg->visible = 1;
+        $neworg->usermodified = $user->id;
+        $this->orgs[5] = $org->add_hierarchy_item($neworg, 0, 1, false);
+        $this->assertTrue((bool)$this->orgs[5]);
 
-        $this->org7 = new stdClass();
-        $this->org7->id = 7;
-        $this->org7->fullname = 'Organisation G';
-        $this->org7->shortname = 'Org G';
-        $this->org7->description = 'Org Description G';
-        $this->org7->idnumber = 'OG';
-        $this->org7->frameworkid = 1;
-        $this->org7->path = '/5/6/7';
-        $this->org7->parentid = 6;
-        $this->org7->sortthread = '02.01.01';
-        $this->org7->depthlevel = 3;
-        $this->org7->visible = 1;
-        $this->org7->timecreated = 1234567890;
-        $this->org7->timemodified = 1234567890;
-        $this->org7->usermodified = 2;
-        $this->org7->typeid = 0;
-        $this->org_data[] = $this->org7;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation F';
+        $neworg->shortname = 'Org F';
+        $neworg->description = 'Org Description F';
+        $neworg->idnumber = 'OF';
+        $neworg->typeid = 0;
+        $neworg->visible = 1;
+        $neworg->usermodified = $user->id;
+        $this->orgs[6] = $org->add_hierarchy_item($neworg, $this->orgs[5]->id, 1, false);
+        $this->assertTrue((bool)$this->orgs[6]);
 
-        $this->org8 = new stdClass();
-        $this->org8->id = 8;
-        $this->org8->fullname = 'Organisation H';
-        $this->org8->shortname = 'Org H';
-        $this->org8->description = 'Org Description H';
-        $this->org8->idnumber = 'OH';
-        $this->org8->frameworkid = 1;
-        $this->org8->path = '/5/6/8';
-        $this->org8->parentid = 6;
-        $this->org8->sortthread = '02.01.02';
-        $this->org8->depthlevel = 3;
-        $this->org8->visible = 1;
-        $this->org8->timecreated = 1234567890;
-        $this->org8->timemodified = 1234567890;
-        $this->org8->usermodified = 2;
-        $this->org8->typeid = 0;
-        $this->org_data[] = $this->org8;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation G';
+        $neworg->shortname = 'Org G';
+        $neworg->description = 'Org Description G';
+        $neworg->idnumber = 'OG';
+        $neworg->typeid = 0;
+        $neworg->visible = 1;
+        $neworg->usermodified = $user->id;
+        $this->orgs[7] = $org->add_hierarchy_item($neworg, $this->orgs[6]->id, 1, false);
+        $this->assertTrue((bool)$this->orgs[7]);
 
-        $this->org9 = new stdClass();
-        $this->org9->id = 9;
-        $this->org9->fullname = 'Organisation I';
-        $this->org9->shortname = 'Org I';
-        $this->org9->description = 'Org Description I';
-        $this->org9->idnumber = 'OI';
-        $this->org9->frameworkid = 1;
-        $this->org9->path = '/5/6/8/9';
-        $this->org9->parentid = 8;
-        $this->org9->sortthread = '02.01.02.01';
-        $this->org9->depthlevel = 4;
-        $this->org9->visible = 1;
-        $this->org9->timecreated = 1234567890;
-        $this->org9->timemodified = 1234567890;
-        $this->org9->usermodified = 2;
-        $this->org9->typeid = 0;
-        $this->org_data[] = $this->org9;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation H';
+        $neworg->shortname = 'Org H';
+        $neworg->description = 'Org Description H';
+        $neworg->idnumber = 'OH';
+        $neworg->typeid = 0;
+        $neworg->visible = 1;
+        $neworg->usermodified = $user->id;
+        $this->orgs[8] = $org->add_hierarchy_item($neworg, $this->orgs[6]->id, 1, false);
+        $this->assertTrue((bool)$this->orgs[8]);
 
-        $this->org10 = new stdClass();
-        $this->org10->id = 10;
-        $this->org10->fullname = 'Organisation J';
-        $this->org10->shortname = 'Org J';
-        $this->org10->description = 'Org Description J';
-        $this->org10->idnumber = 'OJ';
-        $this->org10->frameworkid = 1;
-        $this->org10->path = '/10';
-        $this->org10->parentid = 0;
-        $this->org10->sortthread = '03';
-        $this->org10->depthlevel = 1;
-        $this->org10->visible = 1;
-        $this->org10->timecreated = 1234567890;
-        $this->org10->timemodified = 1234567890;
-        $this->org10->usermodified = 2;
-        $this->org10->typeid = 0;
-        $this->org_data[] = $this->org10;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation I';
+        $neworg->shortname = 'Org I';
+        $neworg->description = 'Org Description I';
+        $neworg->idnumber = 'OI';
+        $neworg->typeid = 0;
+        $neworg->visible = 1;
+        $neworg->usermodified = $user->id;
+        $this->orgs[9] = $org->add_hierarchy_item($neworg, $this->orgs[8]->id, 1, false);
+        $this->assertTrue((bool)$this->orgs[9]);
 
-        $DB->insert_records_via_batch('org', $this->org_data);
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation J';
+        $neworg->shortname = 'Org J';
+        $neworg->description = 'Org Description J';
+        $neworg->idnumber = 'OJ';
+        $neworg->typeid = 0;
+        $neworg->visible = 1;
+        $neworg->usermodified = $user->id;
+        $this->orgs[10] = $org->add_hierarchy_item($neworg, 0, 1, false);
+        $this->assertTrue((bool)$this->orgs[10]);
     }
 
 
@@ -274,22 +205,29 @@ class bulkaddhierarchyitems_test extends advanced_testcase {
         $after = $DB->get_records_menu('org', null, 'sortthread', 'id,sortthread');
 
         // new items should have been added to the end
+        ksort($after);
+        $item2value = end($after);
+        $item2id = key($after);
+        $this->assertEquals('05', $item2value);
+        unset($after[$item2id]);
+        $item1value = end($after);
+        $item1id = key($after);
+        $this->assertEquals('04', $item1value);
+        unset($after[$item1id]);
         // all others should stay the same
-        $before[11] = '04';
-        $before[12] = '05';
         $this->assertEquals($before, $after);
 
         // get the items
-        $this->assertTrue((bool)$item1 = $DB->get_record('org', array('id' => 11)));
-        $this->assertTrue((bool)$item2 = $DB->get_record('org', array('id' => 12)));
+        $this->assertTrue((bool)$item1 = $DB->get_record('org', array('id' => $item1id)));
+        $this->assertTrue((bool)$item2 = $DB->get_record('org', array('id' => $item2id)));
 
         // check depthlevel set right
         $this->assertEquals(1, $item1->depthlevel);
         $this->assertEquals(1, $item2->depthlevel);
 
         // check path set right
-        $this->assertEquals('/11', $item1->path);
-        $this->assertEquals('/12', $item2->path);
+        $this->assertEquals('/' . $item1id, $item1->path);
+        $this->assertEquals('/' . $item2id, $item2->path);
 
         // check parentid set right
         $this->assertEquals(0, $item1->parentid);
@@ -321,34 +259,42 @@ class bulkaddhierarchyitems_test extends advanced_testcase {
         $item2->typeid = 1;
 
         $items = array($item1, $item2);
-        $parent = 6;
+
+        $parent = $this->orgs[6];
 
         // check items are added in the right place
         $before = $DB->get_records_menu('org', null, 'sortthread', 'id,sortthread');
-        $this->assertTrue((bool)$org->add_multiple_hierarchy_items($parent, $items, 1, false));
+        $this->assertTrue((bool)$org->add_multiple_hierarchy_items($parent->id, $items, 1, false));
         $after = $DB->get_records_menu('org', null, 'sortthread', 'id,sortthread');
 
         // new items should have been inserted after parent's last child
-        $before[11] = '02.01.03';
-        $before[12] = '02.01.04';
+        ksort($after);
+        $item2value = end($after);
+        $item2id = key($after);
+        $this->assertEquals('02.01.04', $item2value);
+        unset($after[$item2id]);
+        $item1value = end($after);
+        $item1id = key($after);
+        $this->assertEquals('02.01.03', $item1value);
+        unset($after[$item1id]);
         // all others should have stayed the same
         $this->assertEquals($before, $after);
 
         // get the items
-        $this->assertTrue((bool)$item1 = $DB->get_record('org', array('id' => 11)));
-        $this->assertTrue((bool)$item2 = $DB->get_record('org', array('id' => 12)));
+        $this->assertTrue((bool)$item1 = $DB->get_record('org', array('id' => $item1id)));
+        $this->assertTrue((bool)$item2 = $DB->get_record('org', array('id' => $item2id)));
 
         // check depthlevel set right
         $this->assertEquals(3, $item1->depthlevel);
         $this->assertEquals(3, $item2->depthlevel);
 
         // check path set right
-        $this->assertEquals('/5/6/11', $item1->path);
-        $this->assertEquals('/5/6/12', $item2->path);
+        $this->assertEquals($parent->path . '/' . $item1id, $item1->path);
+        $this->assertEquals($parent->path . '/' . $item2id, $item2->path);
 
         // check parentid set right
-        $this->assertEquals(6, $item1->parentid);
-        $this->assertEquals(6, $item2->parentid);
+        $this->assertEquals($parent->id, $item1->parentid);
+        $this->assertEquals($parent->id, $item2->parentid);
 
         // check the typeid set right
         $this->assertEquals(0, $item1->typeid);
@@ -376,34 +322,41 @@ class bulkaddhierarchyitems_test extends advanced_testcase {
         $item2->typeid = 1;
 
         $items = array($item1, $item2);
-        $parent = 4;
+        $parent = $this->orgs[4];
 
         // check items are added in the right place
         $before = $DB->get_records_menu('org', null, 'sortthread', 'id,sortthread');
-        $this->assertTrue((bool)$org->add_multiple_hierarchy_items($parent, $items, 1, false));
+        $this->assertTrue((bool)$org->add_multiple_hierarchy_items($parent->id, $items, 1, false));
         $after = $DB->get_records_menu('org', null, 'sortthread', 'id,sortthread');
 
         // new items should have been inserted directly after parent
-        $before[11] = '01.01.02.01';
-        $before[12] = '01.01.02.02';
+        ksort($after);
+        $item2value = end($after);
+        $item2id = key($after);
+        $this->assertEquals('01.01.02.02', $item2value);
+        unset($after[$item2id]);
+        $item1value = end($after);
+        $item1id = key($after);
+        $this->assertEquals('01.01.02.01', $item1value);
+        unset($after[$item1id]);
         // all others should stay the same
         $this->assertEquals($before, $after);
 
         // get the items
-        $this->assertTrue((bool)$item1 = $DB->get_record('org', array('id' => 11)));
-        $this->assertTrue((bool)$item2 = $DB->get_record('org', array('id' => 12)));
+        $this->assertTrue((bool)$item1 = $DB->get_record('org', array('id' => $item1id)));
+        $this->assertTrue((bool)$item2 = $DB->get_record('org', array('id' => $item2id)));
 
         // check depthlevel set right
         $this->assertEquals(4, $item1->depthlevel);
         $this->assertEquals(4, $item2->depthlevel);
 
         // check path set right
-        $this->assertEquals('/1/2/4/11', $item1->path);
-        $this->assertEquals('/1/2/4/12', $item2->path);
+        $this->assertEquals($parent->path . '/' . $item1id, $item1->path);
+        $this->assertEquals($parent->path . '/' . $item2id, $item2->path);
 
         // check parentid set right
-        $this->assertEquals(4, $item1->parentid);
-        $this->assertEquals(4, $item2->parentid);
+        $this->assertEquals($parent->id, $item1->parentid);
+        $this->assertEquals($parent->id, $item2->parentid);
 
         // check the typeid set right
         $this->assertEquals(0, $item1->typeid);
@@ -432,34 +385,42 @@ class bulkaddhierarchyitems_test extends advanced_testcase {
         $item2->typeid = 1;
 
         $items = array($item1, $item2);
-        $parent = 10;
+        $parent = $this->orgs[10];
 
         // check items are added in the right place
         $before = $DB->get_records_menu('org', null, 'sortthread', 'id,sortthread');
-        $this->assertTrue((bool)$org->add_multiple_hierarchy_items($parent, $items, 1, false));
+        $this->assertTrue((bool)$org->add_multiple_hierarchy_items($parent->id, $items, 1, false));
         $after = $DB->get_records_menu('org', null, 'sortthread', 'id,sortthread');
 
         // new items should have been added to the end
         // all others should stay the same
-        $before[11] = '03.01';
-        $before[12] = '03.02';
+        ksort($after);
+        $item2value = end($after);
+        $item2id = key($after);
+        $this->assertEquals('03.02', $item2value);
+        unset($after[$item2id]);
+        $item1value = end($after);
+        $item1id = key($after);
+        $this->assertEquals('03.01', $item1value);
+        unset($after[$item1id]);
+        // all others should stay the same
         $this->assertEquals($before, $after);
 
         // get the items
-        $this->assertTrue((bool)$item1 = $DB->get_record('org', array('id' => 11)));
-        $this->assertTrue((bool)$item2 = $DB->get_record('org', array('id' => 12)));
+        $this->assertTrue((bool)$item1 = $DB->get_record('org', array('id' => $item1id)));
+        $this->assertTrue((bool)$item2 = $DB->get_record('org', array('id' => $item2id)));
 
         // check depthlevel set right
         $this->assertEquals(2, $item1->depthlevel);
         $this->assertEquals(2, $item2->depthlevel);
 
         // check path set right
-        $this->assertEquals('/10/11', $item1->path);
-        $this->assertEquals('/10/12', $item2->path);
+        $this->assertEquals($parent->path . '/' . $item1id, $item1->path);
+        $this->assertEquals($parent->path . '/' . $item2id, $item2->path);
 
         // check parentid set right
-        $this->assertEquals(10, $item1->parentid);
-        $this->assertEquals(10, $item2->parentid);
+        $this->assertEquals($parent->id, $item1->parentid);
+        $this->assertEquals($parent->id, $item2->parentid);
 
         // check the typeid set right
         $this->assertEquals(0, $item1->typeid);

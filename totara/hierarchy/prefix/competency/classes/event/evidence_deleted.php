@@ -102,7 +102,7 @@ class evidence_deleted extends \core\event\base {
     }
 
     public function get_url() {
-        $urlparams = array('id' => $this->objectid, 'prefix' => 'competency');
+        $urlparams = array('id' => $this->other['competencyid'], 'prefix' => 'competency');
         return new \moodle_url('/totara/hierarchy/item/view.php', $urlparams);
     }
 

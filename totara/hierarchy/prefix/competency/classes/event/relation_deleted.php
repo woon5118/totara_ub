@@ -100,7 +100,7 @@ class relation_deleted extends \core\event\base {
     }
 
     public function get_url() {
-        $urlparams = array('id' => $this->objectid, 'prefix' => 'competency');
+        $urlparams = array('id' => $this->other['compid1'], 'prefix' => 'competency');
         return new \moodle_url('/totara/hierarchy/item/view.php', $urlparams);
     }
 

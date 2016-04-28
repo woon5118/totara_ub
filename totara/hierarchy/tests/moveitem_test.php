@@ -36,14 +36,18 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/organisation/lib.php');
 class movehierarchyitem_test extends advanced_testcase {
 //TODO: add tests for moving hierarchy items between frameworks
 
+    private $frame1, $frame2;
+    private $org1, $org2, $org3, $org4, $org5, $org6, $org7, $org8, $org9, $org10, $org11, $org12, $org13, $org14, $org15, $org16;
+    private $org;
+
     protected function setUp() {
         global $DB;
         parent::setup();
 
-        $this->frame_data = Array();
+        $admin = get_admin();
+        $userid = $admin->id;
 
         $this->frame1 = new stdClass();
-        $this->frame1->id = 1;
         $this->frame1->fullname = 'Framework A';
         $this->frame1->shortname = 'FW A';
         $this->frame1->description = 'Org Framework Description A';
@@ -51,13 +55,12 @@ class movehierarchyitem_test extends advanced_testcase {
         $this->frame1->visible = 1;
         $this->frame1->timecreated = 1234567890;
         $this->frame1->timemodified = 1234567890;
-        $this->frame1->usermodified = 2;
+        $this->frame1->usermodified = $userid;
         $this->frame1->sortorder = 1;
         $this->frame1->hidecustomfields = 1;
-        $this->frame_data[] = $this->frame1;
+        $this->frame1->id = $DB->insert_record('org_framework', $this->frame1);
 
         $this->frame2 = new stdClass();
-        $this->frame2->id = 2;
         $this->frame2->fullname = 'Framework B';
         $this->frame2->shortname = 'FW B';
         $this->frame2->description = 'Org Framework Description B';
@@ -65,304 +68,174 @@ class movehierarchyitem_test extends advanced_testcase {
         $this->frame2->visible = 1;
         $this->frame2->timecreated = 1234567890;
         $this->frame2->timemodified = 1234567890;
-        $this->frame2->usermodified = 2;
+        $this->frame2->usermodified = $userid;
         $this->frame2->sortorder = 2;
         $this->frame2->hidecustomfields = 1;
-        $this->frame_data[] = $this->frame2;
+        $this->frame2->id = $DB->insert_record('org_framework', $this->frame2);
 
-        $DB->insert_records_via_batch('org_framework', $this->frame_data);
+        // create the competency object
+        $this->org = new organisation();
+        $this->org->frameworkid = $this->frame1->id;
 
-        $this->org_data = Array();
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation A';
+        $neworg->shortname = 'Org A';
+        $neworg->description = 'Org Description A';
+        $neworg->idnumber = 'OA';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org1 = $this->org->add_hierarchy_item($neworg, 0, $this->frame1->id, false, true, false);
 
-        $this->org1 = new stdClass();
-        $this->org1->id = 1;
-        $this->org1->fullname = 'Organisation A';
-        $this->org1->shortname = 'Org A';
-        $this->org1->description = 'Org Description A';
-        $this->org1->idnumber = 'OA';
-        $this->org1->frameworkid = 1;
-        $this->org1->path = '/1';
-        $this->org1->parentid = 0;
-        $this->org1->sortthread = '01';
-        $this->org1->depthlevel = 1;
-        $this->org1->visible = 1;
-        $this->org1->timecreated = 1234567890;
-        $this->org1->timemodified = 1234567890;
-        $this->org1->usermodified = 2;
-        $this->org1->typeid = 0;
-        $this->org_data[] = $this->org1;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation B';
+        $neworg->shortname = 'Org B';
+        $neworg->description = 'Org Description B';
+        $neworg->idnumber = 'OB';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org2 = $this->org->add_hierarchy_item($neworg, $this->org1->id, $this->frame1->id, false, true, false);
 
-        $this->org2 = new stdClass();
-        $this->org2->id = 2;
-        $this->org2->fullname = 'Organisation B';
-        $this->org2->shortname = 'Org B';
-        $this->org2->description = 'Org Description B';
-        $this->org2->idnumber = 'OB';
-        $this->org2->frameworkid = 1;
-        $this->org2->path = '/1/2';
-        $this->org2->parentid = 1;
-        $this->org2->sortthread = '01.01';
-        $this->org2->depthlevel = 2;
-        $this->org2->visible = 1;
-        $this->org2->timecreated = 1234567890;
-        $this->org2->timemodified = 1234567890;
-        $this->org2->usermodified = 2;
-        $this->org2->typeid = 0;
-        $this->org_data[] = $this->org2;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation C';
+        $neworg->shortname = 'Org C';
+        $neworg->description = 'Org Description C';
+        $neworg->idnumber = 'OC';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org3 = $this->org->add_hierarchy_item($neworg, $this->org2->id, $this->frame1->id, false, true, false);
 
-        $this->org3 = new stdClass();
-        $this->org3->id = 3;
-        $this->org3->fullname = 'Organisation C';
-        $this->org3->shortname = 'Org C';
-        $this->org3->description = 'Org Description C';
-        $this->org3->idnumber = 'OC';
-        $this->org3->frameworkid = 1;
-        $this->org3->path = '/1/2/3';
-        $this->org3->parentid = 2;
-        $this->org3->sortthread = '01.01.01';
-        $this->org3->depthlevel = 3;
-        $this->org3->visible = 1;
-        $this->org3->timecreated = 1234567890;
-        $this->org3->timemodified = 1234567890;
-        $this->org3->usermodified = 2;
-        $this->org3->typeid = 0;
-        $this->org_data[] = $this->org3;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation D';
+        $neworg->shortname = 'Org D';
+        $neworg->description = 'Org Description D';
+        $neworg->idnumber = 'OD';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org4 = $this->org->add_hierarchy_item($neworg, $this->org2->id, $this->frame1->id, false, true, false);
 
-        $this->org4 = new stdClass();
-        $this->org4->id = 4;
-        $this->org4->fullname = 'Organisation D';
-        $this->org4->shortname = 'Org D';
-        $this->org4->description = 'Org Description D';
-        $this->org4->idnumber = 'OD';
-        $this->org4->frameworkid = 1;
-        $this->org4->path = '/1/2/4';
-        $this->org4->parentid = 2;
-        $this->org4->sortthread = '01.01.02';
-        $this->org4->depthlevel = 3;
-        $this->org4->visible = 1;
-        $this->org4->timecreated = 1234567890;
-        $this->org4->timemodified = 1234567890;
-        $this->org4->usermodified = 2;
-        $this->org4->typeid = 0;
-        $this->org_data[] = $this->org4;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation E';
+        $neworg->shortname = 'Org E';
+        $neworg->description = 'Org Description E';
+        $neworg->idnumber = 'OE';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org5 = $this->org->add_hierarchy_item($neworg, 0, $this->frame1->id, false, true, false);
 
-        $this->org5 = new stdClass();
-        $this->org5->id = 5;
-        $this->org5->fullname = 'Organisation E';
-        $this->org5->shortname = 'Org E';
-        $this->org5->description = 'Org Description E';
-        $this->org5->idnumber = 'OE';
-        $this->org5->frameworkid = 1;
-        $this->org5->path = '/5';
-        $this->org5->parentid = 0;
-        $this->org5->sortthread = '02';
-        $this->org5->depthlevel = 1;
-        $this->org5->visible = 1;
-        $this->org5->timecreated = 1234567890;
-        $this->org5->timemodified = 1234567890;
-        $this->org5->usermodified = 2;
-        $this->org5->typeid = 0;
-        $this->org_data[] = $this->org5;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation F';
+        $neworg->shortname = 'Org F';
+        $neworg->description = 'Org Description F';
+        $neworg->idnumber = 'OF';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org6 = $this->org->add_hierarchy_item($neworg, $this->org5->id, $this->frame1->id, false, true, false);
 
-        $this->org6 = new stdClass();
-        $this->org6->id = 6;
-        $this->org6->fullname = 'Organisation F';
-        $this->org6->shortname = 'Org F';
-        $this->org6->description = 'Org Description F';
-        $this->org6->idnumber = 'OF';
-        $this->org6->frameworkid = 1;
-        $this->org6->path = '/5/6';
-        $this->org6->parentid = 5;
-        $this->org6->sortthread = '02.01';
-        $this->org6->depthlevel = 2;
-        $this->org6->visible = 1;
-        $this->org6->timecreated = 1234567890;
-        $this->org6->timemodified = 1234567890;
-        $this->org6->usermodified = 2;
-        $this->org6->typeid = 0;
-        $this->org_data[] = $this->org6;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation G';
+        $neworg->shortname = 'Org G';
+        $neworg->description = 'Org Description G';
+        $neworg->idnumber = 'OG';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org7 = $this->org->add_hierarchy_item($neworg, $this->org6->id, $this->frame1->id, false, true, false);
 
-        $this->org7 = new stdClass();
-        $this->org7->id = 7;
-        $this->org7->fullname = 'Organisation G';
-        $this->org7->shortname = 'Org G';
-        $this->org7->description = 'Org Description G';
-        $this->org7->idnumber = 'OG';
-        $this->org7->frameworkid = 1;
-        $this->org7->path = '/5/6/7';
-        $this->org7->parentid = 6;
-        $this->org7->sortthread = '02.01.01';
-        $this->org7->depthlevel = 3;
-        $this->org7->visible = 1;
-        $this->org7->timecreated = 1234567890;
-        $this->org7->timemodified = 1234567890;
-        $this->org7->usermodified = 2;
-        $this->org7->typeid = 0;
-        $this->org_data[] = $this->org7;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation H';
+        $neworg->shortname = 'Org H';
+        $neworg->description = 'Org Description H';
+        $neworg->idnumber = 'OH';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org8 = $this->org->add_hierarchy_item($neworg, $this->org6->id, $this->frame1->id, false, true, false);
 
-        $this->org8 = new stdClass();
-        $this->org8->id = 8;
-        $this->org8->fullname = 'Organisation H';
-        $this->org8->shortname = 'Org H';
-        $this->org8->description = 'Org Description H';
-        $this->org8->idnumber = 'OH';
-        $this->org8->frameworkid = 1;
-        $this->org8->path = '/5/6/8';
-        $this->org8->parentid = 6;
-        $this->org8->sortthread = '02.01.02';
-        $this->org8->depthlevel = 3;
-        $this->org8->visible = 1;
-        $this->org8->timecreated = 1234567890;
-        $this->org8->timemodified = 1234567890;
-        $this->org8->usermodified = 2;
-        $this->org8->typeid = 0;
-        $this->org_data[] = $this->org8;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation I';
+        $neworg->shortname = 'Org I';
+        $neworg->description = 'Org Description I';
+        $neworg->idnumber = 'OI';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org9 = $this->org->add_hierarchy_item($neworg, $this->org8->id, $this->frame1->id, false, true, false);
 
-        $this->org9 = new stdClass();
-        $this->org9->id = 9;
-        $this->org9->fullname = 'Organisation I';
-        $this->org9->shortname = 'Org I';
-        $this->org9->description = 'Org Description I';
-        $this->org9->idnumber = 'OI';
-        $this->org9->frameworkid = 1;
-        $this->org9->path = '/5/6/8/9';
-        $this->org9->parentid = 8;
-        $this->org9->sortthread = '02.01.02.01';
-        $this->org9->depthlevel = 4;
-        $this->org9->visible = 1;
-        $this->org9->timecreated = 1234567890;
-        $this->org9->timemodified = 1234567890;
-        $this->org9->usermodified = 2;
-        $this->org9->typeid = 0;
-        $this->org_data[] = $this->org9;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation J';
+        $neworg->shortname = 'Org J';
+        $neworg->description = 'Org Description J';
+        $neworg->idnumber = 'OJ';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org10 = $this->org->add_hierarchy_item($neworg, 0, $this->frame1->id, false, true, false);
 
-        $this->org10 = new stdClass();
-        $this->org10->id = 10;
-        $this->org10->fullname = 'Organisation J';
-        $this->org10->shortname = 'Org J';
-        $this->org10->description = 'Org Description J';
-        $this->org10->idnumber = 'OJ';
-        $this->org10->frameworkid = 1;
-        $this->org10->path = '/10';
-        $this->org10->parentid = 0;
-        $this->org10->sortthread = '03';
-        $this->org10->depthlevel = 1;
-        $this->org10->visible = 1;
-        $this->org10->timecreated = 1234567890;
-        $this->org10->timemodified = 1234567890;
-        $this->org10->usermodified = 2;
-        $this->org10->typeid = 0;
-        $this->org_data[] = $this->org10;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation 1';
+        $neworg->shortname = 'Org 1';
+        $neworg->description = 'Org Description 1';
+        $neworg->idnumber = 'O1';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org11 = $this->org->add_hierarchy_item($neworg, 0, $this->frame2->id, false, true, false);
 
-        $this->org11 = new stdClass();
-        $this->org11->id = 11;
-        $this->org11->fullname = 'Organisation 1';
-        $this->org11->shortname = 'Org 1';
-        $this->org11->description = 'Org Description 1';
-        $this->org11->idnumber = 'O1';
-        $this->org11->frameworkid = 2;
-        $this->org11->path = '/11';
-        $this->org11->parentid = 0;
-        $this->org11->sortthread = '01';
-        $this->org11->depthlevel = 1;
-        $this->org11->visible = 1;
-        $this->org11->timecreated = 1234567890;
-        $this->org11->timemodified = 1234567890;
-        $this->org11->usermodified = 2;
-        $this->org11->typeid = 0;
-        $this->org_data[] = $this->org11;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation 2';
+        $neworg->shortname = 'Org 2';
+        $neworg->description = 'Org Description 2';
+        $neworg->idnumber = 'O2';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org12 = $this->org->add_hierarchy_item($neworg, $this->org11->id, $this->frame2->id, false, true, false);
 
-        $this->org12 = new stdClass();
-        $this->org12->id = 12;
-        $this->org12->fullname = 'Organisation 2';
-        $this->org12->shortname = 'Org 2';
-        $this->org12->description = 'Org Description 2';
-        $this->org12->idnumber = 'O2';
-        $this->org12->frameworkid = 2;
-        $this->org12->path = '/11/12';
-        $this->org12->parentid = 11;
-        $this->org12->sortthread = '01.01';
-        $this->org12->depthlevel = 2;
-        $this->org12->visible = 1;
-        $this->org12->timecreated = 1234567890;
-        $this->org12->timemodified = 1234567890;
-        $this->org12->usermodified = 2;
-        $this->org12->typeid = 0;
-        $this->org_data[] = $this->org12;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation 3';
+        $neworg->shortname = 'Org 3';
+        $neworg->description = 'Org Description 3';
+        $neworg->idnumber = 'O3';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org13 = $this->org->add_hierarchy_item($neworg, $this->org12->id, $this->frame2->id, false, true, false);
 
-        $this->org13 = new stdClass();
-        $this->org13->id = 13;
-        $this->org13->fullname = 'Organisation 3';
-        $this->org13->shortname = 'Org 3';
-        $this->org13->description = 'Org Description 3';
-        $this->org13->idnumber = 'O3';
-        $this->org13->frameworkid = 2;
-        $this->org13->path = '/11/12/13';
-        $this->org13->parentid = 12;
-        $this->org13->sortthread = '01.01.01';
-        $this->org13->depthlevel = 3;
-        $this->org13->visible = 1;
-        $this->org13->timecreated = 1234567890;
-        $this->org13->timemodified = 1234567890;
-        $this->org13->usermodified = 2;
-        $this->org13->typeid = 0;
-        $this->org_data[] = $this->org13;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation 4';
+        $neworg->shortname = 'Org 4';
+        $neworg->description = 'Org Description 4';
+        $neworg->idnumber = 'O4';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org14 = $this->org->add_hierarchy_item($neworg, $this->org11->id, $this->frame2->id, false, true, false);
 
-        $this->org14 = new stdClass();
-        $this->org14->id = 14;
-        $this->org14->fullname = 'Organisation 4';
-        $this->org14->shortname = 'Org 4';
-        $this->org14->description = 'Org Description 4';
-        $this->org14->idnumber = 'O4';
-        $this->org14->frameworkid = 2;
-        $this->org14->path = '/11/14';
-        $this->org14->parentid = 11;
-        $this->org14->sortthread = '01.02';
-        $this->org14->depthlevel = 2;
-        $this->org14->visible = 1;
-        $this->org14->timecreated = 1234567890;
-        $this->org14->timemodified = 1234567890;
-        $this->org14->usermodified = 2;
-        $this->org14->typeid = 0;
-        $this->org_data[] = $this->org14;
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation 5';
+        $neworg->shortname = 'Org 5';
+        $neworg->description = 'Org Description 5';
+        $neworg->idnumber = 'O5';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org15 = $this->org->add_hierarchy_item($neworg, $this->org11->id, $this->frame2->id, false, true, false);
 
-        $this->org15 = new stdClass();
-        $this->org15->id = 15;
-        $this->org15->fullname = 'Organisation 5';
-        $this->org15->shortname = 'Org 5';
-        $this->org15->description = 'Org Description 5';
-        $this->org15->idnumber = 'O5';
-        $this->org15->frameworkid = 2;
-        $this->org15->path = '/11/15';
-        $this->org15->parentid = 11;
-        $this->org15->sortthread = '01.03';
-        $this->org15->depthlevel = 2;
-        $this->org15->visible = 1;
-        $this->org15->timecreated = 1234567890;
-        $this->org15->timemodified = 1234567890;
-        $this->org15->usermodified = 2;
-        $this->org15->typeid = 0;
-        $this->org_data[] = $this->org15;
-
-        $this->org16 = new stdClass();
-        $this->org16->id = 16;
-        $this->org16->fullname = 'Organisation 6';
-        $this->org16->shortname = 'Org 6';
-        $this->org16->description = 'Org Description 6';
-        $this->org16->idnumber = 'O6';
-        $this->org16->frameworkid = 2;
-        $this->org16->path = '/11/16';
-        $this->org16->parentid = 11;
-        $this->org16->sortthread = '01.04';
-        $this->org16->depthlevel = 2;
-        $this->org16->visible = 1;
-        $this->org16->timecreated = 1234567890;
-        $this->org16->timemodified = 1234567890;
-        $this->org16->usermodified = 2;
-        $this->org16->typeid = 0;
-        $this->org_data[] = $this->org16;
-
-        $DB->insert_records_via_batch('org', $this->org_data);
+        $neworg = new stdClass();
+        $neworg->fullname = 'Organisation 6';
+        $neworg->shortname = 'Org 6';
+        $neworg->description = 'Org Description 6';
+        $neworg->idnumber = 'O6';
+        $neworg->visible = 1;
+        $neworg->usermodified = $userid;
+        $neworg->typeid = 0;
+        $this->org16 = $this->org->add_hierarchy_item($neworg, $this->org11->id, $this->frame2->id, false, true, false);
     }
 
 /*
@@ -395,38 +268,33 @@ class movehierarchyitem_test extends advanced_testcase {
     function test_new_parent_id() {
         global $DB;
 
-        $org = new organisation();
-
-        $item = $DB->get_records('org', array('id' => 6));
-        $newparent = 3;
-        $newframework = '1';
-
-        $before = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,parentid');
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[6], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,parentid');
-
+        $moveorg = $DB->get_record('org', array('id' =>  $this->org6->id));
+        $newparent = $this->org3->id;
+        $before = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,parentid');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,parentid');
         // all that should have changed is item 6 should now have 3 as a parentid
         // others should stay the same
-        $before[6] = 3;
+        $before[$moveorg->id] = $newparent;
         $this->assertEquals($before, $after);
 
         // now test moving to the top level
-        $item = $DB->get_records('org', array('id' => 6));
+        $moveorg = $DB->get_record('org', array('id' => $this->org6->id));
         $newparent = 0;
-
         $before = $after;
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[6], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,parentid');
-        $before[6] = 0;
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,parentid');
+        $before[$moveorg->id] = $newparent;
         $this->assertEquals($before, $after);
 
         // now test moving from the top level
-        $item = $DB->get_records('org', array('id' => 1));
-        $newparent = 6;
-
+        $moveorg = $DB->get_record('org', array('id' =>  $this->org1->id));
+        $newparent = $this->org6->id;
         $before = $after;
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[1], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,parentid');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,parentid');
+        $before[$moveorg->id] = $newparent;
+        $this->assertEquals($before, $after);
 
         $this->resetAfterTest(true);
     }
@@ -434,52 +302,46 @@ class movehierarchyitem_test extends advanced_testcase {
     function test_new_depthlevel() {
         global $DB;
 
-        $org = new organisation();
-
-        $item = $DB->get_records('org', array('id' => 6));
-        $newparent = 3;
-        $newframework = 1;
-
-        $before = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,depthlevel');
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[6], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,depthlevel');
+        $moveorg = $DB->get_record('org', array('id' =>  $this->org6->id));
+        $newparent = $this->org3->id;
+        $before = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,depthlevel');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,depthlevel');
         // item and all it's children should have changed
-        $before[6] = 4;
-        $before[7] = 5;
-        $before[8] = 5;
-        $before[9] = 6;
+        $before[$this->org6->id] = 4;
+        $before[$this->org7->id] = 5;
+        $before[$this->org8->id] = 5;
+        $before[$this->org9->id] = 6;
         // everything else stays the same
         $this->assertEquals($before, $after);
 
         // now try attaching to top level
-        $item = $DB->get_records('org', array('id' => 6));
+        $moveorg = $DB->get_record('org', array('id' => $this->org6->id));
         $newparent = 0;
-
         $before = $after;
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[6], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,depthlevel');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,depthlevel');
         // item and all it's children should have changed
-        $before[6] = 1;
-        $before[7] = 2;
-        $before[8] = 2;
-        $before[9] = 3;
+        $before[$this->org6->id] = 1;
+        $before[$this->org7->id] = 2;
+        $before[$this->org8->id] = 2;
+        $before[$this->org9->id] = 3;
         // everything else stays the same
         $this->assertEquals($before, $after);
 
         // now try moving from the top level
-        $item = $DB->get_records('org', array('id' => 1));
-        $newparent = 10;
+        $moveorg = $DB->get_record('org', array('id' =>  $this->org1->id));
+        $newparent = $this->org10->id;
         $before = $after;
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[1], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,depthlevel');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,depthlevel');
         // item and all it's children should have changed
-        $before[1] = 2;
-        $before[2] = 3;
-        $before[3] = 4;
-        $before[4] = 4;
+        $before[$this->org1->id] = 2;
+        $before[$this->org2->id] = 3;
+        $before[$this->org3->id] = 4;
+        $before[$this->org4->id] = 4;
         // everything else stays the same
         $this->assertEquals($before, $after);
-
 
         $this->resetAfterTest(true);
     }
@@ -487,49 +349,44 @@ class movehierarchyitem_test extends advanced_testcase {
     function test_new_path() {
         global $DB;
 
-        $org = new organisation();
-
-        $item = $DB->get_records('org', array('id' => 6));
-        $newparent = 3;
-        $newframework = 1;
-
-        $before = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,path');
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[6], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,path');
+        $moveorg = $DB->get_record('org', array('id' =>  $this->org6->id));
+        $newparent = $this->org3->id;
+        $before = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,path');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,path');
         // item and all it's children should have changed
-        $before[6] = '/1/2/3/6';
-        $before[7] = '/1/2/3/6/7';
-        $before[8] = '/1/2/3/6/8';
-        $before[9] = '/1/2/3/6/8/9';
+        $before[$this->org6->id] = $this->org3->path . '/' . $this->org6->id;
+        $before[$this->org7->id] = $before[$moveorg->id] . '/' . $this->org7->id;
+        $before[$this->org8->id] = $before[$moveorg->id] . '/' . $this->org8->id;
+        $before[$this->org9->id] = $before[$this->org8->id] . '/' . $this->org9->id;
         // everything else stays the same
         $this->assertEquals($before, $after);
 
         // now try attaching to top level
-        $item = $DB->get_records('org', array('id' => 6));
+        $moveorg = $DB->get_record('org', array('id' => $this->org6->id));
         $newparent = 0;
-
         $before = $after;
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[6], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,path');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,path');
         // item and all it's children should have changed
-        $before[6] = '/6';
-        $before[7] = '/6/7';
-        $before[8] = '/6/8';
-        $before[9] = '/6/8/9';
+        $before[$this->org6->id] = '/' . $this->org6->id;
+        $before[$this->org7->id] = $before[$moveorg->id] . '/' . $this->org7->id;
+        $before[$this->org8->id] = $before[$moveorg->id] . '/' . $this->org8->id;
+        $before[$this->org9->id] = $before[$this->org8->id] . '/' . $this->org9->id;
         // everything else stays the same
         $this->assertEquals($before, $after);
 
         // now try moving from the top level
-        $item = $DB->get_records('org', array('id' => 1));
-        $newparent = 10;
+        $moveorg = $DB->get_record('org', array('id' =>  $this->org1->id));
+        $newparent = $this->org10->id;
         $before = $after;
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[1], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,path');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,path');
         // item and all it's children should have changed
-        $before[1] = '/10/1';
-        $before[2] = '/10/1/2';
-        $before[3] = '/10/1/2/3';
-        $before[4] = '/10/1/2/4';
+        $before[$this->org1->id] = $this->org10->path . '/' . $this->org1->id;
+        $before[$this->org2->id] = $before[$moveorg->id] . '/' . $this->org2->id;
+        $before[$this->org3->id] = $before[$this->org2->id] . '/' . $this->org3->id;
+        $before[$this->org4->id] = $before[$this->org2->id] . '/' . $this->org4->id;
         $this->assertEquals($before, $after);
         // everything else stays the same
         $this->resetAfterTest(true);
@@ -538,50 +395,47 @@ class movehierarchyitem_test extends advanced_testcase {
     function test_new_sortorder() {
         global $DB;
 
-        $org = new organisation();
+        $moveorg = $DB->get_record('org', array('id' =>  $this->org6->id));
+        $newparent = $this->org3->id;
 
-        $item = $DB->get_records('org', array('id' => 6));
-        $newparent = 3;
-        $newframework = 1;
-
-        $before = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,sortthread');
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[6], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,sortthread');
+        $before = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
         // item and all it's children should have changed
-        $before[6] = '01.01.01.01';
-        $before[7] = '01.01.01.01.01';
-        $before[8] = '01.01.01.01.02';
-        $before[9] = '01.01.01.01.02.01';
+        $before[$this->org6->id] = '01.01.01.01';
+        $before[$this->org7->id] = '01.01.01.01.01';
+        $before[$this->org8->id] = '01.01.01.01.02';
+        $before[$this->org9->id] = '01.01.01.01.02.01';
         // displaced items and everything else stays the same
         $this->assertEquals($before, $after);
 
 
         // now try attaching to top level
-        $item = $DB->get_records('org', array('id' =>  6));
+        $moveorg = $DB->get_record('org', array('id' =>  $this->org6->id));
         $newparent = 0;
 
         $before = $after;
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[6], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,sortthread');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
         // item and all it's children should have changed
-        $before[6] = '04';
-        $before[7] = '04.01';
-        $before[8] = '04.02';
-        $before[9] = '04.02.01';
+        $before[$this->org6->id] = '04';
+        $before[$this->org7->id] = '04.01';
+        $before[$this->org8->id] = '04.02';
+        $before[$this->org9->id] = '04.02.01';
         // displaced items and everything else stays the same
         $this->assertEquals($before, $after);
 
         // now try moving from the top level
-        $item = $DB->get_records('org', array('id' => 1));
-        $newparent = 10;
+        $moveorg = $DB->get_record('org', array('id' =>  $this->org1->id));
+        $newparent = $this->org10->id;
         $before = $after;
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[1], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '1'), 'sortthread', 'id,sortthread');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
         // item and all it's children should have changed
-        $before[1] = '03.01';
-        $before[2] = '03.01.01';
-        $before[3] = '03.01.01.01';
-        $before[4] = '03.01.01.02';
+        $before[$this->org1->id] = '03.01';
+        $before[$this->org2->id] = '03.01.01';
+        $before[$this->org3->id] = '03.01.01.01';
+        $before[$this->org4->id] = '03.01.01.02';
         // displayed items and everything else stays the same
         $this->assertEquals($before, $after);
         $this->resetAfterTest(true);
@@ -590,19 +444,16 @@ class movehierarchyitem_test extends advanced_testcase {
     function test_moving_subtree() {
         global $DB;
 
-        $org = new organisation();
+        $moveorg = $DB->get_record('org', array('id' => $this->org12->id));
+        $newparent = $this->org14->id;
 
-        $item = $DB->get_records('org', array('id' => 12));
-        $newparent = 14;
-        $newframework = 2;
-
-        $before = $DB->get_records_menu('org', array('frameworkid' => '2'), 'sortthread', 'id,sortthread');
-        $this->assertTrue((bool)$org->move_hierarchy_item($item[12], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '2'), 'sortthread', 'id,sortthread');
+        $before = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
+        $this->assertTrue((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
 
         // item and all it's children should have changed
-        $before[12] = '01.02.01';
-        $before[13] = '01.02.01.01';
+        $before[$this->org12->id] = '01.02.01';
+        $before[$this->org13->id] = '01.02.01.01';
         // displaced items and everything else stays the same
         $this->assertEquals($before, $after);
         $this->resetAfterTest(true);
@@ -612,17 +463,14 @@ class movehierarchyitem_test extends advanced_testcase {
     function test_bad_moves() {
         global $DB;
 
-        $org = new organisation();
-
         // you shouldn't be able to move an item into it's own child
-        $item = $DB->get_records('org', array('id' => 12));
-        $newparent = 13;
-        $newframework = 2;
+        $moveorg = $DB->get_record('org', array('id' => $this->org12->id));
+        $newparent = $this->org13->id;
 
-        $before = $DB->get_records_menu('org', array('frameworkid' => '2'), 'sortthread', 'id,sortthread');
+        $before = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
         // this should fail
-        $this->assertFalse((bool)$org->move_hierarchy_item($item[12], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '2'), 'sortthread', 'id,sortthread');
+        $this->assertFalse((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
         // everything stays the same
         $this->assertEquals($before, $after);
 
@@ -630,10 +478,10 @@ class movehierarchyitem_test extends advanced_testcase {
         // you shouldn't be able move to parent that doesn't exist
         $newparent = 999;
 
-        $before = $DB->get_records_menu('org', array('frameworkid' => '2'), 'sortthread', 'id,sortthread');
+        $before = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
         // this should fail
-        $this->assertFalse((bool)$org->move_hierarchy_item($item[12], $newframework, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '2'), 'sortthread', 'id,sortthread');
+        $this->assertFalse((bool)$this->org->move_hierarchy_item($moveorg, $moveorg->frameworkid, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
         // everything stays the same
         $this->assertEquals($before, $after);
 
@@ -642,10 +490,10 @@ class movehierarchyitem_test extends advanced_testcase {
         $item = 1234;
         $newparent = 0;
 
-        $before = $DB->get_records_menu('org', array('frameworkid' => '2'), 'sortthread', 'id,sortthread');
+        $before = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
         // this should fail
-        $this->assertFalse((bool)$org->move_hierarchy_item($item, $item, $newparent));
-        $after = $DB->get_records_menu('org', array('frameworkid' => '2'), 'sortthread', 'id,sortthread');
+        $this->assertFalse((bool)$this->org->move_hierarchy_item($item, $item, $newparent));
+        $after = $DB->get_records_menu('org', array('frameworkid' => $moveorg->frameworkid), 'sortthread', 'id,sortthread');
         // everything stays the same
         $this->assertEquals($before, $after);
         $this->resetAfterTest(true);

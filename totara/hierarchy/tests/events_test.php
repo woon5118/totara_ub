@@ -594,7 +594,7 @@ class totara_hierarchy_events_testcase extends advanced_testcase {
         $this->assertNotEmpty($event->get_name());
 
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = "/totara/hierarchy/item/view.php?id={$this->comp->id}&prefix=position";
+        $oldurl = "/totara/hierarchy/item/view.php?id={$this->pos->id}&prefix=position";
         $olddata = array(SITEID, 'position', 'create competency assignment', $oldurl, "position: {$this->pos->id} - competency: {$this->comp->id}");
         $this->assertSame($olddata, $legacydata);
 
@@ -617,7 +617,7 @@ class totara_hierarchy_events_testcase extends advanced_testcase {
         $this->assertNotEmpty($event->get_name());
 
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = "/totara/hierarchy/item/view.php?id={$this->comp->id}&prefix=organisation";
+        $oldurl = "/totara/hierarchy/item/view.php?id={$this->org->id}&prefix=organisation";
         $olddata = array(SITEID, 'organisation', 'create competency assignment', $oldurl, "organisation: {$this->org->id} - competency: {$this->comp->id}");
         $this->assertSame($olddata, $legacydata);
     }
@@ -661,7 +661,7 @@ class totara_hierarchy_events_testcase extends advanced_testcase {
         $event->trigger();
 
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = "/totara/hierarchy/item/view.php?id={$this->pos->id}&prefix=organisation";
+        $oldurl = "/totara/hierarchy/item/view.php?id={$this->org->id}&prefix=organisation";
         $olddata = array(SITEID, 'organisation', 'delete competency assignment', $oldurl, "organisation: {$this->org->id} - competency: {$this->comp->id}");
         $this->assertSame($olddata, $legacydata);
     }
@@ -674,7 +674,6 @@ class totara_hierarchy_events_testcase extends advanced_testcase {
         $avail_types = array(
             'coursecompletion' => $this->course->id,
             'coursegrade' => $this->course->id,
-            'activitycompletion' => $this->module->id
         );
 
         foreach ($avail_types as $type => $instanceid) {
