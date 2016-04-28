@@ -51,7 +51,7 @@ class totara_cohort_enrol_testcase extends advanced_testcase {
         cohort_add_member($cohort1->id, $user1->id);
         cohort_add_member($cohort1->id, $user2->id);
 
-        $cohortplugin->set_config('unenrolaction', ENROL_EXT_REMOVED_SUSPEND);
+        $cohortplugin->set_config('unenrolaction', ENROL_EXT_REMOVED_SUSPENDNOROLES);
 
         $id = $cohortplugin->add_instance($course1, array('customint1' => $cohort1->id, 'roleid' => $studentrole->id));
         $cohortinstance1 = $DB->get_record('enrol', array('id' => $id));
@@ -94,13 +94,11 @@ class totara_cohort_enrol_testcase extends advanced_testcase {
         $this->assertEquals(2, $DB->count_records('user_enrolments', array()));
 
         cohort_remove_member($cohort1->id, $user1->id);
-        /* TODO TL-8816 should fix the incorrect role removal breaking this test
-        $this->assertEquals(2, $DB->count_records('role_assignments', array()));
+        $this->assertEquals(1, $DB->count_records('role_assignments', array()));
         $this->assertEquals(2, $DB->count_records('user_enrolments', array()));
         enrol_cohort_sync($trace);
-        $this->assertEquals(2, $DB->count_records('role_assignments', array()));
+        $this->assertEquals(1, $DB->count_records('role_assignments', array()));
         $this->assertEquals(2, $DB->count_records('user_enrolments', array()));
-        */
 
         $DB->delete_records('role_assignments', array());
         enrol_cohort_sync($trace);
