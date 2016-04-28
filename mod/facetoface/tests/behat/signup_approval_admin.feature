@@ -81,7 +81,6 @@ Feature: Face-to-face Signup Admin Approval
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I should see "Admin Approval"
-    And I press "Request approval"
     Then I should see "This Face-to-face requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
 
   Scenario: Student signs up with no manager assigned with manager select enabled
