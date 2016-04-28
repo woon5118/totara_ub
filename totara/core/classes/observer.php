@@ -225,4 +225,26 @@ class totara_core_observer {
     public static function reset_totara_menu(\core\event\base $event) {
         totara_menu_reset_cache();
     }
+
+    /**
+     * Event that is triggered when a user is deleted.
+     *
+     * Removes an user from reminders they are associated with, tables to clear are
+     * reminder_sent
+     *
+     * @param \core\event\user_deleted $event
+     *
+     */
+    public static function user_deleted(\core\event\user_deleted $event) {
+        global $DB;
+
+        $userid = $event->objectid;
+
+        $transaction = $DB->start_delegated_transaction();
+
+        // Remove the user from reminders.
+        $DB->delete_records('reminder_sent', array('userid' => $userid));
+
+        $transaction->allow_commit();
+    }
 }

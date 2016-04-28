@@ -1623,5 +1623,14 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2016042800, 'totara_core');
     }
 
+    if ($oldversion < 2016042900) {
+
+        $sql = "DELETE FROM {reminder_sent}
+                WHERE userid IN (SELECT id FROM {user} WHERE deleted = 1)";
+        $DB->execute($sql);
+
+        totara_upgrade_mod_savepoint(true, 2016042900, 'totara_core');
+    }
+
     return true;
 }
