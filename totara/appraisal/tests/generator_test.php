@@ -180,7 +180,7 @@ class totara_appraisal_generator_testcase extends advanced_testcase {
         // Verify the created message has the correct data.
         $verify = new appraisal_message($message->id);
         $this->assertEquals($this->appraisal->id, $verify->appraisalid);
-        $this->assertEquals(4, $verify->stageid);
+        $this->assertEquals($stage->id, $verify->stageid);
         $this->assertEquals('stage_due', $verify->type);
         $this->assertEquals(5, $verify->delta);
         $this->assertEquals(1, $verify->deltaperiod);

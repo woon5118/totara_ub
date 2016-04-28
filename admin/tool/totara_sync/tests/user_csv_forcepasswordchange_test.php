@@ -166,180 +166,195 @@ class tool_totara_sync_user_csv_forcepasswordchange_testcase extends advanced_te
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '0', 'import_auth' => '0')), 'user_forcepasswordchange_1.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
-        $this->assertCount(4, $users);
+        $users = $DB->get_records('user', array(), 'id');
+        $this->assertCount(4, $users); // First two users are guest and admin. Third and fourth were just created.
+        $userids = array_keys($users);
 
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '3', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '3', 'name' => 'create_password', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '4', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '4', 'name' => 'create_password', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[2], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[2], 'name' => 'create_password', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[3], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[3], 'name' => 'create_password', 'value' => 1)));
 
         // Adding new Manual auth users with a password column in csv file but with no password content.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '1', 'import_auth' => '0')), 'user_forcepasswordchange_2.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(6, $users);
+        $userids = array_keys($users);
 
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '5', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '5', 'name' => 'create_password', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '6', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '6', 'name' => 'create_password', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[4], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[4], 'name' => 'create_password', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[5], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[5], 'name' => 'create_password', 'value' => 1)));
 
         // Adding new manual auth users with a password column and password in csv file.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '1', 'import_auth' => '0')), 'user_forcepasswordchange_3.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(8, $users);
+        $userids = array_keys($users);
 
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '7', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '7', 'name' => 'create_password', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '8', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '8', 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[6], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[6], 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[7], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[7], 'name' => 'create_password', 'value' => 1)));
 
         // Updating existing Manual auth users with no password column in csv file.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '0', 'import_auth' => '0')), 'user_forcepasswordchange_4.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(8, $users);
+        $userids = array_keys($users);
 
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '3', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '3', 'name' => 'create_password', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '4', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '4', 'name' => 'create_password', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[2], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[2], 'name' => 'create_password', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[3], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[3], 'name' => 'create_password', 'value' => 1)));
 
         // Updating existing Manual auth users with a password column in csv file but with no password content.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '1', 'import_auth' => '0')), 'user_forcepasswordchange_5.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(8, $users);
+        $userids = array_keys($users);
 
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '5', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '5', 'name' => 'create_password', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '6', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => '6', 'name' => 'create_password', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[4], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[4], 'name' => 'create_password', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[5], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertTrue($DB->record_exists('user_preferences', array('userid' => $userids[5], 'name' => 'create_password', 'value' => 1)));
 
         // Updating existing Manual auth users with a password column and password in csv file.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '1', 'import_auth' => '0')), 'user_forcepasswordchange_6.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(8, $users);
+        $userids = array_keys($users);
 
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '7', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '7', 'name' => 'create_password', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '8', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '8', 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[6], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[6], 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[7], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[7], 'name' => 'create_password', 'value' => 1)));
 
         // Adding new CAS auth users with no password column in csv file.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '0', 'import_auth' => '1')), 'user_forcepasswordchange_7.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(10, $users);
+        $userids = array_keys($users);
 
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '9', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '9', 'name' => 'create_password', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '10', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '10', 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[8], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[8], 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[9], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[9], 'name' => 'create_password', 'value' => 1)));
 
         // Adding new CAS auth users with a password column in csv file but with no password content.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '1', 'import_auth' => '1')), 'user_forcepasswordchange_8.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(12, $users);
+        $userids = array_keys($users);
 
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '11', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '11', 'name' => 'create_password', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '12', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '12', 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[10], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[10], 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[11], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[11], 'name' => 'create_password', 'value' => 1)));
 
         // Adding new CAS auth users with a password column and password in csv file.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '1', 'import_auth' => '1')), 'user_forcepasswordchange_9.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(14, $users);
+        $userids = array_keys($users);
 
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '13', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '13', 'name' => 'create_password', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '14', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '14', 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[12], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[12], 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[13], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[13], 'name' => 'create_password', 'value' => 1)));
 
         // Updating existing CAS auth users with no password column in csv file.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '0', 'import_auth' => '1')), 'user_forcepasswordchange_10.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(14, $users);
+        $userids = array_keys($users);
 
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '9', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '9', 'name' => 'create_password', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '10', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '10', 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[8], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[8], 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[9], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[9], 'name' => 'create_password', 'value' => 1)));
 
         // Updating existing CAS auth users with a password column in csv file but with no password content.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '1', 'import_auth' => '1')), 'user_forcepasswordchange_11.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(14, $users);
+        $userids = array_keys($users);
 
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '11', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '11', 'name' => 'create_password', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '12', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '12', 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[10], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[10], 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[11], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[11], 'name' => 'create_password', 'value' => 1)));
 
         // Updating existing CAS auth users with a password column and password in csv file.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '1', 'import_auth' => '1')), 'user_forcepasswordchange_12.csv');
         $this->assertFalse($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(14, $users);
+        $userids = array_keys($users);
 
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '13', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '13', 'name' => 'create_password', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '14', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '14', 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[12], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[12], 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[13], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[13], 'name' => 'create_password', 'value' => 1)));
 
         // Update manual auth users to become CAS auth users, with no password column in csv file.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '0', 'import_auth' => '1')), 'user_forcepasswordchange_13.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(14, $users);
+        $userids = array_keys($users);
 
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '3', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '3', 'name' => 'create_password', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '4', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '4', 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[2], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[2], 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[3], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[3], 'name' => 'create_password', 'value' => 1)));
 
         // Update manual auth users to become CAS auth users, with a password column in csv file but with no password content.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '1', 'import_auth' => '1')), 'user_forcepasswordchange_14.csv');
         $this->assertTrue($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(14, $users);
+        $userids = array_keys($users);
 
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '5', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '5', 'name' => 'create_password', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '6', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '6', 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[4], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[4], 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[5], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[5], 'name' => 'create_password', 'value' => 1)));
 
         // Update manual auth users to become CAS auth users, with a password column and password in csv file.
         $result = $this->do_import(array_merge($this->configcsv, array('import_deleted' => '1', 'import_password' => '1', 'import_auth' => '1')), 'user_forcepasswordchange_15.csv');
         $this->assertFalse($result);
 
-        $users = $DB->get_records('user');
+        $users = $DB->get_records('user', array(), 'id');
         $this->assertCount(14, $users);
+        $userids = array_keys($users);
 
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '7', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '7', 'name' => 'create_password', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '8', 'name' => 'auth_forcepasswordchange', 'value' => 1)));
-        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => '8', 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[6], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[6], 'name' => 'create_password', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[7], 'name' => 'auth_forcepasswordchange', 'value' => 1)));
+        $this->assertFalse($DB->record_exists('user_preferences', array('userid' => $userids[7], 'name' => 'create_password', 'value' => 1)));
     }
 }
