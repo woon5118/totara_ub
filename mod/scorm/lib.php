@@ -1145,7 +1145,7 @@ function scorm_print_overview($courses, &$htmlarray) {
 
         // 3) OR if SCORM completion tracking is not enabled...
         $course_id = $scorm->course;
-        $cm = get_fast_modinfo($course_id)->get_cm($scorm->id);
+        $cm = get_fast_modinfo($course_id)->get_cm($scorm->coursemodule);
         if ($cm->completion == COMPLETION_TRACKING_NONE) {
             continue;
         }

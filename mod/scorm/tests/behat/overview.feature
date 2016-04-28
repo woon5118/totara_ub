@@ -20,6 +20,9 @@ Feature: Scorm my learning overview
     And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
+    And I add a "label" to section "1" and I fill the form with:
+      | Label text | Overview testing |
+    And I delete "Overview testing" activity
     And I add a "SCORM package" to section "1"
     And I set the following fields to these values:
       | Name | Test SCORM package |
@@ -43,16 +46,6 @@ Feature: Scorm my learning overview
       | Require view               | 1                                                 |
       | id_completionscoredisabled | 0                                                 |
       | completionscorerequired    | 80                                                |
-    And I click on "Save and display" "button"
-    And I log out
-    And I log in as "student1"
-    When I click on "My Learning" in the totara menu
-    Then I should not see "You have SCORM packages that need attention"
-
-  Scenario: Scorm my learning overview - no completion tracking
-    Given I set the following fields to these values:
-      | Completion tracking    | Do not indicate activity completion |
-      | Display attempt status | My learning and entry page          |
     And I click on "Save and display" "button"
     And I log out
     And I log in as "student1"

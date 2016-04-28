@@ -51,7 +51,7 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
         $this->setAdminUser();
 
         // Setup test data.
-        $this->course = $this->getDataGenerator()->create_course();
+        $this->course = $this->getDataGenerator()->create_course(array('enablecompletion' => true));
         $this->scorm = $this->getDataGenerator()->create_module('scorm', array('course' => $this->course->id));
         $this->context = context_module::instance($this->scorm->cmid);
         $this->cm = get_coursemodule_from_instance('scorm', $this->scorm->id);
@@ -188,5 +188,38 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
      */
     public function test_scorm_get_last_completed_attempt() {
         $this->assertEquals(1, scorm_get_last_completed_attempt($this->scorm->id, $this->student->id));
+    }
+
+    /**
+     * Test scorm print overview.
+     */
+    public function test_scorm_print_overview() {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $CFG->enablecompletion = true;
+
+        // Delete the existing scorm.
+        $this->assertNull(course_delete_module($this->cm->id));
+
+        // Create and delete a label.
+        $label = $this->getDataGenerator()->create_module('label', array('course' => $this->course->id));
+        $this->assertNull(course_delete_module($label->cmid));
+
+        // Create a new scorm activity.
+        $this->getDataGenerator()->create_module('scorm', array(
+            'course' => $this->course->id,
+            'completion' => COMPLETION_TRACKING_MANUAL
+        ));
+
+        scorm_print_overview(array($this->course->id => $this->course), $details);
+        $this->assertInternalType('array', $details);
+        $this->assertCount(1, $details);
+        $scormdetails = reset($details);
+        $this->assertInternalType('array', $scormdetails);
+        $this->assertCount(1, $scormdetails);
+        $this->assertArrayHasKey('scorm', $scormdetails);
+        $this->assertContains('SCORM package:', $scormdetails['scorm']);
     }
 }
