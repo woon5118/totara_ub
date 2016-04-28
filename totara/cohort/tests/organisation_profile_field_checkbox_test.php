@@ -152,7 +152,11 @@ class totara_cohort_organisation_profile_field_checkbox_testcase extends advance
             array(0) // Checked.
         );
         $this->assertTrue($DB->record_exists('cohort_rules', array('rulesetid' => $this->ruleset)));
-        $this->assertEquals(2, $DB->count_records('cohort_rule_params', array('ruleid' => $this->ruleset)));
+        $sql = "SELECT count(crp.*)
+                  FROM {cohort_rule_params} crp
+                  JOIN {cohort_rules} cr ON cr.id = crp.ruleid
+                 WHERE cr.rulesetid = :rulesetid";
+        $this->assertEquals(2, $DB->count_records_sql($sql, array('rulesetid' => $this->ruleset)));
 
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(10, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
@@ -175,7 +179,11 @@ class totara_cohort_organisation_profile_field_checkbox_testcase extends advance
             array(1) // Unchecked.
         );
         $this->assertTrue($DB->record_exists('cohort_rules', array('rulesetid' => $this->ruleset)));
-        $this->assertEquals(2, $DB->count_records('cohort_rule_params', array('ruleid' => $this->ruleset)));
+        $sql = "SELECT count(crp.*)
+                  FROM {cohort_rule_params} crp
+                  JOIN {cohort_rules} cr ON cr.id = crp.ruleid
+                 WHERE cr.rulesetid = :rulesetid";
+        $this->assertEquals(2, $DB->count_records_sql($sql, array('rulesetid' => $this->ruleset)));
 
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));

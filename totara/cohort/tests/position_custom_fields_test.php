@@ -885,7 +885,7 @@ class totara_cohort_position_custom_fields_testcase extends advanced_testcase {
         $fieldid = $this->add_custom_field('custom_field_test_' . rand(), $this->postype1, $customfieldtype, $param1, $defaulfieldvalue);
 
         // Create a rule in the Audience.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'pos', 'customfield1', $rulepart1, $rulepart2, $paramname);
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'pos', 'customfield' . $fieldid, $rulepart1, $rulepart2, $paramname);
 
         // Save custom field against postition.
         if ($savefield) {
