@@ -1620,8 +1620,7 @@ function xmldb_totara_core_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // Main savepoint reached.
-        upgrade_main_savepoint(true, 2016042800);
+        totara_upgrade_mod_savepoint(true, 2016042800, 'totara_core');
     }
 
     return true;
