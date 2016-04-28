@@ -156,6 +156,9 @@ class block_totara_program_completion_programs implements Iterator {
         $programs = prog_get_programs();
         $visibleids = array_keys($programs);
         $showids = array_intersect($programids, $visibleids);
+        if (empty($showids)) {
+            return array();
+        }
 
         list($sqlin, $params) = $DB->get_in_or_equal($showids);
 
