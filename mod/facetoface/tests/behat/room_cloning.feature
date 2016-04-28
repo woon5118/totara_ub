@@ -57,13 +57,13 @@ Feature: Clone pre-defined rooms in Face-to-face
       | timefinish[minute] | 00   |
     And I press "OK"
     And I click on "Select room" "link"
-    And I click on "Room 1, That house (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I press "Save changes"
 
     And I click on "Copy" "link"
     When I click on "Select room" "link"
-    Then I should see "Room 1, That house (Capacity: 5) (room unavailable on selected dates)" in the "Choose a room" "totaradialogue"
+    Then I should see "Room 1, That house, 123 here street (Capacity: 5) (room unavailable on selected dates)" in the "Choose a room" "totaradialogue"
     And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -79,7 +79,7 @@ Feature: Clone pre-defined rooms in Face-to-face
       | timefinish[minute] | 0    |
     And I press "OK"
     And I click on "Select room" "link"
-    And I click on "Room 1, That house (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -110,7 +110,7 @@ Feature: Clone pre-defined rooms in Face-to-face
       | timefinish[minute] | 0    |
     And I press "OK"
     And I click on "Select room" "link"
-    And I click on "Room 1, That house (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
+    And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
     When I press "Save changes"
     Then I should see "Room 1" in the "2:00 PM - 3:00 PM Australia/Perth" "table_row"
