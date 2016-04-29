@@ -67,10 +67,7 @@ class customfield_define_location extends customfield_define_base {
     }
 
     public function define_form_specific(&$form) {
-        $args = new stdClass();
-        $args->fordisplay = false;
-
-        self::define_add_js($args);
+        self::define_add_js();
         self::add_location_field_form_elements($form);
     }
 
@@ -258,23 +255,23 @@ class customfield_define_location extends customfield_define_base {
 
         if (is_null($args)) {
             $args = new stdClass();
-            $args->fordisplay = true;
+            // If not defined this MUST be false. DO NOT CHANGE!
+            // The reason for this is that if you change the default you need to review all uses of the custom field in all
+            // situations, false gives the correct behaviour behaviour most of the time.
+            // This logic is reflected in the AMD module.
+            $args->fordisplay = false;
+        }
+
+        if (isset($args->formprefix)) {
+            debugging('Location custom fields need to be initalised with fieldprefix now, not formprefix.');
+            $args->fieldprefix = $args->formprefix;
         }
 
         $args->regionbias = $CFG->gmapsregionbias;
         $args->defaultzoomlevel = $CFG->gmapsdefaultzoomlevel;
         $args->mapparams = $mapparams;
 
-        // This will be loaded in location.js.
-        //$PAGE->requires->js(new moodle_url('https://maps.googleapis.com/maps/api/js?' . $mapparams));
-        $jsmodule = array(
-            'name' => 'totara_customfield_location',
-            'fullpath' => '/totara/customfield/field/location/location.js',
-            //'requires' => array('json')
-        );
-        $PAGE->requires->js_init_call('M.totara_customfield_location.init', array($args), false, $jsmodule);
-        // We cannot do AMD here, because AMD is not supported in ajax forms, while customfields actively used in ajax form.
-        //$PAGE->requires->js_call_amd('totara_customfield/field_location', 'init', array($args));
+        $PAGE->requires->js_call_amd('totara_customfield/field_location', 'init', array($args));
     }
 
     public function define_save_preprocess($data, $old = null) {
@@ -460,7 +457,7 @@ class customfield_define_location extends customfield_define_base {
         $output = html_writer::div(implode("", $output), 'mapaddresslookup');
 
         $args = new stdClass;
-        $args->formprefix = $formprefix;
+        $args->fieldprefix = $formprefix;
         $args->fordisplay = true;
         customfield_define_location::define_add_js($args);
 

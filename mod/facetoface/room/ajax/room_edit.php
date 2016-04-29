@@ -47,5 +47,13 @@ $form = process_room_form(
     array('noactionbuttons' => true, 'custom' => true)
 );
 
+
+// This is required because custom fields may use AMD module for JS and we can't re-initialise AMD
+// which will happen if we call get_end_code() without setting the first arg to false.
+// It must be called before form->display and importantly before get_end_code.
+$amdsnippets = $PAGE->requires->get_raw_amd_js_code();
+
 $form->display();
 echo $PAGE->requires->get_end_code(false);
+// Finally add our AMD code into the page.
+echo html_writer::script(implode(";\n", $amdsnippets));

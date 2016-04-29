@@ -1008,6 +1008,21 @@ class page_requirements_manager {
     }
 
     /**
+     * Totara hack, return the raw AMD JS code for the page.
+     *
+     * This is returned without any wrapping RequireJS/AMD wrapping.
+     * Its suitable only for use in situations where a non-JS page is being used to get content for an AJAX request.
+     * This only happens within Totara Dialogs presently.
+     *
+     * DO NOT USE THIS ANYWHERE OTHER THAN THE PAGE RESPONDING FOR A TOTARA DIALOG.
+     *
+     * @return string[]
+     */
+    public function get_raw_amd_js_code() {
+        return $this->amdjscode;
+    }
+
+    /**
      * This function creates a minimal JS script that requires and calls a single function from an AMD module with arguments.
      * If it is called multiple times, it will be executed multiple times.
      *

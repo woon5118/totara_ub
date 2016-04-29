@@ -32,7 +32,7 @@ class customfield_location extends customfield_base {
 
         $args = new stdClass();
         $args->fordisplay = false;
-        $args->formprefix = $mform->_customlocationfieldname;
+        $args->fieldprefix = $mform->_customlocationfieldname;
 
         customfield_define_location::define_add_js($args);
         customfield_define_location::add_location_field_form_elements($mform, $this->field->fullname, false);
