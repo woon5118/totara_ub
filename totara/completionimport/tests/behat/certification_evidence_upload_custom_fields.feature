@@ -83,7 +83,6 @@ Feature: Verify certification completion data with custom fields can be successf
     And I upload "totara/completionimport/tests/behat/fixtures/certification_evidence_custom_fields_1.csv" file to "Choose certification file to upload" filemanager
     And I click on "Upload" "button" in the "#mform2" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Certification data imported successfully"
     And I should see "1 Records created as evidence"
     And I should see "1 Records in total"
 
@@ -125,7 +124,6 @@ Feature: Verify certification completion data with custom fields can be successf
     And I upload "totara/completionimport/tests/behat/fixtures/certification_evidence_custom_fields_1.csv" file to "Choose certification file to upload" filemanager
     And I click on "Upload" "button" in the "#mform2" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Certification data imported successfully"
     And I should see "1 Records created as evidence"
     And I should see "1 Records in total"
 
@@ -144,7 +142,6 @@ Feature: Verify certification completion data with custom fields can be successf
     And I upload "totara/completionimport/tests/behat/fixtures/certification_evidence_custom_fields_2.csv" file to "Choose certification file to upload" filemanager
     And I click on "Upload" "button" in the "#mform2" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Certification data imported successfully"
     And I should see "1 Records created as evidence"
     And I should see "1 Records in total"
 

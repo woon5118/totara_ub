@@ -18,7 +18,6 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I set the field "Import action" to "Certify uncertified users"
     And I click on "Upload" "button" in the "#mform2" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Certification data imported successfully"
     And I should see "1 Records successfully imported as certifications"
     And I should see "1 Records created as evidence"
     And I should see "2 Records in total"
@@ -35,3 +34,13 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I should see "Certification ID number : notacertification"
     And I should see "Date completed : 1 January 2015"
 
+  Scenario: Verify a certification completion import csv with incorrect columns shows an error
+    Given I log in as "admin"
+    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_badcolumns.csv" file to "Choose certification file to upload" filemanager
+    And I set the field "Import action" to "Certify uncertified users"
+    And I click on "Upload" "button" in the "#mform2" "css_element"
+    Then I should see "There were errors while importing the certifications"
+    And I should see "Unknown column 'badcolumn'"
+    And I should see "Missing required column 'duedate'"
+    And I should see "No records were imported"

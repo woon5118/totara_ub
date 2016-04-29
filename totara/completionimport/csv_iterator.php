@@ -20,10 +20,15 @@
  * @package    totara
  * @subpackage completionimport
  * @author     Russell England <russell.england@catalyst-eu.net>
+ * @deprecated since 10
  */
 
 defined('MOODLE_INTERNAL') || die;
 
+/**
+ * Class csv_iterator
+ * @deprecated since Totara 10
+ */
 class csv_iterator extends SplFileObject
 {
     /**
@@ -79,6 +84,9 @@ class csv_iterator extends SplFileObject
     public function __construct($filename, $separator, $delimiter, $encoding, $requiredfields, $importtime,
                                 $csvdateformat, $datefieldmap) {
         global $USER;
+
+        debugging('class csv_iterator has been deprecated, please use \totara_completionimport\import_csv::import() instead.', DEBUG_DEVELOPER);
+
         parent::__construct($filename, 'r');
         // Drop new line doesn't work - not keen on using SplFileObject::SKIP_EMPTY because the rownumber will be incorect.
         // See here https://bugs.php.net/bug.php?id=61032&edit=1 .

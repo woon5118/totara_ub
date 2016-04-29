@@ -203,11 +203,14 @@ function get_default_config($pluginname, $configname, $default) {
  * @param string $importname name of import
  * @param array $customfields available custom fields
  * @return array of errors, blank if no errors
+ * @deprecated since Totara 10
  */
 function check_fields_exist($filename, $importname, $customfields = array()) {
     global $CFG;
 
     require_once($CFG->libdir . '/csvlib.class.php');
+
+    debugging('check_fields_exist() has been deprecated, please import csv data using \totara_completionimport\import_csv::import(), where this validation is done internally.', DEBUG_DEVELOPER);
 
     $errors = array();
     $pluginname = 'totara_completionimport_' . $importname;
@@ -278,12 +281,15 @@ function check_fields_exist($filename, $importname, $customfields = array()) {
  * @param string $importname name of import
  * @param array $customfields available custom fields
  * @param int $importtime time of run
+ * @deprecated since Totara 10
  */
 function import_csv($tempfilename, $importname, $importtime, $customfields = array()) {
     global $CFG, $DB, $USER;
 
     require_once($CFG->libdir . '/csvlib.class.php');
     require_once($CFG->dirroot . '/totara/completionimport/csv_iterator.php');
+
+    debugging('import_csv() has been deprecated, please use \totara_completionimport\import_csv::import() instead.', DEBUG_DEVELOPER);
 
     $tablename = get_tablename($importname);
     $columnnames = array_merge(get_columnnames($importname), $customfields);
@@ -1786,9 +1792,12 @@ function move_sourcefile($filename, $tempfilename) {
  * @param int $importtime time of import
  * @param bool $quiet If true, suppress outputting messages (for tests).
  * @return boolean
+ * @deprecated since Totara 10
  */
 function import_completions($tempfilename, $importname, $importtime, $quiet = false) {
     global $OUTPUT, $DB;
+
+    debugging('import_completions() has been deprecated, please use \totara_completionimport\import_csv::import() instead.', DEBUG_DEVELOPER);
 
     // Increase memory limit.
     raise_memory_limit(MEMORY_EXTRA);

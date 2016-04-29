@@ -83,7 +83,6 @@ Feature: Verify course completion data with custom fields can be successfully up
     And I upload "totara/completionimport/tests/behat/fixtures/course_evidence_custom_fields_1.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
     And I should see "1 Records created as evidence"
     And I should see "1 Records in total"
 
@@ -125,7 +124,6 @@ Feature: Verify course completion data with custom fields can be successfully up
     And I upload "totara/completionimport/tests/behat/fixtures/course_evidence_custom_fields_1.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
     And I should see "1 Records created as evidence"
     And I should see "1 Records in total"
 
@@ -144,7 +142,6 @@ Feature: Verify course completion data with custom fields can be successfully up
     And I upload "totara/completionimport/tests/behat/fixtures/course_evidence_custom_fields_2.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
     And I should see "1 Records created as evidence"
     And I should see "1 Records in total"
 

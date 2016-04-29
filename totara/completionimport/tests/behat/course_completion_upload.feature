@@ -17,8 +17,7 @@ Feature: Verify course completion data can be successfully uploaded.
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
-    And I should see "No records were imported"
+    And I should see "1 Records with data errors - these were ignored"
 
   Scenario: Verify an course completion with no username fails.
     Given I log in as "admin"
@@ -26,7 +25,6 @@ Feature: Verify course completion data can be successfully uploaded.
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1a.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
     And I should see "1 Records with data errors - these were ignored"
     And I should see "1 Records in total"
     And I follow "Course import report"
@@ -38,7 +36,6 @@ Feature: Verify course completion data can be successfully uploaded.
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1b.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
     And I should see "1 Records successfully imported as courses"
     And I should see "1 Records in total"
 
@@ -53,7 +50,6 @@ Feature: Verify course completion data can be successfully uploaded.
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1c.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
     And I should see "1 Records successfully imported as courses"
     And I should see "1 Records in total"
 
@@ -68,7 +64,6 @@ Feature: Verify course completion data can be successfully uploaded.
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1d.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
     And I should see "1 Records with data errors - these were ignored"
     And I should see "1 Records in total"
     And I follow "Course import report"
@@ -80,7 +75,6 @@ Feature: Verify course completion data can be successfully uploaded.
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1e.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
     And I should see "1 Records with data errors - these were ignored"
     And I should see "1 Records in total"
     And I follow "Course import report"
@@ -93,7 +87,6 @@ Feature: Verify course completion data can be successfully uploaded.
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_2.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
     And I should see "1 Records successfully imported as courses"
     And I should see "1 Records created as evidence"
     And I should see "2 Records in total"
@@ -129,7 +122,6 @@ Feature: Verify course completion data can be successfully uploaded.
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_CR_line_endings.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
     And I should see "1 Records successfully imported as courses"
     And I should see "1 Records created as evidence"
     And I should see "2 Records in total"
@@ -153,3 +145,13 @@ Feature: Verify course completion data can be successfully uploaded.
     Then I should see "Additional configuration settings are required to specify a file location on the server. Please contact your system administrator."
     When I click on "Alternatively upload csv files via a form" "link"
     Then I should see "Choose course file to upload"
+
+  Scenario: Verify a course completion import csv with incorrect columns shows an error
+    Given I log in as "admin"
+    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_badcolumns.csv" file to "Choose course file to upload" filemanager
+    And I click on "Upload" "button" in the "#mform1" "css_element"
+    Then I should see "There were errors while importing the courses"
+    And I should see "Unknown column 'badcolumn'"
+    And I should see "Missing required column 'courseidnumber'"
+    And I should see "No records were imported"

@@ -66,17 +66,16 @@ class coursecompletionimport_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
 
         $filename = $CFG->dirroot . '/totara/completionimport/tests/fixtures/course_single_upload.csv';
-        $tempfilename = $CFG->dirroot . '/totara/completionimport/tests/fixtures/course_single_upload_ready.csv';
         $importname = 'course';
         $importtime = time();
-
-        // The file gets deleted so make a copy of the file.
-        copy($filename, $tempfilename);
 
         $this->assertEquals(0, $DB->count_records('course_completions'));
         $this->assertEquals(0, $DB->count_records('course_completion_history'));
 
-        import_completions($tempfilename, $importname, $importtime, true);
+        $handle = fopen($filename, 'r');
+        $size = filesize($filename);
+        $content = fread($handle, $size);
+        \totara_completionimport\csv_import::import($content, $importname, $importtime);
 
         $this->assertEquals(1, $DB->count_records('course_completions'));
         $this->assertEquals(0, $DB->count_records('course_completion_history'));
@@ -110,17 +109,16 @@ class coursecompletionimport_testcase extends advanced_testcase {
         $DB->insert_record('course_completions', $completiondata);
 
         $filename = $CFG->dirroot . '/totara/completionimport/tests/fixtures/course_single_upload.csv';
-        $tempfilename = $CFG->dirroot . '/totara/completionimport/tests/fixtures/course_single_upload_ready.csv';
         $importname = 'course';
         $importtime = time();
-
-        // The file gets deleted so make a copy of the file.
-        copy($filename, $tempfilename);
 
         $this->assertEquals(1, $DB->count_records('course_completions'));
         $this->assertEquals(0, $DB->count_records('course_completion_history'));
 
-        import_completions($tempfilename, $importname, $importtime, true);
+        $handle = fopen($filename, 'r');
+        $size = filesize($filename);
+        $content = fread($handle, $size);
+        \totara_completionimport\csv_import::import($content, $importname, $importtime);
 
         $this->assertEquals(1, $DB->count_records('course_completions'));
         $this->assertEquals(1, $DB->count_records('course_completion_history'));

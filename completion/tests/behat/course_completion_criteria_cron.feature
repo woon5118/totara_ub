@@ -1,4 +1,4 @@
-@core @core_completion
+@core @core_completion @totara_completion_upload
 Feature: Make sure course completion depending on completion of other course is checked on cron
   In order to ensure that course criteria are marked complete when dependent courses are completed
   I need to run the completion cron task and check that the courses were marked complete
@@ -46,7 +46,6 @@ Feature: Make sure course completion depending on completion of other course is 
     And I upload "completion/tests/fixtures/completion_criteria_course_cron.csv" file to "Choose course file to upload" filemanager
     And I click on "Upload" "button" in the "#mform1" "css_element"
     Then I should see "CSV import completed"
-    And I should see "Course data imported successfully"
     And I should see "1 Records successfully imported as courses"
     # Check that the resulting course is NOT marked complete.
     And I am on site homepage
