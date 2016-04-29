@@ -96,7 +96,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertInstanceOf('stdClass', $row);
         $processed = $report->src->process_data_row($row, 'html', $report);
 
-        $this->assertSame('3', $processed[0]);
+        $this->assertSame($row->user_id, $processed[0]);
         $this->assertSame('January', $processed[1]);
         $this->assertSame('10 Jan 2013', $processed[2]);
         $this->assertStringStartsWith('10 Jan 2013 at ', $processed[3]);
@@ -106,7 +106,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $processed = $report->src->process_data_row($row, 'pdf', $report);
 
-        $this->assertSame('3', $processed[0]);
+        $this->assertSame($row->user_id, $processed[0]);
         $this->assertSame('January', $processed[1]);
         $this->assertSame('10 Jan 2013', $processed[2]);
         $this->assertStringStartsWith('10 Jan 2013 at ', $processed[3]);
@@ -116,7 +116,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $processed = $report->src->process_data_row($row, 'excel', $report);
 
-        $this->assertSame('3', $processed[0]);
+        $this->assertSame($row->user_id, $processed[0]);
         $this->assertSame('January', $processed[1]);
         $this->assertSame('date', $processed[2][0]);
         $this->assertSame('1357812000', $processed[2][1]);
@@ -130,7 +130,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $processed = $report->src->process_data_row($row, 'ods', $report);
 
-        $this->assertSame('3', $processed[0]);
+        $this->assertSame($row->user_id, $processed[0]);
         $this->assertSame('January', $processed[1]);
         $this->assertSame('date', $processed[2][0]);
         $this->assertSame('1357812000', $processed[2][1]);

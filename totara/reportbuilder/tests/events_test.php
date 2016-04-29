@@ -46,7 +46,7 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->assertFalse($data['other']['embedded']);
 
         $this->assertEventContextNotUsed($event);
-        $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'new report', 'report.php?id=1', 'Test user report (ID='.$report->_id.')'), $event);
+        $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'new report', 'report.php?id=' . $rid, 'Test user report (ID='.$report->_id.')'), $event);
 
         // Let's created embedded report, we should not get any event since 2.75.
 
@@ -79,7 +79,7 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->assertSame('columns', $data['other']['area']);
 
         $this->assertEventContextNotUsed($event);
-        $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'update report', 'report.php?id=1', 'Test user report (ID='.$report->_id.')'), $event);
+        $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'update report', 'report.php?id=' . $rid, 'Test user report (ID='.$report->_id.')'), $event);
     }
 
     public function test_report_deleted_event() {
@@ -174,7 +174,7 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->assertSame('r', $data['crud']);
 
         $this->assertEventContextNotUsed($event);
-        $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'view report', 'report.php?id=1', 'Test user report'), $event);
+        $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'view report', 'report.php?id=' . $rid, 'Test user report'), $event);
     }
 
     public function test_report_exported_event() {
@@ -197,6 +197,6 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->assertSame('pdflandscape', $data['other']['format']);
 
         $this->assertEventContextNotUsed($event);
-        $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'export report', 'report.php?id=1', 'Test user report'), $event);
+        $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'export report', 'report.php?id=' . $rid, 'Test user report'), $event);
     }
 }

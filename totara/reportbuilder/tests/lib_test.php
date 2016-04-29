@@ -35,548 +35,496 @@ require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
 
 class totara_reportbuilder_lib_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
-    /** @var reportbuilder */
-    public $rb;
+    /** @var $rb reportbuilder */
+    public $rb, $user, $shortname, $filter1, $filter4, $column1, $column4, $savedsearch;
 
     protected function setUp() {
-        global $DB,$CFG;
+        global $DB;
         parent::setup();
         $this->setAdminUser();
 
+        $user = get_admin();
+        $this->user = $user;
+
         //create all the dummy data to put into the phpunit database tables
-        $this->rb_data = new stdclass();
-        $this->rb_data->id = 1;
-        $this->rb_data->fullname = 'Test Report';
-        $this->rb_data->shortname = 'test_report';
-        $this->rb_data->source = 'competency_evidence';
-        $this->rb_data->hidden = 0;
-        $this->rb_data->accessmode = 0;
-        $this->rb_data->contentmode = 0;
-        $this->rb_data->description = '';
-        $this->rb_data->recordsperpage = 40;
-        $this->rb_data->defaultsortcolumn = 'user_fullname';
-        $this->rb_data->defaultsortorder = 4;
-        $this->rb_data->embedded = 0;
+        $report = new stdclass();
+        $report->fullname = 'Test Report';
+        $report->shortname = 'report_test';
+        $report->source = 'competency_evidence';
+        $report->hidden = 0;
+        $report->accessmode = 0;
+        $report->contentmode = 0;
+        $report->description = '';
+        $report->recordsperpage = 40;
+        $report->defaultsortcolumn = 'user_fullname';
+        $report->defaultsortorder = 4;
+        $report->embedded = 0;
+        $report->id = $DB->insert_record('report_builder', $report);
 
-        $this->rb_col_data = Array();
+        $rbcol1 = new stdClass();
+        $rbcol1->reportid = $report->id;
+        $rbcol1->type = 'user';
+        $rbcol1->value = 'namelink';
+        $rbcol1->heading = 'Participant';
+        $rbcol1->sortorder = 1;
+        $rbcol1->hidden = 0;
+        $rbcol1->customheading = 1;
+        $rbcol1->id = $DB->insert_record('report_builder_columns', $rbcol1);
+        $this->column1 = $rbcol1;
 
-        $this->rb_col_data1 = new stdClass();
-        $this->rb_col_data1->id = 1;
-        $this->rb_col_data1->reportid = 1;
-        $this->rb_col_data1->type = 'user';
-        $this->rb_col_data1->value = 'namelink';
-        $this->rb_col_data1->heading = 'Participant';
-        $this->rb_col_data1->sortorder = 1;
-        $this->rb_col_data1->hidden = 0;
-        $this->rb_col_data1->customheading = 1;
-        $this->rb_col_data[] = $this->rb_col_data1;
+        $rbcol2 = new stdClass();
+        $rbcol2->reportid = $report->id;
+        $rbcol2->type = 'competency';
+        $rbcol2->value = 'competencylink';
+        $rbcol2->heading = 'Competency';
+        $rbcol2->sortorder = 2;
+        $rbcol2->hidden = 0;
+        $rbcol2->customheading = 0;
+        $rbcol2->id = $DB->insert_record('report_builder_columns', $rbcol2);
 
-        $this->rb_col_data2 = new stdClass();
-        $this->rb_col_data2->id = 2;
-        $this->rb_col_data2->reportid = 1;
-        $this->rb_col_data2->type = 'competency';
-        $this->rb_col_data2->value = 'competencylink';
-        $this->rb_col_data2->heading = 'Competency';
-        $this->rb_col_data2->sortorder = 2;
-        $this->rb_col_data2->hidden = 0;
-        $this->rb_col_data2->customheading = 0;
-        $this->rb_col_data[] = $this->rb_col_data2;
+        $rbcol3 = new stdClass();
+        $rbcol3->reportid = $report->id;
+        $rbcol3->type = 'user';
+        $rbcol3->value = 'organisation';
+        $rbcol3->heading = 'Office';
+        $rbcol3->sortorder = 3;
+        $rbcol3->hidden = 0;
+        $rbcol3->customheading = 0;
+        $rbcol3->id = $DB->insert_record('report_builder_columns', $rbcol3);
 
-        $this->rb_col_data3 = new stdClass();
-        $this->rb_col_data3->id = 3;
-        $this->rb_col_data3->reportid = 1;
-        $this->rb_col_data3->type = 'user';
-        $this->rb_col_data3->value = 'organisation';
-        $this->rb_col_data3->heading = 'Office';
-        $this->rb_col_data3->sortorder = 3;
-        $this->rb_col_data3->hidden = 0;
-        $this->rb_col_data3->customheading = 0;
-        $this->rb_col_data[] = $this->rb_col_data3;
+        $rbcol4 = new stdClass();
+        $rbcol4->reportid = $report->id;
+        $rbcol4->type = 'competency_evidence';
+        $rbcol4->value = 'organisation';
+        $rbcol4->heading = 'Completion Office';
+        $rbcol4->sortorder = 4;
+        $rbcol4->hidden = 0;
+        $rbcol4->customheading = 0;
+        $rbcol4->id = $DB->insert_record('report_builder_columns', $rbcol4);
+        $this->column4 = $rbcol4;
 
-        $this->rb_col_data4 = new stdClass();
-        $this->rb_col_data4->id = 4;
-        $this->rb_col_data4->reportid = 1;
-        $this->rb_col_data4->type = 'competency_evidence';
-        $this->rb_col_data4->value = 'organisation';
-        $this->rb_col_data4->heading = 'Completion Office';
-        $this->rb_col_data4->sortorder = 4;
-        $this->rb_col_data4->hidden = 0;
-        $this->rb_col_data4->customheading = 0;
-        $this->rb_col_data[] = $this->rb_col_data4;
+        $rbcol5 = new stdClass();
+        $rbcol5->reportid = $report->id;
+        $rbcol5->type = 'user';
+        $rbcol5->value = 'position';
+        $rbcol5->heading = 'Position';
+        $rbcol5->sortorder = 5;
+        $rbcol5->hidden = 0;
+        $rbcol5->customheading = 0;
+        $rbcol5->id = $DB->insert_record('report_builder_columns', $rbcol5);
 
-        $this->rb_col_data5 = new stdClass();
-        $this->rb_col_data5->id = 5;
-        $this->rb_col_data5->reportid = 1;
-        $this->rb_col_data5->type = 'user';
-        $this->rb_col_data5->value = 'position';
-        $this->rb_col_data5->heading = 'Position';
-        $this->rb_col_data5->sortorder = 5;
-        $this->rb_col_data5->hidden = 0;
-        $this->rb_col_data5->customheading = 0;
-        $this->rb_col_data[] = $this->rb_col_data5;
+        $rbcol6 = new stdClass();
+        $rbcol6->reportid = $report->id;
+        $rbcol6->type = 'competency_evidence';
+        $rbcol6->value = 'position';
+        $rbcol6->heading ='Completion Position';
+        $rbcol6->sortorder = 6;
+        $rbcol6->hidden = 0;
+        $rbcol6->customheading = 0;
+        $rbcol6->id = $DB->insert_record('report_builder_columns', $rbcol6);
 
-        $this->rb_col_data6 = new stdClass();
-        $this->rb_col_data6->id = 6;
-        $this->rb_col_data6->reportid = 1;
-        $this->rb_col_data6->type = 'competency_evidence';
-        $this->rb_col_data6->value = 'position';
-        $this->rb_col_data6->heading ='Completion Position';
-        $this->rb_col_data6->sortorder = 6;
-        $this->rb_col_data6->hidden = 0;
-        $this->rb_col_data6->customheading = 0;
-        $this->rb_col_data[] = $this->rb_col_data6;
+        $rbcol7 = new stdClass();
+        $rbcol7->reportid = $report->id;
+        $rbcol7->type = 'competency_evidence';
+        $rbcol7->value = 'proficiency';
+        $rbcol7->heading = 'Proficiency';
+        $rbcol7->sortorder = 7;
+        $rbcol7->hidden = 0;
+        $rbcol7->customheading = 0;
+        $rbcol7->id = $DB->insert_record('report_builder_columns', $rbcol7);
 
-        $this->rb_col_data7 = new stdClass();
-        $this->rb_col_data7->id = 7;
-        $this->rb_col_data7->reportid = 1;
-        $this->rb_col_data7->type = 'competency_evidence';
-        $this->rb_col_data7->value = 'proficiency';
-        $this->rb_col_data7->heading = 'Proficiency';
-        $this->rb_col_data7->sortorder = 7;
-        $this->rb_col_data7->hidden = 0;
-        $this->rb_col_data7->customheading = 0;
-        $this->rb_col_data[] = $this->rb_col_data7;
+        $rbcol8 = new stdClass();
+        $rbcol8->reportid = $report->id;
+        $rbcol8->type = 'competency_evidence';
+        $rbcol8->value = 'completeddate';
+        $rbcol8->heading = 'Completion Date';
+        $rbcol8->sortorder = 8;
+        $rbcol8->hidden = 0;
+        $rbcol8->customheading = 0;
+        $rbcol8->id = $DB->insert_record('report_builder_columns', $rbcol8);
 
-        $this->rb_col_data8 = new stdClass();
-        $this->rb_col_data8->id = 8;
-        $this->rb_col_data8->reportid = 1;
-        $this->rb_col_data8->type = 'competency_evidence';
-        $this->rb_col_data8->value = 'completeddate';
-        $this->rb_col_data8->heading = 'Completion Date';
-        $this->rb_col_data8->sortorder = 8;
-        $this->rb_col_data8->hidden = 0;
-        $this->rb_col_data8->customheading = 0;
-        $this->rb_col_data[] = $this->rb_col_data8;
+        $rbfilter1 = new stdClass();
+        $rbfilter1->reportid = $report->id;
+        $rbfilter1->type = 'user';
+        $rbfilter1->value = 'fullname';
+        $rbfilter1->advanced = 0;
+        $rbfilter1->sortorder = 1;
+        $rbfilter1->id = $DB->insert_record('report_builder_filters', $rbfilter1);
+        $this->filter1 = $rbfilter1;
 
-        $this->rb_filter_data = Array();
+        $rbfilter2 = new stdClass();
+        $rbfilter2->reportid = $report->id;
+        $rbfilter2->type = 'user';
+        $rbfilter2->value = 'organisationid';
+        $rbfilter2->advanced = 0;
+        $rbfilter2->sortorder = 2;
+        $rbfilter2->id = $DB->insert_record('report_builder_filters', $rbfilter2);
 
-        $this->rb_filter_data1 = new stdClass();
-        $this->rb_filter_data1->id = 1;
-        $this->rb_filter_data1->reportid = 1;
-        $this->rb_filter_data1->type = 'user';
-        $this->rb_filter_data1->value = 'fullname';
-        $this->rb_filter_data1->advanced = 0;
-        $this->rb_filter_data1->sortorder = 1;
-        $this->rb_filter_data[] = $this->rb_filter_data1;
+        $rbfilter3 = new stdClass();
+        $rbfilter3->reportid = $report->id;
+        $rbfilter3->type = 'competency_evidence';
+        $rbfilter3->value = 'organisationid';
+        $rbfilter3->advanced = 0;
+        $rbfilter3->sortorder = 3;
+        $rbfilter3->id = $DB->insert_record('report_builder_filters', $rbfilter3);
 
-        $this->rb_filter_data2 = new stdClass();
-        $this->rb_filter_data2->id = 2;
-        $this->rb_filter_data2->reportid = 1;
-        $this->rb_filter_data2->type = 'user';
-        $this->rb_filter_data2->value = 'organisationid';
-        $this->rb_filter_data2->advanced = 0;
-        $this->rb_filter_data2->sortorder = 2;
-        $this->rb_filter_data[] = $this->rb_filter_data2;
+        $rbfilter4 = new stdClass();
+        $rbfilter4->reportid = $report->id;
+        $rbfilter4->type = 'user';
+        $rbfilter4->value = 'positionid';
+        $rbfilter4->advanced = 0;
+        $rbfilter4->sortorder = 4;
+        $rbfilter4->id = $DB->insert_record('report_builder_filters', $rbfilter4);
+        $this->filter4 = $rbfilter4;
 
-        $this->rb_filter_data3 = new stdClass();
-        $this->rb_filter_data3->id = 3;
-        $this->rb_filter_data3->reportid = 1;
-        $this->rb_filter_data3->type = 'competency_evidence';
-        $this->rb_filter_data3->value = 'organisationid';
-        $this->rb_filter_data3->advanced = 0;
-        $this->rb_filter_data3->sortorder = 3;
-        $this->rb_filter_data[] = $this->rb_filter_data3;
+        $rbfilter5 = new stdClass();
+        $rbfilter5->reportid = $report->id;
+        $rbfilter5->type = 'competency_evidence';
+        $rbfilter5->value = 'positionid';
+        $rbfilter5->advanced = 0;
+        $rbfilter5->sortorder = 5;
+        $rbfilter5->id = $DB->insert_record('report_builder_filters', $rbfilter5);
 
-        $this->rb_filter_data4 = new stdClass();
-        $this->rb_filter_data4->id = 4;
-        $this->rb_filter_data4->reportid = 1;
-        $this->rb_filter_data4->type = 'user';
-        $this->rb_filter_data4->value = 'positionid';
-        $this->rb_filter_data4->advanced = 0;
-        $this->rb_filter_data4->sortorder = 4;
-        $this->rb_filter_data[] = $this->rb_filter_data4;
+        $rbfilter6 = new stdClass();
+        $rbfilter6->reportid = $report->id;
+        $rbfilter6->type = 'competency';
+        $rbfilter6->value = 'fullname';
+        $rbfilter6->advanced = 0;
+        $rbfilter6->sortorder = 6;
+        $rbfilter6->id = $DB->insert_record('report_builder_filters', $rbfilter6);
 
-        $this->rb_filter_data5 = new stdClass();
-        $this->rb_filter_data5->id = 5;
-        $this->rb_filter_data5->reportid = 1;
-        $this->rb_filter_data5->type = 'competency_evidence';
-        $this->rb_filter_data5->value = 'positionid';
-        $this->rb_filter_data5->advanced = 0;
-        $this->rb_filter_data5->sortorder = 5;
-        $this->rb_filter_data[] = $this->rb_filter_data5;
+        $rbfilter7 = new stdClass();
+        $rbfilter7->reportid = $report->id;
+        $rbfilter7->type = 'competency_evidence';
+        $rbfilter7->value = 'completeddate';
+        $rbfilter7->advanced = 0;
+        $rbfilter7->sortorder = 7;
+        $rbfilter7->id = $DB->insert_record('report_builder_filters', $rbfilter7);
 
-        $this->rb_filter_data6 = new stdClass();
-        $this->rb_filter_data6->id = 6;
-        $this->rb_filter_data6->reportid = 1;
-        $this->rb_filter_data6->type = 'competency';
-        $this->rb_filter_data6->value = 'fullname';
-        $this->rb_filter_data6->advanced = 0;
-        $this->rb_filter_data6->sortorder = 6;
-        $this->rb_filter_data[] = $this->rb_filter_data6;
+        $rbfilter8 = new stdClass();
+        $rbfilter8->reportid = $report->id;
+        $rbfilter8->type = 'competency_evidence';
+        $rbfilter8->value = 'proficiencyid';
+        $rbfilter8->advanced = 0;
+        $rbfilter8->sortorder = 8;
+        $rbfilter8->id = $DB->insert_record('report_builder_filters', $rbfilter8);
 
-        $this->rb_filter_data7 = new stdClass();
-        $this->rb_filter_data7->id = 7;
-        $this->rb_filter_data7->reportid = 1;
-        $this->rb_filter_data7->type = 'competency_evidence';
-        $this->rb_filter_data7->value = 'completeddate';
-        $this->rb_filter_data7->advanced = 0;
-        $this->rb_filter_data7->sortorder = 7;
-        $this->rb_filter_data[] = $this->rb_filter_data7;
+        $rbsettings1 = new stdClass();
+        $rbsettings1->reportid = $report->id;
+        $rbsettings1->type = 'role_access';
+        $rbsettings1->name = 'activeroles';
+        $rbsettings1->value = '1|2';
+        $rbsettings1->id = $DB->insert_record('report_builder_settings', $rbsettings1);
 
-        $this->rb_filter_data8 = new stdClass();
-        $this->rb_filter_data8->id = 8;
-        $this->rb_filter_data8->reportid = 1;
-        $this->rb_filter_data8->type = 'competency_evidence';
-        $this->rb_filter_data8->value = 'proficiencyid';
-        $this->rb_filter_data8->advanced = 0;
-        $this->rb_filter_data8->sortorder = 8;
-        $this->rb_filter_data[] = $this->rb_filter_data8;
+        $rbsettings2 = new stdClass();
+        $rbsettings2->reportid = $report->id;
+        $rbsettings2->type = 'role_access';
+        $rbsettings2->name = 'enable';
+        $rbsettings2->value = 1;
+        $rbsettings2->id = $DB->insert_record('report_builder_settings', $rbsettings2);
 
-        $this->rb_settings_data = array();
+        $rbsaved = new stdClass();
+        $rbsaved->reportid = $report->id;
+        $rbsaved->userid = $user->id;
+        $rbsaved->name = 'Saved Search';
+        $rbsaved->search = 'a:1:{s:13:"user-fullname";a:1:{i:0;a:2:{s:8:"operator";i:0;s:5:"value";s:1:"a";}}}';
+        $rbsaved->ispublic = 1;
+        $rbsaved->id = $DB->insert_record('report_builder_saved', $rbsaved);
+        $this->savedsearch = $rbsaved;
 
-        $this->rb_settings_data1 = new stdClass();
-        $this->rb_settings_data1->id = 1;
-        $this->rb_settings_data1->reportid = 1;
-        $this->rb_settings_data1->type = 'role_access';
-        $this->rb_settings_data1->name = 'activeroles';
-        $this->rb_settings_data1->value = '1|2';
-        $this->rb_settings_data[] = $this->rb_settings_data1;
+        $roleassignment = new stdClass();
+        $roleassignment->roleid = 1;
+        $roleassignment->contextid = 1;
+        $roleassignment->userid = 2;
+        $roleassignment->hidden = 0;
+        $roleassignment->timestart = 0;
+        $roleassignment->timeend = 0;
+        $roleassignment->timemodified = 0;
+        $roleassignment->modifierid = $user->id;
+        $roleassignment->enrol = 'manual';
+        $roleassignment->sortorder = 0;
+        $roleassignment->id = $DB->insert_record('role_assignments', $roleassignment);
 
-        $this->rb_settings_data2 = new stdClass();
-        $this->rb_settings_data2->id = 2;
-        $this->rb_settings_data2->reportid = 1;
-        $this->rb_settings_data2->type = 'role_access';
-        $this->rb_settings_data2->name = 'enable';
-        $this->rb_settings_data2->value = 1;
-        $this->rb_settings_data[] = $this->rb_settings_data2;
+        $userinfofield = new stdClass();
+        $userinfofield->shortname = 'datejoined';
+        $userinfofield->name = 'Date Joined';
+        $userinfofield->datatype = 'text';
+        $userinfofield->description = '';
+        $userinfofield->categoryid = 1;
+        $userinfofield->sortorder = 1;
+        $userinfofield->required = 0;
+        $userinfofield->locked = 0;
+        $userinfofield->visible = 1;
+        $userinfofield->forceunique = 0;
+        $userinfofield->signup = 0;
+        $userinfofield->defaultdata = '';
+        $userinfofield->param1 = 30;
+        $userinfofield->param2 = 2048;
+        $userinfofield->param3 = 0;
+        $userinfofield->param4 = '';
+        $userinfofield->param5 = '';
+        $userinfofield->id = $DB->insert_record('user_info_field', $userinfofield);
 
-        $this->rb_saved_data = new stdClass();
-        $this->rb_saved_data->id = 1;
-        $this->rb_saved_data->reportid = 1;
-        $this->rb_saved_data->userid = 2;
-        $this->rb_saved_data->name = 'Saved Search';
-        $this->rb_saved_data->search = 'a:1:{s:13:"user-fullname";a:1:{i:0;a:2:{s:8:"operator";i:0;s:5:"value";s:1:"a";}}}';
-        $this->rb_saved_data->ispublic = 1;
+        $postypeinfofield = new stdClass();
+        $postypeinfofield->shortname = 'checktest';
+        $postypeinfofield->typeid = 1;
+        $postypeinfofield->datatype = 'checkbox';
+        $postypeinfofield->description = '';
+        $postypeinfofield->sortorder = 1;
+        $postypeinfofield->hidden = 0;
+        $postypeinfofield->locked = 0;
+        $postypeinfofield->required = 0;
+        $postypeinfofield->forceunique = 0;
+        $postypeinfofield->defaultdata = 0;
+        $postypeinfofield->param1 = null;
+        $postypeinfofield->param2 = null;
+        $postypeinfofield->param3 = null;
+        $postypeinfofield->param4 = null;
+        $postypeinfofield->param5 = null;
+        $postypeinfofield->fullname = 'Checkbox test';
+        $postypeinfofield->id = $DB->insert_record('pos_type_info_field', $postypeinfofield);
 
-        $this->role_assignments_data = new stdClass();
-        $this->role_assignments_data->id = 1;
-        $this->role_assignments_data->roleid = 1;
-        $this->role_assignments_data->contextid = 1;
-        $this->role_assignments_data->userid = 2;
-        $this->role_assignments_data->hidden = 0;
-        $this->role_assignments_data->timestart = 0;
-        $this->role_assignments_data->timeend = 0;
-        $this->role_assignments_data->timemodified = 0;
-        $this->role_assignments_data->modifierid = 2;
-        $this->role_assignments_data->enrol = 'manual';
-        $this->role_assignments_data->sortorder = 0;
+        $orgtypeinfofield = new stdClass();
+        $orgtypeinfofield->shortname = 'checktest';
+        $orgtypeinfofield->typeid = 1;
+        $orgtypeinfofield->datatype = 'checkbox';
+        $orgtypeinfofield->description = '';
+        $orgtypeinfofield->sortorder = 1;
+        $orgtypeinfofield->hidden = 0;
+        $orgtypeinfofield->locked = 0;
+        $orgtypeinfofield->required = 0;
+        $orgtypeinfofield->forceunique = 0;
+        $orgtypeinfofield->defaultdata = 0;
+        $orgtypeinfofield->param1 = null;
+        $orgtypeinfofield->param2 = null;
+        $orgtypeinfofield->param3 = null;
+        $orgtypeinfofield->param4 = null;
+        $orgtypeinfofield->param5 = null;
+        $orgtypeinfofield->fullname = 'Checkbox test';
+        $orgtypeinfofield->id = $DB->insert_record('org_type_info_field', $orgtypeinfofield);
 
-        $this->user_info_field_data = new stdClass();
-        $this->user_info_field_data->id = 1;
-        $this->user_info_field_data->shortname = 'datejoined';
-        $this->user_info_field_data->name = 'Date Joined';
-        $this->user_info_field_data->datatype = 'text';
-        $this->user_info_field_data->description = '';
-        $this->user_info_field_data->categoryid = 1;
-        $this->user_info_field_data->sortorder = 1;
-        $this->user_info_field_data->required = 0;
-        $this->user_info_field_data->locked = 0;
-        $this->user_info_field_data->visible = 1;
-        $this->user_info_field_data->forceunique = 0;
-        $this->user_info_field_data->signup = 0;
-        $this->user_info_field_data->defaultdata = '';
-        $this->user_info_field_data->param1 = 30;
-        $this->user_info_field_data->param2 = 2048;
-        $this->user_info_field_data->param3 = 0;
-        $this->user_info_field_data->param4 = '';
-        $this->user_info_field_data->param5 = '';
+        $comptypeinfofield = new stdClass();
+        $comptypeinfofield->shortname = 'checktest';
+        $comptypeinfofield->typeid = 1;
+        $comptypeinfofield->datatype = 'checkbox';
+        $comptypeinfofield->description = '';
+        $comptypeinfofield->sortorder = 1;
+        $comptypeinfofield->hidden = 0;
+        $comptypeinfofield->locked = 0;
+        $comptypeinfofield->required = 0;
+        $comptypeinfofield->forceunique = 0;
+        $comptypeinfofield->defaultdata = 0;
+        $comptypeinfofield->param1 = null;
+        $comptypeinfofield->param2 = null;
+        $comptypeinfofield->param3 = null;
+        $comptypeinfofield->param4 = null;
+        $comptypeinfofield->param5 = null;
+        $comptypeinfofield->fullname = 'Checkbox test';
+        $comptypeinfofield->id = $DB->insert_record('comp_type_info_field', $comptypeinfofield);
 
-        $this->pos_type_info_field_data = new stdClass();
-        $this->pos_type_info_field_data->id = 1;
-        $this->pos_type_info_field_data->shortname = 'checktest';
-        $this->pos_type_info_field_data->typeid = 1;
-        $this->pos_type_info_field_data->datatype = 'checkbox';
-        $this->pos_type_info_field_data->description = '';
-        $this->pos_type_info_field_data->sortorder = 1;
-        $this->pos_type_info_field_data->hidden = 0;
-        $this->pos_type_info_field_data->locked = 0;
-        $this->pos_type_info_field_data->required = 0;
-        $this->pos_type_info_field_data->forceunique = 0;
-        $this->pos_type_info_field_data->defaultdata = 0;
-        $this->pos_type_info_field_data->param1 = null;
-        $this->pos_type_info_field_data->param2 = null;
-        $this->pos_type_info_field_data->param3 = null;
-        $this->pos_type_info_field_data->param4 = null;
-        $this->pos_type_info_field_data->param5 = null;
-        $this->pos_type_info_field_data->fullname = 'Checkbox test';
+        $comp1 = new stdClass();
+        $comp1->fullname = 'Competency 1';
+        $comp1->shortname =  'Comp 1';
+        $comp1->description = 'Competency Description 1';
+        $comp1->idnumber = 'C1';
+        $comp1->frameworkid = 1;
+        $comp1->path = '/1';
+        $comp1->depthlevel = 1;
+        $comp1->parentid = 0;
+        $comp1->sortthread = '01';
+        $comp1->visible = 1;
+        $comp1->aggregationmethod = 1;
+        $comp1->proficiencyexpected = 1;
+        $comp1->evidencecount = 0;
+        $comp1->timecreated = 1265963591;
+        $comp1->timemodified = 1265963591;
+        $comp1->usermodified = $user->id;
+        $comp1->id = $DB->insert_record('comp', $comp1);
 
-        $this->org_type_info_field_data = new stdClass();
-        $this->org_type_info_field_data->id = 1;
-        $this->org_type_info_field_data->shortname = 'checktest';
-        $this->org_type_info_field_data->typeid = 1;
-        $this->org_type_info_field_data->datatype = 'checkbox';
-        $this->org_type_info_field_data->description = '';
-        $this->org_type_info_field_data->sortorder = 1;
-        $this->org_type_info_field_data->hidden = 0;
-        $this->org_type_info_field_data->locked = 0;
-        $this->org_type_info_field_data->required = 0;
-        $this->org_type_info_field_data->forceunique = 0;
-        $this->org_type_info_field_data->defaultdata = 0;
-        $this->org_type_info_field_data->param1 = null;
-        $this->org_type_info_field_data->param2 = null;
-        $this->org_type_info_field_data->param3 = null;
-        $this->org_type_info_field_data->param4 = null;
-        $this->org_type_info_field_data->param5 = null;
-        $this->org_type_info_field_data->fullname = 'Checkbox test';
+        $comp2 = new stdClass();
+        $comp2->fullname = 'Competency 2';
+        $comp2->shortname = 'Comp 2';
+        $comp2->description = 'Competency Description 2';
+        $comp2->idnumber = 'C2';
+        $comp2->frameworkid = 1;
+        $comp2->path = '/1/2';
+        $comp2->depthlevel = 2;
+        $comp2->parentid = 1;
+        $comp2->sortthread = '01.01';
+        $comp2->visible = 1;
+        $comp2->aggregationmethod = 1;
+        $comp2->proficiencyexpected = 1;
+        $comp2->evidencecount = 0;
+        $comp2->timecreated = 1265963591;
+        $comp2->timemodified = 1265963591;
+        $comp2->usermodified = $user->id;
+        $comp2->id = $DB->insert_record('comp', $comp2);
 
-        $this->comp_type_info_field_data = new stdClass();
-        $this->comp_type_info_field_data->id = 1;
-        $this->comp_type_info_field_data->shortname = 'checktest';
-        $this->comp_type_info_field_data->typeid = 1;
-        $this->comp_type_info_field_data->datatype = 'checkbox';
-        $this->comp_type_info_field_data->description = '';
-        $this->comp_type_info_field_data->sortorder = 1;
-        $this->comp_type_info_field_data->hidden = 0;
-        $this->comp_type_info_field_data->locked = 0;
-        $this->comp_type_info_field_data->required = 0;
-        $this->comp_type_info_field_data->forceunique = 0;
-        $this->comp_type_info_field_data->defaultdata = 0;
-        $this->comp_type_info_field_data->param1 = null;
-        $this->comp_type_info_field_data->param2 = null;
-        $this->comp_type_info_field_data->param3 = null;
-        $this->comp_type_info_field_data->param4 = null;
-        $this->comp_type_info_field_data->param5 = null;
-        $this->comp_type_info_field_data->fullname = 'Checkbox test';
+        $comp3 = new stdClass();
+        $comp3->fullname = 'F2 Competency 1';
+        $comp3->shortname = 'F2 Comp 1';
+        $comp3->description = 'F2 Competency Description 1';
+        $comp3->idnumber = 'F2 C1';
+        $comp3->frameworkid = 2;
+        $comp3->path = '/3';
+        $comp3->depthlevel = 1;
+        $comp3->parentid = 0;
+        $comp3->sortthread = '01';
+        $comp3->visible = 1;
+        $comp3->aggregationmethod = 1;
+        $comp3->proficiencyexpected = 1;
+        $comp3->evidencecount = 0;
+        $comp3->timecreated = 1265963591;
+        $comp3->timemodified = 1265963591;
+        $comp3->usermodified = $user->id;
+        $comp3->id = $DB->insert_record('comp', $comp3);
 
-        $this->comp_data = array();
+        $comp4 = new stdClass();
+        $comp4->fullname = 'Competency 3';
+        $comp4->shortname = 'Comp 3';
+        $comp4->description = 'Competency Description 3';
+        $comp4->idnumber = 'C3';
+        $comp4->frameworkid = 1;
+        $comp4->path = '/1/4';
+        $comp4->depthlevel = 2;
+        $comp4->parentid = 1;
+        $comp4->sortthread = '01.02';
+        $comp4->visible = 1;
+        $comp4->aggregationmethod = 1;
+        $comp4->proficiencyexpected = 1;
+        $comp4->evidencecount = 0;
+        $comp4->timecreated = 1265963591;
+        $comp4->timemodified = 1265963591;
+        $comp4->usermodified = $user->id;
+        $comp4->id = $DB->insert_record('comp', $comp4);
 
-        $this->comp_data1 = new stdClass();
-        $this->comp_data1->id = 1;
-        $this->comp_data1->fullname = 'Competency 1';
-        $this->comp_data1->shortname =  'Comp 1';
-        $this->comp_data1->description = 'Competency Description 1';
-        $this->comp_data1->idnumber = 'C1';
-        $this->comp_data1->frameworkid = 1;
-        $this->comp_data1->path = '/1';
-        $this->comp_data1->depthlevel = 1;
-        $this->comp_data1->parentid = 0;
-        $this->comp_data1->sortthread = '01';
-        $this->comp_data1->visible = 1;
-        $this->comp_data1->aggregationmethod = 1;
-        $this->comp_data1->proficiencyexpected = 1;
-        $this->comp_data1->evidencecount = 0;
-        $this->comp_data1->timecreated = 1265963591;
-        $this->comp_data1->timemodified = 1265963591;
-        $this->comp_data1->usermodified = 2;
-        $this->comp_data[] = $this->comp_data1;
+        $comp5 = new stdClass();
+        $comp5->fullname = 'Competency 4';
+        $comp5->shortname = 'Comp 4';
+        $comp5->description = 'Competency Description 4';
+        $comp5->idnumber = 'C4';
+        $comp5->frameworkid = 1;
+        $comp5->path = '/5';
+        $comp5->depthlevel = 1;
+        $comp5->parentid = 0;
+        $comp5->sortthread = '02';
+        $comp5->visible = 1;
+        $comp5->aggregationmethod = 1;
+        $comp5->proficiencyexpected = 1;
+        $comp5->evidencecount = 0;
+        $comp5->timecreated = 1265963591;
+        $comp5->timemodified = 1265963591;
+        $comp5->usermodified = $user->id;
+        $comp5->id = $DB->insert_record('comp', $comp5);
 
-        $this->comp_data2 = new stdClass();
-        $this->comp_data2->id = 2;
-        $this->comp_data2->fullname = 'Competency 2';
-        $this->comp_data2->shortname = 'Comp 2';
-        $this->comp_data2->description = 'Competency Description 2';
-        $this->comp_data2->idnumber = 'C2';
-        $this->comp_data2->frameworkid = 1;
-        $this->comp_data2->path = '/1/2';
-        $this->comp_data2->depthlevel = 2;
-        $this->comp_data2->parentid = 1;
-        $this->comp_data2->sortthread = '01.01';
-        $this->comp_data2->visible = 1;
-        $this->comp_data2->aggregationmethod = 1;
-        $this->comp_data2->proficiencyexpected = 1;
-        $this->comp_data2->evidencecount = 0;
-        $this->comp_data2->timecreated = 1265963591;
-        $this->comp_data2->timemodified = 1265963591;
-        $this->comp_data2->usermodified = 2;
-        $this->comp_data[] = $this->comp_data2;
+        $org = new stdClass();
+        $org->fullname = 'Distric Office';
+        $org->shortname = 'DO';
+        $org->description = '';
+        $org->idnumber = '';
+        $org->frameworkid = 1;
+        $org->path = '/1';
+        $org->depthlevel = 1;
+        $org->parentid = 0;
+        $org->sortthread = '01';
+        $org->visible = 1;
+        $org->timecreated = 0;
+        $org->timemodified = 0;
+        $org->usermodified = $user->id;
+        $org->id = $DB->insert_record('org', $org);
 
-        $this->comp_data3 = new stdClass();
-        $this->comp_data3->id = 3;
-        $this->comp_data3->fullname = 'F2 Competency 1';
-        $this->comp_data3->shortname = 'F2 Comp 1';
-        $this->comp_data3->description = 'F2 Competency Description 1';
-        $this->comp_data3->idnumber = 'F2 C1';
-        $this->comp_data3->frameworkid = 2;
-        $this->comp_data3->path = '/3';
-        $this->comp_data3->depthlevel = 1;
-        $this->comp_data3->parentid = 0;
-        $this->comp_data3->sortthread = '01';
-        $this->comp_data3->visible = 1;
-        $this->comp_data3->aggregationmethod = 1;
-        $this->comp_data3->proficiencyexpected = 1;
-        $this->comp_data3->evidencecount = 0;
-        $this->comp_data3->timecreated = 1265963591;
-        $this->comp_data3->timemodified = 1265963591;
-        $this->comp_data3->usermodified = 2;
-        $this->comp_data[] = $this->comp_data3;
+        $pos = new stdClass();
+        $pos->fullname = 'Data Analyst';
+        $pos->shortname = 'Data Analyst';
+        $pos->idnumber = '';
+        $pos->description = '';
+        $pos->frameworkid = 1;
+        $pos->path = '/1';
+        $pos->depthlevel = 1;
+        $pos->parentid = 0;
+        $pos->sortthread = '01';
+        $pos->visible = 1;
+        $pos->timevalidfrom = 0;
+        $pos->timevalidto = 0;
+        $pos->timecreated = 0;
+        $pos->timemodified = 0;
+        $pos->usermodified = $user->id;
+        $pos->id = $DB->insert_record('pos', $pos);
 
-        $this->comp_data4 = new stdClass();
-        $this->comp_data4->id = 4;
-        $this->comp_data4->fullname = 'Competency 3';
-        $this->comp_data4->shortname = 'Comp 3';
-        $this->comp_data4->description = 'Competency Description 3';
-        $this->comp_data4->idnumber = 'C3';
-        $this->comp_data4->frameworkid = 1;
-        $this->comp_data4->path = '/1/4';
-        $this->comp_data4->depthlevel = 2;
-        $this->comp_data4->parentid = 1;
-        $this->comp_data4->sortthread = '01.02';
-        $this->comp_data4->visible = 1;
-        $this->comp_data4->aggregationmethod = 1;
-        $this->comp_data4->proficiencyexpected = 1;
-        $this->comp_data4->evidencecount = 0;
-        $this->comp_data4->timecreated = 1265963591;
-        $this->comp_data4->timemodified = 1265963591;
-        $this->comp_data4->usermodified = 2;
-        $this->comp_data[] = $this->comp_data4;
+        $compscalevalue1 = new stdClass();
+        $compscalevalue1->name = 'Competent';
+        $compscalevalue1->idnumber = '';
+        $compscalevalue1->description = '';
+        $compscalevalue1->scaleid = 1;
+        $compscalevalue1->numericscore = '';
+        $compscalevalue1->sortorder = 1;
+        $compscalevalue1->timemodified = 0;
+        $compscalevalue1->usermodified = $user->id;
+        $compscalevalue1->proficient = 1;
+        $compscalevalue1->id = $DB->insert_record('comp_scale_values', $compscalevalue1);
 
-        $this->comp_data5 = new stdClass();
-        $this->comp_data5->id = 5;
-        $this->comp_data5->fullname = 'Competency 4';
-        $this->comp_data5->shortname = 'Comp 4';
-        $this->comp_data5->description = 'Competency Description 4';
-        $this->comp_data5->idnumber = 'C4';
-        $this->comp_data5->frameworkid = 1;
-        $this->comp_data5->path = '/5';
-        $this->comp_data5->depthlevel = 1;
-        $this->comp_data5->parentid = 0;
-        $this->comp_data5->sortthread = '02';
-        $this->comp_data5->visible = 1;
-        $this->comp_data5->aggregationmethod = 1;
-        $this->comp_data5->proficiencyexpected = 1;
-        $this->comp_data5->evidencecount = 0;
-        $this->comp_data5->timecreated = 1265963591;
-        $this->comp_data5->timemodified = 1265963591;
-        $this->comp_data5->usermodified = 2;
-        $this->comp_data[] = $this->comp_data5;
+        $compscalevalue2 = new stdClass();
+        $compscalevalue2->name = 'Partially Competent';
+        $compscalevalue2->idnumber = '';
+        $compscalevalue2->description = '';
+        $compscalevalue2->scaleid = 1;
+        $compscalevalue2->numericscore = '';
+        $compscalevalue2->sortorder = 2;
+        $compscalevalue2->timemodified = 0;
+        $compscalevalue2->usermodified = $user->id;
+        $compscalevalue2->proficient = 0;
+        $compscalevalue2->id = $DB->insert_record('comp_scale_values', $compscalevalue2);
 
-        $this->org_data = new stdClass();
-        $this->org_data->id = 1;
-        $this->org_data->fullname = 'Distric Office';
-        $this->org_data->shortname = 'DO';
-        $this->org_data->description = '';
-        $this->org_data->idnumber = '';
-        $this->org_data->frameworkid = 1;
-        $this->org_data->path = '/1';
-        $this->org_data->depthlevel = 1;
-        $this->org_data->parentid = 0;
-        $this->org_data->sortthread = '01';
-        $this->org_data->visible = 1;
-        $this->org_data->timecreated = 0;
-        $this->org_data->timemodified = 0;
-        $this->org_data->usermodified = 2;
+        $compscalevalue3 = new stdClass();
+        $compscalevalue3->name = 'Not Competent';
+        $compscalevalue3->idnumber = '';
+        $compscalevalue3->description = '';
+        $compscalevalue3->scaleid = 1;
+        $compscalevalue3->numericscore = '';
+        $compscalevalue3->sortorder = 3;
+        $compscalevalue3->timemodified = 0;
+        $compscalevalue3->usermodified = $user->id;
+        $compscalevalue3->proficient = 0;
+        $compscalevalue3->id = $DB->insert_record('comp_scale_values', $compscalevalue3);
 
-        $this->pos_data = new stdClass();
-        $this->pos_data->id = 1;
-        $this->pos_data->fullname = 'Data Analyst';
-        $this->pos_data->shortname = 'Data Analyst';
-        $this->pos_data->idnumber = '';
-        $this->pos_data->description = '';
-        $this->pos_data->frameworkid = 1;
-        $this->pos_data->path = '/1';
-        $this->pos_data->depthlevel = 1;
-        $this->pos_data->parentid = 0;
-        $this->pos_data->sortthread = '01';
-        $this->pos_data->visible = 1;
-        $this->pos_data->timevalidfrom = 0;
-        $this->pos_data->timevalidto = 0;
-        $this->pos_data->timecreated = 0;
-        $this->pos_data->timemodified = 0;
-        $this->pos_data->usermodified = 2;
+        $comprecord = new stdClass();
+        $comprecord->userid = $user->id;
+        $comprecord->competencyid = 1;
+        $comprecord->positionid = 1;
+        $comprecord->organisationid = 1;
+        $comprecord->assessorid = 1;
+        $comprecord->assessorname = 'Assessor';
+        $comprecord->assessmenttype = '';
+        $comprecord->proficiency = 1;
+        $comprecord->timecreated = 1100775600;
+        $comprecord->timemodified = 1100775600;
+        $comprecord->reaggregate = 0;
+        $comprecord->manual = 1;
+        $comprecord->id = $DB->insert_record('comp_record', $comprecord);
 
-        $this->comp_scale_values_data = array();
+        $posassignment = new stdClass();
+        $posassignment->fullname = 'Title';
+        $posassignment->shortname = 'Title';
+        $posassignment->organisationid = 1;
+        $posassignment->positionid = 1;
+        $posassignment->userid = $user->id;
+        $posassignment->type = 1;
+        $posassignment->timecreated = 1;
+        $posassignment->timemodified = 1;
+        $posassignment->usermodified = $user->id;
+        $posassignment->id = $DB->insert_record('pos_assignment', $posassignment);
 
-        $this->comp_scales1 = new stdClass();
-        $this->comp_scales1->id = 1;
-        $this->comp_scales1->name = 'Competent';
-        $this->comp_scales1->idnumber = '';
-        $this->comp_scales1->description = '';
-        $this->comp_scales1->scaleid = 1;
-        $this->comp_scales1->numericscore = '';
-        $this->comp_scales1->sortorder = 1;
-        $this->comp_scales1->timemodified = 0;
-        $this->comp_scales1->usermodified = 2;
-        $this->comp_scales1->proficient = 1;
-        $this->comp_scales_values_data[] = $this->comp_scales1;
+        $tag = new stdClass();
+        $tag->userid = $user->id;
+        $tag->name = 'test';
+        $tag->rawname = 'test';
+        $tag->tagtype = 'official';
+        $tag->id = $DB->insert_record('tag', $tag);
 
-        $this->comp_scales2 = new stdClass();
-        $this->comp_scales2->id  = 2;
-        $this->comp_scales2->name = 'Partially Competent';
-        $this->comp_scales2->idnumber = '';
-        $this->comp_scales2->description = '';
-        $this->comp_scales2->scaleid = 1;
-        $this->comp_scales2->numericscore = '';
-        $this->comp_scales2->sortorder = 2;
-        $this->comp_scales2->timemodified = 0;
-        $this->comp_scales2->usermodified = 2;
-        $this->comp_scales2->proficient = 0;
-        $this->comp_scales_values_data[] = $this->comp_scales2;
-
-        $this->comp_scales3 = new stdClass();
-        $this->comp_scales3->id = 3;
-        $this->comp_scales3->name = 'Not Competent';
-        $this->comp_scales3->idnumber = '';
-        $this->comp_scales3->description = '';
-        $this->comp_scales3->scaleid = 1;
-        $this->comp_scales3->numericscore = '';
-        $this->comp_scales3->sortorder = 3;
-        $this->comp_scales3->timemodified = 0;
-        $this->comp_scales3->usermodified = 2;
-        $this->comp_scales3->proficient = 0;
-        $this->comp_scales_values_data[] = $this->comp_scales3;
-
-        $this->comp_evidence_data = new stdClass();
-        $this->comp_evidence_data->id = 1;
-        $this->comp_evidence_data->userid = 2;
-        $this->comp_evidence_data->competencyid = 1;
-        $this->comp_evidence_data->positionid = 1;
-        $this->comp_evidence_data->organisationid = 1;
-        $this->comp_evidence_data->assessorid = 1;
-        $this->comp_evidence_data->assessorname = 'Assessor';
-        $this->comp_evidence_data->assessmenttype = '';
-        $this->comp_evidence_data->proficiency = 1;
-        $this->comp_evidence_data->timecreated = 1100775600;
-        $this->comp_evidence_data->timemodified = 1100775600;
-        $this->comp_evidence_data->reaggregate = 0;
-        $this->comp_evidence_data->manual = 1;
-
-        $this->pos_assignment_data = new stdClass();
-        $this->pos_assignment_data->id = 1;
-        $this->pos_assignment_data->fullname = 'Title';
-        $this->pos_assignment_data->shortname = 'Title';
-        $this->pos_assignment_data->organisationid = 1;
-        $this->pos_assignment_data->positionid = 1;
-        $this->pos_assignment_data->userid = 2;
-        $this->pos_assignment_data->type = 1;
-        $this->pos_assignment_data->timecreated = 1;
-        $this->pos_assignment_data->timemodified = 1;
-        $this->pos_assignment_data->usermodified = 1;
-
-        $this->tag_data = new stdClass();
-        $this->tag_data->id = 1;
-        $this->tag_data->userid = 2;
-        $this->tag_data->name = 'test';
-        $this->tag_data->rawname = 'test';
-        $this->tag_data->tagtype = 'official';
-
-        //insert the dummy data into the phpunit database
-        $DB->insert_record('report_builder', $this->rb_data);
-        $DB->insert_records_via_batch('report_builder_columns', $this->rb_col_data);
-        $DB->insert_records_via_batch('report_builder_filters', $this->rb_filter_data);
-        $DB->insert_records_via_batch('report_builder_settings', $this->rb_settings_data);
-        $DB->insert_record('report_builder_saved', $this->rb_saved_data);
-        $DB->insert_record('user_info_field', $this->user_info_field_data);
-        $DB->insert_record('pos_type_info_field', $this->pos_type_info_field_data);
-        $DB->insert_record('org_type_info_field', $this->org_type_info_field_data);
-        $DB->insert_record('comp_type_info_field', $this->comp_type_info_field_data);
-        $DB->insert_records_via_batch('comp', $this->comp_data);
-        $DB->insert_record('org', $this->org_data);
-        $DB->insert_record('pos', $this->pos_data);
-        $DB->insert_records_via_batch('comp_scale_values', $this->comp_scale_values_data);
-        $DB->insert_record('comp_record', $this->comp_evidence_data);
-        $DB->insert_record('role_assignments', $this->role_assignments_data);
-        $DB->insert_record('pos_assignment', $this->pos_assignment_data);
-        $DB->insert_record('tag', $this->tag_data);
-
-        $data = array(
-            // show report for a specific user
-            'userid' => 2,
-        );
-        $this->embed = reportbuilder_get_embedded_report_object('plan_competencies', $data);
         $this->shortname = 'plan_competencies';
 
         // db version of report
-        $this->rb = new reportbuilder(1);
+        $this->rb = new reportbuilder($report->id);
         $this->resetAfterTest(true);
     }
 
@@ -584,7 +532,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $rb = $this->rb;
         // should create report builder object with the correct properties
         $this->assertEquals('Test Report', $rb->fullname);
-        $this->assertEquals('test_report', $rb->shortname);
+        $this->assertEquals('report_test', $rb->shortname);
         $this->assertEquals('competency_evidence', $rb->source);
         $this->assertEquals(0, $rb->hidden);
 
@@ -592,7 +540,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     function test_reportbuilder_initialize_embedded_instance() {
-        $rb = new reportbuilder(null, $this->shortname, $this->embed);
+        $rb = new reportbuilder(null, $this->shortname);
         // should create embedded report builder object with the correct properties
         $this->assertEquals('Record of Learning: Competencies', $rb->fullname);
         $this->assertEquals('plan_competencies', $rb->shortname);
@@ -604,13 +552,10 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
     function test_reportbuilder_restore_saved_search() {
         global $SESSION, $USER, $DB;
-        $rb = new reportbuilder(1, null, null, 1);
+        $rb = new reportbuilder($this->rb->_id, null, null, $this->savedsearch->id);
 
         // ensure that saved search belongs to current user
-        $todb = new stdclass();
-        $todb->id = 1;
-        $todb->userid = $USER->id;
-        $DB->update_record('report_builder_saved', $todb);
+        $DB->set_field('report_builder_saved', 'userid', $USER->id, array('id' => $rb->_id));
 
         // should be able to restore a saved search
         $this->assertTrue((bool)$rb->restore_saved_search());
@@ -666,11 +611,11 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     function test_reportbuilder_create_embedded_record() {
         global $DB;
 
-        $rb = new reportbuilder(null, $this->shortname, $this->embed);
+        $newrb = new reportbuilder(null, $this->shortname);
         // should create a db record for the embedded report
         $this->assertTrue((bool)$record = $DB->get_records('report_builder', array('shortname' => $this->shortname)));
         // there should be db records in the columns table
-        $this->assertTrue((bool)$DB->get_records('report_builder_columns', array('reportid' => $record[2]->id)));
+        $this->assertTrue((bool)$DB->get_records('report_builder_columns', array('reportid' => $newrb->_id)));
 
         $this->resetAfterTest(true);
     }
@@ -685,11 +630,11 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->assertEquals('report_my_report_with_special_chars', $shortname2);
         // spaces should be replaced with underscores and upper case moved to lower case
         $this->assertEquals('report_space_here', $shortname3);
-        // create a db entry
-        $rb = new reportbuilder(null, $shortname3, $this->embed);
-        $existingname = reportbuilder::create_shortname('space_here');
+        // Confirm existing report short name which we will collide with.
+        $this->assertEquals('report_test', $this->rb->shortname);
+        $existingname = reportbuilder::create_shortname('test');
         // should append numbers to suggestion if shortname already exists
-        $this->assertEquals('report_space_here1', $existingname);
+        $this->assertEquals('report_test1', $existingname);
 
         $this->resetAfterTest(true);
     }
@@ -698,8 +643,8 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         global $CFG;
         $rb = $this->rb;
         // a normal report should return the report.php url
-        $this->assertEquals('/totara/reportbuilder/report.php?id=1', substr($rb->report_url(), strlen($CFG->wwwroot)));
-        $rb2 = new reportbuilder(null, $this->shortname, $this->embed);
+        $this->assertEquals('/totara/reportbuilder/report.php?id=' . $rb->_id, substr($rb->report_url(), strlen($CFG->wwwroot)));
+        $rb2 = new reportbuilder(null, $this->shortname);
         // an embedded report should return the embedded url (this page)
         $this->assertEquals($CFG->wwwroot . '/totara/plan/record/competencies.php', $rb2->report_url());
 
@@ -711,14 +656,15 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     // get_current_url() not tested
     // leaving get_current_admin_options() until after changes to capabilities
     function test_reportbuilder_get_current_params() {
-        $rb = new reportbuilder(null, $this->shortname, $this->embed);
+        $userid = $this->user->id;
+        $rb = new reportbuilder(null, $this->shortname, false, null, null, false, array('userid' => $userid));
         $paramoption = new stdClass();
         $paramoption->name = 'userid';
         $paramoption->field = 'base.userid';
         $paramoption->joins = '';
         $paramoption->type = 'int';
         $param = new rb_param('userid',array($paramoption));
-        $param->value = 2;
+        $param->value = $userid;
         // should return the expected embedded param
         $this->assertEquals(array($param), $rb->get_current_params());
 
@@ -731,38 +677,37 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         global $USER, $DB;
 
         $rb = $this->rb;
+        $reportid = $rb->_id;
+        $userid = $this->user->id;
 
         // should return true if accessmode is zero
-        $this->assertTrue((bool)$rb->is_capable(1));
-        $todb = new stdClass();
-        $todb->id = 1;
-        $todb->accessmode = REPORT_BUILDER_CONTENT_MODE_ANY;
-        $DB->update_record('report_builder',$todb);
+        $this->assertTrue((bool)$rb->is_capable($reportid));
+        $DB->set_field('report_builder', 'accessmode', REPORT_BUILDER_CONTENT_MODE_ANY, array('id' => $reportid));
         // should return true if accessmode is 1 and admin an allowed role
-        $this->assertTrue((bool)$rb->is_capable(1, 2));
+        $this->assertTrue((bool)$rb->is_capable($reportid, $userid));
         // should return false if access mode is 1 and admin not an allowed role
-        $DB->delete_records('report_builder_settings', array('reportid' => 1));
-        $this->assertFalse((bool)$rb->is_capable(1));
+        $DB->delete_records('report_builder_settings', array('reportid' => $reportid));
+        $this->assertFalse((bool)$rb->is_capable($reportid));
         $todb = new stdClass();
-        $todb->reportid = 1;
+        $todb->reportid = $reportid;
         $todb->type = 'role_access';
         $todb->name = 'activeroles';
         $todb->value = 1;
         $DB->insert_record('report_builder_settings',$todb);
         $todb = new stdClass();
-        $todb->reportid = 1;
+        $todb->reportid = $reportid;
         $todb->type = 'role_access';
         $todb->name = 'enable';
         $todb->value = '1';
         $DB->insert_record('report_builder_settings', $todb);
         // should return true if accessmode is 1 and admin is only allowed role
-        $this->assertTrue((bool)$rb->is_capable(1, 2));
+        $this->assertTrue((bool)$rb->is_capable($reportid, $userid));
 
         $this->resetAfterTest(true);
     }
 
     function test_reportbuilder_get_param_restrictions() {
-        $rb = new reportbuilder(null, $this->shortname, $this->embed);
+        $rb = new reportbuilder(null, $this->shortname, false, null, null, false, array('userid' => $this->user->id));
         // should return the correct SQL fragment if a parameter restriction is set
         $restrictions = $rb->get_param_restrictions();
         $this->assertRegExp('(base.userid\s+=\s+:[a-z0-9]+)', $restrictions[0]);
@@ -774,21 +719,19 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         global $DB;
 
         $rb = $this->rb;
+        $reportid = $rb->_id;
 
         // should return ( 1=1 ) if content mode = 0
         $restrictions = $rb->get_content_restrictions();
         $this->assertEquals('( 1=1 )', $restrictions[0]);
-        $todb = new stdClass();
-        $todb->id = 1;
-        $todb->contentmode = REPORT_BUILDER_CONTENT_MODE_ANY;
-        $DB->update_record('report_builder', $todb);
-        $rb = new reportbuilder(1);
+        $DB->set_field('report_builder', 'contentmode', REPORT_BUILDER_CONTENT_MODE_ANY, array('id' => $reportid));
+        $rb = new reportbuilder($reportid);
         // should return (1=0) if content mode = 1 but no restrictions set
         // using 1=0 instead of FALSE for MSSQL support
         $restrictions = $rb->get_content_restrictions();
         $this->assertEquals('(1=0)', $restrictions[0]);
         $todb = new stdClass();
-        $todb->reportid = 1;
+        $todb->reportid = $reportid;
         $todb->type = 'date_content';
         $todb->name = 'enable';
         $todb->value = 1;
@@ -803,15 +746,12 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $todb->name = 'who';
         $todb->value = rb_user_content::USER_OWN;
         $DB->insert_record('report_builder_settings', $todb);
-        $rb = new reportbuilder(1);
+        $rb = new reportbuilder($reportid);
         $restrictions = $rb->get_content_restrictions();
         // should return the appropriate SQL snippet to OR the restrictions if content mode = 1
         $this->assertRegExp('/\(base\.userid\s+=\s+:[a-z0-9_]+\s+OR\s+\(base\.timemodified\s+>\s+[0-9]+\s+AND\s+base\.timemodified\s+!=\s+0\s+\)\)/', $restrictions[0]);
-        $todb = new stdClass();
-        $todb->id = 1;
-        $todb->contentmode = REPORT_BUILDER_CONTENT_MODE_ALL;
-        $DB->update_record('report_builder', $todb);
-        $rb = new reportbuilder(1);
+        $DB->set_field('report_builder', 'contentmode', REPORT_BUILDER_CONTENT_MODE_ALL, array('id' => $reportid));
+        $rb = new reportbuilder($reportid);
         $restrictions = $rb->get_content_restrictions();
         // should return the appropriate SQL snippet to AND the restrictions if content mode = 2
         $this->assertRegExp('/\(base\.userid\s+=\s+:[a-z0-9_]+\s+AND\s+\(base\.timemodified\s+>\s+[0-9]+\s+AND\s+base\.timemodified\s+!=\s+0\s+\)\)/', $restrictions[0]);
@@ -823,39 +763,34 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         global $USER, $DB;
 
         $rb = $this->rb;
+        $reportid = $rb->_id;
         // should return empty array if content mode = 0
         $this->assertEquals(array(), $rb->get_restriction_descriptions('content'));
-        $todb = new stdClass();
-        $todb->id = 1;
-        $todb->contentmode = REPORT_BUILDER_CONTENT_MODE_ANY;
-        $DB->update_record('report_builder', $todb);
-        $rb = new reportbuilder(1);
+        $DB->set_field('report_builder', 'contentmode', REPORT_BUILDER_CONTENT_MODE_ANY, array('id' => $reportid));
+        $rb = new reportbuilder($reportid);
         // should return an array with empty string if content mode = 1 but no restrictions set
         $this->assertEquals(array(''), $rb->get_restriction_descriptions('content'));
         $todb = new stdClass();
-        $todb->reportid = 1;
+        $todb->reportid = $reportid;
         $todb->type = 'date_content';
         $todb->name = 'enable';
-        $todb->value = 1;
+        $todb->value = $reportid;
         $DB->insert_record('report_builder_settings', $todb);
         $todb->name = 'when';
         $todb->value = 'future';
         $DB->insert_record('report_builder_settings', $todb);
         $todb->type = 'user_content';
         $todb->name = 'enable';
-        $todb->value = 1;
+        $todb->value = $reportid;
         $DB->insert_record('report_builder_settings', $todb);
         $todb->name = 'who';
         $todb->value = rb_user_content::USER_OWN;
         $DB->insert_record('report_builder_settings', $todb);
-        $rb = new reportbuilder(1);
+        $rb = new reportbuilder($reportid);
         // should return the appropriate text description if content mode = 1
         $this->assertRegExp('/The user is ".*" or The completion date occurred after .*/', current($rb->get_restriction_descriptions('content')));
-        $todb = new stdClass();
-        $todb->id = 1;
-        $todb->contentmode = REPORT_BUILDER_CONTENT_MODE_ALL;
-        $DB->update_record('report_builder', $todb);
-        $rb = new reportbuilder(1);
+        $DB->set_field('report_builder', 'contentmode', REPORT_BUILDER_CONTENT_MODE_ALL, array('id' => $reportid));
+        $rb = new reportbuilder($reportid);
         // should return the appropriate array of text descriptions if content mode = 2
         $restrictions = $rb->get_restriction_descriptions('content');
         $firstrestriction = current($restrictions);
@@ -995,7 +930,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // Check internally non grouped report with user columns aggregation.
         $this->add_column($rb, 'competency', 'path', null, 'groupconcat', '', 0);
 
-        $report = new reportbuilder($this->rb_col_data2->reportid);
+        $report = new reportbuilder($this->rb->_id);
         $this->assertTrue($report->grouped);
         $this->assertFalse($report->is_internally_grouped());
 
@@ -1196,7 +1131,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // should not delete column if cid doesn't match
         $this->assertEquals($before, $afterfail);
         // should return true if successful
-        $this->assertTrue((bool)$rb->delete_column(4));
+        $this->assertTrue((bool)$rb->delete_column($this->column4->id));
         $after = count($rb->columns);
         // should be one less column after successful delete operation
         $this->assertEquals($before - 1, $after);
@@ -1212,7 +1147,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // should not delete filter if fid doesn't match
         $this->assertEquals($before, $afterfail);
         // should return true if successful
-        $this->assertTrue((bool)$rb->delete_filter(4));
+        $this->assertTrue((bool)$rb->delete_filter($this->filter4->id));
         $after = count($rb->filters);
         // should be one less filter after successful delete operation
         $this->assertEquals($before - 1, $after);
@@ -1227,7 +1162,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $secondbefore = next($rb->columns);
         $thirdbefore = next($rb->columns);
         // should not be able to move first column up
-        $this->assertFalse((bool)$rb->move_column(1, 'up'));
+        $this->assertFalse((bool)$rb->move_column($this->column1->id, 'up'));
         reset($rb->columns);
         $firstafter = current($rb->columns);
         $secondafter = next($rb->columns);
@@ -1236,7 +1171,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->assertEquals($firstbefore, $firstafter);
         $this->assertEquals($secondbefore, $secondafter);
         // should be able to move first column down
-        $this->assertTrue((bool)$rb->move_column(1, 'down'));
+        $this->assertTrue((bool)$rb->move_column($this->column1->id, 'down'));
         reset($rb->columns);
         $firstafter = current($rb->columns);
         $secondafter = next($rb->columns);
@@ -1259,7 +1194,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $secondbefore = next($rb->filters);
         $thirdbefore = next($rb->filters);
         // should not be able to move first filter up
-        $this->assertFalse((bool)$rb->move_filter(1, 'up'));
+        $this->assertFalse((bool)$rb->move_filter($this->filter1->id, 'up'));
         reset($rb->filters);
         $firstafter = current($rb->filters);
         $secondafter = next($rb->filters);
@@ -1268,7 +1203,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->assertEquals($firstbefore, $firstafter);
         $this->assertEquals($secondbefore, $secondafter);
         // should be able to move first filter down
-        $this->assertTrue((bool)$rb->move_filter(1, 'down'));
+        $this->assertTrue((bool)$rb->move_filter($this->filter1->id, 'down'));
         reset($rb->filters);
         $firstafter = current($rb->filters);
         $secondafter = next($rb->filters);
@@ -1333,26 +1268,36 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     public function test_get_search_columns() {
         global $DB;
         // Add two reports.
-        $rb2data = array(array('id' => 2, 'fullname' => 'Courses', 'shortname' => 'mycourses',
-                         'source' => 'courses', 'hidden' => 1, 'embedded' => 1),
-                         array('id' => 3, 'fullname' => 'Courses2', 'shortname' => 'mycourses2',
-                         'source' => 'courses', 'hidden' => 1, 'embedded' => 1));
+        $report2 = new stdclass();
+        $report2->fullname = 'Courses';
+        $report2->shortname = 'mycourses';
+        $report2->source = 'courses';
+        $report2->hidden = 1;
+        $report2->embedded = 1;
+        $report2->id = $DB->insert_record('report_builder', $report2);
 
-        $rbsearchcolsdata = array(
-                        array('id' => 100, 'reportid' => 1, 'type' => 'course', 'value' => 'fullname',
-                              'heading' => 'A', 'sortorder' => 1),
-                        array('id' => 101, 'reportid' => 1, 'type' => 'course', 'value' => 'summary',
-                              'heading' => 'B', 'sortorder' => 2),
-                        array('id' => 102, 'reportid' => 2, 'type' => 'course', 'value' => 'fullname',
-                              'heading' => 'C', 'sortorder' => 1));
+        $report3 = new stdclass();
+        $report3->fullname = 'Courses2';
+        $report3->shortname = 'mycourses2';
+        $report3->source = 'courses';
+        $report3->hidden = 1;
+        $report3->embedded = 1;
+        $report3->id = $DB->insert_record('report_builder', $report3);
 
         // Add search columns to two reports.
+        $rbsearchcolsdata = array(
+                        array('id' => 100, 'reportid' => $this->rb->_id, 'type' => 'course', 'value' => 'fullname',
+                              'heading' => 'A', 'sortorder' => 1),
+                        array('id' => 101, 'reportid' => $this->rb->_id, 'type' => 'course', 'value' => 'summary',
+                              'heading' => 'B', 'sortorder' => 2),
+                        array('id' => 102, 'reportid' => $report2->id, 'type' => 'course', 'value' => 'fullname',
+                              'heading' => 'C', 'sortorder' => 1));
+
         $this->loadDataSet($this->createArrayDataSet(array(
-            'report_builder' => $rb2data,
             'report_builder_search_cols' => $rbsearchcolsdata)));
 
         // Test result for reports with/without search columns.
-        $report1 = reportbuilder_get_embedded_report('test_report', array(), false, 0);
+        $report1 = reportbuilder_get_embedded_report('report_test', array(), false, 0);
         $cols1 = $report1->get_search_columns();
         $this->assertCount(2, $cols1);
         $this->assertArrayHasKey(100, $cols1);
@@ -1389,7 +1334,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_search_columns_select() {
-        $report1 = reportbuilder_get_embedded_report('test_report', array(), false, 0);
+        $report1 = reportbuilder_get_embedded_report('report_test', array(), false, 0);
         $cols1 = $report1->get_search_columns_select();
         // Current test report has at least three groups. Check some items inside aswell.
         $this->assertGreaterThanOrEqual(3, count($cols1));
@@ -1452,7 +1397,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_all_filter_joins() {
-        $report = reportbuilder_get_embedded_report('test_report', array(), false, 0);
+        $report = reportbuilder_get_embedded_report('report_test', array(), false, 0);
         $joins = $report->get_all_filter_joins();
 
         $this->assertNotEmpty($joins);
@@ -1460,7 +1405,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_filters_select() {
-        $report = reportbuilder_get_embedded_report('test_report', array(), false, 0);
+        $report = reportbuilder_get_embedded_report('report_test', array(), false, 0);
         $filters = $report->get_filters_select();
 
         $compevidstr = get_string('type_competency_evidence', 'rb_source_competency_evidence');
@@ -1476,7 +1421,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_all_filters_select() {
-        $report1 = reportbuilder_get_embedded_report('test_report', array(), false, 0);
+        $report1 = reportbuilder_get_embedded_report('report_test', array(), false, 0);
         $filters = $report1->get_all_filters_select();
 
         $this->assertArrayHasKey('allstandardfilters', $filters);
