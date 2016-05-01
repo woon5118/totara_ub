@@ -127,24 +127,20 @@ class core_scheduled_task_testcase extends advanced_testcase {
         // The timezones used in this test are chosen because they do not use DST - that would break the test.
         $this->resetAfterTest();
 
-        $this->setTimezone('America/Caracas');
+        $this->setTimezone('Asia/Kathmandu', 'Asia/Kathmandu');
 
         $testclass = new \core\task\scheduled_test_task();
 
-        // Scheduled tasks should always use servertime - so this is 03:30 GMT.
-        $testclass->set_hour('1');
-        $testclass->set_minute('0');
+        // Scheduled tasks should always use servertime.
+        $testclass->set_hour('11');
+        $testclass->set_minute('15');
 
         // Next valid time should be 1am of the next day.
         $nexttime = $testclass->get_next_scheduled_time();
 
-        // GMT+05:45.
-        $USER->timezone = 'Asia/Kathmandu';
-        $userdate = userdate($nexttime);
+        // Should be today or tomorrow 11:15 AM.
+        $userdate = userdate($nexttime, '', 'Asia/Kathmandu');
 
-        // Should be displayed in user timezone.
-        // I used http://www.timeanddate.com/worldclock/fixedtime.html?msg=Moodle+Test&iso=20140314T01&p1=58
-        // to verify this time.
         $this->assertContains('11:15 AM', core_text::strtoupper($userdate));
     }
 

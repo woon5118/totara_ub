@@ -144,8 +144,6 @@ class core_date_legacy_testcase extends advanced_testcase {
         $this->assertSame(60 * 60 * 12, get_timezone_offset('Pacific/Auckland'));
 
         // Known half an hour offsets.
-        $this->assertEquals(60 * 60 * -4.5, get_timezone_offset('-4.5'));
-        $this->assertEquals(60 * 60 * -4.5, get_timezone_offset('America/Caracas'));
         $this->assertEquals(60 * 60 * 4.5, get_timezone_offset('4.5'));
         $this->assertEquals(60 * 60 * 4.5, get_timezone_offset('Asia/Kabul'));
         $this->assertEquals(60 * 60 * 5.5, get_timezone_offset('5.5'));
