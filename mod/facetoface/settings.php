@@ -141,10 +141,6 @@ if ($ADMIN->fulltree) { // Improve performance.
         new lang_string('setting:lotteryenabled_caption', 'facetoface'),
         new lang_string('setting:lotteryenabled', 'facetoface'), 0));
 
-    $settings->add(new admin_setting_configtext('facetoface/defaultminbookings',
-        new lang_string('setting:defaultminbookings', 'facetoface'),
-        new lang_string('setting:defaultminbookings_help', 'facetoface'), 0, PARAM_INT));
-
     $settings->add(new admin_setting_configcheckbox('facetoface_hidecost', new lang_string('setting:hidecost_caption', 'facetoface'), new lang_string('setting:hidecost', 'facetoface'), 0));
     $settings->add(new admin_setting_configcheckbox('facetoface_hidediscount', new lang_string('setting:hidediscount_caption', 'facetoface'), new lang_string('setting:hidediscount', 'facetoface'), 0));
 }
@@ -191,6 +187,10 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtime('facetoface/defaultstarttime_hours', 'facetoface/defaultstarttime_minutes', new lang_string('defaultstarttime', 'facetoface'), new lang_string('defaultstarttimehelp', 'facetoface'), array('h' => 9, 'm' => 0)));
     $settings->add(new admin_setting_configtext('facetoface/defaultdaysbetweenstartfinish', new lang_string('defaultdaysbetweenstartfinish', 'facetoface'), new lang_string('defaultdaysbetweenstartfinish_desc', 'facetoface'), '0', PARAM_INT));
     $settings->add(new admin_setting_configtime('facetoface/defaultfinishtime_hours', 'facetoface/defaultfinishtime_minutes', new lang_string('defaultfinishtime', 'facetoface'), new lang_string('defaultfinishtimehelp', 'facetoface'), array('h' => 10, 'm' => 0)));
+    $settings->add(new admin_setting_configtext('facetoface/defaultminbookings',
+        new lang_string('setting:defaultminbookings', 'facetoface'),
+        new lang_string('setting:defaultminbookings_help', 'facetoface'), 0, PARAM_INT));
+
 }
 
 $customfieldurl = new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacesession'));

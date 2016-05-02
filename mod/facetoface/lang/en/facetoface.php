@@ -1293,7 +1293,7 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaultdatetimechangesubjectdefault'] = 'Face-to-face booking date/time changed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultminbookings'] = 'Default minimum bookings';
-$string['setting:defaultminbookings_help'] = 'Global default value for all Face-to-face sessions. All sessions can still have a custom minimum bookings when setting up a new Face-to-face session.';
+$string['setting:defaultminbookings_help'] = 'Default value for all Face-to-face sessions. All sessions can still have a custom minimum bookings when setting up a new Face-to-face session.';
 $string['setting:defaultreminderinstrmngr'] = 'Default reminder message sent to managers.';
 $string['setting:defaultreminderinstrmngr_caption'] = 'Reminder message (managers)';
 $string['setting:defaultreminderinstrmngrdefault'] = '*** Reminder only ****
