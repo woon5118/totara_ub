@@ -55,7 +55,7 @@ $format = optional_param('format','',PARAM_TEXT);
 $sid = optional_param('sid', '0', PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);
 
-// If there's no sessionid specified 
+// If there's no sessionid specified.
 if (!$s) {
     $syscontext = context_system::instance();
     require_login();
@@ -1281,7 +1281,8 @@ if ($action == 'approvalrequired') {
         // Additional approval columns for the approval tab.
         if ($facetoface->approvaltype == APPROVAL_MANAGER || $facetoface->approvaltype == APPROVAL_ADMIN) {
             $manager = facetoface_get_session_manager($attendee->id, $session->id);
-            $data[] = html_writer::span($manager->fullname, 'managername' . $attendee->id, array('id' => 'managername' . $attendee->id));
+            $managername = empty($manager) ? '' : $manager->fullname;
+            $data[] = html_writer::span($managername, 'managername' . $attendee->id, array('id' => 'managername' . $attendee->id));
             if ($facetoface->approvaltype == APPROVAL_ADMIN) {
                 switch ($attendee->statuscode) {
                     case MDL_F2F_STATUS_REQUESTED:
