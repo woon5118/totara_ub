@@ -285,7 +285,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     $stats .= " (" . $waitlisted . " " . get_string('status_waitlisted', 'facetoface') . ")";
                 }
             } else {
-                $stats = $session->capacity . " (" . $signupcount . " " . get_string('status_waitlisted', 'facetoface') . ")";
+                $a = array('current' => 0, 'maximum' => $session->capacity);
+                $stats = get_string('capacitycurrentofmaximum', 'facetoface', $a);
+                $stats .= " (" . $signupcount . " " . get_string('status_waitlisted', 'facetoface') . ")";
             }
         } else {
             $stats = max(0, $session->capacity - $signupcount);
