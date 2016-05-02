@@ -48,7 +48,7 @@ class mod_facetoface_asset_form extends moodleform {
         $mform->addElement('checkbox', 'allowconflicts', get_string('allowconflicts', 'mod_facetoface'));
         $mform->addHelpButton('allowconflicts', 'assettype', 'facetoface');
 
-        $mform->addElement('editor', 'description_editor', get_string('assetdescription', 'facetoface'), null, $this->_customdata['editoroptions']);
+        $mform->addElement('editor', 'description_editor', get_string('assetdescription', 'facetoface'), $this->_customdata['editorattributes'], $this->_customdata['editoroptions']);
 
         if ($this->_customdata['asset']) {
             $asset = $this->_customdata['asset'];

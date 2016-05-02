@@ -114,6 +114,13 @@ function process_room_form($roomid, callable $successhandler, callable $cancelha
 
     $customdata['room'] = $room;
     $customdata['editoroptions'] = $TEXTAREA_OPTIONS;
+    if (empty($room->id)) {
+        // This kills the auto-save for when creating new rooms. We do this as the same description
+        // will keep coming up if creating several rooms in a row.
+        $customdata['editorattributes'] = array('id' => rand());
+    } else {
+        $customdata['editorattributes'] = array('id' => $room->id);
+    }
 
     $form = new mod_facetoface_room_form(null, $customdata, 'post', '', array('class' => 'dialog-nobind'));
     $room->allowconflicts = (isset($room->type) && $room->type == 'external') ? 1 : 0;

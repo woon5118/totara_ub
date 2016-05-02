@@ -59,7 +59,7 @@ class mod_facetoface_room_form extends moodleform {
         $mform->addElement('checkbox', 'allowconflicts', get_string('allowconflicts', 'mod_facetoface'));
         $mform->addHelpButton('allowconflicts', 'roomtype', 'facetoface');
 
-        $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'facetoface'), null, $this->_customdata['editoroptions']);
+        $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'facetoface'), $this->_customdata['editorattributes'], $this->_customdata['editoroptions']);
 
         if ($this->_customdata['room']) {
             $room = $this->_customdata['room'];

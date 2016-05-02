@@ -114,6 +114,13 @@ function process_asset_form($assetid, callable $successhandler, callable $cancel
 
     $customdata['asset'] = $asset;
     $customdata['editoroptions'] = $TEXTAREA_OPTIONS;
+    if (empty($asset->id)) {
+        // This kills the auto-save for when creating new assets. We do this as the same description
+        // will keep coming up if creating several assets in a row.
+        $customdata['editorattributes'] = array('id' => rand());
+    } else {
+        $customdata['editorattributes'] = array('id' => $asset->id);
+    }
 
     $form = new mod_facetoface_asset_form(null, $customdata, 'post', '', array('class' => 'dialog-nobind'));
     $asset->allowconflicts = (isset($asset->type) && $asset->type == 'external') ? 1 : 0;
