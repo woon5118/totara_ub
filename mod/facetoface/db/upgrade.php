@@ -4139,5 +4139,41 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016050200, 'facetoface');
     }
 
+    if ($oldversion < 2016051100) {
+
+        $table = new xmldb_table('facetoface_room');
+        $field = new xmldb_field('allowconflicts', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'capacity');
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('type');
+        if ($dbman->field_exists($table, $field)) {
+            $DB->execute("UPDATE {facetoface_room} SET allowconflicts = 1 WHERE type = 'external'");
+
+            $dbman->drop_field($table, $field);
+        }
+
+        $table = new xmldb_table('facetoface_asset');
+        $field = new xmldb_field('allowconflicts', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'name');
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('type');
+        if ($dbman->field_exists($table, $field)) {
+            $DB->execute("UPDATE {facetoface_asset} SET allowconflicts = 1 WHERE type = 'external'");
+
+            $dbman->drop_field($table, $field);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2016051100, 'facetoface');
+    }
+
     return $result;
 }

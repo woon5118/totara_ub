@@ -123,7 +123,6 @@ function process_room_form($roomid, callable $successhandler, callable $cancelha
     }
 
     $form = new mod_facetoface_room_form(null, $customdata, 'post', '', array('class' => 'dialog-nobind'));
-    $room->allowconflicts = (isset($room->type) && $room->type == 'external') ? 1 : 0;
     $form->set_data($room);
 
     if ($form->is_cancelled()) {
@@ -136,7 +135,7 @@ function process_room_form($roomid, callable $successhandler, callable $cancelha
         $todb = new stdClass();
         $todb->name = $data->name;
         $todb->capacity = $data->roomcapacity;
-        $todb->type = !empty($data->allowconflicts) ? 'external' : 'internal';
+        $todb->allowconflicts = empty($data->allowconflicts) ? 0 : 1;
         $todb->custom = 0;
         if (!empty($customdata['custom']) && empty($data->notcustom)) {
             $todb->custom = 1;

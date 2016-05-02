@@ -104,7 +104,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $customroom = new stdClass();
         $customroom->name = $data->room_name;
         $customroom->description = $data->room_description;
-        $customroom->type = $data->room_type;
+        $customroom->allowconflicts = $data->room_allowconflicts ? 1 : 0;
         $customroom->capacity = $data->room_capacity;
         $customroom->custom = (int)$data->room_custom;
         $customroom->hidden = (int)$data->room_hidden;
@@ -434,7 +434,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         } else {
             // Search for existing asset.
             $assets = $DB->get_records('facetoface_asset', array('name' => $data->asset_name, 'custom' => $data->asset_custom,
-                'type' => $data->asset_type));
+                'allowconflicts' => $data->asset_allowconflicts));
 
             if (count($assets) > 0) {
                 if (count($assets) > 1) {
@@ -462,6 +462,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $customasset = new stdClass();
         $customasset->name = $data->asset_name;
         $customasset->custom = (int)$data->asset_custom;
+        $customasset->allowconflicts = $data->asset_allowconflicts ? 1 : 0;
         $customasset->timecreated = isset($data->timecreated) ? $data->timecreated : $now;
         $customasset->timemodified = isset($data->timemodified) ? $data->timemodified : $now;
         $assetid = $DB->insert_record('facetoface_asset', $customasset);

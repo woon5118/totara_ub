@@ -4536,7 +4536,7 @@ function facetoface_get_available_assets($timeslots=array(), $fields='*', $exclu
                 FROM {facetoface_asset} fa
                 LEFT JOIN {facetoface_asset_dates} fad ON fad.assetid = fa.id
                 LEFT JOIN {facetoface_sessions_dates} fsd ON fsd.id = fad.sessionsdateid
-                WHERE type != 'external'
+                WHERE allowconflicts = 0
                 {$bookedwhere}
             )
         ) a
@@ -4605,7 +4605,7 @@ function facetoface_get_available_rooms($timeslots=array(), $fields='*', $exclud
                 FROM {facetoface_sessions} s
                 INNER JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
                 INNER JOIN {facetoface_room} r ON d.roomid = r.id
-                WHERE type != 'external'
+                WHERE allowconflicts = 0
                 {$bookedwhere}
             )
         ) r";
@@ -4641,7 +4641,7 @@ function facetoface_is_room_available($timestart, $timefinish, $roomid, $session
         FROM {facetoface_room} r
         WHERE r.id = :roomid
         AND (
-            r.type = 'external'
+            r.allowconflicts = 1
             OR r.id NOT IN
             (
               SELECT DISTINCT r.id
@@ -6382,7 +6382,7 @@ function facetoface_get_rooms($facetofaceid) {
 function facetoface_get_room($roomid) {
     global $DB;
 
-    $sql = "SELECT r.id, r.name, r.capacity, r.description, r.type, r.hidden, r.custom, r.usercreated, r.timecreated,
+    $sql = "SELECT r.id, r.name, r.capacity, r.description, r.allowconflicts, r.hidden, r.custom, r.usercreated, r.timecreated,
                    r.usermodified, r.timemodified
               FROM {facetoface_room} r
              WHERE r.id = ?";
@@ -6405,7 +6405,7 @@ function facetoface_get_room($roomid) {
 function facetoface_get_asset($assetid) {
     global $DB;
 
-    $sql = "SELECT fa.id, fa.name, fa.description, fa.type, fa.hidden, fa.custom, fa.usercreated, fa.timecreated,
+    $sql = "SELECT fa.id, fa.name, fa.description, fa.allowconflicts, fa.hidden, fa.custom, fa.usercreated, fa.timecreated,
                    fa.usermodified, fa.timemodified
               FROM {facetoface_asset} fa
              WHERE fa.id = :id";
@@ -6430,7 +6430,7 @@ function facetoface_get_assets_by_ids(array $assetids) {
         return array();
     }
     list($insql, $inparams) = $DB->get_in_or_equal($assetids, SQL_PARAMS_NAMED);
-    $sql = "SELECT fa.id, fa.name, fa.description, fa.type, fa.hidden, fa.custom, fa.usercreated, fa.timecreated,
+    $sql = "SELECT fa.id, fa.name, fa.description, fa.allowconflicts, fa.hidden, fa.custom, fa.usercreated, fa.timecreated,
                    fa.usermodified, fa.timemodified
               FROM {facetoface_asset} fa
              WHERE fa.id $insql";

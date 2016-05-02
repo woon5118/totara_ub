@@ -910,8 +910,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
      */
     function rb_filter_coursedelivery_list() {
         $coursedelivery = array();
-        $coursedelivery['Internal'] = 'Internal';
-        $coursedelivery['External'] = 'External';
+        $coursedelivery[0] = get_string('no');
+        $coursedelivery[1] = get_string('yes');
         return $coursedelivery;
     }
 

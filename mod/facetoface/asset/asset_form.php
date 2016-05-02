@@ -28,7 +28,7 @@ require_once("{$CFG->dirroot}/lib/formslib.php");
 class mod_facetoface_asset_form extends moodleform {
 
     /**
-     * Definition of the room form
+     * Definition of the asset form
      */
     public function definition() {
         global $DB;
@@ -45,8 +45,8 @@ class mod_facetoface_asset_form extends moodleform {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $mform->addElement('checkbox', 'allowconflicts', get_string('allowconflicts', 'mod_facetoface'));
-        $mform->addHelpButton('allowconflicts', 'assettype', 'facetoface');
+        $mform->addElement('checkbox', 'allowconflicts', get_string('allowassetconflicts', 'mod_facetoface'));
+        $mform->addHelpButton('allowconflicts', 'allowassetconflicts', 'facetoface');
 
         $mform->addElement('editor', 'description_editor', get_string('assetdescription', 'facetoface'), $this->_customdata['editorattributes'], $this->_customdata['editoroptions']);
 

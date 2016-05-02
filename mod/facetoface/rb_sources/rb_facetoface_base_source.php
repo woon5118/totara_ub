@@ -568,12 +568,12 @@ abstract class rb_facetoface_base_source extends rb_base_source {
 
     /**
      * Display if room allows scheduling conflicts
-     * @param string $type
+     * @param string $allowconflicts
      * @param stdClass $row
      * @param bool $isexport
      */
-    public function rb_display_conflicts($type, $row, $isexport = false) {
-        return ($type == 'external') ? get_string('yes') : get_string('no');
+    public function rb_display_conflicts($allowconflicts, $row, $isexport = false) {
+        return $allowconflicts ? get_string('yes') : get_string('no');
     }
 
     /**
@@ -714,7 +714,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'room',
             'allowconflicts',
             get_string('allowconflicts', 'rb_source_facetoface_rooms'),
-            "CASE WHEN $join.type = 'external' THEN 'external' ELSE 'internal' END",
+            "$join.allowconflicts",
             array(
                 'joins' => $join,
                 'dbdatatype' => 'text',
@@ -778,7 +778,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'select',
             array(
                 'simplemode' => true,
-                'selectchoices' => array('external' => get_string('yes'), 'internal' => get_string('no'))
+                'selectchoices' => array(1 => get_string('yes'), 0 => get_string('no'))
             )
         );
 
@@ -871,7 +871,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'asset',
             'allowconflicts',
             get_string('allowconflicts', 'rb_source_facetoface_asset'),
-            "CASE WHEN $join.type = 'external' THEN 'external' ELSE 'internal' END",
+            "$join.allowconflicts",
             array(
                 'joins' => $join,
                 'dbdatatype' => 'text',
@@ -935,7 +935,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'select',
             array(
                 'simplemode' => true,
-                'selectchoices' => array('external' => get_string('yes'), 'internal' => get_string('no'))
+                'selectchoices' => array(1 => get_string('yes'), 0 => get_string('no'))
             )
         );
     }

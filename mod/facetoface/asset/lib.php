@@ -123,7 +123,6 @@ function process_asset_form($assetid, callable $successhandler, callable $cancel
     }
 
     $form = new mod_facetoface_asset_form(null, $customdata, 'post', '', array('class' => 'dialog-nobind'));
-    $asset->allowconflicts = (isset($asset->type) && $asset->type == 'external') ? 1 : 0;
     $form->set_data($asset);
 
     if ($form->is_cancelled()) {
@@ -135,7 +134,7 @@ function process_asset_form($assetid, callable $successhandler, callable $cancel
     if ($data = $form->get_data()) {
         $todb = new stdClass();
         $todb->name = $data->name;
-        $todb->type = !empty($data->allowconflicts) ? 'external' : 'internal';
+        $todb->allowconflicts = empty($data->allowconflicts) ? 0 : 1;
         if ($data->custom && empty($data->notcustom)) {
             $todb->custom = 1;
         } else {

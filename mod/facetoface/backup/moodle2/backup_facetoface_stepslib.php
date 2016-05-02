@@ -121,12 +121,12 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $sessions_dates = new backup_nested_element('sessions_dates');
 
         $sessions_date = new backup_nested_element('sessions_date', array('id'), array(
-            'sessionid', 'roomid', 'sessiontimezone', 'timestart', 'timefinish', 'room_name', 'room_type', 'room_capacity',
+            'sessionid', 'roomid', 'sessiontimezone', 'timestart', 'timefinish', 'room_name', 'room_allowconflicts', 'room_capacity',
             'room_hidden', 'room_custom', 'room_description', 'room_custom_building', 'room_custom_location'));
 
         $asset_dates = new backup_nested_element('asset_dates');
         $asset_date =  new backup_nested_element('asset_date', array('id'), array(
-            'sessionsdateid', 'assetid', 'asset_name', 'asset_type', 'asset_description', 'asset_custom', 'asset_hidden'));
+            'sessionsdateid', 'assetid', 'asset_name', 'asset_allowconflicts', 'asset_description', 'asset_custom', 'asset_hidden'));
 
         $interests = new backup_nested_element('interests');
 
@@ -175,7 +175,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session->set_source_table('facetoface_sessions', array('facetoface' => backup::VAR_PARENTID));
 
         $sessions_date->set_source_sql('
-            SELECT fsd.*, r.name AS room_name, r.type AS room_type, r.capacity AS room_capacity, r.hidden AS room_hidden,
+            SELECT fsd.*, r.name AS room_name, r.allowconflicts AS room_allowconflicts, r.capacity AS room_capacity, r.hidden AS room_hidden,
                 r.custom AS room_custom, r.description AS room_description,
                 (SELECT data FROM {facetoface_room_info_data} rd
                     LEFT JOIN {facetoface_room_info_field} rf ON rd.fieldid = rf.id
@@ -189,7 +189,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             ', array('sessionid' => backup::VAR_PARENTID));
 
         $asset_date->set_source_sql('
-            SELECT fad.*, fa.name AS asset_name, fa.type AS asset_type, fa.description AS asset_description, fa.custom AS asset_custom,
+            SELECT fad.*, fa.name AS asset_name, fa.allowconflicts AS asset_allowconflicts, fa.description AS asset_description, fa.custom AS asset_custom,
                 fa.hidden AS asset_hidden
             FROM {facetoface_asset_dates} fad
             LEFT JOIN {facetoface_asset} fa ON (fa.id = fad.assetid)

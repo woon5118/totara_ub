@@ -191,7 +191,7 @@ if (!isset($session)) {
             // Cloning session, check if "allow room booking conflicts" is disable.
             if ($c && $date->roomid) {
                 $room = facetoface_get_room($date->roomid);
-                if ($room->type != 'external') {
+                if (!$room->allowconflicts) {
                     $date->roomid = 0;
                 }
             }

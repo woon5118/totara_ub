@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/mod/facetoface/asset/lib.php');
 
 $id = optional_param('id', 0, PARAM_INT);
 
-admin_externalpage_setup('modfacetofacerooms');
+admin_externalpage_setup('modfacetofaceassets');
 
 $returnurl = new moodle_url('/mod/facetoface/asset/manage.php');
 
