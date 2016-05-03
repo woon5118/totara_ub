@@ -27,11 +27,7 @@ require_once('lib.php');
 require_once('edit_form.php');
 
 // Totara: extra includes
-require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
-require_once($CFG->dirroot.'/cohort/lib.php');
-require_once($CFG->dirroot.'/totara/cohort/lib.php');
-require_once($CFG->dirroot.'/totara/program/lib.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course id.
 $categoryid = optional_param('category', 0, PARAM_INT); // Course category - can be changed in edit form.
@@ -98,8 +94,6 @@ if ($id) {
     require_capability('moodle/course:update', $coursecontext);
 
     customfield_load_data($course, 'course', 'course');
-    $instancetype = COHORT_ASSN_ITEMTYPE_COURSE;
-    $instanceid = $course->id;
 } else if ($categoryid) {
     // Creating new course in this category.
     $course = null;
@@ -108,68 +102,11 @@ if ($id) {
     $catcontext = context_coursecat::instance($category->id);
     require_capability('moodle/course:create', $catcontext);
     $PAGE->set_context($catcontext);
-    $instancetype = COHORT_ASSN_ITEMTYPE_CATEGORY;
-    $instanceid = $categoryid;
 
 } else {
     require_login();
-    print_error('needcoursecategoryid');
+    print_error('needcoursecategroyid');
 }
-
-// Set up JS
-local_js(array(
-        TOTARA_JS_UI,
-        TOTARA_JS_ICON_PREVIEW,
-        TOTARA_JS_DIALOG,
-        TOTARA_JS_TREEVIEW
-        ));
-
-// Enrolled audiences.
-if (empty($course->id)) {
-    $enrolledselected = '';
-} else {
-    $enrolledselected = totara_cohort_get_course_cohorts($course->id, null, 'c.id');
-    $enrolledselected = !empty($enrolledselected) ? implode(',', array_keys($enrolledselected)) : '';
-}
-$PAGE->requires->strings_for_js(array('coursecohortsenrolled'), 'totara_cohort');
-$jsmodule = array(
-        'name' => 'totara_cohortdialog',
-        'fullpath' => '/totara/cohort/dialog/coursecohort.js',
-        'requires' => array('json'));
-$args = array('args'=>'{"enrolledselected":"' . $enrolledselected . '",'.
-    '"COHORT_ASSN_VALUE_ENROLLED":' . COHORT_ASSN_VALUE_ENROLLED .
-    ', "instancetype":"' . $instancetype . '", "instanceid":"' . $instanceid . '"}');
-$PAGE->requires->js_init_call('M.totara_coursecohort.init', $args, true, $jsmodule);
-unset($enrolledselected);
-
-// Visible audiences.
-if (!empty($CFG->audiencevisibility)) {
-    if(empty($course->id)) {
-        $visibleselected = '';
-    } else {
-        $visibleselected = totara_cohort_get_visible_learning($course->id);
-        $visibleselected = !empty($visibleselected) ? implode(',', array_keys($visibleselected)) : '';
-    }
-    $PAGE->requires->strings_for_js(array('coursecohortsvisible'), 'totara_cohort');
-    $jsmodule = array(
-                    'name' => 'totara_visiblecohort',
-                    'fullpath' => '/totara/cohort/dialog/visiblecohort.js',
-                    'requires' => array('json'));
-    $args = array('args'=>'{"visibleselected":"' . $visibleselected .
-        '", "type":"course", "instancetype":"' . $instancetype . '", "instanceid":"' . $instanceid . '"}');
-    $PAGE->requires->js_init_call('M.totara_visiblecohort.init', $args, true, $jsmodule);
-    unset($visibleselected);
-}
-
-// Icon picker.
-$PAGE->requires->string_for_js('chooseicon', 'totara_program');
-$iconjsmodule = array(
-                'name' => 'totara_iconpicker',
-                'fullpath' => '/totara/core/js/icon.picker.js',
-                'requires' => array('json'));
-$currenticon = isset($course->icon) ? $course->icon : 'default';
-$iconargs = array('args' => '{"selected_icon":"' . $currenticon . '","type":"course"}');
-$PAGE->requires->js_init_call('M.totara_iconpicker.init', $iconargs, false, $iconjsmodule);
 
 // Prepare course and the editor.
 $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes'=>$CFG->maxbytes, 'trusttext'=>false, 'noclean'=>true);
@@ -220,6 +157,9 @@ if ($editform->is_cancelled()) {
 } else if ($data = $editform->get_data()) {
     // Process data if submitted.
     if (empty($course->id)) {
+        // Totara: needed for the the edit_form_save_changes hook.
+        $iscreating = true;
+
         // In creating the course.
         $course = create_course($data, $editoroptions);
 
@@ -250,88 +190,17 @@ if ($editform->is_cancelled()) {
             }
         }
     } else {
+        // Totara: needed for the the edit_form_save_changes hook.
+        $iscreating = false;
+
         // Save any changes to the files used in the editor.
         update_course($data, $editoroptions);
         // Set the URL to take them too if they choose save and display.
         $courseurl = new moodle_url('/course/view.php', array('id' => $course->id));
-
-        // Totara: Ensure all completion records are created.
-        completion_start_user_bulk($course->id);
     }
 
-    // Totara: Get context for capability checks.
-    $context = context_course::instance($course->id, MUST_EXIST);
-
-    ///
-    /// Update course cohorts if user has permissions
-    ///
-    $runcohortsync = false;
-    if (enrol_is_enabled('cohort') and has_capability('moodle/course:enrolconfig', $context) and has_capability('enrol/cohort:config', $context)) {
-        // Enrolled audiences.
-        $currentcohorts = totara_cohort_get_course_cohorts($course->id, null, 'c.id, e.id AS associd');
-        $currentcohorts = !empty($currentcohorts) ? $currentcohorts : array();
-        $newcohorts = !empty($data->cohortsenrolled) ? explode(',', $data->cohortsenrolled) : array();
-
-        if ($todelete = array_diff(array_keys($currentcohorts), $newcohorts)) {
-            // Delete removed cohorts
-            foreach ($todelete as $cohortid) {
-                totara_cohort_delete_association($cohortid, $currentcohorts[$cohortid]->associd, COHORT_ASSN_ITEMTYPE_COURSE);
-            }
-            $runcohortsync = true;
-        }
-
-        if ($newcohorts = array_diff($newcohorts, array_keys($currentcohorts))) {
-            // Add new cohort associations
-            foreach ($newcohorts as $cohortid) {
-                $cohort = $DB->get_record('cohort', array('id' => $cohortid));
-                if (!$cohort) {
-                    continue;
-                }
-                $context = context::instance_by_id($cohort->contextid);
-                if (!has_capability('moodle/cohort:view', $context)) {
-                    continue;
-                }
-                totara_cohort_add_association($cohortid, $course->id, COHORT_ASSN_ITEMTYPE_COURSE);
-            }
-            $runcohortsync = true;
-        }
-        cache_helper::purge_by_event('changesincourse');
-    }
-
-    // Visible audiences.
-    if (!empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
-        $visiblecohorts = totara_cohort_get_visible_learning($course->id);
-        $visiblecohorts = !empty($visiblecohorts) ? $visiblecohorts : array();
-        $newvisible = !empty($data->cohortsvisible) ? explode(',', $data->cohortsvisible) : array();
-        if ($todelete = array_diff(array_keys($visiblecohorts), $newvisible)) {
-            // Delete removed cohorts.
-            foreach ($todelete as $cohortid) {
-                totara_cohort_delete_association($cohortid, $visiblecohorts[$cohortid]->associd,
-                    COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
-            }
-        }
-
-        if ($newvisible = array_diff($newvisible, array_keys($visiblecohorts))) {
-            // Add new cohort associations.
-            foreach ($newvisible as $cohortid) {
-                $cohort = $DB->get_record('cohort', array('id' => $cohortid));
-                if (!$cohort) {
-                    continue;
-                }
-                $context = context::instance_by_id($cohort->contextid);
-                if (!has_capability('moodle/cohort:view', $context)) {
-                    continue;
-                }
-                totara_cohort_add_association($cohortid, $course->id, COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
-            }
-         }
-        cache_helper::purge_by_event('changesincourse');
-
-        if ($runcohortsync) {
-            require_once("$CFG->dirroot/enrol/cohort/locallib.php");
-            enrol_cohort_sync(new null_progress_trace(), $course->id);
-        }
-    }
+    $hook = new core_course\hook\edit_form_save_changes($iscreating, $course->id, $data);
+    $hook->execute();
 
     if (isset($data->saveanddisplay)) {
         // Redirect user to newly created/updated course.

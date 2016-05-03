@@ -25,7 +25,9 @@
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 use Behat\Behat\Context\Step\Given as Given,
-    Behat\Gherkin\Node\TableNode as TableNode;
+    Behat\Gherkin\Node\TableNode as TableNode,
+    Behat\Mink\Exception\ElementNotFoundException,
+    Behat\Mink\Exception\ExpectationException;
 
 /**
  * The Totara core definitions class.
@@ -309,4 +311,64 @@ class behat_totara_core extends behat_base {
 
         return true;
     }
+
+    /**
+     * Expect to see a specific image (by alt or title) within the given thing.
+     *
+     * @Then /^I should see the "([^"]*)" image in the "([^"]*)" "([^"]*)"$/
+     */
+    public function i_should_see_the_x_image_in_the_y_element($titleoralt, $containerelement, $containerselectortype) {
+        // Get the container node; here we throw an exception
+        // if the container node does not exist.
+        $containernode = $this->get_selected_node($containerselectortype, $containerelement);
+
+        $xpathliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($titleoralt);
+        $locator = "//img[@alt={$xpathliteral} or @title={$xpathliteral}]";
+
+        // Will throw an ElementNotFoundException if it does not exist, but, actually
+        // it should not exist, so we try & catch it.
+        try {
+            // Would be better to use a 1 second sleep because the element should not be there,
+            // but we would need to duplicate the whole find_all() logic to do it, the benefit of
+            // changing to 1 second sleep is not significant.
+            $this->find('xpath', $locator, false, $containernode, self::REDUCED_TIMEOUT);
+        } catch (ElementNotFoundException $e) {
+            throw new ExpectationException('The "' . $titleoralt . '" image was not found exists in the "' .
+                $containerelement . '" "' . $containerselectortype . '"', $this->getSession());
+        }
+
+    }
+
+    /**
+     * Expect to not see a specific image (by alt or title) within the given thing.
+     *
+     * @Then /^I should not see the "([^"]*)" image in the "([^"]*)" "([^"]*)"$/
+     */
+    public function i_should_not_see_the_x_image_in_the_y_element($titleoralt, $containerelement, $containerselectortype) {
+        // Get the container node; here we throw an exception
+        // if the container node does not exist.
+        $containernode = $this->get_selected_node($containerselectortype, $containerelement);
+
+        $xpathliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($titleoralt);
+        $locator = "//img[@alt={$xpathliteral} or @title={$xpathliteral}]";
+
+        // Will throw an ElementNotFoundException if it does not exist, but, actually
+        // it should not exist, so we try & catch it.
+        try {
+            // Would be better to use a 1 second sleep because the element should not be there,
+            // but we would need to duplicate the whole find_all() logic to do it, the benefit of
+            // changing to 1 second sleep is not significant.
+            $node = $this->find('xpath', $locator, false, $containernode, self::REDUCED_TIMEOUT);
+            if ($this->running_javascript() && !$node->isVisible()) {
+                // It passes it is there but is not visible.
+                return;
+            }
+        } catch (ElementNotFoundException $e) {
+            // It passes.
+            return;
+        }
+        throw new ExpectationException('The "' . $titleoralt . '" image was found in the "' .
+            $containerelement . '" "' . $containerselectortype . '"', $this->getSession());
+    }
+
 }
