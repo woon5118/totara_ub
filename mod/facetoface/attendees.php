@@ -418,6 +418,7 @@ if ($action == 'attendees') {
     }
 
     $report->include_js();
+    $PAGE->set_button($report->edit_button());
 
     // We will show embedded report.
     $show_table = true;
