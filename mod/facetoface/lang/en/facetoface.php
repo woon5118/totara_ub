@@ -1732,7 +1732,7 @@ $string['signinsheetreport'] = 'Session attendance sheet';
 $string['signup'] = 'Sign-up';
 $string['signupandaccept'] = 'Agree and submit';
 $string['signupandrequest'] = 'Request approval';
-$string['signupcustomfieldtab'] = 'Sign-up note';
+$string['signupcustomfieldtab'] = 'Sign-up';
 $string['signupdata'] = 'Sign-up data';
 $string['signupfields'] = 'Sign-up fields';
 $string['signupfieldslimitation'] = 'The values entered below will be populated for all selected users. To enter different values for each user use the <a href="{$a}">file import</a>';
