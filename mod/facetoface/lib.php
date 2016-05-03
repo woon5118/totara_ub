@@ -3578,7 +3578,7 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     $output = html_writer::start_tag('dl', array('class' => $class));
 
     // Print customfields.
-    $customfields = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
+    $customfields = customfield_get_data($session, 'facetoface_session', 'facetofacesession', true, array('extended' => true));
     if (!empty($customfields)) {
         foreach ($customfields as $cftitle => $cfvalue) {
             $output .= html_writer::tag('dt', str_replace(' ', '&nbsp;', format_string($cftitle)));
