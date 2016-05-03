@@ -18,59 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara
- * @subpackage reportbuilder
+ * @package totara_reportbuilder
  */
 
-/**
- * Abstract base access class to be extended to create report builder access restrictions.
- *
- * Defines the properties and methods required by access restrictions
- *
- * This file also contains some core access restrictions
- * that can be used by any report builder source
- */
-abstract class rb_base_access {
-
-    public $foruser;
-
-    /*
-     * @param integer $foruser User ID to determine access for
-     *                         Typically this will be $USER->id, except
-     *                         in the case of scheduled reports run by cron
-     */
-    function __construct($foruser=null) {
-        $this->foruser = $foruser;
-    }
-
-    /*
-     * All sub classes must define the following functions
-     */
-    abstract function access_restriction($reportid);
-    abstract function form_template(&$mform, $reportid);
-    abstract function form_process($reportid, $fromform);
-    abstract function get_accessible_reports();
-
-} // end of rb_base_access class
-
+namespace totara_reportbuilder\rb\access;
+use reportbuilder, context_system, html_writer;
 
 /**
  * Role based access restriction
  *
  * Limit access to reports by user role (either in system context or any context)
  */
-class rb_role_access extends rb_base_access {
+class role extends base {
 
     /**
-    * Get list of reports this user is allowed to access by this restriction class
-    * @return array of permitted report ids
-    */
-    function get_accessible_reports(){
+     * Get list of reports this user is allowed to access by this restriction class
+     * @param int $userid reports for this user
+     * @return array of permitted report ids
+     */
+    public function get_accessible_reports($userid) {
         global $DB, $CFG;
 
-        // remove the rb_ from class
-        $type = substr(get_class($this), 3);
-        $userid = $this->foruser;
+        $type = $this->get_type();
         $anycontextcheck = false;
         $allowedreports = array();
 
@@ -104,28 +73,50 @@ class rb_role_access extends rb_base_access {
                     }
                 }
             }
-            //get default site context array
-            $sql = "SELECT DISTINCT ra.roleid
-                      FROM {role_assignments} ra
-                 LEFT JOIN {context} c
-                        ON ra.contextid = c.id
-                     WHERE ra.userid = ?
-                       AND c.contextlevel = ?";
-            $siteuserroles = $DB->get_fieldset_sql($sql, array($userid, CONTEXT_SYSTEM));
 
-            // Add defaultuserrole if necessary
-            if (!in_array((int)$CFG->defaultuserroleid, $siteuserroles)) {
-                $siteuserroles[] = $CFG->defaultuserroleid;
+            $siteuserroles = array();
+            if ($userid <= 0) {
+                // Not logged in - cannot have any real roles!
+                if (!empty($CFG->notloggedinroleid) and !in_array((int)$CFG->notloggedinroleid, $siteuserroles)) {
+                    $siteuserroles[] = $CFG->notloggedinroleid;
+                }
+                $anyuserroles = $siteuserroles;
+
+            } else if (isguestuser($userid)) {
+                // Guest account - cannot have any real roles!
+                if (!empty($CFG->guestroleid) and !in_array((int)$CFG->guestroleid, $siteuserroles)) {
+                    $siteuserroles[] = $CFG->guestroleid;
+                }
+                $anyuserroles = $siteuserroles;
+
+            } else {
+                // Get default site context array.
+                $sql = "SELECT DISTINCT ra.roleid
+                          FROM {role_assignments} ra
+                     LEFT JOIN {context} c ON ra.contextid = c.id
+                         WHERE ra.userid = ? AND c.contextlevel = ?";
+                $siteuserroles = $DB->get_fieldset_sql($sql, array($userid, CONTEXT_SYSTEM));
+
+                // Add defaultuserrole if necessary.
+                if (!empty($CFG->defaultuserroleid) and !in_array((int)$CFG->defaultuserroleid, $siteuserroles)) {
+                    $siteuserroles[] = $CFG->defaultuserroleid;
+                }
+
+                // Only get any context roles if actually needed.
+                if ($anycontextcheck) {
+                    $sql = "SELECT DISTINCT roleid
+                              FROM {role_assignments}
+                             WHERE userid = ?";
+                    $anyuserroles = $DB->get_fieldset_sql($sql, array($userid));
+
+                    // Add defaultuserrole if necessary.
+                    if (!empty($CFG->defaultuserroleid) and !in_array((int)$CFG->defaultuserroleid, $anyuserroles)) {
+                        $anyuserroles[] = $CFG->defaultuserroleid;
+                    }
+                }
             }
 
-            //only get any context roles if actually needed
-            if ($anycontextcheck) {
-                $sql = "SELECT DISTINCT roleid
-                          FROM {role_assignments}
-                         WHERE userid = ?";
-                $anyuserroles = $DB->get_fieldset_sql($sql, array($userid));
-            }
-            //now loop through our reports again checking role permissions
+            // Now loop through our reports again checking role permissions.
             foreach ($reports as $rpt) {
                 $allowed_roles = explode('|', $rpt->activeroles);
                 $roles_to_compare = (isset($rpt->context) && $rpt->context == 'any') ? $anyuserroles : $siteuserroles;
@@ -139,63 +130,15 @@ class rb_role_access extends rb_base_access {
     }
 
     /**
-     * Check if the user has rights for a particular access restriction
-     *
-     * @param integer $reportid ID of the report to check access for
-     *
-     * @return boolean True if user has access rights
-     */
-    function access_restriction($reportid) {
-        global $DB;
-        // return true if user has rights to access by role
-
-        if (is_siteadmin($this->foruser)) {
-            // site admins are boss - they always have access ;)
-            return true;
-        }
-
-        // remove the rb_ from class
-        $type = substr(get_class($this), 3);
-        $allowedroles = explode('|',
-            reportbuilder::get_setting($reportid, $type, 'activeroles'));
-        $contextsetting = reportbuilder::get_setting($reportid, $type, 'context');
-        $userid = $this->foruser;
-
-        if ($contextsetting == 'any') {
-            // find roles the user has in any context
-            $userroles = $DB->get_records_sql('SELECT DISTINCT roleid
-                FROM {role_assignments}
-                WHERE userid = ?', array($userid));
-        } else {
-            // only find roles the user has in the site context
-            // default to this if not set
-            $context = context_system::instance();
-            $userroles = array();
-            $data = get_user_roles($context, $userid, false);
-            foreach ($data as $item) {
-                $userroles[] = $item->roleid;
-            }
-        }
-
-        // see if user has any allowed roles
-        return (count(array_intersect($allowedroles, $userroles)) != 0);
-    }
-
-
-    /**
      * Adds form elements required for this access restriction's settings page
      *
-     * @param object &$mform Moodle form object to modify (passed by reference)
+     * @param \MoodleQuickForm $mform Moodle form object to modify (passed by reference)
      * @param integer $reportid ID of the report being adjusted
      */
-    function form_template(&$mform, $reportid) {
-        global $DB;
+    public function form_template($mform, $reportid) {
+        $type = $this->get_type();
 
-        // remove the rb_ from class
-        $type = substr(get_class($this), 3);
-        $enable = reportbuilder::get_setting($reportid, $type, 'enable');
-        $activeroles = explode('|',
-            reportbuilder::get_setting($reportid, $type, 'activeroles'));
+        $activeroles = explode('|', reportbuilder::get_setting($reportid, $type, 'activeroles'));
         $context = reportbuilder::get_setting($reportid, $type, 'context');
 
         // generate the check boxes for the access form
@@ -218,7 +161,7 @@ class rb_role_access extends rb_base_access {
 
             $rolesgroup = array();
             foreach ($roles as $role) {
-                $rolesgroup[] =& $mform->createElement('advcheckbox', "role_activeroles[{$role->id}]", '', $role->localname, null, array(0, 1));
+                $rolesgroup[] = $mform->createElement('advcheckbox', "role_activeroles[{$role->id}]", '', $role->localname, null, array(0, 1));
                 if (in_array($role->id, $activeroles)) {
                     $mform->setDefault("role_activeroles[{$role->id}]", 1);
                 }
@@ -229,28 +172,25 @@ class rb_role_access extends rb_base_access {
         } else {
             $mform->addElement('html', html_writer::tag('p', get_string('error:norolesfound', 'totara_reportbuilder')));
         }
-
     }
 
     /**
      * Processes the form elements created by {@link form_template()}
      *
      * @param integer $reportid ID of the report to process
-     * @param object $fromform Moodle form data received via form submission
+     * @param \MoodleQuickForm $fromform Moodle form data received via form submission
      *
      * @return boolean True if form was successfully processed
      */
-    function form_process($reportid, $fromform) {
+    public function form_process($reportid, $fromform) {
         // save the results of submitting the access form to
         // report_builder_settings
 
-        // remove the rb_ from class
-        $type = substr(get_class($this), 3);
+        $type = $this->get_type();
 
         // enable checkbox option
         // TODO not yet used as there is only one access criteria so far
-        $enable = (isset($fromform->role_enable) &&
-            $fromform->role_enable) ? 1 : 0;
+        $enable = (isset($fromform->role_enable) && $fromform->role_enable) ? 1 : 0;
         reportbuilder::update_setting($reportid, $type, 'enable', $enable);
 
         if (isset($fromform->role_context)) {
@@ -266,12 +206,9 @@ class rb_role_access extends rb_base_access {
                 }
             }
             // implode into string and update setting
-            reportbuilder::update_setting($reportid, $type,
-                'activeroles', implode('|', $activeroles));
-
+            reportbuilder::update_setting($reportid, $type, 'activeroles', implode('|', $activeroles));
         }
 
         return true;
     }
-
-} // end of rb_role_access
+}

@@ -1030,13 +1030,10 @@ class report_builder_edit_access_form extends moodleform {
         $mform->setDefault('accessenabled', $DB->get_field('report_builder', 'accessmode', array('id' => $id)));
         $mform->addHelpButton('radiogroup', 'reportbuilderaccessmode', 'totara_reportbuilder');
 
-        // loop round classes, only considering classes that extend rb_base_access
-        foreach (get_declared_classes() as $class) {
-            if (is_subclass_of($class, 'rb_base_access')) {
-                $obj = new $class();
-                // add any form elements for this access option
-                $obj->form_template($mform, $id);
-            }
+        // Loop round classes from rb\access namespace.
+        $plugins = reportbuilder::get_all_access_plugins();
+        foreach ($plugins as $obj) {
+            $obj->form_template($mform, $id);
         }
 
         $mform->addElement('hidden', 'id', $id);

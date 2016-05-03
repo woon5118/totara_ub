@@ -37,7 +37,6 @@ require_once($CFG->libdir . '/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_source.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
-require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_access.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_preproc.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_embedded.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_join.php');
@@ -1983,17 +1982,22 @@ class reportbuilder {
     /**
     * Returns an array of defined reportbuilder access plugins
     *
-    * @return array Array of access plugin names
+    * @return \totara_reportbuilder\rb\access\base[] Array of access plugin classes indexed by type name
     */
     public static function get_all_access_plugins() {
         $plugins = array();
-        // loop round classes, only considering classes that extend rb_base_access
-        foreach (get_declared_classes() as $class) {
-            if (is_subclass_of($class, 'rb_base_access')) {
-                // remove rb_ prefix
-                $plugins[] = substr($class, 3);
+        $classes = core_component::get_namespace_classes('rb\access', 'totara_reportbuilder\rb\access\base');
+        foreach ($classes as $class) {
+            /** @var totara_reportbuilder\rb\access\base $obj */
+            $obj = new $class();
+            $type = $obj->get_type();
+            if (in_array($type, $plugins)) {
+                debugging('Duplicate reportbuilder plugin name detected: '. $type, DEBUG_DEVELOPER);
+                continue;
             }
+            $plugins[$type] = $obj;
         }
+
         return $plugins;
     }
 
@@ -2013,21 +2017,19 @@ class reportbuilder {
     * and the user failed access checks in all three.
     *
     * @param int $userid The user to check which reports they have access to
-    * @param array $plugins array of particular plugins to check
     * @return array Array of reports, with enabled plugin names and access status
     */
-    public static function get_reports_plugins_access($userid, $plugins=NULL) {
+    public static function get_reports_plugins_access($userid) {
         global $DB;
         //create return variable
         $report_plugin_access = array();
         //if no list of plugins specified, check them all
-        if (empty($plugins)) {
-            $plugins = self::get_all_access_plugins();
-        }
+        $plugins = self::get_all_access_plugins();
         //keep track of which plugins are actually active according to report_builder_settings
+        /** @var \totara_reportbuilder\rb\access\base[] $active_plugins */
         $active_plugins = array();
         //now get the info for plugins that are actually enabled for any reports
-        list($insql, $params) = $DB->get_in_or_equal($plugins);
+        list($insql, $params) = $DB->get_in_or_equal(array_keys($plugins));
         $sql = "SELECT id,reportid,type
                   FROM {report_builder_settings}
                  WHERE type $insql
@@ -2041,10 +2043,10 @@ class reportbuilder {
             //foreach scope variables for efficiency
             $rid = $plugin->reportid;
             $ptype = '' . $plugin->type;
-            //add to array of plugins that are actually active
-            if (!in_array($ptype, $active_plugins)) {
-                $active_plugins[] = $ptype;
+            if (!isset($plugins[$ptype])) {
+                continue;
             }
+            $active_plugins[$ptype] = $plugins[$ptype];
             //set up enabled plugin info for this report
             if (isset($report_plugin_access[$rid])) {
                 $report_plugin_access[$rid][$ptype] = 0;
@@ -2053,16 +2055,14 @@ class reportbuilder {
             }
         }
         //now call the plugin class to get the accessible reports for each actually used plugin
-        foreach ($active_plugins as $plugin) {
-            $class = "rb_" . $plugin;
-            $obj = new $class($userid);
-            $accessible = $obj->get_accessible_reports();
+        foreach ($active_plugins as $type => $obj) {
+            $accessible = $obj->get_accessible_reports($userid);
             foreach ($accessible as $key => $rid) {
                 if (isset($report_plugin_access[$rid]) && is_array($report_plugin_access[$rid])) {
                     //report $rid has passed checks in $plugin
                     //the plugin should already have an entry with value 0 from above
-                    if (isset($report_plugin_access[$rid][$plugin])) {
-                        $report_plugin_access[$rid][$plugin] = 1;
+                    if (isset($report_plugin_access[$rid][$type])) {
+                        $report_plugin_access[$rid][$type] = 1;
                     }
                 }
             }
@@ -2089,10 +2089,8 @@ class reportbuilder {
         $foruser = isset($userid) ? $userid : $USER->id;
         //array to hold the final list
         $permitted_reports = array();
-        //get array of plugins
-        $all_plugins = self::get_all_access_plugins();
         //get array of all reports with enabled plugins and whether they passed or failed each enabled plugin
-        $enabled_plugins = self::get_reports_plugins_access($foruser, $all_plugins);
+        $enabled_plugins = self::get_reports_plugins_access($foruser);
         //get basic reports list
         $hidden = (!$showhidden) ? ' WHERE hidden = 0 ' : '';
         $sql = "SELECT *
@@ -6065,7 +6063,7 @@ function reportbuilder_set_default_access($reportid) {
     if ($managerroleid = $DB->get_field('role', 'id', array('shortname' => 'manager'))) {
         $accessdata->role_activeroles = array($managerroleid => 1);
     }
-    $acess = new rb_role_access();
+    $acess = new \totara_reportbuilder\rb\access\role();
     $acess->form_process($reportid, $accessdata);
 }
 
