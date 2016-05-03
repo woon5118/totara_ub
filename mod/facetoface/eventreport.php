@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package mod_facetoface
  */
 
@@ -28,15 +28,14 @@ $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT);
 $debug = optional_param('debug', 0, PARAM_INT);
 
-$url = new moodle_url('/mod/facetoface/sessionreport.php', array('format' => $format, 'debug' => $debug));
+$url = new moodle_url('/mod/facetoface/eventreport.php', array('format' => $format, 'debug' => $debug));
 admin_externalpage_setup('modfacetofaceeventreport', '', null, $url);
 
-
 // Verify global restrictions.
-$reportrecord = $DB->get_record('report_builder', array('shortname' => 'facetoface_summary'));
+$reportrecord = $DB->get_record('report_builder', array('shortname' => 'facetoface_events'));
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
-if (!$report = reportbuilder_get_embedded_report('facetoface_summary', null, false, $sid, $globalrestrictionset)) {
+if (!$report = reportbuilder_get_embedded_report('facetoface_events', null, false, $sid, $globalrestrictionset)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 
@@ -59,7 +58,7 @@ $report->display_restrictions();
 $countfiltered = $report->get_filtered_count();
 $countall = $report->get_full_count();
 
-$heading = get_string('sessionreportcnt', 'mod_facetoface', $renderer->print_result_count_string($countfiltered, $countall));
+$heading = get_string('eventreportcnt', 'mod_facetoface', $renderer->print_result_count_string($countfiltered, $countall));
 echo $renderer->heading($heading);
 
 echo $renderer->print_description($report->description, $report->_id);

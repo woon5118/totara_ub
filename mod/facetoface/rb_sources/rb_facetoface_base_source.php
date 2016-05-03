@@ -30,8 +30,9 @@ abstract class rb_facetoface_base_source extends rb_base_source {
      * Add common facetoface columns
      * Requires 'sessions' and 'facetoface' joins
      * @param array $columnoptions
+     * @param string $joinsessions
      */
-    public function add_facetoface_common_to_columns(&$columnoptions) {
+    public function add_facetoface_common_to_columns(&$columnoptions, $joinsessions = 'sessions') {
                 $columnoptions[] = new rb_column_option(
             'facetoface',
             'facetofaceid',
@@ -59,10 +60,10 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             get_string('ftfnamelink', 'rb_source_facetoface_sessions'),
             "facetoface.name",
             array(
-                'joins' => array('facetoface', 'sessions'),
+                'joins' => array('facetoface', $joinsessions),
                 'displayfunc' => 'link_f2f',
                 'defaultheading' => get_string('ftfname', 'rb_source_facetoface_sessions'),
-                'extrafields' => array('activity_id' => 'sessions.facetoface'),
+                'extrafields' => array('activity_id' => $joinsessions . '.facetoface'),
             )
         );
 
@@ -395,11 +396,11 @@ abstract class rb_facetoface_base_source extends rb_base_source {
 
     /**
      * Add joins required by @see rb_facetoface_base_source::add_session_status_to_columns()
-     * Requires 'sessions' join
      * @param array $joinlist
-     * @param string $sessionidfield
+     * @param string $join 'sessions' table to join to
+     * @param string $field 'id' field (from sessions table) to join to
      */
-    public function add_session_status_to_joinlist(&$joinlist, $sessionidfield = 'sessions.id') {
+    public function add_session_status_to_joinlist(&$joinlist, $join = 'sessions', $field = 'id') {
         // No global restrictions here because status is absolute (e.g if it is overbooked then it is overbooked, even if user
         // cannot see all participants.
         $joinlist[] =  new rb_join(
@@ -413,9 +414,9 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                 WHERE 1=1
                 GROUP BY s.id)",
 
-            "cntbookings.sessionid = {$sessionidfield}",
+            "cntbookings.sessionid = {$join}.{$field}",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'sessions'
+            $join
         );
     }
 

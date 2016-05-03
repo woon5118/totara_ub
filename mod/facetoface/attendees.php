@@ -71,7 +71,7 @@ if (!$s) {
     $PAGE->set_url('/mod/facetoface/attendees.php');
 
     echo $OUTPUT->header();
-    $url = new moodle_url('/mod/facetoface/sessionreport.php');
+    $url = new moodle_url('/mod/facetoface/eventreport.php');
     echo $OUTPUT->heading(get_string('selectaneventheading', 'rb_source_facetoface_sessions'));
     echo html_writer::tag('p', html_writer::link($url, get_string('selectanevent', 'rb_source_facetoface_sessions')));
     echo $OUTPUT->footer();
