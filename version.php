@@ -29,13 +29,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$version  = 2016050200.00;              // YYYYMMDD      = weekly release date of this DEV branch.
+$version  = 2016050400.00;              // YYYYMMDD      = weekly release date of this DEV branch.
                                         //         RR    = release increments - 00 in DEV branches.
                                         //           .XX = incremental changes.
 
-$release  = '3.1dev+ (Build: 20160429)'; // Human-friendly version name
+$release  = '3.1beta (Build: 20160504)'; // Human-friendly version name
 
 $branch   = '31';                       // This version's branch.
+<<<<<<< HEAD
 $maturity = MATURITY_ALPHA;             // This version's maturity level.
 
 
@@ -54,3 +55,6 @@ if ($maturity == MATURITY_EVERGREEN) {
 } else {
     $TOTARA->release = "{$TOTARA->version} (Build: {$TOTARA->build})";
 }
+=======
+$maturity = MATURITY_BETA;             // This version's maturity level.
+>>>>>>> fc1ef59fbed... Moodle release 3.1beta
