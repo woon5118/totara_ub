@@ -32,7 +32,7 @@ class rb_facetoface_interest_embedded extends rb_base_embedded {
         $this->url = '/mod/facetoface/interestreport.php';
         $this->source = 'facetoface_interest';
         $this->shortname = 'facetoface_interest';
-        $this->fullname = get_string('declareinterestreport', 'mod_facetoface');
+        $this->fullname = get_string('embedded:seminarinterest', 'mod_facetoface');
         $this->columns = array(
             array(
                 'type' => 'user',

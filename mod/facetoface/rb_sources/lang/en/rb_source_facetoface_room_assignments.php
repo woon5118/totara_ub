@@ -21,7 +21,7 @@
  * @package mod_facetoface
  */
 
-$string['sourcetitle'] = 'Face-to-face Room Assignments';
+$string['sourcetitle'] = 'Seminar Room Assignments';
 $string['assetnames'] = 'Asset Names';
 $string['assets'] = 'Assets';
 $string['ftfid'] = 'Face-to-face ID';

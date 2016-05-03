@@ -29,7 +29,7 @@ class rb_facetoface_summary_room_embedded extends rb_base_embedded {
         $this->url = '/mod/facetoface/room.php';
         $this->source = 'facetoface_room_assignments';
         $this->shortname = 'facetoface_summary_room';
-        $this->fullname = get_string('facetofacesummaryroom', 'rb_source_facetoface_summary');
+        $this->fullname = get_string('embedded:seminarroomsupcoming', 'mod_facetoface');
         $this->columns = array(
             array('type' => 'facetoface', 'value' => 'name', 'heading' => null),
             array('type' => 'facetoface', 'value' => 'approvaltype', 'heading' => null),

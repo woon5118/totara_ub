@@ -191,8 +191,8 @@ Feature: Face-to-face summary report overview
   Scenario: Create report and check all data
     Given I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
     And I set the following fields to these values:
-      | Report Name | F2F Summary          |
-      | Source      | Face-to-face Summary |
+      | Report Name | F2F Summary      |
+      | Source      | Seminar Sessions |
     And I press "Create report"
     And I click on "Columns" "link"
 

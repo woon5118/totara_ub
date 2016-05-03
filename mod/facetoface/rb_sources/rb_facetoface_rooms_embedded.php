@@ -26,7 +26,7 @@ class rb_facetoface_rooms_embedded extends rb_base_embedded {
         $this->url = '/mod/facetoface/room/manage.php';
         $this->source = 'facetoface_rooms';
         $this->shortname = 'facetoface_rooms';
-        $this->fullname = get_string('embeddedreportname', 'rb_source_facetoface_rooms');
+        $this->fullname = get_string('embedded:seminarrooms', 'mod_facetoface');
         $this->columns = array(
             array('type' => 'room', 'value' => 'name', 'heading' => null),
             // NOTE: hardcoding custom field ids is not nice, but this should work fine at least in new installs and upgrades,

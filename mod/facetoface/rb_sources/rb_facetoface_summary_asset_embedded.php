@@ -26,7 +26,7 @@ class rb_facetoface_summary_asset_embedded extends rb_base_embedded {
         $this->url = '/mod/facetoface/asset.php';
         $this->source = 'facetoface_asset_assignments';
         $this->shortname = 'facetoface_summary_asset';
-        $this->fullname = get_string('facetofacesummaryasset', 'rb_source_facetoface_asset_assignments');
+        $this->fullname = get_string('embedded:seminarassetsupcoming', 'mod_facetoface');
         $this->columns = array(
             array('type' => 'facetoface', 'value' => 'name', 'heading' => null),
             array('type' => 'session', 'value' => 'approvalby', 'heading' => null),

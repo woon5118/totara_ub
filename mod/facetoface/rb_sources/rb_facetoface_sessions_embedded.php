@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2016 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2010 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Lee Campbell <lee@learningpool.com>
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
  * @package totara_reportbuilder
  */
 
-class rb_facetoface_signin_embedded extends rb_base_embedded {
+class rb_facetoface_sessions_embedded extends rb_base_embedded {
 
     public $url, $source, $fullname, $filters, $columns;
     public $contentmode, $contentsettings, $embeddedparams;
     public $hidden, $accessmode, $accesssettings, $shortname;
 
     public function __construct($data) {
-        $this->url = '/mod/facetoface/signinsheet.php';
-        $this->source = 'facetoface_signin';
-        $this->shortname = 'facetoface_signin';
-        $this->fullname = get_string('signinsheetreport', 'mod_facetoface');
+        if (!empty($data['sessionid'])) {
+            $this->embeddedparams['sessionid'] = $data['sessionid'];
+        }
+        if (!empty($data['status'])) {
+            $this->embeddedparams['status'] = $data['status'];
+        }
+        $this->url = '/mod/facetoface/attendees.php';
+        $this->source = 'facetoface_sessions';
+        $this->shortname = 'facetoface_sessions';
+        $this->fullname = get_string('embedded:seminareventattendance', 'mod_facetoface');
         $this->columns = array(
             array(
                 'type' => 'user',
@@ -39,14 +45,24 @@ class rb_facetoface_signin_embedded extends rb_base_embedded {
                 'heading' => get_string('name', 'rb_source_user'),
             ),
             array(
-                'type' => 'facetoface_signup',
-                'value' => 'custom_field_1',
-                'heading' => get_string('usernote', 'mod_facetoface')
+                'type' => 'status',
+                'value' => 'timecreated',
+                'heading' => get_string('timeofsignup', 'rb_source_facetoface_sessions'),
             ),
             array(
-                'type' => 'user_signups',
-                'value' => 'signature',
-                'heading' => get_string('signature', 'mod_facetoface')
+                'type' => 'status',
+                'value' => 'statuscode',
+                'heading' => get_string('status', 'rb_source_facetoface_sessions'),
+            ),
+            array(
+                'type' => 'session',
+                'value' => 'positionnameedit',
+                'heading' => get_string('selectedposition', 'mod_facetoface'),
+            ),
+            array(
+                'type' => 'facetoface_signup',
+                'value' => 'allsignupcustomfields',
+                'heading' => get_string('allsignupcustomfields', 'rb_source_facetoface_sessions')
             )
         );
 
@@ -54,15 +70,6 @@ class rb_facetoface_signin_embedded extends rb_base_embedded {
 
         // No restrictions.
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
-
-        $sessionid = array_key_exists('sessionid', $data) ? $data['sessionid'] : null;
-        if ($sessionid != null) {
-            $this->embeddedparams['sessionid'] = $sessionid;
-        }
-
-        if (isset($data['hasbooked'])) {
-            $this->embeddedparams['hasbooked'] = $data['hasbooked'];
-        }
 
         parent::__construct();
     }
@@ -86,13 +93,14 @@ class rb_facetoface_signin_embedded extends rb_base_embedded {
      * @return boolean true if the user can access this report
      */
     public function is_capable($reportfor, $report) {
-        $facetofaceid = $report->get_param_value('facetofaceid');
+        $sessionid = $report->get_param_value('sessionid');
+        $session = facetoface_get_session($sessionid);
 
-        if ($facetofaceid) {
-            $cm = get_coursemodule_from_instance('facetoface', $facetofaceid);
+        if ($session) {
+            $cm = get_coursemodule_from_instance('facetoface', $session->facetoface);
 
             // Users can only view this report if they have the viewinterestreport capability for this context.
-            return (has_capability('mod/facetoface:exportsessionsigninsheet', context_module::instance($cm->id), $reportfor));
+            return (has_capability('mod/facetoface:viewattendees', context_module::instance($cm->id), $reportfor));
         } else {
             return true;
         }

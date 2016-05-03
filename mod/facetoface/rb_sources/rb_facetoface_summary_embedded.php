@@ -31,7 +31,7 @@ class rb_facetoface_summary_embedded extends rb_base_embedded {
         $this->url = '/mod/facetoface/sessionreport.php';
         $this->source = 'facetoface_summary';
         $this->shortname = 'facetoface_summary';
-        $this->fullname = get_string('sessionreport', 'mod_facetoface');
+        $this->fullname = get_string('embedded:seminarsessions', 'mod_facetoface');
         $this->columns = array(
             array(
                 'type' => 'facetoface',

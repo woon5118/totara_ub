@@ -21,7 +21,7 @@
  * @package mod_facetoface
  */
 
-$string['sourcetitle'] = 'Face-to-face Rooms';
+$string['sourcetitle'] = 'Seminar Rooms';
 
 $string['allowconflicts'] = 'Room Allow Schedule Conflicts';
 $string['building'] = 'Building';

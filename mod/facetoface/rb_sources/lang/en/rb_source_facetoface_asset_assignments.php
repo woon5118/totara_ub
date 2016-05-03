@@ -20,7 +20,7 @@
  * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
  * @package mod_facetoface
  */
-$string['sourcetitle'] = 'Face-to-face Asset Assignments';
+$string['sourcetitle'] = 'Seminar Asset Assignments';
 
 $string['facetofacesummaryasset'] = 'Upcoming Sessions using Asset';
 $string['selectanasset'] = 'To view this report, first <a href="{$a}">select an asset</a> you want to view.';

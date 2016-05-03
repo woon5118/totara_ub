@@ -20,7 +20,7 @@
  * @package mod_facetoface
  */
 
-$string['sourcetitle'] = 'Face-to-face Asset';
+$string['sourcetitle'] = 'Seminar Assets';
 
 $string['allowconflicts'] = 'Asset Allow Schedule Conflicts';
 $string['assetavailable'] = 'Asset Availability';

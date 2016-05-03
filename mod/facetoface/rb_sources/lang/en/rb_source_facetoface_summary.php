@@ -21,6 +21,8 @@
 * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
 * @package mod_facetoface
 */
+$string['sourcetitle'] = 'Seminar Sessions';
+
 $string['approvalby'] = 'Approval by';
 $string['bookingstatus'] = 'Booking Status';
 $string['actions'] = 'Actions';
@@ -49,7 +51,6 @@ $string['sessionid'] = 'Session ID';
 $string['signupperiod'] = 'Sign-up Period';
 $string['signupenddate'] = 'Sign-up End Date';
 $string['signupstartdate'] = 'Sign-up Start Date';
-$string['sourcetitle'] = 'Face-to-face Summary';
 $string['status:available'] = 'Bookings available';
 $string['status:cancelled'] = 'Cancelled';
 $string['status:ended'] = 'Ended';

@@ -26,7 +26,7 @@ class rb_facetoface_assets_embedded extends rb_base_embedded {
         $this->url = '/mod/facetoface/asset/manage.php';
         $this->source = 'facetoface_asset';
         $this->shortname = 'facetoface_assets';
-        $this->fullname = get_string('embeddedreportname', 'rb_source_facetoface_asset');
+        $this->fullname = get_string('embedded:seminarassets', 'mod_facetoface');
         $this->columns = array(
             array('type' => 'asset', 'value' => 'name', 'heading' => null),
             array('type' => 'facetoface_asset', 'value' => 'custom_field_type', 'heading' => null),

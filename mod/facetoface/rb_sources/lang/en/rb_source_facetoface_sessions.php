@@ -21,7 +21,7 @@
  */
 
 // lang file for mod/facetoface/rb_sources/rb_source_facetoface_sessions.php
-$string['sourcetitle'] = 'Face-to-face Sign ups';
+$string['sourcetitle'] = 'Seminar Sign ups';
 // columns
 $string['address'] = 'Address';
 $string['allsignupcustomfields'] = 'All sign up custom fields';
