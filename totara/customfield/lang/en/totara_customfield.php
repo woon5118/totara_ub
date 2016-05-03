@@ -101,6 +101,9 @@ $string['customfieldtypelocation_mapview'] = 'Map View';
 $string['customfieldtypelocation_or'] = 'or';
 $string['customfieldtypelocation_searchbutton'] = 'Search';
 $string['customfieldtypelocation_setmap'] = 'Set map location';
+$string['customfieldtypelocation_setmap_help'] = 'You can set the map location using the address above (if provided) or search for an address, town or city.
+
+If you want to refine the location of the pin, you can do so by clicking on it while holding the mouse button, moving the pin and then releasing the mouse button.';
 $string['customfieldtypelocation_sizelarge'] = 'Large';
 $string['customfieldtypelocation_sizemedium'] = 'Medium';
 $string['customfieldtypelocation_sizesmall'] = 'Small';

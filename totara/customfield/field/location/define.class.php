@@ -208,16 +208,10 @@ class customfield_define_location extends customfield_define_base {
         );
 
         $form->addGroup($mapelements, $formprefix . 'mapelements', get_string('customfieldtypelocation_setmap', 'totara_customfield'), ' ', false);
+        $form->addHelpButton($formprefix . 'mapelements', 'customfieldtypelocation_setmap', 'totara_customfield');
 
         // Google Map element
-
-        $form->addElement(
-            'html',
-            html_writer::tag('h3', 'Preview (drag marker for more specificity)')
-        );
-
         $form->addElement('html', '<div id="' . $formprefix . 'location_map" class="location_map" ></div>');
-
 
         $usertz = core_date::get_user_timezone();
         $tz = new DateTimeZone($usertz);
