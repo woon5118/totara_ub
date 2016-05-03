@@ -1046,7 +1046,7 @@ if ($show_table) {
                 $icon = $OUTPUT->action_icon($url, $showpix, null, array('class' => 'action-icon attendee-cancellation-note pull-right'));
 
                 $cancelstatus = new stdClass();
-                $cancelstatus->id = $attendee->signupid;
+                $cancelstatus->id = $attendee->submissionid;
                 $cancellationnote = customfield_get_data($cancelstatus, 'facetoface_cancellation', 'facetofacecancellation', false);
 
                 $cancellationnotetext = empty($cancellationnote) ? '' : $cancellationnote['cancellationnote'];
