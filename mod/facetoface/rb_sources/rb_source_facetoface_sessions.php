@@ -181,7 +181,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'assetdate',
                 'LEFT',
                 '{facetoface_asset_dates}',
-                'assetdate.sessionsdateid = base.id',
+                'assetdate.sessionsdateid = sessiondate.id',
                 REPORT_BUILDER_RELATION_MANY_TO_ONE,
                 'sessiondate'
             ),

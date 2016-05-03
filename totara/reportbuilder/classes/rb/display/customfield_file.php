@@ -86,6 +86,12 @@ class customfield_file extends base {
                 case 'facetoface_sessioncancel':
                     $prefix = 'facetofacesessioncancel';
                     break;
+                case 'facetoface_asset':
+                    $prefix = 'facetofaceasset';
+                    break;
+                case 'facetoface_room':
+                    $prefix = 'facetofaceroom';
+                    break;
                 default:
                     debugging("Unknown prefix '$cf_prefix'' in custom field '$field'", DEBUG_DEVELOPER);
                     return '';

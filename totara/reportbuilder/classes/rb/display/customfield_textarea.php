@@ -85,6 +85,12 @@ class customfield_textarea extends base {
                 case 'dp_plan_evidence':
                     $prefix = 'dp_plan_evidence';
                     break;
+                case 'facetoface_asset':
+                    $prefix = 'facetofaceasset';
+                    break;
+                case 'facetoface_room':
+                    $prefix = 'facetofaceroom';
+                    break;
                 default:
                     debugging("Unknown prefix '$cf_prefix'' in custom field '$field'", DEBUG_DEVELOPER);
                     return '';
