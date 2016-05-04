@@ -32,6 +32,12 @@ defined('MOODLE_INTERNAL') || die();
 class mod_facetoface_generator extends testing_module_generator {
 
     /**
+     * The number of rooms created so far.
+     * @var int
+     */
+    protected $roominstancecount = 0;
+
+    /**
      * Create new facetoface module instance
      * @param array|stdClass $record
      * @param array $options
@@ -149,6 +155,80 @@ class mod_facetoface_generator extends testing_module_generator {
         $record->usermodified = $USER->id;
 
         return facetoface_add_session($record, $sessiondates);
+    }
+
+    /**
+     * Create a room - please use the add_custom_room, or add_site_wide_room methods.
+     *
+     * @param stdClass|array $record
+     * @return mixed
+     */
+    protected function add_room($record) {
+        global $DB, $USER;
+
+        $this->roominstancecount++;
+        $record = (object) $record;
+
+        if (!isset($record->name)) {
+            $record->name = 'Room '.$this->roominstancecount;
+        }
+        if (!isset($record->capacity)) {
+            // Don't ever bet on the capacity, if you need to be something specific set it to that.
+            $record->capacity = floor(rand(5, 50));
+        }
+        if (!isset($record->type)) {
+            if (!empty($record->allowconflicts)) {
+                $record->type = 'external';
+            } else {
+                $record->type = 'internal';
+            }
+        }
+        if (!isset($record->description)) {
+            $record->description = 'Description for room '.$this->roominstancecount;
+        }
+        if (!isset($record->custom)) {
+            $record->custom = 1;
+        }
+        if (!isset($record->usercreated)) {
+            $record->usercreated = $USER->id;
+        }
+        if (!isset($record->timecreated)) {
+            $record->timecreated = time();
+        }
+        $id = $DB->insert_record('facetoface_room', $record);
+        return $DB->get_record('facetoface_room', array('id' => $id));
+    }
+
+    /**
+     * Add a custom room.
+     *
+     * @param stdClass|array $record
+     * @return stdClass
+     */
+    public function add_custom_room($record) {
+        $record = (object)$record;
+        $record->custom = 1;
+        return $this->add_room($record);
+    }
+
+    /**
+     * Add a site wide room.
+     *
+     * @param stdClass|array $record
+     * @return stdClass
+     */
+    public function add_site_wide_room($record) {
+        $record = (object)$record;
+        $record->custom = 0;
+        return $this->add_room($record);
+    }
+
+    /**
+     * Resets this generator instance.
+     */
+    public function reset() {
+        $this->roominstancecount = 0;
+        parent::reset();
     }
 
     /**

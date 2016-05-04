@@ -87,7 +87,7 @@ class cleanup_task extends \core\task\scheduled_task {
         $roomids = $DB->get_fieldset_sql($sql);
         if ($roomids) {
             list($delsql, $delparams) = $DB->get_in_or_equal($roomids, SQL_PARAMS_NAMED);
-            $DB->delete_('facetoface_room', "id $delsql", $delparams);
+            $DB->delete_records_select('facetoface_room', "id $delsql", $delparams);
         }
         $transaction->allow_commit();
     }
