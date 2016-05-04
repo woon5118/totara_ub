@@ -40,7 +40,7 @@ class rb_facetoface_signin_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'facetoface_signup',
-                'value' => 'note',
+                'value' => 'custom_field_1',
                 'heading' => get_string('usernote', 'mod_facetoface')
             ),
             array(
