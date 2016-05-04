@@ -1,5 +1,5 @@
 @javascript @mod @mod_facetoface @totara @totara_reportbuilder
-Feature: Seminar Sessions report overview
+Feature: Seminar sessions report overview
   In order to see all required information
   As an admin
   I need to configure seminar summary report and see all required information
@@ -15,6 +15,7 @@ Feature: Seminar Sessions report overview
       | student4  | Sam4      | Student4 | student4@example.com |
       | student5  | Sam5      | Student5 | student5@example.com |
       | student6  | Sam6      | Student6 | student6@example.com |
+      | student7  | Sam7      | Student7 | student7@example.com |
     And the following "courses" exist:
       | fullname | shortname | category | enablecompletion | completionstartonenrol |
       | Course 1 | C1        | 0        | 1                | 1                      |
@@ -38,7 +39,52 @@ Feature: Seminar Sessions report overview
     And I click on "s__facetoface_session_roles[4]" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
     And I press "Save changes"
 
-    # Prepare 4 sessions in three activities:
+    # Prepare report
+    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I set the following fields to these values:
+      | Report Name | Seminar Summary          |
+      | Source      | Seminar Sessions |
+    And I press "Create report"
+    And I click on "Columns" "link"
+    And I set the field "newcolumns" to "Number of Attendees"
+    And I press "Add"
+    And I set the field "newcolumns" to "Overbooking allowed"
+    And I press "Add"
+    And I set the field "newcolumns" to "Approval Type"
+    And I press "Add"
+    And I set the field "newcolumns" to "Overall status"
+    And I press "Add"
+    And I set the field "newcolumns" to "Booking Status"
+    And I press "Add"
+    And I set the field "newcolumns" to "Normal cost"
+    And I press "Add"
+    And I set the field "newcolumns" to "Discount cost"
+    And I press "Add"
+    And I set the field "newcolumns" to "Minimum bookings"
+    And I press "Add"
+    And I set the field "newcolumns" to "Duration"
+    And I press "Add"
+    And I set the field "newcolumns" to "Event Learner"
+    And I press "Add"
+    And I set the field "newcolumns" to "Event Learner (linked to profile)"
+    And I press "Add"
+    And I set the field "newcolumns" to "Event Trainer"
+    And I press "Add"
+    And I set the field "newcolumns" to "Event Trainer (linked to profile)"
+    And I press "Add"
+    And I press "Save changes"
+
+    And I click on "Filters" "link"
+    And I set the field "newstandardfilter" to "Booking Status"
+    And I press "Add"
+    And I set the field "newstandardfilter" to "Overall status"
+    And I press "Add"
+    And I set the field "newstandardfilter" to "Event Learner"
+    And I press "Add"
+    And I set the field "newstandardfilter" to "Event Trainer"
+    And I press "Add"
+    And I press "Save changes"
+
     # 1: (1st activity of C1) Underbooked, upcoming, manager approval
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -71,6 +117,15 @@ Feature: Seminar Sessions report overview
       | discountcost          | 1.00 |
     And I press "Save changes"
 
+  Scenario: Check canceled seminar sessions summary report
+    Given I click on "Cancel event" "link"
+    And I press "Yes"
+    And I click on "My Reports" in the totara menu
+    When I click on "Seminar Summary" "link"
+    Then I should see "N/A" in the "1.11" "table_row"
+
+  Scenario: Check active seminar sessions summary report
+    # Prepare 4 sessions in three activities:
     # 2: (2nd activity of C1) Two dates, self approved, overbooked, 1st started, 2nd upcoming
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -188,54 +243,42 @@ Feature: Seminar Sessions report overview
     And I press "Continue"
     And I press "Confirm"
 
-  Scenario: Create report and check all data
-    Given I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    # 5: (1st activity of C2) N/A, ended, no one
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 2"
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name              | Test seminar name 4      |
+      | Description       | Test seminar description |
+    And I follow "Test seminar name 4"
+    And I follow "Add a new event"
+    And I click on "Edit date" "link"
+    And I fill seminar session with relative date in form data:
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | -2               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | -1               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | 0                |
+      | timefinish[minute] | 0                |
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
-      | Report Name | F2F Summary      |
-      | Source      | Seminar Sessions |
-    And I press "Create report"
-    And I click on "Columns" "link"
-
-    And I set the field "newcolumns" to "Number of Attendees"
-    And I press "Add"
-    And I set the field "newcolumns" to "Overbooking allowed"
-    And I press "Add"
-    And I set the field "newcolumns" to "Approval Type"
-    And I press "Add"
-    And I set the field "newcolumns" to "Overall status"
-    And I press "Add"
-    And I set the field "newcolumns" to "Booking Status"
-    And I press "Add"
-    And I set the field "newcolumns" to "Normal cost"
-    And I press "Add"
-    And I set the field "newcolumns" to "Discount cost"
-    And I press "Add"
-    And I set the field "newcolumns" to "Minimum bookings"
-    And I press "Add"
-    And I set the field "newcolumns" to "Duration"
-    And I press "Add"
-    And I set the field "newcolumns" to "Event Learner"
-    And I press "Add"
-    And I set the field "newcolumns" to "Event Learner (linked to profile)"
-    And I press "Add"
-    And I set the field "newcolumns" to "Event Trainer"
-    And I press "Add"
-    And I set the field "newcolumns" to "Event Trainer (linked to profile)"
-    And I press "Add"
+      | capacity           | 2             |
+      | normalcost         | 5.55          |
     And I press "Save changes"
+    And I follow "Attendees"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Sam7 Student7, student7@example.com" "option"
+    And I press "Add"
+    And I wait "1" seconds
+    And I press "Continue"
+    And I press "Confirm"
 
-    And I click on "Filters" "link"
-    And I set the field "newstandardfilter" to "Booking Status"
-    And I press "Add"
-    And I set the field "newstandardfilter" to "Overall status"
-    And I press "Add"
-    And I set the field "newstandardfilter" to "Event Learner"
-    And I press "Add"
-    And I set the field "newstandardfilter" to "Event Trainer"
-    And I press "Add"
-    And I press "Save changes"
-
-    When I click on "View This Report" "link"
+    And I click on "My Reports" in the totara menu
+    When I click on "Seminar Summary" "link"
     Then I should see "Course 1" in the "2.22" "table_row"
     And I should see "No" in the "1.11" "table_row"
     And I should see "Manager Approval" in the "1.11" "table_row"
@@ -264,6 +307,11 @@ Feature: Seminar Sessions report overview
     And I should see "Ended" in the "4.44" "table_row"
     And "Sam4 Student4" "link" should exist in the "4.44" "table_row"
     And "Sam5 Student5" "link" should exist in the "4.44" "table_row"
+
+    And I should see "Course 2" in the "5.55" "table_row"
+    And I should see "No Approval" in the "5.55" "table_row"
+    And I should see "N/A" in the "5.55" "table_row"
+    And I should see "Ended" in the "5.55" "table_row"
 
     # Check filters
     When I set the field "Booking Status field limiter" to "is equal to"
@@ -384,7 +432,7 @@ Feature: Seminar Sessions report overview
     And I click on "s__facetoface_session_roles[4]" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
     And I press "Save changes"
     And I click on "My Reports" in the totara menu
-    And I follow "F2F Summary"
+    And I follow "Seminar Summary"
     Then "Event Learner" "link" should exist in the ".reportbuilder-table" "css_element"
     And "Event Trainer" "link" should not exist in the ".reportbuilder-table" "css_element"
     And I press "Edit this report"

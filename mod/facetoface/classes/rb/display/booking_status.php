@@ -60,6 +60,8 @@ class booking_status extends \totara_reportbuilder\rb\display\base {
                 $str = get_string('status:overbooked', 'rb_source_facetoface_summary');
                 $class = 'overbooked';
                 break;
+            case 'cancelled':
+            case 'ended':
             default:
                 $str = get_string('status:notavailable', 'rb_source_facetoface_summary');
                 $class = 'notavailable';

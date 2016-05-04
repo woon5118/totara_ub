@@ -377,13 +377,15 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'session',
             'bookingstatus',
             get_string('bookingstatus', 'rb_source_facetoface_summary'),
-            "(CASE WHEN cntsignups < sessions.mincapacity THEN 'underbooked'
+            "(CASE WHEN {$now} > {$join}.timefinish AND cntsignups < sessions.capacity THEN 'ended'
+                   WHEN cancelledstatus <> 0 THEN 'cancelled'
+                   WHEN cntsignups < sessions.mincapacity THEN 'underbooked'
                    WHEN cntsignups < sessions.capacity THEN 'available'
                    WHEN cntsignups = sessions.capacity THEN 'fullybooked'
                    WHEN cntsignups > sessions.capacity THEN 'overbooked'
                    ELSE NULL END)",
             array(
-                'joins' => array('cntbookings', 'sessions'),
+                'joins' => array($join, 'cntbookings', 'sessions'),
                 'displayfunc' => 'booking_status',
                 'dbdatatype' => 'char',
                 'extrafields' => array(
