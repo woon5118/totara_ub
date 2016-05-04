@@ -29,3 +29,4 @@ $string['type_session'] = 'Sessions';
 $string['type_room'] = 'Rooms';
 $string['type_facetoface_asset'] = 'Assets';
 $string['type_facetoface_room'] = 'Rooms';
+$string['type_date'] = 'Date';

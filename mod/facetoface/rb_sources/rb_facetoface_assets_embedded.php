@@ -29,7 +29,7 @@ class rb_facetoface_assets_embedded extends rb_base_embedded {
         $this->fullname = get_string('embedded:seminarassets', 'mod_facetoface');
         $this->columns = array(
             array('type' => 'asset', 'value' => 'name', 'heading' => null),
-            array('type' => 'facetoface_asset', 'value' => 'custom_field_type', 'heading' => null),
+            array('type' => 'asset', 'value' => 'allowconflicts', 'heading' => null),
             array('type' => 'asset', 'value' => 'visible', 'heading' => null),
             array('type' => 'asset', 'value' => 'actions', 'heading' => null)
         );

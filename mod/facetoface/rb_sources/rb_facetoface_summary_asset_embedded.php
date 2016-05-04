@@ -29,7 +29,6 @@ class rb_facetoface_summary_asset_embedded extends rb_base_embedded {
         $this->fullname = get_string('embedded:seminarassetsupcoming', 'mod_facetoface');
         $this->columns = array(
             array('type' => 'facetoface', 'value' => 'name', 'heading' => null),
-            array('type' => 'session', 'value' => 'approvalby', 'heading' => null),
             array('type' => 'session', 'value' => 'numattendeeslink', 'heading' => get_string('numberofattendees', 'facetoface')),
             array('type' => 'session', 'value' => 'capacity', 'heading' => null),
             array('type' => 'date', 'value' => 'sessionstartdate', 'heading' => null),

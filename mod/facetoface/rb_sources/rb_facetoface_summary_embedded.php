@@ -45,13 +45,8 @@ class rb_facetoface_summary_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'date',
-                'value' => 'sessiondate',
+                'value' => 'sessionstartdate',
                 'heading' => get_string('sessdatetime', 'rb_source_facetoface_summary'),
-            ),
-            array(
-                'type' => 'session',
-                'value' => 'approvalby',
-                'heading' => get_string('approvalby', 'rb_source_facetoface_summary'),
             ),
             array(
                 'type' => 'session',
