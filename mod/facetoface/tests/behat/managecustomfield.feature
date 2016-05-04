@@ -17,7 +17,7 @@ Feature: Configure face to face custom fields
     When I follow "Room"
     Then I should see "Create a new custom field"
 
-    When I follow "Sign-up note"
+    When I follow "Sign-up"
     Then I should see "Create a new custom field"
 
     When I follow "User cancellation"
@@ -58,7 +58,7 @@ Feature: Configure face to face custom fields
     When I follow "Room"
     Then I should see "Create a new custom field"
 
-    When I follow "Sign-up note"
+    When I follow "Sign-up"
     Then I should see "Create a new custom field"
 
     When I follow "User cancellation"

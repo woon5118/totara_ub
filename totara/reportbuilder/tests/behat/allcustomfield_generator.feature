@@ -14,7 +14,7 @@ Feature: All customfields column generator
       | Course 1 | C1        | 0        |
     And I log in as "admin"
     And I navigate to "Custom fields" node in "Site administration > Face-to-face"
-    And I click on "Sign-up note" "link"
+    And I click on "Sign-up" "link"
 
     # Add Checkbox
     And I set the field "Create a new custom field" to "Checkbox"

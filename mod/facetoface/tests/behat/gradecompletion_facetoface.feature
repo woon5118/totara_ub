@@ -37,7 +37,7 @@ Feature: Give a grade to a student for a face to face
         And I follow "Course 1"
         And I navigate to "Grades" node in "Course administration"
         And I turn editing mode on
-        And I set the field "grade_4_2" to "100"
+        And I set the field "Sam1 Student1 Test facetoface name grade" to "100"
 
         And I press "Save changes"
         And I navigate to "Course completion" node in "Course administration > Reports"
