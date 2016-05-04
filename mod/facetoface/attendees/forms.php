@@ -47,6 +47,7 @@ class addconfirm_form extends moodleform {
         $mform->setDefault('notifymanager', 1);
 
         if ($this->_customdata['approvalreqd']) {
+            $mform->addElement('header', 'bookingoptions', get_string('bookingoptions', 'facetoface'));
             $mform->addElement('advcheckbox', 'ignoreapproval', '', get_string('ignoreapprovalwhenaddingattendees', 'facetoface'));
         }
 
