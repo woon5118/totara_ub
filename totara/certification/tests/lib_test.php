@@ -162,14 +162,20 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals(array(), $found);
     }
 
+    /**
+     * Note that this function is looking at course SET completion dates. A user might have completed the courses required
+     * for a couse set, but if they weren't on that path then they won't have a course set completion record for it.
+     */
     public function test_certif_get_content_completion_time() {
         $this->resetAfterTest(true);
 
         // Set up some courses and certifications.
         $courses = array();
         $certifications = array();
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 20; $i++) {
             $courses[$i] = $this->getDataGenerator()->create_course();
+        }
+        for ($i = 1; $i <= 10; $i++) {
             $certifications[$i] = $this->getDataGenerator()->create_certification();
         }
 
@@ -177,17 +183,17 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->getDataGenerator()->add_courseset_program($certifications[2]->id,
             array($courses[2]->id, $courses[3]->id, $courses[4]->id), CERTIFPATH_CERT);
         $this->getDataGenerator()->add_courseset_program($certifications[2]->id,
-            array($courses[6]->id, $courses[7]->id), CERTIFPATH_RECERT);
+            array($courses[5]->id, $courses[6]->id), CERTIFPATH_RECERT);
 
         $this->getDataGenerator()->add_courseset_program($certifications[4]->id,
-            array($courses[2]->id, $courses[3]->id), CERTIFPATH_CERT);
+            array($courses[7]->id, $courses[8]->id), CERTIFPATH_CERT);
         $this->getDataGenerator()->add_courseset_program($certifications[4]->id,
-            array($courses[3]->id, $courses[4]->id), CERTIFPATH_RECERT);
+            array($courses[8]->id, $courses[9]->id), CERTIFPATH_RECERT);
 
         $this->getDataGenerator()->add_courseset_program($certifications[6]->id,
-            array($courses[6]->id), CERTIFPATH_CERT);
+            array($courses[11]->id), CERTIFPATH_CERT);
         $this->getDataGenerator()->add_courseset_program($certifications[6]->id,
-            array($courses[7]->id), CERTIFPATH_RECERT);
+            array($courses[12]->id), CERTIFPATH_RECERT);
 
         // Set up some users.
         $users = array();
@@ -204,38 +210,61 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
 
         // Mark some users as complete in some courses, with identifiable completion dates.
         $completiondatas = array(
+            // Array(userindex, courseindex, time).
+            array(1, 1, 1),
             array(1, 2, 1000),
             array(1, 3, 3000),
             array(1, 4, 2000),
-            array(1, 5, 99999),
+            array(1, 5, 1),
+            array(1, 6, 99999),
+            array(1, 7, 1),
             array(1, 8, 99999),
             array(1, 9, 99999),
+            array(1, 11, 1),
+            array(1, 12, 99999),
+            array(1, 13, 99999),
 
             array(2, 2, 8000),
             array(2, 3, 6000),
             array(2, 4, 7000),
-            array(2, 5, 99999),
-            array(2, 8, 99999),
-            array(2, 9, 99999),
 
             array(3, 2, 1000),
-            array(3, 3, 2000),
-            array(3, 4, 4000),
-            array(3, 6, 3000),
+            array(3, 3, 4000),
+            array(3, 4, 6000),
+            array(3, 5, 1),
+            array(3, 6, 99999),
             array(3, 7, 5000),
+            array(3, 8, 3000),
+            array(3, 9, 99999),
+            array(3, 11, 1),
+            array(3, 12, 99999),
 
-            array(4, 2, 99999),
-            array(4, 3, 99999),
-            array(4, 4, 99999),
-            array(4, 6, 99999),
-            array(4, 7, 99999),
+            array(4, 2, 2000),
+            array(4, 3, 3000),
+            array(4, 4, 4000),
+            array(4, 7, 1000),
+            array(4, 8, 2000),
+            array(4, 9, 99999),
+            array(4, 11, 99999),
+            array(4, 12, 5000),
 
             array(5, 2, 1),
-            array(5, 3, 1),
-            array(5, 4, 1),
+            array(5, 4, 99999),
             array(5, 6, 1),
-            array(5, 7, 1),
+            array(5, 7, 99999),
         );
+
+        // Put user 4 onto recert path for cert 6 (only complete recert path).
+        list($certcompletion, $progcompletion) = certif_load_completion($certifications[6]->id, $users[4]->id);
+        $certcompletion->status = CERTIFSTATUS_COMPLETED;
+        $certcompletion->renewalstatus = CERTIFRENEWALSTATUS_DUE;
+        $certcompletion->certifpath = CERTIFPATH_RECERT;
+        $certcompletion->timecompleted = 100;
+        $certcompletion->timewindowopens = 200;
+        $certcompletion->timeexpires = 300;
+        $progcompletion->timedue = 300;
+        $this->assertEquals(array(), certif_get_completion_errors($certcompletion, $progcompletion));
+        certif_write_completion($certcompletion, $progcompletion);
 
         foreach ($completiondatas as $completiondata) {
             list($user, $course, $time) = $completiondata;
@@ -243,21 +272,45 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
             $completion->mark_complete($time);
         }
 
+        // Put user 4 onto recert path for cert 2 (complete primary and recert paths).
+        list($certcompletion, $progcompletion) = certif_load_completion($certifications[2]->id, $users[4]->id);
+        $certcompletion->status = CERTIFSTATUS_COMPLETED;
+        $certcompletion->renewalstatus = CERTIFRENEWALSTATUS_DUE;
+        $certcompletion->certifpath = CERTIFPATH_RECERT;
+        $certcompletion->timecompleted = 100;
+        $certcompletion->timewindowopens = 200;
+        $certcompletion->timeexpires = 300;
+        $progcompletion->timedue = 300;
+        $progcompletion->timecompleted = 0;
+        $progcompletion->status = STATUS_PROGRAM_INCOMPLETE;
+        $this->assertEquals(array(), certif_get_completion_errors($certcompletion, $progcompletion));
+        certif_write_completion($certcompletion, $progcompletion);
+
+        $completion = new completion_completion(array('userid' => $users[4]->id, 'course' => $courses[5]->id));
+        $completion->mark_complete(1000);
+        $completion = new completion_completion(array('userid' => $users[4]->id, 'course' => $courses[6]->id));
+        $completion->mark_complete(6000);
+
         // Call the function, checking if the correct times are returned.
 
         // These two check that the correct user's results are being returned.
         $this->assertEquals(3000, certif_get_content_completion_time($certifications[2]->certifid, $users[1]->id));
         $this->assertEquals(8000, certif_get_content_completion_time($certifications[2]->certifid, $users[2]->id));
 
-        // These two check that the correct certification's results are being returned.
-        $this->assertEquals(5000, certif_get_content_completion_time($certifications[2]->certifid, $users[3]->id));
-        $this->assertEquals(4000, certif_get_content_completion_time($certifications[4]->certifid, $users[3]->id));
+        // These two check that the correct certification's results are being returned (on primary path).
+        $this->assertEquals(6000, certif_get_content_completion_time($certifications[2]->certifid, $users[3]->id));
+        $this->assertEquals(5000, certif_get_content_completion_time($certifications[4]->certifid, $users[3]->id));
 
         // These check that the correct certification path results are being returned.
-        $this->assertEquals(4000, certif_get_content_completion_time($certifications[2]->certifid, $users[3]->id, CERTIFPATH_CERT));
-        $this->assertEquals(5000, certif_get_content_completion_time($certifications[2]->certifid, $users[3]->id, CERTIFPATH_RECERT));
-        $this->assertEquals(2000, certif_get_content_completion_time($certifications[4]->certifid, $users[3]->id, CERTIFPATH_CERT));
-        $this->assertEquals(4000, certif_get_content_completion_time($certifications[4]->certifid, $users[3]->id, CERTIFPATH_RECERT));
+        $this->assertEquals(2000, certif_get_content_completion_time($certifications[4]->certifid, $users[4]->id, CERTIFPATH_CERT));
+        $this->assertNull(        certif_get_content_completion_time($certifications[4]->certifid, $users[4]->id, CERTIFPATH_RECERT));
+        $this->assertNull(        certif_get_content_completion_time($certifications[6]->certifid, $users[4]->id, CERTIFPATH_CERT));
+        $this->assertEquals(5000, certif_get_content_completion_time($certifications[6]->certifid, $users[4]->id, CERTIFPATH_RECERT));
+        $this->assertEquals(4000, certif_get_content_completion_time($certifications[2]->certifid, $users[4]->id, CERTIFPATH_CERT));
+        $this->assertEquals(6000, certif_get_content_completion_time($certifications[2]->certifid, $users[4]->id, CERTIFPATH_RECERT));
+
+        // Check result when course set not complete (user completed recert path courses, but is on primary path).
+        $this->assertNull(certif_get_content_completion_time($certifications[2]->certifid, $users[5]->id));
     }
 
     /**

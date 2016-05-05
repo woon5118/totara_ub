@@ -1367,7 +1367,7 @@ function prog_update_completion($userid, program $program = null) {
 
         // Courseset_group_completed will be true if all the course groups in the program have been completed.
         if ($courseset_group_completed) {
-            //Get the completion date of the last courseset to use in program completion
+            // Get maximum completion date of the coursesets in the current path.
             $sql = "SELECT MAX(pc.timecompleted) AS timecompleted
                       FROM {prog_completion} pc
                       JOIN {prog_courseset} pcs ON pcs.id = pc.coursesetid

@@ -559,7 +559,7 @@ function certification_fix_missing_certif_completions() {
 }
 
 /**
- * Get time of last completed certification course
+ * Get time of last completed certification course set
  *
  * @param integer $certificationid
  * @param integer $userid
@@ -568,20 +568,24 @@ function certification_fix_missing_certif_completions() {
  */
 function certif_get_content_completion_time($certificationid, $userid, $path = null) {
     global $DB;
-    $courses = find_courses_for_certif($certificationid, 'c.id', $path);
-    $courselist = array_keys($courses);
-    list($incourse, $params) = $DB->get_in_or_equal($courselist, SQL_PARAMS_NAMED);
 
-    $sql = "SELECT MAX(timecompleted) AS maxtimecompleted
-            FROM {course_completions}
-            WHERE course $incourse
-              AND userid = :userid";
-    $params['userid'] = $userid;
-    $completion = $DB->get_record_sql($sql, $params);
-    if (!$completion) {
+    // Get maximum completion date of the applicable coursesets.
+    $sql = "SELECT MAX(pc.timecompleted) AS timecompleted
+              FROM {prog_completion} pc
+              JOIN {prog} prog ON pc.programid = prog.id
+              JOIN {prog_courseset} pcs ON pcs.id = pc.coursesetid
+             WHERE prog.certifid = :certifid AND pc.userid = :userid";
+    $params = array('certifid' => $certificationid, 'userid' => $userid);
+    if ($path) {
+        $sql .= " AND pcs.certifpath = :path";
+        $params['path'] = $path;
+    }
+    $coursesetcompletion = $DB->get_record_sql($sql, $params);
+
+    if (!$coursesetcompletion) {
         return 0;
     }
-    return $completion->maxtimecompleted;
+    return $coursesetcompletion->timecompleted;
 }
 
 /**
@@ -613,7 +617,6 @@ function write_certif_completion($certificationid, $userid, $certificationpath =
     $todb->certifpath = $certificationpath;
     if ($certificationpath == CERTIFPATH_RECERT) { // The user has just certified, so their new path is recert.
         $todb->status = CERTIFSTATUS_COMPLETED;
-        // Note: this differs from programs, which use courseSET timecompleted, although the result should be the same.
         $lastcompleted = certif_get_content_completion_time($certificationid, $userid, $certificationcompletion->certifpath);
         // If no courses completed, maintain default behaviour.
         if (!$lastcompleted) {
@@ -2393,10 +2396,14 @@ function certif_get_completion_error_solution($problemkey, $programid = 0, $user
             $html = get_string('error:info_timedueunknown', 'totara_program');
             break;
         case 'error:statecertified-certprogtimecompleteddifferent':
-            $url = clone($baseurl);
-            $url->param('fixkey', 'fixprogcompletiondate');
-            $html = get_string('error:info_fixprogcompletiondatematch', 'totara_certification') . '<br>' .
-                html_writer::link($url, get_string('clicktofixcompletions', 'totara_program'));
+            $url1 = clone($baseurl);
+            $url1->param('fixkey', 'fixcertcompletiondate');
+            $html = get_string('error:info_fixprogcompletiondatematchpart1', 'totara_certification') . '<br>' .
+                html_writer::link($url1, get_string('clicktofixcompletions', 'totara_program'));
+            $url2 = clone($baseurl);
+            $url2->param('fixkey', 'fixprogcompletiondate');
+            $html .= '<br>' . get_string('error:info_fixprogcompletiondatematchpart2', 'totara_certification') . '<br>' .
+                html_writer::link($url2, get_string('clicktofixcompletions', 'totara_program'));
             break;
         case 'error:stateassigned-progstatusincorrect|error:stateassigned-progtimecompletednotempty':
             $url = clone($baseurl);
@@ -2532,6 +2539,11 @@ function certif_fix_completions($fixkey, $programid = 0, $userid = 0) {
                     $result = certif_fix_completion_prog_status_set_complete($certcompletion, $progcompletion);
                 }
                 break;
+            case 'fixcertcompletiondate':
+                if ($problemkey == 'error:statecertified-certprogtimecompleteddifferent') {
+                    $result = certif_fix_cert_completion_date($certcompletion, $progcompletion);
+                }
+                break;
             case 'fixprogcompletiondate':
                 if ($problemkey == 'error:statecertified-certprogtimecompleteddifferent') {
                     $result = certif_fix_prog_completion_date($certcompletion, $progcompletion);
@@ -2642,6 +2654,8 @@ function certif_write_completion($certcompletion, $progcompletion, $message = ''
         return true;
     } else {
         // Some error was detected, and it wasn't specified in $ignoreproblemkey.
+        prog_log_completion($progcompletion->programid, $progcompletion->userid,
+            'An attempt was made to write changes, but the data was invalid. Message of caller was:<br>' . $message);
         return false;
     }
 }
@@ -2711,8 +2725,8 @@ function certif_write_completion_history($certcomplhistory, $message = '') {
 /**
  * Fixes program completion records that should have the same due date as the corresponding certification completion expiry date.
  *
- * @param $certcompletion
- * @param $progcompletion
+ * @param stdClass $certcompletion a record from certif_completion to be fixed
+ * @param stdClass $progcompletion a corresponding record from prog_completion to be fixed
  * @return string message for transaction log
  */
 function certif_fix_completion_expiry_to_due_date(&$certcompletion, &$progcompletion) {
@@ -2733,8 +2747,8 @@ function certif_fix_completion_expiry_to_due_date(&$certcompletion, &$progcomple
  *
  * NOTE: This will also cause course progress to be reset when the window opens!
  *
- * @param $certcompletion
- * @param $progcompletion
+ * @param stdClass $certcompletion a record from certif_completion to be fixed
+ * @param stdClass $progcompletion a corresponding record from prog_completion to be fixed
  * @return string message for transaction log
  */
 function certif_fix_completion_window_reopen(&$certcompletion, &$progcompletion) {
@@ -2757,8 +2771,8 @@ function certif_fix_completion_window_reopen(&$certcompletion, &$progcompletion)
  * NOTE: This will NOT cause course progress to be reset, so should only be used if course progress was reset
  * correctly previously!
  *
- * @param $certcompletion
- * @param $progcompletion
+ * @param stdClass $certcompletion a record from certif_completion to be fixed
+ * @param stdClass $progcompletion a corresponding record from prog_completion to be fixed
  * @return string message for transaction log
  */
 function certif_fix_completion_prog_status_reset(&$certcompletion, &$progcompletion) {
@@ -2777,8 +2791,8 @@ function certif_fix_completion_prog_status_reset(&$certcompletion, &$progcomplet
  * NOTE: This could potentially cause course progress to be reset, so should only be used if course progress was NOT reset
  * correctly previously (which is most likely the case)!
  *
- * @param $certcompletion
- * @param $progcompletion
+ * @param stdClass $certcompletion a record from certif_completion to be fixed
+ * @param stdClass $progcompletion a corresponding record from prog_completion to be fixed
  * @return string message for transaction log
  */
 function certif_fix_completion_prog_status_set_complete(&$certcompletion, &$progcompletion) {
@@ -2799,8 +2813,8 @@ function certif_fix_completion_prog_status_set_complete(&$certcompletion, &$prog
  *
  * NOTE: This should only be used if there are no history records that could be restored.
  *
- * @param $certcompletion
- * @param $progcompletion
+ * @param stdClass $certcompletion a record from certif_completion to be fixed
+ * @param stdClass $progcompletion a corresponding record from prog_completion to be fixed
  * @return string message for transaction log
  */
 function certif_fix_completion_prog_incomplete(&$certcompletion, &$progcompletion) {
@@ -2813,10 +2827,50 @@ function certif_fix_completion_prog_incomplete(&$certcompletion, &$progcompletio
 }
 
 /**
+ * Copies program completion date over certification completion date. If using "completion" method, recalculate
+ * window open and expiry dates.
+ *
+ * @param stdClass $certcompletion a record from certif_completion to be fixed
+ * @param stdClass $progcompletion a corresponding record from prog_completion to be fixed
+ * @return string message for transaction log
+ */
+function certif_fix_cert_completion_date(&$certcompletion, &$progcompletion) {
+    global $DB;
+
+    $certification = $DB->get_record('certif', array('id' => $certcompletion->certifid));
+
+    $certcompletion->timecompleted = $progcompletion->timecompleted;
+
+    $timecompleted = userdate($certcompletion->timecompleted, '%d %B %Y, %H:%M', 0) .
+        ' (' . $certcompletion->timecompleted . ')';
+
+    if ($certification->recertifydatetype == CERTIFRECERT_COMPLETION) {
+        $certcompletion->timeexpires = get_timeexpires($certcompletion->timecompleted, $certification->activeperiod);
+        $certcompletion->timewindowopens = get_timewindowopens($certcompletion->timeexpires, $certification->windowperiod);
+        $progcompletion->timedue = $certcompletion->timeexpires;
+
+        $timewindowopens = userdate($certcompletion->timewindowopens, '%d %B %Y, %H:%M', 0) .
+            ' (' . $certcompletion->timewindowopens . ')';
+
+        $timeexpires = userdate($certcompletion->timeexpires, '%d %B %Y, %H:%M', 0) .
+            ' (' . $certcompletion->timeexpires . ')';
+
+        return 'Automated fix \'certif_fix_cert_completion_date\' was applied using current certification settings<br>
+        <ul><li>\'Certification completion date\' was set to ' . $timecompleted . '</li>
+        <li>\'Certification window open date\' was set to ' . $timewindowopens . '</li>
+        <li>\'Certification expiry date\' was set to ' . $timeexpires . '</li>
+        <li>\'Program due date\' was set to ' . $timeexpires . '</li></ul>';
+    } else {
+        return 'Automated fix \'certif_fix_cert_completion_date\' was applied<br>
+        <ul><li>\'Certification completion date\' was set to ' . $timecompleted . '</li></ul>';
+    }
+}
+
+/**
  * Copies certification completion date over program completion date.
  *
- * @param $certcompletion
- * @param $progcompletion
+ * @param stdClass $certcompletion a record from certif_completion to be fixed
+ * @param stdClass $progcompletion a corresponding record from prog_completion to be fixed
  * @return string message for transaction log
  */
 function certif_fix_prog_completion_date(&$certcompletion, &$progcompletion) {
@@ -2826,7 +2880,7 @@ function certif_fix_prog_completion_date(&$certcompletion, &$progcompletion) {
         ' (' . $progcompletion->timecompleted . ')';
 
     return 'Automated fix \'certif_fix_prog_completion_date\' was applied<br>
-        <li>\'Program completion date\' was set to ' . $timecompleted . '</li></ul>';
+        <ul><li>\'Program completion date\' was set to ' . $timecompleted . '</li></ul>';
 }
 
 /**

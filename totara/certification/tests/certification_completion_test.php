@@ -2491,6 +2491,170 @@ class totara_certification_certification_completion_testcase extends reportcache
     }
 
     /**
+     * Test certif_fix_cert_completion_date. Set the certification completion date to match program completion date.
+     *
+     * This fix function requires that the certification exists.
+     */
+    public function test_certif_fix_cert_completion_date() {
+        $this->resetAfterTest(true);
+
+        // Case 1: Certification uses completion date method.
+        $settings = array(
+            'cert_activeperiod' => '100 day',
+            'cert_windowperiod' => '20 day',
+            'cert_recertifydatetype' => CERTIFRECERT_COMPLETION,
+        );
+        $cert = $this->getDataGenerator()->create_certification($settings);
+
+        // Expected record is certified, before window opens.
+        $testcertcompletion = new stdClass();
+        $testcertcompletion->id = 1001;
+        $testcertcompletion->certifid = $cert->certifid;
+        $testcertcompletion->userid = 1003;
+        $testcertcompletion->certifpath = CERTIFPATH_RECERT;
+        $testcertcompletion->status = CERTIFSTATUS_COMPLETED;
+        $testcertcompletion->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $testcertcompletion->timecompleted = 1004;
+        $testcertcompletion->timewindowopens = 1005;
+        $testcertcompletion->timeexpires = 1006;
+
+        $testprogcompletion = new stdClass();
+        $testprogcompletion->id = 1007;
+        $testprogcompletion->programid = 1008;
+        $testprogcompletion->userid = 1003;
+        $testprogcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $testprogcompletion->timestarted = 1009;
+        $testprogcompletion->timedue = 1006;
+        $testprogcompletion->timecompleted = 123456; // Cert dates will be based off this.
+
+        $expectedcertcompletion = new stdClass();
+        $expectedcertcompletion->id = 1001;
+        $expectedcertcompletion->certifid = $cert->certifid;
+        $expectedcertcompletion->userid = 1003;
+        $expectedcertcompletion->certifpath = CERTIFPATH_RECERT;
+        $expectedcertcompletion->status = CERTIFSTATUS_COMPLETED;
+        $expectedcertcompletion->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $expectedcertcompletion->timecompleted = $testprogcompletion->timecompleted;
+        $expectedcertcompletion->timeexpires = $testprogcompletion->timecompleted + DAYSECS * 100;
+        $expectedcertcompletion->timewindowopens = $expectedcertcompletion->timeexpires - DAYSECS * 20;
+
+        $expectedprogcompletion = new stdClass();
+        $expectedprogcompletion->id = 1007;
+        $expectedprogcompletion->programid = 1008;
+        $expectedprogcompletion->userid = 1003;
+        $expectedprogcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $expectedprogcompletion->timestarted = 1009;
+        $expectedprogcompletion->timedue = $expectedcertcompletion->timeexpires;
+        $expectedprogcompletion->timecompleted = 123456;
+
+        // Check that the expected test data is in a valid state.
+        $errors = certif_get_completion_errors($expectedcertcompletion, $expectedprogcompletion);
+        $this->assertEquals(array(), $errors);
+
+        certif_fix_cert_completion_date($testcertcompletion, $testprogcompletion);
+
+        $this->assertEquals($expectedcertcompletion, $testcertcompletion);
+        $this->assertEquals($expectedprogcompletion, $testprogcompletion);
+
+        // Case 2: Certification uses expiry date method and program date is ok.
+        $settings = array(
+            'cert_activeperiod' => '100 day',
+            'cert_windowperiod' => '20 day',
+            'cert_recertifydatetype' => CERTIFRECERT_EXPIRY,
+        );
+        $cert = $this->getDataGenerator()->create_certification($settings);
+
+        $now = time(); // Arbitrary base time.
+
+        // Expected record is certified, before window opens.
+        $testcertcompletion = new stdClass();
+        $testcertcompletion->id = 1001;
+        $testcertcompletion->certifid = $cert->certifid;
+        $testcertcompletion->userid = 1003;
+        $testcertcompletion->certifpath = CERTIFPATH_RECERT;
+        $testcertcompletion->status = CERTIFSTATUS_COMPLETED;
+        $testcertcompletion->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $testcertcompletion->timecompleted = $now;
+        $testcertcompletion->timeexpires = $testcertcompletion->timecompleted + DAYSECS * 100;
+        $testcertcompletion->timewindowopens = $testcertcompletion->timeexpires - DAYSECS * 20;
+
+        $testprogcompletion = new stdClass();
+        $testprogcompletion->id = 1007;
+        $testprogcompletion->programid = 1008;
+        $testprogcompletion->userid = 1003;
+        $testprogcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $testprogcompletion->timestarted = 1009;
+        $testprogcompletion->timedue = $testcertcompletion->timeexpires;
+        $testprogcompletion->timecompleted = $now - DAYSECS * 10; // Prog completion date is 10 days before cert.
+
+        $expectedcertcompletion = clone($testcertcompletion);
+        $expectedprogcompletion = clone($testprogcompletion);
+        $expectedcertcompletion->timecompleted = $testprogcompletion->timecompleted; // The only change.
+
+        // Check that the expected test data is in a valid state.
+        $errors = certif_get_completion_errors($expectedcertcompletion, $expectedprogcompletion);
+        $this->assertEquals(array(), $errors);
+
+        certif_fix_cert_completion_date($testcertcompletion, $testprogcompletion);
+
+        $this->assertEquals($expectedcertcompletion, $testcertcompletion);
+        $this->assertEquals($expectedprogcompletion, $testprogcompletion);
+
+        // Check that the expected test data is in a valid state.
+        $errors = certif_get_completion_errors($expectedcertcompletion, $expectedprogcompletion);
+        $this->assertEquals(array(), $errors);
+
+        certif_fix_cert_completion_date($testcertcompletion, $testprogcompletion);
+
+        $this->assertEquals($expectedcertcompletion, $testcertcompletion);
+        $this->assertEquals($expectedprogcompletion, $testprogcompletion);
+
+        // Case 3: Certification uses expiry date method and program date is after window open date, so results in error.
+        $settings = array(
+            'cert_activeperiod' => '100 day',
+            'cert_windowperiod' => '20 day',
+            'cert_recertifydatetype' => CERTIFRECERT_EXPIRY,
+        );
+        $cert = $this->getDataGenerator()->create_certification($settings);
+
+        $now = time(); // Arbitrary base time.
+
+        // Expected record is certified, before window opens.
+        $testcertcompletion = new stdClass();
+        $testcertcompletion->id = 1001;
+        $testcertcompletion->certifid = $cert->certifid;
+        $testcertcompletion->userid = 1003;
+        $testcertcompletion->certifpath = CERTIFPATH_RECERT;
+        $testcertcompletion->status = CERTIFSTATUS_COMPLETED;
+        $testcertcompletion->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+        $testcertcompletion->timecompleted = $now;
+        $testcertcompletion->timeexpires = $testcertcompletion->timecompleted + DAYSECS * 100;
+        $testcertcompletion->timewindowopens = $testcertcompletion->timeexpires - DAYSECS * 20;
+
+        $testprogcompletion = new stdClass();
+        $testprogcompletion->id = 1007;
+        $testprogcompletion->programid = 1008;
+        $testprogcompletion->userid = 1003;
+        $testprogcompletion->status = STATUS_PROGRAM_COMPLETE;
+        $testprogcompletion->timestarted = 1009;
+        $testprogcompletion->timedue = $testcertcompletion->timeexpires;
+        $testprogcompletion->timecompleted = $now + DAYSECS * 90; // Prog completion date is after window open date.
+
+        $expectedcertcompletion = clone($testcertcompletion);
+        $expectedprogcompletion = clone($testprogcompletion);
+        $expectedcertcompletion->timecompleted = $testprogcompletion->timecompleted; // The only change.
+
+        // Check that the expected test data is in a INVALID state, specifically the completion/window open dates don't match.
+        $errors = certif_get_completion_errors($expectedcertcompletion, $expectedprogcompletion);
+        $this->assertEquals(array('error:statecertified-timewindowopenstimecompletednotordered' => 'timewindowopens'), $errors);
+
+        certif_fix_cert_completion_date($testcertcompletion, $testprogcompletion);
+
+        $this->assertEquals($expectedcertcompletion, $testcertcompletion);
+        $this->assertEquals($expectedprogcompletion, $testprogcompletion);
+    }
+
+    /**
      * Test certif_fix_prog_completion_date. Set the program completion date to match certification completion date.
      */
     public function test_certif_fix_prog_completion_date() {
