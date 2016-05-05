@@ -397,6 +397,7 @@ $string['grademethod_help'] = 'When multiple attempts are allowed, the following
 * Average (mean) grade of all attempts
 * First attempt (all other attempts are ignored)
 * Last attempt (all other attempts are ignored)';
+$string['gradepassrequiredforcompletion'] = '\'Grade to pass\' must be greater than 0 when \'Require passing grade\' activity completion setting is enabled.';
 $string['gradesdeleted'] = 'Quiz grades deleted';
 $string['gradesofar'] = '{$a->method}: {$a->mygrade} / {$a->quizgrade}.';
 $string['gradingdetails'] = 'Marks for this submission: {$a->raw}/{$a->max}.';
