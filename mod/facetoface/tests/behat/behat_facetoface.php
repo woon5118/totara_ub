@@ -184,4 +184,19 @@ class behat_facetoface extends behat_base {
             new Given('I click on "input[value=\'2\']" "css_element" in the "'.$user.'" "table_row"')
         );
     }
+
+    /**
+     * Use magic to alter facetoface cut off to value which is not allowed in UI so that we do not have to wait in tests.
+     *
+     * @Given /^I use magic to set Face-to-Face "([^"]*)" to send capacity notification two days ahead$/
+     */
+    public function i_use_magic_to_set_facetoface_cutoff_one_day_back($facetofacename) {
+        global $DB;
+
+        $facetoface = $DB->get_record('facetoface', array('name' => $facetofacename), '*', MUST_EXIST);
+        $session = $DB->get_record('facetoface_sessions', array('facetoface' => $facetoface->id), '*', MUST_EXIST);
+        $session->sendcapacityemail = 1;
+        $session->cutoff = DAYSECS * 2;
+        $DB->update_record('facetoface_sessions', $session);
+    }
 }
