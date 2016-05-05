@@ -466,6 +466,20 @@ class manager {
         $params = array('timestart1' => $timestart, 'timestart2' => $timestart);
         $records = $DB->get_records_select('task_scheduled', $where, $params);
 
+        if (defined('BEHAT_SITE_RUNNING') and BEHAT_SITE_RUNNING) {
+            // Totara: implementation of proper scheduled task execution from behat, see behat_tool_task::i_run_the_scheduled_task().
+            $behattask = optional_param('behat_task', false, PARAM_RAW);
+            if ($behattask !== false) {
+                static $alreadyexecuted = false;
+                if ($alreadyexecuted) {
+                    $records = array();
+                } else {
+                    $alreadyexecuted = true;
+                    $records = $DB->get_records('task_scheduled', array('classname' => '\\' . $behattask));
+                }
+            }
+        }
+
         $pluginmanager = \core_plugin_manager::instance();
 
         foreach ($records as $record) {

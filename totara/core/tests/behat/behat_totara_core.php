@@ -309,20 +309,4 @@ class behat_totara_core extends behat_base {
 
         return true;
     }
-
-    /**
-     * Run the specified scheduled task.
-     * You need to specify the class name, as shown in Site administration -> Server -> Scheduled tasks.
-     *
-     * @Then /^I run the "([^"]*)" task$/
-     */
-    public function i_run_the_task($taskname) {
-        if (!$task = \core\task\manager::get_scheduled_task($taskname)) {
-            throw new \Behat\Mink\Exception\ExpectationException('Task "' . $taskname . '" not found', $this->getSession());
-        }
-        // No console output in behat!
-        ob_start();
-        $task->execute();
-        ob_end_clean();
-    }
 }

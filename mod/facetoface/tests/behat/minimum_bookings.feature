@@ -103,9 +103,7 @@ Feature: Minimum Face-to-face bookings
     And I click on "Continue" "button"
     And I click on "Confirm" "button"
     And I should see "Bulk add attendees success"
-    And I trigger cron
-    And I should see "Execute scheduled task: Send facetoface notifications (mod_facetoface\task\send_notifications_task)"
-    And I am on homepage
+    And I run the scheduled task "mod_facetoface\task\send_notifications_task"
 
     # Confirm that the alert was sent.
     And I log out
