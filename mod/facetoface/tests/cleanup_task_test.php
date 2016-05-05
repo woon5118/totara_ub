@@ -75,7 +75,9 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         $facetoface = $facetofacegenerator->create_instance(['course' => $course1->id, 'usercalentry' => false]);
         $room1 = $facetofacegenerator->add_custom_room(['timecreated' => $time - ($day * 1.1)]);
         $room2 = $facetofacegenerator->add_custom_room(['timecreated' => $time - ($day * 1.1)]);
-        $sessionid = $facetofacegenerator->add_session([
+        $room3 = $facetofacegenerator->add_site_wide_room(['timecreated' => $time - ($day * 1.1)]);
+        $room4 = $facetofacegenerator->add_site_wide_room(['timecreated' => $time - ($day * 1.1)]);
+        $session1id = $facetofacegenerator->add_session([
             'facetoface' => $facetoface->id,
             'sessiondates' => [
                 (object)[
@@ -86,17 +88,44 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
                 ]
             ]
         ]);
-        $session = facetoface_get_session($sessionid);
+        $session1 = facetoface_get_session($session1id);
 
+        $session2id = $facetofacegenerator->add_session([
+            'facetoface' => $facetoface->id,
+            'sessiondates' => [
+                (object)[
+                    'timestart' => $time + ($day / 24) * 36,
+                    'timefinish' => $time + ($day / 24) * 38,
+                    'sessiontimezone' => 'Pacific/Auckland',
+                    'roomid' => $room3->id
+                ]
+            ]
+        ]);
+        $session2 = facetoface_get_session($session2id);
+
+        // Sign the users up to the first session.
         $sink = $this->redirectMessages();
-        facetoface_user_signup($session, $facetoface, $course1, 'discountcode1', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $user2->id, false, $user1);
-        facetoface_user_signup($session, $facetoface, $course1, 'discountcode1', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $user3->id, false, $user1);
-        facetoface_user_signup($session, $facetoface, $course1, 'discountcode1', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $user4->id, false, $user1);
+        facetoface_user_signup($session1, $facetoface, $course1, 'discountcode1', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $user2->id, false, $user1);
+        facetoface_user_signup($session1, $facetoface, $course1, 'discountcode1', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $user3->id, false, $user1);
+        facetoface_user_signup($session1, $facetoface, $course1, 'discountcode1', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $user4->id, false, $user1);
         $this->assertSame(3, $sink->count());
         $sink->clear();
 
-        $this->assertCount(3, facetoface_get_users_by_status($session->id, MDL_F2F_STATUS_BOOKED));
-        $this->assertCount(0, facetoface_get_users_by_status($session->id, MDL_F2F_STATUS_USER_CANCELLED));
+        // Now sign them up to the second session.
+        $sink = $this->redirectMessages();
+        facetoface_user_signup($session2, $facetoface, $course1, 'discountcode1', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $user2->id, false, $user1);
+        facetoface_user_signup($session2, $facetoface, $course1, 'discountcode1', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $user3->id, false, $user1);
+        facetoface_user_signup($session2, $facetoface, $course1, 'discountcode1', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $user4->id, false, $user1);
+        $this->assertSame(3, $sink->count());
+        $sink->clear();
+
+        // Confirm the signups for session 1.
+        $this->assertCount(3, facetoface_get_users_by_status($session1->id, MDL_F2F_STATUS_BOOKED));
+        $this->assertCount(0, facetoface_get_users_by_status($session1->id, MDL_F2F_STATUS_USER_CANCELLED));
+
+        // Confirm the signups for session 2.
+        $this->assertCount(3, facetoface_get_users_by_status($session2->id, MDL_F2F_STATUS_BOOKED));
+        $this->assertCount(0, facetoface_get_users_by_status($session2->id, MDL_F2F_STATUS_USER_CANCELLED));
 
         // Suspend user 3.
         $user3 = $DB->get_record('user', array('id'=>$user3->id, 'deleted'=>0), '*', MUST_EXIST);
@@ -105,45 +134,66 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
 
         // Delete user 4.
         delete_user($user4);
+
         // Why you may ask do we get this?
         // Because there are two events triggered here that lead to the user being cancelled.
         // 1. The user unenrolled event triggers cancellation.
         //    delete_user does this mid-way through.
         // 2. The user deleted event triggers cancellation.
         //    delete_user triggers this at the end of the function.
-        $this->assertDebuggingCalled('User status already changed to cancelled.');
+        $messages = $this->getDebuggingMessages();
+        $this->resetDebugging();
+        $this->assertCount(2, $messages);
+        foreach ($messages as $message) {
+            $this->assertSame('User status already changed to cancelled.', $message->message);
+        }
+
 
         // Check that both rooms still exist.
         $rooms = $DB->get_records('facetoface_room');
-        $this->assertCount(2, $rooms);
+        $this->assertCount(4, $rooms);
         $this->assertArrayHasKey($room1->id, $rooms);
         $this->assertArrayHasKey($room2->id, $rooms);
+        $this->assertArrayHasKey($room3->id, $rooms);
+        $this->assertArrayHasKey($room4->id, $rooms);
 
         // The deleted user will be automatically updated but the suspended user won't.
-        $this->assertCount(2, facetoface_get_users_by_status($session->id, MDL_F2F_STATUS_BOOKED));
-        $this->assertCount(1, facetoface_get_users_by_status($session->id, MDL_F2F_STATUS_USER_CANCELLED));
+        $this->assertCount(2, facetoface_get_users_by_status($session1->id, MDL_F2F_STATUS_BOOKED));
+        $this->assertCount(1, facetoface_get_users_by_status($session1->id, MDL_F2F_STATUS_USER_CANCELLED));
+        $this->assertCount(2, facetoface_get_users_by_status($session2->id, MDL_F2F_STATUS_BOOKED));
+        $this->assertCount(1, facetoface_get_users_by_status($session2->id, MDL_F2F_STATUS_USER_CANCELLED));
+
+        // Now cancel the second session.
+        facetoface_cancel_session($session2, false);
+
+        // This should have lead to all users in session 2 being marked as cancelled by session cancellation.
+        $this->assertCount(2, facetoface_get_users_by_status($session1->id, MDL_F2F_STATUS_BOOKED));
+        $this->assertCount(1, facetoface_get_users_by_status($session1->id, MDL_F2F_STATUS_USER_CANCELLED));
+        $this->assertCount(0, facetoface_get_users_by_status($session2->id, MDL_F2F_STATUS_BOOKED));
+        $this->assertCount(1, facetoface_get_users_by_status($session2->id, MDL_F2F_STATUS_USER_CANCELLED));
+        $this->assertCount(2, facetoface_get_users_by_status($session2->id, MDL_F2F_STATUS_SESSION_CANCELLED));
 
         // Run the cleanup task.
         $task = new \mod_facetoface\task\cleanup_task();
         $task->execute();
 
-        // Oh what they hell it happens again? why this time?
-        // @todo TL-8983 Bug!
-        // This one is a real bug, the cleanup task attempts to cancel all suspended/deleted users every time.
-        // even if they have previously been cancelled.
-        // We will test this again at the end.
-        $this->assertDebuggingCalled('User status already changed to cancelled.');
+        $this->assertDebuggingNotCalled('Cleanup task is zealously cancelling users. Fix it!');
 
-
-        // We should not have updated statuses.
-        $this->assertCount(1, facetoface_get_users_by_status($session->id, MDL_F2F_STATUS_BOOKED));
-        $this->assertCount(2, facetoface_get_users_by_status($session->id, MDL_F2F_STATUS_USER_CANCELLED));
+        // We should now have updated statuses for session 1.
+        $this->assertCount(1, facetoface_get_users_by_status($session1->id, MDL_F2F_STATUS_BOOKED));
+        $this->assertCount(2, facetoface_get_users_by_status($session1->id, MDL_F2F_STATUS_USER_CANCELLED));
+        // And nothing about session 2 should have changed.
+        $this->assertCount(0, facetoface_get_users_by_status($session2->id, MDL_F2F_STATUS_BOOKED));
+        $this->assertCount(1, facetoface_get_users_by_status($session2->id, MDL_F2F_STATUS_USER_CANCELLED));
+        $this->assertCount(2, facetoface_get_users_by_status($session2->id, MDL_F2F_STATUS_SESSION_CANCELLED));
 
         // Check that room1 has been deleted.
         $rooms = $DB->get_records('facetoface_room');
-        $this->assertCount(1, $rooms);
+        $this->assertCount(3, $rooms);
         $this->assertArrayNotHasKey($room1->id, $rooms);
         $this->assertArrayHasKey($room2->id, $rooms);
+        $this->assertArrayHasKey($room3->id, $rooms);
+        $this->assertArrayHasKey($room4->id, $rooms);
 
         $sink->close();
 
@@ -151,13 +201,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         $task = new \mod_facetoface\task\cleanup_task();
         $task->execute();
 
-        // @todo TL-8983: Yip this bug is still present, hoorah.
-        $messages = $this->getDebuggingMessages();
-        $this->resetDebugging();
-        $this->assertCount(2, $messages);
-        foreach ($messages as $message) {
-            $this->assertSame('User status already changed to cancelled.', $message->message);
-        }
+        $this->assertDebuggingNotCalled('Cleanup task is zealously cancelling users. Fix it!');
     }
 
 }

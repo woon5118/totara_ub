@@ -45,14 +45,23 @@ class cleanup_task extends \core\task\scheduled_task {
         require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 
         // Cancel sessions of all suspended or deleted users,
+        // who are not already cancelled.
         // this solves skipped events, direct db edits and upgrades.
 
-        $sql = "SELECT u.id, u.suspended, u.deleted, fs.sessionid
+        $sql = "SELECT u.id, u.suspended, u.deleted, fs.sessionid, fss.statuscode
                   FROM {user} u
                   JOIN {facetoface_signups} fs ON fs.userid = u.id
-                 WHERE u.deleted <> 0 OR u.suspended <> 0";
+                  JOIN {facetoface_signups_status} fss ON fss.signupid = fs.id
+                 WHERE (u.deleted <> 0 OR u.suspended <> 0)
+                   AND fss.superceded = 0
+                   AND fss.statuscode <> :usercancelled
+                   AND fss.statuscode <> :sessioncancelled";
+        $params = array(
+            'usercancelled' => MDL_F2F_STATUS_USER_CANCELLED,
+            'sessioncancelled' => MDL_F2F_STATUS_SESSION_CANCELLED
+        );
 
-        $rs = $DB->get_recordset_sql($sql);
+        $rs = $DB->get_recordset_sql($sql, $params);
 
         foreach ($rs as $user) {
             if ($user->deleted) {
