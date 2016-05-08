@@ -3595,5 +3595,8 @@ function prevent_form_autofill_password() {
     static $i = 0; // There may be more forms on one page, use something unique in each request.
     $i++;
     $id = 'autofill-prevention' . $i;
-    return '<div style="display: none;"><label for="' . $id . '">?</label><input id="' . $id. '" type="password" /></div>';
+    return '<div style="display: none;">' .
+        '<label for="txt-' . $id . '">?</label><input id="txt-' . $id. '" type="text" class="ignoredirty" />' .
+        '<label for="pw-' . $id . '">?</label><input id="pw-' . $id. '" type="password" class="ignoredirty" />' .
+        '</div>';
 }

@@ -57,9 +57,7 @@ class behat_forms extends behat_base {
      */
     public function press_button($button) {
         // Totara: use alias to "I click on" because we need to wait for page to load.
-        return array(
-            new Given('I click on "' . $button . '" "button"'),
-        );
+        $this->execute('behat_general::i_click_on', array($button, 'button'));
     }
 
     /**

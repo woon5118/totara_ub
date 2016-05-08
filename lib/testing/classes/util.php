@@ -788,20 +788,28 @@ abstract class testing_util {
      * @return string The site info
      */
     public static function get_site_info() {
-        global $CFG, $TOTARA;
+        global $CFG;
 
         $output = '';
 
         // All developers have to understand English, do not localise!
+        $env = self::get_environment();
 
-        $release = null;
-        require("$CFG->dirroot/version.php");
-
-        $output .= "Totara $TOTARA->release, $CFG->dbtype";
+        $output .= "Totara ".$env['totararelease'];
         if ($hash = self::get_git_hash()) {
             $output .= ", $hash";
         }
         $output .= "\n";
+
+        // Add php version.
+        require_once($CFG->libdir.'/environmentlib.php');
+        $output .= "PHP: ". normalize_version($env['phpversion']);
+
+        // Add database type and version.
+        $output .= ", " . $env['dbtype'] . ": " . $env['dbversion'];
+
+        // OS details.
+        $output .= ", OS: " . $env['os'] . "\n";
 
         return $output;
     }
@@ -984,5 +992,46 @@ abstract class testing_util {
             fwrite($fp, json_encode(array_values($listfiles)));
             fclose($fp);
         }
+    }
+
+    /**
+     * Return list of environment versions on which tests will run.
+     * Environment includes:
+     * - moodleversion
+     * - phpversion
+     * - dbtype
+     * - dbversion
+     * - os
+     *
+     * @return array
+     */
+    public static function get_environment() {
+        global $CFG, $DB;
+
+        $env = array();
+
+        // Add moodle version.
+        $release = null;
+        $TOTARA = null;
+        require("$CFG->dirroot/version.php");
+        $env['moodleversion'] = $release;
+        $env['totararelease'] = $TOTARA->release;
+
+        // Add php version.
+        $phpversion = phpversion();
+        $env['phpversion'] = $phpversion;
+
+        // Add database type and version.
+        $dbtype = $DB->get_dbvendor();
+        $dbinfo = $DB->get_server_info();
+        $dbversion = $dbinfo['version'];
+        $env['dbtype'] = $dbtype; // Totara: No case magic here!!!
+        $env['dbversion'] = $dbversion;
+
+        // OS details.
+        $osdetails = php_uname('s') . " " . php_uname('r') . " " . php_uname('m');
+        $env['os'] = $osdetails;
+
+        return $env;
     }
 }

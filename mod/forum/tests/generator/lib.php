@@ -218,7 +218,9 @@ class mod_forum_generator extends testing_module_generator {
         }
 
         // Totara: include extra fields.
-        return $DB->get_record('forum_discussions', array('id' => $record->id));
+        $result = $DB->get_record('forum_discussions', array('id' => $record->id));
+        $result->subject = $record->subject;
+        return $result;
     }
 
     /**

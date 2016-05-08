@@ -38,26 +38,37 @@ require_once($CFG->libdir . '/formslib.php');
 class question_import_form extends moodleform {
 
     protected function definition() {
-        global $COURSE, $OUTPUT;
+        global $OUTPUT;
+
         $mform = $this->_form;
 
         $defaultcategory = $this->_customdata['defaultcategory'];
         $contexts = $this->_customdata['contexts'];
 
         // Choice of import format, with help icons.
+        $mform->addElement('header', 'fileformat', get_string('fileformat', 'question'));
+
         $fileformatnames = get_import_export_formats('import');
         $radioarray = array();
+        $separators = array();
         foreach ($fileformatnames as $shortname => $fileformatname) {
-            $help = '';
+            $radioarray[] = $mform->createElement('radio', 'format', '', $fileformatname, $shortname);
+
+            $separator = '';
             if (get_string_manager()->string_exists('pluginname_help', 'qformat_' . $shortname)) {
-                $help = $OUTPUT->help_icon('pluginname', 'qformat_' . $shortname);
+                $separator .= $OUTPUT->help_icon('pluginname', 'qformat_' . $shortname);
             }
-            $radioelement[] = $mform->createElement('radio', 'format', '', $fileformatname . $help, $shortname);
+            $separator .= '<br>';
+            $separators[] = $separator;
         }
-        $mform->addGroup($radioelement, "format", get_string('fileformat', 'question'), array('<br />'), false);
-        $mform->addRule("format", null, 'required', null, 'client');
+
+        $radioarray[] = $mform->createElement('static', 'makelasthelpiconshowup', '');
+        $mform->addGroup($radioarray, "formatchoices", '', $separators, false);
+        $mform->addRule("formatchoices", null, 'required', null, 'client');
 
         // Import options.
+        $mform->addElement('header','general', get_string('general', 'form'));
+
         $mform->addElement('questioncategory', 'category', get_string('importcategory', 'question'), compact('contexts'));
         $mform->setDefault('category', $defaultcategory);
         $mform->addHelpButton('category', 'importcategory', 'question');
