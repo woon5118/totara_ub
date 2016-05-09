@@ -195,6 +195,12 @@ class behat_general extends behat_base {
         $this->getSession()->evaluateScript(
                 'if (window.name == "") window.name = "' . self::MAIN_WINDOW_NAME . '"');
 
+        // Totara: do not rely on tags, force browser restart here!
+        behat_hooks::$forcerestart = true;
+
+        // Totara: this sleep is mega super important, if we do not do it Chrome may get stuck randomly!
+        sleep(1);
+
         $this->getSession()->switchToWindow($windowname);
     }
 

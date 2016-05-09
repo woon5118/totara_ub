@@ -59,6 +59,9 @@ use Behat\Behat\Event\SuiteEvent as SuiteEvent,
  */
 class behat_hooks extends behat_base {
 
+    /** @var bool Totara: Force restart before the next scenario */
+    public static $forcerestart = false;
+
     /**
      * @var Last browser session start time.
      */
@@ -68,16 +71,6 @@ class behat_hooks extends behat_base {
      * @var For actions that should only run once.
      */
     protected static $initprocessesfinished = false;
-
-    /**
-     * Some exceptions can only be caught in a before or after step hook,
-     * they can not be thrown there as they will provoke a framework level
-     * failure, but we can store them here to fail the step in i_look_for_exceptions()
-     * which result will be parsed by the framework as the last step result.
-     *
-     * @var Null or the exception last step throw in the before or after hook.
-     */
-    protected static $currentstepexception = null;
 
     /**
      * If we are saving any kind of dump on failure we should use the same parent dir during a run.
@@ -234,19 +227,52 @@ class behat_hooks extends behat_base {
             throw new coding_exception('Behat only can modify the test database and the test dataroot!');
         }
 
+        // Totara: Reset the browser if specified in config.php before we do anything.
+        if (!empty($CFG->behat_restart_browser_after)) {
+            if (self::$lastbrowsersessionstart + $CFG->behat_restart_browser_after < time()) {
+                self::$forcerestart = true;
+            }
+        }
+
+        // Totara: use any means to get things back up and running after any problems, browser restart should do the trick.
+        if (self::$forcerestart) {
+            for ($count = 0; $count < 3; $count++) {
+                try {
+                    $this->getMink()->stopSessions();
+                    break;
+                } catch (Exception $e) {
+                    sleep(6);
+                }
+            }
+            self::$forcerestart = false;
+            self::$lastbrowsersessionstart = time();
+        }
+
         $moreinfo = 'More info in ' . behat_command::DOCS_URL . '#Running_tests';
         $driverexceptionmsg = 'Selenium server is not running, you need to start it to run tests that involve Javascript. ' . $moreinfo;
         try {
-            $session = $this->getSession();
+            try {
+                $session = $this->getSession();
+            } catch (Exception $e) {
+                // Totara: Let's try restarting the driver again, maybe this time it will work.
+                try {
+                    $this->getMink()->stopSessions();
+                } catch (Exception $e) {
+                }
+                sleep(6);
+                $session = $this->getSession();
+            }
         } catch (CurlExec $e) {
             // Exception thrown by WebDriver, so only @javascript tests will be caugth; in
             // behat_util::check_server_status() we already checked that the server is running.
-            throw new Exception($driverexceptionmsg);
+            throw new Exception($driverexceptionmsg, 0, $e);
         } catch (DriverException $e) {
-            throw new Exception($driverexceptionmsg);
+            throw new Exception($driverexceptionmsg, 0, $e);
         } catch (UnknownError $e) {
             // Generic 'I have no idea' Selenium error. Custom exception to provide more feedback about possible solutions.
             $this->throw_unknown_exception($e);
+        } catch (Exception $e) {
+            throw new Exception(get_string('unknownexceptioninfo', 'tool_behat'), 0, $e);
         }
 
 
@@ -257,7 +283,19 @@ class behat_hooks extends behat_base {
         }
 
         // Reset mink session between the scenarios.
-        $session->reset();
+        try {
+            $session->reset();
+        } catch (Exception $e) {
+            // Totara: This point is reached when Chrome driver freezes, let's gite it one more kick.
+            try {
+                sleep(5);
+                $session->restart();
+                sleep(5);
+                $session->reset();
+            } catch (Exception $e) {
+                throw new Exception('Resetting of Mink session failed', 0, $e);
+            }
+        }
 
         // Reset $SESSION.
         \core\session\manager::init_empty_session();
@@ -268,21 +306,19 @@ class behat_hooks extends behat_base {
         $user = $DB->get_record('user', array('username' => 'admin'));
         \core\session\manager::set_user($user);
 
-        // Reset the browser if specified in config.php.
-        if (!empty($CFG->behat_restart_browser_after) && $this->running_javascript()) {
-            $now = time();
-            if (self::$lastbrowsersessionstart + $CFG->behat_restart_browser_after < $now) {
-                $session->restart();
-                self::$lastbrowsersessionstart = $now;
-            }
-        }
-
         // Start always in the the homepage.
         try {
             // Let's be conservative as we never know when new upstream issues will affect us.
             $session->visit($this->locate_path('/'));
-        } catch (UnknownError $e) {
-            $this->throw_unknown_exception($e);
+        } catch (Exception $e) {
+            // Totara: Something weird is going on, wait a bit and retry before stopping the whole run.
+            try {
+                $session->restart();
+                sleep(5);
+                $session->visit($this->locate_path('/'));
+            } catch (Exception $e) {
+                throw new Exception('Visiting of the main page failed', 0, $e);
+            }
         }
 
         raise_memory_limit(MEMORY_EXTRA); // Totara includes very many files.
@@ -295,29 +331,35 @@ class behat_hooks extends behat_base {
             self::$initprocessesfinished = true;
         }
         // Run all test with medium (1024x768) screen size, to avoid responsive problems.
-        $this->resize_window('medium');
+        try {
+            $this->resize_window('medium');
+        } catch (Exception $e) {
+            throw new Exception('Error resizing the main page', 0, $e);
+        }
+
+        try {
+            $this->wait_for_pending_js();
+        } catch (Exception $e) {
+            try {
+                sleep(5);
+                $session->visit($this->locate_path('/'));
+                sleep(2);
+                $this->wait_for_pending_js();
+            } catch (Exception $e) {
+                throw new Exception('Main JS page not initialied properly', 0, $e);
+            }
+        }
     }
 
     /**
-     * Wait for JS to complete before beginning interacting with the DOM.
-     *
-     * Executed only when running against a real browser. We wrap it
-     * all in a try & catch to forward the exception to i_look_for_exceptions
-     * so the exception will be at scenario level, which causes a failure, by
-     * default would be at framework level, which will stop the execution of
-     * the run.
+     * Totara: nothing to do
      *
      * @param StepEvent $event event fired before step.
      * @BeforeStep @javascript
      */
     public function before_step_javascript(StepEvent $event) {
-
-        try {
-            $this->wait_for_pending_js();
-            self::$currentstepexception = null;
-        } catch (Exception $e) {
-            self::$currentstepexception = $e;
-        }
+        // Totara: we do not know if the previous step failed or not,
+        //         doing JS stuff makes no sense, do it after the step when we know the result!
     }
 
     /**
@@ -344,22 +386,17 @@ class behat_hooks extends behat_base {
             $this->take_screenshot($event);
         }
 
-        try {
-            $this->wait_for_pending_js();
-            self::$currentstepexception = null;
-        } catch (UnexpectedAlertOpen $e) {
-            self::$currentstepexception = $e;
-
-            // Accepting the alert so the framework can continue properly running
-            // the following scenarios. Some browsers already closes the alert, so
-            // wrapping in a try & catch.
+        // Totara: do not try to wait for anything here if not success, we are going to
+        //         restart the browser anyway to make sure there are no leftovers.
+        if ($event->getResult() === StepEvent::PASSED) {
             try {
-                $this->getSession()->getDriver()->getWebDriverSession()->accept_alert();
+                $this->wait_for_pending_js();
             } catch (Exception $e) {
-                // Catching the generic one as we never know how drivers reacts here.
+                // If there is any problem the next step will fail
+                // and we will restart the browser afterwards.
+                // Do NOT close any alerts here, we want to know when stuff goes wrong!
+                behat_hooks::$forcerestart = true;
             }
-        } catch (Exception $e) {
-            self::$currentstepexception = $e;
         }
     }
 
@@ -373,6 +410,13 @@ class behat_hooks extends behat_base {
      */
     public function after_step(StepEvent $event) {
         global $CFG, $DB;
+
+        // Totara: better restart browser after any failure to prevent cascading problems.
+        if ($event->getResult() === StepEvent::FAILED) {
+            self::$forcerestart = true;
+        } else if ($event->getResult() === StepEvent::UNDEFINED) {
+            self::$forcerestart = true;
+        }
 
         // Save the page content if the step failed.
         if (!empty($CFG->behat_faildump_path) &&
@@ -391,25 +435,13 @@ class behat_hooks extends behat_base {
     }
 
     /**
-     * Executed after scenario having switch window to restart session.
-     * This is needed to close all extra browser windows and starting
-     * one browser window.
+     * Totara: nothing to do
      *
      * @param ScenarioEvent $event event fired after scenario.
      * @AfterScenario @_switch_window
      */
     public function after_scenario_switchwindow(ScenarioEvent $event) {
-        for ($count = 0; $count < self::EXTENDED_TIMEOUT; $count) {
-            try {
-                $this->getSession()->restart();
-                break;
-            } catch (DriverException $e) {
-                // Wait for timeout and try again.
-                sleep(self::TIMEOUT);
-            }
-        }
-        // If session is not restarted above then it will try to start session before next scenario
-        // and if that fails then exception will be thrown.
+        // Totara: let's use our own session restart tricks in the switch_to_window() step itself.
     }
 
     /**
@@ -434,7 +466,11 @@ class behat_hooks extends behat_base {
         }
 
         list ($dir, $filename) = $this->get_faildump_filename($event, 'png');
-        $this->saveScreenshot($filename, $dir);
+        try {
+            $this->saveScreenshot($filename, $dir);
+        } catch (Exception $e) {
+            // Totara: this must not throw exception!!!
+        }
         // Totara: fix new file permissions!
         global $CFG;
         @chmod($dir . DIRECTORY_SEPARATOR . $filename, $CFG->filepermissions);
@@ -450,7 +486,12 @@ class behat_hooks extends behat_base {
         list ($dir, $filename) = $this->get_faildump_filename($event, 'html');
 
         $fh = fopen($dir . DIRECTORY_SEPARATOR . $filename, 'w');
-        fwrite($fh, $this->getSession()->getPage()->getContent());
+        try {
+            fwrite($fh, $this->getSession()->getPage()->getContent());
+        } catch (Exception $e) {
+            // Totara: this must not throw exception!!!
+            fwrite($fh, $e->getMessage() . "\n" . $e->getTraceAsString());
+        }
         fclose($fh);
         // Totara: fix new file permissions!
         global $CFG;
@@ -507,11 +548,6 @@ class behat_hooks extends behat_base {
      */
     public function i_look_for_exceptions() {
 
-        // If the step already failed in a hook throw the exception.
-        if (!is_null(self::$currentstepexception)) {
-            throw self::$currentstepexception;
-        }
-
         // Look for exceptions displayed on page.
         $this->look_for_exceptions();
 
@@ -535,7 +571,7 @@ class behat_hooks extends behat_base {
      */
     protected function throw_unknown_exception(UnknownError $exception) {
         $text = get_string('unknownexceptioninfo', 'tool_behat');
-        throw new Exception($text . PHP_EOL . $exception->getMessage());
+        throw new Exception($text . PHP_EOL . $exception->getMessage(), 0, $exception);
     }
 
 }

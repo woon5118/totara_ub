@@ -238,11 +238,8 @@ class behat_navigation extends behat_base {
         // should follow it, so all the lower-level nodes are available.
         if (!$this->running_javascript()) {
             if ($parentnodes[0] === $siteadminstr) {
-                // We don't know if there if Site admin is already expanded so
-                // don't wait, it is non-JS and we already waited for the DOM.
-                if ($siteadminlink = $this->getSession()->getPage()->find('named', array('link', "'" . $siteadminstr . "'"))) {
-                    $siteadminlink->click();
-                }
+                // Totara: we need to go to admin page to see full admin tree.
+                $this->getSession()->visit($this->locate_path('admin/index.php?cache=1'));
             }
         }
 

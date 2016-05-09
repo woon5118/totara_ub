@@ -29,9 +29,13 @@ Feature: Users can view and search database entries
     And I add an entry to "Test database name" database with:
       | Test field name | Teacher entry 1 |
     And I press "Save and add another"
+    # Totara: we need different timestamp here
+    And I force sleep "1" seconds
     And I add an entry to "Test database name" database with:
       | Test field name | Teacher entry 2 |
     And I press "Save and add another"
+    # Totara: we need different timestamp here
+    And I force sleep "1" seconds
     And I add an entry to "Test database name" database with:
       | Test field name | Teacher entry 3 |
     And I press "Save and view"

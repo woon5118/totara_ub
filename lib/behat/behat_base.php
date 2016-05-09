@@ -30,7 +30,9 @@
 
 use Behat\Mink\Exception\ExpectationException as ExpectationException,
     Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException,
-    Behat\Mink\Element\NodeElement as NodeElement;
+    Behat\Mink\Element\NodeElement as NodeElement,
+    WebDriver\Exception\UnknownError,
+    WebDriver\Exception\NoSuchWindow;
 
 /**
  * Steps definitions base class.
@@ -302,12 +304,28 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
             $loops = $timeout;
         }
 
+        // Totara: this is the start for timeout calculation.
+        $start = time();
+
         // DOM will never change on non-javascript case; do not wait or try again.
         if (!$this->running_javascript()) {
             $loops = 1;
         }
 
         for ($i = 0; $i < $loops; $i++) {
+            // Totara: run at least once, but then use the total time spent here for timeout calculation.
+            if ($i != 0) {
+                if ($start + $timeout < time()) {
+                    break;
+                }
+                if ($microsleep) {
+                    // Sleep for 0.1 seconds only.
+                    usleep(100000);
+                } else {
+                    sleep(1);
+                }
+            }
+
             // We catch the exception thrown by the step definition to execute it again.
             try {
                 // We don't check with !== because most of the time closures will return
@@ -323,14 +341,6 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                 }
                 // We wait until no exception is thrown or timeout expires.
                 continue;
-            }
-
-            if ($this->running_javascript()) {
-                if ($microsleep) {
-                    usleep(100000);
-                } else {
-                    sleep(1);
-                }
             }
         }
 
@@ -665,9 +675,21 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         if (!$this->running_javascript()) {
             return;
         }
+
+        // Totara: this is the start for timeout calculations.
+        $start = time();
+
         // We don't use behat_base::spin() here as we don't want to end up with an exception
         // if the page & JSs don't finish loading properly.
         for ($i = 0; $i < self::EXTENDED_TIMEOUT * 10; $i++) {
+            if ($i != 0) {
+                if ($start + self::EXTENDED_TIMEOUT < time()) {
+                    // We have waited long enough, throw exception.
+                    break;
+                }
+                // Sleep for 0.1 seconds only.
+                usleep(100000);
+            }
             $pending = '';
             try {
                 $jscode = '
@@ -687,6 +709,9 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                         }
                     }();';
                 $pending = $this->getSession()->evaluateScript($jscode);
+            } catch (WebDriver\Exception\ScriptTimeout $e) {
+                // Totara: this is a common problem in Chrome, the JS just stops executing with long timeouts.
+                $pending = 'timeout';
             } catch (NoSuchWindow $nsw) {
                 // We catch an exception here, in case we just closed the window we were interacting with.
                 // No javascript is running if there is no window right?
@@ -701,10 +726,8 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
             if ($pending === '') {
                 return true;
             }
-            // 0.1 seconds.
-            usleep(100000);
         }
-        // Timeout waiting for JS to complete. It will be catched and forwarded to behat_hooks::i_look_for_exceptions().
+        // Timeout waiting for JS to complete.
         // It is unlikely that Javascript code of a page or an AJAX request needs more than self::EXTENDED_TIMEOUT seconds
         // to be loaded, although when pages contains Javascript errors M.util.js_complete() can not be executed, so the
         // number of JS pending code and JS completed code will not match and we will reach this point.
