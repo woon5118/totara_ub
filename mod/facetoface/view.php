@@ -64,6 +64,15 @@ $PAGE->set_context($context);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
 
+// Check for auto nofication duplicates.
+if (has_capability('moodle/course:manageactivities', $context)) {
+    require_once($CFG->dirroot.'/mod/facetoface/notification/lib.php');
+    if (facetoface_notification::has_auto_duplicates($facetoface->id)) {
+        $url = new moodle_url('/mod/facetoface/notification/index.php', array('update' => $cm->id));
+        totara_set_notification(get_string('notificationduplicatesfound', 'facetoface', $url->out()));
+    }
+}
+
 if (!empty($download)) {
     require_capability('mod/facetoface:viewattendees', $context);
     facetoface_download_attendance($facetoface->name, $facetoface->id, $location, $download);

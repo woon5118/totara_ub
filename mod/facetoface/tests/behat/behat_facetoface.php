@@ -199,4 +199,18 @@ class behat_facetoface extends behat_base {
         $session->cutoff = DAYSECS * 2;
         $DB->update_record('facetoface_sessions', $session);
     }
+
+    /**
+     * Make duplicates of notification title (in all seminar activities of all courses). Titles must match exactly.
+     *
+     * @Given /^I make duplicates of seminar notification "([^"]*)"$/
+     */
+    public function i_make_duplicates_of_seminar_notification($title) {
+        global $DB;
+        $notifications = $DB->get_records('facetoface_notification', array('title' => $title));
+        foreach ($notifications as $note) {
+            $note->id = null;
+            $DB->insert_record('facetoface_notification', $note);
+        }
+    }
 }

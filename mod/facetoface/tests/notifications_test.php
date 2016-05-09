@@ -969,4 +969,61 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         sort($oldnotifications);
         $this->assertEquals($expected, $oldnotifications);
     }
+
+    /**
+     * Check auto notifications duplicates recovery code
+     */
+    public function test_notification_duplicates() {
+        global $DB;
+        $sessionok = $this->f2f_generate_data(false);
+        $sessionbad = $session = $this->f2f_generate_data(false);
+
+        // Make duplicate.
+        $duplicate = $DB->get_record('facetoface_notification', array(
+            'facetofaceid' => $sessionbad->facetoface,
+            'type' => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
+        ));
+        $duplicate->id = null;
+        $DB->insert_record('facetoface_notification', $duplicate);
+
+        $noduplicate = $DB->get_record('facetoface_notification', array(
+            'facetofaceid' => $sessionok->facetoface,
+            'type' => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
+        ));
+        $noduplicate->id = null;
+        $noduplicate->type = 1;
+        $DB->insert_record('facetoface_notification', $noduplicate);
+
+        // Check duplicates detection.
+        $this->assertTrue(facetoface_notification::has_auto_duplicates($sessionbad->facetoface));
+        $this->assertFalse(facetoface_notification::has_auto_duplicates($sessionok->facetoface));
+
+        // Check that it will not fail when attempted to send duplicate.
+        $facetoface = $DB->get_record('facetoface', array('id' => $sessionbad->facetoface));
+        $course = $DB->get_record("course", array('id' => $facetoface->course));
+        $student = $this->getDataGenerator()->create_user();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, $studentrole->id);
+        facetoface_user_signup($session, $facetoface, $course, '', MDL_F2F_NOTIFICATION_AUTO, MDL_F2F_STATUS_BOOKED, $student->id);
+
+        facetoface_send_cancellation_notice($facetoface, $sessionbad, $student->id);
+        $this->assertDebuggingCalled();
+
+        // Check duplicates prevention.
+        $allbefore = $DB->get_records('facetoface_notification', array('facetofaceid' => $sessionok->facetoface));
+
+        $note = new facetoface_notification(array(
+            'facetofaceid'  => $sessionok->facetoface,
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
+        ));
+        $note->id = null;
+        $note->save();
+        $this->assertDebuggingCalled();
+
+        $allafter = $DB->get_records('facetoface_notification', array('facetofaceid' => $sessionok->facetoface));
+        $this->assertEquals(count($allbefore), count($allafter));
+    }
 }

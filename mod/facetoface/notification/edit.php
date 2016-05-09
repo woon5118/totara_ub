@@ -87,11 +87,10 @@ if ($id) {
 }
 
 // If duplicate, unset ID
-if ($duplicate) {
+if ($duplicate && $notification->type != MDL_F2F_NOTIFICATION_AUTO) {
     $id = 0;
     $notification->id = 0;
 }
-
 
 // Setup editors
 $editoroptions = array(

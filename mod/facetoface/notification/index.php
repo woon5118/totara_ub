@@ -63,6 +63,27 @@ $context = context_module::instance($cm->id);
 require_capability('moodle/course:manageactivities', $context);
 
 
+// Get all notifications.
+$notifications = $DB->get_records('facetoface_notification', array('facetofaceid' => $facetoface->id), 'title,type');
+
+// Count the number of system notifications by type.
+// We want to allow duplicate system notifications to be deleted.
+$autonotifications = array();
+$foundduplicates = false;
+foreach ($notifications as $note) {
+    if (!isset($autonotifications[$note->conditiontype])) {
+        $autonotifications[$note->conditiontype] = 0;
+    }
+    if ($note->type != MDL_F2F_NOTIFICATION_AUTO) {
+        continue;
+    }
+    $autonotifications[$note->conditiontype]++;
+
+    if ($autonotifications[$note->conditiontype] > 1) {
+        $foundduplicates = true;
+    }
+}
+
 // Check for actions
 if ($deactivate || $activate) {
     if (!confirm_sesskey()) {
@@ -92,10 +113,14 @@ if ($delete && $confirm) {
         print_error('error:notificationdoesnotexist', 'facetoface');
     }
 
-    // Delete the notification and associated sent and history records.
-    $notification->delete();
+    // If its not an auto notification OR if it is but there are duplicates allow the notification to be deleted.
+    if ($notification->type != MDL_F2F_NOTIFICATION_AUTO || $autonotifications[$notification->conditiontype] > 1) {
+        // Delete the notification and associated sent and history records.
+        $notification->delete();
+        totara_set_notification(get_string('notificationdeleted', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
+    }
 
-    totara_set_notification(get_string('notificationdeleted', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
+    totara_set_notification(get_string('error:notificationnonduplicate', 'facetoface'), $redirectto);
 }
 
 if ($restoredefaults && $confirm) {
@@ -130,18 +155,7 @@ if (($data = data_submitted()) && !empty($data->bulk_update)) {
     }
 
     if (in_array($data->bulk_update, array('set_active', 'set_inactive'))) {
-        // Perform bulk action
-        // Get all notifications
-        $notifications = $DB->get_records_sql(
-               'SELECT
-                    id,
-                    status
-                FROM
-                    {facetoface_notification}
-                WHERE
-                    facetofaceid = ?',
-                array($facetoface->id));
-
+        // Perform bulk action.
         if (!empty($notifications)) {
             $selected = facetoface_get_selected_report_items('notification', $update, $notifications);
 
@@ -159,6 +173,11 @@ if (($data = data_submitted()) && !empty($data->bulk_update)) {
 
 $streditinga = get_string('editinga', 'moodle', 'facetoface');
 $strmodulenameplural = get_string('modulenameplural', 'facetoface');
+
+if ($foundduplicates) {
+    $url = new moodle_url('/mod/facetoface/notification/index.php', array('update' => $cm->id));
+    totara_set_notification(get_string('notificationduplicatesfound', 'facetoface', $url->out()));
+}
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($streditinga);
@@ -209,9 +228,6 @@ $report_data = array(
     'facetofaceid'  => $facetoface->id
 );
 
-
-$notifications = $DB->get_records('facetoface_notification', array('facetofaceid' => $facetoface->id), 'title,type');
-
 echo $OUTPUT->heading_with_help($heading, 'notifications', 'facetoface');
 
 // Detect missing default notifications.
@@ -233,6 +249,7 @@ $str_active = get_string('setactive', 'facetoface');
 $str_inactive = get_string('setinactive', 'facetoface');
 $str_duplicate = get_string('duplicate');
 $str_delete = get_string('delete');
+$str_warn_icon = $OUTPUT->pix_icon('i/warning', get_string('notificationduplicatesmessage', 'facetoface'), 'moodle');
 
 $columns = array();
 $headers = array();
@@ -255,12 +272,14 @@ $table->define_headers($headers);
 $table->set_attribute('class', 'generalbox mod-facetoface-notification-list');
 $table->setup();
 
-
 foreach ($notifications as $note) {
     $row = array();
     $buttons = array();
 
-    $row[] = $note->title;
+    // If its not an auto notification OR if it is but there are duplicates allow the notification to be deleted.
+    $warn = ($note->type == MDL_F2F_NOTIFICATION_AUTO && $autonotifications[$note->conditiontype] > 1) ? $str_warn_icon : '';
+
+    $row[] = $warn . $note->title;
 
     // Create a notification object so we can figure out
     // the recipient string
@@ -309,7 +328,10 @@ foreach ($notifications as $note) {
 
     if ($note->type != MDL_F2F_NOTIFICATION_AUTO) {
         $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/edit.php', array('f' => $facetoface->id, 'id' => $note->id, 'duplicate' => '1')), new pix_icon('t/copy', $str_duplicate));
+    }
 
+    // If its not an auto notification OR if it is but there are duplicates allow the notification to be deleted.
+    if ($note->type != MDL_F2F_NOTIFICATION_AUTO || $autonotifications[$note->conditiontype] > 1) {
         $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/index.php', array('update' => $update, 'delete' => $note->id, 'sesskey' => sesskey())), new pix_icon('t/delete', $str_delete));
     }
 

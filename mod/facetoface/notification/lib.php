@@ -183,7 +183,7 @@ class facetoface_notification extends data_object {
      * @return  bool
      */
     public function save() {
-        global $USER;
+        global $USER, $DB;
 
         $no_zero = array('conditiontype', 'scheduleunit', 'scheduleamount', 'scheduletime');
         foreach ($no_zero as $nz) {
@@ -203,6 +203,19 @@ class facetoface_notification extends data_object {
         // Set up modification data
         $this->usermodified = $USER->id;
         $this->timemodified = time();
+
+        // Do not allow duplicates for auto notifications.
+        if (!$this->id && $this->type == MDL_F2F_NOTIFICATION_AUTO) {
+            $exist = $DB->get_record('facetoface_notification', array(
+                'facetofaceid' => $this->facetofaceid,
+                'type' => $this->type,
+                'conditiontype' => $this->conditiontype
+            ));
+            if ($exist) {
+                debugging("Attempted duplication of seminar auto notification", DEBUG_DEVELOPER);
+                $this->id = $exist->id;
+            }
+        }
 
         if ($this->id) {
             return $this->update();
@@ -1101,6 +1114,32 @@ class facetoface_notification extends data_object {
         }
         parent::set_properties($instance, $params);
     }
+
+    /**
+     * Return true if at least one notification has auto duplicate
+     * This should not normally happen, but in extremily rare cases clients can get their auto notifications duplicated in
+     * facetoface session. This is part of code that allows to deal with this situation.
+     *
+     * @param int $facetofaceid
+     */
+    public static function has_auto_duplicates($facetofaceid) {
+        global $DB;
+        $notifications = $DB->get_records('facetoface_notification', array(
+            'facetofaceid' => $facetofaceid,
+            'type' => MDL_F2F_NOTIFICATION_AUTO
+        ));
+
+        $list = array();
+        foreach ($notifications as $notification) {
+            if (!isset($list[$notification->conditiontype])) {
+                $list[$notification->conditiontype] = true;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 
@@ -1128,6 +1167,15 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
     $user = $DB->get_record('user', array('id' => $userid));
     if (!$user) {
         return 'userdoesnotexist';
+    }
+
+    // Make it not fail if more then one notification found. Just use one.
+    // Other option is to change data_object, but so far it's facetoface issue that we hope to fix soon and remove workaround
+    // code from here.
+    $checkrows = $DB->get_records('facetoface_notification', $params);
+    if (count($checkrows) > 1) {
+        $params['id'] = reset($checkrows)->id;
+        debugging("Duplicate notifications found for (excluding id): " . json_encode($params), DEBUG_DEVELOPER);
     }
 
     $notice = new facetoface_notification($params);
