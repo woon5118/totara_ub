@@ -4471,12 +4471,29 @@ class facetoface_event_handler {
         global $DB;
 
         $userid = $event->objectid;
+        $timenow = time();
 
         if ($signups = $DB->get_records('facetoface_signups', array('userid' => $userid))) {
             foreach ($signups as $signup) {
                 $session = facetoface_get_session($signup->sessionid);
-                // Using $null, null fails because of passing by reference.
-                facetoface_user_cancel($session, $userid, false, $null, get_string('usersuspendedcancel', 'facetoface'));
+                if (!empty($session->sessiondates) && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
+                    // Session in progress.
+                    $safetocancel = false;
+                } else if (!empty($session->sessiondates)  && facetoface_has_session_started($session, $timenow)) {
+                    // Session is over, don't remove user's records.
+                    $safetocancel = false;
+                } else if (facetoface_is_user_on_waitlist($session, $userid)) {
+                    // Session is wait-listed.
+                    $safetocancel = true;
+                } else {
+                    // Booking open.
+                    $safetocancel = true;
+                }
+
+                if ($safetocancel) {
+                    // Using $null, null fails because of passing by reference.
+                    facetoface_user_cancel($session, $userid, false, $null, get_string('usersuspendedcancel', 'facetoface'));
+                }
             }
         }
         return true;

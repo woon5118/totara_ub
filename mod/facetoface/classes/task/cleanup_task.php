@@ -44,6 +44,9 @@ class cleanup_task extends \core\task\scheduled_task {
         global $DB, $CFG;
         require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 
+        $conditions = array('component' => 'mod_facetoface', 'classname' => '\mod_facetoface\task\cleanup_task');
+        $lastcron = $DB->get_field('task_scheduled', 'lastruntime', $conditions);
+
         // Cancel sessions of all suspended or deleted users,
         // who are not already cancelled.
         // this solves skipped events, direct db edits and upgrades.
@@ -53,25 +56,45 @@ class cleanup_task extends \core\task\scheduled_task {
                   JOIN {facetoface_signups} fs ON fs.userid = u.id
                   JOIN {facetoface_signups_status} fss ON fss.signupid = fs.id
                  WHERE (u.deleted <> 0 OR u.suspended <> 0)
+                   AND u.timemodified >= :lastcron
                    AND fss.superceded = 0
                    AND fss.statuscode <> :usercancelled
                    AND fss.statuscode <> :sessioncancelled";
         $params = array(
+            'lastcron'      => $lastcron,
             'usercancelled' => MDL_F2F_STATUS_USER_CANCELLED,
             'sessioncancelled' => MDL_F2F_STATUS_SESSION_CANCELLED
         );
 
         $rs = $DB->get_recordset_sql($sql, $params);
+        $timenow = time();
 
         foreach ($rs as $user) {
+            $session = facetoface_get_session($user->sessionid);
+            $error = null; // Passed by reference.
+            $safetocancel = true;
             if ($user->deleted) {
                 $reason = get_string('userdeletedcancel', 'facetoface');
             } else {
                 $reason = get_string('usersuspendedcancel', 'facetoface');
+                // Check if it is safe to cancel the user.
+                if (!empty($session->sessiondates) && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
+                    // Session in progress.
+                    $safetocancel = false;
+                } else if (!empty($session->sessiondates) && facetoface_has_session_started($session, $timenow)) {
+                    // Session is over, don't remove user's records.
+                    $safetocancel = false;
+                } else if (facetoface_is_user_on_waitlist($session, $user->id)) {
+                    // Session is wait-listed.
+                    $safetocancel = true;
+                } else {
+                    // Booking open.
+                    $safetocancel = true;
+                }
             }
-            $session = facetoface_get_session($user->sessionid);
-            $error = null; // Passed by reference.
-            facetoface_user_cancel($session, $user->id, false, $error, $reason);
+            if ($safetocancel) {
+                facetoface_user_cancel($session, $user->id, false, $error, $reason);
+            }
         }
         $rs->close();
         $this->remove_unused_custom_rooms();
