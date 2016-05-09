@@ -54,6 +54,18 @@ define(['jquery'], function ($) {
         this.google = google;
 
         /**
+         * A Google Maps client id, false if none provided.
+         * @type {boolean|string}
+         */
+        this.clientid = get_arg('clientid', false);
+
+        /**
+         * A Google Maps API Key, false if none provided.
+         * @type {boolean|string}
+         */
+        this.apikey = get_arg('apikey', false);
+
+        /**
          * Prefix for this Location custom field.
          * Typically just the field name, and empty during definition.
          * @type {string}
@@ -275,13 +287,19 @@ define(['jquery'], function ($) {
      */
     Location.prototype.geocode_address = function() {
         var self = this,
-            address = this.url_encode_address(this.address);
+            address = this.url_encode_address(this.address),
+            srcurl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + address
+                + '&region=' + this.regionbias;
         if (address === '') {
             return;
         }
+        if (this.clientid) {
+            srcurl += '&client='+this.clientid;
+        } else if (this.apikey) {
+            srcurl += '&key='+this.apikey;
+        }
         $.ajax({
-            url: 'https://maps.googleapis.com/maps/api/geocode/json?address=' + address
-            + '&region=' + this.regionbias,
+            url: srcurl,
             type: 'GET',
             success: function (data, response) {
                 if (response == 'success' && data.results.length > 0) {

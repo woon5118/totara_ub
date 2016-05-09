@@ -147,6 +147,10 @@ $string['fieldmaxlength'] = 'Maximum length';
 $string['fieldrows'] = 'Rows';
 $string['fieldsize'] = 'Display size';
 $string['forceunique'] = 'Should the data be unique?';
+$string['gmaptosnotice_apikey'] = 'Please check that your site adheres to the <a href="https://developers.google.com/maps/terms" target="_blank">Google Maps JavaScript API Terms Of Service</a> before changing the view to include a map.';
+$string['gmaptosnotice_nokey'] = 'Please check that your site adheres to the <a href="https://developers.google.com/maps/terms" target="_blank">Google Maps JavaScript API Terms Of Service</a> before changing the view to include a map.
+
+We strongly recommend your get a Google Maps JavaScript API Key or Client ID and set it within Totara.';
 $string['locked'] = 'Is this field locked?';
 $string['menudefaultnotinoptions'] = 'The default value is not one of the options';
 $string['menunotuniqueoptions'] = 'Menu options should be unique';

@@ -555,8 +555,23 @@ $string['gmapsregionbias'] = 'Region bias';
 $string['gmapsregionbias_help'] = 'Google Maps address returns results influenced by your region/country. For example, searches for "San Francisco" may return different results if sent from a domain within the United States than one sent from Spain. This should be the <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements" target="_blank">ISO 3166-1</a> code for the appropriate region/country.';
 $string['groupenrolmentkeypolicy'] = 'Group enrolment key policy';
 $string['groupenrolmentkeypolicy_desc'] = 'Turning this on will make Totara check group enrolment keys against a valid password policy.';
-$string['googlemapkey3'] = 'Google Maps API V3 key';
-$string['googlemapkey3_help'] = 'You need to enter a special key to use Google Maps for IP address lookup visualization. You can obtain the key free of charge at <a href="https://developers.google.com/maps/documentation/javascript/tutorial#api_key" target="_blank">https://developers.google.com/maps/documentation/javascript/tutorial#api_key</a>';
+$string['googlemapkey3'] = 'Google Maps JavaScript API key';
+$string['googlemapkey3_help'] = 'If you use Google Map features within Totara we strongly recommend that you read and agree to the Google Maps JavaScript API Terms of Service and generate a Google Maps JavaScript API key for use within your site.
+
+Information on obtaining a key can be found at <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">https://developers.google.com/maps/documentation/javascript/get-api-key</a>
+
+Please refer to the <a href="https://developers.google.com/maps/terms" target="_blank">Google Maps JavaScript API Terms of Service</a> for permitted use.
+For help understanding the Terms of Service refer to the <a href="https://developers.google.com/maps/faq#understanding-terms-of-service" target="_blank">Terms of Service FAQ\'s</a>
+
+If you have purchased a Premium Plan then please put your Client ID into the API key setting, Totara will recognise this as Client ID and treat it as such.
+
+Totara currently uses the Google Maps JavaScript API in the following locations:
+
+<ul>
+<li>Location custom fields.</li>
+<li>IP Address lookup visualisation within the site log reports.</li>
+</ul>
+';
 $string['googlemaps'] = 'Google Maps';
 $string['gotofirst'] = 'Go to first missing string';
 $string['gradebook'] = 'Gradebook';

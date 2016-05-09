@@ -102,6 +102,7 @@ class customfield_define_location extends customfield_define_base {
      * @throws coding_exception
      */
     public static function add_location_field_form_elements($form, $fieldname = 'Location', $fielddefinition = true) {
+        global $OUTPUT;
 
         // These fields shouldn't be required during field definition, just in field instantiation.
         $stringsuffix = $fielddefinition ? 'default' : '';
@@ -163,7 +164,16 @@ class customfield_define_location extends customfield_define_base {
             '<br />',
             false
         );
-        $form->setDefault($formprefix . 'display', GMAP_DISPLAY_MAP_AND_ADDRESS);
+        if (self::has_google_maps_client_id()) {
+            // If they have a client ID then they have a Premium plan and they have agreed to the ToS.
+            $form->setDefault($formprefix . 'display', GMAP_DISPLAY_MAP_AND_ADDRESS);
+        } else if (self::has_google_maps_api_key()) {
+            $form->setDefault($formprefix . 'display', GMAP_DISPLAY_MAP_AND_ADDRESS);
+            $form->addElement('static', 'googlemapapitoscheck', null, $OUTPUT->notification(get_string('gmaptosnotice_apikey', 'totara_customfield'), 'notifymessage'));
+        } else {
+            $form->setDefault($formprefix . 'display', GMAP_DISPLAY_ADDRESS_ONLY);
+            $form->addElement('static', 'googlemapapitoscheck', null, $OUTPUT->notification(get_string('gmaptosnotice_nokey', 'totara_customfield'), 'notifymessage'));
+        }
 
         $form->addElement('html', html_writer::start_div('mapaddresslookup'));
 
@@ -247,10 +257,10 @@ class customfield_define_location extends customfield_define_base {
     public static function define_add_js($args = null) {
         global $PAGE, $CFG;
 
-        $mapparams = '';
+        $mapparams = 'define=1';
 
         if (isset($CFG->gmapsforcemaplanguage)) {
-            $mapparams .= "language=" . $CFG->gmapsforcemaplanguage;
+            $mapparams .= "&language=" . $CFG->gmapsforcemaplanguage;
         }
 
         if (is_null($args)) {
@@ -271,7 +281,60 @@ class customfield_define_location extends customfield_define_base {
         $args->defaultzoomlevel = $CFG->gmapsdefaultzoomlevel;
         $args->mapparams = $mapparams;
 
+        // Check if they have set a key.
+        // If so then we want to send it along.
+        if (self::has_google_maps_api_key()) {
+            if (strpos($CFG->googlemapkey3, 'client-id: ') === 0) {
+                // Its 100% a client id.
+                $args->clientid = substr($CFG->googlemapkey3, strlen('client-id: '));
+                $args->mapparams = '&client='.$args->clientid;
+            } else if (strpos($CFG->googlemapkey3, 'apikey: ') === 0) {
+                // Its 100% an api key.
+                $args->apikey = substr($CFG->googlemapkey3, strlen('apikey: '));
+                $args->mapparams = '&key='.$args->apikey;
+            } else if (strpos($CFG->googlemapkey3, 'gme-') === 0) {
+                // It appears this is a client ID not an API key, just a guess but we'll go with it.
+                // Good for them, they have purchased a premium plan.
+                $args->clientid = $CFG->googlemapkey3;
+                $args->mapparams = '&client='.$args->clientid;
+            } else {
+                // Its an API key... most likely.
+                $args->apikey = $CFG->googlemapkey3;
+                $args->mapparams = '&key='.$args->apikey;
+            }
+        }
+
         $PAGE->requires->js_call_amd('totara_customfield/field_location', 'init', array($args));
+    }
+
+    /**
+     * Returns true if a Google Maps API key has been provided.
+     * @return bool
+     */
+    public static function has_google_maps_api_key() {
+        global $CFG;
+        return (isset($CFG->googlemapkey3) && !empty($CFG->googlemapkey3));
+    }
+
+    /**
+     * Returns true if a Google Maps API client ID has been provided.
+     * @return bool
+     */
+    public static function has_google_maps_client_id() {
+        global $CFG;
+        if (!self::has_google_maps_api_key()) {
+            return false;
+        }
+        if (strpos($CFG->googlemapkey3, 'client-id: ') === 0) {
+            return true;
+        }
+        if (strpos($CFG->googlemapkey3, 'apikey: ') === 0) {
+            return false;
+        }
+        if (strpos($CFG->googlemapkey3, 'gme-') === 0) {
+            return true;
+        }
+        return false;
     }
 
     public function define_save_preprocess($data, $old = null) {
@@ -339,7 +402,7 @@ class customfield_define_location extends customfield_define_base {
         $newdata->address = (isset($data->address) && !empty($data->address)) ? $data->address : "";
         $newdata->size = (isset($data->size) && !empty($data->size)) ? $data->size : "";
         $newdata->view = (isset($data->view) && !empty($data->view)) ? $data->view : "";
-        $newdata->display = (isset($data->display) && !empty($data->display)) ? $data->display : "";
+        $newdata->display = (isset($data->display) && !empty($data->display)) ? $data->display : GMAP_DISPLAY_ADDRESS_ONLY;
 
         $newdata->location = new stdClass();
         $newdata->location->latitude = (isset($data->location->latitude) && !empty($data->location->latitude)) ? $data->location->latitude : "0";
