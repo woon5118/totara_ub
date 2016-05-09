@@ -46,8 +46,6 @@ class question_export_form extends moodleform {
         $contexts = $this->_customdata['contexts'];
 
         // Choice of format, with help.
-        $mform->addElement('header', 'fileformat', get_string('fileformat', 'question'));
-
         $fileformatnames = get_import_export_formats('export');
         $radioarray = array();
         $separators = array();
@@ -58,17 +56,15 @@ class question_export_form extends moodleform {
             if (get_string_manager()->string_exists('pluginname_help', 'qformat_' . $shortname)) {
                 $separator .= $OUTPUT->help_icon('pluginname', 'qformat_' . $shortname);
             }
-            $separator .= '<br>';
+            $separator .= '<br/>';
             $separators[] = $separator;
         }
 
         $radioarray[] = $mform->createElement('static', 'makelasthelpiconshowup', '');
-        $mform->addGroup($radioarray, "formatchoices", '', $separators, false);
+        $mform->addGroup($radioarray, "formatchoices", get_string('fileformat', 'question'), $separators, false);
         $mform->addRule("formatchoices", null, 'required', null, 'client');
 
         // Export options.
-        $mform->addElement('header', 'general', get_string('general', 'form'));
-
         $mform->addElement('questioncategory', 'category', get_string('exportcategory', 'question'), compact('contexts'));
         $mform->setDefault('category', $defaultcategory);
         $mform->addHelpButton('category', 'exportcategory', 'question');

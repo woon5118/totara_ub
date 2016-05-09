@@ -46,8 +46,6 @@ class question_import_form extends moodleform {
         $contexts = $this->_customdata['contexts'];
 
         // Choice of import format, with help icons.
-        $mform->addElement('header', 'fileformat', get_string('fileformat', 'question'));
-
         $fileformatnames = get_import_export_formats('import');
         $radioarray = array();
         $separators = array();
@@ -63,12 +61,10 @@ class question_import_form extends moodleform {
         }
 
         $radioarray[] = $mform->createElement('static', 'makelasthelpiconshowup', '');
-        $mform->addGroup($radioarray, "formatchoices", '', $separators, false);
+        $mform->addGroup($radioarray, "formatchoices", get_string('fileformat', 'question'), $separators, false);
         $mform->addRule("formatchoices", null, 'required', null, 'client');
 
         // Import options.
-        $mform->addElement('header','general', get_string('general', 'form'));
-
         $mform->addElement('questioncategory', 'category', get_string('importcategory', 'question'), compact('contexts'));
         $mform->setDefault('category', $defaultcategory);
         $mform->addHelpButton('category', 'importcategory', 'question');
