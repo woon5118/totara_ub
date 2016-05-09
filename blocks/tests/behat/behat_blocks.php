@@ -111,4 +111,29 @@ class behat_blocks extends behat_base {
             new Given('I click on "Configure" "link" in the "'.$this->escape($blockname).'" "block"')
         );
     }
+
+    /**
+     * Confirms that I can see a block with the given title.
+     *
+     * @Given /^I should see the "([^"]*)" block$/
+     * @param string $title
+     * @return Given
+     */
+    public function i_should_see_the_block($title) {
+        return new Given('I should see "'.$this->escape($title).'" in the ".block" "css_element"');
+    }
+
+    /**
+     * Confirms that I cannot see a block with the given title.
+     *
+     * @Given /^I should not see the "([^"]*)" block$/
+     * @param string $title
+     * @return Given
+     */
+    public function i_should_not_see_the_block($title) {
+        $xpathliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($title);
+        $xpath = '//div[contains(concat(\' \', normalize-space(@class), \' \'), \' block \')]//h2[text()[contains(.,'.$xpathliteral.')]]';
+        return new Given('"'.$xpath.'" "xpath_element" should not exist');
+    }
+
 }

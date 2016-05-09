@@ -2657,6 +2657,12 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         $setwantsurltome = false;
     }
 
+    // TOTARA: This script cannot be returned to, no matter when require_login is called we do not ever want to return to the
+    // current script.
+    if ($setwantsurltome && defined('NON_RETURNABLE_SCRIPT') && NON_RETURNABLE_SCRIPT) {
+        $setwantsurltome = false;
+    }
+
     // Redirect to the login page if session has expired, only with dbsessions enabled (MDL-35029) to maintain current behaviour.
     if ((!isloggedin() or isguestuser()) && !empty($SESSION->has_timed_out) && !empty($CFG->dbsessions)) {
         if ($preventredirect) {

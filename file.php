@@ -32,6 +32,8 @@
 
 // disable moodle specific debug messages and any errors in output
 define('NO_DEBUG_DISPLAY', true);
+// TOTARA: no point in returning to this script.
+define('NON_RETURNABLE_SCRIPT', true);
 
 require_once('config.php');
 require_once('lib/filelib.php');
