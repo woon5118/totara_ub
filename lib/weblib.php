@@ -3596,7 +3596,7 @@ function prevent_form_autofill_password() {
     $i++;
     $id = 'autofill-prevention' . $i;
     return '<div style="display: none;">' .
-        '<label for="txt-' . $id . '">?</label><input id="txt-' . $id. '" type="text" class="ignoredirty" />' .
-        '<label for="pw-' . $id . '">?</label><input id="pw-' . $id. '" type="password" class="ignoredirty" />' .
+        '<label for="txt-' . $id . '">?</label><input type="text" id="txt-' . $id. '" class="ignoredirty" />' .
+        '<label for="pw-' . $id . '">?</label><input type="password" id="pw-' . $id. '" class="ignoredirty" />' .
         '</div>';
 }
