@@ -518,8 +518,10 @@ class totaralib_test extends advanced_testcase {
         $DB->update_record('course_modules_completion', $modulecompletion);
 
         // This time, we'll make sure that the scheduled task that should be calling it does so.
+        ob_start();
         $task = new \core\task\completion_regular_task();
         $task->execute();
+        ob_end_clean();
 
         // The results should be the same as calling totara_reaggregate_course_modules_completion() directly.
         $this->assertEquals(true, $DB->record_exists('course_modules_completion',

@@ -33,7 +33,7 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser(); // We need permissions to access all reports.
 
-        $testdir = make_writable_directory($CFG->dirroot . '/mytest');
+        $testdir = make_writable_directory($CFG->dataroot . '/mytest');
         $testdir = realpath($testdir);
         $this->assertFileExists($testdir);
 
@@ -87,8 +87,10 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
         foreach ($schedules as $schedule) {
             $writer = $plugins[$schedule->format];
             $this->assertTrue(class_exists($writer));
+            ob_start(); // Ignore the useless warning about validity of export directory.
             reportbuilder_send_scheduled_report($schedule);
             $reportfilepathname = reportbuilder_get_export_filename($report, $admin->id, $schedule->id) . '.' . $writer::get_file_extension();
+            ob_end_clean();
             $this->assertFileExists($reportfilepathname);
             unlink($reportfilepathname);
         }
