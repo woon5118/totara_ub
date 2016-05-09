@@ -1,6 +1,6 @@
 @mod @mod_facetoface @totara
 Feature: Filter session by pre-defined rooms
-  In order to test Face to face rooms
+  In order to test seminar rooms
   As a site manager
   I need to create rooms
 
@@ -12,17 +12,17 @@ Background:
     And I log in as "admin"
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name              | Test facetoface name        |
-      | Description       | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name              | Test seminar name        |
+      | Description       | Test seminar description |
     And I turn editing mode off
-    And I navigate to "Rooms" node in "Site administration > Face-to-face"
+    And I navigate to "Rooms" node in "Site administration > Seminar"
     And I press "Add a new room"
     And I set the following fields to these values:
-      | Room name | Room 1          |
-      | Building  | Building 123    |
-      | Address   | 123 Tory street |
-      | Capacity  | 10              |
+      | Name              | Room 1          |
+      | Building          | Building 123    |
+      | Address           | 123 Tory street |
+      | Maximum bookings  | 10              |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
@@ -30,30 +30,30 @@ Background:
 
     And I press "Add a new room"
     And I set the following fields to these values:
-      | Room name | Room 2          |
-      | Building  | Building 234    |
-      | Address   | 234 Tory street |
-      | Capacity  | 10              |
+      | Name              | Room 2          |
+      | Building          | Building 234    |
+      | Address           | 234 Tory street |
+      | Maximum bookings  | 10              |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
     And I press "Add a new room"
     And I set the following fields to these values:
-      | Room name | Room 3          |
-      | Building  | Building 345    |
-      | Address   | 345 Tory street |
-      | Capacity  | 10              |
+      | Name              | Room 3          |
+      | Building          | Building 345    |
+      | Address           | 345 Tory street |
+      | Maximum bookings  | 10              |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
     And I press "Add a new room"
     And I set the following fields to these values:
-      | Room name | Room 4          |
-      | Building  | Building 456    |
-      | Address   | 456 Tory street |
-      | Capacity  | 10              |
+      | Name              | Room 4          |
+      | Building          | Building 456    |
+      | Address           | 456 Tory street |
+      | Maximum bookings  | 10              |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
@@ -63,7 +63,7 @@ Background:
   Scenario: Add sessions with different rooms and filter sessions by rooms
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "Test facetoface name"
+    And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:

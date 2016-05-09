@@ -38,11 +38,11 @@ class behat_facetoface extends behat_base {
     /**
      * Create a session in the future based on the current date.
      *
-     * @Given /^I fill facetoface session with relative date in form data:$/
+     * @Given /^I fill seminar session with relative date in form data:$/
      * @param TableNode $data
      * @return array the list of actions to perform
      */
-    public function i_fill_facetoface_session_with_relative_date_in_form_data(TableNode $data) {
+    public function i_fill_seminar_session_with_relative_date_in_form_data(TableNode $data) {
 
         $dataclone = clone $data;
         $rows = array();
@@ -188,9 +188,9 @@ class behat_facetoface extends behat_base {
     /**
      * Use magic to alter facetoface cut off to value which is not allowed in UI so that we do not have to wait in tests.
      *
-     * @Given /^I use magic to set Face-to-Face "([^"]*)" to send capacity notification two days ahead$/
+     * @Given /^I use magic to set Seminar "([^"]*)" to send capacity notification two days ahead$/
      */
-    public function i_use_magic_to_set_facetoface_cutoff_one_day_back($facetofacename) {
+    public function i_use_magic_to_set_seminar_cutoff_one_day_back($facetofacename) {
         global $DB;
 
         $facetoface = $DB->get_record('facetoface', array('name' => $facetofacename), '*', MUST_EXIST);

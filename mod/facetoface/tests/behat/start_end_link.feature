@@ -2,7 +2,7 @@
 Feature: Confirm end date is adjusted when start date is altered
   In order to test that when the end date and time is adjusted when the start time changes
   As a site manager
-  I need to create and edit a face to face session
+  I need to create and edit a seminar session
 
   Background:
     Given I am on a totara site
@@ -13,12 +13,12 @@ Feature: Confirm end date is adjusted when start date is altered
     And I follow "Find Learning"
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                                    | Test facetoface name        |
-      | Description                             | Test facetoface description |
-      | Allow multiple events signup per user   | 1                           |
-      | Allow manager reservations              | Yes                         |
-      | Maximum reservations                    | 10                          |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                                    | Test seminar name        |
+      | Description                             | Test seminar description |
+      | Users can sign-up to multiple sessions  | 1                        |
+      | Allow manager reservations              | Yes                      |
+      | Maximum reservations                    | 10                       |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -47,7 +47,7 @@ Feature: Confirm end date is adjusted when start date is altered
     | timestart[hour]   | 12          | 13        | id_timefinish_hour   |
     | timestart[minute] | 30          | 30        | id_timefinish_minute |
 
-  Scenario: Alter face-to-face date by calendar
+  Scenario: Alter seminar date by calendar
     Given I click on "Calendar" "link" in the "#fitem_id_timestart" "css_element"
     And I click on "22" "text" in the "#dateselector-calendar-panel" "css_element"
     Then I should see "22" in the "#id_timefinish_day" "css_element"

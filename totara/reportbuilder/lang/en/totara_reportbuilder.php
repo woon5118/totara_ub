@@ -364,7 +364,7 @@ $string['globalrestrictiondescription'] = 'Global report restrictions are enable
 $string['globalrestrictionnew'] = 'New restriction';
 $string['globalsettings'] = 'General settings';
 $string['globalsettingsupdated'] = 'Global settings updated';
-$string['gotofacetofacesettings'] = 'To view this report go to a facetoface activity and use the \'Declared interest report\' link in the \'Facetoface administration\' admin menu.';
+$string['gotofacetofacesettings'] = 'To view this report go to a seminar activity and use the \'Declared interest report\' link in the \'Seminar administration\' admin menu.';
 $string['gradeandgradetocomplete'] = '{$a->grade}% ({$a->pass}% to complete)';
 $string['graph'] = 'Graph';
 $string['graphadvancedoptions'] = 'Advanced options';
@@ -748,7 +748,7 @@ If any tags in the \'Exclude records tagged with\' section are selected, records
 It is possible to include and exclude tags at the same time, but a single tag cannot be both included and excluded.';
 $string['reportbuildertrainer'] = 'Report Builder: Show by trainer';
 $string['reportbuildertrainer_help'] = '
-This criteria is enabled by selecting the \'Show records by trainer\' checkbox. If selected, then the report will show different records depending on who the face-to-face trainer was for the feedback being given.
+This criteria is enabled by selecting the \'Show records by trainer\' checkbox. If selected, then the report will show different records depending on who the seminar trainer was for the feedback being given.
 
 If \'Show records where the user is the trainer\' is selected, the report will show feedback for sessions where the user viewing the report was the trainer.
 
@@ -976,7 +976,7 @@ $string['type_comp_type'] = 'Competency custom fields';
 $string['type_course'] = 'Course';
 $string['type_course_category'] = 'Category';
 $string['type_course_custom_fields'] = 'Course Custom Fields';
-$string['type_facetoface'] = 'Face to face';
+$string['type_facetoface'] = 'Seminar';
 $string['type_org_type'] = 'Organisation custom fields';
 $string['type_pos_type'] = 'Position custom fields';
 $string['type_dp_plan_evidence'] = 'Evidence';

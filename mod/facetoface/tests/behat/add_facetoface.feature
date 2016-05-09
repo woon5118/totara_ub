@@ -1,8 +1,8 @@
 @mod @mod_facetoface @totara
-Feature: Add a face to face event and session
+Feature: Add a seminar event and session
   In order to run a seminar
   As a teacher
-  I need to create a face to face activity and add a session to it
+  I need to create a seminar activity and add a session to it
 
   Background:
     Given I am on a totara site
@@ -19,14 +19,14 @@ Feature: Add a face to face event and session
       | student1 | C1     | student        |
 
   @javascript
-  Scenario: Add and configure a facetoface activity with a single session
+  Scenario: Add and configure a seminar activity with a single session
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"

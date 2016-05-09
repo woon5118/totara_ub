@@ -75,9 +75,9 @@ Feature: Use the multi-item course filter
     And I should see "CourseThree" in the ".reportbuilder-table" "css_element"
 
   @javascript
-  Scenario: Add filter with Face-to-face Summary report source
-    Given I set the field "Report Name" to "Face-to-face Summary"
-    And I set the field "Source" to "Face-to-face Summary"
+  Scenario: Add filter with Seminar Sessions report source
+    Given I set the field "Report Name" to "Seminar Sessions"
+    And I set the field "Source" to "Seminar Sessions"
     And I press "Create report"
     And I click on "Filters" "link" in the ".tabtree" "css_element"
     And I select "Course (multi-item)" from the "newstandardfilter" singleselect

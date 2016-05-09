@@ -1,11 +1,11 @@
 @mod @mod_facetoface @totara
-Feature: Delete a course with a facetoface
+Feature: Delete a course with a seminar
   In order to delete a course
   As a teacher
-  I need the facetoface to not do silly things with completion during purging of course.
+  I need the seminar to not do silly things with completion during purging of course.
 
   @javascript
-  Scenario: Delete a course with one facetoface activity
+  Scenario: Delete a course with one seminar activity
     Given I am on a totara site
     And the following "users" exist:
       | username | firstname | lastname | email               |
@@ -24,9 +24,9 @@ Feature: Delete a course with a facetoface
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name                | Test facetoface name                              |
-      | Description         | Test facetoface description                       |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                | Test seminar name                              |
+      | Description         | Test seminar description                       |
       | Completion tracking | Show activity as complete when conditions are met |
       | Require grade       | 1                                                 |
     And I follow "View all events"

@@ -21,7 +21,7 @@ Feature: Play waiting list lottery
       | student2 | C1     | student        |
 
     And I log in as "admin"
-    And I navigate to "Global settings" node in "Site administration > Face-to-face"
+    And I navigate to "Global settings" node in "Site administration > Seminar"
     And I set the following fields to these values:
       | Everyone on waiting list | Yes  |
       | Waitlist lottery         | Yes  |
@@ -34,9 +34,9 @@ Feature: Play waiting list lottery
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name              | Test facetoface name        |
-      | Description       | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name              | Test seminar name        |
+      | Description       | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -54,7 +54,7 @@ Feature: Play waiting list lottery
     And I press "OK"
     And I set the following fields to these values:
       | capacity                       | 2    |
-      | Allow overbooking              | 1    |
+      | Enable waitlist                | 1    |
       | Send all bookings to the waiting list | 1    |
     And I press "Save changes"
     And I log out
@@ -82,7 +82,7 @@ Feature: Play waiting list lottery
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "Test facetoface name"
+    And I follow "Test seminar name"
     And I follow "Attendees"
     And I follow "Wait-list"
     Then I should see "Sam1 Student1"

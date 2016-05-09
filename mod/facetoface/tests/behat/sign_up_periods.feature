@@ -1,6 +1,6 @@
 @javascript @mod @mod_facetoface @totara
-Feature: Face to face signup periods
-  In order to verify Face to Face signup periods
+Feature: Seminar signup periods
+  In order to verify seminar signup periods
   As a f2fadmin
   I need to set various dates
 
@@ -19,9 +19,9 @@ Feature: Face to face signup periods
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
 
   Scenario Outline: Sign up students regardless of sign in period status

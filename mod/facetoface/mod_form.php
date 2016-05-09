@@ -97,11 +97,13 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $multiplesessions = get_config(null, 'facetoface_multiplesessions') ? 1 : 0;
         $mform->setDefault('multiplesessions', $multiplesessions);
 
-        $mform->addElement('checkbox', 'declareinterest', get_string('declareinterestenable', 'facetoface'));
+        $declareinterestops = array(
+            0 => get_string('declareinterestnever', 'facetoface'),
+            2 => get_string('declareinterestnoupcoming', 'facetoface'),
+            1 => get_string('declareinterestalways', 'facetoface')
+        );
+        $mform->addElement('select', 'declareinterest', get_string('declareinterestenable', 'facetoface'), $declareinterestops);
         $mform->addHelpButton('declareinterest', 'declareinterest', 'mod_facetoface');
-        $mform->addElement('checkbox', 'interestonlyiffull', get_string('declareinterestonlyiffull', 'facetoface'));
-        $mform->addHelpButton('interestonlyiffull', 'declareinterestonlyiffull', 'mod_facetoface');
-        $mform->disabledIf('interestonlyiffull', 'declareinterest');
 
         $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
         if (!empty($selectpositiononsignupglobal)) {
@@ -420,6 +422,12 @@ class mod_facetoface_mod_form extends moodleform_mod {
             }
         }
 
+        // Convert interest option to flags for stroing in db.
+        if ($data->declareinterest == 2) {
+            $data->interestonlyiffull =  1;
+            $data->declareinterest = 1;
+        }
+
         return $data;
     }
 
@@ -451,6 +459,9 @@ class mod_facetoface_mod_form extends moodleform_mod {
                     break;
             }
             $defaultvalues['approval_termsandconds'] = s($defaultvalues['approvalterms']);
+
+            // Convert interest flags to option.
+            $defaultvalues['declareinterest'] = ($defaultvalues['interestonlyiffull'] == 1) ? 2 : $defaultvalues['declareinterest'];
         }
 
         $this->data_preprocessing($defaultvalues);

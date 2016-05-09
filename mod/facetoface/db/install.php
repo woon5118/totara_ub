@@ -266,7 +266,7 @@ function facetoface_create_signup_cancellation_customfield_notes() {
     $data->id = 0;
     $data->datatype = 'text';
     $data->shortname = 'signupnote';
-    $data->fullname = 'Signup note';
+    $data->fullname = 'Requests for session organiser';
     $data->description = '';
     $data->defaultdata = '';
     $data->forceunique = 0;

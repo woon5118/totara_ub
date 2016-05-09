@@ -31,7 +31,7 @@ $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)
 $context = context_module::instance($cm->id);
 
 require_login($course, true, $cm);
-require_capability('mod/facetoface:editsessions', $context);
+require_capability('mod/facetoface:editevents', $context);
 
 $sessionsql = "UPDATE {facetoface_sessions}
                   SET selfapproval = 0

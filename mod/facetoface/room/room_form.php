@@ -46,12 +46,12 @@ class mod_facetoface_room_form extends moodleform {
         $mform->addElement('hidden', 'page');
         $mform->setType('page', PARAM_INT);
 
-        $mform->addElement('text', 'name', get_string('roomname', 'facetoface'), array('size' => '45'));
+        $mform->addElement('text', 'name', get_string('roomnameedit', 'facetoface'), array('size' => '45'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
 
         // This form is loaded as ajax into page that has "capacity" so give it different name to avoid conflicts.
-        $mform->addElement('text', 'roomcapacity', get_string('capacity', 'facetoface'));
+        $mform->addElement('text', 'roomcapacity', get_string('maxbookings', 'facetoface'));
         $mform->setType('roomcapacity', PARAM_INT);
         $mform->addRule('roomcapacity', null, 'required', null, 'client');
         $mform->addRule('roomcapacity', null, 'numeric', null, 'client');
@@ -59,7 +59,7 @@ class mod_facetoface_room_form extends moodleform {
         $mform->addElement('checkbox', 'allowconflicts', get_string('allowconflicts', 'mod_facetoface'));
         $mform->addHelpButton('allowconflicts', 'roomtype', 'facetoface');
 
-        $mform->addElement('editor', 'description_editor', get_string('roomdescription', 'facetoface'), null, $this->_customdata['editoroptions']);
+        $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'facetoface'), null, $this->_customdata['editoroptions']);
 
         if ($this->_customdata['room']) {
             $room = $this->_customdata['room'];

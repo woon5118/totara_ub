@@ -211,7 +211,7 @@ function print_session_list($courseid, $facetoface, $sessions) {
     $context = context_module::instance($cm->id);
     $f2f_renderer->setcontext($context);
     $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
-    $editsessions = has_capability('mod/facetoface:editsessions', $context);
+    $editevents = has_capability('mod/facetoface:editevents', $context);
 
     $bookedsession = null;
     $submissions = facetoface_get_user_submissions($facetoface->id, $USER->id);
@@ -282,11 +282,11 @@ function print_session_list($courseid, $facetoface, $sessions) {
         }
 
         echo $f2f_renderer->print_session_list_table(
-            $upcomingarray, $viewattendees, $editsessions, $displaytimezones, $reserveinfo, $PAGE->url
+            $upcomingarray, $viewattendees, $editevents, $displaytimezones, $reserveinfo, $PAGE->url
         );
     }
 
-    if ($editsessions) {
+    if ($editevents) {
         echo html_writer::tag(
             'p',
             html_writer::link(
@@ -299,7 +299,7 @@ function print_session_list($courseid, $facetoface, $sessions) {
     if (!empty($previousarray)) {
         echo $OUTPUT->heading(get_string('previoussessions', 'facetoface'));
         echo $f2f_renderer->print_session_list_table(
-            $previousarray, $viewattendees, $editsessions, $displaytimezones, [], $PAGE->url
+            $previousarray, $viewattendees, $editevents, $displaytimezones, [], $PAGE->url
         );
     }
 }

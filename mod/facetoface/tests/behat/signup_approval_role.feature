@@ -1,5 +1,5 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Face-to-face Signup Role Approval
+Feature: Seminar Signup Role Approval
   In order to signup to classroom connect
   As a learner
   I need to request approval from a session role
@@ -35,7 +35,7 @@ Feature: Face-to-face Signup Role Approval
       | timmy | manager |
       | sammy | manager |
     And I log in as "admin"
-    And I navigate to "Global settings" node in "Site administration > Face-to-face"
+    And I navigate to "Global settings" node in "Site administration > Seminar"
     And I click on "s__facetoface_session_roles[3]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_none]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
@@ -46,7 +46,7 @@ Feature: Face-to-face Signup Role Approval
     And I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
+    And I add a "Seminar" to section "1" and I fill the form with:
       | Name              | Classroom Connect       |
       | Description       | Classroom Connect Tests |
     And I follow "View all events"
@@ -95,12 +95,12 @@ Feature: Face-to-face Signup Role Approval
     And I log out
     And I log in as "manager"
     And I click on "My Learning" in the totara menu
-    Then I should not see "Face-to-face trainer confirmation"
+    Then I should not see "Seminar trainer confirmation"
 
     When I log out
     And I log in as "teacher"
     And I click on "My Learning" in the totara menu
-    Then I should see "Face-to-face trainer confirmation"
+    Then I should see "Seminar trainer confirmation"
 
     When I click on "View all alerts" "link"
     And I click on "Attendees" "link"
@@ -113,7 +113,7 @@ Feature: Face-to-face Signup Role Approval
     When I log out
     And I log in as "jimmy"
     And I click on "My Learning" in the totara menu
-    Then I should see "Face-to-face booking confirmation"
+    Then I should see "Seminar booking confirmation"
 
     When I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"

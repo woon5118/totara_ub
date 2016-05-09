@@ -13,9 +13,9 @@ Feature: Confirm overlapping sessions can be removed
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"

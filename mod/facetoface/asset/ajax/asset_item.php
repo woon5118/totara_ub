@@ -49,7 +49,7 @@ $context = context_module::instance($cm->id);
 
 require_login($course, false, $cm);
 require_sesskey();
-require_capability('mod/facetoface:editsessions', $context);
+require_capability('mod/facetoface:editevents', $context);
 
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/facetoface/asset/ajax/asset_item.php', array(

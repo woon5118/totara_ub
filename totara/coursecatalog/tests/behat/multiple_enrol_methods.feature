@@ -24,7 +24,7 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     And I expand "Plugins" node
     And I expand "Enrolments" node
     And I follow "Manage enrol plugins"
-    And I click on "Enable" "link" in the "Face-to-face direct enrolment" "table_row"
+    And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I set the following administration settings values:
       | Enhanced catalog   | 1    |
       | Guest login button | Show |
@@ -56,11 +56,11 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     And I press "Save changes"
 
     Given I follow "Course 1"
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name             | Test facetoface name 2        |
-      | Description      | Test facetoface description 2 |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name             | Test seminar name 2        |
+      | Description      | Test seminar description 2 |
       | Manager Approval | 0                             |
-    And I follow "Test facetoface name 2"
+    And I follow "Test seminar name 2"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -77,11 +77,11 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I follow "Course 1"
-    And I add "Face-to-face direct enrolment" enrolment method with:
+    And I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     Given I log out
 
-  Scenario: Self-enrolment through course catalog requiring a group enrolment key or guest access or facetoface
+  Scenario: Self-enrolment through course catalog requiring a group enrolment key or guest access or seminar
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I click on ".rb-display-expand" "css_element"

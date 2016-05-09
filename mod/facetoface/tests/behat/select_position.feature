@@ -1,8 +1,8 @@
 @mod @totara @mod_facetoface
-Feature: Add a face to face with select position
+Feature: Add a seminar with select position
   In order to run a seminar
   As a teacher
-  I need to create a face to face activity
+  I need to create a seminar activity
 
   Background:
     Given I am on a totara site
@@ -18,21 +18,21 @@ Feature: Add a face to face with select position
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "admin"
-    And I navigate to "Global settings" node in "Site administration > Face-to-face"
+    And I navigate to "Global settings" node in "Site administration > Seminar"
     And I set the following fields to these values:
       | Select position on signup | 1 |
     And I press "Save changes"
     And I log out
 
   @javascript
-  Scenario: Add and configure a facetoface activity with a single session and position asked for but not mandated then sign up as user with no pos
+  Scenario: Add and configure a seminar activity with a single session and position asked for but not mandated then sign up as user with no pos
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
       | Select position on signup | 1             |
     And I follow "View all events"
     And I follow "Add a new event"
@@ -61,7 +61,7 @@ Feature: Add a face to face with select position
     Then I should see "Your booking has been completed."
 
   @javascript
-  Scenario: Add and configure a facetoface activity with a single session and position asked for but not mandated then sign in as user with two positions and check attendee list reflects this and the selected position can be updated
+  Scenario: Add and configure a seminar activity with a single session and position asked for but not mandated then sign in as user with two positions and check attendee list reflects this and the selected position can be updated
     Given the following "position" frameworks exist:
       | fullname      | idnumber |
       | PosHierarchy1 | FW001    |
@@ -77,9 +77,9 @@ Feature: Add a face to face with select position
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
       | Select position on signup | 1             |
     And I follow "View all events"
     And I follow "Add a new event"
@@ -128,14 +128,14 @@ Feature: Add a face to face with select position
     And I should see "Position1"
 
   @javascript
-  Scenario: Add and configure a facetoface activity with a single session and position asked for and mandated then try to sign up as user with no pos
+  Scenario: Add and configure a seminar activity with a single session and position asked for and mandated then try to sign up as user with no pos
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
       | Select position on signup | 1             |
       | Prevent signup if no position is selected or can be found | 1             |
     And I follow "View all events"
@@ -161,10 +161,10 @@ Feature: Add a face to face with select position
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Sign-up"
-    Then I should see "You must have a suitable position assigned to sign up for this facetoface activity"
+    Then I should see "You must have a suitable position assigned to sign up for this seminar activity"
 
   @javascript
-  Scenario: Add and configure a facetoface activity with a single session and position asked for then sign in as user with two positions and check user shown to correct manager.
+  Scenario: Add and configure a seminar activity with a single session and position asked for then sign in as user with two positions and check user shown to correct manager.
     Given the following "position" frameworks exist:
       | fullname      | idnumber |
       | PosHierarchy1 | FW001    |
@@ -180,9 +180,9 @@ Feature: Add a face to face with select position
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
       | Select position on signup | 1             |
     And I follow "View all events"
     And I follow "Add a new event"
@@ -222,7 +222,7 @@ Feature: Add a face to face with select position
     And I log in as "admin"
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
     And I set the field "Report Name" to "F2F sessions"
-    And I set the field "Source" to "Seminar Sign ups"
+    And I set the field "Source" to "Seminar Sign-ups"
     And I press "Create report"
     And I click on "Columns" "link" in the ".tabtree" "css_element"
     And I add the "Position on sign up" column to the report

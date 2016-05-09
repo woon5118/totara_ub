@@ -1,6 +1,6 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Search pre-defined rooms in Face-to-face
-  In order to test Face-to-face room search
+Feature: Search pre-defined rooms in seminar
+  In order to test seminar room search
   As a site manager
   I need to create the rooms and search in the room search dialog box
 
@@ -10,13 +10,13 @@ Feature: Search pre-defined rooms in Face-to-face
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
     And I log in as "admin"
-    And I navigate to "Rooms" node in "Site administration > Face-to-face"
+    And I navigate to "Rooms" node in "Site administration > Seminar"
     And I press "Add a new room"
     And I set the following fields to these values:
-      | Room name | Room 1          |
-      | Building  | That house      |
-      | Address   | 123 here street |
-      | Capacity  | 5               |
+      | Name              | Room 1          |
+      | Building          | That house      |
+      | Address           | 123 here street |
+      | Maximum bookings  | 5               |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
@@ -24,22 +24,22 @@ Feature: Search pre-defined rooms in Face-to-face
 
     And I press "Add a new room"
     And I set the following fields to these values:
-      | Room name | Room 2          |
-      | Building  | Your house      |
-      | Address   | 123 near street |
-      | Capacity  | 6               |
+      | Name              | Room 2          |
+      | Building          | Your house      |
+      | Address           | 123 near street |
+      | Maximum bookings  | 6               |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
 
-  Scenario: Try and search a room in Face-to-face
+  Scenario: Try and search a room in seminar
     Given I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Select room" "link"

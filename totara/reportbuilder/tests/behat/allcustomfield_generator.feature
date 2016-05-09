@@ -13,7 +13,7 @@ Feature: All customfields column generator
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
     And I log in as "admin"
-    And I navigate to "Custom fields" node in "Site administration > Face-to-face"
+    And I navigate to "Custom fields" node in "Site administration > Seminar"
     And I click on "Sign-up" "link"
 
     # Add Checkbox
@@ -89,9 +89,9 @@ Feature: All customfields column generator
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name        | Test facetoface name        |
-      | Description | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -118,7 +118,7 @@ Feature: All customfields column generator
     And I wait "1" seconds
     And I press "Continue"
     And I set the following fields to these values:
-      | Signup note | My note |
+      | Requests for session organiser | My note |
       | CF Checkbox | 1 |
       | customfield_cfdatetime[day]   | 5    |
       | customfield_cfdatetime[month] | 6    |

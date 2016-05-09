@@ -1,14 +1,14 @@
 @mod @totara @mod_facetoface @javascript
-Feature: Configure face to face custom fields
-  In order to use face to face
+Feature: Configure seminar custom fields
+  In order to use seminar
   As a configurator
   I need to configure custom fields
 
-  Scenario: Access face to face activity custom fields as admin
+  Scenario: Access seminar activity custom fields as admin
     Given I am on a totara site
     And I log in as "admin"
 
-    When I navigate to "Custom fields" node in "Site administration > Face-to-face"
+    When I navigate to "Custom fields" node in "Site administration > Seminar"
     Then I should see "Create a new custom field"
 
     When I follow "Asset"
@@ -26,7 +26,7 @@ Feature: Configure face to face custom fields
     When I follow "Event cancellation"
     Then I should see "Create a new custom field"
 
-  Scenario: Access face to face activity custom fields with modconfig capability
+  Scenario: Access seminar activity custom fields with modconfig capability
     Given I am on a totara site
     And the following "users" exist:
       | username     | firstname    | lastname | email         |
@@ -49,7 +49,7 @@ Feature: Configure face to face custom fields
     And I log out
     And I log in as "configurator"
 
-    When I navigate to "Custom fields" node in "Site administration > Face-to-face"
+    When I navigate to "Custom fields" node in "Site administration > Seminar"
     Then I should see "Create a new custom field"
 
     When I follow "Asset"

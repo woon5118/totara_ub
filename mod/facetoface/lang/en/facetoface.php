@@ -51,25 +51,25 @@ $string['allocate'] = 'Allocate spaces for team';
 $string['allocatenoteam'] = 'There are no team members you can allocate to this event';
 $string['allocationfull_noreserve'] = 'Without replacing your current reservations, you can only allocate {$a} space(s) for this event';
 $string['allocationfull_reserve'] = 'You can only allocate {$a} space(s) for this event';
-$string['allowcancellationanytime'] = 'Allow at any time';
-$string['allowcancellationcutoff'] = 'Allow until cut-off reached';
-$string['allowcancellationnever'] = 'Never allow';
-$string['allowcancellations'] = 'Allow booking cancellations';
-$string['allowcancellationsdefault'] = 'Allow booking cancellations default';
-$string['allowcancellationsdefault_help'] = 'Whether events in this activity will allow booking cancellations by default, can be overridden in the event settings';
+$string['allowcancellationanytime'] = 'At any time';
+$string['allowcancellationcutoff'] = 'Until specified period';
+$string['allowcancellationnever'] = 'Never';
+$string['allowcancellations'] = 'Allow cancellations';
+$string['allowcancellationsdefault'] = 'Allow cancellations default';
+$string['allowcancellationsdefault_help'] = 'Whether events in this activity will allow cancellations by default, can be overridden in the event settings';
 $string['allowcancellations_help'] = 'Whether event attendees will be able to cancel their bookings';
 $string['allowconflicts'] = 'Allow room booking conflicts';
 $string['allowconflicts_help'] = 'This will allow room scheduling conflicts to exist';
-$string['allowoverbook'] = 'Allow overbooking';
+$string['allowoverbook'] = 'Enable waitlist';
 $string['allowscheduleconflicts'] = 'Allow scheduling conflicts';
 $string['allowschedulingconflicts'] = 'Override user conflicts';
-$string['allowschedulingconflicts_help'] = 'If trainers or users are already assigned or booked onto another Facetoface event at the same time as this event then the administrator will be warned, but can override such warnings and proceed anyway by selecting "Yes" from the drop-down menu';
+$string['allowschedulingconflicts_help'] = 'If trainers or users are already assigned or booked onto another seminar event at the same time as this event then the administrator will be warned, but can override such warnings and proceed anyway by selecting "Yes" from the drop-down menu';
 $string['allowselectedschedulingconflicts'] = 'Allow selected scheduling conflicts';
-$string['allowsignupnotedefault'] = 'Allow "User sign-up note" default';
+$string['allowsignupnotedefault'] = 'Default &lsquo;Users can enter requests when signing up&rsquo; setting';
 $string['allowsignupnotedefault_help'] = 'Whether events in this activity will allow a sign-up note by default, can be overridden in the event settings';
 $string['allrooms'] = 'All rooms';
 $string['allsessionsin'] = 'All events in {$a}';
-$string['alreadysignedup'] = 'You have already signed-up for this Face-to-face activity.';
+$string['alreadysignedup'] = 'You have already signed-up for this seminar activity.';
 $string['anytime'] = 'Any time';
 $string['answer'] = 'Sign in';
 $string['answercancel'] = 'Sign out';
@@ -89,7 +89,7 @@ $string['approvalusers_help'] = 'The approval administrators will receive a noti
 $string['approvertime'] = 'Approval Time';
 $string['approveremail'] = 'Approver Email';
 $string['approvaloptions'] = 'Require approval by';
-$string['approvaloptions_help'] = 'Available options are defined by the approvaloptions setting on the facetoface administration settings page:
+$string['approvaloptions_help'] = 'Available options are defined by the approvaloptions setting on the seminar administration settings page:
 <br />
 <br /> <b>No approval</b> - Users will be able to freely sign up to sessions
 <br /> <b>Self approval</b> - Users will be able to sign up to sessions after agreeing to the Terms and Conditions specified in the text box below the setting
@@ -132,7 +132,7 @@ $string['approvalovercapacity'] = 'There are {$a->waiting} learners awaiting app
 $string['approvalovercapacitywaitlist'] = 'There are {$a->waiting} learners awaiting approval but only {$a->available} spaces available.<br /> Only the first {$a->available} learners you approve will be added to the event - additional approvals will be added to the waitlist.';
 $string['potentialattendees'] = 'Potential Attendees';
 $string['attendeestablesummary'] = 'People planning on or having attended this event.';
-$string['availablesignupnote'] = 'User sign-up note';
+$string['availablesignupnote'] = 'Users can enter requests when signing up';
 $string['requeststablesummary'] = 'People requesting to attended this event.';
 $string['beforestartofsession'] = 'before start of event';
 $string['backtoassets'] = 'Back to assets';
@@ -143,10 +143,10 @@ $string['body_help'] = 'This is the body of the notification to be sent.
 
 In the notification there are a number of placeholders that can be used, these placeholders will be replaced with the appropriate values when the message is sent.
 
-Available Face to Face placholders:
+Available Seminar placholders:
 
 * [coursename] - Name of course
-* [facetofacename] - Name of Face to face activity
+* [facetofacename] - Name of seminar activity
 * [cost] - Cost of event
 * [reminderperiod] - Amount of time before the event that the reminder message is sent
 * [sessiondate] - Date of the event the learner is booked on
@@ -162,7 +162,7 @@ Available Face to Face placholders:
 * [latestfinishtime] - Finish time of the event. If there are multiple sessions it will use the last one.
 * [latestfinishdate] - Date at the end of the event. If there are multiple sessions it will use the last one.
 
-There are also placeholders available for event custom fields and they follow the format [session:shortname]. Where "shortname" is the shortname of the Face to face custom field.
+There are also placeholders available for event custom fields and they follow the format [session:shortname]. Where "shortname" is the shortname of the Seminar custom field.
 
 To include the details of each session, a segment of the notification can be repeated to include the details of each individual sesison. To do this, add [#sessions] where you would like the loop to start, add [/sessions] where you would like it to end.
 
@@ -233,8 +233,8 @@ $string['bulkaddsourceidnumber'] = 'ID number';
 $string['bulkaddsourceuserid'] = 'user id';
 $string['bulkaddsourceusername'] = 'username';
 $string['bulkremoveattendeessuccess'] = 'Bulk remove users success';
-$string['calendareventdescriptionbooking'] = 'You are booked for this <a href="{$a}">Face-to-face event</a>.';
-$string['calendareventdescriptionsession'] = 'You have created this <a href="{$a}">Face-to-face event</a>.';
+$string['calendareventdescriptionbooking'] = 'You are booked for this <a href="{$a}">Seminar event</a>.';
+$string['calendareventdescriptionsession'] = 'You have created this <a href="{$a}">Seminar event</a>.';
 $string['calendaroptions'] = 'Calendar options';
 $string['cancelsession'] = 'Cancel event';
 $string['cancelingsession'] = 'Canceling session in {$a}';
@@ -245,14 +245,14 @@ $string['cancelbooking'] = 'Cancel booking';
 $string['cancelbookingfor'] = 'Cancel booking for {$a}';
 $string['cancellationreasoncourseunenrollment'] = '{$a->username} has been unenrolled from the course {$a->coursename}.';
 $string['cancellationsent'] = 'You should immediately receive a cancellation email.';
-$string['cancellationnotsent'] = 'Face-to-face activity email notifications are turned off.';
+$string['cancellationnotsent'] = 'Seminar activity email notifications are turned off.';
 $string['cancellationsentmgr'] = 'You and your manager should immediately receive a cancellation email.';
 $string['cancellationstablesummary'] = 'List of people who have cancelled their event signups.';
 $string['cancelreason'] = 'Reason';
 $string['cancelwaitlist'] = 'Cancel waitlist';
 $string['cancelwaitlistfor'] = 'Cancel place on the waitlist for {$a}';
 $string['capacity'] = 'Capacity';
-$string['capacityallowoverbook'] = '{$a} (allow overbooking)';
+$string['capacityallowoverbook'] = '{$a} (enable waitlist)';
 $string['capacitycurrentofmaximum'] = '{$a->current} / {$a->maximum}';
 $string['capacityoverbooked'] = ' (Overbooked)';
 $string['capacityoverbookedlong'] = 'This event is overbooked ({$a->current} / {$a->maximum})';
@@ -269,7 +269,7 @@ $string['cannotapproveatcapacity'] = 'You cannot approve any more attendees as t
 $string['chooseassets'] = 'Choose assets';
 $string['chooseroom'] = 'Choose a room';
 $string['cannotapproveatcapacity'] = 'You cannot approve any more attendees as this session is full.';
-$string['cleanuptask'] = 'Cleanup facetoface';
+$string['cleanuptask'] = 'Cleanup seminar';
 $string['clearall'] = 'Clear all';
 $string['close'] = 'Close';
 $string['closed'] = 'Closed';
@@ -282,7 +282,7 @@ $string['confirmationmessage'] = 'Confirmation message';
 $string['confirmationsent'] = 'You should immediately receive a confirmation email.';
 $string['confirmationsentmgr'] = 'You and your manager should immediately receive a confirmation email.';
 $string['completionstatusrequired'] = 'Require status';
-$string['completionstatusrequired_help'] = 'Checking one or more statuses will require a user to achieve at least one of the checked statuses in order to be marked complete in this Face to face activity, as well as any other Activity Completion requirements.';
+$string['completionstatusrequired_help'] = 'Checking one or more statuses will require a user to achieve at least one of the checked statuses in order to be marked complete in this seminar activity, as well as any other Activity Completion requirements.';
 $string['copyingsession'] = 'Copying as a new event in {$a}';
 $string['copysession'] = 'Copy event';
 $string['cost'] = 'Cost';
@@ -335,15 +335,16 @@ $string['datetext'] = 'You are signed in for date';
 $string['deactivate'] = 'Deactivate';
 $string['decidelater'] = 'Decide Later';
 $string['declareinterest'] = 'Declare interest';
-$string['declareinterest_help'] = 'Displays a option within the face to face activity to allow a user to flag their interest and write a message without signing up.
+$string['declareinterest_help'] = 'Displays a option within the seminar activity to allow a user to flag their interest and write a message without signing up.
 Information about those who have declared an interest can be reported on from within the activity.';
+$string['declareinterestalways'] = 'Always';
 $string['declareinterestfiltercheckbox'] = 'Show only users who declared interest in this activity';
 $string['declareinterestin'] = 'Declare interest in {$a}';
 $string['declareinterestinconfirm'] = 'You can declare an interest in {$a} in order to be considered when new events are added or places become available in existing events.';
-$string['declareinterestenable'] = 'Enable "Declare Interest" option';
-$string['declareinterestonlyiffull'] = 'Show "Declare Interest" link only if all events are closed';
-$string['declareinterestonlyiffull_help'] = 'Only show the declare interest option if there are no events with spaces or waiting lists.';
-$string['declareinterstreason'] = 'Reason for interest:';
+$string['declareinterestenable'] = 'Users can declare interest';
+$string['declareinterestnever'] = 'Never';
+$string['declareinterestnoupcoming'] = 'When no upcoming sessions are available for booking';
+$string['declareinterestreason'] = 'Reason for interest:';
 $string['declareinterestreport'] = 'Declared interest report';
 $string['declareinterestreportdate'] = 'Date of declared interest';
 $string['declareinterestreportreason'] = 'Stated reason for interest';
@@ -357,9 +358,9 @@ $string['defaultfinishtime'] = 'Default finish time';
 $string['defaultfinishtimehelp'] = 'Default finish time for new events';
 $string['defaultdaysbetweenstartfinish'] = 'Default days between start and finish';
 $string['defaultdaysbetweenstartfinish_desc'] = 'The default number of days between the event start and finish.';
-$string['defaultdaysskipweekends'] = 'Week days only';
+$string['defaultdaysskipweekends'] = 'Default days ahead on week days only';
 $string['defaultdaysskipweekends_desc'] = 'When defaulting the start and finish dates only count week days';
-$string['defaultdaystosession'] = 'Number of days in future to default for new events';
+$string['defaultdaystosession'] = 'Default days ahead for added events';
 $string['defaultdaystosession_desc'] = 'When creating a new event it\'s start and finish dates will default to this many days in the future.';
 $string['deleteall'] = 'Delete all';
 $string['deleteassetconfirm'] = 'Are you sure you want to delete asset <strong>"{$a}"</strong>:';
@@ -379,7 +380,7 @@ $string['discountcode'] = 'Discount code';
 $string['discountcost'] = 'Discount cost';
 $string['discountcosthinttext'] = '';
 $string['dismiss'] = 'Dismiss';
-$string['dismissedwarning'] = 'The warning will no longer be displayed for this face-to-face';
+$string['dismissedwarning'] = 'The warning will no longer be displayed for this seminar';
 $string['downloadsigninsheet'] = 'Download sign-in sheet';
 $string['due'] = 'due';
 $string['duration'] = 'Duration';
@@ -408,16 +409,16 @@ $string['embedded:seminarsignups'] = 'Seminars: Sign ups';
 $string['emptylocation'] = 'Location was empty';
 $string['enablemincapacity'] = 'Enable minimum bookings';
 $string['enablemincapacitynotification'] = 'Notify about minimum bookings';
-$string['enablemincapacitynotification_help'] = 'If the minimum bookings have not been reached by the cut-off point, then the appropriate users will be notified. Users to be notified is determined by the role assignments and the configuration setting under Site administration > Face-to-face > Global settings > Notifications';
+$string['enablemincapacitynotification_help'] = 'If the minimum bookings have not been reached by the cut-off point, then the appropriate users will be notified. Users to be notified is determined by the role assignments and the configuration setting under Site Administration > Seminar > General Settings > Notification';
 $string['enrolled'] = 'enrolled';
-$string['error:addalreadysignedupattendee'] = 'This user is already signed-up for this Face-to-face activity.';
-$string['error:addalreadysignedupattendeeaddself'] = 'You are already signed-up for this Face-to-face activity.';
+$string['error:addalreadysignedupattendee'] = 'This user is already signed-up for this seminar activity.';
+$string['error:addalreadysignedupattendeeaddself'] = 'You are already signed-up for this seminar activity.';
 $string['error:addattendee'] = 'Could not add {$a} to the event.';
 $string['error:approvernotselected'] = 'Please select an approver';
 $string['error:assetisinuse'] = 'This asset is used in one or more events';
 $string['error:cancellationsnotallowed'] = 'You are not allowed to cancel this booking.';
 $string['error:cancelbooking'] = 'There was a problem cancelling your booking';
-$string['error:cannotdeclareinterest'] = 'Cannot declare interest in this face-to-face activity.';
+$string['error:cannotdeclareinterest'] = 'Cannot declare interest in this seminar activity.';
 $string['error:cannotapprovefull'] = 'One or more users were not assigned because the event is fully booked and over booking is not allowed';
 $string['error:cannotemailmanager'] = 'Sent reminder mail for submission id {$a->submissionid} to user {$a->userid}, but could not send the message for the user\'s manager email address ({$a->manageremail}).';
 $string['error:cannotemailuser'] = 'Could not send out mail for submission id {$a->submissionid} to user {$a->userid} ({$a->useremail}).';
@@ -436,24 +437,24 @@ $string['error:conflictingsession'] = 'The user {$a} is already signed up for an
 $string['error:couldnotaddfield'] = 'Could not add custom event field.';
 $string['error:couldnotaddnotice'] = 'Could not add site notice.';
 $string['error:couldnotaddsession'] = 'Could not add event';
-$string['error:couldnotaddtrainer'] = 'Could not save new face-to-face event trainer';
+$string['error:couldnotaddtrainer'] = 'Could not save new seminar event trainer';
 $string['error:couldnotcopysession'] = 'Could not copy event';
 $string['error:couldnotdeletefield'] = 'Could not delete custom event field';
 $string['error:couldnotdeletenotice'] = 'Could not delete site notice';
 $string['error:couldnotdeletesession'] = 'Could not delete event';
 $string['error:couldnotcancelsession'] = 'Could not cancel session';
-$string['error:couldnotdeletetrainer'] = 'Could not delete a face-to-face event trainer';
+$string['error:couldnotdeletetrainer'] = 'Could not delete a seminar event trainer';
 $string['error:couldnotfindsession'] = 'Could not find the newly inserted event';
 $string['error:couldnotsavecustomfield'] = 'Could not save custom field';
 $string['error:couldnotsaveroom'] = 'There is a room conflict - another event is using the room at the same time';
 $string['error:couldnotupdatecalendar'] = 'Could not update event in the calendar.';
 $string['error:couldnotupdatefield'] = 'Could not update custom event field.';
-$string['error:couldnotupdatef2frecord'] = 'Could not update face-to-face signup record in database';
+$string['error:couldnotupdatef2frecord'] = 'Could not update seminar signup record in database';
 $string['error:couldnotupdatenotice'] = 'Could not update site notice.';
 $string['error:couldnotupdatesession'] = 'Could not update event';
 $string['error:coursemisconfigured'] = 'Course is misconfigured';
 $string['error:coursenotfound'] = 'Course no longer available.';
-$string['error:cronprefix'] = 'Error: facetoface cron:';
+$string['error:cronprefix'] = 'Error: seminar cron:';
 $string['error:csvcannotparse'] = 'Cannot parse submitted CSV file.';
 $string['error:csvinconsistentrows'] = 'Rows {$a} of your file contain a different number of columns than the header row';
 $string['error:csvnoidfields'] = 'You did not provide a column called \'username\', \'email\', or \'idnumber\'';
@@ -467,15 +468,15 @@ $string['error:emptylocation'] = 'Location was empty.';
 $string['error:emptyvenue'] = 'Venue was empty.';
 $string['error:enrolmentfailed'] = 'Could not enrol {$a} into the course.';
 $string['error:eventoccurred'] = 'You cannot cancel an event that has already occurred.';
-$string['error:facetofacenotfound'] = 'Face-to-face activity is no longer available.';
+$string['error:facetofacenotfound'] = 'Seminar activity is no longer available.';
 $string['error:fieldidincorrect'] = 'Field ID is incorrect: {$a}';
-$string['error:f2ffailedupdatestatus'] = 'Face-to-face failed to update the user\'s status';
+$string['error:f2ffailedupdatestatus'] = 'Seminar failed to update the user\'s status';
 $string['error:idnumbernotfound'] = 'No users were found with the following ID numbers: {$a}';
 $string['error:incorrectassetid'] = 'Asset ID was incorrect';
 $string['error:incorrectcoursemodule'] = 'Course module is incorrect';
 $string['error:incorrectcoursemoduleid'] = 'Course Module ID was incorrect';
-$string['error:incorrectcoursemodulesession'] = 'Course Module Face-to-face Event was incorrect';
-$string['error:incorrectfacetofaceid'] = 'Face-to-face ID was incorrect';
+$string['error:incorrectcoursemodulesession'] = 'Course Module Seminar Event was incorrect';
+$string['error:incorrectfacetofaceid'] = 'Seminar ID was incorrect';
 $string['error:incorrectnotificationtype'] = 'Incorrect notification type supplied';
 $string['error:invalidstatus'] = 'Invalid signup status';
 $string['error:incorrectroomid'] = 'Room ID was incorrect';
@@ -486,15 +487,15 @@ $string['error:mincapacitymissing'] = 'Session minimum bookings value is missing
 $string['error:mincapacitynotnumeric'] = 'Event minimum capacity is not a number';
 $string['error:mincapacitytoolarge'] = 'Event minimum capacity cannot be greater than the capacity';
 $string['error:mincapacityzero'] = 'Event minimum capacity cannot be zero';
-$string['error:missingrequiredmanager'] = 'This Face-to-face requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator.';
-$string['error:missingselectedmanager'] = 'This Face-to-face requires manager approval, please select a manager to request approval';
-$string['error:mustspecifycoursemodulefacetoface'] = 'Must specify a course module or a facetoface ID';
+$string['error:missingrequiredmanager'] = 'This seminar requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator.';
+$string['error:missingselectedmanager'] = 'This seminar requires manager approval, please select a manager to request approval';
+$string['error:mustspecifycoursemodulefacetoface'] = 'Must specify a course module or a seminar ID';
 $string['error:mustspecifytimezone'] = 'You must set the timezone for each date';
 $string['error:nodatasupplied'] = 'No data supplied';
 $string['error:nomanagersemailset'] = 'No manager email is set';
-$string['error:nopermissiontosignup'] = 'You don\'t have permission to signup to this facetoface event.';
-$string['error:nopositionselected'] = 'You must have a suitable position assigned to sign up for this facetoface event.';
-$string['error:nopositionselectedactivity'] = 'You must have a suitable position assigned to sign up for this facetoface activity.';
+$string['error:nopermissiontosignup'] = 'You don\'t have permission to signup to this seminar event.';
+$string['error:nopositionselected'] = 'You must have a suitable position assigned to sign up for this seminar event.';
+$string['error:nopositionselectedactivity'] = 'You must have a suitable position assigned to sign up for this seminar activity.';
 $string['error:nopredefinedassets'] = 'No pre-defined assets';
 $string['error:nopredefinedrooms'] = 'No pre-defined rooms';
 $string['error:norecipientsselected'] = 'You must choose which learners will receive this notification';
@@ -505,10 +506,10 @@ $string['error:problemsigningup'] = 'There was a problem signing you up.';
 $string['error:removeattendee'] = 'Could not remove {$a} from the event.';
 $string['error:roomisinuse'] = 'Room is in use';
 $string['error:sessionnotfound'] = 'The session is no longer available.';
-$string['error:selfapprovalupgrade'] = 'Self approval has been moved from sessions to a facetoface setting, please run the admin tool to resolve any conflicts before upgrading.';
+$string['error:selfapprovalupgrade'] = 'Self approval has been moved from sessions to a seminar setting, please run the admin tool to resolve any conflicts before upgrading.';
 $string['error:sessionstartafterend'] = 'Event start date/time is after end.';
 $string['error:sessiondatesconflict'] = 'This date conflicts with an earlier date in this event';
-$string['error:signedupinothersession'] = 'You are already signed up in another event for this activity. You can only sign up for one event per Face-to-face activity.';
+$string['error:signedupinothersession'] = 'You are already signed up in another event for this activity. You can only sign up for one event per seminar activity.';
 $string['error:takeattendance'] = 'An error occurred while taking attendance';
 $string['error:therearexconflicts'] = 'There are ({$a}) conflicts with the proposed time period.';
 $string['error:thereisaconflict'] = 'There is a conflict with the proposed time period.';
@@ -523,10 +524,10 @@ $string['error:userassignedsessionconflictmultiday'] = '{$a->fullname} is alread
 $string['error:userassignedsessionconflictmultidayselfsignup'] = 'You are already assigned as a \'{$a->participation}\' for {$a->session} at {$a->datetimestart} to {$a->datetimefinish}.';
 $string['error:userbookedsessionconflictmultiday'] = '{$a->fullname} is already booked to attend {$a->session} at {$a->datetimestart} to {$a->datetimefinish}. Please select another user or change the session';
 $string['error:userbookedsessionconflictmultidayselfsignup'] = 'You are already booked to attend {$a->session} at {$a->datetimestart} to {$a->datetimefinish}.';
-$string['error:userdeleted'] = 'Can not add deleted user {$a} to the facetoface.';
+$string['error:userdeleted'] = 'Can not add deleted user {$a} to the seminar.';
 $string['error:userimportuseridnotanint'] = 'Cannot add user with user id {$a} because it is not an integer';
 $string['error:usernamenotfound'] = 'No users were found with the following usernames: {$a}';
-$string['error:usersuspended'] = 'Can not add suspended user {$a} to the facetoface.';
+$string['error:usersuspended'] = 'Can not add suspended user {$a} to the seminar.';
 $string['eventattendancerequestsapproved'] = 'Attendance requests approved';
 $string['eventattendancerequestsdeclined'] = 'Attendance requests declined';
 $string['eventattendanceupdated'] = 'Attendance updated';
@@ -556,41 +557,41 @@ $string['exportattendancexls'] = 'Export attendance form (xls)';
 $string['exporttofile'] = 'Export to file';
 $string['exportattendance'] = 'Export attendance';
 $string['exportcustomprofilefields'] = 'Export custom profile fields';
-$string['exportcustomprofilefields_desc'] = 'Include these custom user profile fields (short names) in Face-to-face exports, separated by commas.';
+$string['exportcustomprofilefields_desc'] = 'Include these custom user profile fields (short names) in seminar exports, separated by commas.';
 $string['exportuserprofilefields'] = 'Export user profile fields';
-$string['exportuserprofilefields_desc'] = 'Include these user profile fields in the Face-to-face exports, separated by commas.';
+$string['exportuserprofilefields_desc'] = 'Include these user profile fields in the seminar exports, separated by commas.';
 $string['external'] = 'Allow room conflicts';
 $string['f2f-waitlist-actions'] = 'Actions';
 $string['f2f-waitlist-actions_help'] = '<p><strong>Confirm:</strong> Book the selected users into the event and remove them from the wait-list.</p>
 <p><strong>Cancel:</strong> Cancel the selected user\'s requests and remove them from the wait-list.</p>
 <p><strong>Play Lottery:</strong> Fill the available places on the events with a random selection of the users from the wait-list. Users who are not selected will be left on the wait-list.</p>';
-$string['facetoface'] = 'Face-to-face';
-$string['facetoface:addattendees'] = 'Add attendees to a face-to-face event';
-$string['facetoface:addinstance'] = 'Add a new facetoface';
+$string['facetoface'] = 'Seminar';
+$string['facetoface:addattendees'] = 'Add attendees to a seminar event';
+$string['facetoface:addinstance'] = 'Add a new seminar';
 $string['facetoface:approveanyrequest'] = 'Approve any booking requests';
-$string['facetoface:configurecancellation'] = 'Allow the configuration of booking cancellations, upon adding/editing a face-to-face activity.';
+$string['facetoface:configurecancellation'] = 'Allow the configuration of booking cancellations, upon adding/editing a seminar activity.';
 $string['facetoface:changesignedupjobposition'] = 'Change signed up job position';
-$string['facetoface:exportsessionsigninsheet'] = 'Export the face-to-face session sign-in sheet';
-$string['facetoface:managecustomfield'] = 'Manage face-to-face custom fields';
-$string['facetoface:editsessions'] = 'Add, edit, copy and delete face-to-face events';
-$string['facetoface:managereservations'] = 'Manage reservations for a event';
+$string['facetoface:exportsessionsigninsheet'] = 'Export the seminar session sign-in sheet';
+$string['facetoface:managecustomfield'] = 'Manage seminar custom fields';
+$string['facetoface:editevents'] = 'Add, edit, copy and delete seminar events';
+$string['facetoface:managereservations'] = 'Manage reservations for an event';
 $string['facetoface:manageattendeesnote'] = 'Manage event attendee\'s notes';
-$string['facetoface:overbook'] = 'Sign-up to full events.';
-$string['facetoface:removeattendees'] = 'Remove attendees from a face-to-face event';
+$string['facetoface:signupwaitlist'] = 'Sign-up to waitlist of full events';
+$string['facetoface:removeattendees'] = 'Remove attendees from a seminar event';
 $string['facetoface:reserveother'] = 'Reserve on behalf of other managers';
 $string['facetoface:reservespace'] = 'Reserve or allocate spaces for team members';
 $string['facetoface:signup'] = 'Sign-up for an event';
 $string['facetoface:takeattendance'] = 'Take attendance';
-$string['facetoface:viewallsessions'] = 'View all face-to-face sessions';
-$string['facetoface:view'] = 'View face-to-face activities and events';
+$string['facetoface:viewallsessions'] = 'View all seminar sessions';
+$string['facetoface:view'] = 'View seminar activities and events';
 $string['facetoface:viewattendees'] = 'View attendance list and attendees';
 $string['facetoface:viewattendeesnote'] = 'View event attendee\'s notes';
 $string['facetoface:viewcancellations'] = 'View cancellations';
-$string['facetoface:viewemptyactivities'] = 'View empty face-to-face activities';
-$string['facetoface:viewinterestreport'] = 'View face-to-face declared interest report';
-$string['facetofacebooking'] = 'Face-to-face booking';
-$string['facetofacename'] = 'Face-to-face name';
-$string['facetofacesession'] = 'Face-to-face event';
+$string['facetoface:viewemptyactivities'] = 'View empty seminar activities';
+$string['facetoface:viewinterestreport'] = 'View seminar declared interest report';
+$string['facetofacebooking'] = 'Seminar booking';
+$string['facetofacename'] = 'Seminar name';
+$string['facetofacesession'] = 'Seminar event';
 $string['feedback'] = 'Feedback';
 $string['feedbackupdated'] = 'Feedback updated for \{$a} people';
 $string['field:text'] = 'Text';
@@ -604,8 +605,8 @@ $string['format'] = 'Format';
 $string['freebetween'] = 'Free between the following times';
 $string['full'] = 'Date is fully occupied';
 $string['generalsettings'] = 'General settings';
-$string['gettointerestreport'] = 'To view the declare interest report go to the facetoface activity and follow the \'Declared interest report\' link in the module admin menu.';
-$string['gettosigninreport'] = 'To view the sign-in sheet go to the facetoface session and follow the download link available.';
+$string['gettointerestreport'] = 'To view the declare interest report go to the seminar activity and follow the \'Declared interest report\' link in the module admin menu.';
+$string['gettosigninreport'] = 'To view the sign-in sheet go to the seminar session and follow the download link available.';
 $string['globalsettings'] = 'Global settings';
 $string['goback'] = 'Go back';
 $string['guestsno'] = 'Sorry, guests are not allowed to sign up for events.';
@@ -614,7 +615,7 @@ $string['header:approvaltime'] = 'Approval Time';
 $string['header:managername'] = 'Manager\'s Name';
 $string['icalendarheading'] = 'iCalendar Attachments';
 $string['id'] = 'Id';
-$string['icaldescription'] = 'This calendar event is for the "{$a->name}" face-to-face event you have been booked on to.';
+$string['icaldescription'] = 'This calendar event is for the "{$a->name}" seminar event you have been booked on to.';
 $string['ignoreapprovalwhenaddingattendees'] = 'Book users without requiring approval';
 $string['import'] = 'Import';
 $string['individuals'] = 'Individuals';
@@ -642,6 +643,11 @@ $string['managerreserve_help'] = 'Managers are able to make reservations or book
 $string['managerreserveheader'] = 'Manager reservations';
 $string['managesessions'] = 'View and manage sessions';
 $string['mark_selected_as'] = 'Mark all selected as: ';
+$string['maxbookings'] = 'Maximum bookings';
+$string['maxbookings_help'] = '**Maximum bookings** is the number of seats available in a event.
+
+When a seminar event reaches capacity the event details do not appear on the course page. The details will appear greyed out on the \'View all events\' page and the learner cannot enrol on the event.
+&nbsp;';
 $string['maximumpoints'] = 'Maximum number of points';
 $string['maximumsize'] = 'Maximum number of attendees';
 $string['maxmanagerreserves'] = 'Maximum reservations';
@@ -661,20 +667,20 @@ $string['messageusers'] = 'Message users';
 $string['minbookings'] = 'Minimum bookings';
 $string['minbookings_help'] = 'Sessions with a minimum bookings are highlighted when the number of booked users is less than the minimum bookings. To prevent highlighting, set the minimum bookings to zero.';
 $string['mincapacity'] = 'Minimum bookings';
-$string['mincapacity_help'] = 'If the minimum bookings has not been reached by the cut-off point, then the appropriate users will be automatically notified. Users to be notified is determined by role assignments and the configuration setting under Site administration > Face-to-face > Global settings > Notifications';
+$string['mincapacity_help'] = 'If the minimum bookings has not been reached by the cut-off point, then the appropriate users will be automatically notified. Users to be notified is determined by role assignments and the configuration setting under Site Administration > Seminar > General Settings > Notification recipients';
 $string['missingdefaultnotifications'] = 'There are {$a} missing default notifications.';
 $string['missingdefaultsfix'] = 'Click here to restore missing default notifications.';
-$string['modulename'] = 'Face-to-face';
-$string['modulenameplural'] = 'Face-to-face';
+$string['modulename'] = 'Seminar';
+$string['modulenameplural'] = 'Seminars';
 $string['moreinfo'] = 'More info';
 $string['multidate'] = '(multi-date)';
-$string['multiplesessions'] = 'Allow multiple events signup per user';
+$string['multiplesessions'] = 'Users can sign-up to multiple sessions';
 $string['namewithmanager'] = '{$a->attendeename} ({$a->managername})';
 $string['noactionableunapprovedrequests'] = 'No actionable unapproved requests';
 $string['nocancellations'] = 'There have been no cancellations';
 $string['nocustomfields'] = '<p>No custom fields are defined.</p>';
 $string['nodatesyet'] = 'This event has no sessions. Attendees can sign-up to the waitlist for this event and will be booked automatically once one or more sessions are added.';
-$string['nofacetofaces'] = 'There are no Face-to-face activities';
+$string['nofacetofaces'] = 'There are no seminar activities';
 $string['nonapplicable'] = 'N/A';
 $string['none'] = 'None';
 $string['nonotifications'] = 'No notifications';
@@ -707,17 +713,17 @@ $string['notificationssuccessfullyreset'] = 'Notifications successfully reset';
 $string['notificationtemplatedeleted'] = 'Notification template deleted';
 $string['notificationtemplates'] = 'Notification templates';
 $string['notificationtemplatestatus'] = 'Notification template status';
-$string['notificationtemplatestatus_help'] = 'This status allows a notification template to be marked as Active or Inactive. Inactive notification templates will not be available to be used when setting up notifications for a Face-to-face activity.';
+$string['notificationtemplatestatus_help'] = 'This status allows a notification template to be marked as Active or Inactive. Inactive notification templates will not be available to be used when setting up notifications for a seminar activity.';
 $string['notificationtemplatesaved'] = 'Notification template saved';
 $string['notificationtitle'] = 'Notification title';
-$string['notificationtype'] = 'Notification Type';
+$string['notificationtype'] = 'Receive confirmation by';
 $string['notificationtype_1'] = 'Instant';
 $string['notificationtype_2'] = 'Scheduled';
 $string['notificationtype_4'] = 'Auto';
-$string['notificationboth'] = 'Email Notification and iCalendar Appointment';
-$string['notificationemail'] = 'Email Notification only';
-$string['notificationnone'] = 'No Email Notification';
-$string['notifications_help'] = 'Here you can manage notifications for this Face-to-face acitivity'; //TODO: write better help
+$string['notificationboth'] = 'Email with iCalendar appointment';
+$string['notificationemail'] = 'Email only';
+$string['notificationnone'] = 'Do not send confirmation';
+$string['notifications_help'] = 'Here you can manage notifications for this Seminar acitivity'; //TODO: write better help
 $string['notifycancelleduser'] = 'Notify cancelled attendees';
 $string['notifycancelledusermanager'] = 'Notify cancelled attendees\' managers';
 $string['notifynewuser'] = 'Send booking confirmation to new attendees';
@@ -812,7 +818,7 @@ $string['reservenocapacity'] = 'There are no spaces left on this course, so you 
 $string['reserveother'] = 'Reserve for another manager';
 $string['reservepastdeadline'] = 'You cannot make any further reservations within {$a} days of the event starting';
 $string['restoremissingdefaultnotifications'] = 'Restore missing default notifications';
-$string['restoremissingdefaultnotificationsconfirm'] = 'This will restore any missing default notifications for "{$a}" these notifications are used by built in Face-to-face functionality and may result in messages being sent to users. Do you want to continue?';
+$string['restoremissingdefaultnotificationsconfirm'] = 'This will restore any missing default notifications for "{$a}" these notifications are used by built in seminar functionality and may result in messages being sent to users. Do you want to continue?';
 $string['result'] = 'Result';
 $string['return'] = 'Return';
 $string['room'] = 'Room';
@@ -821,10 +827,12 @@ $string['roomdetails'] = '{$a->name},<br/>{$a->building},<br/>{$a->address}';
 $string['roomdoesnotexist'] = 'Room does not exist';
 $string['roomisinuse'] = 'Room is in use';
 $string['roomdescription'] = 'Room description';
+$string['roomdescriptionedit'] = 'Description';
 $string['roomdetails'] = 'Room details';
 $string['roomhidden'] = 'Room hidden successfully';
 $string['roommustbebookedtoexternalcalendar'] = 'Note: Please ensure that this room is available before creating this booking.';
 $string['roomname'] = 'Room name';
+$string['roomnameedit'] = 'Name';
 $string['room'] = 'Room';
 $string['rooms'] = 'Rooms';
 $string['roomshown'] = 'Room shown successfully';
@@ -856,17 +864,17 @@ $string['placeholder:lateststartdate'] = '[lateststartdate]';
 $string['placeholder:latestfinishtime'] = '[latestfinishtime]';
 $string['placeholder:latestfinishdate'] = '[latestfinishdate]';
 $string['pleaseselectusers'] = 'Please select users before continuing.';
-$string['pluginadministration'] = 'Facetoface administration';
-$string['pluginname'] = 'Face-to-face';
+$string['pluginadministration'] = 'Seminar administration';
+$string['pluginname'] = 'Seminar';
 $string['points'] = 'Points';
 $string['pointsplural'] = 'Points';
 $string['potentialallocations'] = 'Potential allocations ({$a} left)';
 $string['potentialrecipients'] = 'Potential recipients';
 $string['previoussessions'] = 'Previous events';
-$string['previoussessionslist'] = 'List of all past events for this Face-to-face activity';
+$string['previoussessionslist'] = 'List of all past events for this seminar activity';
 $string['printversionid'] = 'Print version: without name';
 $string['printversionname'] = 'Print version: with name';
-$string['really'] = 'Do you really want to delete all results for this facetoface?';
+$string['really'] = 'Do you really want to delete all results for this seminar?';
 $string['recipients'] = 'Recipients';
 $string['recipients_allbooked'] = 'All booked';
 $string['recipients_attendedonly'] = 'Attended only';
@@ -925,20 +933,20 @@ $string['selfauthorisation_help'] = 'You must read and agree to the terms and co
 $string['selfauthorisationdesc'] = 'By checking this box, I confirm that I have read and agreed to the {$a} (opens a new window).';
 $string['selfapproval'] = 'Self Approval';
 $string['selfapproval_help'] = 'This setting allows a user to confirm that they have sought approval to attend the event. Instead of their manager needing to approve their booking the user is presented with a check box when signing up and must confirm they have met the specified terms and conditions.
-This setting will be disabled unless "Requires approval" is enabled in the Face-to-face activity settings.';
+This setting will be disabled unless "Requires approval" is enabled in the seminar activity settings.';
 $string['selfapprovalsought'] = 'Self Approval Sought';
 $string['selfapprovalsoughtbrief'] = 'I accept the terms and conditions.';
 $string['selfapprovalsoughtdesc'] = 'By checking this box, I confirm that I have read and agreed to the {$a} (opens a new window).';
 $string['selfapprovaltandc'] = 'Self Approval Terms and Conditions';
 $string['selfapprovaltandc_help'] = 'Where an activity has approval required and a event has self approval enabled these are the terms and conditions that will be displayed when a user signs up.';
-$string['selfapprovaltandccontents'] = 'By checking the box you confirm that permission to sign up to this Face to Face activity has been granted by your manager.
+$string['selfapprovaltandccontents'] = 'By checking the box you confirm that permission to sign up to this seminar activity has been granted by your manager.
 
 Falsely claiming that approval has been granted can result in non-admittance and disciplinary action.
 ';
 $string['selfbooked'] = 'Self booked';
 $string['sendlater'] = 'Send later';
 $string['sendmessage'] = 'Send message';
-$string['sendnotificationstask'] = 'Send facetoface notifications';
+$string['sendnotificationstask'] = 'Send seminar notifications';
 $string['sendnow'] = 'Send now';
 $string['sentxnotifications'] = 'Send {$a} notifications';
 $string['sentremindermanager'] = 'Sent reminder email to user manager';
@@ -954,8 +962,7 @@ $string['sessiondatecolumn_html'] = '{$a->startdate} {$a->starttime} -<br>{$a->e
 $string['sessiondatetime'] = 'Event date/time';
 $string['sessiondatetimecourseformat'] = '{$a->startdate}, {$a->starttime} - {$a->endtime} (time zone: {$a->timezone})';
 $string['sessiondatetimecourseformatwithouttimezone'] = '{$a->startdate}, {$a->starttime} - {$a->endtime}';
-$string['sessiondatetimeknown'] = 'Event date/time known';
-$string['sessiondates'] = 'Sessions';
+$string['sessiondates'] = 'Specify date/time';
 $string['sessiondefaults'] = 'Event defaults';
 $string['sessionenddate'] = 'Session end date';
 $string['sessionenddatewithtime'] = '{$a->enddate}, {$a->endtime} {$a->timezone}';
@@ -968,8 +975,8 @@ $string['sessionisfull'] = 'This event is now full. You will need to pick anothe
 $string['sessionname'] = 'Session Name';
 $string['sessionnoattendeesaswaitlist'] = 'This event does not have any attendees because it does not have a known date and time.<br />See the wait-list tab for users that have signed up.';
 $string['sessionover'] = 'Event over';
-$string['sessionreport'] = 'Face to face sessions';
-$string['sessionreportcnt'] = 'Face to face sessions: {$a}';
+$string['sessionreport'] = 'Seminar sessions';
+$string['sessionreportcnt'] = 'Seminar sessions: {$a}';
 $string['sessions'] = 'Events';
 $string['sessionsoncoursepage'] = 'Events displayed on course page';
 $string['sessionstartdateandtime'] = '{$a->startdate}, {$a->starttime} - {$a->endtime} (time zone: {$a->timezone})';
@@ -983,7 +990,7 @@ $string['sessionstartdate'] = 'Session start';
 $string['sessionstartdateshort'] = 'Start date';
 $string['sessionstarttime'] = 'Event start time';
 $string['sessionstarttime_help'] = 'When creating or editing a event, the event timezone may differ from the timezone for the Start time. This is because the timezone for Start time is determined by the timezone of the user creating or editing the event. The timezone of the user creating or editing the event does not affect the event timezone itself.';
-$string['sessiontimezone'] = 'Timezone';
+$string['sessiontimezone'] = 'Timezone displayed';
 $string['sessiontimezone_help'] = 'Select the timezone you want this event to be displayed in e.g. "Pacific/Auckland". This will display the start time, finish time and timezone in accordance with the timezone selected. If you choose "User timezone", this will display the start time, finish date and timezone in relation to the timezone of the user viewing the event.';
 $string['sessiontimezoneunknown'] = 'Unknown Timezone';
 $string['sessionundercapacity'] = 'Event under capacity for: {$a}';
@@ -999,17 +1006,17 @@ $string['setactive'] = 'Set active';
 $string['setinactive'] = 'Set inactive';
 $string['setting:signupapproval_header'] = 'Signup Approvals';
 $string['setting:approvaloptions_caption'] = 'Available Approval Options';
-$string['setting:approvaloptions_default'] = 'The options selected above will be available in the \'require approval by\' setting for all Face-to-face activities. Text entered below the \'Learner accepts terms and conditions\' option will be default for all activities and can be edited for each activity. Selected \'site level administrative approvers\' are automatically added to all Face-to-face activities and can not be removed from within any given activity (note: other administrative approvers can be added to each Face-to-face activity)';
+$string['setting:approvaloptions_default'] = 'The options selected above will be available in the \'require approval by\' setting for all seminar activities. Text entered below the \'Learner accepts terms and conditions\' option will be default for all activities and can be edited for each activity. Selected \'site level administrative approvers\' are automatically added to all seminar activities and can not be removed from within any given activity (note: other administrative approvers can be added to each seminar activity)';
 $string['setting:managerselect_caption'] = 'Users Select Manager';
 $string['setting:managerselect_format'] = 'Recommended when manager assignment data is not available. When enabled and an activity requires approval by Manager, the session sign-up page will force users to search for and select a user to approve their request to attend a session each time they sign-up. The selected user will receive a notificaqtion about the request and instructions on how to approve or decline it.';
 $string['setting:termsandconditions_caption'] = 'Terms and conditions';
 $string['setting:termsandconditions_format'] = 'Text entered in this setting will be the default for the \'Learner accepts terms and conditions\' setting but can be edited for each activity.';
-$string['setting:termsandconditions_default'] = 'By checking the box you confirm that permission to sign up to this Face to Face activity has been granted by your manager.
+$string['setting:termsandconditions_default'] = 'By checking the box you confirm that permission to sign up to this seminar activity has been granted by your manager.
 
 Falsely claiming that approval has been granted can result in non-admittance and disciplinary action.
 ';
 $string['setting:adminapprovers_caption'] = 'Site level administrative approvers';
-$string['setting:adminapprovers_format'] = 'Selected users \'site level administrative approvers\' are automatically added to all Face-to-face activities and can not be removed from within any given activity (note: other administrative approvers can be added to each Face-to-face activity)';
+$string['setting:adminapprovers_format'] = 'Selected users \'site level administrative approvers\' are automatically added to all seminar activities and can not be removed from within any given activity (note: other administrative approvers can be added to each seminar activity)';
 $string['setting:approval_none'] = 'No approval required';
 $string['setting:approval_self'] = 'Learner accepts terms and conditions';
 $string['setting:approval_role'] = 'TODO - session role name?';
@@ -1018,8 +1025,8 @@ $string['setting:approval_admin'] = 'Manager and Administrative approval';
 $string['setting:allowschedulingconflicts_caption'] = 'Allow override user conflicts:';
 $string['setting:allowschedulingconflicts'] = 'Allow or disallow user conflicts to exist while creating a new event.';
 $string['setting:allowwaitlisteveryone_caption'] = 'Everyone on waiting list';
-$string['setting:allowwaitlisteveryone'] = 'When enabled a setting will appear in face to face event settings to put all users onto the waiting list when they signup regardless of event capacity.';
-$string['setting:calendarfilters'] = 'Selected fields will be displayed as filters in Face-to-face Calendar';
+$string['setting:allowwaitlisteveryone'] = 'When enabled a setting will appear in seminar event settings to put all users onto the waiting list when they signup regardless of event capacity.';
+$string['setting:calendarfilters'] = 'Selected fields will be displayed as filters in Seminar Calendar';
 $string['setting:calendarfilterscaption'] = 'Add calendar filters:';
 $string['setting:defaultcancellationinstrmngr'] = 'Default cancellation message sent to managers.';
 $string['setting:defaultcancellationinstrmngr_caption'] = 'Cancellation message (managers)';
@@ -1053,7 +1060,7 @@ $string['setting:defaultcancellationmessagedefault_v9'] = 'This is to advise tha
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 
 Duration:   [duration]
 
@@ -1068,7 +1075,7 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaultcancellationsubject'] = 'Default subject line for cancellation emails.';
 $string['setting:defaultcancellationsubject_caption'] = 'Cancellation subject';
-$string['setting:defaultcancellationsubjectdefault'] = 'Face-to-face booking cancellation';
+$string['setting:defaultcancellationsubjectdefault'] = 'Seminar booking cancellation';
 $string['setting:defaultcancelallreservationssubjectdefault'] = 'All reservations cancelled';
 $string['setting:defaultcancelallreservationsmessagedefault'] = 'This is to advise you that all unallocated reservations for the following course have been automatically cancelled, as the course will be starting soon:
 
@@ -1164,7 +1171,7 @@ $string['setting:defaultdeclinemessagedefault_v9'] = 'This is to advise that you
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 
 Duration:   [duration]
 
@@ -1179,7 +1186,7 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaultdeclinesubject'] = 'Default subject line for decline emails.';
 $string['setting:defaultdeclinesubject_caption'] = 'Decline subject';
-$string['setting:defaultdeclinesubjectdefault'] = 'Face-to-face booking decline';
+$string['setting:defaultdeclinesubjectdefault'] = 'Seminar booking decline';
 $string['setting:defaultconfirmationinstrmngr'] = 'Default confirmation message sent to managers.';
 $string['setting:defaultconfirmationinstrmngr_caption'] = 'Confirmation message (managers)';
 $string['setting:defaultconfirmationinstrmngrdefault'] = '*** Advice only ****
@@ -1218,7 +1225,7 @@ $string['setting:defaultconfirmationmessagedefault_v9'] = 'This is to confirm th
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 Cost:   [cost]
 
 Duration:    [duration]
@@ -1241,7 +1248,7 @@ To re-schedule your booking you need to cancel this booking and then re-book a n
 ';
 $string['setting:defaultconfirmationsubject'] = 'Default subject line for confirmation emails.';
 $string['setting:defaultconfirmationsubject_caption'] = 'Confirmation subject';
-$string['setting:defaultconfirmationsubjectdefault'] = 'Face-to-face booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultconfirmationsubjectdefault'] = 'Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultdatetimechangemessagedefault'] = 'Your session date/time has changed:
 
 Participant:   [firstname] [lastname]
@@ -1260,7 +1267,7 @@ $string['setting:defaultdatetimechangemessagedefault_v9'] = 'Your session has ch
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 
 Duration:   [duration]
 
@@ -1275,7 +1282,7 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaultdatetimechangesubject'] = 'Default subject line for date/time change emails.';
 $string['setting:defaultdatetimechangesubject_caption'] = 'Date/time change subject';
-$string['setting:defaultregistrationexpiredsubjectdefault'] = 'Face-to-face registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultregistrationexpiredsubjectdefault'] = 'Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultregistrationexpiredinstrmngr'] = '
 *** Advice only ****
 
@@ -1288,7 +1295,7 @@ $string['setting:defaultregistrationexpiredmessagedefault_v9'] = 'The registrati
 
 Course: [coursename]
 
-Face-to-face: [facetofacename]
+Seminar: [facetofacename]
 
 Duration: [duration]
 
@@ -1301,9 +1308,9 @@ Location: [session:room:cf_location]
 [session:room:link]
 [/sessions]
 ';
-$string['setting:defaultdatetimechangesubjectdefault'] = 'Face-to-face booking date/time changed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultdatetimechangesubjectdefault'] = 'Seminar booking date/time changed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultminbookings'] = 'Default minimum bookings';
-$string['setting:defaultminbookings_help'] = 'Default value for all Face-to-face sessions. All sessions can still have a custom minimum bookings when setting up a new Face-to-face session.';
+$string['setting:defaultminbookings_help'] = 'Default value for all seminar sessions. All sessions can still have a custom minimum bookings when setting up a new seminar session.';
 $string['setting:defaultreminderinstrmngr'] = 'Default reminder message sent to managers.';
 $string['setting:defaultreminderinstrmngr_caption'] = 'Reminder message (managers)';
 $string['setting:defaultreminderinstrmngrdefault'] = '*** Reminder only ****
@@ -1342,7 +1349,7 @@ $string['setting:defaultremindermessagedefault_v9'] = 'This is a reminder that y
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 Cost:   [cost]
 
 Duration:   [duration]
@@ -1365,7 +1372,7 @@ To re-schedule your booking you need to cancel this booking and then re-book a n
 ';
 $string['setting:defaultremindersubject'] = 'Default subject line for reminder emails.';
 $string['setting:defaultremindersubject_caption'] = 'Reminder subject';
-$string['setting:defaultremindersubjectdefault'] = 'Face-to-face booking reminder: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultremindersubjectdefault'] = 'Seminar booking reminder: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultrequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as their Team Leader / Manager.
 
 Please follow the link below to approve the request:
@@ -1392,7 +1399,7 @@ $string['setting:defaultrequestmessagedefault_v9'] = 'Your request to book into 
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 Cost:   [cost]
 
 Duration:   [duration]
@@ -1406,7 +1413,7 @@ Location: [session:room:cf_location]
 [session:room:link]
 [/sessions]
 ';
-$string['setting:defaultrequestsubjectdefault'] = 'Face-to-face booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultrequestsubjectdefault'] = 'Seminar booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultrolerequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as a [sessionrole] for the session.
 
 Please follow the link below to approve the request:
@@ -1433,7 +1440,7 @@ $string['setting:defaultrolerequestmessagedefault_v9'] = 'Your request to book i
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 Cost:   [cost]
 
 Duration:   [duration]
@@ -1447,7 +1454,7 @@ Location: [session:room:cf_location]
 [session:room:link]
 [/sessions]
 ';
-$string['setting:defaultrolerequestsubjectdefault'] = 'Face-to-face booking role request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultrolerequestsubjectdefault'] = 'Seminar booking role request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultadminrequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as an approver for the session.
 
 Please follow the link below to approve the request:
@@ -1474,7 +1481,7 @@ $string['setting:defaultadminrequestmessagedefault_v9'] = 'Your request to book 
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 Cost:   [cost]
 
 Duration:   [duration]
@@ -1488,7 +1495,7 @@ Location: [session:room:cf_location]
 [session:room:link]
 [/sessions]
 ';
-$string['setting:defaultadminrequestsubjectdefault'] = 'Face-to-face booking admin request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultadminrequestsubjectdefault'] = 'Seminar booking admin request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaulttrainerconfirmationmessage'] = 'Default message sent to trainers when assigned to an event.';
 $string['setting:defaulttrainerconfirmationmessage_caption'] = 'Trainer confirmation message';
 $string['setting:defaulttrainerconfirmationmessagedefault'] = 'This is to confirm that you are now assigned to deliver training on the following course:
@@ -1513,7 +1520,7 @@ $string['setting:defaulttrainerconfirmationmessagedefault_v9'] = 'This is to con
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 
 Duration:    [duration]
 
@@ -1532,7 +1539,7 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaulttrainerconfirmationsubject'] = 'Default subject line for trainer confirmation emails.';
 $string['setting:defaulttrainerconfirmationsubject_caption'] = 'Trainer confirmation subject';
-$string['setting:defaulttrainerconfirmationsubjectdefault'] = 'Face-to-face trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaulttrainerconfirmationsubjectdefault'] = 'Seminar trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 
 $string['setting:defaulttrainersessioncancellationmessage'] = 'Default event cancellation message sent to the trainer.';
 $string['setting:defaulttrainersessioncancellationmessage_caption'] = 'Trainer event cancellation message';
@@ -1558,7 +1565,7 @@ $string['setting:defaulttrainersessioncancellationmessagedefault_v9'] = 'This is
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 
 Duration:   [duration]
 
@@ -1573,7 +1580,7 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaulttrainersessioncancellationsubject'] = 'Default subject line for trainer event cancellation emails.';
 $string['setting:defaulttrainersessioncancellationsubject_caption'] = 'Trainer event cancellation subject';
-$string['setting:defaulttrainersessioncancellationsubjectdefault'] = 'Face-to-face event trainer cancellation';
+$string['setting:defaulttrainersessioncancellationsubjectdefault'] = 'Seminar event trainer cancellation';
 
 $string['setting:defaulttrainersessionunassignedmessage'] = 'Default event unassigned message sent to the trainer.';
 $string['setting:defaulttrainersessionunassignedmessage_caption'] = 'Trainer event unassigned message';
@@ -1599,7 +1606,7 @@ $string['setting:defaulttrainersessionunassignedmessagedefault_v9'] = 'This is t
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 
 Duration:   [duration]
 
@@ -1614,7 +1621,7 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaulttrainersessionunassignedsubject'] = 'Default subject line for trainer event unassigned emails.';
 $string['setting:defaulttrainersessionunassignedsubject_caption'] = 'Trainer event unassigned subject';
-$string['setting:defaulttrainersessionunassignedsubjectdefault'] = 'Face-to-face event trainer unassigned';
+$string['setting:defaulttrainersessionunassignedsubjectdefault'] = 'Seminar event trainer unassigned';
 $string['setting:defaultvalue'] = 'Default value';
 $string['setting:defaultwaitlistedmessage'] = 'Default wait-listed message sent to users.';
 $string['setting:defaultwaitlistedmessage_caption'] = 'Wait-listed message';
@@ -1634,7 +1641,7 @@ To remove yourself from this waitlist please return to this course and click Can
 $string['setting:defaultwaitlistedmessagedefault_v9'] = 'This is to advise that you have been added to the waitlist for:
 
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 Participant:   [firstname] [lastname]
 
 Location(s):
@@ -1674,7 +1681,7 @@ $string['setting:defaultsessioncancellationmessagedefault_v9'] = 'This is to adv
 ***SESSION CANCELLED***
 
 Course:   [coursename]
-Face-to-face:   [facetofacename]
+Seminar:   [facetofacename]
 
 Duration:   [duration]
 
@@ -1689,11 +1696,11 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaultsessioncancellationsubject'] = 'Default subject line for session cancellation emails.';
 $string['setting:defaultsessioncancellationsubject_caption'] = 'Session cancellation subject';
-$string['setting:defaultsessioncancellationsubjectdefault'] = 'Face-to-face session cancellation';
+$string['setting:defaultsessioncancellationsubjectdefault'] = 'Seminar session cancellation';
 $string['setting:defaultwaitlistedsubject'] = 'Default subject line for wait-listed emails.';
 $string['setting:defaultwaitlistedsubject_caption'] = 'Wait-listed subject';
 $string['setting:defaultwaitlistedsubjectdefault'] = 'Waitlisting advice for [facetofacename]';
-$string['setting:displaysessiontimezones'] = 'When enabled the timezone of the Face-to-face event will be shown otherwise it will be hidden (selecting a timezone for an event will also be enabled/disabled).';
+$string['setting:displaysessiontimezones'] = 'When enabled the timezone of the Seminar event will be shown otherwise it will be hidden (selecting a timezone for an event will also be enabled/disabled).';
 $string['setting:displaysessiontimezones_caption'] = 'Display event timezones';
 $string['setting:disableicalcancel'] = 'Disable cancellation emails with an iCalendar attachment.';
 $string['setting:disableicalcancel_caption'] = 'Disable iCalendar cancellations:';
@@ -1716,22 +1723,22 @@ $string['setting:hidecost_caption'] = 'Hide cost and discount:';
 $string['setting:hidediscount'] = 'Hide only the discount code field.';
 $string['setting:hidediscount_caption'] = 'Hide discount:';
 $string['setting:selectpositiononsignupglobal'] = 'Select position on signup';
-$string['setting:selectpositiononsignupglobal_caption'] = 'When enabled a setting will appear in face to face activity settings to force users with multiple positions to choose which capacity they will be signing up on.';
+$string['setting:selectpositiononsignupglobal_caption'] = 'When enabled a setting will appear in seminar activity settings to force users with multiple positions to choose which capacity they will be signing up on.';
 $string['setting:selectpositiononsignupglobal'] = 'Select position on signup';
-$string['setting:selectpositiononsignupglobal_caption'] = 'When enabled a setting will appear in face to face activity settings to force users with multiple positions to choose which capacity they will be signing up on.';
+$string['setting:selectpositiononsignupglobal_caption'] = 'When enabled a setting will appear in seminar activity settings to force users with multiple positions to choose which capacity they will be signing up on.';
 $string['setting:possiblevalues'] = 'List of possible values';
 $string['setting:reservecanceldays'] = 'Reservation cancellation days';
 $string['setting:reservecanceldays_desc'] = 'The number of days in advance of the event that reservations will be automatically cancelled, if not confirmed.';
 $string['setting:reservedays'] = 'Reservation deadline';
 $string['setting:reservedays_desc'] = 'The number of days before the event starts after which no more reservations are allowed (must be greater than the cancellation days)';
 $string['setting:showinsummary'] = 'Show in exports and lists';
-$string['setting:sessionroles'] = 'Users assigned to the selected roles in a course can be tracked with each face-to-face event';
+$string['setting:sessionroles'] = 'Users assigned to the selected roles in a course can be tracked with each seminar event';
 $string['setting:sessionroles_caption'] = 'Event roles:';
-$string['setting:sessionrolesnotify'] = 'The roles that will recieve the automated notifications for facetoface events, for example the minimum capacity warning';
-$string['setting:sessionrolesnotify_caption'] = 'Notification Recipients';
+$string['setting:sessionrolesnotify'] = 'The roles that will recieve the automated notifications for seminar events, for example the minimum capacity warning';
+$string['setting:sessionrolesnotify_caption'] = 'Notification recipients';
 $string['setting:type'] = 'Field type';
-$string['setting:notificationdisable'] = 'Turn on/off Face-to-face activity notification emails to users';
-$string['setting:notificationdisable_caption'] = 'Disable Face-to-face notifications';
+$string['setting:notificationdisable'] = 'Turn on/off seminar activity notification emails to users';
+$string['setting:notificationdisable_caption'] = 'Disable notifications';
 $string['showattendeesnote'] = 'Show attendee\'s note';
 $string['showbylocation'] = 'Show by location';
 $string['showcancelreason'] = 'Show cancellation reason';
@@ -1748,7 +1755,7 @@ $string['signupfields'] = 'Sign-up fields';
 $string['signupfieldslimitation'] = 'The values entered below will be populated for all selected users. To enter different values for each user use the <a href="{$a}">file import</a>';
 $string['signupfor'] = 'Sign-up for {$a}';
 $string['signupforsession'] = 'Sign-up for an available upcoming event';
-$string['signupforthissession'] = 'Sign-up for this Face-to-face event';
+$string['signupforthissession'] = 'Sign-up for this seminar event';
 $string['signups'] = 'Sign-ups';
 $string['signupunavailable'] = 'Sign-up unavailable';
 $string['spacesreserved'] = 'Spaces reserved';
@@ -1806,7 +1813,7 @@ $string['timerequested'] = 'Time Requested';
 $string['timesignedup'] = 'Time Signed Up';
 $string['timestampbyuser'] = '{$a->time} by {$a->user}';
 $string['title'] = 'Title';
-$string['timezoneupgradeinfomessage'] = 'WARNING : This upgrade to Facetoface adds the ability to specify the timezone in which a Facetoface event will occur.<br /><br />It is <b>strongly</b> recommended that you check the event timezones, start times and end times for all upcoming Facetoface events that were created prior to this upgrade.';
+$string['timezoneupgradeinfomessage'] = 'WARNING : This upgrade to seminar adds the ability to specify the timezone in which a seminar event will occur.<br /><br />It is <b>strongly</b> recommended that you check the event timezones, start times and end times for all upcoming seminar events that were created prior to this upgrade.';
 $string['tutor'] = 'Tutor';
 $string['datesignedup'] = 'Date Signed Up';
 $string['thirdpartyemailaddress'] = 'Third-party email address(es)';
@@ -1816,22 +1823,22 @@ $string['unapprovedrequests'] = 'Unapproved Requests';
 $string['unknowndate'] = '(unknown date)';
 $string['unknowntime'] = '(unknown time)';
 $string['upcomingsessions'] = 'Upcoming events';
-$string['upcomingsessionslist'] = 'List of all upcoming events for this Face-to-face activity';
+$string['upcomingsessionslist'] = 'List of all upcoming events for this seminar activity';
 $string['upcomingsessionsinasset'] = 'Upcoming sessions using this asset';
 $string['upcomingsessionsinroom'] = 'Upcoming sessions in this room';
 $string['upcomingsessionsinroomlist'] = 'A list of upcoming sessions taking place in this room';
 $string['updateactivities'] = 'Update all activities';
 $string['updateactivities_help'] = 'When checked, saving and updating the template will update all activities that have notifications based on this template.';
-$string['updateactivitieswarning'] = '<b>Warning:</b> If you choose to update all activies then all facetoface activities that have notifications based off this template will be updated with the changes that have been made.';
+$string['updateactivitieswarning'] = '<b>Warning:</b> If you choose to update all activies then all seminar activities that have notifications based off this template will be updated with the changes that have been made.';
 $string['updateattendeessuccessful'] = 'Successfully updated attendance';
 $string['updateattendeesunsuccessful'] = 'An error has occurred, attendance could not be updated';
 $string['updateposition'] = 'Update position';
 $string['updaterequests'] = 'Update requests';
 $string['updatewaitlist'] = 'Update waitlist';
-$string['upgradefixstatusapprovedlimbousersdescription'] = 'Students with an invalid Face-to-Face signup status were detected.
+$string['upgradefixstatusapprovedlimbousersdescription'] = 'Students with an invalid seminar signup status were detected.
 The following students were removed from events:<br>{$a}';
-$string['upgradefixstatusapprovedlimbousersdetail'] = '{$a->user} was removed from Face-to-Face {$a->f2f}';
-$string['upgradeprocessinggrades'] = 'Processing Face-to-face grades, this may take a while if there are many events...';
+$string['upgradefixstatusapprovedlimbousersdetail'] = '{$a->user} was removed from seminar {$a->f2f}';
+$string['upgradeprocessinggrades'] = 'Processing seminar grades, this may take a while if there are many events...';
 $string['usercancelledon'] = 'User cancelled on {$a}';
 $string['userdoesnotexist'] = 'User with {$a->fieldname} "{$a->value}" does not exist';
 $string['useriddoesnotexist'] = 'User with ID "{$a}" does not exist';
@@ -1840,10 +1847,10 @@ $string['userstoadd'] = 'Users to add';
 $string['userstoaddcomment'] = 'Enter one user per line:';
 $string['userstobeadded'] = 'Users to be added';
 $string['userstoremove'] = 'Users to remove';
-$string['allowbookingscancellations'] = 'Allow booking cancellations';
-$string['allowbookingscancellationsdefault'] = 'Default booking cancellation setting for this facetoface';
+$string['allowbookingscancellations'] = 'Allow cancellations';
+$string['allowbookingscancellationsdefault'] = 'Default &lsquo;allow cancellations&rsquo; setting for all events';
 $string['allowbookingscancellations_help'] = 'Allow users to cancel their bookings at any time, never or until cut-off reached (x amount of time before the event starts).';
-$string['allowbookingscancellationsdefault_help'] = 'Set the default cancellation settings for this facetoface and allow users to cancel their bookings at any time, never or until cut-off reached (x amount of time before the event starts).';
+$string['allowbookingscancellationsdefault_help'] = 'Set the default cancellation settings for this seminar and allow users to cancel their bookings at any time, never or until cut-off reached (x amount of time before the event starts).';
 $string['usercalentry'] = 'Show entry on user\'s calendar';
 $string['usercancelled'] = 'User cancellation';
 $string['usercancellationnoteheading'] = '{$a} - Cancellation note';
@@ -1889,33 +1896,28 @@ $string['error:shortnametaken'] = 'Custom field with this short name already exi
 // -------------------------------------------------------
 // Help Text
 
-$string['allowoverbook_help'] = 'When "Allow overbooking" is checked, learners will be able to sign up for a face-to-face event even if it is already full.
+$string['allowoverbook_help'] = 'When "Enable waitlist" is checked, learners will be able to sign up for a seminar event even if it is already full.
 
 When a learner signs up for a event that is already full, they will receive an email advising that they have been waitlisted for the event and will be notified when a booking becomes available.';
 
-$string['approvalreqd_help'] = 'When "Approval required" is checked, a learner will need approval from their manager to be permitted to attend a face-to-face event.';
+$string['approvalreqd_help'] = 'When "Approval required" is checked, a learner will need approval from their manager to be permitted to attend a seminar event.';
 
-$string['availablesignupnote_help'] = 'When "User sign-up note" is checked, learners will be able to enter any specific requirements that the event organiser might need to know about:
+$string['availablesignupnote_help'] = 'When "Users can enter requests when signing up" is checked, learners will be able to enter any specific requirements that the event organiser might need to know about:
 
 * Dietary requirements
 * Disabilities';
 
 $string['cancellationinstrmngr'] = '# Notice for manager';
-$string['cancellationinstrmngr_help'] = 'When **Send notice to manager** is checked, the text in the **Notice for manager** field is sent to a learner\'s manager advising that they have cancelled a face-to-face booking.';
+$string['cancellationinstrmngr_help'] = 'When **Send notice to manager** is checked, the text in the **Notice for manager** field is sent to a learner\'s manager advising that they have cancelled a seminar booking.';
 
 $string['cancellationmessage_help'] = 'This message is sent out whenever users cancel their booking for an event.';
 
-$string['capacity_help'] = '**Capacity** is the number of seats available in a event.
-
-When a face-to-face event reaches capacity the event details do not appear on the course page. The details will appear greyed out on the \'View all events\' page and the learner cannot enrol on the event.
-&nbsp;';
-
 $string['confirmationinstrmngr'] = '# Notice for manager';
-$string['confirmationinstrmngr_help'] = 'When "Send notice to manager" is checked, the text in the "Notice for manager" field is sent to a manager advising that a staff member has signed up for a face-to-face event.';
+$string['confirmationinstrmngr_help'] = 'When "Send notice to manager" is checked, the text in the "Notice for manager" field is sent to a manager advising that a staff member has signed up for a seminar event.';
 
 $string['confirmationmessage_help'] = 'This message is sent out whenever users sign up for a event.';
 
-$string['description_help'] = '**Description** is the course description that displays when a learner enrols on a face-to-face event.
+$string['description_help'] = '**Description** is the course description that displays when a learner enrols on a seminar event.
 
 The **Description** also displays in the training calendar.';
 
@@ -1936,13 +1938,13 @@ If the training occurs over two or more time periods, the duration is the combin
 If the event date is known then this value is automatically recalculated when the event is saved.';
 
 $string['emailmanagercancellation'] = '# Send notice to manager';
-$string['emailmanagercancellation_help'] = 'When "Send notice to manager" is checked, an email will be sent to the learner\'s manager advising them that the face-to-face booking has been cancelled.';
+$string['emailmanagercancellation_help'] = 'When "Send notice to manager" is checked, an email will be sent to the learner\'s manager advising them that the seminar booking has been cancelled.';
 
 $string['emailmanagerconfirmation'] = '# Send notice to manager';
-$string['emailmanagerconfirmation_help'] = 'When "Send notice to manager" is checked, a confirmation email will be sent to the learner\'s manager when the learner signs up for a face-to-face event.';
+$string['emailmanagerconfirmation_help'] = 'When "Send notice to manager" is checked, a confirmation email will be sent to the learner\'s manager when the learner signs up for a seminar event.';
 
 $string['emailmanagerreminder'] = '# Send notice to manager';
-$string['emailmanagerreminder_help'] = 'When "Send notice to manager" is checked, a reminder message will be sent to the learner\'s manager a few days before the start date of the face-to-face event.';
+$string['emailmanagerreminder_help'] = 'When "Send notice to manager" is checked, a reminder message will be sent to the learner\'s manager a few days before the start date of the seminar event.';
 
 $string['location_help'] = '**Location** describes the vicinity of the event (city, county, region, etc).
 
@@ -1950,15 +1952,15 @@ $string['location_help'] = '**Location** describes the vicinity of the event (ci
 
 On the \'View all events\' page, the listed events can be filtered by location.';
 
-$string['modulename_help'] = 'The Face-to-Face activity module enables a teacher to set up a booking system for one or many in-person/classroom based events.
+$string['modulename_help'] = 'The seminar activity module enables a teacher to set up a booking system for one or many in-person/classroom based events.
 
-Each event within a Face-to-Face activity can have customised settings around room, start time, finish time, cost, capacity, etc. These can be set to run over multiple days or allow for unscheduled and waitlisted events.
+Each event within a seminar activity can have customised settings around room, start time, finish time, cost, capacity, etc. These can be set to run over multiple days or allow for unscheduled and waitlisted events.
 
 An Activity may be set to require manager approval and teachers can configure automated notifications and event reminders for attendees.
 
 Students can view and sign-up for events with their attendance tracked and recorded within the Grades area.';
 
-$string['mods_help'] = 'Face-to-face activities are used to keep track of in-person trainings which require advance booking.
+$string['mods_help'] = 'Seminar activities are used to keep track of in-person trainings which require advance booking.
 
 Each activity is offered in one or more identical events. These events can be given over multiple days.
 
@@ -1982,36 +1984,36 @@ Please note, when selecting <strong>All booked</strong>, notifications will be i
 <strong>User cancelled</strong> - will send a notification to users for whom a event was cancelled or users who removed themselves from an event.';
 
 $string['reminderinstrmngr'] = '# Notice for Manager';
-$string['reminderinstrmngr_help'] = 'When **Send notice to manager** is checked, the text in the **Notice for Manager** field is sent to a learner\'s manager advising that they have signed up for a face-to-face event.';
+$string['reminderinstrmngr_help'] = 'When **Send notice to manager** is checked, the text in the **Notice for Manager** field is sent to a learner\'s manager advising that they have signed up for a seminar event.';
 
 $string['remindermessage_help'] = 'This message is sent out a few days before a event\'s start date.';
 
 $string['requestmessage_help'] = 'When **Approval required** is enabled, the **Request message** section is available.
 
-The **Request message** section displays the notices sent to the learner and their manager regarding the approval process for the learner to attend the face-to-face event.
+The **Request message** section displays the notices sent to the learner and their manager regarding the approval process for the learner to attend the seminar event.
 
 **Subject:** is the subject line that appears on the request approval emails sent to the manager and the learner.
 
-**Message:** is the email text sent to the learner advising them that their request to attend the face-to-face event has been sent to their manager for approval.
+**Message:** is the email text sent to the learner advising them that their request to attend the seminar event has been sent to their manager for approval.
 
-**Notice for manager:** is the email text sent to the learner\'s manager requesting approval to attend the face-to-face event.';
+**Notice for manager:** is the email text sent to the learner\'s manager requesting approval to attend the seminar event.';
 
 $string['room_help'] = '**Room** is the name/number/identifier of the room being used for the training event.
 
 The **Room** displays on the \'Sign-up\' page, the \'View all events\' page and in all email notifications.';
 
-$string['sessionsoncoursepage_help'] = 'This is the number of events for each face-to-face activity that will be shown on the main course page.';
+$string['sessionsoncoursepage_help'] = 'This is the number of events for each seminar activity that will be shown on the main course page.';
 
 $string['shortname'] = '# Short Name';
 $string['shortname_help'] = '**Short name** is the description of the event that appears on the training calendar when **Show on the calendar** is enabled.';
 
-$string['showoncalendar_help'] = 'When **Site** is selected the face-to-face activity events will be displayed on the site calendar as a Global Event.  All site users will be able to view these events.
+$string['showoncalendar_help'] = 'When **Site** is selected the seminar activity events will be displayed on the site calendar as a Global Event.  All site users will be able to view these events.
 
-When **Course** is selected all of the face-to-face activity events will be displayed on the course calendar and as Course Event on the site level calendar and visible to all users enrolled in the course.
+When **Course** is selected all of the seminar activity events will be displayed on the course calendar and as Course Event on the site level calendar and visible to all users enrolled in the course.
 
-When **None** is selected, face-to-face activity events will only be displayed as User Events on a confirmed attendee\'s calendar, provided the **Show on user\'s calendar** option has been selected.';
+When **None** is selected, seminar activity events will only be displayed as User Events on a confirmed attendee\'s calendar, provided the **Show on user\'s calendar** option has been selected.';
 
-$string['suppressemail_help'] = 'Use this option if you want to silently add/remove users from a Face-to-face event. When this option is toggled, the usual email
+$string['suppressemail_help'] = 'Use this option if you want to silently add/remove users from a seminar event. When this option is toggled, the usual email
   confirmation is not sent to the selected users.';
 
 $string['thirdpartyemailaddress_help'] = '**Third-party email address(es)** is an optional field used to specify the email address of a third-party (such as an external instructor) who will then receive confirmation messages whenever a user signs-up for a event.
@@ -2027,7 +2029,7 @@ $string['timestart_help'] = 'Start time is the time when the event begins.';
 
 $string['useridentifier'] = 'User identifier';
 
-$string['usercalentry_help'] = 'When active this setting adds a User Event entry to the calendar of an attendee of a face-to-face event. When turned off this prevents a duplicate event appearing in a event attendee\'s calendar, where you have calendar display settings set to Course or Site.';
+$string['usercalentry_help'] = 'When active this setting adds a User Event entry to the calendar of an attendee of a seminar event. When turned off this prevents a duplicate event appearing in a event attendee\'s calendar, where you have calendar display settings set to Course or Site.';
 
 
 $string['venue_help'] = '**Venue** is the building the event will be held in.
@@ -2085,7 +2087,7 @@ $string['waitlistcancellationconfirm'] = 'Are you sure you want to cancel your p
 $string['waitlistedforsession'] = 'Waitlisted for event {$a}';
 $string['waitlistfor'] = 'Waitlist for {$a}';
 $string['waitliststatus'] = 'You have a place on the waitlist of the following event';
-$string['warning:mixedapprovaltypes'] = 'This facetoface was previously using mixed approval types, it is currently set to manager approval. Please check all self approval sessions.';
+$string['warning:mixedapprovaltypes'] = 'This seminar was previously using mixed approval types, it is currently set to manager approval. Please check all self approval sessions.';
 
 // Deprecated since Totara 9.0
 $string['addmanageremailaddress'] = 'Add manager email address';
@@ -2093,7 +2095,7 @@ $string['addmanageremailinstruction'] = 'You have not previously entered your ma
 $string['addnewnotice'] = 'Add a new site notice';
 $string['addnewnoticelink'] = 'Create a new site notice';
 $string['bulkaddheading'] = 'Bulk Add';
-$string['calendarfiltersheading'] = 'Facetoface calendar filters';
+$string['calendarfiltersheading'] = 'Seminar calendar filters';
 $string['changemanageremailaddress'] = 'Change manager email address';
 $string['changemanageremailinstruction'] = 'Please enter the email address for your current manager below.';
 $string['conditions'] = 'Conditions';
@@ -2103,6 +2105,8 @@ $string['confirmmanageremailaddressquestion'] = 'Is <strong>{$a}</strong> still 
 $string['confirmmanageremailinstruction1'] = 'You previously entered the following as your manager\'s email address:';
 $string['confirmmanageremailinstruction2'] = 'Is this still your manager\'s email address?';
 $string['costheading'] = 'Session Cost';
+$string['declareinterestonlyiffull'] = 'Show "Declare Interest" link only if all events are closed';
+$string['declareinterestonlyiffull_help'] = 'Only show the declare interest option if there are no events with spaces or waiting lists.';
 $string['error:couldnotupdatemanageremail'] = 'Could not update manager email address.';
 $string['error:emptymanageremail'] = 'Manager email address empty.';
 $string['error:nomanageremail'] = 'You didn\'t provide an email address for your manager';
@@ -2133,13 +2137,17 @@ $string['setting:manageraddressformatdefault'] = '';
 $string['setting:manageraddressformatreadable'] = 'Short description of the restrictions on a manager\'s email address.  This setting has no effect if the previous one is not set.';
 $string['setting:manageraddressformatreadable_caption'] = 'Format example:';
 $string['setting:manageraddressformatreadabledefault'] = 'firstname.lastname@company.com';
-$string['setting:sitenotices'] = 'Notices only appear on the Face-to-face Calendar found {$a}';
+$string['setting:sitenotices'] = 'Notices only appear on the Seminar Calendar found {$a}';
 $string['setting:sitenoticeshere'] = 'here';
 $string['sitenoticesheading'] = 'Site Notices';
 $string['waitliststatus'] = 'You have a place on the waitlist of the following session';
 
 # Deprecated
 $string['cancel'] = 'Cancel';
+$string['capacity_help'] = '**Capacity** is the number of seats available in a event.
+
+When a face-to-face event reaches capacity the event details do not appear on the course page. The details will appear greyed out on the \'View all events\' page and the learner cannot enrol on the event.
+&nbsp;';
 $string['copy'] = 'Copy';
 $string['datetimeknownhinttext'] = '';
 $string['delete'] = 'Delete';
@@ -2166,3 +2174,5 @@ When a staff member signs up for a wait-listed session:
 * The staff member will be sent a confirmation email (i.e. the one formatted per the "Wait-listed message" section of the face-to-face instance\'s settings).
 * The staff member will not be sent a reminder email message.
 * The staff member\'s manager will not be sent confirmation and cancellation email messages.';
+$string['facetoface:editsessions'] = 'Add, edit, copy and delete face-to-face events';
+$string['facetoface:overbook'] = 'Sign-up to full events.';

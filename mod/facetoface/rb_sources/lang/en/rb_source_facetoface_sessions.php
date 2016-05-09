@@ -21,7 +21,8 @@
  */
 
 // lang file for mod/facetoface/rb_sources/rb_source_facetoface_sessions.php
-$string['sourcetitle'] = 'Seminar Sign ups';
+$string['sourcetitle'] = 'Seminar Sign-ups';
+
 // columns
 $string['address'] = 'Address';
 $string['allsignupcustomfields'] = 'All sign up custom fields';
@@ -40,8 +41,8 @@ $string['sessduration'] = 'Event Duration';
 $string['status'] = 'Status';
 $string['endtime'] = 'End Time';
 $string['facilitator'] = 'Facilitator';
-$string['ftfname'] = 'Face to Face Name';
-$string['ftfnamelink'] = 'Face to Face Name (linked to event page)';
+$string['ftfname'] = 'Seminar Name';
+$string['ftfnamelink'] = 'Seminar Name (linked to event page)';
 $string['room'] = 'Room';
 $string['roomdescription'] = 'Room description';
 $string['roomname'] = 'Room name';
@@ -86,7 +87,7 @@ $string['type_session'] = 'Event';
 $string['type_status'] = 'Status';
 $string['type_role'] = 'Role';
 $string['type_room'] = 'Room';
-$string['type_facetoface'] = 'Face-to-face';
+$string['type_facetoface'] = 'Seminar';
 $string['type_facetoface_cancellation'] = 'Cancellation note customfields';
 $string['type_facetoface_room'] = 'Room';
 $string['type_facetoface_session'] = 'Event customfields';

@@ -1,8 +1,8 @@
 @javascript @mod @mod_facetoface @totara @totara_reportbuilder
-Feature: Face-to-face summary report overview
+Feature: Seminar Sessions report overview
   In order to see all required information
   As an admin
-  I need to configure face to face summary report and see all required information
+  I need to configure seminar summary report and see all required information
 
   Background:
     Given I am on a totara site
@@ -32,7 +32,7 @@ Feature: Face-to-face summary report overview
     And I log in as "admin"
 
     # Enable roles for student and trainer
-    And I navigate to "Global settings" node in "Site administration > Face-to-face"
+    And I navigate to "Global settings" node in "Site administration > Seminar"
     And I click on "Learner" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
     # Trainer is ambigous with Editing Trainer
     And I click on "s__facetoface_session_roles[4]" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
@@ -43,11 +43,11 @@ Feature: Face-to-face summary report overview
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name             | Test facetoface name 1      |
-      | Description      | Test facetoface description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name             | Test seminar name 1      |
+      | Description      | Test seminar description |
       | Manager Approval | 1                           |
-    And I follow "Test facetoface name 1"
+    And I follow "Test seminar name 1"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -74,13 +74,13 @@ Feature: Face-to-face summary report overview
     # 2: (2nd activity of C1) Two dates, self approved, overbooked, 1st started, 2nd upcoming
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name              | Test facetoface name 2      |
-      | Description       | Test facetoface description |
-    And I follow "Test facetoface name 2"
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name              | Test seminar name 2      |
+      | Description       | Test seminar description |
+    And I follow "Test seminar name 2"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | -1               |
       | timestart[month]   | 0                |
@@ -155,13 +155,13 @@ Feature: Face-to-face summary report overview
     And I click on "Find Learning" in the totara menu
     And I follow "Course 2"
     #And I turn editing mode on
-    And I add a "Face-to-face" to section "1" and I fill the form with:
-      | Name              | Test facetoface name 3      |
-      | Description       | Test facetoface description |
-    And I follow "Test facetoface name 3"
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name              | Test seminar name 3      |
+      | Description       | Test seminar description |
+    And I follow "Test seminar name 3"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
-    And I fill facetoface session with relative date in form data:
+    And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
       | timestart[day]     | -2               |
       | timestart[month]   | 0                |
@@ -379,7 +379,7 @@ Feature: Face-to-face summary report overview
     # Disable teacher role, and ensure that column and filter disappeared
     Given "Event Trainer" "link" should exist in the ".reportbuilder-table" "css_element"
     And I click on "Home" in the totara menu
-    When I navigate to "Global settings" node in "Site administration > Face-to-face"
+    When I navigate to "Global settings" node in "Site administration > Seminar"
     # Trainer is ambigous with Editing Trainer
     And I click on "s__facetoface_session_roles[4]" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
     And I press "Save changes"

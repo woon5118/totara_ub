@@ -2912,9 +2912,9 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     }
     // Can view attendees.
     $viewattendees = has_capability('mod/facetoface:viewattendees', $contextmodule);
-    $editsessions = has_capability('mod/facetoface:editsessions', $contextmodule);
+    $editevents = has_capability('mod/facetoface:editevents', $contextmodule);
     // Can see "view all sessions" link even if activity is hidden/currently unavailable.
-    $iseditor = has_any_capability(array('mod/facetoface:viewattendees', 'mod/facetoface:editsessions',
+    $iseditor = has_any_capability(array('mod/facetoface:viewattendees', 'mod/facetoface:editevents',
                                         'mod/facetoface:addattendees', 'mod/facetoface:addattendees',
                                         'mod/facetoface:takeattendance'), $contextmodule);
     // Other variables that will be required by calls further down to print_session_list_table.
@@ -2962,7 +2962,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         /** @var mod_facetoface_renderer $f2frenderer */
         $f2frenderer = $PAGE->get_renderer('mod_facetoface');
         $f2frenderer->setcontext($contextmodule);
-        $output .= $f2frenderer->print_session_list_table($sessions, $viewattendees, $editsessions,
+        $output .= $f2frenderer->print_session_list_table($sessions, $viewattendees, $editevents,
             $displaytimezones, $reserveinfo, $PAGE->url, true, false);
 
         // Add "view all sessions" row to table.
@@ -2994,7 +2994,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
             /** @var mod_facetoface_renderer $f2frenderer */
             $f2frenderer = $PAGE->get_renderer('mod_facetoface');
             $f2frenderer->setcontext($contextmodule);
-            $output .= $f2frenderer->print_session_list_table($displaysessions, $viewattendees, $editsessions,
+            $output .= $f2frenderer->print_session_list_table($displaysessions, $viewattendees, $editevents,
                 $displaytimezones, $reserveinfo, $PAGE->url, true, false);
 
             $output .= ($iseditor || ($coursemodule->visible && $coursemodule->available)) ? $htmlviewallsessions : $strviewallsessions;
@@ -3042,7 +3042,7 @@ function facetoface_is_signup_by_waitlist($session) {
     $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
     $waitlisteveryone = !empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone;
     // If user has capability to overbook?
-    $overbook = has_capability('mod/facetoface:overbook', $context);
+    $overbook = has_capability('mod/facetoface:signupwaitlist', $context);
     if ($waitlisteveryone || facetoface_get_num_attendees($session->id) >= $session->capacity) {
         return ($overbook ? false : true);
     }
@@ -3554,7 +3554,7 @@ function facetoface_session_has_capacity($session, $context = false, $status = M
     $signupcount = facetoface_get_num_attendees($session->id, $status);
     if ($signupcount >= $session->capacity) {
         // if session is full, check if overbooking is allowed for this user
-        if (!$context || !has_capability('mod/facetoface:overbook', $context)) {
+        if (!$context || !has_capability('mod/facetoface:signupwaitlist', $context)) {
             return false;
         }
     }
