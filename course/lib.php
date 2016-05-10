@@ -3806,21 +3806,20 @@ function archive_course_activities($userid, $courseid, $windowopens = NULL) {
                     }
                 }
 
-                $resetview = plugin_supports('mod', $mod->name, FEATURE_COMPLETION_TRACKS_VIEWS, 0);
-                $cms = get_all_instances_in_course($mod->name, $course, $userid);
+                $cms = get_all_instances_in_course($mod->name, $course, $userid, true);
                 foreach ($cms as $cm) {
                     // Get all instances doesn't return the completion columns.
                     $cm = get_coursemodule_from_id($mod->name, $cm->coursemodule, $courseid);
-                    if ($resetview) {
-                        // Reset viewed.
-                        $completion->set_module_viewed_reset($cm, $userid);
-                    }
 
-                    // Reset completion.
-                    $completion->update_state($cm, COMPLETION_INCOMPLETE, $userid);
+                    // Delete the course module completion.
+                    $DB->delete_records('course_modules_completion', array('coursemoduleid' => $cm->id, 'userid' => $userid));
 
-                    // Reset cache after each activity just in case the user reattempts.
                     $completion->invalidatecache($courseid, $userid, true);
+
+                    // Still running update_state despite the deletion above, as there may be activity-specific
+                    // records that were not archived by the _archive_completion function above that
+                    // should lead to re-completion.
+                    $completion->update_state($cm, COMPLETION_UNKNOWN, $userid);
                 }
 
             }

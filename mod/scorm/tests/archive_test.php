@@ -153,11 +153,7 @@ class mod_scorm_archive_testcase extends advanced_testcase {
         archive_course_activities($user->id, $course->id);
         $this->assertEquals(0, $DB->count_records('course_completions'));
         $this->assertEquals(0, $DB->count_records('course_completion_crit_compl'));
-        $this->assertEquals(1, $DB->count_records('course_modules_completion'));
+        $this->assertEquals(0, $DB->count_records('course_modules_completion'));
         $this->assertEquals(0, $DB->count_records('scorm_scoes_track'));
-
-        // Check its incomplete.
-        $completionstate = $DB->get_field('course_modules_completion', 'completionstate', $params, MUST_EXIST);
-        $this->assertEquals(COMPLETION_INCOMPLETE, $completionstate);
     }
 }

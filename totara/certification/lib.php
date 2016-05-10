@@ -380,12 +380,16 @@ function recertify_window_opens_stage() {
 
         $courses = find_courses_for_certif($user->certifid, 'c.id, c.fullname');
 
-        // Reset course_completions, course_module_completions, program_completion records.
-        reset_certifcomponent_completions($user, $courses);
-
         // Set the renewal status of the certification/program to due for renewal.
         $DB->set_field('certif_completion', 'renewalstatus', CERTIFRENEWALSTATUS_DUE,
-                        array('certifid' => $user->certifid, 'userid' => $user->id));
+            array('certifid' => $user->certifid, 'userid' => $user->id));
+
+        certif_write_completion_log($user->progid, $user->id,
+            'Window opened, current certification completion archived, all courses reset'
+        );
+
+        // Reset course_completions, course_module_completions, program_completion records.
+        reset_certifcomponent_completions($user, $courses);
 
         // Get the messages for the certification, using the message manager cache.
         $messagesmanager = prog_messages_manager::get_program_messages_manager($user->progid);
@@ -397,10 +401,6 @@ function recertify_window_opens_stage() {
                 $message->send_message($user);
             }
         }
-
-        certif_write_completion_log($user->progid, $user->id,
-            'Window opened, current certification completion archived, all courses reset'
-        );
     }
 
     return count($results);
