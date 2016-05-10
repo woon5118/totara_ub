@@ -245,16 +245,119 @@ function xmldb_totara_certification_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015111600, 'totara_certification');
     }
 
+    // TL-7970 Add program completion log table.
+    // Duplicate of the upgrade step in programs upgrade, because this table is required by subsequent cert upgrade steps,
+    // possibly BEFORE the program upgrade has occurred. Safe to run in both places, because it checks if the table exists.
+    if ($oldversion < 2016021000) {
+
+        // Define table prog_completion_log to be created.
+        $table = new xmldb_table('prog_completion_log');
+
+        // Adding fields to table prog_completion_log.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('programid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('changeuserid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table prog_completion_log.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('certif_comp_log_programid_ix', XMLDB_KEY_FOREIGN, array('programid'), 'prog', array('id'));
+        $table->add_key('certif_comp_log_userid_ix', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        $table->add_key('certif_comp_log_changeuserid_ix', XMLDB_KEY_FOREIGN, array('changeuserid'), 'user', array('id'));
+
+        // Conditionally launch create table for prog_completion_log.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2016021000, 'totara_certification');
+    }
+
+    // TL-9020 Create completion log records for all completion records that don't already have one.
+    // This should have been done when the completion log was created, but better late than never.
+    // It ensures that when a change is logged, the values that it changed FROM will be in the log.
+    // Also create completion logs for certification settings, if they haven't been created already.
+    if ($oldversion < 2016042900) {
+        // Certification settings logs.
+        $sql = "SELECT cert.*, prog.id AS programid
+                  FROM {certif} cert
+                  JOIN {prog} prog ON cert.id = prog.certifid
+             LEFT JOIN {prog_completion_log} pcl ON pcl.programid = prog.id AND pcl.userid IS NULL
+                 WHERE pcl.id IS NULL";
+        $certs = $DB->get_records_sql($sql);
+
+        $now = time();
+
+        foreach ($certs as $cert) {
+            $minimumactiveperiod = '';
+            $recertification = '';
+            switch ($cert->recertifydatetype) {
+                case CERTIFRECERT_COMPLETION:
+                    $recertification = 'Use certification completion date';
+                    break;
+                case CERTIFRECERT_EXPIRY:
+                    $recertification = 'Use certification expiry date';
+                    break;
+                case CERTIFRECERT_FIXED:
+                    $recertification = 'Use fixed expiry date';
+                    $minimumactiveperiod = '<li>Minimum active period: ' . $cert->minimumactiveperiod . '</li>';
+                    break;
+            }
+            $description = 'Snapshot of certification settings<br>' .
+                '<ul><li>Recertification date: ' . $recertification . '</li>' .
+                '<li>Active period: ' . $cert->activeperiod . '</li>' .
+                $minimumactiveperiod .
+                '<li>Window period: ' . $cert->windowperiod . '</li></ul>';
+
+            $record = new stdClass();
+            $record->programid = $cert->programid;
+            $record->userid = null;
+            $record->changeuserid = 0;
+            $record->description = $description;
+            $record->timemodified = $now;
+
+            $DB->insert_record('prog_completion_log', $record);
+        }
+
+        // Certification completion logs, as one big insert/select.
+        $description = $DB->sql_concat(
+            "'Snapshot created during upgrade<br><ul><li>Status: '", "cc.status",
+            "'</li><li>Renewal status: '", "cc.renewalstatus",
+            "'</li><li>Certification path: '", "cc.certifpath",
+            "'</li><li>Due date: '", "pc.timedue",
+            "'</li><li>Completion date: '", "cc.timecompleted",
+            "'</li><li>Window open date: '", "cc.timewindowopens",
+            "'</li><li>Expiry date: '", "cc.timeexpires",
+            "'</li><li>Program status: '", "pc.status",
+            "'</li><li>Program completion date: '", "pc.timecompleted",
+            "'</li></ul>'"
+        );
+        $sql = "INSERT INTO {prog_completion_log} (programid, userid, changeuserid, description, timemodified)
+                     (SELECT pc.programid, cc.userid, 0, {$description}, {$now}
+                        FROM {certif_completion} cc
+                        JOIN {prog} prog ON cc.certifid = prog.certifid
+                        JOIN {prog_completion} pc ON pc.programid = prog.id AND pc.userid = cc.userid AND pc.coursesetid = 0
+                   LEFT JOIN {prog_completion_log} pcl ON pcl.programid = prog.id AND pcl.userid = cc.userid
+                       WHERE pcl.id IS NULL)";
+        $DB->execute($sql);
+
+        // Savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2016042900, 'totara_certification');
+    }
+
     // TL-8605 Repair completion records affected by bug fixed in TL-6790. Users were "certified" when they were
     // unassigned, then later reassigned. Their program completion record is complete while their certification
     // record in newly assigned. Only restore if there is an "unassigned" history record to restore from. If there
     // is any problem then the records must be fixed manually.
-    if ($oldversion < 2016042900) {
+    if ($oldversion < 2016051100) {
 
         certif_upgrade_fix_reassigned_users();
 
         // Savepoint reached.
-        totara_upgrade_mod_savepoint(true, 2016042900, 'totara_certification');
+        totara_upgrade_mod_savepoint(true, 2016051100, 'totara_certification');
     }
 
     return true;

@@ -198,7 +198,7 @@ $string['error:incorrectcertifid'] = 'Incorrect certification ID certifid={$a}';
 $string['error:incorrectid'] = 'Incorrect certification completion ID or user ID';
 $string['error:invalidaction'] = 'Invalid action: {$a}';
 $string['error:invalidunassignedhist'] = 'Only one historical record can be marked as unassigned, and only if there is no current assignment';
-$string['error:cannotloadcompletionrecords'] = 'Tried to load certif_completion and prog_completion records which don\'t exist for programid: $a->program, userid: $a->userid';
+$string['error:cannotloadcompletionrecords'] = 'Tried to load certif_completion and prog_completion records which don\'t exist for programid: {$a->programid}, userid: {$a->userid}';
 $string['error:minimumactiveperiod'] = 'Active period must be greater than the recertification window period';
 $string['error:minimumactiveperiodactive'] = 'Minimum active period cannot be greater than the active period';
 $string['error:minimumactiveperiodwindow'] = 'Minimum active period cannot be less than the recertification window period';

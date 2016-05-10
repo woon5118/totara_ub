@@ -212,12 +212,11 @@ class certification_event_handler {
                 $minimumactiveperiod = '<li>Minimum active period: ' . $cert->minimumactiveperiod . '</li>';
                 break;
         }
-        $recertification .= '<br>';
         $description = 'Certification settings changed<br>' .
             '<ul><li>Recertification date: ' . $recertification . '</li>' .
             '<li>Active period: ' . $cert->activeperiod . '</li>' .
             $minimumactiveperiod .
-            '<li>Recertification date: ' . $cert->windowperiod . '</li></ul>';
+            '<li>Window period: ' . $cert->windowperiod . '</li></ul>';
 
         prog_log_completion(
             $event->objectid,
@@ -2854,7 +2853,7 @@ function certif_load_completion($programid, $userid) {
     $record = $DB->get_record_sql($sql , $params);
 
     if (empty($record)) {
-        $a = array('program' => $programid, 'userid' => $userid);
+        $a = array('programid' => $programid, 'userid' => $userid);
         print_error(get_string('error:cannotloadcompletionrecords', 'totara_certification', $a));
     }
 
@@ -2891,7 +2890,7 @@ function certif_load_completion($programid, $userid) {
  * @param int $programid
  * @param int $userid
  * @param string $message If provided, will be added at the start of the log message (instead of "Completion record edited")
- * @param null $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if empty.
+ * @param null $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if null.
  */
 function certif_write_completion_log($programid, $userid, $message = '', $changeuserid = null) {
     global $CERTIFSTATUS, $CERTIFRENEWALSTATUS, $CERTIFPATH;
@@ -2967,7 +2966,7 @@ function certif_write_completion_log($programid, $userid, $message = '', $change
  *
  * @param int $chid
  * @param string $message If provided, will be added at the start of the log message (instead of "Completion history record edited")
- * @param null $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if empty.
+ * @param null $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if null.
  */
 function certif_write_completion_history_log($chid, $message = '', $changeuserid = null) {
     global $CERTIFSTATUS, $CERTIFRENEWALSTATUS, $CERTIFPATH, $DB;

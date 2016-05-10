@@ -2622,7 +2622,7 @@ function prog_write_completion($progcompletion, $message = '', $ignoreproblemkey
  * @param int    $programid    ID of the program.
  * @param int    $userid       ID of the user who's record is being affected, or null if it affects the whole program.
  * @param string $description  Describing what happened, including details. Can include simple html formatting.
- * @param null   $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if empty.
+ * @param null   $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if null.
  */
 function prog_log_completion($programid, $userid, $description, $changeuserid = null) {
     global $DB, $USER;
@@ -2647,7 +2647,7 @@ function prog_log_completion($programid, $userid, $description, $changeuserid = 
  * @param int $programid
  * @param int $userid
  * @param string $message If provided, will be added at the start of the log message (instead of "Completion record edited")
- * @param null $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if empty.
+ * @param null $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if null.
  */
 function prog_write_completion_log($programid, $userid, $message = '', $changeuserid = null) {
     global $DB;

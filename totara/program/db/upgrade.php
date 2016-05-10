@@ -547,6 +547,8 @@ function xmldb_totara_program_upgrade($oldversion) {
     }
 
     // TL-7970 Add program completion log table.
+    // Duplicated in certs upgrade, because this table is required by subsequent cert upgrade steps, possibly BEFORE the
+    // program upgrade has occurred. Safe to run in both places, because it checks if the table exists.
     if ($oldversion < 2016021000) {
 
         // Define table prog_completion_log to be created.
@@ -602,6 +604,30 @@ function xmldb_totara_program_upgrade($oldversion) {
 
         // Main savepoint reached.
         totara_upgrade_mod_savepoint(true, 2016041400, 'totara_program');
+    }
+
+    // TL-9020 Create completion log records for all completion records that don't already have one.
+    // This should have been done when the completion log was created, but better late than never.
+    // It ensures that when a change is logged, the values that it changed FROM will be in the log.
+    if ($oldversion < 2016051100) {
+        $now = time();
+
+        $description = $DB->sql_concat(
+            "'Snapshot created during upgrade<br><ul><li>Status: '", "pc.status",
+            "'</li><li>Due date: '", "pc.timedue",
+            "'</li><li>Completion date: '", "pc.timecompleted",
+            "'</li></ul>'"
+        );
+        $sql = "INSERT INTO {prog_completion_log} (programid, userid, changeuserid, description, timemodified)
+                     (SELECT pc.programid, pc.userid, 0, {$description}, {$now}
+                        FROM {prog_completion} pc
+                        JOIN {prog} prog ON pc.programid = prog.id AND pc.coursesetid = 0 AND prog.certifid IS NULL
+                   LEFT JOIN {prog_completion_log} pcl ON pcl.programid = pc.programid AND pcl.userid = pc.userid
+                       WHERE pcl.id IS NULL)";
+        $DB->execute($sql);
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2016051100, 'totara_program');
     }
 
     return true;
