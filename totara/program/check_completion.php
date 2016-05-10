@@ -37,6 +37,7 @@ $userid = optional_param('userid', 0, PARAM_INT);
 $progid = optional_param('progid', 0, PARAM_INT);
 $progorcert = optional_param('progorcert', 'program', PARAM_ALPHA);
 $fixkey = optional_param('fixkey', false, PARAM_ALPHANUMEXT);
+$returntoeditor = optional_param('returntoeditor', false, PARAM_BOOL);
 
 core_php_time_limit::raise(0);
 
@@ -75,8 +76,14 @@ if ($userid) {
 if ($fixkey) {
     if ($progorcert == 'program') {
         prog_fix_completions($fixkey, $progid, $userid);
+        if ($returntoeditor) {
+            $url = new moodle_url('/totara/program/edit_completion.php', array('id' => $progid, 'userid' => $userid));
+        }
     } else {
         certif_fix_completions($fixkey, $progid, $userid);
+        if ($returntoeditor) {
+            $url = new moodle_url('/totara/certification/edit_completion.php', array('id' => $progid, 'userid' => $userid));
+        }
     }
     totara_set_notification(get_string('completionchangessaved', 'totara_program'),
         $url,
@@ -92,6 +99,10 @@ $PAGE->set_heading($heading);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($heading);
+
+// Load js.
+$PAGE->requires->strings_for_js(array('fixconfirmsome', 'fixconfirmtitle'), 'totara_program');
+$PAGE->requires->js_call_amd('totara_program/check_completion', 'init');
 
 // Check all the records and output any problems.
 if ($checkcertifications) {

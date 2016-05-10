@@ -108,7 +108,7 @@ if ($certcompletion && $progcompletion && empty($exceptions)) {
         'certification' => $certification,
         'originalstate' => $currentformdata->state,
         'status' => $progcompletion->status,
-        'solution' => certif_get_completion_error_solution($problemkey, $id, $userid),
+        'solution' => certif_get_completion_error_solution($problemkey, $id, $userid, true),
     );
     $editform = new certif_edit_completion_form($url, $editformcustomdata, 'post', '', array('id' => 'form_certif_completion'));
 
@@ -197,6 +197,9 @@ $PAGE->requires->strings_for_js(
     array('notapplicable', 'perioddays', 'periodweeks', 'periodmonths', 'periodyears'), 'totara_certification');
 $PAGE->requires->strings_for_js(
     array('bestguess', 'confirmdeletecompletion'), 'totara_program');
+
+$PAGE->requires->strings_for_js(array('fixconfirmone', 'fixconfirmtitle'), 'totara_program');
+$PAGE->requires->js_call_amd('totara_program/check_completion', 'init');
 
 echo $OUTPUT->header();
 echo $OUTPUT->container_start('editcompletion');

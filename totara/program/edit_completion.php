@@ -87,7 +87,7 @@ if ($progcompletion && empty($exceptions)) {
         'showinitialstateinvalid' => !empty($currentformdata->errors),
         'hascurrentrecord' => !empty($progcompletion),
         'status' => $progcompletion->status,
-        'solution' => prog_get_completion_error_solution($problemkey, $id, $userid),
+        'solution' => prog_get_completion_error_solution($problemkey, $id, $userid, true),
     );
     $editform = new prog_edit_completion_form($url, $customdata, 'post', '', array('id' => 'form_prog_completion'));
 
@@ -171,6 +171,9 @@ $jsmodule = array(
     'fullpath' => '/totara/program/edit_completion.js');
 $PAGE->requires->js_init_call('M.totara_editprogcompletion.init', array(), false, $jsmodule);
 $PAGE->requires->strings_for_js(array('bestguess', 'confirmdeletecompletion'), 'totara_program');
+
+$PAGE->requires->strings_for_js(array('fixconfirmone', 'fixconfirmtitle'), 'totara_program');
+$PAGE->requires->js_call_amd('totara_program/check_completion', 'init');
 
 echo $OUTPUT->header();
 echo $OUTPUT->container_start('editcompletion');

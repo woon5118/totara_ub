@@ -2455,14 +2455,15 @@ function prog_get_completion_error_problemkey($errors) {
  * @param string $problemkey as returned by prog_get_completion_error_problemkey
  * @param int $programid if provided (non-0), url should only fix problems for this program
  * @param int $userid if provided (non-0), url should only fix problems for this user
+ * @param bool $returntoeditor true if you want to return to the certification editor for this user/cert, default false for checker
  * @return string html formatted, possibly including url links to activate known fixes
  */
-function prog_get_completion_error_solution($problemkey, $programid = 0, $userid = 0) {
+function prog_get_completion_error_solution($problemkey, $programid = 0, $userid = 0, $returntoeditor = false) {
     if (empty($problemkey)) {
         return '';
     }
 
-    $params = array('progorcert' => 'program', 'progid' => $programid, 'userid' => $userid);
+    $params = array('progorcert' => 'program', 'progid' => $programid, 'userid' => $userid, 'returntoeditor' => $returntoeditor);
     $baseurl = new moodle_url('/totara/program/check_completion.php', $params);
 
     switch ($problemkey) {

@@ -52,7 +52,7 @@ class prog_edit_completion_form extends moodleform {
         $mform->addElement('header', 'currentcompletionrecord', get_string('currentcompletionrecord', 'totara_program'));
 
         if (!empty($solution)) {
-            $mform->addElement('html', html_writer::div(html_writer::span($solution), 'notifyproblem'));
+            $mform->addElement('html', html_writer::div(html_writer::span($solution), 'notifyproblem problemsolution'));
         }
 
         $progstatusoptions = array();

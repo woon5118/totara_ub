@@ -246,7 +246,7 @@ class totara_certification_renderer extends plugin_renderer_base {
 
             foreach ($aggregatedata as $key => $value) {
                 // Dev note: Change $value->solution to $key to see error keys in summary table.
-                $aggregatetable->add_data(array($value->problem, $value->count, $value->solution));
+                $aggregatetable->add_data(array($value->problem, $value->count, $value->solution), 'problemaggregation');
             }
 
             $aggregatetable->finish_html();
