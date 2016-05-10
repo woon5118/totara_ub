@@ -454,7 +454,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'status',
                 'timecreated',
                 get_string('timeofsignup', 'rb_source_facetoface_sessions'),
-                'status.timecreated',
+                '(SELECT MAX(timecreated)
+                    FROM {facetoface_signups_status}
+                    WHERE signupid = base.id AND statuscode IN ('.MDL_F2F_STATUS_BOOKED.', '.MDL_F2F_STATUS_WAITLISTED.'))',
                 array(
                     'displayfunc' => 'nice_datetime',
                     'dbdatatype' => 'timestamp'
