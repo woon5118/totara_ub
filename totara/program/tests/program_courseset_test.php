@@ -95,14 +95,19 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
         $multicourseset2->add_course($coursedata);
 
         // The courses should already be returned prior to saving.
-        $this->assertEquals(array($this->course1, $this->course2), $multicourseset1->get_courses());
+        // We can set $checkForObjectIdentity to false in the assertion.
+        $this->assertContains($this->course1, $multicourseset1->get_courses(), '', false, false);
+        $this->assertContains($this->course2, $multicourseset1->get_courses(), '', false, false);
+        $this->assertCount(2, $multicourseset1->get_courses());
         $this->assertEquals(array($this->course3), $multicourseset2->get_courses());
 
         $multicourseset1->save_set();
         $multicourseset2->save_set();
 
         // After saving, the same courses should still be there.
-        $this->assertEquals(array($this->course1, $this->course2), $multicourseset1->get_courses());
+        $this->assertContains($this->course1, $multicourseset1->get_courses(), '', false, false);
+        $this->assertContains($this->course2, $multicourseset1->get_courses(), '', false, false);
+        $this->assertCount(2, $multicourseset1->get_courses());
         $this->assertEquals(array($this->course3), $multicourseset2->get_courses());
 
         // Check the same courses are there after freshly instantiating each courseset.
@@ -113,7 +118,9 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
         $coursesetrecord2 = $DB->get_record('prog_courseset', array('id' => $coursesetid2));
         $multicourseset1 = new multi_course_set($this->program1->id, $coursesetrecord1, $uniqueid);
         $multicourseset2 = new multi_course_set($this->program1->id, $coursesetrecord2, $uniqueid);
-        $this->assertEquals(array($this->course1, $this->course2), $multicourseset1->get_courses());
+        $this->assertContains($this->course1, $multicourseset1->get_courses(), '', false, false);
+        $this->assertContains($this->course2, $multicourseset1->get_courses(), '', false, false);
+        $this->assertCount(2, $multicourseset1->get_courses());
         $this->assertEquals(array($this->course3), $multicourseset2->get_courses());
     }
 
@@ -142,7 +149,9 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
         $multicourseset2->add_course($coursedata);
 
         // The courses should already be returned prior to saving.
-        $this->assertEquals(array($this->course1, $this->course2), $multicourseset1->get_courses());
+        $this->assertContains($this->course1, $multicourseset1->get_courses(), '', false, false);
+        $this->assertContains($this->course2, $multicourseset1->get_courses(), '', false, false);
+        $this->assertCount(2, $multicourseset1->get_courses());
         $this->assertEquals(array($this->course3), $multicourseset2->get_courses());
 
         // Delete course 2 from multicourseset1.
@@ -200,7 +209,9 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
         $multicourseset2->save_set();
 
         // Ensure the initial courses are returned after saving.
-        $this->assertEquals(array($this->course1, $this->course2), $multicourseset1->get_courses());
+        $this->assertContains($this->course1, $multicourseset1->get_courses(), '', false, false);
+        $this->assertContains($this->course2, $multicourseset1->get_courses(), '', false, false);
+        $this->assertCount(2, $multicourseset1->get_courses());
         $this->assertEquals(array($this->course3), $multicourseset2->get_courses());
 
 
@@ -333,7 +344,11 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
         // Ensure the correct courses are retuned prior to save.
         $this->assertEquals(array($this->course1), $multicourseset1->get_courses());
         // The competency course set will return it's courses with course ids for keys.
-        $this->assertEquals(array($this->course2->id => $this->course2, $this->course3->id => $this->course3), $competencycourseset->get_courses());
+        $compsetexpected = array($this->course2->id => $this->course2, $this->course3->id => $this->course3);
+        $compsetactual = $competencycourseset->get_courses();
+        ksort($compsetexpected);
+        ksort($compsetactual);
+        $this->assertEquals($compsetexpected, $compsetactual);
 
         // Ensure the same courses are returned after save.
         $multicourseset1->save_set();
@@ -341,14 +356,18 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
 
         $this->assertEquals(array($this->course1), $multicourseset1->get_courses());
         // The competency course set will return it's courses with course ids for keys.
-        $this->assertEquals(array($this->course2->id => $this->course2, $this->course3->id => $this->course3), $competencycourseset->get_courses());
+        $compsetactual = $competencycourseset->get_courses();
+        ksort($compsetactual);
+        $this->assertEquals($compsetexpected, $compsetactual);
 
         // Instantiate new courseset and ensure we still get correct courses returned.
         $competencycoursesetid = $competencycourseset->id;
         unset($competencycourseset);
         $compcoursesetrecord = $DB->get_record('prog_courseset', array('id' => $competencycoursesetid));
         $competencycourseset = new competency_course_set($this->program1->id, $compcoursesetrecord, $uniqueidcomp);
-        $this->assertEquals(array($this->course2->id => $this->course2, $this->course3->id => $this->course3), $competencycourseset->get_courses());
+        $compsetactual = $competencycourseset->get_courses();
+        ksort($compsetactual);
+        $this->assertEquals($compsetexpected, $compsetactual);
 
         // Unlink a course from the competency.
         $hierarchygenerator->remove_linked_course_from_competency($competency, $course3evidenceid);
@@ -396,7 +415,11 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
         // Ensure the correct courses are retuned prior to save.
         $this->assertEquals(array($this->course1), $multicourseset1->get_courses());
         // The competency course set will return it's courses with course ids for keys.
-        $this->assertEquals(array($this->course2->id => $this->course2, $this->course3->id => $this->course3), $competencycourseset->get_courses());
+        $compsetexpected = array($this->course2->id => $this->course2, $this->course3->id => $this->course3);
+        $compsetactual = $competencycourseset->get_courses();
+        ksort($compsetexpected);
+        ksort($compsetactual);
+        $this->assertEquals($compsetexpected, $compsetactual);
 
         // Try a delete prior to save. It should return false before and after.
         // But the script should also carry on without errors/exceptions.
@@ -404,7 +427,9 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
 
         $this->assertEquals(array($this->course1), $multicourseset1->get_courses());
         // The competency course set will return it's courses with course ids for keys.
-        $this->assertEquals(array($this->course2->id => $this->course2, $this->course3->id => $this->course3), $competencycourseset->get_courses());
+        $compsetactual = $competencycourseset->get_courses();
+        ksort($compsetactual);
+        $this->assertEquals($compsetexpected, $compsetactual);
 
         $multicourseset1->save_set();
         $competencycourseset->save_set();
@@ -415,7 +440,9 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
 
         $this->assertEquals(array($this->course1), $multicourseset1->get_courses());
         // The competency course set will return it's courses with course ids for keys.
-        $this->assertEquals(array($this->course2->id => $this->course2, $this->course3->id => $this->course3), $competencycourseset->get_courses());
+        $compsetactual = $competencycourseset->get_courses();
+        ksort($compsetactual);
+        $this->assertEquals($compsetexpected, $compsetactual);
 
         // Now delete the course from the multicourse set and ensure it does not have any effect on the competency course set.
         $multicourseset1->delete_course($this->course1->id);
@@ -426,6 +453,8 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
 
         $this->assertEquals(array(), $multicourseset1->get_courses());
         // The competency course set will return it's courses with course ids for keys.
-        $this->assertEquals(array($this->course2->id => $this->course2, $this->course3->id => $this->course3), $competencycourseset->get_courses());
+        $compsetactual = $competencycourseset->get_courses();
+        ksort($compsetactual);
+        $this->assertEquals($compsetexpected, $compsetactual);
     }
 }
