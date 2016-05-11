@@ -19,11 +19,11 @@ Feature: Set the site home page and My learning as the default home page
     And I should not see "Make this my default home page"
     And I follow "Course 1"
     And I should see "Home" in the ".breadcrumb-nav" "css_element"
-    And "//nav[@class='breadcrumb-nav']//li/a[text()='Home']" "xpath_element" should exist
+    And "//*[@class='breadcrumb-nav']//li/a[text()='Home']" "xpath_element" should exist
     And I am on site homepage
     And I follow "My learning"
     And I follow "Make this my default home page"
     And I should not see "Make this my default home page"
     And I am on site homepage
     When I follow "Course 1"
-    Then "//nav[@class='breadcrumb-nav']//li/a[text()='My learning']" "xpath_element" should exist
+    Then "//*[@class='breadcrumb-nav']//li/a[text()='My learning']" "xpath_element" should exist
