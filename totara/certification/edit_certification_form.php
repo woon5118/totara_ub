@@ -89,7 +89,7 @@ class edit_certification_form extends moodleform {
         $mform->addElement('html', html_writer::start_tag('p', array('class' => 'instructions')) .
                              get_string('editdetailsvalid', 'totara_certification') . html_writer::end_tag('p'));
         $activegrp = array();
-        $activegrp[] =  $mform->createElement('text', 'activenum', '', array('size' => 4, 'maxlength' => 3));
+        $activegrp[] =  $mform->createElement('text', 'activenum', '', array('size' => 4, 'maxlength' => 4));
         $mform->setType('activenum', PARAM_INT);
         $mform->setdefault('activenum', $active[0]);
 
@@ -107,7 +107,7 @@ class edit_certification_form extends moodleform {
 
         // Minimum active period num.
         $minimumactivegrp = array();
-        $minimumactivegrp[] =  $mform->createElement('text', 'minimumactivenum', '', array('size' => 4, 'maxlength' => 3));
+        $minimumactivegrp[] =  $mform->createElement('text', 'minimumactivenum', '', array('size' => 4, 'maxlength' => 4));
         $mform->setType('minimumactivenum', PARAM_INT);
         $mform->setdefault('minimumactivenum', $minimumactive[0]);
 
@@ -134,7 +134,7 @@ class edit_certification_form extends moodleform {
         $mform->addElement('html', html_writer::start_tag('p', array('class' => 'subheader')) .
                              get_string('editdetailsrcwin', 'totara_certification') . html_writer::end_tag('p'));
         $windowgrp = array();
-        $windowgrp[] = $mform->createElement('text', 'windownum', '', array('size' => 4, 'maxlength' => 3));
+        $windowgrp[] = $mform->createElement('text', 'windownum', '', array('size' => 4, 'maxlength' => 4));
         $mform->setType('windownum', PARAM_INT);
         $mform->setDefault('windownum', $window[0]);
 
