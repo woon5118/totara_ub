@@ -1733,3 +1733,10 @@ totaraMultiSelectDialogRbFilter = function(name, title, find_url, save_url) {
     });
 
 }
+
+for (var init in window.dialoginits) {
+    if (typeof window.dialoginits[init] === 'function') {
+        window.dialoginits[init]();
+    }
+}
+window.dialogsInited = true;

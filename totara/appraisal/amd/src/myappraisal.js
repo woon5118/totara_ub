@@ -26,6 +26,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
     var myappraisal = {
 
         config: {},
+
         /**
         * module initialisation method called by php js_init_call()
         *
@@ -33,7 +34,6 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
         * @param string    args supplied in JSON format
         */
         init : function(args) {
-
             if (args) {
                 myappraisal.config = $.parseJSON(args);
             }
@@ -56,54 +56,23 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
               $mainForm.submit();
             });
 
-            // Get moodle strings - yes their implementation isn't great.
-            var requiredstrings = [];
-            requiredstrings.push({key: 'printyourappraisal', component: 'totara_appraisal'});
-            requiredstrings.push({key: 'snapshotdialogtitle', component: 'totara_appraisal'});
-
-            mdlstrings.get_strings(requiredstrings).done(function (strings) {
-                var tstr = [];
-                for (var i = 0; i < requiredstrings.length; i++) {
-                    tstr[requiredstrings[i].key] = strings[i];
+            // Print and PDF dialog boxes.
+            if (window.dialogsInited) {
+                myappraisal.stagesSelectDialog();
+                myappraisal.savePdfDialog();
+            } else {
+                // Queue it up.
+                if (!$.isArray(window.dialoginits)) {
+                    window.dialoginits = [];
                 }
-
-                // Print and PDF dialog boxes.
-                var snapshoturl = mdlcfg.wwwroot + '/totara/appraisal/snapshot.php';
-                var urlparamselect = {
-                    appraisalid: myappraisal.config.appraisalid,
-                    role: myappraisal.config.role,
-                    subjectid: myappraisal.config.subjectid,
-                    action: 'stages'
-                };
-                var urlparamstrselect = $.param(urlparamselect);
-
-                myappraisal.stagesSelectDialog(
-                    'print',
-                    tstr.printyourappraisal,
-                    snapshoturl + '?' + urlparamstrselect,
-                    snapshoturl
-                );
-
-                var urlparampdf = {
-                    appraisalid: myappraisal.config.appraisalid,
-                    role: myappraisal.config.role,
-                    subjectid: myappraisal.config.subjectid,
-                    action: 'snapshot',
-                    sesskey: mdlcfg.sesskey
-                };
-                var urlparamstrpdf = $.param(urlparampdf);
-
-                myappraisal.savePdfDialog(
-                    'savepdf',
-                    tstr.snapshotdialogtitle,
-                    snapshoturl + '?' + urlparamstrpdf
-                );
-            });
+                window.dialoginits.push(this.stagesSelectDialog);
+                window.dialoginits.push(this.savePdfDialog);
+            }
 
             setInterval(myappraisal.keepAlive, 1000 * myappraisal.config.keepalivetime);
         },
 
-        stagesSelectDialog: function(name, title, findurl, printurl) {
+        stagesSelectDialog: function() {
             var handler = new totaraDialog_handler();
 
             handler._print = function(e, printurl) {
@@ -112,7 +81,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
                 M.util.help_popups.setup(Y);
                 var popupdata = {
                     name: 'printpopup',
-                    url: printurl+'?'+urlparam,
+                    url: mdlcfg.wwwroot + '/totara/appraisal/snapshot.php' + '?' + urlparam,
                     options: "height=500,width=600,top=100,left=100,menubar=0,location=0,scrollbars,resizable,toolbar,status,directories=0,dependent"
                 };
                 openpopup(e, popupdata);
@@ -120,9 +89,18 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
                 handler._cancel();
             };
 
+            var urlparamselect = {
+                appraisalid: myappraisal.config.appraisalid,
+                role: myappraisal.config.role,
+                subjectid: myappraisal.config.subjectid,
+                action: 'stages'
+            };
+            var urlparamstrselect = $.param(urlparamselect);
+
             var requiredstrings = [];
             requiredstrings.push({key: 'printnow', component: 'totara_appraisal'});
             requiredstrings.push({key: 'cancel', component: 'moodle'});
+            requiredstrings.push({key: 'printyourappraisal', component: 'totara_appraisal'});
             mdlstrings.get_strings(requiredstrings).done(function(strings) {
                 var tstr = [];
                 for (var i = 0; i < requiredstrings.length; i++) {
@@ -130,23 +108,25 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
                 }
 
                 var buttonObj = {};
-                buttonObj[tstr.printnow] = function(e) { handler._print(e, printurl); };
+                buttonObj[tstr.printnow] = function(e) {
+                    handler._print(e, mdlcfg.wwwroot + '/totara/appraisal/snapshot.php' + '?' + urlparamstrselect);
+                };
                 buttonObj[tstr.cancel] = function() { handler._cancel(); };
 
-                totaraDialogs[name] = new totaraDialog(
-                    name,
-                    'show-'+name+'-dialog',
+                totaraDialogs.print = new totaraDialog(
+                    'print',
+                    'show-print-dialog',
                     {
                         buttons: buttonObj,
-                        title: '<h2>'+title+'</h2>'
+                        title: '<h2>' + tstr.printyourappraisal + '</h2>'
                     },
-                    findurl,
+                    mdlcfg.wwwroot + '/totara/appraisal/snapshot.php' + '?' + urlparamstrselect,
                     handler
                 );
             });
         },
 
-        savePdfDialog: function(name, title, findurl) {
+        savePdfDialog: function() {
             var handler = new totaraDialog_handler();
 
             handler._download = function() {
@@ -161,9 +141,19 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
                 handler._dialog.dialog.html(mdlstrings.get_string('snapshotgeneration', 'totara_appraisal'));
             };
 
+            var urlparampdf = {
+                appraisalid: myappraisal.config.appraisalid,
+                role: myappraisal.config.role,
+                subjectid: myappraisal.config.subjectid,
+                action: 'snapshot',
+                sesskey: mdlcfg.sesskey
+            };
+            var urlparamstrpdf = $.param(urlparampdf);
+
             var requiredstrings = [];
             requiredstrings.push({key: 'downloadnow', component: 'totara_appraisal'});
             requiredstrings.push({key: 'cancel', component: 'moodle'});
+            requiredstrings.push({key: 'snapshotdialogtitle', component: 'totara_appraisal'});
             mdlstrings.get_strings(requiredstrings).done(function(strings) {
                 var tstr = [];
                 for (var i = 0; i < requiredstrings.length; i++) {
@@ -173,15 +163,15 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
                 buttonObj[tstr.downloadnow] = function() { handler._download(); };
                 buttonObj[tstr.cancel] = function() { handler._cancel(); };
 
-                totaraDialogs[name] = new totaraDialog(
-                    name,
-                    'show-'+name+'-dialog',
+                totaraDialogs.savepdf = new totaraDialog(
+                    'savepdf',
+                    'show-savepdf-dialog',
                     {
                         buttons: buttonObj,
-                        title: '<h2>'+title+'</h2>',
+                        title: '<h2>' + tstr.snapshotdialogtitle + '</h2>',
                         height: '200'
                     },
-                    findurl,
+                    mdlcfg.wwwroot + '/totara/appraisal/snapshot.php' + '?' + urlparamstrpdf,
                     handler
                 );
             });

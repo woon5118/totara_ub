@@ -52,6 +52,9 @@ Feature: Perform basic actions for aggregate questions
       | Aggregate Tests | Stage2 | Stage2-Ratings    | S2-Rating_Custom  | ratingcustom  | choice2 |                                    |
       | Aggregate Tests | Stage2 | Stage2-Aggregates | S2-Aggregate      | aggregate     |         | S2-Rating_Numeric,S2-Rating_Custom |
       | Aggregate Tests | Stage2 | Stage2-Aggregates | Total Aggregate   | aggregate     |         | *                                  |
+    And the following "assignments" exist in "totara_appraisal" plugin:
+      | appraisal       | type     | id     |
+      | Aggregate Tests | audience | AppAud |
 
     Scenario: Check available questions in the aggregate settings page.
       When I log in as "admin"
@@ -82,12 +85,6 @@ Feature: Perform basic actions for aggregate questions
       When I log in as "admin"
       And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
       And I click on "Aggregate Tests" "link"
-      And I click on "Assignments" "link"
-      And I set the field "menugroupselector" to "Audience"
-      And I wait "1" seconds
-      And I click on "Appraisals Audience" "link" in the "Assign Learner Group To Appraisal" "totaradialogue"
-      And I click on "Save" "button" in the "Assign Learner Group To Appraisal" "totaradialogue"
-      And I wait "1" seconds
       And I click on "Activate now" "link"
       And I press "Activate"
       And I log out

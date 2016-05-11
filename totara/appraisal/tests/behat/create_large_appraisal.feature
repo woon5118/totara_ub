@@ -67,9 +67,8 @@ Feature: Create a large appraisal
         And I click on "All Appraisals" in the totara menu
         And I should see "Appraisal 1"
         And I click on "Appraisal 1" "link"
-        # These last steps fail because behat doesn't wait until the
-        # snapshot has finished saving
-        #And I click on "Save PDF Snapshot" "button"
-        #And I should see "A snapshot of your appraisal has been saved."
-        #And I click on "All Appraisals" "link"
-        #And I should see "Snapshot"
+        And I click on "Save PDF Snapshot" "button"
+        And I should see "A snapshot of your appraisal has been saved."
+        And I click on "Cancel" "button" in the "savepdf" "totaradialogue"
+        And I click on "All Appraisals" in the totara menu
+        And I should see "Snapshot"
