@@ -138,6 +138,81 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $sink->clear();
     }
 
+    public function test_fullname() {
+        global $CFG;
+        $this->resetAfterTest();
+
+        $this->assertSame('language', $CFG->fullnamedisplay);
+        $this->assertSame('language', $CFG->alternativefullnameformat);
+
+        $user = $this->getDataGenerator()->create_user(array(
+            'firstname' => 'Krestni', 'lastname' => 'Prijmeni',
+            'firstnamephonetic' => 'Křestní', 'lastnamephonetic' => 'Příjmení',
+            'middlename' => 'Prostredni', 'alternatename' => 'prezdivka'));
+
+        $CFG->fullnamedisplay = '';
+        $CFG->alternativefullnameformat = 'language';
+        $this->assertSame('Krestni Prijmeni', fullname($user));
+        $this->assertSame('Krestni Prijmeni', fullname($user, true));
+
+        $CFG->fullnamedisplay = 'language';
+        $CFG->alternativefullnameformat = 'language';
+        $this->assertSame('Krestni Prijmeni', fullname($user));
+        $this->assertSame('Krestni Prijmeni', fullname($user, true));
+
+        $CFG->fullnamedisplay = 'firstname lastname firstnamephonetic lastnamephonetic middlename alternatename';
+        $CFG->alternativefullnameformat = 'language';
+        $this->assertSame('Krestni Prijmeni Křestní Příjmení Prostredni prezdivka', fullname($user));
+        $this->assertSame('Krestni Prijmeni', fullname($user, true));
+
+        $CFG->fullnamedisplay = 'firstname';
+        $CFG->alternativefullnameformat = 'language';
+        $this->assertSame('Krestni', fullname($user));
+        $this->assertSame('Krestni Prijmeni', fullname($user, true));
+
+        // Alternative empty.
+        $CFG->fullnamedisplay = '';
+        $CFG->alternativefullnameformat = '';
+        $this->assertSame('Krestni Prijmeni', fullname($user));
+        $this->assertSame('Krestni Prijmeni', fullname($user, true));
+
+        $CFG->fullnamedisplay = 'language';
+        $CFG->alternativefullnameformat = '';
+        $this->assertSame('Krestni Prijmeni', fullname($user));
+        $this->assertSame('Krestni Prijmeni', fullname($user, true));
+
+        $CFG->fullnamedisplay = 'firstname lastname firstnamephonetic lastnamephonetic middlename alternatename';
+        $CFG->alternativefullnameformat = '';
+        $this->assertSame('Krestni Prijmeni Křestní Příjmení Prostredni prezdivka', fullname($user));
+        $this->assertSame('Krestni Prijmeni', fullname($user, true));
+
+        $CFG->fullnamedisplay = 'firstname';
+        $CFG->alternativefullnameformat = '';
+        $this->assertSame('Krestni', fullname($user));
+        $this->assertSame('Krestni Prijmeni', fullname($user, true));
+
+        // Alternative set.
+        $CFG->fullnamedisplay = '';
+        $CFG->alternativefullnameformat = 'alternatename';
+        $this->assertSame('Krestni Prijmeni', fullname($user));
+        $this->assertSame('prezdivka', fullname($user, true));
+
+        $CFG->fullnamedisplay = 'language';
+        $CFG->alternativefullnameformat = 'alternatename';
+        $this->assertSame('Krestni Prijmeni', fullname($user));
+        $this->assertSame('prezdivka', fullname($user, true));
+
+        $CFG->fullnamedisplay = 'firstname lastname firstnamephonetic lastnamephonetic middlename alternatename';
+        $CFG->alternativefullnameformat = 'alternatename';
+        $this->assertSame('Krestni Prijmeni Křestní Příjmení Prostredni prezdivka', fullname($user));
+        $this->assertSame('prezdivka', fullname($user, true));
+
+        $CFG->fullnamedisplay = 'firstname';
+        $CFG->alternativefullnameformat = 'alternatename';
+        $this->assertSame('Krestni', fullname($user));
+        $this->assertSame('prezdivka', fullname($user, true));
+    }
+
     /**
      * Test all strftime() parameters.
      */
