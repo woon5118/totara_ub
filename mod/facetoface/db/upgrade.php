@@ -3321,30 +3321,6 @@ function xmldb_facetoface_upgrade($oldversion=0) {
             $dbman->create_table($table);
         }
 
-        // Create new 'Location' custom field.
-        $data = new stdClass();
-        $data->shortname = "location";
-        $data->datatype = "location";
-        $data->description = "";
-        $data->sortorder = $DB->get_field(
-            'facetoface_room_info_field',
-            '(CASE WHEN MAX(sortorder) IS NULL THEN 0 ELSE MAX(sortorder) END) + 1',
-            []
-        );
-        $data->hidden = false;
-        $data->locked = false;
-        $data->required = false;
-        $data->forceunique = false;
-        $data->defaultdata = null;
-        $data->param1 = null;
-        $data->param2 = null;
-        $data->param3 = null;
-        $data->param4 = null;
-        $data->param5 = null;
-        $data->fullname = "Location";
-
-        $addressfieldid = $DB->insert_record('facetoface_room_info_field', $data);
-
         // Create new 'Building' custom field.
         $data = new stdClass();
         $data->datatype = "text";
@@ -3368,6 +3344,30 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         $data->fullname = "Building";
 
         $buildingfieldid = $DB->insert_record('facetoface_room_info_field', $data);
+
+        // Create new 'Location' custom field.
+        $data = new stdClass();
+        $data->shortname = "location";
+        $data->datatype = "location";
+        $data->description = "";
+        $data->sortorder = $DB->get_field(
+            'facetoface_room_info_field',
+            '(CASE WHEN MAX(sortorder) IS NULL THEN 0 ELSE MAX(sortorder) END) + 1',
+            []
+        );
+        $data->hidden = false;
+        $data->locked = false;
+        $data->required = false;
+        $data->forceunique = false;
+        $data->defaultdata = null;
+        $data->param1 = null;
+        $data->param2 = null;
+        $data->param3 = null;
+        $data->param4 = null;
+        $data->param5 = null;
+        $data->fullname = "Location";
+
+        $addressfieldid = $DB->insert_record('facetoface_room_info_field', $data);
 
         require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
 

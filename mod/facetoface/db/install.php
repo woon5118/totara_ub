@@ -203,30 +203,6 @@ function xmldb_facetoface_install() {
 function facetoface_create_room_customfields() {
     global $DB;
 
-    // Create new 'Location' custom field.
-    $locationfielddata = new stdClass();
-    $locationfielddata->shortname = "location";
-    $locationfielddata->datatype = "location";
-    $locationfielddata->description = "";
-    $locationfielddata->sortorder = $DB->get_field(
-        'facetoface_room_info_field',
-        '(CASE WHEN MAX(sortorder) IS NULL THEN 0 ELSE MAX(sortorder) END) + 1',
-        []
-    );
-    $locationfielddata->hidden = false;
-    $locationfielddata->locked = false;
-    $locationfielddata->required = false;
-    $locationfielddata->forceunique = false;
-    $locationfielddata->defaultdata = null;
-    $locationfielddata->param1 = null;
-    $locationfielddata->param2 = null;
-    $locationfielddata->param3 = null;
-    $locationfielddata->param4 = null;
-    $locationfielddata->param5 = null;
-    $locationfielddata->fullname = "Location";
-
-    $DB->insert_record('facetoface_room_info_field', $locationfielddata);
-
     // Create new 'Building' custom field.
     $buildingfielddata = new stdClass();
     $buildingfielddata->datatype = "text";
@@ -250,6 +226,30 @@ function facetoface_create_room_customfields() {
     $buildingfielddata->fullname = "Building";
 
     $DB->insert_record('facetoface_room_info_field', $buildingfielddata);
+
+    // Create new 'Location' custom field.
+    $locationfielddata = new stdClass();
+    $locationfielddata->shortname = "location";
+    $locationfielddata->datatype = "location";
+    $locationfielddata->description = "";
+    $locationfielddata->sortorder = $DB->get_field(
+        'facetoface_room_info_field',
+        '(CASE WHEN MAX(sortorder) IS NULL THEN 0 ELSE MAX(sortorder) END) + 1',
+        []
+    );
+    $locationfielddata->hidden = false;
+    $locationfielddata->locked = false;
+    $locationfielddata->required = false;
+    $locationfielddata->forceunique = false;
+    $locationfielddata->defaultdata = null;
+    $locationfielddata->param1 = null;
+    $locationfielddata->param2 = null;
+    $locationfielddata->param3 = null;
+    $locationfielddata->param4 = null;
+    $locationfielddata->param5 = null;
+    $locationfielddata->fullname = "Location";
+
+    $DB->insert_record('facetoface_room_info_field', $locationfielddata);
 }
 
 /**
