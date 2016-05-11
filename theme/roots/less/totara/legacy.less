@@ -1,0 +1,98 @@
+//
+// This file is part of Totara LMS
+//
+// Copyright (C) 2016 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <ht    tp://www.gnu.org/licenses/>.
+//
+// @copyright 2016 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Joby Harding <joby.harding@totaralearning.com>
+// @package   theme_roots
+
+//
+// Legacy styles for Moodle custom menu.
+// This is not displayed when the Totara
+// menu is output.
+//
+div#custommenu  {
+    &:extend(.totara-menu);
+}
+
+div#custommenu ul  {
+    &:extend(.totara-menu-nav-list);
+}
+
+div#custommenu ul li {
+    &:extend(.totara-menu-nav-item);
+}
+
+div#custommenu ul li a {
+    &:extend(.totara-menu-nav-list-link);
+}
+
+div#custommenu ul ul {
+    &:extend(.totara-menu-nav-list .totara-menu-nav-list);
+}
+
+div#custommenu ul ul li {
+    &:extend(.totara-menu .totara-menu-nav-list .totara-menu-nav-list .totara-menu-nav-list-item);
+}
+
+div#custommenu ul ul li a {
+    &:extend(.totara-menu-nav-list .totara-menu-nav-list .totara-menu-nav-item-link);
+}
+
+div#custommenu ul li:hover ul {
+    &:extend(.totara-menu-nav-item:hover .totara-menu-nav-item);
+}
+
+div#custommenu ul li:last-child a {
+    &:extend(.totara-menu-nav-item:last-child .totara-menu-nav-item-link);
+}
+
+div#custommenu ul li a:hover {
+    &:extend(.totara-menu-nav-item-link:hover);
+}
+
+div#custommenu ul li.selected a {
+    &:extend(.totara-menu-nav-item.selected .totara-menu-nav-item-link);
+}
+
+div#custommenu ul li ul {
+    border-top: @totara-menu-border;
+}
+
+// Secondary nav: unselected child of unselected parent.
+div#custommenu ul li li a {
+    border: none;
+    border-bottom: @totara-menu-border;
+    background: @totara-menu-bg;
+}
+
+// Secondary nav: selected child of selected parent.
+div#custommenu ul li.selected li a {
+    color: @totara-menu-default-link-active-color;
+    border-bottom: 1px solid #DDD;
+}
+
+div#custommenu ul li.selected li.selected a {
+    color: #333;
+    background: #FFF;
+    cursor: default;
+}
+
+#page-navbar .singlebutton {
+    float: left;
+}

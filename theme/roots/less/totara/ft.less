@@ -1,0 +1,606 @@
+//
+// This file is part of Totara LMS
+//
+// Copyright (C) 2016 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <ht    tp://www.gnu.org/licenses/>.
+//
+// @copyright 2016 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Joby Harding <joby.harding@totaralearning.com>
+// @package   theme_roots
+
+@font-face {
+    font-family: 'totara';
+    src:url([[font:theme|totara.eot]]);
+    src:url([[font:theme|totara.eot#iefix]]) format('embedded-opentype'),
+        url([[font:theme|totara.ttf]]) format('truetype'),
+        url([[font:theme|totara.woff]]) format('woff'),
+        url([[font:theme|totara.svg#totara]]) format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.ft {
+    font-family: 'totara';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.flex-icon {
+    width: 1.3em;
+    display: inline-block;
+    text-align: center;
+}
+
+.ft-slash:before {
+    content: "\e94b";
+}
+.ft-blended:before {
+    content: "\e93d";
+}
+.ft-alfresco:before {
+    content: "\e93e";
+}
+.ft-viewtreeactive:before {
+    content: "\e93f";
+}
+.ft-grades:before {
+    content: "\e940";
+}
+.ft-backpack:before {
+    content: "\e941";
+}
+.ft-mnethost:before {
+    content: "\e942";
+}
+.ft-moodle:before {
+    content: "\e943";
+}
+.ft-mahara:before {
+    content: "\e944";
+}
+.ft-completion-auto:before {
+    content: "\e945";
+}
+.ft-competency-achieved:before {
+    content: "\e946";
+}
+.ft-competency:before {
+    content: "\e947";
+}
+.ft-mean:before {
+    content: "\e948";
+}
+.ft-seminar:before {
+    content: "\e949";
+}
+.ft-highlight:before {
+    content: "\e94a";
+}
+.ft-checkbox-off:before {
+    content: "\f372";
+}
+.ft-checkbox-on:before {
+    content: "\f373";
+}
+.ft-close:before {
+    content: "\f2d7";
+}
+.ft-done-all:before {
+    content: "\f382";
+}
+.ft-done:before {
+    content: "\f383";
+}
+.ft-hand:before {
+    content: "\f2e3";
+}
+.ft-more-horizontal:before {
+    content: "\f396";
+}
+.ft-more-vertical:before {
+    content: "\f397";
+}
+.ft-options:before {
+    content: "\f39d";
+}
+.ft-radio-button-off:before {
+    content: "\f3a6";
+}
+.ft-radio-button-on:before {
+    content: "\f3a7";
+}
+.ft-cube-alt:before {
+    content: "\f318";
+}
+.ft-easel-alt:before {
+    content: "\f3c2";
+}
+.ft-filing:before {
+    content: "\f134";
+}
+.ft-hammer-alt:before {
+    content: "\f27b";
+}
+.ft-ribbon-alt:before {
+    content: "\f348";
+}
+.ft-ribbon:before {
+    content: "\f349";
+}
+.ft-search:before {
+    content: "\f21f";
+}
+.ft-settings:before {
+    content: "\f2ad";
+}
+.ft-stats-bars-alt:before {
+    content: "\f2b5";
+}
+.ft-stamp:before {
+    content: "\e6d5";
+}
+.ft-pin:before {
+    content: "\e6de";
+}
+.ft-brush:before {
+    content: "\e727";
+}
+.ft-columns:before {
+    content: "\e73b";
+}
+.ft-certificate:before {
+    content: "\1f3c9";
+}
+.ft-easel:before {
+    content: "\e7b5";
+}
+.ft-globe:before {
+    content: "\1f310";
+}
+.ft-chart:before {
+    content: "\1f4c8";
+}
+.ft-box-net:before {
+    content: "\f322";
+}
+.ft-addbook:before {
+    content: "\f100";
+}
+.ft-blind:before {
+    content: "\f11a";
+}
+.ft-new:before {
+    content: "\f121";
+    font-size: 1.4em;
+}
+.ft-crown:before {
+    content: "\f137";
+}
+.ft-archives:before {
+    content: "\f139";
+}
+.ft-vbars:before {
+    content: "\f153";
+}
+.ft-hbars:before {
+    content: "\f154";
+}
+.ft-hearing:before {
+    content: "\f158";
+}
+.ft-blocks:before {
+    content: "\f162";
+}
+.ft-files:before {
+    content: "\f18a";
+}
+.ft-screen:before {
+    content: "\f1a1";
+}
+.ft-quotes:before {
+    content: "\f1a3";
+}
+.ft-usersdoc:before {
+    content: "\f1a6";
+}
+.ft-cone:before {
+    content: "\f1ab";
+}
+.ft-sheriff:before {
+    content: "\f1ae";
+}
+.ft-gdrive:before {
+    content: "\f1c1";
+    font-size: 1.4em;
+}
+.ft-usertie:before {
+    content: "\f1fc";
+}
+.ft-userf:before {
+    content: "\f1fd";
+}
+.ft-userm:before {
+    content: "\f1fe";
+}
+.ft-usersf:before {
+    content: "\f1ff";
+}
+.ft-usersm:before {
+    content: "\f200";
+}
+.ft-usersf-alt:before {
+    content: "\f201";
+}
+.ft-usersmf:before {
+    content: "\f202";
+}
+.ft-usersm-alt:before {
+    content: "\f203";
+}
+.ft-wrench:before {
+    content: "\f215";
+}
+.ft-home:before {
+    content: "\2302";
+}
+.ft-lock:before {
+    content: "\f512";
+}
+.ft-lock-alt:before {
+    content: "\f510";
+}
+.ft-lock-open:before {
+    content: "\f513";
+}
+.ft-lock-open-alt:before {
+    content: "\f075";
+}
+.ft-chart-bar:before {
+    content: "\f526";
+}
+.ft-spread:before {
+    content: "\f527";
+}
+.ft-addressbook:before {
+    content: "\e900";
+}
+.ft-medal:before {
+    content: "\e901";
+}
+.ft-book-bookmark-alt:before {
+    content: "\e902";
+}
+.ft-book-bookmark:before {
+    content: "\e903";
+}
+.ft-box:before {
+    content: "\e904";
+}
+.ft-book-open:before {
+    content: "\e905";
+}
+.ft-package:before {
+    content: "\e906";
+}
+.ft-checklist:before {
+    content: "\e907";
+    font-size: 1.4em;
+}
+.ft-book-open-alt:before {
+    content: "\e908";
+}
+.ft-book-alt:before {
+    content: "\e909";
+}
+.ft-archives-alt:before {
+    content: "\e90a";
+}
+.ft-file-text:before {
+    content: "\e90b";
+}
+.ft-profile:before {
+    content: "\e90c";
+}
+.ft-address-book:before {
+    content: "\e90d";
+}
+.ft-map-alt:before {
+    content: "\e90e";
+}
+.ft-history:before {
+    content: "\e90f";
+}
+.ft-alarm:before {
+    content: "\e910";
+}
+.ft-user:before {
+    content: "\e911";
+}
+.ft-users:before {
+    content: "\e912";
+}
+.ft-user-plus:before {
+    content: "\e913";
+}
+.ft-user-minus:before {
+    content: "\e914";
+}
+.ft-user-check:before {
+    content: "\e915";
+}
+.ft-user-tie:before {
+    content: "\e916";
+}
+.ft-key:before {
+    content: "\e917";
+}
+.ft-hammer:before {
+    content: "\e918";
+}
+.ft-stats-bars:before {
+    content: "\e919";
+}
+.ft-shield:before {
+    content: "\e91a";
+}
+.ft-tree:before {
+    content: "\e91b";
+}
+.ft-happy:before {
+    content: "\e91c";
+}
+.ft-smile:before {
+    content: "\e91d";
+}
+.ft-tongue:before {
+    content: "\e91e";
+}
+.ft-sad:before {
+    content: "\e91f";
+}
+.ft-wink:before {
+    content: "\e920";
+}
+.ft-grin:before {
+    content: "\e921";
+}
+.ft-cool:before {
+    content: "\e922";
+}
+.ft-angry:before {
+    content: "\e923";
+}
+.ft-evil:before {
+    content: "\e924";
+}
+.ft-shocked:before {
+    content: "\e925";
+}
+.ft-baffled:before {
+    content: "\e926";
+}
+.ft-confused:before {
+    content: "\e927";
+}
+.ft-neutral:before {
+    content: "\e928";
+}
+.ft-hipster:before {
+    content: "\e929";
+}
+.ft-wondering:before {
+    content: "\e92a";
+}
+.ft-sleepy:before {
+    content: "\e92b";
+}
+.ft-frustrated:before {
+    content: "\e92c";
+}
+.ft-crying:before {
+    content: "\e92d";
+}
+.ft-infinite:before {
+    content: "\e92e";
+}
+.ft-sigma:before {
+    content: "\e92f";
+}
+.ft-google-drive:before {
+    content: "\e930";
+}
+.ft-picassa:before {
+    content: "\e931";
+}
+.ft-archive:before {
+    content: "\e932";
+}
+.ft-box-alt:before {
+    content: "\e933";
+}
+.ft-document-add:before {
+    content: "\e934";
+}
+.ft-folder-add:before {
+    content: "\e935";
+}
+.ft-infinity:before {
+    content: "\e936";
+}
+.ft-sort-numerically-outline:before {
+    content: "\e937";
+}
+.ft-sort-numerically:before {
+    content: "\e938";
+}
+.ft-browser:before {
+    content: "\e939";
+}
+.ft-book-alt2:before {
+    content: "\e93a";
+}
+.ft-archive-alt:before {
+    content: "\e93b";
+}
+.ft-blackboard:before {
+    content: "\e93c";
+}
+.ft-pipe:before {
+    content: "|";
+}
+.ft-dash:before {
+    content: "\2014";
+}
+
+/* icon stacks */
+.ft-stack {
+    position: relative;
+    height: 1em;
+    line-height: inherit;
+    vertical-align: middle;
+}
+.ft-stack-main {
+    line-height: 1;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.ft-stack-over {
+    line-height: 1;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    text-shadow: -1px 0 0 #FFF, 1px 0 0 #FFF, 0 -1px 0 #FFF, 0 1px 0 #FFF;
+}
+.ft-stack-prefix {
+    line-height: 1;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: right;
+    font-size: .8em;
+    margin: 40% 0 0 -60%;
+    text-shadow: -1px 0 0 #FFF, 1px 0 0 #FFF, 0 -1px 0 #FFF, 0 1px 0 #FFF, 2px 2px 0 #FFF;
+}
+.ft-stack-suffix {
+    line-height: 1;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: right;
+    font-size: .8em;
+    margin: 35% 0 0 0;
+    text-shadow: -1px 0 0 #FFF, 1px 0 0 #FFF, 0 -1px 0 #FFF, 0 1px 0 #FFF, 2px 2px 0 #FFF;
+}
+
+
+/* icon colours */
+.ft-state-default {
+    color: @text-color;
+}
+.ft-state-success {
+    color: @state-success-text;
+}
+.ft-state-warning {
+    color: @state-warning-text;
+}
+.ft-state-danger {
+    color: @state-danger-text;
+}
+.ft-state-info {
+    color: @state-info-text;
+}
+.ft-state-other {
+    color: #9D45B8;
+}
+.ft-state-disabled {
+    color: #BBB;
+}
+
+/* icon pixel sizes */
+.ft-size-100 {
+    font-size: 14px;
+}
+.ft-size-200 {
+    font-size: 16px;
+}
+.ft-size-300 {
+    font-size: 20px;
+}
+.ft-size-400 {
+    font-size: 24px;
+}
+.ft-size-500 {
+    font-size: 28px;
+}
+.ft-size-600 {
+    font-size: 32px;
+}
+.ft-size-700 {
+    font-size: 38px;
+}
+
+.ft-spacer {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+}
+.ft-spacer-100 {
+    width: 14px;
+    height: 14px;
+}
+.ft-spacer-200 {
+    width: 16px;
+    height: 16px;
+}
+.ft-spacer-300 {
+    width: 20px;
+    height: 20px;
+}
+.ft-spacer-400 {
+    width: 24px;
+    height: 24px;
+}
+.ft-spacer-500 {
+    width: 28px;
+    height: 28px;
+}
+.ft-spacer-600 {
+    width: 32px;
+    height: 32px;
+}
+.ft-spacer-700 {
+    width: 38px;
+    height: 38px;
+}
+
+.filemanager .flex-icon {
+    font-size: 18px;
+    padding: 6px 2px;
+}

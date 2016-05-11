@@ -1925,7 +1925,7 @@ class core_plugin_manager {
             'theme' => array(
                 'base', 'bootstrapbase'
                 // Totara:
-                , 'kiwifruitresponsive', 'standardtotararesponsive', 'customtotararesponsive'
+                , 'kiwifruitresponsive', 'standardtotararesponsive', 'customtotararesponsive', 'bootstrap', 'roots'
             ),
 
             'tool' => array(

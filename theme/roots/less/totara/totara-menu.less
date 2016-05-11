@@ -1,0 +1,162 @@
+//
+// This file is part of Totara LMS
+//
+// Copyright (C) 2016 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <ht    tp://www.gnu.org/licenses/>.
+//
+// @copyright 2016 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Joby Harding <joby.harding@totaralearning.com>
+// @package   theme_roots
+
+@import "roots/less/totara/variables";
+
+.totara-navbar.navbar-collapse.collapse,
+.totara-navbar.navbar-collapse.collapsing {
+    // Overrides a Moodle-specific navbar style.
+    margin-top: 0;
+}
+
+.totara-menu {
+    clear:both;
+    width:100%;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    border-top: none;
+}
+
+.totara-menu-nav-list {
+    margin-top: 0;
+    margin-bottom: 0;
+    // Override some BS .navbar styles.
+    min-height: initial;
+    border: none;
+}
+
+.totara-menu-nav-item {
+    border: none;
+    font-weight: bold;
+    list-style-type: none;
+}
+
+.totara-menu-nav-item-link {
+    display:block;
+    border-color: @totara-menu-border-color;
+    border-style: solid;
+    border-width: @totara-menu-border-width 0 0 0;
+    padding: @totara-menu-padding-vertical @totara-menu-padding-horizontal;
+    background-color: @totara-menu-bg;
+}
+
+.totara-menu-nav-item-link:link,
+.totara-menu-nav-item-link:visited {
+    color: @totara-menu-default-link-color;
+    text-decoration: none;
+}
+
+.totara-menu-nav-item.selected > .totara-menu-nav-item-link {
+    background-color: @totara-menu-default-link-active-bg;
+}
+
+.totara-menu-nav-item .totara-menu-nav-item .totara-menu-nav-item-link {
+    border-right-width: 0;
+    border-left-width: 0;
+}
+
+// The first two classes in these selectors are only
+// required to override inherited styles.
+.totara-menu-nav-list .totara-menu-nav-item .totara-menu-nav-item-link:hover,
+.totara-menu-nav-list .totara-menu-nav-item .totara-menu-nav-item-link:focus {
+    color: @totara-menu-default-link-hover-color;
+    background-color: @totara-menu-default-link-hover-bg;
+    text-decoration: none;
+}
+
+.totara-menu-nav-item-link:active,
+.totara-menu-nav-item.selected .totara-menu-nav-item-link:hover {
+    color: @totara-menu-default-link-active-color;
+    background-color: @totara-menu-default-link-active-bg;
+    text-decoration: none;
+}
+
+.totara-menu-nav-item:hover .totara-menu-nav-list {
+    display: block;
+}
+
+.totara-menu-nav-list .totara-menu-nav-list .totara-menu-nav-item {
+    font-size:0.8em;
+    float:none;
+    margin:0;
+}
+
+.totara-menu-nav-list .totara-menu-nav-list .totara-menu-nav-item-link {
+    display: block;
+    border-right-width: 0;
+    border-left-width: 0;
+    text-indent: @totara-menu-text-indent;
+}
+
+.totara-menu-nav-item.selected .totara-menu-nav-item.selected .totara-menu-nav-item-link {
+    color: @totara-menu-default-link-active-color;
+    background: @totara-menu-default-link-active-bg;
+}
+
+.totara-menu-nav > .totara-menu-nav-list > .totara-menu-nav-item:first-child .totara-menu-nav-item-link {
+    border-top-width: 0;
+}
+
+@media (min-width: @grid-float-breakpoint) {
+
+    .totara-navbar {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .totara-menu-nav-item {
+        float: left;
+    }
+
+    .totara-menu-nav-item-link {
+        border-left-width: @totara-menu-border-width;
+    }
+
+    .totara-menu-nav-list .totara-menu-nav-list {
+        position: absolute;
+        display: none;
+        width: auto;
+        min-width: 200px;
+        z-index: 100;
+    }
+
+    .totara-menu-nav-list .totara-menu-nav-list {
+        border: @totara-menu-border;
+        border-top-width: 0;
+        .box-shadow(0 1px 1px rgba(0, 0, 0, .05));
+    }
+
+    .totara-menu-nav-list .totara-menu-nav-list .totara-menu-nav-item-link {
+        text-indent:  0;
+    }
+
+    .totara-menu-nav > .totara-menu-nav-list > .totara-menu-nav-item:first-child .totara-menu-nav-item-link {
+        border-top-width: 1px;
+    }
+
+    .totara-menu-nav > .totara-menu-nav-list > .totara-menu-nav-item:last-child .totara-menu-nav-item-link {
+        border-right-width: @totara-menu-border-width;
+    }
+
+}

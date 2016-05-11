@@ -941,10 +941,10 @@ class core_admin_renderer extends plugin_renderer_base {
 
                 if ($isstandard = $plugin->is_standard()) {
                     $row->attributes['class'] .= ' standard';
-                    $sourcelabel = html_writer::span(get_string('sourcestd', 'core_plugin'), 'sourcetext label');
+                    $sourcelabel = html_writer::span(get_string('sourcestd', 'core_plugin'), 'sourcetext label label-default');
                 } else {
                     $row->attributes['class'] .= ' extension';
-                    $sourcelabel = html_writer::span(get_string('sourceext', 'core_plugin'), 'sourcetext label label-info');
+                    $sourcelabel = html_writer::span(get_string('sourceext', 'core_plugin'), 'sourcetext label label-default');
                 }
 
                 $coredependency = $plugin->is_core_dependency_satisfied($version);
@@ -953,7 +953,7 @@ class core_admin_renderer extends plugin_renderer_base {
 
                 $statuscode = $plugin->get_status();
                 $row->attributes['class'] .= ' status-' . $statuscode;
-                $statusclass = 'statustext label ';
+                $statusclass = 'statustext label label-default ';
                 switch ($statuscode) {
                     case core_plugin_manager::PLUGIN_STATUS_NEW:
                         $statusclass .= $dependenciesok ? 'label-success' : 'label-warning';
@@ -964,7 +964,7 @@ class core_admin_renderer extends plugin_renderer_base {
                     case core_plugin_manager::PLUGIN_STATUS_MISSING:
                     case core_plugin_manager::PLUGIN_STATUS_DOWNGRADE:
                     case core_plugin_manager::PLUGIN_STATUS_DELETE:
-                        $statusclass .= 'label-important';
+                        $statusclass .= 'label-danger';
                         break;
                     case core_plugin_manager::PLUGIN_STATUS_NODB:
                     case core_plugin_manager::PLUGIN_STATUS_UPTODATE:
@@ -1346,7 +1346,7 @@ class core_admin_renderer extends plugin_renderer_base {
                     $label = '';
                 } else {
                     $class = 'requires-failed';
-                    $label = html_writer::span(get_string('dependencyfails', 'core_plugin'), 'label label-important');
+                    $label = html_writer::span(get_string('dependencyfails', 'core_plugin'), 'label label-danger');
                 }
                 $requires[] = html_writer::tag('li',
                     html_writer::span(get_string('moodleversion', 'core_plugin', $plugin->versionrequires), 'dep dep-core').
@@ -1370,9 +1370,9 @@ class core_admin_renderer extends plugin_renderer_base {
                         );
 
                     } else {
-                        $label = html_writer::span(get_string('dependencymissing', 'core_plugin'), 'label label-important');
+                        $label = html_writer::span(get_string('dependencymissing', 'core_plugin'), 'label label-danger');
                         $label .= ' '.html_writer::span(get_string('dependencyunavailable', 'core_plugin'),
-                            'label label-important');
+                            'label label-danger');
                         $class = 'requires-failed requires-missing requires-unavailable';
                     }
                     $displayuploadlink = true;
@@ -1385,9 +1385,9 @@ class core_admin_renderer extends plugin_renderer_base {
                         $displayupdateslink = true;
 
                     } else {
-                        $label = html_writer::span(get_string('dependencyfails', 'core_plugin'), 'label label-important');
+                        $label = html_writer::span(get_string('dependencyfails', 'core_plugin'), 'label label-danger');
                         $label .= ' '.html_writer::span(get_string('dependencyunavailable', 'core_plugin'),
-                            'label label-important');
+                            'label label-danger');
                         $class = 'requires-failed requires-outdated requires-unavailable';
                     }
                     $displayuploadlink = true;
@@ -1655,7 +1655,7 @@ class core_admin_renderer extends plugin_renderer_base {
                 }
 
                 if ($status === core_plugin_manager::PLUGIN_STATUS_MISSING) {
-                    $msg = html_writer::div(get_string('status_missing', 'core_plugin'), 'statusmsg label label-important');
+                    $msg = html_writer::div(get_string('status_missing', 'core_plugin'), 'statusmsg label label-danger');
                 } else if ($status === core_plugin_manager::PLUGIN_STATUS_NEW) {
                     $msg = html_writer::div(get_string('status_new', 'core_plugin'), 'statusmsg label label-success');
                 } else {

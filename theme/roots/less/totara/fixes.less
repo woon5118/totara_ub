@@ -1,0 +1,124 @@
+//
+// This file is part of Totara LMS
+//
+// Copyright (C) 2016 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <ht    tp://www.gnu.org/licenses/>.
+//
+// @copyright 2016 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Joby Harding <joby.harding@totaralearning.com>
+// @package   theme_roots
+
+/* Fix for higher pix density screenshots in theme selector */
+#admindeviceselector td:nth-child(2) img,
+#adminthemeselector td:first-child img {
+    max-width: 500px;
+    max-height: 342px;
+}
+
+button {
+    margin: 0;
+}
+
+// Regression caused by YUI styles.
+// http://totara.vagrant3/theme/yui_combo.php?3.17.2/cssreset/cssreset.css&3.17.2/cssfonts/cssfonts.css&3.17.2/cssgrids/cssgrids.css&3.17.2/cssbase/cssbase.css
+th, td {
+    border-right-width: 0;
+    border-left-width: 0;
+    border-color: #ddd;
+}
+
+
+// Display skip to content link when focused for keyboard navigators.
+a.skip:focus {
+    position: static;
+    display: block;
+    width: auto;
+    height: auto;
+}
+
+//
+// Date selector.
+//
+// Fieldsets which group elements to form a single input
+// component e.g. Date selector (3 X <select>).
+.fitem > fieldset {
+    > legend {
+        font-size: @font-size-base;
+        border-bottom: none;
+        margin-top: 0;
+
+        // Negative margin coming in from grid.less
+        margin-right: 0;
+        margin-left: 0;
+
+        padding-top: 0;
+        &:extend(.fitemtitle);
+        &:extend(.mform .fitemtitle);
+
+        &:extend(.form-horizontal .form-group);
+        .make-md-column(4);
+        .make-lg-column(3);
+
+        .legend {
+            &:extend(label);
+            &:extend(.mform .fitem .fitemtitle label);
+            padding-top: (@padding-base-vertical + 1); // Default padding plus a border
+        }
+    }
+}
+
+.fdate_selector legend {
+    &:extend(.mform .fitem .fitemtitle label);
+}
+
+.mform .fdate_selector .felement select{
+    &:extend(.mform .fitem .felement.fdate_selector select);
+}
+
+//
+// .form-multicheckbox
+// e.g. Seminar global settings.
+//
+.form-setting .form-multicheckbox ul {
+    margin-left: 0;
+}
+
+//
+// User menu.
+//
+.usermenu .moodle-actionmenu .toggle-display .userbutton .avatars {
+    margin: 0 @padding-base-horizontal;
+}
+
+.moodle-actionmenu[data-enhanced].show .menu a .flex-icon {
+    /* legacy fix. New development apply .flex-icon-pre instead */
+    margin-right: @flex-icon-margin-base;
+}
+
+//
+// Site logo.
+//
+// Based on https://codepen.io/bootstrapped/pen/KwYGwq
+.navbar-brand {
+    padding: 0;
+    height: (@font-size-base * 5);
+}
+
+.navbar-brand > img {
+    height: 100%;
+    padding: 15px;
+    width: auto;
+}

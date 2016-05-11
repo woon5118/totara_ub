@@ -62,8 +62,9 @@ $sizeclasses = array(
 
 $stateclasses = array(
     'ft-state-default',
-    'ft-state-danger',
     'ft-state-success',
+    'ft-state-warning',
+    'ft-state-danger',
     'ft-state-info',
     'ft-state-other',
     'ft-state-disabled',
