@@ -203,7 +203,7 @@ if ($cancreateframeworks) {
 
 if ($canviewframeworks) {
     if ($frameworks) {
-        $templatedata->frameworks = $table->export_for_template(null);
+        $templatedata->frameworks = $table->export_for_template($OUTPUT);
     } else {
         $templatedata->noframeworkmessage = get_string($prefix.'noframeworks', 'totara_hierarchy');
     }

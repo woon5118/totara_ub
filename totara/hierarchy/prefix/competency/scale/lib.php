@@ -222,7 +222,7 @@ function competency_scale_display_table($scales) {
     $templatedata->heading = get_string('competencyscales', 'totara_hierarchy');
 
     if ($scales) {
-        $templatedata->scales = $table->export_for_template(null);
+        $templatedata->scales = $table->export_for_template($OUTPUT);
     } else {
         $templatedata->scales = false;
     }
