@@ -20,7 +20,7 @@ Feature: Check global report restrictions default settings
     And I should see "No" in the "Audience members (View)" "table_row"
     And I should see "No" in the "Completion import: Certification status (View)" "table_row"
     And I should see "No" in the "Completion import: Course status (View)" "table_row"
-    And I should see "No" in the "Declared interest report (View)" "table_row"
+    And I should see "No" in the "Seminars: Declared interest (View)" "table_row"
     And I should see "No" in the "Goal Status (View)" "table_row"
     And I should see "No" in the "Goal Status History (View)" "table_row"
     And I should see "No" in the "Goal Summary (View)" "table_row"
