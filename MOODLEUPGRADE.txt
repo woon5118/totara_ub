@@ -6,7 +6,7 @@ These instructions detail the process for upgrading a Moodle site to Totara.
 Minimum requirements in Totara 9.0:
 
 * PHP version 5.5.9
-* PostgreSQL 9.1, MySQL 5.5.31, MariaDB 5.5.31 or MSSQL 2008.
+* PostgreSQL 9.2, MySQL 5.5.31, MariaDB 5.5.31 or MSSQL 2008.
 * Oracle database is not supported.
 * MSSQL only: Database user requires additional permissions: ALTER SETTINGS(SERVER).
 

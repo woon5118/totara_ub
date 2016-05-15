@@ -10,7 +10,7 @@ New requirements in Totara 9.0:
 * PHP zlib and OPcache modules now recommended.
 * MSSQL only: Database user requires additional permissions: ALTER SETTINGS(SERVER).
 * MSSQL 2008 now required (was 2005 in Totara 2.6).
-* Postgres 9.1 now required (was 8.3 in Totara 2.6).
+* PostgreSQL 9.2 now required (was 9.1 in Totara 2.9).
 * MySQL 5.5.31 now required (was 5.1.33 in Totara 2.6).
 * MariaDB 5.5.31 now required (was 5.3.5 in Totara 2.6).
 

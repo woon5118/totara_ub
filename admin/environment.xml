@@ -9,9 +9,9 @@
     <DATABASE level="required">
       <VENDOR name="mysql" version="5.0.25" />
       <VENDOR name="postgres" version="8.3" />
-      <VENDOR name="mssql" version="10.0" />
-      <VENDOR name="odbc_mssql" version="10.0" />
-      <VENDOR name="mssql_n" version="10.0" />
+      <VENDOR name="mssql" version="9.0" />
+      <VENDOR name="odbc_mssql" version="9.0" />
+      <VENDOR name="mssql_n" version="9.0" />
       <VENDOR name="oracle" version="10.2" />
       <VENDOR name="sqlite" version="2.0" />
     </DATABASE>
@@ -108,11 +108,6 @@
           <ON_CHECK message="settingfileuploads" />
         </FEEDBACK>
       </PHP_SETTING>
-      <PHP_SETTING name="always_populate_raw_post_data" value="-1" level="optional">
-        <FEEDBACK>
-          <ON_CHECK message="settingalwayspopulaterawpostdata" />
-        </FEEDBACK>
-      </PHP_SETTING>
     </PHP_SETTINGS>
   </MOODLE>
   <MOODLE version="2.4" requires="2.2">
@@ -124,9 +119,9 @@
     <DATABASE level="required">
       <VENDOR name="mysql" version="5.1.33" />
       <VENDOR name="postgres" version="8.3" />
-      <VENDOR name="mssql" version="10.0" />
-      <VENDOR name="odbc_mssql" version="10.0" />
-      <VENDOR name="mssql_n" version="10.0" />
+      <VENDOR name="mssql" version="9.0" />
+      <VENDOR name="odbc_mssql" version="9.0" />
+      <VENDOR name="mssql_n" version="9.0" />
       <VENDOR name="oracle" version="10.2" />
       <VENDOR name="sqlite" version="2.0" />
     </DATABASE>
@@ -227,11 +222,6 @@
       <PHP_SETTING name="file_uploads" value="1" level="optional">
         <FEEDBACK>
           <ON_CHECK message="settingfileuploads" />
-        </FEEDBACK>
-      </PHP_SETTING>
-      <PHP_SETTING name="always_populate_raw_post_data" value="-1" level="optional">
-        <FEEDBACK>
-          <ON_CHECK message="settingalwayspopulaterawpostdata" />
         </FEEDBACK>
       </PHP_SETTING>
     </PHP_SETTINGS>
@@ -793,7 +783,7 @@
     <DATABASE level="required">
       <VENDOR name="mariadb" version="5.5.31" />
       <VENDOR name="mysql" version="5.5.31" />
-      <VENDOR name="postgres" version="9.1" />
+      <VENDOR name="postgres" version="9.2" />
       <VENDOR name="mssql" version="10.0" />
       <VENDOR name="oracle" version="10.2" />
     </DATABASE>
