@@ -29,7 +29,9 @@
     }
 
     $context = context_course::instance($course->id);
-    if (!$course->visible and !has_capability('moodle/course:viewhiddencourses', $context)) {
+
+    // Check the course is visible either as traditional visibility or via audience based visibility.
+    if (!totara_course_is_viewable($course->id)) {
         print_error('coursehidden', '', $CFG->wwwroot .'/');
     }
 

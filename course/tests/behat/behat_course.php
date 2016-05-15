@@ -1482,6 +1482,38 @@ class behat_course extends behat_base {
     }
 
     /**
+     * Follows the more information icon for a course.
+     *
+     * Please note this does not just click on the icon if JS is running as that will trigger an expand action.
+     * Instead this always follows the link present for the icon.
+     *
+     * @Given /^I follow the more information icon for the "(?P<coursename>(?:[^"]|\\")*)" course$/
+     *
+     * @param string $coursename The course name
+     * @throws ExpectationException When unable to find the more information node.
+     */
+    public function i_follow_the_more_information_icon_for_the_course($coursename) {
+        $nameliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($coursename);
+        $xpath = "//div[@class='coursename']/a[text()={$nameliteral}]/ancestor::div[@class='info']//a[@title='Summary']";
+        $nodes = $this->getSession()->getDriver()->find($xpath);
+        if (count($nodes) > 0) {
+            /** @var Behat\Mink\Element\NodeElement $node */
+            $node = reset($nodes);
+            if (!$this->running_javascript()) {
+                // Easy click it.
+                $node->click();
+            } else {
+                // We want to redirect here.
+                $url = $node->getAttribute('href');
+                $this->getSession()->getDriver()->visit($url);
+            }
+        } else {
+            $exception = new ExpectationException("Unable to find the more information icon for the course '{$coursename}'", $this->getSession());
+            throw $exception;
+        }
+    }
+
+    /**
      * Used by spin to determine the callback has been highlighted.
      *
      * @param behat_course $self A self reference (default first arg from a spin callback)
