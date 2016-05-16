@@ -103,7 +103,21 @@ class removeconfirm_form extends moodleform {
         $mform->addElement('advcheckbox', 'notifymanager', '', get_string('notifycancelledusermanager', 'facetoface'));
         $mform->setDefault('notifymanager', 1);
 
+        // Custom fields.
+        if ($this->_customdata['enablecustomfields']) {
+            $mform->addElement('header', 'cancellationfields', get_string('cancellationfields', 'facetoface'));
+            $mform->addElement('static', 'cancellationfieldslimitation', '', get_string('cancellationfieldslimitation', 'facetoface'));
+            $signup = new stdClass();
+            $signup->id = 0;
+            customfield_definition($mform, $signup, 'facetofacecancellation', 0, 'facetoface_cancellation', true);
+        }
+
         $this->add_action_buttons(true, get_string('confirm'));
+    }
+
+    public function validation($data, $files) {
+        $data['id'] = 0;
+        return customfield_validation((object)$data, 'facetofacesignup', 'facetoface_signup');
     }
 
     public function get_user_list($userlist, $offset = 0, $limit = 0) {
