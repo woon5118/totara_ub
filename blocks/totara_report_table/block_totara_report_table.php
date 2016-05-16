@@ -72,17 +72,6 @@ class block_totara_report_table extends block_base {
     }
 
     /**
-     * Does this block have any configuration options?
-     *
-     * Yes at a minimum you must select a report.
-     *
-     * @return bool
-     */
-    public function has_config() {
-        return true;
-    }
-
-    /**
      * Can you configure this block?
      *
      * @return bool
