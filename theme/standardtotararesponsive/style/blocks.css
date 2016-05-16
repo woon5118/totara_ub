@@ -24,7 +24,7 @@
     margin: 0;
     padding: 10px 5px 10px 10px;
 }
-.block .header .title h2 {
+.block .header h2 {
   color: #444444;
   text-transform: none;
 }

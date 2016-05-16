@@ -90,6 +90,7 @@ div.header h3,
 div.header h4,
 div.header h5,
 div.header h6,
+.block .header h2,
 .jsenabled .usermenu .moodle-actionmenu.show,
 .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd h1,
 .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd h2,
@@ -104,7 +105,7 @@ div.header h6,
 .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd.yui3-widget-hd h5,
 .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd.yui3-widget-hd h6 {
     background: [[setting:headerbgc]];
-    color: [[setting:text-on-headerbgc]];
+    color: [[setting:heading-on-headerbgc]];
 }
 .totara-dialog .ui-dialog-titlebar,
 .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd,

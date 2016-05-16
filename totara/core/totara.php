@@ -2261,12 +2261,12 @@ function totara_theme_generate_autocolors($css, $theme, $substitutions) {
         }
 
     }
-    if (isset($substitutions->headerbgc)) {
+    if (isset($theme->settings->headerbgc)) {
         $find[] = "[[setting:heading-on-headerbgc]]";
-        $replace[] = (totara_readable_text($substitutions->headerbgc) == '#000000' ? '#444444' : '#b3b3b3');
+        $replace[] = (totara_readable_text($theme->settings->headerbgc) == '#000000' ? '#444444' : '#b3b3b3');
 
         $find[] = "[[setting:text-on-headerbgc]]";
-        $replace[] = (totara_readable_text($substitutions->headerbgc) == '#000000' ? '#444444' : '#cccccc');
+        $replace[] = (totara_readable_text($theme->settings->headerbgc) == '#000000' ? '#444444' : '#cccccc');
     }
     return str_replace($find, $replace, $css);
 }
