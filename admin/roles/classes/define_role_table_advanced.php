@@ -479,9 +479,7 @@ class core_role_define_role_table_advanced extends core_role_capability_table_wi
     }
 
     protected function get_description_field($id) {
-        return '<textarea class="form-textarea" id="'. s($id) .'" name="description" rows="10" cols="50">' .
-            htmlspecialchars($this->role->description) .
-            '</textarea>';
+        return print_textarea(true, 10, 50, 50, 10, 'description', $this->role->description, 0, true);
     }
 
     protected function get_archetype_field($id) {
