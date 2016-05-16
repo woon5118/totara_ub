@@ -93,15 +93,21 @@ class send_messages_task extends \core\task\scheduled_task {
             mtrace('Checking programs that have had recent enrolments');
         }
 
-        $lastrun = $this->get_last_run_time();
+        $lastrun = get_config('totara_program', 'enrolment_messages_last_run');
         if (empty($lastrun)) {
-            // Must be the first time run since upgrading, use the old cron value.
-            $lastrun = $DB->get_field('config_plugins', 'value', array('plugin' => 'totara_program', 'name' => 'lastcron'));
+            // Must be the first time run since upgrading to use the config, try using the old task last run time.
+            $lastrun = $this->get_last_run_time();
             if (empty($lastrun)) {
-                // There really is no past value to use here, must be a fresh install.
-                $lastrun = 0;
+                // Must be the first time run since upgrading to use the task last run time, use the old cron value.
+                $lastrun = $DB->get_field('config_plugins', 'value', array('plugin' => 'totara_program', 'name' => 'lastcron'));
+                if (empty($lastrun)) {
+                    // There really is no past value to use here, must be a fresh install.
+                    $lastrun = 0;
+                }
             }
         }
+
+        $currentrun = time();
 
         $sql = "SELECT pua.id, pua.userid, pua.programid, pm.id as messageid
                   FROM {prog_user_assignment} pua
@@ -110,7 +116,7 @@ class send_messages_task extends \core\task\scheduled_task {
                    AND pm.messagetype = :enroltype
              LEFT JOIN {prog_messagelog} pml
                     ON pml.messageid = pm.id AND pml.userid = pua.userid
-                 WHERE pua.timeassigned >= :lastrun
+                 WHERE pua.timeassigned > :lastrun AND pua.timeassigned <= :currentrun
                    AND pua.exceptionstatus <> :exraise
                    AND pua.exceptionstatus <> :exdismiss
                    AND pml.id IS NULL
@@ -120,7 +126,8 @@ class send_messages_task extends \core\task\scheduled_task {
             'exraise' => PROGRAM_EXCEPTION_RAISED,
             'exdismiss' => PROGRAM_EXCEPTION_DISMISSED,
             'enroltype' => MESSAGETYPE_ENROLMENT,
-            'lastrun' => $lastrun
+            'lastrun' => $lastrun,
+            'currentrun' => $currentrun,
         );
 
         $enrolments = $DB->get_records_sql($sql, $params);
@@ -154,6 +161,9 @@ class send_messages_task extends \core\task\scheduled_task {
                 }
             }
         }
+
+        set_config('enrolment_messages_last_run', $currentrun, 'totara_program');
+
         // Success, close the transaction.
         $transaction->allow_commit();
     }
