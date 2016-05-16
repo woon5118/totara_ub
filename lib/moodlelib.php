@@ -4152,11 +4152,13 @@ function delete_user(stdClass $user) {
 
     // Generate username from email address, or a fake email.
     $delemail = !empty($user->email) ? $user->email : $user->username . '.' . $user->id . '@unknownemail.invalid';
-    $delname = clean_param($delemail . "." . time(), PARAM_USERNAME);
+    $delnameid = time();
+    $delname = clean_param($delemail . "." . $delnameid, PARAM_USERNAME);
 
     // Workaround for bulk deletes of users with the same email address.
     while ($DB->record_exists('user', array('username' => $delname))) { // No need to use mnethostid here.
-        $delname++;
+        $delnameid++;
+        $delname = clean_param($delemail . "." . $delnameid, PARAM_USERNAME);
     }
 
     // Mark internal user record as "deleted".

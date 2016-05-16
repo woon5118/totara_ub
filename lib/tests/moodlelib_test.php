@@ -1969,6 +1969,8 @@ class core_moodlelib_testcase extends advanced_testcase {
         $this->assertTrue($result2);
         $this->assertStringStartsWith($usersharedemail1->email . '.', $usersharedemail1after->username);
         $this->assertStringStartsWith($usersharedemail2->email . '.', $usersharedemail2after->username);
+        // Ensure they are different.
+        $this->assertNotSame($usersharedemail1after->username, $usersharedemail2after->username);
 
         // Simultaneously deleting users without email addresses.
         $result1 = delete_user($useremptyemail1);
@@ -1982,6 +1984,8 @@ class core_moodlelib_testcase extends advanced_testcase {
             $useremptyemail1after->username);
         $this->assertStringStartsWith($useremptyemail2->username . '.' . $useremptyemail2->id . '@unknownemail.invalid.',
             $useremptyemail2after->username);
+        // Ensure they are different.
+        $this->assertNotSame($useremptyemail1after->username, $useremptyemail2after->username);
 
         $this->resetDebugging();
     }
