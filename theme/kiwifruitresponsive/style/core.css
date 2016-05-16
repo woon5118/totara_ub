@@ -1036,9 +1036,6 @@ fieldset {
     margin:0;
     padding:10px 0;
 }
-.mform .fitem .feditor textarea {
-    width:98% !important;
-}
 .mform .fitem .feditor table.mceLayout {
     width:100% !important;
 }

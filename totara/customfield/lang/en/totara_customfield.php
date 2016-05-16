@@ -33,7 +33,9 @@ $string['createnewcustomfield'] = 'Create a new custom field';
 $string['createnewfield'] = 'Create a new &quot;{$a}&quot; custom field';
 $string['customfield'] = 'Custom field';
 $string['customfieldcolumnstextarea'] = 'Columns (text area)';
-$string['customfieldcolumnstextarea_help'] = '**Columns** sets the width of text area that will be available.';
+$string['customfieldcolumnstextarea_help'] = '**Columns** sets the width of text area custom field.
+
+If a text editor plug-in is applied to the text area, the width will be determined by the plug-in and changing this value may have no effect.';
 $string['customfielddefaultdatacheckbox'] = 'Checked by default (Checkbox)';
 $string['customfielddefaultdatacheckbox_help'] = 'When set to Yes the Custom field checkbox will be checked by default.
 
@@ -75,7 +77,9 @@ $string['customfieldrequired_help'] = 'If set to Yes, it will be a compulsory fi
 
 If set to No, it will be an optional field when creating new items.';
 $string['customfieldrowstextarea'] = 'Rows (text area)';
-$string['customfieldrowstextarea_help'] = 'Set the height of the text area that will be available (number of lines).';
+$string['customfieldrowstextarea_help'] = '**Rows** sets the height of the text area custom field (the number of lines).
+
+If a text editor plug-in is applied to the text area, the height will be determined by the plug-in and changing this value may have no effect.';
 $string['customfields'] = 'Custom fields';
 $string['customfieldshortname'] = 'Custom Field short name';
 $string['customfieldshortname_help'] = 'Custom field short name is the abbreviated name of the custom field and can be used for display purposes.

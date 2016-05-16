@@ -848,9 +848,6 @@ input#id_submitbutton2:hover {
     padding:10px 0;
     min-width: 425px;
 }
-.mform .fitem .feditor textarea {
-    width:98% !important;
-}
 .mform .fitem .feditor table.mceLayout {
     width:100% !important;
 }
