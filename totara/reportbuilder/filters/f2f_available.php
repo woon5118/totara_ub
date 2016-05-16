@@ -81,7 +81,7 @@ abstract class rb_filter_f2f_available extends rb_filter_type
 
         $mform->addElement('static', $this->name . '_err');
         $grp = $mform->addElement('group', $this->name.'_grp', $label, $objs, '', false);
-        $mform->addHelpButton($grp->_name, 'filter_roomavailable', 'totara_reportbuilder');
+        $mform->addHelpButton($grp->_name, 'filter_'.$this->value, 'totara_reportbuilder');
 
         $mform->disabledIf($this->name . '_start[day]', $this->name . '_enable', 'eq', 0);
         $mform->disabledIf($this->name . '_start[month]', $this->name . '_enable', 'eq', 0);
