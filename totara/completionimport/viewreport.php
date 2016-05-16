@@ -71,10 +71,13 @@ if (!$report = reportbuilder_get_embedded_report($shortname, $pageparams, false,
 $pageheading = get_string('pluginname', 'totara_completionimport');
 $PAGE->set_heading(format_string($pageheading));
 $PAGE->set_title(format_string($pageheading));
-$PAGE->set_url('/totara/completionimport/viewreport.php', $pageparams);
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_button($report->edit_button());
-admin_externalpage_setup('totara_completionimport_' . $importname);
+$pageparams['format'] = $format;
+$pageparams['debug'] = $debug;
+unset($pageparams['clearfilters']);
+$url = new moodle_url('/totara/completionimport/viewreport.php', $pageparams);
+admin_externalpage_setup('totara_completionimport_' . $importname, '', null, $url);
 
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
@@ -86,6 +89,23 @@ if ($format != '') {
 $report->include_js();
 
 echo $OUTPUT->header();
+
+if (!empty($importuserid) || !empty($timecreated)) {
+    $clearembeddedparams = get_string('viewingwithembeddedfilters', 'totara_completionimport') . ':<br>';
+    if (!empty($importuserid)) {
+        $importuser = $DB->get_record('user', array('id' => $importuserid), '*', MUST_EXIST);
+        $clearembeddedparams .= get_string('importedby', 'totara_completionimport') . ': ' . fullname($importuser) . '<br>';
+    }
+    if (!empty($timecreated)) {
+        $clearembeddedparams .= get_string('timeuploaded', 'totara_completionimport') . ': ';
+        $clearembeddedparams .= userdate($timecreated, get_string('strfdateattime', 'langconfig')) . '<br>';
+    }
+    unset($pageparams['importuserid']);
+    unset($pageparams['timecreated']);
+    $showalluploadsurl = new moodle_url('/totara/completionimport/viewreport.php', $pageparams);
+    $clearembeddedparams .= $OUTPUT->action_link($showalluploadsurl, get_string('clearembeddedfilters', 'totara_completionimport'));
+    echo $OUTPUT->notification($clearembeddedparams, 'notifymessage');
+}
 
 // Standard report stuff.
 echo $OUTPUT->container_start('', 'completion_import');

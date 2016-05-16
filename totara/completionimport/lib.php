@@ -1550,7 +1550,7 @@ function display_report_link($importname, $importtime) {
         echo html_writer::tag('p', get_string('importtotal', 'totara_completionimport', $totals->totalrows));
 
         $viewurl = new moodle_url('/totara/completionimport/viewreport.php',
-                array('importname' => $importname, 'timecreated' => $importtime, 'importuserid' => $USER->id));
+                array('importname' => $importname, 'timecreated' => $importtime, 'importuserid' => $USER->id, 'clearfilters' => 1));
         $viewlink = html_writer::link($viewurl, format_string(get_string('report_' . $importname, 'totara_completionimport')));
         echo html_writer::tag('p', $viewlink);
     } else {
