@@ -521,13 +521,13 @@ class mod_quiz_mod_form extends moodleform_mod {
 
         $errors = parent::validation($data, $files);
 
-        // Check that grade to pass is set if it is required for completion.
+        // Totara: Check that grade to pass is set if it is required for completion.
         if (empty($data['gradepass']) || $data['gradepass'] <= 0) {
-            if ($data['completionunlocked']) {
+            if (!empty($data['completionunlocked'])) {
                 if ($data['completion'] == COMPLETION_TRACKING_AUTOMATIC && $data['completionpass']) {
                     $errors['gradepass'] = get_string('gradepassrequiredforcompletion', 'mod_quiz');
                 }
-            } else {
+            } else if ($data['instance']) {
                 $quiz = $DB->get_record('quiz', array('id' => $data['instance']), '*', MUST_EXIST);
                 if ($quiz->completionpass) {
                     $errors['gradepass'] = get_string('gradepassrequiredforcompletion', 'mod_quiz');
