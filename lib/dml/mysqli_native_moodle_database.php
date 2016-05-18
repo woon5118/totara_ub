@@ -466,6 +466,20 @@ class mysqli_native_moodle_database extends moodle_database {
             $this->query_end($result);
         }
 
+        // Totara: make sure the group_concat can work with large strings.
+        $sql = "SELECT @@group_concat_max_len";
+        $this->query_start($sql, null, SQL_QUERY_AUX);
+        $result = $this->mysqli->query($sql);
+        if ($rec = $result->fetch_assoc()) {
+            if ($rec['@@group_concat_max_len'] < 131072) {
+                $this->query_end(true);
+                $sql = "SET SESSION group_concat_max_len = 131072";
+                $this->query_start($sql, null, SQL_QUERY_AUX);
+                $this->mysqli->query($sql);
+            }
+        }
+        $this->query_end(true);
+
         // Connection stabilised and configured, going to instantiate the temptables controller
         $this->temptables = new mysqli_native_moodle_temptables($this);
 
@@ -1560,6 +1574,25 @@ class mysqli_native_moodle_database extends moodle_database {
             return "''";
         }
         return "CONCAT($s)";
+    }
+
+    /**
+     * TOTARA - Returns database specific SQL code similar to GROUP_CONCAT() behaviour from MySQL.
+     *
+     * NOTE: NULL values are skipped, use COALESCE if you want to include a replacement
+     *
+     * @param string $expr      Expression to get individual values
+     * @param string $separator The delimiter to separate the values, a simple string value only
+     * @param string $orderby   ORDER BY clause that determines order of rows with values - required
+     * @return string SQL fragment equivalent to GROUP_CONCAT()
+     */
+    public function sql_group_concat($expr, $separator, $orderby) {
+        if ((string)$orderby === '') {
+            throw new coding_exception('sql_group_concat method requires $orderby parameter');
+        }
+        // See: http://dev.mysql.com/doc/refman/5.7/en/group-by-functions.html#function_group-concat
+        $separator = $this->get_manager()->generator->addslashes($separator);
+        return " GROUP_CONCAT({$expr} ORDER BY {$orderby} SEPARATOR '{$separator}') ";
     }
 
     /**

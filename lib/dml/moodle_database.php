@@ -2175,6 +2175,20 @@ abstract class moodle_database {
     public abstract function sql_concat();
 
     /**
+     * TOTARA - Returns database specific SQL code similar to GROUP_CONCAT() behaviour from MySQL.
+     *
+     * NOTE: NULL values are skipped, use COALESCE if you want to include a replacement
+     *
+     * @param string $expr      Expression to get individual values
+     * @param string $separator The delimiter to separate the values, a simple string value only
+     * @param string $orderby   ORDER BY clause that determines order of rows with values - required
+     * @return string SQL fragment equivalent to GROUP_CONCAT()
+     */
+    public function sql_group_concat($expr, $separator, $orderby) {
+        throw new coding_exception('the database driver does not support sql_group_concat()');
+    }
+
+    /**
      * Returns the proper SQL to do CONCAT between the elements passed
      * with a given separator
      *
