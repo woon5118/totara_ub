@@ -209,6 +209,13 @@ class rb_column {
     public $grouping;
 
     /**
+     * Used to pass through the fields for ordering the grouping, for example:
+     *
+     * 'grouporder' => array('prog_courseset.sortorder', 'prog_courseset_course.id')
+     */
+    public $grouporder;
+
+    /**
      * Inline style information to be applied to this column
      *
      * Array of CSS properties like this:
@@ -293,7 +300,6 @@ class rb_column {
      * @param array $options Associative array of optional settings for the column
      */
     function __construct($type, $value, $heading, $field, $options=array()) {
-
         // use defaults if options not set
         $defaults = array(
             'joins' => null,
@@ -303,6 +309,7 @@ class rb_column {
             'capability' => null,
             'noexport' => false,
             'grouping' => 'none',
+            'grouporder' => null,
             'nosort' => false,
             'style' => null,
             'class' => null,
@@ -339,6 +346,9 @@ class rb_column {
         $value = $this->value;
         $fields = array();
 
+        // Define functions that will need an additional $orderby variable.
+        $sql_functions = array('rb_group_sql_aggregate');
+
         if ($field === null) {
             // Not much to do...
 
@@ -354,23 +364,70 @@ class rb_column {
             // apply grouping function and ignore extrafields
             switch ($aliasmode) {
                 case self::FIELDONLY:
-                    $fields[] = $src->$groupfunc($field);
+                    if (in_array($groupfunc, $sql_functions)) {
+                        $orderby = '';
+                        if (!empty($this->grouporder)) {
+                            $order = array();
+                            foreach ($this->grouporder as $grpalias => $grpfield) {
+                                $order[] = "grp_{$type}_{$grpalias}";
+                            }
+                            $orderby = implode(', ', $order);
+                        }
+
+                        $fields[] = $src->$groupfunc($field, $orderby);
+                    } else {
+                        $fields[] = $src->$groupfunc($field);
+                    }
                     break;
                 case self::ALIASONLY:
                     $fields[] = "{$type}_{$value}";
                     break;
                 case self::NOGROUP:
                     // Grouping disabled in cache preparation when grouping cannot be performed as sensitive data will be removed.
+                    if (!empty($this->grouporder)) {
+                        foreach ($this->grouporder as $grpalias => $grpfield) {
+                            // Include any fields required for ordering in later groupings.
+                            if ($returnextrafields) {
+                                $fields[] = "{$grpfield} as grp_{$type}_{$grpalias}";
+                            }
+                        }
+                    }
+
                     $fields[] = $field . " AS {$type}_{$value}";
                     break;
                 case self::CACHE:
                     // Request will be pointed to cache instead of normal database table.
-                    $fields[] = $src->$groupfunc("{$type}_{$value}") . " AS {$type}_{$value}";
+                    if (in_array($groupfunc, $sql_functions)) {
+                        $orderby = '';
+                        if (!empty($this->grouporder)) {
+                            $order = array();
+                            foreach ($this->grouporder as $grpalias => $grpfield) {
+                                $order[] = "grp_{$type}_{$grpalias}";
+                            }
+                            $orderby = implode(', ', $order);
+                        }
+                        $fields[] = $src->$groupfunc("{$type}_{$value}", $orderby) . " AS {$type}_{$value}";
+                    } else {
+                        $fields[] = $src->$groupfunc("{$type}_{$value}") . " AS {$type}_{$value}";
+                    }
                     break;
                 case self::REGULAR:
                 default:
                     // Cache disabled.
-                    $fields[] = $src->$groupfunc($field) . " AS {$type}_{$value}";
+                    if (in_array($groupfunc, $sql_functions)) {
+                        $orderby = '';
+                        if (!empty($this->grouporder)) {
+                            $order = array();
+                            foreach ($this->grouporder as $grpalias => $grpfield) {
+                                $order[] = "{$grpfield}";
+                            }
+                            $orderby = implode(', ', $order);
+                        }
+
+                        $fields[] = $src->$groupfunc($field, $orderby) . " AS {$type}_{$value}";
+                    } else  {
+                        $fields[] = $src->$groupfunc($field) . " AS {$type}_{$value}";
+                    }
                     break;
             }
 

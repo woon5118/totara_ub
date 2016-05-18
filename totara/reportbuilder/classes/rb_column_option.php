@@ -193,6 +193,13 @@ class rb_column_option {
     public $grouping;
 
     /**
+     * Used to pass through the fields for ordering the grouping, for example:
+     *
+     * 'grouporder' => array('prog_courseset.sortorder', 'prog_courseset_course.id')
+     */
+    public $grouporder;
+
+    /**
      * Determine whether the sorting capability is added to a column
      *
      * @access public
@@ -330,6 +337,7 @@ class rb_column_option {
             'capability' => null,
             'noexport' => false,
             'grouping' => 'none',
+            'grouporder' => null,
             'style' => null,
             'class' => null,
             'nosort' => false,
@@ -354,7 +362,6 @@ class rb_column_option {
         foreach ($defaults as $property => $unused) {
             $this->$property = $options[$property];
         }
-
     }
 
     /**

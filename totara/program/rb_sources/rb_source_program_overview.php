@@ -409,28 +409,34 @@ class rb_source_program_overview extends rb_base_source {
                 'course',
                 'shortname',
                 get_string('courseshortname', 'rb_source_program_overview'),
-                'COALESCE('.$DB->sql_concat('course.id', "'|'", 'course.shortname', "'\n'").', \'-\')',
+                'COALESCE('.$DB->sql_concat('course.id', "'|'", 'course.shortname').', \'-\')',
                 array(
                     'joins' => 'course',
-                    'grouping' => 'list_nodelimiter',
-                    'displayfunc' => 'list_to_newline_coursename',
+                    'grouping' => 'sql_aggregate',
+                    'grouporder' => array(
+                        'csorder'  => 'prog_courseset.sortorder',
+                        'cscid'    => 'prog_courseset_course.id'
+                    ),
+                    'displayfunc' => 'coursename_list',
                     'style' => array('white-space' => 'pre'),
                 )
-
             );
 
             $columnoptions[] = new rb_column_option(
                 'course',
                 'status',
                 get_string('coursecompletionstatus', 'rb_source_program_overview'),
-                sql_cast2char('COALESCE(course_completions.status, '.COMPLETION_STATUS_NOTYETSTARTED.')'),
+                'COALESCE('.sql_cast2char('course_completions.status').', \''.COMPLETION_STATUS_NOTYETSTARTED.'\')',
                 array(
                     'joins' => 'course_completions',
-                    'grouping' => 'comma_list',
-                    'displayfunc' => 'course_completion_status',
+                    'grouping' => 'sql_aggregate',
+                    'grouporder' => array(
+                        'csorder'  => 'prog_courseset.sortorder',
+                        'cscid'    => 'prog_courseset_course.id'
+                    ),
+                    'displayfunc' => 'course_status_list',
                     'style' => array('white-space' => 'pre'),
                 )
-
             );
         }
 
@@ -441,8 +447,12 @@ class rb_source_program_overview extends rb_base_source {
             'COALESCE('.sql_cast2char('course_completions.timeenrolled').', \'-\')',
             array(
                 'joins' => 'course_completions',
-                'grouping' => 'comma_list',
-                'displayfunc' => 'nice_date_list',
+                'grouping' => 'sql_aggregate',
+                'grouporder' => array(
+                    'csorder'  => 'prog_courseset.sortorder',
+                    'cscid'    => 'prog_courseset_course.id'
+                ),
+                'displayfunc' => 'orderedlist_to_newline_date',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -454,8 +464,12 @@ class rb_source_program_overview extends rb_base_source {
             'COALESCE('.sql_cast2char('course_completions.timestarted').', \'-\')',
             array(
                 'joins' => 'course_completions',
-                'grouping' => 'comma_list',
-                'displayfunc' => 'nice_date_list',
+                'grouping' => 'sql_aggregate',
+                'grouporder' => array(
+                    'csorder'  => 'prog_courseset.sortorder',
+                    'cscid'    => 'prog_courseset_course.id'
+                ),
+                'displayfunc' => 'orderedlist_to_newline_date',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -467,8 +481,12 @@ class rb_source_program_overview extends rb_base_source {
             'COALESCE('.sql_cast2char('course_completions.timecompleted').', \'-\')',
             array(
                 'joins' => 'course_completions',
-                'grouping' => 'comma_list',
-                'displayfunc' => 'nice_date_list',
+                'grouping' => 'sql_aggregate',
+                'grouporder' => array(
+                    'csorder'  => 'prog_courseset.sortorder',
+                    'cscid'    => 'prog_courseset_course.id'
+                ),
+                'displayfunc' => 'orderedlist_to_newline_date',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -481,8 +499,15 @@ class rb_source_program_overview extends rb_base_source {
             'COALESCE('.sql_cast2char('grade_grades.finalgrade').', \'-\')',
             array(
                 'joins' => 'grade_grades',
-                'grouping' => 'comma_list',
-                'displayfunc' => 'list_to_newline',
+                'grouping' => 'sql_aggregate',
+                'grouporder' => array(
+                    'csorder'  => 'prog_courseset.sortorder',
+                    'cscid'    => 'prog_courseset_course.id'
+                ),
+                'groupinginfo' => array(
+                    'orderby' => array('prog_courseset.sortorder', 'prog_courseset_course.id'),
+                ),
+                'displayfunc' => 'orderedlist_to_newline',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -494,8 +519,12 @@ class rb_source_program_overview extends rb_base_source {
             'COALESCE('.sql_cast2char('criteria.gradepass').', \'-\')',
             array(
                 'joins' => 'criteria',
-                'grouping' => 'comma_list',
-                'displayfunc' => 'list_to_newline',
+                'grouping' => 'sql_aggregate',
+                'grouporder' => array(
+                    'csorder'  => 'prog_courseset.sortorder',
+                    'cscid'    => 'prog_courseset_course.id'
+                ),
+                'displayfunc' => 'orderedlist_to_newline',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -506,11 +535,15 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'name',
             get_string('coursecategory', 'totara_reportbuilder'),
-            "course_category.name",
+            'course_category.name',
             array(
                 'joins' => 'course_category',
-                'grouping' => 'comma_list',
-                'displayfunc' => 'list_to_newline',
+                'grouping' => 'sql_aggregate',
+                'grouporder' => array(
+                    'csorder'  => 'prog_courseset.sortorder',
+                    'cscid'    => 'prog_courseset_course.id'
+                ),
+                'displayfunc' => 'orderedlist_to_newline',
                 'style' => array('white-space' => 'pre'),
                 'dbdatatype' => 'char',
                 'outputformat' => 'text'
@@ -521,14 +554,17 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'namelink',
             get_string('coursecategorylinked', 'totara_reportbuilder'),
-            "course_category.name",
+            $DB->sql_concat_join("'|'", array(sql_cast2char('course_category.id'), sql_cast2char("course_category.visible"), 'course_category.name')),
             array(
                 'joins' => 'course_category',
                 'displayfunc' => 'link_course_category',
+                'grouping' => 'sql_aggregate',
+                'grouporder' => array(
+                    'csorder'  => 'prog_courseset.sortorder',
+                    'cscid'    => 'prog_courseset_course.id'
+                ),
                 'defaultheading' => get_string('category', 'totara_reportbuilder'),
-                'extrafields' => array('cat_id' => "course_category.id", 'cat_visible' => "course_category.visible"),
-                'grouping' => 'comma_list',
-                'displayfunc' => 'list_to_newline',
+                'displayfunc' => 'category_link_list',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -537,11 +573,15 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'id',
             get_string('coursecategoryid', 'totara_reportbuilder'),
-            "course_category.idnumber",
+            'COALESCE(course_category.idnumber, \'-\')',
             array(
                 'joins' => array('course', 'course_category'),
-                'grouping' => 'comma_list',
-                'displayfunc' => 'list_to_newline',
+                'displayfunc' => 'orderedlist_to_newline',
+                'grouping' => 'sql_aggregate',
+                'grouporder' => array(
+                    'csorder'  => 'prog_courseset.sortorder',
+                    'cscid'    => 'prog_courseset_course.id'
+                ),
                 'style' => array('white-space' => 'pre'),
                 'dbdatatype' => 'char',
                 'outputformat' => 'text'
@@ -694,22 +734,40 @@ class rb_source_program_overview extends rb_base_source {
         }
     }
 
-    function rb_display_course_completion_status($status, $row) {
+    function rb_display_course_status_list($data, $row) {
         global $COMPLETION_STATUS;
 
-        $items = explode(', ', $status);
-        foreach ($items as $key => $item) {
-            if (in_array($item, array_keys($COMPLETION_STATUS))) {
-                $items[$key] = get_string('coursecompletion_'.$COMPLETION_STATUS[$item], 'rb_source_program_overview');
+        $output = array();
+        $items = explode(',', $data);
+        foreach ($items as $status) {
+            if (in_array($status, array_keys($COMPLETION_STATUS))) {
+                $output[] = get_string('coursecompletion_'.$COMPLETION_STATUS[$status], 'rb_source_program_overview');
             } else {
-                $items[$key] = get_string('coursecompletion_notyetstarted', 'rb_source_program_overview');
+                $output[] = get_string('coursecompletion_notyetstarted', 'rb_source_program_overview');
             }
         }
-        return implode($items, "\n");
+        return implode($output, "\n");
     }
 
-    function rb_display_list_to_newline_coursename($date, $row) {
-         $items = array_filter(explode("\n", $date));
+    function rb_display_category_link_list($data, $row) {
+        $output = array();
+        $items = explode(',', $data);
+        foreach ($items as $item) {
+            list($catid, $visible, $catname) = explode('|', $item);
+            if ($visible) {
+                $url = new moodle_url('/course/index.php', array('categoryid' => $catid));
+                $output[] = html_writer::link($url, format_string($catname));
+            } else {
+                $output[] = format_string($catname);
+            }
+        }
+
+        return implode($output, "\n");
+    }
+
+    function rb_display_coursename_list($data, $row) {
+
+         $items = explode(',', $data);
          foreach ($items as $key => $item) {
              list($id, $coursename) = explode('|', $item);
              $url = new moodle_url('/course/view.php', array('id' => $id));
@@ -768,6 +826,5 @@ class rb_source_program_overview extends rb_base_source {
         }
         return ($list);
     }
-
 
 }

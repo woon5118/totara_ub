@@ -413,6 +413,7 @@ abstract class rb_base_source {
                     'capability' => $coloption->capability,
                     'noexport' => $coloption->noexport,
                     'grouping' => $coloption->grouping,
+                    'grouporder' => $coloption->grouporder,
                     'nosort' => $coloption->nosort,
                     'style' => $coloption->style,
                     'class' => $coloption->class,
@@ -649,6 +650,21 @@ abstract class rb_base_source {
         return implode($items, "\n");
     }
 
+    // Displays a comma separated list of strings as one string per line.
+    // Assumes you used "'grouping' => 'prog_aggregate'", which concatenates with ',' to construct a pre-ordered the string.
+    function rb_display_orderedlist_to_newline($list, $row) {
+        $output = array();
+        $items = explode(',', $list);
+        foreach ($items as $item) {
+            if (empty($item) || $item === '-') {
+                $output[] = '-';
+            } else {
+                $output[] = $item;
+            }
+        }
+        return implode($output, "\n");
+    }
+
     // Displays a comma separated list of ints as one nice_date per line.
     // Assumes you used "'grouping' => 'comma_list'", which concatenates with ', ', to construct the string.
     function rb_display_list_to_newline_date($datelist, $row) {
@@ -661,6 +677,21 @@ abstract class rb_base_source {
             }
         }
         return implode($items, "\n");
+    }
+
+    // Displays a comma separated list of ints as one nice_date per line, base off nice_date_list.
+    // Assumes you used "'grouping' => 'prog_aggregate'", which concatenates with ',' to construct a pre-ordered the string.
+    function rb_display_orderedlist_to_newline_date($datelist, $row) {
+        $output = array();
+        $items = explode(',', $datelist);
+        foreach ($items as $item) {
+            if (empty($item) || $item === '-') {
+                $output[] = '-';
+            } else {
+                $output[] = userdate($item, get_string('strfdateshortmonth', 'langconfig'));
+            }
+        }
+        return implode($output, "\n");
     }
 
     /**
@@ -1921,6 +1952,22 @@ abstract class rb_base_source {
         global $DB;
 
         return $DB->sql_round("AVG($field*100.0)", 0);
+    }
+
+    /**
+     * This function calls the databases native implementations of
+     * group_concat where possible and requires an additional $orderby
+     * variable. If you create another one you should add it to the
+     * $sql_functions array() in the get_fields() function in the rb_columns class.
+     *
+     * @param string $field         The expression to use as the select
+     * @param string $orderby       The comma deliminated fields to order by
+     * @return string               The native sql for a group concat
+     */
+    function rb_group_sql_aggregate($field, $orderby) {
+        global $DB;
+
+        return $DB->sql_group_concat($field, ',', $orderby);
     }
 
     // return list as single field, separated by commas

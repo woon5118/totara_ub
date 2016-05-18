@@ -256,11 +256,15 @@ class rb_source_certification_overview extends rb_source_program_overview {
             'course',
             'shortname',
             get_string('courseshortname', 'rb_source_program_overview'),
-            'COALESCE('.$DB->sql_concat('course.id', "'|'", 'course.shortname', "'\n'").', \'-\')',
+            'COALESCE('.$DB->sql_concat('course.id', "'|'", 'course.shortname').', \'-\')',
             array(
                 'joins' => 'course',
-                'grouping' => 'list_nodelimiter',
-                'displayfunc' => 'list_to_newline_coursename',
+                'grouping' => 'sql_aggregate',
+                'grouporder' => array(
+                    'csorder'  => 'prog_courseset.sortorder',
+                    'cscid'    => 'prog_courseset_course.id'
+                ),
+                'displayfunc' => 'coursename_list',
                 'style' => array('white-space' => 'pre'),
             )
 
@@ -273,8 +277,12 @@ class rb_source_certification_overview extends rb_source_program_overview {
             sql_cast2char('COALESCE(course_completions.status, '.COMPLETION_STATUS_NOTYETSTARTED.')'),
             array(
                 'joins' => 'course_completions',
-                'grouping' => 'comma_list',
-                'displayfunc' => 'course_completion_status',
+                'grouping' => 'sql_aggregate',
+                'grouporder' => array(
+                    'csorder'  => 'prog_courseset.sortorder',
+                    'cscid'    => 'prog_courseset_course.id'
+                ),
+                'displayfunc' => 'course_status_list',
                 'style' => array('white-space' => 'pre'),
             )
 
