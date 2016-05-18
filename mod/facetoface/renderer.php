@@ -1037,7 +1037,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $output[] = html_writer::tag('dd', $room->capacity);
 
         // Allow scheduling conflicts.
-        $output[] = html_writer::tag('dt', get_string('allowconflicts', 'facetoface'));
+        $output[] = html_writer::tag('dt', get_string('allowroomconflicts', 'facetoface'));
         $output[] = html_writer::tag('dd', $room->allowconflicts ? get_string('yes') : get_string('no'));
 
         // Description.
@@ -1126,7 +1126,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         }
 
         // Allow scheduling conflicts.
-        $output[] = html_writer::tag('dt', get_string('allowconflicts', 'facetoface'));
+        $output[] = html_writer::tag('dt', get_string('allowassetconflicts', 'facetoface'));
         $output[] = html_writer::tag('dd', $asset->allowconflicts ? get_string('yes') : get_string('no'));
 
         // Description.
