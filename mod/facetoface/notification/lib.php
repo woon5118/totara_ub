@@ -2102,7 +2102,7 @@ function facetoface_get_default_notifications($facetofaceid) {
             $template->title = $rec->title;
             $template->body = $rec->body;
             $template->managerprefix = $rec->managerprefix;
-
+            $template->status = $rec->status;
             $templates[$rec->reference] = $template;
         }
     }
@@ -2135,6 +2135,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $confirmation->managerprefix = $template->managerprefix;
         $confirmation->conditiontype = MDL_F2F_CONDITION_BOOKING_CONFIRMATION;
         $confirmation->ccmanager = 1;
+        $confirmation->status = $template->status;
         $confirmation->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_BOOKING_CONFIRMATION] = $confirmation;
     } else {
@@ -2147,6 +2148,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $waitlist->title = $template->title;
         $waitlist->body = $template->body;
         $waitlist->conditiontype = MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION;
+        $waitlist->status = $template->status;
         $waitlist->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION] = $waitlist;
     } else {
@@ -2162,6 +2164,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $cancellation->conditiontype = MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION;
         $cancellation->ccmanager = 1;
         $cancellation->cancelled = 1;
+        $cancellation->status = $template->status;
         $cancellation->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION] = $cancellation;
     } else {
@@ -2194,6 +2197,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $reminder->scheduleamount = 2;
         $reminder->ccmanager = 1;
         $reminder->booked = 1;
+        $reminder->status = $template->status;
         $reminder->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_BEFORE_SESSION] = $reminder;
     } else {
@@ -2209,6 +2213,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $request->managerprefix = $template->managerprefix;
         $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER;
         $request->ccmanager = 1;
+        $request->status = $template->status;
         $request->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER] = $request;
     } else {
@@ -2224,6 +2229,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $rolerequest->managerprefix = $template->managerprefix;
         $rolerequest->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE;
         $rolerequest->ccmanager = 0;
+        $rolerequest->status = $template->status;
         $rolerequest->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE] = $rolerequest;
     } else {
@@ -2239,6 +2245,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $adminrequest->managerprefix = $template->managerprefix;
         $adminrequest->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN;
         $adminrequest->ccmanager = 1;
+        $adminrequest->status = $template->status;
         $adminrequest->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN] = $adminrequest;
     } else {
@@ -2253,6 +2260,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $session_change->conditiontype = MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE;
         $session_change->booked = 1;
         $session_change->waitlisted = 1;
+        $session_change->status = $template->status;
         $session_change->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE] = $session_change;
     } else {
@@ -2265,6 +2273,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $trainer_confirmation->title = $template->title;
         $trainer_confirmation->body = $template->body;
         $trainer_confirmation->conditiontype = MDL_F2F_CONDITION_TRAINER_CONFIRMATION;
+        $trainer_confirmation->status = $template->status;
         $trainer_confirmation->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_TRAINER_CONFIRMATION] = $trainer_confirmation;
     } else {
@@ -2277,6 +2286,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $trainer_cancellation->title = $template->title;
         $trainer_cancellation->body = $template->body;
         $trainer_cancellation->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION;
+        $trainer_cancellation->status = $template->status;
         $trainer_cancellation->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION] = $trainer_cancellation;
     } else {
@@ -2289,6 +2299,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $trainer_unassigned->title = $template->title;
         $trainer_unassigned->body = $template->body;
         $trainer_unassigned->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT;
+        $trainer_unassigned->status = $template->status;
         $trainer_unassigned->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT] = $trainer_unassigned;
     } else {
@@ -2302,6 +2313,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $cancelreservation->body = $template->body;
         $cancelreservation->conditiontype = MDL_F2F_CONDITION_RESERVATION_CANCELLED;
         $cancelreservation->cancelled = 1;
+        $cancelreservation->status = $template->status;
         $cancelreservation->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_RESERVATION_CANCELLED] = $cancelreservation;
     } else {
@@ -2315,6 +2327,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $cancelallreservations->body = $template->body;
         $cancelallreservations->conditiontype = MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED;
         $cancelallreservations->cancelled = 1;
+        $cancelallreservations->status = $template->status;
         $cancelallreservations->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED] = $cancelallreservations;
     } else {
@@ -2328,6 +2341,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $sessioncancellation->body = $template->body;
         $sessioncancellation->conditiontype = MDL_F2F_CONDITION_SESSION_CANCELLATION;
         $sessioncancellation->cancelled = 1;
+        $sessioncancellation->status = $template->status;
         $sessioncancellation->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_SESSION_CANCELLATION] = $sessioncancellation;
     } else {
@@ -2340,6 +2354,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $registrationexpired->title = $template->title;
         $registrationexpired->body = $template->body;
         $registrationexpired->conditiontype = MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED;
+        $registrationexpired->status = $template->status;
         $registrationexpired->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED] = $registrationexpired;
     } else {
