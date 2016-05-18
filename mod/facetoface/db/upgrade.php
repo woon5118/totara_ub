@@ -37,6 +37,8 @@
 // The commands in here will all be database-neutral,
 // using the functions defined in lib/ddllib.php
 
+require_once("$CFG->dirroot/mod/facetoface/db/upgradelib.php");
+
 /**
  *
  * Sends message to administrator listing all updated
@@ -4064,8 +4066,6 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
     if ($oldversion < 2016031102) {
 
-        require_once("$CFG->dirroot/mod/facetoface/db/upgradelib.php");
-
         // Remove note field.
         $table = new xmldb_table('facetoface_signups_status');
         $field = new xmldb_field('note');
@@ -4240,5 +4240,10 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016051800, 'facetoface');
     }
 
+    if ($oldversion < 2016052500) {
+        // Savepoint reached.
+        mod_facetoface_calendar_search_config_upgrade();
+        upgrade_mod_savepoint(true, 2016052500, 'facetoface');
+    }
     return $result;
 }

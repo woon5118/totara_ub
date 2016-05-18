@@ -631,30 +631,46 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     public function calendar_filter_controls() {
         global $SESSION;
 
-        $fields = facetoface_get_customfield_filters();
-
+        // Custom fields.
+        $fieldsall = facetoface_get_customfield_filters();
         $output = '';
-        foreach ($fields as $f) {
-            $currentval = !empty($SESSION->calendarfacetofacefilter[$f->shortname]) ? $SESSION->calendarfacetofacefilter[$f->shortname] : '';
-            $output .= $this->custom_field_chooser($f, $currentval);
+        foreach ($fieldsall as $type => $fields) {
+            foreach ($fields as $f) {
+                $currentval = '';
+                if (!empty($SESSION->calendarfacetofacefilter[$type][$f->shortname])) {
+                    $currentval = $SESSION->calendarfacetofacefilter[$type][$f->shortname];
+                }
+                $output .= $this->custom_field_chooser($type, $f, $currentval);
+            }
         }
-
         return $output;
     }
 
     /**
      * Generates a custom field select for a f2f custom field
      *
+     * @param string $type Custom field set ("room", "sess", etc)
      * @param int $field
-     * @param string $currentval
+     * @param string $currentvalue
      *
      * @return string html
      */
-    public function custom_field_chooser($field, $currentvalue) {
-        global $DB;
+    public function custom_field_chooser($type, $field, $currentvalue) {
+        // Same $fieldname  must be used in lib.php facetoface_calendar_set_filter().
+        $fieldname = "field_{$type}_{$field->shortname}";
+        $stringsource = '';
+        switch($type) {
+            case 'sess':
+                $stringsource = 'customfieldsession';
+            break;
+            case 'room':
+                $stringsource = 'customfieldroom';
+            break;
+            default:
+                $stringsource = 'customfieldother';
+        }
 
-        $fieldname = "field_$field->shortname";
-        $value = empty($currentvalue) ? '' : $currentvalue;;
+        $value = empty($currentvalue) ? '' : $currentvalue;
         $values = array();
         switch ($field->datatype) {
             case 'multiselect':
@@ -666,21 +682,19 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             case 'menu':
                 $values = explode("\n", $field->param1);
                 break;
-            case 'text':
-                $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 15, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
-                return html_writer::tag('label', format_string($field->fullname) . ':', array('for' => 'id_' . $fieldname)) . $label;
-                break;
             case 'checkbox':
                 $values = array(0 => get_string('no'), 1 => get_string('yes'));
                 break;
             case 'datetime':
                 $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
                 build_datepicker_js('#id_' . $fieldname);
-                return html_writer::tag('label', format_string($field->fullname) . ':', array('for' => 'id_' . $fieldname)) . $label;
+                return html_writer::tag('label', get_string($stringsource, 'facetoface', $field->fullname) . ':', array('for' => 'id_' . $fieldname)) . $label;
                 break;
+            case 'location':
             case 'textarea':
+            case 'text':
                 $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 15, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
-                return html_writer::tag('label', format_string($field->fullname) . ':', array('for' => 'id_' . $fieldname)) . $label;
+                return html_writer::tag('label', get_string($stringsource, 'facetoface', $field->fullname) . ':', array('for' => 'id_' . $fieldname)) . $label;
                 break;
             default:
                 return false;
@@ -704,7 +718,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         $dropdown = html_writer::select($options, $fieldname, $currentvalue, array($nothingvalue => $nothing));
 
-        return html_writer::tag('label', format_string($field->fullname) . ':', array('for' => 'id_customfields')) . $dropdown;
+        return html_writer::tag('label', get_string($stringsource, 'facetoface', $field->fullname) . ':', array('for' => 'id_customfields')) . $dropdown;
 
     }
 

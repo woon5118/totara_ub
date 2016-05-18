@@ -917,4 +917,37 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $this->assertArrayNotHasKey('cancellationnote', $user1data);
         $this->assertArrayNotHasKey('signupnote', $user1data);
     }
+
+    /**
+     * Test Upgrade calendar search config settings to support new customfield search
+     */
+    public function test_mod_facetoface_calendar_search_config_upgrade() {
+        global $CFG;
+        require_once($CFG->dirroot.'/mod/facetoface/db/upgradelib.php');
+
+        // We have to reset as we're going to be adding a config var when calling mod_facetoface_migrate_session_signup_customdata.
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        // Test config is empty.
+        set_config('facetoface_calendarfilters', '');
+        mod_facetoface_calendar_search_config_upgrade();
+        $this->assertEmpty(get_config(null, 'facetoface_calendarfilters'));
+
+        // No room specific values.
+        set_config('facetoface_calendarfilters', '1,2,test');
+        mod_facetoface_calendar_search_config_upgrade();
+        $this->assertEquals('sess_1,sess_2,test', get_config(null, 'facetoface_calendarfilters'));
+
+        // Test config have both room specific values.
+        set_config('facetoface_calendarfilters', 'building,room,address');
+        mod_facetoface_calendar_search_config_upgrade();
+        $this->assertEquals('room_2,room_1', get_config(null, 'facetoface_calendarfilters'));
+
+        // Test config have only one room specific value and confirm that function is indempotent.
+        set_config('facetoface_calendarfilters', 'test,room,1');
+        mod_facetoface_calendar_search_config_upgrade();
+        mod_facetoface_calendar_search_config_upgrade();
+        $this->assertEquals('test,room_1,sess_1', get_config(null, 'facetoface_calendarfilters'));
+    }
 }

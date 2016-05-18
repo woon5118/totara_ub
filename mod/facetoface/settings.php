@@ -77,28 +77,20 @@ if ($ADMIN->fulltree) { // Improve performance.
 
     $settings->add(new admin_setting_configtext('facetoface_export_customprofilefields', new lang_string('exportcustomprofilefields', 'facetoface'), new lang_string('exportcustomprofilefields_desc', 'facetoface'), '', PARAM_TEXT));
 
-// Create array with existing custom fields (if any), empty array otherwise.
+    // Create array with existing custom fields (if any), empty array otherwise.
     $customfields = array();
-    $allcustomfields = array_merge(
-      facetoface_get_session_customfields(),
-      facetoface_get_room_customfields()
-    );
-    // Exclude customfields type file.
-    $allcustomfields = totara_search_for_value($allcustomfields, 'datatype', TOTARA_SEARCH_OP_NOT_EQUAL, 'file');
-    foreach ($allcustomfields as $fieldid => $fielname) {
-        $customfields[$fieldid] = $fielname->fullname;
+    foreach (facetoface_get_session_customfields() as $key => $item) {
+        if ($item->datatype != 'file') {
+            $customfields['sess_' . $key] = get_string('customfieldsession', 'facetoface', $item->fullname);
+        }
+    }
+    foreach (facetoface_get_room_customfields() as $key => $item) {
+        if ($item->datatype != 'file') {
+            $customfields['room_' . $key] = get_string('customfieldroom', 'facetoface', $item->fullname);
+        }
     }
 
-    // List of facetoface session fields that can be selected as filters.
-    $calendarfilters = array(
-        'timestart' => get_string('startdateafter', 'facetoface'),
-        'timefinish' => get_string('finishdatebefore', 'facetoface'),
-        'room' => get_string('room', 'facetoface'),
-        'building' => get_string('building', 'facetoface'),
-        'address' => get_string('address', 'facetoface'),
-        'capacity' => get_string('capacity', 'facetoface')
-    );
-    $calendarfilters = $calendarfilters + $customfields;
+    $calendarfilters = $customfields;
     $settings->add(new admin_setting_configmultiselect('facetoface_calendarfilters', new lang_string('setting:calendarfilterscaption', 'facetoface'), new lang_string('setting:calendarfilters', 'facetoface'), array('room', 'building', 'address'), $calendarfilters));
 
     $settings->add(new admin_setting_heading('facetoface_notifications_header', get_string('notificationsheading', 'facetoface'), ''));

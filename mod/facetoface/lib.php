@@ -1856,13 +1856,6 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
     $timenow = time();
     $i = $startingrow;
 
-    $locationcondition = '';
-    $locationparam = array();
-    if (!empty($location)) {
-        $locationcondition = "AND s.location = ?";
-        $locationparam = array($location);
-    }
-
     // Fast version of "facetoface_get_attendees()" for all sessions
     $sessionsignups = array();
     $signupsql = "
@@ -1903,7 +1896,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
              ON s.sessionid = se.id
             AND se.facetoface = $facetofaceid
             WHERE
-                ss.statuscode IN (?,?)
+                ss.statuscode IN (:booked,:waitlisted)
             GROUP BY
                 ss.signupid
             ) sign
@@ -1922,18 +1915,23 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             ON mu1.id = pa.managerid
         LEFT JOIN
             {pos_assignment} pa2
-         ON pa2.userid = u.id AND pa2.type = ?
+         ON pa2.userid = u.id AND pa2.type = :primary
         LEFT JOIN
             {user} mu2
             ON mu2.id = pa2.managerid
         WHERE
-            f.id = ?
+            f.id = :fid
         AND ss.superceded != 1
-        AND ss.statuscode >= ?
+        AND ss.statuscode >= :waitlisted2
         ORDER BY
             s.id, u.firstname, u.lastname";
-    $signupparams =  array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, POSITION_TYPE_PRIMARY,
-                           $facetofaceid, MDL_F2F_STATUS_WAITLISTED);
+    $signupparams =  array(
+        'booked' => MDL_F2F_STATUS_BOOKED,
+        'waitlisted' => MDL_F2F_STATUS_WAITLISTED,
+        'primary' => POSITION_TYPE_PRIMARY,
+        'fid' => $facetofaceid,
+        'waitlisted2' => MDL_F2F_STATUS_WAITLISTED
+    );
     $signups = $DB->get_records_sql($signupsql, $signupparams);
 
     if ($signups) {
@@ -1975,26 +1973,41 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
         }
     }
 
-    // Fast version of "facetoface_get_sessions($facetofaceid, $location)"
+    // Location filter.
+    // This is snippet reused in facetoface_get_sessions($facetofaceid, $location).
+    // I don't know why facetoface_get_sessions was not used here initially.
+    $locationjoin = '';
+    $locationwhere = '';
+    $locationparams = array();
+    if (!empty($location)) {
+        $locationsql = $DB->sql_like('rid.data', ':location', false);
+        $locationparams['location'] = $location;
+        $locationjoin = "
+            INNER JOIB {facetoface_room} r ON (r.id = d.roomid)
+            INNER JOIN {facetoface_room_info_data} rid ON (rid.facetofaceroomid = r.id)
+            INNER JOIN {facetoface_room_info_field} rif ON (rid.fieldid = rif.id AND rif.shortname = 'location')
+            ";
+        $locationwhere = "AND $locationsql";
+    }
+
     $sql = "SELECT d.id as dateid, s.id, s.capacity, s.duration, d.timestart, d.timefinish, d.roomid,
                    d.sessiontimezone
               FROM {facetoface_sessions} s
               JOIN {facetoface_sessions_dates} d
+              $locationjoin
                 ON s.id = d.sessionid
-             WHERE s.facetoface = ?
+             WHERE s.facetoface = :fid
                AND d.sessionid = s.id
-                   $locationcondition
+               $locationwhere
           ORDER BY d.timestart";
 
-    $sessions = $DB->get_records_sql($sql, array_merge(array($facetofaceid), $locationparam));
+    $sessions = $DB->get_records_sql($sql, array_merge(array('fid' => $facetofaceid), $locationparams));
 
     $i = $i - 1; // will be incremented BEFORE each row is written
 
     $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
 
     foreach ($sessions as $session) {
-        $customdata = $DB->get_records('facetoface_session_info_data', array('facetofacesessionid' => $session->id), '', 'fieldid, data');
-
         $sessionstartdate = false;
         $sessionenddate = false;
         $starttime   = get_string('wait-listed', 'facetoface');
@@ -3869,18 +3882,25 @@ function facetoface_get_customfielddata($sessionid) {
 
     $out = array();
     $session = facetoface_get_session($sessionid);
-    $fields  = $DB->get_records('facetoface_session_info_field', array(), 'sortorder ASC');
 
-    foreach ($fields as $field) {
-        require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
-        $newfield = 'customfield_'.$field->datatype;
-        $formfield = new $newfield($field->id, $session, 'facetofacesession', 'facetoface_session');
-        if (!$formfield->is_hidden() && !$formfield->is_empty()) {
-            $extradata = array('prefix' => $formfield->prefix, 'itemid' => $formfield->dataid);
-            if ($field->datatype == 'multiselect') {
-                $extradata['display'] = 'list-text';
+    $types = array(
+        'sess' => array('prefix' => 'facetofacesession', 'tableprefix' => 'facetoface_session'),
+        'room' => array('prefix' => 'facetofaceroom', 'tableprefix' => 'facetoface_room'),
+    );
+    foreach($types as $type => $def) {
+        $fields  = $DB->get_records($def['tableprefix'] . '_info_field', array(), 'sortorder ASC');
+        foreach ($fields as $field) {
+            require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
+            $newfield = 'customfield_'.$field->datatype;
+            $formfield = new $newfield($field->id, $session, $def['prefix'], $def['tableprefix']);
+
+            if (!$formfield->is_hidden() && !$formfield->is_empty()) {
+                $extradata = array('prefix' => $formfield->prefix, 'itemid' => $formfield->dataid);
+                if ($field->datatype == 'multiselect') {
+                    $extradata['display'] = 'list-text';
+                }
+                $out[$type][$formfield->field->shortname] = $formfield::display_item_data($formfield->data, $extradata);
             }
-            $out[$formfield->field->shortname] = $formfield::display_item_data($formfield->data, $extradata);
         }
     }
     return $out;
@@ -5484,7 +5504,6 @@ function facetoface_download_csv($fields, $datarows, $file=null) {
  */
 function facetoface_filter_calendar_events(&$events) {
     global $SESSION;
-
     if (empty($SESSION->calendarfacetofacefilter)) {
         return;
     }
@@ -5497,18 +5516,22 @@ function facetoface_filter_calendar_events(&$events) {
 
         $cfield_vals = facetoface_get_customfielddata($event->uuid);
 
-        foreach ($filters as $shortname => $fval) {
-            if (empty($fval) || $fval == 'all') {  // ignore empty filters
-                continue;
-            }
-            if (empty($cfield_vals[$shortname])) {
-                // no reason comparing empty values :D
-                unset($events[$eid]);
-                break;
-            }
-            if ($fval != $cfield_vals[$shortname]) {
-                unset($events[$eid]);
-                break;
+        foreach ($filters as $type => $filter) {
+            foreach ($filter as $shortname => $fval) {
+                if (empty($fval) || $fval == 'all') {  // ignore empty filters
+                    continue;
+                }
+                if (empty($cfield_vals[$type][$shortname])) {
+                    // no reason comparing empty values :D
+                    unset($events[$eid]);
+                    break;
+                }
+                $filterval = core_text::strtolower($fval);
+                $fielddval = core_text::strtolower($cfield_vals[$type][$shortname]);
+                if (core_text::strpos($fielddval, $filterval) === false) {
+                    unset($events[$eid]);
+                    break;
+                }
             }
         }
     }
@@ -5524,11 +5547,17 @@ function facetoface_filter_calendar_events(&$events) {
 function facetoface_calendar_set_filter() {
     global $SESSION;
 
-    $fields = facetoface_get_customfield_filters();
+    $fieldsall = facetoface_get_customfield_filters();
 
     $SESSION->calendarfacetofacefilter = array();
-    foreach ($fields as $f) {
-        $SESSION->calendarfacetofacefilter[$f->shortname] = optional_param("field_{$f->shortname}", '', PARAM_TEXT);
+    foreach ($fieldsall as $type => $fields) {
+        if (!isset($SESSION->calendarfacetofacefilter[$type])) {
+            $SESSION->calendarfacetofacefilter[$type] = array();
+        }
+        foreach ($fields as $field) {
+            $fieldname = "field_{$type}_{$field->shortname}";
+            $SESSION->calendarfacetofacefilter[$type][$field->shortname] = optional_param($fieldname, '', PARAM_TEXT);
+        }
     }
 }
 
@@ -5540,24 +5569,36 @@ function facetoface_calendar_set_filter() {
 function facetoface_get_customfield_filters() {
     global $DB;
 
-    $fields = array();
-    $calendarcustomfields = get_config(null, 'facetoface_calendarfilters');
-    if ($calendarcustomfields) {
-        $customfieldids = array();
-        $calendarcustomfields = explode(',', $calendarcustomfields);
-        foreach ($calendarcustomfields as $filterkey) {
-            if (is_numeric($filterkey)) {
-                $customfieldids[] = $filterkey;
+    $sessfields = array();
+    $roomfields = array();
+    $allsearchfields = get_config(null, 'facetoface_calendarfilters');
+    if ($allsearchfields) {
+        $customfieldids = array('sess' => array(), 'room' => array());
+        $allsearchfields = explode(',', $allsearchfields);
+
+        foreach ($allsearchfields as $filterkey) {
+            // Customfields are prefixed with room_ and sess_ strings
+            // @see settings.php refer to facetoface_calendarfilters setting for details.
+            if (strpos($filterkey, 'sess_') === 0) {
+                $customfieldids['sess'][] = explode('_', $filterkey)[1];
+            }
+            if (strpos($filterkey, 'room_') === 0) {
+                $customfieldids['room'][] = explode('_', $filterkey)[1];
             }
         }
-        if (!empty($customfieldids)) {
-            list($sessionfieldids, $params) = $DB->get_in_or_equal($customfieldids);
-            $sql = "SELECT * FROM {facetoface_session_info_field} WHERE id $sessionfieldids";
-            $fields = $DB->get_records_sql($sql, $params);
+        if (!empty($customfieldids['sess'])) {
+            list($cfids, $cfparams) = $DB->get_in_or_equal($customfieldids['sess']);
+            $sql = "SELECT * FROM {facetoface_session_info_field} WHERE id $cfids";
+            $sessfields = $DB->get_records_sql($sql, $cfparams);
+        }
+        if (!empty($customfieldids['room'])) {
+            list($cfids, $cfparams) = $DB->get_in_or_equal($customfieldids['room']);
+            $sql = "SELECT * FROM {facetoface_room_info_field} WHERE id $cfids";
+            $roomfields = $DB->get_records_sql($sql, $cfparams);
         }
     }
 
-    return $fields;
+    return array('sess' => $sessfields, 'room' => $roomfields);
 }
 
 /**

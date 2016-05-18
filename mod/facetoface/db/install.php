@@ -187,7 +187,7 @@ function xmldb_facetoface_install() {
     $DB->insert_record('facetoface_notification_tpl', $tpl_regclose);
 
     // Setting room, building, and address as default filters.
-    set_config('facetoface_calendarfilters', 'room,building,address');
+    set_config('facetoface_calendarfilters', 'room_1');
 
     facetoface_create_signup_cancellation_customfield_notes();
 

@@ -105,3 +105,35 @@ function mod_facetoface_migrate_session_signup_customdata(moodle_database $db, d
 
     $dbman->drop_table($temptable);
 }
+
+/**
+ * Upgrade calendar search config settings to support new customfield search
+ */
+function mod_facetoface_calendar_search_config_upgrade() {
+    $exconfig = get_config(null, 'facetoface_calendarfilters');
+    $newconfig = array();
+    if (!empty($exconfig)) {
+        $exall = explode(',', $exconfig);
+        $roomfound = false;
+        foreach ($exall as $val) {
+            if ($val == 'room' || $val == 'address') {
+                if (!$roomfound) {
+                    $newconfig[] = 'room_1';
+                }
+                $roomfound = true;
+            }
+            else if ($val == 'building') {
+                $newconfig[] = 'room_2';
+            }
+            else if (is_number($val)) {
+                // Previous version supported only session customfields and stored them as numbers.
+                $newconfig[] = 'sess_' . $val;
+            } else {
+                // Other fields we pass through (in case of double run of upgrade).
+                $newconfig[] = $val;
+            }
+        }
+    }
+
+    set_config('facetoface_calendarfilters', implode(',', $newconfig));
+}
