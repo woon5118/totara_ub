@@ -8,7 +8,7 @@ Feature: Configure seminar custom fields
     Given I am on a totara site
     And I log in as "admin"
 
-    When I navigate to "Custom fields" node in "Site administration > Seminar"
+    When I navigate to "Custom fields" node in "Site administration > Seminars"
     Then I should see "Create a new custom field"
 
     When I follow "Asset"
@@ -49,7 +49,7 @@ Feature: Configure seminar custom fields
     And I log out
     And I log in as "configurator"
 
-    When I navigate to "Custom fields" node in "Site administration > Seminar"
+    When I navigate to "Custom fields" node in "Site administration > Seminars"
     Then I should see "Create a new custom field"
 
     When I follow "Asset"

@@ -26,7 +26,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$ADMIN->add('root', new admin_category('modfacetofacefolder', new lang_string('pluginname', 'mod_facetoface'), $module->is_enabled() === false), 'grades');
+$ADMIN->add('root', new admin_category('modfacetofacefolder', new lang_string('modulenameplural', 'mod_facetoface'), $module->is_enabled() === false), 'courses');
 
 $eventreporturl = new moodle_url('/mod/facetoface/eventreport.php');
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofaceeventreport', new lang_string('manageevents', 'mod_facetoface'), $eventreporturl, 'mod/facetoface:viewallsessions'));

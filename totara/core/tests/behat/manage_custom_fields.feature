@@ -166,7 +166,7 @@ Feature: Test new custom field capabilities
       # Check all access of Site Manager
       When I log in as "sitemanuser"
       # Seminar: allowed
-      And I navigate to "Custom fields" node in "Site administration > Seminar"
+      And I navigate to "Custom fields" node in "Site administration > Seminars"
       And I should see "Create a new custom field"
       # Course: allowed
       And I navigate to "Custom fields" node in "Site administration > Courses"
@@ -199,7 +199,7 @@ Feature: Test new custom field capabilities
       # Check seminar managecustomfield access
       When I log in as "faceuser"
       # Seminar: allowed
-      And I navigate to "Custom fields" node in "Site administration > Seminar"
+      And I navigate to "Custom fields" node in "Site administration > Seminars"
       And I should see "Create a new custom field"
       # Avoid seeing Custom fields in the seminar section
       And I click on "Seminar" "text" in the "Administration" "block"
@@ -395,7 +395,7 @@ Feature: Test new custom field capabilities
       # Check position and seminar managecustomfield access
       When I log in as "posfaceuser"
       # Seminar: allowed
-      And I navigate to "Custom fields" node in "Site administration > Seminar"
+      And I navigate to "Custom fields" node in "Site administration > Seminars"
       And I should see "Create a new custom field"
       # Avoid seeing Custom fields in the seminar section
       And I click on "Seminar" "text" in the "Administration" "block"

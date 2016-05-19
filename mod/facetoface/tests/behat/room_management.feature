@@ -28,7 +28,7 @@ Feature: Manage pre-defined rooms
       | user5    | C1     | student        |
       | user6    | C1     | student        |
     And I log in as "admin"
-    And I navigate to "Rooms" node in "Site administration > Seminar"
+    And I navigate to "Rooms" node in "Site administration > Seminars"
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name              | Room 1          |
@@ -52,7 +52,7 @@ Feature: Manage pre-defined rooms
     And I press "Add a room"
 
   Scenario: See that the rooms were created correctly
-    Given I navigate to "Rooms" node in "Site administration > Seminar"
+    Given I navigate to "Rooms" node in "Site administration > Seminars"
     Then I should see "That house" in the "Room 1" "table_row"
     And I should see "123 here street" in the "Room 1" "table_row"
     And I should see "5" in the "Room 1" "table_row"

@@ -21,7 +21,7 @@ Feature: Play waiting list lottery
       | student2 | C1     | student        |
 
     And I log in as "admin"
-    And I navigate to "Global settings" node in "Site administration > Seminar"
+    And I navigate to "Global settings" node in "Site administration > Seminars"
     And I set the following fields to these values:
       | Everyone on waiting list | Yes  |
       | Waitlist lottery         | Yes  |

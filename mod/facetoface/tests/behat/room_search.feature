@@ -10,7 +10,7 @@ Feature: Search pre-defined rooms in seminar
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
     And I log in as "admin"
-    And I navigate to "Rooms" node in "Site administration > Seminar"
+    And I navigate to "Rooms" node in "Site administration > Seminars"
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name              | Room 1          |

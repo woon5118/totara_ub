@@ -13,7 +13,7 @@ Feature: All customfields column generator
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
     And I log in as "admin"
-    And I navigate to "Custom fields" node in "Site administration > Seminar"
+    And I navigate to "Custom fields" node in "Site administration > Seminars"
     And I click on "Sign-up" "link"
 
     # Add Checkbox

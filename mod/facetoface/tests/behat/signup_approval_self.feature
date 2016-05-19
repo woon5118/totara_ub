@@ -36,11 +36,11 @@ Feature: Seminar Signup Self Approval
       | timmy | manager |
       | sammy | manager |
     And I log in as "admin"
-    And I navigate to "Global settings" node in "Site administration > Seminar"
+    And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "s__facetoface_approvaloptions[approval_none]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_manager]" "checkbox"
     And I press "Save changes"
-    And I navigate to "Activity defaults" node in "Site administration > Seminar"
+    And I navigate to "Activity defaults" node in "Site administration > Seminars"
     And I set the following fields to these values:
       | Terms and conditions | Blah Blah Blah, agree? |
     And I press "Save changes"

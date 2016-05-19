@@ -19,7 +19,7 @@ Feature: Seminar session date with timezone management
       | teacher2 | C1     | editingteacher |
 
     And I log in as "admin"
-    And I navigate to "Rooms" node in "Site administration > Seminar"
+    And I navigate to "Rooms" node in "Site administration > Seminars"
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name              | Room 1          |

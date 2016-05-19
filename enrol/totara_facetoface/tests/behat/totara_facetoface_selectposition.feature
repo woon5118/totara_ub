@@ -20,14 +20,9 @@ Feature: Users can enrol on courses that have position signup enabled and get si
       | teacher1 | C2 | editingteacher |
 
     And I log in as "admin"
-    And I expand "Site administration" node
-    And I expand "Plugins" node
-    And I expand "Enrolments" node
-    And I follow "Manage enrol plugins"
+    And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
-    And I expand "Activity modules" node
-    And I expand "Seminar" node
-    And I follow "Global settings"
+    And I navigate to "Global settings" node in "Site administration > Seminars"
     And I set the field "Select position on signup" to "checked_checkbox"
     And I press "Save changes"
     And I log out

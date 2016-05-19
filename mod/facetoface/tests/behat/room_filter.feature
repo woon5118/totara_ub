@@ -16,7 +16,7 @@ Background:
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
     And I turn editing mode off
-    And I navigate to "Rooms" node in "Site administration > Seminar"
+    And I navigate to "Rooms" node in "Site administration > Seminars"
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name              | Room 1          |

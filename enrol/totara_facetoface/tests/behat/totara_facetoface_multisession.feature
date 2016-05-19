@@ -18,10 +18,7 @@ Feature: Users can enrol on courses that have several seminar activities and sig
       | teacher1 | C1     | editingteacher |
 
     And I log in as "admin"
-    And I expand "Site administration" node
-    And I expand "Plugins" node
-    And I expand "Enrolments" node
-    And I follow "Manage enrol plugins"
+    And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I log out
     And I log in as "teacher1"

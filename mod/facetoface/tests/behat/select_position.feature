@@ -18,7 +18,7 @@ Feature: Add a seminar with select position
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "admin"
-    And I navigate to "Global settings" node in "Site administration > Seminar"
+    And I navigate to "Global settings" node in "Site administration > Seminars"
     And I set the following fields to these values:
       | Select position on signup | 1 |
     And I press "Save changes"

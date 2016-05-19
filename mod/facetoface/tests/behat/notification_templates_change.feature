@@ -20,7 +20,7 @@ Feature: Test notification templates update all activities
   Scenario: Changing default notification templates using Update all activities will affect all F2F activities notifications
     Given I log in as "admin"
     # Change default template.
-    And I navigate to "Notification templates" node in "Site administration > Seminar"
+    And I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Seminar booking cancellation" "table_row"
     And I set the following fields to these values:
       | Title  | TL-9052 booking cancellation |
@@ -55,7 +55,7 @@ Feature: Test notification templates update all activities
   Scenario: Changing default notification templates not using Update all activities will not affect any F2F activities notifications
     Given I log in as "admin"
     # Change default template.
-    And I navigate to "Notification templates" node in "Site administration > Seminar"
+    And I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Seminar booking cancellation" "table_row"
     And I set the following fields to these values:
       | Title  | TL-9052 booking cancellation |
@@ -88,7 +88,7 @@ Feature: Test notification templates update all activities
   Scenario: Changing default notification templates not using Update all activities will affect all new F2F activities notifications
     Given I log in as "admin"
     # Change default template.
-    And I navigate to "Notification templates" node in "Site administration > Seminar"
+    And I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Seminar booking cancellation" "table_row"
     And I set the following fields to these values:
       | Title  | TL-9052 booking cancellation |

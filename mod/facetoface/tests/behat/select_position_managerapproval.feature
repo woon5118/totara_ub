@@ -26,7 +26,7 @@ Feature: Seminar Select position with Manager approval
     And I expand "Enrolments" node
     And I follow "Manage enrol plugins"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
-    And I navigate to "Global settings" node in "Site administration > Seminar"
+    And I navigate to "Global settings" node in "Site administration > Seminars"
     And I set the following fields to these values:
       | Select position on signup | 1 |
     And I press "Save changes"

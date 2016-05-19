@@ -28,23 +28,23 @@ Feature: Configure seminar settings
   Scenario: Access all seminar activity settings with modconfig capability
     Given I log in as "configurator"
 
-    When I navigate to "Global settings" node in "Site administration > Seminar"
+    When I navigate to "Global settings" node in "Site administration > Seminars"
     Then I should see "facetoface_fromaddress"
 
-    When I navigate to "Activity defaults" node in "Site administration > Seminar"
+    When I navigate to "Activity defaults" node in "Site administration > Seminars"
     Then I should see "facetoface_multiplesessions"
 
-    When I navigate to "Event defaults" node in "Site administration > Seminar"
+    When I navigate to "Event defaults" node in "Site administration > Seminars"
     Then I should see "defaultdaysskipweekends"
 
-    When I navigate to "Notification templates" node in "Site administration > Seminar"
+    When I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Add" "button"
     Then I should see "Manager copy prefix"
 
-    When I navigate to "Rooms" node in "Site administration > Seminar"
+    When I navigate to "Rooms" node in "Site administration > Seminars"
     And I click on "Add a new room" "button"
     Then I should see "Name"
 
-    When I navigate to "Assets" node in "Site administration > Seminar"
+    When I navigate to "Assets" node in "Site administration > Seminars"
     And I click on "Add a new asset" "button"
     Then I should see "Asset name"

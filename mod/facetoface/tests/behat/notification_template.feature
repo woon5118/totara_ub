@@ -14,25 +14,25 @@ Feature: Edit seminar notification templates
   Scenario: Check that the correct seminar notification templates have been installed
     # Check the templates and ensure that there is at least a key line present from the body of the notification.
     # Also check which room placeholders are present as indicator that it is the 9.0+ version of the notification installed.
-    When I navigate to "Notification templates" node in "Site administration > Seminar"
+    When I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "All reservations cancelled" "table_row"
     Then I should see "This is to advise you that all unallocated reservations for the following course have been automatically cancelled"
     And I should see "Room: [session:room:name]"
     And I should not see "Room: [session:room]"
 
-    When I navigate to "Notification templates" node in "Site administration > Seminar"
+    When I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Seminar booking admin request" "table_row"
     Then I should see "Your request to book into the following course has been sent to the sessions approvers"
     And I should see "Room: [session:room:name]"
     And I should not see "Room: [session:room]"
 
-    When I navigate to "Notification templates" node in "Site administration > Seminar"
+    When I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Seminar booking cancellation" "table_row"
     Then I should see "This is to advise that your booking on the following course has been cancelled"
     And I should see "Room: [session:room:name]"
     And I should not see "Room: [session:room]"
 
-    When I navigate to "Notification templates" node in "Site administration > Seminar"
+    When I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Seminar booking confirmation" "table_row"
     Then I should see "This is to confirm that you are now booked on the following course"
     And I should see "Room: [session:room:name]"
@@ -40,7 +40,7 @@ Feature: Edit seminar notification templates
 
   @javascript
   Scenario: Old placeholders are identified in seminar notification templates
-    When I navigate to "Notification templates" node in "Site administration > Seminar"
+    When I navigate to "Notification templates" node in "Site administration > Seminars"
     Then I should not see "Some templates contain deprecated placeholders. Please review the templates marked with a warning icon and update where necessary."
     When I click on "Edit" "link" in the "Seminar booking decline" "table_row"
     And I set the following fields to these values:
@@ -65,7 +65,7 @@ Feature: Edit seminar notification templates
       | Template | Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate] |
       | Title    | Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate] |
     And I should see "The registration period for the following session has been closed:"
-    When I navigate to "Notification templates" node in "Site administration > Seminar"
+    When I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Seminar registration closed" "table_row"
     And I set the following fields to these values:
       | Title                 | A customised title |
@@ -98,7 +98,7 @@ Feature: Edit seminar notification templates
       | Template | Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate] |
       | Title    | Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate] |
     And I should see "The registration period for the following session has been closed:"
-    When I navigate to "Notification templates" node in "Site administration > Seminar"
+    When I navigate to "Notification templates" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Seminar registration closed" "table_row"
     And I set the following fields to these values:
       | Title                 | A customised title |

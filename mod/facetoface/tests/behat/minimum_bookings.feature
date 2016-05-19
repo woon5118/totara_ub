@@ -66,7 +66,7 @@ Feature: Minimum Seminar bookings
     Then the field "Minimum bookings" matches value "2"
 
   Scenario Outline: Confirm notifications are sent out once cutoff has been reached
-    Given I navigate to "Global settings" node in "Site administration > Seminar"
+    Given I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "Editing Trainer" "text" in the "#admin-facetoface_session_rolesnotify" "css_element"
     And I click on "<notification to>" "checkbox" in the "#admin-facetoface_session_rolesnotify" "css_element"
     And I press "Save changes"

@@ -33,7 +33,7 @@ Feature: Seminar sessions report overview
     And I log in as "admin"
 
     # Enable roles for student and trainer
-    And I navigate to "Global settings" node in "Site administration > Seminar"
+    And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "Learner" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
     # Trainer is ambigous with Editing Trainer
     And I click on "s__facetoface_session_roles[4]" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
@@ -427,7 +427,7 @@ Feature: Seminar sessions report overview
     # Disable teacher role, and ensure that column and filter disappeared
     Given "Event Trainer" "link" should exist in the ".reportbuilder-table" "css_element"
     And I click on "Home" in the totara menu
-    When I navigate to "Global settings" node in "Site administration > Seminar"
+    When I navigate to "Global settings" node in "Site administration > Seminars"
     # Trainer is ambigous with Editing Trainer
     And I click on "s__facetoface_session_roles[4]" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
     And I press "Save changes"
