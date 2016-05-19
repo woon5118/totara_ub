@@ -26,10 +26,10 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_summary_room_embedded.php');
 
+$roomid = optional_param('roomid', 0, PARAM_INT);
 $backurl = optional_param('b', '', PARAM_URL);
 $debug = optional_param('debug', 0, PARAM_INT);
 $popup = optional_param('popup', 0, PARAM_INT);
-
 
 require_login(0, false);
 
@@ -42,20 +42,6 @@ if ($popup) {
     $PAGE->set_pagelayout('popup');
 }
 
-// Verify global restrictions.
-$shortname = 'facetoface_summary_room';
-$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
-$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
-
-$report = reportbuilder_get_embedded_report($shortname, null, false, 0, $globalrestrictionset);
-if (!$report) {
-    print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
-}
-
-$PAGE->set_button($report->edit_button());
-
-$roomid = $report->get_param_value('roomid');
-
 if (!$roomid) {
     echo $OUTPUT->header();
     $manageroomsurl = new moodle_url('/mod/facetoface/room/manage.php');
@@ -66,6 +52,20 @@ if (!$roomid) {
 
 if (!$room = facetoface_get_room($roomid)) {
     print_error('error:incorrectroomid', 'facetoface');
+}
+
+$report = null;
+if (rb_facetoface_summary_room_embedded::is_capable_static($USER->id)) {
+    // Verify global restrictions.
+    $shortname = 'facetoface_summary_room';
+    $reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
+    $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+    $report = reportbuilder_get_embedded_report($shortname, null, false, 0, $globalrestrictionset);
+    if (!$report) {
+        print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
+    }
+
+    $PAGE->set_button($report->edit_button());
 }
 
 $title = get_string('viewroom', 'facetoface');
