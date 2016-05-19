@@ -209,19 +209,16 @@ class rb_filter_cohort extends rb_filter_type {
         local_js($code);
 
         $jsdetails = new stdClass();
-        $jsdetails->initcall = 'M.totara_reportbuilder_filterdialogs.init';
-        $jsdetails->jsmodule = array('name' => 'totara_reportbuilder_filterdialogs',
-            'fullpath' => '/totara/reportbuilder/filter_dialogs.js');
         $jsdetails->strings = array(
             'totara_cohort' => array('choosecohorts')
         );
-        $jsdetails->args = array('args' => '{"filter_to_load":"cohort"}');
+        $jsdetails->args = array('filter_to_load' => 'cohort');
 
         foreach ($jsdetails->strings as $scomponent => $sstrings) {
             $PAGE->requires->strings_for_js($sstrings, $scomponent);
         }
 
-        $PAGE->requires->js_init_call($jsdetails->initcall, $jsdetails->args, false, $jsdetails->jsmodule);
+        $PAGE->requires->js_call_amd('totara_reportbuilder/filter_dialogs', 'init', $jsdetails->args);
     }
 }
 
