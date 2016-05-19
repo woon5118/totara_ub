@@ -4907,7 +4907,12 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
     if (isset($params['approvalreqd'])) {
         // Overwrite default behaviour as bulkadd_* is requested
         $facetoface->approvaltype = $params['approvalreqd'];
-        $facetoface->ccmanager = (isset($params['ccmanager']) ? $params['ccmanager'] : 0);
+    }
+    // Comes from "Suppress notifications to manager about added and removed attendees" as 0 value.
+    if (isset($params['ccmanager'])) {
+        $facetoface->ccmanager = $params['ccmanager'];
+    } else {
+        // Do not set any value here, value is set in facetoface_notification->ccmanager table.
     }
 
     // Check parameters.

@@ -1026,4 +1026,258 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         $allafter = $DB->get_records('facetoface_notification', array('facetofaceid' => $sessionok->facetoface));
         $this->assertEquals(count($allbefore), count($allafter));
     }
+
+    public function f2fsession_generate_data($future = true) {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $teacher1 = $this->getDataGenerator()->create_user();
+        $student1 = $this->getDataGenerator()->create_user();
+        $student2 = $this->getDataGenerator()->create_user();
+        $manager  = $this->getDataGenerator()->create_user();
+
+        $assignment = new position_assignment(array('userid' => $student1->id, 'type' => POSITION_TYPE_PRIMARY));
+        $assignment->managerid = $manager->id;
+        assign_user_position($assignment, true);
+
+        $assignment = new position_assignment(array('userid' => $student2->id, 'type' => POSITION_TYPE_PRIMARY));
+        $assignment->managerid = $manager->id;
+        assign_user_position($assignment, true);
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+
+        $this->getDataGenerator()->enrol_user($teacher1->id, $course->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course->id, $studentrole->id);
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface',
+            'course' => $course->id
+        );
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+
+        $sessiondate = new stdClass();
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondate->timestart = time() + WEEKSECS;
+        $sessiondate->timefinish = time() + WEEKSECS + 60;
+
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1',
+            'mincapacity' => '1',
+            'cutoff' => DAYSECS - 60
+        );
+
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $session = facetoface_get_session($sessionid);
+
+        return array($session, $facetoface, $course, $student1, $student2, $teacher1, $manager);
+    }
+
+    public function test_booking_confirmation_default() {
+
+        // Default test Manager copy is enable and suppressccmanager is disabled.
+        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+
+        $this->emailsink = $this->redirectEmails();
+        facetoface_user_import($course, $facetoface, $session, $student1->id);
+        $this->emailsink->close();
+
+        $emails = $this->get_emails();
+        $this->assertCount(2, $emails, 'Wrong booking confirmation for Default test Manager copy is enable and suppressccmanager is disabled.');
+    }
+
+    public function test_booking_confirmation_suppress_ccmanager() {
+
+        // Test Manager copy is enable and suppressccmanager is enabled(do not send a copy to manager).
+        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+
+        $suppressccmanager = true;
+
+        $this->emailsink = $this->redirectEmails();
+        if ($suppressccmanager) {
+            $params['ccmanager'] = 0;
+        }
+        facetoface_user_import($course, $facetoface, $session, $student1->id, $params);
+        $this->emailsink->close();
+
+        $emails = $this->get_emails();
+        $this->assertCount(1, $emails, 'Wrong booking confirmation for Test Manager copy is enable and suppressccmanager is enabled(do not send a copy to manager).');
+    }
+
+    public function test_booking_confirmation_no_ccmanager() {
+
+        // Test Manager copy is disabled and suppressccmanager is disbaled.
+        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+
+        $params = array(
+            'facetofaceid'  => $facetoface->id,
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_BOOKING_CONFIRMATION
+        );
+        $this->update_f2f_notification($params, 0);
+
+        $this->emailsink = $this->redirectEmails();
+        facetoface_user_import($course, $facetoface, $session, $student1->id);
+        $this->emailsink->close();
+
+        $emails = $this->get_emails();
+        $this->assertCount(1, $emails, 'Wrong booking confirmation for Test Manager copy is disabled and suppressccmanager is disbaled.');
+    }
+
+    public function test_booking_confirmation_no_ccmanager_and_suppress_ccmanager() {
+
+        // Test Manager copy is disabled and suppressccmanager is disbaled.
+        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+
+        $suppressccmanager = true;
+
+        $params = array(
+            'facetofaceid'  => $facetoface->id,
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_BOOKING_CONFIRMATION
+        );
+        $this->update_f2f_notification($params, 0);
+
+        $data = array();
+        if ($suppressccmanager) {
+            $data['ccmanager'] = 0;
+        }
+        $this->emailsink = $this->redirectEmails();
+        facetoface_user_import($course, $facetoface, $session, $student1->id, $data);
+        $this->emailsink->close();
+
+        $emails = $this->get_emails();
+        $this->assertCount(1, $emails, 'Wrong booking confirmation for Test Manager copy is disabled and suppressccmanager is disbaled.');
+    }
+
+    public function test_booking_cancellation_default() {
+
+        // Default test Manager copy is enable and suppressccmanager is disabled.
+        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+
+        facetoface_user_import($course, $facetoface, $session, $student1->id);
+
+        $attendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED));
+
+        $this->emailsink = $this->redirectEmails();
+        foreach ($attendees as $attendee) {
+            if (facetoface_user_cancel($session, $attendee->id)) {
+                facetoface_send_cancellation_notice($facetoface, $session, $attendee->id);
+            }
+        }
+        $this->emailsink->close();
+
+        $emails = $this->get_emails();
+        $this->assertCount(2, $emails, 'Wrong booking cancellation for Default test Manager copy is enable and suppressccmanager is disabled.');
+    }
+
+    public function test_booking_cancellation_suppress_ccmanager() {
+
+        // Test Manager copy is enable and suppressccmanager is enabled.
+        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+
+        $suppressccmanager = true;
+
+        facetoface_user_import($course, $facetoface, $session, $student1->id);
+
+        $attendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED));
+
+        $this->emailsink = $this->redirectEmails();
+        foreach ($attendees as $attendee) {
+            if (facetoface_user_cancel($session, $attendee->id)) {
+                if ($suppressccmanager) {
+                    $facetoface->ccmanager = 0;
+                }
+                facetoface_send_cancellation_notice($facetoface, $session, $attendee->id);
+            }
+        }
+        $this->emailsink->close();
+
+        $emails = $this->get_emails();
+        $this->assertCount(1, $emails, 'Wrong booking cancellation for Test Manager copy is enable and suppressccmanager is enabled.');
+    }
+
+    public function test_booking_cancellation_no_ccmanager() {
+
+        // Test Manager copy is disabled and suppressccmanager is disbaled.
+        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+
+        facetoface_user_import($course, $facetoface, $session, $student1->id);
+
+        $attendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED));
+
+        $params = array(
+            'facetofaceid'  => $facetoface->id,
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
+        );
+        $this->update_f2f_notification($params, 0);
+
+        $this->emailsink = $this->redirectEmails();
+        foreach ($attendees as $attendee) {
+            if (facetoface_user_cancel($session, $attendee->id)) {
+                facetoface_send_cancellation_notice($facetoface, $session, $attendee->id);
+            }
+        }
+        $this->emailsink->close();
+
+        $emails = $this->get_emails();
+        $this->assertCount(1, $emails, 'Wrong booking cancellation for Test Manager copy is disabled and suppressccmanager is disbaled.');
+    }
+
+    public function test_booking_cancellation_no_ccmanager_and_suppress_ccmanager() {
+
+        // Test Manager copy is disabled and suppressccmanager is disbaled.
+        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+
+        $suppressccmanager = true;
+
+        facetoface_user_import($course, $facetoface, $session, $student1->id);
+
+        $attendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED));
+
+        $params = array(
+            'facetofaceid'  => $facetoface->id,
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
+        );
+        $this->update_f2f_notification($params, 0);
+
+        $this->emailsink = $this->redirectEmails();
+        foreach ($attendees as $attendee) {
+            if (facetoface_user_cancel($session, $attendee->id)) {
+                if ($suppressccmanager) {
+                    $facetoface->ccmanager = 0;
+                }
+                facetoface_send_cancellation_notice($facetoface, $session, $attendee->id);
+            }
+        }
+        $this->emailsink->close();
+
+        $emails = $this->get_emails();
+        $this->assertCount(1, $emails, 'Wrong booking cancellation for Test Manager copy is disabled and suppressccmanager is disbaled.');
+    }
+
+    private function update_f2f_notification($params, $ccmanager) {
+        global $DB;
+
+        $notification = new facetoface_notification($params);
+
+        $notice = new stdClass();
+        $notice->id = $notification->id;
+        $notice->ccmanager = $ccmanager;
+
+        return $DB->update_record('facetoface_notification', $notice);
+    }
 }
