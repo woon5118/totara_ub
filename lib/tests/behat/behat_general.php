@@ -258,21 +258,6 @@ class behat_general extends behat_base {
     }
 
     /**
-     * Force waiting for X seconds without javascript in Totara.
-     *
-     * Usually needed when things need to have different timestamps and GoutteDriver is too fast.
-     *
-     * @Then /^I force sleep "(?P<seconds_number>\d+)" seconds$/
-     * @param int $seconds
-     */
-    public function i_force_sleep($seconds) {
-        if ($this->running_javascript()) {
-            throw new DriverException('Use \'I wait "X" seconds\' with Javascript support');
-        }
-        sleep($seconds);
-    }
-
-    /**
      * Waits until the page is completely loaded. This step is auto-executed after every step.
      *
      * @Given /^I wait until the page is ready$/

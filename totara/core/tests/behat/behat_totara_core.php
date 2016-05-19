@@ -313,6 +313,38 @@ class behat_totara_core extends behat_base {
     }
 
     /**
+     * Force waiting for X seconds without javascript in Totara.
+     *
+     * Usually needed when things need to have different timestamps and GoutteDriver is too fast.
+     *
+     * @Then /^I force sleep "(?P<seconds_number>\d+)" seconds$/
+     * @param int $seconds
+     */
+    public function i_force_sleep($seconds) {
+        if ($this->running_javascript()) {
+            throw new \Behat\Mink\Exception\DriverException('Use \'I wait "X" seconds\' with Javascript support');
+        }
+        sleep($seconds);
+    }
+
+    /**
+     * Force waiting for the next second.
+     *
+     * This is intended for places that need different timestamp in database.
+     *
+     * @Then /^I wait for the next second$/
+     */
+    public function i_wait_for_next_second() {
+        $now = microtime(true);
+        $sleep = ceil($now) - $now;
+        if ($sleep > 0) {
+            usleep($sleep * 1000000);
+        } else {
+            usleep(1000000);
+        }
+    }
+
+    /**
      * Expect to see a specific image (by alt or title) within the given thing.
      *
      * @Then /^I should see the "([^"]*)" image in the "([^"]*)" "([^"]*)"$/
@@ -370,5 +402,4 @@ class behat_totara_core extends behat_base {
         throw new ExpectationException('The "' . $titleoralt . '" image was found in the "' .
             $containerelement . '" "' . $containerselectortype . '"', $this->getSession());
     }
-
 }
