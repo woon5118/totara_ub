@@ -2328,6 +2328,7 @@ function certif_get_completion_error_solution($problemkey, $programid = 0, $user
         'progid' => $programid,
         'userid' => $userid,
         'returntoeditor' => $returntoeditor,
+        'sesskey' => sesskey()
     );
     $baseurl = new moodle_url('/totara/program/check_completion.php', $params);
 

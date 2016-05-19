@@ -2463,7 +2463,13 @@ function prog_get_completion_error_solution($problemkey, $programid = 0, $userid
         return '';
     }
 
-    $params = array('progorcert' => 'program', 'progid' => $programid, 'userid' => $userid, 'returntoeditor' => $returntoeditor);
+    $params = array(
+        'progorcert' => 'program',
+        'progid' => $programid,
+        'userid' => $userid,
+        'returntoeditor' => $returntoeditor,
+        'sesskey' => sesskey()
+    );
     $baseurl = new moodle_url('/totara/program/check_completion.php', $params);
 
     switch ($problemkey) {

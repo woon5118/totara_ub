@@ -74,6 +74,7 @@ if ($userid) {
 
 // If a fix key has been provided, fix the corresponding records.
 if ($fixkey) {
+    require_sesskey();
     if ($progorcert == 'program') {
         prog_fix_completions($fixkey, $progid, $userid);
         if ($returntoeditor) {
