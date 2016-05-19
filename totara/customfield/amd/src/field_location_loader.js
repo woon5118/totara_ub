@@ -74,7 +74,7 @@ define(function() {
                 scripttag = document.createElement('script');
                 scripttag.setAttribute('type', 'text/javascript');
                 scripttag.setAttribute('async', true);
-                scripttag.setAttribute('src', 'http://maps.google.com/maps/api/js?' + name + '&callback='+id);
+                scripttag.setAttribute('src', 'https://maps.google.com/maps/api/js?' + name + '&callback='+id);
 
                 firstscript = document.getElementsByTagName('script')[0];
                 firstscript.parentNode.insertBefore(scripttag, firstscript);
