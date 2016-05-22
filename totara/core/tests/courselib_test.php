@@ -47,11 +47,18 @@ class totara_core_courselib_testcase extends reportcache_advanced_testcase {
     /** @var mod_facetoface_generator $facetoface_generator */
     private $facetoface_generator;
 
+    /** @var phpunit_message_sink $messagesink */
+    private $messagesink;
+
     private $user1, $user2, $user3, $user4, $user5, $user6;
 
     public function setUp() {
         parent::setUp();
         $this->resetAfterTest();
+
+        // Ignore messages and silence debug output in cron.
+        $this->messagesink = $this->redirectMessages();
+        ob_start();
 
         set_config('enablecompletion', 1);
 
@@ -67,6 +74,12 @@ class totara_core_courselib_testcase extends reportcache_advanced_testcase {
         $this->user4 = $this->data_generator->create_user();
         $this->user5 = $this->data_generator->create_user();
         $this->user6 = $this->data_generator->create_user();
+    }
+
+    public function tearDown() {
+        ob_end_clean();
+        $this->messagesink->close();
+        parent::tearDown();
     }
 
     /**
