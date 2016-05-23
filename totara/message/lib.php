@@ -259,9 +259,12 @@ function totara_message_action_button($action) {
  *
  * @param int $id message Id
  * @return string HTML of accept/reject button
+ * @deprecated Since Totara 9.0
  */
 function totara_message_accept_reject_action($id) {
     global $CFG, $FULLME, $PAGE, $DB, $OUTPUT;
+
+    debugging("totara_message_accept_reject_action() has been deprecated because it is no longer used in the codebase.", DEBUG_DEVELOPER);
 
     // Button Lang Strings
     $cancel_string = get_string('cancel');
