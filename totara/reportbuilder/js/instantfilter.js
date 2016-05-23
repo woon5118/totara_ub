@@ -56,7 +56,8 @@ M.totara_reportbuilder_instantfilter = M.totara_reportbuilder_instantfilter || {
             throw new Error('M.totara_reportbuilder_instantfilter.init()-> jQuery dependency required for this module to function.');
         }
 
-        $('.rb-sidebar input, .rb-sidebar select').change(function (event) {
+        // ignoredirty needs to be avoided as it is the password hack to stop browsers populating password fields
+        $('.rb-sidebar input:not(.ignoredirty), .rb-sidebar select').change(function (event) {
             // Abort any call to instantreport that is already active.
             if (xhr) {
                 xhr.abort();
