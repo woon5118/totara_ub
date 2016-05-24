@@ -150,6 +150,12 @@ define(['jquery'], function ($) {
          */
         this.input_longitude = $('#' + this.fieldprefix + 'longitude');
 
+        /**
+         * The fieldset containing this location custom field.
+         * @type {jQuery}
+         */
+        this.fieldset = null;
+
         if (!this.fordisplay) {
             this.wireDefinitionControls();
         }
@@ -180,6 +186,18 @@ define(['jquery'], function ($) {
             return;
         }
 
+        // If the fieldset is collapsed then we need an action to initialise the map the first time the fieldset is expanded.
+        // We only want to do this once, and only if it is collapsed.
+        this.fieldset = map.closest('fieldset.collapsible.collapsed');
+        if (this.fieldset.length) {
+            window.form_fieldset_expand = window.form_fieldset_expand || [];
+            window.form_fieldset_expand.push({
+                context: this,
+                callback: this.fieldSetRefreshMap
+            });
+            this.fieldset.attr('data-location-refresh-'+this.fieldprefix, 'true');
+        }
+
         // Get the initial address.
         if (this.input_address.length) {
             this.address = this.input_address.val().trim();
@@ -203,6 +221,26 @@ define(['jquery'], function ($) {
         // Finally now that we know what we need to know initialise the map.
         this.load_map();
     }
+
+    /**
+     * Refreshes the map, needs to be done if the map was hidden when it was initialised.
+     * @param {Element} fieldset
+     */
+    Location.prototype.fieldSetRefreshMap = function(fieldset) {
+        if (!this.map) {
+            return;
+        }
+        if ($(fieldset).attr('data-location-refresh-'+this.fieldprefix) !== 'true') {
+            return;
+        }
+        // We only want to do this once, change it to false so that we know it has happened.
+        $(fieldset).attr('data-location-refresh-'+this.fieldprefix, 'false');
+        this.google.maps.event.trigger(this.map, 'resize');
+        // No need to check the location inputs exist, they must do if we got this far.
+        this.location.lat = parseFloat(this.input_latitude.val());
+        this.location.lng = parseFloat(this.input_longitude.val());
+        this.map.panTo(this.location);
+    };
     Location.prototype.wireDefinitionControls = function() {
         var self = this,
             fordisplay = this.fordisplay,
