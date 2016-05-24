@@ -78,7 +78,7 @@ Feature: Seminar event cancellation calendar views
     And I follow "Go back"
 
 
-  Scenario: mod_facetoface_cancel_81: cancelled events removed from learner calendar.
+  Scenario: mod_facetoface_cancel_800: cancelled events removed from learner calendar.
     When I log out
     And I log in as "learner1"
     And I click on "Calendar" in the totara menu
@@ -112,7 +112,7 @@ Feature: Seminar event cancellation calendar views
     And I should not see "Editing Trainer Teacher One"
 
 
-  Scenario: mod_facetoface_cancel_82: cancelled events removed from session role calendar.
+  Scenario: mod_facetoface_cancel_801: cancelled events removed from session role calendar.
     When I log out
     And I log in as "teacher1"
     And I click on "Calendar" in the totara menu
