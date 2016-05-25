@@ -36,10 +36,14 @@ class customfield_text extends customfield_base {
 
         /// Create the form field
         $mform->addElement($fieldtype, $this->inputname, $fullname, 'maxlength="'.$maxlength.'" size="'.$size.'" ');
-        $mform->setType($this->inputname, PARAM_MULTILANG);
+        $mform->setType($this->inputname, PARAM_TEXT);
 
         if (!empty($regex)) {
             $mform->addRule($this->inputname, get_string('regexvalidationfailed', 'totara_customfield', $fullname), 'regex', $regex);
+            // Param5 is regex pattern validation help message.
+            if (!empty($this->field->param5)) {
+                $mform->addElement('static', null, null, $this->field->param5);
+            }
         }
     }
 

@@ -29,7 +29,7 @@ class customfield_define_text extends customfield_define_base {
     function define_form_specific(&$form) {
         /// Default data
         $form->addElement('text', 'defaultdata', get_string('defaultdata', 'totara_customfield'), 'size="50"');
-        $form->setType('defaultdata', PARAM_MULTILANG);
+        $form->setType('defaultdata', PARAM_TEXT);
         $form->addHelpButton('defaultdata', 'customfielddefaultdatatext', 'totara_customfield');
 
         /// Param 1 for text type is the size of the field
@@ -49,6 +49,11 @@ class customfield_define_text extends customfield_define_base {
         $form->addElement('text', 'regex', get_string('regexpattern', 'totara_customfield'));
         $form->setType('regex', PARAM_TEXT);
         $form->addHelpButton('regex', 'regexpattern', 'totara_customfield');
+
+        // Param5 is regex pattern validation message.
+        $form->addElement('text', 'param5', get_string('regexpatternmessage', 'totara_customfield'), 'size="50"');
+        $form->setType('param5', PARAM_TEXT);
+        $form->addHelpButton('param5', 'regexpatternmessage', 'totara_customfield');
     }
 
     function define_validate_specific($data, $files, $tableprefix) {
