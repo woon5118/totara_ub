@@ -305,7 +305,13 @@ switch ($searchtype) {
         }
         $contextids = array_filter($context->get_parent_context_ids(true),
             create_function('$a', 'return has_capability("moodle/cohort:view", context::instance_by_id($a));'));
-        list($contextssql, $contextparams) = $DB->get_in_or_equal($contextids);
+        $equal = true;
+        if (!isset($instanceid) && $contextids) {
+            // User passed capability check, search through entire cohort including all contextids.
+            $contextids = array('0');
+            $equal = false;
+        }
+        list($contextssql, $contextparams) = $DB->get_in_or_equal($contextids, SQL_PARAMS_QM, 'param', $equal);
 
         $search_info->fullname = "(
             CASE WHEN {cohort}.idnumber IS NULL
