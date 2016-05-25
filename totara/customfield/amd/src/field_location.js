@@ -151,6 +151,12 @@ define(['jquery'], function ($) {
         this.input_longitude = $('#' + this.fieldprefix + 'longitude');
 
         /**
+         * The zoom input.
+         * @type {jQuery}
+         */
+        this.input_zoom = $('#' + this.fieldprefix + 'zoom');
+
+        /**
          * The fieldset containing this location custom field.
          * @type {jQuery}
          */
@@ -195,7 +201,14 @@ define(['jquery'], function ($) {
                 context: this,
                 callback: this.fieldSetRefreshMap
             });
-            this.fieldset.attr('data-location-refresh-'+this.fieldprefix, 'true');
+            this.fieldset.attr('data-location-refresh-' + this.fieldprefix, 'true');
+        }
+
+        // Get initial zoom.
+        if (this.input_zoom.length) {
+            this.location.zoom = parseInt(this.input_zoom.val());
+        } else {
+            this.location.zoom = this.defaultzoomlevel;
         }
 
         // Get the initial address.
@@ -358,7 +371,7 @@ define(['jquery'], function ($) {
      * @returns {Number}
      */
     Location.prototype.get_zoom_level = function() {
-        return parseInt(this.defaultzoomlevel);
+        return parseInt(this.input_zoom.val());
     };
     /**
      * Load the map!
@@ -406,6 +419,9 @@ define(['jquery'], function ($) {
             this.marker.addListener('drag', function (e) {
                 self.input_latitude.val(e.latLng.lat());
                 self.input_longitude.val(e.latLng.lng());
+            });
+            this.map.addListener('zoom_changed', function (e) {
+                self.input_zoom.val(self.map.getZoom());
             });
         } else {
             if (this.address !== null && this.address.length > 0) {

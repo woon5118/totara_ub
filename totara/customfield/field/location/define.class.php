@@ -42,6 +42,8 @@ require_once($CFG->dirroot . '/totara/customfield/field/location/field.class.php
 class customfield_define_location extends customfield_define_base {
 
     public static function set_location_field_form_element_defaults(&$form, $defaultlocationdata, $storeddata) {
+        global $CFG;
+
         $datatouse = $storeddata;
 
         if (empty($storeddata)) {
@@ -64,6 +66,9 @@ class customfield_define_location extends customfield_define_base {
         $form->setDefault($form->_customlocationfieldname . 'size', $defaults->size);
         $form->setDefault($form->_customlocationfieldname . 'view', $defaults->view);
         $form->setDefault($form->_customlocationfieldname . 'display', $defaults->display);
+
+        $defaults->zoom = isset($defaults->zoom) ? $defaults->zoom : $CFG->gmapsdefaultzoomlevel;
+        $form->setDefault($form->_customlocationfieldname . 'zoom', $defaults->zoom);
     }
 
     public function define_form_specific(&$form) {
@@ -102,7 +107,7 @@ class customfield_define_location extends customfield_define_base {
      * @throws coding_exception
      */
     public static function add_location_field_form_elements($form, $fieldname = 'Location', $fielddefinition = true) {
-        global $OUTPUT;
+        global $OUTPUT, $CFG;
 
         // These fields shouldn't be required during field definition, just in field instantiation.
         $stringsuffix = $fielddefinition ? 'default' : '';
@@ -245,6 +250,18 @@ class customfield_define_location extends customfield_define_base {
         }
         $form->setType($formprefix . 'longitude', PARAM_FLOAT);
 
+        // Zoom element.
+        $form->addElement(
+            'hidden',
+            $formprefix . 'zoom',
+            "",
+            array(
+                'id' => $formprefix . 'zoom'
+            )
+        );
+        $form->setDefault($formprefix . 'zoom', $CFG->gmapsdefaultzoomlevel);
+        $form->setType($formprefix . 'zoom', PARAM_INT);
+
         $form->addElement('html', html_writer::end_div());
     }
 
@@ -348,6 +365,8 @@ class customfield_define_location extends customfield_define_base {
     }
 
     public static function prepare_location_data($data, $fieldname = '') {
+        global $CFG;
+
         $locationdata = new stdClass();
 
         $latitude = $fieldname . 'latitude';
@@ -356,6 +375,7 @@ class customfield_define_location extends customfield_define_base {
         $size = $fieldname . 'size';
         $view = $fieldname . 'view';
         $display = $fieldname . 'display';
+        $zoom = $fieldname . 'zoom';
 
         $locationdata->latitude = (!empty($data->$latitude)) ? $data->$latitude : "0";
         $locationdata->longitude = (!empty($data->$longitude)) ? $data->$longitude : "0";
@@ -365,6 +385,7 @@ class customfield_define_location extends customfield_define_base {
         $newdata->size = (!empty($data->$size)) ? $data->$size : "";
         $newdata->view = (!empty($data->$view)) ? $data->$view : "";
         $newdata->display = (!empty($data->$display)) ? $data->$display : "";
+        $newdata->zoom = (!empty($data->$zoom)) ? $data->$zoom : $CFG->gmapsdefaultzoomlevel;
         $newdata->location = $locationdata;
 
         return json_encode($newdata);
@@ -379,9 +400,11 @@ class customfield_define_location extends customfield_define_base {
         unset($data->size);
         unset($data->view);
         unset($data->display);
+        unset($data->zoom);
     }
 
     public static function prepare_db_location_data_for_form($data) {
+        global $CFG;
 
         if (empty($data)) {
             return null;
@@ -397,6 +420,7 @@ class customfield_define_location extends customfield_define_base {
         $newdata->size = (isset($data->size) && !empty($data->size)) ? $data->size : "";
         $newdata->view = (isset($data->view) && !empty($data->view)) ? $data->view : "";
         $newdata->display = (isset($data->display) && !empty($data->display)) ? $data->display : GMAP_DISPLAY_ADDRESS_ONLY;
+        $newdata->zoom = (isset($data->zoom) && !empty($data->zoom)) ? $data->zoom : $CFG->gmapsdefaultzoomlevel;
 
         $newdata->location = new stdClass();
         $newdata->location->latitude = (isset($data->location->latitude) && !empty($data->location->latitude)) ? $data->location->latitude : "0";
@@ -428,6 +452,7 @@ class customfield_define_location extends customfield_define_base {
     }
 
     public static function render($fielddata, $extradata = array()) {
+        global $CFG;
 
         static $instancecount = 0;
         $instancecount++;
@@ -438,6 +463,11 @@ class customfield_define_location extends customfield_define_base {
         if (is_string($fielddata)) {
             // Data is json_endoded prior to storage. Lets decode it.
             $fielddata = json_decode($fielddata);
+        }
+
+        // Ensure zoom level is set.
+        if (!isset($fielddata->zoom)) {
+            $fielddata->zoom = $CFG->gmapsdefaultzoomlevel;
         }
 
         $extended = isset($extradata['extended']) && !empty($extradata['extended']);
@@ -506,6 +536,9 @@ class customfield_define_location extends customfield_define_base {
         );
         $output[] = html_writer::empty_tag('input',
             array('type' => 'hidden', 'id' => $formprefix . 'longitude', 'value' => $fielddata->location->longitude)
+        );
+        $output[] = html_writer::empty_tag('input',
+            array('type' => 'hidden', 'id' => $formprefix . 'zoom', 'value' => $fielddata->zoom)
         );
         $output[] = html_writer::empty_tag('input',
             array('type' => 'hidden', 'id' => $formprefix . 'room-location-view', 'value' => $view)
