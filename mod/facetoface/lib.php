@@ -3702,13 +3702,14 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
         $output .= html_writer::tag('dd', $approver);
     }
 
-    if (!empty($session->normalcost)) {
+    if (!get_config(null, 'facetoface_hidecost') && !empty($session->normalcost)) {
         $output .= html_writer::tag('dt', get_string('normalcost', 'facetoface'));
         $output .= html_writer::tag('dd', format_string($session->normalcost));
-    }
-    if (!empty($session->discountcost)) {
-        $output .= html_writer::tag('dt', get_string('discountcost', 'facetoface'));
-        $output .= html_writer::tag('dd', format_string($session->discountcost));
+
+        if (!get_config(null, 'facetoface_hidediscount') && !empty($session->discountcost)) {
+            $output .= html_writer::tag('dt', get_string('discountcost', 'facetoface'));
+            $output .= html_writer::tag('dd', format_string($session->discountcost));
+        }
     }
 
     // Display trainers.

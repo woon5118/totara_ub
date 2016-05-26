@@ -132,7 +132,6 @@ class mod_facetoface_signup_form extends moodleform {
             $mform->addHelpButton('approvalusers', 'approvalusers', 'facetoface');
         }
 
-        $showdiscountcode = true;
         if ($showdiscountcode) {
             $mform->addElement('text', 'discountcode', get_string('discountcode', 'facetoface'), 'size="6"');
             $mform->addHelpButton('discountcode', 'discountcodelearner', 'facetoface');

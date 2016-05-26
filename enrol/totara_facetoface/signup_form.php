@@ -248,7 +248,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
             $mform->addElement('html', html_writer::start_tag('td', array('class' => 'session-signupinfo')));
 
             $elementid = 'discountcode' . $session->id;
-            if ($session->discountcost > 0) {
+            if (!get_config(null, 'facetoface_hidediscount') && $session->discountcost > 0) {
                 $mform->addElement('text', $elementid, get_string('discountcode', 'facetoface'), 'size="6"');
                 $mform->addHelpButton($elementid, 'discountcodelearner', 'facetoface');
             } else {

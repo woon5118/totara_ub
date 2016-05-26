@@ -219,24 +219,6 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'facetoface',
-                'normalcost',
-                get_string('normalcost', 'rb_source_facetoface_summary'),
-                'base.normalcost',
-                array(
-                    'dbdatatype' => 'decimal'
-                )
-            ),
-            new rb_column_option(
-                'facetoface',
-                'discountcost',
-                get_string('discountcost', 'rb_source_facetoface_summary'),
-                'base.discountcost',
-                array(
-                    'dbdatatype' => 'decimal'
-                )
-            ),
-            new rb_column_option(
-                'facetoface',
                 'minbookings',
                 get_string('minbookings', 'rb_source_facetoface_summary'),
                 'base.mincapacity',
@@ -245,6 +227,29 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 )
             ),
         );
+
+        if (!get_config(null, 'facetoface_hidecost')) {
+            $columnoptions[] = new rb_column_option(
+                'facetoface',
+                'normalcost',
+                get_string('normalcost', 'rb_source_facetoface_summary'),
+                'base.normalcost',
+                array(
+                    'dbdatatype' => 'decimal'
+                )
+            );
+            if (!get_config(null, 'facetoface_hidediscount')) {
+                $columnoptions[] = new rb_column_option(
+                    'facetoface',
+                    'discountcost',
+                    get_string('discountcost', 'rb_source_facetoface_summary'),
+                    'base.discountcost',
+                    array(
+                        'dbdatatype' => 'decimal'
+                    )
+                );
+            }
+        }
 
         $columnoptions[] = new rb_column_option(
             'session',

@@ -99,7 +99,7 @@ if (!empty($manager)) {
     $managerid = 0;
 }
 
-$showdiscountcode = ($session->discountcost > 0);
+$showdiscountcode = (!get_config(null, 'facetoface_hidecost') && !get_config(null, 'facetoface_hidediscount') && $session->discountcost > 0);
 
 $approvaltype = $facetoface->approvaltype;
 

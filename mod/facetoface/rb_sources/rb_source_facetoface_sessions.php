@@ -318,36 +318,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     'displayfunc' => 'signup_status',
                 )
             ),
-             new rb_column_option(
-                'session',
-                'discountcode',
-                get_string('discountcode', 'rb_source_facetoface_sessions'),
-                'base.discountcode',
-                array('dbdatatype' => 'text',
-                      'outputformat' => 'text')
-            ),
-            new rb_column_option(
-                'session',
-                'normalcost',
-                get_string('normalcost', 'rb_source_facetoface_sessions'),
-                'sessions.normalcost',
-                array(
-                    'joins' => 'sessions',
-                    'dbdatatype' => 'char',
-                    'outputformat' => 'text'
-                )
-            ),
-            new rb_column_option(
-                'session',
-                'discountcost',
-                get_string('discountcost', 'rb_source_facetoface_sessions'),
-                'sessions.discountcost',
-                array(
-                    'joins' => 'sessions',
-                    'dbdatatype' => 'char',
-                    'outputformat' => 'text'
-                )
-            ),
             new rb_column_option(
                 'facetoface',
                 'name',
@@ -540,6 +510,41 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
         );
 
+        if (!get_config(null, 'facetoface_hidecost')) {
+            $columnoptions[] = new rb_column_option(
+                'session',
+                'normalcost',
+                get_string('normalcost', 'rb_source_facetoface_sessions'),
+                'sessions.normalcost',
+                array(
+                    'joins' => 'sessions',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
+                )
+            );
+            if (!get_config(null, 'facetoface_hidediscount')) {
+                $columnoptions[] = new rb_column_option(
+                    'session',
+                    'discountcost',
+                    get_string('discountcost', 'rb_source_facetoface_sessions'),
+                    'sessions.discountcost',
+                    array(
+                        'joins' => 'sessions',
+                        'dbdatatype' => 'char',
+                        'outputformat' => 'text'
+                    )
+                );
+                $columnoptions[] = new rb_column_option(
+                    'session',
+                    'discountcode',
+                    get_string('discountcode', 'rb_source_facetoface_sessions'),
+                    'base.discountcode',
+                    array('dbdatatype' => 'text',
+                        'outputformat' => 'text')
+                );
+            }
+        }
+
         // include some standard columns
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_course_fields_to_columns($columnoptions);
@@ -610,27 +615,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_filter_option(
                 'session',
-                'discountcode',
-                get_string('discountcode', 'rb_source_facetoface_sessions'),
-                'text'
-            ),
-            new rb_filter_option(
-                'session',
                 'duration',
                 get_string('sessduration', 'rb_source_facetoface_sessions'),
                 'number'
-            ),
-            new rb_filter_option(
-                'session',
-                'normalcost',
-                get_string('normalcost', 'rb_source_facetoface_sessions'),
-                'text'
-            ),
-            new rb_filter_option(
-                'session',
-                'discountcost',
-                get_string('discountcost', 'rb_source_facetoface_sessions'),
-                'text'
             ),
             new rb_filter_option(
                 'session',
@@ -729,6 +716,29 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 )
             ),
         );
+
+        if (!get_config(null, 'facetoface_hidecost')) {
+            $filteroptions[] = new rb_filter_option(
+                'session',
+                'normalcost',
+                get_string('normalcost', 'rb_source_facetoface_sessions'),
+                'text'
+            );
+            if (!get_config(null, 'facetoface_hidediscount')) {
+                $filteroptions[] = new rb_filter_option(
+                    'session',
+                    'discountcost',
+                    get_string('discountcost', 'rb_source_facetoface_sessions'),
+                    'text'
+                );
+                $filteroptions[] = new rb_filter_option(
+                    'session',
+                    'discountcode',
+                    get_string('discountcode', 'rb_source_facetoface_sessions'),
+                    'text'
+                );
+            }
+        }
 
         // include some standard filters
         $this->add_user_fields_to_filters($filteroptions);

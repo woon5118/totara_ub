@@ -266,26 +266,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'facetoface',
-                'normalcost',
-                get_string('normalcost', 'rb_source_facetoface_summary'),
-                'sessions.normalcost',
-                array(
-                    'joins' => 'sessions',
-                    'dbdatatype' => 'decimal'
-                )
-            ),
-            new rb_column_option(
-                'facetoface',
-                'discountcost',
-                get_string('discountcost', 'rb_source_facetoface_summary'),
-                'sessions.discountcost',
-                array(
-                    'joins' => 'sessions',
-                    'dbdatatype' => 'decimal'
-                )
-            ),
-            new rb_column_option(
-                'facetoface',
                 'duration',
                 get_string('duration', 'rb_source_facetoface_summary'),
                 '(base.timefinish-base.timestart)/' . MINSECS,
@@ -322,6 +302,32 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 )
             )
         );
+
+        if (!get_config(null, 'facetoface_hidecost')) {
+            $columnoptions[] = new rb_column_option(
+                'facetoface',
+                'normalcost',
+                get_string('normalcost', 'rb_source_facetoface_summary'),
+                'sessions.normalcost',
+                array(
+                    'joins' => 'sessions',
+                    'dbdatatype' => 'decimal'
+                )
+            );
+            if (!get_config(null, 'facetoface_hidediscount')) {
+                $columnoptions[] = new rb_column_option(
+                    'facetoface',
+                    'discountcost',
+                    get_string('discountcost', 'rb_source_facetoface_summary'),
+                    'sessions.discountcost',
+                    array(
+                        'joins' => 'sessions',
+                        'dbdatatype' => 'decimal'
+                    )
+                );
+            }
+        }
+
         $this->add_session_status_to_columns($columnoptions);
         $this->add_session_common_to_columns($columnoptions);
         $this->add_facetoface_common_to_columns($columnoptions);
