@@ -30,7 +30,7 @@ Feature: Seminar Event Registration Closure
       | minny | manager |
       | moxxy | manager |
     And I log in as "admin"
-    And I navigate to "Global settings" node in "Site administration > Seminar"
+    And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "s__facetoface_approvaloptions[approval_none]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_manager]" "checkbox"
