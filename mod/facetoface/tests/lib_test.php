@@ -1850,17 +1850,44 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $session = facetoface_get_session($sessionid);
 
         // set up a notification that uses all current placeholders
-        $fields = array('coursename', 'facetofacename', 'firstname', 'lastname', 'cost',
-            'sessions:loopstart', 'session:starttime', 'session:startdate', 'session:finishtime', 'session:finishdate',
-            'session:timezone', 'sessions:loopend',
+        $legacyfields = array('coursename', 'facetofacename', 'firstname', 'lastname', 'cost',
             'sessiondate', 'startdate', 'finishdate', 'starttime', 'finishtime', 'lateststartdate', 'latestfinishdate', 'lateststarttime',
             'latestfinishtime', 'duration');
-        $noticebody = '';
-        foreach ($fields as $field) {
+
+        // Create field that should be translated if following hack with string cache works.
+        $noticebody = 'borked [borked] ';
+
+        foreach ($legacyfields as $field) {
             // adding name of field in front of placeholder so that tests for starttime etc. don't simply pick
             // up those times within alldates.
             $noticebody .= $field.' '.get_string('placeholder:'.$field, 'facetoface') . ' ';
         }
+
+        $newfields = array('sessions:loopstart' => '[#sessions]', 'session:starttime' => '[session:starttime]',
+            'session:startdate' => '[session:startdate]', 'session:finishtime' => '[session:finishtime]',
+            'session:finishdate' => '[session:finishdate]', 'session:timezone' => '[session:timezone]',
+            'sessions:loopend' => '[/sessions]');
+        foreach ($newfields as $key => $field) {
+            // adding name of field in front of placeholder so that tests for starttime etc. don't simply pick
+            // up those times within alldates.
+            $noticebody .= $key.' '.$field . ' ';
+        }
+
+        // Translation problems hack.
+        $strmanager = get_string_manager();
+        $rp = new ReflectionProperty(get_class($strmanager), 'cache');
+        $rp->setAccessible(true);
+        $cache = $rp->getValue($strmanager);
+        // Clone cache key calculations as it is done in string manager.
+        $rev = $strmanager->get_revision();
+        $rev = ($rev < 0) ? 0 : $rev;
+        $key = 'en_mod_facetoface_' . $rev;
+
+        // Now "translate" placeholder to make it different from used in notification template.
+        $strings = $cache->get($key);
+        $strings['placeholder:firstname'] = '[borked]';
+        $cache->set($key, $strings);
+        $this->assertEquals('[borked]', get_string('placeholder:firstname', 'facetoface'));
 
         $notification = new facetoface_notification();
         $notification->courseid = $course1->id;
@@ -1886,6 +1913,10 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         // Plain text message has been formatted to include new lines at every ~75 characters - removing these as they complicate testing.
         $fullmessage = str_replace("\n", " ", end($messages)->fullmessage);
         $fullmessagehtml = end($messages)->fullmessagehtml;
+
+        // Confirm that hack worked.
+        $this->assertContains('borked', $fullmessage);
+        $this->assertNotContains('[borked]', $fullmessage);
 
         // Assertions for values that are already strings
         $this->assertContains('coursename '.$course1->fullname, $fullmessage);

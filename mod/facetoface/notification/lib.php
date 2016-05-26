@@ -1576,11 +1576,34 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     if (!empty($approvalrole)) {
         $rolenames = role_fix_names(get_all_roles());
         $rolename = $rolenames[$approvalrole]->localname;
+        // Replace.
+        $msg = str_replace('[sessionrole]', $rolename, $msg);
+        // Legacy.
         $msg = str_replace(get_string('placeholder:sessionrole', 'facetoface'), $rolename, $msg);
     } else {
+        // Replace.
+        $msg = str_replace('[sessionrole]', '', $msg);
+        // Legacy.
         $msg = str_replace(get_string('placeholder:sessionrole', 'facetoface'), '', $msg);
     }
 
+    // Replace placeholders with values
+    $msg = str_replace('[coursename]', $coursename, $msg);
+    $msg = str_replace('[facetofacename]', $facetofacename, $msg);
+    $msg = str_replace('[firstname]', $user->firstname, $msg);
+    $msg = str_replace('[lastname]', $user->lastname, $msg);
+    $msg = str_replace('[cost]', facetoface_cost($user->id, $sessionid, $data), $msg);
+    $msg = str_replace('[sessiondate]', $sessiondate, $msg);
+    $msg = str_replace('[startdate]', $startdate, $msg);
+    $msg = str_replace('[finishdate]', $finishdate, $msg);
+    $msg = str_replace('[starttime]', $starttime, $msg);
+    $msg = str_replace('[finishtime]', $finishtime, $msg);
+    $msg = str_replace('[lateststarttime]', $lateststarttime, $msg);
+    $msg = str_replace('[lateststartdate]', $lateststartdate, $msg);
+    $msg = str_replace('[latestfinishtime]', $latestfinishtime, $msg);
+    $msg = str_replace('[latestfinishdate]', $latestfinishdate, $msg);
+    $msg = str_replace('[duration]', format_time($data->duration), $msg);
+    // Legacy.
     $msg = str_replace(get_string('placeholder:coursename', 'facetoface'), $coursename, $msg);
     $msg = str_replace(get_string('placeholder:facetofacename', 'facetoface'), $facetofacename, $msg);
     $msg = str_replace(get_string('placeholder:firstname', 'facetoface'), $user->firstname, $msg);
@@ -1605,6 +1628,9 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $registrationcutoff = $str_unknowndate;
     }
 
+    // Replace.
+    $msg = str_replace('[registrationcutoff]', $registrationcutoff, $msg);
+    // Legacy.
     $msg = str_replace(get_string('placeholder:registrationcutoff', 'facetoface'), $registrationcutoff, $msg);
 
     if (!empty($data->sessiondates)) {
@@ -1619,22 +1645,34 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     }
 
     if (empty($data->details)) {
+        // Replace.
+        $msg = str_replace('[details]', '', $msg);
+        // Legacy.
         $msg = str_replace(get_string('placeholder:details', 'facetoface'), '', $msg);
     } else {
+        // Replace.
+        $msg = str_replace('[details]', html_to_text($data->details), $msg);
+        // Legacy.
         $msg = str_replace(get_string('placeholder:details', 'facetoface'), html_to_text($data->details), $msg);
     }
 
     // Replace more meta data
     $attendees_url = new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessionid, 'action' => 'approvalrequired'));
     $link = html_writer::link($attendees_url, $attendees_url, array('title' => get_string('attendees', 'facetoface')));
+    // Replace.
+    $msg = str_replace('[attendeeslink]', $link, $msg);
+    // Legacy.
     $msg = str_replace(get_string('placeholder:attendeeslink', 'facetoface'), $link, $msg);
 
-    if (strstr($msg, get_string('placeholder:reminderperiod', 'facetoface'))) {
+    if (strstr($msg, '[reminderperiod]') || strstr($msg, get_string('placeholder:reminderperiod', 'facetoface'))) {
         // Handle the legacy reminderperiod placeholder.
         $reminderperiod = $DB->get_field('facetoface_notification', 'MAX(scheduleamount)',
             array('facetofaceid' => $data->facetoface, 'conditiontype' => MDL_F2F_CONDITION_BEFORE_SESSION,
             'scheduleunit' => MDL_F2F_SCHEDULE_UNIT_DAY, 'status' => 1), IGNORE_MULTIPLE);
         $reminderperiod = empty($reminderperiod) ? 0 : $reminderperiod;
+        // Replace.
+        $msg = str_replace('[reminderperiod]', $reminderperiod, $msg);
+        // Legacy.
         $msg = str_replace(get_string('placeholder:reminderperiod', 'facetoface'), $reminderperiod, $msg);
     }
 
@@ -1658,8 +1696,8 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
 }
 
 /**
- * Replaces a section in a notification string that begins with the loop start tag (by default this is '[#sessions]')
- * and ends with the loop end tag (by default this is '[/sessions]') for sessions. The section will be replaced with
+ * Replaces a section in a notification string that begins with the loop start tag ('[#sessions]')
+ * and ends with the loop end tag ('[/sessions]') for sessions. The section will be replaced with
  * placeholders substituted and will be repeated for each session.
  *
  * Properties in $session that may be required are:
@@ -1680,14 +1718,14 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
     while($startposition !== false) {
 
         // Check that msg contains a start tag (e.g. '[#sessions]').
-        $starttag = get_string('placeholder:sessions:loopstart', 'facetoface');
+        $starttag = '[#sessions]';
         $startposition = strpos($msg, $starttag, $prevendposition);
         if (!$startposition) {
             return $msg;
         }
 
         // Check that msg contains an end tag (e.g. '[/sessions]').
-        $endtag = get_string('placeholder:sessions:loopend', 'facetoface');
+        $endtag = '[/sessions]';
         $endposition = strpos($msg, $endtag, $startposition);
         if (!$endposition) {
             return $msg;
@@ -1703,18 +1741,15 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
 
         // Define the fixed (non-customfield) placeholders.
         $fixed_placeholders = array(
-            'session:startdate',
-            'session:starttime',
-            'session:finishdate',
-            'session:finishtime',
-            'session:timezone',
-            'room:name',
-            'room:link');
+            'session:startdate' => '[session:startdate]',
+            'session:starttime' => '[session:starttime]',
+            'session:finishdate' => '[session:finishdate]',
+            'session:finishtime' => '[session:finishtime]',
+            'session:timezone' => '[session:timezone]',
+            'room:name' => '[session:room:name]',
+            'room:link' => '[session:room:link]');
 
-        // We will use the above strings as keys.
-        $fixed_placeholders = array_flip($fixed_placeholders);
-        foreach ($fixed_placeholders as $key => $placeholder) {
-            $placeholderstring = get_string('placeholder:' . $key, 'facetoface');
+        foreach ($fixed_placeholders as $key => $placeholderstring) {
             // Check if the placeholder is present in this segment.
             if (strpos($templatesegment, $placeholderstring) !== false) {
                 $fixed_placeholders[$key] = $placeholderstring;
@@ -1729,7 +1764,7 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
         $room_cf_placeholders = array();
         $room_cf_names = $DB->get_records('facetoface_room_info_field', array('hidden' => 0), '', 'shortname');
         foreach ($room_cf_names as $room_cf_name) {
-            $placeholderstring = get_string('placeholder:room:customfield', 'facetoface', $room_cf_name);
+            $placeholderstring = "[session:room:cf_{$room_cf_name->shortname}]";
             // Check if the placeholder is present in this segment.
             if (strpos($templatesegment, $placeholderstring) !== false) {
                 $room_cf_placeholders[$room_cf_name->shortname] = $placeholderstring;
@@ -1819,27 +1854,49 @@ function facetoface_message_substitutions_userfields($msg, $user) {
     global $DB;
     static $customfields = null;
 
-    $fields = array('username', 'email', 'institution', 'department', 'city', 'idnumber', 'icq', 'skype',
-        'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'address', 'url', 'description');
+    $placeholders = array('username' => '[username]', 'email' => '[email]', 'institution' => '[institution]',
+        'department' => '[department]', 'city' => '[city]', 'idnumber' => '[idnumber]', 'icq' => '[icq]', 'skype' => '[skype]',
+        'yahoo' => '[yahoo]', 'aim' => '[aim]', 'msn' => '[msn]', 'phone1' => '[phone1]', 'phone2' => '[phone2]',
+        'address' => '[address]', 'url' => '[url]', 'description' => '[description]');
+    $fields = array_keys($placeholders);
 
+    // TODO: This is highly unreliable part, as placeholders are really static. We need to remove this in future versions
+    // TODO: and just replace all supported fields.
     $usernamefields = get_all_user_name_fields();
     $fields = array_merge($fields, array_values($usernamefields));
 
     // Process basic user fields.
     foreach ($fields as $field) {
+        // Replace.
+        if (isset($placeholders[$field])) {
+            $msg = str_replace($placeholders[$field], $user->$field, $msg);
+        }
+        // Legacy.
         $msg = str_replace(get_string('placeholder:'.$field, 'mod_facetoface'), $user->$field, $msg);
     }
 
     $fullname = fullname($user);
+    // Replace.
+    $msg = str_replace('[fullname]', $fullname, $msg);
+    // Legacy.
     $msg = str_replace(get_string('placeholder:fullname', 'mod_facetoface'), $fullname, $msg);
 
     $langvalue = output_language_code($user->lang);
+    // Replace.
+    $msg = str_replace('[lang]', $langvalue, $msg);
+    // Legacy.
     $msg = str_replace(get_string('placeholder:lang', 'mod_facetoface'), $langvalue, $msg);
 
     $countryvalue = output_country_code($user->country);
+    // Replace.
+    $msg = str_replace('[country]', $countryvalue, $msg);
+    // Legacy.
     $msg = str_replace(get_string('placeholder:country', 'mod_facetoface'), $countryvalue, $msg);
 
     $timezone = core_date::get_user_timezone($user);
+    // Replace.
+    $msg = str_replace('[timezone]', $timezone, $msg);
+    // Legacy.
     $msg = str_replace(get_string('placeholder:timezone', 'mod_facetoface'), $timezone, $msg);
 
     // Check to see if we need to load and process custom profile fields.
@@ -1926,9 +1983,9 @@ function facetoface_notification_substitute_deprecated_placeholders($msg, $sessi
     }
 
     // Get the deprecated placeholders.
-    $roomnameplaceholder = get_string('placeholder:room', 'facetoface');
-    $locationplaceholder = get_string('placeholder:location', 'facetoface');
-    $venueplaceholder = get_string('placeholder:venue', 'facetoface');
+    $roomnameplaceholder = '[session:room]';
+    $locationplaceholder = '[session:location]';
+    $venueplaceholder = '[session:venue]';
 
     $msg = str_replace($roomnameplaceholder, $roomnamevalue, $msg);
     $msg = str_replace($locationplaceholder, $locationvalue, $msg);
@@ -2464,10 +2521,17 @@ function facetoface_notification_get_templates_with_old_placeholders() {
         return $oldnotifcations;
     }
 
-    $oldplaceholderroom = '%' . $DB->sql_like_escape(get_string('placeholder:room', 'facetoface')) . '%';
-    $oldplaceholdervenue = '%' . $DB->sql_like_escape(get_string('placeholder:venue', 'facetoface')) . '%';
-    $oldplaceholderlocation = '%' . $DB->sql_like_escape(get_string('placeholder:location', 'facetoface')) . '%';
-    $oldplaceholderalldates = '%' . $DB->sql_like_escape(get_string('placeholder:alldates', 'facetoface')) . '%';
+    // Legacy
+    $oldplaceholderroomlegacy = '%' . $DB->sql_like_escape(get_string('placeholder:room', 'facetoface')) . '%';
+    $oldplaceholdervenuelegacy = '%' . $DB->sql_like_escape(get_string('placeholder:venue', 'facetoface')) . '%';
+    $oldplaceholderlocationlegacy = '%' . $DB->sql_like_escape(get_string('placeholder:location', 'facetoface')) . '%';
+    $oldplaceholderalldateslegacy = '%' . $DB->sql_like_escape(get_string('placeholder:alldates', 'facetoface')) . '%';
+
+    // Replace.
+    $oldplaceholderroom = '%' . $DB->sql_like_escape('[session:room]') . '%';
+    $oldplaceholdervenue = '%' . $DB->sql_like_escape('[session:venue]') . '%';
+    $oldplaceholderlocation = '%' . $DB->sql_like_escape('[session:location]') . '%';
+    $oldplaceholderalldates = '%' . $DB->sql_like_escape('[alldates]') . '%';
 
     $sql = 'SELECT id
               FROM {facetoface_notification_tpl}
@@ -2475,14 +2539,26 @@ function facetoface_notification_get_templates_with_old_placeholders() {
               ' OR ' . $DB->sql_like('title', ':titlevenue') .
               ' OR ' . $DB->sql_like('title', ':titlelocation') .
               ' OR ' . $DB->sql_like('title', ':titlealldates') .
+              ' OR ' . $DB->sql_like('title', ':titleroomlegacy') .
+              ' OR ' . $DB->sql_like('title', ':titlevenuelegacy') .
+              ' OR ' . $DB->sql_like('title', ':titlelocationlegacy') .
+              ' OR ' . $DB->sql_like('title', ':titlealldateslegacy') .
               ' OR ' . $DB->sql_like('body', ':bodyroom') .
               ' OR ' . $DB->sql_like('body', ':bodyvenue') .
               ' OR ' . $DB->sql_like('body', ':bodylocation') .
               ' OR ' . $DB->sql_like('body', ':bodyalldates') .
+              ' OR ' . $DB->sql_like('body', ':bodyroomlegacy') .
+              ' OR ' . $DB->sql_like('body', ':bodyvenuelegacy') .
+              ' OR ' . $DB->sql_like('body', ':bodylocationlegacy') .
+              ' OR ' . $DB->sql_like('body', ':bodyalldateslegacy') .
               ' OR ' . $DB->sql_like('managerprefix', ':managerprefixroom') .
               ' OR ' . $DB->sql_like('managerprefix', ':managerprefixvenue') .
               ' OR ' . $DB->sql_like('managerprefix', ':managerprefixlocation') .
-              ' OR ' . $DB->sql_like('managerprefix', ':managerprefixalldates');
+              ' OR ' . $DB->sql_like('managerprefix', ':managerprefixalldates') .
+              ' OR ' . $DB->sql_like('managerprefix', ':managerprefixroomlegacy') .
+              ' OR ' . $DB->sql_like('managerprefix', ':managerprefixvenuelegacy') .
+              ' OR ' . $DB->sql_like('managerprefix', ':managerprefixlocationlegacy') .
+              ' OR ' . $DB->sql_like('managerprefix', ':managerprefixalldateslegacy');
 
     $params = array(
         'titleroom' => $oldplaceholderroom,
@@ -2497,6 +2573,18 @@ function facetoface_notification_get_templates_with_old_placeholders() {
         'managerprefixvenue' => $oldplaceholdervenue,
         'managerprefixlocation' => $oldplaceholderlocation,
         'managerprefixalldates' => $oldplaceholderalldates,
+        'titleroomlegacy' => $oldplaceholderroomlegacy,
+        'titlevenuelegacy' => $oldplaceholdervenuelegacy,
+        'titlelocationlegacy' => $oldplaceholderlocationlegacy,
+        'titlealldateslegacy' => $oldplaceholderalldateslegacy,
+        'bodyroomlegacy' => $oldplaceholderroomlegacy,
+        'bodyvenuelegacy' => $oldplaceholdervenuelegacy,
+        'bodylocationlegacy' => $oldplaceholderlocationlegacy,
+        'bodyalldateslegacy' => $oldplaceholderalldateslegacy,
+        'managerprefixroomlegacy' => $oldplaceholderroomlegacy,
+        'managerprefixvenuelegacy' => $oldplaceholdervenuelegacy,
+        'managerprefixlocationlegacy' => $oldplaceholderlocationlegacy,
+        'managerprefixalldateslegacy' => $oldplaceholderalldateslegacy
     );
 
     $oldnotifcations = $DB->get_fieldset_sql($sql, $params);

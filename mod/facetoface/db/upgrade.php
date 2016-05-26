@@ -3918,15 +3918,15 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         $stringsexist = true;
         // Strings for placeholders. This would require that any code base where this installation ran, would
         // have these strings in the f2f lang file or we'll be needing to skip these changes.
-        $alldates = get_string('placeholder:alldates', 'facetoface');
+        $alldates = '[alldates]';
         $f2flangstrings = array();
-        $f2flangstrings['loopstart'] = get_string('placeholder:sessions:loopstart', 'facetoface');
-        $f2flangstrings['loopend'] = get_string('placeholder:sessions:loopend', 'facetoface');
-        $f2flangstrings['sessionstarttime'] = get_string('placeholder:session:starttime', 'facetoface');
-        $f2flangstrings['sessionstartdate'] = get_string('placeholder:session:startdate', 'facetoface');
-        $f2flangstrings['sessionfinishtime'] = get_string('placeholder:session:finishtime', 'facetoface');
-        $f2flangstrings['sessionfinishdate'] = get_string('placeholder:session:finishdate', 'facetoface');
-        $f2flangstrings['timezone'] = get_string('placeholder:session:timezone', 'facetoface');
+        $f2flangstrings['loopstart'] = '[#sessions]';
+        $f2flangstrings['loopend'] = '[/sessions]';
+        $f2flangstrings['sessionstarttime'] = '[session:starttime]';
+        $f2flangstrings['sessionstartdate'] = '[session:startdate]';
+        $f2flangstrings['sessionfinishtime'] = '[session:finishtime]';
+        $f2flangstrings['sessionfinishdate'] = '[session:finishdate]';
+        $f2flangstrings['timezone'] = '[session:timezone]';
 
         // Strings for previous template defaults just prior to 9.0. Uses their reference as keys.
         $oldtemplatedefaults = array();
