@@ -171,6 +171,13 @@ function message_send($eventdata) {
             $savemessage->timeread = time();
             $messageid = $DB->insert_record('message_read', $savemessage);
             $message = $DB->get_record('message_read', array('id'=>$messageid));
+
+            // Totara: additional details needed for testing that sent messages
+            // have correct values for other email fields.
+            $message->fromemail = $eventdata->userfrom->email;
+            $message->fromfirstname = $eventdata->userfrom->firstname;
+            $message->fromlastname = $eventdata->userfrom->lastname;
+
             phpunit_util::message_sent($message);
             return $messageid;
         }

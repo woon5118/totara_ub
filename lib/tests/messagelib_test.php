@@ -324,7 +324,7 @@ class core_messagelib_testcase extends advanced_testcase {
         $this->assertNull($savedmessage->contexturlname);
         $this->assertTimeCurrent($savedmessage->timecreated);
         $record = $DB->get_record('message_read', array('id' => $savedmessage->id), '*', MUST_EXIST);
-        $this->assertEquals($record, $savedmessage);
+        $this->message_is_similar($record, $savedmessage);
         $sink->clear();
         $this->assertFalse($DB->record_exists('message', array()));
         $DB->delete_records('message_read', array());
@@ -360,7 +360,7 @@ class core_messagelib_testcase extends advanced_testcase {
         $this->assertEquals($message->contexturlname, $savedmessage->contexturlname);
         $this->assertTimeCurrent($savedmessage->timecreated);
         $record = $DB->get_record('message_read', array('id' => $savedmessage->id), '*', MUST_EXIST);
-        $this->assertEquals($record, $savedmessage);
+        $this->message_is_similar($record, $savedmessage);
         $sink->clear();
         $this->assertFalse($DB->record_exists('message', array()));
         $DB->delete_records('message_read', array());
@@ -476,6 +476,31 @@ class core_messagelib_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('Necessary properties missing in userto object, fetching full record');
         $sink->clear();
         $user2->emailstop = '0';
+    }
+
+    /**
+     * Checks the given messages are similar (not necessarily 100% identical) to
+     * each other. Starting in TL-9106, the message sent out for *testing* has
+     * additional fields - eg from email address - that are not stored in the
+     * database. A direct, object to object comparison will therefore fail.
+     *
+     * @param stdClass $actual actual message.
+     * @param stdClass $expected expected message.
+     */
+    private function message_is_similar(stdClass $actual, stdClass $expected) {
+        $this->assertEquals($actual->id, $expected->id);
+        $this->assertEquals($actual->useridfrom, $expected->useridfrom);
+        $this->assertEquals($actual->useridto, $expected->useridto);
+        $this->assertEquals($actual->subject, $expected->subject);
+        $this->assertEquals($actual->fullmessage, $expected->fullmessage);
+        $this->assertEquals($actual->fullmessageformat, $expected->fullmessageformat);
+        $this->assertEquals($actual->fullmessagehtml, $expected->fullmessagehtml);
+        $this->assertEquals($actual->smallmessage, $expected->smallmessage);
+        $this->assertEquals($actual->notification, $expected->notification);
+        $this->assertEquals($actual->contexturl, $expected->contexturl);
+        $this->assertEquals($actual->contexturlname, $expected->contexturlname);
+        $this->assertEquals($actual->timecreated, $expected->timecreated);
+        $this->assertEquals($actual->timeread, $expected->timeread);
     }
 
     public function test_send_message() {

@@ -2724,9 +2724,16 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Set userfrom used for the assertion.
         $userfrom = (!empty($senderfrom)) ? \mod_facetoface\facetoface_user::get_facetoface_user() : $user3;
-        $userfrom = totara_get_user_from($userfrom);
+
+        $checkformat = '%s %s (%s)';
+        $expectedemail = $emailonlyfromnoreplyaddress ? $noreplyaddress : $userfrom->email;
+        $expected = sprintf($checkformat, $userfrom->firstname, $userfrom->lastname, $expectedemail);
+
         foreach ($emails as $email) {
             $this->assertEquals($userfrom->id, $email->useridfrom);
+
+            $actual = sprintf($checkformat, $email->fromfirstname, $email->fromlastname, $email->fromemail);
+            $this->assertEquals($expected, $actual);
         }
         $sink->clear();
     }

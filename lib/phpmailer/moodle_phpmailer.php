@@ -68,7 +68,7 @@ class moodle_phpmailer extends PHPMailer {
     }
 
     /**
-     * Extended AddCustomHeader function in order to stop duplicate 
+     * Extended AddCustomHeader function in order to stop duplicate
      * message-ids
      * http://tracker.moodle.org/browse/MDL-3681
      */
@@ -86,7 +86,7 @@ class moodle_phpmailer extends PHPMailer {
 
     /**
      * Use internal moodles own core_text to encode mimeheaders.
-     * Fall back to phpmailers inbuilt functions if not 
+     * Fall back to phpmailers inbuilt functions if not
      */
     public function encodeHeader($str, $position = 'text') {
         $encoded = core_text::encode_mimeheader($str, $this->CharSet);
@@ -162,6 +162,11 @@ class moodle_phpmailer extends PHPMailer {
             $mail->subject = $this->Subject;
             $mail->from = $this->From;
             $mail->to = $this->to[0][0];
+
+            // Totara: additional details needed for testing that sent messages
+            // have correct values for other email fields.
+            $mail->fromname = $this->FromName;
+
             phpunit_util::phpmailer_sent($mail);
             return true;
         } else {

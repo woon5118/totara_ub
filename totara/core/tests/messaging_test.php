@@ -90,6 +90,7 @@ class totara_core_messaging_testcase extends advanced_testcase {
      * @dataProvider messages_setting
      */
     public function test_messages_from_no_reply($emailonlyfromnoreplyaddress, $noreplyaddress) {
+        global $USER;
         $this->preventResetByRollback();
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -113,13 +114,18 @@ class totara_core_messaging_testcase extends advanced_testcase {
         $task->execute();
 
         // Check user from.
-        $fromuser = totara_get_user_from();
+        $fromuser = $USER;
+        $expectedname = sprintf("%s %s", $fromuser->firstname, $fromuser->lastname);
+        $expectedemail = $emailonlyfromnoreplyaddress ? $noreplyaddress : $fromuser->email;
+        $checkformat = '%s (%s)';
+        $expected = sprintf($checkformat, $expectedname, $expectedemail);
 
         // Check that that one email was sent and the from adress corresponds to the noreply address.
         $emails = $sink->get_messages();
         $this->assertCount(2, $emails);
         foreach ($emails as $email) {
-            $this->assertEquals($fromuser->email, $email->from);
+            $actual = sprintf($checkformat, $email->fromname, $email->from);
+            $this->assertEquals($expected, $actual);
         }
         $sink->clear();
 
@@ -132,7 +138,8 @@ class totara_core_messaging_testcase extends advanced_testcase {
         $emails = $sink->get_messages();
         $this->assertCount(1, $emails);
         foreach ($emails as $email) {
-            $this->assertEquals($fromuser->email, $email->from);
+            $actual = sprintf($checkformat, $email->fromname, $email->from);
+            $this->assertEquals($expected, $actual);
         }
         $sink->clear();
         ob_end_clean();

@@ -558,16 +558,13 @@ function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\men
 function totara_get_user_from($fromuser = null) {
     global $CFG, $USER;
 
-    if (!empty($CFG->emailonlyfromnoreplyaddress)) {
-        // We are not validating if noreplyaddress is empty as Moodle will use the user's email data in email_to_user if
-        // maildisplay is set to 1, which we don't want.
-        $userfrom = core_user::get_noreply_user();
-    } else if (!empty($fromuser)) {
-        $userfrom = $fromuser;
-    } else {
-        $userfrom = $USER;
-    }
+    $userfrom = clone(
+        empty($fromuser) ? $USER : $fromuser
+    );
 
+    if (!empty($CFG->emailonlyfromnoreplyaddress)) {
+        $userfrom->email = core_user::get_noreply_user()->email;
+    }
     return $userfrom;
 }
 
