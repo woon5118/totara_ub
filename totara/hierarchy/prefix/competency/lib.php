@@ -417,37 +417,29 @@ class competency extends hierarchy {
         switch ($page) {
             case 'item/view':
 
-                $jargs = '{';
+                $args = array();
                 if (!empty($item->id)) {
-                    $jargs .= '"id":'.$item->id;
+                    $args['id'] = $item->id;
                 }
                 if (!empty($CFG->competencyuseresourcelevelevidence)) {
-                    $jargs .= ', "competencyuseresourcelevelevidence":true';
+                    $args['competencyuseresourcelevelevidence'] = true;
                 }
-                $jargs .= '}';
                 // Include competency item js module
                 $PAGE->requires->strings_for_js(array('assignrelatedcompetencies',
                         'assignnewevidenceitem','assigncoursecompletions'), 'totara_hierarchy');
-                $jsmodule = array(
-                        'name' => 'totara_competencyitem',
-                        'fullpath' => '/totara/core/js/competency.item.js',
-                        'requires' => array('json'));
-                $PAGE->requires->js_init_call('M.totara_competencyitem.init',
-                         array('args'=>$jargs), false, $jsmodule);
+                $PAGE->requires->js_call_amd('totara_hierarchy/competency_item', 'item', $args);
 
                 break;
             case 'template/view':
 
-                $itemid = !(empty($item->id)) ? array('args'=>'{"id":'.$item->id.'}') : NULL;
+                $args = array();
+                if (!(empty($item->id))) {
+                    $args['id'] = $item->id;
+                }
 
                 // Include competency template js module
                 $PAGE->requires->string_for_js('assignnewcompetency', 'totara_competency');
-                $jsmodule = array(
-                        'name' => 'totara_competencytemplate',
-                        'fullpath' => '/totara/core/js/competency.template.js',
-                        'requires' => array('json'));
-                $PAGE->requires->js_init_call('M.totara_competencytemplate.init',
-                         $itemid, false, $jsmodule);
+                $PAGE->requires->js_call_amd('totara_hierarchy/competency_item', 'template', $args);
 
                 break;
             case 'item/add':
