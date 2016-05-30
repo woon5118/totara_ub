@@ -1430,13 +1430,19 @@ class individuals_category extends prog_assignment_category {
             if ($isprog && $item->progstatus == STATUS_PROGRAM_COMPLETE) {
                 // Program which is complete.
                 $row[] = get_string('timeduefixedprog', 'totara_program');
-                $row[] = trim(userdate($item->timedue,
-                    get_string('strfdateattime', 'langconfig'), 99, false));
+                if (empty($item->timedue) || $item->timedue == COMPLETION_TIME_NOT_SET) {
+                    $row[] = get_string('noduedate', 'totara_program');
+                } else {
+                    $row[] = trim(userdate($item->timedue, get_string('strfdateattime', 'langconfig'), 99, false));
+                }
             } else if (!$isprog && ($item->certifpath == CERTIFPATH_RECERT || $item->renewalstatus == CERTIFRENEWALSTATUS_EXPIRED)) {
                 // Certification which is complete.
                 $row[] = get_string('timeduefixedcert', 'totara_program');
-                $row[] = trim(userdate($item->timedue,
-                    get_string('strfdateattime', 'langconfig'), 99, false));
+                if (empty($item->timedue) || $item->timedue == COMPLETION_TIME_NOT_SET) {
+                    $row[] = get_string('noduedate', 'totara_program');
+                } else {
+                    $row[] = trim(userdate($item->timedue, get_string('strfdateattime', 'langconfig'), 99, false));
+                }
             } else if (empty($item->timedue) || $item->timedue == COMPLETION_TIME_NOT_SET) {
                 // No date set.
                 $row[] = $this->get_completion($item);
