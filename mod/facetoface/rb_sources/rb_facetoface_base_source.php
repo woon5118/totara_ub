@@ -241,7 +241,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         }
 
         // Fields.
-        $usernamefields = totara_get_all_user_name_fields_join('role_user');
+        $usernamefields = totara_get_all_user_name_fields_join('role_user', null, true);
         $userlistcolumn = $this->rb_group_comma_list($DB->sql_concat_join("' '", $usernamefields));
         // Add id to fields.
         $usernamefieldsid = array_merge(array('role_user.id' => 'userid'), $usernamefields);
