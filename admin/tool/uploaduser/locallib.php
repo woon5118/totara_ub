@@ -437,19 +437,22 @@ function uu_check_custom_profile_data(&$data) {
                     require_once($CFG->dirroot.'/user/profile/field/'.$field->datatype.'/field.class.php');
                     $newfield = 'profile_field_'.$field->datatype;
                     $formfield = new $newfield($field->id, 0);
-                    if (method_exists($formfield, 'convert_external_data') &&
-                            is_null($formfield->convert_external_data($value))) {
-                        $data['status'][] = get_string('invaliduserfield', 'error', $shortname);
-                        $noerror = false;
-                    }
-                    // Check for duplicate value.
-                    if (method_exists($formfield, 'edit_validate_field') ) {
-                        $testuser = new stdClass();
-                        $testuser->{$key} = $value;
-                        $testuser->id = $testuserid;
-                        $err = $formfield->edit_validate_field($testuser);
-                        if (!empty($err[$key])) {
-                            $data['status'][] = $err[$key].' ('.$key.')';
+                    if (method_exists($formfield, 'convert_external_data')) {
+                        $testvalue = $formfield->convert_external_data($value);
+                        if (!is_null($testvalue)) {
+                            // Check for duplicate value.
+                            if (method_exists($formfield, 'edit_validate_field')) {
+                                $testuser = new stdClass();
+                                $testuser->{$key} = $testvalue;
+                                $testuser->id = $testuserid;
+                                $err = $formfield->edit_validate_field($testuser);
+                                if (!empty($err[$key])) {
+                                    $data['status'][] = $err[$key].' ('.$key.')';
+                                    $noerror = false;
+                                }
+                            }
+                        } else {
+                            $data['status'][] = get_string('invaliduserfield', 'error', $shortname);
                             $noerror = false;
                         }
                     }

@@ -50,6 +50,17 @@ Feature: Upload users
       | Short name | superfield  |
       | Name       | Super field |
     And I click on "Save changes" "button"
+    And I set the field "datatype" to "Dropdown menu"
+    And I set the following fields to these values:
+      | Short name | fruit     |
+      | Name       | Fav fruit |
+    And I set the field "Menu options (one per line)" to multiline
+      """
+      Apple
+      Orange
+      Banana
+      """
+    And I click on "Save changes" "button"
     # Upload users.
     When I navigate to "Upload users" node in "Site administration > Users > Accounts"
     And I upload "lib/tests/fixtures/upload_users_profile.csv" file to "File" filemanager
@@ -60,4 +71,6 @@ Feature: Upload users
     And I follow "Tom Jones"
     And I should see "Super field"
     And I should see "The big guy"
+    And I should see "Fav fruit"
+    And I should see "Apple"
     And I log out
