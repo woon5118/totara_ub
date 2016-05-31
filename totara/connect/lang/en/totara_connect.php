@@ -22,7 +22,7 @@
  */
 
 $string['addnewcourses'] = 'Add new courses';
-$string['addnewcourses_help'] = 'If enabled then by default all newly created courses are synchronised to this client.';
+$string['addnewcourses_help'] = 'If enabled then by default all enrolled members of newly created courses are synchronised to this client.';
 $string['addnewcohorts'] = 'Add new audiences';
 $string['addnewcohorts_help'] = 'If enabled then by default all newly created audiences are synchronised to this client.';
 $string['cancelsso'] = 'Return to {$a}';
