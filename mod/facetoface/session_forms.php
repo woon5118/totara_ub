@@ -441,6 +441,14 @@ class mod_facetoface_session_form extends moodleform {
                 }
             }
 
+            // Check if the room is available.
+            if ((int)$roomid > 0) {
+                $room = facetoface_get_room($roomid);
+                if ($room->hidden == 1) {
+                    $errdates[] = get_string('error:roomunavailable', 'facetoface', $room->name);
+                }
+            }
+
             // If valid date, add to array.
             $date = new stdClass();
             $date->timestart = $starttime;

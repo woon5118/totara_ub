@@ -513,6 +513,7 @@ $string['error:notificationtemplatemissing'] = 'The following notification templ
 $string['error:problemsigningup'] = 'There was a problem signing you up.';
 $string['error:removeattendee'] = 'Could not remove {$a} from the event.';
 $string['error:roomisinuse'] = 'Room is in use';
+$string['error:roomunavailable'] = 'The "{$a}" room is no longer available.';
 $string['error:sessionnotfound'] = 'The session is no longer available.';
 $string['error:selfapprovalupgrade'] = 'Self approval has been moved from sessions to a seminar setting, please run the admin tool to resolve any conflicts before upgrading.';
 $string['error:sessionstartafterend'] = 'Event start date/time is after end.';
