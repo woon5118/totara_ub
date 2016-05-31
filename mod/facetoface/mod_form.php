@@ -314,7 +314,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
             $selected_approvers = json_encode(array());
         }
 
-        $args = array('facetoface' => $this->current->id, 'existing' => $selected_approvers);
+        $args = array('facetoface' => $this->current->id);
 
         $PAGE->requires->js_init_call('M.facetoface_approver.init', $args, false, $jsmodule);
     }

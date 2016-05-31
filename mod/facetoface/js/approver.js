@@ -46,7 +46,6 @@ M.facetoface_approver = M.facetoface_approver || {
 
         // Parse args into this module's config object
         this.config.fid = facetoface;
-        this.config.existing = existing;
 
         // check jQuery dependency is available
         if (typeof $ === 'undefined') {
@@ -107,7 +106,6 @@ facetofaceApproverDialog = function(name, title, find_url, save_url) {
     var handler = new facetoface_handler();
     var saveurl = save_url;
     var findurl = find_url;
-    var existing = M.facetoface_approver.config.existing;
 
     var buttonObj = {};
     buttonObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(save_url) };
@@ -122,7 +120,7 @@ facetofaceApproverDialog = function(name, title, find_url, save_url) {
             buttons: buttonObj,
             title: '<h2>'+title+'</h2>'
         },
-        find_url + '&selected=' + existing,
+        find_url + '&selected=' + $('input[name="selectedapprovers"]').val(),
         handler
     );
 
@@ -138,7 +136,7 @@ facetofaceApproverDialog = function(name, title, find_url, save_url) {
         var method = 'GET';
 
         var selected = $('input[name="selectedapprovers"]');
-        this.default_url = this.findurl + '&selected=' + M.facetoface_approver.config.existing;
+        this.default_url = this.findurl + '&selected=' + $('input[name="selectedapprovers"]').val();
         this.dialog.html('');
         this.dialog.dialog('open');
 
