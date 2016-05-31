@@ -43,8 +43,8 @@ function xmldb_facetoface_install() {
         'setting:defaultcancelreservationsubjectdefault' => get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface'),
         'setting:defaultcancelallreservationssubjectdefault' => get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface'),
         'setting:defaultsessioncancellationsubjectdefault' => get_string('setting:defaultsessioncancellationsubjectdefault', 'facetoface'),
-        'setting:defaultregistrationexpiredmessagedefault' => get_string('setting:defaultregistrationexpiredmessagedefault', 'facetoface'),
-        'setting:defaultregistrationclosuremessagedefault' => get_string('setting:defaultregistrationclosuremessagedefault_v9', 'facetoface')
+        'setting:defaultregistrationexpiredsubjectdefault' => get_string('setting:defaultregistrationexpiredsubjectdefault', 'facetoface'),
+        'setting:defaultregistrationclosuresubjectdefault' => get_string('setting:defaultregistrationclosuresubjectdefault', 'facetoface'),
     );
 
     foreach ($titles as $key => $title) {
@@ -52,7 +52,7 @@ function xmldb_facetoface_install() {
             // We choose to truncate here. If we throw an exception like we should then the user won't be able to add face to face
             // sessions and the user may not be able to edit the language pack to fix it. Thus we truncate and debug.
             $titles[$key] = core_text::substr($title, 0, 255);
-            debugging('A face to face notification title was truncated due to its length: ' . $key, DEBUG_NORMAL);
+            debugging('Error: A face to face notification title was truncated due to its length: ' . $key, DEBUG_NORMAL);
         }
     }
 
