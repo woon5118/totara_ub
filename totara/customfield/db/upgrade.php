@@ -28,11 +28,34 @@
  * @return  boolean $result
  */
 function xmldb_totara_customfield_upgrade($oldversion) {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+
     if ($oldversion < 2015021300) {
         xmldb_totara_customfield_upgrade_clean_removed();
 
         // Main savepoint reached.
         totara_upgrade_mod_savepoint(true, 2015021300, 'totara_customfield');
+    }
+
+    // Delete all param records where the records were deleted from {prefix}_info_data tables
+    if ($oldversion < 2016060800) {
+
+        $tableprefixes = array('comp_type', 'course', 'dp_plan_evidence', 'facetoface_asset', 'facetoface_cancellation',
+            'facetoface_room', 'facetoface_session', 'facetoface_sessioncancel', 'facetoface_signup', 'goal_type',
+            'goal_user', 'org_type', 'pos_type', 'prog');
+        foreach ($tableprefixes as $prefix) {
+            $tblnamedata = $prefix . '_info_data';
+            $tblnamedataparam = $prefix . '_info_data_param';
+            if ($dbman->table_exists($tblnamedata) && $dbman->table_exists($tblnamedataparam)) {
+                $sql = "DELETE FROM {{$tblnamedataparam}} WHERE dataid NOT IN (SELECT id FROM {{$tblnamedata}})";
+                $DB->execute($sql);
+            }
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2016060800, 'totara_customfield');
     }
 
     return true;

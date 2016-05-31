@@ -128,7 +128,7 @@ abstract class type_base {
     }
 
     /**
-     * Edit customfield.
+     * Delete customfield.
      *
      * @param int $id ID of the customfield we want to delete.
      */
@@ -136,6 +136,13 @@ abstract class type_base {
         global $DB;
 
         $tableprefix = $this->tableprefix;
+
+        $dataids = $DB->get_fieldset_select($tableprefix.'_info_data', 'id', 'fieldid = :fieldid', array('fieldid' => $id));
+        if (!empty($dataids)) {
+            list($sql, $params) = $DB->get_in_or_equal($dataids);
+            $tablename = $tableprefix.'_info_data_param';
+            $DB->execute("DELETE FROM {{$tablename}} WHERE dataid $sql", $params);
+        }
 
         // Remove any user data associated with this field.
         $DB->delete_records($tableprefix.'_info_data', array('fieldid' => $id));
