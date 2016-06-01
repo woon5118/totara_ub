@@ -137,3 +137,28 @@ function mod_facetoface_calendar_search_config_upgrade() {
 
     set_config('facetoface_calendarfilters', implode(',', $newconfig));
 }
+
+/*
+ * Delete orphaned custom field data.
+ *
+ * @param string          $type The type of customfield e.g. signup/cancellation
+ */
+function mod_facetoface_delete_orphaned_customfield_data($type) {
+    global $DB;
+
+    $foreignkey = "facetoface{$type}id";
+    $customfield_table = "facetoface_{$type}_info_data";
+    $customparam_table = "facetoface_{$type}_info_data_param";
+
+    $customfieldids = $DB->get_fieldset_select(
+        $customfield_table,
+        'id',
+        $foreignkey . ' NOT IN (SELECT s.id FROM {facetoface_signups} s)'
+    );
+
+    if (!empty($customfieldids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($customfieldids);
+        $DB->delete_records_select($customparam_table, "dataid {$sqlin}", $inparams);
+        $DB->delete_records_select($customfield_table, "id {$sqlin}", $inparams);
+    }
+}

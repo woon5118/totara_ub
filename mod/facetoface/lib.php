@@ -1004,21 +1004,17 @@ function facetoface_delete_session($session) {
         $DB->delete_records_select('facetoface_session_info_data', "id {$sqlin}", $inparams);
     }
 
-    // Get signup ids to delete.
-    $signupstatus = array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, MDL_F2F_STATUS_REQUESTED);
-    list($statussql, $statusparams) = $DB->get_in_or_equal($signupstatus, SQL_PARAMS_NAMED);
-    $statusparams['sessionid'] = $session->id;
+    // Get all associated signup customfield data to delete.
+    $signupparams = array();
+    $signupparams['sessionid'] = $session->id;
     $signupids = $DB->get_fieldset_select(
         'facetoface_signup_info_data',
         'id',
-        "facetofacesignupid IN (
-            SELECT ss.id
-              FROM {facetoface_signups_status} ss
-        INNER JOIN {facetoface_signups} s
-                ON ss.signupid = s.id
-             WHERE s.sessionid = :sessionid
-               AND ss.statuscode {$statussql})",
-        $statusparams);
+        "facetofacesignupid IN (SELECT s.id
+                                  FROM {facetoface_signups} s
+                                 WHERE s.sessionid = :sessionid)",
+        $signupparams
+    );
 
     if (!empty($signupids)) {
         list($sqlin, $inparams) = $DB->get_in_or_equal($signupids);
@@ -1026,18 +1022,17 @@ function facetoface_delete_session($session) {
         $DB->delete_records_select('facetoface_signup_info_data', "id {$sqlin}", $inparams);
     }
 
-    // Get cancellation ids to delete.
+    // Get all associated cancellation customfield data to delete.
+    $cancelparams = array();
+    $cancelparams['sessionid'] = $session->id;
     $cancellationids = $DB->get_fieldset_select(
         'facetoface_cancellation_info_data',
         'id',
-        "facetofacecancellationid IN (
-            SELECT ss.id
-              FROM {facetoface_signups_status} ss
-        INNER JOIN {facetoface_signups} s
-                ON ss.signupid = s.id
-             WHERE s.sessionid = :sessionid
-               AND ss.statuscode = :cancellationstatus)",
-        array('sessionid' => $session->id, 'cancellationstatus' => MDL_F2F_STATUS_USER_CANCELLED));
+        "facetofacecancellationid IN (SELECT s.id
+                                        FROM {facetoface_signups} s
+                                       WHERE s.sessionid = :sessionid)",
+        $cancelparams
+    );
 
     if (!empty($cancellationids)) {
         list($sqlin, $inparams) = $DB->get_in_or_equal($cancellationids);
@@ -1055,7 +1050,7 @@ function facetoface_delete_session($session) {
     $DB->delete_records('facetoface_notification_hist', array('sessionid' => $session->id));
 
     // Check that nothing else is using the room.
-    foreach($customroomids AS $roomid) {
+    foreach ($customroomids as $roomid) {
         $inuse = $DB->count_records_select('facetoface_sessions_dates', 'roomid = :roomid', array('roomid' => $roomid));
 
         if (!$inuse) {

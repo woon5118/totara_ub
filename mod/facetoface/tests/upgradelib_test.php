@@ -950,4 +950,199 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         mod_facetoface_calendar_search_config_upgrade();
         $this->assertEquals('test,room_1,sess_1', get_config(null, 'facetoface_calendarfilters'));
     }
+
+    public function test_mod_facetoface_delete_orphaned_customfield_data_signup() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot.'/lib/upgradelib.php');
+      
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        // Get some generators, and generate some data.
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $f2f1 = $this->getDataGenerator()->create_module('facetoface', array('course' => $course->id, 'approvaloptions' => 'approval_none'));
+        $s1id = $facetofacegenerator->add_session(array('facetoface' => $f2f1->id, 'sessiondates' => array()));
+        $session1 = facetoface_get_session($s1id);
+
+        $f2f2 = $this->getDataGenerator()->create_module('facetoface', array('course' => $course->id, 'approvaloptions' => 'approval_none'));
+        $s2id = $facetofacegenerator->add_session(array('facetoface' => $f2f2->id, 'sessiondates' => array()));
+        $session2 = facetoface_get_session($s2id);
+
+        $signupfieldid = $DB->get_field('facetoface_signup_info_field', 'id', array('shortname' => 'signupnote'));
+        $cancellationfieldid = $DB->get_field('facetoface_cancellation_info_field', 'id', array('shortname' => 'cancellationnote'));
+
+        // Sign user 1 up to session 1.
+        $result = facetoface_user_import($course, $f2f1, $session1, $user1->id, array(
+            'discountcode' => '',
+            'notificationtype' => MDL_F2F_NONE,
+        ));
+        $this->assertTrue($result['result']);
+        $signup_u1s1 = facetoface_get_attendee($session1->id, $user1->id);
+        // Now set up the custom data.
+        $customdata = new stdClass;
+        $customdata->id = $signup_u1s1->submissionid;
+        $customdata->customfield_signupnote = 'Apples';
+        customfield_save_data($customdata, 'facetofacesignup', 'facetoface_signup');
+
+        // Sign user 2 up to session 1.
+        $result = facetoface_user_import($course, $f2f1, $session1, $user2->id, array(
+            'discountcode' => '',
+            'notificationtype' => MDL_F2F_NONE,
+        ));
+        $this->assertTrue($result['result']);
+        $signup_u2s1 = facetoface_get_attendee($session1->id, $user2->id);
+        // Now set up the custom data.
+        $customdata = new stdClass;
+        $customdata->id = $signup_u2s1->submissionid;
+        $customdata->customfield_signupnote = 'Oranges';
+        customfield_save_data($customdata, 'facetofacesignup', 'facetoface_signup');
+
+        // Sign user 1 up to session 2.
+        $result = facetoface_user_import($course, $f2f2, $session2, $user1->id, array(
+            'discountcode' => '',
+            'notificationtype' => MDL_F2F_NONE,
+        ));
+        $this->assertTrue($result['result']);
+        $signup_u1s2 = facetoface_get_attendee($session2->id, $user1->id);
+        // Now set up the custom data.
+        $customdata = new stdClass;
+        $customdata->id = $signup_u1s2->submissionid;
+        $customdata->customfield_signupnote = 'Mangoes';
+        customfield_save_data($customdata, 'facetofacesignup', 'facetoface_signup');
+
+        // Sign user 2 up to session 2.
+        $result = facetoface_user_import($course, $f2f2, $session2, $user2->id, array(
+            'discountcode' => '',
+            'notificationtype' => MDL_F2F_NONE,
+        ));
+        $this->assertTrue($result['result']);
+        $signup_u2s2 = facetoface_get_attendee($session2->id, $user2->id);
+        // Now set up the custom data.
+        $customdata = new stdClass;
+        $customdata->id = $signup_u2s2->submissionid;
+        $customdata->customfield_signupnote = 'Bananas';
+        customfield_save_data($customdata, 'facetofacesignup', 'facetoface_signup');
+
+        // Now manually delete the signups for s1u1 and s2u2 to orphan the custom fields.
+        $DB->delete_records('facetoface_signups', array('userid' => $user1->id, 'sessionid' => $session1->id));
+        $DB->delete_records('facetoface_signups', array('userid' => $user2->id, 'sessionid' => $session2->id));
+
+        // Now do some pre-checks for sanity/comparison.
+        $this->assertEquals(4, $DB->count_records('facetoface_signup_info_data'));
+        $this->assertNotEmpty($DB->get_records('facetoface_signup_info_data', array('facetofacesignupid' => $signup_u1s1->submissionid)));
+        $this->assertNotEmpty($DB->get_records('facetoface_signup_info_data', array('facetofacesignupid' => $signup_u2s1->submissionid)));
+        $this->assertNotEmpty($DB->get_records('facetoface_signup_info_data', array('facetofacesignupid' => $signup_u1s2->submissionid)));
+        $this->assertNotEmpty($DB->get_records('facetoface_signup_info_data', array('facetofacesignupid' => $signup_u2s2->submissionid)));
+
+        mod_facetoface_delete_orphaned_customfield_data('signup');
+
+        $this->assertEquals(2, $DB->count_records('facetoface_signup_info_data'));
+
+        $this->assertEmpty($DB->get_records('facetoface_signup_info_data', array('facetofacesignupid' => $signup_u1s1->submissionid)));
+        $this->assertNotEmpty($DB->get_records('facetoface_signup_info_data', array('facetofacesignupid' => $signup_u2s1->submissionid)));
+        $this->assertNotEmpty($DB->get_records('facetoface_signup_info_data', array('facetofacesignupid' => $signup_u1s2->submissionid)));
+        $this->assertEmpty($DB->get_records('facetoface_signup_info_data', array('facetofacesignupid' => $signup_u2s2->submissionid)));
+    }
+
+    public function test_mod_facetoface_delete_orphaned_customfield_data_cancellation() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot.'/lib/upgradelib.php');
+        require_once($CFG->dirroot.'/mod/facetoface/db/upgradelib.php');
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        // Get some generators, and generate some data.
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $f2f1 = $this->getDataGenerator()->create_module('facetoface', array('course' => $course->id, 'approvaloptions' => 'approval_none'));
+        $s1id = $facetofacegenerator->add_session(array('facetoface' => $f2f1->id, 'sessiondates' => array()));
+        $session1 = facetoface_get_session($s1id);
+
+        $f2f2 = $this->getDataGenerator()->create_module('facetoface', array('course' => $course->id, 'approvaloptions' => 'approval_none'));
+        $s2id = $facetofacegenerator->add_session(array('facetoface' => $f2f2->id, 'sessiondates' => array()));
+        $session2 = facetoface_get_session($s2id);
+
+        $signupfieldid = $DB->get_field('facetoface_signup_info_field', 'id', array('shortname' => 'signupnote'));
+        $cancellationfieldid = $DB->get_field('facetoface_cancellation_info_field', 'id', array('shortname' => 'cancellationnote'));
+
+        // Sign user 1 up to session 1.
+        $result = facetoface_user_import($course, $f2f1, $session1, $user1->id, array(
+            'discountcode' => '',
+            'notificationtype' => MDL_F2F_NONE,
+        ));
+        $this->assertTrue($result['result']);
+        $signup_u1s1 = facetoface_get_attendee($session1->id, $user1->id);
+        // Now set up the custom data - to make sure it isn't affected.
+        $customdata = new stdClass;
+        $customdata->id = $signup_u1s1->submissionid;
+        $customdata->customfield_signupnote = 'Apples';
+        customfield_save_data($customdata, 'facetofacesignup', 'facetoface_signup');
+
+        // Sign user 2 up to session 1.
+        $result = facetoface_user_import($course, $f2f1, $session1, $user2->id, array(
+            'discountcode' => '',
+            'notificationtype' => MDL_F2F_NONE,
+        ));
+        $this->assertTrue($result['result']);
+        $signup_u2s1 = facetoface_get_attendee($session1->id, $user2->id);
+
+        // Sign user 1 up to session 2.
+        $result = facetoface_user_import($course, $f2f2, $session2, $user1->id, array(
+            'discountcode' => '',
+            'notificationtype' => MDL_F2F_NONE,
+        ));
+        $this->assertTrue($result['result']);
+        $signup_u1s2 = facetoface_get_attendee($session2->id, $user1->id);
+
+        // Sign user 2 up to session 2.
+        $result = facetoface_user_import($course, $f2f2, $session2, $user2->id, array(
+            'discountcode' => '',
+            'notificationtype' => MDL_F2F_NONE,
+        ));
+        $this->assertTrue($result['result']);
+        $signup_u2s2 = facetoface_get_attendee($session2->id, $user2->id);
+
+        // Cancel all the users and set up some cancellation custom fields.
+        $error = null;
+        facetoface_user_cancel($session1, $user1->id, true, $error, 'Rabbits');
+        facetoface_user_cancel($session1, $user2->id, true, $error, 'Kittens');
+        facetoface_user_cancel($session2, $user1->id, true, $error, 'Puppies');
+        facetoface_user_cancel($session2, $user2->id, true, $error, 'Squirrels');
+
+        // Now manually delete the signups for s1u1 and s2u2 to orphan the custom fields.
+        $DB->delete_records('facetoface_signups', array('userid' => $user1->id, 'sessionid' => $session1->id));
+        $DB->delete_records('facetoface_signups', array('userid' => $user2->id, 'sessionid' => $session2->id));
+
+        // Now do some pre-checks for sanity/comparison.
+        $this->assertEquals(4, $DB->count_records('facetoface_cancellation_info_data'));
+        $this->assertEquals(1, $DB->count_records('facetoface_signup_info_data'));
+        $this->assertNotEmpty($DB->get_records('facetoface_cancellation_info_data', array('facetofacecancellationid' => $signup_u1s1->submissionid)));
+        $this->assertNotEmpty($DB->get_records('facetoface_cancellation_info_data', array('facetofacecancellationid' => $signup_u2s1->submissionid)));
+        $this->assertNotEmpty($DB->get_records('facetoface_cancellation_info_data', array('facetofacecancellationid' => $signup_u1s2->submissionid)));
+        $this->assertNotEmpty($DB->get_records('facetoface_cancellation_info_data', array('facetofacecancellationid' => $signup_u2s2->submissionid)));
+
+        mod_facetoface_delete_orphaned_customfield_data('cancellation');
+
+        $this->assertEquals(2, $DB->count_records('facetoface_cancellation_info_data'));
+        $this->assertEquals(1, $DB->count_records('facetoface_signup_info_data'));
+
+        $this->assertEmpty($DB->get_records('facetoface_cancellation_info_data', array('facetofacecancellationid' => $signup_u1s1->submissionid)));
+        $this->assertNotEmpty($DB->get_records('facetoface_cancellation_info_data', array('facetofacecancellationid' => $signup_u2s1->submissionid)));
+        $this->assertNotEmpty($DB->get_records('facetoface_cancellation_info_data', array('facetofacecancellationid' => $signup_u1s2->submissionid)));
+        $this->assertEmpty($DB->get_records('facetoface_cancellation_info_data', array('facetofacecancellationid' => $signup_u2s2->submissionid)));
+    }
 }

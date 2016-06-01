@@ -4245,5 +4245,20 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         mod_facetoface_calendar_search_config_upgrade();
         upgrade_mod_savepoint(true, 2016052500, 'facetoface');
     }
+
+    // Delete all the orphaned signup and cancellation custom fields.
+    if ($oldversion < 2016060100) {
+        require_once("$CFG->dirroot/mod/facetoface/db/upgradelib.php");
+
+        // Delete all the orphaned signup custom fields.
+        mod_facetoface_delete_orphaned_customfield_data('signup');
+
+        // Delete all the orphaned cancellation custom fields.
+        mod_facetoface_delete_orphaned_customfield_data('cancellation');
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2016060100, 'facetoface');
+    }
+
     return $result;
 }

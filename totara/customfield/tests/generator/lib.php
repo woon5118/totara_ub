@@ -35,6 +35,8 @@ require_once($CFG->dirroot . '/totara/customfield/field/multiselect/define.class
 require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.php');
 require_once($CFG->dirroot . '/totara/customfield/field/text/field.class.php');
 require_once($CFG->dirroot . '/totara/customfield/field/text/define.class.php');
+require_once($CFG->dirroot . '/totara/customfield/field/datetime/field.class.php');
+require_once($CFG->dirroot . '/totara/customfield/field/datetime/define.class.php');
 
 /**
  * This class intended to generate different mock entities
@@ -188,7 +190,7 @@ class totara_customfield_generator extends testing_data_generator {
             $cfsettings->description_editor = array('text' => '', 'format' => '');
             $cfsettings->datatype = 'datetime';
             $cf = new customfield_define_datetime();
-            $cf->define_save($cfsettings, 'facetoface_room');
+            $cf->define_save($cfsettings, $tableprefix);
             // define_save does not presently return the saved record or id.
             $results[$name] = $DB->get_field($tableprefix.'_info_field', 'id', array('fullname' => $name), IGNORE_MULTIPLE);
         }
