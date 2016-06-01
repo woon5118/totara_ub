@@ -3923,6 +3923,24 @@ function facetoface_get_session_customfields() {
 
 /**
  * Return a cached copy of all records in room_info_field
+ *
+ * @param integer $roomid ID of facetoface_room record
+ * @return array
+ */
+function facetoface_get_room_customfield_data($roomid) {
+    global $DB;
+
+    $sql = "SELECT frtd.*, frif.shortname, frif.datatype, frif.fullname
+              FROM {facetoface_room_info_data} frtd
+              JOIN {facetoface_room_info_field} frif ON frtd.fieldid = frif.id
+             WHERE frtd.facetofaceroomid = ?
+          ORDER BY frif.sortorder";
+
+    return $DB->get_records_sql($sql, array($roomid));
+}
+
+/**
+ * Return a cached copy of all records in room_info_field
  * @return array
  */
 function facetoface_get_room_customfields() {

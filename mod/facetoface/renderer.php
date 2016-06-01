@@ -1027,17 +1027,18 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $output[] = html_writer::tag('dt', get_string('roomname', 'facetoface'));
         $output[] = html_writer::tag('dd', $room->name);
 
-        $fields = facetoface_get_room_customfields();
+        $fields = facetoface_get_room_customfield_data($room->id);
         if (!empty($fields)) {
             /** @var totara_customfield_renderer $renderer */
             $renderer = $PAGE->get_renderer('totara_customfield');
 
             foreach ($fields as $field) {
-                $cfoutput = $renderer->customfield_render($field->datatype, $room->{"customfield_".$field->shortname}, array('extended' => true));
+
+                $cfoutput = $renderer->customfield_render($field->datatype, $field->data, array('prefix' => 'facetofaceroom', 'extended' => true));
 
                 if (empty($cfoutput)) {
-                    if (is_string($room->{"customfield_".$field->shortname})) {
-                        $cfoutput = $room->{"customfield_".$field->shortname};
+                    if (is_string($field->data)) {
+                        $cfoutput = $field->data;
                     }
                 }
 
