@@ -125,7 +125,7 @@ if ($formdata = $mform->get_data()) {
                         $erridstr = 'error:usernamenotfound';
                         break;
                     default:
-                        print_error(get_sring('error:unknownuserfield', 'facetoface'));
+                        print_error(get_string('error:unknownuserfield', 'facetoface'));
                 }
             }
         }
