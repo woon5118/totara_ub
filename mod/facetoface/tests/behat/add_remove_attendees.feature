@@ -43,6 +43,9 @@ Feature: Add - Remove seminar attendees
 
     When I click on "Attendees" "link"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the following fields to these values:
+      | searchtext | Sam1 Student1 |
+    And I press "Search"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
     And I wait "1" seconds
