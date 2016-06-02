@@ -346,4 +346,31 @@ class customfield_multiselect extends customfield_base {
         }
     }
 
+    /**
+     * Changes the customfield value from a file data to the key and value.
+     *
+     * @param  object $syncitem The original syncitem to be processed.
+     * @return object The syncitem with the customfield data processed.
+     */
+    public function sync_filedata_preprocess($syncitem) {
+
+        $values = explode(',', core_text::strtolower($syncitem->{$this->field->shortname}));
+        unset($syncitem->{$this->field->shortname});
+
+        $syncoptions = array();
+        foreach ($this->options as $key => $item) {
+            $syncoptions[] = core_text::strtolower($item['option']);
+        }
+
+        $newvalues = array();
+        // Now get the corresponding option for that value.
+        foreach ($syncoptions as $key => $option) {
+            if (in_array($option, $values)) {
+                $newvalues[$key] = $option;
+            }
+        }
+        $syncitem->{$this->inputname} = $newvalues;
+
+        return $syncitem;
+    }
 }

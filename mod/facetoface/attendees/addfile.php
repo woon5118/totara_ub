@@ -147,11 +147,7 @@ if ($formdata = $mform->get_data()) {
     // Convert headers to field names required for data storing.
     $fieldnames = array();
     foreach ($headers as $header) {
-        if (in_array($header, $customfieldnames)) {
-            $fieldnames[] = 'customfield_' . $header;
-        } else {
-            $fieldnames[] = $header;
-        }
+        $fieldnames[] = $header;
     }
 
     // Prepare add users information.
@@ -162,11 +158,21 @@ if ($formdata = $mform->get_data()) {
         $iter = 0;
         while ($signup = $cir->next()) {
             $iter++;
+
             $data = array_combine($fieldnames, $signup);
             if(!$data) {
                 $inconsistentlines[] = $iter;
                 continue;
             }
+
+            // Custom fields validate.
+            $data['id'] = 0;
+            list($cferrors, $data) = customfield_validation_filedata((object)$data, 'facetofacesignup', 'facetoface_signup');
+            if (!empty($cferrors)) {
+                $errors = array_merge($errors, $cferrors);
+                continue;
+            }
+
             // Check that user exists.
             $user = $DB->get_record('user', array($idfield => $data[$idfield]));
             if (!$user) {
@@ -177,14 +183,6 @@ if ($formdata = $mform->get_data()) {
                 if (!empty($validationerror)) {
                     $validationerrors[] = $validationerror;
                 }
-            }
-
-            // Custom fields validate.
-            $data['id'] = 0;
-            $cferrors = customfield_validation((object)$data, 'facetofacesignup', 'facetoface_signup');
-            if (!empty($cferrors)) {
-                 $errors = array_merge($errors, $cferrors);
-                 continue;
             }
 
             $addusers[$user->id] = $data;

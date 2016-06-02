@@ -116,6 +116,7 @@ if ($fromform = $mform->get_data()) {
         }
         $params['ignoreconflicts'] = $ignoreconflicts;
 
+        $clonefromform = serialize($fromform);
         foreach ($attendeestoadd as $attendee) {
             $result = facetoface_user_import($course, $facetoface, $session, $attendee->id, $params);
             if ($result['result'] !== true) {
@@ -132,6 +133,8 @@ if ($fromform = $mform->get_data()) {
                 $customdata = $list->has_user_data() ? (object)$list->get_user_data($attendee->id) : $fromform;
                 $customdata->id = $signupstatus->submissionid;
                 customfield_save_data($customdata, 'facetofacesignup', 'facetoface_signup');
+                // Values of multi-select are changing after edit_save_data func.
+                $fromform = unserialize($clonefromform);
             }
         }
     }

@@ -216,6 +216,22 @@ class customfield_base {
     }
 
     /**
+     * Changes the customfield value from a file data to the key and value.
+     *
+     * @param  object $syncitem The original syncitem to be processed.
+     * @return object The syncitem with the customfield data processed.
+     */
+    public function sync_filedata_preprocess($syncitem) {
+
+        $value = $syncitem->{$this->field->shortname};
+        unset($syncitem->{$this->field->shortname});
+
+        $syncitem->{$this->inputname} = $value;
+
+        return $syncitem;
+    }
+
+    /**
      * Sets the required flag for the field in the form object
      * @param   object   instance of the moodleform class
      */
@@ -519,6 +535,33 @@ function customfield_validation($itemnew, $prefix, $tableprefix) {
     }
 
     return $err;
+}
+
+/**
+ * Process the CSV file data for a custom field and validate it.
+ *
+ * @param object  $itemnew      The CSV file data we are overwrite and validating
+ * @param string  $prefix       The custom field prefix (organisation, position, etc)
+ * @param string  $tableprefix  The table prefix (org_type, pos_type, etc)
+  *
+ * @return list array $err $newdata
+ */
+function customfield_validation_filedata($itemnew, $prefix, $tableprefix) {
+    global $CFG, $DB;
+
+    $err = array();
+
+    $fields = $DB->get_records($tableprefix.'_info_field');
+
+    foreach ($fields as $field) {
+        require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
+        $newfield = 'customfield_'.$field->datatype;
+        $formfield = new $newfield($field->id, $itemnew, $prefix, $tableprefix);
+        $itemnew = $formfield->sync_filedata_preprocess($itemnew);
+        $err += $formfield->edit_validate_field($itemnew, $prefix, $tableprefix);
+    }
+
+    return array($err, (array)$itemnew);
 }
 
 /**

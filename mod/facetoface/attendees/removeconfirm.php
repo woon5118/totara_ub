@@ -110,19 +110,20 @@ if ($fromform = $mform->get_data()) {
                     $facetoface->ccmanager = $fromform->notifymanager;
                     facetoface_send_cancellation_notice($facetoface, $session, $attendee->id);
                 }
+
+                // Store customfields.
+                if ($enableattendeenote) {
+                    $signupstatus = facetoface_get_attendee($session->id, $attendee->id);
+                    $customdata = $list->has_user_data() ? (object)$list->get_user_data($attendee->id) : $fromform;
+                    $customdata->id = $signupstatus->submissionid;
+                    customfield_save_data($customdata, 'facetofacecancellation', 'facetoface_cancellation');
+                }
+
                 $result['result'] = get_string('removedsuccessfully', 'facetoface');
                 $removed[] = $result;
             } else {
                 $result['result'] = $cancelerr;
                 $errors[] = $result;
-            }
-
-            // Store customfields.
-            if ($enableattendeenote) {
-                $signupstatus = facetoface_get_attendee($session->id, $attendee->id);
-                $customdata = $list->has_user_data() ? (object)$list->get_user_data($attendee->id) : $fromform;
-                $customdata->id = $signupstatus->submissionid;
-                customfield_save_data($customdata, 'facetofacecancellation', 'facetoface_cancellation');
             }
         }
     }

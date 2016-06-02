@@ -149,4 +149,28 @@ class customfield_menu extends customfield_base {
             $mform->setConstant($this->inputname, $this->datakey);
         }
     }
+
+    /**
+     * Changes the customfield value from a file data to the key and value.
+     *
+     * @param  object $syncitem The original syncitem to be processed.
+     * @return object The syncitem with the customfield data processed.
+     */
+    public function sync_filedata_preprocess($syncitem) {
+
+        $value = $syncitem->{$this->field->shortname};
+        unset($syncitem->{$this->field->shortname});
+
+        $value = core_text::strtolower($value);
+        $options = explode("\n", core_text::strtolower($this->field->param1));
+        foreach($options as $key => $option) {
+            if ($option == $value) {
+                $value = (string)$key;
+                break;
+            }
+        }
+        $syncitem->{$this->inputname} = $value;
+
+        return $syncitem;
+    }
 }

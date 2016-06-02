@@ -70,4 +70,28 @@ class customfield_checkbox extends customfield_base {
         }
     }
 
+    /**
+     * Changes the customfield value from a file data to the key and value.
+     *
+     * @param  object $syncitem The original syncitem to be processed.
+     * @return object The syncitem with the customfield data processed.
+     */
+    public function sync_filedata_preprocess($syncitem) {
+
+        $value = $syncitem->{$this->field->shortname};
+        unset($syncitem->{$this->field->shortname});
+
+        if (core_text::strtolower($value) == get_string('yes')) {
+            $value = '1';
+        } else if (core_text::strtolower($value) == get_string('no')) {
+            $value = '0';
+        } else {
+            $value = (string)(int)$value;
+        }
+
+        $syncitem->{$this->inputname} = $value;
+
+        return $syncitem;
+
+    }
 }

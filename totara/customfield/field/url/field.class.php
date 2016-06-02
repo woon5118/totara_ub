@@ -239,4 +239,31 @@ class customfield_url extends customfield_base {
 
         }
     }
+
+    /**
+     * Changes the customfield value from a file data to the key and value.
+     *
+     * @param  object $syncitem The original syncitem to be processed.
+     * @return array The syncitem with the customfield data processed.
+     */
+    public function sync_filedata_preprocess($syncitem) {
+
+        $value = $syncitem->{$this->field->shortname};
+        unset($syncitem->{$this->field->shortname});
+
+        $data = array();
+        if (!empty($value)) {
+            $value = core_text::strtolower($value);
+            if (substr($value, 0, 7) !== 'http://' && substr($value, 0, 8) !== 'https://' && substr($value, 0, 1) !== '/') {
+                $value = 'http://' . $value;
+            }
+        }
+        $data['url']  = $value;
+        $data['text'] = '';
+        $data['target'] = '0';
+
+        $syncitem->{$this->inputname} = $data;
+
+        return $syncitem;
+    }
 }

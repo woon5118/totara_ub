@@ -75,4 +75,28 @@ class customfield_datetime extends customfield_base {
             return userdate($data, $format);
         }
     }
+
+    /**
+     * Changes the customfield value from a file data to the key and value.
+     *
+     * @param  object $syncitem The original syncitem to be processed.
+     * @return object The syncitem with the customfield data processed.
+     */
+    public function sync_filedata_preprocess($syncitem) {
+        global $CFG;
+
+        $value = $syncitem->{$this->field->shortname};
+        unset($syncitem->{$this->field->shortname});
+
+        // Parse using $CFG->csvdateformat if set, or default if not set.
+        $csvdateformat = (isset($CFG->csvdateformat)) ? $CFG->csvdateformat : get_string('csvdateformatdefault', 'totara_core');
+        // If date can't be parsed, assume it is a unix timestamp and leave unchanged.
+        $parsed_date = totara_date_parse_from_format($csvdateformat, $value, true);
+        if ($parsed_date) {
+            $value = $parsed_date;
+        }
+        $syncitem->{$this->inputname} = $value;
+
+        return $syncitem;
+    }
 }

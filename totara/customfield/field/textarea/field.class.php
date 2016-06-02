@@ -159,4 +159,25 @@ class customfield_textarea extends customfield_base {
             return $data;
         }
     }
+
+    /**
+     * Changes the customfield value from a file data to the key and value.
+     *
+     * @param  object $syncitem The original syncitem to be processed.
+     * @return object The syncitem with the customfield data processed.
+     */
+    public function sync_filedata_preprocess($syncitem) {
+
+        $value = $syncitem->{$this->field->shortname};
+        unset($syncitem->{$this->field->shortname});
+
+        $data = array();
+        $data['text']   = $value;
+        $data['itemid'] = '0';
+        $data['format'] = FORMAT_HTML;
+
+        $syncitem->{$this->inputname} = $data;
+
+        return $syncitem;
+    }
 }

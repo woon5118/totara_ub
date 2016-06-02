@@ -117,7 +117,7 @@ class removeconfirm_form extends moodleform {
 
     public function validation($data, $files) {
         $data['id'] = 0;
-        return customfield_validation((object)$data, 'facetofacesignup', 'facetoface_signup');
+        return customfield_validation((object)$data, 'facetofacecancellation', 'facetoface_cancellation');
     }
 
     public function get_user_list($userlist, $offset = 0, $limit = 0) {
