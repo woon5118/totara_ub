@@ -848,21 +848,8 @@ function facetoface_cancel_session($session, $fromform) {
     $sessionobj->cancelledstatus = $session->cancelledstatus;
     $DB->set_field('facetoface_sessions', 'cancelledstatus', $session->cancelledstatus, array('id' => $session->id));
 
-    // Remove entries from the teacher calendars.
-    $select = $DB->sql_like('description', ':attendess');
-    $select .= " AND modulename = 'facetoface' AND eventtype = 'facetofacesession' AND instance = :facetofaceid";
-    $params = array(
-        'attendess' => "%attendees.php?s={$session->id}%",
-        'facetofaceid' => $facetoface->id
-    );
-    $DB->delete_records_select('event', $select, $params);
-    if ($facetoface->showoncalendar == F2F_CAL_COURSE) {
-        // Remove entry from course calendar.
-        facetoface_remove_session_from_calendar($session, $facetoface->course);
-    } else if ($facetoface->showoncalendar == F2F_CAL_SITE) {
-        // Remove entry from site-wide calendar.
-        facetoface_remove_session_from_calendar($session, SITEID);
-    }
+    // Remove entries from the calendars.
+    facetoface_remove_all_calendar_entries($session);
 
     // Change all user sign-up statuses, the only exception is previously cancelled users.
     $sql = "SELECT DISTINCT s.userid, s.id as signupid
@@ -879,7 +866,7 @@ function facetoface_cancel_session($session, $fromform) {
     foreach ($signedupusers as $user) {
         // We record this change as being triggered by the current user.
         facetoface_update_signup_status($user->signupid, MDL_F2F_STATUS_SESSION_CANCELLED, $USER->id);
-        $notifyusers[$user->signupid] = $user->signupid;
+        $notifyusers[$user->userid] = $user->userid;
     }
     $signedupusers->close();
 
@@ -3530,6 +3517,59 @@ function facetoface_remove_session_from_calendar($session, $courseid = 0, $useri
                                                 userid = ? AND
                                                 courseid = ? AND
                                                 uuid = ?", $params);
+}
+
+/**
+ * Remove all entries in the course calendar which relate to this session.
+ *
+ * Note: the user/course ID is nominally an integer but it is not right for the
+ * code to assume its value will always > 0. This is why default values for the
+ * parameters are null, NOT 0. In other words, if a caller passes in a non null
+ * user ID, then the assumption is the caller wants to remove calendar entries
+ * for that specific userid. It is this contract that works around a problem in
+ * `facetoface_remove_session_from_calendar` - where a course/user ID is always
+ * used even if it is 0.
+ *
+ * @param \stdClass $session record from the facetoface_sessions table.
+ * @param integer $courseid identifies the specific course whose calendar entry
+ *        is to be removed. If null, it is ignored.
+ * @param integer $userid identifies the specific user whose calendar entry is
+ *        to be removed. If null, it is ignored.
+ *
+ * @return boolean true if the removal succeeded.
+ */
+function facetoface_remove_all_calendar_entries($session, $courseid = null, $userid = null) {
+    global $DB;
+
+    $initial = new \stdClass();
+    $initial->whereClause = "modulename = 'facetoface'";
+    $initial->params = array();
+
+    $fragments = array(
+        array('instance', $session->facetoface),
+        array('uuid',     $session->id),
+        array('courseid', $courseid),
+        array('userid',   $userid)
+    );
+
+    $final = array_reduce($fragments,
+        function (\stdClass $accumulated, array $fragment) {
+
+            list($field, $value) = $fragment;
+            if (is_null($value)) {
+                return $accumulated;
+            }
+
+            $accumulated->whereClause = sprintf('%s AND %s = ?', $accumulated->whereClause, $field);
+            $accumulated->params[] = $value;
+
+            return $accumulated;
+        },
+
+        $initial
+    );
+
+    return $DB->delete_records_select('event', $final->whereClause, $final->params);
 }
 
 /**
