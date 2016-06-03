@@ -2105,4 +2105,41 @@ class core_ddl_testcase extends database_driver_testcase {
         }
     */
 
+    /**
+     * Totara: unfortunately we use unique indexes on nullable columns.
+     */
+    public function test_unique_index_on_null_column() {
+        $DB = $this->tdb;
+        $dbman = $this->tdb->get_manager();
+
+        // Check exceptions if multiple R columns.
+        $table = new xmldb_table ('test_tablex');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->setComment("This is a test'n drop table. You can drop it safely");
+
+        $this->tables[$table->getName()] = $table;
+        $dbman->create_table($table);
+
+        $DB->insert_record('test_tablex', array('course' => 0));
+        $DB->insert_record('test_tablex', array('course' => null));
+        $DB->insert_record('test_tablex', array('course' => null));
+
+        $key = new xmldb_key('course');
+        $key->set_attributes(XMLDB_KEY_UNIQUE, array('course'));
+        $dbman->add_key($table, $key);
+
+        $DB->insert_record('test_tablex', array('course' => null));
+        $DB->insert_record('test_tablex', array('course' => null));
+
+        $this->assertCount(5, $DB->get_records('test_tablex', array()));
+
+        try {
+            $DB->insert_record('test_tablex', array('course' => 0));
+            $this->fail('Exceptio nexpected on duplicate record');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf('dml_write_exception', $e);
+        }
+    }
 }

@@ -308,6 +308,40 @@ class mssql_sql_generator extends sql_generator {
     }
 
     /**
+     * Given one correct xmldb_index, returns the SQL statements
+     * needed to create it (in array).
+     *
+     * @param xmldb_table $xmldb_table The xmldb_table instance to create the index on.
+     * @param xmldb_index $xmldb_index The xmldb_index to create.
+     * @return array An array of SQL statements to create the index.
+     * @throws coding_exception Thrown if the xmldb_index does not validate with the xmldb_table.
+     */
+    public function getCreateIndexSQL($xmldb_table, $xmldb_index) {
+        // Totara: allow unique index on nullable columns ignoring the nulls.
+        if ($error = $xmldb_index->validateDefinition($xmldb_table)) {
+            throw new coding_exception($error);
+        }
+
+        if ($xmldb_index->getUnique() and count($xmldb_index->getFields()) === 1) {
+            $fields = $xmldb_index->getFields();
+            $fieldname = reset($fields);
+            /** @var xmldb_field $field */
+            $field = $xmldb_table->getField($fieldname);
+            if ($field and !$field->getNotNull()) {
+                $unique = ' UNIQUE';
+                $suffix = 'uix';
+                $index = 'CREATE' . $unique . ' INDEX ';
+                $index .= $this->getNameForObject($xmldb_table->getName(), implode(', ', $xmldb_index->getFields()), $suffix);
+                $index .= ' ON ' . $this->getTableName($xmldb_table);
+                $index .= ' (' . implode(', ', $this->getEncQuoted($xmldb_index->getFields())) . ')';
+                $index .= ' WHERE '. $this->getEncQuoted($fieldname) . ' IS NOT NULL';
+                return array($index);
+            }
+        }
+        return parent::getCreateIndexSQL($xmldb_table, $xmldb_index);
+    }
+
+    /**
      * Given one xmldb_table and one xmldb_field, return the SQL statements needed to alter the field in the table.
      *
      * @param xmldb_table $xmldb_table The table related to $xmldb_field.
