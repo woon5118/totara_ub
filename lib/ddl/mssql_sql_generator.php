@@ -322,7 +322,9 @@ class mssql_sql_generator extends sql_generator {
             throw new coding_exception($error);
         }
 
-        if ($xmldb_index->getUnique() and count($xmldb_index->getFields()) === 1) {
+        // NOTE: quiz_report table has a messed up nullable name field, ignore it.
+        
+        if ($xmldb_index->getUnique() and count($xmldb_index->getFields()) === 1 and $xmldb_table->getName() !== 'quiz_reports') {
             $fields = $xmldb_index->getFields();
             $fieldname = reset($fields);
             /** @var xmldb_field $field */
