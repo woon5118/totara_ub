@@ -137,8 +137,7 @@ class customfield_textarea extends customfield_base {
         $shortinputname = substr($this->inputname, 0, strlen($this->inputname)-7);
         $context = context_system::instance();
         if ($this->data !== NULL && !$this->is_locked()) {
-            $data = file_rewrite_pluginfile_urls($this->data, 'pluginfile.php', $context->id, 'totara_customfield', $this->prefix, $this->dataid);
-            $item->{$shortinputname} = $data;
+            $item->{$shortinputname} = $this->data;
         }
     }
     /**
