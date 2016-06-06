@@ -97,3 +97,13 @@ Feature: Administrators can add a custom location field to complete during room 
       | id_customfield_clf2size_medium     | 1                           |
       | id_customfield_clf2view_hybrid     | 1                           |
       | id_customfield_clf2display_map     | 1                           |
+
+  Scenario: Confirm invalid location displays error message
+    Given I click on "Edit" "link" in the "Custom Location Field 1" "table_row"
+    And I set the field "addresslookup" to "abcdefghijklmnop"
+    And I click on "Search" "button" in the "Set map location" "fieldset"
+    Then I should see "Location not found" in the "Set map location" "fieldset"
+
+    When I set the field "addresslookup" to "150 Willis st"
+    And I click on "Search" "button" in the "Set map location" "fieldset"
+    Then I should not see "Location not found" in the "Set map location" "fieldset"
