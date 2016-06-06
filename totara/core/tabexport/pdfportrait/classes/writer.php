@@ -101,7 +101,7 @@ class writer extends tabexport_writer {
 
             // Check memory limit.
             $mramuse = ceil(((memory_get_usage(true)/1024)/1024));
-            if (1024 <= $mramuse) {
+            if (1024 <= $mramuse and !PHPUNIT_TEST) {
                 // Notice message.
                 print_error('exportpdf_mramlimitexceeded', 'totara_reportbuilder', '', 1024);
             }
