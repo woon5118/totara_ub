@@ -2464,10 +2464,10 @@ function facetoface_notification_get_templates_with_old_placeholders() {
         return $oldnotifcations;
     }
 
-    $oldplaceholderroom = '%'.get_string('placeholder:room', 'facetoface').'%';
-    $oldplaceholdervenue = '%'.get_string('placeholder:venue', 'facetoface').'%';
-    $oldplaceholderlocation = '%'.get_string('placeholder:location', 'facetoface').'%';
-    $oldplaceholderalldates = '%'.get_string('placeholder:alldates', 'facetoface').'%';
+    $oldplaceholderroom = '%' . $DB->sql_like_escape(get_string('placeholder:room', 'facetoface')) . '%';
+    $oldplaceholdervenue = '%' . $DB->sql_like_escape(get_string('placeholder:venue', 'facetoface')) . '%';
+    $oldplaceholderlocation = '%' . $DB->sql_like_escape(get_string('placeholder:location', 'facetoface')) . '%';
+    $oldplaceholderalldates = '%' . $DB->sql_like_escape(get_string('placeholder:alldates', 'facetoface')) . '%';
 
     $sql = 'SELECT id
               FROM {facetoface_notification_tpl}

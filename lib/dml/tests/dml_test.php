@@ -4036,6 +4036,81 @@ class core_dml_testcase extends database_driver_testcase {
         // $this->assertEquals(3, count($records), 'Accent insensitive LIKE searches may not be supported in all databases, this is not a problem.');
     }
 
+    /**
+     * Totara only.
+     */
+    public function test_sql_like_escape() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = $this->get_test_table();
+        $tablename = $table->getName();
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_table($table);
+
+        $DB->insert_record($tablename, array('name'=>'one_two'));
+        $DB->insert_record($tablename, array('name'=>'one two'));
+        $DB->insert_record($tablename, array('name'=>'one%two'));
+        $DB->insert_record($tablename, array('name'=>'one?two'));
+        $DB->insert_record($tablename, array('name'=>'one[two]'));
+        $DB->insert_record($tablename, array('name'=>'one[^two]'));
+        $DB->insert_record($tablename, array('name'=>'one]two'));
+        $DB->insert_record($tablename, array('name'=>'onetwo'));
+        $DB->insert_record($tablename, array('name'=>'onex'));
+
+        $search = 'one_two';
+        $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_like('name', '?');
+        $records = $DB->get_records_sql($sql, array('%' . $DB->sql_like_escape($search) . '%'));
+        $this->assertCount(1, $records);
+        $record = reset($records);
+        $this->assertSame($search, $record->name);
+
+        $search = 'one two';
+        $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_like('name', '?');
+        $records = $DB->get_records_sql($sql, array('%' . $DB->sql_like_escape($search) . '%'));
+        $this->assertCount(1, $records);
+        $record = reset($records);
+        $this->assertSame($search, $record->name);
+
+        $search = 'one%two';
+        $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_like('name', '?');
+        $records = $DB->get_records_sql($sql, array('%' . $DB->sql_like_escape($search) . '%'));
+        $this->assertCount(1, $records);
+        $record = reset($records);
+        $this->assertSame($search, $record->name);
+
+        $search = 'one?two';
+        $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_like('name', '?');
+        $records = $DB->get_records_sql($sql, array('%' . $DB->sql_like_escape($search) . '%'));
+        $this->assertCount(1, $records);
+        $record = reset($records);
+        $this->assertSame($search, $record->name);
+
+        $search = 'one[two]';
+        $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_like('name', '?');
+        $records = $DB->get_records_sql($sql, array('%' . $DB->sql_like_escape($search) . '%'));
+        $this->assertCount(1, $records);
+        $record = reset($records);
+        $this->assertSame($search, $record->name);
+
+        $search = 'one]two';
+        $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_like('name', '?');
+        $records = $DB->get_records_sql($sql, array('%' . $DB->sql_like_escape($search) . '%'));
+        $this->assertCount(1, $records);
+        $record = reset($records);
+        $this->assertSame($search, $record->name);
+
+        $search = 'one[^two]';
+        $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_like('name', '?');
+        $records = $DB->get_records_sql($sql, array('%' . $DB->sql_like_escape($search) . '%'));
+        $this->assertCount(1, $records);
+        $record = reset($records);
+        $this->assertSame($search, $record->name);
+    }
+
     public function test_coalesce() {
         $DB = $this->tdb;
 

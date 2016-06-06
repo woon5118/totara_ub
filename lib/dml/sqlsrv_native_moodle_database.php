@@ -1295,6 +1295,20 @@ class sqlsrv_native_moodle_database extends moodle_database {
     }
 
     /**
+     * Escape sql LIKE special characters like '_' or '%'.
+     * @param string $text The string containing characters needing escaping.
+     * @param string $escapechar The desired escape character, defaults to '\\'.
+     * @return string The escaped sql LIKE string.
+     */
+    public function sql_like_escape($text, $escapechar = '\\') {
+        // Totara fix for weird [] LIKEs in SQL Server.
+        $text = str_replace('_', $escapechar.'_', $text);
+        $text = str_replace('%', $escapechar.'%', $text);
+        $text = str_replace('[', $escapechar.'[', $text);
+        return $text;
+    }
+
+    /**
      * Returns 'LIKE' part of a query.
      *
      * @param string $fieldname usually name of the table column
