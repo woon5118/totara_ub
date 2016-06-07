@@ -9218,41 +9218,109 @@ function apd_get_profiling() {
  */
 function remove_dir($dir, $contentonly=false) {
     global $CFG;
+
+    // TOTARA: This is our version of remove_dir, its much safer than Moodle's version.
+
+    // First up clear stats cache, we need all ops to be accurate.
+    clearstatcache();
+
     if (!file_exists($dir)) {
         // Nothing to do.
         return true;
     }
-    if (!$handle = opendir($dir)) {
-        return false;
-    }
-    $result = true;
-    while (false!==($item = readdir($handle))) {
-        if ($item != '.' && $item != '..') {
-            if (is_dir($dir.'/'.$item)) {
-                $result = remove_dir($dir.'/'.$item) && $result;
-            } else {
-                if ($CFG->ostype == 'WINDOWS') {
-                    // WINDOWS specific bug when META-INF folder locked by javaw process and cannot be deleted
-                    $result = @unlink($dir.'/'.$item) && $result;
-                } else {
-                    $result = unlink($dir.'/'.$item) && $result;
-                }
+
+    // Rename and then delete technique.
+    // Here we are going to try to rename the directory to a temporary name and then delete it.
+    // This will improve our chance of deleting the directory without encountering race directories.
+    // We will try up to 10 times to get a unique name.
+    $originaldir = $dir;
+    $temppath = dirname($dir);
+    $attempts = 0;
+    do {
+        $tempname = 'safe_to_delete_'.sha1(microtime(true).'_'.rand());
+        $tempdir = $temppath.'/'.$tempname;
+        if (!file_exists($tempdir)) {
+            $result = @rename($dir, $tempdir);
+            if ($result) {
+                // Yay we successfully renamed dir to tempdir.
+                // Now update the variable so that we delete the new directory.
+                $dir = $tempdir;
+                break;
             }
         }
-    }
-    closedir($handle);
+        $attempts++;
+        if ($attempts > 10) {
+            // Safety net, we can't rename it, just continue on and perhaps perms are configured strict.
+            @error_log('Failed to rename directory prior to removal, risking collisions and performance burden, fix your perms!');
+            break;
+        }
+    } while (0);
+
+    // If content only is set to true then re-create the original directory.
     if ($contentonly) {
-        clearstatcache(); // Make sure file stat cache is properly invalidated.
-        return $result;
+        make_writable_directory($originaldir);
     }
 
-    if ($CFG->ostype == 'WINDOWS') {
-        // WINDOWS specific bug when META-INF folder locked by javaw process and cannot be deleted
-        $result = @rmdir($dir);
-    } else {
-        $result = rmdir($dir); // If anything left the result will be false, no need for && $result.
+    $result = false;
+
+    // TODO: Get this working, it fails in CentOS apparently due to process limits.
+    // if ($CFG->ostype === 'UNIX') {
+    //     // If this is Unix we are going to cheat and call a quick delete via exec.
+    //     // Super fast.
+    //     $realdir = realpath($dir);
+    //     if ($realdir) {
+    //         $command = 'rm -Rf ' . escapeshellarg($realdir);
+    //         $cmdoutput = array();
+    //         $cmdresult = false;
+    //         exec($command, $cmdoutput, $cmdresult);
+    //         $result = ($cmdresult === 0);
+    //     }
+    // }
+
+    if (!$result) {
+        /**
+         * Anonymous function that calls itself recursively to delete a directory and its contents.
+         *
+         * Having "use (&$handler)" allows this function to be called recursively.
+         *
+         * @param string $directory
+         * @return bool
+         */
+        $handler = function ($directory) use (&$handler) {
+            if (!$handle = opendir($directory)) {
+                return false;
+            }
+            $result = true;
+            while (false !== ($item = readdir($handle))) {
+                if ($item != '.' && $item != '..') {
+                    if (is_dir($directory . '/' . $item)) {
+                        // Call this function recursively.
+                        $result = $handler($directory . '/' . $item) && $result;
+                    } else {
+                        // There are many reasons why incl. windows specific bug when META-INF folder locked by javaw process.
+                        $result = @unlink($directory . '/' . $item) && $result;
+                    }
+                }
+            }
+            closedir($handle);
+            // Always mute the warnings from rmdir.
+            // There are many reasons why incl. windows specific bug when META-INF folder locked by javaw process.
+            $result = @rmdir($directory);
+            return $result;
+        };
+
+        $result = $handler($dir);
     }
-    clearstatcache(); // Make sure file stat cache is properly invalidated.
+
+    // Clear the stat cache once more now that the directory has been deleted.
+    clearstatcache();
+
+    // It doesn't hurt to have it twice, and having it after clearstatcache is good.
+    // This will also ensure the directory exists should something be relying upon it.
+    if ($contentonly) {
+        make_writable_directory($originaldir);
+    }
+
     return $result;
 }
 
