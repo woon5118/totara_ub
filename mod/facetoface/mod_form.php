@@ -467,4 +467,62 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $this->data_preprocessing($defaultvalues);
         parent::set_data($defaultvalues);
     }
+
+    public function validation($data, $files) {
+        global $DB;
+        $errors = parent::validation($data, $files);
+        $selectedapprovers = explode(',', $data['selectedapprovers']);
+
+        $systemapprovers = get_users_from_config(
+                get_config(null, 'facetoface_adminapprovers'),
+                'mod/facetoface:approveanyrequest'
+        );
+
+        $guest = guest_user();
+        $usernamefields = get_all_user_name_fields(true, 'u');
+        list($selectedsql, $selectedparam) = $DB->get_in_or_equal($selectedapprovers, SQL_PARAMS_NAMED);
+        $selectedusers = $DB->get_records_sql("
+            SELECT
+                u.id, {$usernamefields}, u.email
+            FROM
+                {user} u
+            WHERE
+                u.deleted = 0
+            AND u.suspended = 0
+            AND u.id != :guestid
+            AND u.id $selectedsql
+            ORDER BY
+                u.firstname,
+                u.lastname
+        ", array_merge(array('guestid' => $guest->id), $selectedparam));
+
+        $exists = array();
+        $suberrors = array();
+        foreach ($selectedapprovers as $selected) {
+            // Check for non-guest active users.
+            if (!isset($selectedusers[$selected])) {
+                $suberrors[] = html_writer::tag('li', get_string('error:approverinactive', 'facetoface', $selected));
+                continue;
+            }
+            $username = fullname($selectedusers[$selected]);
+
+            // Check for duplicates.
+            if (isset($exists[$selected])) {
+                $suberrors[] = html_writer::tag('li', get_string('error:approverselected', 'facetoface', $username));
+                continue;
+            }
+            $exists[$selected] = 1;
+
+            // Check for system wide approvers.
+            if (isset($systemapprovers[$selected])) {
+                $suberrors[] = html_writer::tag('li', get_string('error:approversystem', 'facetoface', $username));
+                continue;
+            }
+        }
+
+        if (!empty($suberrors)) {
+            $errors['approvaloptions'] = html_writer::tag('ul', implode("\n", $suberrors));
+        }
+        return $errors;
+    }
 }

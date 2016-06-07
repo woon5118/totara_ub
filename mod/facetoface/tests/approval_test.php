@@ -31,6 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+require_once($CFG->dirroot . '/mod/facetoface/mod_form.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 
 class mod_facetoface_approvals_testcase extends advanced_testcase {
@@ -62,6 +63,73 @@ class mod_facetoface_approvals_testcase extends advanced_testcase {
 
         $this->cfgemail = isset($CFG->noemailever) ? $CFG->noemailever : null;
         $CFG->noemailever = false;
+    }
+
+    /**
+     * Check that approvers list is validated correctly
+     */
+    public function test_admin_approvers_validation() {
+        global $DB;
+        $guest = guest_user()->id;
+        $user1 = $this->getDataGenerator()->create_user()->id;
+        $user2 = $this->getDataGenerator()->create_user()->id;
+        $inactive = $this->getDataGenerator()->create_user(array('suspended' => 1))->id;
+        $deleted = $this->getDataGenerator()->create_user(array('deleted' => 1))->id;
+        $course = $this->getDataGenerator()->create_course();
+        $nonadmin = $this->getDataGenerator()->create_user()->id;
+        $admin = $this->getDataGenerator()->create_user()->id;
+
+        set_config('facetoface_adminapprovers', "$nonadmin,$admin");
+        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
+        role_assign($managerrole->id, $admin, context_system::instance());
+        assign_capability('mod/facetoface:approveanyrequest', CAP_ALLOW, $managerrole->id, context_system::instance());
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetoface = $facetofacegenerator->create_instance(array('course' => $course->id));
+        $cm = get_coursemodule_from_id('facetoface', $facetoface->cmid, $course->id, true, MUST_EXIST);
+
+        $form = new mod_facetoface_mod_form($cm, 0, $cm, $course);
+        $mockdata = array(
+            'name' => 'test',
+            'modulename' => 'facetoface',
+            'instance' => $cm->instance,
+            'coursemodule' => $cm->id,
+            'cmidnumber' => $cm->idnumber
+        );
+        // Many errors.
+        $mockdata['selectedapprovers'] = "$user1,$user2,$inactive,$user2,$admin,$guest,$deleted";
+        $errors = $form->validation($mockdata, array());
+        $this->assertNotEmpty($errors['approvaloptions']);
+
+        // Duplicate.
+        $mockdata['selectedapprovers'] = "$user1,$user2,$user1";
+        $errors = $form->validation($mockdata, array());
+        $this->assertNotEmpty($errors['approvaloptions']);
+
+        // Admin.
+        $mockdata['selectedapprovers'] = "$user1,$user2,$admin";
+        $errors = $form->validation($mockdata, array());
+        $this->assertNotEmpty($errors['approvaloptions']);
+
+        // Guest.
+        $mockdata['selectedapprovers'] = "$user1,$guest,$user2";
+        $errors = $form->validation($mockdata, array());
+        $this->assertNotEmpty($errors['approvaloptions']);
+
+        // Deleted.
+        $mockdata['selectedapprovers'] = "$deleted,$user1,$user2";
+        $errors = $form->validation($mockdata, array());
+        $this->assertNotEmpty($errors['approvaloptions']);
+
+        // Inactive.
+        $mockdata['selectedapprovers'] = "$user1,$user2,$inactive";
+        $errors = $form->validation($mockdata, array());
+        $this->assertNotEmpty($errors['approvaloptions']);
+
+        // Ok.
+        $mockdata['selectedapprovers'] = "$user1,$user2,$nonadmin";
+        $errors = $form->validation($mockdata, array());
+        $this->assertArrayNotHasKey('approvaloptions', $errors);
     }
 
     // TODO - manager, role, admin notification checks
