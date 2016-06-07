@@ -176,13 +176,13 @@ class mod_facetoface_generator extends testing_module_generator {
             // Don't ever bet on the capacity, if you need to be something specific set it to that.
             $record->capacity = floor(rand(5, 50));
         }
-        if (!isset($record->type)) {
-            if (!empty($record->allowconflicts)) {
-                $record->type = 'external';
-            } else {
-                $record->type = 'internal';
-            }
+
+        if (!empty($record->allowconflicts)) {
+            $record->allowconflicts = 1;
+        } else {
+            $record->allowconflicts = 0;
         }
+
         if (!isset($record->description)) {
             $record->description = 'Description for room '.$this->roominstancecount;
         }

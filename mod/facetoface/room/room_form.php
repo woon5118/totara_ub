@@ -40,6 +40,12 @@ class mod_facetoface_room_form extends moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
+        if (!empty($this->_customdata['f'])) {
+            $mform->addElement('hidden', 'f');
+            $mform->setType('f', PARAM_INT);
+            $mform->getElement('f')->setValue($this->_customdata['f']);
+        }
+
         $mform->addElement('hidden', 'custom');
         $mform->setType('custom', PARAM_INT);
 
@@ -69,8 +75,9 @@ class mod_facetoface_room_form extends moodleform {
         }
 
         customfield_definition($mform, $room, 'facetofaceroom', 0, 'facetoface_room');
-
-        if (!empty($room->custom) || !isset($room->custom) && !empty($this->_customdata['custom'])) {
+        // If nonpublic enforced, or room is already public - do not even ask to make it public.
+        if (empty($this->_customdata['customforce']) &&
+                (!empty($room->custom) || !isset($room->custom) && !empty($this->_customdata['custom']))) {
             $mform->addElement('checkbox', 'notcustom', get_string('publishreuse', 'mod_facetoface'));
         }
 

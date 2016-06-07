@@ -343,7 +343,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
                         id = Number(M.totara_f2f_room.config.editroom);
                         M.totara_f2f_room.config.editroom = 0;
                     }
-                    return url + 'room/ajax/room_edit.php?id=' + id + '&sesskey=' + M.cfg.sesskey;
+                    return url + 'room/ajax/room_edit.php?id=' + id + '&f=' + $('input[name="f"]').val() +
+                            '&sesskey=' + M.cfg.sesskey;
                 },
                 editcustomroomhandler
             );

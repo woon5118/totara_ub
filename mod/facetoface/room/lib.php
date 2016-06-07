@@ -100,7 +100,8 @@ function process_room_form($roomid, callable $successhandler, callable $cancelha
         $room->description = '';
         $room->status = 1;
         $room->custom=0;
-        if (!empty($customdata['custom'])) {
+        if (!empty($customdata['custom']) || !empty($customdata['customforce'])) {
+            // Pre set custom for new rooms and when it's enforced.
             $room->custom=1;
         }
     } else {
@@ -140,6 +141,10 @@ function process_room_form($roomid, callable $successhandler, callable $cancelha
         if (!empty($customdata['custom']) && empty($data->notcustom)) {
             $todb->custom = 1;
         }
+        if (!empty($customdata['customforce'])) {
+            // Force custom to stay as is.
+            $todb->custom = $room->custom;
+        }
         $new = false;
         if (empty($data->id)) {
             $todb->timecreated = time();
@@ -163,4 +168,62 @@ function process_room_form($roomid, callable $successhandler, callable $cancelha
         $successhandler($todb);
     }
     return $form;
+}
+
+/**
+ * Return true if user has capability to edit room.
+ * @param int $userid
+ * @param int $roomid
+ * @param int $facetofaceid
+ * @return bool
+ */
+function can_user_edit_room($userid, $roomid, $facetofaceid) {
+    global $DB;
+    $system_context = context_system::instance();
+    if (has_capability('totara/core:modconfig', $system_context, $userid)) {
+        return true;
+    }
+    // Check if user have 'mod/facetoface:editevents' capability to edit events in current facetoface.
+    if (!$facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid))) {
+        print_error('error:incorrectfacetofaceid', 'facetoface');
+    }
+    if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
+        print_error('error:coursemisconfigured', 'facetoface');
+    }
+    if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
+        print_error('error:incorrectcoursemodule', 'facetoface');
+    }
+
+    $context = context_module::instance($cm->id);
+    if (has_capability('mod/facetoface:editevents', $context, $userid)) {
+        if (!$roomid) {
+            // New room creation.
+            return true;
+        }
+
+        $roomdata = $DB->get_record('facetoface_room', array('id' => $roomid));
+        // Only custom rooms can be edited.
+        if ($roomdata->custom) {
+            // Determine event it is assigned to and check that event is the same as current.
+            $roomsess = $DB->get_records_sql("
+                SELECT fs.facetoface FROM {facetoface_sessions_dates} fsd
+                JOIN {facetoface_sessions} fs ON (fsd.sessionid = fs.id)
+                WHERE fsd.roomid = :roomid
+            ", array('roomid' => $roomid));
+
+            // Unassigned (orphaned) custom rooms can be edited
+            // (they will became normal custom room exclusively owned by event after save).
+            if (empty($roomsess)) {
+                return true;
+            }
+
+            // If room assigned to current facetoface, user can edit it.
+            foreach ($roomsess as $roomses) {
+                if ($roomses->facetoface == $facetofaceid) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }

@@ -45,7 +45,10 @@ if (!$s && $cntdates < 1) {
     $cntdates = 1;
 }
 
-if ($id && !$s) {
+if ($s) {
+    list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
+    $s = $session->id;
+} else if ($id) {
     if (!$cm = get_coursemodule_from_id('facetoface', $id)) {
         print_error('error:incorrectcoursemoduleid', 'facetoface');
     }
@@ -55,8 +58,6 @@ if ($id && !$s) {
     if (!$facetoface = $DB->get_record('facetoface',array('id' => $cm->instance))) {
         print_error('error:incorrectcoursemodule', 'facetoface');
     }
-} else if ($s) {
-    list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 } else {
     if (!$facetoface = $DB->get_record('facetoface', array('id' => $f))) {
         print_error('error:incorrectfacetofaceid', 'facetoface');
@@ -69,6 +70,8 @@ if ($id && !$s) {
     }
 }
 $context = context_module::instance($cm->id);
+$f = $facetoface->id;
+$id = $cm->id;
 
 require_login($course, false, $cm);
 require_capability('mod/facetoface:editevents', $context);

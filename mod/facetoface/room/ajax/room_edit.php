@@ -25,11 +25,20 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php'
 require_once($CFG->dirroot . '/mod/facetoface/room/lib.php');
 
 $id = optional_param('id', 0, PARAM_INT);   // Room id.
+$facetofaceid = optional_param('f', 0, PARAM_INT);   // Face-to-face id.
 
-$system_context = context_system::instance();
 require_login(0, false);
 require_sesskey();
-require_capability('totara/core:modconfig', $system_context);
+
+$system_context = context_system::instance();
+$customforce = false;
+if (!has_capability('totara/core:modconfig', $system_context)
+        && $facetofaceid
+        && can_user_edit_room($USER->id, $id, $facetofaceid)) {
+    $customforce = true;
+} else {
+    require_capability('totara/core:modconfig', $system_context);
+}
 
 // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
 send_headers('text/html; charset=utf-8', false);
@@ -44,7 +53,7 @@ $form = process_room_form(
         exit();
     },
     null,
-    array('noactionbuttons' => true, 'custom' => true)
+    array('noactionbuttons' => true, 'custom' => true, 'customforce' => $customforce, 'f' => $facetofaceid)
 );
 
 
