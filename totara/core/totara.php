@@ -474,6 +474,13 @@ function totara_upgrade_installed_languages() {
     $notice_error = array();
     $installer = new lang_installer();
 
+    // Do not download anything if there is only 'en' lang pack.
+    $currentlangs = array_keys(get_string_manager()->get_list_of_translations(true));
+    if (count($currentlangs) === 1 and in_array('en', $currentlangs)) {
+        echo $OUTPUT->notification(get_string('nolangupdateneeded', 'tool_langimport'), 'notifysuccess');
+        return;
+    }
+
     if (!$availablelangs = $installer->get_remote_list_of_languages()) {
         echo $OUTPUT->notification(get_string('cannotdownloadtotaralanguageupdatelist', 'totara_core'), 'notifyproblem');
         return;
@@ -484,7 +491,6 @@ function totara_upgrade_installed_languages() {
     }
 
     // filter out unofficial packs
-    $currentlangs = array_keys(get_string_manager()->get_list_of_translations(true));
     $updateablelangs = array();
     foreach ($currentlangs as $clang) {
         if (!array_key_exists($clang, $md5array)) {
