@@ -2299,7 +2299,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $decline->managerprefix = $template->managerprefix;
         $decline->conditiontype = MDL_F2F_CONDITION_DECLINE_CONFIRMATION;
         $decline->ccmanager = 0;
-        $decline->status = facetoface_approval_required($facetoface) ? 1 : 0;
+        $decline->status = $template->status;
         $decline->templateid = $template->id;
         $notifications[MDL_F2F_CONDITION_DECLINE_CONFIRMATION] = $decline;
     } else {
