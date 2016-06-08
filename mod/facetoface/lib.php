@@ -3637,38 +3637,36 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
 
     $strdatetime = str_replace(' ', '&nbsp;', get_string('sessiondatetime', 'facetoface'));
     if ($session->mintimestart) {
-        $html = '';
         foreach ($session->sessiondates as $date) {
-            if (!empty($html)) {
-                $html .= html_writer::empty_tag('br');
+            $output .= html_writer::empty_tag('br');
+
+            $sessionobj = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
+            if ($sessionobj->startdate == $sessionobj->enddate) {
+                $html = $sessionobj->startdate . ', ';
+            } else {
+                $html = $sessionobj->startdate . ' - ' . $sessionobj->enddate . ', ';
             }
+
+            $sessiontimezonestr = !empty($displaytimezones) ? $sessionobj->timezone : '';
+            $html .= $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessiontimezonestr;
+
+            $output .= html_writer::tag('dt', $strdatetime);
+            $output .= html_writer::tag('dd', $html);
 
             // Display room information
             $date->room = $DB->get_record('facetoface_room', array('id' => $date->roomid));
             if (!empty($date->room)) {
                 $roomstring = facetoface_room_html($date->room, $PAGE->url);
-
                 $systemcontext = context_system::instance();
-
                 $descriptionhtml = file_rewrite_pluginfile_urls($date->room->description, 'pluginfile.php', $systemcontext->id, 'mod_facetoface', 'room', $date->room->id);
                 $roomstring .= $descriptionhtml;
 
-                $html .= html_writer::tag('span', get_string('room', 'facetoface'), array('class' => 'roomtitle'));
-                $html .= html_writer::tag('span', $roomstring, array('class' => 'roomdescription'));
+                $output .= html_writer::tag('dt', get_string('room', 'facetoface'));
+                $output .= html_writer::tag('dd', html_writer::tag('span', $roomstring, array('class' => 'roomdescription')));
             }
-
-            $sessionobj = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
-            if ($sessionobj->startdate == $sessionobj->enddate) {
-                $html .= $sessionobj->startdate . ', ';
-            } else {
-                $html .= $sessionobj->startdate . ' - ' . $sessionobj->enddate . ', ';
-            }
-
-            $sessiontimezonestr = !empty($displaytimezones) ? $sessionobj->timezone : '';
-            $html .= $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessiontimezonestr;
         }
-        $output .= html_writer::tag('dt', $strdatetime);
-        $output .= html_writer::tag('dd', $html);
+
+        $output .= html_writer::empty_tag('br');
     } else {
         $output .= html_writer::tag('dt', $strdatetime);
         $output .= html_writer::tag('dd', html_writer::tag('em', get_string('wait-listed', 'facetoface')));
@@ -3678,15 +3676,14 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     $placesleft = $session->capacity - $signupcount;
 
     if ($showcapacity) {
+        $output .= html_writer::tag('dt', get_string('maxbookings', 'facetoface'));
+
         if ($session->allowoverbook) {
-            $output .= html_writer::tag('dt', get_string('capacity', 'facetoface'));
             $output .= html_writer::tag('dd', get_string('capacityallowoverbook', 'facetoface', $session->capacity));
         } else {
-            $output .= html_writer::tag('dt', get_string('capacity', 'facetoface'));
             $output .= html_writer::tag('dd', $session->capacity);
         }
-    }
-    elseif (!$calendaroutput) {
+    } else if (!$calendaroutput) {
         $output .= html_writer::tag('dt', get_string('seatsavailable', 'facetoface'));
         $output .= html_writer::tag('dd', max(0, $placesleft));
     }
