@@ -22,6 +22,8 @@
  * @subpackage totara_core
  */
 
+require_once(dirname(__FILE__) . '/upgradelib.php');
+
 function xmldb_totara_core_install() {
     global $CFG, $DB, $SITE;
 
@@ -553,6 +555,11 @@ function xmldb_totara_core_install() {
     // Conditionally add description format field to the badge_criteria table.
     if (!$dbman->field_exists($table, $field)) {
         $dbman->add_field($table, $field);
+    }
+
+    // Make sure we run the MSSQL fixes when upgrading from Moodle.
+    if (!during_initial_install()) {
+        totara_core_fix_old_upgraded_mssql();
     }
 
     return true;

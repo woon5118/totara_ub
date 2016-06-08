@@ -1551,5 +1551,11 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2016042900, 'totara_core');
     }
 
+    if ($oldversion < 2016042901) {
+        // Run this again because we might have skipped this during upgrade from Moodle.
+        totara_core_fix_old_upgraded_mssql();
+        upgrade_plugin_savepoint(true, 2016042901, 'totara', 'core');
+    }
+
     return true;
 }
