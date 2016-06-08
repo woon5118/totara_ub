@@ -87,9 +87,9 @@ if (!empty($coursesets)) {
 
     foreach ($coursesets as $cs) {
         if ($cs->certifid) {
-            $certnames[$cs->id] = s($cs->fullname);
+            $certnames[$cs->id] = format_string($cs->fullname);
         } else {
-            $prognames[$cs->id] = s($cs->fullname);
+            $prognames[$cs->id] = format_string($cs->fullname);
         }
     }
 
