@@ -306,7 +306,8 @@ if ($CFG->version != $DB->get_field('config', 'value', array('name'=>'version'))
     redirect(new moodle_url($PAGE->url), 'Config cache inconsistency detected, resetting caches...');
 }
 
-if (!$cache and $version > $CFG->version) {  // upgrade
+if (!$cache and $totarainfo->upgradecore) {
+    // Totara: this is executed when Moodle version or Totara release changed.
 
     $PAGE->set_url(new moodle_url($PAGE->url, array(
         'confirmupgrade' => $confirmupgrade,
@@ -507,13 +508,12 @@ if (!$cache and $version > $CFG->version) {  // upgrade
             die();
         }
         unset($failed);
-        // Totara: Launch pre-upgrade checks.
-        totara_preupgrade($totarainfo);
 
         // Launch main upgrade.
         upgrade_core($version, true);
     }
 } else if ($version < $CFG->version) {
+    // Totara: this is not reached because we do the test above on $a->totaraupgradeerror
     // better stop here, we can not continue with plugin upgrades or anything else
     throw new moodle_exception('downgradedcore', 'error', new moodle_url('/admin/'));
 }

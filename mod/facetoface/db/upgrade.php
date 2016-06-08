@@ -1959,6 +1959,13 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014022000, 'facetoface');
     }
 
+    if ($oldversion < 2014041500) {
+        // Fix incorrect timezone information for Indianapolis.
+        $sql = "UPDATE {facetoface_sessions_dates} SET sessiontimezone = ? WHERE sessiontimezone = ?";
+        $DB->execute($sql, array('America/Indiana/Indianapolis', 'America/Indianapolis'));
+        upgrade_mod_savepoint(true, 2014041500, 'facetoface');
+    }
+
     if ($oldversion < 2014061600) {
 
         // Create the a userid field for the facetoface_notification_sent table.

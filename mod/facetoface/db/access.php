@@ -300,6 +300,7 @@ $capabilities = array(
         'archetypes' => array(
             'manager' => CAP_ALLOW
         ),
+        'clonepermissionsfrom' => 'mod/facetoface:updatefacetofacecustomfield',
     ),
 
     // View all sessions.

@@ -276,6 +276,14 @@ function xmldb_totara_certification_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2016021000, 'totara_certification');
     }
 
+    if ($oldversion < 2016040400) {
+        $sql = "DELETE FROM {course_completion_history}
+                WHERE courseid NOT IN (SELECT id FROM {course})";
+        $DB->execute($sql);
+
+        totara_upgrade_mod_savepoint(true, 2016040400, 'totara_certification');
+    }
+
     // TL-9020 Create completion log records for all completion records that don't already have one.
     // This should have been done when the completion log was created, but better late than never.
     // It ensures that when a change is logged, the values that it changed FROM will be in the log.

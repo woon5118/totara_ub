@@ -94,4 +94,27 @@ class totara_core_accesslib_testcase extends advanced_testcase {
             $this->assertInstanceOf('coding_exception', $e);
         }
     }
+
+    /**
+     * Test that core takes over migrated capabilities automatically with a debug message in case
+     * we forget to do it in Totara pre-upgrade script.
+     */
+    public function test_capability_move() {
+        global $DB;
+        $this->resetAfterTest();
+
+        update_capabilities('moodle');
+        $this->assertDebuggingNotCalled();
+
+        $viewbadges = $DB->get_record('capabilities', array('name' => 'moodle/badges:viewbadges'), '*', MUST_EXIST);
+        $this->assertSame('moodle', $viewbadges->component);
+
+        $DB->set_field('capabilities', 'component', 'totara_core', array('id' => $viewbadges->id));
+
+        update_capabilities('moodle');
+        $this->assertDebuggingCalled('Capability \'moodle/badges:viewbadges\' already existed in different component, please fix the pre-upgrade code');
+
+        $newviewbadges = $DB->get_record('capabilities', array('name' => 'moodle/badges:viewbadges'), '*', MUST_EXIST);
+        $this->assertEquals($viewbadges, $newviewbadges);
+    }
 }

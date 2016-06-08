@@ -96,9 +96,6 @@ function xmldb_totara_core_install() {
 
     $systemcontext->mark_dirty();
 
-    // Set up blocks.
-    totara_reset_mymoodle_blocks();
-
     // Set up frontpage.
     set_config('frontpage', '');
     set_config('frontpageloggedin', '');

@@ -406,6 +406,7 @@ function upgrade_stale_php_files_present() {
 
         // Removed in Totara 9.0.
         '/blocks/facetoface/lib.php',
+        '/totara/core/db/pre_any_upgrade.php',
         // Removed in Totara 2.7.
         '/admin/bulk-course-restore.php',
     );
@@ -434,7 +435,13 @@ function upgrade_plugins($type, $startcallback, $endcallback, $verbose) {
         return upgrade_plugins_blocks($startcallback, $endcallback, $verbose);
     }
 
-    $plugs = core_component::get_plugin_list($type);
+    if ($type === 'totaracoreonly') {
+        $type = 'totara';
+        $plugs = array('core' => realpath("$CFG->dirroot/totara/core"));
+        // Note we can safely run the totara_core upgrade again later.
+    } else {
+        $plugs = core_component::get_plugin_list($type);
+    }
 
     foreach ($plugs as $plug=>$fullplug) {
         // Reset time so that it works when installing a large number of plugins
@@ -1413,7 +1420,11 @@ function print_upgrade_part_start($plugin, $installation, $verbose) {
     if (empty($plugin) or $plugin == 'moodle') {
         upgrade_started($installation); // does not store upgrade running flag yet
         if ($verbose) {
-            echo $OUTPUT->heading(get_string('coresystem'));
+            if (empty($plugin)) {
+                echo $OUTPUT->heading('Totara');
+            } else {
+                echo $OUTPUT->heading(get_string('coresystem'));
+            }
         }
     } else {
         upgrade_started();
@@ -1613,14 +1624,15 @@ function upgrade_core($version, $verbose) {
     raise_memory_limit(MEMORY_EXTRA);
 
     require_once($CFG->libdir.'/db/upgrade.php');    // Defines upgrades
+    require_once($CFG->dirroot.'/totara/core/db/utils.php'); // Include Totara upgrade stuff.
 
     try {
         // Reset caches before any output.
         cache_helper::purge_all(true);
         purge_all_caches();
 
-        // Upgrade current language pack if we can
-        upgrade_language_pack();
+        // Totara; Run any pre-upgrade special fixes that may be required and update all languages.
+        totara_preupgrade();
 
         print_upgrade_part_start('moodle', false, $verbose);
 
@@ -1690,28 +1702,33 @@ function upgrade_noncore($verbose) {
     global $CFG;
 
     raise_memory_limit(MEMORY_EXTRA);
-    // Upgrade internationalisation first.
-    print_upgrade_part_start('Totara', false, $verbose);
-    // Upgrade all language packs if we can.
-    totara_upgrade_installed_languages();
-    print_upgrade_part_end('Totara', false, $verbose);
+
+    require_once($CFG->dirroot.'/totara/core/db/utils.php'); // Include Totara upgrade stuff.
+
     // upgrade all plugins types
     try {
         // Reset caches before any output.
         cache_helper::purge_all(true);
         purge_all_caches();
 
+        // Totara; Run any pre-upgrade special fixes that may be required.
+        totara_preupgrade();
+
         $plugintypes = core_component::get_plugin_types();
+
+        // Totara: we give totara_core preferential treatment, it always gets executed first.
+        $plugintypes = array_merge(array('totaracoreonly' => null), $plugintypes);
+
         foreach ($plugintypes as $type=>$location) {
             upgrade_plugins($type, 'print_upgrade_part_start', 'print_upgrade_part_end', $verbose);
         }
-        // Upgrade totara navigation menu.
-        totara_upgrade_menu();
         // Update cache definitions. Involves scanning each plugin for any changes.
         cache_helper::update_definitions();
         // Mark the site as upgraded.
         set_config('allversionshash', core_component::get_all_versions_hash());
 
+        // Upgrade totara navigation menu.
+        totara_upgrade_menu();
         // Allow the Totara Flavour to act upon the upgrade if need be.
         \totara_flavour\helper::execute_post_upgrade_steps();
 

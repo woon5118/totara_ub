@@ -751,5 +751,12 @@ function xmldb_totara_cohort_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015042200, 'totara', 'cohort');
     }
 
+    if ($oldversion < 2016061000) {
+        // This flag can be safely removed now because the plugin version itself does the same job.
+        get_config('totara_cohort', 'cohort_rule_fix_has_run');
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2016061000, 'totara', 'cohort');
+    }
+
     return true;
 }

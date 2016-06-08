@@ -42,6 +42,7 @@ $capabilities = array(
         'archetypes' => array(
             'manager' => CAP_ALLOW
         ),
+        'clonepermissionsfrom' => 'totara/core:updatecoursecustomfield',
     ),
     // Managing program custom fields.
     'totara/core:programmanagecustomfield' => array(
@@ -51,6 +52,7 @@ $capabilities = array(
         'archetypes' => array(
             'manager' => CAP_ALLOW
         ),
+        'clonepermissionsfrom' => 'totara/core:updateprogramcustomfield',
     ),
     'totara/core:undeleteuser' => array(
         'riskbitmask'   => RISK_CONFIG,

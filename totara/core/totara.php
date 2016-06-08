@@ -1978,87 +1978,13 @@ function totara_upgrade_menu() {
         $pluginname = core_component::get_plugin_list_with_file($plugin, 'db/totaramenu.php');
         if (!empty($pluginname)) {
             foreach ($pluginname as $name => $file) {
-                require_once($file);
+                // This is NOT a library file!
+                require($file);
             }
         }
     }
     $TOTARAMENU->upgrade();
 }
-
-/**
- * Install the Totara MyMoodle blocks
- *
- * @return bool
- */
-function totara_reset_mymoodle_blocks() {
-    global $DB, $SITE;
-
-    // get the id of the default mymoodle page
-    $mypageid = $DB->get_field_sql('SELECT id FROM {my_pages} WHERE userid IS null AND private = 1');
-
-    // build new block array
-    $blocks = array(
-        (object)array(
-            'blockname'=> 'totara_tasks',
-            'parentcontextid' => $SITE->id,
-            'showinsubcontexts' => 0,
-            'pagetypepattern' => 'my-index',
-            'subpagepattern' => $mypageid,
-            'defaultweight' => 1,
-            'configdata' => '',
-            'defaultregion' => 'content'
-        ),
-        (object)array(
-            'blockname'=> 'totara_alerts',
-            'parentcontextid' => $SITE->id,
-            'showinsubcontexts' => 0,
-            'pagetypepattern' => 'my-index',
-            'subpagepattern' => $mypageid,
-            'defaultweight' => 1,
-            'configdata' => '',
-            'defaultregion' => 'content',
-        ),
-        (object)array(
-            'blockname'=> 'totara_stats',
-            'parentcontextid' => $SITE->id,
-            'showinsubcontexts' => 0,
-            'pagetypepattern' => 'my-index',
-            'subpagepattern' => $mypageid,
-            'defaultweight' => 1,
-            'configdata' => '',
-            'defaultregion' => 'side-post',
-        )
-    );
-
-    // insert blocks
-    foreach ($blocks as $b) {
-        $blockid = $DB->insert_record('block_instances', $b);
-        context_block::instance($blockid);
-    }
-
-    //A separate set up for a quicklinks block as it needs additional data to be added on install
-    $blockinstance = new stdClass();
-    $blockinstance->blockname = 'totara_quicklinks';
-    $blockinstance->parentcontextid = SITEID;
-    $blockinstance->showinsubcontexts = 0;
-    $blockinstance->pagetypepattern = 'my-index';
-    $blockinstance->subpagepattern = $mypageid;
-    $blockinstance->defaultregion = 'side-post';
-    $blockinstance->defaultweight = 1;
-    $blockinstance->configdata = '';
-    $blockinstance->id = $DB->insert_record('block_instances', $blockinstance);
-
-    // Ensure the block context is created.
-    context_block::instance($blockinstance->id);
-
-    // If the new instance was created, allow it to do additional setup
-    if ($block = block_instance('totara_quicklinks', $blockinstance)) {
-        $block->instance_create();
-    }
-
-    return 1;
-}
-
 
 /**
  * Color functions used by totara themes for auto-generating colors

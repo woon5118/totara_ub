@@ -928,8 +928,6 @@ function xmldb_totara_core_upgrade($oldversion) {
         // Fix incorrect timezone information for Indianapolis.
         $sql = "UPDATE {user} SET timezone = ? WHERE timezone = ?";
         $DB->execute($sql, array('America/Indiana/Indianapolis', 'America/Indianapolis'));
-        $sql = "UPDATE {facetoface_sessions_dates} SET sessiontimezone = ? WHERE sessiontimezone = ?";
-        $DB->execute($sql, array('America/Indiana/Indianapolis', 'America/Indianapolis'));
         totara_upgrade_mod_savepoint(true, 2014041500, 'totara_core');
     }
 
@@ -939,26 +937,8 @@ function xmldb_totara_core_upgrade($oldversion) {
         // Don't run again if this upgrade has occurred before.
         $hasrun = get_config('totara_core', 'completion_reaggregation_fix_has_run');
         if (empty($hasrun)) {
-
-            $previousversion = get_config('totara_core', 'previous_version');
-            if (empty($previousversion)) {
-                $previousversionknown = false;
-            } else {
-                $previousversionknown = true;
-
-                $affected25site =
-                    (version_compare($previousversion, '2.5.10', '>=') &&
-                    version_compare($previousversion, '2.5.13', '<'));
-
-                $affected26site =
-                    (version_compare($previousversion, '2.6.0', '>=') &&
-                    version_compare($previousversion, '2.6.1', '<'));
-            }
-
-            // Only run if previous version was affected.
-            // If the previous version isn't known it won't be affected as $CFG->previous_version
-            // is set in all affected versions.
-            if ($previousversionknown && ($affected25site || $affected26site)) {
+            // Only run if previous version was affected - 2.5.10, 2.5.11, 2.5.12, 2.5.12.1, 2.6.0 and 2.6.0.1 releases.
+            if (($oldversion == 2014030701) || ($oldversion == 2014030702) || ($oldversion == 2014050500)) {
                 // Set time to unlimited as this could take a while.
                 core_php_time_limit::raise(0);
 
@@ -1496,14 +1476,6 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2016021700, 'totara_core');
     }
 
-    if ($oldversion < 2016040400) {
-        $sql = "DELETE FROM {course_completion_history}
-                WHERE courseid NOT IN (SELECT id FROM {course})";
-        $DB->execute($sql);
-
-        totara_upgrade_mod_savepoint(true, 2016040400, 'totara_core');
-    }
-
     // Delete reminder records for deleted courses.
     if ($oldversion < 2016041900) {
 
@@ -1555,6 +1527,12 @@ function xmldb_totara_core_upgrade($oldversion) {
         // Run this again because we might have skipped this during upgrade from Moodle.
         totara_core_fix_old_upgraded_mssql();
         upgrade_plugin_savepoint(true, 2016042901, 'totara', 'core');
+    }
+
+    if ($oldversion < 2016061401) {
+        // This setting was never necessary because it already used the totara_core version to execute it only once.
+        unset_config('completion_reaggregation_fix_has_run', 'totara_core');
+        upgrade_plugin_savepoint(true, 2016061401, 'totara', 'core');
     }
 
     return true;

@@ -3023,6 +3023,8 @@ function update_capabilities($component = 'moodle') {
     }
     // Add new capabilities to the stored definition.
     $existingcaps = $DB->get_records_menu('capabilities', array(), 'id', 'id, name');
+    $existingcapsmap = array_flip($existingcaps);
+
     foreach ($newcaps as $capname => $capdef) {
         $capability = new stdClass();
         $capability->name         = $capname;
@@ -3031,7 +3033,14 @@ function update_capabilities($component = 'moodle') {
         $capability->component    = $component;
         $capability->riskbitmask  = $capdef['riskbitmask'];
 
-        $DB->insert_record('capabilities', $capability, false);
+        // Totara: make sure there are no preexisting caps with the same name.
+        if (isset($existingcapsmap[$capname])) {
+            debugging("Capability '$capname' already existed in different component, please fix the pre-upgrade code", DEBUG_DEVELOPER);
+            $capability->id = $existingcapsmap[$capname];
+            $DB->update_record('capabilities', $capability);
+        } else {
+            $DB->insert_record('capabilities', $capability, false);
+        }
 
         if (isset($capdef['clonepermissionsfrom']) && in_array($capdef['clonepermissionsfrom'], $existingcaps)){
             if ($rolecapabilities = $DB->get_records('role_capabilities', array('capability'=>$capdef['clonepermissionsfrom']))){
