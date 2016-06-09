@@ -4289,5 +4289,54 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016061400, 'facetoface');
     }
 
+    // Update room and asset files to use mod_facetoface component name.
+    if ($oldversion < 2016061600) {
+
+        $fs = get_file_storage();
+        $syscontextid = context_system::instance()->id;
+
+        // Find all existing rooms and update the component name of any saved files to mod_facetoface.
+        $rooms = $DB->get_records('facetoface_room');
+        foreach ($rooms as $room) {
+            $files = $fs->get_area_files($syscontextid, 'facetoface', 'room', $room->id);
+            foreach ($files as $orgfile) {
+
+                if ($orgfile->get_filename() === ".") {
+                    continue;
+                }
+
+                $newfile = array(
+                    'component' => 'mod_facetoface',
+                    'filearea' => 'room',
+                    'itemid' => $room->id
+                );
+                $fs->create_file_from_storedfile($newfile, $orgfile);
+                $orgfile->delete();
+            }
+        }
+
+        // Find all existing assets and update the component name of any saved files to mod_facetoface.
+        $assets = $DB->get_records('facetoface_asset');
+        foreach ($assets as $asset) {
+            $files = $fs->get_area_files($syscontextid, 'facetoface', 'asset', $asset->id);
+            foreach ($files as $orgfile) {
+
+                if ($orgfile->get_filename() === ".") {
+                    continue;
+                }
+
+                $newfile = array(
+                    'component' => 'mod_facetoface',
+                    'filearea' => 'asset',
+                    'itemid' => $asset->id
+                );
+                $fs->create_file_from_storedfile($newfile, $orgfile);
+                $orgfile->delete();
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2016061600, 'facetoface');
+    }
+
     return $result;
 }

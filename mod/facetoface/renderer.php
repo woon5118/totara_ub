@@ -1147,7 +1147,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         // Description.
         if (!empty($asset->description)) {
             $asset->descriptionformat = FORMAT_HTML;
-            $asset = file_prepare_standard_editor($asset, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'facetoface', 'asset', $asset->id);
+            $asset = file_prepare_standard_editor($asset, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'mod_facetoface', 'asset', $asset->id);
             $output[] = html_writer::tag('dt', get_string('assetdescription', 'facetoface'));
             $output[] = html_writer::tag('dd', $asset->description_editor['text']);
         }

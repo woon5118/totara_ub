@@ -52,7 +52,7 @@ function create_or_update_asset($data, $todb) {
       'description',
       $TEXTAREA_OPTIONS,
       $TEXTAREA_OPTIONS['context'],
-      'facetoface',
+      'mod_facetoface',
       'asset',
       $data->id
     );
@@ -110,7 +110,7 @@ function process_asset_form($assetid, callable $successhandler, callable $cancel
     }
 
     $asset->descriptionformat = FORMAT_HTML;
-    $asset = file_prepare_standard_editor($asset, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'facetoface', 'asset', $asset->id);
+    $asset = file_prepare_standard_editor($asset, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'mod_facetoface', 'asset', $asset->id);
 
     $customdata['asset'] = $asset;
     $customdata['editoroptions'] = $TEXTAREA_OPTIONS;
