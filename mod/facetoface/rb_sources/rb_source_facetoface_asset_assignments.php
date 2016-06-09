@@ -185,16 +185,16 @@ class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source
                 'value' => 'namelink'
             ),
             array(
-                'type' => 'asset',
-                'value' => 'namelink'
-            ),
-            array(
-                'type' => 'sessions',
-                'value' => 'sessionstartdate'
-            ),
-            array(
                 'type' => 'room',
-                'value' => 'capacity'
+                'value' => 'name'
+            ),
+            array(
+                'type' => 'asset',
+                'value' => 'name'
+            ),
+            array(
+                'type' => 'date',
+                'value' => 'sessionstartdate'
             )
         );
 
@@ -212,19 +212,19 @@ class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source
                 'value' => 'name'
             ),
             array(
-                'type' => 'sessions',
+                'type' => 'date',
                 'value' => 'sessionstartdate'
             ),
             array(
-                'type' => 'sessions',
+                'type' => 'date',
                 'value' => 'sessionfinishdate'
             ),
             array(
-                'type' => 'room',
+                'type' => 'asset',
                 'value' => 'name'
             ),
             array(
-                'type' => 'room',
+                'type' => 'asset',
                 'value' => 'visible'
             )
         );
