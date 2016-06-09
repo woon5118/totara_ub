@@ -70,7 +70,22 @@ $sql = "SELECT pcl.id, pcl.timemodified, pcl.changeuserid, pcl.description, " . 
          ORDER BY pcl.id DESC";
 $transactions = $DB->get_records_sql($sql, array('userid' => $userid, 'programid' => $id));
 
-if ($progcompletion && empty($exceptions)) {
+if ($dismissedexceptions = $program->check_user_for_dismissed_exceptions($userid)) {
+    $resetexception = optional_param('resetexception', 0, PARAM_INT);
+
+    if ($resetexception) {
+        // Remove the exception status on the user assignment.
+        $exmanager = new prog_exceptions_manager($id);
+        $exmanager->override_dismissed_exception($userid);
+
+        $urlparams = array('id' => $id, 'userid' => $userid);
+        $redirecturl = new moodle_url('/totara/program/edit_completion.php', $urlparams);
+
+        totara_set_notification(get_string('exceptionoverridden', 'totara_program'), $redirecturl, array('class' => 'notifysuccess'));
+    }
+}
+
+if ($progcompletion && empty($exceptions) && !$dismissedexceptions) {
     $errors = prog_get_completion_errors($progcompletion);
     $currentformdata = new stdClass();
     $currentformdata->status = $progcompletion->status;
@@ -169,6 +184,12 @@ if (isset($editform)) {
     $editform->set_data($currentformdata);
     $editform->validate_defined_fields(true);
     $editform->display();
+} else if ($dismissedexceptions) {
+    $urlparams = array('id' => $id, 'userid' => $userid, 'resetexception' => 1);
+    $exceptionurl = new moodle_url('/totara/program/edit_completion.php', $urlparams);
+
+    echo $OUTPUT->notification(get_string('userhasdismissedexception', 'totara_program'), 'notifymessage');
+    echo $OUTPUT->single_button($exceptionurl, get_string('overrideandassign', 'totara_program'));
 } else if (!empty($exceptions)) {
     echo $OUTPUT->notification(get_string('fixexceptionbeforeeditingcompletion', 'totara_program'), 'notifyproblem');
 } else {

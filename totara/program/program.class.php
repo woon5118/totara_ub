@@ -1876,6 +1876,24 @@ class program {
     }
 
     /**
+     * Checks whether a user is currently unassigned but has an existing
+     * assignment with an exception which was previously dismissed.
+     *
+     * @param int $userid
+     * @return bool
+     */
+    public function check_user_for_dismissed_exceptions($userid) {
+        global $DB;
+
+        $assigned = $this->user_is_assigned($userid);
+
+        $params = array('programid' => $this->id, 'userid' => $userid, 'exceptionstatus' => PROGRAM_EXCEPTION_DISMISSED);
+        $dismissed = $DB->record_exists('prog_user_assignment', $params);
+
+        return (!$assigned && $dismissed);
+    }
+
+    /**
      * Checks to see if a program is assigned to a user
      * through a plan and approved
      *

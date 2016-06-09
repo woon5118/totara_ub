@@ -137,6 +137,13 @@ abstract class prog_exception {
                 return false;
             }
 
+            // Record the change in the program completion log.
+            prog_log_completion(
+               $this->programid,
+               $this->userid,
+               'Assignment exception overridden and user assigned despite problem'
+            );
+
             // Event trigger to send notification when exception is resolved.
             $event = \totara_program\event\program_assigned::create(
                 array(
@@ -191,6 +198,13 @@ abstract class prog_exception {
 
             $DB->update_record('prog_user_assignment', $learner_assign_todb);
 
+            // Record the change in the program completion log.
+            prog_log_completion(
+               $this->programid,
+               $this->userid,
+               'User assigned and due date exception automatically resolved'
+            );
+
             $event = \totara_program\event\program_assigned::create(
                 array(
                     'objectid' => $this->programid,
@@ -224,6 +238,13 @@ abstract class prog_exception {
                 return false;
             }
         }
+
+        // Record the change in the program completion log.
+        prog_log_completion(
+           $this->programid,
+           $this->userid,
+           'Assignment exception dismissed without assigning user'
+        );
 
         return prog_exception::delete_exception($this->id);
     }

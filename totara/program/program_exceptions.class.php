@@ -105,6 +105,59 @@ class prog_exceptions_manager {
     }
 
     /**
+     * Override and complete the assignment for a user with a previously dismissed exception.
+     * This should never be used, however dismissed exceptions are handled badly so we have to
+     *
+     * @param userid
+     * @return bool
+     */
+    public function override_dismissed_exception($userid) {
+        global $DB;
+
+        $assignparams = array('programid' => $this->programid, 'userid' => $userid);
+        $assignments = $DB->get_records('prog_user_assignment', $assignparams);
+        if (!empty($assignments)) {
+            // Update all the dismissed exceptions at once.
+            $assignsql = 'UPDATE {prog_user_assignment}
+                             SET exceptionstatus = ' . PROGRAM_EXCEPTION_RESOLVED . '
+                           WHERE exceptionstatus = ' . PROGRAM_EXCEPTION_DISMISSED . '
+                             AND userid = :userid
+                             AND programid = :programid';
+            $DB->execute($assignsql, $assignparams);
+        } else {
+            throw new ProgramExceptionException(get_string('error:assignmentnotfound', 'totara_program'));
+        }
+
+        // There shouldn't be any exception records here but just to be safe.
+        $exceptions = $DB->get_records('prog_exception', $assignparams);
+        foreach ($exceptions as $exception) {
+            // Only delete the ones we have edited above.
+            if ($assignments[$exception->assignmentid]->exceptionstatus === PROGRAM_EXCEPTION_DISMISSED) {
+                prog_exception::delete_exception($exception->id);
+            }
+        }
+
+        // Record the change in the program completion log.
+        prog_log_completion(
+            $this->programid,
+            $userid,
+            'Program Assignment Exception - Overridden a previously dismissed exception'
+        );
+
+        // Event trigger to send notification when exception is resolved.
+        $event = \totara_program\event\program_assigned::create(
+            array(
+                'objectid' => $this->programid,
+                'context' => context_program::instance($this->programid),
+                'userid' => $userid,
+            )
+        );
+        $event->trigger();
+
+        return true;
+    }
+
+    /**
      * Deletes an exception from the database
      *
      * @param <type> $exceptionid

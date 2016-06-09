@@ -57,9 +57,24 @@ $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 $url = new moodle_url('/totara/certification/edit_completion.php', array('id' => $id, 'userid' => $userid));
 $PAGE->set_context($programcontext);
 
+if ($dismissedexceptions = $program->check_user_for_dismissed_exceptions($userid)) {
+    $resetexception = optional_param('resetexception', 0, PARAM_INT);
+
+    if ($resetexception) {
+        // Remove the exception status on the user assignment.
+        $exmanager = new prog_exceptions_manager($id);
+        $exmanager->override_dismissed_exception($userid);
+
+        $urlparams = array('id' => $id, 'userid' => $userid);
+        $redirecturl = new moodle_url('/totara/certification/edit_completion.php', $urlparams);
+
+        totara_set_notification(get_string('exceptionoverridden', 'totara_program'), $redirecturl, array('class' => 'notifysuccess'));
+    }
+}
+
 // Process delete history.
 $deletehistory = optional_param('deletehistory', 0, PARAM_INT);
-if ($deletehistory) {
+if ($deletehistory && !$dismissedexceptions) {
     $chid = required_param('chid', PARAM_INT);
 
     // Validate that the record to be deleted matches the certification and user.
@@ -81,7 +96,7 @@ if ($deletehistory) {
 list($certcompletion, $progcompletion) = certif_load_completion($id, $userid, false);
 $exceptions = $DB->get_records('prog_exception', array('programid' => $id, 'userid' => $userid));
 
-if ($certcompletion && $progcompletion && empty($exceptions)) {
+if ($certcompletion && $progcompletion && empty($exceptions) && !$dismissedexceptions) {
     $currentformdata = new stdClass();
     $currentformdata->state = certif_get_completion_state($certcompletion);
     $currentformdata->inprogress = ($certcompletion->status == CERTIFSTATUS_INPROGRESS) ? 1 : 0;
@@ -211,6 +226,12 @@ if (isset($editform)) {
     $editform->set_data($currentformdata);
     $editform->validate_defined_fields(true);
     $editform->display();
+} else if ($dismissedexceptions) {
+    $urlparams = array('id' => $id, 'userid' => $userid, 'resetexception' => 1);
+    $exceptionurl = new moodle_url('/totara/certification/edit_completion.php', $urlparams);
+
+    echo $OUTPUT->notification(get_string('userhasdismissedexception', 'totara_program'), 'notifymessage');
+    echo $OUTPUT->single_button($exceptionurl, get_string('overrideandassign', 'totara_program'));
 } else if (!empty($exceptions)) {
     echo $OUTPUT->notification(get_string('fixexceptionbeforeeditingcompletion', 'totara_program'), 'notifyproblem');
 } else {

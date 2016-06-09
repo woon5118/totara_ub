@@ -397,6 +397,7 @@ $string['eventunassigned'] = 'Program unassigned';
 $string['eventupdated'] = 'Program updated';
 $string['eventviewed'] = 'Program Viewed';
 $string['eventnotfound'] = 'Could not find program assignment event with id {$a}';
+$string['exceptionoverridden'] = 'Program assignment exception overridden, and user assignment successfully completed.';
 $string['exceptionreportmessage'] = 'Exception report message';
 $string['exceptionreportmessage_help'] = 'This message will be sent to the site administrator whenever new exceptions are added to a program\'s exception report.';
 $string['exceptions'] = 'Exception Report ({$a})';
@@ -722,6 +723,7 @@ $string['orviewprograms'] = 'or view programs in this category ({$a})';
 $string['othersettings'] = 'Settings';
 $string['overdue'] = 'Overdue!';
 $string['overrideandaddprogram'] = 'Override and add program';
+$string['overrideandassign'] = 'Override and assign';
 $string['overview'] = 'Overview';
 $string['partofteam'] = 'Part of \'{$a}\' team.';
 $string['pendingextension'] = '(Pending extension request)';
@@ -957,6 +959,7 @@ $string['userassignmentstask'] = 'Program user assignments';
 $string['userhasnocompletionhistory'] = 'The user has no historical completion records.';
 $string['userid'] = 'User ID';
 $string['usernotcurrentlyassigned'] = 'The user is not currently assigned. A user cannot have a current completion record unless they are assigned.';
+$string['userhasdismissedexception'] = 'The user currently has a dismissed exception. You must override the exception before you can edit the current completion record.';
 $string['variablesubstitution_help'] = '
 
 ## Variable substitution
