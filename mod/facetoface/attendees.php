@@ -906,7 +906,7 @@ if ($show_table) {
             $headers[] = get_string('attendance', 'facetoface');
             $columns[] = 'attendance';
 
-            if ($session->availablesignupnote && $action != 'takeattendance') {
+            if ($action != 'takeattendance') {
                 if ($includeattendeesnote) {
 
                     $headers[] = get_string('attendeenote', 'facetoface');
@@ -1087,24 +1087,22 @@ if ($show_table) {
                 }
 
                 $data[] = str_replace(' ', '&nbsp;', get_string('status_'.facetoface_get_status($attendee->statuscode), 'facetoface'));
-                if ($session->availablesignupnote) {
-                    $icon = '';
-                    if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
-                        $url = new moodle_url('/mod/facetoface/attendee_note.php', array('s' => $session->id, 'userid' => $attendee->id, 'sesskey' => sesskey()));
-                        $showpix = new pix_icon('/t/preview', get_string('showattendeesnote', 'facetoface'));
-                        $icon = $OUTPUT->action_icon($url, $showpix, null, array('class' => 'action-icon attendee-add-note pull-right'));
-                    }
-                    if ($includeattendeesnote) {
-                        // Get signup note.
-                        $signupstatus = new stdClass();
-                        $signupstatus->id = $attendee->submissionid;
-                        $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
+                $icon = '';
+                if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
+                    $url = new moodle_url('/mod/facetoface/attendee_note.php', array('s' => $session->id, 'userid' => $attendee->id, 'sesskey' => sesskey()));
+                    $showpix = new pix_icon('/t/preview', get_string('showattendeesnote', 'facetoface'));
+                    $icon = $OUTPUT->action_icon($url, $showpix, null, array('class' => 'action-icon attendee-add-note pull-right'));
+                }
+                if ($includeattendeesnote) {
+                    // Get signup note.
+                    $signupstatus = new stdClass();
+                    $signupstatus->id = $attendee->submissionid;
+                    $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
 
-                        $signupnotetext = empty($signupnote) ? '' : $signupnote['signupnote'];
+                    $signupnotetext = empty($signupnote) ? '' : $signupnote['signupnote'];
 
-                        $note = html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
-                        $data[] = ($download) ? $datanote : $icon . $note;
-                    }
+                    $note = html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
+                    $data[] = ($download) ? $datanote : $icon . $note;
                 }
             }
 
@@ -1231,7 +1229,7 @@ if ($action == 'approvalrequired') {
     $headings = array();
     $headings[] = get_string('name');
     $headings[] = get_string('timerequested', 'facetoface');
-    if ($session->availablesignupnote && $includeattendeesnote) {
+    if ($includeattendeesnote) {
         // The user has to hold specific permissions to view this.
         $headings[] = get_string('attendeenote', 'facetoface');
     }
@@ -1260,23 +1258,21 @@ if ($action == 'approvalrequired') {
         $data[] = html_writer::link($attendee_link, format_string(fullname($attendee)));
         $data[] = userdate($attendee->timerequested, get_string('strftimedatetime'));
 
-        if ($session->availablesignupnote) {
-            $icon = '';
-            if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
-                $url = new moodle_url('/mod/facetoface/attendee_note.php', array('s' => $session->id, 'userid' => $attendee->id, 'sesskey' => sesskey()));
-                $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
-            }
-            if ($includeattendeesnote) {
-                // Get signup note.
-                $signupstatus = new stdClass();
-                $signupstatus->id = $attendee->signupid;
-                $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
+        $icon = '';
+        if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
+            $url = new moodle_url('/mod/facetoface/attendee_note.php', array('s' => $session->id, 'userid' => $attendee->id, 'sesskey' => sesskey()));
+            $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
+        }
+        if ($includeattendeesnote) {
+            // Get signup note.
+            $signupstatus = new stdClass();
+            $signupstatus->id = $attendee->signupid;
+            $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
 
-                $signupnotetext = empty($signupnote) ? '' : $signupnote['signupnote'];
+            $signupnotetext = empty($signupnote) ? '' : $signupnote['signupnote'];
 
-                $note = html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
-                $data[] = $icon . $note;
-            }
+            $note = html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
+            $data[] = $icon . $note;
         }
 
         // Additional approval columns for the approval tab.

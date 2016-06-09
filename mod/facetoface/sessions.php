@@ -246,9 +246,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
     if (empty($fromform->selfapproval)) {
         $fromform->selfapproval = 0;
     }
-    if (empty($fromform->availablesignupnote)) {
-        $fromform->availablesignupnote = 0;
-    }
 
     //check dates and calculate total duration
     $sessiondates = array();
@@ -277,7 +274,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $todb->normalcost = $fromform->normalcost;
     $todb->discountcost = $fromform->discountcost;
     $todb->usermodified = $USER->id;
-    $todb->availablesignupnote = $fromform->availablesignupnote;
 
     // Sign-Up fields added.
     $todb->registrationtimestart = $fromform->registrationtimestart;

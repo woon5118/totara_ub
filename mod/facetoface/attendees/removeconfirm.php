@@ -52,10 +52,7 @@ if (empty($userlist)) {
             new moodle_url('/mod/facetoface/attendees.php', array('s' => $s, 'backtoallsessions' => 1)));
 }
 
-$enableattendeenote = $session->availablesignupnote;
-$showcustomfields = $enableattendeenote && !$list->has_user_data();
-
-$mform = new removeconfirm_form(null, array('s' => $s, 'listid' => $listid, 'enablecustomfields' => $showcustomfields));
+$mform = new removeconfirm_form(null, array('s' => $s, 'listid' => $listid, 'enablecustomfields' => !$list->has_user_data()));
 
 $returnurl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $s, 'backtoallsessions' => 1));
 if ($mform->is_cancelled()) {
@@ -112,12 +109,10 @@ if ($fromform = $mform->get_data()) {
                 }
 
                 // Store customfields.
-                if ($enableattendeenote) {
-                    $signupstatus = facetoface_get_attendee($session->id, $attendee->id);
-                    $customdata = $list->has_user_data() ? (object)$list->get_user_data($attendee->id) : $fromform;
-                    $customdata->id = $signupstatus->submissionid;
-                    customfield_save_data($customdata, 'facetofacecancellation', 'facetoface_cancellation');
-                }
+                $signupstatus = facetoface_get_attendee($session->id, $attendee->id);
+                $customdata = $list->has_user_data() ? (object)$list->get_user_data($attendee->id) : $fromform;
+                $customdata->id = $signupstatus->submissionid;
+                customfield_save_data($customdata, 'facetofacecancellation', 'facetoface_cancellation');
 
                 $result['result'] = get_string('removedsuccessfully', 'facetoface');
                 $removed[] = $result;

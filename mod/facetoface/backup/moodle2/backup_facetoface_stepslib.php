@@ -74,7 +74,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             'approvaltype', 'approvalterms', 'approvalrole', 'approvaladmins', 'multiplesessions',
             'completionstatusrequired', 'managerreserve', 'maxmanagerreserves', 'reservecanceldays',
             'reservedays', 'selfapprovaltandc', 'declareinterest', 'interestonlyiffull', 'selectpositiononsignup',
-            'forceselectposition', 'allowcancellationsdefault', 'cancellationscutoffdefault', 'allowsignupnotedefault'));
+            'forceselectposition', 'allowcancellationsdefault', 'cancellationscutoffdefault'));
         $notifications = new backup_nested_element('notifications');
 
         $notification = new backup_nested_element('notification', array('id'), array(
@@ -87,7 +87,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session = new backup_nested_element('session', array('id'), array(
             'facetoface', 'capacity', 'allowoverbook', 'details', 'duration', 'normalcost', 'discountcost', 'timecreated',
             'timemodified', 'selfapproval', 'mincapacity', 'cutoff', 'waitlisteveryone', 'allowcancellations',
-            'cancellationcutoff', 'availablesignupnote'));
+            'cancellationcutoff'));
 
         $signups = new backup_nested_element('signups');
 

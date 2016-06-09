@@ -139,10 +139,6 @@ class mod_facetoface_session_form extends moodleform {
             }
         }
 
-        $mform->addElement('checkbox', 'availablesignupnote', get_string('availablesignupnote', 'facetoface'));
-        $mform->addHelpButton('availablesignupnote', 'availablesignupnote', 'facetoface');
-        $mform->setDefault('availablesignupnote', $this->_customdata['facetoface']->allowsignupnotedefault);
-
         $mform->addElement('editor', 'details_editor', get_string('details', 'facetoface'), null, $editoroptions);
         $mform->setType('details_editor', PARAM_RAW);
         $mform->addHelpButton('details_editor', 'details', 'facetoface');

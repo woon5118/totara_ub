@@ -270,7 +270,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
 
         if ($result['result'] === true) {
             // Add signup note.
-            if ($session->availablesignupnote && $signupnote) {
+            if ($signupnote) {
                 $signupstatus = facetoface_get_attendee($session->id, $USER->id);
                 $signupdata = new stdClass();
                 $signupdata->id = $signupstatus->submissionid;

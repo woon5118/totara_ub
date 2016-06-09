@@ -61,3 +61,7 @@ setting:sitenotices,mod_facetoface
 setting:sitenoticeshere,mod_facetoface
 sitenoticesheading,mod_facetoface
 xhxm,mod_facetoface
+allowsignupnotedefault,mod_facetoface
+allowsignupnotedefault_help,mod_facetoface
+availablesignupnote,mod_facetoface
+availablesignupnote_help,mod_facetoface

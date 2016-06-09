@@ -4338,5 +4338,24 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016061600, 'facetoface');
     }
 
+    if ($oldversion < 2016062400) {
+        // Remove allowsignupnotedefault field from facetoface table.
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('allowsignupnotedefault');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Remove availablesignupnote field from facetoface_sessions table.
+        $table = new xmldb_table('facetoface_sessions');
+        $field = new xmldb_field('availablesignupnote');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2016062400, 'facetoface');
+    }
+
     return $result;
 }

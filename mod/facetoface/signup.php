@@ -108,13 +108,12 @@ $approvaladmins = $facetoface->approvaladmins;
 
 $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
 $waitlisteveryone = !empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone;
-$enableattendeenote = $session->availablesignupnote;
 $signupbywaitlist = facetoface_is_signup_by_waitlist($session);
 
 $f2fid = $session->facetoface;
 
 $params = compact('s', 'backtoallsessions', 'managerid', 'showdiscountcode', 'approvaltype',
-    'approvalterms', 'approvaladmins', 'f2fid', 'waitlisteveryone', 'enableattendeenote', 'signupbywaitlist');
+    'approvalterms', 'approvaladmins', 'f2fid', 'waitlisteveryone', 'signupbywaitlist');
 $mform = new mod_facetoface_signup_form(null, $params);
 
 // Setup custom javascript
@@ -188,11 +187,9 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
     $result = facetoface_user_import($course, $facetoface, $session, $USER->id, $params);
     if ($result['result'] === true) {
-        if ($enableattendeenote) {
-            $signup = facetoface_get_attendee($session->id, $USER->id);
-            $fromform->id = $signup->submissionid;
-            customfield_save_data($fromform, 'facetofacesignup', 'facetoface_signup');
-        }
+        $signup = facetoface_get_attendee($session->id, $USER->id);
+        $fromform->id = $signup->submissionid;
+        customfield_save_data($fromform, 'facetofacesignup', 'facetoface_signup');
 
         switch ($facetoface->approvaltype) {
             case APPROVAL_NONE:

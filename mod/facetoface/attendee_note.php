@@ -49,7 +49,7 @@ if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course
 // Check essential permissions.
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
-if (!has_capability('mod/facetoface:manageattendeesnote', $context) || (bool)$session->availablesignupnote == false) {
+if (!has_capability('mod/facetoface:manageattendeesnote', $context)) {
     print_error('nopermissions', 'error', '', 'Update attendee note');
 }
 

@@ -257,18 +257,17 @@ class enrol_totara_facetoface_signup_form extends moodleform {
             $mform->setType($elementid, PARAM_TEXT);
 
             // Signup note.
-            if ($session->availablesignupnote == 1) {
-                // Get list of signup customfields.
-                $signupfields = $DB->get_records('facetoface_signup_info_field');
 
-                foreach ($signupfields as $signupfield) {
-                    // Currently we only support signup note.
-                    if ($signupfield->shortname == 'signupnote') {
-                        $elementid = $signupfield->shortname . $session->id;
+            // Get list of signup customfields.
+            $signupfields = $DB->get_records('facetoface_signup_info_field');
 
-                        $mform->addElement('text', $elementid, $signupfield->fullname);
-                        $mform->setType($elementid, PARAM_TEXT);
-                    }
+            foreach ($signupfields as $signupfield) {
+                // Currently we only support signup note.
+                if ($signupfield->shortname == 'signupnote') {
+                    $elementid = $signupfield->shortname . $session->id;
+
+                    $mform->addElement('text', $elementid, $signupfield->fullname);
+                    $mform->setType($elementid, PARAM_TEXT);
                 }
             }
 

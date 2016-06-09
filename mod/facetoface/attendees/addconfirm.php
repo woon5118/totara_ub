@@ -53,12 +53,9 @@ if (empty($userlist)) {
             new moodle_url('/mod/facetoface/attendees.php', array('s' => $s, 'backtoallsessions' => 1)));
 }
 
-$enableattendeenote = $session->availablesignupnote;
-$showcustomfields = $enableattendeenote && !$list->has_user_data();
-
 $approvalreqd = facetoface_approval_required($facetoface);
 $mform = new addconfirm_form(null, array('s' => $s, 'listid' => $listid, 'approvalreqd' => $approvalreqd,
-        'enablecustomfields' => $showcustomfields, 'ignoreconflicts' => $ignoreconflicts));
+        'enablecustomfields' => !$list->has_user_data(), 'ignoreconflicts' => $ignoreconflicts));
 
 $returnurl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $s, 'backtoallsessions' => 1));
 if ($mform->is_cancelled()) {
@@ -128,14 +125,12 @@ if ($fromform = $mform->get_data()) {
             }
 
             // Store customfields.
-            if ($enableattendeenote) {
-                $signupstatus = facetoface_get_attendee($session->id, $attendee->id);
-                $customdata = $list->has_user_data() ? (object)$list->get_user_data($attendee->id) : $fromform;
-                $customdata->id = $signupstatus->submissionid;
-                customfield_save_data($customdata, 'facetofacesignup', 'facetoface_signup');
-                // Values of multi-select are changing after edit_save_data func.
-                $fromform = unserialize($clonefromform);
-            }
+            $signupstatus = facetoface_get_attendee($session->id, $attendee->id);
+            $customdata = $list->has_user_data() ? (object)$list->get_user_data($attendee->id) : $fromform;
+            $customdata->id = $signupstatus->submissionid;
+            customfield_save_data($customdata, 'facetofacesignup', 'facetoface_signup');
+            // Values of multi-select are changing after edit_save_data func.
+            $fromform = unserialize($clonefromform);
         }
     }
 

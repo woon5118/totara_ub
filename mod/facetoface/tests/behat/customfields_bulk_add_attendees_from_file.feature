@@ -76,8 +76,6 @@ Feature: Add seminar attendess from csv file with custom fields
     And I follow "Course 1"
     And I follow "View all events"
     And I follow "Add a new event"
-    And I set the following fields to these values:
-      | availablesignupnote | 1 |
     And I press "Save changes"
 
   Scenario: Login as manager, upload csv file with custom fields using bulk add attendees from file and check the result.

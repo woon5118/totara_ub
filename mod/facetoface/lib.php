@@ -304,9 +304,6 @@ function facetoface_fix_settings($facetoface) {
     if (empty($facetoface->forceselectposition) || !$facetoface->forceselectposition) {
         $facetoface->forceselectposition = 0;
     }
-    if (empty($facetoface->allowsignupnotedefault) || !$facetoface->allowsignupnotedefault) {
-        $facetoface->allowsignupnotedefault = 0;
-    }
 }
 
 /**

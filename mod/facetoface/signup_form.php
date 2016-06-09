@@ -31,7 +31,6 @@ class mod_facetoface_signup_form extends moodleform {
 
         $mform =& $this->_form;
         $showdiscountcode = $this->_customdata['showdiscountcode'];
-        $enableattendeenote = $this->_customdata['enableattendeenote'];
         $approvaltype = $this->_customdata['approvaltype'];
         $approvaladmins = $this->_customdata['approvaladmins'];
         $managerid = $this->_customdata['managerid'];
@@ -140,12 +139,10 @@ class mod_facetoface_signup_form extends moodleform {
         }
         $mform->setType('discountcode', PARAM_TEXT);
 
-        if ($enableattendeenote) {
-            $signup = new stdClass();
-            $signup->id = 0;
-            customfield_definition($mform, $signup, 'facetofacesignup', 0, 'facetoface_signup');
-            $mform->removeElement('customfields');
-        }
+        $signup = new stdClass();
+        $signup->id = 0;
+        customfield_definition($mform, $signup, 'facetofacesignup', 0, 'facetoface_signup');
+        $mform->removeElement('customfields');
 
         if (empty($CFG->facetoface_notificationdisable)) {
             $options = array(MDL_F2F_BOTH => get_string('notificationboth', 'facetoface'),

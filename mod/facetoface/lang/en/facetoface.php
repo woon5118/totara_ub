@@ -68,8 +68,6 @@ $string['allowscheduleconflicts'] = 'Allow scheduling conflicts';
 $string['allowschedulingconflicts'] = 'Override user conflicts';
 $string['allowschedulingconflicts_help'] = 'If trainers or users are already assigned or booked onto another seminar event at the same time as this event then the administrator will be warned, but can override such warnings and proceed anyway by selecting "Yes" from the drop-down menu';
 $string['allowselectedschedulingconflicts'] = 'Allow selected scheduling conflicts';
-$string['allowsignupnotedefault'] = 'Default &lsquo;Users can enter requests when signing up&rsquo; setting';
-$string['allowsignupnotedefault_help'] = 'Whether events in this activity will allow a sign-up note by default, can be overridden in the event settings';
 $string['allrooms'] = 'All rooms';
 $string['allsessionsin'] = 'All events in {$a}';
 $string['alreadysignedup'] = 'You have already signed-up for this seminar activity.';
@@ -134,7 +132,6 @@ $string['approvalovercapacity'] = 'There are {$a->waiting} learners awaiting app
 $string['approvalovercapacitywaitlist'] = 'There are {$a->waiting} learners awaiting approval but only {$a->available} spaces available.<br /> Only the first {$a->available} learners you approve will be added to the event - additional approvals will be added to the waitlist.';
 $string['potentialattendees'] = 'Potential Attendees';
 $string['attendeestablesummary'] = 'People planning on or having attended this event.';
-$string['availablesignupnote'] = 'Users can enter requests when signing up';
 $string['requeststablesummary'] = 'People requesting to attended this event.';
 $string['beforeregistrationends'] = 'before registration closes';
 $string['beforestartofsession'] = 'before start of event';
@@ -1965,11 +1962,6 @@ When a learner signs up for a event that is already full, they will receive an e
 
 $string['approvalreqd_help'] = 'When "Approval required" is checked, a learner will need approval from their manager to be permitted to attend a seminar event.';
 
-$string['availablesignupnote_help'] = 'When "Users can enter requests when signing up" is checked, learners will be able to enter any specific requirements that the event organiser might need to know about:
-
-* Dietary requirements
-* Disabilities';
-
 $string['cancellationinstrmngr'] = '# Notice for manager';
 $string['cancellationinstrmngr_help'] = 'When **Send notice to manager** is checked, the text in the **Notice for manager** field is sent to a learner\'s manager advising that they have cancelled a seminar booking.';
 
@@ -2158,6 +2150,13 @@ $string['addmanageremailaddress'] = 'Add manager email address';
 $string['addmanageremailinstruction'] = 'You have not previously entered your manager\'s email address. Please enter it below to sign-up for this event. ';
 $string['addnewnotice'] = 'Add a new site notice';
 $string['addnewnoticelink'] = 'Create a new site notice';
+$string['allowsignupnotedefault'] = 'Default &lsquo;Users can enter requests when signing up&rsquo; setting';
+$string['allowsignupnotedefault_help'] = 'Whether events in this activity will allow a sign-up note by default, can be overridden in the event settings';
+$string['availablesignupnote'] = 'Users can enter requests when signing up';
+$string['availablesignupnote_help'] = 'When "Users can enter requests when signing up" is checked, learners will be able to enter any specific requirements that the event organiser might need to know about:
+
+* Dietary requirements
+* Disabilities';
 $string['bulkaddheading'] = 'Bulk Add';
 $string['calendarfiltersheading'] = 'Seminar calendar filters';
 $string['changemanageremailaddress'] = 'Change manager email address';
