@@ -138,15 +138,15 @@ class behat_facetoface extends behat_base {
         $finishdate->setTime($finishdate->format('H'), $minutes);
 
         // Replace values for timestart.
-        $rows[] = array('timestart[day]', (int) $startdate->format('d'));
         $rows[] = array('timestart[month]', (int) $startdate->format('m'));
+        $rows[] = array('timestart[day]', (int) $startdate->format('d'));
         $rows[] = array('timestart[year]', (int) $startdate->format('Y'));
         $rows[] = array('timestart[hour]', (int) $startdate->format('H'));
         $rows[] = array('timestart[minute]', (int) $startdate->format('i'));
 
         // Replace values for timefinish.
-        $rows[] = array('timefinish[day]', (int) $finishdate->format('d'));
         $rows[] = array('timefinish[month]', (int) $finishdate->format('m'));
+        $rows[] = array('timefinish[day]', (int) $finishdate->format('d'));
         $rows[] = array('timefinish[year]', (int) $finishdate->format('Y'));
         $rows[] = array('timefinish[hour]', (int) $finishdate->format('H'));
         $rows[] = array('timefinish[minute]', (int) $finishdate->format('i'));
