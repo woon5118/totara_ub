@@ -50,7 +50,7 @@ class customfield_menu extends customfield_base {
         // Include the choose option at the beginning.
         $this->options[''] = $this->get_choose_option();
         foreach($options as $key => $option) {
-            $this->options[$key] = $option;
+            $this->options[$key] = format_string($option);// Multilang formatting.
         }
 
         // Set the data key.
@@ -68,9 +68,7 @@ class customfield_menu extends customfield_base {
      * @param   object   moodleform instance
      */
     function edit_field_add(&$mform) {
-        // Fix multilang display stuff.
-        $options = array_map('format_string', $this->options);
-        $mform->addElement('select', $this->inputname, format_string($this->field->fullname), $options);
+        $mform->addElement('select', $this->inputname, format_string($this->field->fullname), $this->options);
     }
 
     /**
