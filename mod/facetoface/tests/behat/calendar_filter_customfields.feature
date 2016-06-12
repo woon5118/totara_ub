@@ -18,7 +18,7 @@ Feature: Filter seminar events in calendar by their customfields
     And I log in as "admin"
 
     # Add customfields to events.
-    When I navigate to "Custom fields" node in "Site administration > Seminar"
+    When I navigate to "Custom fields" node in "Site administration > Seminars"
     And I set the field "Create a new custom field" to "Checkbox"
     And I set the following fields to these values:
       | Full name  | Checkbox |
@@ -122,7 +122,7 @@ Feature: Filter seminar events in calendar by their customfields
     And I press "Save changes"
 
     # Enable filtering by customfields, not using values (as they depend on id)
-    And I navigate to "Global settings" node in "Site administration > Seminar"
+    And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "Event: Checkbox" "option"
     And I click on "Event: Date time" "option"
     And I click on "Event: Location" "option"
@@ -140,7 +140,7 @@ Feature: Filter seminar events in calendar by their customfields
     And I press "Save changes"
 
     # Create rooms
-    And I navigate to "Rooms" node in "Site administration > Seminar"
+    And I navigate to "Rooms" node in "Site administration > Seminars"
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                          | Room 1          |
