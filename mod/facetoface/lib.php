@@ -6153,7 +6153,7 @@ function facetoface_allocate_spaces($session, $facetoface, $course, $bookedby, $
         }
 
         // Make sure the status is set and the correct notification messages are sent.
-        if (facetoface_user_signup($session, $facetoface, $course, null, MDL_F2F_NOTIFICATION_AUTO, $status, $userid)) {
+        if (facetoface_user_signup($session, $facetoface, $course, null, MDL_F2F_BOTH, $status, $userid)) {
             $DB->set_field('facetoface_signups', 'bookedby', $bookedby, array('sessionid' => $session->id, 'userid' => $userid));
         }
         $capacityleft--;
