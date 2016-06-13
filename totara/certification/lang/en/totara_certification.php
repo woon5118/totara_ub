@@ -140,6 +140,7 @@ $string['createnewcertifprog'] = 'Create new certification program';
 $string['days'] = 'Day(s)';
 $string['defaultcertprogramfullname'] = 'Certification program fullname 101';
 $string['defaultcertprogramshortname'] = 'CP101';
+$string['duedate'] = 'Due date';
 $string['editcertif'] = 'Edit certification details';
 $string['editcertification'] = 'Edit certification';
 $string['editdetailsactive'] = 'Certification is active for';
