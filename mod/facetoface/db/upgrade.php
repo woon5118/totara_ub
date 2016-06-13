@@ -4260,5 +4260,34 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016060100, 'facetoface');
     }
 
+    if ($oldversion < 2016061400) {
+        // Get rid of duplicates before adding unique index.
+        $sql = "SELECT MIN(id) AS id, sessionsdateid, assetid, COUNT(*) AS dupcount
+                  FROM {facetoface_asset_dates}
+              GROUP BY sessionsdateid, assetid
+                HAVING COUNT(*) > 1";
+        $duplicates = $DB->get_records_sql($sql);
+        $sql = "DELETE
+                  FROM {facetoface_asset_dates}
+                 WHERE id <> :id AND sessionsdateid = :sessionsdateid AND assetid = :assetid";
+        foreach ($duplicates as $duplicate) {
+            $duplicate = (array)$duplicate;
+            unset($duplicate['dupcount']);
+            $DB->execute($sql, $duplicate);
+        }
+
+        // Define index sessionsdateid-assetid (unique) to be added to facetoface_asset_dates.
+        $table = new xmldb_table('facetoface_asset_dates');
+        $index = new xmldb_index('sessionsdateid-assetid', XMLDB_INDEX_UNIQUE, array('sessionsdateid', 'assetid'));
+
+        // Conditionally launch add index sessionsdateid-assetid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2016061400, 'facetoface');
+    }
+
     return $result;
 }

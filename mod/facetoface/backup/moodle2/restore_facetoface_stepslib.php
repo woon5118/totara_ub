@@ -33,8 +33,8 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $paths[] = new restore_path_element('facetoface', '/activity/facetoface');
         $paths[] = new restore_path_element('facetoface_notification', '/activity/facetoface/notifications/notification');
         $paths[] = new restore_path_element('facetoface_session', '/activity/facetoface/sessions/session');
-        $paths[] = new restore_path_element('facetoface_sessions_dates', '/activity/facetoface/sessions/session/sessions_dates/sessions_date');
-        $paths[] = new restore_path_element('facetoface_asset_dates', '/activity/facetoface/sessions/session/sessions_dates/asset_dates/asset_date');
+        $paths[] = new restore_path_element('facetoface_sessions_date', '/activity/facetoface/sessions/session/sessions_dates/sessions_date');
+        $paths[] = new restore_path_element('facetoface_asset', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/assets/asset');
         $paths[] = new restore_path_element('facetoface_session_custom_fields', '/activity/facetoface/sessions/session/custom_fields/custom_field');
         if ($userinfo) {
             $paths[] = new restore_path_element('facetoface_signup', '/activity/facetoface/sessions/session/signups/signup');
@@ -332,7 +332,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
     }
 
 
-    protected function process_facetoface_sessions_dates($data) {
+    protected function process_facetoface_sessions_date($data) {
         global $DB;
 
         $data = (object)$data;
@@ -419,55 +419,68 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
 
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_sessions_dates', $data);
+
+        $this->set_mapping('facetoface_sessions_date', $oldid, $newitemid);
     }
 
-    protected function process_facetoface_asset_dates($data) {
+    protected function process_facetoface_asset($data) {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
 
-        $data->sessionsdateid = $this->get_new_parentid('facetoface_sessions_date');
+        $sessionsdateid = $this->get_new_parentid('facetoface_sessions_date');
+        $sessiondate = $DB->get_record('facetoface_sessions_dates', array('id' => $sessionsdateid), '*', MUST_EXIST);
 
-        if ((int)$data->asset_custom == 1) {
-            $data->assetid = $this->create_facetoface_asset($data);
-        } else {
-            // Search for existing asset.
-            $assets = $DB->get_records('facetoface_asset', array('name' => $data->asset_name, 'custom' => $data->asset_custom,
-                'allowconflicts' => $data->asset_allowconflicts));
+        if ((int)$data->custom == 1) {
+            // Custom assets are easy, we just add a new one as exact copy.
+            $newid = $this->create_facetoface_asset($data);
+            $DB->insert_record('facetoface_asset_dates', (object)array('assetid' => $newid, 'sessionsdateid' => $sessionsdateid));
+            return;
+        }
 
-            if (count($assets) > 0) {
-                if (count($assets) > 1) {
-                    debugging("Asset {$data->asset_name}, matches more than one asset - arbitrarily selecting one of them");
-                }
-                $data->assetid = reset($assets)->id;
-            } else {
-                $data->assetid = $this->create_facetoface_asset($data);
+        if (!$this->get_task()->is_samesite()) {
+            // We cannot restore site assets from inside courses, sorry!
+            $this->log('shared seminar asset from other site cannot be restored', backup::LOG_WARNING);
+            return;
+        }
+
+        // Ok, we are on the same site, let's see if the asset still exists and use it if there are no conflicts.
+        $asset = $DB->get_record('facetoface_asset', array('id' => $oldid));
+        if (!$asset) {
+            $this->log('original seminar asset not found', backup::LOG_WARNING);
+            return;
+        }
+        if ($asset->custom != 0) {
+            // This should not ever happen, somebody hacked DB or backup file.
+            return;
+        }
+        if ($asset->allowconflicts == 0) {
+            $available = facetoface_get_available_assets(array(array($sessiondate->timestart, $sessiondate->timefinish)), 'id');
+            if (!isset($available[$asset->id])) {
+                $this->log('seminar asset collision detected, asset not added', backup::LOG_WARNING);
+                return;
             }
         }
-        // Insert the entry record.
-        $DB->insert_record('facetoface_asset_dates', $data);
+        // It should be fine to add the asset to the session.
+        $DB->insert_record('facetoface_asset_dates', (object)array('assetid' => $asset->id, 'sessionsdateid' => $sessionsdateid));
     }
 
     /**
-     * Create custom asset
-     * @param array $data
-     * @return int asset id
+     * Create a new asset.
+     *
+     * @param stdClass $asset
+     * @return int new asset id
      */
-    private function create_facetoface_asset($data) {
-        global $DB;
-
+    private function create_facetoface_asset(stdClass $asset) {
+        global $DB, $USER;
         $now = time();
-
-        $customasset = new stdClass();
-        $customasset->name = $data->asset_name;
-        $customasset->custom = (int)$data->asset_custom;
-        $customasset->allowconflicts = $data->asset_allowconflicts ? 1 : 0;
-        $customasset->timecreated = isset($data->timecreated) ? $data->timecreated : $now;
-        $customasset->timemodified = isset($data->timemodified) ? $data->timemodified : $now;
-        $assetid = $DB->insert_record('facetoface_asset', $customasset);
-
-        return $assetid;
+        unset($asset->id);
+        $asset->timecreated = $now;
+        $asset->timemodified = $now;
+        $asset->usercreated = $USER->id; // This is a NEW asset, do not use old user id!
+        $asset->usermodified = null;
+        return $DB->insert_record('facetoface_asset', $asset);
     }
 
     protected function process_facetoface_interest($data) {

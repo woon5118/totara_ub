@@ -124,9 +124,9 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             'sessionid', 'roomid', 'sessiontimezone', 'timestart', 'timefinish', 'room_name', 'room_allowconflicts', 'room_capacity',
             'room_hidden', 'room_custom', 'room_description', 'room_custom_building', 'room_custom_location'));
 
-        $asset_dates = new backup_nested_element('asset_dates');
-        $asset_date =  new backup_nested_element('asset_date', array('id'), array(
-            'sessionsdateid', 'assetid', 'asset_name', 'asset_allowconflicts', 'asset_description', 'asset_custom', 'asset_hidden'));
+        $assets = new backup_nested_element('assets');
+        $asset =  new backup_nested_element('asset', array('id'), array(
+            'name', 'description', 'allowconflicts', 'custom', 'hidden', 'usercreated', 'usermodified', 'timecreated', 'timemodified'));
 
         $interests = new backup_nested_element('interests');
 
@@ -161,8 +161,8 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session->add_child($sessions_dates);
         $sessions_dates->add_child($sessions_date);
 
-        $sessions_dates->add_child($asset_dates);
-        $asset_dates->add_child($asset_date);
+        $sessions_date->add_child($assets);
+        $assets->add_child($asset);
 
         $facetoface->add_child($interests);
         $interests->add_child($interest);
@@ -188,13 +188,11 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             WHERE fsd.sessionid = :sessionid
             ', array('sessionid' => backup::VAR_PARENTID));
 
-        $asset_date->set_source_sql('
-            SELECT fad.*, fa.name AS asset_name, fa.allowconflicts AS asset_allowconflicts, fa.description AS asset_description, fa.custom AS asset_custom,
-                fa.hidden AS asset_hidden
-            FROM {facetoface_asset_dates} fad
-            LEFT JOIN {facetoface_asset} fa ON (fa.id = fad.assetid)
-            WHERE fad.sessionsdateid = :sessionsdateid
-            ', array('sessionsdateid' => backup::VAR_PARENTID));
+        $asset->set_source_sql("SELECT fa.*
+                                  FROM {facetoface_asset} fa
+                                  JOIN {facetoface_asset_dates} fad  ON (fad.assetid = fa.id)
+                                 WHERE fad.sessionsdateid = :sessionsdateid",
+            array('sessionsdateid' => backup::VAR_PARENTID));
 
         if ($userinfo) {
             $signup->set_source_table('facetoface_signups', array('sessionid' => backup::VAR_PARENTID));
@@ -237,6 +235,9 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session_role->annotate_ids('user', 'userid');
 
         $interest->annotate_ids('user', 'userid');
+
+        $asset->annotate_ids('user', 'usercreated');
+        $asset->annotate_ids('user', 'usermodified');
 
         // Define file annotations
         // None for F2F
