@@ -5288,63 +5288,116 @@ function reportbuilder_generate_cache($reportid) {
 }
 
 /**
- *  Send Scheduled report to a user
+ *  Process Scheduled report and email or store it.
  *
- *  @param object $sched Object containing data from schedule table
+ *  NOTE: diagnostic output is sent to cron console.
  *
- *  @return boolean True if email was successfully sent
+ *  @param stdClass $sched Object containing data from schedule table
+ *
+ *  @return boolean True if email was successfully sent or file stored in filesystem, false on error or any problem
  */
 function reportbuilder_send_scheduled_report($sched) {
     global $CFG, $DB, $USER;
     require_once($CFG->dirroot . '/totara/reportbuilder/email_setting_schedule.php');
 
-    if ($sched->userid == $USER->id) {
-        $user = $USER;
-    } else {
-        debugging('reportbuilder_send_scheduled_report() expects $USER->id to be the same as sched->userid');
-        $user = $DB->get_record('user', array('id' => $sched->userid), '*', MUST_EXIST);
+    // Do not modify the parameter, the schedule class did its own magic in there already!
+    $sched = clone($sched);
+
+    if (!CLI_SCRIPT) {
+        throw new coding_exception('reportbuilder_send_scheduled_report() can be used from cron task and tests only!');
     }
 
-    if (!$report = $DB->get_record('report_builder', array('id' => $sched->reportid))) {
-        error_log(get_string('error:invalidreportid', 'totara_reportbuilder'));
+    if ($sched->userid != $USER->id) {
+        throw new coding_exception('reportbuilder_send_scheduled_report() requires $USER->id to be the same as sched->userid!');
+    }
+    $user = $USER;
+
+    if ($user->deleted or $user->suspended) {
+        throw new coding_exception('reportbuilder_send_scheduled_report() requires active user!');
+    }
+
+    if (!$reportrecord = $DB->get_record('report_builder', array('id' => $sched->reportid))) {
+        mtrace("Error: Scheduled report {$sched->id} references non-existent report {$sched->reportid}");
         return false;
     }
 
     // Make sure the source exists and is not ignored.
     $alluserreports = reportbuilder::get_user_generated_reports();
     if (!isset($alluserreports[$sched->reportid])) {
-        error_log(get_string('error:invalidreportid', 'totara_reportbuilder'));
+        mtrace("Error: Scheduled report {$sched->id} references invalid report {$sched->reportid}");
         return false;
     }
 
     // Don't send/store the report if the user doesn't have permission to view it.
     if (!reportbuilder::is_capable($sched->reportid, $sched->userid)) {
-        error_log(get_string('error:nopermissionsforscheduledreport', 'totara_reportbuilder', $sched));
+        mtrace("Error: Scheduled report {$sched->id} references report {$sched->reportid} that cannot be accessed by user {$sched->userid}");
         return false;
+    }
+
+    $saved = null;
+    if ($sched->savedsearchid) {
+        // Note: we must replicate the access control here to prevent fatal errors later when calling reportbuilder constructor.
+        if (!$saved = $DB->get_record('report_builder_saved', array('id' => $sched->savedsearchid))) {
+            mtrace("Error: Scheduled report {$sched->id} uses invalid saved search {$sched->savedsearchid}");
+            return false;
+        }
+        if ($saved->ispublic == 0 and $sched->userid != $saved->userid) {
+            mtrace("Error: Scheduled report {$sched->id} uses non-public saved search {$sched->savedsearchid} of other user");
+            return false;
+        }
     }
 
     $format = \totara_core\tabexport_writer::normalise_format($sched->format);
     $options = reportbuilder_get_export_options(null, false);
     $formats = \totara_core\tabexport_writer::get_export_classes();
     if (!isset($formats[$format]) or !isset($options[$format])) {
-        error_log('Unknown or disabled report export format - ' . $sched->format);
+        mtrace("Error: Scheduled report {$sched->id} uses unknown or disabled format '{$sched->format}'");
         return false;
     }
     $writerclassname = $formats[$format];
 
-    $tempfile = reportbuilder_create_attachment($sched);
+    if ($sched->exporttofilesystem == REPORT_BUILDER_EXPORT_SAVE or
+        $sched->exporttofilesystem == REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE) {
+
+        // Make sure we can actually export the data.
+        $exportsetting = get_config('reportbuilder', 'exporttofilesystem');
+        if (!$exportsetting) {
+            if ($sched->exporttofilesystem == REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE) {
+                $sched->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
+            } else {
+                mtrace("Error: Scheduled report {$sched->id} is set to export to filesystem only");
+                return false;
+            }
+        }
+    }
+
+    $report = reportbuilder_get_schduled_report($sched, $reportrecord);
+    $tempfile = reportbuilder_export_schduled_report($sched, $report, $writerclassname);
     if (!$tempfile) {
-        error_log('Error exporting report');
+        mtrace("Error: Scheduled report {$sched->id} could not be created");
         return false;
     }
+
+    if ($sched->exporttofilesystem == REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE or $sched->exporttofilesystem == REPORT_BUILDER_EXPORT_SAVE) {
+        $reportfilepathname = reportbuilder_get_export_filename($report, $sched->userid, $sched->id) . '.' . $writerclassname::get_file_extension();
+        // Do not crete the file again, just copy it.
+        $exported = copy($tempfile, $reportfilepathname);
+        @chmod($reportfilepathname, (fileperms(dirname($reportfilepathname)) & 0666));
+        if ($exported) {
+            mtrace("Scheduled report {$sched->id} was saved in file system");
+        } else {
+            mtrace("Scheduled report {$sched->id} could not be saved in file system");
+        }
+    }
+
     $attachmentfilename = 'report.' . $writerclassname::get_file_extension();
 
-    $reporturl = reportbuilder_get_report_url($report);
+    $reporturl = reportbuilder_get_report_url($reportrecord);
     if ($sched->savedsearchid != 0) {
         $reporturl .= '&sid=' . $sched->savedsearchid;
     }
     $messagedetails = new stdClass();
-    $messagedetails->reportname = $report->fullname;
+    $messagedetails->reportname = format_string($reportrecord->fullname);
     $messagedetails->exporttype = $writerclassname::get_export_option_name();
     $messagedetails->reporturl = $reporturl;
     $messagedetails->scheduledreportsindex = $CFG->wwwroot . '/my/reports.php#scheduled';
@@ -5352,14 +5405,10 @@ function reportbuilder_send_scheduled_report($sched) {
     $schedule = new scheduler($sched, array('nextevent' => 'nextreport'));
     $messagedetails->schedule = $schedule->get_formatted($user);
 
-    $subject = $report->fullname . ' ' . get_string('report', 'totara_reportbuilder');
+    $subject = format_string($reportrecord->fullname) . ' ' . get_string('report', 'totara_reportbuilder');
 
     if ($sched->savedsearchid != 0) {
-        if (!$savename = $DB->get_field('report_builder_saved', 'name', array('id' => $sched->savedsearchid))) {
-            mtrace(get_string('error:invalidsavedsearchid', 'totara_reportbuilder'));
-        } else {
-            $messagedetails->savedtext = get_string('savedsearchmessage', 'totara_reportbuilder', $savename);
-        }
+        $messagedetails->savedtext = get_string('savedsearchmessage', 'totara_reportbuilder', $saved->name);
     } else {
         $messagedetails->savedtext = '';
     }
@@ -5367,66 +5416,88 @@ function reportbuilder_send_scheduled_report($sched) {
     $message = get_string('scheduledreportmessage', 'totara_reportbuilder', $messagedetails);
 
     $fromaddress = core_user::get_noreply_user();
-    $emailed = false;
+    $emailedcount = 0;
+    $failedcount = 0;
 
-    if ($sched->exporttofilesystem != REPORT_BUILDER_EXPORT_SAVE) {
+    if ($sched->exporttofilesystem == REPORT_BUILDER_EXPORT_EMAIL
+        or $sched->exporttofilesystem == REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE) {
+
         // Get all emails set in the schedule report.
         $scheduleemail = new email_setting_schedule($sched->id);
         $systemusers   = $scheduleemail->get_all_system_users_to_email();
         $externalusers = email_setting_schedule::get_external_users_to_email($sched->id);
 
         // Sending email to all system users.
-        foreach ($systemusers as $user) {
-            $emailed = email_to_user($user, $fromaddress, $subject, $message, '', $tempfile, $attachmentfilename);
+        foreach ($systemusers as $userto) {
+            $result = email_to_user($userto, $fromaddress, $subject, $message, '', $tempfile, $attachmentfilename);
+            if ($result) {
+                $emailedcount++;
+            } else {
+                $failedcount++;
+            }
         }
 
         // Sending email to external users.
         foreach ($externalusers as $email) {
             $userto = \totara_core\totara_user::get_external_user($email);
-            $emailed = email_to_user($userto, $fromaddress, $subject, $message, '', $tempfile, $attachmentfilename);
+            $result = email_to_user($userto, $fromaddress, $subject, $message, '', $tempfile, $attachmentfilename);
+            if ($result) {
+                $emailedcount++;
+            } else {
+                $failedcount++;
+            }
+        }
+
+        if ($emailedcount) {
+            mtrace("Scheduled report {$sched->id} was emailed to {$emailedcount} users");
+        } else {
+            if (!$failedcount) {
+                mtrace("Scheduled report {$sched->id} was not emailed to any users");
+            }
+        }
+        if ($failedcount) {
+            mtrace("Error: Scheduled report {$sched->id} was not emailed to $failedcount users");
         }
     }
 
     @unlink($tempfile);
 
-    return $emailed;
+    return (!$failedcount);
 }
 
 /**
- * Creates an export of a report in specified format (xls, csv or ods)
- * for adding to email as attachment
+ * Create instance of reportbuilder object.
+ *
+ * @param stdClass $sched
+ * @param stdClass $reportrecord
+ * @return reportbuilder
+ */
+function reportbuilder_get_schduled_report(stdClass $sched, stdClass $reportrecord) {
+    if ($sched->reportid != $reportrecord->id) {
+        throw new coding_exception('Invalid parameters');
+    }
+    $allrestr = rb_global_restriction_set::create_from_ids(
+        $reportrecord, rb_global_restriction_set::get_user_all_restrictions_ids($sched->userid, true)
+    );
+
+    return new reportbuilder($sched->reportid, null, false, $sched->savedsearchid, $sched->userid, false, array('userid' => $sched->userid), $allrestr);
+}
+
+/**
+ * Creates an export of a report in specified format (xls, csv or ods).
  *
  * @param stdClass $sched schedule record
+ * @param reportbuilder $report
+ * @param string $writerclass class extending \totara_core\tabexport_writer
  *
- * @return string Filename of the created attachment
+ * @return string temporary file path
  */
-function reportbuilder_create_attachment(stdClass $sched) {
-    global $USER, $DB;
+function reportbuilder_export_schduled_report(stdClass $sched, reportbuilder $report, $writerclass) {
+    global $USER;
 
-    $reportid = $sched->reportid;
-    $format = $sched->format;
-    $exporttofilesystem = $sched->exporttofilesystem;
-    $sid = $sched->savedsearchid;
-    $scheduleid = $sched->id;
-    $userid = $sched->userid;
-
-    if ($userid != $USER->id) {
-        debugging('reportbuilder_create_attachment() expects $USER->id to be the same as sched->userid');
+    if ($sched->userid != $USER->id) {
+        throw new coding_exception('$USER->id must matchs $sched->userid');
     }
-
-    $format = \totara_core\tabexport_writer::normalise_format($format);
-    $formats = \totara_core\tabexport_writer::get_export_classes();
-    if (!isset($formats[$format])) {
-        // Somebody most likely uninstalled the export format.
-        return null;
-    }
-    $writerclass = $formats[$format];
-
-    $allrestr = rb_global_restriction_set::create_from_ids(
-        $DB->get_record('report_builder', array('id' => $reportid)),
-        rb_global_restriction_set::get_user_all_restrictions_ids($userid, true)
-    );
-    $report = new reportbuilder($reportid, null, false, $sid, $userid, false, array('userid' => $userid), $allrestr);
 
     $source = new \totara_reportbuilder\tabexport_source($report);
 
@@ -5436,17 +5507,10 @@ function reportbuilder_create_attachment(stdClass $sched) {
     // TODO: TL-6751 move this to a request dir, but first make sure the email attachments support it
     do {
         $tempfilepathname = make_temp_directory('reportbuilderexport') . '/'
-            . md5(uniqid($userid, true)) . '.' . $writer::get_file_extension();
+            . md5(uniqid($USER->id, true)) . '.' . $writer::get_file_extension();
     } while (file_exists($tempfilepathname));
 
     $writer->save_file($tempfilepathname);
-
-    if ($exporttofilesystem == REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE or $exporttofilesystem == REPORT_BUILDER_EXPORT_SAVE) {
-        $reportfilepathname = reportbuilder_get_export_filename($report, $userid, $scheduleid) . '.' . $writer::get_file_extension();
-        // Do not crete the file again, just copy it.
-        copy($tempfilepathname, $reportfilepathname);
-        @chmod($reportfilepathname, (fileperms(dirname($reportfilepathname)) & 0666));
-    }
 
     return $tempfilepathname;
 }

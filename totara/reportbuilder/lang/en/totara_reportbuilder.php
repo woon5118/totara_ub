@@ -292,7 +292,6 @@ $string['error:nocolumnsdefined'] = 'No columns have been defined for this repor
 $string['error:nocontentrestrictions'] = 'No content restrictions are available for this source. To use restrictions, ask your developer to add the necessary code to the \'{$a}\' source.';
 $string['error:nographseries'] = 'There are no columns suitable for construction of a graph. You need to add some columns with numeric data to this report or set "Graph type" to "None".';
 $string['error:nopdf'] = 'No PDF plugin found';
-$string['error:nopermissionsforscheduledreport'] = 'Scheduled Report Error: User {$a->userid} is not capable of viewing report {$a->reportid}.';
 $string['error:norolesfound'] = 'No roles found';
 $string['error:nosavedsearches'] = 'This report does not yet have any saved searches';
 $string['error:nosources'] = 'No sources found. You must have at least one source before you can add reports. Ask your developer to add the necessary files to the codebase.';

@@ -1219,7 +1219,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
-    public function test_reportbuilder_create_attachment() {
+    public function test_reportbuilder_export_schduled_report() {
         $this->resetAfterTest(true);
 
         $admin = get_admin();
@@ -1233,7 +1233,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $sched->savedsearchid = 0;
         $sched->userid = $admin->id;
 
-        $filename = reportbuilder_create_attachment($sched);
+        $filename = reportbuilder_export_schduled_report($sched, $this->rb, 'tabexport_excel\writer');
         $this->assertFileExists($filename);
         unlink($filename);
         unset($sched);
@@ -1246,7 +1246,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $sched->savedsearchid = 0;
         $sched->userid = $admin->id;
 
-        $filename = reportbuilder_create_attachment($sched);
+        $filename = reportbuilder_export_schduled_report($sched, $this->rb, 'tabexport_csv\writer');
         $this->assertFileExists($filename);
         unlink($filename);
         unset($sched);
@@ -1259,7 +1259,33 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $sched->savedsearchid = 0;
         $sched->userid = $admin->id;
 
-        $filename = reportbuilder_create_attachment($sched);
+        $filename = reportbuilder_export_schduled_report($sched, $this->rb, 'tabexport_ods\writer');
+        $this->assertFileExists($filename);
+        unlink($filename);
+        unset($sched);
+
+        $sched = new stdClass();
+        $sched->id = 3;
+        $sched->reportid = $this->rb->_id;
+        $sched->format = 'pdflandscape';
+        $sched->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
+        $sched->savedsearchid = 0;
+        $sched->userid = $admin->id;
+
+        $filename = reportbuilder_export_schduled_report($sched, $this->rb, 'tabexport_pdflandscape\writer');
+        $this->assertFileExists($filename);
+        unlink($filename);
+        unset($sched);
+
+        $sched = new stdClass();
+        $sched->id = 3;
+        $sched->reportid = $this->rb->_id;
+        $sched->format = 'pdfportrait';
+        $sched->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
+        $sched->savedsearchid = 0;
+        $sched->userid = $admin->id;
+
+        $filename = reportbuilder_export_schduled_report($sched, $this->rb, 'tabexport_pdfportrait\writer');
         $this->assertFileExists($filename);
         unlink($filename);
         unset($sched);
