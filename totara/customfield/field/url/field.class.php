@@ -155,7 +155,7 @@ class customfield_url extends customfield_base {
             }
 
             $text = s(empty($urldata->text) ? $urldata->url : format_string($urldata->text));
-            $target = isset($urldata->target) ? array('target' => '_blank') : null;
+            $target = isset($urldata->target) ? array('target' => '_blank', 'rel' => 'noreferrer') : null;
 
             return html_writer::link($urldata->url, $text, $target);
         }
