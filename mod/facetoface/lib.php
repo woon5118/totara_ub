@@ -6255,11 +6255,26 @@ function facetoface_remove_allocations($session, $facetoface, $course, $userids,
     }
 
     foreach ($userids as $userid) {
+        $transaction = $DB->start_delegated_transaction();
+        $userisinwaitlist = facetoface_is_user_on_waitlist($session, $userid);
+
+        facetoface_user_cancel($session, $userid);
+
         if ($converttoreservations) {
-            $DB->set_field('facetoface_signups', 'userid', 0, array('sessionid' => $session->id, 'userid' => $userid,
-                                                                    'bookedby' => $managerid));
-        } else {
-            facetoface_user_cancel($session, $userid);
+            // Add one reservation.
+            $book = 1;
+            $waitlist = 0;
+            if ($userisinwaitlist) {
+                $book = 0;
+                $waitlist = 1;
+            }
+            facetoface_add_reservations($session, $managerid, $book, $waitlist);
+        }
+        $transaction->allow_commit();
+
+        // Send notification.
+        if (!empty($session->sessiondates) && $userisinwaitlist === false) {
+            facetoface_send_cancellation_notice($facetoface, $session, $userid);
         }
     }
 }
