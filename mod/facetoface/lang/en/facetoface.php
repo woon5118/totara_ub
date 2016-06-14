@@ -1287,17 +1287,15 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaultdatetimechangesubject'] = 'Default subject line for date/time change emails.';
 $string['setting:defaultdatetimechangesubject_caption'] = 'Date/time change subject';
-$string['setting:defaultregistrationclosureinstrmngr'] = 'Default registration closure message sent to managers.';
-$string['setting:defaultregistrationclosureinstrmngr_caption'] = 'Registration closure message (managers)';
-$string['setting:defaultregistrationclosureinstrmngrdefault'] = '*** Advice only ****
-Your staff member [firstname] [lastname] had a pending request to attend the above seminar event and has also received this closure email.
+$string['setting:defaultpendingreqclosureinstrmngr'] = 'Default registration closure message sent to managers.';
+$string['setting:defaultpendingreqclosureinstrmngrcopybelow'] = '*** Advice only ****
+Your staff member [firstname] [lastname] had a pending request to attend the below seminar event and has also received this closure email.
 
 If you are not their Team Leader / Manager and believe you have received this email by mistake please reply to this email.
 ';
-$string['setting:defaultregistrationclosureinstrmngrcopybelow'] = '*** [firstname] [lastname]\'s registration closure is copied below ****';
-$string['setting:defaultregistrationclosuremessage'] = 'Default cancellation message sent to the user.';
-$string['setting:defaultregistrationclosuremessage_caption'] = 'Registration closure message';
-$string['setting:defaultregistrationclosuremessagedefault_v9'] = 'This is to advise that your pending booking request for the following seminar event has expired:
+$string['setting:defaultpendingreqclosuremessage'] = 'Default cancellation message sent to the user.';
+$string['setting:defaultpendingreqclosuremessage_caption'] = 'Registration closure message';
+$string['setting:defaultpendingreqclosuremessagedefault_v9'] = 'This is to advise that your pending booking request for the following seminar event has expired:
 This seminar events registration period has closed while your request was pending, please request a booking on a different event.
 
 Course: [coursename]
@@ -1315,9 +1313,9 @@ Location: [session:room:cf_location]
 [session:room:link]
 [/sessions]
 ';
-$string['setting:defaultregistrationclosuresubject'] = 'Default subject line for registration closure emails.';
-$string['setting:defaultregistrationclosuresubject_caption'] = 'registration closure subject';
-$string['setting:defaultregistrationclosuresubjectdefault'] = 'Seminar event registration closure';
+$string['setting:defaultpendingreqclosuresubject'] = 'Default subject line for registration closure emails.';
+$string['setting:defaultpendingreqclosuresubject_caption'] = 'registration closure subject';
+$string['setting:defaultpendingreqclosuresubjectdefault'] = 'Seminar event registration closure';
 $string['setting:defaultregistrationexpiredsubjectdefault'] = 'Seminar registration closed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultregistrationexpiredinstrmngr'] = '
 *** Advice only ****

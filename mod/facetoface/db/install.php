@@ -44,7 +44,7 @@ function xmldb_facetoface_install() {
         'setting:defaultcancelallreservationssubjectdefault' => get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface'),
         'setting:defaultsessioncancellationsubjectdefault' => get_string('setting:defaultsessioncancellationsubjectdefault', 'facetoface'),
         'setting:defaultregistrationexpiredsubjectdefault' => get_string('setting:defaultregistrationexpiredsubjectdefault', 'facetoface'),
-        'setting:defaultregistrationclosuresubjectdefault' => get_string('setting:defaultregistrationclosuresubjectdefault', 'facetoface'),
+        'setting:defaultpendingreqclosuresubjectdefault' => get_string('setting:defaultpendingreqclosuresubjectdefault', 'facetoface'),
     );
 
     foreach ($titles as $key => $title) {
@@ -181,9 +181,9 @@ function xmldb_facetoface_install() {
     $tpl_regclose = new stdClass();
     $tpl_regclose->reference = 'registrationclosure';
     $tpl_regclose->status = 1;
-    $tpl_regclose->title = get_string('setting:defaultregistrationclosuresubjectdefault', 'facetoface');
-    $tpl_regclose->body = text_to_html(get_string('setting:defaultregistrationclosuremessagedefault_v9', 'facetoface'));
-    $tpl_regclose->managerprefix = text_to_html(get_string('setting:defaultregistrationclosuremessagedefault_v9', 'facetoface'));
+    $tpl_regclose->title = get_string('setting:defaultpendingreqclosuresubjectdefault', 'facetoface');
+    $tpl_regclose->body = text_to_html(get_string('setting:defaultpendingreqclosuremessagedefault_v9', 'facetoface'));
+    $tpl_regclose->managerprefix = text_to_html(get_string('setting:defaultpendingreqclosureinstrmngrcopybelow', 'facetoface'));
     $DB->insert_record('facetoface_notification_tpl', $tpl_regclose);
 
     // Setting room, building, and address as default filters.

@@ -1306,7 +1306,7 @@ function facetoface_notify_under_capacity() {
  * @param stdClass $session - A database record from facetoface_session
  */
 function facetoface_cancel_pending_requests($session) {
-    global $DB, $CFG, $USER;
+    global $DB, $USER;
 
     // Find any pending requests for the given session.
     $requestsql = "SELECT fss.*, fs.userid as recipient
@@ -1318,7 +1318,6 @@ function facetoface_cancel_pending_requests($session) {
     $requestparams = array('req' => MDL_F2F_STATUS_REQUESTED, 'adreq' => MDL_F2F_STATUS_REQUESTEDADMIN);
 
     $f2fs = array();
-    $notifications = array();
 
     $requestparams['sess'] = $session->id;
     $pendingrequests = $DB->get_records_sql($requestsql, $requestparams);

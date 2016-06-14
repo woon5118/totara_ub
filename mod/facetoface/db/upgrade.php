@@ -4191,8 +4191,9 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         if (!$DB->record_exists('facetoface_notification_tpl', array('reference' => $reference))) {
 
             // Prepare the common strings.
-            $title = get_string('setting:defaultregistrationclosuresubjectdefault', 'facetoface');
-            $body = text_to_html(get_string('setting:defaultregistrationclosuremessagedefault_v9', 'facetoface'));
+            $title = get_string('setting:defaultpendingreqclosuresubjectdefault', 'facetoface');
+            $body = text_to_html(get_string('setting:defaultpendingreqclosuremessagedefault_v9', 'facetoface'));
+            $mgrprefix = text_to_html(get_string('setting:defaultpendingreqclosureinstrmngrcopybelow', 'facetoface'));
 
             // Add the template.
             $tpl_regclose = new stdClass();
@@ -4201,8 +4202,8 @@ function xmldb_facetoface_upgrade($oldversion=0) {
             $tpl_regclose->title = $title;
             $tpl_regclose->ccmanager = 1;
             $tpl_regclose->requested = 1;
-            $tpl_regclose->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
-            $tpl_regclose->managerprefix = $body;
+            $tpl_regclose->body = $body;
+            $tpl_regclose->managerprefix = $mgrprefix;
             $templateid = $DB->insert_record('facetoface_notification_tpl', $tpl_regclose, true);
 
             // Add the noticifations to existing facetoface activities.
@@ -4228,12 +4229,13 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                     $registrationclosure = new facetoface_notification($defaults, false);
                     $registrationclosure->title = $title;
                     $registrationclosure->body = $body;
+                    $registrationclosure->managerprefix = $mgrprefix;
                     $registrationclosure->conditiontype = MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS;
                     $result = $result && $registrationclosure->save();
                 }
             }
             // Unset some of the structures we've used, particularly facetofaces as it may be HUGE.
-            unset($title, $body, $facetofaces, $facetoface, $defaults, $tpl_regclose, $registrationclosure);
+            unset($title, $body, $mgrprefix, $facetofaces, $facetoface, $defaults, $tpl_regclose, $registrationclosure);
         }
 
         // Facetoface savepoint reached.

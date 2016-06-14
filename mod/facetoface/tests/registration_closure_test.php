@@ -152,7 +152,7 @@ class mod_facetoface_session_registration_closure_testcase extends advanced_test
         // Check the registration closure messages.
         $emails = $this->emailsink->get_messages();
         $this->assertEquals(4, count($emails));
-        $subject = get_string('setting:defaultregistrationclosuresubjectdefault', 'mod_facetoface');
+        $subject = get_string('setting:defaultpendingreqclosuresubjectdefault', 'mod_facetoface');
         foreach ($emails as $email) {
             $expected = false;
             $userid = $email->useridto;
