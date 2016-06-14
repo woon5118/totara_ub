@@ -245,14 +245,14 @@ if ($action == 'reserve') {
             $form .= html_writer::tag('label', get_string('replacereservations', 'mod_facetoface'),
                                       array('for' => 'replacereservations'));
             $form .= ' ('.$reserveinfo['reserved'][$session->id].') ';
-            $form .= html_writer::select($yesno, 'replacereservations', $replacereservations, null,
+            $form .= html_writer::select($yesno, 'replacereservations', (int)$replacereservations, null,
                                          array('id' => 'replaceresrvations'));
             $form .= html_writer::empty_tag('br');
         }
 
         if (!empty($reserveinfo['allocated'][$session->id]) && !$reserveinfo['reservepastdeadline']) {
             $form .= html_writer::tag('label', get_string('replaceallocations', 'mod_facetoface'), array('for' => 'replaceallocations'));
-            $form .= html_writer::select($yesno, 'replaceallocations', $replaceallocations, null, array('id' => 'replaceallocations'));
+            $form .= html_writer::select($yesno, 'replaceallocations', (int)$replaceallocations, null, array('id' => 'replaceallocations'));
             $form .= html_writer::empty_tag('br');
         }
     }
