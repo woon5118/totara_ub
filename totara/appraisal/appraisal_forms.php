@@ -46,7 +46,10 @@ class appraisal_edit_form extends moodleform {
 
         if ($readonly) {
             $appraisal->name = format_string($appraisal->name);
-            $appraisal->desc = format_text($appraisal->description_editor['text']);
+
+            $description = file_rewrite_pluginfile_urls($appraisal->description, 'pluginfile.php', $TEXTAREA_OPTIONS['context']->id,
+                'totara_appraisal', 'appraisal', $appraisal->id);
+            $appraisal->desc = format_text($description);
 
             $mform->addElement('static', 'name', get_string('name', 'totara_appraisal'));
             $mform->addElement('static', null, get_string('description'), $appraisal->desc);
