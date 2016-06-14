@@ -121,8 +121,10 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $sessions_dates = new backup_nested_element('sessions_dates');
 
         $sessions_date = new backup_nested_element('sessions_date', array('id'), array(
-            'sessionid', 'roomid', 'sessiontimezone', 'timestart', 'timefinish', 'room_name', 'room_allowconflicts', 'room_capacity',
-            'room_hidden', 'room_custom', 'room_description', 'room_custom_building', 'room_custom_location'));
+            'sessiontimezone', 'timestart', 'timefinish'));
+
+        $room = new backup_nested_element('room', array('id'), array(
+            'name', 'description', 'capacity', 'allowconflicts', 'custom', 'hidden', 'usercreated', 'usermodified', 'timecreated', 'timemodified'));
 
         $assets = new backup_nested_element('assets');
         $asset =  new backup_nested_element('asset', array('id'), array(
@@ -161,6 +163,8 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session->add_child($sessions_dates);
         $sessions_dates->add_child($sessions_date);
 
+        $sessions_date->add_child($room);
+
         $sessions_date->add_child($assets);
         $assets->add_child($asset);
 
@@ -174,19 +178,13 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
 
         $session->set_source_table('facetoface_sessions', array('facetoface' => backup::VAR_PARENTID));
 
-        $sessions_date->set_source_sql('
-            SELECT fsd.*, r.name AS room_name, r.allowconflicts AS room_allowconflicts, r.capacity AS room_capacity, r.hidden AS room_hidden,
-                r.custom AS room_custom, r.description AS room_description,
-                (SELECT data FROM {facetoface_room_info_data} rd
-                    LEFT JOIN {facetoface_room_info_field} rf ON rd.fieldid = rf.id
-                    WHERE rf.shortname = \'building\' AND rd.facetofaceroomid = r.id) AS room_custom_building,
-                (SELECT data FROM {facetoface_room_info_data} rd
-                    LEFT JOIN {facetoface_room_info_field} rf ON rd.fieldid = rf.id
-                    WHERE rf.shortname = \'location\' AND rd.facetofaceroomid = r.id) AS  room_custom_location
-            FROM {facetoface_sessions_dates} fsd
-            LEFT JOIN {facetoface_room} r ON (fsd.roomid = r.id)
-            WHERE fsd.sessionid = :sessionid
-            ', array('sessionid' => backup::VAR_PARENTID));
+        $sessions_date->set_source_table('facetoface_sessions_dates', array('sessionid' => backup::VAR_PARENTID));
+
+        $room->set_source_sql("SELECT fr.*
+                                 FROM {facetoface_room} fr
+                                 JOIN {facetoface_sessions_dates} fsd  ON (fsd.roomid = fr.id)
+                                WHERE fsd.id = :sessionsdateid",
+            array('sessionsdateid' => backup::VAR_PARENTID));
 
         $asset->set_source_sql("SELECT fa.*
                                   FROM {facetoface_asset} fa
