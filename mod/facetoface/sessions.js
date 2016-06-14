@@ -371,10 +371,12 @@ M.totara_f2f_room = M.totara_f2f_room || {
                             M.totara_f2f_room.config['display_selected_item' + offset] + '</h2>'
                 },
                 function() {
-                    return url + 'room/ajax/sessionrooms.php?sessionid=' + sessionid +
+                    return url + 'room/ajax/sessionrooms.php' +
+                        '?sessionid=' + sessionid +
                         '&facetofaceid=' + M.totara_f2f_room.config.facetofaceid +
                         '&timestart=' + $('input[name="timestart[' + offset + ']"]').val() +
                         '&timefinish=' + $('input[name="timefinish[' + offset + ']"]').val() +
+                        '&selected=' + $('input[name="roomid[' + offset + ']"]').val() +
                         '&offset=' + offset +
                         '&sesskey=' + M.cfg.sesskey;
                 },

@@ -441,14 +441,6 @@ class mod_facetoface_session_form extends moodleform {
                 }
             }
 
-            // Check if the room is available.
-            if ((int)$roomid > 0) {
-                $room = facetoface_get_room($roomid);
-                if ($room->hidden == 1) {
-                    $errdates[] = get_string('error:roomunavailable', 'facetoface', $room->name);
-                }
-            }
-
             // If valid date, add to array.
             $date = new stdClass();
             $date->timestart = $starttime;
@@ -746,9 +738,12 @@ class session_date_form extends moodleform {
 
         // Validate room.
         if (!empty($roomid)) {
-            if (!facetoface_is_room_available($timestart, $timefinish, $roomid, $sessionid)) {
-                $room = facetoface_get_room($roomid);
-                $link = html_writer::link(new moodle_url('/mod/facetoface/room.php', array('roomid' => $roomid)), $room->name,
+            // Check if the room is available.
+            $room = facetoface_get_room($roomid);
+            if ($room->hidden == 1 && $sessionid == 0) {
+                $errors['roomid'] = get_string('error:roomunavailable', 'facetoface', $room->name);
+            } else if (!facetoface_is_room_available($timestart, $timefinish, $roomid, $sessionid)) {
+                 $link = html_writer::link(new moodle_url('/mod/facetoface/room.php', array('roomid' => $roomid)), $room->name,
                         array('target' => '_blank'));
                 $errors['roomid'] = get_string('error:isalreadybooked', 'facetoface', $link);
             }

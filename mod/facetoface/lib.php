@@ -1510,10 +1510,15 @@ function facetoface_get_sessions($facetofaceid, $location = '', $roomid = 0) {
         $locationwhere = "AND $locationsql";
     }
 
+    $roomjoin = '';
     $roomwhere = '';
     $roomparams = array();
     if (!empty($roomid)) {
-        $roomwhere = 'AND roomid = :roomid';
+        $roomjoin = "
+            INNER JOIN {facetoface_sessions_dates} sd ON sd.sessionid = s.id
+            INNER JOIN {facetoface_room} fr ON fr.id = sd.roomid
+        ";
+        $roomwhere = 'AND fr.id = :roomid';
         $roomparams['roomid'] = $roomid;
     }
 
@@ -1526,10 +1531,11 @@ function facetoface_get_sessions($facetofaceid, $location = '', $roomid = 0) {
                 $locationjoin
                 WHERE (1=1)
                 $locationwhere
-                $roomwhere
                 GROUP BY fsd.sessionid
             ) m ON m.sessionid = s.id
+            $roomjoin
             WHERE s.facetoface = :facetoface
+            $roomwhere
             ORDER BY m.mintimestart, m.maxtimefinish",
             array_merge(array('facetoface' => $facetofaceid), $roomparams, $locationparams));
 

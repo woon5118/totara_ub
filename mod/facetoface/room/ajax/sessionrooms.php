@@ -35,7 +35,7 @@ $timestart = required_param('timestart', PARAM_INT);
 $timefinish = required_param('timefinish', PARAM_INT);
 $offset = optional_param('offset', 0, PARAM_INT);
 $search = optional_param('search', 0, PARAM_INT);
-$selected = optional_param('selected', '', PARAM_SEQUENCE);
+$selected = optional_param('selected', 0, PARAM_INT);
 
 if (!$facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid))) {
     print_error('error:incorrectfacetofaceid', 'facetoface');
@@ -79,6 +79,15 @@ if (empty($timestart) || empty($timefinish)) {
 // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
 send_headers('text/html; charset=utf-8', false);
 
+$where = "r.custom = 0 AND r.hidden = 0
+          OR (r.hidden = 0 AND r.custom > 0 AND fsd.sessionid = :sessionid)";
+$sqlparams = array('sessionid' => $sessionid);
+// Select booked room whatever is hidden or not.
+if ($selected > 0) {
+    $where .= " OR r.id = :selected";
+    $sqlparams['selected'] = $selected;
+}
+
 // Setup / loading data
 $sql = "SELECT
             DISTINCT r.*
@@ -86,14 +95,13 @@ $sql = "SELECT
             {facetoface_room} r
             LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = r.id)
         WHERE
-            r.custom = 0 AND r.hidden = 0
-            OR (r.hidden = 0 AND r.custom > 0 AND fsd.sessionid = :sessionid)
+            {$where}
         ORDER BY
             r.name";
 
 $allrooms = array();
 $unavailablerooms = array();
-if ($rooms = $DB->get_records_sql($sql, array('sessionid' => $sessionid))) {
+if ($rooms = $DB->get_records_sql($sql, $sqlparams)) {
     foreach ($rooms as $room) {
         customfield_load_data($room, "facetofaceroom", "facetoface_room");
 

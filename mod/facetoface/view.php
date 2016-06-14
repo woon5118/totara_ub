@@ -137,7 +137,7 @@ if (count($locations) > 2) {
 }
 
 $rooms = facetoface_get_rooms($facetoface->id);
-if (count($rooms) > 3 || !empty($roomid)) {
+if (count($rooms) > 1) {
     $roomselect = array(0 => get_string('allrooms', 'facetoface'));
     $onlyrooms = $roomselect;
     $notonlytrooms = false;

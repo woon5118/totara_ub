@@ -9,13 +9,11 @@ Background:
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
+    And the following "activities" exist:
+      | activity   | name              | course | idnumber |
+      | facetoface | Test seminar name | C1     | S9103    |
+
     And I log in as "admin"
-    And I follow "Course 1"
-    And I turn editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name              | Test seminar name        |
-      | Description       | Test seminar description |
-    And I turn editing mode off
     And I navigate to "Rooms" node in "Site administration > Seminars"
     And I press "Add a new room"
     And I set the following fields to these values:
@@ -38,6 +36,7 @@ Background:
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
+
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name              | Room 3          |
@@ -48,6 +47,7 @@ Background:
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
     And I press "Add a room"
+
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name              | Room 4          |
@@ -64,6 +64,7 @@ Background:
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
+
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -78,102 +79,94 @@ Background:
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
-    And I set the following fields to these values:
-      | capacity              | 7    |
-    When I click on "Select room" "link"
-    And I wait "1" seconds
-
+    And I click on "Select room" "link"
     And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
-    And I wait "1" seconds
     And I press "Save changes"
+
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[day]     | 1    |
+      | timestart[day]     | 2    |
       | timestart[month]   | 1    |
       | timestart[year]    | 2020 |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
+      | timefinish[day]    | 2    |
       | timefinish[month]  | 1    |
       | timefinish[year]   | 2020 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
-    And I set the following fields to these values:
-      | capacity              | 7    |
-    When I click on "Select room" "link"
-    And I wait "1" seconds
+    And I click on "Select room" "link"
     And I click on "Room 2, Building 234, 234 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
-    And I wait "1" seconds
     And I press "Save changes"
+
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[day]     | 1    |
+      | timestart[day]     | 3    |
       | timestart[month]   | 1    |
       | timestart[year]    | 2020 |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
+      | timefinish[day]    | 3    |
       | timefinish[month]  | 1    |
       | timefinish[year]   | 2020 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
-    And I set the following fields to these values:
-      | capacity              | 7    |
-    When I click on "Select room" "link"
-    And I wait "1" seconds
+    And I click on "Select room" "link"
     And I click on "Room 3, Building 345, 345 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
-    And I wait "1" seconds
     And I press "Save changes"
+
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
-      | timestart[day]     | 1    |
+      | timestart[day]     | 4    |
       | timestart[month]   | 1    |
       | timestart[year]    | 2020 |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
+      | timefinish[day]    | 4    |
       | timefinish[month]  | 1    |
       | timefinish[year]   | 2020 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
-    And I set the following fields to these values:
-      | capacity              | 7    |
-    When I click on "Select room" "link"
-    And I wait "1" seconds
+    And I click on "Select room" "link"
     And I click on "Room 4, Building 456, 456 Tory street (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
-    And I wait "1" seconds
     And I press "Save changes"
 
-    And I click on "Room 1" "option"
-    And I should see "Room 1" in the "span.room_name" "css_element"
-    And I should not see "Room 2" in the "span.room_name" "css_element"
-    And I should not see "Room 3" in the "span.room_name" "css_element"
-    And I should not see "Room 4" in the "span.room_name" "css_element"
+    When I click on "Room 1" "option"
+    Then I should see "Room 1" in the "1 January 2020" "table_row"
+    And I should not see "Room 2" in the ".generaltable" "css_element"
+    And I should not see "Room 3" in the ".generaltable" "css_element"
+    And I should not see "Room 4" in the ".generaltable" "css_element"
 
-    And I click on "Room 2" "option"
-    And I should see "Room 2" in the "span.room_name" "css_element"
-    And I should not see "Room 1" in the "span.room_name" "css_element"
-    And I should not see "Room 3" in the "span.room_name" "css_element"
-    And I should not see "Room 4" in the "span.room_name" "css_element"
+    When I click on "Room 2" "option"
+    Then I should see "Room 2" in the "2 January 2020" "table_row"
+    And I should not see "Room 1" in the ".generaltable" "css_element"
+    And I should not see "Room 3" in the ".generaltable" "css_element"
+    And I should not see "Room 4" in the ".generaltable" "css_element"
 
-    And I click on "Room 3" "option"
-    And I should see "Room 3" in the "span.room_name" "css_element"
-    And I should not see "Room 2" in the "span.room_name" "css_element"
-    And I should not see "Room 1" in the "span.room_name" "css_element"
-    And I should not see "Room 4" in the "span.room_name" "css_element"
+    When I click on "Room 3" "option"
+    Then I should see "Room 3" in the "3 January 2020" "table_row"
+    And I should not see "Room 2" in the ".generaltable" "css_element"
+    And I should not see "Room 1" in the ".generaltable" "css_element"
+    And I should not see "Room 4" in the ".generaltable" "css_element"
 
-    And I click on "Room 4" "option"
-    And I should see "Room 4" in the "span.room_name" "css_element"
-    And I should not see "Room 2" in the "span.room_name" "css_element"
-    And I should not see "Room 3" in the "span.room_name" "css_element"
-    And I should not see "Room 1" in the "span.room_name" "css_element"
+    When I click on "Room 4" "option"
+    Then I should see "Room 4" in the "4 January 2020" "table_row"
+    And I should not see "Room 2" in the ".generaltable" "css_element"
+    And I should not see "Room 3" in the ".generaltable" "css_element"
+    And I should not see "Room 1" in the ".generaltable" "css_element"
+
+    When I click on "All rooms" "option"
+    Then I should see "Room 1" in the "1 January 2020" "table_row"
+    And I should see "Room 2" in the "2 January 2020" "table_row"
+    And I should see "Room 3" in the "3 January 2020" "table_row"
+    And I should see "Room 4" in the "4 January 2020" "table_row"

@@ -183,7 +183,7 @@ Feature: Manage pre-defined rooms
     And I press "OK"
     When I click on "Select room" "link"
     And I wait "1" seconds
-    Then I should see "(room unavailable on selected dates)" in the "Choose a room" "totaradialogue"
+    Then I should see "(Room unavailable)" in the "Choose a room" "totaradialogue"
     And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
     And I wait "1" seconds
     And I click on "Edit date" "link"
@@ -274,7 +274,7 @@ Feature: Manage pre-defined rooms
       | capacity                | 7             |
     When I click on "Select room" "link"
     And I wait "1" seconds
-    Then I should see "(room unavailable on selected dates)" in the "Choose a room" "totaradialogue"
+    Then I should see "(Room unavailable)" in the "Choose a room" "totaradialogue"
     And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
