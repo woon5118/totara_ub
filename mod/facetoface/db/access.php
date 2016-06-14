@@ -147,7 +147,7 @@ $capabilities = array(
 
     // View session cancellations.
     'mod/facetoface:viewcancellations' => array(
-        'captype' => 'write',
+        'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
