@@ -125,10 +125,17 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
 
         $room = new backup_nested_element('room', array('id'), array(
             'name', 'description', 'capacity', 'allowconflicts', 'custom', 'hidden', 'usercreated', 'usermodified', 'timecreated', 'timemodified'));
+        // NOTE: we need to use different element names for custom fields because each type needs different SQL query.
+        $room_fields = new backup_nested_element('room_fields');
+        $room_field = new backup_nested_element('room_field', array('id'), array(
+            'field_name', 'field_type', 'field_data', 'paramdatavalue'));
 
         $assets = new backup_nested_element('assets');
         $asset =  new backup_nested_element('asset', array('id'), array(
             'name', 'description', 'allowconflicts', 'custom', 'hidden', 'usercreated', 'usermodified', 'timecreated', 'timemodified'));
+        $asset_fields = new backup_nested_element('asset_fields');
+        $asset_field = new backup_nested_element('asset_field', array('id'), array(
+            'field_name', 'field_type', 'field_data', 'paramdatavalue'));
 
         $interests = new backup_nested_element('interests');
 
@@ -149,10 +156,10 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $signups_status->add_child($signup_status);
 
         $signup_fields->add_child($signup_field);
-        $signup_status->add_child($signup_fields);
+        $signup->add_child($signup_fields);
 
         $cancellation_fields->add_child($cancellation_field);
-        $signup_status->add_child($cancellation_fields);
+        $signup->add_child($cancellation_fields);
 
         $session->add_child($session_roles);
         $session_roles->add_child($session_role);
@@ -163,10 +170,14 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session->add_child($sessions_dates);
         $sessions_dates->add_child($sessions_date);
 
+        $room_fields->add_child($room_field);
+        $room->add_child($room_fields);
         $sessions_date->add_child($room);
 
-        $sessions_date->add_child($assets);
+        $asset_fields->add_child($asset_field);
+        $asset->add_child($asset_fields);
         $assets->add_child($asset);
+        $sessions_date->add_child($assets);
 
         $facetoface->add_child($interests);
         $interests->add_child($interest);
@@ -185,12 +196,14 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
                                  JOIN {facetoface_sessions_dates} fsd  ON (fsd.roomid = fr.id)
                                 WHERE fsd.id = :sessionsdateid",
             array('sessionsdateid' => backup::VAR_PARENTID));
+        $this->add_customfield_set_source($room_field, 'facetoface_room', 'facetofaceroomid');
 
         $asset->set_source_sql("SELECT fa.*
                                   FROM {facetoface_asset} fa
                                   JOIN {facetoface_asset_dates} fad  ON (fad.assetid = fa.id)
                                  WHERE fad.sessionsdateid = :sessionsdateid",
             array('sessionsdateid' => backup::VAR_PARENTID));
+        $this->add_customfield_set_source($asset_field, 'facetoface_asset', 'facetofaceassetid');
 
         if ($userinfo) {
             $signup->set_source_table('facetoface_signups', array('sessionid' => backup::VAR_PARENTID));
@@ -202,26 +215,11 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             $interest->set_source_table('facetoface_interest', array('facetoface' => backup::VAR_PARENTID));
         }
 
-        $customfield->set_source_sql('SELECT d.id, f.shortname AS field_name, f.datatype AS field_type, d.data AS field_data,
-                                             dp.value AS paramdatavalue
-                                        FROM {facetoface_session_info_field} f
-                                        JOIN {facetoface_session_info_data} d ON d.fieldid = f.id
-                                   LEFT JOIN {facetoface_session_info_data_param} dp ON dp.dataid = d.id
-                                       WHERE d.facetofacesessionid = ?', array(backup::VAR_PARENTID));
+        $this->add_customfield_set_source($customfield, 'facetoface_session', 'facetofacesessionid');
 
-        $signup_field->set_source_sql('SELECT d.id, f.shortname AS field_name, f.datatype AS field_type, d.data AS field_data,
-                                             dp.value AS paramdatavalue
-                                        FROM {facetoface_signup_info_field} f
-                                        JOIN {facetoface_signup_info_data} d ON d.fieldid = f.id
-                                   LEFT JOIN {facetoface_signup_info_data_param} dp ON dp.dataid = d.id
-                                       WHERE d.facetofacesignupid = ?', array(backup::VAR_PARENTID));
+        $this->add_customfield_set_source($signup_field, 'facetoface_signup', 'facetofacesignupid');
 
-        $cancellation_field->set_source_sql('SELECT d.id, f.shortname AS field_name, f.datatype AS field_type, d.data AS field_data,
-                                             dp.value AS paramdatavalue
-                                        FROM {facetoface_cancellation_info_field} f
-                                        JOIN {facetoface_cancellation_info_data} d ON d.fieldid = f.id
-                                   LEFT JOIN {facetoface_cancellation_info_data_param} dp ON dp.dataid = d.id
-                                       WHERE d.facetofacecancellationid = ?', array(backup::VAR_PARENTID));
+        $this->add_customfield_set_source($cancellation_field, 'facetoface_cancellation', 'facetofacecancellationid');
 
         // Define id annotations
         $signup->annotate_ids('user', 'userid');
@@ -234,6 +232,9 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
 
         $interest->annotate_ids('user', 'userid');
 
+        $room->annotate_ids('user', 'usercreated');
+        $room->annotate_ids('user', 'usermodified');
+
         $asset->annotate_ids('user', 'usercreated');
         $asset->annotate_ids('user', 'usermodified');
 
@@ -242,5 +243,23 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
 
         // Return the root element (facetoface), wrapped into standard activity structure
         return $this->prepare_activity_structure($facetoface);
+    }
+
+    /**
+     * Add custom field source data to element.
+     *
+     * @param backup_nested_element $fieldelement
+     * @param string $tableprefix
+     * @param string $parentfield
+     * @throws base_element_struct_exception
+     */
+    private function add_customfield_set_source(backup_nested_element $fieldelement, $tableprefix, $parentfield) {
+        $fieldelement->set_source_sql(
+            "SELECT d.id, f.shortname AS field_name, f.datatype AS field_type, d.data AS field_data, dp.value AS paramdatavalue
+               FROM {{$tableprefix}_info_field} f
+               JOIN {{$tableprefix}_info_data} d ON d.fieldid = f.id
+          LEFT JOIN {{$tableprefix}_info_data_param} dp ON dp.dataid = d.id
+              WHERE d.{$parentfield} = ?",
+            array(backup::VAR_PARENTID));
     }
 }

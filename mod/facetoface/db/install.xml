@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/facetoface/db" VERSION="20160614" COMMENT="XMLDB file for Moodle mod/facetoface"
+<XMLDB PATH="mod/facetoface/db" VERSION="20160616" COMMENT="XMLDB file for Totara mod/facetoface"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="facetoface" COMMENT="Each facetoface activity has an entry here">
+    <TABLE NAME="facetoface" COMMENT="Each seminar activity has an entry here">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="id of the table, please edit me"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="intro"/>
@@ -41,7 +41,7 @@
         <KEY NAME="face_cou_fk" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_session_roles" COMMENT="Users with a trainer role in a facetoface session">
+    <TABLE NAME="facetoface_session_roles" COMMENT="Users with a trainer-like role in a seminar event">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="id of the table"/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -54,9 +54,9 @@
         <KEY NAME="facesessrole_use_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_sessions" COMMENT="A given facetoface activity may be given at different times and places">
+    <TABLE NAME="facetoface_sessions" COMMENT="Describes seminar events">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="id of the table, please edit me"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="facetoface" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of the facetoface activity this session is for"/>
         <FIELD NAME="capacity" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of students who can enroll in this session. A value of 0 means unlimited."/>
         <FIELD NAME="allowoverbook" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flag to turn on waitlisting of signups over capacity."/>
@@ -79,27 +79,27 @@
         <FIELD NAME="cancelledstatus" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Session cancelled status"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="primary key of the table, please edit me"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="facetoface" TYPE="foreign" FIELDS="facetoface" REFTABLE="facetoface" REFFIELDS="id"/>
         <KEY NAME="facesess_use_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_sessions_dates" COMMENT="The dates and times for each session.  Sessions can be set over multiple days or blocks of time.">
+    <TABLE NAME="facetoface_sessions_dates" COMMENT="Describes sessions of event. Specifies the start time, end time and optionally room and assets. Sessions can be set over multiple days or blocks of time.">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="id of the table, please edit me"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="sessiontimezone" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Timezone in which this event will take place"/>
+        <FIELD NAME="sessiontimezone" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Timezone used for display of dates and times, 99 means use user timeozone"/>
         <FIELD NAME="roomid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Foreign key to facetoface_room"/>
         <FIELD NAME="timestart" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timefinish" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="primary key of the table, please edit me"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="facesessdate_roo_fk" TYPE="foreign" FIELDS="roomid" REFTABLE="facetoface_room" REFFIELDS="id"/>
         <KEY NAME="sessionid" TYPE="foreign" FIELDS="sessionid" REFTABLE="facetoface_sessions" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_signups" COMMENT="User/session signups">
+    <TABLE NAME="facetoface_signups" COMMENT="User signups for events">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -114,28 +114,28 @@
         <FIELD NAME="managerid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="primary key of the table, please edit me"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="sessionid" TYPE="foreign" FIELDS="sessionid" REFTABLE="facetoface_sessions" REFFIELDS="id"/>
         <KEY NAME="facesign_use_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_signups_status" COMMENT="User/session signup status">
+    <TABLE NAME="facetoface_signups_status" COMMENT="Status of user signups, this table keeps the history for each user signup, no data is deleted">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="signupid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="statuscode" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="superceded" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="superceded" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="0 means this is the current status"/>
         <FIELD NAME="grade" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5"/>
         <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="primary key of the table, please edit me"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="signupid" TYPE="foreign" FIELDS="signupid" REFTABLE="facetoface_signups" REFFIELDS="id"/>
         <KEY NAME="facesignstat_cre_fk" TYPE="foreign" FIELDS="createdby" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_session_info_data" COMMENT="Stores custom field data related to facetoface session">
+    <TABLE NAME="facetoface_session_info_data" COMMENT="Stores custom field data related to event, these fields describe event details">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
@@ -148,7 +148,7 @@
         <KEY NAME="sessioninfodata_sessionid_fk" TYPE="foreign" FIELDS="facetofacesessionid" REFTABLE="facetoface_sessions" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_session_info_data_param" COMMENT="Custom facetoface session fields data parameters">
+    <TABLE NAME="facetoface_session_info_data_param" COMMENT="Custom event fields data parameters">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -162,7 +162,7 @@
         <INDEX NAME="sessioninfodatapara_value_ix" UNIQUE="false" FIELDS="value"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="facetoface_session_info_field" COMMENT="Stores the custom fields for each facetoface session type">
+    <TABLE NAME="facetoface_session_info_field" COMMENT="Stores the definitions for event custom fields">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
@@ -186,20 +186,20 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_signup_info_data" COMMENT="Stores custom field data related to signups">
+    <TABLE NAME="facetoface_signup_info_data" COMMENT="Stores custom field data related to user signups for events, this data is attached to signup table, not status">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="fieldid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="facetofacesignupid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="facetofacesignupid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false" COMMENT="WARNING - this points to signup id"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="signupinfodata_fielid_fk" TYPE="foreign" FIELDS="fieldid" REFTABLE="facetoface_signup_info_field" REFFIELDS="id"/>
-        <KEY NAME="signupinfodata_signupid_fk" TYPE="foreign" FIELDS="facetofacesignupid" REFTABLE="facetoface_signups_status" REFFIELDS="id"/>
+        <KEY NAME="signupinfodata_signupid_fk" TYPE="foreign" FIELDS="facetofacesignupid" REFTABLE="facetoface_signups" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_signup_info_data_param" COMMENT="Custom signup fields data parameters">
+    <TABLE NAME="facetoface_signup_info_data_param" COMMENT="Custom event signup fields data parameters">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -213,7 +213,7 @@
         <INDEX NAME="signupinfodatapara_value_ix" UNIQUE="false" FIELDS="value"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="facetoface_signup_info_field" COMMENT="Stores the custom fields for each signup type">
+    <TABLE NAME="facetoface_signup_info_field" COMMENT="Stores the definitions of user signup custom fields">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
@@ -236,20 +236,20 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_cancellation_info_data" COMMENT="Stores custom field data related to cancellation notes">
+    <TABLE NAME="facetoface_cancellation_info_data" COMMENT="Stores custom field data related to user signup cancellation">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="fieldid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="facetofacecancellationid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="facetofacecancellationid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false" COMMENT="WARNING - this points to signup id"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="cancellationinfodata_fieldid_fk" TYPE="foreign" FIELDS="fieldid" REFTABLE="facetoface_cancellation_info_field" REFFIELDS="id"/>
-        <KEY NAME="cancellationinfodata_cancellationid_fk" TYPE="foreign" FIELDS="facetofacecancellationid" REFTABLE="facetoface_signups_status" REFFIELDS="id"/>
+        <KEY NAME="cancellationinfodata_cancellationid_fk" TYPE="foreign" FIELDS="facetofacecancellationid" REFTABLE="facetoface_signups" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_cancellation_info_data_param" COMMENT="Custom cancellation fields data parameters">
+    <TABLE NAME="facetoface_cancellation_info_data_param" COMMENT="Custom user signup cancellation fields data parameters">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -263,7 +263,7 @@
         <INDEX NAME="cancellationinfodatapara_value_ix" UNIQUE="false" FIELDS="value"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="facetoface_cancellation_info_field" COMMENT="Stores the custom fields for each cancellation type">
+    <TABLE NAME="facetoface_cancellation_info_field" COMMENT="Stores the definitions for user signup cancellation custom fields">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
@@ -286,20 +286,20 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_sessioncancel_info_data" COMMENT="Stores custom field data related to cancellation notes">
+    <TABLE NAME="facetoface_sessioncancel_info_data" COMMENT="Stores custom field data related to cancellation of the whole event">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="fieldid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="facetofacecancellationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="facetofacecancellationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="WARNING - this points to session id"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="cancellationinfodata_fieldid_fk" TYPE="foreign" FIELDS="fieldid" REFTABLE="facetoface_sessioncancel_info_field" REFFIELDS="id"/>
-        <KEY NAME="cancellationinfodata_cancellationid_fk" TYPE="foreign" FIELDS="facetofacecancellationid" REFTABLE="facetoface_signups_status" REFFIELDS="id"/>
+        <KEY NAME="cancellationinfodata_cancellationid_fk" TYPE="foreign" FIELDS="facetofacecancellationid" REFTABLE="facetoface_sessions" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_sessioncancel_info_data_param" COMMENT="Custom cancellation fields data parameters">
+    <TABLE NAME="facetoface_sessioncancel_info_data_param" COMMENT="Whole event cancellation custom fields data parameters">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -313,7 +313,7 @@
         <INDEX NAME="cancellationinfodatapara_value_ix" UNIQUE="false" FIELDS="value"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="facetoface_sessioncancel_info_field" COMMENT="Stores the custom fields for each cancellation type">
+    <TABLE NAME="facetoface_sessioncancel_info_field" COMMENT="Stores the definitions for whole event cancellation custom fields">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
@@ -336,7 +336,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_notification_tpl" COMMENT="Face-to-face notification templates">
+    <TABLE NAME="facetoface_notification_tpl" COMMENT="Seminar notification templates">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
@@ -353,7 +353,7 @@
         <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="facetoface_notification" COMMENT="Facetoface notifications">
+    <TABLE NAME="facetoface_notification" COMMENT="Seminar notifications">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="type" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
@@ -390,7 +390,7 @@
         <INDEX NAME="issent" UNIQUE="false" FIELDS="issent"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="facetoface_notification_sent" COMMENT="Face-to-face notification reciepts">
+    <TABLE NAME="facetoface_notification_sent" COMMENT="Seminar notification reciepts">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="notificationid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -404,14 +404,14 @@
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_room" COMMENT="Table for storing facetoface room data">
+    <TABLE NAME="facetoface_room" COMMENT="Table for storing seminar room data">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="capacity" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="allowconflicts" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="custom" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="custom" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means room is created secifically for one session only and cannot be reused"/>
         <FIELD NAME="hidden" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Do not show this room in add/search room dialogs"/>
         <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="user id who created the room"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="user id who modified the room"/>
@@ -446,7 +446,7 @@
         <KEY NAME="facenotihist_use_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_interest" COMMENT="Users who have declared interest in a facetoface session">
+    <TABLE NAME="facetoface_interest" COMMENT="Users who have declared interest in a seminar activity">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="facetoface" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -489,7 +489,7 @@
         <INDEX NAME="roominfodatapara_value_ix" UNIQUE="false" FIELDS="value"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="facetoface_room_info_field" COMMENT="Stores the custom fields for each room type">
+    <TABLE NAME="facetoface_room_info_field" COMMENT="Stores the definition of available room custom fields">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
@@ -512,13 +512,13 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_asset" COMMENT="Table for storing pre-defined facetoface assets data">
+    <TABLE NAME="facetoface_asset" COMMENT="Table for storing seminar assets data">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="allowconflicts" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="custom" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="custom" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means room is created secifically for one session only and cannot be reused"/>
         <FIELD NAME="hidden" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Do not show this asset in add/search asset dialogs"/>
         <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="user id who created the asset"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="user id who modified the asset"/>
@@ -547,7 +547,7 @@
         <KEY NAME="assetinfodata_assetid_fk" TYPE="foreign" FIELDS="facetofaceassetid" REFTABLE="facetoface_asset" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="facetoface_asset_info_data_param" COMMENT="Custom asset fields data parameters">
+    <TABLE NAME="facetoface_asset_info_data_param" COMMENT="Asset custom fields data parameters">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -561,7 +561,7 @@
         <INDEX NAME="assetinfodatapara_value_ix" UNIQUE="false" FIELDS="value"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="facetoface_asset_info_field" COMMENT="Stores the custom fields for each asset type">
+    <TABLE NAME="facetoface_asset_info_field" COMMENT="Stores the definition of available asset custom fields">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
