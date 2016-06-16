@@ -871,24 +871,28 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $data = array();
         $data[] = array(get_string('facetoface', 'mod_facetoface'), format_string($facetoface->name));
         // Get session custom fields.
-        $sessioncustomfields = customfield_get_fields($session, 'facetoface_session', 'facetofacesession');
-        if (!empty($sessioncustomfields)) {
-            foreach ($sessioncustomfields as $name => $data) {
-                $data[] = array($name, $data);
-            }
+        $sessioncustomfields = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
+        foreach ($sessioncustomfields as $name => $customdata) {
+            $data[] = array($name, $customdata);
         }
+
         $data[] = array(get_string('sessionstartdate', 'mod_facetoface'), get_string('sessionstartdatewithtime', 'facetoface', $dates));
         $data[] = array(get_string('sessionenddate', 'mod_facetoface'), get_string('sessionenddatewithtime', 'facetoface', $dates));
-        $data[] = array(get_string('capacity', 'mod_facetoface'), $session->capacity);
+        $data[] = array(get_string('maxbookings', 'mod_facetoface'), $session->capacity);
         $data[] = array(get_string('numberofattendees', 'mod_facetoface'), facetoface_get_num_attendees($session->id));
         $room = facetoface_get_room($sessiondate->roomid);
         if (!$room) {
-            $roomstring = get_string('notapplicable', 'facetoface');
+            $data[] = array(get_string('place', 'mod_facetoface'), get_string('notapplicable', 'facetoface'));
         } else {
-            $roomstring = facetoface_room_to_string($room);
+            $info = customfield_get_data($room, 'facetoface_room', 'facetofaceroom');
+            $data[] = array(get_string('place', 'mod_facetoface'), $room->name);
+            foreach ($info as $name => $roomdata) {
+                if (!empty($roomdata)) {
+                    $data[] = array($name, $roomdata);
+                }
+            }
         }
         unset($room);
-        $data[] = array(get_string('place', 'mod_facetoface'), $roomstring);
 
         if ($format === 'pdf' or $format === 'html') {
             $table = new html_table();
@@ -917,5 +921,4 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
 
         return $result;
     }
-
 } // end of rb_source_facetoface_signin class

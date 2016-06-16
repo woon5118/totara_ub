@@ -37,6 +37,7 @@ $string['endtime'] = 'End Time';
 $string['facilitator'] = 'Facilitator';
 $string['f2fname'] = 'Seminar Name';
 $string['f2fnamelink'] = 'Seminar Name (linked to session page)';
+$string['maxbookings'] = 'Maximum bookings';
 $string['normalcost'] = 'Normal cost';
 $string['numattendees'] = 'Number of Attendees';
 $string['room'] = 'Room';
