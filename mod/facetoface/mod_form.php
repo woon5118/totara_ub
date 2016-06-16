@@ -471,6 +471,9 @@ class mod_facetoface_mod_form extends moodleform_mod {
     public function validation($data, $files) {
         global $DB;
         $errors = parent::validation($data, $files);
+        if (empty($data['selectedapprovers'])) {
+            return $errors;
+        }
         $selectedapprovers = explode(',', $data['selectedapprovers']);
 
         $systemapprovers = get_users_from_config(
