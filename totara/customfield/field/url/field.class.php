@@ -60,12 +60,17 @@ class customfield_url extends customfield_base {
     public function edit_field_add(&$mform) {
         $urlgrp = array();
         $urlgrpname = $this->inputname . '_group';
-        $urlgrp[] = $mform->createElement('static', null, null, get_string('customfieldtypeurl', 'totara_customfield'));
+
+        // Why create the labels manually? Because there is no way to make the accessible label visible ...
+        $urllabel = html_writer::tag('label', get_string('customfieldtypeurl', 'totara_customfield'), array('for' => 'id_' . $this->inputname . '_url'));
+        $urlgrp[] = $mform->createElement('static', null, null, $urllabel);
         $urlgrp[] = $mform->createElement('text', $this->inputname . '[url]');
-        $urlgrp[] = $mform->createElement('static', null, null, get_string('customfieldtypeurltext', 'totara_customfield'));
+        $textlabel = html_writer::tag('label', get_string('customfieldtypeurltext', 'totara_customfield'), array('for' => 'id_' . $this->inputname . '_text'));
+        $urlgrp[] = $mform->createElement('static', null, null, $textlabel);
         $urlgrp[] = $mform->createElement('text', $this->inputname . '[text]');
         $urlgrp[] = $mform->createElement('checkbox', $this->inputname . '[target]');
-        $urlgrp[] = $mform->createElement('static', null, null, get_string('customfieldtypeurltarget', 'totara_customfield'));
+        $checkboxlabel = html_writer::tag('label', get_string('customfieldtypeurltarget', 'totara_customfield'), array('for' => 'id_' . $this->inputname . '_target'));
+        $urlgrp[] = $mform->createElement('static', null, null, $checkboxlabel);
 
         $mform->addGroup($urlgrp, $urlgrpname, format_string($this->field->fullname), null, false);
         $mform->setType($this->inputname . '[url]', PARAM_URL);
