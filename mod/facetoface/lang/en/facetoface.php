@@ -26,6 +26,8 @@ $string['activitydefaults'] = 'Activity defaults';
 $string['addattendees'] = 'Add users';
 $string['addattendeestep1'] = "Select users to add (step 1 of 2)";
 $string['addattendeestep2'] = "Add users (step 2 of 2)";
+$string['addattendeesviaidlist'] = 'Add users via list of IDs';
+$string['addattendeesviafileupload'] = 'Add users via file upload';
 $string['addasset'] = 'Add an asset';
 $string['addeditattendeeserror'] = 'Add/edit attendees error';
 $string['addeditattendeesresults'] = 'Add/edit attendees results';
@@ -225,8 +227,6 @@ $string['bookingsessioncancelled'] = 'Session cancelled';
 $string['building'] = 'Building';
 $string['bulkactions'] = 'Bulk actions';
 $string['bulkaddattendeeserror'] = 'Bulk add attendees error';
-$string['bulkaddattendeesfromfile'] = 'Bulk add attendees from file';
-$string['bulkaddattendeesfrominput'] = 'Bulk add attendees from text input';
 $string['bulkaddattendeesresults'] = 'Bulk add attendees results';
 $string['bulkaddattendeessuccess'] = 'Bulk add attendees success';
 $string['bulkaddhelptext'] = 'Note: Users must be referenced by their {$a} and must be delimited by a comma or newline';
@@ -2157,6 +2157,8 @@ $string['availablesignupnote_help'] = 'When "Users can enter requests when signi
 
 * Dietary requirements
 * Disabilities';
+$string['bulkaddattendeesfromfile'] = 'Bulk add attendees from file';
+$string['bulkaddattendeesfrominput'] = 'Bulk add attendees from text input';
 $string['bulkaddheading'] = 'Bulk Add';
 $string['calendarfiltersheading'] = 'Seminar calendar filters';
 $string['changemanageremailaddress'] = 'Change manager email address';

@@ -396,8 +396,8 @@ if ($action == 'attendees') {
     if (empty($session->cancelledstatus)) {
         if (in_array('addattendees', $allowed_actions)) {
             $actions['add']    = get_string('addattendees', 'facetoface');
-            $actions['bulkaddfile']  = get_string('bulkaddattendeesfromfile', 'facetoface');
-            $actions['bulkaddinput'] = get_string('bulkaddattendeesfrominput', 'facetoface');
+            $actions['bulkaddfile']  = get_string('addattendeesviafileupload', 'facetoface');
+            $actions['bulkaddinput'] = get_string('addattendeesviaidlist', 'facetoface');
             $actions['remove']    = get_string('removeattendees', 'facetoface');
         }
     }
@@ -624,7 +624,7 @@ if (!$onlycontent) {
     $PAGE->requires->string_for_js('cancel', 'moodle');
     $PAGE->requires->strings_for_js(
         array('uploadfile', 'addremoveattendees', 'approvalreqd', 'areyousureconfirmwaitlist',
-            'bulkaddattendeesfrominput', 'submitcsvtext', 'bulkaddattendeesresults', 'bulkaddattendeesfromfile',
+            'addattendeesviaidlist', 'submitcsvtext', 'bulkaddattendeesresults', 'addattendeesviafileupload',
             'bulkaddattendeesresults', 'wait-list', 'cancellations', 'approvalreqd', 'takeattendance',
             'updateattendeessuccessful', 'updateattendeesunsuccessful', 'waitlistselectoneormoreusers',
             'confirmlotteryheader', 'confirmlotterybody', 'updatewaitlist', 'close'),
