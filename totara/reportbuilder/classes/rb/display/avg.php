@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2014 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2016 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Petr Skoda <petr.skoda@totaralms.com>
+ * @author Alastair Munro <alastair.munro@totaralearning.com>
  * @package totara_reportbuilder
  */
 
-namespace totara_reportbuilder\rb\aggregate;
+namespace totara_reportbuilder\rb\display;
 
 /**
- * Class describing column aggregation options.
+ * Class describing column display formatting.
  */
 class avg extends base {
-    protected static function get_field_aggregate($field) {
-        return "AVG($field)";
-    }
-
-    public static function get_displayfunc(\rb_column $column) {
-        return 'avg';
-    }
-
-    public static function is_column_option_compatible(\rb_column_option $option) {
-        return ($option->dbdatatype === 'integer' or $option->dbdatatype === 'decimal' or $option->dbdatatype === 'boolean');
+    public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        return $value === null ? null : sprintf('%.2f', $value);
     }
 
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {

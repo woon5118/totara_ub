@@ -303,4 +303,57 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertSame('a', $processed[0]);
         $this->assertSame('50.0%', $processed[1]);
     }
+
+    function test_avg() {
+        global $DB, $CFG;
+        require_once($CFG->libdir . '/completionlib.php');
+
+        set_config('enablecompletion', 1);
+
+        $this->resetAfterTest();
+        $this->setAdminUser(); // We need permissions to view all reports.
+
+        $user1 = $this->getDataGenerator()->create_user(array('institution' => 'a'));
+        $user2 = $this->getDataGenerator()->create_user(array('institution' => 'a'));
+
+        $course = $this->getDataGenerator()->create_course(
+            array('enablecompletion' => COMPLETION_ENABLED, 'completionstartonenrol' => 1));
+        $page = $this->getDataGenerator()->create_module('page',
+            array('course' => $course->id, 'completion' => COMPLETION_TRACKING_AUTOMATIC , 'completionview' => COMPLETION_VIEW_REQUIRED));
+        $cm = get_coursemodule_from_instance('page', $page->id);
+
+        $this->getDataGenerator()->get_plugin_generator('core_completion')->set_activity_completion($course->id, array($page));
+
+        $this->getDataGenerator()->enrol_user($user1->id, $course->id);
+        $this->getDataGenerator()->enrol_user($user2->id, $course->id);
+
+        $completion = new completion_info($course);
+        $completion->set_module_viewed($cm, $user1->id);
+
+        $this->assertTrue($completion->is_course_complete($user1->id));
+        $this->assertFalse($completion->is_course_complete($user2->id));
+
+        $rid = $this->create_report('course_completion', 'Test courses report 1');
+
+        $report = new reportbuilder($rid, null, false, null, null, true);
+
+        $this->add_column($report, 'user', 'institution', null, null, null, 0);
+        $this->add_column($report, 'course_completion', 'iscomplete', null, 'avg', null, 0);
+
+        $report = new reportbuilder($rid);
+
+        list($sql, $params, $cache) = $report->build_query();
+
+        $records = $DB->get_records_sql($sql, $params);
+        $this->assertCount(1, $records);
+        $row = reset($records);
+
+        $this->assertSame('a', $row->user_institution);
+        $this->assertEquals(0.50000000000000000000, $row->course_completion_iscomplete, '', 0.0001);
+
+        $processed = $report->src->process_data_row($row, 'html', $report);
+
+        $this->assertSame('a', $processed[0]);
+        $this->assertSame('0.50', $processed[1]);
+    }
 }
