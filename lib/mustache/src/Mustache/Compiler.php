@@ -421,7 +421,13 @@ class Mustache_Compiler
 
     const PARTIAL_INDENT = ', $indent . %s';
     const PARTIAL = '
-        if ($partial = $this->mustache->loadPartial(%s)) {
+        // Totara hack: if the partial starts with "." then try
+        // to resolve it from the current context.
+        $partialstr = %s;
+        if (strpos($partialstr, \'&&\') === 0) {
+            $partialstr = $context->find(substr($partialstr, 2));
+        }
+        if ($partial = $this->mustache->loadPartial($partialstr)) {
             $buffer .= $partial->renderInternal($context%s);
         }
     ';
