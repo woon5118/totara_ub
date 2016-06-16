@@ -76,6 +76,7 @@ Feature: Users assignments to a program
     And I log in as "user001"
     And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
+    And I should see "Assigned as an individual."
 
     When I log out
     And I log in as "user002"
@@ -88,6 +89,19 @@ Feature: Users assignments to a program
 
     When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
+    And I should not see "Assigned as an individual."
+
+    When I log out
+    And I log in as "admin"
+    And I set the following administration settings values:
+      | enableprogramcompletioneditor | 1 |
+    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I click on "Miscellaneous" "link"
+    And I click on "Assignment Program Tests" "link"
+    And I click on "Edit program details" "button"
+    And I click on "Completion" "link" in the ".tabtree" "css_element"
+    And I click on "Edit completion records" "link" in the "fn_001 ln_001" "table_row"
+    Then I should see "Assigned as an individual."
 
   @javascript
   Scenario: Test program assignments and updates via audience assigments
@@ -111,6 +125,7 @@ Feature: Users assignments to a program
     And I log in as "user002"
     And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
+    And I should see "Member of audience 'Audience1'."
 
     When I log out
     And I log in as "user003"
@@ -123,6 +138,7 @@ Feature: Users assignments to a program
 
     When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
+    And I should not see "Member of audience 'Audience1'."
 
     When I log out
     And I log in as "admin"
@@ -153,6 +169,18 @@ Feature: Users assignments to a program
     And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
+    When I log out
+    And I log in as "admin"
+    And I set the following administration settings values:
+      | enableprogramcompletioneditor | 1 |
+    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I click on "Miscellaneous" "link"
+    And I click on "Assignment Program Tests" "link"
+    And I click on "Edit program details" "button"
+    And I click on "Completion" "link" in the ".tabtree" "css_element"
+    And I click on "Edit completion records" "link" in the "fn_003 ln_003" "table_row"
+    Then I should see "Member of audience 'Audience1'."
+
   @javascript
   Scenario: Test program assignments and updates via position assigments
     Given I log in as "admin"
@@ -175,6 +203,7 @@ Feature: Users assignments to a program
     And I log in as "user001"
     And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
+    And I should see "Hold position of 'Position One'"
 
     When I log out
     And I log in as "user002"
@@ -187,6 +216,7 @@ Feature: Users assignments to a program
 
     When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
+    And I should not see "Hold position of 'Position One'"
 
     When the following job assignments exist:
       | user    | position | idnumber |
@@ -212,6 +242,18 @@ Feature: Users assignments to a program
     And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
+    When I log out
+    And I log in as "admin"
+    And I set the following administration settings values:
+      | enableprogramcompletioneditor | 1 |
+    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I click on "Miscellaneous" "link"
+    And I click on "Assignment Program Tests" "link"
+    And I click on "Edit program details" "button"
+    And I click on "Completion" "link" in the ".tabtree" "css_element"
+    And I click on "Edit completion records" "link" in the "fn_002 ln_002" "table_row"
+    Then I should see "Hold position of 'Position One'"
+
   @javascript
   Scenario: Test program assignments and updates via organisation assigments
     Given I log in as "admin"
@@ -234,6 +276,7 @@ Feature: Users assignments to a program
     And I log in as "user001"
     And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
+    And I should see "Member of organisation 'Organisation One'"
 
     When I log out
     And I log in as "user002"
@@ -246,6 +289,7 @@ Feature: Users assignments to a program
 
     When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
+    And I should not see "Member of organisation 'Organisation One'"
 
     And the following job assignments exist:
       | user    | organisation | idnumber |
@@ -271,6 +315,18 @@ Feature: Users assignments to a program
     And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
+    When I log out
+    And I log in as "admin"
+    And I set the following administration settings values:
+      | enableprogramcompletioneditor | 1 |
+    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I click on "Miscellaneous" "link"
+    And I click on "Assignment Program Tests" "link"
+    And I click on "Edit program details" "button"
+    And I click on "Completion" "link" in the ".tabtree" "css_element"
+    And I click on "Edit completion records" "link" in the "fn_002 ln_002" "table_row"
+    Then I should see "Member of organisation 'Organisation One'"
+
   @javascript
   Scenario: Test program assignments and updates via manager path assigments
     Given I log in as "admin"
@@ -294,6 +350,7 @@ Feature: Users assignments to a program
     And I log in as "user002"
     And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
+    And I should see "Part of 'fn_001 ln_001' team"
 
     When I log out
     And I log in as "user003"
@@ -322,6 +379,7 @@ Feature: Users assignments to a program
 
     When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
+    And I should not see "Part of 'fn_001 ln_001' team"
 
     When I log out
     And I log in as "user003"
@@ -332,3 +390,15 @@ Feature: Users assignments to a program
     And I log in as "user004"
     And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
+
+    When I log out
+    And I log in as "admin"
+    And I set the following administration settings values:
+      | enableprogramcompletioneditor | 1 |
+    And I navigate to "Manage programs" node in "Site administration > Courses"
+    And I click on "Miscellaneous" "link"
+    And I click on "Assignment Program Tests" "link"
+    And I click on "Edit program details" "button"
+    And I click on "Completion" "link" in the ".tabtree" "css_element"
+    And I click on "Edit completion records" "link" in the "fn_003 ln_003" "table_row"
+    Then I should see "Part of 'fn_001 ln_001' team"

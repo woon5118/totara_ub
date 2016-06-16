@@ -1328,25 +1328,9 @@ class program {
 
         $userassigned = $this->user_is_assigned($userid);
 
-        // Display the reason why this user has been assigned to the program (if it is mandatory for the user).
         if ($userassigned) {
-            $user_assignments = $DB->get_records_select('prog_user_assignment', "programid = ? AND userid = ?", array($this->id, $userid));
-
-            if (count($user_assignments) > 0) {
-                if ($viewinganothersprogram) {
-                    $message .= html_writer::tag('p', get_string('assignmentcriteriamanager', 'totara_program'));
-                } else {
-                    $message .= html_writer::tag('p', get_string('assignmentcriterialearner', 'totara_program'));
-                }
-                $message .= html_writer::start_tag('ul');
-                foreach ($user_assignments as $user_assignment) {
-                    if ($assignment = $DB->get_record('prog_assignment', array('id' => $user_assignment->assignmentid))) {
-                        $user_assignment_ob = prog_user_assignment::factory($assignment->assignmenttype, $user_assignment->id);
-                        $message .= $user_assignment_ob->display_criteria();
-                    }
-                }
-                $message .= html_writer::end_tag('ul');
-            }
+            // Display the reason why this user has been assigned to the program (if it is mandatory for the user).
+            $message .= $this->display_required_assignment_reason($userid);
         }
 
         // Show message box if there are any messages.
@@ -1953,6 +1937,134 @@ class program {
         }
 
         return false;
+    }
+
+    /**
+     * Display the reason why this user has been assigned to the program (if it is mandatory for the user).
+     *
+     * @param int $userid - id of the user.
+     * @param bool $includefull - include the full message to be output. Set to false if this output will be included
+     *  in a larger unordered list where those tags will be created separately.
+     * @return string
+     * @throws UserAssignmentException
+     * @throws coding_exception
+     */
+    public function display_required_assignment_reason($userid, $includefull = true) {
+        global $DB, $USER;
+
+        $message = '';
+
+        $user_assignments = $DB->get_records_select('prog_user_assignment', "programid = ? AND userid = ?", array($this->id, $userid));
+
+        if (count($user_assignments) > 0) {
+            if ($includefull) {
+                if ($USER->id == $userid) {
+                    // Viewing user's own records.
+                    $message .= html_writer::tag('p', get_string('assignmentcriterialearner', 'totara_program'));
+                } else {
+                    // Viewing another's records.
+                    $message .= html_writer::tag('p', get_string('assignmentcriteriamanager', 'totara_program'));
+                }
+                $message .= html_writer::start_tag('ul');
+            }
+            foreach ($user_assignments as $user_assignment) {
+                if ($assignment = $DB->get_record('prog_assignment', array('id' => $user_assignment->assignmentid))) {
+                    /** @var prog_user_assignment $user_assignment_ob */
+                    $user_assignment_ob = prog_user_assignment::factory($assignment->assignmenttype, $user_assignment->id);
+                    $message .= $user_assignment_ob->display_criteria();
+                }
+            }
+            if ($includefull) {
+                $message .= html_writer::end_tag('ul');
+            }
+        }
+
+        return $message;
+    }
+
+    /**
+     * Display reasons for why a user might have a completion record. Most common reason
+     * is that they are assigned, as returned by $this->display_assignment_reason(), but
+     * also tries to find other reasons if nothing comes back from that.
+     *
+     * This only takes into account a prog_completion record. If there is a certif_completion record
+     * but not a prog_completion record, it will say no record exists.
+     *
+     * @param stdClass $user - a user record.
+     * @param null|stdClass $currentcompletion - the current progcompletion record. If left as null,
+     *  will assume no check has been made yet and query the database.
+     * @return string explaining why completion record exists.
+     * @throws coding_exception
+     */
+    public function display_completion_record_reason($user, $currentcompletion = null) {
+        global $DB;
+        $reasonlist = '';
+
+        if (!isset($currentcompletion)) {
+            // Currently, for the certification completion editor, it will not show a current completion record if there
+            // is no prog_completion, but there is a cert completion. We'll want to update this if that changes.
+            $currentcompletion = $DB->get_record('prog_completion', array('userid' => $user->id, 'programid' => $this->id, 'coursesetid' => 0));
+        }
+
+        if (empty($currentcompletion)) {
+            // There is no prog_completion record.
+            return get_string('usernotcurrentlyassigned', 'totara_program');
+        }
+
+        $userassigned = $this->user_is_assigned($user->id);
+        if ($userassigned) {
+            $reasonlist .= $this->display_required_assignment_reason($user->id, false);
+        }
+
+        // The display_required_assignment_reason method doesn't currently show a message if
+        // the user is assigned via a plan as that is not considered required learning.
+        if ($this->assigned_through_plan($user->id)) {
+            $reasonlist .= html_writer::tag('li', get_string('assignedvialearningplan', 'totara_program'));
+        }
+
+        if (!empty($reasonlist)) {
+            // We have found assignment records or similar reasons and added them to the message. Return
+            // those so they can be displayed.
+            $message = html_writer::tag('p', get_string('completionrecordbecause', 'totara_program'))
+                 . html_writer::tag('ul', $reasonlist);
+            if ($user->suspended) {
+                // If the user is suspended, things such setting their window to open won't work,
+                // so we'll point that out.
+                $message .= html_writer::tag('p', get_string('completionrecordusersuspended', 'totara_program'));
+            }
+            return $message;
+        } else {
+            // Let's go through some other reasons why they might have a record.
+            if ($user->deleted) {
+                return html_writer::tag('p', get_string('completionrecorduserdeleted', 'totara_program'));
+            }
+
+            // They may have added a program to their learning plan. If it was approved, this
+            // would have been added as a reason above. So if we find any other record, it
+            // should be unapproved.
+            $sql = "SELECT *
+                      FROM {dp_plan} p
+                      JOIN {dp_plan_program_assign} pa
+                        ON p.id = pa.planid
+                     WHERE p.userid = ?
+                       AND pa.programid = ?";
+            $params = array($user->id, $this->id);
+            if ($DB->record_exists_sql($sql, $params)) {
+                $message = html_writer::tag('p', get_string('completionrecordunapprovedplan', 'totara_program'));
+            }
+        }
+
+        if (empty($message)) {
+            // Still nothing found.
+            // The default is to say a completion record exists but no reason was found.
+            $message = html_writer::tag('p', get_string('completionrecordreasonnotfound', 'totara_program'));
+        }
+
+        if ($user->suspended) {
+            $message .= html_writer::tag('p', get_string('completionrecordusersuspended', 'totara_program'));
+        }
+
+        return $message;
     }
 }
 

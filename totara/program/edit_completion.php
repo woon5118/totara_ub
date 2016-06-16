@@ -179,6 +179,9 @@ $completionurl = new moodle_url('/totara/program/completion.php', array('id' => 
 echo html_writer::tag('ul', html_writer::tag('li', html_writer::link($completionurl,
     get_string('completionreturntoprogram', 'totara_program'))));
 
+// Display if and how this user is assigned, or otherwise why they might have the completion record.
+echo $OUTPUT->notification($program->display_completion_record_reason($user, $progcompletion), 'notifymessage');
+
 // Display the edit completion record form.
 if (isset($editform)) {
     $editform->set_data($currentformdata);
@@ -192,8 +195,6 @@ if (isset($editform)) {
     echo $OUTPUT->single_button($exceptionurl, get_string('overrideandassign', 'totara_program'));
 } else if (!empty($exceptions)) {
     echo $OUTPUT->notification(get_string('fixexceptionbeforeeditingcompletion', 'totara_program'), 'notifyproblem');
-} else {
-    echo $OUTPUT->notification(get_string('usernotcurrentlyassigned', 'totara_program'), 'notifymessage');
 }
 
 $historyformcustomdata = array(

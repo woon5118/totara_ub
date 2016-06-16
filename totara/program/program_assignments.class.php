@@ -1359,7 +1359,11 @@ class managers_category extends prog_assignment_category {
     }
 
     function get_includechildren($data, $object) {
-        return $data->includechildren[$this->id][$object->assignmenttypeid];
+        if (empty($data->includechildren[$this->id][$object->assignmenttypeid])) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
     function get_js($programid) {
