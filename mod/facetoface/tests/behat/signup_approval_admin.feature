@@ -80,7 +80,7 @@ Feature: Seminar Signup Admin Approval
     And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"
-    And I should see "Admin Approval"
+    And I should see "Manager and Administrative approva"
     Then I should see "This seminar requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
 
   Scenario: Student signs up with no manager assigned with manager select enabled
@@ -94,7 +94,7 @@ Feature: Seminar Signup Admin Approval
     And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"
-    And I should see "Admin Approval"
+    And I should see "Manager and Administrative approva"
     And I press "Request approval"
     Then I should see "This seminar requires manager approval, please select a manager to request approval"
 
@@ -129,7 +129,7 @@ Feature: Seminar Signup Admin Approval
     And I follow "Classroom Connect Course"
     And I should see "Sign-up"
     And I follow "Sign-up"
-    And I should see "Admin Approval"
+    And I should see "Manager and Administrative approva"
     And I press "Request approval"
     And I log out
 

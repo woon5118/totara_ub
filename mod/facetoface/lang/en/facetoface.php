@@ -80,7 +80,7 @@ $string['approvalreqd'] = 'Approval required';
 $string['applyfilter'] = 'Apply filter';
 $string['approval_activityapprover'] = '{$a} (activity level approver)';
 $string['approval_addapprover'] = 'Add approver';
-$string['approval_admin'] = 'Admin Approval';
+$string['approval_admin'] = 'Manager and Administrative approval';
 $string['approval_manager'] = 'Manager Approval';
 $string['approval_managerselect'] = 'Users Select Manager';
 $string['approval_none'] = 'No Approval';
@@ -93,12 +93,13 @@ $string['approvertime'] = 'Approval Time';
 $string['approveremail'] = 'Approver Email';
 $string['approvaloptions'] = 'Require approval by';
 $string['approvaloptions_help'] = 'Available options are defined by the approvaloptions setting on the seminar administration settings page:
-<br />
-<br /> <b>No approval</b> - Users will be able to freely sign up to sessions
-<br /> <b>Self approval</b> - Users will be able to sign up to sessions after agreeing to the Terms and Conditions specified in the text box below the setting
-<br /> <b>Role approval</b> - Users will be able to request access to a session, users with the role will then be emailed and will approve/decline the requests
-<br /> <b>Manager approval</b> - Users will be able to request access to a session, their user will then be emailed and will approve/decline the requests
-<br /> <b>Admin approval</b> - Users will be able to request access to a session, their managers and the approvers selected by the add approver option below will then be emailed. This is a two step approval process, the manager will first approve/decline the request, then one of the approvers will also have to approve/decline.';
+<ul>
+<li> When <strong>No approval</strong> is selected, a user will be immediately booked into a session when signing up.</li>
+<li> When <strong>Learner accepts terms and conditions</strong> is selected, a user will be presented the text defined in the text area below, and required to accept the terms and conditions.</li>
+<li> When a session role is selected, all user\'s assigned to the role in the session will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the session</li>
+<li> When <strong>Manager approval</strong> is selected, the Learner\'s Manager will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the session</li>
+<li>When <strong>Manager and Administrative approval</strong> is selected, all users selected on the site level and activity level will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the session after the Learner\'s Manager has initially approved the request. The administrative approver can also provide final approval before the Manager responds</li>
+</ul>';
 $string['approvaloptionsheader'] = 'Approval Options';
 $string['approvalrequiredby'] = 'Approval required by: ';
 $string['approvalterms'] = 'Terms and conditions';
