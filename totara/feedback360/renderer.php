@@ -866,7 +866,6 @@ class totara_feedback360_renderer extends plugin_renderer_base {
         $out = '';
 
         $username = fullname($user);
-        $removestr = get_string('remove');
         $completestr = get_string('alreadyreplied', 'totara_feedback360');
 
         $out .= html_writer::start_tag('div', array('id' => "system_user_{$user->id}", 'class' => 'user_record'));
@@ -875,6 +874,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
             if (!empty($resp->timecompleted)) {
                 $out .= $this->output->pix_icon('/t/delete_gray', $completestr);
             } else {
+                $removestr = get_string('removeuserfromrequest', 'totara_feedback360', $username);
                 $out .= $this->output->action_icon('', new pix_icon('/t/delete', $removestr), null,
                     array('class' => 'system_record_del', 'id' => $user->id));
             }
@@ -896,7 +896,6 @@ class totara_feedback360_renderer extends plugin_renderer_base {
 
         $out = '';
 
-        $removestr = get_string('remove');
         $completestr = get_string('alreadyreplied', 'totara_feedback360');
         $deleteparams = array('respid' => $resp->id, 'email' => $email);
         $deleteurl = new moodle_url('/totara/feedback360/request/delete.php', $deleteparams);
@@ -907,6 +906,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
             if (!empty($resp->timecompleted)) {
                 $out .= $this->output->pix_icon('/t/delete_gray', $completestr);
             } else {
+                $removestr = get_string('removeuserfromrequest', 'totara_feedback360', $email);
                 $out .= $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $removestr), null,
                         array('class' => 'external_record_del', 'id' => $email));
             }

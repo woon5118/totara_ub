@@ -112,5 +112,5 @@ Feature: Normal feedback
     And I should see "User Four"
     And I should see "User Five"
     And I should see "User Six"
-    When I click on "Remove" "link" in the "#system_user_5" "css_element"
+    When I click on "Remove feedback request from User Three" "link"
     Then I should not see "User three"
