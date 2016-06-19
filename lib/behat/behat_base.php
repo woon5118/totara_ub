@@ -319,12 +319,23 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         // Totara: this is the start for timeout calculation.
         $start = time();
 
+        $jsrunning = $this->running_javascript();
+
         // DOM will never change on non-javascript case; do not wait or try again.
-        if (!$this->running_javascript()) {
+        if (!$jsrunning) {
             $loops = 1;
         }
 
         for ($i = 0; $i < $loops; $i++) {
+
+            if ($jsrunning) {
+                // Spin will first check if there are any pending JS operations, if there are then wait for pending JS will sleep until
+                // operations are done before returning us to the spin operation.
+                // This should help performance in many situations as rather than execute costly find operations it will execute some
+                // cheap JS until we expect things to be ready.
+                $this->wait_for_pending_js();
+            }
+
             // We catch the exception thrown by the step definition to execute it again.
             try {
                 // We don't check with !== because most of the time closures will return
