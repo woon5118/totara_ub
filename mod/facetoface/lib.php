@@ -65,7 +65,7 @@ define('CUSTOMFIELD_TYPE_SELECT',      1);
 define('CUSTOMFIELD_TYPE_MULTISELECT', 2);
 
 // Calendar-related constants
-define('CALENDAR_MAX_NAME_LENGTH', 32);
+define('CALENDAR_MAX_NAME_LENGTH', 256);
 define('F2F_CAL_NONE',      0);
 define('F2F_CAL_COURSE',    1);
 define('F2F_CAL_SITE',      2);
@@ -289,7 +289,8 @@ function facetoface_fix_settings($facetoface) {
         $facetoface->thirdpartywaitlist = 0;
     }
     if (!empty($facetoface->shortname)) {
-        $facetoface->shortname = core_text::substr($facetoface->shortname, 0, CALENDAR_MAX_NAME_LENGTH);
+        $shorten = !empty($CFG->seminar_calendar_max_length) ? $CFG->seminar_calendar_max_length : CALENDAR_MAX_NAME_LENGTH;
+        $facetoface->shortname = core_text::substr($facetoface->shortname, 0, $shorten);
     }
     if (empty($facetoface->declareinterest)) {
         $facetoface->declareinterest = 0;
@@ -3479,7 +3480,8 @@ function facetoface_add_session_to_calendar($session, $facetoface, $calendartype
 
     $shortname = $facetoface->shortname;
     if (empty($shortname)) {
-        $shortname = core_text::substr($facetoface->name, 0, CALENDAR_MAX_NAME_LENGTH);
+        $shorten = !empty($CFG->seminar_calendar_max_length) ? $CFG->seminar_calendar_max_length : CALENDAR_MAX_NAME_LENGTH;
+        $shortname = core_text::substr($facetoface->name, 0, $shorten);
     }
 
     $result = true;
