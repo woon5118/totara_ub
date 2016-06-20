@@ -41,10 +41,6 @@ class mod_facetoface_signup_form extends moodleform {
         $mform->addElement('hidden', 'backtoallsessions', $this->_customdata['backtoallsessions']);
         $mform->setType('backtoallsessions', PARAM_BOOL);
 
-        $mform->addElement('hidden', 'managerid');
-        $mform->setType('managerid', PARAM_INT);
-        $mform->setDefault('managerid', $managerid);
-
         // Do nothing if approval is set to none or role.
         if ($approvaltype == APPROVAL_SELF) {
             global $PAGE;
@@ -214,6 +210,8 @@ class mod_facetoface_signup_form extends moodleform {
     }
 
     function validation($data, $files) {
+        global $USER;
+
         $errors = parent::validation($data, $files);
         $approvaltype = $this->_customdata['approvaltype'];
 
@@ -228,6 +226,11 @@ class mod_facetoface_signup_form extends moodleform {
                     $errors['managername'] = get_string('error:missingrequiredmanager', 'mod_facetoface');
                 }
             }
+        }
+
+        // Ensure user doesn't select themselves (by hacking the form).
+        if ($data['managerid'] == $USER->id) {
+            $errors['managerselector'] = get_string('error');
         }
 
         return $errors;
