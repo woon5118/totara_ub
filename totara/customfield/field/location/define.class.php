@@ -380,8 +380,11 @@ class customfield_define_location extends customfield_define_base {
         $locationdata->latitude = (!empty($data->$latitude)) ? $data->$latitude : "0";
         $locationdata->longitude = (!empty($data->$longitude)) ? $data->$longitude : "0";
 
+        $options = new stdClass();
+        $options->para = false;
+
         $newdata = new stdClass();
-        $newdata->address = (!empty($data->$address)) ? $data->$address : "";
+        $newdata->address = (!empty($data->$address)) ? format_text($data->$address, FORMAT_HTML, $options) : "";
         $newdata->size = (!empty($data->$size)) ? $data->$size : "";
         $newdata->view = (!empty($data->$view)) ? $data->$view : "";
         $newdata->display = (!empty($data->$display)) ? $data->$display : "";
@@ -415,9 +418,11 @@ class customfield_define_location extends customfield_define_base {
             $data = json_decode($data);
         }
 
-        $newdata = new stdClass();
+        $options = new stdClass();
+        $options->para = false;
 
-        $newdata->address = (isset($data->address) && !empty($data->address)) ? $data->address : "";
+        $newdata = new stdClass();
+        $newdata->address = (isset($data->address) && !empty($data->address)) ? format_text($data->address, FORMAT_MOODLE, $options) : "";
         $newdata->size = (isset($data->size) && !empty($data->size)) ? $data->size : "";
         $newdata->view = (isset($data->view) && !empty($data->view)) ? $data->view : "";
         $newdata->display = (isset($data->display) && !empty($data->display)) ? $data->display : GMAP_DISPLAY_ADDRESS_ONLY;
