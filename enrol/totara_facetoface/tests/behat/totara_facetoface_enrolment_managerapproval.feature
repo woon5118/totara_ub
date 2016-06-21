@@ -24,7 +24,7 @@ Feature: Users are forced to get manager approval where required
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name             | Test seminar name        |
       | Description      | Test seminar description |
-      | Manager Approval | 1                           |
+      | Manager Approval | 1                        |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -50,12 +50,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
 
   Scenario: Should be unable to enrol using seminar direct without a manager
-    Given I log in as "teacher1"
-    And I follow "Course 1"
-    When I add "Seminar direct enrolment" enrolment method with:
-      | Custom instance name | Test student enrolment |
-    And I log out
-    And I log in as "student1"
+    Given I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I should see "You can not enrol yourself in this course."

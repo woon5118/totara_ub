@@ -195,15 +195,19 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         $sessionstojoin = enrol_totara_facetoface_get_sessions_to_autoenrol($this, $course, $facetofaces);
 
         $joinedsessions = 0;
+        $needapproval = false;
         foreach ($sessionstojoin as $session) {
             $facetoface = $facetofaces[$session->facetoface];
 
             $result = facetoface_user_import($course, $facetoface, $session, $USER->id, $signupparams);
             if ($result['result'] === true) {
                 $joinedsessions++;
+                if (facetoface_approval_required($facetoface)) {
+                    $needapproval = true;
+                }
             }
         }
-       return $joinedsessions;
+       return array($joinedsessions, $needapproval);
     }
 
     /**
@@ -347,6 +351,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             $timeend = 0;
         }
 
+        $needapproval = null;
         // Check autosignup.
         $autosignup = $instance->{self::SETTING_AUTOSIGNUP};
         if (!empty($autosignup)) {
@@ -354,11 +359,16 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             $signupparams['notificationtype'] = $notificationtype;
             $signupparams['autoenrol'] = false;
 
-            $joinedsessions = $this->signup_totara_facetoface_autosignup($course, $facetofaces, $signupparams);
+            list($joinedsessions, $needapproval) = $this->signup_totara_facetoface_autosignup($course, $facetofaces, $signupparams);
 
             // Initial code ignored if user didn't join any session. Maintain this behaviour.
-            $enrol = true;
-            $message = get_string('autobookingcompleted', 'enrol_totara_facetoface', $joinedsessions);
+            if ($needapproval) {
+                $message = get_string('bookingcompleted_approvalrequired', 'facetoface');
+            } else {
+                $enrol = true;
+                $message = get_string('autobookingcompleted', 'enrol_totara_facetoface', $joinedsessions);
+            }
+
         } else {
             // No autosignup, use user submitted session ids.
             $sids = empty($fromform->sid) ? array() : $fromform->sid;
@@ -375,7 +385,6 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             }
 
             // Try to signup to all sessions (we need at least one to enrol).
-            $needapproval = null;
             $message = '';
             foreach ($sids as $sid) {
                 $signupparams = array();
@@ -414,17 +423,17 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                     'message' => $result['message']
                 )), 'enrolfacetofacesignupresult');
             }
+        }
 
-            // Enrol or add pending enrolent.
-            if ($needapproval) {
-                $toinsert = (object)array(
-                    'enrolid' => $instance->id,
-                    'userid' => $USER->id,
-                    'timecreated' => time(),
-                );
-                $DB->insert_record('enrol_totara_f2f_pending', $toinsert);
-                $returnurl = new moodle_url('/');
-            }
+        // Enrol or add pending enrolent.
+        if ($needapproval) {
+            $toinsert = (object)array(
+                'enrolid' => $instance->id,
+                'userid' => $USER->id,
+                'timecreated' => time(),
+            );
+            $DB->insert_record('enrol_totara_f2f_pending', $toinsert);
+            $returnurl = new moodle_url('/');
         }
 
         $cssclass = 'notifymessage';
@@ -1465,7 +1474,6 @@ function enrol_totara_facetoface_get_sessions_to_autoenrol($totara_facetoface, $
 
     foreach ($sessionstochoosefrom as $facetofaceid => $facetofacesessions) {
         $facetoface = $facetofaces[$facetofaceid];
-        $facetoface->approvaltype = APPROVAL_NONE; // No approval is ever required if you are being auto enrolled on sessions.
 
         $submissions = facetoface_get_user_submissions($facetofaceid, $user->id, MDL_F2F_STATUS_REQUESTED);
 
