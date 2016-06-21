@@ -75,6 +75,14 @@ $string['associationnameiconlink'] = 'Name (with icon and link)';
 $string['associationprogramcompletionlink'] = 'Completion';
 $string['associationtype'] = 'Type';
 $string['audiencevisibility'] = 'Audience-based visibility';
+$string['autocreatenew'] = 'Dynamic creation';
+$string['autocreatenew_help'] = 'Based on these settings, automatically create a new learning plan for every new user who becomes a member of this audience.
+
+If the \'exclude users who\' setting for \'have an existing, automatically created plan based on this template\' is not set, automatic creation of learning plans will not be available.
+
+If a user is removed from the audience any created learning plans will remain';
+$string['autocreatenewon'] = 'New learning plans will be automatically generated for every new user who becomes a member of this audience.';
+$string['autocreatenewoff'] = 'Learning plans will not be automatically generated for users who become a member of this audience in the future.';
 $string['autocreateplan'] = 'Automatically create plans';
 $string['autocreateplan_help'] = 'Automatically create learning plans for members of this Audience using the selected plan template';
 $string['backtocohorts'] = 'Back to audiences';
@@ -179,8 +187,11 @@ $string['configenableaudiencevisibility'] = 'When enabled, course, program and c
 Once enabled, the visibility of each individual course, program or certification can be set to "Visible to all users", "Visible to enrolled users" or "Visible to enrolled users and members of the selected audiences". If "Visible to enrolled users and members of the selected audiences" is selected then the course, program or certification is only visible to enrolled users and members of any of the assigned audiences.
 
 <strong>Warning:</strong> Enabling this setting will change the visibility of courses, programs and certifications across the whole site - the existing "Visibility" setting and the "viewhiddencourses" capability will no longer apply, so courses, programs and certifications that are currently hidden may become visible.';
+$string['confirmcreateplansmessage'] = 'This will create new learning plans for {$a} user(s).';
 $string['confirmdynamiccohortcreation'] = 'Confirm Dynamic Audience Creation';
+$string['confirmnousers'] = 'No users require having learning plans created.';
 $string['contains'] = 'contains';
+$string['continue'] = 'Do you want to continue?';
 $string['copy'] = 'Copy';
 $string['coursecohortsenrolled'] = 'Course audiences (enrolled)';
 $string['coursecohortsvisible'] = 'Course audiences (visible)';
@@ -192,6 +203,7 @@ $string['createlpforaudience'] = 'Create learning plans for users in this audien
 $string['createlpforaudienceblurb'] = 'This page allows you to automatically create learning plans for all users currently assigned to this audience.';
 $string['createnewcohort'] = 'Create new audience';
 $string['createplans'] = 'Create plans';
+$string['createplansfornewmembers'] = 'Automatically create a new learning plan for every new user who becomes a member of this audience';
 $string['createplanstatus'] = 'Create new plans as';
 $string['createplanstatus_help'] = 'This will be the status that the created plans are given';
 $string['criteria'] = 'Criteria';
@@ -486,6 +498,8 @@ $string['rulestitle'] = 'Membership criteria';
 $string['rulesupdatesuccess'] = 'Rules updated';
 $string['rulesupdatefailure'] = 'Failure occured while updating rules. Changes will not be applied';
 $string['saveallchanges'] = 'Save all changes';
+$string['saveandcreateplans'] = 'Save and create plans';
+$string['saved'] = 'Settings saved';
 $string['savinglearning'] = 'Saving learning...';
 $string['savingrule'] = 'Saving...';
 $string['selectfromcohort'] = 'Select members from audience';

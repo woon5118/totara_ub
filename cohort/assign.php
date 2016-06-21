@@ -93,6 +93,12 @@ if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
         // Notify users.
         totara_cohort_notify_add_users($cohort->id, $newids);
 
+        // Create learning plans.
+        $config = \totara_cohort\learning_plan_config::get_config($cohort->id);
+        if ($config->auto_create_new()) {
+            \totara_cohort\learning_plan_helper::create_plans($config);
+        }
+
         $potentialuserselector->invalidate_selected_users();
         $existinguserselector->invalidate_selected_users();
     }

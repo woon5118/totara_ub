@@ -534,6 +534,26 @@ class totaracohort_event_handler {
         // TODO: rewrite for new dynamic cohorts.
         return true;
     }
+
+    /**
+     * Event handler for when a user gets assigned to a cohort.
+     *
+     * New members need to have the cohort plans assigned to.
+     *
+     * @param \totara_cohort\event\members_updated $event
+     * @return bool
+     */
+    public static function members_updated(\totara_cohort\event\members_updated $event) {
+
+        // Get the plan config for the audience, the audience id is the event objectid.
+        $config = \totara_cohort\learning_plan_config::get_config($event->objectid);
+        if ($config->auto_create_new()) {
+            // Create the plans.
+            \totara_cohort\learning_plan_helper::create_plans($config);
+        }
+
+        return true;
+    }
 }
 
 /**

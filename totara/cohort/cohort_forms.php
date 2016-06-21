@@ -187,18 +187,18 @@ class cohort_learning_plan_settings_form extends moodleform {
             $template_options[$template->id] = format_string($template->fullname);
         }
 
-        $mform->addElement('select', 'plantemplate', get_string('plantemplate', 'totara_plan'), $template_options);
-        $mform->setDefault('plantemplate', $default_template->id);
+        $mform->addElement('select', 'plantemplateid', get_string('plantemplate', 'totara_plan'), $template_options);
+        $mform->setDefault('plantemplateid', $default_template->id);
 
-        $exludegroup = array();
-        $excludegroup[] =& $mform->createElement('advcheckbox', 'manualplan', '', get_string('createforexistingmanualplan', 'totara_cohort'));
-        $excludegroup[] =& $mform->createElement('advcheckbox', 'autoplan', '', get_string('createforexistingautoplan', 'totara_cohort'));
-        $excludegroup[] =& $mform->createElement('advcheckbox', 'completeplan', '', get_string('createforexistingcompleteplan', 'totara_cohort'));
+        $excludegroup = array();
+        $excludegroup[] =& $mform->createElement('advcheckbox', 'excludecreatedmanual', '', get_string('createforexistingmanualplan', 'totara_cohort'));
+        $excludegroup[] =& $mform->createElement('advcheckbox', 'excludecreatedauto', '', get_string('createforexistingautoplan', 'totara_cohort'));
+        $excludegroup[] =& $mform->createElement('advcheckbox', 'excludecompleted', '', get_string('createforexistingcompleteplan', 'totara_cohort'));
 
-        // Set all checkboxs to be checked by default
-        $mform->setDefault('manualplan', 1);
-        $mform->setDefault('autoplan', 1);
-        $mform->setDefault('completeplan', 1);
+        // Set all checkboxes to be checked by default.
+        $mform->setDefault('excludecreatedmanual', 1);
+        $mform->setDefault('excludecreatedauto', 1);
+        $mform->setDefault('excludecompleted', 1);
 
         $mform->addGroup($excludegroup, 'exclude', get_string('excludeuserswho', 'totara_cohort'), html_writer::empty_tag('br'), false);
         $mform->addHelpButton('exclude', 'excludeuserswho', 'totara_cohort');
@@ -209,6 +209,14 @@ class cohort_learning_plan_settings_form extends moodleform {
         );
         $mform->addElement('select', 'planstatus', get_string('createplanstatus', 'totara_cohort'), $plan_statuses);
 
-        $this->add_action_buttons(false, get_string('createplans', 'totara_cohort'));
+        $autocreatenewgrp = array();
+        $autocreatenewgrp[] = $mform->createElement('advcheckbox', 'autocreatenew', '', get_string('createplansfornewmembers', 'totara_cohort'));
+
+        $mform->addGroup($autocreatenewgrp, 'autocreatenew', get_string('autocreatenew', 'totara_cohort'), '', false);
+        $mform->addHelpButton('autocreatenew', 'autocreatenew', 'totara_cohort');
+
+        $mform->disabledIf('autocreatenew', 'excludecreatedauto', 'notchecked');
+
+        $this->add_action_buttons(false, get_string('saveandcreateplans', 'totara_cohort'));
     }
 }

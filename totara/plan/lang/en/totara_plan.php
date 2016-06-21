@@ -318,14 +318,10 @@ $string['configenablelearningplans'] = 'This option will let you: Enable(show)/D
 ';
 $string['confirm'] = 'Confirm';
 $string['confirmcreateplans'] = 'Confirm creation of plans';
-$string['confirmcreateplansmessage'] = 'This will create new learning plans for {$a} user(s).
-<br /><br />
-Do you want to continue?';
 $string['confirmdeleteplantitle'] = 'Delete learning plan: {$a}';
 $string['confirmitemdelete'] = 'Are you sure you want to remove this item?';
 $string['confirmlinkedcourses'] = 'Confirm linked courses';
 $string['confirmlinkedcoursesdesc'] = 'Some of those competencies have linked courses. If checked below, these courses will also be added to this plan:';
-$string['confirmnousers'] = 'This action will not affect any users';
 $string['confirmrequestapprove'] = 'Are you sure you want to approve the following request?';
 $string['confirmrequestdecline'] = 'Are you sure you want to decline the following request?';
 $string['couldnotinsertnewrecord'] = 'Could not insert new record';
