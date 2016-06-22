@@ -61,13 +61,13 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
         var that = this;
         require(['core/templates'], function (templates) {
             var iconscache = [];
-            iconscache.push(templates.renderFlexIcon('spinner-pulse', M.util.get_string('saving', 'totara_reportbuilder')));
-            iconscache.push(templates.renderFlexIcon('eye', M.util.get_string('hide', 'totara_reportbuilder')));
-            iconscache.push(templates.renderFlexIcon('eye-slash', M.util.get_string('show', 'totara_reportbuilder')));
-            iconscache.push(templates.renderFlexIcon('delete', M.util.get_string('delete', 'totara_reportbuilder')));
-            iconscache.push(templates.renderFlexIcon('arrow-up', M.util.get_string('moveup', 'totara_reportbuilder')));
-            iconscache.push(templates.renderFlexIcon('arrow-down', M.util.get_string('movedown', 'totara_reportbuilder')));
-            iconscache.push(templates.renderFlexIcon('spacer'));
+            iconscache.push(templates.renderIcon('spinner-pulse', M.util.get_string('saving', 'totara_reportbuilder')));
+            iconscache.push(templates.renderIcon('eye', M.util.get_string('hide', 'totara_reportbuilder')));
+            iconscache.push(templates.renderIcon('eye-slash', M.util.get_string('show', 'totara_reportbuilder')));
+            iconscache.push(templates.renderIcon('delete', M.util.get_string('delete', 'totara_reportbuilder')));
+            iconscache.push(templates.renderIcon('arrow-up', M.util.get_string('moveup', 'totara_reportbuilder')));
+            iconscache.push(templates.renderIcon('arrow-down', M.util.get_string('movedown', 'totara_reportbuilder')));
+            iconscache.push(templates.renderIcon('spacer'));
 
             $.when.apply($, iconscache).then(function (loadingicon, hideicon, showicon, deleteicon, upicon, downicon, spacer) {
                 that.loadingimg = loadingicon;

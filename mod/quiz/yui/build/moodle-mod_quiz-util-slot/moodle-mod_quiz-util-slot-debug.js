@@ -426,7 +426,9 @@ Y.Moodle.mod_quiz.util.slot = {
                 // Font style icon
                 require(['core/templates'], function (templates) {
                     icon = link.one('.flex-icon');
-                    templates.replacePix(icon.getDOMNode(), 't/locked', 'core', newstring);
+                    templates.renderIcon('lock', newstring).done(function (html) {
+                        templates.replaceNode(icon.getDOMNode(), html, '');
+                    });
                 });
             }
         } else {
@@ -441,7 +443,9 @@ Y.Moodle.mod_quiz.util.slot = {
                 // Font style icon
                 require(['core/templates'], function (templates) {
                     icon = link.one('.flex-icon');
-                    templates.replacePix(icon.getDOMNode(), 't/unlocked', 'core', newstring);
+                    templates.renderIcon('unlock-alt', newstring).done(function (html) {
+                        templates.replaceNode(icon.getDOMNode(), html, '');
+                    });
                 });
             }
         }

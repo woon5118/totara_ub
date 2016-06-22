@@ -931,7 +931,7 @@ function item(category, element, isexistingitem) {
                         self.completionlink.parent().append(newlink);
 
                         require(['core/templates'], function (templates) {
-                            templates.renderFlexIcon('delete', M.util.get_string('removecompletiondate', 'totara_program')).done(function (html) {
+                            templates.renderIcon('delete', M.util.get_string('removecompletiondate', 'totara_program')).done(function (html) {
                                 newlink.html(html);
                             });
                         });
@@ -1083,7 +1083,7 @@ function item(category, element, isexistingitem) {
     this.set_loading = function() {
         var that = this;
         require(['core/templates'], function (templates) {
-            templates.renderFlexIcon('spinner-pulse', M.util.get_string('loading', 'admin')).done(function (html) {
+            templates.renderIcon('spinner-pulse', M.util.get_string('loading', 'admin')).done(function (html) {
                 if (that.usersElement.data('complete') === false) {
                     that.usersElement.html(html);
                 }

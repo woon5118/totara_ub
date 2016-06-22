@@ -55,7 +55,7 @@ define(['jquery', 'core/config', 'core/templates'], function ($, mdlconfig, temp
 
                     // Add the wait icon if it is not already attached to the clicked item.
                     if ($(e.target).siblings('.instantreportwait').length === 0) {
-                        templates.renderFlexIcon('spinner-pulse', '', 'ft-size-600').done(function (html) {
+                        templates.renderIcon('spinner-pulse', '', 'ft-size-600').done(function (html) {
                             var $splash = $('<div class="instantreportwait">' + html +'</div>'),
                                 $content = $('.block_totara_report_table.' + uniqueid + ' .content .rb-display-table-container'),
                                 offset = $content.offset();

@@ -145,7 +145,7 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
                 data: ({}),
                 beforeSend: function() {
                     require(['core/templates'], function (templates) {
-                        templates.renderFlexIcon('spinner-pulse', M.util.get_string('savingrule', 'totara_cohort')).done(function (html) {
+                        templates.renderIcon('spinner-pulse', M.util.get_string('savingrule', 'totara_cohort')).done(function (html) {
                             link.replaceWith(html);
                         });
                     });

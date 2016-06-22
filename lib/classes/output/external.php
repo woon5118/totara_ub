@@ -95,48 +95,6 @@ class external extends external_api {
 
     /**
      * Returns the required parameters
-     *
-     * TODO TL-9347 remove after new get_flex_icons() is finished.
-     *
-     * @return external_function_parameters
-     */
-    public static function load_flex_icons_cache_parameters() {
-        $description = 'The theme to return the icons cache for.';
-
-        return new external_function_parameters(array('themename' => new external_value(PARAM_SAFEDIR, $description)));
-    }
-
-    /**
-     * Return the flexible icons cache for the given theme.
-     *
-     * TODO TL-9347 remove after new get_flex_icons() is finished.
-     *
-     * @param string $themename
-     * @return array
-     */
-    public static function load_flex_icons_cache($themename) {
-        $definition = self::load_flex_icons_cache_parameters();
-        $validated = self::validate_parameters($definition, array('themename' => $themename));
-
-        return array(
-            'defaults' => array(),
-            'map' => \core\output\flex_icon_helper::get_icons($validated['themename']),
-        );
-    }
-
-    /**
-     * Invalid return description, this is not used in ajax services.
-     *
-     * TODO TL-9347 remove after new get_flex_icons() is finished.
-     *
-     * @return \external_description
-     */
-    public static function load_flex_icons_cache_returns() {
-        return new \external_value(PARAM_RAW, 'random format, do not validate');
-    }
-
-    /**
-     * Returns the required parameters
      * @return external_function_parameters
      */
     public static function get_flex_icons_parameters() {

@@ -82,7 +82,9 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         } else {
             // Font style icon
             require(['core/templates'], function (templates) {
-                templates.replacePix(hideicon.getDOMNode(), 'i/' + nextaction, 'core', newstring);
+                templates.renderIcon('core|i/' + nextaction, newstring).done(function (html) {
+                    templates.replaceNode(hideicon.getDOMNode(), html, '');
+                });
             });
         }
         button.set('title', newstring);
@@ -162,7 +164,9 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         require(['core/templates'], function (templates) {
             nodes.each(function (node) {
                 // Font style icon
-                templates.replacePix(node.getDOMNode(), 'i/marker', 'core', old_string);
+                templates.renderIcon('lightbulb-o-disabled', old_string).done(function (html) {
+                    templates.replaceNode(node.getDOMNode(), html, '');
+                });
             });
         });
 
@@ -189,7 +193,9 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
             } else {
                 // Font style icon
                 require(['core/templates'], function (templates) {
-                    templates.replacePix(highlighticon.getDOMNode(), 'i/marked', 'core', new_string);
+                    templates.renderIcon('lightbulb-o', new_string).done(function (html) {
+                        templates.replaceNode(highlighticon.getDOMNode(), html, '');
+                    });
                 });
             }
             if (buttontext) {

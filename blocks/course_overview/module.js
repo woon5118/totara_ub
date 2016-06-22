@@ -17,7 +17,7 @@ M.block_course_overview.add_handles = function(Y) {
             var imagenode = v.one('.course_title .move a img');
             if (imagenode === null) {
                 require(['core/templates'], function (templates) {
-                    templates.renderFlexIcon('arrows', '').done(function(html) {
+                    templates.renderIcon('arrows', '').done(function(html) {
                         v.one('.course_title .move a').replace(html);
                     });
                 });

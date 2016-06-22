@@ -402,7 +402,9 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         if (hideicon !== null) {
             // Font style icon
             require(['core/templates'], function (templates) {
-                templates.replacePix(hideicon.getDOMNode(), 't/' + nextaction, 'core', newstring);
+                templates.renderIcon('core|t/' + nextaction, newstring).done(function (html) {
+                    templates.replaceNode(hideicon.getDOMNode(), html, '');
+                });
             });
         }
         else {
@@ -512,7 +514,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                         flexicon = 'users';
                         break;
                 }
-                templates.renderFlexIcon(flexicon, newtitlestr, 'ft-size-200')
+                templates.renderIcon(flexicon, newtitlestr, 'ft-size-200')
                     .done(function (html) {button.setContent(html);});
             });
         } else {

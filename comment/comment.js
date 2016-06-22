@@ -192,7 +192,7 @@ M.core_comment = {
                         var clientid = this.client_id;
                         var listid = list[i].id;
                         require(['core/templates'], function (templates) {
-                            templates.renderFlexIcon('delete', '').done(function (html) {
+                            templates.renderIcon('delete', '').done(function (html) {
                                 Y.one('#comment-delete-' + clientid + '-' + listid).setContent(html);
                             });
                         });

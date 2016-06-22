@@ -606,7 +606,9 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         if (hideicon !== null) {
             // Font style icon
             require(['core/templates'], function (templates) {
-                templates.replacePix(hideicon.getDOMNode(), 't/' + nextaction, 'core', newstring);
+                templates.renderIcon('core|t/' + nextaction, newstring).done(function (html) {
+                    templates.replaceNode(hideicon.getDOMNode(), html, '');
+                });
             });
         }
         else {
@@ -716,7 +718,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                         flexicon = 'users';
                         break;
                 }
-                templates.renderFlexIcon(flexicon, newtitlestr, 'ft-size-200')
+                templates.renderIcon(flexicon, newtitlestr, 'ft-size-200')
                     .done(function (html) {button.setContent(html);});
             });
         } else {
@@ -1052,7 +1054,9 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         } else {
             // Font style icon
             require(['core/templates'], function (templates) {
-                templates.replacePix(hideicon.getDOMNode(), 'i/' + nextaction, 'core', newstring);
+                templates.renderIcon('core|i/' + nextaction, newstring).done(function (html) {
+                    templates.replaceNode(hideicon.getDOMNode(), html, '');
+                });
             });
         }
         button.set('title', newstring);
@@ -1132,7 +1136,9 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         require(['core/templates'], function (templates) {
             nodes.each(function (node) {
                 // Font style icon
-                templates.replacePix(node.getDOMNode(), 'i/marker', 'core', old_string);
+                templates.renderIcon('lightbulb-o-disabled', old_string).done(function (html) {
+                    templates.replaceNode(node.getDOMNode(), html, '');
+                });
             });
         });
 
@@ -1159,7 +1165,9 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
             } else {
                 // Font style icon
                 require(['core/templates'], function (templates) {
-                    templates.replacePix(highlighticon.getDOMNode(), 'i/marked', 'core', new_string);
+                    templates.renderIcon('lightbulb-o', new_string).done(function (html) {
+                        templates.replaceNode(highlighticon.getDOMNode(), html, '');
+                    });
                 });
             }
             if (buttontext) {

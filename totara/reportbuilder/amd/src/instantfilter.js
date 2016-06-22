@@ -45,7 +45,7 @@ define(['jquery', 'core/config', 'core/templates'], function ($, mdlcfg, templat
                 }
                 // Add the wait icon if it is not already attached to the clicked item.
                 if ($(event.target).siblings('.instantfilterwait').length === 0) {
-                    templates.renderFlexIcon('spinner-pulse', 'loading', 'instantfilterwait').done(function (html) {
+                    templates.renderIcon('spinner-pulse', 'loading', 'instantfilterwait').done(function (html) {
                         $(html).insertAfter($(event.target).parent().children().last());
                     });
                 }

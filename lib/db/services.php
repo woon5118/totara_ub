@@ -1082,16 +1082,6 @@ $functions = array(
         'ajax'        => true,
     ),
 
-    // TOTARA: support for getting the flex icon cache - TODO TL-9347 remove after new get_flex_icons() is finished.
-    'core_output_load_flex_icons_cache' => array(
-        'classname'   => 'core\output\external',
-        'methodname'  => 'load_flex_icons_cache',
-        'description' => 'Load the flexible icons cache for the specified theme',
-        'type'        => 'read',
-        'loginrequired' => false,
-        'ajax'        => true,
-    ),
-
     // TOTARA: support for getting flex icons list.
     'core_output_get_flex_icons' => array(
         'classname'   => 'core\output\external',
