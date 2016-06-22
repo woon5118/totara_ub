@@ -138,7 +138,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     $sessionrow[] = $this->session_resgistrationperiod_table_cell($session);
                 }
                 $reservelink = $this->session_options_reserve_link($session, $signupcount, $reserveinfo);
-                $signuplink = $this->session_options_signup_link($session, $sessionstarted, $minimal, $returntoallsessions);
+                $signuplink = $this->session_options_signup_link($session, $sessionstarted, $minimal, $returntoallsessions, $displaytimezones);
                 $sessionrow[] = $this->session_options_table_cell($session, $viewattendees, $editevents, $reservelink, $signuplink);
 
                 $row = new html_table_row($sessionrow);
@@ -189,7 +189,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                             $sessionrow[] = $this->session_resgistrationperiod_table_cell($session, $datescount);
                         }
                         $reservelink = $this->session_options_reserve_link($session, $signupcount, $reserveinfo);
-                        $signuplink = $this->session_options_signup_link($session, $sessionstarted, $minimal, $returntoallsessions);
+                        $signuplink = $this->session_options_signup_link($session, $sessionstarted, $minimal, $returntoallsessions, $displaytimezones);
                         $sessionrow[] = $this->session_options_table_cell($session, $viewattendees, $editevents, $reservelink, $signuplink, $datescount);
                     }
 
@@ -456,15 +456,29 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string to add to the tooltip and aria-label attributes of an html link.
      * @throws coding_exception
      */
-    private function get_regdates_tooltip_info($session) {
+    private function get_regdates_tooltip_info($session, $displaytimezones) {
         $tooltip = array();
         if (!empty($session->registrationtimestart)) {
-            $opendate = userdate($session->registrationtimestart, get_string('strftimedate', 'langconfig'));
-            $tooltip[] = get_string('registrationhoverhintstart', 'facetoface', $opendate);
+            $start = new stdClass();
+            $start->startdate = userdate($session->registrationtimestart, get_string('strftimedate', 'langconfig'));
+            $start->starttime = userdate($session->registrationtimestart, get_string('strftimetime', 'langconfig'));
+            if ($displaytimezones) {
+                $start->timezone = core_date::get_user_timezone();
+                $tooltip[] = get_string('registrationhoverhintstarttz', 'facetoface', $start);
+            } else {
+                $tooltip[] = get_string('registrationhoverhintstart', 'facetoface', $start);
+            }
         }
         if (!empty($session->registrationtimefinish)) {
-            $closedate = userdate($session->registrationtimefinish, get_string('strftimedate', 'langconfig'));
-            $tooltip[] = get_string('registrationhoverhintend', 'facetoface', $closedate);
+            $finish = new stdClass();
+            $finish->enddate = userdate($session->registrationtimefinish, get_string('strftimedate', 'langconfig'));
+            $finish->endtime = userdate($session->registrationtimefinish, get_string('strftimetime', 'langconfig'));
+            if ($displaytimezones) {
+                $finish->timezone = core_date::get_user_timezone();
+                $tooltip[] = get_string('registrationhoverhintendtz', 'facetoface', $finish);
+            } else {
+                $tooltip[] = get_string('registrationhoverhintend', 'facetoface', $finish);
+            }
         }
 
         return implode("\n", $tooltip);
@@ -540,7 +554,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string to be put into an options cell in the sessions table.
      * @throws coding_exception
      */
-    private function session_options_signup_link($session, $sessionstarted, $regdatestooltip = false, $returntoallsessions = true) {
+    private function session_options_signup_link($session, $sessionstarted, $regdatestooltip = false, $returntoallsessions = true, $displaytimezones = true) {
 
         $signuplink = '';
 
@@ -584,7 +598,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 if (empty($session->cancelledstatus) && $registrationopen == true && $registrationclosed == false) {
                     // Ok to register.
                     if ($regdatestooltip) {
-                        $tooltip = $this->get_regdates_tooltip_info($session);
+                        $tooltip = $this->get_regdates_tooltip_info($session, $displaytimezones);
                     } else {
                         $tooltip = '';
                     }
@@ -593,7 +607,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 } else if ($registrationclosed == true) {
                     // Registration has closed for this session.
                     if ($regdatestooltip) {
-                        $tooltip = $this->get_regdates_tooltip_info($session);
+                        $tooltip = $this->get_regdates_tooltip_info($session, $displaytimezones);
                     } else {
                         $tooltip = get_string('registrationclosed', 'facetoface');
                     }
@@ -602,7 +616,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 } else {
                     // Registration date not yet reached.
                     if ($regdatestooltip) {
-                        $tooltip = $this->get_regdates_tooltip_info($session);
+                        $tooltip = $this->get_regdates_tooltip_info($session, $displaytimezones);
                     } else {
                         $tooltip = get_string('registrationnotopen', 'facetoface');
                     }
