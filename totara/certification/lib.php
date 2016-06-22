@@ -1930,6 +1930,7 @@ function certif_get_completion_change_consequences($originalstate, $newstate, $n
                     $userresults[] = 'completionchangeuserpathrecerttocert';
                     $userresults[] = 'completionchangeuserdue';
                     $userresults[] = 'completionchangeuserenableextensions';
+                    $userresults[] = 'completionchangeusercoursesetreset';
                     break;
                 case CERTIFCOMPLETIONSTATE_CERTIFIED:
                     // No change.
@@ -1938,12 +1939,14 @@ function certif_get_completion_change_consequences($originalstate, $newstate, $n
                     $userresults[] = 'completionchangeusercoursesnotreset';
                     $userresults[] = 'completionchangeusercompletionnotarchived';
                     $userresults[] = 'completionchangeuserdue';
+                    $userresults[] = 'completionchangeusercoursesetreset';
                     break;
                 case CERTIFCOMPLETIONSTATE_EXPIRED:
                     $userresults[] = 'completionchangeuserpathrecerttocert';
                     $userresults[] = 'completionchangeusercoursesnotreset';
                     $userresults[] = 'completionchangeusercompletionnotarchived';
                     $userresults[] = 'completionchangeuserdue';
+                    $userresults[] = 'completionchangeusercoursesetreset';
                     break;
             }
             break;

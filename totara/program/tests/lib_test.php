@@ -146,4 +146,112 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals(16000, $certcompletion->timecompleted);
         $this->assertEquals(16000, $progcompletion->timecompleted);
     }
+
+    public function test_prog_reset_course_set_completions() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+
+        // Set up some stuff.
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $user4 = $this->getDataGenerator()->create_user();
+        $users = array($user1, $user2, $user3, $user4);
+
+        $prog1 = $this->getDataGenerator()->create_program();
+        $prog2 = $this->getDataGenerator()->create_program();
+        $cert1 = $this->getDataGenerator()->create_certification();
+        $cert2 = $this->getDataGenerator()->create_certification();
+
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $course3 = $this->getDataGenerator()->create_course();
+        $course4 = $this->getDataGenerator()->create_course();
+        $course5 = $this->getDataGenerator()->create_course();
+        $course6 = $this->getDataGenerator()->create_course();
+        $courses = array($course1, $course2, $course3, $course4, $course5, $course6);
+
+        // Add the courses to the programs and certifications.
+        $this->getDataGenerator()->add_courseset_program($prog1->id, array($course1->id));
+        $this->getDataGenerator()->add_courseset_program($prog2->id, array($course2->id));
+        $this->getDataGenerator()->add_courseset_program($cert1->id, array($course3->id), CERTIFPATH_CERT);
+        $this->getDataGenerator()->add_courseset_program($cert1->id, array($course4->id), CERTIFPATH_RECERT);
+        $this->getDataGenerator()->add_courseset_program($cert2->id, array($course5->id), CERTIFPATH_CERT);
+        $this->getDataGenerator()->add_courseset_program($cert2->id, array($course6->id), CERTIFPATH_RECERT);
+
+        // Assign the users to the programs and certs as individuals.
+        foreach ($users as $user) {
+            $this->getDataGenerator()->assign_to_program($prog1->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+            $this->getDataGenerator()->assign_to_program($prog2->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+            $this->getDataGenerator()->assign_to_program($cert1->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+            $this->getDataGenerator()->assign_to_program($cert2->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        }
+
+        $now = time();
+
+        // Mark all the users complete in all the courses, causing completion in all programs/certs.
+        foreach ($users as $user) {
+            foreach ($courses as $course) {
+                $completion = new completion_completion(array('userid' => $user->id, 'course' => $course->id));
+                $completion->mark_complete(1000);
+            }
+        }
+
+        // Hack the timedue field - we can't confirm that 0 changes to 0, so put something else in there.
+        $DB->set_field('prog_completion', 'timedue', 12345);
+
+        // Check all the data starts out correct.
+        $sql = "SELECT pc.*, pcs.certifpath
+                  FROM {prog_completion} pc
+                  JOIN {prog_courseset} pcs ON pc.coursesetid = pcs.id
+                 WHERE pc.coursesetid != 0";
+        $progcompletionnonzeropre = $DB->get_records_sql($sql);
+        $this->assertEquals(16, count($progcompletionnonzeropre));
+
+        $sql = "SELECT *
+                  FROM {prog_completion}
+                 WHERE coursesetid = 0";
+        $progcompletionzeropre = $DB->get_records_sql($sql);
+        $this->assertEquals(16, count($progcompletionzeropre));
+
+        foreach ($progcompletionnonzeropre as $pcnonzero) {
+            $this->assertEquals(STATUS_COURSESET_COMPLETE, $pcnonzero->status);
+            $this->assertGreaterThanOrEqual($now, $pcnonzero->timestarted);
+            $this->assertEquals(12345, $pcnonzero->timedue);
+            $this->assertEquals(1000, $pcnonzero->timecompleted);
+
+            if ($pcnonzero->programid == $prog1->id && $pcnonzero->userid == $user1->id ||
+                $pcnonzero->programid == $cert1->id && $pcnonzero->userid == $user2->id && $pcnonzero->certifpath == CERTIFPATH_CERT ||
+                $pcnonzero->programid == $cert2->id && $pcnonzero->userid == $user3->id && $pcnonzero->certifpath == CERTIFPATH_RECERT) {
+                // Manually modify the data in memory to what we are expecting to happen automatically in the database.
+                $pcnonzero->status = STATUS_COURSESET_INCOMPLETE;
+                $pcnonzero->timestarted = 0;
+                $pcnonzero->timedue = 0;
+                $pcnonzero->timecompleted = 0;
+            }
+        }
+
+        // Run the function that we're testing.
+        prog_reset_course_set_completions($prog1->id, $user1->id);
+        prog_reset_course_set_completions($cert1->id, $user2->id, CERTIFPATH_CERT);
+        prog_reset_course_set_completions($cert2->id, $user3->id, CERTIFPATH_RECERT);
+
+        // Check that modified data matches the expected.
+        $sql = "SELECT pc.*, pcs.certifpath
+                  FROM {prog_completion} pc
+                  JOIN {prog_courseset} pcs ON pc.coursesetid = pcs.id
+                 WHERE coursesetid != 0";
+        $progcompletionnonzeropost = $DB->get_records_sql($sql);
+        $this->assertEquals($progcompletionnonzeropre, $progcompletionnonzeropost);
+        $this->assertEquals(16, count($progcompletionnonzeropost));
+
+        // Course set 0 records are unaffected for all users.
+        $sql = "SELECT *
+                  FROM {prog_completion}
+                 WHERE coursesetid = 0";
+        $progcompletionzeropost = $DB->get_records_sql($sql);
+        $this->assertEquals($progcompletionzeropre, $progcompletionzeropost);
+        $this->assertEquals(16, count($progcompletionzeropost));
+    }
 }

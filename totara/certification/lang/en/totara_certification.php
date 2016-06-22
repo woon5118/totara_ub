@@ -89,6 +89,7 @@ $string['completionchangecronexpire'] = 'The user\'s courses will expire, becaus
 $string['completionchangecronwindowopen'] = 'The user\'s recertification window will open, because their Window open date is in the past, causing their courses to be reset, and they will become due to complete recertification. Once a user\'s course progress is reset, it cannot be undone.';
 $string['completionchangestates'] = 'You are changing the state of this completion record from <strong>{$a->from}</strong> to <strong>{$a->to}</strong>.';
 $string['completionchangeuser'] = 'For the user, the consequences of these changes are:';
+$string['completionchangeusercoursesetreset'] = 'The course set completion records will be reset. If the courses are still complete then the course set records will be recreated automatically by cron.';
 $string['completionchangeusercoursesnotreset'] = 'Their courses will not be reset, and existing course progress may contribute to recertification, possibly triggering completion immediately (by cron). If you want to have the courses reset, set the Certification completion state to \'Certified, before window opens\' and allow cron to automatically open the window for the user.';
 $string['completionchangeusercoursesreset'] = 'Their courses will be reset again when the window opens. Any progress they have made will be lost.';
 $string['completionchangeusercompletionarchived'] = 'Another (possibly duplicate) completion record will be created when the window opens.';

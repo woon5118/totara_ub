@@ -136,6 +136,9 @@ if ($progcompletion && empty($exceptions) && !$dismissedexceptions) {
         $newprogcompletion = prog_process_submitted_edit_completion($submitted);
 
         if (prog_write_completion($newprogcompletion, 'Completion manually edited')) {
+            if ($progcompletion->status == STATUS_PROGRAM_COMPLETE && $newprogcompletion->status == STATUS_PROGRAM_INCOMPLETE) {
+                prog_reset_course_set_completions($id, $userid);
+            }
             totara_set_notification(get_string('completionchangessaved', 'totara_program'),
                 $url,
                 array('class' => 'notifysuccess'));

@@ -173,6 +173,9 @@ if ($certcompletion && $progcompletion && empty($exceptions) && !$dismissedexcep
         } else if (!empty($submitted->confirmsave)) {
             // The user has clicked the confirm button, so save to db.
             if (certif_write_completion($newcertcompletion, $newprogcompletion, 'Completion manually edited')) {
+                if ($currentformdata->state == CERTIFCOMPLETIONSTATE_CERTIFIED && $newstate != CERTIFCOMPLETIONSTATE_CERTIFIED) {
+                    prog_reset_course_set_completions($id, $userid);
+                }
                 totara_set_notification(get_string('completionchangessaved', 'totara_program'),
                     $url,
                     array('class' => 'notifysuccess'));

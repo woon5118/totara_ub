@@ -2687,6 +2687,61 @@ function prog_write_completion_log($programid, $userid, $message = '', $changeus
 }
 
 /**
+ * Delete program course set completion records, logging it in the prog completion log.
+ *
+ * Note that the $path param should only be used for certifications, not normal programs. This is not checked by the function.
+ *
+ * @param int $programid
+ * @param int $userid
+ * @param int $path null if course sets in all paths should be reset, else CERTIFPATH_CERT or CERTIFPATH_RECERT
+ * @param string $message If provided, will override the default program completion log message.
+ */
+function prog_reset_course_set_completions($programid, $userid, $path = null, $message = '') {
+    global $CERTIFPATH, $DB;
+
+    // State changed from complete (progs) or before window opens (certs) to something else, so delete the related course set completion records.
+    $sql = "UPDATE {prog_completion}
+               SET status = :statusincomplete,
+                   timestarted = 0,
+                   timedue = 0,
+                   timecompleted = 0
+             WHERE programid = :programid1
+               AND userid = :userid";
+    $params = array(
+        'statusincomplete' => STATUS_COURSESET_INCOMPLETE,
+        'programid1' => $programid,
+        'userid' => $userid
+    );
+
+    if (is_null($path)) {
+        $sql .= " AND coursesetid != 0";
+    } else {
+        $sql .= " AND coursesetid IN (SELECT id
+                                        FROM {prog_courseset}
+                                       WHERE programid = :programid2
+                                         AND certifpath = :path)";
+        $params['programid2'] = $programid;
+        $params['path'] = $path;
+    }
+
+    $DB->execute($sql, $params);
+
+    if (empty($message)) {
+        if (is_null($path)) {
+            $message = 'Course set records reset';
+        } else {
+            $message = 'Course set records reset for path: ' . $CERTIFPATH[$path];
+        }
+    }
+
+    prog_log_completion(
+        $programid,
+        $userid,
+        $message
+    );
+}
+
+/**
  * Processes completion data submitted by an admin - transforms it to look like a program completion record, suitable
  * for use in $DB->update_record().
  *
