@@ -260,14 +260,16 @@ if ($facetoface->approvaltype == APPROVAL_MANAGER || $facetoface->approvaltype =
 
 if ($facetoface->approvaltype == APPROVAL_ROLE) {
     $sessionroles = facetoface_get_trainers($session->id, $facetoface->approvalrole);
-    foreach ($sessionroles as $user) {
-        if ($user->id == $USER->id) {
-            // The current user is one of the role approvers.
-            $allowed_actions[] = 'approvalrequired';
-            $available_actions[] = 'approvalrequired';
-            // Set everyone as their staff.
-            $staff = array_keys(facetoface_get_requests($session->id));
-            break;
+    if (!empty($sessionroles)) {
+        foreach ($sessionroles as $user) {
+            if ($user->id == $USER->id) {
+                // The current user is one of the role approvers.
+                $allowed_actions[] = 'approvalrequired';
+                $available_actions[] = 'approvalrequired';
+                // Set everyone as their staff.
+                $staff = array_keys(facetoface_get_requests($session->id));
+                break;
+            }
         }
     }
 }
