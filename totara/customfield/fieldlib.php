@@ -57,6 +57,7 @@ class customfield_base {
         $this->set_addsuffix($addsuffix);
         $this->load_data($item, $prefix, $tableprefix);
         $this->prefix = $prefix;
+        $this->tableprefix = $tableprefix;
     }
 
     /**
@@ -393,6 +394,33 @@ class customfield_base {
      */
     function is_unique() {
         return (boolean)$this->field->forceunique;
+    }
+
+    /**
+     * Deletes data and any related files for this custom field instance. Can be
+     * overwritten by child classes if necessary.
+     *
+     * @throws dml_exception
+     */
+    public function delete() {
+        global $DB;
+        if (empty($this->dataid)) {
+            // There is no data to delete.
+            return;
+        }
+
+        if (empty($this->context)) {
+            // The default context is currently context_system.
+            $this->context = context_system::instance();
+        }
+
+        // Delete related files.
+        $fs = get_file_storage();
+        $fs->delete_area_files($this->context->id, 'totara_customfield', $this->prefix . '_filemgr', $this->dataid);
+        $fs->delete_area_files($this->context->id, 'totara_customfield', $this->prefix, $this->dataid);
+        // Delete data.
+        $DB->delete_records($this->tableprefix . '_info_data', array('id' => $this->dataid));
+        $DB->delete_records($this->tableprefix . '_info_data_param', array('dataid' => $this->dataid));
     }
 
 } /// End of class efinition
@@ -784,7 +812,7 @@ function customfield_record($id, $tableprefix) {
  * @param string $tableprefix Prefix to append '_info_field' to
  * @param string $prefix Custom field prefix (e.g. 'course' or 'position')
  *
- * @return boolean/object containing field attributes and the field value, or false
+ * @return boolean|object containing field attributes and the field value, or false
  */
 function customfield_get_field_instance($item, $fieldid, $tableprefix, $prefix) {
     global $CFG, $DB;

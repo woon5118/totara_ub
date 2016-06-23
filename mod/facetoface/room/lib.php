@@ -67,13 +67,16 @@ function create_or_update_room($data, $todb) {
 function room_delete($id) {
     global $DB;
 
-    $sqldelparam = "
-        DELETE FROM {facetoface_room_info_data_param}
-        WHERE dataid IN
-            (SELECT id FROM {facetoface_room_info_data} WHERE facetofaceroomid = :id)
-        ";
-    $DB->execute($sqldelparam, array('id' => $id));
-    $DB->delete_records('facetoface_room_info_data', array('facetofaceroomid' => $id));
+    $room = $DB->get_record('facetoface_room', array('id' => $id));
+    $roomfields = $DB->get_records('facetoface_room_info_field');
+    foreach($roomfields as $roomfield) {
+        /** @var customfield_base $customfieldentry */
+        $customfieldentry = customfield_get_field_instance($room, $roomfield->id, 'facetoface_room', 'facetofaceroom');
+        if (!empty($customfieldentry)) {
+            $customfieldentry->delete();
+        }
+    }
+
     $DB->delete_records('facetoface_room', array('id' => $id));
 }
 
