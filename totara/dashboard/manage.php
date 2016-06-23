@@ -70,16 +70,6 @@ switch ($action) {
                     array('class' => 'notifysuccess'));
         }
         break;
-    case 'publish':
-        require_sesskey();
-        $dashboard->publish()->save();
-        redirect($returnurl);
-        break;
-    case 'unpublish':
-        require_sesskey();
-        $dashboard->unpublish()->save();
-        redirect($returnurl);
-        break;
     case 'up':
         require_sesskey();
         $dashboard->move_up();

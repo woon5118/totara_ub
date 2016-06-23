@@ -25,6 +25,12 @@
 
 $string['assigncohorts'] = 'Assign new audiences';
 $string['assignedcohorts'] = 'Assigned audiences';
+$string['availability'] = 'Availability';
+$string['availableall'] = 'Available to all logged in users';
+$string['availableaudience'] = 'Available only to the following audiences';
+$string['availableaudiencecnt'] = 'Assigned to {$a} audiences';
+$string['availablenone'] = 'Available to no users';
+$string['availableunknown'] = 'Unknown';
 $string['clonename'] = '{$a->name} copy {$a->count}';
 $string['clonedashboard'] = 'Clone dashboard';
 $string['clonedashboardconfirm'] = 'Do you really want to clone dashboard {$a}?
@@ -59,8 +65,6 @@ $string['nodashboards'] = 'No dashboards';
 $string['options'] = 'Options';
 $string['pluginname'] = 'Totara Dashboards';
 $string['publish'] = 'Publish';
-$string['published'] = 'Published';
-$string['published_help'] = 'When published dashboard is visible for assigned audiences.';
 $string['resetalldashboard'] = 'Reset dashboard for all users';
 $string['resetdashboard'] = 'Reset dashboard to default';
 $string['resetdashboardconfirm'] = 'Do you really want to reset dashboard {$a} layout for all assigned users?';

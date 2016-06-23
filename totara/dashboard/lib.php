@@ -34,6 +34,13 @@ require_once($CFG->dirroot . '/totara/cohort/lib.php');
 class totara_dashboard {
 
     /**
+     * Dashboard availability
+     */
+    const ALL = 2;
+    const AUDIENCE = 1;
+    const NONE = 0;
+
+    /**
      * Dashboard id
      *
      * @var int
@@ -48,9 +55,9 @@ class totara_dashboard {
     public $name = '';
 
     /**
-     * Is dashboard visible for assigned users
+     * How dashboard published: 0 - hidden, 1 - to selected audiences, 2 - to all logged in users
      *
-     * @var int 0|1
+     * @var int 0|1|2
      */
     public $published = 0;
 
@@ -109,20 +116,21 @@ class totara_dashboard {
         }
 
         // Get user cohorts.
+        $cohortsql = '1 = 0';
+        $cohortsparams = array();
         $cohorts = totara_cohort_get_user_cohorts($userid);
-        if (empty($cohorts)) {
-            return array();
+        if (count($cohorts)) {
+            list($cohortlistsql, $cohortsparams) = $DB->get_in_or_equal($cohorts, SQL_PARAMS_NAMED);
+            $cohortsql = 'tdc.cohortid ' . $cohortlistsql;
         }
-        list($cohortssql, $cohortsparams) = $DB->get_in_or_equal($cohorts);
-
         // Check relevant dashboards.
-        $sql = 'SELECT DISTINCT td.*
+        $sql = "SELECT DISTINCT td.*
                 FROM {totara_dashboard} td
-                INNER JOIN {totara_dashboard_cohort} tdc ON (tdc.dashboardid = td.id)
-                WHERE tdc.cohortid ' . $cohortssql . '
-                  AND td.published = 1
+                LEFT JOIN {totara_dashboard_cohort} tdc ON (tdc.dashboardid = td.id)
+                WHERE ($cohortsql OR td.published = 2)
+                  AND td.published > 0
                 ORDER BY td.sortorder
-               ';
+               ";
         return $DB->get_records_sql($sql, $cohortsparams);
     }
 
@@ -189,32 +197,12 @@ class totara_dashboard {
     }
 
     /**
-     * Is dashboard visible for assigned audience
+     * What level of visibility audience have totara_dashboard::NONE, totara_dashboard::AUDIENCE, totara_dashboard::ALL,
      *
-     * @return boolean
+     * @return int
      */
-    public function is_published() {
-        return (bool)$this->published;
-    }
-
-    /**
-     * Make dashboard visible for audince.
-     *
-     * @return totara_dashboard $this
-     */
-    public function publish() {
-        $this->published = 1;
-        return $this;
-    }
-
-    /**
-     * Hide dashboard from audience
-     *
-     * @return totara_dashboard $this
-     */
-    public function unpublish() {
-        $this->published = 0;
-        return $this;
+    public function get_published() {
+        return $this->published;
     }
 
     /**
@@ -233,16 +221,6 @@ class totara_dashboard {
      */
     public function lock() {
         $this->locked = 1;
-        return $this;
-    }
-
-    /**
-     * Prevent changes to dashboard by users
-     *
-     * @return totara_dashboard $this
-     */
-    public function unlock() {
-        $this->locked = 0;
         return $this;
     }
 
@@ -302,8 +280,9 @@ class totara_dashboard {
             $this->locked = (bool)$data->locked;
         }
         if (isset($data->published)) {
-            $this->published = (bool)$data->published;
+            $this->published = (int)$data->published;
         }
+
         if (isset($data->cohorts)) {
             if (is_array($data->cohorts)) {
                 $this->cohorts = $data->cohorts;
@@ -332,7 +311,7 @@ class totara_dashboard {
     }
 
     /**
-     * Get assigned audince id's
+     * Get assigned audience id's
      *
      * @return array of cohort id's
      */

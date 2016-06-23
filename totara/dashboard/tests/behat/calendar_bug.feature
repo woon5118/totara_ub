@@ -19,7 +19,7 @@ Feature: Test that calendar works properly with calendar when dashboard set as h
     And I press "Create dashboard"
     And I set the following fields to these values:
      | Name | The Dashboard |
-     | Published | 1        |
+    And I click on "Available only to the following audiences" "radio"
     And I press "Assign new audiences"
     And I click on "Cohort 1" "link"
     And I press "OK"
