@@ -3295,7 +3295,7 @@ function calendar_update_subscription($subscription) {
  * @return bool true if current user can edit the subscription else false
  */
 function calendar_can_edit_subscription($subscriptionorid) {
-    global $DB;
+    global $DB, $USER;
 
     if (is_array($subscriptionorid)) {
         $subscription = (object)$subscriptionorid;
@@ -3310,7 +3310,11 @@ function calendar_can_edit_subscription($subscriptionorid) {
     calendar_get_allowed_types($allowed, $courseid);
     switch ($subscription->eventtype) {
         case 'user':
-            return $allowed->user;
+            // The user can only manage the subscription if the subscription belongs to them.
+            if (($USER->id == $subscription->userid) && $allowed->user) {
+                return true;
+            }
+            return false;
         case 'course':
             if (isset($allowed->courses[$courseid])) {
                 return $allowed->courses[$courseid];
