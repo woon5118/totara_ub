@@ -88,7 +88,7 @@ if ($formdata = $mform->get_data()) {
         $content = $mform->get_file_content('userfile');
         $readcount = $cir->load_csv_content($content, $formdata->encoding, 'comma');
         if (!$readcount) {
-            $errors[] = get_string('error:nodatasupplied', 'facetoface');
+            $errors[] = $cir->get_error();
         }
         unset($content);
     } else {
@@ -203,6 +203,7 @@ if ($formdata = $mform->get_data()) {
     }
 
     if (!empty($errors)) {
+        $errors = array_unique($errors);
         foreach ($errors as $error) {
             totara_set_notification($error, null, array('class' => 'notifyproblem'));
         }

@@ -33,6 +33,10 @@ Feature: Add seminar attendess from csv file with custom fields
       | Short name (must be unique) | datetime        |
     And I press "Save changes"
 
+
+  @_file_upload
+  Scenario: Login as manager, upload csv file with custom fields using bulk add attendees from file and check the result.
+
     And I click on "Menu of choices" "option"
     And I set the following fields to these values:
       | Full name                   | Event menu of choices |
@@ -78,7 +82,6 @@ Feature: Add seminar attendess from csv file with custom fields
     And I follow "Add a new event"
     And I press "Save changes"
 
-  Scenario: Login as manager, upload csv file with custom fields using bulk add attendees from file and check the result.
     And I click on "Attendees" "link"
     And I click on "Bulk add attendees from file" "option" in the "#menuf2f-actions" "css_element"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields.csv" file to "Text file" filemanager
@@ -110,3 +113,33 @@ Feature: Add seminar attendess from csv file with custom fields
     And I should see "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." in the "John3 Smith3" "table_row"
     And I should see "Sed do eiusmod tempor incididunt" in the "John3 Smith3" "table_row"
     And I should see "/mod/facetoface/view.php?id=1" in the "John3 Smith3" "table_row"
+
+  @_file_upload
+  Scenario: Invalid CSV format, where header and colums are missed
+
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "View all events"
+    And I follow "Add a new event"
+    And I press "Save changes"
+
+    And I click on "Attendees" "link"
+    And I click on "Bulk add attendees from file" "option" in the "#menuf2f-actions" "css_element"
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_invalid_columns.csv" file to "Text file" filemanager
+    When I press "Continue"
+    Then I should see "Invalid CSV file format - \"checkbox\" custom field does not exist"
+
+  @_file_upload
+  Scenario: Invalid CSV format, one of the custom field values is missed
+
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "View all events"
+    And I follow "Add a new event"
+    And I press "Save changes"
+
+    And I click on "Attendees" "link"
+    And I click on "Bulk add attendees from file" "option" in the "#menuf2f-actions" "css_element"
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_invalid_columns2.csv" file to "Text file" filemanager
+    When I press "Continue"
+    Then I should see "Invalid CSV file format - number of columns is not constant!"

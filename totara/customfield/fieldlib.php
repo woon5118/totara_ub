@@ -554,11 +554,15 @@ function customfield_validation_filedata($itemnew, $prefix, $tableprefix) {
     $fields = $DB->get_records($tableprefix.'_info_field');
 
     foreach ($fields as $field) {
-        require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
-        $newfield = 'customfield_'.$field->datatype;
-        $formfield = new $newfield($field->id, $itemnew, $prefix, $tableprefix);
-        $itemnew = $formfield->sync_filedata_preprocess($itemnew);
-        $err += $formfield->edit_validate_field($itemnew, $prefix, $tableprefix);
+        if (isset($itemnew->{$field->shortname})) {
+            require_once($CFG->dirroot . '/totara/customfield/field/' . $field->datatype . '/field.class.php');
+            $newfield = 'customfield_' . $field->datatype;
+            $formfield = new $newfield($field->id, $itemnew, $prefix, $tableprefix);
+            $itemnew = $formfield->sync_filedata_preprocess($itemnew);
+            $err += $formfield->edit_validate_field($itemnew, $prefix, $tableprefix);
+        } else {
+            $err += (array)get_string('error:novalue', 'totara_customfield', $field->shortname);
+        }
     }
 
     return array($err, (array)$itemnew);

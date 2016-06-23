@@ -13,16 +13,16 @@ Feature: Add - Remove seminar attendees
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
+    And the following "activities" exist:
+      | activity   | name              | course | idnumber |
+      | facetoface | Test seminar name | C1     | seminar  |
+
 
   Scenario: Add users to a seminar session with dates
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I turn editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
+    And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -57,11 +57,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I turn editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
+    And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
@@ -82,11 +78,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I turn editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
+    And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
@@ -97,12 +89,12 @@ Feature: Add - Remove seminar attendees
     And I click on "Bulk add attendees from text input" "option" in the "#menuf2f-actions" "css_element"
     # By default user is expected to separate ID's by newline, but comma is also supported.
     And I set the following fields to these values:
-      | User identifier | Username |
+      | User identifier | Username          |
       | csvinput        | student1,student2 |
     And I press "Continue"
     And I click on "Change selected users" "link"
     Then the following fields match these values:
-      | User identifier | Username |
+      | User identifier | Username          |
       | csvinput        | student1,student2 |
     And I press "Continue"
     And I press "Confirm"
@@ -114,11 +106,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I turn editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
+    And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I set the following fields to these values:
@@ -147,11 +135,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I turn editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
+    And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I fill seminar session with relative date in form data:
@@ -198,11 +182,7 @@ Feature: Add - Remove seminar attendees
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I turn editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name one    |
-      | Description | Test seminar description |
-    And I follow "View all events"
+    And I follow "Test seminar name"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
@@ -231,6 +211,7 @@ Feature: Add - Remove seminar attendees
     Then I should see "Sam1 Student1"
 
     And I follow "Course 1"
+    And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name two    |
       | Description | Test seminar description |
@@ -261,7 +242,7 @@ Feature: Add - Remove seminar attendees
     And I press "Continue"
     Then I should see "1 problem(s) encountered during import."
     When I click on "View results" "link"
-    Then I should see "Sam1 Student1 is already booked to attend Test seminar name one at 11:00 AM to 12:00 PM on 1 January 2020. Please select another user or change the session"
+    Then I should see "Sam1 Student1 is already booked to attend Test seminar name at 11:00 AM to 12:00 PM on 1 January 2020. Please select another user or change the session"
     When I press "Close"
     And I set the following fields to these values:
       | Allow scheduling conflicts | 1 |
@@ -273,3 +254,35 @@ Feature: Add - Remove seminar attendees
     Then I should see "Added successfully" in the "Bulk add attendees results" "totaradialogue"
     When I press "Cancel"
     Then I should see "Sam1 Student1"
+
+  @_file_upload
+  Scenario: Use invalid csv file to test the errors
+    Given I log in as "admin"
+
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "Test seminar name"
+    And I follow "Add a new event"
+    And I click on "Edit date" "link"
+    And I fill seminar session with relative date in form data:
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | +1               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | +1               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | +1               |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity           | 2                |
+    And I press "Save changes"
+
+    When I click on "Attendees" "link"
+    And I click on "Bulk add attendees from file" "option" in the "#menuf2f-actions" "css_element"
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_invalid_columns.csv" file to "Text file" filemanager
+    And I press "Continue"
+    And I should see "Invalid CSV file format - number of columns is not constant!"

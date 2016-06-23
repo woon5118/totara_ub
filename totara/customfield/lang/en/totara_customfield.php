@@ -147,6 +147,7 @@ $string['editfield'] = 'Editing custom field: {$a}';
 $string['endyear'] = 'End year';
 $string['error:abstractmethod'] = 'This abstract method must be overriden';
 $string['error:updatecustomfield'] = 'Error updating custom field!';
+$string['error:novalue'] = 'Invalid CSV file format - "{$a}" custom field does not exist';
 $string['eventdeleted'] = 'Customfield deleted';
 $string['fieldcolumns'] = 'Columns';
 $string['fieldispassword'] = 'Is this a password field?';
