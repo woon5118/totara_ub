@@ -1825,7 +1825,8 @@ function certif_process_submitted_edit_completion($submitted) {
     $progcompletion->programid = $submitted->id;
     $progcompletion->userid = $submitted->userid;
     $progcompletion->status = $submitted->progstatus;
-    $progcompletion->timedue = $submitted->timedue;
+    // Fix stupid timedue should be -1 for not set problem.
+    $progcompletion->timedue = ($submitted->timeduenotset === 'yes') ? COMPLETION_TIME_NOT_SET : $submitted->timedue;
     $progcompletion->timecompleted = $submitted->progtimecompleted;
     $progcompletion->timemodified = $now;
 
@@ -2889,11 +2890,15 @@ function certif_fix_prog_completion_date(&$certcompletion, &$progcompletion) {
  *
  * This loads the two records in a single query, rather than doing it in 3 queries as is usually needed.
  *
- * @param $programid
- * @param $userid
+ * Note that if $mustexist is false and returns array(false, false), it is still possible that one or the
+ * other of the two records exists, but not both.
+ *
+ * @param int $programid
+ * @param int $userid
+ * @param bool $mustexist If records are missing, default true causes an error, false returns array(false, false)
  * @return array (certif_completion, prog_completion) pair of matching records
  */
-function certif_load_completion($programid, $userid) {
+function certif_load_completion($programid, $userid, $mustexist = true) {
     global $DB;
 
     $sql = "SELECT cc.*, pc.id AS pcid, pc.programid, pc.coursesetid, pc.status AS progstatus, pc.timestarted AS progtimestarted,
@@ -2908,8 +2913,12 @@ function certif_load_completion($programid, $userid) {
     $record = $DB->get_record_sql($sql , $params);
 
     if (empty($record)) {
-        $a = array('programid' => $programid, 'userid' => $userid);
-        print_error(get_string('error:cannotloadcompletionrecords', 'totara_certification', $a));
+        if ($mustexist) {
+            $a = array('programid' => $programid, 'userid' => $userid);
+            print_error(get_string('error:cannotloadcompletionrecords', 'totara_certification', $a));
+        } else {
+            return array(false, false);
+        }
     }
 
     $certcompletion = new stdClass();

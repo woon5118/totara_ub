@@ -301,6 +301,7 @@ $string['error:addinguserassignment'] = 'An error occured when adding a user ass
 $string['error:assignmentnotfound'] = 'Assignment record not found';
 $string['error:availibileuntilearlierthanfrom'] = 'Available until date cannot be earlier than from date';
 $string['error:badcheckvariable'] = 'The check variable was wrong - try again';
+$string['error:cannotloadcompletionrecord'] = 'Tried to load prog_completion record which doesn\'t exist for programid: {$a->programid}, userid: {$a->userid}';
 $string['error:cannotrequestextnotuser'] = 'You cannot request an extension for another user';
 $string['error:completioneditornotenabled'] = 'Completion editor is not enabled on this site';
 $string['error:couldnotloadextension'] = 'Error, could not load extension.';

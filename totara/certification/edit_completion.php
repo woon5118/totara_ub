@@ -78,8 +78,7 @@ if ($deletehistory) {
 }
 
 // Load all the data about the user and certification.
-$certcompletion = $DB->get_record('certif_completion', array('certifid' => $program->certifid, 'userid' => $userid));
-$progcompletion = $DB->get_record('prog_completion', array('programid' => $id, 'userid' => $userid, 'coursesetid' => 0));
+list($certcompletion, $progcompletion) = certif_load_completion($id, $userid, false);
 $exceptions = $DB->get_records('prog_exception', array('programid' => $id, 'userid' => $userid));
 
 if ($certcompletion && $progcompletion && empty($exceptions)) {
@@ -127,9 +126,6 @@ if ($certcompletion && $progcompletion && empty($exceptions)) {
                 $url,
                 array('class' => 'notifyproblem'));
         }
-
-        // Fix stupid timedue should be -1 for not set problem.
-        $submitted->timedue = ($submitted->timeduenotset === 'yes') ? COMPLETION_TIME_NOT_SET : $submitted->timedue;
 
         list($newcertcompletion, $newprogcompletion) = certif_process_submitted_edit_completion($submitted);
         $newstate = certif_get_completion_state($newcertcompletion);

@@ -57,7 +57,7 @@ $url = new moodle_url('/totara/program/edit_completion.php', array('id' => $id, 
 $PAGE->set_context($programcontext);
 
 // Load all the data about the user and program.
-$progcompletion = $DB->get_record('prog_completion', array('programid' => $id, 'userid' => $userid, 'coursesetid' => 0));
+$progcompletion = prog_load_completion($id, $userid, false);
 $exceptions = $DB->get_records('prog_exception', array('programid' => $id, 'userid' => $userid));
 
 $history = $DB->get_records('prog_completion_history',
@@ -118,36 +118,17 @@ if ($progcompletion && empty($exceptions)) {
             array('class' => 'notifysuccess'));
 
     } else if ($submitted = $editform->get_data() and !empty($submitted->savechanges)) {
-        $oldprogcompletion = $DB->get_record('prog_completion', array('programid' => $id, 'userid' => $userid, 'coursesetid' => 0));
+        $newprogcompletion = prog_process_submitted_edit_completion($submitted);
 
-        if (empty($oldprogcompletion)) {
+        if (prog_write_completion($newprogcompletion, 'Completion manually edited')) {
+            totara_set_notification(get_string('completionchangessaved', 'totara_program'),
+                $url,
+                array('class' => 'notifysuccess'));
+        } else {
             totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
                 $url,
                 array('class' => 'notifyproblem'));
         }
-
-        $newprogcompletion = new stdClass();
-        $newprogcompletion->id = $oldprogcompletion->id;
-        $newprogcompletion->status = $submitted->status;
-        $newprogcompletion->timecompleted = $submitted->timecompleted;
-        // Fix stupid timedue should be -1 for not set problem.
-        $newprogcompletion->timedue = ($submitted->timeduenotset === 'yes') ? COMPLETION_TIME_NOT_SET : $submitted->timedue;
-
-        $errors = prog_get_completion_errors($newprogcompletion);
-
-        if (!empty($errors)) {
-            totara_set_notification(get_string('error:impossibledatasubmitted', 'totara_program'),
-                $url,
-                array('class' => 'notifyproblem'));
-        }
-
-        $DB->update_record('prog_completion', $newprogcompletion);
-
-        prog_write_completion_log($id, $userid, 'Completion manually edited');
-
-        totara_set_notification(get_string('completionchangessaved', 'totara_program'),
-            $url,
-            array('class' => 'notifysuccess'));
     }
 }
 

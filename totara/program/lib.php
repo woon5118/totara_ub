@@ -2699,3 +2699,60 @@ function prog_write_completion_log($programid, $userid, $message = '', $changeus
         $changeuserid
     );
 }
+
+/**
+ * Processes completion data submitted by an admin - transforms it to look like a program completion record, suitable
+ * for use in $DB->update_record().
+ *
+ * Note that the prog_completion record must already exist in the database (matching the user and program id
+ * supplied), and their record ids will be included in the returned data. Creating new completion records should be
+ * achieved automatically by assigning a user to a program, not manually in a form.
+ *
+ * @param object $submitted contains the data submitted by the form
+ * @return object $progcompletion compatible with the corresponding database record
+ */
+function prog_process_submitted_edit_completion($submitted) {
+    // Get existing record id.
+    $existingrecord = prog_load_completion($submitted->id, $submitted->userid);
+
+    $now = time();
+
+    $progcompletion = new stdClass();
+    $progcompletion->id = $existingrecord->id;
+    $progcompletion->programid = $submitted->id;
+    $progcompletion->userid = $submitted->userid;
+    $progcompletion->status = $submitted->status;
+    // Fix stupid timedue should be -1 for not set problem.
+    $progcompletion->timedue = ($submitted->timeduenotset === 'yes') ? COMPLETION_TIME_NOT_SET : $submitted->timedue;
+    $progcompletion->timecompleted = $submitted->timecompleted;
+    $progcompletion->timemodified = $now;
+
+    return $progcompletion;
+}
+
+/**
+ * Load a prog_completion record out of the db.
+ *
+ * Use this function to make sure you don't accidentally get a course set completion record.
+ *
+ * @param int $programid
+ * @param int $userid
+ * @param bool $mustexist If records are missing, default true causes an error, false returns false
+ * @return mixed
+ */
+function prog_load_completion($programid, $userid, $mustexist = true) {
+    global $DB;
+
+    $progcompletion = $DB->get_record('prog_completion', array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0));
+
+    if (empty($progcompletion)) {
+        if ($mustexist) {
+            $a = array('programid' => $programid, 'userid' => $userid);
+            print_error(get_string('error:cannotloadcompletionrecord', 'totara_program', $a));
+        } else {
+            return false;
+        }
+    }
+
+    return $progcompletion;
+}

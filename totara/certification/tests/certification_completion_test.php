@@ -91,6 +91,7 @@ class totara_certification_certification_completion_testcase extends reportcache
         $submitted->timewindowopens = 1005;
         $submitted->timeexpires = 1006;
         $submitted->progstatus = 1007;
+        $submitted->timeduenotset = 'no';
         $submitted->timedue = 1008;
         $submitted->progtimecompleted = 1009;
 
@@ -120,6 +121,42 @@ class totara_certification_certification_completion_testcase extends reportcache
         $this->assertEquals($user->id, $progcompletion->userid);
         $this->assertEquals(1007, $progcompletion->status);
         $this->assertEquals(1008, $progcompletion->timedue);
+        $this->assertEquals(1009, $progcompletion->timecompleted);
+        $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timemodified);
+        $this->assertLessThanOrEqual($timeafter, $progcompletion->timemodified);
+
+        $this->assertEquals($certcompletion->timemodified, $progcompletion->timemodified);
+
+        // Run a second test, just disable the due date.
+        $submitted->timeduenotset = 'yes';
+        $submitted->timedue = 56789;
+
+        $timebefore = time();
+        list($certcompletion, $progcompletion) = certif_process_submitted_edit_completion($submitted);
+        $timeafter = time();
+
+        $certcompletionid = $DB->get_field('certif_completion', 'id',
+            array('certifid' => $prog->certifid, 'userid' => $user->id));
+        $progcompletionid = $DB->get_field('prog_completion', 'id',
+            array('programid' => $prog->id, 'userid' => $user->id));
+
+        $this->assertEquals($certcompletionid, $certcompletion->id);
+        $this->assertEquals($prog->certifid, $certcompletion->certifid);
+        $this->assertEquals($user->id, $certcompletion->userid);
+        $this->assertEquals(1001, $certcompletion->status);
+        $this->assertEquals(1002, $certcompletion->renewalstatus);
+        $this->assertEquals(1003, $certcompletion->certifpath);
+        $this->assertEquals(1004, $certcompletion->timecompleted);
+        $this->assertEquals(1005, $certcompletion->timewindowopens);
+        $this->assertEquals(1006, $certcompletion->timeexpires);
+        $this->assertGreaterThanOrEqual($timebefore, $certcompletion->timemodified);
+        $this->assertLessThanOrEqual($timeafter, $certcompletion->timemodified);
+
+        $this->assertEquals($progcompletionid, $progcompletion->id);
+        $this->assertEquals($prog->id, $progcompletion->programid);
+        $this->assertEquals($user->id, $progcompletion->userid);
+        $this->assertEquals(1007, $progcompletion->status);
+        $this->assertEquals(-1, $progcompletion->timedue);
         $this->assertEquals(1009, $progcompletion->timecompleted);
         $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timemodified);
         $this->assertLessThanOrEqual($timeafter, $progcompletion->timemodified);
