@@ -437,8 +437,13 @@ class customfield_define_location extends customfield_define_base {
 
             foreach ($locationdata as $index => $value) {
                 if ($index == 'location') {
-                    $newdata->latitude = $value->latitude;
-                    $newdata->longitude = $value->longitude;
+                    if (empty($value->latitude) && empty($value->longitude)) {
+                        $newdata->latitude = null;
+                        $newdata->longitude = null;
+                    } else {
+                        $newdata->latitude = $value->latitude;
+                        $newdata->longitude = $value->longitude;
+                    }
                 } else {
                     $newdata->$index = $value;
                 }
