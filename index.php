@@ -203,9 +203,9 @@ if (!empty($CFG->customfrontpageinclude)) {
 include_course_ajax($SITE, $modnamesused);
 
 if (isloggedin() and !isguestuser() and isset($CFG->frontpageloggedin)) {
-    $frontpagelayout = $CFG->frontpageloggedin;
+    $frontpagelayout = explode(',', $CFG->frontpageloggedin);
 } else {
-    $frontpagelayout = $CFG->frontpage;
+    $frontpagelayout = explode(',', $CFG->frontpage);
 }
 
 // Totara specific feature.
@@ -213,7 +213,7 @@ if (isloggedin() and !isguestuser() and isset($CFG->courseprogress) and $CFG->co
     totara_print_my_courses();
 }
 
-foreach (explode(',', $frontpagelayout) as $v) {
+foreach ($frontpagelayout as $v) {
     switch ($v) {
         // Display the main part of the front page.
         case FRONTPAGENEWS:
@@ -282,7 +282,11 @@ foreach (explode(',', $frontpagelayout) as $v) {
                 echo html_writer::tag('span', '', array('class' => 'skip-block-to', 'id' => 'skipmycourses'));
                 break;
             }
-        // No "break" here. If there are no enrolled courses - continue to 'Available courses'.
+        // No "break" here if there are no enrolled courses - continue to 'Available courses', unless FRONTPAGEALLCOURSELIST is set.
+        if (in_array(FRONTPAGEALLCOURSELIST, $frontpagelayout)) {
+            // FRONTPAGEALLCOURSELIST is set, lets break to avoid duplicate content.
+            break;
+        }
 
         case FRONTPAGEALLCOURSELIST:
             $availablecourseshtml = $courserenderer->frontpage_available_courses();
