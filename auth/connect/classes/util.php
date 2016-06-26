@@ -400,9 +400,10 @@ class util {
      *
      * @param \stdClass $server
      * @param array $serveruser
+     * @param bool $sso true during sso login (performance trick)
      * @return \stdClass local user record, null on error
      */
-    public static function update_local_user(\stdClass $server, array $serveruser) {
+    public static function update_local_user(\stdClass $server, array $serveruser, $sso = false) {
         global $DB, $CFG;
         require_once("$CFG->dirroot/user/lib.php");
 
@@ -526,6 +527,7 @@ class util {
         $usercreated = false;
         $userundeleted = false;
         $usersuspended = false;
+        $olduser = false;
 
         if ($userinfo) {
             $olduser = $DB->get_record('user', array('id' => $userinfo->userid), '*', MUST_EXIST);
@@ -621,6 +623,36 @@ class util {
         }
 
         $userrecord = $DB->get_record('user', array('id' => $user->id), '*', MUST_EXIST);
+
+        if ($sso) {
+            // For performance reasons update extra user data only during login.
+            $updatepictures = false;
+            if ($usercreated and $userrecord->picture > 0) {
+                $updatepictures = true;
+            }
+            if ($olduser and $userrecord->picture != $olduser->picture) {
+                $updatepictures = true;
+            }
+            if ($updatepictures) {
+                $usercontext = \context_user::instance($userrecord->id);
+                $fs = get_file_storage();
+                $fs->delete_area_files($usercontext->id, 'user', 'icon', 0);
+                if ($userrecord->picture > 0) {
+                    if (!empty($serveruser->pictures)) {
+                        foreach ($serveruser->pictures as $filename => $data) {
+                            $record = new \stdClass();
+                            $record->contextid = $usercontext->id;
+                            $record->component = 'user';
+                            $record->filearea = 'icon';
+                            $record->itemid = 0;
+                            $record->filepath = '/';
+                            $record->filename = $filename;
+                            $fs->create_file_from_string($record, base64_decode($data));
+                        }
+                    }
+                }
+            }
+        }
 
         // NOTE TL-7410: add code for user preference and custom profile fields sync here.
 
@@ -852,7 +884,7 @@ class util {
         }
 
         $serveruser = $result['data'];
-        $user = self::update_local_user($server, $serveruser);
+        $user = self::update_local_user($server, $serveruser, true);
 
         if (!$user or $user->deleted != 0 or $user->suspended != 0) {
             // Cannot login on this client, sorry.

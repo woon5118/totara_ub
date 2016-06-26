@@ -164,6 +164,8 @@ class totara_connect_sep_services_testcase extends advanced_testcase {
             }
             $this->assertNull($u->password);
             $this->assertObjectNotHasAttribute('secret', $u);
+            $this->assertObjectNotHasAttribute('picture', $u);
+            $this->assertObjectNotHasAttribute('pictures', $u);
             if ($u->deleted) {
                 $this->assertNull($u->description);
                 $this->assertNull($u->descriptionformat);
@@ -185,6 +187,8 @@ class totara_connect_sep_services_testcase extends advanced_testcase {
             $this->assertTrue(cohort_is_member($cohort->id, $u->id));
             $this->assertNotNull($u->password);
             $this->assertObjectNotHasAttribute('secret', $u);
+            $this->assertObjectNotHasAttribute('picture', $u);
+            $this->assertObjectNotHasAttribute('pictures', $u);
             if ($u->deleted) {
                 $this->assertNull($u->description);
                 $this->assertNull($u->descriptionformat);
@@ -345,13 +349,15 @@ class totara_connect_sep_services_testcase extends advanced_testcase {
         $this->assertSame('0', $DB->get_field('totara_connect_sso_sessions', 'active', array('id' => $session->id)));
         $result = sep_services::get_sso_user($client, array('ssotoken' => $session->ssotoken));
         $this->assertSame('success', $result['status']);
-        $this->assertCount(53, (array)$result['data']);
+        $this->assertCount(54, (array)$result['data']);
         $this->assertSame('1', $DB->get_field('totara_connect_sso_sessions', 'active', array('id' => $session->id)));
 
         $user = (object)$result['data'];
         $this->assertSame($user1->id, $user->id);
         $this->assertNull($user->password);
         $this->assertObjectNotHasAttribute('secret', $user);
+        $this->assertSame('0', $user->picture);
+        $this->assertSame(array(), $user->pictures);
         $this->assertSame(FORMAT_HTML, $user->descriptionformat);
 
         // Now with password.
@@ -362,13 +368,15 @@ class totara_connect_sep_services_testcase extends advanced_testcase {
         $DB->set_field('totara_connect_sso_sessions', 'active', 0, array('id' => $session->id));
         $result = sep_services::get_sso_user($client, array('ssotoken' => $session->ssotoken));
         $this->assertSame('success', $result['status']);
-        $this->assertCount(53, (array)$result['data']);
+        $this->assertCount(54, (array)$result['data']);
         $this->assertSame('1', $DB->get_field('totara_connect_sso_sessions', 'active', array('id' => $session->id)));
 
         $user = (object)$result['data'];
         $this->assertSame($user1->id, $user->id);
         $this->assertNotNull($user->password);
         $this->assertObjectNotHasAttribute('secret', $user);
+        $this->assertSame('0', $user->picture);
+        $this->assertSame(array(), $user->pictures);
 
         // Test for all errors.
 

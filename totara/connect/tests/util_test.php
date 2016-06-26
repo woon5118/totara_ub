@@ -605,6 +605,27 @@ class totara_connect_util_testcase extends advanced_testcase {
         util::prepare_user_for_client($result);
 
         $this->assertObjectNotHasAttribute('secret', $result);
+        $this->assertObjectNotHasAttribute('picture', $result);
+        $this->assertObjectNotHasAttribute('pictures', $result);
+        $this->assertNull($result->password);
+
+        foreach ((array)$result as $k => $v) {
+            if ($k === 'password') {
+                continue;
+            }
+            if (property_exists($user1, $k)) {
+                $this->assertSame($v, $user1->$k, "sync user property $k is not the same");
+            }
+        }
+
+        // Test extra SSO data (such as user picture).
+        $result = clone($user1);
+        util::prepare_user_for_client($result, true);
+
+        $this->assertObjectNotHasAttribute('secret', $result);
+        $this->assertObjectHasAttribute('picture', $result);
+        $this->assertSame(array(), $result->pictures);
+        unset($result->pictures);
         $this->assertNull($result->password);
 
         foreach ((array)$result as $k => $v) {
@@ -646,5 +667,31 @@ class totara_connect_util_testcase extends advanced_testcase {
                 $this->assertSame($v, $user1->$k, "sync user property $k is not the same");
             }
         }
+    }
+
+    public function test_prepare_user_for_client_icons() {
+        global $CFG, $DB;
+        require_once("$CFG->dirroot/lib/gdlib.php");
+        $this->resetAfterTest();
+
+        $user = $this->getDataGenerator()->create_user(array('description' => 'test user'));
+        $usercontext = context_user::instance($user->id);
+        $iconfile = "$CFG->dirroot/pix/u/user100.png";
+        $this->assertFileExists($iconfile);
+        $iid = process_new_icon($usercontext, 'user', 'icon', 0, $iconfile, true);
+        $DB->set_field('user', 'picture', $iid, array('id' => $user->id));
+
+        $user = $DB->get_record('user', array('id' => $user->id));
+        util::prepare_user_for_client($user, true);
+        $this->assertGreaterThan(0, (int)$user->picture);
+        $this->assertCount(3, $user->pictures);
+        $this->assertArrayHasKey('f1.png', $user->pictures);
+        $this->assertArrayHasKey('f2.png', $user->pictures);
+        $this->assertArrayHasKey('f3.png', $user->pictures);
+
+        $user = $DB->get_record('user', array('id' => $user->id));
+        util::prepare_user_for_client($user, false);
+        $this->assertObjectNotHasAttribute('picture', $user);
+        $this->assertObjectNotHasAttribute('pictures', $user);
     }
 }

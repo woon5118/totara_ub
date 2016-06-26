@@ -1005,6 +1005,88 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertFalse(cohort_is_member($cohorts[0]->id, $users[1]->id));
     }
 
+    public function test_update_local_user_pictures() {
+        global $DB;
+        $this->resetAfterTest();
+
+        set_config('syncpasswords', 0, 'totara_connect');
+        $fs = get_file_storage();
+
+        /** @var auth_connect_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('auth_connect');
+        $server = $generator->create_server();
+        $this->assertEquals(2, $DB->count_records('user', array()));
+
+        // Add new user from server.
+        $serveruser1 = $generator->get_fake_server_user(array('password' => 'testpw'));
+        $serveruser1['picture'] = '100';
+        $serveruser1['pictures'] = array(
+            'f1.png' => base64_encode('xx'),
+            'f2.png' => base64_encode('xxx'),
+            'f3.png' => base64_encode('xxxx'),
+        );
+        $user1 = util::update_local_user($server, $serveruser1, true);
+        $this->assertSame($serveruser1['firstname'], $user1->firstname);
+        $this->assertSame($serveruser1['lastname'], $user1->lastname);
+        $this->assertSame($serveruser1['picture'], $user1->picture);
+        $this->assertObjectNotHasAttribute('pictures', $user1);
+        $this->assertTrue($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f1.png'));
+        $this->assertTrue($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f2.png'));
+        $this->assertTrue($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f3.png'));
+
+        // Update pictures only if picture flag changes.
+        $serveruser1['picture'] = '100';
+        $serveruser1['pictures'] = array(
+            'f1.jpg' => base64_encode('xx'),
+            'f2.jpg' => base64_encode('xxx'),
+            'f3.jpg' => base64_encode('xxxx'),
+        );
+        $user1 = util::update_local_user($server, $serveruser1, true);
+        $this->assertSame($serveruser1['firstname'], $user1->firstname);
+        $this->assertSame($serveruser1['lastname'], $user1->lastname);
+        $this->assertSame($serveruser1['picture'], $user1->picture);
+        $this->assertObjectNotHasAttribute('pictures', $user1);
+        $this->assertTrue($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f1.png'));
+        $this->assertTrue($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f2.png'));
+        $this->assertTrue($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f3.png'));
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f1.jpg'));
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f2.jpg'));
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f3.jpg'));
+
+        $serveruser1['picture'] = '101';
+        $serveruser1['pictures'] = array(
+            'f1.jpg' => base64_encode('xx'),
+            'f2.jpg' => base64_encode('xxx'),
+            'f3.jpg' => base64_encode('xxxx'),
+        );
+        $user1 = util::update_local_user($server, $serveruser1, true);
+        $this->assertSame($serveruser1['firstname'], $user1->firstname);
+        $this->assertSame($serveruser1['lastname'], $user1->lastname);
+        $this->assertSame($serveruser1['picture'], $user1->picture);
+        $this->assertObjectNotHasAttribute('pictures', $user1);
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f1.png'));
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f2.png'));
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f3.png'));
+        $this->assertTrue($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f1.jpg'));
+        $this->assertTrue($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f2.jpg'));
+        $this->assertTrue($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f3.jpg'));
+
+        // Delete pictures.
+        $serveruser1['picture'] = '0';
+        $serveruser1['pictures'] = array();
+        $user1 = util::update_local_user($server, $serveruser1, true);
+        $this->assertSame($serveruser1['firstname'], $user1->firstname);
+        $this->assertSame($serveruser1['lastname'], $user1->lastname);
+        $this->assertSame($serveruser1['picture'], $user1->picture);
+        $this->assertObjectNotHasAttribute('pictures', $user1);
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f1.png'));
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f2.png'));
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f3.png'));
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f1.jpg'));
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f2.jpg'));
+        $this->assertFalse($fs->file_exists(context_user::instance($user1->id)->id, 'user', 'icon', 0, '/', 'f3.jpg'));
+    }
+
     public function test_finish_sso() {
         global $DB, $SESSION, $USER;
         $this->resetAfterTest();

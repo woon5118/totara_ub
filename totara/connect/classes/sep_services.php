@@ -333,7 +333,7 @@ class sep_services {
         $DB->set_field('totara_connect_sso_sessions', 'active', 1, array('id' => $ssosession->id));
 
         // Add profile fields, prefs and format description.
-        util::prepare_user_for_client($user);
+        util::prepare_user_for_client($user, true);
 
         return array(
             'status' => 'success',

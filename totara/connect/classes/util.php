@@ -459,9 +459,10 @@ class util {
      * to TC clients.
      *
      * @param \stdClass $user
+     * @param bool $sso true if preparing user for get_sso_user function
      * @return void the $user param object is modified
      */
-    public static function prepare_user_for_client($user) {
+    public static function prepare_user_for_client($user, $sso = false) {
         global $CFG;
         require_once("$CFG->libdir/filelib.php");
 
@@ -469,6 +470,12 @@ class util {
             // Do not send all info about deleted users, they should not be used any more.
             $user->password = null;
             unset($user->secret);
+            if ($sso) {
+                $user->picture = '0';
+                $user->pictures = array();
+            } else {
+                unset($user->picture);
+            }
             $user->description = null;
             $user->descriptionformat = null;
             return;
@@ -482,7 +489,27 @@ class util {
         // Secret is for this site only!
         unset($user->secret);
 
-        // NOTE TL-7406: add user preferences and custom profile fields here if enabled via settings.
+        if ($sso) {
+            // For performance reasons some user data is synced only during sso login.
+            $user->pictures = array();
+            if ($user->picture) {
+                $context = \context_user::instance($user->id);
+                $fs = get_file_storage();
+                foreach (array('f1', 'f2', 'f3') as $filename) {
+                    if (!$file = $fs->get_file($context->id, 'user', 'icon', 0, '/', $filename.'.png')) {
+                        if (!$file = $fs->get_file($context->id, 'user', 'icon', 0, '/', $filename . '.jpg')) {
+                            continue;
+                        }
+                    }
+                    $user->pictures[$file->get_filename()] = base64_encode($file->get_content());
+                }
+            }
+
+            // NOTE TL-7406: add user preferences and custom profile fields here if enabled via settings.
+
+        } else {
+            unset($user->picture);
+        }
 
         // Add description - keep links to original embedded images, but do not use filters.
         $usercontext = \context_user::instance($user->id);
