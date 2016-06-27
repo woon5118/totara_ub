@@ -2948,9 +2948,28 @@ function certif_load_completion($programid, $userid) {
  * @param null $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if null.
  */
 function certif_write_completion_log($programid, $userid, $message = '', $changeuserid = null) {
-    global $CERTIFSTATUS, $CERTIFRENEWALSTATUS, $CERTIFPATH;
-
     list($certcompletion, $progcompletion) = certif_load_completion($programid, $userid);
+
+    $description = certif_calculate_completion_description($certcompletion, $progcompletion, $message);
+
+    prog_log_completion(
+        $programid,
+        $userid,
+        $description,
+        $changeuserid
+    );
+}
+
+/**
+ * Calculate the description string for a certification completion history log message.
+ *
+ * @param stdClass $certcompletion
+ * @param stdClass $progcompletion
+ * @param string $message If provided, will be added at the start of the log message (instead of "Completion record edited")
+ * @return string
+ */
+function certif_calculate_completion_description($certcompletion, $progcompletion, $message = '') {
+    global $CERTIFSTATUS, $CERTIFRENEWALSTATUS, $CERTIFPATH;
 
     $progstatus = 'Invalid';
     switch ($progcompletion->status) {
@@ -3008,12 +3027,7 @@ function certif_write_completion_log($programid, $userid, $message = '', $change
         '<li>Program status: ' . $progstatus . ' (' . $progcompletion->status . ')</li>' .
         '<li>Program completion date: ' . $progtimecompleted . '</li></ul>';
 
-    prog_log_completion(
-        $programid,
-        $userid,
-        $description,
-        $changeuserid
-    );
+    return $description;
 }
 
 /**
@@ -3024,13 +3038,35 @@ function certif_write_completion_log($programid, $userid, $message = '', $change
  * @param null $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if null.
  */
 function certif_write_completion_history_log($chid, $message = '', $changeuserid = null) {
-    global $CERTIFSTATUS, $CERTIFRENEWALSTATUS, $CERTIFPATH, $DB;
+    global $DB;
 
     $sql = "SELECT cch.*, prog.id AS programid
               FROM {certif_completion_history} cch
               JOIN {prog} prog ON cch.certifid = prog.certifid
              WHERE cch.id = :chid";
     $certcomplhistory = $DB->get_record_sql($sql, array('chid' => $chid));
+
+    $description = certif_calculate_completion_history_description($certcomplhistory, $message);
+
+    prog_log_completion(
+        $certcomplhistory->programid,
+        $certcomplhistory->userid,
+        $description,
+        $changeuserid
+    );
+}
+
+/**
+ * Calculate the description string for a certification completion history log message.
+ *
+ * @param stdClass $certcomplhistory
+ * @param string $message If provided, will be added at the start of the log message (instead of "Completion history edited")
+ * @return string
+ */
+function certif_calculate_completion_history_description($certcomplhistory, $message = '') {
+    global $CERTIFSTATUS, $CERTIFRENEWALSTATUS, $CERTIFPATH;
+
+    $id = isset($certcomplhistory->id) ? $certcomplhistory->id : 'Unknown - new history record';
 
     if ($certcomplhistory->timecompleted > 0) {
         $timecompleted = userdate($certcomplhistory->timecompleted, '%d %B %Y, %H:%M', 0) .
@@ -3057,7 +3093,7 @@ function certif_write_completion_history_log($chid, $message = '', $changeuserid
     }
 
     $description = $message . '<br>' .
-        '<ul><li>ID: ' . $chid . '</li>' .
+        '<ul><li>ID: ' . $id . '</li>' .
         '<li>Status: ' . $CERTIFSTATUS[$certcomplhistory->status] . ' (' . $certcomplhistory->status . ')</li>' .
         '<li>Renewal status: ' . $CERTIFRENEWALSTATUS[$certcomplhistory->renewalstatus] . ' (' . $certcomplhistory->renewalstatus . ')</li>' .
         '<li>Certification path: ' . $CERTIFPATH[$certcomplhistory->certifpath] . ' (' . $certcomplhistory->certifpath . ')</li>' .
@@ -3066,12 +3102,7 @@ function certif_write_completion_history_log($chid, $message = '', $changeuserid
         '<li>Expiry date: ' . $timeexpires . '</li>' .
         '<li>Unassigned: ' . $unassigned . '</li></ul>';
 
-    prog_log_completion(
-        $certcomplhistory->programid,
-        $certcomplhistory->userid,
-        $description,
-        $changeuserid
-    );
+    return $description;
 }
 
 /**
