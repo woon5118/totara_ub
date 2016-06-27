@@ -781,15 +781,15 @@ if ($show_table) {
 
     // Actions menu.
     if (has_any_capability(array('mod/facetoface:addattendees', 'mod/facetoface:removeattendees'), $context)) {
-        echo $OUTPUT->container_start('actions last');
         if ($actions) {
+            echo $OUTPUT->container_start('actions last');
             // Action selector
             echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('actions')));
             if ($action == 'waitlist') {
                 echo $OUTPUT->help_icon('f2f-waitlist-actions', 'mod_facetoface');
             }
+            echo $OUTPUT->container_end();
         }
-        echo $OUTPUT->container_end();
     }
 
     if ($action == 'attendees') {
@@ -984,10 +984,7 @@ if ($show_table) {
                 $data[] = $reserved.$cancelicon;
             }
 
-            $timesignedup = userdate($attendee->timesignedup, get_string('strftimedatetime'));
-
-            // Strip the comma if we are exporting to CSV.
-            $data[] = $download == 'csv' ? str_replace(',', '', $timesignedup) : $timesignedup;
+            $data[] = userdate($attendee->timesignedup, get_string('strftimedatetime'));
 
             if ($showpositions) {
                 $label = position::position_label($attendee);
@@ -1053,9 +1050,11 @@ if ($show_table) {
                 $cancellationnote = customfield_get_data($cancelstatus, 'facetoface_cancellation', 'facetofacecancellation', false);
 
                 $cancellationnotetext = empty($cancellationnote) ? '' : $cancellationnote['cancellationnote'];
-
-                $note = html_writer::span($cancellationnotetext, 'cancellationnote' . $attendee->id, array('id' => 'cancellationnote' . $attendee->id));
-                $data[] = ($download) ? $datanote : $icon . $note;
+                if (!$download) {
+                    $data[] = $icon . html_writer::span($cancellationnotetext, 'cancellationnote' . $attendee->id, array('id' => 'cancellationnote' . $attendee->id));
+                } else {
+                    $data[] = $cancellationnotetext;
+                }
             } else {
                 // To get the right approver & approval time we will need to get the approved status record.
                 $sql = 'SELECT fss.id, fss.signupid, fs.userid, fss.createdby, fss.timecreated
@@ -1102,9 +1101,11 @@ if ($show_table) {
                     $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
 
                     $signupnotetext = empty($signupnote) ? '' : $signupnote['signupnote'];
-
-                    $note = html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
-                    $data[] = ($download) ? $datanote : $icon . $note;
+                    if (!$download) {
+                        $data[] = $icon . html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
+                    } else {
+                        $data[] = $signupnotetext;
+                    }
                 }
             }
 
@@ -1163,12 +1164,13 @@ if ($show_table) {
             echo '&nbsp;' . html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'cancelform', 'value' => get_string('cancel')));
             echo html_writer::end_tag('p') . html_writer::end_tag('form');
         }
-        echo $OUTPUT->container_start('actions last');
+
         if ($exports) {
+            echo $OUTPUT->container_start('actions last');
             // Action selector.
             echo html_writer::select($exports, 'f2f-actions', '', array('' => get_string('export', 'totara_reportbuilder')));
+            echo $OUTPUT->container_end();
         }
-        echo $OUTPUT->container_end();
     }
 }
 

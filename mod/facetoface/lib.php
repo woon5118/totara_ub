@@ -5462,41 +5462,24 @@ function facetoface_download_xls($fields, $datarows, $file=null) {
   * @return Returns the CSV file
   */
 function facetoface_download_csv($fields, $datarows, $file=null) {
-    global $DB;
+    global $CFG;
 
-    $filename = clean_filename($file . '.csv');
-    $csv = '';
+    require_once($CFG->libdir . '/csvlib.class.php');
 
-    header("Content-Type: application/download\n");
-    header("Content-Disposition: attachment; filename=$filename");
-    header("Expires: 0");
-    header("Cache-Control: must-revalidate,post-check=0,pre-check=0");
-    header("Pragma: public");
-
-    $delimiter = get_string('listsep', 'langconfig');
-    $encdelim  = '&#' . ord($delimiter) . ';';
-    $row = array();
-    foreach ($fields as $field) {
-        $row[] = str_replace($delimiter, $encdelim, strip_tags($field));
-    }
-
-    $csv .= implode($delimiter, $row) . "\n";
+    $csvexport = new csv_export_writer();
+    $csvexport->set_filename($file);
+    $csvexport->add_data($fields);
 
     $numfields = count($fields);
-
     foreach ($datarows as $record) {
         $row = array();
-        for ($j=0; $j<$numfields; $j++) {
-            if (isset($record[$j])) {
-                $row[] = html_entity_decode(str_replace($delimiter, $encdelim, $record[$j]), ENT_COMPAT, 'UTF-8');
-            } else {
-                $row[] = '';
-            }
+        for ($j = 0; $j < $numfields; $j++) {
+            $row[] = (isset($record[$j]) ? $record[$j] : '');
         }
-        $csv .= implode($delimiter, $row)."\n";
+        $csvexport->add_data($row);
     }
 
-    echo $csv;
+    $csvexport->download_file();
     die;
 }
 
