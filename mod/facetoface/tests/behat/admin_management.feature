@@ -25,8 +25,8 @@ Feature: Add and remove seminar Administrators
     And I add a "Seminar" to section "1"
     And I expand all fieldsets
     And I set the following fields to these values:
-      | Name           | test seminar |
-      | Admin Approval | 1            |
+      | Name                                | test seminar |
+      | Manager and Administrative approval | 1            |
     And I click on "Add approver" "button"
     And I click on "Admin One (admin1@example.com)" "link" in the "Select activity level approvers" "totaradialogue"
     And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
