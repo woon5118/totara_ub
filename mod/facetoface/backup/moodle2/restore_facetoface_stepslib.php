@@ -33,18 +33,23 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $paths[] = new restore_path_element('facetoface', '/activity/facetoface');
         $paths[] = new restore_path_element('facetoface_notification', '/activity/facetoface/notifications/notification');
         $paths[] = new restore_path_element('facetoface_session', '/activity/facetoface/sessions/session');
+        if ($userinfo) {
+            $paths[] = new restore_path_element('facetoface_session_role', '/activity/facetoface/sessions/session/sessions_roles/sessions_role');
+        }
         $paths[] = new restore_path_element('facetoface_session_custom_field', '/activity/facetoface/sessions/session/custom_fields/custom_field');
-        $paths[] = new restore_path_element('facetoface_sessions_date', '/activity/facetoface/sessions/session/sessions_dates/sessions_date');
-        $paths[] = new restore_path_element('facetoface_room', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/room');
-        $paths[] = new restore_path_element('facetoface_room_custom_field', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/room/room_fields/room_field');
-        $paths[] = new restore_path_element('facetoface_asset', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/assets/asset');
-        $paths[] = new restore_path_element('facetoface_asset_custom_field', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/assets/asset/asset_fields/asset_field');
         if ($userinfo) {
             $paths[] = new restore_path_element('facetoface_signup', '/activity/facetoface/sessions/session/signups/signup');
             $paths[] = new restore_path_element('facetoface_signups_status', '/activity/facetoface/sessions/session/signups/signup/signups_status/signup_status');
             $paths[] = new restore_path_element('facetoface_signup_custom_field', '/activity/facetoface/sessions/session/signups/signup/signup_fields/signup_field');
             $paths[] = new restore_path_element('facetoface_cancellation_custom_field', '/activity/facetoface/sessions/session/signups/signup/cancellation_fields/cancellation_field');
-            $paths[] = new restore_path_element('facetoface_session_roles', '/activity/facetoface/sessions/session/session_roles/session_role');
+        }
+        $paths[] = new restore_path_element('facetoface_sessions_date', '/activity/facetoface/sessions/session/sessions_dates/sessions_date');
+        $paths[] = new restore_path_element('facetoface_room', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/room');
+        $paths[] = new restore_path_element('facetoface_room_custom_field', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/room/room_fields/room_field');
+        $paths[] = new restore_path_element('facetoface_asset', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/assets/asset');
+        $paths[] = new restore_path_element('facetoface_asset_custom_field', '/activity/facetoface/sessions/session/sessions_dates/sessions_date/assets/asset/asset_fields/asset_field');
+
+        if ($userinfo) {
             $paths[] = new restore_path_element('facetoface_interest', '/activity/facetoface/interests/interest');
         }
 
@@ -56,47 +61,116 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         global $DB;
 
         $data = (object)$data;
-        $oldid = $data->id;
+
         $data->course = $this->get_courseid();
+        // Keeping or moving these times makes little sense, but it is the expected Moodle way...
+        $data->timecreated = $this->apply_date_offset($data->timecreated);
+        $data->timemodified = $this->apply_date_offset($data->timemodified);
+        if (!empty($data->approvalrole)) {
+            $data->approvalrole = $this->get_mappingid('role', $data->approvalrole);
+        }
+        if (!empty($data->approvaladmins)) {
+            $oldadmins = explode(',', $data->approvaladmins);
+            $admins = array();
+            foreach ($oldadmins as $oldadmin) {
+                $newadmin = $this->get_mappingid('user', $oldadmin);
+                if ($newadmin) {
+                    $admins[] = $newadmin;
+                }
+            }
+            $data->approvaladmins = implode(',', $admins);
+        }
 
         // insert the facetoface record
         $newitemid = $DB->insert_record('facetoface', $data);
         $this->apply_activity_instance($newitemid);
     }
 
-
     protected function process_facetoface_notification($data) {
-        global $DB, $USER;
+        global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
 
         $data->facetofaceid = $this->get_new_parentid('facetoface');
-        $data->course = $this->get_courseid();
+        $data->courseid = $this->get_courseid();
 
+        if (empty($data->templateid) or !$this->get_task()->is_samesite()) {
+            $data->templateid = 0;
+        } else {
+            if (!$DB->record_exists('facetoface_notification_tpl', array('id' => $data->templateid))) {
+                $data->templateid = 0;
+            }
+        }
+
+        // Keeping or moving this time makes little sense, but it is the expected Moodle way...
         $data->timemodified = $this->apply_date_offset($data->timemodified);
-        $data->usermodified = isset($USER->id) ? $USER->id : get_admin()->id;
+        // Always map the old user id, that is the standard way for now.
+        $data->usermodified = $this->get_mappingid('user', $data->usermodified);
 
         // Insert the notification record.
         $newitemid = $DB->insert_record('facetoface_notification', $data);
+        $this->set_mapping('facetoface_notification', $oldid, $newitemid);
     }
 
-
     protected function process_facetoface_session($data) {
-        global $DB, $USER;
+        global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
 
+        if (!empty($data->cancelledstatus)) {
+            // Support for restoring of cancelled sessions is not available!
+            $this->set_mapping('facetoface_session', $oldid, null);
+            return;
+        }
+
         $data->facetoface = $this->get_new_parentid('facetoface');
 
+        // Keeping or moving these two times makes little sense, but it is the expected Moodle way...
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
-        $data->usermodified = isset($USER->id) ? $USER->id : get_admin()->id;
+        // Moodle way is to map the original user even if it makes little sense.
+        if (!empty($data->usermodified)) {
+            $data->usermodified = (int)$this->get_mappingid('user', $data->usermodified);
+        } else {
+            $data->usermodified = 0;
+        }
+        // Following dates are definitely expected to change when course date moves!
+        if (!empty($data->registrationtimestart)) {
+            $data->registrationtimestart = $this->apply_date_offset($data->registrationtimestart);
+        }
+        if (!empty($data->registrationtimefinish)) {
+            $data->registrationtimefinish = $this->apply_date_offset($data->registrationtimefinish);
+        }
 
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_sessions', $data);
-        $this->set_mapping('facetoface_session', $oldid, $newitemid, true); // childs and files by itemname
+        $this->set_mapping('facetoface_session', $oldid, $newitemid, true);
+    }
+
+    protected function process_facetoface_session_role($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->sessionid = $this->get_new_parentid('facetoface_session');
+        if (!$data->sessionid) {
+            return;
+        }
+
+        $data->userid = $this->get_mappingid('user', $data->userid);
+        if (!$data->userid) {
+            return;
+        }
+        $data->roleid = $this->get_mappingid('role', $data->roleid);
+        if (!$data->roleid) {
+            return;
+        }
+
+        // insert the entry record
+        $newitemid = $DB->insert_record('facetoface_session_roles', $data);
     }
 
     protected function process_facetoface_signup($data) {
@@ -106,6 +180,11 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $oldid = $data->id;
 
         $data->sessionid = $this->get_new_parentid('facetoface_session');
+        if (!$data->sessionid) {
+            $this->set_mapping('facetoface_signup', $oldid, null);
+            return;
+        }
+
         $data->userid = $this->get_mappingid('user', $data->userid);
         if (!$data->userid) {
             $this->set_mapping('facetoface_signup', $oldid, null);
@@ -114,12 +193,14 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         if (!empty($data->bookedby)) {
             $data->bookedby = $this->get_mappingid('user', $data->bookedby);
         }
+        if (!empty($data->managerid)) {
+            $data->managerid = $this->get_mappingid('user', $data->managerid);
+        }
 
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_signups', $data);
         $this->set_mapping('facetoface_signup', $oldid, $newitemid, true); // childs and files by itemname
     }
-
 
     protected function process_facetoface_signups_status($data) {
         global $DB;
@@ -129,31 +210,17 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
 
         $data->signupid = $this->get_new_parentid('facetoface_signup');
         if (!$data->signupid) {
+            $this->set_mapping('facetoface_signups_status', $oldid, null);
             return;
         }
 
         $data->timecreated = $this->apply_date_offset($data->timecreated);
+        $data->createdby = (int)$this->get_mappingid('user', $data->createdby);
 
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_signups_status', $data);
-        $this->set_mapping('facetoface_signups_status', $oldid, $newitemid, true); // Childs and files by itemname.
+        $this->set_mapping('facetoface_signups_status', $oldid, $newitemid, true);
     }
-
-
-    protected function process_facetoface_session_roles($data) {
-        global $DB;
-
-        $data = (object)$data;
-        $oldid = $data->id;
-
-        $data->sessionid = $this->get_new_parentid('facetoface_session');
-        $data->userid = $this->get_mappingid('user', $data->userid);
-        $data->roleid = $this->get_mappingid('role', $data->roleid);
-
-        // insert the entry record
-        $newitemid = $DB->insert_record('facetoface_session_roles', $data);
-    }
-
 
     protected function process_facetoface_session_custom_field($data) {
         $data = (object)$data;
@@ -195,6 +262,10 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $oldid = $data->id;
 
         $data->sessionid = $this->get_new_parentid('facetoface_session');
+        if (!$data->sessionid) {
+            $this->set_mapping('facetoface_sessions_date', $oldid, null);
+            return;
+        }
 
         $data->roomid = 0;
         $data->timestart = $this->apply_date_offset($data->timestart);
@@ -213,6 +284,10 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $oldid = $data->id;
 
         $sessionsdateid = $this->get_new_parentid('facetoface_sessions_date');
+        if (!$sessionsdateid) {
+            $this->set_mapping('facetoface_room', $oldid, null);
+            return;
+        }
         $sessiondate = $DB->get_record('facetoface_sessions_dates', array('id' => $sessionsdateid), '*', MUST_EXIST);
 
         if ((int)$data->custom == 1) {
@@ -270,13 +345,17 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
      * @return int new room id
      */
     private function create_facetoface_room(stdClass $room) {
-        global $DB, $USER;
-        $now = time();
+        global $DB;
         unset($room->id);
-        $room->timecreated = $now;
-        $room->timemodified = $now;
-        $room->usercreated = $USER->id; // This is a NEW room, do not use old user id!
-        $room->usermodified = null;
+
+        // Keeping or moving these two times makes little sense, but it is the expected Moodle way...
+        $room->timecreated = $this->apply_date_offset($room->timecreated);
+        $room->timemodified = $this->apply_date_offset($room->timemodified);
+
+        // Moodle way is to map the original user even if it makes little sense.
+        $room->usercreated = $this->get_mappingid('user', $room->usercreated);
+        $room->usermodified = $this->get_mappingid('user', $room->usermodified);
+
         return $DB->insert_record('facetoface_room', $room);
     }
 
@@ -287,6 +366,10 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $oldid = $data->id;
 
         $sessionsdateid = $this->get_new_parentid('facetoface_sessions_date');
+        if (!$sessionsdateid) {
+            $this->set_mapping('facetoface_asset', $oldid, null);
+            return;
+        }
         $sessiondate = $DB->get_record('facetoface_sessions_dates', array('id' => $sessionsdateid), '*', MUST_EXIST);
 
         if ((int)$data->custom == 1) {
@@ -344,13 +427,17 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
      * @return int new asset id
      */
     private function create_facetoface_asset(stdClass $asset) {
-        global $DB, $USER;
-        $now = time();
+        global $DB;
         unset($asset->id);
-        $asset->timecreated = $now;
-        $asset->timemodified = $now;
-        $asset->usercreated = $USER->id; // This is a NEW asset, do not use old user id!
-        $asset->usermodified = null;
+
+        // Keeping or moving these two times makes little sense, but it is the expected Moodle way...
+        $asset->timecreated = $this->apply_date_offset($asset->timecreated);
+        $asset->timemodified = $this->apply_date_offset($asset->timemodified);
+
+        // Moodle way is to map the original user even if it makes little sense.
+        $asset->usercreated = $this->get_mappingid('user', $asset->usercreated);
+        $asset->usermodified = $this->get_mappingid('user', $asset->usermodified);
+
         return $DB->insert_record('facetoface_asset', $asset);
     }
 
@@ -402,6 +489,9 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
 
         $data->facetoface = $this->get_new_parentid('facetoface');
         $data->userid = $this->get_mappingid('user', $data->userid);
+        if (!$data->userid) {
+            return;
+        }
 
         // Insert the entry record.
         $newitemid = $DB->insert_record('facetoface_interest', $data);

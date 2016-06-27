@@ -66,49 +66,48 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         // To know if we are including userinfo
         $userinfo = $this->get_setting_value('userinfo');
 
-
         // Define each element separated
         $facetoface = new backup_nested_element('facetoface', array('id'), array(
             'name', 'intro', 'introformat', 'thirdparty', 'thirdpartywaitlist', 'display',
             'timecreated', 'timemodified', 'shortname', 'showoncalendar', 'usercalentry',
-            'approvaltype', 'approvalterms', 'approvalrole', 'approvaladmins', 'multiplesessions',
-            'completionstatusrequired', 'managerreserve', 'maxmanagerreserves', 'reservecanceldays',
-            'reservedays', 'selfapprovaltandc', 'declareinterest', 'interestonlyiffull', 'selectpositiononsignup',
-            'forceselectposition', 'allowcancellationsdefault', 'cancellationscutoffdefault'));
-        $notifications = new backup_nested_element('notifications');
+            'multiplesessions', 'completionstatusrequired', 'managerreserve', 'maxmanagerreserves',
+            'reservecanceldays', 'reservedays', 'declareinterest', 'interestonlyiffull',
+            'allowcancellationsdefault', 'cancellationscutoffdefault', 'selectpositiononsignup',
+            'forceselectposition', 'approvaltype', 'approvalrole', 'approvalterms', 'approvaladmins'));
 
+        $notifications = new backup_nested_element('notifications');
         $notification = new backup_nested_element('notification', array('id'), array(
             'type', 'conditiontype', 'scheduleunit', 'scheduleamount', 'scheduletime', 'ccmanager', 'managerprefix',
-            'title', 'body', 'booked', 'waitlisted', 'cancelled', 'courseid', 'facetofaceid', 'status',
+            'title', 'body', 'booked', 'waitlisted', 'cancelled', 'requested', 'templateid', 'status',
             'issent', 'timemodified', 'usermodified'));
 
         $sessions = new backup_nested_element('sessions');
-
         $session = new backup_nested_element('session', array('id'), array(
-            'facetoface', 'capacity', 'allowoverbook', 'details', 'duration', 'normalcost', 'discountcost', 'timecreated',
-            'timemodified', 'selfapproval', 'mincapacity', 'cutoff', 'waitlisteveryone', 'allowcancellations',
-            'cancellationcutoff'));
-
-        $signups = new backup_nested_element('signups');
-
-        $signup = new backup_nested_element('signup', array('id'), array(
-            'sessionid', 'userid', 'mailedreminder', 'discountcode', 'notificationtype', 'archived', 'bookedby',
-            'positionid', 'positiontype', 'positionassignmentid'));
-
-        $signups_status = new backup_nested_element('signups_status');
-
-        $signup_status = new backup_nested_element('signup_status', array('id'), array(
-            'signupid', 'statuscode', 'superceded', 'grade', 'note', 'advice', 'createdby', 'timecreated'));
+            'capacity', 'allowoverbook', 'waitlisteveryone',  'details', 'duration', 'normalcost',
+            'discountcost', 'allowcancellations', 'cancellationcutoff', 'timecreated', 'timemodified',
+            'usermodified', 'selfapproval', 'mincapacity', 'cutoff', 'sendcapacityemail',
+            'registrationtimestart', 'registrationtimefinish', 'cancelledstatus'));
 
         $session_roles = new backup_nested_element('session_roles');
-
         $session_role = new backup_nested_element('session_role', array('id'), array(
-            'sessionid', 'roleid', 'userid'));
+            'roleid', 'userid'));
 
         $customfields = new backup_nested_element('custom_fields');
-
         $customfield = new backup_nested_element('custom_field', array('id'), array(
             'field_name', 'field_type', 'field_data', 'paramdatavalue'));
+
+        $sessioncancelfields = new backup_nested_element('sessioncancel_fields');
+        $sessioncancelfield = new backup_nested_element('sessioncancel_field', array('id'), array(
+            'field_name', 'field_type', 'field_data', 'paramdatavalue'));
+
+        $signups = new backup_nested_element('signups');
+        $signup = new backup_nested_element('signup', array('id'), array(
+            'userid', 'discountcode', 'notificationtype', 'archived', 'bookedby',
+            'positionid', 'positiontype', 'positionassignmentid', 'managerid'));
+
+        $signups_status = new backup_nested_element('signups_status');
+        $signup_status = new backup_nested_element('signup_status', array('id'), array(
+            'statuscode', 'superceded', 'grade', 'createdby', 'timecreated'));
 
         $signup_fields = new backup_nested_element('signup_fields');
         $signup_field  = new backup_nested_element('signup_field', array('id'), array(
@@ -119,7 +118,6 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             'field_name', 'field_type', 'field_data', 'paramdatavalue'));
 
         $sessions_dates = new backup_nested_element('sessions_dates');
-
         $sessions_date = new backup_nested_element('sessions_date', array('id'), array(
             'sessiontimezone', 'timestart', 'timefinish'));
 
@@ -138,28 +136,15 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             'field_name', 'field_type', 'field_data', 'paramdatavalue'));
 
         $interests = new backup_nested_element('interests');
-
         $interest = new backup_nested_element('interest', array('id'), array(
-            'facetoface', 'userid', 'timedeclared', 'reason'));
+            'userid', 'timedeclared', 'reason'));
 
-        // Build the tree
+        // Build the tree (in the same order as above).
         $facetoface->add_child($notifications);
         $notifications->add_child($notification);
 
         $facetoface->add_child($sessions);
         $sessions->add_child($session);
-
-        $session->add_child($signups);
-        $signups->add_child($signup);
-
-        $signup->add_child($signups_status);
-        $signups_status->add_child($signup_status);
-
-        $signup_fields->add_child($signup_field);
-        $signup->add_child($signup_fields);
-
-        $cancellation_fields->add_child($cancellation_field);
-        $signup->add_child($cancellation_fields);
 
         $session->add_child($session_roles);
         $session_roles->add_child($session_role);
@@ -167,27 +152,60 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session->add_child($customfields);
         $customfields->add_child($customfield);
 
+        $session->add_child($sessioncancelfields);
+        $sessioncancelfields->add_child($sessioncancelfield);
+
+        $session->add_child($signups);
+        $signups->add_child($signup);
+
+        $signup->add_child($signups_status);
+        $signups_status->add_child($signup_status);
+
+        $signup->add_child($signup_fields);
+        $signup_fields->add_child($signup_field);
+
+        $signup->add_child($cancellation_fields);
+        $cancellation_fields->add_child($cancellation_field);
+
         $session->add_child($sessions_dates);
         $sessions_dates->add_child($sessions_date);
 
-        $room_fields->add_child($room_field);
-        $room->add_child($room_fields);
         $sessions_date->add_child($room);
+        $room->add_child($room_fields);
+        $room_fields->add_child($room_field);
 
-        $asset_fields->add_child($asset_field);
-        $asset->add_child($asset_fields);
-        $assets->add_child($asset);
         $sessions_date->add_child($assets);
+        $assets->add_child($asset);
+        $asset->add_child($asset_fields);
+        $asset_fields->add_child($asset_field);
 
         $facetoface->add_child($interests);
         $interests->add_child($interest);
 
-        // Define sources
+        // Define sources (in the same order as above).
         $facetoface->set_source_table('facetoface', array('id' => backup::VAR_ACTIVITYID));
 
         $notification->set_source_table('facetoface_notification', array('facetofaceid' => backup::VAR_PARENTID));
 
         $session->set_source_table('facetoface_sessions', array('facetoface' => backup::VAR_PARENTID));
+
+        if ($userinfo) {
+            $session_role->set_source_table('facetoface_session_roles', array('sessionid' => backup::VAR_PARENTID));
+        }
+
+        $this->add_customfield_set_source($customfield, 'facetoface_session', 'facetofacesessionid');
+
+        $this->add_customfield_set_source($sessioncancelfield, 'facetoface_sessioncancel', 'facetofacecancellationid');
+
+        if ($userinfo) {
+            $signup->set_source_table('facetoface_signups', array('sessionid' => backup::VAR_PARENTID));
+
+            $signup_status->set_source_table('facetoface_signups_status', array('signupid' => backup::VAR_PARENTID));
+
+            $this->add_customfield_set_source($signup_field, 'facetoface_signup', 'facetofacesignupid');
+
+            $this->add_customfield_set_source($cancellation_field, 'facetoface_cancellation', 'facetofacecancellationid');
+        }
 
         $sessions_date->set_source_table('facetoface_sessions_dates', array('sessionid' => backup::VAR_PARENTID));
 
@@ -206,31 +224,25 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $this->add_customfield_set_source($asset_field, 'facetoface_asset', 'facetofaceassetid');
 
         if ($userinfo) {
-            $signup->set_source_table('facetoface_signups', array('sessionid' => backup::VAR_PARENTID));
-
-            $signup_status->set_source_table('facetoface_signups_status', array('signupid' => backup::VAR_PARENTID));
-
-            $session_role->set_source_table('facetoface_session_roles', array('sessionid' => backup::VAR_PARENTID));
-
             $interest->set_source_table('facetoface_interest', array('facetoface' => backup::VAR_PARENTID));
         }
 
-        $this->add_customfield_set_source($customfield, 'facetoface_session', 'facetofacesessionid');
+        // Define id annotations (in the same order as above).
+        $facetoface->annotate_ids('role', 'approvalrole');
+        // File facetoface.approvaladmins is a comma separated list, we cannot annotate it automatically.
 
-        $this->add_customfield_set_source($signup_field, 'facetoface_signup', 'facetofacesignupid');
-
-        $this->add_customfield_set_source($cancellation_field, 'facetoface_cancellation', 'facetofacecancellationid');
-
-        // Define id annotations
-        $signup->annotate_ids('user', 'userid');
-
-        $signup->annotate_ids('user', 'bookedby');
+        $notification->annotate_ids('user', 'usermodified');
 
         $session_role->annotate_ids('role', 'roleid');
-
         $session_role->annotate_ids('user', 'userid');
 
-        $interest->annotate_ids('user', 'userid');
+        $session->annotate_ids('user', 'usermodified');
+
+        $signup->annotate_ids('user', 'userid');
+        $signup->annotate_ids('user', 'bookedby');
+        $signup->annotate_ids('user', 'managerid');
+
+        $signup_status->annotate_ids('user', 'createdby');
 
         $room->annotate_ids('user', 'usercreated');
         $room->annotate_ids('user', 'usermodified');
@@ -238,8 +250,10 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $asset->annotate_ids('user', 'usercreated');
         $asset->annotate_ids('user', 'usermodified');
 
+        $interest->annotate_ids('user', 'userid');
+
         // Define file annotations
-        // None for F2F
+        // TODO: TL-9408 None for F2F yet
 
         // Return the root element (facetoface), wrapped into standard activity structure
         return $this->prepare_activity_structure($facetoface);
