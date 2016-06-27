@@ -1282,6 +1282,7 @@ class program {
         global $CFG, $DB, $USER, $OUTPUT, $PAGE;
 
         $iscertif = (isset($this->certifid) && $this->certifid > 0) ? true : false;
+        $userid = $userid ? $userid : $USER->id;
 
         // Div created to show notifications. Needed when requesting extensions.
         $out = html_writer::tag('div', '', array('id' => 'totara-header-notifications'));
@@ -1305,13 +1306,10 @@ class program {
         }
 
         $userassigned = $this->user_is_assigned($userid);
-        $timedue = null;
 
         // Display the reason why this user has been assigned to the program (if it is mandatory for the user).
         if ($userassigned) {
-            $prog_completion = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $userid, 'coursesetid' => 0));
             $user_assignments = $DB->get_records_select('prog_user_assignment', "programid = ? AND userid = ?", array($this->id, $userid));
-            $timedue = $prog_completion->timedue;
 
             if (count($user_assignments) > 0) {
                 if ($viewinganothersprogram) {
@@ -1336,11 +1334,10 @@ class program {
         }
 
         if ($iscertif) {
-            global $CERTIFPATH;
-            $userid = (($userid) ? $userid : $USER->id);
-            $certifcompletion = $DB->get_record('certif_completion', array('certifid' => $this->certifid, 'userid' =>  $userid));
+            list($certifcompletion, $prog_completion) = certif_load_completion($this->id, $userid, false);
 
             if ($certifcompletion) {
+                $certifstate = certif_get_completion_state($certifcompletion);
                 $now = time();
                 $out .= html_writer::start_tag('p', array('class' => 'certifpath'));
                 if ($certifcompletion->certifpath == CERTIFPATH_CERT) {
@@ -1350,18 +1347,33 @@ class program {
                         $out .= get_string('certinprogress', 'totara_certification');
                     }
                 } else {
-                    if ($now > $certifcompletion->timewindowopens) {
+                    if ($certifstate == CERTIFCOMPLETIONSTATE_CERTIFIED && $now > $certifcompletion->timewindowopens + DAYSECS) {
+                        $out .= get_string('currentlycertified', 'totara_certification');
+                        $lateopenwarning = get_string('recertwindowopendateverylate', 'totara_certification',
+                            userdate($certifcompletion->timewindowopens, get_string('strftimedatetime', 'langconfig')));
+                        $out .= html_writer::tag('div', $lateopenwarning, array('class' => 'notifyproblem'));
+
+                    } else if ($certifstate == CERTIFCOMPLETIONSTATE_CERTIFIED && $now > $certifcompletion->timewindowopens) {
+                        $out .= get_string('currentlycertified', 'totara_certification');
+                        $lateopenwarning = get_string('recertwindowopendatelate', 'totara_certification',
+                            userdate($certifcompletion->timewindowopens, get_string('strftimedatetime', 'langconfig')));
+                        $out .= html_writer::tag('div', $lateopenwarning, array('class' => 'notifyproblem'));
+
+                    } else if ($certifstate == CERTIFCOMPLETIONSTATE_CERTIFIED) {
+                        $out .= get_string('currentlycertified', 'totara_certification');
+                        $out .= get_string('recertwindowopendate', 'totara_certification',
+                            userdate($certifcompletion->timewindowopens, get_string('strftimedatetime', 'langconfig')));
+
+                    } else {
                         $out .= get_string('recertwindowopen', 'totara_certification');
                         $out .= get_string('recertwindowexpiredate', 'totara_certification',
-                                userdate($certifcompletion->timeexpires, get_string('strftimedatetime', 'langconfig')));
-                    } else {
-                        $out .= get_string('certcomplete', 'totara_certification');
-                        $out .= get_string('recertwindowopendate', 'totara_certification',
-                                userdate($certifcompletion->timewindowopens, get_string('strftimedatetime', 'langconfig')));
+                            userdate($certifcompletion->timeexpires, get_string('strftimedatetime', 'langconfig')));
                     }
                 }
                 $out .= html_writer::end_tag('p');
             }
+        } else {
+            $prog_completion = prog_load_completion($this->id, $userid, false);
         }
 
         // display the start date, due date and progress bar.
@@ -1387,6 +1399,7 @@ class program {
             }
 
             if ($prog_completion) {
+                $timedue = $prog_completion->timedue;
                 $startdatestr = ($prog_completion->timestarted != 0
                                 ? $this->display_date_as_text($prog_completion->timestarted)
                                 : get_string('unknown', 'totara_program'));
@@ -1423,7 +1436,9 @@ class program {
 
         // course sets - for certify or recertify paths
         if ($iscertif) {
-            if (is_siteadmin()) {
+            // Before window opens, ideally we'd show the last path that they completed, but assuming the recert path because
+            // of an existing history record is inaccurate, due to expiry and import. So instead we'll show both paths.
+            if (is_siteadmin() || $certifcompletion && $certifstate == CERTIFCOMPLETIONSTATE_CERTIFIED) {
                 $out .= $OUTPUT->heading(get_string('oricertpath', 'totara_certification'), 2);
                 $out .= $this->display_courseset(CERTIFPATH_CERT, $userid, $viewinganothersprogram);
 
@@ -1433,12 +1448,7 @@ class program {
 
                 $out .= $this->display_courseset(CERTIFPATH_RECERT, $userid, $viewinganothersprogram);
             } else if ($certifcompletion) {
-                // If on certification path OR if on recertification but not recertified before: display certification coursesset,
-                // Else display recert path.
-                $histcount = $DB->count_records('certif_completion_history', array('certifid' => $this->certifid, 'userid' => $userid, 'unassigned' => 0));
-
-                if ($certifcompletion->certifpath == CERTIFPATH_CERT ||
-                                ($certifcompletion->certifpath == CERTIFPATH_RECERT && !$histcount)) {
+                if ($certifcompletion->certifpath == CERTIFPATH_CERT) {
                     $out .= $OUTPUT->heading(get_string('oricertpath', 'totara_certification'), 2);
                     $out .= $this->display_courseset(CERTIFPATH_CERT, $userid, $viewinganothersprogram);
                 } else {
