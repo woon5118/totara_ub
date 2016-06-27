@@ -30,7 +30,7 @@
     border-spacing: 0;
     border-bottom-width: 0;
     border-right-width: 0;
-    margin-bottom: 2em;
+    margin-bottom: 0;
 }
 .dir-rtl.path-grade-report-grader .gradeparent table {
     border-left-width: 0;

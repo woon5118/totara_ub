@@ -595,6 +595,7 @@ FloatingHeaders.prototype = {
         this._eventHandles.push(
             // Listen for window scrolls, resizes, and rotation events.
             Y.one(Y.config.win).on('scroll', this._handleScrollEvent, this),
+            Y.one('.gradeparent').on('scroll', this._handleScrollEvent, this),
             Y.one(Y.config.win).on('resize', this._handleResizeEvent, this),
             Y.one(Y.config.win).on('orientationchange', this._handleResizeEvent, this),
             Y.Global.on('dock:shown', this._handleResizeEvent, this),
@@ -613,10 +614,10 @@ FloatingHeaders.prototype = {
         var userColumn = Y.all(SELECTORS.USERCELL),
 
         // Create a floating table.
-            floatingUserColumn = Y.Node.create('<div aria-hidden="true" role="presentation" class="floater sideonly"></div>'),
+        floatingUserColumn = Y.Node.create('<div aria-hidden="true" role="presentation" class="floater sideonly"></div>'),
 
         // Get the XY for the floating element.
-            coordinates = this._getRelativeXY(this.firstUserCell);
+        coordinates = this._getRelativeXY(this.firstUserCell);
 
         // Generate the new fields.
         userColumn.each(function(node) {
@@ -904,8 +905,6 @@ FloatingHeaders.prototype = {
             userColumnStyles = {},
             footerStyles = {},
             coord = 0,
-            floatingUserTriggerPoint = 0,       // The X position at which the floating should start.
-            floatingUserRelativePoint = 0,      // The point to use when calculating the new position.
             headerFloats = false,
             userFloats = false,
             footerFloats = false,
@@ -936,28 +935,15 @@ FloatingHeaders.prototype = {
         }
 
         // User column position.
-        if (window.right_to_left()) {
-            floatingUserTriggerPoint = Y.config.win.innerWidth + Y.config.win.pageXOffset - this.dockWidth;
-            floatingUserRelativePoint = floatingUserTriggerPoint - this.firstUserCellWidth;
-            userFloats = floatingUserTriggerPoint < (this.firstUserCellLeft + this.firstUserCellWidth);
-            leftTitleFloats = (floatingUserTriggerPoint - this.firstNonUserCellWidth) <
-                              (this.firstNonUserCellLeft + this.firstUserCellWidth);
-        } else {
-            floatingUserRelativePoint = Y.config.win.pageXOffset;
-            floatingUserTriggerPoint = floatingUserRelativePoint + this.dockWidth;
-            userFloats = floatingUserTriggerPoint > this.firstUserCellLeft;
-            leftTitleFloats = floatingUserTriggerPoint > (this.firstNonUserCellLeft - this.firstUserCellWidth);
-        }
+        // TL-9343
+        var gradeparent = Y.one('.gradeparent').getDOMNode();
+        // This page doesn't get translated for some reason.
+        leftTitleFloats = gradeparent.scrollLeft > (Y.one('.gradeparent .avg.lastrow th').get('offsetWidth') - Y.one('.gradeparent .user').get('offsetWidth'));
 
-        if (userFloats) {
-            coord = this._getRelativeXFromX(floatingUserRelativePoint);
-            userColumnStyles.left = coord + 'px';
-            userColumnHeaderStyles.left = coord + 'px';
-        } else {
-            coord = this._getRelativeXFromX(this.firstUserCellLeft);
-            userColumnStyles.left = coord + 'px';
-            userColumnHeaderStyles.left = coord + 'px';
-        }
+        // User column always floats in Totara as the grade table is scrolled (as opposed to Moodle where the whole page scrolls).
+        userFloats = true;
+        userColumnStyles.left = (gradeparent.scrollLeft) + 'px';
+        userColumnHeaderStyles.left = (gradeparent.scrollLeft) + 'px';
 
         // Update the miscellaneous left-only floats.
         Y.Object.each(this.floatingHeaderRow, function(origin, key) {
@@ -968,7 +954,6 @@ FloatingHeaders.prototype = {
 
         // Update footer.
         if (this.footerRow) {
-            footerStyles.left = this._getRelativeXFromX(this.headerRow.getX());
 
             // Determine whether the footer should now be shown as sticky.
             var pageHeight = Y.config.win.innerHeight,
