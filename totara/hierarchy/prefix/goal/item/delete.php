@@ -30,43 +30,34 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 goal::check_feature_enabled();
 
 $goalpersonalid = required_param('goalpersonalid', PARAM_INT);
-$userid = required_param('userid', PARAM_INT);
 $delete = optional_param('del', '', PARAM_ALPHANUM);
 
 // Check permissions before we do anything.
-$context = context_user::instance($userid);
+$goalpersonal = goal::get_goal_item(array('id' => $goalpersonalid), goal::SCOPE_PERSONAL);
+if (empty($goalpersonal)) {
+    print_error('error:goalnotfound', 'totara_hierarchy');
+}
+
+$context = context_user::instance($goalpersonal->userid);
 $can_edit = has_capability('totara/hierarchy:managegoalassignments', context_system::instance())
-    || (totara_is_manager($userid) && has_capability('totara/hierarchy:managestaffpersonalgoal', $context))
-    || ($USER->id == $userid && has_capability('totara/hierarchy:manageownpersonalgoal', $context));
+    || (totara_is_manager($goalpersonal->userid) && has_capability('totara/hierarchy:managestaffpersonalgoal', $context))
+    || ($USER->id == $goalpersonal->userid && has_capability('totara/hierarchy:manageownpersonalgoal', $context));
 
 if (!$can_edit) {
     print_error('error:deleteusergoals', 'totara_hierarchy');
 }
 
-$ret_url = new moodle_url("/totara/hierarchy/prefix/goal/mygoals.php", array('userid' => $userid));
-
-$goalpersonal = goal::get_goal_item(array('id' => $goalpersonalid), goal::SCOPE_PERSONAL);
-if (empty($goalpersonal)) {
-    // Goal isn't there to delete, just return.
-    redirect($ret_url);
-}
-
 $strdelgoals = get_string('removegoal', 'totara_hierarchy');
+$ret_url = new moodle_url("/totara/hierarchy/prefix/goal/mygoals.php", array('userid' => $goalpersonal->userid));
 
 // Set up the page.
-// String of params needed in non-js url strings.
-$urlparams = array('goalpersonalid' => $goalpersonalid,
-                   'userid' => $userid,
-                  );
-
-// Set up the page.
+$urlparams = array('goalpersonalid' => $goalpersonalid);
 $PAGE->set_url(new moodle_url('/totara/hierarchy/prefix/goal/item/delete.php'), $urlparams);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
 $PAGE->set_totara_menu_selected('mygoals');
 $PAGE->set_title($strdelgoals);
 $PAGE->set_heading($strdelgoals);
-
 
 if ($delete) {
     // Delete.
@@ -95,20 +86,20 @@ if ($delete) {
 
 // Display confirmation.
 $PAGE->navbar->add(get_string('mygoals', 'totara_hierarchy'),
-    new moodle_url('/totara/hierarchy/item/prefix/goal/mygoals.php', array('userid' => $userid)));
+    new moodle_url('/totara/hierarchy/item/prefix/goal/mygoals.php', array('userid' => $goalpersonal->userid)));
 $PAGE->navbar->add(format_string($goalpersonal->name),
     new moodle_url('/totara/hierarchy/prefix/goal/item/view.php', array('goalpersonalid' => $goalpersonalid)));
 $PAGE->navbar->add(get_string('deletegoal', 'totara_hierarchy'));
 
 echo $OUTPUT->header();
 
-$str_param = new stdClass();
-$str_param->goalname = $goalpersonal->name;
-$str_param->username = fullname($DB->get_record('user', array('id' => $userid)));
+$strvars = new stdClass();
+$strvars->goalname = $goalpersonal->name;
+$strvars->username = fullname($DB->get_record('user', array('id' => $goalpersonal->userid)));
 
-$strdelete = get_string('confirmpersonaldelete', 'totara_hierarchy', $str_param);
+$strdelete = get_string('confirmpersonaldelete', 'totara_hierarchy', $strvars);
 
-$del_params = array('goalpersonalid' => $goalpersonalid, 'userid' => $userid, 'del' => md5($goalpersonal->timemodified),
+$del_params = array('goalpersonalid' => $goalpersonalid, 'del' => md5($goalpersonal->timemodified),
         'sesskey' => $USER->sesskey);
 $del_url = new moodle_url("/totara/hierarchy/prefix/goal/item/delete.php", $del_params);
 

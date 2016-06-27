@@ -483,6 +483,7 @@ $string['error:editgoals'] = 'You do not have permission to edit this goal';
 $string['error:evidencealreadyexists'] = 'Could not create new goal evidence because a record already exists for that user and goal';
 $string['error:failedbulkmove'] = 'There was a problem moving those items';
 $string['error:findgoals'] = 'You do not have permission to find goal(s)';
+$string['error:goalnotfound'] = 'The goal could not be found';
 $string['error:hierarchyprefixnotfound'] = 'Hierarchy prefix {$a} not found';
 $string['error:hierarchytypenotfound'] = 'Hierarchy type {$a} not found';
 $string['error:includechildrencohort'] = 'can not include children of a non hierarchy item, Audiences';

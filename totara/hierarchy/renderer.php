@@ -732,12 +732,10 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 $jsparams = array('userid' => $userid, 'personalscope' => goal::SCOPE_PERSONAL);
                 $PAGE->requires->js_call_amd('totara_hierarchy/mygoals', 'init_personal', $jsparams);
                 // Set up the edit and delete icons.
-                $edit_url = new moodle_url('/totara/hierarchy/prefix/goal/item/edit_personal.php',
-                        array('userid' => $userid, 'id' => $goalid));
+                $edit_url = new moodle_url('/totara/hierarchy/prefix/goal/item/edit_personal.php', array('id' => $goalid));
                 $edit_str = get_string('edit');
                 $edit_button = $this->output->action_icon($edit_url, new pix_icon('t/edit', $edit_str));
-                $delete_url = new moodle_url('/totara/hierarchy/prefix/goal/item/delete.php',
-                        array('goalpersonalid' => $goalid, 'userid' => $userid));
+                $delete_url = new moodle_url('/totara/hierarchy/prefix/goal/item/delete.php', array('goalpersonalid' => $goalid));
                 $delete_str = get_string('delete');
                 $delete_button = $this->output->action_icon($delete_url, new pix_icon('t/delete', $delete_str));
             } else {

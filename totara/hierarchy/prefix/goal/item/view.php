@@ -49,7 +49,7 @@ if (!$permissions = $goal->get_permissions(null, $userid)) {
 
 extract($permissions);
 
-$edit_params = array('id' => $goalpersonalid, 'userid' => $userid);
+$edit_params = array('id' => $goalpersonalid);
 $edit_url = new moodle_url('/totara/hierarchy/prefix/goal/item/edit_personal.php', $edit_params);
 
 $name = format_string($goalpersonal->name);
