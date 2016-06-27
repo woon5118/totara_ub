@@ -49,6 +49,8 @@ Feature: Use the multi-item hierarchy filter
     And I press "Create report"
     And I click on "Filters" "link" in the ".tabtree" "css_element"
     And I select "User's Position (multi-item)" from the "newstandardfilter" singleselect
+    And I press "Add"
+    And I select "User's Position Framework ID" from the "newstandardfilter" singleselect
     And I press "Save changes"
     And I follow "View This Report"
     Then I should see "user1" in the ".reportbuilder-table" "css_element"
@@ -56,6 +58,15 @@ Feature: Use the multi-item hierarchy filter
     And I should see "user3" in the ".reportbuilder-table" "css_element"
     And I should see "user4" in the ".reportbuilder-table" "css_element"
     And I should see "user5" in the ".reportbuilder-table" "css_element"
+    When I select "is greater than or equal to" from the "user-positionframeworkid_op" singleselect
+    And I set the field "user-positionframeworkid" to "1"
+    And I click on "Search" "button" in the "#fgroup_id_submitgroupstandard" "css_element"
+    Then I should see "user1"
+    And I should see "user2" in the ".reportbuilder-table" "css_element"
+    And I should see "user3" in the ".reportbuilder-table" "css_element"
+    And I should see "user4" in the ".reportbuilder-table" "css_element"
+    And I should not see "user5" in the ".reportbuilder-table" "css_element"
+    And I click on "Clear" "button" in the "#fgroup_id_submitgroupstandard" "css_element"
     When I click on "Choose Positions" "link" in the "Search by" "fieldset"
     And I click on "Position One" "link" in the "Choose Positions" "totaradialogue"
     And I click on "Save" "button" in the "Choose Positions" "totaradialogue"

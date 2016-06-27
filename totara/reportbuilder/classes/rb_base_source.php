@@ -3782,7 +3782,7 @@ abstract class rb_base_source {
                 'user',
                 'positionframeworkid',
                 get_string('positionframeworkid', 'totara_reportbuilder'),
-                'text'
+                'number'
         );
         $filteroptions[] = new rb_filter_option(
                 'user',
