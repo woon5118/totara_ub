@@ -147,30 +147,6 @@ if ($restoredefaults && $confirm) {
     totara_set_notification(get_string('notificationssuccessfullyreset', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
 }
 
-// Check for form submission
-if (($data = data_submitted()) && !empty($data->bulk_update)) {
-    // Check sesskey
-    if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
-    }
-
-    if (in_array($data->bulk_update, array('set_active', 'set_inactive'))) {
-        // Perform bulk action.
-        if (!empty($notifications)) {
-            $selected = facetoface_get_selected_report_items('notification', $update, $notifications);
-
-            foreach ($selected as $item) {
-                $notification = new facetoface_notification(array('id' => $item->id), true);
-                $notification->status = $data->bulk_update == 'set_active' ? 1 : 0;
-                $notification->update();
-            }
-        }
-    }
-
-    facetoface_reset_selected_report_items('notification', $update);
-    redirect($redirectto);
-}
-
 $streditinga = get_string('editinga', 'moodle', 'facetoface');
 $strmodulenameplural = get_string('modulenameplural', 'facetoface');
 

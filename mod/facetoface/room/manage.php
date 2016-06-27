@@ -93,28 +93,6 @@ if ($delete) {
     totara_set_notification(get_string('roomhidden', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
 }
 
-// Check for form submission.
-if (($data = data_submitted()) && !empty($data->bulk_update)) {
-    if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
-    }
-
-    if ($data->bulk_update == 'delete') {
-        // Perform bulk delete action.
-        if ($rooms = $DB->get_records('facetoface_room', null, '', 'id')) {
-
-            $selected = facetoface_get_selected_report_items('room', null, $rooms);
-
-            foreach ($selected as $item) {
-                $DB->delete_records('facetoface_room', array('id' => $item->id));
-            }
-        }
-    }
-
-    facetoface_reset_selected_report_items('room');
-    redirect($redirectto);
-}
-
 local_js(array(
     TOTARA_JS_DIALOG,
     )
