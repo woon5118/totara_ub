@@ -22,9 +22,9 @@
  */
 
 require_once '../../config.php';
-require_once 'lib.php';
-require_once 'renderer.php';
-require_once($CFG->dirroot . '/totara/customfield/field/location/field.class.php');
+require_once $CFG->dirroot . '/mod/facetoface/lib.php';
+require_once $CFG->dirroot . '/mod/facetoface/renderer.php';
+require_once($CFG->dirroot . '/totara/customfield/field/location/field.class.php'); // TODO: TL-9425 this hack is unacceptable.
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
 $f = optional_param('f', 0, PARAM_INT); // facetoface ID
@@ -136,46 +136,28 @@ if (count($locations) > 2) {
     echo html_writer::end_tag('div'). html_writer::end_tag('form');
 }
 
-$rooms = facetoface_get_rooms($facetoface->id);
+$rooms = facetoface_get_used_rooms($facetoface->id);
 if (count($rooms) > 1) {
     $roomselect = array(0 => get_string('allrooms', 'facetoface'));
-    $onlyrooms = $roomselect;
-    $notonlytrooms = false;
+    // Here used to be some fancy code that deal with missing room names,
+    // that magic cannot be done easily any more, allow selection of named rooms only here.
     foreach ($rooms as $rid => $room) {
-
         $roomname = format_string($room->name);
         if ($roomname === '') {
-            $roomname = get_string('notspecified', 'facetoface');
+            continue;
         }
-        $roomdetails = array();
-        /*
-         * Todo: Set room building and address values to use the customfields before uncommenting the below code.
-        $building = format_string($room->building);
-        if ($building === '') {
-            $building = get_string('notspecified', 'facetoface');
-        } else {
-            $notonlytrooms = true;
-        }
-        $roomdetails[] = get_string('building', 'facetoface') . ': ' . $building;
-        $address = format_string($room->address);
-        if ($address === '') {
-            $address = get_string('notspecified', 'facetoface');
-        } else {
-            $notonlytrooms = true;
-        }
-        $roomdetails[] = get_string('address', 'facetoface') . ': ' . $address;
-        */
-        $roomdetails = implode(' - ', $roomdetails);
-        $roomselect[sha1($roomdetails)][$roomdetails][$rid] = get_string('room', 'facetoface') . ': ' . $roomname;
-        $onlyrooms[$rid] = $roomname;
-    }
-    if (!$notonlytrooms) {
-        // There are only N/As in buildings and rooms, let's just show room names.
-        $roomselect = $onlyrooms;
-        $roomselect[$rid] = format_string($room->name);
+        $roomselect[$rid] = $roomname;
     }
 
-    echo $OUTPUT->single_select($PAGE->url, 'roomid', $roomselect, $roomid, null, null, array('label' => get_string('filterbyroom', 'facetoface')));
+    if (!isset($roomselect[$roomid])) {
+        $roomid = 0;
+    }
+
+    if (count($roomselect) > 2) {
+        echo $OUTPUT->single_select($PAGE->url, 'roomid', $roomselect, $roomid, null, null, array('label' => get_string('filterbyroom', 'facetoface')));
+    }
+} else {
+    $roomid = 0;
 }
 
 $sessions = facetoface_get_sessions($facetoface->id, $location, $roomid);

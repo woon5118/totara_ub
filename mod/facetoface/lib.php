@@ -35,6 +35,7 @@ require_once $CFG->dirroot.'/mod/facetoface/messaginglib.php';
 require_once $CFG->dirroot.'/mod/facetoface/notification/lib.php';
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/signup_form.php');
+require_once($CFG->dirroot . '/mod/facetoface/room/lib.php');
 
 /**
  * Definitions for setting notification types
@@ -848,6 +849,11 @@ function facetoface_cancel_session($session, $fromform) {
     $sessionobj->cancelledstatus = $session->cancelledstatus;
     $DB->set_field('facetoface_sessions', 'cancelledstatus', $session->cancelledstatus, array('id' => $session->id));
 
+    // Unlink rooms, orphaned custom rooms are deleted from cleanup task.
+    $DB->set_field('facetoface_sessions_dates', 'roomid', 0, array('sessionid' => $session->id));
+
+    // TODO: TL-9455 Unlink assets and fix UI and cover with tests
+
     // Remove entries from the calendars.
     facetoface_remove_all_calendar_entries($session);
 
@@ -1043,7 +1049,7 @@ function facetoface_delete_session($session) {
 
         if (!$inuse) {
             // Purge the orphaned custom room.
-            $DB->delete_records('facetoface_room', array('id' => $roomid));
+            facetoface_delete_room($roomid);
         }
     }
 
@@ -1497,15 +1503,13 @@ function facetoface_get_sessions($facetofaceid, $location = '', $roomid = 0) {
         $locationwhere = "AND $locationsql";
     }
 
-    $roomjoin = '';
     $roomwhere = '';
     $roomparams = array();
     if (!empty($roomid)) {
-        $roomjoin = "
-            INNER JOIN {facetoface_sessions_dates} sd ON sd.sessionid = s.id
-            INNER JOIN {facetoface_room} fr ON fr.id = sd.roomid
-        ";
-        $roomwhere = 'AND fr.id = :roomid';
+        $roomwhere = "AND s.id IN (
+             SELECT sd.sessionid
+               FROM {facetoface_sessions_dates} sd
+              WHERE sd.roomid = :roomid)";
         $roomparams['roomid'] = $roomid;
     }
 
@@ -1520,7 +1524,6 @@ function facetoface_get_sessions($facetofaceid, $location = '', $roomid = 0) {
                 $locationwhere
                 GROUP BY fsd.sessionid
             ) m ON m.sessionid = s.id
-            $roomjoin
             WHERE s.facetoface = :facetoface
             $roomwhere
             ORDER BY m.mintimestart, m.maxtimefinish",
@@ -3681,6 +3684,8 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
 
     $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
 
+    $rooms = facetoface_get_session_rooms($session->id);
+
     $strdatetime = str_replace(' ', '&nbsp;', get_string('sessiondatetime', 'facetoface'));
     if ($session->mintimestart) {
         foreach ($session->sessiondates as $date) {
@@ -3699,17 +3704,17 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
             $output .= html_writer::tag('dt', $strdatetime);
             $output .= html_writer::tag('dd', $html);
 
-            // Display room information
-            $date->room = $DB->get_record('facetoface_room', array('id' => $date->roomid));
-            if (!empty($date->room)) {
-                $roomstring = facetoface_room_html($date->room, $PAGE->url);
-                $systemcontext = context_system::instance();
-                $descriptionhtml = file_rewrite_pluginfile_urls($date->room->description, 'pluginfile.php', $systemcontext->id, 'mod_facetoface', 'room', $date->room->id);
-                $roomstring .= $descriptionhtml;
-
-                $output .= html_writer::tag('dt', get_string('room', 'facetoface'));
-                $output .= html_writer::tag('dd', html_writer::tag('span', $roomstring, array('class' => 'roomdescription')));
+            if (!$date->roomid or !isset($rooms[$date->roomid])) {
+                continue;
             }
+            // Display room information
+            $room = $rooms[$date->roomid];
+            $roomstring = facetoface_room_html($room, $PAGE->url);
+            $systemcontext = context_system::instance();
+            $descriptionhtml = file_rewrite_pluginfile_urls($room->description, 'pluginfile.php', $systemcontext->id, 'mod_facetoface', 'room', $room->id);
+            $roomstring .= $descriptionhtml;
+            $output .= html_writer::tag('dt', get_string('room', 'facetoface'));
+            $output .= html_writer::tag('dd', html_writer::tag('span', $roomstring, array('class' => 'roomdescription')));
         }
 
         $output .= html_writer::empty_tag('br');
@@ -4559,7 +4564,7 @@ function facetoface_get_all_assets($sessionid = 0) {
 function facetoface_get_available_assets($timeslots=array(), $fields='*', $excludesessions=array()) {
     global $DB;
 
-    // Allow to have a room conflict, where type != 'external'
+    // Allow to have aa asset conflict, where type != 'external'
     $bookedwhere = "";
     $params = array();
     $timeslotsql = array();
@@ -4612,118 +4617,6 @@ function facetoface_get_available_assets($timeslots=array(), $fields='*', $exclu
         ) a
     ";
     return $DB->get_records_sql($sql, $params);
-}
-
-/**
- * Get available rooms for the specified time period
- *
- * Available rooms are rooms where the start- OR end times don't fall within that of another session's room,
- * as well as rooms where the start- AND end times don't encapsulate that of another session's room
- *
- * @param array $timeslots array of [timestart, timefinish] arrays
- * @param string $fields db fields for which data should be retrieved
- * @param array $excludesessionids array of sessionids to exclude in availability checking
- * @return array rooms
- * // TODO: Cover this function by unit tests (if not covered yet).
- */
-function facetoface_get_available_rooms($timeslots=array(), $fields='*', $excludesessionids = array()) {
-    global $DB;
-
-    $bookedwhere = "";
-    $params = array();
-    $timeslotsql = array();
-    $timeslotparams = array();
-    $i = 0;
-    foreach ($timeslots as $t) {
-        $timestart = $t[0];
-        $timefinish = $t[1];
-        $timeslotsql[] = " (:end{$i} > d.timestart AND d.timefinish > :start{$i})";
-        $timeslotparams = array_merge($timeslotparams, array(
-            "end{$i}" => $timefinish,
-            "start{$i}" => $timestart
-        ));
-        $i++;
-    }
-
-    if (!empty($timeslotsql)) {
-        $bookedwhere .= 'AND ('.implode(' OR ', $timeslotsql).') ';
-        $params = array_merge($params, $timeslotparams);
-    }
-
-    $customwhere = '';
-    if (!empty($excludesessionids)) {
-        // Prepare options to not mark rooms booked in ignored sessions.
-        list($insql, $inparams) = $DB->get_in_or_equal($excludesessionids, SQL_PARAMS_NAMED, 'book', false);
-        $bookedwhere .= " AND d.sessionid {$insql} ";
-        $params = array_merge($params, $inparams);
-
-        // Prepare options for allowing custom rooms associated with sessions.
-        list($insql, $inparams) = $DB->get_in_or_equal($excludesessionids, SQL_PARAMS_NAMED, 'custom');
-        $customwhere = "OR custom > 0 AND fsd.sessionid {$insql} ";
-        $params = array_merge($params, $inparams);
-    }
-
-    $sql = "
-        SELECT DISTINCT {$fields} FROM (
-            SELECT fr.*
-            FROM {facetoface_room} fr
-            LEFT JOIN {facetoface_sessions_dates} fsd ON fr.id = fsd.roomid
-            WHERE hidden = 0
-            AND (custom = 0 {$customwhere})
-            AND fr.id NOT IN (
-                SELECT DISTINCT r.id
-                FROM {facetoface_sessions} s
-                INNER JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
-                INNER JOIN {facetoface_room} r ON d.roomid = r.id
-                WHERE allowconflicts = 0
-                {$bookedwhere}
-            )
-        ) r";
-        return $DB->get_records_sql($sql, $params);
-}
-
-/**
- * Check if room is available during certain timeframe.
- *
- * Available rooms are rooms where the start- OR end times don't fall within that of another session's room,
- * as well as rooms where the start- AND end times don't encapsulate that of another session's room
- *
- * @param int $timestart
- * @param int $timefinish
- * @param int $roomid
- * @param int $sessionid ignore session id. Ignoring whole session and not only date, bacause user manage whole session at once.
- * @return boolean
- *
- * // TODO: Cover this function by unit tests (if not covered yet).
- */
-function facetoface_is_room_available($timestart, $timefinish, $roomid, $sessionid = 0) {
-    global $DB;
-
-    $params = array('timestart' => $timestart, 'timefinish' => $timefinish, 'roomid' => $roomid);
-
-    $sessionsql = '';
-    if (!empty($sessionid)) {
-        $sessionsql = 'AND sessionid <> :sessionid';
-        $params['sessionid'] = $sessionid;
-    }
-
-    $sql = "SELECT r.id
-        FROM {facetoface_room} r
-        WHERE r.id = :roomid
-        AND (
-            r.allowconflicts = 1
-            OR r.id NOT IN
-            (
-              SELECT DISTINCT r.id
-              FROM {facetoface_sessions} s
-              INNER JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
-              INNER JOIN {facetoface_room} r ON d.roomid = r.id
-              WHERE (:timefinish > d.timestart AND d.timefinish > :timestart)
-                {$sessionsql}
-            )
-        )";
-
-    return !empty($DB->get_record_sql($sql, $params));
 }
 
 /**
@@ -5520,33 +5413,6 @@ function facetoface_get_customfield_filters() {
     }
 
     return array('sess' => $sessfields, 'room' => $roomfields);
-}
-
-/**
- * Get the room record for the specified session
- *
- * @param int $sessionid
- *
- * @return object the room record or false if no room found
- */
-function facetoface_get_session_rooms($sessionid) {
-    global $DB;
-
-    $sql = "SELECT DISTINCT r.*
-        FROM {facetoface_sessions} s
-        JOIN {facetoface_sessions_dates} sd ON (sd.sessionid = s.id)
-        JOIN {facetoface_room} r ON (sd.roomid = r.id)
-        WHERE s.id = ?";
-
-    $rooms = $DB->get_records_sql($sql, array($sessionid));
-
-    if ($rooms) {
-        foreach ($rooms as &$room) {
-            customfield_load_data($room, "facetofaceroom", "facetoface_room");
-        }
-    }
-
-    return $rooms;
 }
 
 /**
@@ -6370,49 +6236,6 @@ function facetoface_format_session_dates($session) {
 }
 
 /**
- * Get the relevant session rooms for a facetoface activity
- *
- * @param int $facetofaceid
- *
- * @return array containing facetoface_room table db objects
- */
-function facetoface_get_rooms($facetofaceid) {
-    global $DB;
-
-    $sql = "SELECT DISTINCT r.id, r.name
-        FROM {facetoface_sessions} s
-        INNER JOIN {facetoface_sessions_dates} sd ON (sd.sessionid = s.id)
-        INNER JOIN {facetoface_room} r ON (sd.roomid = r.id)
-        WHERE s.facetoface = ?
-     ORDER BY r.name ASC";
-
-    return $DB->get_records_sql($sql, array($facetofaceid));
-}
-
-/**
- * Get the session room for a facetoface activity
- *
- * @param int $roomid
- *
- * @return mixed stdClass object or false if not found
- */
-function facetoface_get_room($roomid) {
-    global $DB;
-
-    $sql = "SELECT r.id, r.name, r.capacity, r.description, r.allowconflicts, r.hidden, r.custom, r.usercreated, r.timecreated,
-                   r.usermodified, r.timemodified
-              FROM {facetoface_room} r
-             WHERE r.id = ?";
-
-    $room = $DB->get_record_sql($sql, array($roomid));
-    if (!empty($room)) {
-        customfield_load_data($room, 'facetofaceroom', 'facetoface_room');
-    }
-
-    return $room;
-}
-
-/**
  * Get the relevant session asset for a facetoface activity
  *
  * @param int $assetid
@@ -6459,42 +6282,6 @@ function facetoface_get_assets_by_ids(array $assetids) {
     //customfield_load_data($asset, 'facetofaceasset', 'facetoface_asset');
 
     return $assets;
-}
-
-/**
- * Formats HTML for room details..
- *
- * @param object $room        DB record of a facetoface room.
- *
- * @return string containing room details with relevant html tags.
- */
-
-function facetoface_room_html($room, $backurl=null) {
-    global $OUTPUT;
-    $roomhtml = [];
-
-    if (!empty($room)) {
-        $roomhtml[] = !empty($room->name) ? html_writer::span(format_string($room->name), 'room room_name') : '';
-
-        $roomhtml[] = !empty($room->customfield_building) ?
-            html_writer::span(format_string($room->customfield_building), 'room room_building') :
-            '';
-
-        $url = new moodle_url('/mod/facetoface/room.php', array(
-            'roomid' => $room->id,
-            'b' => $backurl
-        ));
-
-        $popupurl = clone($url);
-        $popupurl->param('popup', 1);
-        $action = new popup_action('click', $popupurl, 'popup', array('width' => 800,'height' => 600));
-        $link = $OUTPUT->action_link($url, get_string('roomdetails', 'facetoface'), $action);
-        $roomhtml[] = html_writer::span('(' . $link . ')', 'room room_details');
-    }
-
-    $roomhtml = implode('', $roomhtml);
-
-    return $roomhtml;
 }
 
 /**
@@ -6818,42 +6605,6 @@ function facetoface_display_approver($user, $activity = false) {
     }
 
     return html_writer::tag('div', $content, array('id' => $uniqueid, 'class' => $classname));
-}
-
-/**
- * Returns the address string from the Room's 'location' customfield (if available). Note this function expects that
- * the passed room parameter has been loaded with customfield data already
- * @param stdClass $room
- *
- * @return string
- */
-function facetoface_room_get_address($room) {
-    global $CFG;
-
-    require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
-
-    // We're assuming the relevant location field is named 'location' and the building customfield is
-    // named 'building'. Doesn't seem to be a way to make this more dynamic, it's just expected that if a
-    // room has these customfields, they're named this way
-    $locationdata = customfield_define_location::prepare_db_location_data_for_form(
-        $room->{"customfield_location"}
-    );
-
-    return (isset($locationdata->address) && !empty($locationdata->address)) ? $locationdata->address : "";
-}
-
-/**
- * Render detailed room description to a string
- * @param stdClass $room room details with customfields info
- * @return string
- */
-function facetoface_room_to_string($room) {
-    $stringitems = [];
-    $stringitems[] = isset($room->name) ? $room->name : null;
-    $stringitems[] = isset($room->{"customfield_building"}) ? $room->{"customfield_building"} : null;
-    $stringitems[] = facetoface_room_get_address($room);
-
-    return implode(", ", array_filter($stringitems));
 }
 
 function facetoface_validate_user_import($user, $context, $facetoface, $session, $ignoreconflicts = null) {

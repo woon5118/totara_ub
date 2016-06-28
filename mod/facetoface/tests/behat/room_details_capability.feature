@@ -49,7 +49,7 @@ Feature: Check room details capability view for student and manager
     Then I should see "Sam1 Student1"
     And I log out
 
-  Scenario: Login as a student and check room details, login as manager and check room details
+  Scenario: Login as a student and check seminar room details
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -59,10 +59,9 @@ Feature: Check room details capability view for student and manager
     And I should see "Room 1"
     And I should see "Building 123"
     And I should not see "Upcoming sessions in this room"
-    # TODO: close popup window
-    And I switch to the main window
-    And I log out
+    #NOTE: do not switch back to main window and instead rely on restart of browser after any switch.
 
+  Scenario: Login as a manager and check seminar room details
     When I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -71,3 +70,4 @@ Feature: Check room details capability view for student and manager
     Then I should see "View room"
     And I should see "Upcoming sessions in this room"
     And I should see "Seminar TL-9052"
+    #NOTE: do not switch back to main window and instead rely on restart of browser after any switch.

@@ -72,6 +72,12 @@ $PAGE->set_url('/mod/facetoface/room/ajax/sessionrooms.php', array(
     'timefinish' => $timefinish
 ));
 
+// Include the same strings as mod/facetoface/sessions.php, because we override the lang string cache with this ugly hack.
+$PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
+$PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
+$PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
+    'createnewasset', 'createnewroom', 'editroom'), 'facetoface');
+
 if (empty($timestart) || empty($timefinish)) {
     print_error('notimeslotsspecified', 'facetoface');
 }
@@ -79,56 +85,19 @@ if (empty($timestart) || empty($timefinish)) {
 // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
 send_headers('text/html; charset=utf-8', false);
 
-$where = "r.custom = 0 AND r.hidden = 0
-          OR (r.hidden = 0 AND r.custom > 0 AND fsd.sessionid = :sessionid)";
-$sqlparams = array('sessionid' => $sessionid);
-// Select booked room whatever is hidden or not.
-if ($selected > 0) {
-    $where .= " OR r.id = :selected";
-    $sqlparams['selected'] = $selected;
-}
-
 // Setup / loading data
-$sql = "SELECT
-            DISTINCT r.*
-        FROM
-            {facetoface_room} r
-            LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = r.id)
-        WHERE
-            {$where}
-        ORDER BY
-            r.name";
-
-$allrooms = array();
+$allrooms = facetoface_get_available_rooms(0, 0 , 'fr.*', $sessionid, $facetofaceid);
+$availablerooms = facetoface_get_available_rooms($timestart, $timefinish, 'fr.id', $sessionid, $facetofaceid);
 $unavailablerooms = array();
-if ($rooms = $DB->get_records_sql($sql, $sqlparams)) {
-    foreach ($rooms as $room) {
-        customfield_load_data($room, "facetofaceroom", "facetoface_room");
-
-        $roomobject = new stdClass();
-        $roomobject->id = $room->id;
-        $roomobject->fullname = facetoface_room_to_string($room) .
-            " (" . get_string("capacity", "facetoface") . ": {$room->capacity})";
-        $roomobject->name = $room->name;
-        $roomobject->capacity = $room->capacity;
-        $roomobject->custom = $room->custom;
-
-        $allrooms[$room->id] = $roomobject;
+foreach ($allrooms as $room) {
+    customfield_load_data($room, "facetofaceroom", "facetoface_room");
+    $room->fullname = facetoface_room_to_string($room) . " (" . get_string("capacity", "facetoface") . ": {$room->capacity})";
+    if (!isset($availablerooms[$room->id])) {
+        $unavailablerooms[$room->id] = $room->id;
+        $room->fullname .= get_string('roomalreadybooked', 'facetoface');
     }
-
-    // Disable unavailable rooms.
-    $excludesessionids = $sessionid ? array($sessionid) : array();
-    $availablerooms = facetoface_get_available_rooms(array(array($timestart, $timefinish)), 'id', $excludesessionids);
-    if ($unavailablerooms = array_diff(array_keys($allrooms), array_keys($availablerooms))) {
-        // Make array keys and values the same.
-        $unavailablerooms = array_combine($unavailablerooms, $unavailablerooms);
-
-        // Add alreadybooked string to fullname.
-        foreach ($unavailablerooms as $key => $unavailable) {
-            if (isset($allrooms[$key])) {
-                $allrooms[$key]->fullname .= get_string('roomalreadybooked', 'facetoface');
-            }
-        }
+    if ($room->custom) {
+        $room->fullname .= ' (' . get_string('facetoface', 'facetoface') . ': ' . format_string($facetoface->name) . ')';
     }
 }
 

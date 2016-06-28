@@ -192,9 +192,14 @@ class mod_facetoface_generator extends testing_module_generator {
         if (!isset($record->usercreated)) {
             $record->usercreated = $USER->id;
         }
+        $record->usermodified = $record->usercreated;
+        if (!isset($record->usercreated)) {
+            $record->usercreated = $USER->id;
+        }
         if (!isset($record->timecreated)) {
             $record->timecreated = time();
         }
+        $record->timemodified = $record->timecreated;
         $id = $DB->insert_record('facetoface_room', $record);
         return $DB->get_record('facetoface_room', array('id' => $id));
     }

@@ -26,16 +26,11 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-require_once($CFG->dirroot . '/mod/facetoface/room/lib.php');
-require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
-
-global $DB, $OUTPUT;
 
 $delete = optional_param('delete', 0, PARAM_INT);
 $show = optional_param('show', 0, PARAM_INT);
 $hide = optional_param('hide', 0, PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
-$page = optional_param('page', 0, PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);
 
 // Check permissions.
@@ -48,13 +43,13 @@ $redirectto = new moodle_url('/mod/facetoface/room/manage.php', $report->get_cur
 
 // Handle actions.
 if ($delete) {
-    if (!$room = $DB->get_record('facetoface_room', array('id' => $delete))) {
-        print_error('error:roomdoesnotexist', 'facetoface');
+    if (!$room = $DB->get_record('facetoface_room', array('id' => $delete, 'custom' => 0))) {
+        return($returnurl);
     }
 
-    $roominuse = $DB->count_records_select('facetoface_sessions_dates', "roomid = :id", array('id' => $delete));
+    $roominuse = $DB->count_records('facetoface_sessions_dates', array('roomid' => $delete));
     if ($roominuse) {
-        print_error('error:roomisinuse', 'facetoface');
+        print_error('error:roomisinuse', 'facetoface', $returnurl);
     }
 
     if (!$confirm) {
@@ -66,15 +61,15 @@ if ($delete) {
     }
 
     require_sesskey();
-    room_delete($delete);
+    facetoface_delete_room($delete);
 
     totara_set_notification(get_string('roomdeleted', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
 
 } else if ($show) {
 
     require_sesskey();
-    if (!$room = $DB->get_record('facetoface_room', array('id' => $show))) {
-        print_error('error:roomdoesnotexist', 'facetoface');
+    if (!$room = $DB->get_record('facetoface_room', array('id' => $show, 'custom' => 0))) {
+        print_error('error:roomdoesnotexist', 'facetoface', $returnurl);
     }
 
     $DB->update_record('facetoface_room', array('id' => $show, 'hidden' => 0));
@@ -84,19 +79,14 @@ if ($delete) {
 } else if ($hide) {
 
     require_sesskey();
-    if (!$room = $DB->get_record('facetoface_room', array('id' => $hide))) {
-        print_error('error:roomdoesnotexist', 'facetoface');
+    if (!$room = $DB->get_record('facetoface_room', array('id' => $hide, 'custom' => 0))) {
+        print_error('error:roomdoesnotexist', 'facetoface', $returnurl);
     }
 
     $DB->update_record('facetoface_room', array('id' => $hide, 'hidden' => 1));
 
     totara_set_notification(get_string('roomhidden', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
 }
-
-local_js(array(
-    TOTARA_JS_DIALOG,
-    )
-);
 
 $PAGE->set_button($report->edit_button());
 

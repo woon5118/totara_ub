@@ -22,112 +22,130 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/totara/customfield/fieldlib.php');
-require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/lib/filelib.php');
-require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/totara/core/totara.php');
-require_once($CFG->dirroot . '/mod/facetoface/room/room_form.php');
-
 /**
- * Creates a new room, or updates an existing one depending on whether $data->id is set
- * @stdClass $data
- * @dataobject $todb
- */
-function create_or_update_room($data, $todb) {
-    global $DB, $TEXTAREA_OPTIONS;
-    $iscreation = ($data->id == 0);
-    if ($iscreation) {
-        $data->id = $DB->insert_record('facetoface_room', $todb);
-        $todb->id = $data->id;
-    } else {
-        $todb->id = $data->id;
-        $DB->update_record('facetoface_room', $todb);
-    }
-
-    customfield_save_data($data, 'facetofaceroom', 'facetoface_room');
-
-    // Update description.
-    $descriptiondata = file_postupdate_standard_editor(
-      $data,
-      'description',
-      $TEXTAREA_OPTIONS,
-      $TEXTAREA_OPTIONS['context'],
-      'mod_facetoface',
-      'room',
-      $data->id
-    );
-
-    $DB->set_field('facetoface_room', 'description', $descriptiondata->description, array('id' => $data->id));
-}
-
-/**
- * Delete room and related information
+ * Get the relevant session rooms for a seminar activity
  *
- * @param int $id
+ * @param int $facetofaceid
+ * @param string $fields fields with prefix fr, name and id are required
+ * @return stdClass[] containing facetoface_room table db objects
  */
-function room_delete($id) {
+function facetoface_get_used_rooms($facetofaceid, $fields = 'fr.id, fr.name') {
     global $DB;
 
-    $room = $DB->get_record('facetoface_room', array('id' => $id));
-    $roomfields = $DB->get_records('facetoface_room_info_field');
-    foreach($roomfields as $roomfield) {
-        /** @var customfield_base $customfieldentry */
-        $customfieldentry = customfield_get_field_instance($room, $roomfield->id, 'facetoface_room', 'facetofaceroom');
-        if (!empty($customfieldentry)) {
-            $customfieldentry->delete();
+    $params = array('facetofaceid' => $facetofaceid);
+
+    if ($fields !== 'fr.*') {
+        if (strpos($fields, 'fr.id') === false or strpos($fields, 'fr.name') === false) {
+            throw new coding_exception('r.id and r.name are required columns');
         }
     }
 
-    $DB->delete_records('facetoface_room', array('id' => $id));
+    $sql = "SELECT DISTINCT {$fields}
+              FROM {facetoface_sessions} fs
+              JOIN {facetoface_sessions_dates} fsd ON (fsd.sessionid = fs.id)
+              JOIN {facetoface_room} fr ON (fsd.roomid = fr.id)
+             WHERE fs.facetoface = :facetofaceid
+          ORDER BY fr.name ASC, fr.id ASC";
+
+    return $DB->get_records_sql($sql, $params);
+}
+
+/**
+ * Get the session room for a seminar activity
+ *
+ * @param int $roomid
+ * @return stdClass|false room with loaded custom fields or false if not found
+ */
+function facetoface_get_room($roomid) {
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
+
+    if (!$roomid) {
+        return false;
+    }
+
+    $room = $DB->get_record('facetoface_room', array('id' => $roomid));
+    if (empty($room)) {
+        return false;
+    }
+
+    customfield_load_data($room, 'facetofaceroom', 'facetoface_room');
+    return $room;
+}
+
+/**
+ * Get the room record for the specified session
+ *
+ * @param int $sessionid
+ * @return stdClass[] the room record or empty array if no room found
+ */
+function facetoface_get_session_rooms($sessionid) {
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
+
+    $sql = "SELECT DISTINCT fr.*
+              FROM {facetoface_room} fr
+              JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = fr.id)
+              JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
+             WHERE fs.id = ?
+          ORDER BY fr.name ASC, fr.id ASC";
+    $rooms = $DB->get_records_sql($sql, array($sessionid));
+
+    foreach ($rooms as &$room) {
+        customfield_load_data($room, "facetofaceroom", "facetoface_room");
+    }
+
+    return $rooms;
 }
 
 /**
  * Process room edit form and call related handlers
- * @param int $roomid
+ *
+ * @param stdClass|false $room
+ * @param stdClass|false $facetoface non-false means we are editing session via ajax
+ * @param stdClass|false $session non-false means we are editing existing session via ajax
  * @param callable $successhandler function($id) where $id is roomid
  * @param callable $cancelhandler
- * @param array $customdata additional form customdata
- * @return \mod_facetoface_room_form
+ * @return mod_facetoface_room_form
  */
-function process_room_form($roomid, callable $successhandler, callable $cancelhandler = null, array $customdata = array()) {
-    global $DB, $TEXTAREA_OPTIONS, $USER;
+function facetoface_process_room_form($room, $facetoface, $session, callable $successhandler, callable $cancelhandler = null) {
+    global $DB, $TEXTAREA_OPTIONS, $USER, $CFG;
+    require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
+    require_once($CFG->dirroot . '/mod/facetoface/room/room_form.php');
 
-    if (empty($customdata['userid'])) {
-        $userid = $USER->id;
-    } else {
-        $userid = $customdata['userid'];
+    $editoroptions = $TEXTAREA_OPTIONS;
+    if ($facetoface) {
+        // Do not use autosave in editor when nesting forms.
+        $editoroptions['autosave'] = false;
     }
 
-    if ($roomid == 0) {
+    if (!$room) {
         $room = new stdClass();
         $room->id = 0;
         $room->description = '';
-        $room->status = 1;
-        $room->custom=0;
-        if (!empty($customdata['custom']) || !empty($customdata['customforce'])) {
-            // Pre set custom for new rooms and when it's enforced.
-            $room->custom=1;
+        $room->descriptionformat = FORMAT_HTML;
+        $room->capacity = '';
+        $room->allowconflicts = 0;
+        if ($facetoface) {
+            $room->custom = 1;
+        } else {
+            $room->custom = 0;
         }
     } else {
-        $room = $DB->get_record('facetoface_room', array('id' => $roomid), '*', MUST_EXIST);
-        $room->roomcapacity = $room->capacity;
+        $room->descriptionformat = FORMAT_HTML;
         customfield_load_data($room, 'facetofaceroom', 'facetoface_room');
+        $room = file_prepare_standard_editor($room, 'description', $editoroptions, $editoroptions['context'], 'mod_facetoface', 'room', $room->id);
     }
+    $room->roomcapacity = $room->capacity;
+    unset($room->capacity);
 
-    $room->descriptionformat = FORMAT_HTML;
-    $room = file_prepare_standard_editor($room, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'mod_facetoface', 'room', $room->id);
-
+    $customdata = array();
     $customdata['room'] = $room;
-    $customdata['editoroptions'] = $TEXTAREA_OPTIONS;
-    if (empty($room->id)) {
-        // This kills the auto-save for when creating new rooms. We do this as the same description
-        // will keep coming up if creating several rooms in a row.
-        $customdata['editorattributes'] = array('id' => rand());
-    } else {
-        $customdata['editorattributes'] = array('id' => $room->id);
-    }
+    $customdata['facetoface'] = $facetoface;
+    $customdata['session'] = $session;
+    $customdata['editoroptions'] = $editoroptions;
 
     $form = new mod_facetoface_room_form(null, $customdata, 'post', '', array('class' => 'dialog-nobind'));
-    $form->set_data($room);
 
     if ($form->is_cancelled()) {
         if (is_callable($cancelhandler)) {
@@ -139,23 +157,27 @@ function process_room_form($roomid, callable $successhandler, callable $cancelha
         $todb = new stdClass();
         $todb->name = $data->name;
         $todb->capacity = $data->roomcapacity;
-        $todb->allowconflicts = empty($data->allowconflicts) ? 0 : 1;
-        $todb->custom = 0;
-        if (!empty($customdata['custom']) && empty($data->notcustom)) {
-            $todb->custom = 1;
+        $todb->allowconflicts = $data->allowconflicts;
+        if ($facetoface) {
+            if (!empty($data->notcustom)) {
+                $todb->custom = 0;
+            } else {
+                $todb->custom = 1;
+            }
         }
-        if (!empty($customdata['customforce'])) {
-            // Force custom to stay as is.
-            $todb->custom = $room->custom;
-        }
-        $new = false;
+        // NOTE: usually the time created and updated are set to the same value when adding new items,
+        //       do the same here and later compare timestamps to find out if it was not updated yet.
         if (empty($data->id)) {
-            $todb->timecreated = time();
-            $todb->usercreated = $userid;
+            $todb->timemodified = $todb->timecreated = time();
+            $todb->usercreated = $USER->id;
+            $todb->usermodified = $USER->id;
+            $data->id = $DB->insert_record('facetoface_room', $todb);
+            $todb->id = $data->id;
         } else {
             $todb->timemodified = time();
-            $todb->usermodified = $userid;
-            $new = true;
+            $todb->usermodified = $USER->id;
+            $todb->id = $data->id;
+            $DB->update_record('facetoface_room', $todb);
         }
 
         /**
@@ -164,69 +186,327 @@ function process_room_form($roomid, callable $successhandler, callable $cancelha
          * $_customlocationfieldname added in @see customfield_location::edit_field_add()
          */
         if (property_exists($form->_form, '_customlocationfieldname')) {
+            // TODO: TL-9425 this hack is absolutely unacceptable!
             customfield_define_location::prepare_form_location_data_for_db($data, $form->_form->_customlocationfieldname);
         }
 
-        create_or_update_room($data, $todb);
-        $successhandler($todb);
+        customfield_save_data($data, 'facetofaceroom', 'facetoface_room');
+
+        // Update description.
+        $descriptiondata = file_postupdate_standard_editor(
+            $data,
+            'description',
+            $editoroptions,
+            $editoroptions['context'],
+            'mod_facetoface',
+            'room',
+            $data->id
+        );
+
+        $DB->set_field('facetoface_room', 'description', $descriptiondata->description, array('id' => $data->id));
+
+        $room = $DB->get_record('facetoface_room', array('id' => $data->id), '*', MUST_EXIST);
+
+        $successhandler($room);
     }
     return $form;
 }
 
 /**
- * Return true if user has capability to edit room.
- * @param int $userid
- * @param int $roomid
- * @param int $facetofaceid
- * @return bool
+ * Delete room and all related information.
+ *
+ * If any sesion is still using this room, the room is unassigned.
+ *
+ * @param int $id
  */
-function can_user_edit_room($userid, $roomid, $facetofaceid) {
-    global $DB;
-    $system_context = context_system::instance();
-    if (has_capability('totara/core:modconfig', $system_context, $userid)) {
+function facetoface_delete_room($id) {
+    global $DB, $CFG;
+    require_once("$CFG->dirroot/totara/customfield/fieldlib.php");
+
+    $room = $DB->get_record('facetoface_room', array('id' => $id));
+    if (!$room) {
+        // Nothing to delete.
+        return;
+    }
+
+    // Delete all custom fields related to room.
+    $roomfields = $DB->get_records('facetoface_room_info_field');
+    foreach($roomfields as $roomfield) {
+        /** @var customfield_base $customfieldentry */
+        $customfieldentry = customfield_get_field_instance($room, $roomfield->id, 'facetoface_room', 'facetofaceroom');
+        if (!empty($customfieldentry)) {
+            $customfieldentry->delete();
+        }
+    }
+
+    // Delete all files embedded in the room description.
+    $fs = get_file_storage();
+    $syscontext = context_system::instance();
+    $fs->delete_area_files($syscontext->id, 'mod_facetoface', 'room', $room->id);
+
+    // Unlink this room from any session.
+    $DB->set_field('facetoface_sessions_dates', 'roomid', 0, array('roomid' => $room->id));
+
+    // Finally delete the room record itself.
+    $DB->delete_records('facetoface_room', array('id' => $id));
+}
+
+/**
+ * Get available rooms for the specified time slot, or all rooms if $timestart and $timefinish are empty.
+ *
+ * NOTE: performance is not critical here because this function should be used only when assigning rooms to sessions.
+ *
+ * @param int $timestart start of requested slot
+ * @param int $timefinish end of requested slot
+ * @param string $fields db fields for which data should be retrieved, with mandatory 'fr.' prefix
+ * @param int $sessionid current session id, 0 if session is being created, all current session rooms are always included
+ * @param int $facetofaceid facetofaceid custom rooms can be used in all dates of one seminar activity
+ * @return stdClass[] rooms
+ */
+function facetoface_get_available_rooms($timestart, $timefinish, $fields='fr.*', $sessionid, $facetofaceid) {
+    global $DB, $USER;
+
+    $params = array();
+    $params['timestart'] = (int)$timestart;
+    $params['timefinish'] = (int)$timefinish;
+    $params['sessionid'] = (int)$sessionid;
+    $params['facetofaceid'] = (int)$facetofaceid;
+    $params['userid'] = $USER->id;
+
+    if ($fields !== 'fr.*' and strpos($fields, 'fr.id') !== 0) {
+        throw new coding_exception('Invalid $fields parameter specified, must be fr.* or must start with fr.id');
+    }
+
+    $bookedrooms = array();
+    if ($timestart and $timefinish) {
+        if ($timestart > $timefinish) {
+            debugging('Invalid slot specified, start cannot be later than finish', DEBUG_DEVELOPER);
+        }
+        $sql = "SELECT DISTINCT fr.id
+                  FROM {facetoface_room} fr
+                  JOIN {facetoface_sessions_dates} fsd ON fr.id = fsd.roomid
+                 WHERE fr.allowconflicts = 0 AND fsd.sessionid <> :sessionid
+                       AND (fsd.timestart < :timefinish AND fsd.timefinish > :timestart)";
+        $bookedrooms = $DB->get_records_sql($sql, $params);
+    }
+
+    // First get all site rooms that either allow conflicts
+    // or are not occupied at the given times
+    // or are already used from the current event.
+    // Note that hidden rooms may be reused in the same session if already there,
+    // but are completely hidden everywhere else.
+    if ($sessionid) {
+        $sql = "SELECT DISTINCT {$fields}
+                  FROM {facetoface_room} fr
+             LEFT JOIN {facetoface_sessions_dates} fsd ON fr.id = fsd.roomid
+                 WHERE fr.custom = 0 AND (fr.hidden = 0 OR fsd.sessionid = :sessionid)";
+        if (strpos($fields, 'fr.*') !== false or strpos($fields, 'fr.name') !== false) {
+            $sql .= " ORDER BY fr.name ASC, fr.id ASC";
+        }
+    } else {
+        $sql = "SELECT {$fields}
+                  FROM {facetoface_room} fr
+                 WHERE fr.custom = 0 AND fr.hidden = 0
+              ORDER BY fr.name ASC, fr.id ASC";
+    }
+    $rooms = $DB->get_records_sql($sql, $params);
+    foreach ($bookedrooms as $rid => $unused) {
+        unset($rooms[$rid]);
+    }
+
+    // Custom rooms in the current facetoface activity.
+    if ($facetofaceid) {
+        $sql = "SELECT DISTINCT {$fields}
+                  FROM {facetoface_room} fr
+                  JOIN {facetoface_sessions_dates} fsd ON fr.id = fsd.roomid
+                  JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid
+                 WHERE fr.custom = 1 AND fs.facetoface = :facetofaceid";
+        if (strpos($fields, 'fr.*') !== false or strpos($fields, 'fr.name') !== false) {
+            $sql .= " ORDER BY fr.name ASC, fr.id ASC";
+        }
+        $customrooms = $DB->get_records_sql($sql, $params);
+        foreach ($customrooms as $room) {
+            if (!isset($bookedrooms[$room->id])) {
+                $rooms[$room->id] = $room;
+            }
+        }
+        unset($customrooms);
+    }
+
+    // Add custom rooms of the current user that are not assigned yet or any more.
+    $sql = "SELECT {$fields}
+              FROM {facetoface_room} fr
+         LEFT JOIN {facetoface_sessions_dates} fsd ON fr.id = fsd.roomid
+             WHERE fsd.id IS NULL AND fr.custom = 1 AND fr.usercreated = :userid
+          ORDER BY fr.name ASC, fr.id ASC";
+    $userrooms = $DB->get_records_sql($sql, $params);
+    foreach ($userrooms as $room) {
+        $rooms[$room->id] = $room;
+    }
+
+    return $rooms;
+}
+
+/**
+ * Check if room is available during certain time slot.
+ *
+ * Available rooms are rooms where the start- OR end times don't fall within that of another session's room,
+ * as well as rooms where the start- AND end times don't encapsulate that of another session's room
+ *
+ * @param int $timestart
+ * @param int $timefinish
+ * @param stdClass $room
+ * @param int $sessionid current session id, 0 if adding new session
+ * @param int $facetofaceid current facetoface id
+ * @return boolean
+ */
+function facetoface_is_room_available($timestart, $timefinish, stdClass $room, $sessionid, $facetofaceid) {
+    global $DB, $USER;
+
+    if ($room->hidden) {
+        // Hidden rooms can be assigned only if they are already used in the session.
+        if (!$sessionid) {
+            return false;
+        }
+        if (!$DB->record_exists('facetoface_sessions_dates', array('roomid' => $room->id, 'sessionid' => $sessionid))) {
+            return false;
+        }
+    }
+
+    if ($room->custom) {
+        // Custom rooms can be used only if already used in seminar
+        // or not used anywhere and created by current user.
+        $sql = "SELECT 'x'
+                  FROM {facetoface_sessions_dates} fsd
+                  JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
+                 WHERE fsd.roomid = :roomid AND fs.facetoface = :facetofaceid";
+
+        if (!$DB->record_exists_sql($sql, array('roomid' => $room->id, 'facetofaceid' => $facetofaceid))) {
+            if ($room->usercreated == $USER->id) {
+                if ($DB->record_exists('facetoface_sessions_dates', array('roomid' => $room->id))) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+    }
+
+    if (!$timestart and !$timefinish) {
+        // Time not specified, no need to verify conflicts.
         return true;
     }
-    // Check if user have 'mod/facetoface:editevents' capability to edit events in current facetoface.
-    if (!$facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid))) {
-        print_error('error:incorrectfacetofaceid', 'facetoface');
-    }
-    if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
-        print_error('error:coursemisconfigured', 'facetoface');
-    }
-    if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
-        print_error('error:incorrectcoursemodule', 'facetoface');
+
+    if ($room->allowconflicts) {
+        // No need to worry about time slots.
+        return true;
     }
 
-    $context = context_module::instance($cm->id);
-    if (has_capability('mod/facetoface:editevents', $context, $userid)) {
-        if (!$roomid) {
-            // New room creation.
-            return true;
-        }
-
-        $roomdata = $DB->get_record('facetoface_room', array('id' => $roomid));
-        // Only custom rooms can be edited.
-        if ($roomdata->custom) {
-            // Determine event it is assigned to and check that event is the same as current.
-            $roomsess = $DB->get_records_sql("
-                SELECT fs.facetoface FROM {facetoface_sessions_dates} fsd
-                JOIN {facetoface_sessions} fs ON (fsd.sessionid = fs.id)
-                WHERE fsd.roomid = :roomid
-            ", array('roomid' => $roomid));
-
-            // Unassigned (orphaned) custom rooms can be edited
-            // (they will became normal custom room exclusively owned by event after save).
-            if (empty($roomsess)) {
-                return true;
-            }
-
-            // If room assigned to current facetoface, user can edit it.
-            foreach ($roomsess as $roomses) {
-                if ($roomses->facetoface == $facetofaceid) {
-                    return true;
-                }
-            }
-        }
+    if ($timestart > $timefinish) {
+        debugging('Invalid slot specified, start cannot be later than finish', DEBUG_DEVELOPER);
     }
-    return false;
+
+    // Is there any other event using this room in this slot?
+    // Note that there cannot be collisions in session dates of one event because they cannot overlap.
+    $params = array('timestart' => $timestart, 'timefinish' => $timefinish, 'roomid' => $room->id, 'sessionid' => $sessionid);
+
+    $sql = "SELECT 'x'
+              FROM {facetoface_sessions_dates} fsd
+              JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
+             WHERE fsd.roomid = :roomid AND fs.id <> :sessionid
+                   AND :timefinish > fsd.timestart AND :timestart < fsd.timefinish";
+    return !$DB->record_exists_sql($sql, $params);
+}
+
+/**
+ * Find out if room has scheduling conflicts.
+ *
+ * @param int $roomid
+ * @return bool
+ */
+function facetoface_room_has_conflicts($roomid) {
+    global $DB;
+
+    $sql = "SELECT 'x'
+              FROM {facetoface_sessions_dates} fsd
+              JOIN {facetoface_sessions_dates} fsd2 ON (fsd2.roomid = fsd.roomid AND fsd2.id <> fsd.id)
+             WHERE fsd.roomid = :roomid AND
+                   ((fsd.timestart >= fsd2.timestart AND fsd.timestart < fsd2.timefinish)
+                    OR (fsd.timefinish > fsd2.timestart AND fsd.timefinish <= fsd2.timefinish))";
+    return $DB->record_exists_sql($sql, array('roomid' => $roomid));
+}
+
+/**
+ * Returns the address string from the Room's 'location' customfield (if available). Note this function expects that
+ * the passed room parameter has been loaded with customfield data already
+ *
+ * @param stdClass $room
+ *
+ * @return string
+ */
+function facetoface_room_get_address($room) {
+    global $CFG;
+
+    // TODO: TL-9425 this hack is not pretty
+
+    require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
+
+    // We're assuming the relevant location field is named 'location' and the building customfield is
+    // named 'building'. Doesn't seem to be a way to make this more dynamic, it's just expected that if a
+    // room has these customfields, they're named this way
+    $locationdata = customfield_define_location::prepare_db_location_data_for_form(
+        $room->{"customfield_location"}
+    );
+
+    return (isset($locationdata->address) && !empty($locationdata->address)) ? $locationdata->address : "";
+}
+
+/**
+ * Render detailed room description to a string
+ *
+ * @param stdClass $room room details with customfields info
+ * @return string
+ */
+function facetoface_room_to_string($room) {
+    $stringitems = [];
+    $stringitems[] = isset($room->name) ? $room->name : null;
+    $stringitems[] = isset($room->{"customfield_building"}) ? $room->{"customfield_building"} : null;
+    $stringitems[] = facetoface_room_get_address($room);
+
+    return implode(", ", array_filter($stringitems));
+}
+
+/**
+ * Formats HTML for room details..
+ *
+ * @param object $room        DB record of a facetoface room.
+ *
+ * @return string containing room details with relevant html tags.
+ */
+function facetoface_room_html($room, $backurl=null) {
+    global $OUTPUT;
+    $roomhtml = [];
+
+    if (!empty($room)) {
+        $roomhtml[] = !empty($room->name) ? html_writer::span(format_string($room->name), 'room room_name') : '';
+
+        $roomhtml[] = !empty($room->customfield_building) ?
+            html_writer::span(format_string($room->customfield_building), 'room room_building') :
+            '';
+
+        $url = new moodle_url('/mod/facetoface/room.php', array(
+            'roomid' => $room->id,
+            'b' => $backurl
+        ));
+
+        $popupurl = clone($url);
+        $popupurl->param('popup', 1);
+        $action = new popup_action('click', $popupurl, 'popup', array('width' => 800,'height' => 600));
+        $link = $OUTPUT->action_link($url, get_string('roomdetails', 'facetoface'), $action);
+        $roomhtml[] = html_writer::span('(' . $link . ')', 'room room_details');
+    }
+
+    $roomhtml = implode('', $roomhtml);
+
+    return $roomhtml;
 }

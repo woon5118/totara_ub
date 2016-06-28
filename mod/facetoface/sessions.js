@@ -287,7 +287,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                             $roomitem.addClass('nonempty');
                             // Edit button.
                             if (Number(elem.custom) > 0) {
-                                var $editbutton = $('<a href="#" class="dialog-singleselect-editable">'+M.util.get_string('edit', 'moodle')+'</a>');
+                                var $editbutton = $('<a href="#" class="dialog-singleselect-editable">'+M.util.get_string('editroom', 'facetoface')+'</a>');
                                 $editbutton.click(function(e) {
                                     e.preventDefault();
                                     M.totara_f2f_room.config.editroom = elem.id;
@@ -343,8 +343,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
                         id = Number(M.totara_f2f_room.config.editroom);
                         M.totara_f2f_room.config.editroom = 0;
                     }
-                    return url + 'room/ajax/room_edit.php?id=' + id + '&f=' + $('input[name="f"]').val() +
-                            '&sesskey=' + M.cfg.sesskey;
+                    return url + 'room/ajax/room_edit.php?id=' + id + '&f=' + M.totara_f2f_room.config.facetofaceid +
+                        '&s=' + M.totara_f2f_room.config.sessionid + '&sesskey=' + M.cfg.sesskey;
                 },
                 editcustomroomhandler
             );

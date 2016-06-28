@@ -23,12 +23,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/totara/reportbuilder/filters/f2f_available.php');
+require_once($CFG->dirroot . '/mod/facetoface/rb_sources/f2f_available.php');
+
 /**
  * Empty rooms during specified time search implementation
  */
-class rb_filter_f2f_assetavailable extends rb_filter_f2f_available
-{
+class rb_filter_f2f_assetavailable extends rb_filter_f2f_available {
     // TODO: This need to be covered by unit tests.
     public function get_sql_snippet($sessionstarts, $sessionends) {
         $paramstarts1 = rb_unique_param('timestart');

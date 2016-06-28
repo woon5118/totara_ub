@@ -101,26 +101,29 @@ class cleanup_task extends \core\task\scheduled_task {
     }
 
     /**
-     * Clean custom rooms that are no longer used (therefore not available to be choosen).
+     * Clean custom rooms that are no longer used (therefore not available to be chosen).
      */
     protected function remove_unused_custom_rooms() {
         global $DB;
-        $lifetime = time() - 86400; // Allow one day for unassigned room as it can be just created and not stored in f2f session yet.
+
         // Get all custom rooms that are not assigned to any date.
         $sql = "SELECT fr.id
                 FROM {facetoface_room} fr
                 LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = fr.id)
                 WHERE fsd.id IS NULL
                   AND fr.custom > 0
-                  AND fr.timecreated < {$lifetime}
+                  AND fr.timecreated < :lifetime
                 ";
-        // Do in transaction to avoid assigning during room removal.
-        $transaction = $DB->start_delegated_transaction();
-        $roomids = $DB->get_fieldset_sql($sql);
+
+        // Allow one day for unassigned room as it can be just created and not stored in f2f session yet.
+        $roomids = $DB->get_fieldset_sql($sql, array('lifetime' => time() - 86400));
+
+        // Transactions do not help here with anything.
         if ($roomids) {
-            list($delsql, $delparams) = $DB->get_in_or_equal($roomids, SQL_PARAMS_NAMED);
-            $DB->delete_records_select('facetoface_room', "id $delsql", $delparams);
+            foreach ($roomids as $roomid) {
+                // Do a proper room removal including files and custom fields.
+                facetoface_delete_room($roomid);
+            }
         }
-        $transaction->allow_commit();
     }
 }

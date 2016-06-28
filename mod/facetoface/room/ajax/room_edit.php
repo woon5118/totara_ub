@@ -22,40 +22,57 @@
  */
 
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
-require_once($CFG->dirroot . '/mod/facetoface/room/lib.php');
+require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
-$id = optional_param('id', 0, PARAM_INT);   // Room id.
-$facetofaceid = optional_param('f', 0, PARAM_INT);   // Face-to-face id.
+$id = required_param('id', PARAM_INT);   // Room id.
+$facetofaceid = required_param('f', PARAM_INT);   // Face-to-face id.
+$sessionid = optional_param('s', 0, PARAM_INT);
 
-require_login(0, false);
+$facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $facetoface->course), '*', MUST_EXIST);
+$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course, false, MUST_EXIST);
+if ($sessionid) {
+    $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid, 'facetoface' => $facetoface->id), '*', MUST_EXIST);
+} else {
+    $session = false;
+}
+
+$context = context_module::instance($cm->id);
+require_login($course, false, $cm, false, true);
+require_capability('mod/facetoface:editevents', $context);
+
 require_sesskey();
 
-$system_context = context_system::instance();
-$customforce = false;
-if (!has_capability('totara/core:modconfig', $system_context)
-        && $facetofaceid
-        && can_user_edit_room($USER->id, $id, $facetofaceid)) {
-    $customforce = true;
+if ($id) {
+    // Only custom rooms can be changed here!
+    $room = $DB->get_record('facetoface_room', array('id' => $id, 'custom' => 1), '*', MUST_EXIST);
+    if (!facetoface_is_room_available(0, 0, $room, $sessionid, $facetoface->id)) {
+        // They should never get here, any error will do.
+        print_error('error');
+    }
 } else {
-    require_capability('totara/core:modconfig', $system_context);
+    $room = false;
 }
 
 // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
 send_headers('text/html; charset=utf-8', false);
 
-$PAGE->set_context($system_context);
+$PAGE->set_context($context);
 $PAGE->set_url('/mod/facetoface/room/ajax/room_edit.php');
 
-$form = process_room_form(
-    $id,
+$form = facetoface_process_room_form($room, $facetoface, $session,
     function($room) {
         echo json_encode(array('id' => $room->id, 'name' => $room->name, 'capacity' => $room->capacity, 'custom' => $room->custom));
         exit();
     },
-    null,
-    array('noactionbuttons' => true, 'custom' => true, 'customforce' => $customforce, 'f' => $facetofaceid)
+    null
 );
 
+// Include the same strings as mod/facetoface/sessions.php, because we override the lang string cache with this ugly hack.
+$PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
+$PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
+$PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
+    'createnewasset', 'createnewroom', 'editroom'), 'facetoface');
 
 // This is required because custom fields may use AMD module for JS and we can't re-initialise AMD
 // which will happen if we call get_end_code() without setting the first arg to false.

@@ -373,6 +373,7 @@ class mod_facetoface_session_form extends moodleform {
 
     function validation($data, $files) {
         $errors = parent::validation($data, $files);
+        $facetofaceid = $this->_customdata['f'];
         $dates = array();
         $dateids = $data['sessiondateid'];
         $datecount = count($dateids);
@@ -395,7 +396,7 @@ class mod_facetoface_session_form extends moodleform {
             }
             // If event is a cloning then remove session id and behave as a new event to get rooms availability.
             $sessid = ($data['c'] ? 0 : $data['s']);
-            $errdate = session_date_form::dates_validate($starttime, $endtime, $roomid, $assetlist, $sessid);
+            $errdate = session_date_form::dates_validate($starttime, $endtime, $roomid, $assetlist, $sessid, $facetofaceid);
 
             if (!empty($errdate['timestart'])) {
                 $errdates[] = $errdate['timestart'];
@@ -721,9 +722,10 @@ class session_date_form extends moodleform {
      * @param int $roomid
      * @param array $assetids
      * @param int $sessionid ignore room conflicts within current session (as it is covered by dates and some dates can be marked as deleted)
-     * @return $array errors ('timestart' => string, 'timefinish' => string, 'assetids' => string, 'roomid' => string)
+     * @param int $facetofaceid
+     * @return array errors ('timestart' => string, 'timefinish' => string, 'assetids' => string, 'roomid' => string)
      */
-    public static function dates_validate($timestart, $timefinish, $roomid = 0, $assetids = null, $sessionid = 0) {
+    public static function dates_validate($timestart, $timefinish, $roomid, $assetids, $sessionid, $facetofaceid) {
         $errors = array();
         // Validate start time.
         if ($timestart > $timefinish) {
@@ -734,13 +736,13 @@ class session_date_form extends moodleform {
 
         // Validate room.
         if (!empty($roomid)) {
+            $roomproblemfound = false;
             // Check if the room is available.
             $room = facetoface_get_room($roomid);
-            if ($room->hidden == 1 && $sessionid == 0) {
-                $errors['roomid'] = get_string('error:roomunavailable', 'facetoface', $room->name);
-            } else if (!facetoface_is_room_available($timestart, $timefinish, $roomid, $sessionid)) {
+            if (!facetoface_is_room_available($timestart, $timefinish, $room, $sessionid, $facetofaceid)) {
                  $link = html_writer::link(new moodle_url('/mod/facetoface/room.php', array('roomid' => $roomid)), $room->name,
                         array('target' => '_blank'));
+                // We should not get here because users should be able to select only available slots.
                 $errors['roomid'] = get_string('error:isalreadybooked', 'facetoface', $link);
             }
         }
@@ -803,8 +805,9 @@ class session_date_form extends moodleform {
         if (!empty($data['assetids'])) {
             $assetids = explode(',', $data['assetids']);
         }
+        $facetofaceid = $this->_customdata['facetofaceid'];
         $errors = session_date_form::dates_validate($data['timestart'], $data['timefinish'], $data['roomid'], $assetids,
-                $data['sessionid']);
+                $data['sessionid'], $facetofaceid);
         return $errors;
     }
 

@@ -945,8 +945,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
      * @return string
      */
     public function custom_pdf_header(reportbuilder $report) {
-        global $DB;
-
         if(!isset($report->embedobj->embeddedparams['sessionid'])) {
             return '';
         }
@@ -960,26 +958,13 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
             $session->sessiondates[0]->timefinish, $session->sessiondates[0]->sessiontimezone
         );
 
-        $activityname = $DB->get_field('facetoface', 'name', array('id' => $session->facetoface));
-
-        $rooms = facetoface_get_rooms($session->facetoface);
-        if(empty($session->roomid)) {
+        $room = facetoface_get_room($session->roomid);
+        if (!$room) {
             $roomstring = get_string('nonapplicable', 'facetoface');
         } else {
-            $room = $rooms[$session->roomid];
-
-            $roomarray[] = !empty($room->name) ? format_string($room->name) : false;
-            $roomarray[] = !empty($room->building) ? format_string($room->building) : false;
-            $roomarray[] = !empty($room->address) ? format_string($room->address) : false;
-
-            if (empty($roomarray)) {
-                $roomstring = '';
-            } else {
-                $roomstring = implode('<br />', $roomarray);
-            }
-
-            unset($room);
+            $roomstring = facetoface_room_to_string($room);
         }
+        unset($room);
 
         $table = new html_table();
         $table->size = array('200px');

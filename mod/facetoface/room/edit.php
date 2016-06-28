@@ -18,24 +18,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Alastair Munro <alastair.munro@totaralms.com>
- * @package totara
- * @subpackage facetoface
+ * @package totara_facetoface
  */
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once($CFG->libdir . '/adminlib.php');
-require_once($CFG->dirroot . '/mod/facetoface/room/lib.php');
+require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 $id = optional_param('id', 0, PARAM_INT);
-$page = optional_param('page', 0, PARAM_INT);
 
 admin_externalpage_setup('modfacetofacerooms');
-$systemcontext = context_system::instance();
 
-$roomlisturl = new moodle_url('/mod/facetoface/room/manage.php', array('page' => $page));
+if ($id) {
+    $room = $DB->get_record('facetoface_room', array('id' => $id, 'custom' => 0), '*', MUST_EXIST);
+} else {
+    $room = false;
+}
 
-$form = process_room_form(
-    $id,
+$roomlisturl = new moodle_url('/mod/facetoface/room/manage.php');
+
+$form = facetoface_process_room_form($room, false, false,
     function() use ($roomlisturl, $id) {
         if (!$id) {
             $successstr = 'roomcreatesuccess';

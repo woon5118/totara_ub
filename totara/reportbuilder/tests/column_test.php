@@ -201,7 +201,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $f2f_room_data = array(
-        'id' => 1, 'name' => 'F2F room', 'building' => 'Building 1', 'address' => 'Wellington', 'capacity' => 10, 'type' => 'internal',
+        'id' => 1, 'name' => 'F2F room', 'capacity' => 10,
         'description' => 'Room description', 'custom' => 0, 'timecreated' => 1265963591, 'timemodified' => 1265963591
     );
 

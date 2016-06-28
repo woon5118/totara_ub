@@ -34,7 +34,6 @@ global $CFG;
 
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
-require_once($CFG->dirroot . '/mod/facetoface/room/lib.php');
 require_once($CFG->dirroot . '/totara/customfield/field/datetime/define.class.php');
 require_once($CFG->dirroot . '/totara/customfield/field/datetime/field.class.php');
 

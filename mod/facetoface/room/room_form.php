@@ -18,14 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Eugene Venter <eugene@catalyst.net.nz>
- * @package totara
- * @subpackage facetoface
+ * @package totara_facetoface
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once("{$CFG->dirroot}/lib/formslib.php");
-require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
+require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php'); // TODO: TL-9425 this hack is unacceptable.
 
 class mod_facetoface_room_form extends moodleform {
 
@@ -36,21 +35,22 @@ class mod_facetoface_room_form extends moodleform {
         global $DB;
 
         $mform = $this->_form;
+        $room = $this->_customdata['room'];
+        $facetoface = $this->_customdata['facetoface'];
+        $session = $this->_customdata['session'];
+        $modconfig = has_capability('totara/core:modconfig', context_system::instance());
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-        if (!empty($this->_customdata['f'])) {
-            $mform->addElement('hidden', 'f');
+        if ($facetoface) {
+            $mform->addElement('hidden', 'f', $facetoface->id);
             $mform->setType('f', PARAM_INT);
-            $mform->getElement('f')->setValue($this->_customdata['f']);
         }
-
-        $mform->addElement('hidden', 'custom');
-        $mform->setType('custom', PARAM_INT);
-
-        $mform->addElement('hidden', 'page');
-        $mform->setType('page', PARAM_INT);
+        if ($session) {
+            $mform->addElement('hidden', 's', $session->id);
+            $mform->setType('s', PARAM_INT);
+        }
 
         $mform->addElement('text', 'name', get_string('roomnameedit', 'facetoface'), array('size' => '45'));
         $mform->setType('name', PARAM_TEXT);
@@ -62,23 +62,16 @@ class mod_facetoface_room_form extends moodleform {
         $mform->addRule('roomcapacity', null, 'required', null, 'client');
         $mform->addRule('roomcapacity', null, 'numeric', null, 'client');
 
-        $mform->addElement('checkbox', 'allowconflicts', get_string('allowroomconflicts', 'mod_facetoface'));
+        $mform->addElement('advcheckbox', 'allowconflicts', get_string('allowroomconflicts', 'mod_facetoface'));
         $mform->addHelpButton('allowconflicts', 'allowroomconflicts', 'mod_facetoface');
 
-        $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'facetoface'), $this->_customdata['editorattributes'], $this->_customdata['editoroptions']);
-
-        if ($this->_customdata['room']) {
-            $room = $this->_customdata['room'];
-        } else {
-            $room = new stdClass();
-            $room->id = 0;
-        }
+        $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'facetoface'), null, $this->_customdata['editoroptions']);
 
         customfield_definition($mform, $room, 'facetofaceroom', 0, 'facetoface_room');
-        // If nonpublic enforced, or room is already public - do not even ask to make it public.
-        if (empty($this->_customdata['customforce']) &&
-                (!empty($room->custom) || !isset($room->custom) && !empty($this->_customdata['custom']))) {
-            $mform->addElement('checkbox', 'notcustom', get_string('publishreuse', 'mod_facetoface'));
+
+        if ($modconfig and $facetoface and $room->custom) {
+            $mform->addElement('advcheckbox', 'notcustom', get_string('publishreuse', 'mod_facetoface'));
+            // Disable if does not seem to work in dialog forms, back luck.
         }
 
         if ($room->id) {
@@ -100,7 +93,7 @@ class mod_facetoface_room_form extends moodleform {
                     get_string('timestampbyuser', 'mod_facetoface', $created)
             );
 
-            if (!empty($room->timemodified)) {
+            if (!empty($room->timemodified) and $room->timemodified != $room->timecreated) {
                 $modified = new stdClass();
                 $modified->user = get_string('unknownuser');
                 if (!empty($room->usermodified)) {
@@ -119,12 +112,37 @@ class mod_facetoface_room_form extends moodleform {
             }
         }
 
-        if (empty($this->_customdata['noactionbuttons'])) {
+        if (!$facetoface) {
             $label = null;
             if (!$room->id) {
                 $label = get_string('addroom', 'facetoface');
             }
             $this->add_action_buttons(true, $label);
         }
+
+        $this->set_data($room);
+    }
+
+    public function validation($data, $files) {
+        global $DB;
+
+        $errors = parent::validation($data, $files);
+
+        $room = $this->_customdata['room'];
+
+        if ((int)$data['roomcapacity'] <= 0) {
+            // Client side JS validation does not work much in the hacky dialog forms - do it on server side!
+            $errors['roomcapacity'] = get_string('required');
+        }
+
+        if ($room->id and $room->allowconflicts == 1 and $data['allowconflicts'] == 0) {
+            // Make sure there are no existing conflicts before we switch the setting!
+
+            if (facetoface_room_has_conflicts($room->id)) {
+                $errors['allowconflicts'] = get_string('error:roomconflicts', 'mod_facetoface');
+            }
+        }
+
+        return $errors;
     }
 }

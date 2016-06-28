@@ -23,7 +23,6 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_summary_room_embedded.php');
 
 $roomid = optional_param('roomid', 0, PARAM_INT);

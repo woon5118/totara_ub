@@ -20,8 +20,7 @@
  * @author Chris Wharton <chrisw@catalyst.net.nz>
  * @author Aaron Barnes <aaronb@catalyst.net.nz>
  * @author David Curry <david.curry@totaralms.com>
- * @package totara
- * @subpackage facetoface
+ * @package mod_facetoface
  */
 
 /*
@@ -38,6 +37,20 @@ require_once($CFG->dirroot . '/completion/cron.php');
 require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
 
 class mod_facetoface_lib_testcase extends advanced_testcase {
+    /** @var mod_facetoface_generator */
+    protected $facetoface_generator;
+
+    /** @var totara_customfield_generator */
+    protected $customfield_generator;
+
+    public function setUp() {
+        parent::setUp();
+        $this->resetAfterTest();
+
+        $this->facetoface_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $this->customfield_generator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
+    }
+
     // Test database data.
     // TODO TL-8860: We should change the 'id' values below to be unique to each table.
     protected $facetoface_data = array(
@@ -582,10 +595,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         array(4,        4,          'name4',    'val4'),
     );
 
-    protected $config_email = false;
-
-    // Constant variables!
-
     protected $facetoface = array(
         'f2f0' => array(
             'id' => 1,
@@ -715,35 +724,44 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         ),
     );
 
-    // message string 1
+    /** @var string */
     protected $msgtrue = 'should be true';
 
-    // message string 2
+    /** @var string */
     protected $msgfalse = 'should be false';
 
-    //Users are created in setUp().
-    protected $user1, $user2, $user3, $user4;
+    /** @var stdClass */
+    protected $user1;
 
-    function array_to_object(array $arr) {
-        $obj = new stdClass();
+    /** @var stdClass */
+    protected $user2;
 
-        foreach ($arr as $key => $value) {
-            $obj->$key = $value;
-        }
+    /** @var stdClass */
+    protected $user3;
 
-        return $obj;
-    }
+    /** @var stdClass */
+    protected $user4;
 
-    function setup() {
-        // function to load test tables
-        global $DB, $CFG;
+    /** @var stdClass */
+    protected $course1;
 
-        isset($CFG->noemailever) ? $this->config_email = $CFG->noemailever : false;
-        $CFG->noemailever = true;
+    /** @var stdClass */
+    protected $course2;
 
-        parent::setUp();
+    /** @var stdClass */
+    protected $course3;
+
+    /** @var stdClass */
+    protected $course4;
+
+    /**
+     * Set up site with some very basic basic seminar data.
+     *
+     * NOTE: please set up your site with generators for more complex testing scenarios.
+     */
+    protected function init_sample_data() {
         $this->loadDataSet(
-            $this->createArrayDataset(
+            $this->createArrayDataSet(
                 array(
                     'course'            => $this->course_data,
                     'facetoface_signups'            => $this->facetoface_signups_data,
@@ -779,10 +797,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->course2 = $this->getDataGenerator()->create_course(array('fullname'=> 'Basics'));
         $this->course3 = $this->getDataGenerator()->create_course(array('fullname'=> 'Advanced'));
         $this->course4 = $this->getDataGenerator()->create_course(array('fullname'=> 'Pro'));
-
     }
 
     function test_facetoface_get_status() {
+        $this->init_sample_data();
+
         // check for valid status codes
         $this->assertEquals(facetoface_get_status(10), 'user_cancelled');
         //$this->assertEquals(facetoface_get_status(20), 'session_cancelled'); //not yet implemented
@@ -794,21 +813,21 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertEquals(facetoface_get_status(80), 'no_show');
         $this->assertEquals(facetoface_get_status(90), 'partially_attended');
         $this->assertEquals(facetoface_get_status(100), 'fully_attended');
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_cost() {
+        $this->init_sample_data();
+
         // Test variables - case WITH discount.
         $sessiondata = $this->sessiondata['sess0'];
-        $sess0 = $this->array_to_object($sessiondata);
+        $sess0 = (object)$sessiondata;
 
         $userid1 = 1;
         $sessionid1 = 1;
 
         // Variable for test case NO discount.
         $sessiondata1 = $this->sessiondata['sess1'];
-        $sess1 = $this->array_to_object($sessiondata1);
+        $sess1 = (object)$sessiondata1;
 
         $userid2 = 2;
         $sessionid2 = 2;
@@ -818,43 +837,43 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test NO discount case.
         $this->assertEquals(facetoface_cost($userid2, $sessionid2, $sess1), '$90');
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_fix_settings() {
+        $this->init_sample_data();
+
         // test for facetoface object
         $facetoface1 = $this->facetoface['f2f0'];
-        $f2f = $this->array_to_object($facetoface1);
+        $f2f = (object)$facetoface1;
 
         // Test - for empty values.
         $this->assertEquals(facetoface_fix_settings($f2f), null);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_add_instance() {
+        $this->init_sample_data();
+
         // Define test variables.
         $facetoface1 = $this->facetoface['f2f0'];
-        $f2f = $this->array_to_object($facetoface1);
+        $f2f = (object)$facetoface1;
 
         $this->assertEquals(facetoface_add_instance($f2f), 7);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_update_instance() {
+        $this->init_sample_data();
+
         // Define test variables.
         $facetoface1 = $this->facetoface['f2f0'];
-        $f2f = $this->array_to_object($facetoface1);
+        $f2f = (object)$facetoface1;
 
         // Test.
         $this->assertTrue((bool)facetoface_update_instance($f2f));
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_delete_instance() {
+        $this->init_sample_data();
+
         // Test variables.
         $id = 1;
 
@@ -862,11 +881,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $sink = $this->redirectMessages();
         $this->assertTrue((bool)facetoface_delete_instance($id));
         $sink->close();
-
-        $this->resetAfterTest(true);
     }
 
     function test_cleanup_session_data() {
+        $this->init_sample_data();
+
         //define session object for test
         //valid values
         $sessionValid = new stdClass();
@@ -887,25 +906,26 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test - for invalid values.
         $this->assertEquals(cleanup_session_data($sessionInvalid), $sessionInvalid);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_add_session() {
+        $this->init_sample_data();
+
         // Variable for test.
         $session1 = $this->sessions['sess0'];
-        $sess0 = $this->array_to_object($session1);
+        $sess0 = (object)$session1;
         $sess0->usermodified = time();
 
         // Test.
         $this->assertNotEmpty(facetoface_add_session($sess0, null));
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_update_session() {
+        $this->init_sample_data();
+
         // Test variables.
         $session1 = $this->sessions['sess0'];
-        $sess0 = $this->array_to_object($session1);
+        $sess0 = (object)$session1;
 
         $sessiondates = new stdClass();
         $sessiondates->sessionid = 1;
@@ -915,29 +935,32 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test.
         $this->assertTrue((bool)facetoface_update_session($sess0, array($sessiondates)), $this->msgtrue);
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_update_attendees() {
+        $this->init_sample_data();
+
         // Test variables.
         $session1 = $this->sessions['sess0'];
-        $sess0 = $this->array_to_object($session1);
-        $sess0->sessiondates[0] = $this->array_to_object($sess0->sessiondates[0]);
+        $sess0 = (object)$session1;
+        $sess0->sessiondates[0] = (object)($sess0->sessiondates[0]);
 
         $this->assertTrue((bool)facetoface_update_attendees($sess0), $this->msgtrue);
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_get_facetoface_menu() {
+        $this->init_sample_data();
+
         // positive test
         $menu = facetoface_get_facetoface_menu();
         $this->assertEquals('array', gettype($menu));
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_delete_session() {
         global $DB, $CFG;
         require_once("$CFG->dirroot/totara/hierarchy/prefix/position/lib.php");
+
+        $this->init_sample_data();
 
         // Set up some users.
         $teacher1 = $this->getDataGenerator()->create_user();
@@ -1142,7 +1165,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertEquals(3, $DB->count_records('facetoface_session_info_data', array('facetofacesessionid' => $session2->id)));
         $session2params = $DB->get_records_sql($sqlparams . $sqlin2, $paramin2);
         $this->assertCount(1, $session2params);
-        $this->resetAfterTest(true);
 
         // Check the customfield data for session 2 is intact.
         $this->assertEquals(3, $DB->count_records('facetoface_signup_info_data', array('facetofacesignupid' => $signup22->id)));
@@ -1150,23 +1172,26 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_cron() {
+        $this->init_sample_data();
+
         // Test for valid case.
         $cron = new \mod_facetoface\task\send_notifications_task();
         $cron->testing = true;
         $cron->execute();
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_has_session_started() {
+        $this->init_sample_data();
+
         // Define test variables.
         $session1 = $this->sessions['sess0'];
-        $sess0 = $this->array_to_object($session1);
+        $sess0 = (object)$session1;
         $sess0->sessiondates = array(0 => new stdClass());
         $sess0->sessiondates[0]->timestart = time() - 100;
         $sess0->sessiondates[0]->timefinish = time() + 100;
 
         $session2 = $this->sessions['sess1'];
-        $sess1 = $this->array_to_object($session2);
+        $sess1 = (object)$session2;
 
         $timenow = time();
 
@@ -1175,20 +1200,20 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test for invalid case.
         $this->assertFalse((bool)facetoface_has_session_started($sess1, $timenow), $this->msgfalse);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_is_session_in_progress() {
+        $this->init_sample_data();
+
         // Define test variables.
         $session1 = $this->sessions['sess0'];
-        $sess0 = $this->array_to_object($session1);
+        $sess0 = (object)$session1;
         $sess0->sessiondates = array(0 => new stdClass());
         $sess0->sessiondates[0]->timestart = time() - 100;
         $sess0->sessiondates[0]->timefinish = time() + 100;
 
         $session2 = $this->sessions['sess1'];
-        $sess1 = $this->array_to_object($session2);
+        $sess1 = (object)$session2;
 
         $timenow = time();
 
@@ -1197,10 +1222,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test for invalid case.
         $this->assertFalse((bool)facetoface_is_session_in_progress($sess1, $timenow), $this->msgfalse);
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_get_session_dates() {
+        $this->init_sample_data();
+
         // Test variables.
         $sessionid1 = 1;
         $sessionid2 = 10;
@@ -1210,10 +1236,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test for invalid case.
         $this->assertFalse((bool)facetoface_get_session_dates($sessionid2), $this->msgfalse);
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_get_session() {
+        $this->init_sample_data();
+
         // Test variables.
         $sessionid1 = 1;
         $sessionid2 = 10;
@@ -1223,23 +1250,98 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test for invalid case.
         $this->assertFalse((bool)facetoface_get_session($sessionid2), $this->msgfalse);
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_get_sessions() {
-        // Test variables.
-        $facetofaceid1 = 1;
-        $facetofaceid2 = 42;
+        $this->resetAfterTest();
+        $now = time();
 
-        // Test for valid case.
-        $this->assertTrue((bool)facetoface_get_sessions($facetofaceid1), $this->msgtrue);
+        $sitewideroom1 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 1));
+        $sitewideroom2 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 2', 'allowconflicts' => 1));
+        $sitewideroom3 = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 3', 'allowconflicts' => 1));
 
-        // Test for invalid case.
-        $this->assertFalse((bool)facetoface_get_sessions($facetofaceid2), $this->msgfalse);
-        $this->resetAfterTest(true);
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface1 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+        $facetoface2 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        $sessiondates1_1 = array();
+        $sessiondates1_1[] = $this->prepare_date($now + (DAYSECS * 5), $now + (DAYSECS * 6), $sitewideroom1->id);
+        $sessiondates1_1[] = $this->prepare_date($now + (DAYSECS * 2), $now + (DAYSECS * 3), $sitewideroom1->id);
+        $sessiondates1_1[] = $this->prepare_date($now + (DAYSECS * 3), $now + (DAYSECS * 4), $sitewideroom2->id);
+        $sessionid1_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates1_1));
+
+        $sessiondates1_2 = array();
+        $sessiondates1_2[] = $this->prepare_date($now + (DAYSECS * 1), $now + (DAYSECS * 2), $sitewideroom1->id);
+        $sessiondates1_2[] = $this->prepare_date($now + (DAYSECS * 2), $now + (DAYSECS * 3), 0);
+        $sessionid1_2 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates1_2));
+
+        $sessiondates2_1 = array();
+        $sessiondates2_1[] = $this->prepare_date($now + (DAYSECS * 5), $now + (DAYSECS * 6), 0);
+        $sessionid2_1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates2_1));
+
+        $sessions = facetoface_get_sessions($facetoface1->id);
+        $this->assertCount(2, $sessions);
+        $this->assertSame(array($sessionid1_2, $sessionid1_1), array_keys($sessions));
+        $this->assertCount(3, $sessions[$sessionid1_1]->sessiondates);
+        $this->assertCount(2, $sessions[$sessionid1_2]->sessiondates);
+        $this->assertSame($sessiondates1_1[1]->roomid, $sessions[$sessionid1_1]->sessiondates[0]->roomid);
+        $this->assertSame($sessiondates1_1[1]->timestart, $sessions[$sessionid1_1]->sessiondates[0]->timestart);
+        $this->assertSame($sessiondates1_1[2]->roomid, $sessions[$sessionid1_1]->sessiondates[1]->roomid);
+        $this->assertSame($sessiondates1_1[2]->timestart, $sessions[$sessionid1_1]->sessiondates[1]->timestart);
+        $this->assertSame($sessiondates1_1[0]->roomid, $sessions[$sessionid1_1]->sessiondates[2]->roomid);
+        $this->assertSame($sessiondates1_1[0]->timestart, $sessions[$sessionid1_1]->sessiondates[2]->timestart);
+        $this->assertSame($sessiondates1_2[0]->roomid, $sessions[$sessionid1_2]->sessiondates[0]->roomid);
+        $this->assertSame($sessiondates1_2[0]->timestart, $sessions[$sessionid1_2]->sessiondates[0]->timestart);
+        $this->assertSame($sessiondates1_2[1]->roomid, $sessions[$sessionid1_2]->sessiondates[1]->roomid);
+        $this->assertSame($sessiondates1_2[1]->timestart, $sessions[$sessionid1_2]->sessiondates[1]->timestart);
+
+        $sessions = facetoface_get_sessions($facetoface2->id);
+        $this->assertCount(1, $sessions);
+        $this->assertCount(1, $sessions[$sessionid2_1]->sessiondates);
+        $this->assertSame($sessiondates2_1[0]->roomid, $sessions[$sessionid2_1]->sessiondates[0]->roomid);
+        $this->assertSame($sessiondates2_1[0]->timestart, $sessions[$sessionid2_1]->sessiondates[0]->timestart);
+
+        // Test room filtering.
+
+        $sessions = facetoface_get_sessions($facetoface1->id, '', $sitewideroom1->id);
+        $this->assertCount(2, $sessions);
+        $this->assertSame(array($sessionid1_2, $sessionid1_1), array_keys($sessions));
+        $this->assertCount(3, $sessions[$sessionid1_1]->sessiondates);
+        $this->assertCount(2, $sessions[$sessionid1_2]->sessiondates);
+        $this->assertSame($sessiondates1_1[1]->roomid, $sessions[$sessionid1_1]->sessiondates[0]->roomid);
+        $this->assertSame($sessiondates1_1[1]->timestart, $sessions[$sessionid1_1]->sessiondates[0]->timestart);
+        $this->assertSame($sessiondates1_1[2]->roomid, $sessions[$sessionid1_1]->sessiondates[1]->roomid);
+        $this->assertSame($sessiondates1_1[2]->timestart, $sessions[$sessionid1_1]->sessiondates[1]->timestart);
+        $this->assertSame($sessiondates1_1[0]->roomid, $sessions[$sessionid1_1]->sessiondates[2]->roomid);
+        $this->assertSame($sessiondates1_1[0]->timestart, $sessions[$sessionid1_1]->sessiondates[2]->timestart);
+        $this->assertSame($sessiondates1_2[0]->roomid, $sessions[$sessionid1_2]->sessiondates[0]->roomid);
+        $this->assertSame($sessiondates1_2[0]->timestart, $sessions[$sessionid1_2]->sessiondates[0]->timestart);
+        $this->assertSame($sessiondates1_2[1]->roomid, $sessions[$sessionid1_2]->sessiondates[1]->roomid);
+        $this->assertSame($sessiondates1_2[1]->timestart, $sessions[$sessionid1_2]->sessiondates[1]->timestart);
+
+        $sessions = facetoface_get_sessions($facetoface1->id, '', $sitewideroom2->id);
+        $this->assertCount(1, $sessions);
+        $this->assertSame(array($sessionid1_1), array_keys($sessions));
+        $this->assertCount(3, $sessions[$sessionid1_1]->sessiondates);
+        $this->assertSame($sessiondates1_1[1]->roomid, $sessions[$sessionid1_1]->sessiondates[0]->roomid);
+        $this->assertSame($sessiondates1_1[1]->timestart, $sessions[$sessionid1_1]->sessiondates[0]->timestart);
+        $this->assertSame($sessiondates1_1[2]->roomid, $sessions[$sessionid1_1]->sessiondates[1]->roomid);
+        $this->assertSame($sessiondates1_1[2]->timestart, $sessions[$sessionid1_1]->sessiondates[1]->timestart);
+        $this->assertSame($sessiondates1_1[0]->roomid, $sessions[$sessionid1_1]->sessiondates[2]->roomid);
+        $this->assertSame($sessiondates1_1[0]->timestart, $sessions[$sessionid1_1]->sessiondates[2]->timestart);
+
+        $sessions = facetoface_get_sessions($facetoface2->id, '', $sitewideroom1->id);
+        $this->assertCount(0, $sessions);
+
+        $sessions = facetoface_get_sessions($facetoface2->id, '', -1);
+        $this->assertCount(0, $sessions);
+
+        // TODO: add location search test
     }
 
     function test_facetoface_get_attendees() {
+        $this->init_sample_data();
+
         // Test variables.
         $sessionid1 = 1;
         $sessionid2 = 42;
@@ -1249,11 +1351,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test - for invalid sessionid.
         $this->assertEquals(facetoface_get_attendees($sessionid2), array());
-        $this->resetAfterTest(true);
-
     }
 
     function test_facetoface_get_attendee() {
+        $this->init_sample_data();
+
         // Test variables.
         $sessionid1 = 1;
         $sessionid2 = 42;
@@ -1265,15 +1367,17 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test for invalid case.
         $this->assertFalse((bool)facetoface_get_attendee($sessionid2, $userid2), $this->msgfalse);
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_get_userfields() {
+        $this->init_sample_data();
+
         $this->assertTrue((bool)facetoface_get_userfields(), $this->msgtrue);
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_get_user_custom_fields() {
+        $this->init_sample_data();
+
         // Test variables.
         $userid1 = 1;
         $userid2 = 42;
@@ -1284,12 +1388,13 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertTrue((bool)facetoface_get_user_customfields($userid1), $this->msgtrue);
         //TODO invalid case
         // Test for invalid case.
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_user_signup() {
         global $DB, $CFG;
         require_once("$CFG->dirroot/totara/hierarchy/prefix/position/lib.php");
+
+        $this->init_sample_data();
 
         $teacher1 = $this->getDataGenerator()->create_user();
         $student1 = $this->getDataGenerator()->create_user();
@@ -1351,16 +1456,14 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $sink = $this->redirectMessages();
         $this->assertTrue((bool)facetoface_user_signup($session, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
         $sink->close();
-
-        $this->resetAfterTest(true);
     }
 
     public function test_facetoface_user_signup_select_manager_message_manager() {
         global $DB, $CFG;
+        $this->init_sample_data();
 
         set_config('facetoface_selectpositiononsignupglobal', true);
 
-        $this->resetAfterTest();
         $this->preventResetByRollback();
 
         // Set up three users, one learner, a primary mgr and a secondary mgr.
@@ -1448,6 +1551,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_send_request_notice() {
+        $this->init_sample_data();
+
         // Set managerroleid to make sure that it
         // matches the role id defined in the unit test
         // role table, as the local install may have a different
@@ -1456,9 +1561,9 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test variables.
         $session1 = $this->sessions['sess0'];
-        $sess0 = $this->array_to_object($session1);
+        $sess0 = (object)$session1;
         $facetoface1 = $this->facetoface['f2f0'];
-        $f2f = $this->array_to_object($facetoface1);
+        $f2f = (object)$facetoface1;
 
         $userid1 = 1;
         $userid2 = 25;
@@ -1470,12 +1575,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $sink = $this->redirectMessages();
         $this->assertEquals(get_string(facetoface_send_request_notice($f2f, $sess0, $userid2), 'facetoface'), 'No manager email is set');
         $sink->close();
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_update_signup_status() {
         global $DB;
+        $this->init_sample_data();
 
         $teacher1 = $this->getDataGenerator()->create_user();
         $student1 = $this->getDataGenerator()->create_user();
@@ -1534,18 +1638,19 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         // Test for invalid case.
         // TODO invlaid case - how to cause sql error from here?
         //$this->assertFalse((bool)facetoface_update_signup_status($signupid2, $statuscode2, $createdby2, $note2), $this->msgfalse);
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_user_cancel() {
+        $this->init_sample_data();
+
         // test method - returns boolean
         $this->markTestSkipped('TODO - this test hasn\'t been working since 1.1');
 
         // Test variables.
         $session1 = $this->sessions['sess0'];
-        $sess0 = $this->array_to_object($session1);
+        $sess0 = (object)$session1;
         $facetoface1 = $this->facetoface['f2f0'];
-        $f2f = $this->array_to_object($facetoface1);
+        $f2f = (object)$facetoface1;
 
         $userid1 = 1;
         $forcecancel1 = TRUE;
@@ -1562,11 +1667,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         // Test for invalid case.
         //TODO invalid case?
         //$this->assertFalse((bool)facetoface_user_cancel($session2, $userid2), $this->msgfalse);
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_user_cancel_submission() {
         global $DB;
+        $this->init_sample_data();
 
         $student1 = $this->getDataGenerator()->create_user();
         $course1 = $this->getDataGenerator()->create_course();
@@ -1626,13 +1731,12 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('User status already changed to cancelled.');
 
         $sink->close();
-
-        $this->resetAfterTest(true);
     }
 
     // Test sending an adhoc notice using message substitution to the users signed for a session.
     function test_facetoface_send_notice() {
-        $this->resetAfterTest();
+        $this->init_sample_data();
+
         $this->preventResetByRollback();
 
         $fields = array('username', 'email', 'institution', 'department', 'city', 'idnumber', 'icq', 'skype',
@@ -1716,10 +1820,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
      */
     function test_facetoface_send_notice_duplicates() {
         global $CFG;
+        $this->init_sample_data();
+
         // Turn this stuff off. We need to fix these tests one day!
         $CFG->noemailever = false;
 
-        $this->resetAfterTest();
         $this->preventResetByRollback();
         $fields = array('username', 'email', 'institution', 'department', 'city', 'idnumber', 'icq', 'skype',
             'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'address', 'url', 'description');
@@ -1827,7 +1932,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_send_confirmation_notice() {
-        $this->resetAfterTest();
+        $this->init_sample_data();
+
         $this->preventResetByRollback();
 
         // Set up three users, one learner, a primary mgr and a secondary mgr.
@@ -1866,6 +1972,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_send_cancellation_notice() {
+        $this->init_sample_data();
+
         // Test. method - returns string
         $this->markTestSkipped('TODO - this test hasn\'t been working since 1.1');
 
@@ -1878,11 +1986,10 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test for valid case.
         //$this->assertEquals(facetoface_send_cancellation_notice($facetoface1, $session1, $userid1), '');
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_message_substitutions(){
-        $this->resetAfterTest();
+        $this->init_sample_data();
 
         $user1 = $this->getDataGenerator()->create_user();
         $course1 = $this->getDataGenerator()->create_course();
@@ -2046,6 +2153,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_take_attendance() {
+        $this->init_sample_data();
+
         // Test variables.
         $data1 = new stdClass();
         $data1->s = 1;
@@ -2055,11 +2164,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertTrue((bool)facetoface_take_attendance($data1), $this->msgtrue);
         //TODO invalid case
         // Test for invalid case.
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_approve_requests() {
         global $DB;
+        $this->init_sample_data();
 
         // Test variables.
         $data1 = new stdClass();
@@ -2072,7 +2181,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertTrue((bool)facetoface_approve_requests($data1), $this->msgtrue);
 
         // TODO test for invalid case
-        $this->resetAfterTest(true);
 
         $data2 = new stdClass();
         $data2->s = 5; // Seesion ID.
@@ -2108,17 +2216,19 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_ical_generate_timestamp() {
+        $this->init_sample_data();
+
         // Test variables.
         $timenow = time();
         $return = gmdate("Ymd\THis\Z", $timenow);
         //TODO check if this is the correct return value to compare
         // Test for valid case.
         $this->assertEquals(facetoface_ical_generate_timestamp($timenow), $return);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_ical_escape() {
+        $this->init_sample_data();
+
         // Define test variables.
         $text1 = "this is a test!&nbsp";
         $text2 = NULL;
@@ -2148,47 +2258,47 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         $this->assertEquals(facetoface_ical_escape($text4, $converthtml1), "/'s \; \\\" ' \\n \, . & &nbsp\;");
         $this->assertEquals(facetoface_ical_escape($text4, $converthtml2), "/'s \; \\\" ' \, . &  ");
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_update_grades() {
+        $this->init_sample_data();
+
         // Variables.
         $facetoface1 = $this->facetoface['f2f0'];
-        $f2f = $this->array_to_object($facetoface1);
+        $f2f = (object)$facetoface1;
 
         $userid = 0;
 
         $this->assertTrue((bool)facetoface_update_grades($f2f, $userid), $this->msgtrue);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_grade_item_update() {
+        $this->init_sample_data();
+
         // Test variables.
         $facetoface1 = $this->facetoface['f2f0'];
-        $f2f = $this->array_to_object($facetoface1);
+        $f2f = (object)$facetoface1;
 
         $grades = NULL;
 
         // Test.
         $this->assertTrue((bool)facetoface_grade_item_update($f2f), $this->msgtrue);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_grade_item_delete() {
+        $this->init_sample_data();
+
         // Test variables.
         $facetoface1 = $this->facetoface['f2f0'];
-        $f2f = $this->array_to_object($facetoface1);
+        $f2f = (object)$facetoface1;
 
         // Test for valid case.
         $this->assertTrue((bool)facetoface_grade_item_delete($f2f), $this->msgtrue);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_get_num_attendees() {
+        $this->init_sample_data();
+
         // Test variables.
         $sessionid1 = 2;
         $sessionid2 = 42;
@@ -2198,11 +2308,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test for invalid case.
         $this->assertEquals(facetoface_get_num_attendees($sessionid2), 0);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_get_user_submissions() {
+        $this->init_sample_data();
+
         // Test variables.
         $facetofaceid1 = 1;
         $userid1 = 1;
@@ -2217,20 +2327,21 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test for invalid case.
         $this->assertFalse((bool)facetoface_get_user_submissions($facetofaceid2, $userid2, $includecancellations2), $this->msgfalse);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_get_view_actions() {
+        $this->init_sample_data();
+
         // Define test variables.
         $testArray = array('view', 'view all');
 
         // Test.
         $this->assertEquals(facetoface_get_view_actions(), $testArray);
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_get_post_actions() {
+        $this->init_sample_data();
+
         // Test method - returns an array.
 
         // Define test variables.
@@ -2238,32 +2349,30 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test.
         $this->assertEquals(facetoface_get_post_actions(), $testArray);
-
-        $this->resetAfterTest(true);
     }
 
-
     function test_facetoface_session_has_capacity() {
+        $this->init_sample_data();
+
         // Test method - returns boolean.
 
         // Test variables.
         $session1 = $this->sessions['sess0'];
-        $sess0 = $this->array_to_object($session1);
+        $sess0 = (object)$session1;
 
         $session2 = $this->sessions['sess1'];
-        $sess1 = $this->array_to_object($session2);
+        $sess1 = (object)$session2;
 
         // Test for valid case.
         $this->assertFalse((bool)facetoface_session_has_capacity($sess0), $this->msgfalse);
 
         // Test for invalid case.
         $this->assertFalse((bool)facetoface_session_has_capacity($sess1), $this->msgfalse);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_get_trainer_roles() {
-        global $CFG;
+        $this->init_sample_data();
+
         // Test method - returns array.
 
         $context = context_course::instance(123074);
@@ -2276,12 +2385,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         $result = facetoface_get_trainer_roles($context);
         $this->assertEquals($result[4]->localname, 'Trainer');
-
-        $this->resetAfterTest(true);
     }
 
-
     function test_facetoface_get_trainers() {
+        $this->init_sample_data();
+
         // Test variables.
         $sessionid1 = 1;
         $roleid1 = 1;
@@ -2290,11 +2398,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertTrue((bool)facetoface_get_trainers($sessionid1, $roleid1), $this->msgtrue);
 
         $this->assertTrue((bool)facetoface_get_trainers($sessionid1), $this->msgtrue);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_supports() {
+        $this->init_sample_data();
+
         // Test variables.
         $feature1 = 'grade_has_grade';
         $feature2 = 'UNSUPPORTED_FEATURE';
@@ -2304,31 +2412,29 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // Test for invalid case.
         $this->assertFalse((bool)facetoface_supports($feature2), $this->msgfalse);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_manager_needed() {
+        $this->init_sample_data();
+
         // Test variables.
         $facetoface1 = $this->facetoface['f2f1'];
-        $f2f1 = $this->array_to_object($facetoface1);
+        $f2f1 = (object)$facetoface1;
 
         $facetoface2 = $this->facetoface['f2f0'];
-        $f2f2 = $this->array_to_object($facetoface2);
+        $f2f2 = (object)$facetoface2;
 
         // Test for valid case.
         $this->assertTrue((bool)facetoface_manager_needed($f2f1), $this->msgtrue);
 
         // Test for invalid case.
         $this->assertFalse((bool)facetoface_manager_needed($f2f2), $this->msgfalse);
-
-        $this->resetAfterTest(true);
     }
 
     function test_facetoface_notify_under_capacity() {
         global $DB;
+        $this->init_sample_data();
 
-        $this->resetAfterTest();
         $this->preventResetByRollback();
 
         $teacher1 = $this->getDataGenerator()->create_user();
@@ -2406,8 +2512,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     // Face-to-face minimum capacity specification.
     function test_facetoface_disable_notify_under_capacity() {
         global $DB;
+        $this->init_sample_data();
 
-        $this->resetAfterTest();
         $this->preventResetByRollback();
 
         $teacher1 = $this->getDataGenerator()->create_user();
@@ -2458,8 +2564,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     // Face-to-face minimum capacity specification.
     public function test_under_capacity_notification() {
         global $DB;
+        $this->init_sample_data();
 
-        $this->resetAfterTest();
         $this->preventResetByRollback();
 
         $teacher1 = $this->getDataGenerator()->create_user();
@@ -2528,7 +2634,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     }
 
     public function test_facetoface_waitlist() {
-        $this->resetAfterTest();
+        $this->init_sample_data();
 
         // Set two users.
         $user1 = $this->getDataGenerator()->create_user();
@@ -2663,9 +2769,9 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
      * @dataProvider facetoface_messaging_settings
      */
     public function test_facetoface_messages($emailonlyfromnoreplyaddress, $noreplyaddress, $senderfrom) {
-        global $UNITTEST;
+        $this->init_sample_data();
+
         $this->preventResetByRollback();
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
@@ -2681,12 +2787,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         // Assign managers to students.
         $hierarchygenerator->assign_primary_position($user1->id, $manager1->id, null, null);
         $hierarchygenerator->assign_primary_position($user2->id, $manager2->id, null, null);
-
-        // Function in lib/moodlelib.php email_to_user require this.
-        if (!isset($UNITTEST)) {
-            $UNITTEST = new stdClass();
-            $UNITTEST->running = true;
-        }
 
         set_config('emailonlyfromnoreplyaddress', $emailonlyfromnoreplyaddress);
         set_config('noreplyaddress', $noreplyaddress);
@@ -2740,8 +2840,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
     public function test_send_scheduled(){
         global $DB;
-
-        $this->resetAfterTest();
+        $this->init_sample_data();
 
         // We need to explicitly declare users' firstnames as these need to be unique - generator may sometimes produce duplicates.
         $user1 = $this->getDataGenerator()->create_user(array('firstname' => 'user1'));
@@ -2974,8 +3073,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
      * Reaggregation of activity completion is done via totara_core_reaggregate_course_modules_completion().
      */
     public function test_totara_core_update_module_completion_data_facetoface_fullyattended() {
-        $this->resetAfterTest(true);
         global $DB;
+        $this->init_sample_data();
 
         set_config('enablecompletion', '1');
 
@@ -2993,7 +3092,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         );
         $facetoface = $facetofacegenerator->create_instance($f2fdata, $f2foptions);
 
-        $sessiondate1 = $this->array_to_object($this->facetoface_sessions_dates_data);
+        $sessiondate1 = (object)($this->facetoface_sessions_dates_data);
         $sessiondata1 = array(
             'facetoface' => $facetoface->id,
             'capacity' => 10,
@@ -3057,8 +3156,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
      * Reaggregation of activity completion is done via totara_core_reaggregate_course_modules_completion().
      */
     public function test_totara_core_update_module_completion_data_facetoface_fullyattended_course_completion() {
-        $this->resetAfterTest(true);
         global $DB;
+        $this->init_sample_data();
 
         set_config('enablecompletion', '1');
 
@@ -3079,7 +3178,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $course_completion_info = new completion_info($course);
         $this->assertEquals(COMPLETION_ENABLED, $course_completion_info->is_enabled());
 
-        $sessiondate1 = $this->array_to_object($this->facetoface_sessions_dates_data);
+        $sessiondate1 = (object)($this->facetoface_sessions_dates_data);
         $sessiondata1 = array(
             'facetoface' => $facetoface->id,
             'capacity' => 10,
@@ -3153,8 +3252,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
      * Reaggregation of activity completion is done via totara_core_reaggregate_course_modules_completion().
      */
     public function test_totara_core_update_module_completion_data_facetoface_fullyattended_viewed() {
-        $this->resetAfterTest(true);
         global $DB;
+        $this->init_sample_data();
 
         set_config('enablecompletion', '1');
 
@@ -3173,7 +3272,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         );
         $facetoface = $facetofacegenerator->create_instance($f2fdata, $f2foptions);
 
-        $sessiondate1 = $this->array_to_object($this->facetoface_sessions_dates_data);
+        $sessiondate1 = (object)($this->facetoface_sessions_dates_data);
         $sessiondata1 = array(
             'facetoface' => $facetoface->id,
             'capacity' => 10,
@@ -3235,5 +3334,14 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         // The activity should now be complete.
         $this->assertEquals(true, $DB->record_exists('course_modules_completion',
             array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id, 'completionstate' => COMPLETION_COMPLETE)));
+    }
+
+    protected function prepare_date($timestart, $timeend, $roomid) {
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = (string)$timestart;
+        $sessiondate->timefinish = (string)$timeend;
+        $sessiondate->sessiontimezone = '99';
+        $sessiondate->roomid = (string)$roomid;
+        return $sessiondate;
     }
 }

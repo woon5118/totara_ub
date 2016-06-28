@@ -4375,5 +4375,21 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016070400, 'facetoface');
     }
 
+    if ($oldversion < 2016070500) {
+        // Unlink rooms from cancelled events,
+        // orphaned custom rooms get deleted automatically from cleanup task.
+        $sql = "SELECT fsd.id
+                  FROM {facetoface_sessions_dates} fsd
+                  JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
+                 WHERE fsd.roomid > 0 AND fs.cancelledstatus = 1";
+        $records = $DB->get_recordset_sql($sql);
+        foreach ($records as $record) {
+            $DB->set_field('facetoface_sessions_dates', 'roomid', 0, array('id' => $record->id));
+        }
+        $records->close();
+
+        upgrade_mod_savepoint(true, 2016070500, 'facetoface');
+    }
+
     return $result;
 }

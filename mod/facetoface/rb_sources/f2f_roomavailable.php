@@ -23,34 +23,28 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/totara/reportbuilder/filters/f2f_available.php');
+require_once($CFG->dirroot . '/mod/facetoface/rb_sources/f2f_available.php');
+
 /**
  * Empty rooms during specified time search implementation
  */
-class rb_filter_f2f_roomavailable extends rb_filter_f2f_available
-{
-    // TODO: This need to be covered by unit tests.
+class rb_filter_f2f_roomavailable extends rb_filter_f2f_available {
+    // TODO: This needs to be covered by behat tests.
     public function get_sql_snippet($sessionstarts, $sessionends) {
-        $paramstarts1 = rb_unique_param('timestart');
-        $paramstarts2 = rb_unique_param('timestart');
+        $paramstarts = rb_unique_param('timestart');
+        $paramends = rb_unique_param('timefinish');
 
-        $paramends1 = rb_unique_param('timefinish');
-        $paramends2 = rb_unique_param('timefinish');
         $field = $this->get_field();
         $sql = "$field NOT IN (
             SELECT r.id
-            FROM {facetoface_room} r
-            INNER JOIN {facetoface_sessions_dates} fsd
-                ON fsd.roomid = r.id
-            WHERE (fsd.timestart < :$paramstarts1 AND fsd.timefinish > :$paramends1)
-              OR (fsd.timestart > :$paramstarts2 AND fsd.timestart < :$paramends2)
-            )";
+              FROM {facetoface_room} r
+              JOIN {facetoface_sessions_dates} fsd ON fsd.roomid = r.id
+             WHERE r.allowconflicts = 0 AND :{$paramends} > fsd.timestart AND fsd.timefinish > :{$paramstarts}
+             )";
 
         $params = array();
-        $params[$paramstarts1] = $sessionstarts;
-        $params[$paramstarts2] = $sessionstarts;
-        $params[$paramends1] = $sessionends;
-        $params[$paramends2] = $sessionends;
+        $params[$paramstarts] = $sessionstarts;
+        $params[$paramends] = $sessionends;
 
         return array($sql, $params);
     }

@@ -283,6 +283,10 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $data = (object)$data;
         $oldid = $data->id;
 
+        /** @var restore_activity_task $task */
+        $task = $this->get_task();
+        $facetofaceid = $task->get_activityid();
+
         $sessionsdateid = $this->get_new_parentid('facetoface_sessions_date');
         if (!$sessionsdateid) {
             $this->set_mapping('facetoface_room', $oldid, null);
@@ -290,11 +294,15 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         }
         $sessiondate = $DB->get_record('facetoface_sessions_dates', array('id' => $sessionsdateid), '*', MUST_EXIST);
 
-        if ((int)$data->custom == 1) {
-            // Custom rooms are easy, we just add a new one as exact copy.
-            $newid = $this->create_facetoface_room($data);
+        if ($data->custom == 1) {
+            // Custom rooms are easy, we just add a new one as exact copy,
+            // but watch out that custom rooms might be shared in one seminar activity.
+            $newid = $this->get_mappingid('facetoface_room', $oldid);
+            if (!$newid) {
+                $newid = $this->create_facetoface_room($data);
+                $this->set_mapping('facetoface_room', $oldid, $newid);
+            }
             $DB->set_field('facetoface_sessions_dates', 'roomid', $newid, array('id' => $sessionsdateid));
-            $this->set_mapping('facetoface_room', $oldid, $newid);
             return;
         }
         // Only set the mapping when we actually create a new room!!!
@@ -317,9 +325,8 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
             return;
         }
         if ($room->allowconflicts == 0) {
-            $available = facetoface_get_available_rooms(array(array($sessiondate->timestart, $sessiondate->timefinish)), 'id');
-            if (!isset($available[$room->id])) {
-                $this->log('seminar room collision detected, room not added', backup::LOG_WARNING);
+            if (!facetoface_is_room_available($sessiondate->timestart, $sessiondate->timefinish, $room, $sessiondate->sessionid, $facetofaceid)) {
+                $this->log('seminar room not available', backup::LOG_WARNING);
                 return;
             }
         }
@@ -460,9 +467,8 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         }
 
         if ($DB->record_exists($tableprefix . '_info_data', array($parentfield => $newparentid, 'fieldid' => $field->id))) {
-            // Something is very wrong, this should never happen.
-            $info = "invalid field {$data->field_name} value detected in {$tableprefix}";
-            $this->log($info, backup::LOG_ERROR);
+            // Add the values only the first time, the fields can be easily duplicated in the backup tree,
+            // such as for reused custom seminar rooms.
             return;
         }
 

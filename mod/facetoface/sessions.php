@@ -86,7 +86,7 @@ $PAGE->set_url('/mod/facetoface/sessions.php', array('f' => $f, 'backtoallsessio
 $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
 $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
 $PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
-    'createnewasset', 'createnewroom'), 'facetoface');
+    'createnewasset', 'createnewroom', 'editroom'), 'facetoface');
 $PAGE->set_title($facetoface->name);
 $PAGE->set_heading($course->fullname);
 
@@ -226,21 +226,6 @@ if (!isset($session)) {
             $sessiondata->$roomcapacityfield = $date->roomid;
             $sessiondata->$assetsfield = $date->assetids;
             $i++;
-        }
-    }
-
-    if (!empty($sroom->id)) {
-        if (!$sroom->custom) {
-            // Pre-defined room
-            $sessiondata->pdroomid = $session->roomid;
-            $sessiondata->pdroomcapacity = $sroom->capacity;
-        } else {
-            // Custom room
-            $sessiondata->customroom = 1;
-            $sessiondata->croomname = $sroom->name;
-            $sessiondata->croombuilding = $sroom->building;
-            $sessiondata->croomaddress = $sroom->address;
-            $sessiondata->croomcapacity = $sroom->capacity;
         }
     }
 }
