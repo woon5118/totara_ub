@@ -110,6 +110,10 @@ if ($backtoallsessions) {
     $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
 }
 
+if (!empty($session->cancelledstatus)) {
+    print_error('error:cannoteditcancelledevent', 'facetoface', $returnurl);
+}
+
 $editoroptions = array(
     'noclean'  => false,
     'maxfiles' => EDITOR_UNLIMITED_FILES,

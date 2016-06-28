@@ -412,8 +412,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         // Can edit sessions.
         if ($editevents) {
-            // NOTE: TL-8718 decide what to do with editing of cancelled sessions
-            $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/edit', get_string('editsession', 'facetoface'))) . ' ';
+            if (empty($session->cancelledstatus)) {
+                $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/sessions.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/edit', get_string('editsession', 'facetoface'))) . ' ';
+            } else {
+                // The event is cancelled so disable the edit icon.
+                $options .= $this->output->pix_icon('t/edit_gray', get_string('editeventcancelled', 'facetoface')) . ' ';
+            }
             if ($session->cancelledstatus == 0) {
                 if (!facetoface_has_session_started($session, $timenow)) {
                     $options .= $this->output->action_icon(new moodle_url('/mod/facetoface/cancelsession.php', array('s' => $session->id, 'backtoallsessions' => $bas)), new pix_icon('t/block', get_string('cancelsession', 'facetoface'))) . ' ';
