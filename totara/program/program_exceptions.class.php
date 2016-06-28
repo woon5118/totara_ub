@@ -256,7 +256,7 @@ class prog_exceptions_manager {
                 $sql .= " AND us.id = ?";
                 $params[] = $searchterm;
             } else {
-                $sql .= " AND " . $DB->sql_like($DB->sql_concat('us.firstname','us.lastname'), '?', false);
+                $sql .= " AND " . $DB->sql_like($DB->sql_concat('us.firstname', "' '", 'us.lastname'), '?', false);
                 $params[] = '%' . $DB->sql_like_escape($searchterm) . '%';
             }
         }
