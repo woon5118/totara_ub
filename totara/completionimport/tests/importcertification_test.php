@@ -271,14 +271,14 @@ class importcertification_testcase extends reportcache_advanced_testcase {
                 'wrong assignment type assigned. The user is already assigned to the program as an individual');
         }
 
-        // Check user 8 was assigned as individual but only has records for future assignment.
+        // Check user 8 was assigned as individual and also has records for future assignment.
         $params = array('programid' => $program->id, 'assignmenttype' => ASSIGNTYPE_INDIVIDUAL, 'assignmenttypeid' => $users[8]->id);
         $records = $DB->get_records('prog_assignment', $params);
         $this->assertEquals(1, count($records));
         $assignment = reset($records);
         $params = array('programid' => $program->id, 'userid' => $users[8]->id, 'assignmentid' => $assignment->id);
         $this->assertTrue($DB->record_exists('prog_future_user_assignment', $params));
-        $this->assertFalse($DB->record_exists('prog_user_assignment', $params));
+        $this->assertTrue($DB->record_exists('prog_user_assignment', $params));
 
         // Check that the rest of users who don't have previous assignments were assigned as individual.
         $params = array($program->id);
@@ -303,8 +303,8 @@ class importcertification_testcase extends reportcache_advanced_testcase {
             'Record count mismatch in the certif_completion table');
         $this->assertEquals(CERT_HISTORY_IMPORT_USERS+2, $DB->count_records('prog_completion'),
             'Record count mismatch in the prog_completion table');
-        $this->assertEquals(CERT_HISTORY_IMPORT_USERS+1, $DB->count_records('prog_user_assignment'),
-            'Record count mismatch in the prog_user_assignment table'); // Because user8 doesn't have records in this table.
+        $this->assertEquals(CERT_HISTORY_IMPORT_USERS+2, $DB->count_records('prog_user_assignment'),
+            'Record count mismatch in the prog_user_assignment table');
         $this->assertEquals(1, $DB->count_records('prog_future_user_assignment'),
             'Record count mismatch in the prog_future_user_assignment table');
     }
