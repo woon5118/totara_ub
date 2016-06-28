@@ -385,7 +385,8 @@ class customfield_define_location extends customfield_define_base {
         $newdata->size = (!empty($data->$size)) ? $data->$size : "";
         $newdata->view = (!empty($data->$view)) ? $data->$view : "";
         $newdata->display = (!empty($data->$display)) ? $data->$display : "";
-        $newdata->zoom = (!empty($data->$zoom)) ? $data->$zoom : $CFG->gmapsdefaultzoomlevel;
+        $gmapsdefaultzoomlevel = isset($CFG->gmapsdefaultzoomlevel) ? $CFG->gmapsdefaultzoomlevel : 12; // Not set during upgrade!
+        $newdata->zoom = (!empty($data->$zoom)) ? $data->$zoom : $gmapsdefaultzoomlevel;
         $newdata->location = $locationdata;
 
         return json_encode($newdata);
