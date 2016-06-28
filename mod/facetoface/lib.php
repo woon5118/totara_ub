@@ -3013,18 +3013,17 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         }
     } else if ($sessions = facetoface_get_sessions($facetoface->id)) {
         if ($facetoface->display > 0) {
-
-            // Limit number of sessions display. $sessions is in order of start time.
-            $displaysessions = array_slice($sessions, 0, $facetoface->display, true);
-
-            foreach($displaysessions as $id => $displaysession) {
-                if (facetoface_has_session_started($displaysession, $timenow)) {
+            foreach($sessions as $id => $session) {
+                if (facetoface_has_session_started($session, $timenow)) {
                     // We only want upcoming sessions (or those with no date set).
                     // For now, we've cut down the sessions to loop through to just those displayed.
                     // Todo: we need a version of facetoface_get_sessions that will return only upcoming in the first place.
-                    unset($displaysessions[$id]);
+                    unset($sessions[$id]);
                 }
             }
+
+            // Limit number of sessions display. $sessions is in order of start time.
+            $displaysessions = array_slice($sessions, 0, $facetoface->display, true);
 
             if (!empty($facetoface->managerreserve)) {
                 // Include information about reservations when drawing the list of sessions.
