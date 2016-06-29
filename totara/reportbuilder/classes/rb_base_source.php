@@ -2823,6 +2823,20 @@ abstract class rb_base_source {
         );
         $filteroptions[] = new rb_filter_option(
             'course',
+            'audvis',
+            get_string('audiencevisibility', 'totara_reportbuilder'),
+            'select',
+            array(
+                'selectchoices' => array(
+                    COHORT_VISIBLE_NOUSERS => get_string('visiblenousers', 'totara_cohort'),
+                    COHORT_VISIBLE_ENROLLED => get_string('visibleenrolled', 'totara_cohort'),
+                    COHORT_VISIBLE_AUDIENCE => get_string('visibleaudience', 'totara_cohort'),
+                    COHORT_VISIBLE_ALL => get_string('visibleall', 'totara_cohort')),
+                'simplemode' => true
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'course',
             'startdate',
             get_string('coursestartdate', 'totara_reportbuilder'),
             'date'
