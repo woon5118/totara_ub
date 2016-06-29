@@ -728,7 +728,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 goal::get_custom_field_data($personalcustomfields, $assignment);
             }
 
-            if ($can_edit) {
+            if ($can_edit[$assignment->assigntype]) {
                 $jsparams = array('userid' => $userid, 'personalscope' => goal::SCOPE_PERSONAL);
                 $PAGE->requires->js_call_amd('totara_hierarchy/mygoals', 'init_personal', $jsparams);
                 // Set up the edit and delete icons.

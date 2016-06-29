@@ -33,17 +33,19 @@ $goalpersonalid = required_param('goalpersonalid', PARAM_INT);
 $delete = optional_param('del', '', PARAM_ALPHANUM);
 
 // Check permissions before we do anything.
+$goal = new goal();
 $goalpersonal = goal::get_goal_item(array('id' => $goalpersonalid), goal::SCOPE_PERSONAL);
 if (empty($goalpersonal)) {
     print_error('error:goalnotfound', 'totara_hierarchy');
 }
 
-$context = context_user::instance($goalpersonal->userid);
-$can_edit = has_capability('totara/hierarchy:managegoalassignments', context_system::instance())
-    || (totara_is_manager($goalpersonal->userid) && has_capability('totara/hierarchy:managestaffpersonalgoal', $context))
-    || ($USER->id == $goalpersonal->userid && has_capability('totara/hierarchy:manageownpersonalgoal', $context));
+if (!$permissions = $goal->get_permissions(null, $goalpersonal->userid)) {
+    // Error setting up page permissions.
+    print_error('error:viewusergoals', 'totara_hierarchy');
+}
 
-if (!$can_edit) {
+extract($permissions);
+if (!$can_edit[$goalpersonal->assigntype]) {
     print_error('error:deleteusergoals', 'totara_hierarchy');
 }
 
@@ -51,6 +53,7 @@ $strdelgoals = get_string('removegoal', 'totara_hierarchy');
 $ret_url = new moodle_url("/totara/hierarchy/prefix/goal/mygoals.php", array('userid' => $goalpersonal->userid));
 
 // Set up the page.
+$context = context_user::instance($goalpersonal->userid);
 $urlparams = array('goalpersonalid' => $goalpersonalid);
 $PAGE->set_url(new moodle_url('/totara/hierarchy/prefix/goal/item/delete.php'), $urlparams);
 $PAGE->set_context($context);
