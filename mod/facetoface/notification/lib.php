@@ -1547,18 +1547,19 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         // Scheduled session
         $strftimedate = get_string('strftimedate');
         $strftimetime = get_string('strftimetime');
-
-        $startdate = userdate($data->sessiondates[0]->timestart, $strftimedate, $data->sessiondates[0]->sessiontimezone);
-        $finishdate = userdate($data->sessiondates[0]->timefinish, $strftimedate, $data->sessiondates[0]->sessiontimezone);
+        $sessiontimezone = (($data->sessiondates[0]->sessiontimezone == 99 && $user->timezone) ? $user->timezone : $data->sessiondates[0]->sessiontimezone);
+        $startdate = userdate($data->sessiondates[0]->timestart, $strftimedate, $sessiontimezone);
+        $finishdate = userdate($data->sessiondates[0]->timefinish, $strftimedate, $sessiontimezone);
         $sessiondate = ($startdate == $finishdate) ? $startdate : $startdate . ' - ' . $finishdate;
-        $starttime = userdate($data->sessiondates[0]->timestart, $strftimetime, $data->sessiondates[0]->sessiontimezone);
-        $finishtime = userdate($data->sessiondates[0]->timefinish, $strftimetime, $data->sessiondates[0]->sessiontimezone);
+        $starttime = userdate($data->sessiondates[0]->timestart, $strftimetime, $sessiontimezone);
+        $finishtime = userdate($data->sessiondates[0]->timefinish, $strftimetime, $sessiontimezone);
         // On a session with multiple-dates, variables above are finish dates etc for first date.
         // Below variables give dates and times for last date.
-        $lateststarttime = userdate(end($data->sessiondates)->timestart, $strftimetime, end($data->sessiondates)->sessiontimezone);
-        $lateststartdate = userdate(end($data->sessiondates)->timestart, $strftimedate, end($data->sessiondates)->sessiontimezone);
-        $latestfinishtime = userdate(end($data->sessiondates)->timefinish, $strftimetime, end($data->sessiondates)->sessiontimezone);
-        $latestfinishdate = userdate(end($data->sessiondates)->timefinish, $strftimedate, end($data->sessiondates)->sessiontimezone);
+        $sessiontimezone = ((end($data->sessiondates)->sessiontimezone == 99 && $user->timezone) ? $user->timezone : end($data->sessiondates)->sessiontimezone);
+        $lateststarttime = userdate(end($data->sessiondates)->timestart, $strftimetime, $sessiontimezone);
+        $lateststartdate = userdate(end($data->sessiondates)->timestart, $strftimedate, $sessiontimezone);
+        $latestfinishtime = userdate(end($data->sessiondates)->timefinish, $strftimetime, $sessiontimezone);
+        $latestfinishdate = userdate(end($data->sessiondates)->timefinish, $strftimedate, $sessiontimezone);
 
     } else {
         // Wait-listed session
@@ -1640,7 +1641,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         foreach($rooms as $room) {
             $roomcustomfields[$room->id] = customfield_get_data($room, 'facetoface_room', 'facetofaceroom', false);
         }
-        $msg = facetoface_notification_loop_session_placeholders($msg, $data, $rooms, $roomcustomfields);
+        $msg = facetoface_notification_loop_session_placeholders($msg, $data, $rooms, $roomcustomfields, $user);
         $msg = facetoface_notification_substitute_deprecated_placeholders($msg, $data, $rooms, $roomcustomfields);
     }
 
@@ -1708,9 +1709,10 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
  * @param array $rooms - array of room objects
  * @param array $roomcustomfields - array of room custom fields values with room->id as keys,
  * and for the values: customfield arrays of the format ['shortname' => value].
+ * @param stdClass $user - an object of user detail information
  * @return string the message with the looped replacements added.
  */
-function facetoface_notification_loop_session_placeholders($msg, $session, $rooms = array(), $roomcustomfields = array()) {
+function facetoface_notification_loop_session_placeholders($msg, $session, $rooms = array(), $roomcustomfields = array(), $user = null) {
     global $DB;
 
     $prevendposition = 0;
@@ -1778,24 +1780,28 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
 
         foreach ($session->sessiondates as $key => $sessiondate) {
             $returnedsegments[$key] = $templatesegment;
+            $sessiontimezone = $sessiondate->sessiontimezone;
+            if (isset($user->timezone)) {
+                $sessiontimezone = ($sessiondate->sessiontimezone == 99 ? $user->timezone : $sessiondate->sessiontimezone);
+            }
             foreach ($fixed_placeholders as $type => $fixed_placeholder) {
                 $value = '';
                 switch ($type) {
                     case 'session:startdate':
-                        $value = userdate($sessiondate->timestart, $strftimedate, $sessiondate->sessiontimezone);
+                        $value = userdate($sessiondate->timestart, $strftimedate, $sessiontimezone);
                         break;
                     case 'session:starttime':
-                        $value = userdate($sessiondate->timestart, $strftimetime, $sessiondate->sessiontimezone);
+                        $value = userdate($sessiondate->timestart, $strftimetime, $sessiontimezone);
                         break;
                     case 'session:finishdate':
-                        $value = userdate($sessiondate->timefinish, $strftimedate, $sessiondate->sessiontimezone);
+                        $value = userdate($sessiondate->timefinish, $strftimedate, $sessiontimezone);
                         break;
                     case 'session:finishtime':
-                        $value = userdate($sessiondate->timefinish, $strftimetime, $sessiondate->sessiontimezone);
+                        $value = userdate($sessiondate->timefinish, $strftimetime, $sessiontimezone);
                         break;
                     case 'session:timezone':
                         $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
-                        $value = $displaytimezones ? core_date::get_user_timezone($sessiondate->sessiontimezone) : '';
+                        $value = $displaytimezones ? core_date::get_user_timezone($sessiontimezone) : '';
                         break;
                     case 'room:name':
                         if (!empty($sessiondate->roomid) && isset($rooms[$sessiondate->roomid])) {

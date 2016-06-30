@@ -1279,4 +1279,225 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
 
         return $DB->update_record('facetoface_notification', $notice);
     }
+
+    public function test_user_timezone() {
+        global $DB;
+
+        list($sessiondate, $student1, $student2, $student3) = $this->f2fsession_generate_timezone(99);
+
+        // Test we are getting F2F booking confirmation email.
+        $haystack = $this->get_emails();
+        $this->notification_content_test('This is to confirm that you are now booked on the following course',
+            $haystack,
+            'Wrong notification, must be Face-to-face booking confirmation');
+
+
+        $alldates = $this->get_user_date($sessiondate, $student1);
+        // Test user timezone date with session timezone date.
+        $this->assertContains(
+            $alldates,
+            $haystack[0],
+            'Wrong session timezone date for student 1 Face-to-face booking confirmation notification');
+        $alldates = $this->get_user_date($sessiondate, $student2);
+        // Test user timezone date with session timezone date.
+        $this->assertContains(
+            $alldates,
+            $haystack[1],
+            'Wrong session timezone date for student 2 Face-to-face booking confirmation notification');
+        $alldates = $this->get_user_date($sessiondate, $student3);
+        // Test user timezone date with session timezone date.
+        $this->assertContains($alldates, $haystack[2], $message = 'Wrong session timezone date for student 3 Face-to-face booking confirmation notification');
+
+        $scheduled = $DB->get_records_select('facetoface_notification', 'conditiontype = ?', array(MDL_F2F_CONDITION_BEFORE_SESSION));
+        if ($scheduled) {
+            $this->emailsink = $this->redirectEmails();
+            foreach ($scheduled as $notify) {
+                $notification = new \facetoface_notification((array)$notify, false);
+                $notification->send_scheduled();
+            }
+            $this->emailsink->close();
+            // Test we are getting F2F booking reminder email.
+            $haystack = $this->get_emails();
+            $this->notification_content_test(
+                'This is a reminder that you are booked on the following course',
+                $haystack,
+                'Wrong notification, must be Face-to-face booking reminder');
+
+            $alldates = $this->get_user_date($sessiondate, $student1);
+            // Test user timezone date with session timezone date.
+            $this->assertContains(
+                $alldates,
+                $haystack[0],
+                'Wrong session timezone date for student 1 of Face-to-face booking reminder notification');
+
+            $alldates = $this->get_user_date($sessiondate, $student2);
+            // Test user timezone date with session timezone date.
+            $this->assertContains(
+                $alldates,
+                $haystack[1],
+                'Wrong session timezone date for student 2 of Face-to-face booking reminder notification');
+
+            $alldates = $this->get_user_date($sessiondate, $student3);
+            // Test user timezone date with session timezone date.
+            $this->assertContains(
+                $alldates,
+                $haystack[2],
+                'Wrong session timezone date for student 3 of Face-to-face booking reminder notification');
+        } else {
+            $this->fail('Something wrong with the test, please debug');
+        }
+    }
+
+    public function test_session_timezone() {
+        global $DB;
+
+        $test = new stdClass();
+        $test->timezone = 'America/New_York';
+
+        list($sessiondate, $student1, $student2, $student3) = $this->f2fsession_generate_timezone($test->timezone);
+
+        // Test we are getting F2F booking confirmation email.
+        $haystack = $this->get_emails();
+        $this->notification_content_test(
+            'This is to confirm that you are now booked on the following course',
+            $haystack,
+            'Wrong notification, must be Face-to-face booking confirmation');
+
+        $alldates = $this->get_user_date($sessiondate, $test);
+        // Test user timezone date with session timezone date.
+        $this->assertContains(
+            $alldates,
+            $haystack[0],
+            'Wrong session timezone date for student 1 Face-to-face booking confirmation notification');
+        // Test user timezone date with session timezone date.
+        $this->assertContains(
+            $alldates,
+            $haystack[1],
+            'Wrong session timezone date for student 2 Face-to-face booking confirmation notification');
+        // Test user timezone date with session timezone date.
+        $this->assertContains(
+            $alldates,
+            $haystack[2],
+            'Wrong session timezone date for student 3 Face-to-face booking confirmation notification');
+
+        $scheduled = $DB->get_records_select('facetoface_notification', 'conditiontype = ?', array(MDL_F2F_CONDITION_BEFORE_SESSION));
+        if ($scheduled) {
+            $this->emailsink = $this->redirectEmails();
+            foreach ($scheduled as $notify) {
+                $notification = new \facetoface_notification((array)$notify, false);
+                $notification->send_scheduled();
+            }
+            $this->emailsink->close();
+            // Test we are getting F2F booking reminder email.
+            $haystack = $this->get_emails();
+            $this->notification_content_test(
+                'This is a reminder that you are booked on the following course',
+                $haystack,
+                'Wrong notification, must be Face-to-face booking reminder');
+
+            // Test user timezone date with session timezone date.
+            $this->assertContains(
+                $alldates,
+                $haystack[0],
+                'Wrong session timezone date for student 1 of Face-to-face booking reminder notification');
+            // Test user timezone date with session timezone date.
+            $this->assertContains(
+                $alldates,
+                $haystack[1],
+                'Wrong session timezone date for student 2 of Face-to-face booking reminder notification');
+            // Test user timezone date with session timezone date.
+            $this->assertContains(
+                $alldates,
+                $haystack[2],
+                'Wrong session timezone date for student 3 of Face-to-face booking reminder notification');
+        } else {
+            $this->fail('Something wrong with the test, please debug');
+        }
+    }
+
+    private function f2fsession_generate_timezone($sessiontimezone) {
+        global $DB, $CFG;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Server timezone is Australia/Perth = $CFG->timezone.
+        $student1 = $this->getDataGenerator()->create_user(array('timezone' => 'Europe/London'));
+        $student2 = $this->getDataGenerator()->create_user(array('timezone' => 'Pacific/Auckland'));
+        $student3 = $this->getDataGenerator()->create_user(array('timezone' => $CFG->timezone));
+        $this->assertEquals($student1->timezone, 'Europe/London');
+        $this->assertEquals($student2->timezone, 'Pacific/Auckland');
+        $this->assertEquals($student3->timezone, $CFG->timezone);
+
+        $assignment = new position_assignment(array('userid' => $student1->id, 'type' => POSITION_TYPE_PRIMARY));
+        assign_user_position($assignment, true);
+        $assignment = new position_assignment(array('userid' => $student2->id, 'type' => POSITION_TYPE_PRIMARY));
+        assign_user_position($assignment, true);
+        $assignment = new position_assignment(array('userid' => $student3->id, 'type' => POSITION_TYPE_PRIMARY));
+        assign_user_position($assignment, true);
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $this->getDataGenerator()->enrol_user($student1->id, $course->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student3->id, $course->id, $studentrole->id);
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface',
+            'course' => $course->id
+        );
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+
+        $sessiondate = new stdClass();
+        $sessiondate->sessiontimezone = $sessiontimezone;
+        $sessiondate->timestart = time() + DAYSECS;
+        $sessiondate->timefinish = time() + DAYSECS + (4 * HOURSECS);
+
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 5,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1',
+        );
+
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
+        $session->sessiondates = facetoface_get_session_dates($session->id);
+
+        $this->emailsink = $this->redirectEmails();
+        facetoface_user_signup($session, $facetoface, $course, '', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $student1->id);
+        facetoface_user_signup($session, $facetoface, $course, '', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $student2->id);
+        facetoface_user_signup($session, $facetoface, $course, '', MDL_F2F_TEXT, MDL_F2F_STATUS_BOOKED, $student3->id);
+        $this->emailsink->close();
+
+        return array($sessiondate, $student1, $student2, $student3);
+    }
+
+    private function notification_content_test($needlebody, $haystack, $message) {
+
+        $this->assertContains($needlebody, $haystack[0], $message);
+        $this->assertContains($needlebody, $haystack[1], $message);
+        $this->assertContains($needlebody, $haystack[2], $message);
+    }
+
+    private function get_user_date($sessiondate, $date) {
+        // Get user settings.
+        $alldates = '';
+        $strftimedate = get_string('strftimedate');
+        $strftimetime = get_string('strftimetime');
+
+        $startdate  = userdate($sessiondate->timestart, $strftimedate, $date->timezone);
+        $startime   = userdate($sessiondate->timestart, $strftimetime, $date->timezone);
+
+        $finishdate = userdate($sessiondate->timefinish, $strftimedate, $date->timezone);
+        $finishtime = userdate($sessiondate->timefinish, $strftimetime, $date->timezone);
+
+        // Template example: [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+        $alldates .= $startdate .', '.$startime .' - '. $finishdate .', '. $finishtime . ' '. $date->timezone;
+
+        return $alldates;
+    }
 }
