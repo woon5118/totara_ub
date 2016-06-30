@@ -80,6 +80,10 @@ class mod_facetoface_signup_form extends moodleform {
                 $mform->addHelpButton('managername', 'managername', 'facetoface');
             }
         } else if ($approvaltype == APPROVAL_ADMIN) {
+            $mform->addElement('hidden', 'managerid');
+            $mform->setType('managerid', PARAM_INT);
+            $mform->setDefault('managerid', $managerid);
+
             $select = get_config(null, 'facetoface_managerselect');
             if ($select) {
                 $manager_title = fullname($manager);
