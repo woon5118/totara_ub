@@ -28,7 +28,14 @@ namespace totara_reportbuilder\rb\aggregate;
  */
 class avg extends base {
     protected static function get_field_aggregate($field) {
-        return "AVG($field)";
+        global $DB;
+
+        $dbfamily = $DB->get_dbfamily();
+        if ($dbfamily === 'mssql') {
+            return "AVG(1.0*$field)";
+        } else {
+            return "AVG($field)";
+        }
     }
 
     public static function get_displayfunc(\rb_column $column) {
