@@ -138,6 +138,12 @@ abstract class course_set {
                 $typestr = get_string('completemincourses', 'totara_program', $a);
             }
         }
+
+        if ($this->timeallowed > 0) {
+            $numperiod = program_utilities::get_duration_num_and_period($this->timeallowed);
+            $typestr .= html_writer::tag('p', get_string('allowtimeforset' . $numperiod->periodkey, 'totara_program', $numperiod->num));
+        }
+
         $out .= html_writer::div($typestr);
         return $out;
     }
@@ -407,20 +413,7 @@ abstract class course_set {
      * @return string
      */
     public function display_form_label() {
-
-        $timeallowedob = program_utilities::duration_explode($this->timeallowed);
-        $this->timeallowednum = $timeallowedob->num;
-        $this->timeallowedperiod = $timeallowedob->period;
-        $timeallowedperiodstr = $timeallowedob->periodstr;
-
-        $out = '';
-        $out .= $this->label.' (';
-        if ($this->timeallowedperiod !== TIME_SELECTOR_NOMINIMUM) {
-            $out .= $this->timeallowednum.' ';
-        }
-        $out .= $timeallowedperiodstr.')';
-
-        return $out;
+        return $this->label;
     }
 
     /**
@@ -901,10 +894,10 @@ class multi_course_set extends course_set {
                 break;
         }
 
-        $timeallowance = program_utilities::duration_explode($this->timeallowed);
+        $numperiod = program_utilities::get_duration_num_and_period($this->timeallowed);
 
         if ($this->timeallowed > 0) {
-            $out .= html_writer::tag('p', get_string('allowtimeforset', 'totara_program', $timeallowance));
+            $out .= html_writer::tag('p', get_string('allowtimeforset' . $numperiod->periodkey, 'totara_program', $numperiod->num));
         }
 
         $customfieldcriteria = $this->completiontype == COMPLETIONTYPE_SOME &&
@@ -1742,10 +1735,10 @@ class competency_course_set extends course_set {
                 break;
         }
 
-        $timeallowance = program_utilities::duration_explode($this->timeallowed);
+        $numperiod = program_utilities::get_duration_num_and_period($this->timeallowed);
 
         if ($this->timeallowed > 0) {
-            $out .= html_writer::tag('p', get_string('allowtimeforset', 'totara_program', $timeallowance));
+            $out .= html_writer::tag('p', get_string('allowtimeforset' . $numperiod->periodkey, 'totara_program', $numperiod->num));
         }
 
         $courses = $this->get_competency_courses();
@@ -2310,10 +2303,10 @@ class recurring_course_set extends course_set {
         $out .= html_writer::start_tag('div', array('class' => 'surround display-program'));
         $out .= $OUTPUT->heading(format_string($this->label), 3);
 
-        $timeallowance = program_utilities::duration_explode($this->timeallowed);
+        $numperiod = program_utilities::get_duration_num_and_period($this->timeallowed);
 
         if ($this->timeallowed > 0) {
-            $out .= html_writer::tag('p', get_string('allowtimeforset', 'totara_program', $timeallowance));
+            $out .= html_writer::tag('p', get_string('allowtimeforset' . $numperiod->periodkey, 'totara_program', $numperiod->num));
         }
 
         if (is_object($this->course)) {

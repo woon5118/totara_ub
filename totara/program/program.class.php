@@ -2024,6 +2024,52 @@ class program_utilities {
 
     }
 
+    /**
+     * Given a timestamp representing a duration, this function factors the
+     * timestamp out into a time period (e.g. an hour, a day, a week, etc)
+     * and the number of units of the time period.
+     *
+     * The period is included in two forms:
+     * $period - A constant such as TIME_SELECTOR_YEARS.
+     * $periodkey - A string such as 'years' (not translated, but might be used as part of
+     *  a lang string key).
+     *
+     * @param int $duration
+     * @return object Containing $num, $period and $periodkey properties
+     */
+    public static function get_duration_num_and_period($duration) {
+        $object = new stdClass();
+
+        if ($duration == 0) {
+            $object->num = 0;
+            $object->period = TIME_SELECTOR_NOMINIMUM;
+            $object->periodkey = 'nominimum';
+        } else if ($duration % DURATION_YEAR == 0) {
+            $object->num = $duration / DURATION_YEAR;
+            $object->period = TIME_SELECTOR_YEARS;
+            $object->periodkey = 'years';
+        } else if ($duration % DURATION_MONTH == 0) {
+            $object->num = $duration / DURATION_MONTH;
+            $object->period = TIME_SELECTOR_MONTHS;
+            $object->periodkey = 'months';
+        } else if ($duration % DURATION_WEEK == 0) {
+            $object->num = $duration / DURATION_WEEK;
+            $object->period = TIME_SELECTOR_WEEKS;
+            $object->periodkey = 'weeks';
+        } else if ($duration % DURATION_DAY == 0) {
+            $object->num = $duration / DURATION_DAY;
+            $object->period = TIME_SELECTOR_DAYS;
+            $object->periodkey = 'days';
+        } else if ($duration % DURATION_HOUR == 0) {
+            $object->num = $duration / DURATION_HOUR;
+            $object->period = TIME_SELECTOR_HOURS;
+            $object->periodkey = 'hours';
+        } else {
+            throw new ProgramException('Unrecognised datetime');
+        }
+
+        return $object;
+    }
 
     /**
      * Prints or returns the html for the time allowance fields
