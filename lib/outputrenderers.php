@@ -1272,7 +1272,7 @@ class core_renderer extends renderer_base {
             $config->tooltipVisible = get_string('hideblocka', 'access', $config->title);
             $config->tooltipHidden = get_string('showblocka', 'access', $config->title);
 
-            $this->page->requires->js_init_call('M.util.init_block_hider', array($config));
+            $this->page->requires->js_call_amd('core/blocks', 'init', array($config));
             user_preference_allow_ajax_update($config->preference, PARAM_BOOL);
         }
     }
