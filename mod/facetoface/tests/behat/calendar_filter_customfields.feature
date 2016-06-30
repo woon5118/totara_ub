@@ -184,6 +184,21 @@ Feature: Filter seminar events in calendar by their customfields
       | Description | Seminar one desc   |
     And I follow "View all events"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
+    And I fill seminar session with relative date in form data:
+      | timestart[timezone]  | Australia/Perth |
+      | timestart[day]       | 0               |
+      | timestart[month]     | 0               |
+      | timestart[year]      | 0               |
+      | timestart[hour]      | 0               |
+      | timestart[minute]    | 0               |
+      | timefinish[timezone] | Australia/Perth |
+      | timefinish[day]      | 0               |
+      | timefinish[month]    | 0               |
+      | timefinish[year]     | 0               |
+      | timefinish[hour]     | +1              |
+      | timefinish[minute]   | 0               |
+    And I press "OK"
     And I click on "Select room" "link"
     And I click on "Room 1" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
@@ -210,6 +225,21 @@ Feature: Filter seminar events in calendar by their customfields
       | Description | Seminar two desc   |
     And I follow "Seminar two"
     And I follow "Add a new event"
+    And I click on "Edit date" "link"
+    And I fill seminar session with relative date in form data:
+      | timestart[timezone]  | Australia/Perth |
+      | timestart[day]       | 0               |
+      | timestart[month]     | 0               |
+      | timestart[year]      | 0               |
+      | timestart[hour]      | 0               |
+      | timestart[minute]    | 0               |
+      | timefinish[timezone] | Australia/Perth |
+      | timefinish[day]      | 0               |
+      | timefinish[month]    | 0               |
+      | timefinish[year]     | 0               |
+      | timefinish[hour]     | +1              |
+      | timefinish[minute]   | 0               |
+    And I press "OK"
     And I click on "Select room" "link"
     And I click on "Room 2" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"

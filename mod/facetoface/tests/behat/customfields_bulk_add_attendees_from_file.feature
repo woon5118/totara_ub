@@ -83,7 +83,7 @@ Feature: Add seminar attendess from csv file with custom fields
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Bulk add attendees from file" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields.csv" file to "Text file" filemanager
     And I press "Continue"
     When I press "Confirm"
@@ -124,7 +124,7 @@ Feature: Add seminar attendess from csv file with custom fields
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Bulk add attendees from file" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_invalid_columns.csv" file to "Text file" filemanager
     When I press "Continue"
     Then I should see "Invalid CSV file format - \"checkbox\" custom field does not exist"
@@ -139,7 +139,7 @@ Feature: Add seminar attendess from csv file with custom fields
     And I press "Save changes"
 
     And I click on "Attendees" "link"
-    And I click on "Bulk add attendees from file" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_invalid_columns2.csv" file to "Text file" filemanager
     When I press "Continue"
     Then I should see "Invalid CSV file format - number of columns is not constant!"

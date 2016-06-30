@@ -229,7 +229,7 @@ class mod_facetoface_signup_form extends moodleform {
         }
 
         // Ensure user doesn't select themselves (by hacking the form).
-        if ($data['managerid'] == $USER->id) {
+        if (isset($data['managerid']) and $data['managerid'] == $USER->id) {
             $errors['managerselector'] = get_string('error');
         }
 

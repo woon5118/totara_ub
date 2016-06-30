@@ -86,7 +86,7 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Bulk add attendees from text input" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users via list of IDs" "option" in the "#menuf2f-actions" "css_element"
     # By default user is expected to separate ID's by newline, but comma is also supported.
     And I set the following fields to these values:
       | User identifier | Username          |
@@ -114,7 +114,7 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Bulk add attendees from text input" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users via list of IDs" "option" in the "#menuf2f-actions" "css_element"
     # By default user separate ID's by newline, but comma is also supported.
     And I set the following fields to these values:
       | User identifier | Email address |
@@ -156,7 +156,7 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Bulk add attendees from file" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "Text file" filemanager
     And I press "Continue"
     And I press "Confirm"
@@ -282,7 +282,7 @@ Feature: Add - Remove seminar attendees
     And I press "Save changes"
 
     When I click on "Attendees" "link"
-    And I click on "Bulk add attendees from file" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_invalid_columns.csv" file to "Text file" filemanager
     And I press "Continue"
     And I should see "Invalid CSV file format - number of columns is not constant!"
