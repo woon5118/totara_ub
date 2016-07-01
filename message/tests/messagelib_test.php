@@ -340,6 +340,9 @@ class core_message_messagelib_testcase extends advanced_testcase {
         $this->assertCount(2, message_search_users(0, 'Test'));
         $this->assertCount(1, message_search_users(0, 'user1'));
         $this->assertCount(2, message_search_users(0, 'user'));
+
+        // Test keyword matches escape SQL like characters.
+        $this->assertCount(0, message_search_users(0, '%'));
     }
 
     /**

@@ -1746,7 +1746,7 @@ function message_search_users($courseids, $searchtext, $sort='', $exceptions='')
 
     $params = array(
         'userid' => $USER->id,
-        'query' => "%$searchtext%"
+        'query' => '%' . $DB->sql_like_escape($searchtext) . '%'
     );
 
     if (empty($exceptions)) {
