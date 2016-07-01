@@ -1158,7 +1158,7 @@ class facetoface_notification extends data_object {
 
 
 /**
- * Send a notice.
+ * Send a notice (all session dates in one message).
  *
  * @param class $facetoface record from the facetoface table
  * @param class $session record from the facetoface_sessions table
@@ -1171,7 +1171,7 @@ class facetoface_notification extends data_object {
  * @return string Error message (or empty string if successful)
  */
 function facetoface_send_notice($facetoface, $session, $userid, $params, $icalattachmenttype = MDL_F2F_TEXT, $icalattachmentmethod = MDL_F2F_INVITE, $fromuser = null, array $olddates = array()) {
-    global $DB, $CFG;
+    global $DB;
 
     $notificationdisable = get_config(null, 'facetoface_notificationdisable');
     if (!empty($notificationdisable)) {
@@ -1192,6 +1192,10 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
         debugging("Duplicate notifications found for (excluding id): " . json_encode($params), DEBUG_DEVELOPER);
     }
 
+    if (get_config(null, 'facetoface_oneemailperday')) {
+        return facetoface_send_oneperday_notice($facetoface, $session, $userid, $params, $icalattachmenttype, $icalattachmentmethod, $fromuser, $olddates);
+    }
+
     $notice = new facetoface_notification($params);
     if (isset($facetoface->ccmanager)) {
         $notice->ccmanager = $facetoface->ccmanager;
@@ -1202,47 +1206,112 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
         $session->notifyuser = true;
     }
 
-    if (get_config(null, 'facetoface_oneemailperday')) {
-        // Keep track of all sessiondates.
-        $sessiondates = $session->sessiondates;
-        foreach ($sessiondates as $sessiondate) {
-            $session->sessiondates = array($sessiondate); // One day at a time.
+    if ((int)$icalattachmenttype == MDL_F2F_BOTH) {
+        $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid, $olddates);
+        $notice->set_ical_attachment($ical_attach);
+    }
+    $notice->set_newevent($user, $session->id, null, $fromuser);
+    if ($session->notifyuser) {
+        $notice->send_to_user($user, $session->id);
+    }
+    $notice->send_to_manager($user, $session->id);
+    $notice->send_to_thirdparty($user, $session->id);
+    $notice->send_to_roleapprovers($facetoface, $session);
+    $notice->send_to_adminapprovers($facetoface);
+    $notice->delete_ical_attachment();
+
+    return '';
+}
+
+/**
+ * Send a notice (one message per session date).
+ *
+ * @param class $facetoface record from the facetoface table
+ * @param class $session record from the facetoface_sessions table
+ * @param integer $userid ID of the recipient of the email
+ * @param array $params The parameters for the notification
+ * @param int $icalattachmenttype The ical attachment type, or MDL_F2F_TEXT to disable ical attachments
+ * @param int $icalattachmentmethod The ical method type: MDL_F2F_INVITE or MDL_F2F_CANCEL
+ * @param object $fromuser User object describing who the email is from.
+ * @param array $olddates array of previous dates
+ * @return string Error message (or empty string if successful)
+ */
+function facetoface_send_oneperday_notice($facetoface, $session, $userid, $params, $icalattachmenttype = MDL_F2F_TEXT, $icalattachmentmethod = MDL_F2F_INVITE, $fromuser = null, array $olddates = array()) {
+    global $DB, $CFG;
+
+    $notificationdisable = get_config(null, 'facetoface_notificationdisable');
+    if (!empty($notificationdisable)) {
+        return false;
+    }
+
+    $user = $DB->get_record('user', array('id' => $userid));
+    if (!$user) {
+        return 'userdoesnotexist';
+    }
+
+    if (!isset($session->notifyuser)) {
+        $session->notifyuser = true;
+    }
+
+    // Keep track of all sessiondates.
+    $sessiondates = $session->sessiondates;
+    // We need to consider old dates (cancel them if no new date exist for their dates).
+    $maxdates = max(count($sessiondates), count($olddates));
+    if ($maxdates == 0) {
+        return '';
+    }
+
+    for ($i = 0; $i < $maxdates; $i++) {
+        if (isset($sessiondates[$i])) {
+            $notice = new facetoface_notification($params);
+            if (isset($facetoface->ccmanager)) {
+                $notice->ccmanager = $facetoface->ccmanager;
+            }
+            $notice->set_facetoface($facetoface);
             if ((int)$icalattachmenttype == MDL_F2F_BOTH) {
-                $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid, $olddates);
+                $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid, $olddates, $i);
                 $notice->set_ical_attachment($ical_attach);
             }
+            $sessiondate = $sessiondates[$i];
+            // Send original notice for this date
             $notice->set_newevent($user, $session->id, $sessiondate);
             if ($session->notifyuser) {
                 $notice->send_to_user($user, $session->id, $sessiondate);
             }
+
             $notice->send_to_manager($user, $session->id);
             $notice->send_to_thirdparty($user, $session->id);
             $notice->send_to_roleapprovers($facetoface, $session);
             $notice->send_to_adminapprovers($facetoface);
 
             $notice->delete_ical_attachment();
+        } else {
+            // Send cancel notice.
+            $cancelparams = $params;
+            $cancelparams['conditiontype'] = MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION;
+            $cancelnotice = new facetoface_notification($cancelparams);
+            if (isset($facetoface->ccmanager)) {
+                $cancelnotice->ccmanager = $facetoface->ccmanager;
+            }
+            if ((int)$icalattachmenttype == MDL_F2F_BOTH && empty($CFG->facetoface_disableicalcancel)) {
+                $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid, $olddates, $i);
+                $cancelnotice->set_ical_attachment($ical_attach);
+            }
+            $cancelnotice->set_facetoface($facetoface);
+            $cancelnotice->set_newevent($user, $session->id);
+            if ($session->notifyuser) {
+                $cancelnotice->send_to_user($user, $session->id);
+            }
+            $cancelnotice->send_to_manager($user, $session->id);
+            $cancelnotice->send_to_thirdparty($user, $session->id);
+            $cancelnotice->send_to_roleapprovers($facetoface, $session);
+            $cancelnotice->send_to_adminapprovers($facetoface);
+            $cancelnotice->delete_ical_attachment();
         }
-        // Restore session dates.
-        $session->sessiondates = $sessiondates;
-    } else {
-        if ((int)$icalattachmenttype == MDL_F2F_BOTH) {
-            $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid, $olddates);
-            $notice->set_ical_attachment($ical_attach);
-        }
-        $notice->set_newevent($user, $session->id, null, $fromuser);
-        if ($session->notifyuser) {
-            $notice->send_to_user($user, $session->id);
-        }
-        $notice->send_to_manager($user, $session->id);
-        $notice->send_to_thirdparty($user, $session->id);
-        $notice->send_to_roleapprovers($facetoface, $session);
-        $notice->send_to_adminapprovers($facetoface);
-
-        $notice->delete_ical_attachment();
     }
+
     return '';
 }
-
 
 /**
  * Send a confirmation email to the user and manager regarding the

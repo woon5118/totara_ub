@@ -71,9 +71,10 @@ function facetoface_get_unmailed_reminders() {
  * @param stdClass $session instance
  * @param stdClass $user instance
  * @param array $olddates previous session dates
+ * @param int $onedate Provide ical attachment only for one specified date
  * @return stdClass Object that contains a filename in dataroot directory and ical template
  */
-function facetoface_get_ical_attachment($method, $facetoface, $session, $user, array $olddates = array()) {
+function facetoface_get_ical_attachment($method, $facetoface, $session, $user, array $olddates = array(), $onedate = -1) {
     global $CFG, $DB;
 
     // Get user object if only id is given
@@ -89,13 +90,26 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user, a
     // First, generate all the VEVENT blocks
     $VEVENTS = '';
     $rooms = facetoface_get_session_rooms($session->id);
-
-    $newdates = $session->sessiondates;
+    $newdates = empty($session->sessiondates) ? array() : $session->sessiondates;
     $maxdates = max(count($newdates), count($olddates));
     if ($maxdates == 0) {
         return null;
     }
-    $maxdateid = 0;
+
+    // It is important to sort dates by id, becuase sequence number depends on it.
+    uasort($olddates, function($a, $b) {
+        if ($a->id == $b->id) {
+            return 0;
+        }
+        return ($a->id < $b->id) ? -1 : 1;
+    });
+    uasort($newdates, function($a, $b) {
+        if ($a->id == $b->id) {
+            return 0;
+        }
+        return ($a->id < $b->id) ? -1 : 1;
+    });
+
 
     // Count user signup changes.
     $sql = "SELECT COUNT(*)
@@ -107,36 +121,36 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user, a
     $params = array($user->id, $session->id, MDL_F2F_STATUS_USER_CANCELLED);
     $usercnt = $DB->count_records_sql($sql, $params);
 
-    $date = null;
     for ($i = 0; $i < $maxdates; $i++) {
-        // This is possible only when $olddates are larger than $newdates. Cancel extra dates.
-        if (empty($newdates)) {
-            // Choose right sequence: it should be larger then previous and lower then next.
-            if (is_null($date)) {
-                // We don't have any new dates, reuse id from olddates.
-                foreach ($olddates as $olddate) {
-                    $maxdateid = max($olddate->id, $maxdateid);
-                }
-                $date = array_pop($olddates);
-                $date->timestart = 0;
-                $date->timefinish = 0;
-            } else {
-                $date = clone($date);
-            }
-            $date->id = $maxdateid;
+        // Take dates.
+        $newdate = null;
+        $olddate = null;
+        if (!empty($newdates)) {
+            $newdate = array_shift($newdates);
+        }
+        if(!empty($olddates)) {
+            $olddate = array_shift($olddates);
+        }
 
+        // Skip if we need only one date and this is not that date.
+        if ($onedate >= 0 && $onedate != $i) {
+            continue;
+        }
+
+        // This is possible only when $olddates are larger than $newdates. Cancel extra dates.
+        if (is_null($newdate)) {
+            $date = $olddate;
             // Cancel all the rest.
             $method = MDL_F2F_CANCEL;
             // So we need to increase sequnce without increasing date id or signup count,
             // but not make it equal or larger than next increase.
             $SEQUENCE = ($date->id + $usercnt) * 2 + 1;
         } else {
-            $date = array_shift($newdates);
+            $date = $newdate;
             // This will allow to increase sequence in both cases: when status changes for individual user
             // and when date changes for all.
             $SEQUENCE = ($date->id + $usercnt) * 2;
         }
-        $maxdateid = max($maxdateid, $date->id);
 
         // Date that this representation of the calendar information was created -
         // we use the time the session was created

@@ -315,6 +315,113 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
     }
 
     /**
+     * Test sending notifications when "facetoface_oneemailperday" is enabled
+     */
+    public function test_oneperday_ical_generation() {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        set_config('facetoface_oneemailperday', true);
+
+        $student1 = $this->getDataGenerator()->create_user();
+
+        $course = $this->getDataGenerator()->create_course();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $this->getDataGenerator()->enrol_user($student1->id, $course->id, $studentrole->id);
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface',
+            'course' => $course->id
+        );
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+
+        $date1 = new stdClass();
+        $date1->sessiontimezone = 'Pacific/Auckland';
+        $date1->timestart = time() + WEEKSECS;
+        $date1->timefinish = time() + WEEKSECS + 3600;
+
+        $date2 = new stdClass();
+        $date2->sessiontimezone = 'Pacific/Auckland';
+        $date2->timestart = time() + WEEKSECS + DAYSECS;
+        $date2->timefinish = time() + WEEKSECS + DAYSECS + 3600;
+
+        $sessiondates = array($date1, $date2);
+
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => $sessiondates,
+            'datetimeknown' => '1',
+            'mincapacity' => '1',
+            'cutoff' => DAYSECS - 60
+        );
+
+        $session = facetoface_get_session($facetofacegenerator->add_session($sessiondata));
+        $sessionolddates = facetoface_get_session_dates($session->id);
+
+        $this->emailsink = $this->redirectEmails();
+        facetoface_user_import($course, $facetoface, $session, $student1->id);
+        $this->emailsink->close();
+
+        $preemails = $this->get_emails();
+        foreach($preemails as $preemail) {
+            $this->assertContains("This is to confirm that you are now booked", $preemail);
+        }
+
+        // Get ical specifics.
+        $before0 = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student1, array(), 0);
+        $before1 = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student1, array(), 1);
+
+        $date1edit = new stdClass();
+        $date1edit->sessiontimezone = 'Pacific/Auckland';
+        $date1edit->timestart = time() + 2 * WEEKSECS;
+        $date1edit->timefinish = time() + 2 * WEEKSECS + 3600;
+
+        $this->emailsink = $this->redirectEmails();
+        // Change one date and cancel second.
+        facetoface_update_session($session, array($date1edit));
+        // Refresh session data.
+        $session = facetoface_get_session($session->id);
+
+        // Send message.
+        facetoface_send_datetime_change_notice($facetoface, $session, $student1->id, $sessionolddates);
+        $this->emailsink->close();
+        $after0 = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student1, $sessionolddates, 0);
+        $after1 = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student1, $sessionolddates, 1);
+
+        $emails = $this->get_emails();
+        $this->assertContains("Your session has changed", $emails[0]);
+        $this->assertContains("BOOKING CANCELLED", $emails[1]);
+
+        // Check ical specifics.
+        $before0ids = $this->get_ical_values($before0->content, 'UID');
+        $before0seqs = $this->get_ical_values($before0->content, 'SEQUENCE');
+        $before1ids = $this->get_ical_values($before1->content, 'UID');
+        $before1seqs = $this->get_ical_values($before1->content, 'SEQUENCE');
+        $after0ids = $this->get_ical_values($after0->content, 'UID');
+        $after0seqs = $this->get_ical_values($after0->content, 'SEQUENCE');
+        $after1ids = $this->get_ical_values($after1->content, 'UID');
+        $after1seqs = $this->get_ical_values($after1->content, 'SEQUENCE');
+
+        $this->assertCount(1, $before0ids);
+        $this->assertCount(1, $after0ids);
+        $this->assertCount(1, $before0seqs);
+        $this->assertCount(1, $after0seqs);
+        $this->assertCount(1, $before1ids);
+        $this->assertCount(1, $after1ids);
+        $this->assertCount(1, $before1seqs);
+        $this->assertCount(1, $after1seqs);
+        $this->assertEquals($before0ids[0], $after0ids[0]);
+        $this->assertEquals($before1ids[0], $after1ids[0]);
+        $this->assertGreaterThanOrEqual($before0seqs[0], $after0seqs[0]);
+        $this->assertGreaterThanOrEqual($before0seqs[0], $after1seqs[0]);
+    }
+
+    /**
      * Simplified parse $ical content and return values of requested property
      * @param string $content
      * @param string $name
