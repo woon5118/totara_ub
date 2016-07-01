@@ -299,4 +299,17 @@ class flex_icon_testcase extends advanced_testcase {
 
     }
 
+    public function test_template_helper_output() {
+
+        global $OUTPUT;
+
+        $name = 'cog';
+
+        $expected = $OUTPUT->flex_icon($name);
+        $actual = $OUTPUT->render_from_template('core/flex_icon_helper_test', array());
+
+        $this->assertEquals($expected, $actual);
+
+    }
+
 }
