@@ -310,13 +310,17 @@ class rb_filter_type {
         if (!$filtertype = self::get_filter_type($type, $value, $report)) {
             return false;
         }
-        $filename = "{$CFG->dirroot}/totara/reportbuilder/filters/{$filtertype}.php";
-        if (!is_readable($filename)) {
-            return false;
-        }
-        require_once($filename);
         $classname = "rb_filter_{$filtertype}";
+
         if (!class_exists($classname)) {
+            $filename = "{$CFG->dirroot}/totara/reportbuilder/filters/{$filtertype}.php";
+            if (!is_readable($filename)) {
+                return false;
+            }
+            require_once($filename);
+        }
+
+        if (!class_exists($classname, false)) {
             return false;
         }
 
