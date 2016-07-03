@@ -25,6 +25,10 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
+/**
+ * To test, run this from the command line from the $CFG->dirroot.
+ * vendor/bin/phpunit --verbose totara_plan_components_testcase totara/plan/tests/components_test.php
+ */
 class totara_plan_components_testcase extends advanced_testcase {
     /** @var phpunit_message_sink $messagesink */
     private $messagesink;
@@ -484,4 +488,111 @@ class totara_plan_components_testcase extends advanced_testcase {
         $this->assertObjectHasAttribute('linkedevidence', $assignedprogram);
         $this->assertEquals(2, $assignedprogram->linkedevidence);
     }
+
+    /**
+     * Tests dp_program_component->assign_new_item
+     *
+     * This ensures that we have the correct saved records when no due date
+     * is required for programs added to a learning plan.
+     *
+     * The user's time due should be set to COMPLETION_TIME_NOT_SET.
+     *
+     * @throws coding_exception
+     */
+    public function test_dp_component_program_assign_new_item_no_duedate() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        $datagenerator = $this->getDataGenerator();
+
+        $user = $datagenerator->create_user();
+        $this->setUser($user);
+
+        /** @var totara_plan_generator $plangenerator */
+        $plangenerator = $datagenerator->get_plugin_generator('totara_plan');
+        $enddate = time() + DAYSECS;
+        $planrecord = $plangenerator->create_learning_plan(array('userid' => $user->id, 'enddate' => $enddate));
+        $plan = new development_plan($planrecord->id);
+
+        // We're initialising the settings but not changing anything. The defaults
+        // should give us the results that we're checking for.
+        $plan->initialize_settings();
+
+        /** @var totara_program_generator $programgenerator */
+        $programgenerator = $datagenerator->get_plugin_generator('totara_program');
+        $program1 = $programgenerator->create_program();
+
+        /** @var dp_program_component $component_program */
+        $component_program = $plan->get_component('program');
+
+        $assigneditem = $component_program->assign_new_item($program1->id);
+
+        // Check that the item was successfully saved to the database.
+        $this->assertTrue($DB->record_exists('dp_plan_program_assign',
+            array('planid' => $planrecord->id, 'programid' => $program1->id)));
+
+        // The user should now have a program completion record. We'll ensure the values are correct.
+        $progcompletion = $DB->get_record('prog_completion',
+            array('programid' => $program1->id, 'userid' => $user->id, 'coursesetid' => 0));
+
+        $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status);
+        $this->assertEquals(0, $progcompletion->timecompleted);
+
+        // No due date was required. Therefore the timedue should be not set.
+        $this->assertEquals(COMPLETION_TIME_NOT_SET, $progcompletion->timedue);
+    }
+
+    /**
+     * Tests dp_program_component->assign_new_item
+     *
+     * This ensures that we have the correct saved records when a due date
+     * is required for programs added to a learning plan.
+     *
+     * The user's time due should be set to the end date of the plan.
+     *
+     * @throws coding_exception
+     */
+    public function test_dp_component_program_assign_new_item_require_duedate() {
+        $this->resetAfterTest(true);
+        global $DB;
+
+        $datagenerator = $this->getDataGenerator();
+
+        $user = $datagenerator->create_user();
+        $this->setUser($user);
+
+        /** @var totara_plan_generator $plangenerator */
+        $plangenerator = $datagenerator->get_plugin_generator('totara_plan');
+        $enddate = time() + DAYSECS;
+        $planrecord = $plangenerator->create_learning_plan(array('userid' => $user->id, 'enddate' => $enddate));
+        $plan = new development_plan($planrecord->id);
+
+        // Have a due date be required for any programs added to this plan.
+        $plan->initialize_settings();
+        $plan->settings['program_duedatemode'] = DP_DUEDATES_REQUIRED;
+
+        /** @var totara_program_generator $programgenerator */
+        $programgenerator = $datagenerator->get_plugin_generator('totara_program');
+        $program1 = $programgenerator->create_program();
+
+        /** @var dp_program_component $component_program */
+        $component_program = $plan->get_component('program');
+
+        $assigneditem = $component_program->assign_new_item($program1->id);
+
+        // Check that the item was successfully saved to the database.
+        $this->assertTrue($DB->record_exists('dp_plan_program_assign',
+            array('planid' => $planrecord->id, 'programid' => $program1->id)));
+
+        // The user should now have a program completion record. We'll ensure the values are correct.
+        $progcompletion = $DB->get_record('prog_completion',
+            array('programid' => $program1->id, 'userid' => $user->id, 'coursesetid' => 0));
+
+        $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status);
+        $this->assertEquals(0, $progcompletion->timecompleted);
+
+        // When due dates are required for programs, the due date will be the plans end date.
+        $this->assertEquals($enddate, $progcompletion->timedue);
+    }
+
 }
