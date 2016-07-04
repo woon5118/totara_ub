@@ -50,7 +50,13 @@ class mod_facetoface_allocation_testcase extends advanced_testcase {
 
         $facetoface = $this->getDataGenerator()->create_module('facetoface', array('course' => $course->id, 'name' => 'Test seminar'));
         $facetoface = $DB->get_record('facetoface', array('id' => $facetoface->id), '*', MUST_EXIST);
-        $sessionid = $seminargenerator->add_session(array('facetoface' => $facetoface->id));
+
+        // Use future session date to get consistent notifications.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + (DAYSECS * 1);;
+        $sessiondate->timefinish = $sessiondate->timestart + (DAYSECS * 1);
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessionid = $seminargenerator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => array($sessiondate)));
         $session = facetoface_get_session($sessionid);
 
         $this->setUser($user1);
