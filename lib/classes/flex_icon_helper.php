@@ -292,6 +292,16 @@ class flex_icon_helper {
             return $caches[$themename];
         }
 
+        // Always make sure that the requested theme name is valid before creating any files!
+        $themename = clean_param($themename, PARAM_THEME);
+        if (!$themename) {
+            debugging('Valid theme name not specified, reverting to default theme', DEBUG_DEVELOPER);
+            $themename = $CFG->theme;
+            if (array_key_exists($themename, $caches)) {
+                return $caches[$themename];
+            }
+        }
+
         // We store the cache inside a function so that we
         // can take advantage of namespacing to prevent any
         // collisions. A class for this purpose seems overkill.
@@ -313,10 +323,19 @@ class flex_icon_helper {
         $cachedata = self::build_cache_file_data($themename);
         $cachecontent = self::get_cache_file_content_from_data($themename, $cachedata);
 
-        file_put_contents($cachefilepath, $cachecontent);
+        // Do an atomic file creation, otherwise concurrent web requests will require_once() the incomplete file and fail badly.
+        do {
+            $randomsuffix = '.' . (string)rand(100000, 999999);
+        } while (file_exists($cachefilepath . $randomsuffix));
 
-        return self::get_cache($themename);
+        file_put_contents($cachefilepath . $randomsuffix, $cachecontent);
 
+        require_once($cachefilepath . $randomsuffix);
+        $caches[$themename] = call_user_func($functionname);
+
+        rename($cachefilepath . $randomsuffix, $cachefilepath);
+
+        return $caches[$themename];
     }
 
     /**
