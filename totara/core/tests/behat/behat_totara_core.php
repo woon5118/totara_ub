@@ -402,4 +402,28 @@ class behat_totara_core extends behat_base {
         throw new ExpectationException('The "' . $titleoralt . '" image was found in the "' .
             $containerelement . '" "' . $containerselectortype . '"', $this->getSession());
     }
+
+    /**
+     * Convenience step to force a Behat scenario to be skipped. Use anywhere in
+     * a Behat scenario; all steps after this step will be skipped but the test
+     * will not count as "failed". If you use it in a background section, then
+     * the entire feature will be skipped.
+     *
+     * This is meant to be used in the situation where there are known bugs in
+     * the code under test but the bugs have not been fixed yet. Another reason
+     * for this step is to force the test to indicate an issue tracker reference
+     * that will resolve the bugs(s).
+     *
+     * @Given /^I skip the scenario until issue "([^"]*)" lands$/
+     */
+    public function i_skip_the_scenario_until_issue_lands($issue) {
+        if (!empty($issue)) {
+            $msg = "THIS SCENARIO IS SKIPPED UNTIL '$issue' LANDS.";
+            throw new \Moodle\BehatExtension\Exception\SkippedException($msg);
+        }
+
+        throw new ExpectationException(
+            'No associated issue given for skipped scenario'
+        );
+    }
 }
