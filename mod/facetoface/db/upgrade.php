@@ -4359,5 +4359,14 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016062400, 'facetoface');
     }
 
+    if ($oldversion < 2016070400) {
+        // Uninstall the removed block_facetoface.
+        if (!file_exists("$CFG->dirroot/blocks/facetoface")) {
+            uninstall_plugin('block', 'facetoface');
+        }
+
+        upgrade_mod_savepoint(true, 2016070400, 'facetoface');
+    }
+
     return $result;
 }
