@@ -497,52 +497,6 @@ abstract class rb_base_source {
     }
 
     /**
-     * Reformat a timestamp and timezone into a time, showing nothing if invalid or null
-     *
-     * @param integer $date Unix timestamp
-     * @param object $row Object containing all other fields for this row (which should include a timezone field)
-     *
-     * @return string Time in a nice format
-     */
-    function rb_display_nice_time_in_timezone($date, $row) {
-        if ($date && is_numeric($date)) {
-            if (empty($row->timezone)) {
-                $targetTZ = core_date::get_user_timezone();
-                $tzstring = get_string('nice_time_unknown_timezone', 'totara_reportbuilder');
-            } else {
-                $targetTZ = core_date::normalise_timezone($row->timezone);
-                $tzstring = core_date::get_localised_timezone($targetTZ);
-            }
-            $date = userdate($date, get_string('strftimetime', 'langconfig'), $targetTZ) . ' ';
-            return $date . $tzstring;
-        } else {
-            return '';
-        }
-    }
-
-    /**
-     * Reformat a timestamp and timezone into a date, showing nothing if invalid or null
-     *
-     * @param integer $date Unix timestamp
-     * @param object $row Object containing all other fields for this row (which should include a timezone field)
-     *
-     * @return string Date in a nice format
-     */
-    function rb_display_nice_date_in_timezone($date, $row) {
-        if ($date && is_numeric($date)) {
-            if (empty($row->timezone)) {
-                $targetTZ = core_date::get_user_timezone();
-            } else {
-                $targetTZ = core_date::normalise_timezone($row->timezone);
-            }
-            $date = userdate($date, get_string('strftimedate', 'langconfig'), $targetTZ) . ' ';
-            return $date;
-        } else {
-            return '';
-        }
-    }
-
-    /**
      * Reformat a timestamp and timezone into a datetime, showing nothing if invalid or null
      *
      * @param integer $date Unix timestamp

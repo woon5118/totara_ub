@@ -355,7 +355,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('sessdate', 'rb_source_facetoface_sessions'),
                 'sessiondate.timestart',
                 array(
-                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
+                    'extrafields' => array(
+                        'timezone' => 'sessiondate.sessiontimezone'),
                     'joins' =>'sessiondate',
                     'displayfunc' => 'nice_date' . $intimezone,
                     'dbdatatype' => 'timestamp'
@@ -370,7 +371,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                     'joins' => 'sessiondate',
                     'displayfunc' => 'link_f2f_session',
                     'defaultheading' => get_string('sessdate', 'rb_source_facetoface_sessions'),
-                    'extrafields' => array('session_id' => 'base.sessionid', 'timezone' => 'sessiondate.sessiontimezone'),
+                    'extrafields' => array(
+                        'session_id' => 'base.sessionid',
+                        'timezone' => 'sessiondate.sessiontimezone'),
                     'dbdatatype' => 'timestamp'
                 )
             ),
@@ -380,7 +383,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('sessdatefinish', 'rb_source_facetoface_sessions'),
                 'sessiondate.timefinish',
                 array(
-                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
+                    'extrafields' => array(
+                        'timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
                     'displayfunc' => 'nice_date' . $intimezone,
                     'dbdatatype' => 'timestamp')
@@ -391,7 +395,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('sessstart', 'rb_source_facetoface_sessions'),
                 'sessiondate.timestart',
                 array(
-                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
+                    'extrafields' => array(
+                        'timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
                     'displayfunc' => 'nice_time' . $intimezone,
                     'dbdatatype' => 'timestamp'
@@ -403,7 +408,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('sessfinish', 'rb_source_facetoface_sessions'),
                 'sessiondate.timefinish',
                 array(
-                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
+                    'extrafields' => array(
+                        'timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
                     'displayfunc' => 'nice_time' . $intimezone,
                     'dbdatatype' => 'timestamp'
@@ -969,6 +975,25 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         global $OUTPUT;
         $activityid = $row->activity_id;
         return $OUTPUT->action_link(new moodle_url('/mod/facetoface/view.php', array('f' => $activityid)), $name);
+    }
+
+    // convert a f2f date into a link to that session
+    function rb_display_link_f2f_session($date, $row) {
+        global $OUTPUT, $CFG;
+
+        if (!$date || !is_numeric($date)) {
+            return '';
+        }
+
+        if (empty($row->timezone) || (int)$row->timezone == 99 || empty($CFG->facetoface_displaysessiontimezones)) {
+            $targetTZ = core_date::get_user_timezone();
+        } else {
+            $targetTZ = core_date::normalise_timezone($row->timezone);
+        }
+
+        $sessionid = $row->session_id;
+        $strdate = userdate($date, get_string('strftimedate', 'langconfig'), $targetTZ);
+        return $OUTPUT->action_link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessionid)), $strdate);
     }
 
     // Override user display function to show 'Reserved' for reserved spaces.
