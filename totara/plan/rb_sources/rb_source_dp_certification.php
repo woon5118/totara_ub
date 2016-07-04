@@ -727,9 +727,6 @@ class rb_source_dp_certification extends rb_base_source {
                 case CERTIFSTATUS_COMPLETED:
                     $strstatus = get_string('certified', 'totara_certification') . ' ' . $unassigned;
                     break;
-                case CERTIFSTATUS_INPROGRESS:
-                    // Return empty string.
-                    break;
                 default:
                     $strstatus = get_string($CERTIFSTATUS[$status], 'totara_certification') . ' ' . $unassigned;
                     break;
