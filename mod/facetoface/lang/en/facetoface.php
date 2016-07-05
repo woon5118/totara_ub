@@ -394,7 +394,6 @@ $string['duration'] = 'Duration';
 $string['early'] = '{$a} early';
 $string['editasset'] = 'Edit asset';
 $string['editdate'] = 'Edit date';
-$string['editeventcancelled'] = 'Cancelled events cannot be edited';
 $string['editmessagerecipientsindividually'] = 'Edit recipients individually';
 $string['editnotificationx'] = 'Edit "{$a}"';
 $string['editnotificationtemplate'] = 'Edit notification template';
