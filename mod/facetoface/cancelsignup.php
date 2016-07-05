@@ -145,7 +145,7 @@ $heading = get_string($strheading, 'facetoface', $facetoface->name);
 echo $OUTPUT->box_start();
 echo $OUTPUT->heading($heading);
 
-facetoface_print_session($session, $viewattendees);
+echo facetoface_print_session($session, $viewattendees);
 $mform->display();
 
 echo $OUTPUT->box_end();

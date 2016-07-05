@@ -3662,8 +3662,9 @@ function facetoface_session_has_capacity($session, $context = false, $status = M
  * @param boolean $return         Whether to return (true) the html or print it directly (true)
  * @param boolean $hidesignup     Hide any messages relating to signing up
  * @param string  $class          Custom css class for dl
+ * @return string|null html markup when return is true
  */
-function facetoface_print_session($session, $showcapacity, $calendaroutput=false, $return=false, $hidesignup=false, $class='f2f') {
+function facetoface_print_session($session, $showcapacity, $calendaroutput=false, $return=true, $hidesignup=false, $class='f2f') {
     global $CFG, $DB, $PAGE;
 
     $output = html_writer::start_tag('dl', array('class' => $class));
@@ -3799,7 +3800,11 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     }
     $output .= html_writer::end_tag('dl');
 
-    return $output;
+    if ($return) {
+        return $output;
+    }
+
+    echo $output;
 }
 
 /**
