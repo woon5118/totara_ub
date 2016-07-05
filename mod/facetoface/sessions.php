@@ -87,6 +87,8 @@ $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
 $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
 $PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
     'createnewasset', 'createnewroom'), 'facetoface');
+$PAGE->set_title($facetoface->name);
+$PAGE->set_heading($course->fullname);
 
 $jsconfig = array('sessionid' => $s, 'can_edit' => 'true', 'facetofaceid' => $facetoface->id);
 if (!empty($session)) {
@@ -110,6 +112,37 @@ if ($backtoallsessions) {
     $returnurl = new moodle_url('/course/view.php', array('id' => $course->id));
 }
 
+// Handle deletions, note that cancelled events must be deletable too.
+if ($session and $d) {
+    if (!$confirm) {
+        echo $OUTPUT->header();
+
+        echo $OUTPUT->heading(get_string('deletingsession', 'facetoface', format_string($facetoface->name)));
+
+        $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
+
+        echo facetoface_print_session($session, $viewattendees);
+
+        $optionsyes = array('sesskey' => sesskey(), 's' => $session->id, 'd' => 1, 'confirm' => 1, 'backtoallsessions' => $backtoallsessions);
+        echo $OUTPUT->confirm(get_string('deletesessionconfirm', 'facetoface', format_string($facetoface->name)),
+            new moodle_url('sessions.php', $optionsyes),
+            new moodle_url($returnurl));
+
+        echo $OUTPUT->footer();
+        die;
+    }
+
+    if (!confirm_sesskey()) {
+        print_error('confirmsesskeybad', 'error');
+    }
+
+    if (facetoface_delete_session($session)) {
+        \mod_facetoface\event\session_deleted::create_from_session($session, $context)->trigger();
+        redirect($returnurl);
+    }
+    print_error('error:couldnotdeletesession', 'facetoface', $returnurl);
+}
+
 if (!empty($session->cancelledstatus)) {
     print_error('error:cannoteditcancelledevent', 'facetoface', $returnurl);
 }
@@ -120,20 +153,6 @@ $editoroptions = array(
     'maxbytes' => $course->maxbytes,
     'context'  => $context,
 );
-
-// Handle deletions
-if ($d and $confirm) {
-    if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
-    }
-
-    if (facetoface_delete_session($session)) {
-        \mod_facetoface\event\session_deleted::create_from_session($session, $context)->trigger();
-    } else {
-        print_error('error:couldnotdeletesession', 'facetoface', $returnurl);
-    }
-    redirect($returnurl);
-}
 
 $sessionid = isset($session->id) ? $session->id : 0;
 
@@ -382,21 +401,12 @@ if ($fromform = $mform->get_data()) { // Form submitted
 if ($c) {
     $heading = get_string('copyingsession', 'facetoface', $facetoface->name);
 }
-else if ($d) {
-    $heading = get_string('deletingsession', 'facetoface', $facetoface->name);
-}
 else if ($id or $f) {
     $heading = get_string('addingsession', 'facetoface', $facetoface->name);
 }
 else {
     $heading = get_string('editingsession', 'facetoface', $facetoface->name);
 }
-
-$pagetitle = format_string($facetoface->name);
-
-$PAGE->set_cm($cm);
-$PAGE->set_title($pagetitle);
-$PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
 
@@ -407,17 +417,7 @@ if (!empty($errorstr)) {
     echo $OUTPUT->container(html_writer::tag('span', $errorstr, array('class' => 'errorstring')), array('class' => 'notifyproblem'));
 }
 
-if ($d) {
-    $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
-    facetoface_print_session($session, $viewattendees);
-    $optionsyes = array('sesskey' => sesskey(), 's' => $session->id, 'd' => 1, 'confirm' => 1, 'backtoallsessions' => $backtoallsessions);
-    echo $OUTPUT->confirm(get_string('deletesessionconfirm', 'facetoface', format_string($facetoface->name)),
-        new moodle_url('sessions.php', $optionsyes),
-        new moodle_url($returnurl));
-}
-else {
-    $mform->display();
-}
+$mform->display();
 
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer($course);

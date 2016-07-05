@@ -76,7 +76,7 @@ Feature: Return to previous page after actions in seminar
     And I click on "Yes" "button"
     Then I should see "View all events"
     And I should not see "All events in"
-    And I should see "Session cancelled"
+    And I should see "Event cancelled"
 
   Scenario: Sessions page - Seminar cancel session actions return to original page
     Given I click on "Find Learning" in the totara menu
@@ -94,7 +94,7 @@ Feature: Return to previous page after actions in seminar
     And I click on "Yes" "button"
     Then I should see "All events in"
     And I should not see "View all events"
-    And I should see "Session cancelled"
+    And I should see "Event cancelled"
 
   Scenario: Course page - Seminar clone session actions return to original page
     Given I click on "Find Learning" in the totara menu

@@ -102,7 +102,7 @@ Feature: Seminar event cancellation calendar views
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see date "1 day" formatted "%d %B %Y"
-    And I should see "Session cancelled" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
+    And I should see "Event cancelled" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
     And I should see "Sign-up unavailable" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
 
     When I click on "Calendar" in the totara menu
@@ -136,7 +136,7 @@ Feature: Seminar event cancellation calendar views
     And I follow "Course 1"
     And I follow "View all events"
     Then I should see date "1 day" formatted "%d %B %Y"
-    And I should see "Session cancelled" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
+    And I should see "Event cancelled" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
     And I should see "Sign-up unavailable" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
 
     When I click on "Calendar" in the totara menu
