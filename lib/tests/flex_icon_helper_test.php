@@ -586,7 +586,11 @@ class core_flex_icon_helper_testcase extends advanced_testcase {
 
         global $CFG;
 
-        $themename = 'testtheme';
+        // Note that we have to use non-default theme here
+        // because get_cache() is abusing static caches.
+        $themename = 'base';
+        $this->assertFileExists("$CFG->dirroot/theme/$themename");
+
         $testdata = array('testdata' => 123);
 
         $filepath = \core\flex_icon_helper::get_cache_file_path($themename);
