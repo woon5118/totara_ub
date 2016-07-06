@@ -61,7 +61,7 @@ if ($CFG->version < 2013051402.00) { // Upgrade from 2.4.x or earlier.
 // Add custom Totara completion field to prevent fatal problems during upgrade.
 if ($CFG->version < 2013111802.00) { // Upgrade from Totara 2.5.x or earlier.
     $table = new xmldb_table('course_completions');
-    $field = new xmldb_field('invalidatecache', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'status');
+    $field = new xmldb_field('invalidatecache', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'reaggregate');
     if (!$dbman->field_exists($table, $field)) {
         $dbman->add_field($table, $field);
     }
