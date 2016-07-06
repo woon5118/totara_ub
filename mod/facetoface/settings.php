@@ -79,12 +79,14 @@ if ($ADMIN->fulltree) { // Improve performance.
 
     // Create array with existing custom fields (if any), empty array otherwise.
     $customfields = array();
-    foreach (facetoface_get_session_customfields() as $key => $item) {
+    $eventcustomfields = customfield_get_fields_definition('facetoface_session', array('hidden' => 0));
+    foreach ($eventcustomfields as $key => $item) {
         if ($item->datatype != 'file') {
             $customfields['sess_' . $key] = get_string('customfieldsession', 'facetoface', $item->fullname);
         }
     }
-    foreach (facetoface_get_room_customfields() as $key => $item) {
+    $roomcustomfields = customfield_get_fields_definition('facetoface_room', array('hidden' => 0));
+    foreach ($roomcustomfields as $key => $item) {
         if ($item->datatype != 'file') {
             $customfields['room_' . $key] = get_string('customfieldroom', 'facetoface', $item->fullname);
         }

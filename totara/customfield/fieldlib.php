@@ -663,13 +663,14 @@ function customfield_get_fields($item, $tableprefix, $prefix) {
  *
  *
  * @param string $tableprefix Prefix to append '_info_field' to
+ * @param array $conditions optional array $fieldname=>requestedvalue with AND in between
  *
  * @return array Associate array of field definition ids and properties
  */
-function customfield_get_fields_definition($tableprefix) {
+function customfield_get_fields_definition($tableprefix, $conditions = array()) {
     global $DB;
 
-    $fields = $DB->get_records($tableprefix.'_info_field', array(), 'sortorder ASC');
+    $fields = $DB->get_records($tableprefix.'_info_field', $conditions, 'sortorder ASC');
     if (!$fields) {
         $fields = array();
     }

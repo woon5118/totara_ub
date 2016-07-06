@@ -1781,7 +1781,7 @@ function facetoface_download_attendance($facetofacename, $facetofaceid, $locatio
  */
 function facetoface_write_worksheet_header(&$worksheet, $context) {
     $pos=0;
-    $customfields = facetoface_get_session_customfields();
+    $customfields = customfield_get_fields_definition('facetoface_session', array('hidden' => 0));
     foreach ($customfields as $field) {
         if (!empty($field->showinsummary)) {
             $worksheet->write_string(0, $pos++, $field->fullname);
@@ -1840,7 +1840,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
 
     $trainerroles = facetoface_get_trainer_roles($coursecontext);
     $userfields = facetoface_get_userfields();
-    $customsessionfields = facetoface_get_session_customfields();
+    $customsessionfields = customfield_get_fields_definition('facetoface_session', array('hidden' => 0));
     $timenow = time();
     $i = $startingrow;
 
@@ -3949,98 +3949,31 @@ function facetoface_get_customfielddata($sessionid) {
 }
 
 /**
- * Return a cached copy of all records in session_info_field
- */
-function facetoface_get_session_customfields() {
-    global $DB;
-
-    static $customfields = null;
-    if (null == $customfields) {
-        if (!$customfields = $DB->get_records('facetoface_session_info_field', array('hidden' => 0))) {
-            $customfields = array();
-        }
-    }
-    return $customfields;
-}
-
-/**
- * Return a cached copy of all records in room_info_field
+ * Get custom fields and their data, this is a short version of customfield_get_data, which does not return default values
+ * if there no record for customfield
  *
- * @param integer $roomid ID of facetoface_room record
- * @return array
+ * @param stdClass $item The Item associated with the customfield
+ * @param string $tableprefix the table prefix of the customfield
+ * @param string $prefix The prefix of the custom field
+ * @param array $options customfield_file::display_item_data requires some additional extradata.
+ * @return array Array with the customfield and its associated value
  */
-function facetoface_get_room_customfield_data($roomid) {
-    global $DB;
+function facetoface_get_customfield_data($item, $tableprefix, $prefix, $options = array()) {
+    global $CFG, $DB;
 
-    $sql = "SELECT frtd.*, frif.shortname, frif.datatype, frif.fullname
-              FROM {facetoface_room_info_data} frtd
-              JOIN {facetoface_room_info_field} frif ON frtd.fieldid = frif.id
-             WHERE frtd.facetofaceroomid = ?
-          ORDER BY frif.sortorder";
-
-    return $DB->get_records_sql($sql, array($roomid));
-}
-
-/**
- * Return a cached copy of all records in room_info_field
- * @return array
- */
-function facetoface_get_room_customfields() {
-    global $DB;
-
-    static $customfields = null;
-    if (null == $customfields) {
-        if (!$customfields = $DB->get_records('facetoface_room_info_field', array('hidden' => 0))) {
-            $customfields = array();
+    $output = array();
+    $fields = $DB->get_records($tableprefix.'_info_field', array(), 'sortorder ASC');
+    $options = array('prefix' => $prefix, 'extended' => true);
+    foreach ($fields as $field) {
+        require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
+        $newfield = 'customfield_'.$field->datatype;
+        $formfield = new $newfield($field->id, $item, $prefix, $tableprefix);
+        if (!$formfield->is_hidden() and !$formfield->is_empty()) {
+            $output[s($formfield->field->fullname)] = $formfield::display_item_data($formfield->data, $options);
         }
     }
-    return $customfields;
-}
 
-/**
- * Return a cached copy of all records in asset_info_field
- * @return array
- */
-function facetoface_get_asset_customfields() {
-    global $DB;
-
-    static $customfields = null;
-    if (null == $customfields) {
-        if (!$customfields = $DB->get_records('facetoface_asset_info_field', array('hidden' => 0))) {
-            $customfields = array();
-        }
-    }
-    return $customfields;
-}
-
-/**
- * Return a cached copy of all records in facetoface_signup_info_field
- */
-function facetoface_get_signup_customfields() {
-    global $DB;
-
-    static $customfields = null;
-    if (null == $customfields) {
-        if (!$customfields = $DB->get_records('facetoface_signup_info_field', array('hidden' => 0))) {
-            $customfields = array();
-        }
-    }
-    return $customfields;
-}
-
-/**
- * Return a cached copy of all records in facetoface_cancellation_info_field
- */
-function facetoface_get_cancellation_customfields() {
-    global $DB;
-
-    static $customfields = null;
-    if (null == $customfields) {
-        if (!$customfields = $DB->get_records('facetoface_cancellation_info_field', array('hidden' => 0))) {
-            $customfields = array();
-        }
-    }
-    return $customfields;
+    return $output;
 }
 
 function facetoface_update_trainers($facetoface, $session, $form) {
@@ -6496,7 +6429,9 @@ function facetoface_get_asset($assetid) {
 
     $asset = $DB->get_record_sql($sql, array('id' => $assetid));
 
-    customfield_load_data($asset, 'facetofaceasset', 'facetoface_asset');
+    if (!empty($asset)) {
+        customfield_load_data($asset, 'facetofaceasset', 'facetoface_asset');
+    }
 
     return $asset;
 }
@@ -6545,18 +6480,11 @@ function facetoface_room_html($room, $backurl=null) {
             html_writer::span(format_string($room->customfield_building), 'room room_building') :
             '';
 
-        $fields = facetoface_get_room_customfields();
-
-        //if function exists else just output
-
-        //$link = html_writer::link(
         $url = new moodle_url('/mod/facetoface/room.php', array(
             'roomid' => $room->id,
             'b' => $backurl
         ));
-        //    ),
-        //    get_string('roomdetails', 'facetoface')
-        //);
+
         $popupurl = clone($url);
         $popupurl->param('popup', 1);
         $action = new popup_action('click', $popupurl, 'popup', array('width' => 800,'height' => 600));

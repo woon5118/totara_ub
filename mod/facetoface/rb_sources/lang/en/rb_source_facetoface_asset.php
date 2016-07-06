@@ -31,4 +31,5 @@ $string['name'] = 'Asset Name';
 $string['namelink'] = 'Asset Name (linked to asset details page)';
 $string['published'] = 'Asset Published';
 $string['type_asset'] = 'Assets';
+$string['type_facetoface_asset'] = 'Asset Custom Fields';
 $string['visible'] = 'Asset Visible';

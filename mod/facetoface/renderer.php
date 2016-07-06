@@ -69,7 +69,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         // If we want the minimal table, no customfield columns are shown.
         if (!$minimal) {
-            $customfields = facetoface_get_session_customfields();
+            $customfields = customfield_get_fields_definition('facetoface_session', array('hidden' => 0));
             foreach ($customfields as $customfield) {
                 if (!empty($customfield->showinsummary)) {
                     $tableheader[] = format_string($customfield->fullname);
@@ -1026,23 +1026,14 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $output[] = html_writer::tag('dt', get_string('roomname', 'facetoface'));
         $output[] = html_writer::tag('dd', $room->name);
 
-        $fields = facetoface_get_room_customfield_data($room->id);
+        $options = array('prefix' => 'facetofaceroom', 'extended' => true);
+        $fields = facetoface_get_customfield_data($room, 'facetoface_room', 'facetofaceroom', $options);
         if (!empty($fields)) {
-            /** @var totara_customfield_renderer $renderer */
-            $renderer = $PAGE->get_renderer('totara_customfield');
 
-            foreach ($fields as $field) {
+            foreach ($fields as $field => $value) {
 
-                $cfoutput = $renderer->customfield_render($field->datatype, $field->data, array('prefix' => 'facetofaceroom', 'extended' => true));
-
-                if (empty($cfoutput)) {
-                    if (is_string($field->data)) {
-                        $cfoutput = $field->data;
-                    }
-                }
-
-                $output[] = html_writer::tag('dt', $field->fullname);
-                $output[] = html_writer::tag('dd', $cfoutput);
+                $output[] = html_writer::tag('dt', $field);
+                $output[] = html_writer::tag('dd', $value);
             }
         }
 
@@ -1111,7 +1102,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_asset_details($asset) {
-        global $PAGE, $DB, $TEXTAREA_OPTIONS;
+        global $DB, $TEXTAREA_OPTIONS;
 
         $output = [];
 
@@ -1121,21 +1112,13 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $output[] = html_writer::tag('dt', get_string('assetname', 'facetoface'));
         $output[] = html_writer::tag('dd', $asset->name);
 
-        $fields = facetoface_get_asset_customfields();
+        $options = array('prefix' => 'facetofaceasset', 'extended' => true);
+        $fields = facetoface_get_customfield_data($asset, 'facetoface_asset', 'facetofaceasset', $options);
         if (!empty($fields)) {
-            $renderer = $PAGE->get_renderer('totara_customfield');
+            foreach ($fields as $field => $value) {
 
-            foreach ($fields as $field) {
-                $cfoutput = $renderer->customfield_render($field->datatype, $asset->{"customfield_".$field->shortname});
-
-                if (empty($cfoutput)) {
-                    if (is_string($asset->{"customfield_".$field->shortname})) {
-                        $cfoutput = $asset->{"customfield_".$field->shortname};
-                    }
-                }
-
-                $output[] = html_writer::tag('dt', $field->fullname);
-                $output[] = html_writer::tag('dd', $cfoutput);
+                $output[] = html_writer::tag('dt', $field);
+                $output[] = html_writer::tag('dd', $value);
             }
         }
 
