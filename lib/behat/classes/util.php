@@ -135,6 +135,19 @@ class behat_util extends testing_util {
         // Enable web cron.
         set_config('cronclionly', 0);
 
+        // Totara: Add behat filesystem repository to eliminate problematic file uploads in behat.
+        // NOTE: Repository API is a total mess, let's just insert the records directly here
+        //       and allow all registered users to access the repo.
+        mkdir("$CFG->dataroot/repository/behat", 02777, true);
+        $maxorder = $DB->get_field('repository', 'MAX(sortorder)', array());
+        $typeid = $DB->insert_record('repository', (object)array('type' => 'filesystem', 'sortorder' => $maxorder + 1, 'visible' => 1));
+        $instanceid = $DB->insert_record('repository_instances',
+            (object)array('name' => 'behat', 'typeid' => $typeid, 'contextid' => SYSCONTEXTID, 'timecreated' => time(), 'timemodified' => time()));
+        $DB->insert_record('repository_instance_config', (object)array('instanceid' => $instanceid, 'name' => 'fs_path', 'value' => 'behat'));
+        $DB->insert_record('repository_instance_config', (object)array('instanceid' => $instanceid, 'name' => 'relativefiles', 'value' => '0'));
+        $userrole = $DB->get_record('role', array('shortname' => 'user'));
+        assign_capability('repository/filesystem:view', CAP_ALLOW, $userrole->id, SYSCONTEXTID, true);
+
         // Keeps the current version of database and dataroot.
         self::store_versions_hash();
 

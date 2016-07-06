@@ -107,26 +107,7 @@ class behat_repository_upload extends behat_files {
     protected function upload_file_to_filemanager($filepath, $filemanagerelement, TableNode $data, $overwriteaction = false) {
         global $CFG;
 
-        $filemanagernode = $this->get_filepicker_node($filemanagerelement);
-
-        // Opening the select repository window and selecting the upload repository.
-        $this->open_add_file_window($filemanagernode, get_string('pluginname', 'repository_upload'));
-
-        // Ensure all the form is ready.
-        $noformexception = new ExpectationException('The upload file form is not ready', $this->getSession());
-        $this->find(
-            'xpath',
-            "//div[contains(concat(' ', normalize-space(@class), ' '), ' file-picker ')]" .
-                "[contains(concat(' ', normalize-space(@class), ' '), ' repository_upload ')]" .
-                "/descendant::div[@class='fp-content']" .
-                "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-upload-form ')]" .
-                "/descendant::form",
-            $noformexception
-        );
-        // After this we have the elements we want to interact with.
-
-        // Form elements to interact with.
-        $file = $this->find_file('repo_upload_file');
+        // TOTARA: file upload does not work much, we use auxiliary behat filesystem repository instead
 
         // Attaching specified file to the node.
         // Replace 'admin/' if it is in start of path with $CFG->admin .
@@ -141,7 +122,33 @@ class behat_repository_upload extends behat_files {
                 throw new ExpectationException('The file to be uploaded does not exist.', $this->getSession());
             }
         }
-        $file->attachFile($filepath);
+
+        $filename = basename($filepath);
+        $behatpath = "$CFG->dataroot/repository/behat/$filename";
+        @mkdir(dirname($behatpath), 02777, true);
+        @unlink($behatpath);
+        copy($filepath, $behatpath);
+        chmod($behatpath, 0666);
+
+        $filemanagernode = $this->get_filepicker_node($filemanagerelement);
+
+        // Opening the select repository window and selecting the upload repository.
+        $this->open_add_file_window($filemanagernode, 'behat');
+
+        // Ensure all the form is ready.
+        $noformexception = new ExpectationException('The filesystem file form is not ready', $this->getSession());
+        $fileelement = $this->find(
+            'xpath',
+            "//div[contains(concat(' ', normalize-space(@class), ' '), ' file-picker ')]" .
+                "[contains(concat(' ', normalize-space(@class), ' '), ' repository_filesystem ')]" .
+                "/descendant::div[@class='fp-content']" .
+            "//p[contains(., '$filename')]"
+            ,
+            $noformexception
+        );
+        // After this we have the elements we want to interact with.
+
+        $fileelement->click();
 
         // Fill the form in Upload window.
         $datahash = $data->getRowsHash();
@@ -156,7 +163,7 @@ class behat_repository_upload extends behat_files {
         }
 
         // Submit the file.
-        $submit = $this->find_button(get_string('upload', 'repository'));
+        $submit = $this->find_button(get_string('getfile', 'repository'));
         $submit->press();
 
         // We wait for all the JS to finish as it is performing an action.
