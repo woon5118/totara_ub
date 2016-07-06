@@ -355,6 +355,36 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Totara: Work around missing support for alert confirmation in some Selenium browsers.
+     *
+     * @param bool $accept true means accept, false dismiss the confirmation alert
+     * @return bool true if workaround applied, false if not
+     */
+    protected function apply_confirm_workaround($accept) {
+        /** @var Moodle\BehatExtension\Driver\MoodleSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        if (get_class($driver) !== 'Moodle\BehatExtension\Driver\MoodleSelenium2Driver') {
+            return false;
+        }
+        if ($driver->getBrowser() !== 'phantomjs') {
+            return false;
+        }
+
+        $accept = $accept ? 'true' : 'false';
+
+        $this->getSession()->evaluateScript("
+            if (typeof window.originalconfirm == 'undefined') {
+                window.originalconfirm = window.confirm;
+            }
+            window.confirm = function(msg) {
+                window.confirm = window.originalconfirm;
+                return $accept;
+            };");
+
+        return true;
+    }
+
+    /**
      * Clicks the specified element and confirms the expected dialogue.
      *
      * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" confirming the dialogue$/
@@ -363,7 +393,11 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of what we look for
      */
     public function i_click_on_confirming_the_dialogue($element, $selectortype) {
+        $workaroundactive = $this->apply_confirm_workaround(true);
         $this->i_click_on($element, $selectortype);
+        if ($workaroundactive) {
+            return;
+        }
         $this->accept_currently_displayed_alert_dialog();
     }
 
@@ -376,7 +410,11 @@ class behat_general extends behat_base {
      * @param string $selectortype The type of what we look for
      */
     public function i_click_on_dismissing_the_dialogue($element, $selectortype) {
+        $workaroundactive = $this->apply_confirm_workaround(false);
         $this->i_click_on($element, $selectortype);
+        if ($workaroundactive) {
+            return;
+        }
         $this->dismiss_currently_displayed_alert_dialog();
     }
 
@@ -408,8 +446,11 @@ class behat_general extends behat_base {
      * @param string $nodeselectortype The type of selector where we look in
      */
     public function i_click_on_in_the_confirming_the_dialogue($element, $selectortype, $nodeelement, $nodeselectortype) {
-
+        $workaroundactive = $this->apply_confirm_workaround(true);
         $node = $this->i_click_on_in_the($element, $selectortype, $nodeelement, $nodeselectortype);
+        if ($workaroundactive) {
+            return;
+        }
         $this->accept_currently_displayed_alert_dialog();
     }
 
@@ -425,8 +466,11 @@ class behat_general extends behat_base {
      * @param string $nodeselectortype The type of selector where we look in
      */
     public function i_click_on_in_the_dismissing_the_dialogue($element, $selectortype, $nodeelement, $nodeselectortype) {
-
+        $workaroundactive = $this->apply_confirm_workaround(false);
         $node = $this->i_click_on_in_the($element, $selectortype, $nodeelement, $nodeselectortype);
+        if ($workaroundactive) {
+            return;
+        }
         $this->dismiss_currently_displayed_alert_dialog();
     }
 
