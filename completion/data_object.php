@@ -217,6 +217,7 @@ abstract class data_object {
 
         $wheresql = array();
 
+        $dbparams = array();
         foreach ($params as $var=>$value) {
             if (!in_array($var, $instance->required_fields) and !array_key_exists($var, $instance->optional_fields)) {
                 continue;
@@ -225,10 +226,10 @@ abstract class data_object {
                 $wheresql[] = " $var IS NULL ";
             } else if (in_array($var, $instance->text_fields)) {
                 $wheresql[] = " ".$DB->sql_order_by_text($var, 255)." = ? ";
-                $params[] = $value;
+                $dbparams[] = $value;
             } else {
                 $wheresql[] = " $var = ? ";
-                $params[] = $value;
+                $dbparams[] = $value;
             }
         }
 
@@ -239,7 +240,7 @@ abstract class data_object {
         }
 
         global $DB;
-        if ($datas = $DB->get_records_select($table, $wheresql, $params)) {
+        if ($datas = $DB->get_records_select($table, $wheresql, $dbparams)) {
 
             $result = array();
             foreach($datas as $data) {
@@ -250,7 +251,6 @@ abstract class data_object {
             return $result;
 
         } else {
-
             return false;
         }
     }
