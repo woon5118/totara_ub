@@ -90,7 +90,6 @@ class rb_source_completionimport_certification extends rb_base_source {
      * @return array
      */
     protected function define_joinlist() {
-        global $DB;
 
         // Add support for user restrictions.
         // This will show only existing allowed users if their username is not changed.
@@ -109,13 +108,27 @@ class rb_source_completionimport_certification extends rb_base_source {
 
         $joinlist = array();
 
+        // Join to the user table on the username field, this is the user for whom completion has been imported.
+        // Ironically we need this join to use the default alias, because report builder assumes if you join to the user
+        // table then you magically want user custom fields.
+        // LAME!
         $joinlist[] = new rb_join(
-                'importuser',
-                'LEFT',
-                '(SELECT id, username, ' . $DB->sql_fullname() . ' AS userfullname FROM {user})',
-                'importuser.id = base.importuserid',
-                REPORT_BUILDER_RELATION_MANY_TO_ONE,
-                array('base')
+            'auser',
+            'LEFT',
+            '{user}',
+            'auser.username = base.username',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            'base'
+        );
+
+        // The id of the user who performed the user is stored in importuserid.
+        $joinlist[] = new rb_join(
+            'importuser',
+            'LEFT',
+            '{user}',
+            'importuser.id = base.importuserid',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            'base'
         );
 
         $joinlist[] = new rb_join(
@@ -136,6 +149,8 @@ class rb_source_completionimport_certification extends rb_base_source {
      * @return array
      */
     protected function define_columnoptions() {
+        global $DB;
+
         $columnoptions = array();
 
         $columnoptions[] = new rb_column_option(
@@ -177,10 +192,14 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'importuser',
                 'userfullname',
                 get_string('columnbaseimportuserfullname', 'rb_source_completionimport_certification'),
-                'importuser.userfullname',
-                array('joins' => 'importuser',
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                $DB->sql_concat_join("' '", totara_get_all_user_name_fields_join('importuser', null, true)),
+                array(
+                    'joins' => 'importuser',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text',
+                    'extrafields' => totara_get_all_user_name_fields_join('importuser'),
+                    'displayfunc' => 'user'
+                )
         );
 
         $columnoptions[] = new rb_column_option(
