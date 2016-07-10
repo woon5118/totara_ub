@@ -290,28 +290,28 @@ Feature: Seminar sessions report overview
     And I should see "No" in the "2.22" "table_row"
     And I should see "No Approval" in the "2.22" "table_row"
     And I should see "Overbooked" in the "2.22" "table_row"
-    And I should see "Started" in the "2.22" "table_row"
+    And I should see "Event in progress" in the "2.22" "table_row"
     And I should see "2.10" in the "2.22" "table_row"
 
     And I should see "Course 1" in the "3.33" "table_row"
     And I should see "No" in the "3.33" "table_row"
     And I should see "No Approval" in the "3.33" "table_row"
-    And I should see "Bookings available" in the "3.33" "table_row"
+    And I should see "Booking open" in the "3.33" "table_row"
     And I should see "Upcoming" in the "3.33" "table_row"
     And I should see "1.50" in the "3.33" "table_row"
 
     And I should see "Course 2" in the "4.44" "table_row"
     And I should see "No" in the "4.44" "table_row"
     And I should see "No Approval" in the "4.44" "table_row"
-    And I should see "Fully booked" in the "4.44" "table_row"
-    And I should see "Ended" in the "4.44" "table_row"
+    And I should see "Booking full" in the "4.44" "table_row"
+    And I should see "Event over" in the "4.44" "table_row"
     And "Sam4 Student4" "link" should exist in the "4.44" "table_row"
     And "Sam5 Student5" "link" should exist in the "4.44" "table_row"
 
     And I should see "Course 2" in the "5.55" "table_row"
     And I should see "No Approval" in the "5.55" "table_row"
     And I should see "N/A" in the "5.55" "table_row"
-    And I should see "Ended" in the "5.55" "table_row"
+    And I should see "Event over" in the "5.55" "table_row"
 
     # Check filters
     When I set the field "Booking Status field limiter" to "is equal to"
@@ -333,7 +333,7 @@ Feature: Seminar sessions report overview
     And I press "Clear"
 
     When I set the field "Booking Status field limiter" to "is equal to"
-    And I set the field "Booking Status value" to "Bookings available"
+    And I set the field "Booking Status value" to "Booking open"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "3.33"
     And I should not see "1.11"
@@ -342,7 +342,7 @@ Feature: Seminar sessions report overview
     And I press "Clear"
 
     When I set the field "Booking Status field limiter" to "is equal to"
-    And I set the field "Booking Status value" to "Fully booked"
+    And I set the field "Booking Status value" to "Booking full"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "4.44"
     And I should not see "1.11"
@@ -351,7 +351,7 @@ Feature: Seminar sessions report overview
     And I press "Clear"
 
     When I set the field "Booking Status field limiter" to "isn't equal to"
-    And I set the field "Booking Status value" to "Bookings available"
+    And I set the field "Booking Status value" to "Booking open"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should not see "3.33"
     And I should see "1.11"
@@ -369,7 +369,7 @@ Feature: Seminar sessions report overview
     And I press "Clear"
 
     When I set the field "Overall status field limiter" to "is equal to"
-    And I set the field "Overall status value" to "Started"
+    And I set the field "Overall status value" to "Event in progress"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "2.22"
     And I should not see "1.11"
@@ -378,7 +378,7 @@ Feature: Seminar sessions report overview
     And I press "Clear"
 
     When I set the field "Overall status field limiter" to "is equal to"
-    And I set the field "Overall status value" to "Ended"
+    And I set the field "Overall status value" to "Event over"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "4.44"
     And I should not see "1.11"
