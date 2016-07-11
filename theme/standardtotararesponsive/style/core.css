@@ -1528,3 +1528,7 @@ div.criteria-description {
 .dir-rtl #plugins-control-panel .pluginname .action-icon {
     margin-right: 4px;
 }
+
+.form-autocomplete-downarrow {
+    top: 0.15em
+}
