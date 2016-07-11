@@ -230,13 +230,13 @@ foreach ($instances as $instance) {
             $aurl = new moodle_url($url, array('action'=>'up', 'instance'=>$instance->id));
             $updown[] = $OUTPUT->action_icon($aurl, new pix_icon('t/up', $strup, 'core', array('class' => 'iconsmall')));
         } else {
-            $updown[] = $OUTPUT->flex_icon('spacer', array('classes' => 'ft-size-200'));
+            $updown[] = $OUTPUT->flex_icon('spacer');
         }
         if ($updowncount < $icount) {
             $aurl = new moodle_url($url, array('action'=>'down', 'instance'=>$instance->id));
             $updown[] = $OUTPUT->action_icon($aurl, new pix_icon('t/down', $strdown, 'core', array('class' => 'iconsmall')));
         } else {
-            $updown[] = $OUTPUT->flex_icon('spacer', array('classes' => 'ft-size-200'));
+            $updown[] = $OUTPUT->flex_icon('spacer');
         }
         ++$updowncount;
 

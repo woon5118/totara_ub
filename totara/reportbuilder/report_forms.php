@@ -489,7 +489,7 @@ class report_builder_edit_columns_form extends moodleform {
         $strdelete = get_string('delete', 'totara_reportbuilder');
         $strhide = get_string('hide');
         $strshow = get_string('show');
-        $spacer = $OUTPUT->spacer(array('width' => 20, 'height' => 13, 'class' => 'ft-size-200'));
+        $spacer = $OUTPUT->flex_icon('spacer');
 
         $mform->addElement('header', 'reportcolumns', get_string('reportcolumns', 'totara_reportbuilder'));
 
