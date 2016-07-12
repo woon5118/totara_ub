@@ -22,30 +22,64 @@
  */
 
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
-require_once($CFG->dirroot . '/mod/facetoface/asset/lib.php');
+require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
-$id = optional_param('id', 0, PARAM_INT);   // Asset id.
+$id = required_param('id', PARAM_INT);   // Room id.
+$facetofaceid = required_param('f', PARAM_INT);   // Face-to-face id.
+$sessionid = optional_param('s', 0, PARAM_INT);
 
-$system_context = context_system::instance();
-require_login(0, false);
+$facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $facetoface->course), '*', MUST_EXIST);
+$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course, false, MUST_EXIST);
+if ($sessionid) {
+    $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid, 'facetoface' => $facetoface->id), '*', MUST_EXIST);
+} else {
+    $session = false;
+}
+
+$context = context_module::instance($cm->id);
+require_login($course, false, $cm, false, true);
+require_capability('mod/facetoface:editevents', $context);
+
 require_sesskey();
-require_capability('totara/core:modconfig', $system_context);
+
+if ($id) {
+    // Only custom assets can be changed here!
+    $asset = $DB->get_record('facetoface_asset', array('id' => $id, 'custom' => 1), '*', MUST_EXIST);
+    if (!facetoface_is_asset_available(0, 0, $asset, $sessionid, $facetoface->id)) {
+        // They should never get here, any error will do.
+        print_error('error');
+    }
+} else {
+    $asset = false;
+}
 
 // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
 send_headers('text/html; charset=utf-8', false);
 
-$PAGE->set_context($system_context);
+$PAGE->set_context($context);
 $PAGE->set_url('/mod/facetoface/asset/ajax/asset_edit.php');
 
-$form = process_asset_form(
-    $id,
+$form = facetoface_process_asset_form($asset, $facetoface, $session,
     function($asset) {
         echo json_encode(array('id' => $asset->id, 'name' => $asset->name, 'custom' => $asset->custom));
         exit();
     },
-    null,
-    array('noactionbuttons' => true, 'custom' => true)
+    null
 );
+
+// Include the same strings as mod/facetoface/sessions.php, because we override the lang string cache with this ugly hack.
+$PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
+$PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
+$PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
+    'createnewasset', 'editasset', 'createnewroom', 'editroom'), 'facetoface');
+
+// This is required because custom fields may use AMD module for JS and we can't re-initialise AMD
+// which will happen if we call get_end_code() without setting the first arg to false.
+// It must be called before form->display and importantly before get_end_code.
+$amdsnippets = $PAGE->requires->get_raw_amd_js_code();
 
 $form->display();
 echo $PAGE->requires->get_end_code(false);
+// Finally add our AMD code into the page.
+echo html_writer::script(implode(";\n", $amdsnippets));

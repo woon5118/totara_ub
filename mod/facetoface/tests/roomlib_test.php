@@ -226,6 +226,8 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertSame($customroom->id, $sessiondate2->roomid);
 
         facetoface_delete_room($sitewideroom->id);
+        $this->assertFalse($DB->record_exists('facetoface_room', array('id' => $sitewideroom->id)));
+        $this->assertTrue($DB->record_exists('facetoface_room', array('id' => $customroom->id)));
         $sessiondate1 = $DB->get_record('facetoface_sessions_dates', array('sessionid' => $sessionid1), '*', MUST_EXIST);
         $this->assertSame('0', $sessiondate1->roomid);
         $this->assertFalse($fs->file_exists_by_hash($sitefile->get_pathnamehash()));
@@ -551,7 +553,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
             }
         }
 
-        // GEt available site rooms for given slot.
+        // Get available site rooms for given slot.
 
         $rooms = facetoface_get_available_rooms($now + (DAYSECS * -1), $now + (DAYSECS * 1), 'fr.*', 0, 0);
         $this->assertCount(4, $rooms);

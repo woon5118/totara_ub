@@ -86,7 +86,7 @@ $PAGE->set_url('/mod/facetoface/sessions.php', array('f' => $f, 'backtoallsessio
 $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
 $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
 $PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
-    'createnewasset', 'createnewroom', 'editroom'), 'facetoface');
+    'createnewasset', 'editasset', 'createnewroom', 'editroom'), 'facetoface');
 $PAGE->set_title($facetoface->name);
 $PAGE->set_heading($course->fullname);
 
@@ -200,7 +200,6 @@ if (!isset($session)) {
             $timefinishfield = "timefinish[$i]";
             $timezonefield = "sessiontimezone[$i]";
             $roomidfield = "roomid[$i]";
-            $roomcapacityfield = "roomcapacity[$i]";
             $assetsfield = "assetids[$i]";
 
             if ($date->sessiontimezone === '') {
@@ -213,18 +212,29 @@ if (!isset($session)) {
             $sessiondata->$timestartfield = $date->timestart;
             $sessiondata->$timefinishfield = $date->timefinish;
             $sessiondata->$timezonefield = $date->sessiontimezone;
+            $sessiondata->$roomidfield = $date->roomid;
+            $sessiondata->$assetsfield = $date->assetids;
 
-            // Cloning session, check if "allow room booking conflicts" is disable.
-            if ($c && $date->roomid) {
-                $room = facetoface_get_room($date->roomid);
-                if (!$room->allowconflicts) {
-                    $date->roomid = 0;
+            // When cloning a session, check that conflicting rooms and assets are removed.
+            if ($c) {
+                if ($date->roomid) {
+                    $room = facetoface_get_room($date->roomid);
+                    if (!$room or !$room->allowconflicts) {
+                        $sessiondata->$roomidfield = 0;
+                    }
+                }
+                if ($date->assetids) {
+                    $assetids = explode(',', $date->assetids);
+                    foreach ($assetids as $k => $assetid) {
+                        $asset = facetoface_get_asset($assetid);
+                        if (!$asset or !$asset->allowconflicts) {
+                            unset($assetids[$k]);
+                        }
+                    }
+                    $sessiondata->$assetsfield = implode(',', $assetids);
                 }
             }
 
-            $sessiondata->$roomidfield = $date->roomid;
-            $sessiondata->$roomcapacityfield = $date->roomid;
-            $sessiondata->$assetsfield = $date->assetids;
             $i++;
         }
     }
@@ -236,6 +246,8 @@ if ($mform->is_cancelled()) {
 }
 
 if ($fromform = $mform->get_data()) { // Form submitted
+    // Make sure user cannot cancel this page request. (Back luck IIS users!)
+    ignore_user_abort();
 
     if (empty($fromform->submitbutton)) {
         print_error('error:unknownbuttonclicked', 'facetoface', $returnurl);

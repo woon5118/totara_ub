@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
-* @package totara_facetoface
+* @package mod_facetoface
 */
 
 defined('MOODLE_INTERNAL') || die();
@@ -215,7 +215,7 @@ function facetoface_process_room_form($room, $facetoface, $session, callable $su
 /**
  * Delete room and all related information.
  *
- * If any sesion is still using this room, the room is unassigned.
+ * If any session is still using this room, the room is unassigned.
  *
  * @param int $id
  */

@@ -1,8 +1,8 @@
 @mod @mod_facetoface @totara @javascript
-Feature: Seminar room availability
-  In order to prevent room conflicts
+Feature: Seminar asset availability
+  In order to prevent asset conflicts
   As an editing trainer
-  I need to see only available rooms
+  I need to see only available assets
 
   Background:
     Given I am on a totara site
@@ -18,26 +18,23 @@ Feature: Seminar room availability
       | teacher1 | C1     | editingteacher |
       | teacher2 | C1     | editingteacher |
     And I log in as "admin"
-    And I navigate to "Rooms" node in "Site administration > Seminars"
-    And I press "Add a new room"
+    And I navigate to "Assets" node in "Site administration > Seminars"
+    And I press "Add a new asset"
     And I set the following fields to these values:
-      | Name                         | Room 1          |
-      | Maximum bookings             | 10              |
-      | Allow room booking conflicts | 0               |
-    And I press "Add a room"
-    And I press "Add a new room"
+      | Asset name                    | Asset 1         |
+      | Allow asset booking conflicts | 0               |
+    And I press "Add an asset"
+    And I press "Add a new asset"
     And I set the following fields to these values:
-      | Name                         | Room 2          |
-      | Maximum bookings             | 10              |
-      | Allow room booking conflicts | 1               |
-    And I press "Add a room"
-    And I press "Add a new room"
+      | Asset name                    | Asset 2         |
+      | Allow asset booking conflicts | 1               |
+    And I press "Add an asset"
+    And I press "Add a new asset"
     And I set the following fields to these values:
-      | Name                         | Room 3          |
-      | Maximum bookings             | 10              |
-      | Allow room booking conflicts | 0               |
-    And I press "Add a room"
-    And I click on "Hide from users when choosing a room on the Add/Edit event page" "link" in the "Room 3" "table_row"
+      | Asset name                    | Asset 3         |
+      | Allow asset booking conflicts | 0               |
+    And I press "Add an asset"
+    And I click on "Hide from users when choosing an asset on the Add/Edit event page" "link" in the "Asset 3" "table_row"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
@@ -49,7 +46,7 @@ Feature: Seminar room availability
       | Description | test           |
     And I log out
 
-  Scenario: Time based seminar room conflicts
+  Scenario: Time based seminar asset conflicts
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -68,17 +65,18 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
-    And I click on "Select room" "link"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Asset 1" "text" in the "Choose assets" "totaradialogue"
+    And I click on "Asset 2" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Add a new date"
     # The UI is not usable much here, we just save this and go back and the last added session will be listed first.
     And I press "Save changes"
@@ -96,12 +94,12 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Asset 2" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Add a new date"
     # The UI is not usable much here, we just save this and go back and the last added session will be listed first.
     And I press "Save changes"
@@ -119,16 +117,21 @@ Feature: Seminar room availability
       | timefinish[hour]   | 13   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
-    And I should see "Room 1 (10)" in the "1 January 2025 1:00 PM" "table_row"
-    And I should see "Room 1 (10)" in the "1 January 2025 11:00 AM" "table_row"
-    And I should see "Room 2 (10)" in the "January 2026" "table_row"
+    And I click on "Select asset" "link"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Asset 1" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
+    And I click on "Edit event" "link" in the "0 / 10" "table_row"
+    And I should see "Asset 1" in the "1 January 2025 1:00 PM" "table_row"
+    And I should not see "Asset 2" in the "1 January 2025 1:00 PM" "table_row"
+    And I should see "Asset 1" in the "1 January 2025 11:00 AM" "table_row"
+    And I should see "Asset 2" in the "1 January 2025 11:00 AM" "table_row"
+    And I should not see "Asset 1" in the "January 2026" "table_row"
+    And I should see "Asset 2" in the "January 2026" "table_row"
+    And I press "Cancel"
 
     When I follow "Add a new event"
     And I set the following fields to these values:
@@ -146,14 +149,17 @@ Feature: Seminar room availability
       | timefinish[hour]   | 11   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Asset 1" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
-    Then I should see "Room 1" in the "0 / 20" "table_row"
+    And I click on "Edit event" "link" in the "0 / 20" "table_row"
+    And I should see "Asset 1" in the "1 January 2025" "table_row"
+    And I should not see "Asset 2" in the "1 January 2025" "table_row"
+    And I press "Cancel"
 
     When I follow "Add a new event"
     And I set the following fields to these values:
@@ -171,14 +177,18 @@ Feature: Seminar room availability
       | timefinish[hour]   | 14   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Asset 1" "text" in the "Choose assets" "totaradialogue"
+    And I click on "Asset 2" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
-    Then I should see "Room 1" in the "0 / 30" "table_row"
+    And I click on "Edit event" "link" in the "0 / 30" "table_row"
+    And I should see "Asset 1" in the "1 January 2025" "table_row"
+    And I should see "Asset 2" in the "1 January 2025" "table_row"
+    And I press "Cancel"
 
     When I follow "Add a new event"
     And I set the following fields to these values:
@@ -196,14 +206,17 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Asset 2" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
-    Then I should see "Room 2" in the "0 / 40" "table_row"
+    And I click on "Edit event" "link" in the "0 / 40" "table_row"
+    And I should not see "Asset 1" in the "1 January 2026" "table_row"
+    And I should see "Asset 2" in the "1 January 2026" "table_row"
+    And I press "Cancel"
 
     When I follow "Add a new event"
     And I set the following fields to these values:
@@ -221,9 +234,10 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    Then I should see "Room 1 (Capacity: 10) (Room unavailable)"
-    When I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    Then I should see "Asset 1 (asset unavailable on selected dates)"
+    Then I should not see "Asset 2 (asset unavailable on selected dates)"
+    When I click on "Cancel" "button" in the "Choose assets" "totaradialogue"
     And I press "Cancel"
 
     And I click on "Edit event" "link" in the "0 / 20" "table_row"
@@ -240,11 +254,11 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I should see "Room 1 is already booked"
+    And I should see "Asset 1 is already booked"
     When I click on "Cancel" "button" in the "Select date" "totaradialogue"
     And I press "Cancel"
 
-  Scenario: Hiding related seminar room availability
+  Scenario: Hiding related seminar asset availability
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -265,22 +279,22 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
-    And I click on "Select room" "link"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Asset 1" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
     And I log out
     And I log in as "admin"
-    And I navigate to "Rooms" node in "Site administration > Seminars"
-    And I click on "Hide from users when choosing a room on the Add/Edit event page" "link" in the "Room 1" "table_row"
+    And I navigate to "Assets" node in "Site administration > Seminars"
+    And I click on "Hide from users when choosing an asset on the Add/Edit event page" "link" in the "Asset 1" "table_row"
     And I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
@@ -301,19 +315,19 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    Then I should not see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    Then I should not see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Cancel" "button" in the "Choose assets" "totaradialogue"
     And I press "Cancel"
 
     When I click on "Edit event" "link" in the "0 / 20" "table_row"
-    And I click on "Select room" "link"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Cancel" "button" in the "Choose assets" "totaradialogue"
     And I press "Add a new date"
     # The UI is not usable much here, we just save this and go back and the last added session will be listed first.
     And I press "Save changes"
@@ -331,16 +345,16 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    Then I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    Then I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Asset 1" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
     And I should see "Upcoming events"
 
-  Scenario: Custom seminar room availability
+  Scenario: Custom seminar asset availability
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -361,13 +375,12 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Create new room" "link" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I click on "Create new asset" "link" in the "Choose assets" "totaradialogue"
     And I set the following fields to these values:
-      | Name                         | Zimmer 1 |
-      | roomcapacity                 | 30       |
-      | Allow room booking conflicts | 0        |
-    And I click on "OK" "button" in the "Create new room" "totaradialogue"
+      | Asset name                    | Etwas 1 |
+      | Allow asset booking conflicts | 0       |
+    And I click on "OK" "button" in the "Create new asset" "totaradialogue"
 
     When  I press "Add a new date"
     # The UI is not usable much here, we just save this and go back and the last added session will be listed first.
@@ -386,13 +399,13 @@ Feature: Seminar room availability
       | timefinish[hour]   | 13   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    Then I should see "Zimmer 1 (Capacity: 30) (Seminar: Test Seminar 1)"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Zimmer 1 (Capacity: 30) (Seminar: Test Seminar 1)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    Then I should see "Etwas 1 (Seminar: Test Seminar 1)"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Etwas 1 (Seminar: Test Seminar 1)" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
     And I should see "Upcoming events"
 
@@ -412,42 +425,41 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    Then I should see "Zimmer 1 (Capacity: 30) (Room unavailable) (Seminar: Test Seminar 1)"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Create new room" "link" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    Then I should see "Etwas 1 (asset unavailable on selected dates) (Seminar: Test Seminar 1)"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Create new asset" "link" in the "Choose assets" "totaradialogue"
     And I set the following fields to these values:
-      | Name                         | Zimmer 2 |
-      | roomcapacity                 | 40       |
-      | Allow room booking conflicts | 0        |
-    And I click on "OK" "button" in the "Create new room" "totaradialogue"
-    And I click on "Delete" "link" in the "Zimmer 2" "table_row"
+      | Asset name                    | Etwas 2 |
+      | Allow asset booking conflicts | 0       |
+    And I click on "OK" "button" in the "Create new asset" "totaradialogue"
+    And I click on "Delete" "link" in the "Etwas 2" "table_row"
     And I press "Save changes"
-    And I should not see "Zimmer 2" in the "0 / 40" "table_row"
 
     When I click on "Edit event" "link" in the "0 / 40" "table_row"
-    And I click on "Select room" "link"
-    Then I should see "Zimmer 1 (Capacity: 30) (Room unavailable) (Seminar: Test Seminar 1)"
-    And I should see "Zimmer 2 (Capacity: 40) (Seminar: Test Seminar 1)"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I should not see "Etwas 2" in the "1 January 2025" "table_row"
+    And I click on "Select asset" "link"
+    Then I should see "Etwas 1 (asset unavailable on selected dates) (Seminar: Test Seminar 1)"
+    And I should see "Etwas 2 (Seminar: Test Seminar 1)"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Cancel" "button" in the "Choose assets" "totaradialogue"
     And I press "Cancel"
 
     When I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Test Seminar 2"
     And I follow "Add a new event"
-    And I click on "Select room" "link"
-    Then I should not see "Zimmer 1"
-    And I should see "Zimmer 2 (Capacity: 40) (Seminar: Test Seminar 2)"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    Then I should not see "Etwas 1"
+    And I should see "Etwas 2 (Seminar: Test Seminar 2)"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Cancel" "button" in the "Choose assets" "totaradialogue"
     And I press "Cancel"
     And I log out
 
@@ -456,29 +468,29 @@ Feature: Seminar room availability
     And I follow "Course 1"
     And I follow "Test Seminar 2"
     And I follow "Add a new event"
-    And I click on "Select room" "link"
-    Then I should not see "Zimmer 1"
-    And I should not see "Zimmer 2"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    Then I should not see "Etwas 1"
+    And I should not see "Etwas 2"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Cancel" "button" in the "Choose assets" "totaradialogue"
     And I press "Cancel"
 
     When I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Test Seminar 1"
     And I follow "Add a new event"
-    And I click on "Select room" "link"
-    Then I should see "Zimmer 1 (Capacity: 30) (Seminar: Test Seminar 1)"
-    And I should not see "Zimmer 2"
-    And I should see "Room 1 (Capacity: 10)"
-    And I should see "Room 2 (Capacity: 10)"
-    And I should not see "Room 3 (Capacity: 10)"
-    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    Then I should see "Etwas 1 (Seminar: Test Seminar 1)"
+    And I should not see "Etwas 2"
+    And I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should not see "Asset 3"
+    And I click on "Cancel" "button" in the "Choose assets" "totaradialogue"
     And I press "Cancel"
 
-  Scenario: Seminar switch site room to not allow conflicts
+  Scenario: Seminar switch site asset to not allow conflicts
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -499,9 +511,9 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I click on "Asset 2" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
     And I follow "Add a new event"
     And I set the following fields to these values:
@@ -519,19 +531,17 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I click on "Asset 2" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     When I press "Save changes"
-    Then I should see "Room 2" in the "0 / 20" "table_row"
-    And I should see "Room 2" in the "0 / 30" "table_row"
 
-    When I navigate to "Rooms" node in "Site administration > Seminars"
-    And I click on "Edit" "link" in the "Room 2" "table_row"
+    When I navigate to "Assets" node in "Site administration > Seminars"
+    And I click on "Edit" "link" in the "Asset 2" "table_row"
     And I set the following fields to these values:
-      | Allow room booking conflicts | 0               |
+      | Allow asset booking conflicts | 0               |
     And I press "Save changes"
-    Then I should see "Room has conflicting usage"
+    Then I should see "Asset has conflicting usage"
     And I press "Cancel"
 
     When I click on "Find Learning" in the totara menu
@@ -552,14 +562,14 @@ Feature: Seminar room availability
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    And I navigate to "Rooms" node in "Site administration > Seminars"
-    And I click on "Edit" "link" in the "Room 2" "table_row"
+    And I navigate to "Assets" node in "Site administration > Seminars"
+    And I click on "Edit" "link" in the "Asset 2" "table_row"
     And I set the following fields to these values:
-      | Allow room booking conflicts | 0               |
+      | Allow asset booking conflicts | 0               |
     And I press "Save changes"
-    Then I should not see "Room has conflicting usage"
+    Then I should not see "Asset has conflicting usage"
 
-  Scenario: Seminar switch custom room to not allow conflicts
+  Scenario: Seminar switch custom asset to not allow conflicts
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -580,13 +590,12 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Create new room" "link" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I click on "Create new asset" "link" in the "Choose assets" "totaradialogue"
     And I set the following fields to these values:
-      | Name                         | Zimmer 1 |
-      | roomcapacity                 | 40       |
-      | Allow room booking conflicts | 1        |
-    And I click on "OK" "button" in the "Create new room" "totaradialogue"
+      | Asset name                    | Etwas 1 |
+      | Allow asset booking conflicts | 1       |
+    And I click on "OK" "button" in the "Create new asset" "totaradialogue"
     And I press "Save changes"
     And I follow "Add a new event"
     And I set the following fields to these values:
@@ -604,21 +613,19 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Zimmer 1 (Capacity: 40) (Seminar: Test Seminar 1)" "link"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I click on "Etwas 1 (Seminar: Test Seminar 1)" "link"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
-    Then I should see "Zimmer 1" in the "0 / 40" "table_row"
-    And I should see "Zimmer 1" in the "0 / 50" "table_row"
 
     When I click on "Edit event" "link" in the "0 / 50" "table_row"
-    And I click on "Edit room" "link" in the "Zimmer 1 (40)" "table_row"
+    And I click on "Edit asset" "link" in the "Etwas 1" "table_row"
     And I set the following fields to these values:
-      | Allow room booking conflicts | 0 |
-    # TODO TL-9503 fix dialog name to be 'Edit room'
-    And I click on "OK" "button" in the "Create new room" "totaradialogue"
-    Then I should see "Room has conflicting usage" in the "Create new room" "totaradialogue"
-    And I click on "Cancel" "button" in the "Create new room" "totaradialogue"
+      | Allow asset booking conflicts | 0 |
+    # TODO TL-9503 fix dialog name to be 'Edit asset'
+    And I click on "OK" "button" in the "Create new asset" "totaradialogue"
+    Then I should see "Asset has conflicting usage" in the "Create new asset" "totaradialogue"
+    And I click on "Cancel" "button" in the "Create new asset" "totaradialogue"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -634,15 +641,15 @@ Feature: Seminar room availability
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     When I click on "Edit event" "link" in the "0 / 50" "table_row"
-    And I click on "Edit room" "link" in the "Zimmer 1 (40)" "table_row"
+    And I click on "Edit asset" "link" in the "Etwas 1" "table_row"
     And I set the following fields to these values:
-      | Allow room booking conflicts | 0 |
-    # TODO TL-9503 fix dialog name to be 'Edit room'
-    And I click on "OK" "button" in the "Create new room" "totaradialogue"
-    Then I should not see "Room has conflicting usage"
+      | Allow asset booking conflicts | 0 |
+    # TODO TL-9503 fix dialog name to be 'Edit asset'
+    And I click on "OK" "button" in the "Create new asset" "totaradialogue"
+    Then I should not see "Asset has conflicting usage"
     And I press "Save changes"
 
-  Scenario: Reportbuilder seminar room availability filter
+  Scenario: Reportbuilder seminar asset availability filter
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -663,9 +670,9 @@ Feature: Seminar room availability
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I click on "Asset 1" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
     And I follow "Add a new event"
     And I set the following fields to these values:
@@ -683,9 +690,9 @@ Feature: Seminar room availability
       | timefinish[hour]   | 14   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 1 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I click on "Asset 1" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
     And I follow "Add a new event"
     And I set the following fields to these values:
@@ -703,123 +710,123 @@ Feature: Seminar room availability
       | timefinish[hour]   | 16   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select room" "link"
-    And I click on "Room 2 (Capacity: 10)" "text" in the "Choose a room" "totaradialogue"
-    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I click on "Select asset" "link"
+    And I click on "Asset 2" "text" in the "Choose assets" "totaradialogue"
+    And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     And I press "Save changes"
-    And I navigate to "Rooms" node in "Site administration > Seminars"
+    And I navigate to "Assets" node in "Site administration > Seminars"
 
     # NOTE: We cannot use "Search" button because there is already "Search by" aria button above.
 
     When I set the following fields to these values:
-      | room-roomavailable_enable        | Free between the following times |
-      | room-roomavailable_start[day]    | 1                                |
-      | room-roomavailable_start[month]  | January                          |
-      | room-roomavailable_start[year]   | 2025                             |
-      | room-roomavailable_start[hour]   | 10                               |
-      | room-roomavailable_start[minute] | 00                               |
-      | room-roomavailable_end[day]      | 1                                |
-      | room-roomavailable_end[month]    | January                          |
-      | room-roomavailable_end[year]     | 2025                             |
-      | room-roomavailable_end[hour]     | 11                               |
-      | room-roomavailable_end[minute]   | 00                               |
+      | asset-assetavailable_enable        | Free between the following times |
+      | asset-assetavailable_start[day]    | 1                                |
+      | asset-assetavailable_start[month]  | January                          |
+      | asset-assetavailable_start[year]   | 2025                             |
+      | asset-assetavailable_start[hour]   | 10                               |
+      | asset-assetavailable_start[minute] | 00                               |
+      | asset-assetavailable_end[day]      | 1                                |
+      | asset-assetavailable_end[month]    | January                          |
+      | asset-assetavailable_end[year]     | 2025                             |
+      | asset-assetavailable_end[hour]     | 11                               |
+      | asset-assetavailable_end[minute]   | 00                               |
     And I press "submitgroupstandard[addfilter]"
-    Then I should see "Room 1"
-    And I should see "Room 2"
-    And I should see "Room 3"
+    Then I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should see "Asset 3"
 
     When I set the following fields to these values:
-      | room-roomavailable_start[day]    | 1                                |
-      | room-roomavailable_start[month]  | January                          |
-      | room-roomavailable_start[year]   | 2025                             |
-      | room-roomavailable_start[hour]   | 10                               |
-      | room-roomavailable_start[minute] | 00                               |
-      | room-roomavailable_end[day]      | 1                                |
-      | room-roomavailable_end[month]    | January                          |
-      | room-roomavailable_end[year]     | 2025                             |
-      | room-roomavailable_end[hour]     | 11                               |
-      | room-roomavailable_end[minute]   | 01                               |
+      | asset-assetavailable_start[day]    | 1                                |
+      | asset-assetavailable_start[month]  | January                          |
+      | asset-assetavailable_start[year]   | 2025                             |
+      | asset-assetavailable_start[hour]   | 10                               |
+      | asset-assetavailable_start[minute] | 00                               |
+      | asset-assetavailable_end[day]      | 1                                |
+      | asset-assetavailable_end[month]    | January                          |
+      | asset-assetavailable_end[year]     | 2025                             |
+      | asset-assetavailable_end[hour]     | 11                               |
+      | asset-assetavailable_end[minute]   | 01                               |
     And I press "submitgroupstandard[addfilter]"
-    Then I should not see "Room 1"
-    And I should see "Room 2"
-    And I should see "Room 3"
+    Then I should not see "Asset 1"
+    And I should see "Asset 2"
+    And I should see "Asset 3"
 
     When I set the following fields to these values:
-      | room-roomavailable_start[day]    | 1                                |
-      | room-roomavailable_start[month]  | January                          |
-      | room-roomavailable_start[year]   | 2025                             |
-      | room-roomavailable_start[hour]   | 11                               |
-      | room-roomavailable_start[minute] | 30                               |
-      | room-roomavailable_end[day]      | 1                                |
-      | room-roomavailable_end[month]    | January                          |
-      | room-roomavailable_end[year]     | 2025                             |
-      | room-roomavailable_end[hour]     | 12                               |
-      | room-roomavailable_end[minute]   | 30                               |
+      | asset-assetavailable_start[day]    | 1                                |
+      | asset-assetavailable_start[month]  | January                          |
+      | asset-assetavailable_start[year]   | 2025                             |
+      | asset-assetavailable_start[hour]   | 11                               |
+      | asset-assetavailable_start[minute] | 30                               |
+      | asset-assetavailable_end[day]      | 1                                |
+      | asset-assetavailable_end[month]    | January                          |
+      | asset-assetavailable_end[year]     | 2025                             |
+      | asset-assetavailable_end[hour]     | 12                               |
+      | asset-assetavailable_end[minute]   | 30                               |
     And I press "submitgroupstandard[addfilter]"
-    Then I should not see "Room 1"
-    And I should see "Room 2"
-    And I should see "Room 3"
+    Then I should not see "Asset 1"
+    And I should see "Asset 2"
+    And I should see "Asset 3"
 
     When I set the following fields to these values:
-      | room-roomavailable_start[day]    | 1                                |
-      | room-roomavailable_start[month]  | January                          |
-      | room-roomavailable_start[year]   | 2025                             |
-      | room-roomavailable_start[hour]   | 12                               |
-      | room-roomavailable_start[minute] | 59                               |
-      | room-roomavailable_end[day]      | 1                                |
-      | room-roomavailable_end[month]    | January                          |
-      | room-roomavailable_end[year]     | 2025                             |
-      | room-roomavailable_end[hour]     | 14                               |
-      | room-roomavailable_end[minute]   | 00                               |
+      | asset-assetavailable_start[day]    | 1                                |
+      | asset-assetavailable_start[month]  | January                          |
+      | asset-assetavailable_start[year]   | 2025                             |
+      | asset-assetavailable_start[hour]   | 12                               |
+      | asset-assetavailable_start[minute] | 59                               |
+      | asset-assetavailable_end[day]      | 1                                |
+      | asset-assetavailable_end[month]    | January                          |
+      | asset-assetavailable_end[year]     | 2025                             |
+      | asset-assetavailable_end[hour]     | 14                               |
+      | asset-assetavailable_end[minute]   | 00                               |
     And I press "submitgroupstandard[addfilter]"
-    Then I should not see "Room 1"
-    And I should see "Room 2"
-    And I should see "Room 3"
+    Then I should not see "Asset 1"
+    And I should see "Asset 2"
+    And I should see "Asset 3"
 
     When I set the following fields to these values:
-      | room-roomavailable_start[day]    | 1                                |
-      | room-roomavailable_start[month]  | January                          |
-      | room-roomavailable_start[year]   | 2025                             |
-      | room-roomavailable_start[hour]   | 10                               |
-      | room-roomavailable_start[minute] | 00                               |
-      | room-roomavailable_end[day]      | 1                                |
-      | room-roomavailable_end[month]    | January                          |
-      | room-roomavailable_end[year]     | 2025                             |
-      | room-roomavailable_end[hour]     | 14                               |
-      | room-roomavailable_end[minute]   | 00                               |
+      | asset-assetavailable_start[day]    | 1                                |
+      | asset-assetavailable_start[month]  | January                          |
+      | asset-assetavailable_start[year]   | 2025                             |
+      | asset-assetavailable_start[hour]   | 10                               |
+      | asset-assetavailable_start[minute] | 00                               |
+      | asset-assetavailable_end[day]      | 1                                |
+      | asset-assetavailable_end[month]    | January                          |
+      | asset-assetavailable_end[year]     | 2025                             |
+      | asset-assetavailable_end[hour]     | 14                               |
+      | asset-assetavailable_end[minute]   | 00                               |
     And I press "submitgroupstandard[addfilter]"
-    Then I should not see "Room 1"
-    And I should see "Room 2"
-    And I should see "Room 3"
+    Then I should not see "Asset 1"
+    And I should see "Asset 2"
+    And I should see "Asset 3"
 
     When I set the following fields to these values:
-      | room-roomavailable_start[day]    | 1                                |
-      | room-roomavailable_start[month]  | January                          |
-      | room-roomavailable_start[year]   | 2025                             |
-      | room-roomavailable_start[hour]   | 14                               |
-      | room-roomavailable_start[minute] | 00                               |
-      | room-roomavailable_end[day]      | 1                                |
-      | room-roomavailable_end[month]    | January                          |
-      | room-roomavailable_end[year]     | 2025                             |
-      | room-roomavailable_end[hour]     | 15                               |
-      | room-roomavailable_end[minute]   | 00                               |
+      | asset-assetavailable_start[day]    | 1                                |
+      | asset-assetavailable_start[month]  | January                          |
+      | asset-assetavailable_start[year]   | 2025                             |
+      | asset-assetavailable_start[hour]   | 14                               |
+      | asset-assetavailable_start[minute] | 00                               |
+      | asset-assetavailable_end[day]      | 1                                |
+      | asset-assetavailable_end[month]    | January                          |
+      | asset-assetavailable_end[year]     | 2025                             |
+      | asset-assetavailable_end[hour]     | 15                               |
+      | asset-assetavailable_end[minute]   | 00                               |
     And I press "submitgroupstandard[addfilter]"
-    Then I should see "Room 1"
-    And I should see "Room 2"
-    And I should see "Room 3"
+    Then I should see "Asset 1"
+    And I should see "Asset 2"
+    And I should see "Asset 3"
 
     When I set the following fields to these values:
-      | room-roomavailable_start[day]    | 1                                |
-      | room-roomavailable_start[month]  | January                          |
-      | room-roomavailable_start[year]   | 2001                             |
-      | room-roomavailable_start[hour]   | 10                               |
-      | room-roomavailable_start[minute] | 00                               |
-      | room-roomavailable_end[day]      | 1                                |
-      | room-roomavailable_end[month]    | January                          |
-      | room-roomavailable_end[year]     | 2030                             |
-      | room-roomavailable_end[hour]     | 14                               |
-      | room-roomavailable_end[minute]   | 00                               |
+      | asset-assetavailable_start[day]    | 1                                |
+      | asset-assetavailable_start[month]  | January                          |
+      | asset-assetavailable_start[year]   | 2001                             |
+      | asset-assetavailable_start[hour]   | 10                               |
+      | asset-assetavailable_start[minute] | 00                               |
+      | asset-assetavailable_end[day]      | 1                                |
+      | asset-assetavailable_end[month]    | January                          |
+      | asset-assetavailable_end[year]     | 2030                             |
+      | asset-assetavailable_end[hour]     | 14                               |
+      | asset-assetavailable_end[minute]   | 00                               |
     And I press "submitgroupstandard[addfilter]"
-    Then I should not see "Room 1"
-    And I should see "Room 2"
-    And I should see "Room 3"
+    Then I should not see "Asset 1"
+    And I should see "Asset 2"
+    And I should see "Asset 3"

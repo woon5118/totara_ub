@@ -739,7 +739,9 @@ class session_date_form extends moodleform {
             $roomproblemfound = false;
             // Check if the room is available.
             $room = facetoface_get_room($roomid);
-            if (!facetoface_is_room_available($timestart, $timefinish, $room, $sessionid, $facetofaceid)) {
+            if (!$room) {
+                $errors['roomid'] = get_string('roomdeleted', 'facetoface');
+            } else if (!facetoface_is_room_available($timestart, $timefinish, $room, $sessionid, $facetofaceid)) {
                  $link = html_writer::link(new moodle_url('/mod/facetoface/room.php', array('roomid' => $roomid)), $room->name,
                         array('target' => '_blank'));
                 // We should not get here because users should be able to select only available slots.
@@ -749,33 +751,19 @@ class session_date_form extends moodleform {
 
         // Validate assets.
         if (!empty($assetids)) {
-            // Get a list of all available private assets for this session and all public assets.
-            $all = facetoface_get_all_assets($sessionid);
-            $available = facetoface_get_available_assets(array(array($timestart, $timefinish)), 'id', array($sessionid));
-            $unavailable = array_diff(array_keys($all), array_keys($available));
-
-            // Remove any unavailable assets that aren't in the list of assets we're validating.
-            // We need to do this if we're creating a new face-to-face event as there'll be no
-            // session id to limit the list of assets retrieved by the above functions.
-            foreach ($unavailable as $index => $id) {
-                if (!in_array($id, $assetids)) {
-                    unset($unavailable[$index]);
-                }
-            }
-
-            if (count($unavailable)) {
-                $errors['assetid'] = array();
-                foreach($unavailable as $asset) {
-                    $link = html_writer::link(
-                        new moodle_url('/mod/facetoface/asset.php', array('assetid' => $all[$asset]->id)),
-                        $all[$asset]->fullname,
-                        array('target' => '_blank')
-                    );
+            foreach ($assetids as $assetid) {
+                $asset = facetoface_get_asset($assetid);
+                if (!$asset) {
+                    $errors['assetid'][] = get_string('assetdeleted', 'facetoface');
+                } else if (!facetoface_is_asset_available($timestart, $timefinish, $asset, $sessionid, $facetofaceid)) {
+                    $link = html_writer::link(new moodle_url('/mod/facetoface/asset.php', array('assetid' => $assetid)), $asset->name,
+                        array('target' => '_blank'));
+                    // We should not get here because users should be able to select only available slots.
                     $errors['assetid'][] = get_string('error:isalreadybooked', 'facetoface', $link);
                 }
-                if (!empty($errors['assetid'])) {
-                    $errors['assetids'] = implode(html_writer::empty_tag('br'), $errors['assetid']);
-                }
+            }
+            if (!empty($errors['assetid'])) {
+                $errors['assetids'] = implode(html_writer::empty_tag('br'), $errors['assetid']);
             }
         }
 

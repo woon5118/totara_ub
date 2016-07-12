@@ -56,16 +56,12 @@ $PAGE->set_url('/mod/facetoface/asset/ajax/asset_item.php', array(
     'itemids' => $itemseq
 ));
 
-$assets = facetoface_get_assets_by_ids($itemids);
+list($insql, $inparams) = $DB->get_in_or_equal($itemids, SQL_PARAMS_NAMED);
+$sql = "SELECT fa.id, fa.name, fa.hidden, fa.custom
+          FROM {facetoface_asset} fa
+         WHERE fa.id $insql
+      ORDER BY fa.name ASC, fa.id ASC";
+$assets = $DB->get_records_sql($sql, $inparams);
 
 // Render assets list.
-$out = array();
-foreach ($assets as $asset) {
-    $out[] = array(
-        'id' => $asset->id,
-        'name' => $asset->name,
-        'hidden' => $asset->hidden,
-        'custom' => $asset->custom
-    );
-}
-echo json_encode($out);
+echo json_encode(array_values($assets));

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Eugene Venter <eugene@catalyst.net.nz>
- * @package totara_facetoface
+ * @package mod_facetoface
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -124,8 +124,6 @@ class mod_facetoface_room_form extends moodleform {
     }
 
     public function validation($data, $files) {
-        global $DB;
-
         $errors = parent::validation($data, $files);
 
         $room = $this->_customdata['room'];

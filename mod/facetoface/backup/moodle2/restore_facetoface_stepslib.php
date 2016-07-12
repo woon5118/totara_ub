@@ -372,6 +372,10 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $data = (object)$data;
         $oldid = $data->id;
 
+        /** @var restore_activity_task $task */
+        $task = $this->get_task();
+        $facetofaceid = $task->get_activityid();
+
         $sessionsdateid = $this->get_new_parentid('facetoface_sessions_date');
         if (!$sessionsdateid) {
             $this->set_mapping('facetoface_asset', $oldid, null);
@@ -379,11 +383,15 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         }
         $sessiondate = $DB->get_record('facetoface_sessions_dates', array('id' => $sessionsdateid), '*', MUST_EXIST);
 
-        if ((int)$data->custom == 1) {
-            // Custom assets are easy, we just add a new one as exact copy.
-            $newid = $this->create_facetoface_asset($data);
+        if ($data->custom == 1) {
+            // Custom assets are easy, we just add a new one as exact copy,
+            // but watch out that custom assets might be shared in one seminar activity.
+            $newid = $this->get_mappingid('facetoface_asset', $oldid);
+            if (!$newid) {
+                $newid = $this->create_facetoface_asset($data);
+                $this->set_mapping('facetoface_asset', $oldid, $newid);
+            }
             $DB->insert_record('facetoface_asset_dates', (object)array('assetid' => $newid, 'sessionsdateid' => $sessionsdateid));
-            $this->set_mapping('facetoface_asset', $oldid, $newid);
             return;
         }
         // Only set the mapping when we actually create a new asset!!!
@@ -406,9 +414,8 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
             return;
         }
         if ($asset->allowconflicts == 0) {
-            $available = facetoface_get_available_assets(array(array($sessiondate->timestart, $sessiondate->timefinish)), 'id');
-            if (!isset($available[$asset->id])) {
-                $this->log('seminar asset collision detected, asset not added', backup::LOG_WARNING);
+            if (!facetoface_is_asset_available($sessiondate->timestart, $sessiondate->timefinish, $asset, $sessiondate->sessionid, $facetofaceid)) {
+                $this->log('seminar asset not available', backup::LOG_WARNING);
                 return;
             }
         }

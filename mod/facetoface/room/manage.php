@@ -19,8 +19,7 @@
  *
  * @author Eugene Venter <eugene@catalyst.net.nz>
  * @author Alastair Munro <alastair.munro@totaralms.com>
- * @package totara
- * @subpackage facetoface
+ * @package mod_facetoface
  */
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');

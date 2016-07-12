@@ -98,32 +98,59 @@ class cleanup_task extends \core\task\scheduled_task {
         }
         $rs->close();
         $this->remove_unused_custom_rooms();
+        $this->remove_unused_custom_assets();
     }
 
     /**
-     * Clean custom rooms that are no longer used (therefore not available to be chosen).
+     * Delete old custom rooms that are no longer used (not available to be chosen by non-creators).
      */
     protected function remove_unused_custom_rooms() {
         global $DB;
 
-        // Get all custom rooms that are not assigned to any date.
+        // Get all old custom rooms that are not assigned to any date.
         $sql = "SELECT fr.id
-                FROM {facetoface_room} fr
-                LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = fr.id)
-                WHERE fsd.id IS NULL
-                  AND fr.custom > 0
-                  AND fr.timecreated < :lifetime
-                ";
+                  FROM {facetoface_room} fr
+             LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = fr.id)
+                 WHERE fsd.id IS NULL AND fr.custom = 1 AND fr.timecreated < :old";
 
-        // Allow one day for unassigned room as it can be just created and not stored in f2f session yet.
-        $roomids = $DB->get_fieldset_sql($sql, array('lifetime' => time() - 86400));
+        // Allow one day for unassigned room as it can be just created and not stored in seminar session yet.
+        $roomids = $DB->get_fieldset_sql($sql, array('old' => time() - 86400));
 
         // Transactions do not help here with anything.
-        if ($roomids) {
-            foreach ($roomids as $roomid) {
-                // Do a proper room removal including files and custom fields.
-                facetoface_delete_room($roomid);
-            }
+        foreach ($roomids as $roomid) {
+            // Do a proper room removal including files and custom fields.
+            facetoface_delete_room($roomid);
+        }
+    }
+
+    /**
+     * Delete old custom assets that are no longer used (not available to be chosen by non-creators).
+     */
+    protected function remove_unused_custom_assets() {
+        global $DB;
+
+        // First remove invalid links between assets and dates.
+        $sql = "SELECT fad.id
+                  FROM {facetoface_asset_dates} fad
+             LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.id = fad.sessionsdateid)
+                 WHERE fsd.id IS NULL";
+        $dateids = $DB->get_fieldset_sql($sql);
+        foreach ($dateids as $dateid) {
+            $DB->delete_records('facetoface_asset_dates', array('id' => $dateid));
+        }
+
+        // Now delete all old unused custom assets.
+        $sql = "SELECT fa.id
+                  FROM {facetoface_asset} fa
+             LEFT JOIN {facetoface_asset_dates} fad ON (fad.assetid = fa.id)
+                 WHERE fad.id IS NULL AND fa.custom = 1 AND fa.timecreated < :old";
+
+        // Allow one day for unassigned asset as it can be just created and not stored in seminar session yet.
+        $assetids = $DB->get_fieldset_sql($sql, array('old' => time() - 86400));
+
+        foreach ($assetids as $assetid) {
+            // Do a proper asset removal including files and custom fields.
+            facetoface_delete_asset($assetid);
         }
     }
 }

@@ -38,6 +38,12 @@ class mod_facetoface_generator extends testing_module_generator {
     protected $roominstancecount = 0;
 
     /**
+     * The number of assets created so far.
+     * @var int
+     */
+    protected $assetinstancecount = 0;
+
+    /**
      * Create new facetoface module instance
      * @param array|stdClass $record
      * @param array $options
@@ -116,6 +122,8 @@ class mod_facetoface_generator extends testing_module_generator {
             $sessiondate->timestart = $time;
             $sessiondate->timefinish = $time + (DAYSECS * 2);
             $sessiondate->sessiontimezone = 'Pacific/Auckland';
+            $sessiondate->roomid = 0;
+            $sessiondate->assetids = array();
             $sessiondates = array($sessiondate);
         } else {
             $sessiondates = $record->sessiondates;
@@ -229,10 +237,78 @@ class mod_facetoface_generator extends testing_module_generator {
     }
 
     /**
+     * Create a asset - please use the add_custom_asset, or add_site_wide_asset methods.
+     *
+     * @param stdClass|array $record
+     * @return mixed
+     */
+    protected function add_asset($record) {
+        global $DB, $USER;
+
+        $this->assetinstancecount++;
+        $record = (object) $record;
+
+        if (!isset($record->name)) {
+            $record->name = 'asset '.$this->assetinstancecount;
+        }
+
+        if (!empty($record->allowconflicts)) {
+            $record->allowconflicts = 1;
+        } else {
+            $record->allowconflicts = 0;
+        }
+
+        if (!isset($record->description)) {
+            $record->description = 'Description for asset '.$this->assetinstancecount;
+        }
+        if (!isset($record->custom)) {
+            $record->custom = 1;
+        }
+        if (!isset($record->usercreated)) {
+            $record->usercreated = $USER->id;
+        }
+        $record->usermodified = $record->usercreated;
+        if (!isset($record->usercreated)) {
+            $record->usercreated = $USER->id;
+        }
+        if (!isset($record->timecreated)) {
+            $record->timecreated = time();
+        }
+        $record->timemodified = $record->timecreated;
+        $id = $DB->insert_record('facetoface_asset', $record);
+        return $DB->get_record('facetoface_asset', array('id' => $id));
+    }
+
+    /**
+     * Add a custom asset.
+     *
+     * @param stdClass|array $record
+     * @return stdClass
+     */
+    public function add_custom_asset($record) {
+        $record = (object)$record;
+        $record->custom = 1;
+        return $this->add_asset($record);
+    }
+
+    /**
+     * Add a site wide asset.
+     *
+     * @param stdClass|array $record
+     * @return stdClass
+     */
+    public function add_site_wide_asset($record) {
+        $record = (object)$record;
+        $record->custom = 0;
+        return $this->add_asset($record);
+    }
+
+    /**
      * Resets this generator instance.
      */
     public function reset() {
         $this->roominstancecount = 0;
+        $this->assetinstancecount = 0;
         parent::reset();
     }
 

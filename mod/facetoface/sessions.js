@@ -401,7 +401,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
         var render_asset_item = function(data, $input, offset) {
             var $elem = $('<li class="assetname" id="assetname' + offset + '_' + data.id + '" data-assetid="' + data.id + '" data-custom="' + data.custom + '">' + data.name + '</li>');
             if (Number(data.custom) > 0) {
-                var $editbutton = $('<a href="#" class="dialog-singleselect-editable">'+M.util.get_string('edit', 'moodle')+'</a>');
+                var $editbutton = $('<a href="#" class="dialog-singleselect-editable">'+M.util.get_string('editasset', 'facetoface')+'</a>');
                 $editbutton.click(function(e) {
                     e.preventDefault();
                     M.totara_f2f_room.config.editasset = data.id;
@@ -506,7 +506,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
                         id = Number(M.totara_f2f_room.config.editasset);
                         M.totara_f2f_room.config.editasset = 0;
                     }
-                    return url + 'asset/ajax/asset_edit.php?id=' + id + '&sesskey=' + M.cfg.sesskey;
+                    return url + 'asset/ajax/asset_edit.php?id=' + id + '&f=' + M.totara_f2f_room.config.facetofaceid +
+                        '&s=' + M.totara_f2f_room.config.sessionid + '&sesskey=' + M.cfg.sesskey;
                 },
                 editcustomassethandler
             );

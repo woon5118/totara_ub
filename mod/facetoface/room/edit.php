@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Alastair Munro <alastair.munro@totaralms.com>
- * @package totara_facetoface
+ * @package mod_facetoface
  */
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');

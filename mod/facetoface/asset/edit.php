@@ -23,23 +23,31 @@
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once($CFG->libdir . '/adminlib.php');
-require_once($CFG->dirroot . '/mod/facetoface/asset/asset_form.php');
-require_once($CFG->dirroot . '/mod/facetoface/asset/lib.php');
+require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 $id = optional_param('id', 0, PARAM_INT);
 
 admin_externalpage_setup('modfacetofaceassets');
 
-$returnurl = new moodle_url('/mod/facetoface/asset/manage.php');
+if ($id) {
+    $asset = $DB->get_record('facetoface_asset', array('id' => $id, 'custom' => 0), '*', MUST_EXIST);
+} else {
+    $asset = false;
+}
 
-$form = process_asset_form(
-    $id,
-    function() use ($returnurl, $id) {
-        $successstr = $id ? 'assetupdatesuccess' : 'assetcreatesuccess';
-        totara_set_notification(get_string($successstr, 'facetoface'), $returnurl, array('class' => 'notifysuccess'));
+$assetlisturl = new moodle_url('/mod/facetoface/asset/manage.php');
+
+$form = facetoface_process_asset_form($asset, false, false,
+    function() use ($assetlisturl, $id) {
+        if (!$id) {
+            $successstr = 'assetcreatesuccess';
+        } else {
+            $successstr = 'assetupdatesuccess';
+        }
+        totara_set_notification(get_string($successstr, 'facetoface'), $assetlisturl, array('class' => 'notifysuccess'));
     },
-    function() use ($returnurl) {
-        redirect($returnurl);
+    function() use ($assetlisturl) {
+        redirect($assetlisturl);
     }
 );
 

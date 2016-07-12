@@ -99,8 +99,9 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
                 get_string('actions'),
                 'base.id',
                 array(
-                    'joins' => 'assigned',
                     'noexport' => true,
+                    'nosort' => true,
+                    'joins' => 'assigned',
                     'capability' => 'totara/core:modconfig',
                     'extrafields' => array('hidden' => 'base.hidden', 'cntdates' => 'assigned.cntdates'),
                     'displayfunc' => 'actions',

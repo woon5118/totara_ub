@@ -36,6 +36,7 @@ require_once $CFG->dirroot.'/mod/facetoface/notification/lib.php';
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/signup_form.php');
 require_once($CFG->dirroot . '/mod/facetoface/room/lib.php');
+require_once($CFG->dirroot . '/mod/facetoface/asset/lib.php');
 
 /**
  * Definitions for setting notification types
@@ -608,7 +609,9 @@ function facetoface_save_dates($sessionid, array $sessiondates = null) {
 
             // Add assets.
             if (!empty($date->assetids) && is_array($date->assetids)) {
-                foreach($date->assetids as $assetid) {
+                // Make sure there are not duplicates coming from JS code.
+                $assetids = array_unique($date->assetids);
+                foreach ($assetids as $assetid) {
                     $asset = new stdClass();
                     $asset->sessionsdateid = $date->id;
                     $asset->assetid = $assetid;
@@ -852,7 +855,11 @@ function facetoface_cancel_session($session, $fromform) {
     // Unlink rooms, orphaned custom rooms are deleted from cleanup task.
     $DB->set_field('facetoface_sessions_dates', 'roomid', 0, array('sessionid' => $session->id));
 
-    // TODO: TL-9455 Unlink assets and fix UI and cover with tests
+    // Unlink assets, orphaned custom assets are deleted from cleanup task.
+    $dateids = $DB->get_fieldset_select('facetoface_sessions_dates', 'id', "sessionid = :sessionid", array('sessionid' => $session->id));
+    foreach($dateids as $dateid) {
+        $DB->delete_records('facetoface_asset_dates', array('sessionsdateid' => $dateid));
+    }
 
     // Remove entries from the calendars.
     facetoface_remove_all_calendar_entries($session);
@@ -973,13 +980,34 @@ function facetoface_delete_session($session) {
         facetoface_remove_session_from_calendar($session, SITEID);
     }
 
-    // Get custom room ids.
-    $customroomids = $DB->get_fieldset_sql(
-            'SELECT fsd.roomid FROM {facetoface_sessions_dates} fsd
-            INNER JOIN {facetoface_room} fr ON fsd.roomid = fr.id AND fr.custom > 0
-            WHERE sessionid = :sessionid',
-            array('sessionid' =>  $session->id)
-    );
+    // Delete links to assets and delete freshly orphaned custom assets because there is little chance they would be reused.
+    $dateids = $DB->get_fieldset_select('facetoface_sessions_dates', 'id', "sessionid = :sessionid", array('sessionid' => $session->id));
+    foreach($dateids as $dateid) {
+        $sql = "SELECT fa.id
+                  FROM {facetoface_asset} fa
+                  JOIN {facetoface_asset_dates} fad ON (fad.assetid = fa.id)
+                 WHERE fa.custom = 1 AND sessionsdateid = :sessionsdateid";
+        $customassetids = $DB->get_fieldset_sql($sql, array('sessionsdateid' => $dateid));
+        $DB->delete_records('facetoface_asset_dates', array('sessionsdateid' => $dateid));
+        foreach ($customassetids as $assetid) {
+            if (!$DB->record_exists('facetoface_asset_dates', array('assetid', $assetid))) {
+                facetoface_delete_asset($assetid);
+            }
+        }
+    }
+
+    // Delete links to rooms and delete freshly orphaned custom rooms because there is little chance they would be reused.
+    $sql = "SELECT fr.id
+              FROM {facetoface_room} fr
+              JOIN {facetoface_sessions_dates} fsd ON (fsd.roomid = fr.id)
+             WHERE fr.custom = 1 AND sessionid = :sessionid";
+    $customroomids = $DB->get_fieldset_sql($sql, array('sessionid' => $session->id));
+    $DB->set_field('facetoface_sessions_dates', 'roomid', 0, array('sessionid' => $session->id));
+    foreach ($customroomids as $roomid) {
+        if (!$DB->record_exists('facetoface_sessions_dates', array('roomid', $roomid))) {
+            facetoface_delete_room($roomid);
+        }
+    }
 
     // Delete session details
     $DB->delete_records('facetoface_sessions_dates', array('sessionid' => $session->id));
@@ -1042,16 +1070,6 @@ function facetoface_delete_session($session) {
     // Notifications.
     $DB->delete_records('facetoface_notification_sent', array('sessionid' => $session->id));
     $DB->delete_records('facetoface_notification_hist', array('sessionid' => $session->id));
-
-    // Check that nothing else is using the room.
-    foreach ($customroomids as $roomid) {
-        $inuse = $DB->count_records_select('facetoface_sessions_dates', 'roomid = :roomid', array('roomid' => $roomid));
-
-        if (!$inuse) {
-            // Purge the orphaned custom room.
-            facetoface_delete_room($roomid);
-        }
-    }
 
     $DB->delete_records('facetoface_sessions', array('id' => $session->id));
 
@@ -4517,109 +4535,6 @@ function facetoface_task_check_capacity($data) {
 }
 
 /**
- * Get all non-custom (public) and custom (private) assets belonging to current session
- * @param int $sessionid
- * @return array assets
- */
-function facetoface_get_all_assets($sessionid = 0) {
-    global $DB;
-    // Get predefined and custom assets owned by current session.
-    $sql = "SELECT DISTINCT fa.*
-            FROM {facetoface_asset} fa
-                LEFT JOIN {facetoface_asset_dates} fad ON (fad.assetid = fa.id)
-                LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.id=fad.sessionsdateid)
-            WHERE
-                fa.custom = 0 AND hidden = 0
-                OR (fa.custom > 0 AND fsd.sessionid = :sessionid)
-            ORDER BY
-                fa.name";
-
-    $allassets = array();
-    $assets = $DB->get_records_sql($sql, array('sessionid' => $sessionid));
-    if (!empty($assets)) {
-        foreach ($assets as $asset) {
-            $assetobject = new stdClass();
-            $assetobject->id = $asset->id;
-            $assetobject->fullname = $asset->name;
-            $assetobject->custom = $asset->custom;
-
-            $allassets[$asset->id] = $assetobject;
-        }
-    }
-    return $allassets;
-}
-
-/**
- * Get available assets for the specified time period.
- *
- * Available assets are where the start- OR end times don't fall within that of another session's asset,
- * as well as assets where the start- AND end times don't encapsulate that of another session's asset
- *
- * @param array $timeslots array of [timestart, timefinish] arrays
- * @param string $fields db fields for which data should be retrieved
- * @param array $excludesessions array of sessionids to exclude in availability checking
- * @return array assets
- * // TODO: Cover this function by unit tests.
- */
-function facetoface_get_available_assets($timeslots=array(), $fields='*', $excludesessions=array()) {
-    global $DB;
-
-    // Allow to have aa asset conflict, where type != 'external'
-    $bookedwhere = "";
-    $params = array();
-    $timeslotsql = array();
-    $timeslotparams = array();
-    foreach ($timeslots as $i => $t) {
-        $timestart = $t[0];
-        $timefinish = $t[1];
-        $timeslotsql[] = " (:end{$i} > fsd.timestart AND fsd.timefinish > :start{$i})";
-        $timeslotparams = array_merge($timeslotparams, array(
-            "end{$i}" => $timefinish,
-            "start{$i}" => $timestart
-        ));
-    }
-
-    if (!empty($timeslotsql)) {
-        $bookedwhere .= 'AND ('.implode(' OR ', $timeslotsql).') ';
-        $params = array_merge($params, $timeslotparams);
-    }
-
-    $customwhere = '';
-    if (!empty($excludesessions)) {
-        // Prepare options to not mark assets booked in ignored sessions.
-        list($insql, $inparams) = $DB->get_in_or_equal($excludesessions, SQL_PARAMS_NAMED, 'exsess', false);
-        $bookedwhere .= " AND fsd.sessionid {$insql} ";
-        $params = array_merge($params, $inparams);
-
-        // Prepare options for allowing custom assets associated with sessions.
-        list($customsql, $customparams) = $DB->get_in_or_equal($excludesessions, SQL_PARAMS_NAMED, 'custsess');
-        $customwhere .= "OR custom > 0 AND fsd.sessionid {$customsql} ";
-        $params = array_merge($params, $customparams);
-    }
-
-    $sql = "
-        SELECT DISTINCT {$fields} FROM (
-            SELECT fa.*
-            FROM {facetoface_asset} fa
-            LEFT JOIN {facetoface_asset_dates} fad ON fad.assetid = fa.id
-            LEFT JOIN {facetoface_sessions_dates} fsd ON fsd.id = fad.sessionsdateid
-            WHERE fa.hidden = 0
-            AND (fa.custom = 0 {$customwhere})
-            AND fa.id NOT IN
-            (
-                SELECT DISTINCT fa.id
-                FROM {facetoface_asset} fa
-                LEFT JOIN {facetoface_asset_dates} fad ON fad.assetid = fa.id
-                LEFT JOIN {facetoface_sessions_dates} fsd ON fsd.id = fad.sessionsdateid
-                WHERE allowconflicts = 0
-                {$bookedwhere}
-            )
-        ) a
-    ";
-    return $DB->get_records_sql($sql, $params);
-}
-
-/**
  * Get sessions the occur at least partly during time periods
  *
  * @access  public
@@ -6233,55 +6148,6 @@ function facetoface_format_session_dates($session) {
         $ret = html_writer::tag('em', get_string('wait-listed', 'facetoface'));
     }
     return $ret;
-}
-
-/**
- * Get the relevant session asset for a facetoface activity
- *
- * @param int $assetid
- *
- * @return mixed stdClass object or false if not found
- */
-function facetoface_get_asset($assetid) {
-    global $DB;
-
-    $sql = "SELECT fa.id, fa.name, fa.description, fa.allowconflicts, fa.hidden, fa.custom, fa.usercreated, fa.timecreated,
-                   fa.usermodified, fa.timemodified
-              FROM {facetoface_asset} fa
-             WHERE fa.id = :id";
-
-    $asset = $DB->get_record_sql($sql, array('id' => $assetid));
-
-    if (!empty($asset)) {
-        customfield_load_data($asset, 'facetofaceasset', 'facetoface_asset');
-    }
-
-    return $asset;
-}
-
-/**
- * Get the assets by their list of ids
- *
- * @param int $assetids
- *
- * @return array of stdClass
- */
-function facetoface_get_assets_by_ids(array $assetids) {
-    global $DB;
-    if (empty($assetids)) {
-        return array();
-    }
-    list($insql, $inparams) = $DB->get_in_or_equal($assetids, SQL_PARAMS_NAMED);
-    $sql = "SELECT fa.id, fa.name, fa.description, fa.allowconflicts, fa.hidden, fa.custom, fa.usercreated, fa.timecreated,
-                   fa.usermodified, fa.timemodified
-              FROM {facetoface_asset} fa
-             WHERE fa.id $insql";
-
-    $assets = $DB->get_records_sql($sql, $inparams);
-
-    //customfield_load_data($asset, 'facetofaceasset', 'facetoface_asset');
-
-    return $assets;
 }
 
 /**

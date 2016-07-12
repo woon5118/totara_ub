@@ -76,6 +76,12 @@ $jsmodule = array(
 
 $PAGE->requires->js_init_call('M.totara_f2f_dateintervalkeeper.init', array(), false, $jsmodule);
 
+// Include the same strings as mod/facetoface/sessions.php, because we override the lang string cache with this ugly hack.
+$PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
+$PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
+$PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
+    'createnewasset', 'editasset', 'createnewroom', 'editroom'), 'facetoface');
+
 $form = new session_date_form($currenturl, $params, 'post', '', array('class' => 'dialog-nobind'), true, md5($start.$finish));
 if ($data = $form->get_data()) {
     // Provide timestamp, timezone values, and rendered dates text.

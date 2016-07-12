@@ -29,17 +29,16 @@ require_once($CFG->dirroot . '/mod/facetoface/rb_sources/f2f_available.php');
  * Empty rooms during specified time search implementation
  */
 class rb_filter_f2f_roomavailable extends rb_filter_f2f_available {
-    // TODO: This needs to be covered by behat tests.
     public function get_sql_snippet($sessionstarts, $sessionends) {
         $paramstarts = rb_unique_param('timestart');
         $paramends = rb_unique_param('timefinish');
 
         $field = $this->get_field();
         $sql = "$field NOT IN (
-            SELECT r.id
-              FROM {facetoface_room} r
-              JOIN {facetoface_sessions_dates} fsd ON fsd.roomid = r.id
-             WHERE r.allowconflicts = 0 AND :{$paramends} > fsd.timestart AND fsd.timefinish > :{$paramstarts}
+            SELECT fr.id
+              FROM {facetoface_room} fr
+              JOIN {facetoface_sessions_dates} fsd ON fsd.roomid = fr.id
+             WHERE fr.allowconflicts = 0 AND :{$paramends} > fsd.timestart AND fsd.timefinish > :{$paramstarts}
              )";
 
         $params = array();

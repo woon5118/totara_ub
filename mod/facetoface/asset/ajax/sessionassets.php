@@ -31,9 +31,9 @@ $facetofaceid = required_param('facetofaceid', PARAM_INT); // Necessary when cre
 $sessionid = required_param('sessionid', PARAM_INT);       // Empty when adding new session.
 $timestart = required_param('timestart', PARAM_INT);
 $timefinish = required_param('timefinish', PARAM_INT);
-$selected = required_param('selected', PARAM_SEQUENCE);
 $offset = optional_param('offset', 0, PARAM_INT);
 $search = optional_param('search', 0, PARAM_INT);
+$selected = required_param('selected', PARAM_SEQUENCE);
 
 if (!$facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid))) {
     print_error('error:incorrectfacetofaceid', 'facetoface');
@@ -70,6 +70,12 @@ $PAGE->set_url('/mod/facetoface/asset/ajax/sessionassets.php', array(
     'timefinish' => $timefinish
 ));
 
+// Include the same strings as mod/facetoface/sessions.php, because we override the lang string cache with this ugly hack.
+$PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');
+$PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'moodle');
+$PAGE->requires->strings_for_js(array('chooseassets', 'chooseroom', 'dateselect', 'useroomcapacity', 'nodatesyet',
+    'createnewasset', 'editasset', 'createnewroom', 'editroom'), 'facetoface');
+
 if (empty($timestart) || empty($timefinish)) {
     print_error('notimeslotsspecified', 'facetoface');
 }
@@ -77,46 +83,43 @@ if (empty($timestart) || empty($timefinish)) {
 // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
 send_headers('text/html; charset=utf-8', false);
 
-$allassets = facetoface_get_all_assets($sessionid);
-$unavailableassets = array();
-
-if (!empty($allassets)) {
-    // Disable unavailable assets.
-    $availableassets = facetoface_get_available_assets(array(array($timestart, $timefinish)), 'id', array($sessionid));
-    if ($unavailableassets = array_diff(array_keys($allassets), array_keys($availableassets))) {
-        // Make array keys and values the same.
-        $unavailableassets = array_combine($unavailableassets, $unavailableassets);
-
-        // Add alreadybooked string to fullname.
-        foreach ($unavailableassets as $key => $unavailable) {
-            if (isset($allassets[$key])) {
-                $allassets[$key]->fullname .= get_string('assetalreadybooked', 'facetoface');
-            }
-        }
-    }
-}
-
-// Set actual selected assets.
+// Setup / loading data
+$allassets = facetoface_get_available_assets(0, 0 , 'fa.*', $sessionid, $facetofaceid);
+$availableassets = facetoface_get_available_assets($timestart, $timefinish, 'fa.id', $sessionid, $facetofaceid);
+$selectedids = explode(',', $selected);
 $selectedassets = array();
-if (!empty($selected)) {
-    $selectedids = explode(',', $selected);
-    $selectedassets = facetoface_get_assets_by_ids($selectedids);
+$unavailableassets = array();
+foreach ($allassets as $asset) {
+    customfield_load_data($asset, "facetofaceasset", "facetoface_asset");
+    $asset->fullname = $asset->name;
+    if (!isset($availableassets[$asset->id])) {
+        $unavailableassets[$asset->id] = $asset->id;
+        $asset->fullname .= get_string('assetalreadybooked', 'facetoface');
+    }
+    if ($asset->custom) {
+        $asset->fullname .= ' (' . get_string('facetoface', 'facetoface') . ': ' . format_string($facetoface->name) . ')';
+    }
+    if (in_array($asset->id, $selectedids)) {
+        $selectedassets[$asset->id] = $asset;
+    }
 }
 
 // Display page.
 $dialog = new totara_dialog_content();
-$dialog->proxy_dom_data(array('id', 'custom'));
 $dialog->searchtype = 'facetoface_asset';
+$dialog->proxy_dom_data(array('id', 'custom'));
 $dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
 $dialog->items = $allassets;
-$dialog->selected_items = $selectedassets;
 $dialog->disabled_items = $unavailableassets;
+$dialog->selected_items = $selectedassets;
 $dialog->selected_title = 'itemstoadd';
 $dialog->lang_file = 'facetoface';
 $dialog->customdata['facetofaceid'] = $facetofaceid;
 $dialog->customdata['timestart'] = $timestart;
 $dialog->customdata['timefinish'] = $timefinish;
 $dialog->customdata['sessionid'] = $sessionid;
+$dialog->customdata['selected'] = $selected;
+$dialog->customdata['offset'] = $offset;
 $dialog->string_nothingtodisplay = 'error:nopredefinedassets';
 
 echo $dialog->generate_markup();

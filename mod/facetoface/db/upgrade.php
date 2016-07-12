@@ -4391,5 +4391,22 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016070500, 'facetoface');
     }
 
+    if ($oldversion < 2016071200) {
+        // Unlink assets from cancelled events,
+        // orphaned custom assets get deleted automatically from cleanup task.
+        $sql = "SELECT fad.id
+                  FROM {facetoface_asset_dates} fad
+                  JOIN {facetoface_sessions_dates} fsd ON (fsd.id = fad.sessionsdateid)
+                  JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
+                 WHERE fs.cancelledstatus = 1";
+        $records = $DB->get_recordset_sql($sql);
+        foreach ($records as $record) {
+            $DB->delete_records('facetoface_asset_dates', array('id' => $record->id));
+        }
+        $records->close();
+
+        upgrade_mod_savepoint(true, 2016071200, 'facetoface');
+    }
+
     return $result;
 }
