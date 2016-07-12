@@ -734,6 +734,9 @@ class theme_config {
         $svg = $this->use_svg_icons();
         $separate = (core_useragent::is_ie() && !core_useragent::check_ie_version('10'));
 
+        // Totara: RTL stylesheet.
+        $rtl = (get_string('thisdirection', 'langconfig') === 'rtl');
+
         if ($rev > -1) {
             $url = new moodle_url("$CFG->httpswwwroot/theme/styles.php");
             if (!empty($CFG->slasharguments)) {
@@ -744,6 +747,10 @@ class theme_config {
                     $slashargs .= '/_s'.$slashargs;
                 }
                 $slashargs .= '/'.$this->name.'/'.$rev.'/all';
+                // Totara: RTL stylesheet.
+                if ($rtl) {
+                    $slashargs .= '/rtl';
+                }
                 if ($separate) {
                     $slashargs .= '/chunk0';
                 }
@@ -754,6 +761,10 @@ class theme_config {
                     // We add an SVG param so that we know not to serve SVG images.
                     // We do this because all modern browsers support SVG and this param will one day be removed.
                     $params['svg'] = '0';
+                }
+                // Totara: RTL stylesheet.
+                if ($rtl) {
+                    $params['rtl'] = '1';
                 }
                 if ($separate) {
                     $params['chunk'] = '0';
@@ -774,6 +785,10 @@ class theme_config {
             if ($separate) {
                 // We might need to chunk long files.
                 $baseurl->param('chunk', '0');
+            }
+            // Totara: RTL stylesheet.
+            if ($rtl) {
+                $baseurl->param('rtl', '1');
             }
             if (core_useragent::is_ie()) {
                 // Lalala, IE does not allow more than 31 linked CSS files from main document.
@@ -817,14 +832,15 @@ class theme_config {
      *
      * NOTE: this method is not expected to be used from any addons.
      *
+     * @param $rtl Are we expecting a RTL stylesheet?
      * @return string CSS markup, already optimised and compressed
      */
-    public function get_css_content() {
+    public function get_css_content($rtl = false) {
         global $CFG;
         require_once($CFG->dirroot.'/lib/csslib.php');
 
         $csscontent = '';
-        foreach ($this->get_css_files(false) as $type => $value) {
+        foreach ($this->get_css_files(false, $rtl) as $type => $value) {
             foreach ($value as $identifier => $val) {
                 if (is_array($val)) {
                     foreach ($val as $v) {
@@ -867,9 +883,10 @@ class theme_config {
      * @param string $type
      * @param string $subtype
      * @param string $sheet
+     * @param string $rtl
      * @return string CSS markup
      */
-    public function get_css_content_debug($type, $subtype, $sheet) {
+    public function get_css_content_debug($type, $subtype, $sheet, $rtl) {
         global $CFG;
         require_once($CFG->dirroot.'/lib/csslib.php');
 
@@ -893,7 +910,7 @@ class theme_config {
         }
 
         $cssfiles = array();
-        $css = $this->get_css_files(true);
+        $css = $this->get_css_files(true, $rtl);
 
         if ($type === 'ie') {
             // IE is a sloppy browser with weird limits, sorry.
@@ -975,13 +992,17 @@ class theme_config {
      * Returns an array of organised CSS files required for this output.
      *
      * @param bool $themedesigner
+     * @param bool $rtl Is the current language rtl?
      * @return array nested array of file paths
      */
-    protected function get_css_files($themedesigner) {
+    protected function get_css_files($themedesigner, $rtl = false) {
         global $CFG;
 
         $cache = null;
         $cachekey = 'cssfiles';
+        if ($rtl) {
+            $cachekey = 'cssfiles-rtl';
+        }
         if ($themedesigner) {
             require_once($CFG->dirroot.'/lib/csslib.php');
             // We need some kind of caching here because otherwise the page navigation becomes
@@ -1070,6 +1091,24 @@ class theme_config {
         }
         if (is_array($this->sheets)) {
             foreach ($this->sheets as $sheet) {
+
+                // Totara: Direction-specific stylesheets are detected automatically.
+                // They should not be included in the sheets array.
+                if (substr($sheet, -4) === '-rtl') {
+                    $message  = 'RTL Stylesheets detected automatically. ';
+                    $message .= "Remove {$sheet} from your theme config.php";
+                    throw new coding_exception($message);
+                }
+
+                // Totara: Check for a RTL sheet first so we can fall back to
+                // non-direction specific if <sheet>-rtl.css doesn't exist.
+                if ($rtl) {
+                    $sheetfile = "$this->dir/style/$sheet-rtl.css";
+                    if (is_readable($sheetfile) && !isset($cssfiles['theme'][$sheet])) {
+                        $cssfiles['theme'][$sheet] = $sheetfile;
+                    }
+                }
+
                 $sheetfile = "$this->dir/style/$sheet.css";
                 if (is_readable($sheetfile) && !isset($cssfiles['theme'][$sheet])) {
                     $cssfiles['theme'][$sheet] = $sheetfile;
