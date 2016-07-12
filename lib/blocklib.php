@@ -1057,7 +1057,7 @@ class block_manager {
             $str = new lang_string('moveblock', 'block', $blocktitle);
             $controls[] = new action_menu_link_primary(
                 new moodle_url($actionurl, array('bui_moveid' => $block->instance->id)),
-                new pix_icon('t/move', $str, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                new pix_icon('f/move', $str, 'moodle', array('class' => 'iconsmall', 'title' => '')),
                 $str,
                 array('class' => 'editing_move')
             );
