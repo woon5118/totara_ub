@@ -28,6 +28,11 @@ module.exports = function(grunt) {
         tasks = {},
         cwd = process.env.PWD || process.cwd();
 
+    // Totara: Promise polyfill for legacy Node versions.
+    if (typeof Promise === 'undefined') {
+        global.Promise = require('promise/lib/es6-extensions');
+    }
+
     // Windows users can't run grunt in a subdirectory, so allow them to set
     // the root by passing --root=path/to/dir.
     if (grunt.option('root')) {
@@ -44,6 +49,221 @@ module.exports = function(grunt) {
 
     // Globbing pattern for matching all AMD JS source files.
     var amdSrc = [inAMD ? cwd + '/src/*.js' : '**/amd/src/*.js'];
+
+    /**
+     * Totara: Test if given path is for a RTL stylesheet.
+     *
+     * @param {String} path
+     * @return {Boolean}
+     */
+    var isRTLStylesheet = function(path) {
+         return path.match(/-rtl\.css$/);
+    };
+
+    /**
+     * Totara: Is path is inside a theme with CSS that Grunt should preprocess?
+     *
+     * @param {String} path
+     * @return {Boolean}
+     */
+    var preprocessTheme = function(path) {
+        var dontProcess = [
+            'base', 'bootstrap', 'bootstrapbase', 'standardtotararesponsive',
+            'customtotararesponsive', 'kiwifruitresponsive'
+        ];
+
+        for (var i = 0; i < dontProcess.length; i++) {
+            if (grunt.file.isMatch('**/theme/' + dontProcess[i] + '/**', path)) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    // Totara: Compilation of Less in core / themes
+    // source files based on current dir.
+    var localLess = grunt.file.isDir(cwd, 'less');
+    var customThemeDir = grunt.option('themedir') || '';
+    var inTheme =  false;
+
+    // Standard theme location.
+    if (path.basename(path.dirname(cwd)) === 'theme') {
+        inTheme = true;
+    }
+
+    // Custom theme directory.
+    if (path.basename(path.dirname(cwd)) === path.basename(customThemeDir)) {
+        inTheme = true;
+    }
+
+    // Globbing pattern for Less source files.
+    var lessSrc;
+
+    if (inTheme) {
+        // Single theme less only.
+        lessSrc = [cwd + '/less/*.less'];
+        grunt.verbose.writeln('Current directory is a theme.');
+    } else if (localLess) {
+        // Single component less only.
+        lessSrc = [cwd + '/less/styles.less'];
+        grunt.verbose.writeln('Detected local less directory.');
+    } else {
+        // All theme and component less files.
+        lessSrc = [
+            '**/less/styles.less',
+            'theme/*/less/*.less',
+            '!theme/bootstrap/less/**'
+        ];
+    }
+
+    /**
+     * Generate destination paths for compiled Less files.
+     *
+     * @param {String} destPath The current destination
+     * @param {String} srcPath The  matched src path
+     * @return {String} The rewritten destination path.
+     */
+    var less_rename = function(destPath, srcPath) {
+        var themePath = false;
+        var upThreeDirs = path.basename(path.dirname(path.dirname(path.dirname(srcPath))));
+        var customThemeDir = path.basename(grunt.config('themedir') || '');
+
+        if (upThreeDirs === 'theme' || upThreeDirs === customThemeDir) {
+            themePath = true;
+        }
+
+        // In themes CSS files are stored in styles directory.
+        if (themePath === true) {
+            var filename = path.basename(srcPath, '.less') + '.css';
+            return path.join(path.dirname(path.dirname(srcPath)), 'style', filename);
+        }
+
+        // Component - styles.css file only.
+        return path.join(path.dirname(path.dirname(srcPath)), 'styles.css');
+    };
+
+    /**
+     * Filter expanded Less files glob.
+     *
+     * For some reason adding the negative match to the lessSrc
+     * glob does not remove the roots variables file.
+     *
+     * @param {String} srcPath
+     */
+    var less_filter = function(srcPath) {
+        return !(grunt.file.isMatch('**/roots/less/variables.less', srcPath));
+    };
+
+    var rtlSrc = 'theme/roots/style/*.css';
+
+    if (inTheme) {
+        // Single theme only.
+        rtlSrc = cwd + '/style/*.css';
+    } else if (localLess) {
+        rtlSrc = [];
+    } else {
+        // All theme style files.
+        rtlSrc = 'theme/*/style/*.css';
+    }
+
+    /**
+     * Rewrite destination path for RTL styles.
+     *
+     * @param {String} destPath
+     * @param {String} srcPath
+     * @return {String}
+     */
+    var rtl_rename = function(destPath, srcPath) {
+        return srcPath.replace('.css', '-rtl.css');
+    };
+
+    /**
+     * Filter expanded RTL source matches.
+     *
+     * @param {String} srcPath
+     * @return {Boolean}
+     */
+    var rtl_filter = function(srcPath) {
+
+        if (!preprocessTheme(srcPath)) {
+            return false;
+        }
+
+        // Don't flip RTL files.
+        return !isRTLStylesheet(srcPath);
+    };
+
+    // Roots less directory is added so that variables.less
+    // containing all bootstrap, Moodle & Totara variables
+    // can be imported in core without having to hard-code
+    // the theme path.
+    var lessImportPaths = ['theme', 'theme/roots/less'];
+
+    // Facilitate working with custom $CFG->themedir.
+    if (customThemeDir !== '') {
+        customThemeDir = path.resolve(cwd, customThemeDir);
+        if (grunt.file.isDir(customThemeDir)) {
+            grunt.log.ok("Adding custom themedir '" + customThemeDir + "' to less import search paths.");
+            lessImportPaths.push(customThemeDir);
+            if (!inTheme) {
+                grunt.log.ok("Adding custom themedir '" + customThemeDir + "' to less sources.");
+                lessSrc.push(customThemeDir + '/*/less/*.less');
+                grunt.log.ok("Adding custom themedir '" + customThemeDir + "' to RTL sources.");
+                rtlSrc.push(customThemeDir + '/*/style/*.css');
+            }
+        } else {
+            grunt.fail.fatal("Custom themedir '" + customThemeDir + "' is not accessible.");
+        }
+    }
+
+    // Auto prefixer source globs.
+    var prefixSrc;
+
+    if (inTheme) {
+        // Current theme only.
+        prefixSrc = rtlSrc;
+    } else if (localLess) {
+        // Single component only.
+        prefixSrc = [cwd + '/styles.css'];
+    } else {
+        // All styles compiled from Less.
+        prefixSrc = [
+            rtlSrc,
+            '**/styles.css'
+        ];
+    }
+
+    /**
+     * Totara: Filter out styles not generated from Less.
+     *
+     * @param {String} srcPath
+     * @return {Boolean}
+     */
+    var prefix_filter = function(srcPath) {
+
+        // RTL stylesheets are generated from the result of this processing.
+        if (isRTLStylesheet(srcPath)) {
+            return false;
+        }
+
+        if (!preprocessTheme(srcPath)) {
+            return false;
+        }
+
+        // In these cases we know sources are ok.
+        if (localLess || inTheme) {
+            return true;
+        }
+
+        // Theme styles were included based on RTL sources so they are also ok.
+        if (grunt.file.isMatch('**/theme/*/style/*.css', srcPath)) {
+            return true;
+        }
+
+        // Is there a less/styles.less locally?
+        return grunt.file.isFile(path.dirname(srcPath), 'less', 'styles.css');
+    };
 
     /**
      * Function to generate the destination for the uglify task
@@ -81,6 +301,19 @@ module.exports = function(grunt) {
             }
         },
         less: {
+            // Totara: Dedicated Less target.
+            totara: {
+                options: {
+                    compress: true,
+                    paths: lessImportPaths
+                },
+                files: [{
+                    expand: true,
+                    src: lessSrc,
+                    rename: less_rename,
+                    filter: less_filter
+                }]
+            },
             bootstrapbase: {
                 files: {
                     "theme/bootstrapbase/style/moodle.css": "theme/bootstrapbase/less/moodle.less",
@@ -99,6 +332,11 @@ module.exports = function(grunt) {
                 files: ['**/amd/src/**/*.js'],
                 tasks: ['amd']
             },
+            // Totara: Add less watch target.
+            less: {
+                files: ['**/less/**/*.less', '!**/node_modules/**/*'],
+                tasks: ['less:totara', 'postcss:prefix', 'postcss:rtl']
+            },
             bootstrapbase: {
                 files: ["theme/bootstrapbase/less/**/*.less"],
                 tasks: ["less:bootstrapbase"]
@@ -112,6 +350,34 @@ module.exports = function(grunt) {
             options: {
                 recursive: true,
                 paths: [cwd]
+            }
+        },
+        // Totara: PostCSS for prefixing and theme RTL.
+        postcss: {
+            prefix: {
+                options: {
+                    processors: [
+                        require('autoprefixer')({ browsers: 'last 2 versions, ie >= 9' })
+                    ]
+                },
+                files: [{
+                    expand: true,
+                    src: prefixSrc,
+                    filter: prefix_filter
+                }]
+            },
+            rtl: {
+                options: {
+                    processors: [
+                        require('rtlcss')()
+                    ]
+                },
+                files: [{
+                    expand: true,
+                    src: rtlSrc,
+                    rename: rtl_rename,
+                    filter: rtl_filter
+                }]
             }
         }
     });
@@ -242,13 +508,16 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
 
+    // Totara: Load PostCSS.
+    grunt.loadNpmTasks('grunt-postcss');
+
     // Register JS tasks.
     grunt.registerTask('shifter', 'Run Shifter against the current directory', tasks.shifter);
     grunt.registerTask('amd', ['jshint', 'uglify']);
     grunt.registerTask('js', ['amd', 'shifter']);
 
-    // Register CSS taks.
-    grunt.registerTask('css', ['less:bootstrapbase']);
+    // Register Totara tasks.
+    grunt.registerTask('css', ['less:totara', 'postcss:prefix', 'postcss:rtl']);
 
     // Register the startup task.
     grunt.registerTask('startup', 'Run the correct tasks for the current directory', tasks.startup);
