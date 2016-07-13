@@ -5414,6 +5414,9 @@ function reportbuilder_send_scheduled_report($sched) {
     }
 
     $message = get_string('scheduledreportmessage', 'totara_reportbuilder', $messagedetails);
+    // Markdown format is compatible with plain text lang packs and allows limited html markup too.
+    $messagehtml = markdown_to_html($message);
+    $messageplain = html_to_text($messagehtml);
 
     $fromaddress = core_user::get_noreply_user();
     $emailedcount = 0;
@@ -5429,7 +5432,7 @@ function reportbuilder_send_scheduled_report($sched) {
 
         // Sending email to all system users.
         foreach ($systemusers as $userto) {
-            $result = email_to_user($userto, $fromaddress, $subject, $message, '', $tempfile, $attachmentfilename);
+            $result = email_to_user($userto, $fromaddress, $subject, $messageplain, $messagehtml, $tempfile, $attachmentfilename);
             if ($result) {
                 $emailedcount++;
             } else {
@@ -5440,7 +5443,7 @@ function reportbuilder_send_scheduled_report($sched) {
         // Sending email to external users.
         foreach ($externalusers as $email) {
             $userto = \totara_core\totara_user::get_external_user($email);
-            $result = email_to_user($userto, $fromaddress, $subject, $message, '', $tempfile, $attachmentfilename);
+            $result = email_to_user($userto, $fromaddress, $subject, $messageplain, $messagehtml, $tempfile, $attachmentfilename);
             if ($result) {
                 $emailedcount++;
             } else {
