@@ -40,10 +40,7 @@ class rb_facetoface_summary_room_embedded extends rb_base_embedded {
             array('type' => 'session', 'value' => 'overallstatus', 'heading' => null),
         );
 
-        $this->filters = array(
-            array('type' => 'room', 'value' => 'name', 'advanced' => 0),
-            array('type' => 'room', 'value' => 'roomavailable', 'advanced' => 0)
-        );
+        $this->filters = array();
 
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_ALL;
         $this->contentsettings = array(

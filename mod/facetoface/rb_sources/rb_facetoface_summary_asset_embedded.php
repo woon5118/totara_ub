@@ -36,10 +36,7 @@ class rb_facetoface_summary_asset_embedded extends rb_base_embedded {
             array('type' => 'session', 'value' => 'overallstatus', 'heading' => null),
         );
 
-        $this->filters = array(
-            array('type' => 'asset', 'value' => 'name', 'advanced' => 0),
-            array('type' => 'asset', 'value' => 'assetavailable', 'advanced' => 0)
-        );
+        $this->filters = array();
 
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_ALL;
 
