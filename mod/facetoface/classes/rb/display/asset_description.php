@@ -17,30 +17,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @author Petr Skoda <pter.skoda@totaralms.com>
  * @package mod_facetoface
  */
 
 namespace mod_facetoface\rb\display;
 
 /**
- * Display room description with images
+ * Display asset description with images
  *
  * @package mod_facetoface
  */
-class room_description extends \totara_reportbuilder\rb\display\base {
+class asset_description extends \totara_reportbuilder\rb\display\base {
     public static function display($description, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
 
         $isexport = ($format !== 'html');
         $extra = self::get_extrafields_row($row, $column);
-
         $descriptionhtml = file_rewrite_pluginfile_urls(
-                $description,
-                'pluginfile.php',
-                \context_system::instance()->id,
-                'mod_facetoface',
-                'room',
-                $extra->roomid
+            $description,
+            'pluginfile.php',
+            \context_system::instance()->id,
+            'mod_facetoface',
+            'asset',
+            $extra->assetid
         );
         $descriptionhtml = format_text($descriptionhtml, FORMAT_HTML);
 

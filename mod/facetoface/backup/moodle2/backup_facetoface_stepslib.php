@@ -252,8 +252,13 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
 
         $interest->annotate_ids('user', 'userid');
 
-        // Define file annotations
-        // TODO: TL-9408 None for F2F yet
+        // Define file annotations.
+        $facetoface->annotate_files('mod_facetoface', 'intro', null); // Intro file area hasn't itemid.
+        $session->annotate_files('mod_facetoface', 'session', 'id');
+
+        $syscontext = context_system::instance();
+        $room->annotate_files('mod_facetoface', 'room', 'id', $syscontext->id);
+        $asset->annotate_files('mod_facetoface', 'asset', 'id', $syscontext->id);
 
         // Return the root element (facetoface), wrapped into standard activity structure
         return $this->prepare_activity_structure($facetoface);

@@ -1056,6 +1056,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 'room',
                 $room->id
             );
+            $descriptionhtml = format_text($descriptionhtml, FORMAT_HTML);
             $output[] = html_writer::tag('dd', $descriptionhtml);
         }
 
@@ -1128,10 +1129,17 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         // Description.
         if (!empty($asset->description)) {
-            $asset->descriptionformat = FORMAT_HTML;
-            $asset = file_prepare_standard_editor($asset, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'mod_facetoface', 'asset', $asset->id);
             $output[] = html_writer::tag('dt', get_string('assetdescription', 'facetoface'));
-            $output[] = html_writer::tag('dd', $asset->description_editor['text']);
+            $descriptionhtml = file_rewrite_pluginfile_urls(
+                $asset->description,
+                'pluginfile.php',
+                \context_system::instance()->id,
+                'mod_facetoface',
+                'asset',
+                $asset->id
+            );
+            $descriptionhtml = format_text($descriptionhtml, FORMAT_HTML);
+            $output[] = html_writer::tag('dd', $descriptionhtml);
         }
 
         // Created.

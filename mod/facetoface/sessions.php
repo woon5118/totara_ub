@@ -215,25 +215,9 @@ if (!isset($session)) {
             $sessiondata->$roomidfield = $date->roomid;
             $sessiondata->$assetsfield = $date->assetids;
 
-            // When cloning a session, check that conflicting rooms and assets are removed.
-            if ($c) {
-                if ($date->roomid) {
-                    $room = facetoface_get_room($date->roomid);
-                    if (!$room or !$room->allowconflicts) {
-                        $sessiondata->$roomidfield = 0;
-                    }
-                }
-                if ($date->assetids) {
-                    $assetids = explode(',', $date->assetids);
-                    foreach ($assetids as $k => $assetid) {
-                        $asset = facetoface_get_asset($assetid);
-                        if (!$asset or !$asset->allowconflicts) {
-                            unset($assetids[$k]);
-                        }
-                    }
-                    $sessiondata->$assetsfield = implode(',', $assetids);
-                }
-            }
+            // NOTE: There is no need to remove rooms and assets
+            //       because form validation will not allow saving
+            //       and likely they will just change the date.
 
             $i++;
         }

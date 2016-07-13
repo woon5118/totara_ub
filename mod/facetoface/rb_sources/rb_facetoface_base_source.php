@@ -28,6 +28,11 @@ require_once($CFG->dirroot . '/mod/facetoface/rb_sources/f2f_roomavailable.php')
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/f2f_assetavailable.php');
 
 abstract class rb_facetoface_base_source extends rb_base_source {
+    public function __construct() {
+        $this->usedcomponents[] = 'mod_facetoface';
+        parent::__construct();
+    }
+
     /**
      * Add common facetoface columns
      * Requires 'sessions' and 'facetoface' joins
@@ -675,7 +680,6 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             )
         );
 
-        $this->usedcomponents[] = 'mod_facetoface';
         $columnoptions[] = new rb_column_option(
             'room',
             'description',
@@ -853,7 +857,9 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             "$join.description",
             array(
                 'joins' => $join,
-                'dbdatatype' => 'text'
+                'dbdatatype' => 'text',
+                'displayfunc' => 'asset_description',
+                'extrafields' => array('assetid' => "$join.id")
             )
         );
 

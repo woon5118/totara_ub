@@ -51,6 +51,15 @@ class rb_facetoface_summary_asset_embedded extends rb_base_embedded {
     }
 
     public function is_capable($reportfor, $report) {
+        return self::is_capable_static($reportfor);
+    }
+
+    /**
+     * Allow to check capability without instance creation
+     * @param int $reportfor user id
+     * @return bool
+     */
+    public static function is_capable_static($reportfor) {
         $systemcontext = context_system::instance();
         return has_capability('mod/facetoface:addinstance', $systemcontext, $reportfor);
     }

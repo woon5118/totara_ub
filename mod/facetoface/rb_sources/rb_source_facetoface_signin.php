@@ -56,7 +56,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         // Apply global user restrictions.
         $this->add_global_report_restriction_join('base', 'userid');
 
-        $this->usedcomponents[] = 'mod_facetoface';
         $this->base = '{facetoface_signups}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();

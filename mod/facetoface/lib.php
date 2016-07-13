@@ -918,7 +918,10 @@ function facetoface_cancel_session($session, $fromform) {
 function facetoface_delete_session($session) {
     global $DB;
 
-    $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
+    $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course, false, MUST_EXIST);
+    $context = context_module::instance($cm->id);
+
     // Get session status and if it is over, do not send any cancellation notifications, see below.
     $sessionover = $session->mintimestart && facetoface_has_session_started($session, time());
 
@@ -1070,6 +1073,10 @@ function facetoface_delete_session($session) {
     // Notifications.
     $DB->delete_records('facetoface_notification_sent', array('sessionid' => $session->id));
     $DB->delete_records('facetoface_notification_hist', array('sessionid' => $session->id));
+
+     // Delete files embedded in details text.
+    $fs = get_file_storage();
+    $fs->delete_area_files($context->id, 'mod_facetoface', 'session', $session->id);
 
     $DB->delete_records('facetoface_sessions', array('id' => $session->id));
 
@@ -3730,7 +3737,7 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
             $roomstring = facetoface_room_html($room, $PAGE->url);
             $systemcontext = context_system::instance();
             $descriptionhtml = file_rewrite_pluginfile_urls($room->description, 'pluginfile.php', $systemcontext->id, 'mod_facetoface', 'room', $room->id);
-            $roomstring .= $descriptionhtml;
+            $roomstring .= format_text($descriptionhtml, FORMAT_HTML);
             $output .= html_writer::tag('dt', get_string('room', 'facetoface'));
             $output .= html_writer::tag('dd', html_writer::tag('span', $roomstring, array('class' => 'roomdescription')));
         }
@@ -3794,6 +3801,7 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
         if ($cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $courseid)) {
             $context = context_module::instance($cm->id);
             $session->details = file_rewrite_pluginfile_urls($session->details, 'pluginfile.php', $context->id, 'mod_facetoface', 'session', $session->id);
+            $session->details = format_text($session->details, FORMAT_HTML);
         }
         $details = format_text($session->details, FORMAT_HTML);
         $output .= html_writer::tag('dt', get_string('details', 'facetoface'));
@@ -5344,14 +5352,15 @@ function facetoface_get_customfield_filters() {
  */
 function facetoface_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $DB;
+    $fs = get_file_storage();
 
-    if ($context->contextlevel == CONTEXT_SYSTEM && $filearea == 'room') {
-        $fs = get_file_storage();
-        $filename = array_pop($args);
-        $itemid = array_pop($args);
-
-        $file = $fs->get_file($context->id, 'mod_facetoface', 'room', $itemid, '/', $filename);
-        if (!$file) {
+    if ($context->contextlevel == CONTEXT_SYSTEM && ($filearea === 'room' || $filearea === 'asset')) {
+        // NOTE: we do not know where is the room and asset description visible,
+        //       this means we cannot do any strict access control, bad luck.
+        $itemid = (int)array_shift($args);
+        $relativepath = implode('/', $args);
+        $fullpath = "/$context->id/mod_facetoface/$filearea/$itemid/$relativepath";
+        if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
             return false;
         }
 
@@ -5364,18 +5373,14 @@ function facetoface_pluginfile($course, $cm, $context, $filearea, $args, $forced
     }
 
     require_login($course, true, $cm);
+    // NOTE: we do not know where is the session details text displayed,
+    //       this means we cannot do any strict access control, bad luck.
 
     $sessionid = (int)array_shift($args);
-
-    if (!$session = $DB->get_record('facetoface_sessions', array('id' => $sessionid))) {
+    if (!$session = $DB->get_record('facetoface_sessions', array('id' => $sessionid, 'facetoface' => $cm->instance))) {
         return false;
     }
 
-    if (!$facetoface = $DB->get_record('facetoface', array('id' => $cm->instance))) {
-        return false;
-    }
-
-    $fs = get_file_storage();
     $relativepath = implode('/', $args);
     $fullpath = "/$context->id/mod_facetoface/$filearea/$sessionid/$relativepath";
     if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {

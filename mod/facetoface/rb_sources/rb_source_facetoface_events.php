@@ -39,7 +39,6 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
 
         // Global report restrictions are applied in define_joinlist() method.
 
-        $this->usedcomponents[] = 'mod_facetoface';
         $this->base = '{facetoface_sessions}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();

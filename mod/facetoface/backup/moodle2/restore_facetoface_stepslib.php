@@ -119,6 +119,9 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $data = (object)$data;
         $oldid = $data->id;
 
+        /** @var restore_activity_task $task */
+        $task = $this->get_task();
+
         if (!empty($data->cancelledstatus)) {
             // Support for restoring of cancelled sessions is not available!
             $this->set_mapping('facetoface_session', $oldid, null);
@@ -147,6 +150,8 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_sessions', $data);
         $this->set_mapping('facetoface_session', $oldid, $newitemid, true);
+
+        $this->add_related_files('mod_facetoface', 'session', 'facetoface_session', $task->get_old_contextid(), $oldid);
     }
 
     protected function process_facetoface_session_role($data) {
@@ -199,7 +204,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
 
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_signups', $data);
-        $this->set_mapping('facetoface_signup', $oldid, $newitemid, true); // childs and files by itemname
+        $this->set_mapping('facetoface_signup', $oldid, $newitemid); // childs and files by itemname
     }
 
     protected function process_facetoface_signups_status($data) {
@@ -219,7 +224,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
 
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_signups_status', $data);
-        $this->set_mapping('facetoface_signups_status', $oldid, $newitemid, true);
+        $this->set_mapping('facetoface_signups_status', $oldid, $newitemid);
     }
 
     protected function process_facetoface_session_custom_field($data) {
@@ -300,7 +305,6 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
             $newid = $this->get_mappingid('facetoface_room', $oldid);
             if (!$newid) {
                 $newid = $this->create_facetoface_room($data);
-                $this->set_mapping('facetoface_room', $oldid, $newid);
             }
             $DB->set_field('facetoface_sessions_dates', 'roomid', $newid, array('id' => $sessionsdateid));
             return;
@@ -353,6 +357,8 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
      */
     private function create_facetoface_room(stdClass $room) {
         global $DB;
+
+        $oldid = $room->id;
         unset($room->id);
 
         // Keeping or moving these two times makes little sense, but it is the expected Moodle way...
@@ -363,7 +369,12 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $room->usercreated = $this->get_mappingid('user', $room->usercreated);
         $room->usermodified = $this->get_mappingid('user', $room->usermodified);
 
-        return $DB->insert_record('facetoface_room', $room);
+        $newid = $DB->insert_record('facetoface_room', $room);
+        $this->set_mapping('facetoface_room', $oldid, $newid, true, $this->get_task()->get_old_system_contextid());
+
+        $this->add_related_files('mod_facetoface', 'room', 'facetoface_room', $this->get_task()->get_old_system_contextid(), $oldid);
+
+        return $newid;
     }
 
     protected function process_facetoface_asset($data) {
@@ -389,7 +400,6 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
             $newid = $this->get_mappingid('facetoface_asset', $oldid);
             if (!$newid) {
                 $newid = $this->create_facetoface_asset($data);
-                $this->set_mapping('facetoface_asset', $oldid, $newid);
             }
             $DB->insert_record('facetoface_asset_dates', (object)array('assetid' => $newid, 'sessionsdateid' => $sessionsdateid));
             return;
@@ -442,6 +452,8 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
      */
     private function create_facetoface_asset(stdClass $asset) {
         global $DB;
+
+        $oldid = $asset->id;
         unset($asset->id);
 
         // Keeping or moving these two times makes little sense, but it is the expected Moodle way...
@@ -452,7 +464,12 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $asset->usercreated = $this->get_mappingid('user', $asset->usercreated);
         $asset->usermodified = $this->get_mappingid('user', $asset->usermodified);
 
-        return $DB->insert_record('facetoface_asset', $asset);
+        $newid = $DB->insert_record('facetoface_asset', $asset);
+        $this->set_mapping('facetoface_asset', $oldid, $newid, true, $this->get_task()->get_old_system_contextid());
+
+        $this->add_related_files('mod_facetoface', 'asset', 'facetoface_asset', $this->get_task()->get_old_system_contextid(), $oldid);
+
+        return $newid;
     }
 
     /**
@@ -511,8 +528,6 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
     }
 
     protected function after_execute() {
-        // Face-to-face doesn't have any related files
-        //
-        // Add facetoface related files, no need to match by itemname (just internally handled context)
+        $this->add_related_files('mod_facetoface', 'intro', null);
     }
 }
