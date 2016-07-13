@@ -24,10 +24,25 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_hierarchy.class.php');
 
+require_login();
+require_sesskey();
+
+// Check that facetoface_managerselect is set.
+$facetoface_managerselect = isset($CFG->facetoface_managerselect) ? $CFG->facetoface_managerselect : 0;
+if ($facetoface_managerselect != 1) {
+    print_error('error:approvaladminnotactive', 'facetoface');
+}
+
+$fid = required_param('fid', PARAM_INT);
 $userid = required_param('userid', PARAM_INT);
 
-$PAGE->set_context(context_system::instance());
-require_login(null, false, null, false, true);
+$facetoface = $DB->get_record('facetoface', array('id' => $fid), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $facetoface->course), '*', MUST_EXIST);
+$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course, false, MUST_EXIST);
+
+$context = context_module::instance($cm->id);
+$PAGE->set_context($context);
+require_capability('mod/facetoface:view', $context);
 
 // First check that the user really does exist and that they're not a guest.
 $userexists = !isguestuser($userid) && $DB->record_exists('user', array('id' => $userid, 'deleted' => 0));

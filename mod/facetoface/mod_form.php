@@ -310,7 +310,10 @@ class mod_facetoface_mod_form extends moodleform_mod {
             $selected_approvers = json_encode(array());
         }
 
-        $args = array('facetoface' => $this->current->id);
+        $args = array(
+            'course' => $this->current->course,
+            'sesskey' => sesskey()
+        );
 
         $PAGE->requires->js_init_call('M.facetoface_approver.init', $args, false, $jsmodule);
     }

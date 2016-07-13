@@ -24,12 +24,22 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
+require_sesskey();
 ajax_require_login();
 
-$users = required_param('users', PARAM_SEQUENCE);
-$fid = required_param('fid', PARAM_INT);
+// Check that approval_admin is active in facetoface_approvaloptions.
+$settingsoptions = isset($CFG->facetoface_approvaloptions) ? $CFG->facetoface_approvaloptions : '';
+$approvaloptions = explode(',', $settingsoptions);
+if (!in_array('approval_admin', $approvaloptions)) {
+    print_error('error:approvaladminnotactive', 'facetoface');
+}
 
-$PAGE->set_context(context_system::instance());
+$users = required_param('users', PARAM_SEQUENCE);
+$cid = required_param('cid', PARAM_INT);
+
+$context = context_course::instance($cid);
+$PAGE->set_context($context);
+require_capability('moodle/course:manageactivities', $context);
 
 $out = html_writer::start_tag('div', array('id' => 'activityapproverbox', 'class' => 'activity_approvers'));
 

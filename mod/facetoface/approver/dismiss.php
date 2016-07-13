@@ -23,6 +23,8 @@
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
+require_sesskey();
+
 $fid = required_param('fid', PARAM_INT);
 
 $facetoface = $DB->get_record('facetoface', array('id' => $fid), '*', MUST_EXIST);

@@ -128,7 +128,12 @@ $jsmodule = array(
         'fullpath' => '/mod/facetoface/js/manager.js',
         'requires' => array('json'));
 $selected_manager = dialog_display_currently_selected(get_string('currentmanager', 'mod_facetoface'), 'manager');
-$args = array('userid' => $USER->id, 'manager' => $selected_manager);
+$args = array(
+    'userid' => $USER->id,
+    'fid' => $facetoface->id,
+    'manager' => $selected_manager,
+    'sesskey' => sesskey()
+);
 
 $PAGE->requires->js_init_call('M.facetoface_managerselect.init', $args, false, $jsmodule);
 

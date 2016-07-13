@@ -25,27 +25,28 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content.class.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 
-$fid = optional_param('fid', 0, PARAM_INT);
-$selected = optional_param('selected', null, PARAM_SEQUENCE);
+require_login();
+require_sesskey();
 
+// Check that approval_admin is active in facetoface_approvaloptions.
+$settingsoptions = isset($CFG->facetoface_approvaloptions) ? $CFG->facetoface_approvaloptions : '';
+$approvaloptions = explode(',', $settingsoptions);
+if (!in_array('approval_admin', $approvaloptions)) {
+    print_error('error:approvaladminnotactive', 'facetoface');
+}
+
+$cid = required_param('cid', PARAM_INT);
+$selected = optional_param('selected', null, PARAM_SEQUENCE);
 
 $nojs = optional_param('nojs', false, PARAM_BOOL);
 $returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 
-$systemcontext = context_system::instance();
-$PAGE->set_context($systemcontext);
-
-// Setup page.
-require_login();
+$context = context_course::instance($cid);
+$PAGE->set_context($context);
+require_capability('moodle/course:manageactivities', $context);
 
 // Get guest user for exclusion purposes.
 $guest = guest_user();
-
-// Exclude anyone already requested from the list of available users.
-$facetoface = null;
-if ($fid > 0) {
-    $facetoface = $DB->get_record('facetoface', array('id' => $fid));
-}
 
 $disable_items = array();
 $systemapprovers = get_users_from_config(get_config(null, 'facetoface_adminapprovers'), 'mod/facetoface:approveanyrequest');
@@ -98,7 +99,6 @@ if (!$nojs) {
     $dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
     $dialog->searchtype = 'user';
     $dialog->items = $availableusers;
-    $dialog->urlparams['fid'] = $fid;
 
     echo $dialog->generate_markup();
 }

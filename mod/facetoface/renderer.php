@@ -1020,7 +1020,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     public function dismiss_selfapproval_notice($f2fid) {
         $attributes = array('class' => 'smallicon dismissicon');
         $dismissstr = get_string('dismiss', 'mod_facetoface');
-        $dismissurl = new moodle_url('/mod/facetoface/approver/dismiss.php', array('fid' => $f2fid));
+        $dismissurl = new moodle_url('/mod/facetoface/approver/dismiss.php', array('fid' => $f2fid, 'sesskey' => sesskey()));
         return $this->output->action_icon($dismissurl, new pix_icon('/t/delete', $dismissstr), null, $attributes);
     }
 

@@ -28,7 +28,6 @@ M.facetoface_approver = M.facetoface_approver || {
     // These values will be overrided below.
     config: {
         id:0,
-        fid:0,
         sesskey:0
     },
 
@@ -36,16 +35,18 @@ M.facetoface_approver = M.facetoface_approver || {
      * module initialisation method called by php js_init_call()
      *
      * @param object    YUI instance
-     * @param int       facetoface      The facetoface id
+     * @param int       course          The course id
+     * @param string    sesskey         The sesskey
      * @param array     existing        The existing approvers for the facetoface
      */
-    init: function(Y, facetoface, existing){
+    init: function(Y, course, sesskey, existing){
 
         // Save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
         // Parse args into this module's config object
-        this.config.fid = facetoface;
+        this.config.cid = course;
+        this.config.sesskey = sesskey;
 
         // check jQuery dependency is available
         if (typeof $ === 'undefined') {
@@ -57,12 +58,13 @@ M.facetoface_approver = M.facetoface_approver || {
             var url = M.cfg.wwwroot+ '/mod/facetoface/approver';
             var saveurl = url + '/update.php';
             var findurl = url + '/find.php';
-            var fid = M.facetoface_approver.config.fid;
+            var cid = M.facetoface_approver.config.cid;
+            var sesskey = M.facetoface_approver.config.sesskey;
             facetofaceApproverDialog(
                 'addapprover',
                 M.util.get_string('chooseapprovers', 'mod_facetoface'),
-                findurl + '?fid=' + fid,
-                saveurl + '?fid=' + fid
+                findurl + '?cid=' + cid + '&sesskey=' + sesskey,
+                saveurl + '?cid=' + cid + '&sesskey=' + sesskey
             );
         })();
 

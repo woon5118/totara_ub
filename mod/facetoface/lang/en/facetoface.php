@@ -422,6 +422,7 @@ $string['enrolled'] = 'enrolled';
 $string['error:addalreadysignedupattendee'] = 'This user is already signed-up for this seminar activity.';
 $string['error:addalreadysignedupattendeeaddself'] = 'You are already signed-up for this seminar activity.';
 $string['error:addattendee'] = 'Could not add {$a} to the event.';
+$string['error:approvaladminnotactive'] = 'Manager and Administrative approval is not activated';
 $string['error:approverinactive'] = 'User ID: {$a} does not exist or is not active.';
 $string['error:approvernotselected'] = 'Please select an approver';
 $string['error:approverselected'] = 'User {$a} selected more than once.';
