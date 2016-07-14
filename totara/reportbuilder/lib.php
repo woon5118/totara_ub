@@ -1320,7 +1320,7 @@ class reportbuilder {
             }
         }
         $mformsidebar = new report_builder_sidebar_search_form(null,
-                array('report' => $this, 'fields' => $this->get_sidebar_filters()));
+                array('report' => $this, 'fields' => $this->get_sidebar_filters(), 'nodisplay' => true));
         $adddatasidebar = $mformsidebar->get_data(false);
         if ($adddatasidebar || $clearfilters) {
             foreach ($this->get_sidebar_filters() as $field) {

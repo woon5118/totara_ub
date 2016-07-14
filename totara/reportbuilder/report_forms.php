@@ -1288,8 +1288,12 @@ class report_builder_sidebar_search_form extends moodleform {
         $mform =& $this->_form;
         $report = $this->_customdata['report'];
         $fields = $this->_customdata['fields'];
+        $displayform = empty($this->_customdata['nodisplay']);
 
-        $report->add_filter_counts($mform);
+        if ($displayform) {
+            // Only run the potentially expensive queries to add filter counts if they will be displayed.
+            $report->add_filter_counts($mform);
+        }
 
         if ($fields && is_array($fields) && count($fields) > 0) {
             foreach ($fields as $ft) {
