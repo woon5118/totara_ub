@@ -62,7 +62,7 @@ if ($csv) {
 }
 
 // Paging
-$start   = optional_param('start', 0, PARAM_INT);
+$page    = optional_param('page', 0, PARAM_INT);
 $sifirst = optional_param('sifirst', 'all', PARAM_NOTAGS);
 $silast  = optional_param('silast', 'all', PARAM_NOTAGS);
 
@@ -74,24 +74,24 @@ $leftcols = 1 + count($extrafields);
 /// Display RPL stuff
 ///
 function show_rpl($type, $user, $rpl, $describe, $fulldescribe, $cmid = null) {
-    global $OUTPUT, $edituser, $course, $sort, $start;
+    global $OUTPUT, $edituser, $course, $sort, $page;
 
     // If editing a user
     if ($edituser == $user->id) {
         // Show edit form
-        print '<form action="save_rpl.php?type='.$type.'&course='.$course->id.'&sort='.$sort.'&start='.$start.'&redirect=1" method="post">';
+        print '<form action="save_rpl.php?type='.$type.'&course='.$course->id.'&sort='.$sort.'&page='.$page.'&redirect=1" method="post">';
         print '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
         print '<input type="hidden" name="user" value="'.$user->id.'" />';
         print '<input type="hidden" name="cmid" value="'.$cmid.'" />';
         print '<input type="text" name="rpl" value="'.format_string($rpl).'" maxlength="255" />';
         print '<input type="submit" name="saverpl" value="'.get_string('save', 'completion').'" /></form> ';
-        print '<a href="index.php?course='.$course->id.'&sort='.$sort.'&start='.$start.'">'.get_string('cancel').'</a>';
+        print '<a href="index.php?course='.$course->id.'&sort='.$sort.'&page='.$page.'">'.get_string('cancel').'</a>';
     } else {
         // Show RPL status icon
         $rplicon = strlen($rpl) ?
             $OUTPUT->flex_icon('check-square-o', ['classes' => 'ft-size-300', 'alt' => $describe]) :
             $OUTPUT->flex_icon('square-o', ['classes' => 'ft-size-300', 'alt' => $describe]);
-        print '<a href="index.php?course='.$course->id.'&sort='.$sort.'&start='.$start.'&edituser='.$user->id.'#user-'.$user->id.'" class="rpledit">' . $rplicon .
+        print '<a href="index.php?course='.$course->id.'&sort='.$sort.'&page='.$page.'&edituser='.$user->id.'#user-'.$user->id.'" class="rpledit">' . $rplicon .
             '</a>';
 
         // Show status text
@@ -280,7 +280,7 @@ if ($total) {
         $group,
         $firstnamesort ? 'u.firstname ASC' : 'u.lastname ASC',
         $csv ? 0 : COMPLETION_REPORT_PAGE,
-        $csv ? 0 : $start,
+        $csv ? 0 : $page * COMPLETION_REPORT_PAGE,
         $context,
         $showactiveonly
     );
@@ -291,7 +291,7 @@ $link = $CFG->wwwroot.'/report/completion/?course='.$course->id;
 if (strlen($sort)) {
     $link .= '&amp;sort='.$sort;
 }
-$link .= '&amp;start=';
+$link .= '&amp;page=';
 
 // Build the the page by Initial bar
 $initials = array('first', 'last');
@@ -329,10 +329,7 @@ foreach ($initials as $initial) {
 // Do we need a paging bar?
 if ($total > COMPLETION_REPORT_PAGE) {
 
-    // Paging bar
-    $pagingbar .= '<div class="paging">';
-    $pagingbar .= get_string('page').': ';
-
+    // TL-9502 - replaced custom coded paging bar with an output component
     $sistrings = array();
     if ($sifirst != 'all') {
         $sistrings[] =  "sifirst={$sifirst}";
@@ -342,35 +339,8 @@ if ($total > COMPLETION_REPORT_PAGE) {
     }
     $sistring = !empty($sistrings) ? '&amp;'.implode('&amp;', $sistrings) : '';
 
-    // Display previous link
-    if ($start > 0) {
-        $pstart = max($start - COMPLETION_REPORT_PAGE, 0);
-        $pagingbar .= "(<a class=\"previous\" href=\"{$link}{$pstart}{$sistring}\">".get_string('previous').'</a>)&nbsp;';
-    }
-
-    // Create page links
-    $curstart = 0;
-    $curpage = 0;
-    while ($curstart < $total) {
-        $curpage++;
-
-        if ($curstart == $start) {
-            $pagingbar .= '&nbsp;'.$curpage.'&nbsp;';
-        }
-        else {
-            $pagingbar .= "&nbsp;<a href=\"{$link}{$curstart}{$sistring}\">$curpage</a>&nbsp;";
-        }
-
-        $curstart += COMPLETION_REPORT_PAGE;
-    }
-
-    // Display next link
-    $nstart = $start + COMPLETION_REPORT_PAGE;
-    if ($nstart < $total) {
-        $pagingbar .= "&nbsp;(<a class=\"next\" href=\"{$link}{$nstart}{$sistring}\">".get_string('next').'</a>)';
-    }
-
-    $pagingbar .= '</div>';
+    $pagingbarobj = new paging_bar($total, $page, COMPLETION_REPORT_PAGE, $link . $sistring);
+    $pagingbar .= $OUTPUT->render($pagingbarobj);
 }
 
 /*

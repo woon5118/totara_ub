@@ -49,7 +49,8 @@ $csv = $format == 'csv' || $excel;
 $start   = optional_param('start', 0, PARAM_INT);
 $sifirst = optional_param('sifirst', 'all', PARAM_NOTAGS);
 $silast  = optional_param('silast', 'all', PARAM_NOTAGS);
-$start   = optional_param('start', 0, PARAM_INT);
+// TL-9502
+$page    = optional_param('page', 0, PARAM_INT);
 
 // Whether to show extra user identity information
 $extrafields = get_extra_user_fields($context);
@@ -71,8 +72,9 @@ if ($sort !== '') {
 if ($format !== '') {
     $url->param('format', $format);
 }
-if ($start !== 0) {
-    $url->param('start', $start);
+// TL-9502
+if ($page !== 0) {
+    $url->param('page', $page);
 }
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('report');
@@ -126,7 +128,7 @@ if ($total) {
         $group,
         $firstnamesort ? 'u.firstname ASC' : 'u.lastname ASC',
         $csv ? 0 : COMPLETION_REPORT_PAGE,
-        $csv ? 0 : $start,
+        $csv ? 0 : $page * COMPLETION_REPORT_PAGE, // TL-9502
         $context,
         $showactiveonly
     );
@@ -219,11 +221,7 @@ foreach ($initials as $initial) {
 
 // Do we need a paging bar?
 if ($total > COMPLETION_REPORT_PAGE) {
-
-    // Paging bar
-    $pagingbar .= '<div class="paging">';
-    $pagingbar .= get_string('page').': ';
-
+    // TL-9502 - replaced custom coded paging bar with an output component
     $sistrings = array();
     if ($sifirst != 'all') {
         $sistrings[] =  "sifirst={$sifirst}";
@@ -233,34 +231,8 @@ if ($total > COMPLETION_REPORT_PAGE) {
     }
     $sistring = !empty($sistrings) ? '&amp;'.implode('&amp;', $sistrings) : '';
 
-    // Display previous link
-    if ($start > 0) {
-        $pstart = max($start - COMPLETION_REPORT_PAGE, 0);
-        $pagingbar .= "(<a class=\"previous\" href=\"{$link}{$pstart}{$sistring}\">".get_string('previous').'</a>)&nbsp;';
-    }
-
-    // Create page links
-    $curstart = 0;
-    $curpage = 0;
-    while ($curstart < $total) {
-        $curpage++;
-
-        if ($curstart == $start) {
-            $pagingbar .= '&nbsp;'.$curpage.'&nbsp;';
-        } else {
-            $pagingbar .= "&nbsp;<a href=\"{$link}{$curstart}{$sistring}\">$curpage</a>&nbsp;";
-        }
-
-        $curstart += COMPLETION_REPORT_PAGE;
-    }
-
-    // Display next link
-    $nstart = $start + COMPLETION_REPORT_PAGE;
-    if ($nstart < $total) {
-        $pagingbar .= "&nbsp;(<a class=\"next\" href=\"{$link}{$nstart}{$sistring}\">".get_string('next').'</a>)';
-    }
-
-    $pagingbar .= '</div>';
+    $pagingbarobj = new paging_bar($total, $page, COMPLETION_REPORT_PAGE, $link . $sistring);
+    $pagingbar .= $OUTPUT->render($pagingbarobj);
 }
 
 // Okay, let's draw the table of progress info,
