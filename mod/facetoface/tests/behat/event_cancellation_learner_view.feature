@@ -86,40 +86,18 @@ Feature: Seminar event cancellation learner views
     And I set the following fields to these values:
       | Maximum bookings | 29 |
     And I follow "show-selectdate0-dialog"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 0                |
-      | timestart[month]    | 0                |
-      | timestart[year]     | 0                |
-      | timestart[hour]     | 0                |
-      | timestart[minute]   | 1                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 0                |
-      | timefinish[month]   | 0                |
-      | timefinish[year]    | 0                |
-      | timefinish[hour]    | 2                |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
-    And I click on "Teacher One" "checkbox"
-    And I press "Save changes"
-
-    Given I follow "Add a new event"
     And I set the following fields to these values:
-      | Maximum bookings | 35 |
-    And I follow "show-selectdate0-dialog"
-    And I fill seminar session with relative date in form data:
       | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 0                |
-      | timestart[month]    | 1                |
-      | timestart[year]     | 0                |
-      | timestart[hour]     | 0                |
+      | timestart[day]      | 10               |
+      | timestart[month]    | 4                |
+      | timestart[year]     | 2030             |
+      | timestart[hour]     | 17               |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 0                |
-      | timefinish[month]   | 1                |
-      | timefinish[year]    | 0                |
-      | timefinish[hour]    | 2                |
+      | timefinish[day]     | 10               |
+      | timefinish[month]   | 4                |
+      | timefinish[year]    | 2030             |
+      | timefinish[hour]    | 18               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
     And I press "OK"
@@ -195,12 +173,7 @@ Feature: Seminar event cancellation learner views
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_302: cancelled booking (past bookings view).
-    # --------------------------------------------------------------------------
-    # THIS IS A LONG RUNNING SCENARIO: it needs to wait until the final event
-    # created 5 mins in the future becomes in the past. Can't set a future time
-    # to < 5 mins since the UI only accepts minutes in multiples of 5 mins only!
-    # --------------------------------------------------------------------------
-    Given I click on "Attendees" "link" in the "0 / 29" "table_row"
+    Given I click on "Attendees" "link" in the "10 April 2030" "table_row"
     And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Learner One, learner1@example.com" "option"
     And I press "Add"
@@ -217,18 +190,23 @@ Feature: Seminar event cancellation learner views
     And I press "Continue"
     And I press "Confirm"
     And I follow "Go back"
-    And I click on "Cancel event" "link" in the "4 / 29" "table_row"
+    And I click on "Cancel event" "link" in the "10 April 2030" "table_row"
     And I press "Yes"
 
-    When I log out
-    And I wait "360" seconds
+    # Magic needed here since only a future event can be cancelled and we don't
+    # want to wait until that future time comes.
+    Given I use magic to adjust the seminar event "start" from "10/04/2030 17:00" "Pacific/Auckland" to "10/04/2015 09:00"
+    And I use magic to adjust the seminar event "end" from "10/04/2030 18:00" "Pacific/Auckland" to "10/04/2015 14:00"
+    And I log out
+
     And I log in as "learner1"
     And I click on "My Bookings" in the totara menu
     And I click on "Past Bookings" "link"
     Then I should see "Course 1" in the "Test Seminar" "table_row"
-    Then I should see date "0 day" formatted "%d %B %Y"
+    And I should see "10 April 2015" in the "Test Seminar" "table_row"
+    And I should see "9:00 AM Pacific/Auckland" in the "Test Seminar" "table_row"
+    And I should see "2:00 PM Pacific/Auckland" in the "Test Seminar" "table_row"
     And I should see "Event Cancelled" in the "Test Seminar" "table_row"
-
 
 
   # ----------------------------------------------------------------------------
