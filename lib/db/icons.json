@@ -106,6 +106,7 @@
     "core-i/grade_incorrect": "times-danger",
     "core-i/invalid": "times-danger",
     "core-t/delete": "times-danger",
+    "core-i/delete": "times-danger",
     "totara_core-i/bullet_delete": "times-danger",
 
     "totara_core-i/delete_grey": "times-disabled",
