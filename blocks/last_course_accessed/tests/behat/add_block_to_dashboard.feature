@@ -1,4 +1,4 @@
-@totara @block_last_course_accessed @javascript
+@block_last_course_accessed @javascript @totara @totara_dashboard
 Feature: User can add and remove block to / from dashboard.
 
   Background:
@@ -21,7 +21,7 @@ Feature: User can add and remove block to / from dashboard.
     When I navigate to "Dashboards" node in "Site administration > Appearance"
     And I press "Create dashboard"
     And I set the field "Name" to "My Dashboard"
-    And I set the field "Published" to "1"
+    And I click on "Available only to the following audiences" "radio"
     And I press "Assign new audiences"
     And I follow "Audience 1"
     And I press "OK"
