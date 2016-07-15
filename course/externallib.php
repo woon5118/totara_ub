@@ -1625,7 +1625,7 @@ class core_course_external extends external_api {
                     }
 
                     if (isset($value)) {
-                        $conditions[$key] = $crit['value'];
+                        $conditions[$key] = $value;
                         $wheres[] = $key . " = :" . $key;
                     }
                 }
