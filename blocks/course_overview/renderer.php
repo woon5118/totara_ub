@@ -228,13 +228,16 @@ class block_course_overview_renderer extends plugin_renderer_base {
     /**
      * Show hidden courses count
      *
-     * @param int $total count of hidden courses
+     * @param int $total The total number of courses.
+     * @param int $showing The number of courses being shown.
      * @return string html
      */
     public function hidden_courses($total, $showing) {
         if ($total <= $showing) {
             return;
         }
+
+        $hiddencourses = $total - $showing;
 
         $vars = new stdClass();
         $vars->showing = $showing;
@@ -245,14 +248,14 @@ class block_course_overview_renderer extends plugin_renderer_base {
         $output = $this->output->box_start('notice');
         $output .= get_string('showingxofycourses', 'block_course_overview', $vars);
 
-        $plural = $total > 1 ? 'plural' : '';
+        $plural = $hiddencourses > 1 ? 'plural' : '';
         $config = get_config('block_course_overview');
         // Show view all course link to user if forcedefaultmaxcourses is not empty.
         if (!empty($config->forcedefaultmaxcourses)) {
-            $output .= get_string('hiddencoursecount'.$plural, 'block_course_overview', $total);
+            $output .= get_string('hiddencoursecount'.$plural, 'block_course_overview', $hiddencourses);
         } else {
             $a = new stdClass();
-            $a->coursecount = $total;
+            $a->coursecount = $hiddencourses;
             $a->showalllink = html_writer::link(new moodle_url('/my/index.php', array('mynumber' => block_course_overview::SHOW_ALL_COURSES)),
                     get_string('showallcourses'));
             $output .= get_string('hiddencoursecountwithshowall'.$plural, 'block_course_overview', $a);
