@@ -26,47 +26,31 @@ require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
+$format = optional_param('format', '', PARAM_PLUGIN); // Export format.
 $debug = optional_param('debug', 0, PARAM_INT);
-$sessionid = optional_param('sessionid', 0, PARAM_INT);
+$sessiondateid = optional_param('sessiondateid', 0, PARAM_INT);
 
-$url = new moodle_url('/mod/facetoface/signinsheet.php');
+$PAGE->set_url('/mod/facetoface/signinsheet.php', array('sessiondateid' => $sessiondateid));
 
-if (!$sessionid) {
-    $PAGE->set_url($url);
+$sessiondate = $DB->get_record('facetoface_sessions_dates', array('id' => $sessiondateid));
+if (!$sessiondate) {
+    require_login();
     $PAGE->set_context(context_system::instance());
-    $PAGE->set_heading(format_string($SITE->fullname));
+    $PAGE->set_heading($SITE->fullname);
     $PAGE->set_title(get_string('signinsheetreport', 'mod_facetoface'));
     echo $OUTPUT->header();
-    echo $OUTPUT->container(get_string('gettosigninreport', 'mod_facetoface'), $url->out());
+    echo $OUTPUT->container(get_string('gettosigninreport', 'mod_facetoface'));
     echo $OUTPUT->footer();
     exit;
 }
 
-$session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
-if(!$session) {
-    print_error('error:sessionnotfound', 'facetoface');
-}
-
-$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
-if(!$facetoface) {
-    print_error('error:facetofacenotfound', 'facetoface');
-}
-
-$course = $DB->get_record('course', array('id' => $facetoface->course));
-if(!$course) {
-    print_error('error:coursenotfound', 'facetoface');
-}
-
+$session = $DB->get_record('facetoface_sessions', array('id' => $sessiondate->sessionid), '*', MUST_EXIST);
+$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $facetoface->course), '*', MUST_EXIST);
 $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id, false, MUST_EXIST);
 $context = context_module::instance($cm->id);
-$PAGE->set_context($context);
 
-$format = optional_param('format', '', PARAM_TEXT); // Export format.
-$PAGE->set_pagelayout('standard');
-$PAGE->set_cm($cm);
-$url = new moodle_url('/mod/facetoface/signinsheet.php', array('sessionid' => $sessionid));
-$PAGE->set_url($url);
-require_login();
+require_login($course, false, $cm);
 require_capability('mod/facetoface:exportsessionsigninsheet', $context);
 
 // Verify global restrictions.
@@ -74,7 +58,12 @@ $shortname = 'facetoface_signin';
 $reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
-if (!$report = reportbuilder_get_embedded_report($shortname, array('sessionid' => $session->id, 'hasbooked' => 1), false, 0,
+$reportparams = array(
+    'facetofaceid' => $facetoface->id,
+    'sessionid' => $session->id,
+    'sessiondateid' => $sessiondate->id,
+);
+if (!$report = reportbuilder_get_embedded_report($shortname, $reportparams, false, 0,
     $globalrestrictionset)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
@@ -82,14 +71,11 @@ if (!$report = reportbuilder_get_embedded_report($shortname, array('sessionid' =
 if ($format != '') {
     \mod_facetoface\event\session_signin_sheet_exported::create_from_facetoface_session($session, $context)->trigger();
 
-    $report->export_data('pdflandscape');
+    $report->export_data($format);
     die;
 }
 
-if ($debug) {
-    $report->debug($debug);
-}
-
+/** @var totara_reportbuilder_renderer|core_renderer $renderer */
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
 $strheading = get_string('signinsheetreport', 'mod_facetoface') . ' - ' . $facetoface->name;
@@ -98,13 +84,18 @@ $PAGE->set_title($strheading);
 $PAGE->set_button($report->edit_button());
 $PAGE->set_heading($strheading);
 
-echo $OUTPUT->header();
+echo $renderer->header();
 
 $report->display_restrictions();
 
 echo $OUTPUT->heading($strheading);
+
+if ($debug) {
+    $report->debug($debug);
+}
+
 echo $renderer->print_description($report->description, $report->_id);
 
 $renderer->export_select($report->_id, 0);
 
-echo $OUTPUT->footer();
+echo $renderer->footer();

@@ -1142,8 +1142,12 @@ if ($show_table) {
         $downloadsheetattendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_FULLY_ATTENDED, MDL_F2F_STATUS_NOT_SET,
             MDL_F2F_STATUS_NO_SHOW, MDL_F2F_STATUS_PARTIALLY_ATTENDED));
         if (!empty($downloadsheetattendees)) {
-            $url = new moodle_url('/mod/facetoface/signinsheet.php', array('sessionid' => $s, 'format' => 'landscape'));
-            echo $OUTPUT->single_button($url, get_string('downloadsigninsheet', 'mod_facetoface'), 'get', array('class' => 'f2fdownloadsigninsheet'));
+            // We need the dates, and we only want to show this option if there are one or more dates.
+            $action = new moodle_url('/mod/facetoface/signinsheet.php');
+            $signinform = new mod_facetoface_signin_form($action, $session);
+            echo html_writer::start_div('f2fdownloadsigninsheet');
+            $signinform->display();
+            echo html_writer::end_div();
         }
     }
 

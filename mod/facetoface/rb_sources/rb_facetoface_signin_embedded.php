@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Lee Campbell <lee@learningpool.com>
- * @package totara_reportbuilder
+ * @package mod_facetoface
  */
 
 class rb_facetoface_signin_embedded extends rb_base_embedded {
@@ -55,14 +55,11 @@ class rb_facetoface_signin_embedded extends rb_base_embedded {
         // No restrictions.
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
 
-        $sessionid = array_key_exists('sessionid', $data) ? $data['sessionid'] : null;
-        if ($sessionid != null) {
-            $this->embeddedparams['sessionid'] = $sessionid;
-        }
-
-        if (isset($data['hasbooked'])) {
-            $this->embeddedparams['hasbooked'] = $data['hasbooked'];
-        }
+        // Add required parameters from the mod/facetoface/signinsheet.php page.
+        $this->embeddedparams['sessiondateid'] = isset($data['sessiondateid']) ? $data['sessiondateid'] : 0;
+        $this->embeddedparams['sessionid'] = isset($data['sessionid']) ? $data['sessionid'] : 0;
+        $this->embeddedparams['facetofaceid'] = isset($data['facetofaceid']) ? $data['facetofaceid'] : 0;
+        $this->embeddedparams['hasbooked'] = 1;
 
         parent::__construct();
     }
@@ -86,15 +83,14 @@ class rb_facetoface_signin_embedded extends rb_base_embedded {
      * @return boolean true if the user can access this report
      */
     public function is_capable($reportfor, $report) {
+        $context = context_system::instance();
         $facetofaceid = $report->get_param_value('facetofaceid');
-
         if ($facetofaceid) {
             $cm = get_coursemodule_from_instance('facetoface', $facetofaceid);
-
-            // Users can only view this report if they have the viewinterestreport capability for this context.
-            return (has_capability('mod/facetoface:exportsessionsigninsheet', context_module::instance($cm->id), $reportfor));
-        } else {
-            return true;
+            if ($cm) {
+                $context = context_module::instance($cm->id);
+            }
         }
+        return has_capability('mod/facetoface:exportsessionsigninsheet', $context, $reportfor);
     }
 }

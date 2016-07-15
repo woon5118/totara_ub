@@ -103,7 +103,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
             ),
             new rb_join(
                 'facetoface',
-                'LEFT',
+                'INNER',
                 '{facetoface}',
                 'facetoface.id = sessions.facetoface',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
@@ -652,8 +652,18 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'status'
             ),
             new rb_param_option(
+                'facetofaceid',
+                'sessions.facetoface',
+                'sessions'
+            ),
+            new rb_param_option(
                 'sessionid',
                 'base.sessionid'
+            ),
+            new rb_param_option(
+                'sessiondateid',
+                'sessiondate.id',
+                'sessiondate'
             ),
             new rb_param_option(
                 'hasbooked',
@@ -940,30 +950,42 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
     /**
      * Custom PDF header content.
      *
+     * This prints details if one session date selected.
+     *
      * @param reportbuilder $report
      * @return string
      */
     public function custom_pdf_header(reportbuilder $report) {
-        if(!isset($report->embedobj->embeddedparams['sessionid'])) {
+        global $DB;
+        $sessiondateid = $report->get_param_value('sessiondateid');
+        if (!$sessiondateid) {
+            return '';
+        }
+        $sessiondate = $DB->get_record('facetoface_sessions_dates', array('id' => $sessiondateid));
+        if (!$sessiondate) {
             return '';
         }
 
-        $session = facetoface_get_session($report->embedobj->embeddedparams['sessionid']);
-        if(!$session) {
+        $session = facetoface_get_session($sessiondate->sessionid);
+        if (!$session) {
             return '';
         }
 
-        $dates = facetoface_format_session_times($session->sessiondates[0]->timestart,
-            $session->sessiondates[0]->timefinish, $session->sessiondates[0]->sessiontimezone
-        );
+        $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
 
-        $room = facetoface_get_room($session->roomid);
+        $room = facetoface_get_room($sessiondate->roomid);
         if (!$room) {
-            $roomstring = get_string('nonapplicable', 'facetoface');
+            $roomstring = get_string('notapplicable', 'facetoface');
         } else {
             $roomstring = facetoface_room_to_string($room);
         }
         unset($room);
+
+        $dates = facetoface_format_session_times(
+            $sessiondate->timestart,
+            $sessiondate->timefinish,
+            $sessiondate->sessiontimezone
+        );
 
         $table = new html_table();
         $table->size = array('200px');
@@ -973,20 +995,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
 
         $table->data = array();
 
-        // Get session custom fields.
-        $sessioncustomfields = customfield_get_fields($session, 'facetoface_session', 'facetofacesession');
-        if (!empty($sessioncustomfields)) {
-            foreach($sessioncustomfields as $name => $data) {
-                $title = new html_table_cell($name);
-                $title->style = $titlestyles;
-                $table->data[] = new html_table_row(array(
-                    $title,
-                    $data));
-            }
-        }
-
         $titlestrings = get_strings(array(
-            'sessionname','sessionstartdate','sessionenddate',
+            'facetoface','sessionstartdate','sessionenddate',
             'capacity','numberofattendees','place'),
             'mod_facetoface');
 
@@ -994,6 +1004,22 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         foreach($titlestrings as $identifier => $string) {
             $titles[$identifier] = new html_table_cell($string);
             $titles[$identifier]->style = $titlestyles;
+        }
+
+        $table->data[] = new html_table_row(array(
+            $titles['facetoface'],
+            format_string($facetoface->name)));
+
+        // Get session custom fields.
+        $sessioncustomfields = customfield_get_fields($session, 'facetoface_session', 'facetofacesession');
+        if (!empty($sessioncustomfields)) {
+            foreach ($sessioncustomfields as $name => $data) {
+                $title = new html_table_cell($name);
+                $title->style = $titlestyles;
+                $table->data[] = new html_table_row(array(
+                    $title,
+                    $data));
+            }
         }
 
         $table->data[] = new html_table_row(array(
