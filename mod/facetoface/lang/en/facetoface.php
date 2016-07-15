@@ -1603,7 +1603,7 @@ $string['setting:defaulttrainersessioncancellationmessage'] = 'Default event can
 $string['setting:defaulttrainersessioncancellationmessage_caption'] = 'Trainer event cancellation message';
 $string['setting:defaulttrainersessioncancellationmessagedefault'] = 'This is to advise that your assigned training session the following course has been cancelled:
 
-***SESSION CANCELLED***
+***EVENT CANCELLED***
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
@@ -1721,7 +1721,7 @@ $string['setting:defaultsessioncancellationmessage'] = 'Default session cancella
 $string['setting:defaultsessioncancellationmessage_caption'] = 'Session cancellation message';
 $string['setting:defaultsessioncancellationmessagedefault'] = 'This is to advise that the following session has been cancelled:
 
-***SESSION CANCELLED***
+***EVENT CANCELLED***
 
 Course:   [coursename]
 Face-to-face:   [facetofacename]
@@ -1736,7 +1736,7 @@ Room:   [session:room]
 ';
 $string['setting:defaultsessioncancellationmessagedefault_v9'] = 'This is to advise that the following session has been cancelled:
 
-***SESSION CANCELLED***
+***EVENT CANCELLED***
 
 Course:   [coursename]
 Seminar:   [facetofacename]
@@ -1753,8 +1753,8 @@ Location: [session:room:cf_location]
 [/sessions]
 ';
 $string['setting:defaultsessioncancellationsubject'] = 'Default subject line for session cancellation emails.';
-$string['setting:defaultsessioncancellationsubject_caption'] = 'Session cancellation subject';
-$string['setting:defaultsessioncancellationsubjectdefault'] = 'Seminar session cancellation';
+$string['setting:defaultsessioncancellationsubject_caption'] = 'Event cancellation subject';
+$string['setting:defaultsessioncancellationsubjectdefault'] = 'Seminar event cancellation';
 $string['setting:defaultwaitlistedsubject'] = 'Default subject line for wait-listed emails.';
 $string['setting:defaultwaitlistedsubject_caption'] = 'Wait-listed subject';
 $string['setting:defaultwaitlistedsubjectdefault'] = 'Waitlisting advice for [facetofacename]';

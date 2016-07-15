@@ -1,6 +1,6 @@
 @mod @mod_facetoface @totara @javascript
 Feature: Seminar event cancellation notifications
-  After seminar sessions have been cancelled
+  After seminar events have been cancelled
   As an learner
   I need to be notified of the cancellations
 
@@ -84,6 +84,7 @@ Feature: Seminar event cancellation notifications
       | timefinish[timezone]| Pacific/Auckland |
     And I press "OK"
     And I click on "Teacher One" "checkbox"
+    And I click on "Manager Four" "checkbox"
     And I press "Save changes"
 
     Given I click on "Attendees" "link"
@@ -129,24 +130,12 @@ Feature: Seminar event cancellation notifications
     When I log out
     And I log in as "learner1"
     And I click on "My Learning" in the totara menu
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "***EVENT CANCELLED***"
 
     And I should see "Course:   Course 1"
@@ -156,18 +145,12 @@ Feature: Seminar event cancellation notifications
     When I log out
     And I log in as "learner2"
     And I click on "My Learning" in the totara menu
-    Then I should see "Seminar session cancellation"
+    Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "***EVENT CANCELLED***"
 
     And I should see "Course:   Course 1"
@@ -177,18 +160,12 @@ Feature: Seminar event cancellation notifications
     When I log out
     And I log in as "learner3"
     And I click on "My Learning" in the totara menu
-    Then I should see "Seminar session cancellation"
+    Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "***EVENT CANCELLED***"
 
     And I should see "Course:   Course 1"
@@ -198,18 +175,12 @@ Feature: Seminar event cancellation notifications
     When I log out
     And I log in as "teacher1"
     And I click on "My Learning" in the totara menu
-    Then I should see "Seminar session cancellation"
+    Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "***EVENT CANCELLED***"
 
     And I should see "Course:   Course 1"
@@ -265,24 +236,12 @@ Feature: Seminar event cancellation notifications
     When I log out
     And I log in as "learner1"
     And I click on "My Learning" in the totara menu
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "***EVENT CANCELLED***"
 
     And I should see "Course:   Course 1"
@@ -293,18 +252,12 @@ Feature: Seminar event cancellation notifications
     When I log out
     And I log in as "learner2"
     And I click on "My Learning" in the totara menu
-    Then I should see "Seminar session cancellation"
+    Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "***EVENT CANCELLED***"
 
     And I should see "Course:   Course 1"
@@ -315,18 +268,12 @@ Feature: Seminar event cancellation notifications
     When I log out
     And I log in as "learner3"
     And I click on "My Learning" in the totara menu
-    Then I should see "Seminar session cancellation"
+    Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "***EVENT CANCELLED***"
 
     And I should see "Course:   Course 1"
@@ -337,18 +284,12 @@ Feature: Seminar event cancellation notifications
     When I log out
     And I log in as "teacher1"
     And I click on "My Learning" in the totara menu
-    Then I should see "Seminar session cancellation"
+    Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "***EVENT CANCELLED***"
 
     And I should see "Course:   Course 1"
@@ -394,12 +335,6 @@ Feature: Seminar event cancellation notifications
     When I log out
     And I log in as "learner1"
     And I click on "My Learning" in the totara menu
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should not see "Seminar event cancellation"
 
 
@@ -437,25 +372,12 @@ Feature: Seminar event cancellation notifications
     And I should see "Sign-up unavailable" in the "10 February 2025" "table_row"
 
     When I click on "My Learning" in the totara menu
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. This is
-    # because the code does not follow the v1.6 specs (background section, 2nd
-    # para, #3) which says the manager with reservations needs to be notified of
-    # cancellations.
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9111, TL-9479" lands
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "***EVENT CANCELLED***"
 
     And I should see "Course:   Course 1"
@@ -491,18 +413,12 @@ Feature: Seminar event cancellation notifications
     When I log out
     And I log in as "learner4"
     And I click on "My Learning" in the totara menu
-    Then I should see "Seminar session cancellation"
+    Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "***EVENT CANCELLED***"
 
     And I should see "Course:   Course 1"
@@ -519,25 +435,12 @@ Feature: Seminar event cancellation notifications
     And I should see "Sign-up unavailable" in the "10 February 2025" "table_row"
 
     When I click on "My Learning" in the totara menu
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. This is
-    # because the code does not follow the v1.6 specs (background section, 2nd
-    # para, #3) which says the manager with reservations needs to be notified of
-    # cancellations.
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9111, TL-9479" lands
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-
-    # --------------------------------------------------------------------------
-    # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. Current
-    # code uses "session" instead of "event".
-    # --------------------------------------------------------------------------
-    Given I skip the scenario until issue "TL-9479" lands
     Then I should see "***EVENT CANCELLED***"
 
     And I should see "Course:   Course 1"
