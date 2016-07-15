@@ -51,9 +51,8 @@ class copy_recurring_courses_task extends \core\task\scheduled_task {
         require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
         require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
-        // Don't run programs cron if programs and certifications are disabled.
-        if (totara_feature_disabled('programs') &&
-            totara_feature_disabled('certifications')) {
+        // Don't run programs cron if programs are disabled.
+        if (totara_feature_disabled('programs')) {
             return false;
         }
 
@@ -129,8 +128,8 @@ class copy_recurring_courses_task extends \core\task\scheduled_task {
 
                 // Unzip backup to a temporary folder.
                 $tempfolder = time() . $USER->id;
-                check_dir_exists($CFG->dataroot . '/temp/backup');
-                $backupfile->extract_to_pathname(get_file_packer('application/vnd.moodle.backup'), $CFG->dataroot . '/temp/backup/' . $tempfolder);
+                $fulltempdir = make_temp_directory('/backup/' . $tempfolder);
+                $backupfile->extract_to_pathname(get_file_packer('application/vnd.moodle.backup'), $fulltempdir);
 
                 // Execute in transaction to prevent course creation if restore fails.
                 $transaction = $DB->start_delegated_transaction();
