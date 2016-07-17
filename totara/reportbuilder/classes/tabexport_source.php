@@ -39,10 +39,10 @@ class tabexport_source extends \totara_core\tabexport_source {
     protected $report;
 
     /** @var \rb_column[] $headings */
-    protected $coulmns;
+    protected $columns;
 
     /** @var array $cache data caching info */
-    protected $cach;
+    protected $cache;
 
     public function __construct(\reportbuilder $report) {
         global $DB;
@@ -56,7 +56,6 @@ class tabexport_source extends \totara_core\tabexport_source {
         $this->cache = $cache;
         $order = $report->get_report_sort();
 
-        $this->headings = array();
         foreach ($this->report->columns as $column) {
             // check that column should be included
             if ($column->display_column(true)) {
@@ -148,19 +147,18 @@ class tabexport_source extends \totara_core\tabexport_source {
     }
 
     /**
-     * Returns whether to include the row count in the export.
-     * @return bool
-     */
-    public function export_row_count() {
-        return $this->report->src->exportrowcount;
-    }
-
-    /**
-     * Returns the HTML content for the PDF export.
-     * @return string
+     * Doest the source have custom header?
+     *
+     * NOTE: The data should be cast to string[][]
+     *
+     * @return mixed null if standard header used, anything else is data for custom header
      */
     public function get_custom_header() {
-        return $this->report->src->custom_pdf_header($this->report);
+        if ($this->report->embedded) {
+            return $this->report->embedobj->get_custom_export_header($this->report, $this->format);
+        } else {
+            return $this->report->src->get_custom_export_header($this->report, $this->format);
+        }
     }
 
     /**

@@ -37,8 +37,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $sourcetitle, $requiredcolumns;
 
-    public $exportrowcount = false;
-
     /**
      * Constructor.
      *
@@ -948,38 +946,29 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
     }
 
     /**
-     * Custom PDF header content.
-     *
-     * This prints details if one session date selected.
+     * Allows report source to override page header in reportbuilder exports.
      *
      * @param reportbuilder $report
-     * @return string
+     * @param string $format 'html', 'text', 'excel', 'ods', 'csv' or 'pdf'
+     * @return mixed|null must be possible to cast to string[][]
      */
-    public function custom_pdf_header(reportbuilder $report) {
+    public function get_custom_export_header(reportbuilder $report, $format) {
         global $DB;
         $sessiondateid = $report->get_param_value('sessiondateid');
         if (!$sessiondateid) {
-            return '';
+            return null;
         }
         $sessiondate = $DB->get_record('facetoface_sessions_dates', array('id' => $sessiondateid));
         if (!$sessiondate) {
-            return '';
+            return null;
         }
 
         $session = facetoface_get_session($sessiondate->sessionid);
         if (!$session) {
-            return '';
+            return null;
         }
 
         $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
-
-        $room = facetoface_get_room($sessiondate->roomid);
-        if (!$room) {
-            $roomstring = get_string('notapplicable', 'facetoface');
-        } else {
-            $roomstring = facetoface_room_to_string($room);
-        }
-        unset($room);
 
         $dates = facetoface_format_session_times(
             $sessiondate->timestart,
@@ -987,62 +976,54 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
             $sessiondate->sessiontimezone
         );
 
-        $table = new html_table();
-        $table->size = array('200px');
-        $table->head = array();
-
-        $titlestyles = 'font-weight:bold;';
-
-        $table->data = array();
-
-        $titlestrings = get_strings(array(
-            'facetoface','sessionstartdate','sessionenddate',
-            'capacity','numberofattendees','place'),
-            'mod_facetoface');
-
-        $titles = array();
-        foreach($titlestrings as $identifier => $string) {
-            $titles[$identifier] = new html_table_cell($string);
-            $titles[$identifier]->style = $titlestyles;
-        }
-
-        $table->data[] = new html_table_row(array(
-            $titles['facetoface'],
-            format_string($facetoface->name)));
-
+        $data = array();
+        $data[] = array(get_string('facetoface', 'mod_facetoface'), format_string($facetoface->name));
         // Get session custom fields.
         $sessioncustomfields = customfield_get_fields($session, 'facetoface_session', 'facetofacesession');
         if (!empty($sessioncustomfields)) {
             foreach ($sessioncustomfields as $name => $data) {
-                $title = new html_table_cell($name);
-                $title->style = $titlestyles;
-                $table->data[] = new html_table_row(array(
-                    $title,
-                    $data));
+                $data[] = array($name, $data);
             }
         }
+        $data[] = array(get_string('sessionstartdate', 'mod_facetoface'), get_string('sessionstartdatewithtime', 'facetoface', $dates));
+        $data[] = array(get_string('sessionenddate', 'mod_facetoface'), get_string('sessionenddatewithtime', 'facetoface', $dates));
+        $data[] = array(get_string('capacity', 'mod_facetoface'), $session->capacity);
+        $data[] = array(get_string('numberofattendees', 'mod_facetoface'), facetoface_get_num_attendees($session->id));
+        $room = facetoface_get_room($sessiondate->roomid);
+        if (!$room) {
+            $roomstring = get_string('notapplicable', 'facetoface');
+        } else {
+            $roomstring = facetoface_room_to_string($room);
+        }
+        unset($room);
+        $data[] = array(get_string('place', 'mod_facetoface'), $roomstring);
 
-        $table->data[] = new html_table_row(array(
-            $titles['sessionstartdate'],
-            get_string('sessionstartdatewithtime', 'facetoface', $dates)));
+        if ($format === 'pdf' or $format === 'html') {
+            $table = new html_table();
+            $table->size = array('200px');
+            $table->head = array();
+            $table->data = array();
+            foreach ($data as $d) {
+                $title = new html_table_cell($d[0]);
+                $title->style = 'font-weight:bold;';
+                $table->data[] = new html_table_row(array($title, $d[1]));
+            }
 
-        $table->data[] = new html_table_row(array(
-            $titles['sessionenddate'],
-            get_string('sessionenddatewithtime', 'facetoface', $dates)));
+            $result = '<h1>' . get_string('sourcetitle', 'rb_source_facetoface_signin') . '</h1>';
+            $result .= html_writer::table($table);
+            return $result;
+        }
 
-        $table->data[] = new html_table_row(array(
-            $titles['capacity'],
-            $session->capacity));
+        // No fancy html for the rest, just a list of lines
+        $result = array();
+        $result[] = get_string('sourcetitle', 'rb_source_facetoface_signin');
+        $result[] = '';
+        foreach ($data as $d) {
+            $d[1] = html_to_text($d[1]);
+            $result[] = $d;
+        }
 
-        $table->data[] = new html_table_row(array(
-            $titles['numberofattendees'],
-            facetoface_get_num_attendees($session->id)));
-
-        $table->data[] = new html_table_row(array(
-            $titles['place'],
-            $roomstring));
-
-        return html_writer::table($table);
+        return $result;
     }
 
 } // end of rb_source_facetoface_signin class

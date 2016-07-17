@@ -54,9 +54,6 @@ abstract class rb_base_source {
     /** @var array named query params used in global restriction joins */
     public $globalrestrictionparams = array();
 
-    /** @var bool whether to export the report row count */
-    public $exportrowcount = true;
-
     /**
      * Class constructor
      *
@@ -5255,12 +5252,13 @@ abstract class rb_base_source {
     }
 
     /**
-     * Retrieve the custom content for the PDF export.
+     * Allows report source to override page header in reportbuilder exports.
      *
      * @param reportbuilder $report
-     * @return string
+     * @param string $format 'html', 'text', 'excel', 'ods', 'csv' or 'pdf'
+     * @return mixed|null must be possible to cast to string[][]
      */
-    public function custom_pdf_header(reportbuilder $report) {
-        return '';
+    public function get_custom_export_header(reportbuilder $report, $format) {
+        return null;
     }
 }
