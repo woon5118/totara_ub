@@ -59,7 +59,7 @@ class block_feedback extends block_list {
             $courseid = SITEID;
         }
 
-        $icon = $OUTPUT->flex_icon('mod_feedback-icon');
+        $icon = $OUTPUT->flex_icon('mod_feedback|icon');
 
         if (empty($this->instance->pageid)) {
             $this->instance->pageid = SITEID;

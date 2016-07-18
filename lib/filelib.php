@@ -1667,16 +1667,13 @@ function file_mimetype_icon($mimetype, $size = NULL) {
  * @return string HTML markup for a flex_icon
  */
 function file_mimetype_flex_icon($mimetype, $alt = '', $classes = '') {
-    global $OUTPUT, $CFG;
+    global $OUTPUT;
 
-    $ext = mimeinfo_from_type('icon', $mimetype);
+    $iconname = 'core|f/' . mimeinfo_from_type('icon', $mimetype);
 
-    $fileidentifier = 'core-f/'.$ext;
-
-    if (\core\flex_icon_helper::identifier_has_map_data($CFG->theme, $fileidentifier)) {
-        $iconname = \core\flex_icon_helper::resolve_identifier($CFG->theme, $fileidentifier);
-    } else {
+    if (!\core\output\flex_icon::exists($iconname)) {
         $iconname = 'file-o';
+
     }
 
     return $OUTPUT->flex_icon($iconname, ['alt' => $alt, 'classes' => $classes]);

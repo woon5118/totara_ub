@@ -30,4 +30,13 @@ $definitions = array(
         'staticacceleration' => true,
         'staticaccelerationsize' => 2,
     ),
+
+    // Cache for flex_icons mappings.
+    'flex_icons' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 10
+    ),
 );

@@ -93,7 +93,7 @@
             $strmodulename = '<span class="notifyproblem">'.$module->name.' ('.get_string('missingfromdisk').')</span>';
             $missing = true;
         } else {
-            $icon = $OUTPUT->flex_icon('mod_' . $module->name . '-icon');
+            $icon = $OUTPUT->flex_icon('mod_' . $module->name . '|icon');
             $strmodulename = $icon.' '.get_string('modulename', $module->name);
             $missing = false;
         }

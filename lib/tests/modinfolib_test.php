@@ -960,12 +960,10 @@ class core_modinfolib_testcase extends advanced_testcase {
     }
 
     /**
-     * It should return a rendered [flex] icon for the course module when there are no overrides.
+     * Totara: It should return a rendered [flex] icon for the course module when there are no overrides.
      */
     public function test_cm_info_get_icon_output_no_overrides() {
-
         global $OUTPUT;
-
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
@@ -973,17 +971,15 @@ class core_modinfolib_testcase extends advanced_testcase {
         $forum = $generator->create_module('forum', array('course' => $course->id));
         $cminfo = cm_info::create((object)array('id' => $forum->cmid, 'course' => $course->id));
 
-        $flexidentifier = core\output\flex_icon::legacy_identifier_from_pix_data('icon', $cminfo->modname);
-        $customdata = array_merge(array('classes' => ''), core\output\flex_icon::get_customdata_by_legacy_identifier($flexidentifier));
-        $customdata['classes'] .= ' activityicon';
-
-        $flexicon = new core\output\flex_icon('mod_forum-icon', $customdata);
+        $pixicon = new pix_icon('icon', '', 'forum');
+        $flexicon = \core\output\flex_icon::create_from_pix_icon($pixicon);
+        $this->assertInstanceOf('core\output\flex_icon', $flexicon);
+        $flexicon->customdata['classes'] = 'activityicon';
 
         $expected = $OUTPUT->render($flexicon);
         $actual = $cminfo->get_icon();
 
         $this->assertEquals($expected, $actual);
-
     }
 
     /**

@@ -98,11 +98,9 @@ class external extends external_api {
      * @return external_function_parameters
      */
     public static function load_flex_icons_cache_parameters() {
-
         $description = 'The theme to return the icons cache for.';
 
         return new external_function_parameters(array('themename' => new external_value(PARAM_SAFEDIR, $description)));
-
     }
 
     /**
@@ -112,13 +110,13 @@ class external extends external_api {
      * @return string
      */
     public static function load_flex_icons_cache($themename) {
-
-        $params = array('themename' => $themename);
         $definition = self::load_flex_icons_cache_parameters();
-        $validated = self::validate_parameters($definition, $params);
+        $validated = self::validate_parameters($definition, array('themename' => $themename));
 
-        return \core\flex_icon_helper::get_cache($validated['themename']);
-
+        return array(
+            'defaults' => array(),
+            'map' => \core\output\flex_icon_helper::get_icons($validated['themename']),
+        );
     }
 
     /**
@@ -129,6 +127,5 @@ class external extends external_api {
     public static function load_flex_icons_cache_returns() {
         return new external_value(PARAM_RAW, 'template');
     }
-
 }
 

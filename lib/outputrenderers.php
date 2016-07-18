@@ -1835,26 +1835,19 @@ class core_renderer extends renderer_base {
      * @return string HTML fragment
      */
     protected function render_pix_icon(pix_icon $icon) {
-        $themename = $this->page->theme->name;
-        $flexidentifier = \core\output\flex_icon::legacy_identifier_from_pix_data($icon->pix, $icon->component);
-
-        $useflexicons = \core\flex_icon_helper::flex_icon_should_replace_pix_icon($themename, $flexidentifier);
-
-        if ($useflexicons === true) {
-            $customdata = \core\output\flex_icon::get_customdata_by_legacy_identifier($flexidentifier);
-            if (isset($icon->attributes['alt'])) {
-                $customdata['alt'] = $icon->attributes['alt'];
-            }
-            $flexicon = new \core\output\flex_icon($flexidentifier, $customdata);
+        $flexicon = \core\output\flex_icon::create_from_pix_icon($icon);
+        if ($flexicon) {
             return $this->render($flexicon);
         }
 
         $data = $icon->export_for_template($this);
-        return $this->render_from_template('core/pix_icon', $data);
+        $template = $icon->get_template();
+
+        return $this->render_from_template($template, $data);
     }
 
     /**
-     * Return HTML to display an emoticon icon.
+     * Return HTML to display an emoticon icon.`
      *
      * @param pix_emoticon $emoticon
      * @return string HTML fragment
@@ -1875,7 +1868,7 @@ class core_renderer extends renderer_base {
      * @param array $customdata Optional.
      * @return string
      */
-    public function flex_icon($identifier, $customdata = array()) {
+    public function flex_icon($identifier, array $customdata = null) {
         $icon = new core\output\flex_icon($identifier, $customdata);
         return $this->render($icon);
     }
@@ -1887,7 +1880,6 @@ class core_renderer extends renderer_base {
      * @return string
      */
     protected function render_flex_icon(core\output\flex_icon $flexicon) {
-
         $contextdata = $flexicon->export_for_template($this);
         $template = $flexicon->get_template();
 

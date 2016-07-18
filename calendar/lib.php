@@ -645,7 +645,7 @@ function calendar_add_event_metadata($event) {
             $eventtype = '';
         }
 
-        $event->icon = $OUTPUT->flex_icon('mod_' . $event->modulename . '-icon', array('alt' => $eventtype));
+        $event->icon = $OUTPUT->flex_icon('mod_' . $event->modulename . '|icon', array('alt' => $eventtype));
         $event->referer = '<a href="'.$CFG->wwwroot.'/mod/'.$event->modulename.'/view.php?id='.$module->id.'">'.$event->name.'</a>';
         $event->courselink = calendar_get_courselink($module->course);
         $event->cmid = $module->id;

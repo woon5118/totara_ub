@@ -42,7 +42,10 @@ echo html_writer::link(new moodle_url('/elementlibrary/flex_icon.php'), '&laquo;
 
 echo $OUTPUT->box_start();
 
-$iconsfile = "{$CFG->libdir}/db/" . \core\flex_icon_helper::FLEX_ICON_MAP_FILENAME;
+// TODO: TL-9469
+die;
+
+$iconsfile = "{$CFG->libdir}/db/" . \core\ouput\flex_icon_helper::FLEX_ICON_MAP_FILENAME;
 $iconsmap = json_decode(file_get_contents($iconsfile), true)['map'];
 $identifiers = array_keys($iconsmap);
 sort($identifiers);
@@ -98,7 +101,7 @@ between these and icon systems and is intended to be used only for the latter.</
 
 <p>This page illustrates flexible icons available in Totara core. The core flexible icons are based on
 {$fontawesomelink} font-icons with some bespoke additions - but that doensn't mean you're limited to
-only using font icons. They can be overridden within your theme using an <code>icons.json</code> file which allows
+only using font icons. They can be overridden within your plugins theme using an <code>pix/flex_icons.php</code> file which allows
 you to swap out core icons and provide your own default data structures to be passed into all templates or target
 them on a per-icon basis. Flexible icons are intended to be used in templates by passing an icon identifier into the
 flex_icon template helper:<br />

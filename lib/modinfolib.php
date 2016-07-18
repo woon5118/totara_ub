@@ -2000,7 +2000,6 @@ class cm_info implements IteratorAggregate {
      * Return a rendered icon (flex icon or pix icon).
      */
     public function get_icon() {
-
         global $OUTPUT, $PAGE;
 
         $pixicon = new pix_icon('icon', '', $this->modname, array(
@@ -2030,21 +2029,7 @@ class cm_info implements IteratorAggregate {
             return html_writer::img($iconpixurl, '', $pixicon->attributes);
         }
 
-        $themename = $PAGE->theme->name;
-        $flexidentifier = \core\output\flex_icon::legacy_identifier_from_pix_data('icon', $this->modname);
-
-        $useflexicons = \core\flex_icon_helper::flex_icon_should_replace_pix_icon($themename, $flexidentifier);
-
-        if ($useflexicons === true) {
-            $customdata = array_merge(array('classes' => ''), \core\output\flex_icon::get_customdata_by_legacy_identifier($flexidentifier));
-            $customdata['classes'] .= ' activityicon';
-            $flexicon = new \core\output\flex_icon($flexidentifier, $customdata);
-            return $OUTPUT->render($flexicon);
-        }
-
-        $data = $pixicon->export_for_template($OUTPUT);
-        return $OUTPUT->render_from_template('core/pix_icon', $data);
-
+        return $OUTPUT->render($pixicon);
     }
 }
 

@@ -557,6 +557,15 @@ class pix_icon implements renderable, templatable {
     }
 
     /**
+     * Retrieve the template name which should be used to render $this icon.
+     *
+     * @return string
+     */
+    public function get_template() {
+        return 'core/pix_icon';
+    }
+
+    /**
      * Export this data so it can be used as the context for a mustache template.
      *
      * @param renderer_base $output Used to do a final render of any components that need to be rendered for export.

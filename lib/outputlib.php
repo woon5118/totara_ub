@@ -2045,20 +2045,20 @@ class theme_config {
     }
 
     /**
-     * Return an array of paths to potential icons.json files for a given theme.
+     * Return an array of paths to potential theme directories for the current theme.
      *
-     * The returned array is in order of precedence highest first to lowest last.
+     * The returned array is in order of precedence highest lowest to highest last.
      *
-     * @param string $themename Name of the theme to get candidates for.
      * @return array
      */
-    public static function flex_icon_get_file_candidate_paths($themename) {
-
-        $themeconfig = self::load($themename);
-        return core\flex_icon_helper::get_file_candidate_paths(array_merge(array($themeconfig), array_values($themeconfig->parent_configs)));
-
+    public function get_flex_icon_candidate_dirs() {
+        $themedirs = array($this->dir);
+        foreach ($this->parent_configs as $parent_config) {
+            $themedirs[] = $parent_config->dir;
+        }
+        $themedirs = array_reverse($themedirs);
+        return $themedirs;
     }
-
 }
 
 /**
