@@ -262,7 +262,7 @@ class totara_dialog_content {
 
         $markup .= html_writer::start_tag('div', array('id' => 'dialog-tabs', 'class' => 'dialog-content-select'));
 
-        $markup .= '<ul class="tabs dialog-nobind">';
+        $markup .= '<ul class="nav nav-tabs tabs dialog-nobind">';
         $markup .= '  <li><a href="#browse-tab">'.get_string('browse', 'totara_core').'</a></li>';
         if (!empty($this->search_code)) {
             $markup .= '  <li><a href="#search-tab">'.get_string('search').'</a></li>';

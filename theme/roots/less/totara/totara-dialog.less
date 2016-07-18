@@ -99,3 +99,79 @@ div.totara-dialog td.select #browse-tab {
   text-align: center;
   cursor: pointer;
 }
+
+.totara-dialog .dialog-content-select {
+  border: none;
+}
+
+.totara-dialog .selected .unremovable .deletebutton,
+.totara-dialog .selected .unremovable .addbutton {
+  background:none;
+}
+.totara-dialog .selected span span.addbutton,
+.totara-dialog .selected span span.deletebutton {
+  background: none repeat scroll 0 0 transparent;
+  cursor: pointer;
+  float: right;
+  display: inline; /* IE margin-doubling fix */
+  margin: 0;
+  overflow: hidden;
+  text-indent: -999px;
+  width: 17px;
+}
+/* Handle hovers */
+.totara-dialog .selected div:hover span.deletebutton {
+  background-image: url([[pix:totara_core|jquery_ui_dialog/ui-icons_000000_256x240]]);
+  background-position:-80px -128px;
+  background-repeat: no-repeat;
+}
+.totara-dialog .selected div:hover span.addbutton {
+  background-image: url([[pix:moodle|t/add]]);
+  background-position: right center;
+  background-repeat: no-repeat;
+}
+.totara-dialog .deletebutton,
+.totara-dialog .addbutton {
+  background:none;
+  display: none;
+}
+
+.totara-dialog .row-fluid {
+  margin: 0;
+}
+
+.totara-dialog .unclickable a {
+  color: @gray-light;
+}
+
+
+#dialog-tabs .tabs {
+  padding: 0;
+}
+
+
+#dialog-tabs .tabs li {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  margin-bottom: -1px;
+}
+
+#dialog-tabs .tabs li.ui-tabs-active.ui-state-active a {
+  border-top: 1px solid @nav-tabs-border-color;
+  border-left: 1px solid @nav-tabs-border-color;
+  border-right: 1px solid @nav-tabs-border-color;
+  border-bottom: none;
+  border-top-left-radius: @border-radius-base;
+  border-top-right-radius: @border-radius-base;
+  background-color: @nav-tabs-background-color;
+}
+
+.dialog-singleselect-deletable {
+  background: transparent url([[pix:core|t/delete]]) no-repeat scroll 50% 50%;
+  cursor: pointer;
+  display: inline-block;
+  text-indent: 100%;
+  width: 20px;
+  margin-right: @padding-small-vertical;
+}
