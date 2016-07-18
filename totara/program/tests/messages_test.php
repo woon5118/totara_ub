@@ -85,10 +85,11 @@ class totara_program_messages_testcase extends advanced_testcase {
         $usersprogram1 = array($this->user1->id, $this->user2->id, $this->user3->id);
         $this->program_generator->assign_program($this->program1->id, $usersprogram1);
 
+        sleep(1); // Messages are only sent if they were created before "now", so we need to wait one second.
+
         // Attempt to send any program messages.
         $task = new \totara_program\task\send_messages_task();
         $task->execute();
-        $lastrun = time();
 
         // Check the right amount of messages were caught.
         $emails = $sink->get_messages();
@@ -102,11 +103,11 @@ class totara_program_messages_testcase extends advanced_testcase {
         $usersprogram1 = array($this->user1->id, $this->user2->id, $this->user4->id, $this->user5->id);
         $this->program_generator->assign_program($this->program1->id, $usersprogram1);
 
+        sleep(1);
+
         // Attempt to send any program messages.
         $task = new \totara_program\task\send_messages_task();
-        $task->set_last_run_time($lastrun);
         $task->execute();
-        $lastrun = time();
 
         // Check the right amount of messages were caught.
         $emails = $sink->get_messages();
@@ -119,9 +120,10 @@ class totara_program_messages_testcase extends advanced_testcase {
         $usersprogram2 = array($this->user3->id, $this->user4->id, $this->user5->id, $this->user6->id, $this->user7->id);
         $this->program_generator->assign_program($this->program2->id, $usersprogram2);
 
+        sleep(1);
+
         // Attempt to send any program messages.
         $task = new \totara_program\task\send_messages_task();
-        $task->set_last_run_time($lastrun);
         $task->execute();
 
         // Check the right amount of messages were caught.

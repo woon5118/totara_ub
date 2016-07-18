@@ -116,7 +116,7 @@ class send_messages_task extends \core\task\scheduled_task {
                    AND pm.messagetype = :enroltype
              LEFT JOIN {prog_messagelog} pml
                     ON pml.messageid = pm.id AND pml.userid = pua.userid
-                 WHERE pua.timeassigned > :lastrun AND pua.timeassigned <= :currentrun
+                 WHERE pua.timeassigned >= :lastrun AND pua.timeassigned < :currentrun
                    AND pua.exceptionstatus <> :exraise
                    AND pua.exceptionstatus <> :exdismiss
                    AND pml.id IS NULL
