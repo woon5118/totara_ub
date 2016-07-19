@@ -156,9 +156,15 @@ function mod_facetoface_delete_orphaned_customfield_data($type) {
         $foreignkey . ' NOT IN (SELECT s.id FROM {facetoface_signups} s)'
     );
 
-    if (!empty($customfieldids)) {
-        list($sqlin, $inparams) = $DB->get_in_or_equal($customfieldids);
-        $DB->delete_records_select($customparam_table, "dataid {$sqlin}", $inparams);
-        $DB->delete_records_select($customfield_table, "id {$sqlin}", $inparams);
+    $managablechunks = array_chunk($customfieldids, $DB->get_max_in_params());
+
+    $transaction = $DB->start_delegated_transaction();
+    foreach ($managablechunks as $chunk) {
+        if (!empty($chunk)) {
+            list($sqlin, $inparams) = $DB->get_in_or_equal($chunk);
+            $DB->delete_records_select($customparam_table, "dataid {$sqlin}", $inparams);
+            $DB->delete_records_select($customfield_table, "id {$sqlin}", $inparams);
+        }
     }
+    $transaction->allow_commit();
 }
