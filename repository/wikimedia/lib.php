@@ -178,6 +178,21 @@ EOD;
     }
 
     /**
+     * Download a file from Wikimedia URL
+     *
+     * @param string $url some url
+     * @param string $file
+     * @return array
+     */
+    public function get_file($url, $file = '') {
+        if (!preg_match('|^https?://[a-z0-9]+\.wikimedia\.org/|', $url)) {
+            // This should not happen.
+            return array();
+        }
+        return $this->download_one_file($url, $file);
+    }
+
+    /**
      * Return the source information
      *
      * @param stdClass $url

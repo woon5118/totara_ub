@@ -295,6 +295,7 @@ $string['idnumberduplicates'] = 'Table: "{$a->table}". ID numbers: {$a->idnumber
 $string['idnumberexists'] = 'Record with this ID number already exists';
 $string['importtimezonesskipped'] = 'Skipped updating timezone information.';
 $string['importtimezonessuccess'] = 'Timezone information updated from source {$a}.';
+$string['incompatiblerepository'] = 'File download is disabled for security reasons, repository "{$a}" needs to be updated by developer';
 $string['inprogress'] = 'In Progress';
 $string['installdemoquestion'] = 'Do you want to include demo data with this installation?<br /><br />(This will take a long time.)';
 $string['installingdemodata'] = 'Installing Demo Data';

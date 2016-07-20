@@ -98,6 +98,21 @@ class repository_picasa extends repository {
         return parent::logout();
     }
 
+    /**
+     * Download a file from Google URL
+     *
+     * @param string $url some url
+     * @param string $file
+     * @return array
+     */
+    public function get_file($url, $file = '') {
+        if (!preg_match('|^https?://[a-z0-9]+\.googleusercontent\.com/|', $url)) {
+            // This should not happen.
+            return array();
+        }
+        return $this->download_one_file($url, $file);
+    }
+
     public function supported_filetypes() {
         return array('web_image');
     }

@@ -276,7 +276,7 @@ class repository_flickr extends repository {
      */
     public function get_file($photoid, $file = '') {
         $url = $this->build_photo_url($photoid);
-        return parent::get_file($url, $file);
+        return $this->download_one_file($url, $file);
     }
 
     /**

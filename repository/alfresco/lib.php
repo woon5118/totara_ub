@@ -202,7 +202,7 @@ class repository_alfresco extends repository {
     public function get_file($uuid, $file = '') {
         $node = $this->user_session->getNode($this->store, $uuid);
         $url = $this->get_url($node);
-        return parent::get_file($url, $file);
+        return $this->download_one_file($url, $file);
     }
 
     public function print_search() {

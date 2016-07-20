@@ -1703,13 +1703,43 @@ abstract class repository implements cacheable_object {
     /**
      * Downloads a file from external repository and saves it in temp dir
      *
+     * Totara: It was a really bad idea to treat the reference as trusted url by default!
+     *
      * Function get_file() must be implemented by repositories that support returntypes
      * FILE_INTERNAL or FILE_REFERENCE. It is invoked to pick up the file and copy it
      * to moodle. This function is not called for moodle repositories, the function
      * {@link repository::copy_to_area()} is used instead.
      *
-     * This function can be overridden by subclass if the files.reference field contains
-     * not just URL or if request should be done differently.
+     * This function must be overridden by subclass if repository supports
+     * return type FILE_INTERNAL or FILE_REFERENCE.
+     *
+     * @see curl
+     * @throws file_exception when error occured
+     *
+     * @param string $reference the content of files.reference field
+     * @param string $filename filename (without path) to save the downloaded file in the
+     * temporary directory, if omitted or file already exists the new filename will be generated
+     * @return array with elements:
+     *   path: internal location of the file
+     *   url: URL to the source (from parameters)
+     */
+    public function get_file($reference, $filename = '') {
+        if ($this->supported_returntypes() == FILE_EXTERNAL) {
+            // No need to download anything.
+            return array();
+        }
+
+        // Totara: Add-on repositories must be updated to override this method
+        // with code that verifies the $reference parameter and constructs a
+        // trusted URL that is then downloaded via $this->download_one_file().
+
+        throw new moodle_exception('incompatiblerepository', 'totara_core', '', $this->get_name());
+    }
+
+    /**
+     * Downloads a file from url.
+     *
+     * Totara: use this from get_file() above after the creating validated $url from $reference.
      *
      * @see curl
      * @throws file_exception when error occured
@@ -1722,7 +1752,7 @@ abstract class repository implements cacheable_object {
      *   path: internal location of the file
      *   url: URL to the source (from parameters)
      */
-    public function get_file($url, $filename = '') {
+    protected function download_one_file($url, $filename = '') {
         global $CFG;
 
         $path = $this->prepare_file($filename);

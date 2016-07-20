@@ -110,6 +110,20 @@ EOD;
     }
 
     /**
+     * Download a file from random URL
+     *
+     * @param string $url some url
+     * @param string $file
+     * @return array
+     */
+    public function get_file($url, $file = '') {
+        // NOTE: if anybody wants to implement some kind of half-secure
+        //       white listing this is the place to do it, otherwise just
+        //       keep this repository disabled for security reasons.
+        return $this->download_one_file($url, $file);
+    }
+
+    /**
      * Parses one file (either html or css)
      *
      * @param string $baseurl (optional) URL of the file where link to this file was found

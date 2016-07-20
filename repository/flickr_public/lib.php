@@ -467,7 +467,7 @@ class repository_flickr_public extends repository {
             $source = $this->build_photo_url($photoid);
         }
 
-        $result = parent::get_file($source, $file);
+        $result = $this->download_one_file($source, $file);
         $path = $result['path'];
 
         if (!empty($this->usewatermarks)) {

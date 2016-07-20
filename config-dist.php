@@ -861,6 +861,11 @@ $CFG->admin = 'admin';
 // Note that, for now, this only used by the profiling features
 // (Development->Profiling) built into Totara.
 //      $CFG->pathtodot = '';
+//
+//=========================================================================
+// 14. ADD-ON COMPATIBILITY SETTINGS
+//=========================================================================
+//
 
 //=========================================================================
 // ALL DONE!  To continue installation, visit your main page with a browser
