@@ -395,6 +395,7 @@ $string['stageinitialpagesheader'] = 'Create pages for this stage';
 $string['stageinitialpagetitles'] = 'Page names (optional)';
 $string['stageinitialpagetitles_help'] = 'You can use this field to quickly create a set of pages for this stage by entering one page name per line. If you don\'t know the page names yet you can still create new pages or edit existing ones later.';
 $string['stageupdated'] = 'Stage updated';
+$string['stagesendingoption'] = 'Stage sending option';
 $string['stagename'] = 'Stage: {$a}';
 $string['stages'] = 'Stages';
 $string['start'] = 'Start';

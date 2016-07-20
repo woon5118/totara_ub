@@ -782,7 +782,7 @@ class appraisal_message_form extends moodleform {
         $compgrp[] = $mform->createElement('advcheckbox', 'stageis', '', get_string('eventsendstagecompleted', 'totara_appraisal'));
         $compgrp[] = $mform->createElement('radio', 'complete', '', get_string('eventstageisincomplete', 'totara_appraisal'), '-1');
         $compgrp[] = $mform->createElement('radio', 'complete', '', get_string('eventstageiscomplete', 'totara_appraisal'), '1');
-        $mform->addGroup($compgrp, 'completegrp', '', html_writer::empty_tag('br'));
+        $mform->addGroup($compgrp, 'completegrp', get_string('stagesendingoption', 'totara_appraisal'), html_writer::empty_tag('br'));
         $mform->disabledIf('completegrp[stageis]', 'eventtype', 'eq', appraisal_message::EVENT_STAGE_COMPLETE);
         $mform->disabledIf('completegrp[stageis]', 'eventid', 'eq', 0);
         $mform->disabledIf('completegrp[complete]', 'eventtype', 'eq', appraisal_message::EVENT_STAGE_COMPLETE);

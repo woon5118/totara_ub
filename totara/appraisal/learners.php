@@ -119,7 +119,6 @@ if (!empty($CFG->dynamicappraisals) && $appraisal->status == appraisal::STATUS_A
 }
 
 echo $output->appraisal_management_tabs($appraisal->id, 'learners');
-
 echo $output->heading(get_string('assigncurrentgroups', 'totara_appraisal'), 3);
 
 if ($canassign) {

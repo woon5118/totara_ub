@@ -639,7 +639,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $stagestable->summary = '';
         $stagestable->head = $tableheader;
         $stagestable->data = array();
-        $stagestable->attributes['class'] = 'appraisal-stages fullwidth';
+        $stagestable->attributes['class'] = 'generaltable appraisal-stages fullwidth';
 
         $strsettings = get_string('settings', 'totara_appraisal');
         $strdelete = get_string('delete', 'totara_appraisal');
@@ -1230,7 +1230,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $appraisal = new appraisal($itemid);
 
         $table = new html_table();
-        $table->attributes['class'] = 'fullwidth dataTable';
+        $table->attributes['class'] = 'generaltable fullwidth dataTable';
         $table->summary = '';
         $table->head = $tableheader;
         $table->data = array();
@@ -1275,7 +1275,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
     public function display_user_datatable() {
         $table = new html_table();
         $table->id = 'datatable';
-        $table->attributes['class'] = 'clearfix';
+        $table->attributes['class'] = 'generaltable clearfix';
         $table->head = array(get_string('learner'),
                              get_string('assignedvia', 'totara_core'),
                              );
