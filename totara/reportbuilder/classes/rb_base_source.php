@@ -2811,10 +2811,18 @@ abstract class rb_base_source {
             get_string('courseidnumber', 'totara_reportbuilder'),
             'text'
         );
+        $audvisibility = get_config(null, 'audiencevisibility');
+        if (empty($audvisibility)) {
+            $coursevisiblestring = get_string('coursevisible', 'totara_reportbuilder');
+            $audvisiblilitystring = get_string('audiencevisibilitydisabled', 'totara_reportbuilder');
+        } else {
+            $coursevisiblestring = get_string('coursevisibledisabled', 'totara_reportbuilder');
+            $audvisiblilitystring = get_string('audiencevisibility', 'totara_reportbuilder');
+        }
         $filteroptions[] = new rb_filter_option(
             'course',
             'visible',
-            get_string('coursevisible', 'totara_reportbuilder'),
+            $coursevisiblestring,
             'select',
             array(
                 'selectchoices' => array(0 => get_string('no'), 1 => get_string('yes')),
@@ -2824,7 +2832,7 @@ abstract class rb_base_source {
         $filteroptions[] = new rb_filter_option(
             'course',
             'audvis',
-            get_string('audiencevisibility', 'totara_reportbuilder'),
+            $audvisiblilitystring,
             'select',
             array(
                 'selectchoices' => array(
