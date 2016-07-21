@@ -112,7 +112,7 @@ if ($display) {
     $table->head = array($namestr, $pluginstr, $showhide);
     $table->data = array();
 
-    $editicon = $OUTPUT->flex_icon('cog', ['alt' => get_string('configure')]);
+    $editicon = $OUTPUT->flex_icon('settings', ['alt' => get_string('configure')]);
     $showicon = $OUTPUT->flex_icon('eye', ['alt' => get_string('show')]);
     $hideicon = $OUTPUT->flex_icon('eye-slash', ['alt' => get_string('hide')]);
 

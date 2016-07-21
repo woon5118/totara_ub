@@ -1244,11 +1244,11 @@ function data_print_template($template, $records, $data, $search='', $page=0, $r
         $patterns[]='##delete##';
         if (data_user_can_manage_entry($record, $data, $context)) {
 
-            $flexicon = $image = $OUTPUT->flex_icon('cog', array('alt' => get_string('edit')));
+            $flexicon = $image = $OUTPUT->flex_icon('settings', array('alt' => get_string('edit')));
             $replacement[] = '<a href="'.$CFG->wwwroot.'/mod/data/edit.php?d='
                 .$data->id.'&amp;rid='.$record->id.'&amp;sesskey='.sesskey().'">' . $flexicon . '</a>';
 
-            $flexicon = $image = $OUTPUT->flex_icon('times-danger', array('alt' => get_string('delete')));
+            $flexicon = $image = $OUTPUT->flex_icon('delete', array('alt' => get_string('delete')));
             $replacement[] = '<a href="'.$CFG->wwwroot.'/mod/data/view.php?d='
                 .$data->id.'&amp;delete='.$record->id.'&amp;sesskey='.sesskey().'">' . $flexicon . '</a>';
         } else {

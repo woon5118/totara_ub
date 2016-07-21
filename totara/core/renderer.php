@@ -339,13 +339,13 @@ class totara_core_renderer extends plugin_renderer_base {
             $cells[] = new html_table_cell($sched->schedule);
             if ($showoptions) {
                 $text = get_string('edit');
-                $icon = $this->output->flex_icon('cog', ['classes' => 'ft-size-100', 'alt' => $text]);
+                $icon = $this->output->flex_icon('settings', ['classes' => 'ft-size-100', 'alt' => $text]);
                 $url = new moodle_url('/totara/reportbuilder/scheduled.php', array('id' => $sched->id));
                 $attributes = array('href' => $url);
                 $cellcontent = html_writer::tag('a', $icon, $attributes);
                 $cellcontent .= ' ';
                 $text = get_string('delete');
-                $icon = $this->output->flex_icon('times-danger', ['classes' => 'ft-size-100', 'alt' => $text]);
+                $icon = $this->output->flex_icon('delete', ['classes' => 'ft-size-100', 'alt' => $text]);
                 $url = new moodle_url('/totara/reportbuilder/deletescheduled.php', array('id' => $sched->id));
                 $attributes = array('href' => $url);
                 $cellcontent .= html_writer::tag('a', $icon, $attributes);

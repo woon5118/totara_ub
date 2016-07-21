@@ -93,6 +93,11 @@ foreach ($requests as $request) {
         $responses[$index] = $response;
     } catch (Exception $e) {
         $jsonexception = get_exception_info($e);
+        if (debugging('', DEBUG_MINIMAL)) {
+            // Totara: add proper error logging here the same way as in default error handler.
+            $logerrmsg = "Ajax service exception: ".$jsonexception->message.' Debug: '.$jsonexception->debuginfo."\n".format_backtrace($jsonexception->backtrace, true);
+            error_log($logerrmsg);
+        }
         unset($jsonexception->a);
         if (!debugging('', DEBUG_DEVELOPER)) {
             unset($jsonexception->debuginfo);
@@ -105,5 +110,10 @@ foreach ($requests as $request) {
         break;
     }
 }
+
+// Totara: note that the returned value is not validated in any way,
+// this is intentional because the returned data may have flexible format
+// and cannot be described with external_description structure.
+// It was a really bad idea to abuse externallib for ajax stuff!
 
 echo json_encode($responses);

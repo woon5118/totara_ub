@@ -81,6 +81,23 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $this->assertSame($identifier, $icon->identifier);
         $this->assertSame($customdata, $icon->customdata);
         $this->assertDebuggingCalled("Flex icon '$identifier' not found");
+
+        // Legacy data.
+        $icon = new flex_icon('edit');
+        $this->assertInstanceOf('pix_icon', $icon);
+        $this->assertSame('flexicon', $icon->pix);
+        $this->assertSame(array('class' => 'smallicon', 'alt' => ''), $icon->attributes);
+        $this->assertSame('core', $icon->component);
+
+        $icon = new flex_icon('core|i/edit', array('alt' => 'Alt text', 'classes' => 'xx zz'));
+        $this->assertSame('flexicon', $icon->pix);
+        $this->assertSame(array('class' => 'xx zz', 'alt' => 'Alt text', 'title' => 'Alt text'), $icon->attributes);
+        $this->assertSame('core', $icon->component);
+
+        $icon = new flex_icon('mod_book|chapter', array());
+        $this->assertSame('flexicon', $icon->pix);
+        $this->assertSame(array('class' => 'smallicon', 'alt' => ''), $icon->attributes);
+        $this->assertSame('mod_book', $icon->component);
     }
 
     public function test_get_template() {
@@ -104,6 +121,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
     public function test_export_for_template() {
         global $PAGE;
 
+        /** @var core_renderer $renderer */
         $renderer = $PAGE->get_renderer('core');
 
         // New icon names.
@@ -234,23 +252,65 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
      */
     public function test_render_flex_icon() {
         global $PAGE;
+
+        /** @var core_renderer $renderer */
         $renderer = $PAGE->get_renderer('core');
 
         $icon = new flex_icon('edit');
         $expected = $renderer->render_from_template($icon->get_template(), $icon->export_for_template($renderer));
         $this->assertSame($expected, $renderer->render($icon));
+
+        $deprecatedicon = new flex_icon('core|i/edit');
+        $this->assertSame($expected, $renderer->render($deprecatedicon));
+
+        $stackdicon = new flex_icon('unsubscribed');
+        $expected = $renderer->render_from_template($stackdicon->get_template(), $stackdicon->export_for_template($renderer));
+        $this->assertSame($expected, $renderer->render($stackdicon));
+
+        // Test rendering with incorrect template, the result does not matter, but there must not be fatal errors.
+
+        $this->assertSame('core/flex_icon', $icon->get_template());
+        @$renderer->render_from_template('core/flex_icon_stack', $icon->export_for_template($renderer));
+
+        $this->assertSame('core/flex_icon_stack', $stackdicon->get_template());
+        @$renderer->render_from_template('core/flex_icon', $stackdicon->export_for_template($renderer));
     }
 
     public function test_render_pix_icon() {
         global $PAGE;
+
+        /** @var core_renderer $renderer */
         $renderer = $PAGE->get_renderer('core');
 
-        $flexicon = new flex_icon('core|i/edit');
-        $pixicon = new pix_icon('i/edit', '');
-        $this->assertSame($renderer->render($flexicon), $renderer->render($pixicon));
+        $expected = $renderer->render(new flex_icon('core|i/edit'));
+        $this->assertSame($expected, $renderer->render(new pix_icon('i/edit', '')));
+        $this->assertSame($expected, $renderer->render(new pix_icon('i/edit', '', 'moodle')));
+        $this->assertSame($expected, $renderer->render(new pix_icon('i/edit', '', 'core')));
+        $this->assertSame($expected, $renderer->render(new pix_icon('i/edit', '', '')));
 
-        $flexicon = new flex_icon('mod_book|icon');
-        $pixicon = new pix_icon('icon', '', 'book');
-        $this->assertSame($renderer->render($flexicon), $renderer->render($pixicon));
+        $expected = $renderer->render(new flex_icon('mod_book|icon'));
+        $this->assertSame($expected, $renderer->render(new pix_icon('icon', '', 'mod_book')));
+        $this->assertSame($expected, $renderer->render(new pix_icon('icon', '', 'book')));
+    }
+
+    public function test_render_action_icon() {
+        global $PAGE;
+
+        /** @var core_renderer $renderer */
+        $renderer = $PAGE->get_renderer('core');
+
+        $url = new moodle_url('/');
+        $flexicon = new flex_icon('edit');
+        $pixicon = new pix_icon('i/edit', '');
+
+        $this->assertSame($renderer->action_icon($url, $pixicon), $renderer->action_icon($url, $flexicon));
+    }
+
+    public function test_pix_icon_url() {
+        global $PAGE;
+
+        $url = $PAGE->theme->pix_url('i/edit', 'core');
+        $this->assertInstanceOf('moodle_url', $url);
+        $this->assertSame('http://www.example.com/moodle/theme/image.php/_s/standardtotararesponsive/core/1/i/edit', $url->out());
     }
 }

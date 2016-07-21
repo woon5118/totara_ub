@@ -240,7 +240,7 @@ function display_selected_badge_item($badge, $filtername) {
     $bcontext = $bclass->get_context();
     $out .= print_badge_image($bclass, $bcontext) . format_string($badge->name) . ' (' .
                                 get_string("badgestatus_{$badge->status}", 'badges') . ')';
-    $deleteicon = $OUTPUT->flex_icon('times-danger');
+    $deleteicon = $OUTPUT->flex_icon('delete');
     $out .= html_writer::link('#', $deleteicon, array('title' => $strdelete));
     $out .= html_writer::end_tag('div');
     return $out;

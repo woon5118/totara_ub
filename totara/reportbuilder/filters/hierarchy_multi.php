@@ -231,7 +231,7 @@ function display_selected_hierarchy_item($item, $filtername) {
     $out = html_writer::start_tag('div', array('data-filtername' =>  $filtername,
         'data-id' => $item->id, 'class' => 'multiselect-selected-item'));
     $out .= format_string($item->fullname);
-    $deleteicon = $OUTPUT->flex_icon('times-danger');
+    $deleteicon = $OUTPUT->flex_icon('delete');
     $out .= html_writer::link('#', $deleteicon);
     $out .= html_writer::end_tag('div');
     return $out;

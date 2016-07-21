@@ -29,363 +29,34 @@
  */
 
 /*
- * Translation of old pix icon names to flex icon identifiers.
- *
- * The old pix icon name format is "component_name|originalpixpath"
- * similar to the old pix placeholders in CSS.
- *
- * All flex icon identifiers must be present in the $map.
+ * Default values for the all $map arrays from all plugins, core and themes.
+ * This can be overridden in themes only.
  */
-$translations = array(
-    'core|a/add_file' => 'new-document',
-    'core|a/create_folder' => 'folder-create',
-    'core|a/download_all' => 'download',
-    'core|a/help' => 'question-circle',
-    'core|a/logout' => 'sign-out',
-    'core|a/refresh' => 'refresh',
-    'core|a/search' => 'search',
-    'core|a/setting' => 'cog',
-    'core|a/view_icon_active' => 'th-large',
-    'core|a/view_list_active' => 'align-justify',
-    'core|a/view_tree_active' => 'viewtreeactive',
-    'core|b/bookmark-new' => 'bookmark-o',
-    'core|b/document-edit' => 'edit-document',
-    'core|b/document-new' => 'new-document',
-    'core|b/document-properties' => 'document-properties',
-    'core|b/edit-copy' => 'copy',
-    'core|b/edit-delete' => 'times-danger',
-    'core|c/event' => 'calendar',
-    'core|docs' => 'info-circle',
-    'core|e/accessibility_checker' => 'wheelchair',
-    'core|e/align_center' => 'align-center',
-    'core|e/align_left' => 'align-left',
-    'core|e/align_right' => 'align-right',
-    'core|e/anchor' => 'bookmark-o',
-    'core|e/bold' => 'bold',
-    'core|e/bullet_list' => 'list-ul',
-    'core|e/cite' => 'quote-left',
-    'core|e/copy' => 'copy',
-    'core|e/cut' => 'scissors',
-    'core|e/decrease_indent' => 'outdent',
-    'core|e/delete' => 'strikethrough',
-    'core|e/document-properties' => 'document-properties',
-    'core|e/document_properties' => 'file-wrench',
-    'core|e/emoticons' => 'smile-o',
-    'core|e/fullscreen' => 'expand',
-    'core|e/help' => 'question-circle',
-    'core|e/increase_indent' => 'indent',
-    'core|e/insert' => 'underline',
-    'core|e/insert_date' => 'calendar',
-    'core|e/insert_edit_image' => 'image',
-    'core|e/insert_edit_link' => 'link',
-    'core|e/insert_edit_video' => 'film',
-    'core|e/insert_horizontal_ruler' => 'dash',
-    'core|e/insert_time' => 'clock-o',
-    'core|e/italic' => 'italic',
-    'core|e/justify' => 'align-justify',
-    'core|e/math' => 'calculator',
-    'core|e/new_document' => 'new-document',
-    'core|e/numbered_list' => 'list-ol',
-    'core|e/paste' => 'paste',
-    'core|e/prevent_autolink' => 'prevent-autolink',
-    'core|e/preview' => 'eye',
-    'core|e/print' => 'print',
-    'core|e/question' => 'question',
-    'core|e/redo' => 'repeat',
-    'core|e/remove_link' => 'unlink',
-    'core|e/resize' => 'arrows-alt',
-    'core|e/restore_draft' => 'restore-draft',
-    'core|e/save' => 'save',
-    'core|e/screenreader_helper' => 'wheelchair',
-    'core|e/search' => 'search',
-    'core|e/show_invisible_characters' => 'paragraph',
-    'core|e/source_code' => 'code',
-    'core|e/strikethrough' => 'strikethrough',
-    'core|e/subscript' => 'subscript',
-    'core|e/superscript' => 'superscript',
-    'core|e/table' => 'table',
-    'core|e/text_color' => 'font-info',
-    'core|e/text_color_picker' => 'text-color-picker',
-    'core|e/tick' => 'check-success',
-    'core|e/toggle_blockquote' => 'quote-left',
-    'core|e/underline' => 'underline',
-    'core|e/undo' => 'undo',
-    'core|f/archive' => 'box-alt',
-    'core|f/audio' => 'volume-up',
-    'core|f/avi' => 'film',
-    'core|f/base' => 'database',
-    'core|f/bmp' => 'file-image-o',
-    'core|f/chart' => 'bar-chart',
-    'core|f/database' => 'database',
-    'core|f/dmg' => 'file-archive-o',
-    'core|f/document' => 'file-text-o',
-    'core|f/edit' => 'pencil-square-o',
-    'core|f/eps' => 'file-image-o',
-    'core|f/epub' => 'ebook',
-    'core|f/explore' => 'explore',
-    'core|f/flash' => 'file-video-o',
-    'core|f/folder' => 'folder-o',
-    'core|f/folder-open' => 'folder-open-o',
-    'core|f/gif' => 'file-image-o',
-    'core|f/help-32' => 'question-circle',
-    'core|f/html' => 'file-code-o',
-    'core|f/image' => 'file-image-o',
-    'core|f/jpeg' => 'file-image-o',
-    'core|f/markup' => 'file-code-o',
-    'core|f/mov' => 'file-video-o',
-    'core|f/move' => 'arrows',
-    'core|f/mp3' => 'file-sound-o',
-    'core|f/mpeg' => 'file-video-o',
-    'core|f/parent-32' => 'level-up',
-    'core|f/pdf' => 'file-pdf-o',
-    'core|f/png' => 'file-image-o',
-    'core|f/powerpoint' => 'file-powerpoint-o',
-    'core|f/psd' => 'file-image-o',
-    'core|f/quicktime' => 'file-video-o',
-    'core|f/sourcecode' => 'file-code-o',
-    'core|f/spreadsheet' => 'file-excel-o',
-    'core|f/text' => 'file-text-o',
-    'core|f/tiff' => 'file-image-o',
-    'core|f/unknown' => 'file-o',
-    'core|f/video' => 'file-video-o',
-    'core|f/wav' => 'file-sound-o',
-    'core|f/wmv' => 'file-video-o',
-    'core|g/f1' => 'smile-o',
-    'core|g/f2' => 'smile-o',
-    'core|help' => 'question-circle',
-    'core|i/admin' => 'cog',
-    'core|i/agg_mean' => 'mean',
-    'core|i/agg_sum' => 'sigma',
-    'core|i/ajaxloader' => 'spinner-pulse',
-    'core|i/assignroles' => 'user-plus',
-    'core|i/backup' => 'upload',
-    'core|i/badge' => 'trophy',
-    'core|i/calc' => 'calculator',
-    'core|i/calendar' => 'calendar',
-    'core|i/caution' => 'exclamation-circle',
-    'core|i/checkpermissions' => 'check-permissions',
-    'core|i/closed' => 'folder-o',
-    'core|i/cohort' => 'users',
-    'core|i/completion-auto-enabled' => 'auto-completion-on',
-    'core|i/completion-auto-fail' => 'times-circle-o-danger',
-    'core|i/completion-auto-n' => 'circle-o',
-    'core|i/completion-auto-pass' => 'check-circle-o-success',
-    'core|i/completion-auto-y' => 'check-circle-o',
-    'core|i/completion-manual-enabled' => 'manual-completion-on',
-    'core|i/completion-manual-n' => 'square-o',
-    'core|i/completion-manual-y' => 'check-square-o',
-    'core|i/configlock' => 'cog-lock',
-    'core|i/course' => 'cube',
-    'core|i/courseevent' => 'course-event',
-    'core|i/db' => 'database',
-    'core|i/delete' => 'times-danger',
-    'core|i/down' => 'arrow-down',
-    'core|i/dragdrop' => 'arrows',
-    'core|i/dropdown' => 'caret-down',
-    'core|i/edit' => 'edit',
-    'core|i/email' => 'envelope-o',
-    'core|i/enrolmentsuspended' => 'enrolment-suspended',
-    'core|i/enrolusers' => 'user-plus',
-    'core|i/export' => 'upload',
-    'core|i/feedback' => 'comment-o',
-    'core|i/feedback_add' => 'add-feedback',
-    'core|i/files' => 'file-o',
-    'core|i/filter' => 'filter',
-    'core|i/flagged' => 'flag',
-    'core|i/folder' => 'folder-o',
-    'core|i/grade_correct' => 'check-success',
-    'core|i/grade_incorrect' => 'times-danger',
-    'core|i/grade_partiallycorrect' => 'check-warning',
-    'core|i/grades' => 'grades',
-    'core|i/group' => 'users',
-    'core|i/groupevent' => 'group-event',
-    'core|i/groupn' => 'no-groups',
-    'core|i/groups' => 'separate-groups',
-    'core|i/groupv' => 'users',
-    'core|i/guest' => 'user-secret',
-    'core|i/hide' => 'eye-slash',
-    'core|i/hierarchylock' => 'site-lock',
-    'core|i/import' => 'download',
-    'core|i/info' => 'info-circle',
-    'core|i/invalid' => 'times-danger',
-    'core|i/key' => 'key',
-    'core|i/loading' => 'spinner-pulse',
-    'core|i/loading_small' => 'spinner-pulse',
-    'core|i/lock' => 'lock',
-    'core|i/log' => 'log',
-    'core|i/mahara_host' => 'mahara',
-    'core|i/manual_item' => 'edit',
-    'core|i/marked' => 'lightbulb-o',
-    'core|i/marker' => 'lightbulb-o-disabled',
-    'core|i/mean' => 'mean',
-    'core|i/menu' => 'bars',
-    'core|i/mnethost' => 'mnet-host',
-    'core|i/moodle_host' => 'moodle',
-    'core|i/move_2d' => 'arrows',
-    'core|i/new' => 'new',
-    'core|i/news' => 'newspaper-o',
-    'core|i/nosubcat' => 'no-subcategory',
-    'core|i/open' => 'folder-open-o',
-    'core|i/outcomes' => 'pie-chart',
-    'core|i/payment' => 'dollar',
-    'core|i/permissionlock' => 'permission-lock',
-    'core|i/permissions' => 'permissions',
-    'core|i/portfolio' => 'portfolio',
-    'core|i/preview' => 'eye',
-    'core|i/publish' => 'publish',
-    'core|i/questions' => 'question',
-    'core|i/reload' => 'refresh',
-    'core|i/report' => 'file-text-o',
-    'core|i/repository' => 'database',
-    'core|i/restore' => 'download',
-    'core|i/return' => 'undo',
-    'core|i/risk_config' => 'cogs-risk',
-    'core|i/risk_dataloss' => 'database-risk',
-    'core|i/risk_managetrust' => 'shield-risk',
-    'core|i/risk_personal' => 'user-risk',
-    'core|i/risk_spam' => 'envelope-risk',
-    'core|i/risk_xss' => 'code-risk',
-    'core|i/rss' => 'rss',
-    'core|i/scales' => 'scales',
-    'core|i/scheduled' => 'clock-o',
-    'core|i/search' => 'search',
-    'core|i/self' => 'user',
-    'core|i/settings' => 'cog',
-    'core|i/show' => 'eye',
-    'core|i/siteevent' => 'calendar',
-    'core|i/star-rating' => 'star-half-o',
-    'core|i/stats' => 'line-chart',
-    'core|i/switch' => 'toggle-on',
-    'core|i/switchrole' => 'user-refresh',
-    'core|i/twoway' => 'arrows-h',
-    'core|i/unflagged' => 'flag-o',
-    'core|i/unlock' => 'unlock',
-    'core|i/up' => 'arrow-up',
-    'core|i/user' => 'user',
-    'core|i/useradd' => 'user-plus',
-    'core|i/userdel' => 'user-times',
-    'core|i/userevent' => 'user-event',
-    'core|i/users' => 'users',
-    'core|i/valid' => 'check-success',
-    'core|i/warning' => 'warning-warning',
-    'core|i/withsubcat' => 'viewtreeactive',
-    'core|m/USD' => 'dollar',
-    'core|req' => 'asterisk',
-    'core|spacer' => 'spacer',
-    'core|t/add' => 'plus',
-    'core|t/addcontact' => 'contact-add',
-    'core|t/adddir' => 'folder-create',
-    'core|t/addfile' => 'new-document',
-    'core|t/approve' => 'check',
-    'core|t/assignroles' => 'user-plus',
-    'core|t/award' => 'trophy',
-    'core|t/backpack' => 'backpack',
-    'core|t/backup' => 'upload',
-    'core|t/block' => 'block',
-    'core|t/block_to_dock' => 'block_to_dock',
-    'core|t/block_to_dock_rtl' => 'dock_to_block',
-    'core|t/cache' => 'cache',
-    'core|t/calc' => 'calculator',
-    'core|t/calc_off' => 'calculator-off',
-    'core|t/calendar' => 'calendar',
-    'core|t/check' => 'check',
-    'core|t/cohort' => 'users',
-    'core|t/collapsed' => 'caret-right',
-    'core|t/collapsed_empty' => 'caret-right-disabled',
-    'core|t/collapsed_empty_rtl' => 'caret-left-disabled',
-    'core|t/collapsed_rtl' => 'caret-left',
-    'core|t/contextmenu' => 'bars',
-    'core|t/copy' => 'copy',
-    'core|t/delete' => 'times-danger',
-    'core|t/disable_down' => 'arrow-down',
-    'core|t/disable_up' => 'arrow-up',
-    'core|t/dock_to_block' => 'dock_to_block',
-    'core|t/dock_to_block_rtl' => 'block_to_dock',
-    'core|t/dockclose' => 'times-circle-o',
-    'core|t/down' => 'arrow-down',
-    'core|t/download' => 'download',
-    'core|t/dropdown' => 'caret-down',
-    'core|t/edit' => 'cog',
-    'core|t/edit_gray' => 'edit',
-    'core|t/edit_menu' => 'editmenu',
-    'core|t/editstring' => 'edit',
-    'core|t/email' => 'envelope-o',
-    'core|t/emailno' => 'no-email',
-    'core|t/enroladd' => 'plus',
-    'core|t/enrolusers' => 'user-plus',
-    'core|t/expanded' => 'caret-down',
-    'core|t/feedback' => 'comment-o',
-    'core|t/feedback_add' => 'add-feedback',
-    'core|t/go' => 'circle-success',
-    'core|t/grades' => 'grades',
-    'core|t/groupn' => 'no-groups',
-    'core|t/groups' => 'separate-groups',
-    'core|t/groupv' => 'users',
-    'core|t/hide' => 'eye-slash',
-    'core|t/left' => 'arrow-left',
-    'core|t/less' => 'minus',
-    'core|t/lock' => 'lock',
-    'core|t/locked' => 'lock',
-    'core|t/locktime' => 'clock-locked',
-    'core|t/log' => 'log',
-    'core|t/markasread' => 'check',
-    'core|t/mean' => 'mean',
-    'core|t/message' => 'comment',
-    'core|t/messages' => 'comments',
-    'core|t/more' => 'plus',
-    'core|t/move' => 'arrows-v',
-    'core|t/portfolioadd' => 'portfolio-add',
-    'core|t/preferences' => 'sliders',
-    'core|t/preview' => 'eye',
-    'core|t/print' => 'print',
-    'core|t/ranges' => 'ranges',
-    'core|t/recycle' => 'recycle',
-    'core|t/reload' => 'refresh',
-    'core|t/removecontact' => 'contact-remove',
-    'core|t/reset' => 'undo',
-    'core|t/restore' => 'download',
-    'core|t/right' => 'arrow-right',
-    'core|t/scales' => 'scales',
-    'core|t/show' => 'eye',
-    'core|t/sigma' => 'sigma',
-    'core|t/sigmaplus' => 'sigma-plus',
-    'core|t/sort' => 'sort',
-    'core|t/sort_asc' => 'sort-asc',
-    'core|t/sort_desc' => 'sort-desc',
-    'core|t/stop' => 'circle-danger',
-    'core|t/stop_gray' => 'circle-disabled',
-    'core|t/switch' => 'plus-square',
-    'core|t/switch_minus' => 'minus-square',
-    'core|t/switch_plus' => 'plus-square',
-    'core|t/switch_plus_rtl' => 'plus-square',
-    'core|t/switch_whole' => 'external-link-square',
-    'core|t/unblock' => 'check',
-    'core|t/unlock' => 'unlock',
-    'core|t/unlocked' => 'unlock-alt',
-    'core|t/up' => 'arrow-up',
-    'core|t/user' => 'user',
-    'core|t/usernot' => 'user-times',
-    'core|t/viewdetails' => 'eye',
-    'core|u/f1' => 'user-disabled',
-    'core|u/f2' => 'user-disabled',
-    'core|u/f3' => 'user-disabled',
-    'core|u/user100' => 'user-disabled',
-    'core|u/user35' => 'user-disabled',
-    'core|y/lm' => 'caret-down',
-    'core|y/loading' => 'spinner-pulse',
-    'core|y/lp' => 'caret-right',
-    'core|y/lp_rtl' => 'caret-left',
-    'core|y/tm' => 'caret-down',
-    'core|y/tp' => 'caret-right',
-    'core|y/tp_rtl' => 'caret-left',
+$defaults = array(
+    'template' => 'core/flex_icon',
 );
 
 /*
- * Map describes available flex icons.
+ * Translations array is expected to be used in plugins pix/flex_icons.php only.
+ *
+ * The data format is: array('mod_xxxx|someicon' => 'mapidentifier', 'mod_xxxx|otehricon' => 'mapidentifierx')
+ */
+$translations = array(
+    // NOTE: do not add anything here in core, use the $map instead!
+);
+
+/*
+ * Font icon map - this definition tells us how is each icon constructed.
+ *
+ * The identifiers in this core map are expected to be general
+ * shape descriptions not directly related to Totara.
+ *
+ * In plugins the map is used when plugin needs a completely new icon
+ * that is not defined here in core.
  */
 $map = array(
-    /* Do not use 'missing-flex-icon' directly, it indicates icon was not found */
-    'missing-flex-icon' =>
+    /* Do not use 'flex-icon-missing' directly, it indicates requested icon was not found */
+    'flex-icon-missing' =>
         array(
             'template' => 'core/flex_icon_stack',
             'data' =>
@@ -394,18 +65,6 @@ $map = array(
                         array(
                             'stack_first' => 'fa fa-question ft-stack-main',
                             'stack_second' => 'fa fa-exclamation ft-stack-suffix'
-                        ),
-                ),
-        ),
-    'add-feedback' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-comment-o ft-stack-main',
-                            'stack_second' => 'fa fa-plus ft-stack-suffix',
                         ),
                 ),
         ),
@@ -452,34 +111,6 @@ $map = array(
             'data' =>
                 array(
                     'classes' => 'ft ft-alfresco',
-                ),
-        ),
-    'align-center' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-align-center',
-                ),
-        ),
-    'align-justify' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-align-justify',
-                ),
-        ),
-    'align-left' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-align-left',
-                ),
-        ),
-    'align-right' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-align-right',
                 ),
         ),
     'archive' =>
@@ -571,18 +202,6 @@ $map = array(
                     'classes' => 'fa fa-arrows-v',
                 ),
         ),
-    'assign' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-file-text-o ft-stack-main',
-                            'stack_second' => 'fa fa-thumb-tack ft-stack-suffix ft-state-info',
-                        ),
-                ),
-        ),
     'asterisk' =>
         array(
             'data' =>
@@ -609,6 +228,13 @@ $map = array(
                     'classes' => 'ft ft-backpack',
                 ),
         ),
+    'ban' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa fa-ban',
+                ),
+        ),
     'bar-chart' =>
         array(
             'data' =>
@@ -630,25 +256,11 @@ $map = array(
                     'classes' => 'ft ft-blended',
                 ),
         ),
-    'block' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-ban',
-                ),
-        ),
     'block_to_dock' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa fa-caret-square-o-left',
-                ),
-        ),
-    'bold' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-bold',
                 ),
         ),
     'bookmark-o' =>
@@ -918,47 +530,11 @@ $map = array(
                     'classes' => 'fa fa-code',
                 ),
         ),
-    'code-risk' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-code ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
-                        ),
-                ),
-        ),
     'cog' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa fa-cog',
-                ),
-        ),
-    'cog-lock' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-cog ft-stack-main',
-                            'stack_second' => 'fa fa-lock ft-stack-suffix ft-state-danger',
-                        ),
-                ),
-        ),
-    'cogs-risk' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-cogs ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
-                        ),
                 ),
         ),
     'columns' =>
@@ -973,6 +549,18 @@ $map = array(
             'data' =>
                 array(
                     'classes' => 'fa fa-comment',
+                ),
+        ),
+    'comment-add-o' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-comment-o ft-stack-main',
+                            'stack_second' => 'fa fa-plus ft-stack-suffix',
+                        ),
                 ),
         ),
     'comment-o' =>
@@ -1001,6 +589,18 @@ $map = array(
             'data' =>
                 array(
                     'classes' => 'fa fa-comments-o',
+                ),
+        ),
+    'comments-search' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-comment ft-stack-main',
+                            'stack_second' => 'fa fa-search ft-stack-suffix',
+                        ),
                 ),
         ),
     'competency' =>
@@ -1046,11 +646,12 @@ $map = array(
                         ),
                 ),
         ),
-    'copy' =>
+    /* Totara course */
+    'course' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-copy',
+                    'classes' => 'fa fa-cube',
                 ),
         ),
     'course-completed' =>
@@ -1062,18 +663,6 @@ $map = array(
                         array(
                             'stack_first' => 'fa fa-cube ft-stack-main',
                             'stack_second' => 'fa fa-check ft-stack-suffix ft-state-success',
-                        ),
-                ),
-        ),
-    'course-event' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-cube ft-stack-main',
-                            'stack_second' => 'fa fa-clock-o ft-stack-suffix',
                         ),
                 ),
         ),
@@ -1096,13 +685,6 @@ $map = array(
                     'classes' => 'fa fa-cube',
                 ),
         ),
-    'cubes' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-cubes',
-                ),
-        ),
     'dash' =>
         array(
             'data' =>
@@ -1117,16 +699,12 @@ $map = array(
                     'classes' => 'fa fa-database',
                 ),
         ),
-    'database-risk' =>
+    /* General delete icon to be used for all delete actions */
+    'delete' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-database ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'fa fa-times ft-state-danger',
                 ),
         ),
     'dock_to_block' =>
@@ -1134,6 +712,30 @@ $map = array(
             'data' =>
                 array(
                     'classes' => 'fa fa-caret-square-o-right',
+                ),
+        ),
+    'document-edit' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-file-o ft-stack-main',
+                            'stack_second' => 'fa fa-pencil ft-stack-suffix',
+                        ),
+                ),
+        ),
+    'document-new' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-file-o ft-stack-main',
+                            'stack_second' => 'fa fa-plus ft-stack-suffix',
+                        ),
                 ),
         ),
     'document-properties' =>
@@ -1190,18 +792,6 @@ $map = array(
                     'classes' => 'fa fa-edit',
                 ),
         ),
-    'edit-document' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-file-o ft-stack-main',
-                            'stack_second' => 'fa fa-pencil ft-stack-suffix',
-                        ),
-                ),
-        ),
     'editmenu' =>
         array(
             'template' => 'core/flex_icon_stack',
@@ -1240,15 +830,39 @@ $map = array(
                     'classes' => 'fa fa-envelope-o',
                 ),
         ),
-    'envelope-risk' =>
+    'event-course' =>
         array(
             'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-envelope ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                            'stack_first' => 'fa fa-cube ft-stack-main',
+                            'stack_second' => 'fa fa-clock-o ft-stack-suffix',
+                        ),
+                ),
+        ),
+    'event-group' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-users ft-stack-main',
+                            'stack_second' => 'fa fa-clock-o ft-stack-suffix ft-state-info',
+                        ),
+                ),
+        ),
+    'event-user' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-user ft-stack-main',
+                            'stack_second' => 'fa fa-clock-o ft-stack-suffix ft-state-info',
                         ),
                 ),
         ),
@@ -1449,13 +1063,6 @@ $map = array(
                     'classes' => 'fa fa-folder-open-o',
                 ),
         ),
-    'font-info' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-font ft-state-info',
-                ),
-        ),
     'frown-o' =>
         array(
             'data' =>
@@ -1484,16 +1091,12 @@ $map = array(
                     'classes' => 'ft ft-grades',
                 ),
         ),
-    'group-event' =>
+    /* For links to Totara help */
+    'help' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-users ft-stack-main',
-                            'stack_second' => 'fa fa-clock-o ft-stack-suffix ft-state-info',
-                        ),
+                    'classes' => 'fa fa-question-circle',
                 ),
         ),
     'highlight' =>
@@ -1522,13 +1125,6 @@ $map = array(
             'data' =>
                 array(
                     'classes' => 'fa fa-info-circle',
-                ),
-        ),
-    'italic' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-italic',
                 ),
         ),
     'key' =>
@@ -1592,13 +1188,6 @@ $map = array(
             'data' =>
                 array(
                     'classes' => 'fa fa-list-ol',
-                ),
-        ),
-    'list-ul' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-list-ul',
                 ),
         ),
     'lock' =>
@@ -1690,23 +1279,11 @@ $map = array(
                     'classes' => 'fa fa-mouse-pointer',
                 ),
         ),
-    'new' =>
+    'new' => // Something recently added.
         array(
             'data' =>
                 array(
                     'classes' => 'ft ft-new',
-                ),
-        ),
-    'new-document' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-file-o ft-stack-main',
-                            'stack_second' => 'fa fa-plus ft-stack-suffix',
-                        ),
                 ),
         ),
     'newspaper-o' =>
@@ -1802,20 +1379,6 @@ $map = array(
             'data' =>
                 array(
                     'classes' => 'fa fa-paperclip',
-                ),
-        ),
-    'paragraph' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-paragraph',
-                ),
-        ),
-    'paste' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-paste',
                 ),
         ),
     'paypal' =>
@@ -1945,23 +1508,19 @@ $map = array(
                         ),
                 ),
         ),
-    'prevent-autolink' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-link ft-stack-main',
-                            'stack_second' => 'ft ft-slash ft-stack-over ft-state-danger',
-                        ),
-                ),
-        ),
     'print' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa fa-print',
+                ),
+        ),
+    /* Totara program */
+    'program' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa fa-cubes',
                 ),
         ),
     'publish' =>
@@ -2004,13 +1563,6 @@ $map = array(
                     'classes' => 'fa fa-question-circle ft-state-warning',
                 ),
         ),
-    'quote-left' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-quote-left',
-                ),
-        ),
     'ranges' =>
         array(
             'data' =>
@@ -2039,16 +1591,83 @@ $map = array(
                     'classes' => 'fa fa-repeat',
                 ),
         ),
-    'restore-draft' =>
+    'risk-config' =>
         array(
             'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-file-o ft-stack-main',
-                            'stack_second' => 'fa fa-undo ft-stack-suffix',
+                            'stack_first' => 'fa fa-cogs ft-stack-main',
+                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
                         ),
+                ),
+        ),
+    'risk-dataloss' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-database ft-stack-main',
+                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                        ),
+                ),
+        ),
+    'risk-managetrust' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-shield ft-stack-main',
+                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                        ),
+                ),
+        ),
+    'risk-personal' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-user ft-stack-main',
+                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                        ),
+                ),
+        ),
+    'risk-spam' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-envelope ft-stack-main',
+                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                        ),
+                ),
+        ),
+    'risk-xss' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-code ft-stack-main',
+                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                        ),
+                ),
+        ),
+    'rows' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa fa-bars',
                 ),
         ),
     'rss' =>
@@ -2086,18 +1705,6 @@ $map = array(
                     'classes' => 'fa fa-search',
                 ),
         ),
-    'search-comments' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-comment ft-stack-main',
-                            'stack_second' => 'fa fa-search ft-stack-suffix',
-                        ),
-                ),
-        ),
     'seminar' =>
         array(
             'data' =>
@@ -2117,23 +1724,31 @@ $map = array(
                         ),
                 ),
         ),
-    'share-square-o' =>
+    /* Settings or editing of stuff that changes how Totara works */
+    'settings' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-share-square-o',
+                    'classes' => 'fa fa-cog',
                 ),
         ),
-    'shield-risk' =>
+    'settings-lock' =>
         array(
             'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-shield ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                            'stack_first' => 'fa fa-cog ft-stack-main',
+                            'stack_second' => 'fa fa-lock ft-stack-suffix ft-state-danger',
                         ),
+                ),
+        ),
+    'share-square-o' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa fa-share-square-o',
                 ),
         ),
     'sigma' =>
@@ -2269,13 +1884,6 @@ $map = array(
                     'classes' => 'fa fa-star-o',
                 ),
         ),
-    'strikethrough' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-strikethrough',
-                ),
-        ),
     'subscribed' =>
         array(
             'template' => 'core/flex_icon_stack',
@@ -2286,20 +1894,6 @@ $map = array(
                             'stack_first' => 'fa fa-envelope-o ft-stack-main',
                             'stack_second' => 'fa fa-check ft-stack-suffix ft-state-success',
                         ),
-                ),
-        ),
-    'subscript' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-subscript',
-                ),
-        ),
-    'superscript' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-superscript',
                 ),
         ),
     'table' =>
@@ -2316,23 +1910,18 @@ $map = array(
                     'classes' => 'fa fa-tag',
                 ),
         ),
-    'text-color-picker' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-font ft-stack-main',
-                            'stack_second' => 'fa fa-eyedropper ft-stack-suffix',
-                        ),
-                ),
-        ),
     'th-large' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa fa-th-large',
+                ),
+        ),
+    'th-list' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa fa-th-list',
                 ),
         ),
     'thumbs-down-danger' =>
@@ -2384,6 +1973,13 @@ $map = array(
                     'classes' => 'fa fa-times ft-state-disabled',
                 ),
         ),
+    'toggle-off' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa fa-toggle-off',
+                ),
+        ),
     'toggle-on' =>
         array(
             'data' =>
@@ -2403,13 +1999,6 @@ $map = array(
             'data' =>
                 array(
                     'classes' => 'fa fa-trophy',
-                ),
-        ),
-    'underline' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-underline',
                 ),
         ),
     'undo' =>
@@ -2473,18 +2062,6 @@ $map = array(
                     'classes' => 'fa fa-user ft-state-disabled',
                 ),
         ),
-    'user-event' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-user ft-stack-main',
-                            'stack_second' => 'fa fa-clock-o ft-stack-suffix ft-state-info',
-                        ),
-                ),
-        ),
     'user-plus' =>
         array(
             'data' =>
@@ -2501,18 +2078,6 @@ $map = array(
                         array(
                             'stack_first' => 'fa fa-user ft-stack-main',
                             'stack_second' => 'fa fa-refresh ft-stack-suffix ft-state-info',
-                        ),
-                ),
-        ),
-    'user-risk' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'stack_first' => 'fa fa-user ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -2582,15 +2147,412 @@ $map = array(
 );
 
 /*
- * List of deprecated translations that will be removed in the next release.
+ * Translation of old pix icon names to flex icon identifiers.
+ *
+ * The old core pix icon name format is "core|originalpixpath"
+ * similar to the old pix placeholders in CSS.
+ *
+ * This information allows the pix_icon renderer
+ * to automatically return the new flex icon markup.
+ *
+ * All referenced identifiers must be present in the $map.
+ *
+ * Note that plugins are using the same identifier format
+ * for $translations, $deprecated and $map "plugintype_pluginname|icon".
  */
 $deprecated = array(
+    'core|a/add_file' => 'document-new',
+    'core|a/create_folder' => 'folder-create',
+    'core|a/download_all' => 'download',
+    'core|a/help' => 'help',
+    'core|a/logout' => 'sign-out',
+    'core|a/refresh' => 'refresh',
+    'core|a/search' => 'search',
+    'core|a/setting' => 'settings',
+    'core|a/view_icon_active' => 'th-large',
+    'core|a/view_list_active' => 'th-list',
+    'core|a/view_tree_active' => 'viewtreeactive',
+    'core|b/bookmark-new' => 'bookmark-o',
+    'core|b/document-edit' => 'document-edit',
+    'core|b/document-new' => 'document-new',
+    'core|b/document-properties' => 'document-properties',
+    'core|b/edit-copy' => 'copy',
+    'core|b/edit-delete' => 'delete',
+    'core|c/event' => 'calendar',
+    'core|docs' => 'info-circle',
+    'core|f/archive' => 'box-alt',
+    'core|f/audio' => 'volume-up',
+    'core|f/avi' => 'film',
+    'core|f/base' => 'database',
+    'core|f/bmp' => 'file-image-o',
+    'core|f/chart' => 'bar-chart',
+    'core|f/database' => 'database',
+    'core|f/dmg' => 'file-archive-o',
+    'core|f/document' => 'file-text-o',
+    'core|f/edit' => 'pencil-square-o',
+    'core|f/eps' => 'file-image-o',
+    'core|f/epub' => 'ebook',
+    'core|f/explore' => 'explore',
+    'core|f/flash' => 'file-video-o',
+    'core|f/folder' => 'folder-o',
+    'core|f/folder-open' => 'folder-open-o',
+    'core|f/gif' => 'file-image-o',
+    'core|f/help-32' => 'help',
+    'core|f/html' => 'file-code-o',
+    'core|f/image' => 'file-image-o',
+    'core|f/jpeg' => 'file-image-o',
+    'core|f/markup' => 'file-code-o',
+    'core|f/mov' => 'file-video-o',
+    'core|f/move' => 'arrows',
+    'core|f/mp3' => 'file-sound-o',
+    'core|f/mpeg' => 'file-video-o',
+    'core|f/parent-32' => 'level-up',
+    'core|f/pdf' => 'file-pdf-o',
+    'core|f/png' => 'file-image-o',
+    'core|f/powerpoint' => 'file-powerpoint-o',
+    'core|f/psd' => 'file-image-o',
+    'core|f/quicktime' => 'file-video-o',
+    'core|f/sourcecode' => 'file-code-o',
+    'core|f/spreadsheet' => 'file-excel-o',
+    'core|f/text' => 'file-text-o',
+    'core|f/tiff' => 'file-image-o',
+    'core|f/unknown' => 'file-o',
+    'core|f/video' => 'file-video-o',
+    'core|f/wav' => 'file-sound-o',
+    'core|f/wmv' => 'file-video-o',
+    'core|g/f1' => 'smile-o',
+    'core|g/f2' => 'smile-o',
+    'core|help' => 'help',
+    'core|i/admin' => 'settings',
+    'core|i/agg_mean' => 'mean',
+    'core|i/agg_sum' => 'sigma',
+    'core|i/ajaxloader' => 'spinner-pulse',
+    'core|i/assignroles' => 'user-plus',
+    'core|i/backup' => 'upload',
+    'core|i/badge' => 'trophy',
+    'core|i/calc' => 'calculator',
+    'core|i/calendar' => 'calendar',
+    'core|i/caution' => 'exclamation-circle',
+    'core|i/checkpermissions' => 'check-permissions',
+    'core|i/closed' => 'folder-o',
+    'core|i/cohort' => 'users',
+    'core|i/completion-auto-enabled' => 'auto-completion-on',
+    'core|i/completion-auto-fail' => 'times-circle-o-danger',
+    'core|i/completion-auto-n' => 'circle-o',
+    'core|i/completion-auto-pass' => 'check-circle-o-success',
+    'core|i/completion-auto-y' => 'check-circle-o',
+    'core|i/completion-manual-enabled' => 'manual-completion-on',
+    'core|i/completion-manual-n' => 'square-o',
+    'core|i/completion-manual-y' => 'check-square-o',
+    'core|i/configlock' => 'settings-lock',
+    'core|i/course' => 'course',
+    'core|i/courseevent' => 'event-course',
+    'core|i/db' => 'database',
+    'core|i/delete' => 'delete',
+    'core|i/down' => 'arrow-down',
+    'core|i/dragdrop' => 'arrows',
+    'core|i/dropdown' => 'caret-down',
+    'core|i/edit' => 'edit',
+    'core|i/email' => 'envelope-o',
+    'core|i/enrolmentsuspended' => 'enrolment-suspended',
+    'core|i/enrolusers' => 'user-plus',
+    'core|i/export' => 'upload',
+    'core|i/feedback' => 'comment-o',
+    'core|i/feedback_add' => 'comment-add-o',
+    'core|i/files' => 'file-o',
+    'core|i/filter' => 'filter',
+    'core|i/flagged' => 'flag',
+    'core|i/folder' => 'folder-o',
+    'core|i/grade_correct' => 'check-success',
+    'core|i/grade_incorrect' => 'times-danger',
+    'core|i/grade_partiallycorrect' => 'check-warning',
+    'core|i/grades' => 'grades',
+    'core|i/group' => 'users',
+    'core|i/groupevent' => 'event-group',
+    'core|i/groupn' => 'no-groups',
+    'core|i/groups' => 'separate-groups',
+    'core|i/groupv' => 'users',
+    'core|i/guest' => 'user-secret',
+    'core|i/hide' => 'eye-slash',
+    'core|i/hierarchylock' => 'site-lock',
+    'core|i/import' => 'download',
+    'core|i/info' => 'info-circle',
+    'core|i/invalid' => 'times-danger',
+    'core|i/key' => 'key',
+    'core|i/loading' => 'spinner-pulse',
+    'core|i/loading_small' => 'spinner-pulse',
+    'core|i/lock' => 'lock',
+    'core|i/log' => 'log',
+    'core|i/mahara_host' => 'mahara',
+    'core|i/manual_item' => 'edit',
+    'core|i/marked' => 'lightbulb-o',
+    'core|i/marker' => 'lightbulb-o-disabled',
+    'core|i/mean' => 'mean',
+    'core|i/menu' => 'bars',
+    'core|i/mnethost' => 'mnet-host',
+    'core|i/moodle_host' => 'moodle',
+    'core|i/move_2d' => 'arrows',
+    'core|i/new' => 'new',
+    'core|i/news' => 'newspaper-o',
+    'core|i/nosubcat' => 'no-subcategory',
+    'core|i/open' => 'folder-open-o',
+    'core|i/outcomes' => 'pie-chart',
+    'core|i/payment' => 'dollar',
+    'core|i/permissionlock' => 'permission-lock',
+    'core|i/permissions' => 'permissions',
+    'core|i/portfolio' => 'portfolio',
+    'core|i/preview' => 'eye',
+    'core|i/publish' => 'publish',
+    'core|i/questions' => 'question',
+    'core|i/reload' => 'refresh',
+    'core|i/report' => 'file-text-o',
+    'core|i/repository' => 'database',
+    'core|i/restore' => 'download',
+    'core|i/return' => 'undo',
+    'core|i/risk_config' => 'risk-config',
+    'core|i/risk_dataloss' => 'risk-dataloss',
+    'core|i/risk_managetrust' => 'risk-managetrust',
+    'core|i/risk_personal' => 'risk-personal',
+    'core|i/risk_spam' => 'risk-spam',
+    'core|i/risk_xss' => 'risk-xss',
+    'core|i/rss' => 'rss',
+    'core|i/scales' => 'scales',
+    'core|i/scheduled' => 'clock-o',
+    'core|i/search' => 'search',
+    'core|i/self' => 'user',
+    'core|i/settings' => 'settings',
+    'core|i/show' => 'eye',
+    'core|i/siteevent' => 'calendar',
+    'core|i/star-rating' => 'star-half-o',
+    'core|i/stats' => 'line-chart',
+    'core|i/switch' => 'toggle-on',
+    'core|i/switchrole' => 'user-refresh',
+    'core|i/twoway' => 'arrows-h',
+    'core|i/unflagged' => 'flag-o',
+    'core|i/unlock' => 'unlock',
+    'core|i/up' => 'arrow-up',
+    'core|i/user' => 'user',
+    'core|i/useradd' => 'user-plus',
+    'core|i/userdel' => 'user-times',
+    'core|i/userevent' => 'event-user',
+    'core|i/users' => 'users',
+    'core|i/valid' => 'check-success',
+    'core|i/warning' => 'warning-warning',
+    'core|i/withsubcat' => 'viewtreeactive',
+    'core|m/USD' => 'dollar',
+    'core|req' => 'asterisk',
+    'core|spacer' => 'spacer',
+    'core|t/add' => 'plus',
+    'core|t/addcontact' => 'contact-add',
+    'core|t/adddir' => 'folder-create',
+    'core|t/addfile' => 'document-new',
+    'core|t/approve' => 'check',
+    'core|t/assignroles' => 'user-plus',
+    'core|t/award' => 'trophy',
+    'core|t/backpack' => 'backpack',
+    'core|t/backup' => 'upload',
+    'core|t/block' => 'ban',
+    'core|t/block_to_dock' => 'block_to_dock',
+    'core|t/block_to_dock_rtl' => 'dock_to_block',
+    'core|t/cache' => 'cache',
+    'core|t/calc' => 'calculator',
+    'core|t/calc_off' => 'calculator-off',
+    'core|t/calendar' => 'calendar',
+    'core|t/check' => 'check',
+    'core|t/cohort' => 'users',
+    'core|t/collapsed' => 'caret-right',
+    'core|t/collapsed_empty' => 'caret-right-disabled',
+    'core|t/collapsed_empty_rtl' => 'caret-left-disabled',
+    'core|t/collapsed_rtl' => 'caret-left',
+    'core|t/contextmenu' => 'bars',
+    'core|t/copy' => 'copy',
+    'core|t/delete' => 'delete',
+    'core|t/disable_down' => 'arrow-down',
+    'core|t/disable_up' => 'arrow-up',
+    'core|t/dock_to_block' => 'dock_to_block',
+    'core|t/dock_to_block_rtl' => 'block_to_dock',
+    'core|t/dockclose' => 'times-circle-o',
+    'core|t/down' => 'arrow-down',
+    'core|t/download' => 'download',
+    'core|t/dropdown' => 'caret-down',
+    'core|t/edit' => 'settings',
+    'core|t/edit_gray' => 'edit',
+    'core|t/edit_menu' => 'editmenu',
+    'core|t/editstring' => 'edit',
+    'core|t/email' => 'envelope-o',
+    'core|t/emailno' => 'no-email',
+    'core|t/enroladd' => 'plus',
+    'core|t/enrolusers' => 'user-plus',
+    'core|t/expanded' => 'caret-down',
+    'core|t/feedback' => 'comment-o',
+    'core|t/feedback_add' => 'comment-add-o',
+    'core|t/go' => 'circle-success',
+    'core|t/grades' => 'grades',
+    'core|t/groupn' => 'no-groups',
+    'core|t/groups' => 'separate-groups',
+    'core|t/groupv' => 'users',
+    'core|t/hide' => 'eye-slash',
+    'core|t/left' => 'arrow-left',
+    'core|t/less' => 'minus',
+    'core|t/lock' => 'lock',
+    'core|t/locked' => 'lock',
+    'core|t/locktime' => 'clock-locked',
+    'core|t/log' => 'log',
+    'core|t/markasread' => 'check',
+    'core|t/mean' => 'mean',
+    'core|t/message' => 'comment',
+    'core|t/messages' => 'comments',
+    'core|t/more' => 'plus',
+    'core|t/move' => 'arrows-v',
+    'core|t/portfolioadd' => 'portfolio-add',
+    'core|t/preferences' => 'sliders',
+    'core|t/preview' => 'eye',
+    'core|t/print' => 'print',
+    'core|t/ranges' => 'ranges',
+    'core|t/recycle' => 'recycle',
+    'core|t/reload' => 'refresh',
+    'core|t/removecontact' => 'contact-remove',
+    'core|t/reset' => 'undo',
+    'core|t/restore' => 'download',
+    'core|t/right' => 'arrow-right',
+    'core|t/scales' => 'scales',
+    'core|t/show' => 'eye',
+    'core|t/sigma' => 'sigma',
+    'core|t/sigmaplus' => 'sigma-plus',
+    'core|t/sort' => 'sort',
+    'core|t/sort_asc' => 'sort-asc',
+    'core|t/sort_desc' => 'sort-desc',
+    'core|t/stop' => 'circle-danger',
+    'core|t/stop_gray' => 'circle-disabled',
+    'core|t/switch' => 'plus-square',
+    'core|t/switch_minus' => 'minus-square',
+    'core|t/switch_plus' => 'plus-square',
+    'core|t/switch_plus_rtl' => 'plus-square',
+    'core|t/switch_whole' => 'external-link-square',
+    'core|t/unblock' => 'check',
+    'core|t/unlock' => 'unlock',
+    'core|t/unlocked' => 'unlock-alt',
+    'core|t/up' => 'arrow-up',
+    'core|t/user' => 'user',
+    'core|t/usernot' => 'user-times',
+    'core|t/viewdetails' => 'eye',
+    'core|u/f1' => 'user-disabled',
+    'core|u/f2' => 'user-disabled',
+    'core|u/f3' => 'user-disabled',
+    'core|u/user100' => 'user-disabled',
+    'core|u/user35' => 'user-disabled',
+    'core|y/lm' => 'caret-down',
+    'core|y/loading' => 'spinner-pulse',
+    'core|y/lp' => 'caret-right',
+    'core|y/lp_rtl' => 'caret-left',
+    'core|y/tm' => 'caret-down',
+    'core|y/tp' => 'caret-right',
+    'core|y/tp_rtl' => 'caret-left',
 );
 
 /*
- * Default values for the all $map arrays from all plugins, core and themes.
- * This can be overridden in themes only.
+ * Pix only images are not supposed to be converted to flex icons.
+ *
+ * - e/xxx pix icons should be used by Atto and TinyMCE editors that do not support flex icons
+ *
  */
-$defaults = array(
-    'template' => 'core/flex_icon',
+$pixonlyimages = array(
+    'e/abbr',
+    'e/absolute',
+    'e/accessibility_checker',
+    'e/acronym',
+    'e/advance_hr',
+    'e/align_center',
+    'e/align_left',
+    'e/align_right',
+    'e/anchor',
+    'e/backward',
+    'e/bold',
+    'e/bullet_list',
+    'e/cell_props',
+    'e/cite',
+    'e/cleanup_messy_code',
+    'e/clear_formatting',
+    'e/copy',
+    'e/cut',
+    'e/decrease_indent',
+    'e/delete',
+    'e/delete_col',
+    'e/delete_row',
+    'e/delete_table',
+    'e/document_properties',
+    'e/emoticons',
+    'e/find_replace',
+    'e/forward',
+    'e/fullpage',
+    'e/fullscreen',
+    'e/help',
+    'e/increase_indent',
+    'e/insert',
+    'e/insert_col_after',
+    'e/insert_col_before',
+    'e/insert_date',
+    'e/insert_edit_image',
+    'e/insert_edit_link',
+    'e/insert_edit_video',
+    'e/insert_file',
+    'e/insert_horizontal_ruler',
+    'e/insert_nonbreaking_space',
+    'e/insert_page_break',
+    'e/insert_row_after',
+    'e/insert_row_before',
+    'e/insert_time',
+    'e/italic',
+    'e/justify',
+    'e/layers',
+    'e/layers_over',
+    'e/layers_under',
+    'e/left_to_right',
+    'e/manage_files',
+    'e/math',
+    'e/merge_cells',
+    'e/new_document',
+    'e/numbered_list',
+    'e/page_break',
+    'e/paste',
+    'e/paste_text',
+    'e/paste_word',
+    'e/prevent_autolink',
+    'e/preview',
+    'e/print',
+    'e/question',
+    'e/redo',
+    'e/remove_link',
+    'e/remove_page_break',
+    'e/resize',
+    'e/restore_draft',
+    'e/restore_last_draft',
+    'e/right_to_left',
+    'e/row_props',
+    'e/save',
+    'e/screenreader_helper',
+    'e/search',
+    'e/select_all',
+    'e/show_invisible_characters',
+    'e/source_code',
+    'e/special_character',
+    'e/spellcheck',
+    'e/split_cells',
+    'e/strikethrough',
+    'e/styleprops',
+    'e/subscript',
+    'e/superscript',
+    'e/table',
+    'e/table_props',
+    'e/template',
+    'e/text_color',
+    'e/text_color_picker',
+    'e/text_highlight',
+    'e/text_highlight_picker',
+    'e/tick',
+    'e/toggle_blockquote',
+    'e/underline',
+    'e/undo',
+    'e/visual_aid',
+    'e/visual_blocks',
 );

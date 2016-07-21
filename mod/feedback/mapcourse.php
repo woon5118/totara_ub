@@ -138,7 +138,7 @@ if ($coursemap = feedback_get_courses_from_sitecourse_map($feedback->id)) {
         $cmapfullname = format_string($cmap->fullname, true, array('context' => $coursecontext));
         $unmapurl->params(array('id'=>$id, 'cmapid'=>$cmap->id));
         $anker = '<a href="'.$unmapurl->out().'">';
-        $anker .= $OUTPUT->flex_icon('times-danger', array ('alt' => get_string('delete')));
+        $anker .= $OUTPUT->flex_icon('delete', array ('alt' => get_string('delete')));
         $anker .= '</a>';
         $table->add_data(array($anker.' ('.$cmapshortname.') '.$cmapfullname));
     }

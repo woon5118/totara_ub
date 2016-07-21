@@ -17,42 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author  Joby Harding <joby.harding@totaralms.com>
  * @author  Petr Skoda <petr.skoda@totaralms.com>
- * @package mod_book
+ * @package theme_base
  */
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-/*
- * Unique book icons.
- */
-$map = array(
-    'mod_book|icon' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa fa-book',
-                ),
-        ),
-    'mod_book|chapter' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft ft-book-open',
-                ),
-        ),
-);
-
-/*
- * These deprecated icons should not be used anymore.
- */
-$deprecated = array(
-    'mod_book|nav_exit' => 'caret-up',
-    'mod_book|nav_next' => 'caret-right',
-    'mod_book|nav_next_dis' => 'caret-right-disabled',
-    'mod_book|nav_prev' => 'caret-left',
-    'mod_book|nav_prev_dis' => 'caret-left-disabled',
-    'mod_book|nav_sep' => 'pipe',
-    'mod_book|add' => 'plus',
+/* Pix only images are not supposed to be converted to flex icons. */
+$pixonlyimages = array(
+    'screenshot',
 );

@@ -727,22 +727,22 @@ function certificate_get_images($type) {
 
     switch($type) {
         case CERT_IMAGE_BORDER :
-            $path = "$CFG->dirroot/mod/certificate/pix/borders";
+            $path = "$CFG->dirroot/mod/certificate/pdfresources/borders";
             $uploadpath = "$CFG->dataroot/mod/certificate/pix/borders";
             $imagetype = 'border';
             break;
         case CERT_IMAGE_SEAL :
-            $path = "$CFG->dirroot/mod/certificate/pix/seals";
+            $path = "$CFG->dirroot/mod/certificate/pdfresources/seals";
             $uploadpath = "$CFG->dataroot/mod/certificate/pix/seals";
             $imagetype = 'seal';
             break;
         case CERT_IMAGE_SIGNATURE :
-            $path = "$CFG->dirroot/mod/certificate/pix/signatures";
+            $path = "$CFG->dirroot/mod/certificate/pdfresources/signatures";
             $uploadpath = "$CFG->dataroot/mod/certificate/pix/signatures";
             $imagetype = 'signature';
             break;
         case CERT_IMAGE_WATERMARK :
-            $path = "$CFG->dirroot/mod/certificate/pix/watermarks";
+            $path = "$CFG->dirroot/mod/certificate/pdfresources/watermarks";
             $uploadpath = "$CFG->dataroot/mod/certificate/pix/watermarks";
             $imagetype = 'watermark';
             break;
@@ -1172,25 +1172,25 @@ function certificate_print_image($pdf, $certificate, $type, $x, $y, $w, $h) {
             $attr = 'borderstyle';
             $name = $certificate->borderstyle;
             $filetype = 'border';
-            $path = "$CFG->dirroot/mod/certificate/pix/$type/$certificate->borderstyle";
+            $path = "$CFG->dirroot/mod/certificate/pdfresources/$type/$certificate->borderstyle";
             break;
         case CERT_IMAGE_SEAL :
             $attr = 'printseal';
             $name = $certificate->printseal;
             $filetype = 'seal';
-            $path = "$CFG->dirroot/mod/certificate/pix/$type/$certificate->printseal";
+            $path = "$CFG->dirroot/mod/certificate/pdfresources/$type/$certificate->printseal";
             break;
         case CERT_IMAGE_SIGNATURE :
             $attr = 'printsignature';
             $name = $certificate->printsignature;
             $filetype = 'signature';
-            $path = "$CFG->dirroot/mod/certificate/pix/$type/$certificate->printsignature";
+            $path = "$CFG->dirroot/mod/certificate/pdfresources/$type/$certificate->printsignature";
             break;
         case CERT_IMAGE_WATERMARK :
             $attr = 'printwmark';
             $name = $certificate->printwmark;
             $filetype = 'watermark';
-            $path = "$CFG->dirroot/mod/certificate/pix/$type/$certificate->printwmark";
+            $path = "$CFG->dirroot/mod/certificate/pdfresources/$type/$certificate->printwmark";
             break;
     }
     // Has to be valid

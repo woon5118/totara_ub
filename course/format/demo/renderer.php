@@ -154,7 +154,7 @@ class format_demo_renderer extends format_section_renderer_base {
         $context = context_course::instance($course->id);
         if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $context)) {
             $url = new moodle_url('/course/editsection.php', array('id'=>$section->id, 'sr'=>$sectionreturn));
-            $output .= html_writer::link($url, $this->flex_icon('cog', array('alt' => get_string('edit'))));
+            $output .= html_writer::link($url, $this->flex_icon('settings', array('alt' => get_string('edit'))));
         }
         $output .= html_writer::end_tag('div');
         $output .= $this->section_availability_message($section, has_capability('moodle/course:viewhiddensections', $context));

@@ -654,7 +654,7 @@ function calendar_add_event_metadata($event) {
         $event->icon = $OUTPUT->flex_icon('calendar', array('alt' => get_string('globalevent', 'calendar')));
         $event->cssclass = 'calendar_event_global';
     } else if($event->courseid != 0 && $event->courseid != SITEID && $event->groupid == 0) {          // Course event
-        $event->icon = $OUTPUT->flex_icon('course-event', array('alt' => get_string('courseevent', 'calendar')));
+        $event->icon = $OUTPUT->flex_icon('event-course', array('alt' => get_string('courseevent', 'calendar')));
         $event->courselink = calendar_get_courselink($event->courseid);
         $event->cssclass = 'calendar_event_course';
     } else if ($event->groupid) {                                    // Group event
@@ -663,11 +663,11 @@ function calendar_add_event_metadata($event) {
         } else {
             $groupname = '';
         }
-        $event->icon = $OUTPUT->flex_icon('group-event', array('alt' => get_string('groupevent', 'calendar')));
+        $event->icon = $OUTPUT->flex_icon('event-group', array('alt' => get_string('groupevent', 'calendar')));
         $event->courselink = calendar_get_courselink($event->courseid) . ', ' . $groupname;
         $event->cssclass = 'calendar_event_group';
     } else if($event->userid) {                                      // User event
-        $event->icon = $OUTPUT->flex_icon('user-event', array('alt' => get_string('userevent', 'calendar')));
+        $event->icon = $OUTPUT->flex_icon('event-user', array('alt' => get_string('userevent', 'calendar')));
         $event->cssclass = 'calendar_event_user';
     }
     return $event;

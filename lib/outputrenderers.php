@@ -1853,9 +1853,7 @@ class core_renderer extends renderer_base {
      * @return string HTML fragment
      */
     protected function render_pix_emoticon(pix_emoticon $emoticon) {
-        $attributes = $emoticon->attributes;
-        $attributes['src'] = $this->pix_url($emoticon->pix, $emoticon->component);
-        return html_writer::empty_tag('img', $attributes);
+        return $this->render_pix_icon($emoticon);
     }
 
     /**
@@ -2068,8 +2066,7 @@ class core_renderer extends renderer_base {
             $alt = get_string('helpwiththis');
         }
 
-        $attributes = array('src'=>$src, 'alt'=>$alt, 'class'=>'iconhelp');
-        $output = html_writer::empty_tag('img', $attributes);
+        $output = $this->flex_icon('help', array('alt' => $alt, 'classes' => 'iconhelp'));
 
         // add the link text if given
         if (!empty($helpicon->linktext)) {

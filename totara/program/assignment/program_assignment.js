@@ -931,7 +931,7 @@ function item(category, element, isexistingitem) {
                         self.completionlink.parent().append(newlink);
 
                         require(['core/templates'], function (templates) {
-                            templates.renderFlexIcon('times-danger', M.util.get_string('removecompletiondate', 'totara_program')).done(function (html) {
+                            templates.renderFlexIcon('delete', M.util.get_string('removecompletiondate', 'totara_program')).done(function (html) {
                                 newlink.html(html);
                             });
                         });

@@ -389,7 +389,7 @@ if ($do_show == 'edit') {
 
             $buttonlink = $deleteitemurl->out();
             $strbutton = get_string('delete_item', 'feedback');
-            $icon = $OUTPUT->flex_icon('times-danger', array ('alt' => $strbutton));
+            $icon = $OUTPUT->flex_icon('delete', array ('alt' => $strbutton));
             echo '<a class="icon delete" title="'.$strbutton.'" href="'.$buttonlink.'">' . $icon .'</a>';
             echo '</span>';
             echo $OUTPUT->box_end();

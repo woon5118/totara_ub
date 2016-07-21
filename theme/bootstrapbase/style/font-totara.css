@@ -552,37 +552,6 @@
 }
 
 .ft-spacer {
-    display: inline-block;
-    width: 13px;
-    height: 13px;
-}
-.ft-spacer-100 {
-    width: 14px;
-    height: 14px;
-}
-.ft-spacer-200 {
-    width: 16px;
-    height: 16px;
-}
-.ft-spacer-300 {
-    width: 20px;
-    height: 20px;
-}
-.ft-spacer-400 {
-    width: 24px;
-    height: 24px;
-}
-.ft-spacer-500 {
-    width: 28px;
-    height: 28px;
-}
-.ft-spacer-600 {
-    width: 32px;
-    height: 32px;
-}
-.ft-spacer-700 {
-    width: 38px;
-    height: 38px;
 }
 
 .filemanager .flex-icon {

@@ -64,7 +64,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             iconscache.push(templates.renderFlexIcon('spinner-pulse', M.util.get_string('saving', 'totara_reportbuilder')));
             iconscache.push(templates.renderFlexIcon('eye', M.util.get_string('hide', 'totara_reportbuilder')));
             iconscache.push(templates.renderFlexIcon('eye-slash', M.util.get_string('show', 'totara_reportbuilder')));
-            iconscache.push(templates.renderFlexIcon('times-danger', M.util.get_string('delete', 'totara_reportbuilder')));
+            iconscache.push(templates.renderFlexIcon('delete', M.util.get_string('delete', 'totara_reportbuilder')));
             iconscache.push(templates.renderFlexIcon('arrow-up', M.util.get_string('moveup', 'totara_reportbuilder')));
             iconscache.push(templates.renderFlexIcon('arrow-down', M.util.get_string('movedown', 'totara_reportbuilder')));
             iconscache.push(templates.renderFlexIcon('spacer'));

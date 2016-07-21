@@ -237,7 +237,7 @@ function display_selected_cohort_item($cohort, $filtername) {
                                                'data-id' => $cohort->id,
                                                'class' => 'multiselect-selected-item'));
     $out .= format_string($cohort->name);
-    $deleteicon = $OUTPUT->flex_icon('times-danger');
+    $deleteicon = $OUTPUT->flex_icon('delete');
     $out .= html_writer::link('#', $deleteicon, array('title' => $strdelete));
     $out .= html_writer::end_tag('div');
     return $out;

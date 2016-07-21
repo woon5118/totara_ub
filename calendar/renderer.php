@@ -282,11 +282,11 @@ class core_calendar_renderer extends plugin_renderer_base {
 
             $commands  = html_writer::start_tag('div', array('class'=>'commands'));
             $commands .= html_writer::start_tag('a', array('href'=>$editlink));
-            $commands .= $this->flex_icon('cog', array('alt' => get_string('tt_editevent', 'calendar')));
+            $commands .= $this->flex_icon('settings', array('alt' => get_string('tt_editevent', 'calendar')));
             $commands .= html_writer::end_tag('a');
             if ($deletelink != null) {
                 $commands .= html_writer::start_tag('a', array('href'=>$deletelink));
-                $commands .= $this->flex_icon('times-danger', array('alt' =>get_string('tt_deleteevent', 'calendar')));
+                $commands .= $this->flex_icon('delete', array('alt' =>get_string('tt_deleteevent', 'calendar')));
                 $commands .= html_writer::end_tag('a');
             }
             $commands .= html_writer::end_tag('div');

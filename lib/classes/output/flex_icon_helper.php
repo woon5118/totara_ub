@@ -41,7 +41,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package   core
  */
 class flex_icon_helper {
-    const MISSING_ICON = 'missing-flex-icon';
+    const MISSING_ICON = 'flex-icon-missing';
 
     /**
      * Resolve translation, deprecated, defaults and map
@@ -106,11 +106,59 @@ class flex_icon_helper {
                 // Nothing to map to.
                 continue;
             }
+            if (!empty($iconsdata['map'][$identifierto]['translatesto'])) {
+                // Always link the original.
+                $identifierto = $iconsdata['map'][$identifierto]['translatesto'];
+            }
             $iconsdata['map'][$identifierfrom] = $iconsdata['map'][$identifierto];
+            $iconsdata['map'][$identifierfrom]['translatesto'] = $identifierto;
             $iconsdata['map'][$identifierfrom]['deprecated'] = true;
         }
 
         return $iconsdata['map'];
+    }
+
+    public static function get_ajax_data($themename) {
+        $icons = self::get_icons($themename);
+
+        $templates = array();
+        $ti = 0;
+
+        $datas = array();
+        $di = 0;
+
+        foreach ($icons as $identifier => $desc) {
+            if (!empty($desc['translatesto'])) {
+                continue;
+            }
+            $icon = array();
+
+            $template = $desc['template'];
+            if (!isset($templates[$template])) {
+                $templates[$template] = $ti;
+                $ti++;
+            }
+            $icon[0] = $templates[$template];
+
+            $datas[$di] = $desc['data'];
+            $icon[1] = $di;
+            $di++;
+
+            $icons[$identifier] = $icon;
+        }
+
+        foreach ($icons as $identifier => $desc) {
+            if (empty($desc['translatesto'])) {
+                continue;
+            }
+            $icons[$identifier] = $icons[$desc['translatesto']];
+        }
+
+        return array(
+            'templates' => array_flip($templates),
+            'datas' => $datas,
+            'icons' => $icons,
+        );
     }
 
     /**

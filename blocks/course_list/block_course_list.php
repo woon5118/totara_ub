@@ -46,7 +46,7 @@ class block_course_list extends block_list {
         $this->content->icons = array();
         $this->content->footer = '';
 
-        $icon  = $OUTPUT->flex_icon('cube');
+        $icon  = $OUTPUT->flex_icon('course');
 
         $adminseesall = true;
         if (isset($CFG->block_course_list_adminview)) {

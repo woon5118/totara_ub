@@ -414,7 +414,7 @@ class mod_lesson_renderer extends plugin_renderer_base {
         $url = new moodle_url('/mod/lesson/lesson.php',
                 array('id' => $this->page->cm->id, 'action' => 'confirmdelete', 'pageid' => $page->id, 'sesskey' => sesskey()));
         $label = get_string('deletepagenamed', 'lesson', format_string($page->title));
-        $img = $this->output->flex_icon('times-danger', array('alt' => $label));
+        $img = $this->output->flex_icon('delete', array('alt' => $label));
         $actions[] = html_writer::link($url, $img, array('title' => $label));
 
         if ($printaddpage) {

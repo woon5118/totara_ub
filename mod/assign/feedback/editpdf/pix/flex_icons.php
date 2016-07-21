@@ -26,7 +26,7 @@
 
 $translations = array(
     'assignfeedback_editpdf|comment' => 'comment',
-    'assignfeedback_editpdf|comment_search' => 'search-comments',
+    'assignfeedback_editpdf|comment_search' => 'comments-search',
     'assignfeedback_editpdf|cross' => 'times-danger',
     'assignfeedback_editpdf|highlight' => 'highlight',
     'assignfeedback_editpdf|line' => 'slash',

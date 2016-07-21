@@ -187,12 +187,12 @@ class core_files_renderer extends plugin_renderer_base {
         $strdndenabledinbox = get_string('dndenabled_inbox', 'moodle');
 
         $icons = array(
-            'add_file' => $this->output->flex_icon('new-document', ['alt' => get_string('addfiletext', 'repository')]),
+            'add_file' => $this->output->flex_icon('document-new', ['alt' => get_string('addfiletext', 'repository')]),
             'create_folder' => $this->output->flex_icon('folder-create', ['alt' => get_string('createfolder', 'repository')]),
             'download_all' => $this->output->flex_icon('download', ['alt' => get_string('downloadallfiles', 'repository')]),
             'loading_small' => $this->output->flex_icon('spinner-pulse', ['classes' => 'fp-img-downloading']),
             'view_icon_active' => $this->output->flex_icon('th-large', ['alt' => get_string('displayasicons', 'repository')]),
-            'view_list_active' => $this->output->flex_icon('align-justify', ['alt' => get_string('displayasdetails', 'repository')]),
+            'view_list_active' => $this->output->flex_icon('th-list', ['alt' => get_string('displayasdetails', 'repository')]),
             'view_tree_active' => $this->output->flex_icon('viewtreeactive', ['alt' => get_string('displayastree', 'repository')]),
             'progress' => $this->output->flex_icon('spinner-pulse', ['alt' => get_string('loading', 'repository')])
         );
@@ -586,10 +586,10 @@ class core_files_renderer extends plugin_renderer_base {
                         <a title="'. get_string('logout', 'repository') .'" href="#">'.$this->output->flex_icon('sign-out').'</a>
                     </div>
                     <div class="fp-tb-manage">
-                        <a title="'. get_string('settings', 'repository') .'" href="#">'.$this->output->flex_icon('cog').'</a>
+                        <a title="'. get_string('settings', 'repository') .'" href="#">'.$this->output->flex_icon('settings').'</a>
                     </div>
                     <div class="fp-tb-help">
-                        <a title="'. get_string('help', 'repository') .'" href="#">'.$this->output->flex_icon('question-circle').'</a>
+                        <a title="'. get_string('help', 'repository') .'" href="#">'.$this->output->flex_icon('help').'</a>
                     </div>
                     <div class="fp-tb-message"></div>
                 </div>
@@ -598,7 +598,7 @@ class core_files_renderer extends plugin_renderer_base {
                         '.$this->output->flex_icon('th-large').'
                     </a>
                     <a role="button" title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details" href="#">
-                        '.$this->output->flex_icon('align-justify').'
+                        '.$this->output->flex_icon('th-list').'
                     </a>
                     <a role="button" title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree" href="#">
                         '.$this->output->flex_icon('viewtreeactive').'

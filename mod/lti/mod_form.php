@@ -214,7 +214,7 @@ class mod_lti_mod_form extends moodleform_mod {
         $jsinfo = (object)array(
                         'edit_icon_html' => (string) $OUTPUT->flex_icon('edit', array ('alt' => get_string('edit'))),
                         'add_icon_html' => (string) $OUTPUT->flex_icon('plus', array ('alt' => get_string('add'))),
-                        'delete_icon_html' => (string) $OUTPUT->flex_icon('times-danger', array ('alt' => get_string('delete'))),
+                        'delete_icon_html' => (string) $OUTPUT->flex_icon('delete', array ('alt' => get_string('delete'))),
                         'green_check_icon_html' => (string) $OUTPUT->flex_icon('check-success', array ('alt' => get_string('success'))),
                         'warning_icon_html' => (string) $OUTPUT->flex_icon('warning-warning', array ('alt' => get_string('error'))),
                         'instructor_tool_type_edit_url' => $editurl->out(false),

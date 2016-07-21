@@ -235,7 +235,7 @@ class atto_page_hack {
     public function __construct($oldpage) {
         $this->oldpage = $oldpage;
         $this->requires = $this;
-        $this->theme = $this;
+        $this->theme = $oldpage->theme;
         $this->url = $oldpage->url;
     }
 

@@ -190,7 +190,7 @@ class core_enrol_renderer extends plugin_renderer_base {
         foreach ($roles as $roleid=>$role) {
             if ($canassign and (is_siteadmin() or isset($assignableroles[$roleid])) and !$role['unchangeable']) {
                 $strunassign = get_string('unassignarole', 'role', $role['text']);
-                $icon = $this->output->flex_icon('times-danger', array('alt'=>$strunassign));
+                $icon = $this->output->flex_icon('delete', array('alt'=>$strunassign));
                 $url = new moodle_url($pageurl, array('action'=>'unassign', 'roleid'=>$roleid, 'user'=>$userid));
                 $rolesoutput .= html_writer::tag('div', $role['text'] . html_writer::link($url, $icon, array('class'=>'unassignrolelink', 'rel'=>$roleid, 'title'=>$strunassign)), array('class'=>'role role_'.$roleid));
             } else {
@@ -235,7 +235,7 @@ class core_enrol_renderer extends plugin_renderer_base {
         $groupoutput = '';
         foreach($groups as $groupid=>$name) {
             if ($canmanagegroups and groups_remove_member_allowed($groupid, $userid)) {
-                $icon = $this->output->flex_icon('times-danger', array('alt'=>get_string('removefromgroup', 'group', $name)));
+                $icon = $this->output->flex_icon('delete', array('alt'=>get_string('removefromgroup', 'group', $name)));
                 $url = new moodle_url($pageurl, array('action'=>'removemember', 'group'=>$groupid, 'user'=>$userid));
                 $groupoutput .= html_writer::tag('div', $name . html_writer::link($url, $icon), array('class'=>'group', 'rel'=>$groupid));
             } else {

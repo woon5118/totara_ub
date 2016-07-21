@@ -27,5 +27,5 @@
 $translations = array(
     'mod_choice|column' => 'columns',
     'mod_choice|icon' => 'question-circle',
-    'mod_choice|row' => 'align-justify',
+    'mod_choice|row' => 'rows',
 );

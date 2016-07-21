@@ -23,7 +23,7 @@
                 $streditsummary  = get_string('editsummary');
                 $introcontent .= '<div class="editinglink"><a title="'.$streditsummary.'" '.
                                  '   href="modedit.php?update='.$cm->id.'&amp;sesskey='.sesskey().'">'.
-                                 $OUTPUT->flex_icon('cog', array('alt' => $streditsummary)) . '</a></div>';
+                                 $OUTPUT->flex_icon('settings', array('alt' => $streditsummary)) . '</a></div>';
             }
             echo $OUTPUT->box($introcontent, 'generalbox', 'intro');
         }

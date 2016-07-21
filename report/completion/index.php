@@ -571,7 +571,7 @@ if (!$csv) {
         print ($iconlink ? '</a>' : '');
 
         if (in_array($criterion->id, $criteria_with_rpl)) {
-            $courseicon = $OUTPUT->flex_icon('cube', ['alt' => get_string('rpl', 'completion'), 'classes' => 'ft-size-300']);
+            $courseicon = $OUTPUT->flex_icon('course', ['alt' => get_string('rpl', 'completion'), 'classes' => 'ft-size-300']);
             print $courseicon;
             $moreicon = $OUTPUT->flex_icon('plus', ['alt' => get_string('showrpls', 'completion'), 'classes' => 'ft-size-300']);
             print '<a href="#" class="rplexpand rpl-'.$criterion->id.'" title="'.get_string('showrpls', 'completion').'">' . $moreicon . '</a>';
@@ -582,11 +582,11 @@ if (!$csv) {
 
     // Overall course completion status
     print '<th class="criteriaicon">';
-    $courseicon = $OUTPUT->flex_icon('cube', ['alt' => get_string('course'), 'classes' => 'ft-size-300']);
+    $courseicon = $OUTPUT->flex_icon('course', ['alt' => get_string('course'), 'classes' => 'ft-size-300']);
     print $courseicon;
 
     if ($CFG->enablecourserpl) {
-        $courseicon = $OUTPUT->flex_icon('cube', ['alt' => get_string('rpl', 'completion'), 'classes' => 'ft-size-300']);
+        $courseicon = $OUTPUT->flex_icon('course', ['alt' => get_string('rpl', 'completion'), 'classes' => 'ft-size-300']);
         $moreicon = $OUTPUT->flex_icon('plus', ['alt' => get_string('showrpls', 'completion'), 'classes' => 'ft-size-300']);
         print $courseicon;
         print '<a href="#" class="rplexpand rpl-course" title="'.get_string('showrpls', 'completion').'">' . $moreicon . '</a>';

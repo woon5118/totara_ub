@@ -39,14 +39,23 @@ defined('MOODLE_INTERNAL') || die();
  * @author    Petr Skoda <petr.skoda@totaralms.com>
  * @package   core
  */
-class flex_icon implements \renderable, \templatable {
+class flex_icon extends \pix_icon {
+    /** @deprecated do not use in flex icons */
+    var $pix;
+
+    /** @deprecated do not use in flex icons */
+    var $component;
+
+    /** @deprecated do not use in flex icons */
+    var $attributes;
+
     /**
-     * @var string The name of the flex icon
+     * @var string Flex icon identifier
      */
     public $identifier;
 
     /**
-     * @var array Custom data for icon instance
+     * @var array Flex icon custom template data, such as 'alt' and 'classes'
      */
     public $customdata;
 
@@ -64,6 +73,22 @@ class flex_icon implements \renderable, \templatable {
         if (!self::exists($this->identifier)) {
             debugging("Flex icon '{$this->identifier}' not found", DEBUG_DEVELOPER);
         }
+
+        // Emulate the legacy pix_icon data for constructor.
+        $alt = '';
+        if (isset($customdata['alt'])) {
+            $alt = $customdata['alt'];
+        }
+        $component = 'core';
+        $pos = strpos($identifier, '|');
+        if ($pos > 0) {
+            $component = substr($identifier, 0, $pos);
+        }
+        $attributes = array();
+        if (isset($customdata['classes'])) {
+            $attributes['class'] = $customdata['classes'];
+        }
+        parent::__construct('flexicon', $alt, $component, $attributes);
     }
 
     /**
@@ -115,8 +140,11 @@ class flex_icon implements \renderable, \templatable {
      * @return flex_icon|null returns null if flex matching flex icon cannot be found
      */
     public static function create_from_pix_icon(pix_icon $icon, $customclasses = null) {
-        $flexidentifier = self::get_identifier_from_pix_icon($icon);
+        if ($icon instanceof flex_icon) {
+            return $icon;
+        }
 
+        $flexidentifier = self::get_identifier_from_pix_icon($icon);
         if (!self::exists($flexidentifier)) {
             return null;
         }

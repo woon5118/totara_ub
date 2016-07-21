@@ -203,7 +203,7 @@ foreach ($overrides as $override) {
     // Delete.
     $deleteurlstr = $overridedeleteurl->out(true,
             array('id' => $override->id, 'sesskey' => sesskey()));
-    $iconstr .= '<a title="' . get_string('delete') . '" href="' . $deleteurlstr . '">' . $OUTPUT->flex_icon('times-danger', array ('alt' => get_string('delete'))) . '</a> ';
+    $iconstr .= '<a title="' . get_string('delete') . '" href="' . $deleteurlstr . '">' . $OUTPUT->flex_icon('delete', array ('alt' => get_string('delete'))) . '</a> ';
 
     if ($groupmode) {
         $usergroupstr = '<a href="' . $groupurl->out(true,

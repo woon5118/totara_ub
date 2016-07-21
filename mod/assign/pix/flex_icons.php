@@ -26,5 +26,19 @@
 
 $translations = array(
     'mod_assign|gradefeedback' => 'edit',
-    'mod_assign|icon' => 'assign',
+);
+
+$map = array(
+    'mod_assign|icon' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'stack_first' => 'fa fa-file-text-o ft-stack-main',
+                            'stack_second' => 'fa fa-thumb-tack ft-stack-suffix ft-state-info',
+                        ),
+                ),
+        ),
 );

@@ -27,3 +27,5 @@
 $translations = array(
     'mod_certificate|icon' => 'certificate',
 );
+
+// NOTE: Images used to construct PDF certificates were moved to pdfresources directory.

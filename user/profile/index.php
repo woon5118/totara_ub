@@ -187,8 +187,8 @@ function profile_category_icons($category) {
     $categorycount = $DB->count_records('user_info_category');
     $fieldcount    = $DB->count_records('user_info_field', array('categoryid' => $category->id));
 
-    $editicon = $OUTPUT->flex_icon('cog');
-    $deleteicon = $OUTPUT->flex_icon('times-danger');
+    $editicon = $OUTPUT->flex_icon('settings');
+    $deleteicon = $OUTPUT->flex_icon('delete');
     $moveupicon = $OUTPUT->flex_icon('arrow-up');
     $movedownicon = $OUTPUT->flex_icon('arrow-down');
     $spacericon = $OUTPUT->flex_icon('spacer');
@@ -238,8 +238,8 @@ function profile_field_icons($field) {
     $fieldcount = $DB->count_records('user_info_field', array('categoryid' => $field->categoryid));
     $datacount  = $DB->count_records('user_info_data', array('fieldid' => $field->id));
 
-    $editicon = $OUTPUT->flex_icon('cog');
-    $deleteicon = $OUTPUT->flex_icon('times-danger');
+    $editicon = $OUTPUT->flex_icon('settings');
+    $deleteicon = $OUTPUT->flex_icon('delete');
     $moveupicon = $OUTPUT->flex_icon('arrow-up');
     $movedownicon = $OUTPUT->flex_icon('arrow-down');
     $spacericon = $OUTPUT->flex_icon('spacer');

@@ -349,7 +349,7 @@
                 if (is_mnet_remote_user($user) or $user->id == $USER->id or is_siteadmin($user)) {
                     // no deleting of self, mnet accounts or admins allowed
                 } else {
-                    $buttons[] = html_writer::link(new moodle_url($returnurl, array('delete'=>$user->id, 'sesskey'=>sesskey())), $OUTPUT->flex_icon('times-danger', array('alt' => $strdelete)), array('title'=>$strdelete));
+                    $buttons[] = html_writer::link(new moodle_url($returnurl, array('delete'=>$user->id, 'sesskey'=>sesskey())), $OUTPUT->flex_icon('delete', array('alt' => $strdelete)), array('title'=>$strdelete));
                 }
             }
 
@@ -385,7 +385,7 @@
             if (has_capability('moodle/user:update', $sitecontext)) {
                 // prevent editing of admins by non-admins
                 if (is_siteadmin($USER) or !is_siteadmin($user)) {
-                    $buttons[] = html_writer::link(new moodle_url($securewwwroot.'/user/editadvanced.php', array('id'=>$user->id, 'course'=>$site->id)), $OUTPUT->flex_icon('cog', array('alt' => $stredit)), array('title'=>$stredit));
+                    $buttons[] = html_writer::link(new moodle_url($securewwwroot.'/user/editadvanced.php', array('id'=>$user->id, 'course'=>$site->id)), $OUTPUT->flex_icon('settings', array('alt' => $stredit)), array('title'=>$stredit));
                 }
             }
 
@@ -414,7 +414,7 @@
                     array('title' => $strundelete));
                 if ($CFG->authdeleteusers !== 'partial' and !preg_match($preg_emailhash, $user->email)) {
                     $buttons[] = html_writer::link(new moodle_url($returnurl, array('delete' => $user->id, 'sesskey' => sesskey())),
-                        $OUTPUT->flex_icon('times-danger', array('alt' => $strdelete)),
+                        $OUTPUT->flex_icon('delete', array('alt' => $strdelete)),
                         array('title' => $strdelete));
                 }
                 $lastcolumn = '';
