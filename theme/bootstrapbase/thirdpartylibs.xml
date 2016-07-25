@@ -21,4 +21,18 @@
     <version>2.3.2</version>
     <licenseversion>2.0</licenseversion>
   </library>
+  <library>
+    <location>fonts</location>
+    <name>Font Awesome Fonts</name>
+    <license>SIL OFL</license>
+    <version>4.6.3</version>
+    <licenseversion>1.1</licenseversion>
+  </library>
+  <library>
+    <location>style</location>
+    <name>Font Awesome CSS</name>
+    <license>MIT</license>
+    <version>4.6.3</version>
+    <licenseversion></licenseversion>
+  </library>
 </libraries>
