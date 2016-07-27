@@ -40,12 +40,12 @@
             "classes": "custom-class another-custom-class",
             "alt": "Settings"
         },
-        "classes": "fa fa-edit"
+        "classes": "fa-edit"
     }
 
 }}
 <span aria-hidden="true"
-      class="flex-icon{{#classes}} {{.}}{{/classes}}{{#customdata.classes}} {{.}}{{/customdata.classes}}"
+      class="flex-icon ft-fw ft {{#classes}}{{.}}{{/classes}}{{#customdata.classes}} {{.}}{{/customdata.classes}}"
       {{#customdata.alt}} title="{{.}}"{{/customdata.alt}}></span>
 {{#customdata.alt}}<span class="sr-only">{{.}}</span>{{/customdata.alt}}
 

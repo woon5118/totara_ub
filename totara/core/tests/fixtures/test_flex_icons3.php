@@ -17,7 +17,7 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-edit ft-state-warning',
+                    'classes' => 'fa-edit ft-state-warning',
                 ),
         ),
     'fancy' =>
@@ -25,7 +25,7 @@ $map = array(
             'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' => 'fa fa-circle',
+                    'classes' => 'fa-circle',
                 ),
         ),
 );

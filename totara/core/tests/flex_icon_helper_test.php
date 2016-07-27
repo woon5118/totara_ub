@@ -82,12 +82,12 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
     public function test_get_data_by_identifier() {
         global $CFG;
 
-        $expected = array('classes' => 'fa fa-edit');
+        $expected = array('classes' => 'fa-edit');
         $this->assertSame($expected, flex_icon_helper::get_data_by_identifier($CFG->theme, 'edit'));
 
         $expected = array('classes' => array(
-            'stack_first' => 'fa fa-question ft-stack-main',
-            'stack_second' => 'fa fa-exclamation ft-stack-suffix'));
+            'fa-question ft-stack-main',
+            'fa-exclamation ft-stack-suffix'));
         $this->assertSame($expected, flex_icon_helper::get_data_by_identifier($CFG->theme, 'unsubscribe'));
 
         $missingiconsdata = flex_icon_helper::get_data_by_identifier($CFG->theme, flex_icon_helper::MISSING_ICON);
@@ -123,8 +123,8 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
         $this->assertSame(array('nav_exit' => 'caret-up'), $merged1['deprecated']);
         $this->assertSame(array(), $merged1['defaults']);
         $this->assertSame(array(
-            'icon' => array('data' => array('classes' => 'fa fa-edit')),
-            'fancy' => array('data' => array('classes' => 'fa fa-circle')),
+            'icon' => array('data' => array('classes' => 'fa-edit')),
+            'fancy' => array('data' => array('classes' => 'fa-circle')),
         ), $merged1['map']);
 
         $merged1b = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons1.php', $merged1);
@@ -139,8 +139,8 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
         $this->assertSame(array('nav_exit' => 'caret-up', 'nav_entry' => 'caret-down'), $merged3['deprecated']);
         $this->assertSame(array('data' => array('template' => 'core/flex_icon2')), $merged3['defaults']);
         $this->assertSame(array(
-            'icon' => array('data' => array('classes' => 'fa fa-edit ft-state-warning')),
-            'fancy' => array('template' => 'core/flex_icon_stack', 'data' => array('classes' => 'fa fa-circle')),
+            'icon' => array('data' => array('classes' => 'fa-edit ft-state-warning')),
+            'fancy' => array('template' => 'core/flex_icon_stack', 'data' => array('classes' => 'fa-circle')),
         ), $merged3['map']);
     }
 
@@ -169,7 +169,7 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                 'close' => array(
                     'data' =>
                         array(
-                            'classes' => 'fa fa-close',
+                            'classes' => 'fa-close',
                         ),
                 ),
                 'edit' => array(
@@ -178,8 +178,8 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                         array(
                             'classes' =>
                                 array(
-                                    'stack_first' => 'fa fa-edit ft-stack-main',
-                                    'stack_second' => 'fa fa-exclamation ft-stack-suffix'
+                                    'fa-edit ft-stack-main',
+                                    'fa-exclamation ft-stack-suffix'
                                 ),
                         ),
                 ),
@@ -187,7 +187,7 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                 'open' => array(
                     'data' =>
                         array(
-                            'classes' => 'fa fa-open',
+                            'classes' => 'fa-open',
                         ),
                 ),
             ),
@@ -201,7 +201,7 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                     'data' =>
                         array(
                             'template' => 'core/flex_icon',
-                            'classes' => 'fa fa-close',
+                            'classes' => 'fa-close',
                         ),
                     'template' => 'core/flex_icon',
                 ),
@@ -213,8 +213,8 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                             'template' => 'core/flex_icon',
                             'classes' =>
                                 array(
-                                    'stack_first' => 'fa fa-edit ft-stack-main',
-                                    'stack_second' => 'fa fa-exclamation ft-stack-suffix',
+                                    'fa-edit ft-stack-main',
+                                    'fa-exclamation ft-stack-suffix',
                                 ),
                         ),
                 ),
@@ -223,7 +223,7 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                     'data' =>
                         array(
                             'template' => 'core/flex_icon',
-                            'classes' => 'fa fa-open',
+                            'classes' => 'fa-open',
                         ),
                     'template' => 'core/flex_icon',
                 ),
@@ -232,7 +232,7 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                     'data' =>
                         array(
                             'template' => 'core/flex_icon',
-                            'classes' => 'fa fa-open',
+                            'classes' => 'fa-open',
                         ),
                     'template' => 'core/flex_icon',
                     'translatesto' => 'open',
@@ -242,7 +242,7 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                     'data' =>
                         array(
                             'template' => 'core/flex_icon',
-                            'classes' => 'fa fa-open',
+                            'classes' => 'fa-open',
                         ),
                     'template' => 'core/flex_icon',
                     'translatesto' => 'open',
@@ -255,8 +255,8 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                             'template' => 'core/flex_icon',
                             'classes' =>
                                 array(
-                                    'stack_first' => 'fa fa-edit ft-stack-main',
-                                    'stack_second' => 'fa fa-exclamation ft-stack-suffix',
+                                    'fa-edit ft-stack-main',
+                                    'fa-exclamation ft-stack-suffix',
                                 ),
                         ),
                     'translatesto' => 'edit',
@@ -266,7 +266,7 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                     'data' =>
                         array(
                             'template' => 'core/flex_icon',
-                            'classes' => 'fa fa-close',
+                            'classes' => 'fa-close',
                         ),
                     'template' => 'core/flex_icon',
                     'translatesto' => 'close',
@@ -277,7 +277,7 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                     'data' =>
                         array(
                             'template' => 'core/flex_icon',
-                            'classes' => 'fa fa-open',
+                            'classes' => 'fa-open',
                         ),
                     'template' => 'core/flex_icon',
                     'translatesto' => 'open',

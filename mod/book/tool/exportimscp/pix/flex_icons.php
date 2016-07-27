@@ -32,8 +32,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'ft ft-package ft-stack-main',
-                            'stack_second' => 'fa fa-arrow-right ft-stack-suffix',
+                            'ft-package ft-stack-main',
+                            'fa-arrow-right ft-stack-suffix',
                         ),
                 ),
         ),

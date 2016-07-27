@@ -16,14 +16,14 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-edit',
+                    'classes' => 'fa-edit',
                 ),
         ),
     'fancy' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-circle',
+                    'classes' => 'fa-circle',
                 ),
         ),
 );

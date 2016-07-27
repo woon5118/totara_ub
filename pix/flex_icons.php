@@ -63,8 +63,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-question ft-stack-main',
-                            'stack_second' => 'fa fa-exclamation ft-stack-suffix'
+                            'fa-question ft-stack-main',
+                            'fa-exclamation ft-stack-suffix'
                         ),
                 ),
         ),
@@ -72,14 +72,14 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-addressbook',
+                    'classes' => 'ft-addressbook',
                 ),
         ),
     'alarm' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-alarm',
+                    'classes' => 'ft-alarm',
                 ),
         ),
     'alarm-danger' =>
@@ -89,8 +89,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'ft ft-alarm ft-stack-main',
-                            'stack_second' => 'fa fa-bolt ft-stack-suffix ft-state-danger',
+                            'ft-alarm ft-stack-main',
+                            'fa-bolt ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -101,8 +101,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'ft ft-alarm ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-warning',
+                            'ft-alarm ft-stack-main',
+                            'fa-warning ft-stack-suffix ft-state-warning',
                         ),
                 ),
         ),
@@ -110,28 +110,28 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-alfresco',
+                    'classes' => 'ft-alfresco',
                 ),
         ),
     'archive' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-archive',
+                    'classes' => 'fa-archive',
                 ),
         ),
     'archive-alt' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-archive-alt',
+                    'classes' => 'ft-archive-alt',
                 ),
         ),
     'archives-alt' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-archives-alt',
+                    'classes' => 'ft-archives-alt',
                 ),
         ),
     'areafiles' =>
@@ -141,8 +141,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-file-text-o ft-stack-main',
-                            'stack_second' => 'fa fa-paperclip ft-stack-suffix',
+                            'fa-file-text-o ft-stack-main',
+                            'fa-paperclip ft-stack-suffix',
                         ),
                 ),
         ),
@@ -150,63 +150,63 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-arrow-down',
+                    'classes' => 'fa-arrow-down',
                 ),
         ),
     'arrow-left' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-arrow-left',
+                    'classes' => 'fa-arrow-left',
                 ),
         ),
     'arrow-right' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-arrow-right',
+                    'classes' => 'fa-arrow-right',
                 ),
         ),
     'arrow-up' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-arrow-up',
+                    'classes' => 'fa-arrow-up',
                 ),
         ),
     'arrows' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-arrows',
+                    'classes' => 'fa-arrows',
                 ),
         ),
     'arrows-alt' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-arrows-alt',
+                    'classes' => 'fa-arrows-alt',
                 ),
         ),
     'arrows-h' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-arrows-h',
+                    'classes' => 'fa-arrows-h',
                 ),
         ),
     'arrows-v' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-arrows-v',
+                    'classes' => 'fa-arrows-v',
                 ),
         ),
     'asterisk' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-asterisk',
+                    'classes' => 'fa-asterisk',
                 ),
         ),
     'auto-completion-on' =>
@@ -216,8 +216,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-check-circle-o ft-stack-main',
-                            'stack_second' => 'fa fa-play ft-stack-suffix',
+                            'fa-check-circle-o ft-stack-main',
+                            'fa-play ft-stack-suffix',
                         ),
                 ),
         ),
@@ -225,91 +225,91 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-backpack',
+                    'classes' => 'ft-backpack',
                 ),
         ),
     'ban' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-ban',
+                    'classes' => 'fa-ban',
                 ),
         ),
     'bar-chart' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-bar-chart',
+                    'classes' => 'fa-bar-chart',
                 ),
         ),
     'bars' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-bars',
+                    'classes' => 'fa-bars',
                 ),
         ),
     'blended' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-blended',
+                    'classes' => 'ft-blended',
                 ),
         ),
     'block_to_dock' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-caret-square-o-left',
+                    'classes' => 'fa-caret-square-o-left',
                 ),
         ),
     'bookmark-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-bookmark-o',
+                    'classes' => 'fa-bookmark-o',
                 ),
         ),
     'box-alt' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-box-alt',
+                    'classes' => 'ft-box-alt',
                 ),
         ),
     'box-net' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-box-net',
+                    'classes' => 'ft-box-net',
                 ),
         ),
     'briefcase' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-briefcase',
+                    'classes' => 'fa-briefcase',
                 ),
         ),
     'bullhorn' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-bullhorn',
+                    'classes' => 'fa-bullhorn',
                 ),
         ),
     'cache' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-bolt',
+                    'classes' => 'fa-bolt',
                 ),
         ),
     'calculator' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-calculator',
+                    'classes' => 'fa-calculator',
                 ),
         ),
     'calculator-off' =>
@@ -319,8 +319,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-calculator ft-stack-main',
-                            'stack_second' => 'ft ft-slash ft-stack-over ft-state-danger',
+                            'fa-calculator ft-stack-main',
+                            'ft-slash ft-stack-over ft-state-danger',
                         ),
                 ),
         ),
@@ -328,112 +328,112 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-calendar',
+                    'classes' => 'fa-calendar',
                 ),
         ),
     'caret-down' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-caret-down',
+                    'classes' => 'fa-caret-down',
                 ),
         ),
     'caret-left' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-caret-left',
+                    'classes' => 'fa-caret-left',
                 ),
         ),
     'caret-left-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-caret-left ft-state-disabled',
+                    'classes' => 'fa-caret-left ft-state-disabled',
                 ),
         ),
     'caret-left-info' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-caret-left ft-state-info',
+                    'classes' => 'fa-caret-left ft-state-info',
                 ),
         ),
     'caret-right' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-caret-right',
+                    'classes' => 'fa-caret-right',
                 ),
         ),
     'caret-right-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-caret-right ft-state-disabled',
+                    'classes' => 'fa-caret-right ft-state-disabled',
                 ),
         ),
     'caret-right-info' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-caret-right ft-state-info',
+                    'classes' => 'fa-caret-right ft-state-info',
                 ),
         ),
     'caret-up' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-caret-up',
+                    'classes' => 'fa-caret-up',
                 ),
         ),
     'certificate' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-certificate',
+                    'classes' => 'ft-certificate',
                 ),
         ),
     'chart-bar' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-chart-bar',
+                    'classes' => 'ft-chart-bar',
                 ),
         ),
     'check' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-check',
+                    'classes' => 'fa-check',
                 ),
         ),
     'check-circle-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-check-circle-o',
+                    'classes' => 'fa-check-circle-o',
                 ),
         ),
     'check-circle-o-success' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-check-circle-o ft-state-success',
+                    'classes' => 'fa-check-circle-o ft-state-success',
                 ),
         ),
     'check-circle-success' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-check-circle ft-state-success',
+                    'classes' => 'fa-check-circle ft-state-success',
                 ),
         ),
     'check-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-check ft-state-disabled',
+                    'classes' => 'fa-check ft-state-disabled',
                 ),
         ),
     'check-permissions' =>
@@ -443,8 +443,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-user ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-warning',
+                            'fa-user ft-stack-main',
+                            'fa-warning ft-stack-suffix ft-state-warning',
                         ),
                 ),
         ),
@@ -452,56 +452,56 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-check-square-o',
+                    'classes' => 'fa-check-square-o',
                 ),
         ),
     'check-success' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-check ft-state-success',
+                    'classes' => 'fa-check ft-state-success',
                 ),
         ),
     'check-warning' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-check ft-state-warning',
+                    'classes' => 'fa-check ft-state-warning',
                 ),
         ),
     'checklist' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-checklist',
+                    'classes' => 'ft-checklist',
                 ),
         ),
     'circle-danger' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-circle ft-state-danger',
+                    'classes' => 'fa-circle ft-state-danger',
                 ),
         ),
     'circle-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-circle ft-state-disabled',
+                    'classes' => 'fa-circle ft-state-disabled',
                 ),
         ),
     'circle-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-circle-o',
+                    'classes' => 'fa-circle-o',
                 ),
         ),
     'circle-success' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-circle ft-state-success',
+                    'classes' => 'fa-circle ft-state-success',
                 ),
         ),
     'clock-locked' =>
@@ -511,8 +511,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-clock-o ft-stack-main',
-                            'stack_second' => 'fa fa-lock ft-stack-suffix ft-state-danger',
+                            'fa-clock-o ft-stack-main',
+                            'fa-lock ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -520,35 +520,35 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-clock-o',
+                    'classes' => 'fa-clock-o',
                 ),
         ),
     'code' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-code',
+                    'classes' => 'fa-code',
                 ),
         ),
     'cog' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-cog',
+                    'classes' => 'fa-cog',
                 ),
         ),
     'columns' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-columns',
+                    'classes' => 'ft-columns',
                 ),
         ),
     'comment' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-comment',
+                    'classes' => 'fa-comment',
                 ),
         ),
     'comment-add-o' =>
@@ -558,8 +558,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-comment-o ft-stack-main',
-                            'stack_second' => 'fa fa-plus ft-stack-suffix',
+                            'fa-comment-o ft-stack-main',
+                            'fa-plus ft-stack-suffix',
                         ),
                 ),
         ),
@@ -567,28 +567,28 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-comment-o',
+                    'classes' => 'fa-comment-o',
                 ),
         ),
     'commenting-info' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-commenting ft-state-info',
+                    'classes' => 'fa-commenting ft-state-info',
                 ),
         ),
     'comments' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-comments',
+                    'classes' => 'fa-comments',
                 ),
         ),
     'comments-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-comments-o',
+                    'classes' => 'fa-comments-o',
                 ),
         ),
     'comments-search' =>
@@ -598,8 +598,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-comment ft-stack-main',
-                            'stack_second' => 'fa fa-search ft-stack-suffix',
+                            'fa-comment ft-stack-main',
+                            'fa-search ft-stack-suffix',
                         ),
                 ),
         ),
@@ -607,7 +607,7 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-competency',
+                    'classes' => 'ft-competency',
                 ),
         ),
     'competency-achieved' =>
@@ -617,8 +617,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'ft ft-competency ft-stack-main',
-                            'stack_second' => 'fa fa-check ft-stack-suffix ft-state-success',
+                            'ft-competency ft-stack-main',
+                            'fa-check ft-stack-suffix ft-state-success',
                         ),
                 ),
         ),
@@ -629,8 +629,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'ft ft-address-book ft-stack-main',
-                            'stack_second' => 'fa fa-plus ft-stack-suffix ft-state-info',
+                            'ft-address-book ft-stack-main',
+                            'fa-plus ft-stack-suffix ft-state-info',
                         ),
                 ),
         ),
@@ -641,8 +641,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'ft ft-address-book ft-stack-main',
-                            'stack_second' => 'fa fa-minus ft-stack-suffix ft-state-danger',
+                            'ft-address-book ft-stack-main',
+                            'fa-minus ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -651,7 +651,7 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-cube',
+                    'classes' => 'fa-cube',
                 ),
         ),
     'course-completed' =>
@@ -661,8 +661,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-cube ft-stack-main',
-                            'stack_second' => 'fa fa-check ft-stack-suffix ft-state-success',
+                            'fa-cube ft-stack-main',
+                            'fa-check ft-stack-suffix ft-state-success',
                         ),
                 ),
         ),
@@ -673,8 +673,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-cube ft-stack-main',
-                            'stack_second' => 'fa fa-play ft-stack-suffix',
+                            'fa-cube ft-stack-main',
+                            'fa-play ft-stack-suffix',
                         ),
                 ),
         ),
@@ -682,21 +682,21 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-cube',
+                    'classes' => 'fa-cube',
                 ),
         ),
     'dash' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-dash',
+                    'classes' => 'ft-dash',
                 ),
         ),
     'database' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-database',
+                    'classes' => 'fa-database',
                 ),
         ),
     /* General delete icon to be used for all delete actions */
@@ -704,14 +704,14 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-times ft-state-danger',
+                    'classes' => 'fa-times ft-state-danger',
                 ),
         ),
     'dock_to_block' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-caret-square-o-right',
+                    'classes' => 'fa-caret-square-o-right',
                 ),
         ),
     'document-edit' =>
@@ -721,8 +721,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-file-o ft-stack-main',
-                            'stack_second' => 'fa fa-pencil ft-stack-suffix',
+                            'fa-file-o ft-stack-main',
+                            'fa-pencil ft-stack-suffix',
                         ),
                 ),
         ),
@@ -733,8 +733,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-file-o ft-stack-main',
-                            'stack_second' => 'fa fa-plus ft-stack-suffix',
+                            'fa-file-o ft-stack-main',
+                            'fa-plus ft-stack-suffix',
                         ),
                 ),
         ),
@@ -745,8 +745,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-file-o ft-stack-main',
-                            'stack_second' => 'fa fa-wrench ft-stack-suffix',
+                            'fa-file-o ft-stack-main',
+                            'fa-wrench ft-stack-suffix',
                         ),
                 ),
         ),
@@ -754,42 +754,42 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-dollar',
+                    'classes' => 'fa-dollar',
                 ),
         ),
     'dot-circle-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-dot-circle-o',
+                    'classes' => 'fa-dot-circle-o',
                 ),
         ),
     'download' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-download',
+                    'classes' => 'fa-download',
                 ),
         ),
     'dropbox' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-dropbox',
+                    'classes' => 'fa-dropbox',
                 ),
         ),
     'ebook' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-book-alt',
+                    'classes' => 'ft-book-alt',
                 ),
         ),
     'edit' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-edit',
+                    'classes' => 'fa-edit',
                 ),
         ),
     'editmenu' =>
@@ -799,8 +799,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-cog ft-stack-main',
-                            'stack_second' => 'fa fa-caret-down ft-stack-suffix',
+                            'fa-cog ft-stack-main',
+                            'fa-caret-down ft-stack-suffix',
                         ),
                 ),
         ),
@@ -808,7 +808,7 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-ellipsis-h',
+                    'classes' => 'fa-ellipsis-h',
                 ),
         ),
     'enrolment-suspended' =>
@@ -818,8 +818,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-user ft-stack-main',
-                            'stack_second' => 'fa fa-pause ft-stack-suffix',
+                            'fa-user ft-stack-main',
+                            'fa-pause ft-stack-suffix',
                         ),
                 ),
         ),
@@ -827,7 +827,7 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-envelope-o',
+                    'classes' => 'fa-envelope-o',
                 ),
         ),
     'event-course' =>
@@ -837,8 +837,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-cube ft-stack-main',
-                            'stack_second' => 'fa fa-clock-o ft-stack-suffix',
+                            'fa-cube ft-stack-main',
+                            'fa-clock-o ft-stack-suffix',
                         ),
                 ),
         ),
@@ -849,8 +849,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-users ft-stack-main',
-                            'stack_second' => 'fa fa-clock-o ft-stack-suffix ft-state-info',
+                            'fa-users ft-stack-main',
+                            'fa-clock-o ft-stack-suffix ft-state-info',
                         ),
                 ),
         ),
@@ -861,8 +861,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-user ft-stack-main',
-                            'stack_second' => 'fa fa-clock-o ft-stack-suffix ft-state-info',
+                            'fa-user ft-stack-main',
+                            'fa-clock-o ft-stack-suffix ft-state-info',
                         ),
                 ),
         ),
@@ -870,14 +870,14 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-exclamation-circle',
+                    'classes' => 'fa-exclamation-circle',
                 ),
         ),
     'expand' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-expand',
+                    'classes' => 'fa-expand',
                 ),
         ),
     'explore' =>
@@ -887,8 +887,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-folder-o ft-stack-main',
-                            'stack_second' => 'fa fa-search ft-stack-suffix',
+                            'fa-folder-o ft-stack-main',
+                            'fa-search ft-stack-suffix',
                         ),
                 ),
         ),
@@ -896,98 +896,98 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-external-link-square',
+                    'classes' => 'fa-external-link-square',
                 ),
         ),
     'eye' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-eye',
+                    'classes' => 'fa-eye',
                 ),
         ),
     'eye-slash' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-eye-slash',
+                    'classes' => 'fa-eye-slash',
                 ),
         ),
     'file-archive-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-file-archive-o',
+                    'classes' => 'fa-file-archive-o',
                 ),
         ),
     'file-code-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-file-code-o',
+                    'classes' => 'fa-file-code-o',
                 ),
         ),
     'file-excel-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-file-excel-o',
+                    'classes' => 'fa-file-excel-o',
                 ),
         ),
     'file-image-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-file-image-o',
+                    'classes' => 'fa-file-image-o',
                 ),
         ),
     'file-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-file-o',
+                    'classes' => 'fa-file-o',
                 ),
         ),
     'file-pdf-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-file-pdf-o',
+                    'classes' => 'fa-file-pdf-o',
                 ),
         ),
     'file-powerpoint-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-file-powerpoint-o',
+                    'classes' => 'fa-file-powerpoint-o',
                 ),
         ),
     'file-sound-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-file-sound-o',
+                    'classes' => 'fa-file-sound-o',
                 ),
         ),
     'file-text' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-file-text',
+                    'classes' => 'fa-file-text',
                 ),
         ),
     'file-text-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-file-text-o',
+                    'classes' => 'fa-file-text-o',
                 ),
         ),
     'file-video-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-file-video-o',
+                    'classes' => 'fa-file-video-o',
                 ),
         ),
     'file-wrench' =>
@@ -997,8 +997,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-file-o ft-stack-main',
-                            'stack_second' => 'fa fa-wrench ft-stack-suffix',
+                            'fa-file-o ft-stack-main',
+                            'fa-wrench ft-stack-suffix',
                         ),
                 ),
         ),
@@ -1006,35 +1006,35 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-film',
+                    'classes' => 'fa-film',
                 ),
         ),
     'filter' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-filter',
+                    'classes' => 'fa-filter',
                 ),
         ),
     'flag' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-flag',
+                    'classes' => 'fa-flag',
                 ),
         ),
     'flag-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-flag-o',
+                    'classes' => 'fa-flag-o',
                 ),
         ),
     'flickr' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-flickr',
+                    'classes' => 'fa-flickr',
                 ),
         ),
     'folder-create' =>
@@ -1044,8 +1044,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-folder-o ft-stack-main',
-                            'stack_second' => 'fa fa-plus ft-stack-suffix',
+                            'fa-folder-o ft-stack-main',
+                            'fa-plus ft-stack-suffix',
                         ),
                 ),
         ),
@@ -1053,42 +1053,42 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-folder-o',
+                    'classes' => 'fa-folder-o',
                 ),
         ),
     'folder-open-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-folder-open-o',
+                    'classes' => 'fa-folder-open-o',
                 ),
         ),
     'frown-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-frown-o',
+                    'classes' => 'fa-frown-o',
                 ),
         ),
     'gdrive' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-gdrive',
+                    'classes' => 'ft-gdrive',
                 ),
         ),
     'globe' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-globe',
+                    'classes' => 'fa-globe',
                 ),
         ),
     'grades' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-grades',
+                    'classes' => 'ft-grades',
                 ),
         ),
     /* For links to Totara help */
@@ -1096,119 +1096,119 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-question-circle',
+                    'classes' => 'fa-question-circle',
                 ),
         ),
     'highlight' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-highlight',
+                    'classes' => 'ft-highlight',
                 ),
         ),
     'image' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-image',
+                    'classes' => 'fa-image',
                 ),
         ),
     'indent' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-indent',
+                    'classes' => 'fa-indent',
                 ),
         ),
     'info-circle' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-info-circle',
+                    'classes' => 'fa-info-circle',
                 ),
         ),
     'key' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-key',
+                    'classes' => 'fa-key',
                 ),
         ),
     'laptop' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-laptop',
+                    'classes' => 'fa-laptop',
                 ),
         ),
     'level-up' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-level-up',
+                    'classes' => 'fa-level-up',
                 ),
         ),
     'lightbulb-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-lightbulb-o',
+                    'classes' => 'fa-lightbulb-o',
                 ),
         ),
     'lightbulb-o-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-lightbulb-o ft-state-disabled',
+                    'classes' => 'fa-lightbulb-o ft-state-disabled',
                 ),
         ),
     'line-chart' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-line-chart',
+                    'classes' => 'fa-line-chart',
                 ),
         ),
     'link' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-link',
+                    'classes' => 'fa-link',
                 ),
         ),
     'list-alt' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-list-alt',
+                    'classes' => 'fa-list-alt',
                 ),
         ),
     'list-ol' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-list-ol',
+                    'classes' => 'fa-list-ol',
                 ),
         ),
     'lock' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-lock',
+                    'classes' => 'fa-lock',
                 ),
         ),
     'log' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-hbars',
+                    'classes' => 'ft-hbars',
                 ),
         ),
     'mahara' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-mahara',
+                    'classes' => 'ft-mahara',
                 ),
         ),
     'manual-completion-on' =>
@@ -1218,8 +1218,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-check-square-o ft-stack-main',
-                            'stack_second' => 'fa fa-play ft-stack-suffix',
+                            'fa-check-square-o ft-stack-main',
+                            'fa-play ft-stack-suffix',
                         ),
                 ),
         ),
@@ -1227,70 +1227,70 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-mean',
+                    'classes' => 'ft-mean',
                 ),
         ),
     'minus' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-minus',
+                    'classes' => 'fa-minus',
                 ),
         ),
     'minus-square' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-minus-square',
+                    'classes' => 'fa-minus-square',
                 ),
         ),
     'minus-square-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-minus-square-o',
+                    'classes' => 'fa-minus-square-o',
                 ),
         ),
     'mnet-host' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-mnethost',
+                    'classes' => 'ft-mnethost',
                 ),
         ),
     'moodle' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-moodle',
+                    'classes' => 'ft-moodle',
                 ),
         ),
     'moon-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-moon-o',
+                    'classes' => 'fa-moon-o',
                 ),
         ),
     'mouse-pointer' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-mouse-pointer',
+                    'classes' => 'fa-mouse-pointer',
                 ),
         ),
     'new' => // Something recently added.
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-new',
+                    'classes' => 'ft-new',
                 ),
         ),
     'newspaper-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-newspaper-o',
+                    'classes' => 'fa-newspaper-o',
                 ),
         ),
     'no-email' =>
@@ -1300,8 +1300,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-envelope-o ft-stack-main',
-                            'stack_second' => 'ft ft-slash ft-stack-over ft-state-danger',
+                            'fa-envelope-o ft-stack-main',
+                            'ft-slash ft-stack-over ft-state-danger',
                         ),
                 ),
         ),
@@ -1312,8 +1312,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-users ft-stack-main',
-                            'stack_second' => 'ft ft-slash ft-stack-main ft-state-danger',
+                            'fa-users ft-stack-main',
+                            'ft-slash ft-stack-main ft-state-danger',
                         ),
                 ),
         ),
@@ -1324,8 +1324,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-key ft-stack-main',
-                            'stack_second' => 'ft ft-slash ft-stack-over ft-state-danger',
+                            'fa-key ft-stack-main',
+                            'ft-slash ft-stack-over ft-state-danger',
                         ),
                 ),
         ),
@@ -1336,8 +1336,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'ft ft-viewtreeactive ft-stack-main',
-                            'stack_second' => 'ft ft-slash ft-stack-over ft-state-danger',
+                            'ft-viewtreeactive ft-stack-main',
+                            'ft-slash ft-stack-over ft-state-danger',
                         ),
                 ),
         ),
@@ -1345,7 +1345,7 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-bullseye',
+                    'classes' => 'fa-bullseye',
                 ),
         ),
     'objective-achieved' =>
@@ -1355,8 +1355,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-bullseye ft-stack-main',
-                            'stack_second' => 'fa fa-check ft-stack-suffix ft-state-success',
+                            'fa-bullseye ft-stack-main',
+                            'fa-check ft-stack-suffix ft-state-success',
                         ),
                 ),
         ),
@@ -1364,49 +1364,49 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-outdent',
+                    'classes' => 'fa-outdent',
                 ),
         ),
     'package' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-package',
+                    'classes' => 'ft-package',
                 ),
         ),
     'paperclip' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-paperclip',
+                    'classes' => 'fa-paperclip',
                 ),
         ),
     'paypal' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-paypal',
+                    'classes' => 'fa-paypal',
                 ),
         ),
     'pencil' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-pencil',
+                    'classes' => 'fa-pencil',
                 ),
         ),
     'pencil-square-info' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-pencil-square ft-state-info',
+                    'classes' => 'fa-pencil-square ft-state-info',
                 ),
         ),
     'pencil-square-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-pencil-square-o',
+                    'classes' => 'fa-pencil-square-o',
                 ),
         ),
     'permission-lock' =>
@@ -1416,8 +1416,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-user ft-stack-main',
-                            'stack_second' => 'fa fa-lock ft-stack-suffix ft-state-danger',
+                            'fa-user ft-stack-main',
+                            'fa-lock ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -1428,8 +1428,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-user ft-stack-main',
-                            'stack_second' => 'fa fa-key ft-stack-suffix ft-state-info',
+                            'fa-user ft-stack-main',
+                            'fa-key ft-stack-suffix ft-state-info',
                         ),
                 ),
         ),
@@ -1437,63 +1437,63 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-picasa',
+                    'classes' => 'ft-picasa',
                 ),
         ),
     'pie-chart' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-pie-chart',
+                    'classes' => 'fa-pie-chart',
                 ),
         ),
     'pipe' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-pipe',
+                    'classes' => 'ft-pipe',
                 ),
         ),
     'plug' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-plug',
+                    'classes' => 'fa-plug',
                 ),
         ),
     'plus' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-plus',
+                    'classes' => 'fa-plus',
                 ),
         ),
     'plus-circle-info' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-plus-circle ft-state-info',
+                    'classes' => 'fa-plus-circle ft-state-info',
                 ),
         ),
     'plus-square' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-plus-square',
+                    'classes' => 'fa-plus-square',
                 ),
         ),
     'plus-square-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-plus-square-o',
+                    'classes' => 'fa-plus-square-o',
                 ),
         ),
     'portfolio' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-profile',
+                    'classes' => 'ft-profile',
                 ),
         ),
     'portfolio-add' =>
@@ -1503,8 +1503,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'ft ft-profile ft-stack-main',
-                            'stack_second' => 'fa fa-plus ft-stack-suffix',
+                            'ft-profile ft-stack-main',
+                            'fa-plus ft-stack-suffix',
                         ),
                 ),
         ),
@@ -1512,7 +1512,7 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-print',
+                    'classes' => 'fa-print',
                 ),
         ),
     /* Totara program */
@@ -1520,7 +1520,7 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-cubes',
+                    'classes' => 'fa-cubes',
                 ),
         ),
     'publish' =>
@@ -1530,8 +1530,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-globe ft-stack-main',
-                            'stack_second' => 'fa fa-play ft-stack-suffix ft-state-info',
+                            'fa-globe ft-stack-main',
+                            'fa-play ft-stack-suffix ft-state-info',
                         ),
                 ),
         ),
@@ -1539,56 +1539,56 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-puzzle-piece',
+                    'classes' => 'fa-puzzle-piece',
                 ),
         ),
     'question' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-question',
+                    'classes' => 'fa-question',
                 ),
         ),
     'question-circle' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-question-circle',
+                    'classes' => 'fa-question-circle',
                 ),
         ),
     'question-circle-warning' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-question-circle ft-state-warning',
+                    'classes' => 'fa-question-circle ft-state-warning',
                 ),
         ),
     'ranges' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-vbars',
+                    'classes' => 'ft-vbars',
                 ),
         ),
     'recycle' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-recycle',
+                    'classes' => 'fa-recycle',
                 ),
         ),
     'refresh' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-refresh',
+                    'classes' => 'fa-refresh',
                 ),
         ),
     'repeat' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-repeat',
+                    'classes' => 'fa-repeat',
                 ),
         ),
     'risk-config' =>
@@ -1598,8 +1598,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-cogs ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                            'fa-cogs ft-stack-main',
+                            'fa-warning ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -1610,8 +1610,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-database ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                            'fa-database ft-stack-main',
+                            'fa-warning ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -1622,8 +1622,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-shield ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                            'fa-shield ft-stack-main',
+                            'fa-warning ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -1634,8 +1634,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-user ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                            'fa-user ft-stack-main',
+                            'fa-warning ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -1646,8 +1646,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-envelope ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                            'fa-envelope ft-stack-main',
+                            'fa-warning ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -1658,8 +1658,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-code ft-stack-main',
-                            'stack_second' => 'fa fa-warning ft-stack-suffix ft-state-danger',
+                            'fa-code ft-stack-main',
+                            'fa-warning ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -1667,49 +1667,49 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-bars',
+                    'classes' => 'fa-bars',
                 ),
         ),
     'rss' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-rss',
+                    'classes' => 'fa-rss',
                 ),
         ),
     'save' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-save',
+                    'classes' => 'fa-save',
                 ),
         ),
     'scales' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-stats-bars',
+                    'classes' => 'ft-stats-bars',
                 ),
         ),
     'scissors' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-scissors',
+                    'classes' => 'fa-scissors',
                 ),
         ),
     'search' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-search',
+                    'classes' => 'fa-search',
                 ),
         ),
     'seminar' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-seminar',
+                    'classes' => 'ft-seminar',
                 ),
         ),
     'separate-groups' =>
@@ -1719,8 +1719,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-users ft-stack-prefix',
-                            'stack_second' => 'fa fa-users ft-stack-suffix',
+                            'fa-users ft-stack-prefix',
+                            'fa-users ft-stack-suffix',
                         ),
                 ),
         ),
@@ -1729,7 +1729,7 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-cog',
+                    'classes' => 'fa-cog',
                 ),
         ),
     'settings-lock' =>
@@ -1739,8 +1739,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-cog ft-stack-main',
-                            'stack_second' => 'fa fa-lock ft-stack-suffix ft-state-danger',
+                            'fa-cog ft-stack-main',
+                            'fa-lock ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -1748,14 +1748,14 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-share-square-o',
+                    'classes' => 'fa-share-square-o',
                 ),
         ),
     'sigma' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-sigma',
+                    'classes' => 'ft-sigma',
                 ),
         ),
     'sigma-plus' =>
@@ -1765,8 +1765,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'ft ft-sigma ft-stack-main',
-                            'stack_second' => 'fa fa-plus ft-stack-suffix',
+                            'ft-sigma ft-stack-main',
+                            'fa-plus ft-stack-suffix',
                         ),
                 ),
         ),
@@ -1774,7 +1774,7 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-sign-out',
+                    'classes' => 'fa-sign-out',
                 ),
         ),
     'site-lock' =>
@@ -1784,8 +1784,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-sitemap ft-stack-main',
-                            'stack_second' => 'fa fa-lock ft-stack-suffix ft-state-danger',
+                            'fa-sitemap ft-stack-main',
+                            'fa-lock ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -1793,49 +1793,49 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-skyatlas',
+                    'classes' => 'fa-skyatlas',
                 ),
         ),
     'slash' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-slash',
+                    'classes' => 'ft-slash',
                 ),
         ),
     'sliders' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-sliders',
+                    'classes' => 'fa-sliders',
                 ),
         ),
     'smile-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-smile-o',
+                    'classes' => 'fa-smile-o',
                 ),
         ),
     'sort' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-sort',
+                    'classes' => 'fa-sort',
                 ),
         ),
     'sort-asc' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-sort-asc',
+                    'classes' => 'fa-sort-asc',
                 ),
         ),
     'sort-desc' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-sort-desc',
+                    'classes' => 'fa-sort-desc',
                 ),
         ),
     'spacer' =>
@@ -1846,42 +1846,42 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-spinner fa-pulse',
+                    'classes' => 'fa-spinner fa-pulse',
                 ),
         ),
     'square-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-square-o',
+                    'classes' => 'fa-square-o',
                 ),
         ),
     'stamp' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-stamp',
+                    'classes' => 'ft-stamp',
                 ),
         ),
     'star' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-star',
+                    'classes' => 'fa-star',
                 ),
         ),
     'star-half-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-star-half-o',
+                    'classes' => 'fa-star-half-o',
                 ),
         ),
     'star-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-star-o',
+                    'classes' => 'fa-star-o',
                 ),
         ),
     'subscribed' =>
@@ -1891,8 +1891,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-envelope-o ft-stack-main',
-                            'stack_second' => 'fa fa-check ft-stack-suffix ft-state-success',
+                            'fa-envelope-o ft-stack-main',
+                            'fa-check ft-stack-suffix ft-state-success',
                         ),
                 ),
         ),
@@ -1900,133 +1900,133 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-table',
+                    'classes' => 'fa-table',
                 ),
         ),
     'tag' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-tag',
+                    'classes' => 'fa-tag',
                 ),
         ),
     'th-large' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-th-large',
+                    'classes' => 'fa-th-large',
                 ),
         ),
     'th-list' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-th-list',
+                    'classes' => 'fa-th-list',
                 ),
         ),
     'thumbs-down-danger' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-thumbs-down ft-state-danger',
+                    'classes' => 'fa-thumbs-down ft-state-danger',
                 ),
         ),
     'thumbs-up-success' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-thumbs-up ft-state-success',
+                    'classes' => 'fa-thumbs-up ft-state-success',
                 ),
         ),
     'times-circle-danger' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-times-circle ft-state-danger',
+                    'classes' => 'fa-times-circle ft-state-danger',
                 ),
         ),
     'times-circle-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-times-circle-o',
+                    'classes' => 'fa-times-circle-o',
                 ),
         ),
     'times-circle-o-danger' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-times-circle-o ft-state-danger',
+                    'classes' => 'fa-times-circle-o ft-state-danger',
                 ),
         ),
     'times-danger' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-times ft-state-danger',
+                    'classes' => 'fa-times ft-state-danger',
                 ),
         ),
     'times-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-times ft-state-disabled',
+                    'classes' => 'fa-times ft-state-disabled',
                 ),
         ),
     'toggle-off' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-toggle-off',
+                    'classes' => 'fa-toggle-off',
                 ),
         ),
     'toggle-on' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-toggle-on',
+                    'classes' => 'fa-toggle-on',
                 ),
         ),
     'trash' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-trash',
+                    'classes' => 'fa-trash',
                 ),
         ),
     'trophy' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-trophy',
+                    'classes' => 'fa-trophy',
                 ),
         ),
     'undo' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-undo',
+                    'classes' => 'fa-undo',
                 ),
         ),
     'unlink' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-unlink',
+                    'classes' => 'fa-unlink',
                 ),
         ),
     'unlock' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-unlock',
+                    'classes' => 'fa-unlock',
                 ),
         ),
     'unlock-alt' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-unlock-alt',
+                    'classes' => 'fa-unlock-alt',
                 ),
         ),
     'unsubscribed' =>
@@ -2036,8 +2036,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-envelope-o ft-stack-main',
-                            'stack_second' => 'fa fa-times ft-stack-suffix ft-state-danger',
+                            'fa-envelope-o ft-stack-main',
+                            'fa-times ft-stack-suffix ft-state-danger',
                         ),
                 ),
         ),
@@ -2045,28 +2045,28 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-upload',
+                    'classes' => 'fa-upload',
                 ),
         ),
     'user' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-user',
+                    'classes' => 'fa-user',
                 ),
         ),
     'user-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-user ft-state-disabled',
+                    'classes' => 'fa-user ft-state-disabled',
                 ),
         ),
     'user-plus' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-user-plus',
+                    'classes' => 'fa-user-plus',
                 ),
         ),
     'user-refresh' =>
@@ -2076,8 +2076,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-user ft-stack-main',
-                            'stack_second' => 'fa fa-refresh ft-stack-suffix ft-state-info',
+                            'fa-user ft-stack-main',
+                            'fa-refresh ft-stack-suffix ft-state-info',
                         ),
                 ),
         ),
@@ -2085,63 +2085,63 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-user-secret',
+                    'classes' => 'fa-user-secret',
                 ),
         ),
     'user-times' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-user-times',
+                    'classes' => 'fa-user-times',
                 ),
         ),
     'users' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-users',
+                    'classes' => 'fa-users',
                 ),
         ),
     'viewtreeactive' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-viewtreeactive',
+                    'classes' => 'ft-viewtreeactive',
                 ),
         ),
     'volume-up' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-volume-up',
+                    'classes' => 'fa-volume-up',
                 ),
         ),
     'warning-warning' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-warning ft-state-warning',
+                    'classes' => 'fa-warning ft-state-warning',
                 ),
         ),
     'wheelchair' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-wheelchair',
+                    'classes' => 'fa-wheelchair',
                 ),
         ),
     'wikipedia-w' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-wikipedia-w',
+                    'classes' => 'fa-wikipedia-w',
                 ),
         ),
     'youtube-play' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-youtube-play',
+                    'classes' => 'fa-youtube-play',
                 ),
         ),
 );

@@ -36,8 +36,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-file-text-o ft-stack-main',
-                            'stack_second' => 'fa fa-thumb-tack ft-stack-suffix ft-state-info',
+                            'fa-file-text-o ft-stack-main',
+                            'fa-thumb-tack ft-stack-suffix ft-state-info',
                         ),
                 ),
         ),

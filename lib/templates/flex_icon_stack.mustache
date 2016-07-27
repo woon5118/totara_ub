@@ -32,8 +32,7 @@
     * none
 
     Context variables required for this template:
-    * classes.stack_first
-    * classes.stack_second
+    * classes
 
     Example context (json):
     {
@@ -41,16 +40,16 @@
             "classes": "custom-class another-custom-class",
             "alt": "Settings"
         },
-        "classes": {
-            "stack_first": "fa fa-user ft-stack-main",
-            "stack_second": "fa fa-warning ft-stack-suffix ft-state-warning"
-        }
+        "classes": [
+            "fa-user ft-stack-main",
+            "fa-warning ft-stack-suffix ft-state-warning"
+        ]
     }
 
 }}
-<span class="flex-icon ft-stack{{#customdata.classes}} {{.}}{{/customdata.classes}}"
+<span aria-hidden="true" class="flex-icon ft-fw ft-stack{{#customdata.classes}} {{.}}{{/customdata.classes}}"
       {{#customdata.alt}} title="{{.}}"{{/customdata.alt}}>
-    <span class="{{classes.stack_first}}"></span>
-    <span class="{{classes.stack_second}}"></span>
+{{#classes}}      <span class="ft ft-fw {{.}}"></span>
+{{/classes}}
 </span>
 {{#customdata.alt}}<span class="sr-only">{{.}}</span>{{/customdata.alt}}

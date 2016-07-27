@@ -32,14 +32,14 @@ $map = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa fa-book',
+                    'classes' => 'fa-book',
                 ),
         ),
     'mod_book|chapter' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft ft-book-open',
+                    'classes' => 'ft-book-open',
                 ),
         ),
 );

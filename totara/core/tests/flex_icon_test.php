@@ -127,15 +127,15 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         // New icon names.
         $icon = new flex_icon('edit', array('classes' => 'normalstuff'));
         $expected = array(
-            'classes' => 'fa fa-edit',
+            'classes' => 'fa-edit',
             'customdata' => array('classes' => 'normalstuff'),
         );
         $this->assertSame($expected, $icon->export_for_template($renderer));
         $icon = new flex_icon('unsubscribed', array('classes' => 'compositestuff'));
         $expected = array(
             'classes' => array(
-                'stack_first' => 'fa fa-envelope-o ft-stack-main',
-                'stack_second' => 'fa fa-times ft-stack-suffix ft-state-danger',
+                'fa-envelope-o ft-stack-main',
+                'fa-times ft-stack-suffix ft-state-danger',
             ),
             'customdata' => array('classes' => 'compositestuff'),
         );
@@ -144,7 +144,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         // Legacy icon name.
         $icon = new flex_icon('core|i/edit');
         $expected = array(
-            'classes' => 'fa fa-edit',
+            'classes' => 'fa-edit',
             'customdata' => array(),
         );
         $this->assertSame($expected, $icon->export_for_template($renderer));
@@ -152,7 +152,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         // Deprecated icon.
         $icon = new flex_icon('mod_book|nav_exit');
         $expected = array(
-            'classes' => 'fa fa-caret-up',
+            'classes' => 'fa-caret-up',
             'customdata' => array(),
         );
         $this->assertSame($expected, $icon->export_for_template($renderer));

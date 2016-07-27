@@ -59,8 +59,8 @@ only one-off graphical elements should use the pix_icon rendering and URLs.
 Plugins that are not complatible with automatic conversion to flex icons need to be updated by developers.</p>
 
 <p>This page diplays all flexible icons available in Totara core and illustrates how to use them.
-The flexible icons are based on {$fontawesomelink} font-icons with some bespoke additions - but that doensn't
-mean you're limited to only using icons listed here. All flex icons can be overridden by your theme and
+The flexible icons are based on {$fontawesomelink} font-icons using Totara specific CSS classes -
+but that doensn't mean you're limited to only using icons listed here. All flex icons can be overridden by your theme and
 plugin developers may add more icons for individual plugins.</p>
 
 <p>Flexible icons can be used from PHP or in any template via flex_icon helper.</p>
@@ -144,7 +144,7 @@ $sizeclasses = array(
     'ft-size-600',
     'ft-size-700',
 );
-echo render_icons_table(array('alarm-warning', 'edit', 'event-user'), $sizeclasses);
+echo render_icons_table(array('alarm-warning', 'edit', 'permissions'), $sizeclasses);
 $editicon = $OUTPUT->render(new flex_icon('edit', array('classes' => 'ft-size-300')));
 $editiconmarkup = htmlentities($editicon);
 echo <<<EOF
@@ -172,7 +172,7 @@ $stateclasses = array(
     'ft-state-other',
     'ft-state-disabled',
 );
-echo render_icons_table(array('alarm-warning', 'edit', 'event-user'), $stateclasses);
+echo render_icons_table(array('alarm-warning', 'edit', 'permissions'), $stateclasses);
 $editicon = $OUTPUT->render(new flex_icon('edit', array('classes' => 'ft-state-disabled')));
 $editiconmarkup = htmlentities($editicon);
 echo <<<EOF
@@ -229,7 +229,7 @@ or use the template renderer directly:<br />
 All preexisting non-icon files in pix directories should be moved elsewhere.</p>
 EOF;
 
-echo $OUTPUT->heading('List of all standard core icons');
+echo $OUTPUT->heading('List of all standard core flex icons');
 echo render_all_core_icons();
 echo <<<EOF
 <p>Note: Brand icons should only be used to represent the company or product to which they refer.</p>

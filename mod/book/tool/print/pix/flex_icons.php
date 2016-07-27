@@ -32,8 +32,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'fa fa-book ft-stack-main',
-                            'stack_second' => 'fa fa-print ft-stack-suffix',
+                            'fa-book ft-stack-main',
+                            'fa-print ft-stack-suffix',
                         ),
                 ),
         ),
@@ -44,8 +44,8 @@ $map = array(
                 array(
                     'classes' =>
                         array(
-                            'stack_first' => 'ft ft-book-open ft-stack-main',
-                            'stack_second' => 'fa fa-print ft-stack-suffix',
+                            'ft-book-open ft-stack-main',
+                            'fa-print ft-stack-suffix',
                         ),
                 ),
         ),
