@@ -287,10 +287,12 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $this->assertSame($expected, $renderer->render(new pix_icon('i/edit', '', 'moodle')));
         $this->assertSame($expected, $renderer->render(new pix_icon('i/edit', '', 'core')));
         $this->assertSame($expected, $renderer->render(new pix_icon('i/edit', '', '')));
+        $this->assertSame($expected, $renderer->render(new pix_icon('/i/edit', '')));
 
         $expected = $renderer->render(new flex_icon('mod_book|icon'));
         $this->assertSame($expected, $renderer->render(new pix_icon('icon', '', 'mod_book')));
         $this->assertSame($expected, $renderer->render(new pix_icon('icon', '', 'book')));
+        $this->assertSame($expected, $renderer->render(new pix_icon('/icon', '', 'book')));
     }
 
     public function test_render_action_icon() {

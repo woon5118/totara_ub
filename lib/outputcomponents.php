@@ -529,7 +529,7 @@ class pix_icon implements renderable, templatable {
      * @param array $attributes html attributes
      */
     public function __construct($pix, $alt, $component='moodle', array $attributes = null) {
-        $this->pix        = $pix;
+        $this->pix        = ltrim($pix, '/'); // Totara: fix invalid pix names with leading slashes.
         $this->component  = $component;
         $this->attributes = (array)$attributes;
 
