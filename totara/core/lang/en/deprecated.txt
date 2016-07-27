@@ -1,1 +1,2 @@
 recordoflearningfor,totara_core
+developmentplan,totara_core

@@ -172,7 +172,6 @@ $string['deleteusercheckfull'] = 'Are you absolutely sure you want to completely
 <li>messages will be marked as read</li>
 </ul>
 If you wish to retain any data you may wish to consider suspending the user instead.';
-$string['developmentplan'] = 'Development Planner';
 $string['disablefeature'] = 'Disable';
 $string['downloaderrorlog'] = 'Download error log';
 $string['dynamicappraisals'] = 'Dynamic Appraisals';
@@ -628,3 +627,4 @@ $string['xresultsfory'] = '<strong>{$a->count}</strong> results found for "{$a->
 // Deprecated in 9.0.
 
 $string['recordoflearningfor'] = 'Record of Learning for ';
+$string['developmentplan'] = 'Development Planner';
