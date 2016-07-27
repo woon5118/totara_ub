@@ -135,9 +135,6 @@ class mod_facetoface_generator extends testing_module_generator {
         if (!isset($record->allowoverbook)) {
             $record->allowoverbook = 0;
         }
-        if (!isset($record->duration)) {
-            $record->duration = '';
-        }
         if (!isset($record->normalcost)) {
             $record->normalcost = '$100';
         }

@@ -62,7 +62,6 @@
         <FIELD NAME="allowoverbook" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flag to turn on waitlisting of signups over capacity."/>
         <FIELD NAME="waitlisteveryone" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Will everyone be added to the waiting list"/>
         <FIELD NAME="details" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Extra information about this session"/>
-        <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Total duration (in minutes) of the session.  A session may be split across multiple dates, this is the total."/>
         <FIELD NAME="normalcost" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The normal (non-discounted) cost of the session"/>
         <FIELD NAME="discountcost" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Discounted cost of the event"/>
         <FIELD NAME="allowcancellations" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>

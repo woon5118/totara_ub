@@ -261,17 +261,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'session',
-                'duration',
-                get_string('sessduration', 'rb_source_facetoface_sessions'),
-                '(sessiondate.timefinish-sessiondate.timestart)/' . MINSECS,
-                array(
-                    'joins' => array('sessiondate','sessions'),
-                    'dbdatatype' => 'decimal',
-                    'displayfunc' => 'duration_hours_minutes',
-                )
-            ),
-            new rb_column_option(
-                'session',
                 'signupperiod',
                 get_string('signupperiod', 'rb_source_facetoface_sessions'),
                 'sessions.registrationtimestart',
@@ -601,12 +590,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'details',
                 get_string('sessdetails', 'rb_source_facetoface_sessions'),
                 'text'
-            ),
-            new rb_filter_option(
-                'session',
-                'duration',
-                get_string('sessduration', 'rb_source_facetoface_sessions'),
-                'number'
             ),
             new rb_filter_option(
                 'session',

@@ -256,7 +256,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
     //check dates and calculate total duration
     $sessiondates = array();
-    $fromform->duration = 0;
     for ($i = 0; $i < $fromform->cntdates; $i++) {
         if (!empty($fromform->datedelete[$i])) {
             continue; // skip this date
@@ -268,7 +267,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
             $date->timefinish = $fromform->timefinish[$i];
             $date->roomid = $fromform->roomid[$i];
             $date->assetids = !empty($fromform->assetids[$i]) ? explode(',', $fromform->assetids[$i]) : array();
-            $fromform->duration += ($date->timefinish - $date->timestart);
             $sessiondates[] = $date;
         }
     }

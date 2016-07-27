@@ -116,7 +116,6 @@ class mod_facetoface_archive_testcase extends advanced_testcase {
         $session->facetoface = $facetoface->id;
         $session->capacity = 10;
         $session->allowoverbook = 0;
-        $session->duration = 0;
         $session->normalcost = 0;
         $session->discountcost = 0;
         $session->usermodified = $manager->id;

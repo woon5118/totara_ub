@@ -266,17 +266,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'facetoface',
-                'duration',
-                get_string('duration', 'rb_source_facetoface_summary'),
-                '(base.timefinish-base.timestart)/' . MINSECS,
-                array(
-                    'joins' => 'sessions',
-                    'dbdatatype' => 'decimal',
-                    'displayfunc' => 'duration_hours_minutes'
-                )
-            ),
-            new rb_column_option(
-                'facetoface',
                 'minbookings',
                 get_string('minbookings', 'rb_source_facetoface_summary'),
                 'sessions.mincapacity',

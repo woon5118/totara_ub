@@ -177,6 +177,7 @@ You can then add the following placeholders for each session:
 * [session:finishtime] - finish time of the session.
 * [session:finishdate] - finish date of the session.
 * [session:timezone] - timezone of the session.
+* [session:duration] - session duration.
 * [session:room:name] - name of room assigned to this session.
 * [session:room:link] - link to details page for this room.
 
@@ -1069,11 +1070,10 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [facetofacename]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1104,11 +1104,10 @@ $string['setting:defaultcancelallreservationsmessagedefault_v9'] = 'This is to a
 
 Course:   [facetofacename]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1135,11 +1134,10 @@ $string['setting:defaultcancelreservationmessagedefault_v9'] = 'This is to advis
 
 Course:   [facetofacename]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1180,11 +1178,10 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [facetofacename]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1235,11 +1232,10 @@ Course:   [coursename]
 Seminar:   [facetofacename]
 Cost:   [cost]
 
-Duration:    [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1276,11 +1272,10 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [facetofacename]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1304,11 +1299,10 @@ Course: [coursename]
 
 Seminar: [facetofacename]
 
-Duration: [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1333,11 +1327,10 @@ Course: [coursename]
 
 Face-to-face: [facetofacename]
 
-Duration: [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1350,11 +1343,10 @@ Course: [coursename]
 
 Seminar: [facetofacename]
 
-Duration: [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1405,11 +1397,10 @@ Course:   [coursename]
 Seminar:   [facetofacename]
 Cost:   [cost]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1456,11 +1447,10 @@ Course:   [coursename]
 Seminar:   [facetofacename]
 Cost:   [cost]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1500,11 +1490,10 @@ Course:   [coursename]
 Seminar:   [facetofacename]
 Cost:   [cost]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1544,11 +1533,10 @@ Course:   [coursename]
 Seminar:   [facetofacename]
 Cost:   [cost]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1584,11 +1572,10 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [facetofacename]
 
-Duration:    [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1629,11 +1616,10 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [facetofacename]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1670,11 +1656,10 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [facetofacename]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]
@@ -1745,11 +1730,10 @@ $string['setting:defaultsessioncancellationmessagedefault_v9'] = 'This is to adv
 Course:   [coursename]
 Seminar:   [facetofacename]
 
-Duration:   [duration]
-
 Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
 Room: [session:room:name]
 Building: [session:room:cf_building]
 Location: [session:room:cf_location]

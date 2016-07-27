@@ -1636,7 +1636,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $lateststartdate = userdate(end($data->sessiondates)->timestart, $strftimedate, $sessiontimezone);
         $latestfinishtime = userdate(end($data->sessiondates)->timefinish, $strftimetime, $sessiontimezone);
         $latestfinishdate = userdate(end($data->sessiondates)->timefinish, $strftimedate, $sessiontimezone);
-
+        $data->duration = format_time((int)$data->sessiondates[0]->timestart - (int)end($data->sessiondates)->timefinish);
     } else {
         // Wait-listed session
         $startdate   = $str_unknowndate;
@@ -1648,6 +1648,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $lateststartdate = $str_unknowndate;
         $latestfinishtime = $str_unknowntime;
         $latestfinishdate = $str_unknowndate;
+        $data->duration = '';
     }
 
     if (!empty($approvalrole)) {
@@ -1679,7 +1680,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = str_replace('[lateststartdate]', $lateststartdate, $msg);
     $msg = str_replace('[latestfinishtime]', $latestfinishtime, $msg);
     $msg = str_replace('[latestfinishdate]', $latestfinishdate, $msg);
-    $msg = str_replace('[duration]', format_time($data->duration), $msg);
+    $msg = str_replace('[duration]', $data->duration, $msg);
     // Legacy.
     $msg = str_replace(get_string('placeholder:coursename', 'facetoface'), $coursename, $msg);
     $msg = str_replace(get_string('placeholder:facetofacename', 'facetoface'), $facetofacename, $msg);
@@ -1695,7 +1696,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = str_replace(get_string('placeholder:lateststartdate', 'facetoface'), $lateststartdate, $msg);
     $msg = str_replace(get_string('placeholder:latestfinishtime', 'facetoface'), $latestfinishtime, $msg);
     $msg = str_replace(get_string('placeholder:latestfinishdate', 'facetoface'), $latestfinishdate, $msg);
-    $msg = str_replace(get_string('placeholder:duration', 'facetoface'), format_time($data->duration), $msg);
+    $msg = str_replace(get_string('placeholder:duration', 'facetoface'), $data->duration, $msg);
 
     if (!empty($data->registrationtimefinish)) {
         $registrationcutoff = userdate($data->registrationtimefinish, get_string('strftimerecent'));
@@ -1824,6 +1825,7 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
             'session:finishdate' => '[session:finishdate]',
             'session:finishtime' => '[session:finishtime]',
             'session:timezone' => '[session:timezone]',
+            'session:duration' => '[session:duration]',
             'room:name' => '[session:room:name]',
             'room:link' => '[session:room:link]');
 
@@ -1878,6 +1880,9 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
                     case 'session:timezone':
                         $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
                         $value = $displaytimezones ? core_date::get_user_timezone($sessiontimezone) : '';
+                        break;
+                    case 'session:duration':
+                        $value = format_time((int)$sessiondate->timestart - (int)$sessiondate->timefinish);
                         break;
                     case 'room:name':
                         if (!empty($sessiondate->roomid) && isset($rooms[$sessiondate->roomid])) {

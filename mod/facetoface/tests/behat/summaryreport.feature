@@ -62,8 +62,6 @@ Feature: Seminar sessions report overview
     And I press "Add"
     And I set the field "newcolumns" to "Minimum bookings"
     And I press "Add"
-    And I set the field "newcolumns" to "Duration"
-    And I press "Add"
     And I set the field "newcolumns" to "Event Learner"
     And I press "Add"
     And I set the field "newcolumns" to "Event Learner (linked to profile)"

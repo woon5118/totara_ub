@@ -210,17 +210,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 )
             ),
             new rb_column_option(
-                'session',
-                'duration',
-                get_string('sessduration', 'rb_source_facetoface_signin'),
-                '(sessiondate.timefinish-sessiondate.timestart)/' . MINSECS,
-                array(
-                    'joins' => array('sessiondate','sessions'),
-                    'dbdatatype' => 'decimal',
-                    'displayfunc' => 'duration_hours_minutes',
-                )
-            ),
-            new rb_column_option(
                 'status',
                 'statuscode',
                 get_string('status', 'rb_source_facetoface_signin'),
@@ -437,12 +426,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'details',
                 get_string('sessdetails', 'rb_source_facetoface_signin'),
                 'text'
-            ),
-            new rb_filter_option(
-                'session',
-                'duration',
-                get_string('sessduration', 'rb_source_facetoface_signin'),
-                'number'
             ),
             new rb_filter_option(
                 'session',

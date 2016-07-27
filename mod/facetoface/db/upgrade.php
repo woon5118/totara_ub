@@ -1245,7 +1245,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
     if ($oldversion < 2013070900) {
         // Change the cost fields to varchars instead of integers.
         $table = new xmldb_table('facetoface_sessions');
-        $costfield = new xmldb_field('normalcost', XMLDB_TYPE_CHAR, '255', null, true, null, '0','duration');
+        $costfield = new xmldb_field('normalcost', XMLDB_TYPE_CHAR, '255', null, true, null, '0','details');
         $discountfield = new xmldb_field('discountcost', XMLDB_TYPE_CHAR, '255', null, true, null, '0','normalcost');
         $dbman->change_field_type($table, $costfield);
         $dbman->change_field_type($table, $discountfield);
@@ -2351,21 +2351,6 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2014102200, 'facetoface');
-    }
-
-
-    if ($oldversion < 2014102201) {
-        // Change the f2f session duration fields from minutes to seconds.
-        $sessions = $DB->get_recordset('facetoface_sessions', null, 'id', 'id, duration');
-        $transaction = $DB->start_delegated_transaction();
-        foreach ($sessions as $session) {
-            $session->duration = $session->duration * MINSECS;
-            $DB->set_field('facetoface_sessions', 'duration', $session->duration, array('id' => $session->id));
-        }
-        $transaction->allow_commit();
-
-        // Facetoface savepoint reached.
-        upgrade_mod_savepoint(true, 2014102201, 'facetoface');
     }
 
     /* T-13006: It should not be possible for a signup status record to have a statuscode of
@@ -3898,6 +3883,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         $f2flangstrings['sessionfinishtime'] = '[session:finishtime]';
         $f2flangstrings['sessionfinishdate'] = '[session:finishdate]';
         $f2flangstrings['timezone'] = '[session:timezone]';
+        $f2flangstrings['duration'] = '[session:duration]';
 
         // Strings for previous template defaults just prior to 9.0. Uses their reference as keys.
         $oldtemplatedefaults = array();
@@ -4369,6 +4355,18 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         $records->close();
 
         upgrade_mod_savepoint(true, 2016071200, 'facetoface');
+    }
+
+    if ($oldversion < 2016080900) {
+        // Drop the old column
+        $table = new xmldb_table('facetoface_sessions');
+        $field = new xmldb_field('duration');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2016080900, 'facetoface');
     }
 
     return $result;

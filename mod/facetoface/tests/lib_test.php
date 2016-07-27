@@ -929,14 +929,12 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         //define session object for test
         //valid values
         $sessionValid = new stdClass();
-        $sessionValid->duration = '5400';
         $sessionValid->capacity = '250';
         $sessionValid->normalcost = '70';
         $sessionValid->discountcost = '50';
 
         //invalid values
         $sessionInvalid = new stdClass();
-        $sessionInvalid->duration = '0';
         $sessionInvalid->capacity = '100999';
         $sessionInvalid->normalcost = '-7';
         $sessionInvalid->discountcost = 'b';
@@ -2138,7 +2136,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $newfields = array('sessions:loopstart' => '[#sessions]', 'session:starttime' => '[session:starttime]',
             'session:startdate' => '[session:startdate]', 'session:finishtime' => '[session:finishtime]',
             'session:finishdate' => '[session:finishdate]', 'session:timezone' => '[session:timezone]',
-            'sessions:loopend' => '[/sessions]');
+            'session:duration' => '[session:duration]', 'sessions:loopend' => '[/sessions]');
         foreach ($newfields as $key => $field) {
             // adding name of field in front of placeholder so that tests for starttime etc. don't simply pick
             // up those times within alldates.

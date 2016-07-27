@@ -1996,7 +1996,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
         $locationwhere = "AND $locationsql";
     }
 
-    $sql = "SELECT d.id as dateid, s.id, s.capacity, s.duration, d.timestart, d.timefinish, d.roomid,
+    $sql = "SELECT d.id as dateid, s.id, s.capacity, d.timestart, d.timefinish, d.roomid,
                    d.sessiontimezone
               FROM {facetoface_sessions} s
               JOIN {facetoface_sessions_dates} d
@@ -2095,7 +2095,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
                 $worksheet->write_string($i, $j++, $roomstring);
                 $worksheet->write_string($i, $j++, $starttime);
                 $worksheet->write_string($i, $j++, $finishtime);
-                $worksheet->write_string($i, $j++, format_time($session->duration));
+                $worksheet->write_string($i, $j++, format_time((int)$session->timestart - (int)$session->timefinish));
                 $worksheet->write_string($i, $j++, $status);
 
                 if ($trainerroles) {
@@ -2199,7 +2199,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             $worksheet->write_string($i, $j++, $roomstring);
             $worksheet->write_string($i, $j++, $starttime);
             $worksheet->write_string($i, $j++, $finishtime);
-            $worksheet->write_string($i, $j++, format_time($session->duration));
+            $worksheet->write_string($i, $j++, format_time((int)$session->timestart - (int)$session->timefinish));
             $worksheet->write_string($i, $j++, $status);
 
             if ($trainerroles) {
@@ -3713,6 +3713,9 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
             $output .= html_writer::tag('dt', $strdatetime);
             $output .= html_writer::tag('dd', $html);
 
+            $output .= html_writer::tag('dt', get_string('duration', 'facetoface'));
+            $output .= html_writer::tag('dd', format_time((int)$date->timestart - (int)$date->timefinish));
+
             if (!$date->roomid or !isset($rooms[$date->roomid])) {
                 continue;
             }
@@ -3754,11 +3757,6 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     // Display waitlist notification
     if (!$hidesignup && $session->allowoverbook && $placesleft < 1) {
         $output .= html_writer::tag('dd', get_string('userwillbewaitlisted', 'facetoface'));
-    }
-
-    if (!empty($session->duration)) {
-        $output .= html_writer::tag('dt', get_string('duration', 'facetoface'));
-        $output .= html_writer::tag('dd', format_time($session->duration));
     }
 
     if ($facetoface->approvaltype != APPROVAL_NONE && $facetoface->approvaltype != APPROVAL_SELF) {

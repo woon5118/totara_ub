@@ -38,7 +38,6 @@ function facetoface_get_unmailed_reminders() {
             f.course,
             f.id as facetofaceid,
             f.name as facetofacename,
-            se.duration,
             se.normalcost,
             se.discountcost,
             se.details
