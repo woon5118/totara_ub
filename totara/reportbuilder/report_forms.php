@@ -171,7 +171,7 @@ class report_builder_edit_filters_form extends moodleform {
             $mform->addElement('html', $OUTPUT->container(get_string('standardfilterdesc', 'totara_reportbuilder')) .
                     html_writer::empty_tag('br'));
 
-            $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table') .
+            $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table', array('class' => 'table table-striped')) .
                     html_writer::start_tag('tr') . html_writer::tag('th', get_string('searchfield', 'totara_reportbuilder')) .
                     html_writer::tag('th', get_string('customisename', 'totara_reportbuilder'), array('colspan' => 2)) .
                     html_writer::tag('th', get_string('advanced', 'totara_reportbuilder')) .
@@ -270,7 +270,7 @@ class report_builder_edit_filters_form extends moodleform {
                     html_writer::empty_tag('br'));
             $mform->addElement('selectgroups', "all_sidebar_filters", '', $allsidebarfilters);
 
-            $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table') .
+            $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table', array('class' => 'table table-striped')) .
                     html_writer::start_tag('tr') . html_writer::tag('th', get_string('searchfield', 'totara_reportbuilder')) .
                     html_writer::tag('th', get_string('customisename', 'totara_reportbuilder'), array('colspan' => 2)) .
                     html_writer::tag('th', get_string('advanced', 'totara_reportbuilder')) .
@@ -392,7 +392,7 @@ class report_builder_edit_filters_form extends moodleform {
             $mform->addElement('html', $OUTPUT->container(get_string('toolbarsearchdesc', 'totara_reportbuilder')) .
                     html_writer::empty_tag('br'));
 
-            $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table') .
+            $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table', array('class' => 'table table-striped')) .
                     html_writer::start_tag('tr') . html_writer::tag('th', get_string('searchfield', 'totara_reportbuilder')) .
                     html_writer::tag('th', get_string('options', 'totara_reportbuilder')) . html_writer::end_tag('tr'));
 
@@ -510,7 +510,7 @@ class report_builder_edit_columns_form extends moodleform {
                 html_writer::empty_tag('br'));
 
 
-            $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table') .
+            $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table', array('class' => 'table table-striped')) .
                 html_writer::start_tag('tr') . html_writer::tag('th', get_string('column', 'totara_reportbuilder')) .
                 html_writer::tag('th', get_string('advancedcolumnheading', 'totara_reportbuilder')) .
                 html_writer::tag('th', get_string('customiseheading', 'totara_reportbuilder'), array('colspan' => 2)) .
@@ -684,7 +684,7 @@ class report_builder_edit_columns_form extends moodleform {
                 $mform->addElement('html', html_writer::tag('p', get_string('badcolumnsdesc', 'totara_reportbuilder')));
 
                 $mform->addElement('html',
-                    $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table') . html_writer::start_tag('tr') .
+                    $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table', array('class' => 'table table-striped')) . html_writer::start_tag('tr') .
                     html_writer::tag('th', get_string('type', 'totara_reportbuilder')) .
                     html_writer::tag('th', get_string('value', 'totara_reportbuilder')) .
                     html_writer::tag('th', get_string('heading', 'totara_reportbuilder')) .

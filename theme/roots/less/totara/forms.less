@@ -23,6 +23,76 @@
 
 @import "moodle/forms";
 
+.mform .fitem_fgroup .felement input[type="text"],
+.mform .fitem_fgroup .felement input[type="password"] {
+  display: inline-block;
+}
+
+.mform .fitem .felement input[type="checkbox"],
+.mform .fitem .felement input[type="radio"] {
+  vertical-align: (@line-height-computed * -.2);
+}
+
+.mform .fitem_fscheduler .felement select,
+.mform .fdate_time_selector .felement select,
+.mform .fgroup .felement select {
+  width: auto;
+  display: inline-block;
+  margin-right: @padding-xs-horizontal;
+}
+
+.mform .fgroup .felement input[type="text"] {
+  margin-right: @padding-small-horizontal;
+}
+
+// 'Required information' text at the top of a form.
+.mform .fdescription.required {
+  margin-bottom: @line-height-computed;
+}
+
+// Collapsible section headers.
+.mform .collapsible .ftoggler .fheader {
+  margin-left: 0;
+}
+
+// For grouped elements with no label.
+.mform .femptylabel .fgroup .felement {
+  float: right;
+}
+
+.mform span.error {
+  color: @state-danger-text;
+  background-color: inherit;
+  display: block;
+  clear: both;
+}
+
+.mform input[type="password"] + div.unmask {
+  display: inline-block;
+  margin-left: @padding-small-horizontal;
+}
+
+.mform input[type="password"] + div.unmask > label {
+  padding: 0;
+  margin: 0;
+}
+
+//
+// Form elements inside tables (e.g. Reportbuilder columns).
+//
+.mform table .fitem {
+  // Remove default margins set by Bootstrap
+  // for form elements in this situation as
+  // it causes them to overlap table cells.
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+}
+
+.mform td .fitem .fcheckbox {
+  margin-top: (@line-height-computed * 0.4);
+}
+
 div#dateselector-calendar-panel {
-    z-index: 3100; /* Fix for calendar pickers in dialogs & filepickers - see MDL-39047. */
+  z-index: 3100; /* Fix for calendar pickers in dialogs & filepickers - see MDL-39047. */
 }
