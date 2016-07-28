@@ -1616,7 +1616,7 @@ function message_contact_link($userid, $linktype='add', $return=false, $script=n
         $iconpath = null;
         switch ($linktype) {
             case 'block':
-                $iconpath = 'block';
+                $iconpath = 'ban';
                 break;
             case 'unblock':
                 $iconpath = 'check';

@@ -198,7 +198,7 @@ foreach ($overrides as $override) {
         // Duplicate.
         $copyurlstr = $overrideediturl->out(true,
                 array('id' => $override->id, 'action' => 'duplicate'));
-        $iconstr .= '<a title="' . get_string('copy') . '" href="' . $copyurlstr . '">' . $OUTPUT->flex_icon('copy', array ('alt' => get_string('copy'))) . '</a> ';
+        $iconstr .= '<a title="' . get_string('copy') . '" href="' . $copyurlstr . '">' . $OUTPUT->flex_icon('duplicate', array ('alt' => get_string('copy'))) . '</a> ';
     }
     // Delete.
     $deleteurlstr = $overridedeleteurl->out(true,
