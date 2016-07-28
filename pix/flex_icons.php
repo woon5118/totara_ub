@@ -778,6 +778,13 @@ $map = array(
                     'classes' => 'fa-dropbox',
                 ),
         ),
+    'duplicate' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-copy',
+                ),
+        ),
     'ebook' =>
         array(
             'data' =>
@@ -2176,7 +2183,7 @@ $deprecated = array(
     'core|b/document-edit' => 'document-edit',
     'core|b/document-new' => 'document-new',
     'core|b/document-properties' => 'document-properties',
-    'core|b/edit-copy' => 'copy',
+    'core|b/edit-copy' => 'duplicate',
     'core|b/edit-delete' => 'delete',
     'core|c/event' => 'calendar',
     'core|docs' => 'info-circle',
@@ -2365,7 +2372,7 @@ $deprecated = array(
     'core|t/collapsed_empty_rtl' => 'caret-left-disabled',
     'core|t/collapsed_rtl' => 'caret-left',
     'core|t/contextmenu' => 'bars',
-    'core|t/copy' => 'copy',
+    'core|t/copy' => 'duplicate',
     'core|t/delete' => 'delete',
     'core|t/disable_down' => 'arrow-down',
     'core|t/disable_up' => 'arrow-up',

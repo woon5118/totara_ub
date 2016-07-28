@@ -284,7 +284,76 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                     'deprecated' => true,
                 ),
         );
+        $this->assertSame($expected, $icons);
 
+        $iconsdata = array(
+            'translations' => array(
+                'mod_xxx|missing' => 'xxzxzxzxz',
+            ),
+            'defaults' => array(
+                'data' => array(
+                    'template' => 'core/flex_icon',
+                ),
+            ),
+            'deprecated' => array(
+            ),
+            'map' => array(
+                'close' => array(
+                    'data' =>
+                        array(
+                            'classes' => 'fa-close',
+                        ),
+                ),
+            ),
+        );
+        $icons = $function->invoke(null, $iconsdata);
+        $this->assertDebuggingCalled();
+        $expected = array(
+            'close' =>
+                array(
+                    'data' =>
+                        array(
+                            'template' => 'core/flex_icon',
+                            'classes' => 'fa-close',
+                        ),
+                    'template' => 'core/flex_icon',
+                ),
+        );
+        $this->assertSame($expected, $icons);
+
+        $iconsdata = array(
+            'translations' => array(
+            ),
+            'defaults' => array(
+                'data' => array(
+                    'template' => 'core/flex_icon',
+                ),
+            ),
+            'deprecated' => array(
+                'mod_xxx|missing' => 'xxzxzxzxz',
+            ),
+            'map' => array(
+                'close' => array(
+                    'data' =>
+                        array(
+                            'classes' => 'fa-close',
+                        ),
+                ),
+            ),
+        );
+        $icons = $function->invoke(null, $iconsdata);
+        $this->assertDebuggingCalled();
+        $expected = array(
+            'close' =>
+                array(
+                    'data' =>
+                        array(
+                            'template' => 'core/flex_icon',
+                            'classes' => 'fa-close',
+                        ),
+                    'template' => 'core/flex_icon',
+                ),
+        );
         $this->assertSame($expected, $icons);
     }
 

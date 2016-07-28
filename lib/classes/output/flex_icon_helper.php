@@ -103,7 +103,7 @@ class flex_icon_helper {
                 continue;
             }
             if (!isset($iconsdata['map'][$identifierto])) {
-                // Nothing to map to.
+                debugging("Deprecated pix icon $identifierfrom points to non-existent $identifierto map entry", DEBUG_DEVELOPER);
                 continue;
             }
             if (!empty($iconsdata['map'][$identifierto]['translatesto'])) {
