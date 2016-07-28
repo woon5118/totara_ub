@@ -1473,12 +1473,9 @@ class grade_structure {
                         $modinfo = get_fast_modinfo($element['object']->courseid);
                         $module = $element['object']->itemmodule;
                         $instanceid = $element['object']->iteminstance;
-                        if (isset($modinfo->instances[$module][$instanceid])) {
-                            $icon->url = $modinfo->instances[$module][$instanceid]->get_icon_url();
-                        } else {
-                            $icon->pix = 'icon';
-                            $icon->component = $element['object']->itemmodule;
-                        }
+                        // Totara: always use the plugin icon, the custom activity icon urls are not compatible with flex icons!
+                        $icon->pix = 'icon';
+                        $icon->component = $element['object']->itemmodule;
                         $icon->title = s(get_string('modulename', $element['object']->itemmodule));
                     }
                 } else if ($element['object']->itemtype == 'manual') {
