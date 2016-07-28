@@ -200,6 +200,24 @@ echo <<<EOF
 </p>
 EOF;
 
+echo $OUTPUT->heading('RTL aware icons');
+echo <<<EOF
+<p>Some icons need to be horizontally flipped in right-to-left languages, to do thisd evelopers may use ft-flip-rtl class in flex icon definition.
+For example:<br />
+<pre>
+\$map = array(
+    'mod_book|nav_prev' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-caret-left ft-flip-rtl',
+                ),
+        ),
+);
+</pre>
+</p>
+EOF;
+
 echo $OUTPUT->heading('Necessary code changes in pre-existing code', 3);
 echo <<<EOF
 <p>Flexible icons require minimal changes in existing code, in most cases new icons are

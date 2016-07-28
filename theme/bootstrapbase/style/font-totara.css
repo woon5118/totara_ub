@@ -656,6 +656,13 @@
     text-shadow: -1px 0 0 #FFF, 1px 0 0 #FFF, 0 -1px 0 #FFF, 0 1px 0 #FFF, 2px 2px 0 #FFF;
 }
 
+/* RTL support */
+.dir-rtl .ft-flip-rtl {
+    -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)";
+    -webkit-transform: scale(-1, 1);
+    -ms-transform: scale(-1, 1);
+    transform: scale(-1, 1);
+}
 
 /* icon colours */
 /* Replace with Sass values */

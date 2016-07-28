@@ -147,16 +147,13 @@ foreach ($chapters as $ch) {
 
 $islastchapter = false;
 if ($book->navstyle) {
-    $navprevicon = right_to_left() ? 'caret-right' : 'caret-left';
-    $navnexticon = right_to_left() ? 'caret-left' : 'caret-right';
-    $navprevdisicon = right_to_left() ? 'caret-right-info' : 'caret-left-info';
     $chnavigation = '';
     if ($previd) {
         $navprev = get_string('navprev', 'book');
         if ($book->navstyle == 1) {
             $chnavigation .= '<a title="' . $navprev . '" class="bookprev" href="view.php?id=' .
                 $cm->id . '&amp;chapterid=' . $previd .  '">' .
-                $OUTPUT->flex_icon($navprevicon, array('alt' => $navprev, 'classes' => 'ft-size-600')) . '</a>';
+                $OUTPUT->flex_icon('mod_book|nav_prev', array('alt' => $navprev, 'classes' => 'ft-size-600')) . '</a>';
         } else {
             $chnavigation .= '<a title="' . $navprev . '" class="bookprev" href="view.php?id=' .
                 $cm->id . '&amp;chapterid=' . $previd . '">' .
@@ -165,7 +162,7 @@ if ($book->navstyle) {
         }
     } else {
         if ($book->navstyle == 1) {
-            $chnavigation .= $OUTPUT->flex_icon($navprevdisicon);
+            $chnavigation .= $OUTPUT->flex_icon('mod_book|nav_prev_dis', array('classes' => 'ft-size-600'));
         }
     }
     if ($nextid) {
@@ -173,7 +170,7 @@ if ($book->navstyle) {
         if ($book->navstyle == 1) {
             $chnavigation .= '<a title="' . $navnext . '" class="booknext" href="view.php?id=' .
                 $cm->id . '&amp;chapterid='.$nextid.'">' .
-                $OUTPUT->flex_icon($navnexticon, array('alt' => $navnext, 'classes' => 'ft-size-600')) . '</a>';
+                $OUTPUT->flex_icon('mod_book|nav_next', array('alt' => $navnext, 'classes' => 'ft-size-600')) . '</a>';
         } else {
             $chnavigation .= ' <a title="' . $navnext . '" class="booknext" href="view.php?id=' .
                 $cm->id . '&amp;chapterid='.$nextid.'">' .
@@ -186,7 +183,7 @@ if ($book->navstyle) {
         $returnurl = course_get_url($course, $sec);
         if ($book->navstyle == 1) {
             $chnavigation .= '<a title="' . $navexit . '" class="bookexit"  href="'.$returnurl.'">' .
-                $OUTPUT->flex_icon('caret-up', array('alt' => $navexit, 'classes' => 'ft-size-600')) . '</a>';
+                $OUTPUT->flex_icon('mod_book|nav_exit', array('alt' => $navexit, 'classes' => 'ft-size-600')) . '</a>';
         } else {
             $chnavigation .= ' <a title="' . $navexit . '" class="bookexit"  href="'.$returnurl.'">' .
                 '<span class="chaptername">' . $navexit . '&nbsp;' . $OUTPUT->uarrow() . '</span></a>';

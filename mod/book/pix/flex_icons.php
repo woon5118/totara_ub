@@ -42,17 +42,41 @@ $map = array(
                     'classes' => 'ft-book-open',
                 ),
         ),
+    'mod_book|nav_exit' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-caret-up',
+                ),
+        ),
+    'mod_book|nav_next' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-caret-right ft-flip-rtl',
+                ),
+        ),
+    'mod_book|nav_prev' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-caret-left ft-flip-rtl',
+                ),
+        ),
+    'mod_book|nav_prev_dis' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-caret-left ft-state-disabled ft-flip-rtl',
+                ),
+        ),
 );
 
 /*
  * These deprecated icons should not be used anymore.
  */
 $deprecated = array(
-    'mod_book|nav_exit' => 'caret-up',
-    'mod_book|nav_next' => 'caret-right',
     'mod_book|nav_next_dis' => 'caret-right-disabled',
-    'mod_book|nav_prev' => 'caret-left',
-    'mod_book|nav_prev_dis' => 'caret-left-disabled',
     'mod_book|nav_sep' => 'pipe',
     'mod_book|add' => 'plus',
 );
