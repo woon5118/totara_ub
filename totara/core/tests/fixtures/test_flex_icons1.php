@@ -7,11 +7,11 @@
  *
  */
 
-$translations = array(
+$aliases = array(
     'add' => 'plus',
 );
 
-$map = array(
+$icons = array(
     'icon' =>
         array(
             'data' =>

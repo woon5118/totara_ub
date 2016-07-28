@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$map = array(
+$icons = array(
     'booktool_exportimscp|generate' =>
         array(
             'template' => 'core/flex_icon_stack',

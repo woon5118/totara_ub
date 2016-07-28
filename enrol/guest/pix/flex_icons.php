@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'enrol_guest|withoutpassword' => 'no-key',
     'enrol_guest|withpassword' => 'key',
 );

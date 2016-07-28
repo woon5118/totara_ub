@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'enrol_totara_facetoface|withkey' => 'key',
     'enrol_totara_facetoface|withoutkey' => 'no-key',
 );

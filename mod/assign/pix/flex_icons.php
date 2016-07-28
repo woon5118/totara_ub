@@ -24,11 +24,11 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'mod_assign|gradefeedback' => 'edit',
 );
 
-$map = array(
+$icons = array(
     'mod_assign|icon' =>
         array(
             'template' => 'core/flex_icon_stack',

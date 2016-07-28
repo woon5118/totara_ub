@@ -7,12 +7,12 @@
  *
  */
 
-$translations = array(
+$aliases = array(
     'add' => 'minus',
     'remove' => 'plus',
 );
 
-$map = array(
+$icons = array(
     'icon' =>
         array(
             'data' =>
@@ -32,10 +32,4 @@ $map = array(
 
 $deprecated = array(
     'nav_entry' => 'caret-down',
-);
-
-$defaults = array(
-    'data' => array(
-        'template' => 'core/flex_icon2',
-    )
 );

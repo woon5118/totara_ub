@@ -44,80 +44,74 @@ class flex_icon_helper {
     const MISSING_ICON = 'flex-icon-missing';
 
     /**
-     * Resolve translation, deprecated, defaults and map
+     * Resolve aliases, deprecated, and icons
      * to create a list of all icons.
      *
      * @param array $iconsdata
      * @return array all flex icon definitions
      */
-    protected static function resolve_translations(array $iconsdata) {
-        // Apply defaults to map.
-        if ($iconsdata['defaults']) {
-            $template = 'core/flex_icon';
-            if (!empty($iconsdata['defaults']['template'])) {
-                $template = $iconsdata['defaults']['template'];
+    protected static function resolve_aliases(array $iconsdata) {
+        // Add defaults to all icons.
+        foreach ($iconsdata['icons'] as $identifier => $item) {
+            if (empty($item['template'])) {
+                $iconsdata['icons'][$identifier]['template'] = 'core/flex_icon';
             }
-            $data = array();
-            if (!empty($iconsdata['defaults']['data'])) {
-                $data = $iconsdata['defaults']['data'];
-            }
-            foreach ($iconsdata['map'] as $k => $item) {
-                if (empty($item['template'])) {
-                    $item['template'] = $template;
-                }
-                if (!isset($item['data'])) {
-                    $item['data'] = array();
-                }
-                if ($data) {
-                    $item['data'] = array_merge($data, $item['data']);
-                }
-                $iconsdata['map'][$k] = $item;
+            if (!isset($item['data'])) {
+                $iconsdata['icons'][$identifier]['data'] = array();
             }
         }
 
-        // Verify the translations first.
-        foreach ($iconsdata['translations'] as $identifierfrom => $identifierto) {
-            if (isset($iconsdata['map'][$identifierfrom])) {
+        // Verify the aliases first.
+        foreach ($iconsdata['aliases'] as $identifierfrom => $identifierto) {
+            if (isset($iconsdata['icons'][$identifierfrom])) {
                 // Translation cannot override map, do not show debug warning because
                 // theme might force these for some reason.
-                unset($iconsdata['translations'][$identifierfrom]);
+                unset($iconsdata['aliases'][$identifierfrom]);
                 continue;
             }
-            if (!isset($iconsdata['map'][$identifierto])) {
+            if (!isset($iconsdata['icons'][$identifierto])) {
                 debugging("Flex icon translation $identifierfrom points to non-existent $identifierto map entry", DEBUG_DEVELOPER);
-                unset($iconsdata['translations'][$identifierfrom]);
+                unset($iconsdata['aliases'][$identifierfrom]);
                 continue;
             }
         }
 
-        // Map the translations and remember what we did.
-        foreach ($iconsdata['translations'] as $identifierfrom => $identifierto) {
-            $iconsdata['map'][$identifierfrom] = $iconsdata['map'][$identifierto];
-            $iconsdata['map'][$identifierfrom]['translatesto'] = $identifierto;
+        // Map the aliases and remember what we did.
+        foreach ($iconsdata['aliases'] as $identifierfrom => $identifierto) {
+            $iconsdata['icons'][$identifierfrom] = $iconsdata['icons'][$identifierto];
+            $iconsdata['icons'][$identifierfrom]['alias'] = $identifierto;
         }
 
         // Add deprecated stuff.
         foreach ($iconsdata['deprecated'] as $identifierfrom => $identifierto) {
-            if (isset($iconsdata['map'][$identifierfrom])) {
+            if (isset($iconsdata['icons'][$identifierfrom])) {
                 // Valid map already exists.
                 continue;
             }
-            if (!isset($iconsdata['map'][$identifierto])) {
+            if (!isset($iconsdata['icons'][$identifierto])) {
                 debugging("Deprecated pix icon $identifierfrom points to non-existent $identifierto map entry", DEBUG_DEVELOPER);
                 continue;
             }
-            if (!empty($iconsdata['map'][$identifierto]['translatesto'])) {
+            if (!empty($iconsdata['icons'][$identifierto]['alias'])) {
                 // Always link the original.
-                $identifierto = $iconsdata['map'][$identifierto]['translatesto'];
+                $identifierto = $iconsdata['icons'][$identifierto]['alias'];
             }
-            $iconsdata['map'][$identifierfrom] = $iconsdata['map'][$identifierto];
-            $iconsdata['map'][$identifierfrom]['translatesto'] = $identifierto;
-            $iconsdata['map'][$identifierfrom]['deprecated'] = true;
+            $iconsdata['icons'][$identifierfrom] = $iconsdata['icons'][$identifierto];
+            $iconsdata['icons'][$identifierfrom]['alias'] = $identifierto;
+            $iconsdata['icons'][$identifierfrom]['deprecated'] = true;
         }
 
-        return $iconsdata['map'];
+        return $iconsdata['icons'];
     }
 
+    /**
+     * Return data for javascript part of flex icons implementation.
+     *
+     * Note: this is not a public api and is intended for \core\output\external::get_flex_icons() only.
+     *
+     * @param string $themename
+     * @return array
+     */
     public static function get_ajax_data($themename) {
         $icons = self::get_icons($themename);
 
@@ -128,7 +122,7 @@ class flex_icon_helper {
         $di = 0;
 
         foreach ($icons as $identifier => $desc) {
-            if (!empty($desc['translatesto'])) {
+            if (!empty($desc['alias'])) {
                 continue;
             }
             $icon = array();
@@ -148,10 +142,10 @@ class flex_icon_helper {
         }
 
         foreach ($icons as $identifier => $desc) {
-            if (empty($desc['translatesto'])) {
+            if (empty($desc['alias'])) {
                 continue;
             }
-            $icons[$identifier] = $icons[$desc['translatesto']];
+            $icons[$identifier] = $icons[$desc['alias']];
         }
 
         return array(
@@ -189,10 +183,9 @@ class flex_icon_helper {
 
         $flexiconsfile = '/pix/flex_icons.php';
         $iconsdata = array(
-            'translations' => array(),
+            'aliases' => array(),
             'deprecated' => array(),
-            'defaults' => array(),
-            'map' => array(),
+            'icons' => array(),
         );
 
         // Load all plugins in the standard order.
@@ -214,7 +207,7 @@ class flex_icon_helper {
             $iconsdata = self::merge_flex_icons_file($candidatedir . $flexiconsfile, $iconsdata);
         }
 
-        $iconsmap = self::resolve_translations($iconsdata);
+        $iconsmap = self::resolve_aliases($iconsdata);
         $cache->set($themename, $iconsmap);
         return $iconsmap;
     }
@@ -231,23 +224,19 @@ class flex_icon_helper {
             return $iconsdata;
         }
 
-        $translations = array();
+        $aliases = array();
         $deprecated = array();
-        $defaults = array();
-        $map = array();
+        $icons = array();
         require($file);
 
         if ($deprecated) {
             $iconsdata['deprecated'] = array_merge($iconsdata['deprecated'], $deprecated);
         }
-        if ($translations) {
-            $iconsdata['translations'] = array_merge($iconsdata['translations'], $translations);
+        if ($aliases) {
+            $iconsdata['aliases'] = array_merge($iconsdata['aliases'], $aliases);
         }
-        if ($defaults) {
-            $iconsdata['defaults'] = array_merge($iconsdata['defaults'], $defaults);
-        }
-        if ($map) {
-            $iconsdata['map'] = array_merge($iconsdata['map'], $map);
+        if ($icons) {
+            $iconsdata['icons'] = array_merge($iconsdata['icons'], $icons);
         }
         return $iconsdata;
     }

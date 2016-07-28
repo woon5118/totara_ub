@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'block_totara_stats|statcompachieved' => 'competency-achieved',
     'block_totara_stats|statcoursescompleted' => 'course-completed',
     'block_totara_stats|statcoursesstarted' => 'course-started',

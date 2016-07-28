@@ -189,14 +189,14 @@ EOF;
 
 echo $OUTPUT->heading('pix/flex_icons.php files');
 echo <<<EOF
-<p>Core and plugin flex icons are defined in pix/flex_icons.php files.</p>
-<p>TODO: explain here <ul>
-<li>\$map</li>
-<li>\$translations</li>
-<li>\$deprecated</li>
-<li>\$pixonlyimages</li>
-<li>\$defaults</li>
-</ul>
+<p>Flexible icons are defined in pix/flex_icons.php files. All non-core icon identifiers must use 'pluginname_pluginntype|' prefix.
+The file format is PHP code with following variables:<br />
+<dl>
+<dt>\$icons</dt><dd>list of icons defined by identifier, template name (defaults to 'core/flex_icon') and template data</dd>
+<dt>\$aliases</dt><dd>icon aliases referencing other \$icons identifiers</dd>
+<dt>\$deprecated</dt><dd>deprecated icon aliases</dd>
+<dt>\$pixonlyimages</dt><dd>array containing names of all other non-icon images stored in pix directory</dd>
+</dl>
 </p>
 EOF;
 
@@ -205,7 +205,7 @@ echo <<<EOF
 <p>Some icons need to be horizontally flipped in right-to-left languages, to do thisd evelopers may use ft-flip-rtl class in flex icon definition.
 For example:<br />
 <pre>
-\$map = array(
+\$icons = array(
     'mod_book|nav_prev' =>
         array(
             'data' =>

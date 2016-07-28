@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'totara_appraisal|link' => 'link',
     'totara_appraisal|tick2' => 'check',
 );

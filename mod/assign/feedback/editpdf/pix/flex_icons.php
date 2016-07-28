@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'assignfeedback_editpdf|comment' => 'comment',
     'assignfeedback_editpdf|comment_search' => 'comments-search',
     'assignfeedback_editpdf|cross' => 'times-danger',

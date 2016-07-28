@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'mod_glossary|asc' => 'sort-asc',
     'mod_glossary|comment' => 'comment',
     'mod_glossary|desc' => 'sort-desc',

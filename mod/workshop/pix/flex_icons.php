@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'mod_workshop|icon' => 'seminar',
     'mod_workshop|userplan/task-done' => 'check-success',
     'mod_workshop|userplan/task-fail' => 'times-danger',

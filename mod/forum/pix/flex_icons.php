@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'mod_forum|icon' => 'comments-o',
     'mod_forum|t/subscribed' => 'subscribed',
     'mod_forum|t/unsubscribed' => 'unsubscribed',

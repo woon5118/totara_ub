@@ -29,20 +29,12 @@
  */
 
 /*
- * Default values for the all $map arrays from all plugins, core and themes.
- * This can be overridden in themes only.
- */
-$defaults = array(
-    'template' => 'core/flex_icon',
-);
-
-/*
  * Translations array is expected to be used in plugins pix/flex_icons.php only.
  *
  * The data format is: array('mod_xxxx|someicon' => 'mapidentifier', 'mod_xxxx|otehricon' => 'mapidentifierx')
  */
-$translations = array(
-    // NOTE: do not add anything here in core, use the $map instead!
+$aliases = array(
+    // NOTE: do not add anything here in core, use the $icons instead!
 );
 
 /*
@@ -54,7 +46,7 @@ $translations = array(
  * In plugins the map is used when plugin needs a completely new icon
  * that is not defined here in core.
  */
-$map = array(
+$icons = array(
     /* Do not use 'flex-icon-missing' directly, it indicates requested icon was not found */
     'flex-icon-missing' =>
         array(
@@ -2162,10 +2154,10 @@ $map = array(
  * This information allows the pix_icon renderer
  * to automatically return the new flex icon markup.
  *
- * All referenced identifiers must be present in the $map.
+ * All referenced identifiers must be present in the $icons.
  *
  * Note that plugins are using the same identifier format
- * for $translations, $deprecated and $map "plugintype_pluginname|icon".
+ * for $aliases, $deprecated and $icons "plugintype_pluginname|icon".
  */
 $deprecated = array(
     'core|a/add_file' => 'document-new',

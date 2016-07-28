@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'mod_lti|icon' => 'puzzle-piece',
     'mod_lti|warning' => 'warning-warning',
 );

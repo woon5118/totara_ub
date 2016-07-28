@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'totara_reportbuilder|report_icon' => 'pie-chart',
     'totara_reportbuilder|wait' => 'spinner-pulse',
     'totara_reportbuilder|waitbig' => 'spinner-pulse',

@@ -27,7 +27,7 @@
 /*
  * Unique book icons.
  */
-$map = array(
+$icons = array(
     'mod_book|icon' =>
         array(
             'data' =>

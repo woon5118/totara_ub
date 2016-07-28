@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'mod_data|field/checkbox' => 'check-square-o',
     'mod_data|field/date' => 'calendar',
     'mod_data|field/file' => 'file-o',

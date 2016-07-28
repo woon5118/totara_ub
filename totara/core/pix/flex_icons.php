@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'totara_core|bookings' => 'calendar',
     'totara_core|comment-point-blue' => 'caret-left-info',
     'totara_core|comment-point-blue-rtl' => 'caret-right-info',

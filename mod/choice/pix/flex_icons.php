@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'mod_choice|column' => 'columns',
     'mod_choice|icon' => 'question-circle',
     'mod_choice|row' => 'rows',

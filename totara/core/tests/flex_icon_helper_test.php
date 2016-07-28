@@ -112,20 +112,18 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
         $function->setAccessible(true);
 
         $iconsdata = array(
-            'translations' => array(),
+            'aliases' => array(),
             'deprecated' => array(),
-            'defaults' => array(),
-            'map' => array(),
+            'icons' => array(),
         );
         $merged1 = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons1.php', $iconsdata);
         $this->assertSame(array_keys($iconsdata), array_keys($merged1));
-        $this->assertSame(array('add' => 'plus'), $merged1['translations']);
+        $this->assertSame(array('add' => 'plus'), $merged1['aliases']);
         $this->assertSame(array('nav_exit' => 'caret-up'), $merged1['deprecated']);
-        $this->assertSame(array(), $merged1['defaults']);
         $this->assertSame(array(
             'icon' => array('data' => array('classes' => 'fa-edit')),
             'fancy' => array('data' => array('classes' => 'fa-circle')),
-        ), $merged1['map']);
+        ), $merged1['icons']);
 
         $merged1b = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons1.php', $merged1);
         $this->assertSame($merged1, $merged1b);
@@ -135,22 +133,21 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
 
         $merged3 = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons3.php', $merged2);
         $this->assertSame(array_keys($iconsdata), array_keys($merged3));
-        $this->assertSame(array('add' => 'minus', 'remove' => 'plus'), $merged3['translations']);
+        $this->assertSame(array('add' => 'minus', 'remove' => 'plus'), $merged3['aliases']);
         $this->assertSame(array('nav_exit' => 'caret-up', 'nav_entry' => 'caret-down'), $merged3['deprecated']);
-        $this->assertSame(array('data' => array('template' => 'core/flex_icon2')), $merged3['defaults']);
         $this->assertSame(array(
             'icon' => array('data' => array('classes' => 'fa-edit ft-state-warning')),
             'fancy' => array('template' => 'core/flex_icon_stack', 'data' => array('classes' => 'fa-circle')),
-        ), $merged3['map']);
+        ), $merged3['icons']);
     }
 
-    public function test_protected_resolve_translations() {
+    public function test_protected_resolve_aliases() {
         $reflectionclass = new \ReflectionClass('core\output\flex_icon_helper');
-        $function = $reflectionclass->getMethod('resolve_translations');
+        $function = $reflectionclass->getMethod('resolve_aliases');
         $function->setAccessible(true);
 
         $iconsdata = array(
-            'translations' => array(
+            'aliases' => array(
                 'mod_xxx|start' => 'open',
                 'core|i-open' => 'open',
                 'core|i-edit' => 'edit',
@@ -160,12 +157,7 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                 'mod_xx|close' => 'close',
                 'mod_xxx|startnow' => 'mod_xxx|start',
             ),
-            'defaults' => array(
-                'data' => array(
-                    'template' => 'core/flex_icon',
-                ),
-            ),
-            'map' => array(
+            'icons' => array(
                 'close' => array(
                     'data' =>
                         array(
@@ -200,7 +192,6 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                 array(
                     'data' =>
                         array(
-                            'template' => 'core/flex_icon',
                             'classes' => 'fa-close',
                         ),
                     'template' => 'core/flex_icon',
@@ -210,7 +201,6 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                     'template' => 'core/flex_icon_stack',
                     'data' =>
                         array(
-                            'template' => 'core/flex_icon',
                             'classes' =>
                                 array(
                                     'fa-edit ft-stack-main',
@@ -222,7 +212,6 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                 array(
                     'data' =>
                         array(
-                            'template' => 'core/flex_icon',
                             'classes' => 'fa-open',
                         ),
                     'template' => 'core/flex_icon',
@@ -231,73 +220,63 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                 array(
                     'data' =>
                         array(
-                            'template' => 'core/flex_icon',
                             'classes' => 'fa-open',
                         ),
                     'template' => 'core/flex_icon',
-                    'translatesto' => 'open',
+                    'alias' => 'open',
                 ),
             'core|i-open' =>
                 array(
                     'data' =>
                         array(
-                            'template' => 'core/flex_icon',
                             'classes' => 'fa-open',
                         ),
                     'template' => 'core/flex_icon',
-                    'translatesto' => 'open',
+                    'alias' => 'open',
                 ),
             'core|i-edit' =>
                 array(
                     'template' => 'core/flex_icon_stack',
                     'data' =>
                         array(
-                            'template' => 'core/flex_icon',
                             'classes' =>
                                 array(
                                     'fa-edit ft-stack-main',
                                     'fa-exclamation ft-stack-suffix',
                                 ),
                         ),
-                    'translatesto' => 'edit',
+                    'alias' => 'edit',
                 ),
             'mod_xx|close' =>
                 array(
                     'data' =>
                         array(
-                            'template' => 'core/flex_icon',
                             'classes' => 'fa-close',
                         ),
                     'template' => 'core/flex_icon',
-                    'translatesto' => 'close',
+                    'alias' => 'close',
                     'deprecated' => true,
                 ),
             'mod_xxx|startnow' =>
                 array(
                     'data' =>
                         array(
-                            'template' => 'core/flex_icon',
                             'classes' => 'fa-open',
                         ),
                     'template' => 'core/flex_icon',
-                    'translatesto' => 'open',
+                    'alias' => 'open',
                     'deprecated' => true,
                 ),
         );
         $this->assertSame($expected, $icons);
 
         $iconsdata = array(
-            'translations' => array(
+            'aliases' => array(
                 'mod_xxx|missing' => 'xxzxzxzxz',
-            ),
-            'defaults' => array(
-                'data' => array(
-                    'template' => 'core/flex_icon',
-                ),
             ),
             'deprecated' => array(
             ),
-            'map' => array(
+            'icons' => array(
                 'close' => array(
                     'data' =>
                         array(
@@ -313,7 +292,6 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                 array(
                     'data' =>
                         array(
-                            'template' => 'core/flex_icon',
                             'classes' => 'fa-close',
                         ),
                     'template' => 'core/flex_icon',
@@ -322,17 +300,12 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
         $this->assertSame($expected, $icons);
 
         $iconsdata = array(
-            'translations' => array(
-            ),
-            'defaults' => array(
-                'data' => array(
-                    'template' => 'core/flex_icon',
-                ),
+            'aliases' => array(
             ),
             'deprecated' => array(
                 'mod_xxx|missing' => 'xxzxzxzxz',
             ),
-            'map' => array(
+            'icons' => array(
                 'close' => array(
                     'data' =>
                         array(
@@ -348,7 +321,6 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
                 array(
                     'data' =>
                         array(
-                            'template' => 'core/flex_icon',
                             'classes' => 'fa-close',
                         ),
                     'template' => 'core/flex_icon',
@@ -405,8 +377,8 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
     }
 
     protected function get_known_pix_files($location, $component) {
-        $translations = array();
-        $map = array();
+        $aliases = array();
+        $icons = array();
         $deprecated = array();
         $pixonlyimages = array();
 
@@ -416,13 +388,13 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
         }
 
         $knownfiles = array();
-        foreach ($translations as $id => $ignored) {
+        foreach ($aliases as $id => $ignored) {
             $id = preg_replace('/^' . preg_quote($component). '\|/', '', $id);
             $knownfiles[] = $location . '/'. $id . '.gif';
             $knownfiles[] = $location . '/'. $id . '.png';
             $knownfiles[] = $location . '/'. $id . '.svg';
         }
-        foreach ($map as $id => $ignored) {
+        foreach ($icons as $id => $ignored) {
             $id = preg_replace('/^' . preg_quote($component). '\|/', '', $id);
             $knownfiles[] = $location . '/'. $id . '.gif';
             $knownfiles[] = $location . '/'. $id . '.png';

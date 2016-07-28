@@ -24,7 +24,7 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$translations = array(
+$aliases = array(
     'totara_program|program_warning' => 'exclamation-circle',
     'totara_program|progress_or' => 'ellipsis-h',
     'totara_program|progress_then' => 'arrow-down',
