@@ -205,7 +205,8 @@ function totara_major_version() {
         return false;
     }
 
-    if (preg_match('/^[0-9]+\.[0-9]+/', $release, $matches)) {
+    // Starting in Totara 9 we do not return decimals here.
+    if (preg_match('/^[0-9]+/', $TOTARA->version, $matches)) {
         return $matches[0];
     } else {
         return false;
