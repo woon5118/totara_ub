@@ -94,19 +94,19 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
         $this->assertSame($missingiconsdata, flex_icon_helper::get_data_by_identifier($CFG->theme, 'xxxzxxzxzxz'));
     }
 
-    public function test_get_flex_icon_candidate_dirs() {
+    public function test_get_related_theme_dirs() {
         global $CFG;
         $this->assertSame('standardtotararesponsive', $CFG->theme);
 
         $theme = \theme_config::load('standardtotararesponsive');
-        $candidatedirs = $theme->get_flex_icon_candidate_dirs();
+        $candidatedirs = $theme->get_related_theme_dirs();
         $this->assertCount(2, $candidatedirs);
 
         $this->assertSame(realpath("$CFG->dirroot/theme/bootstrapbase"), realpath($candidatedirs[0]));
         $this->assertSame(realpath("$CFG->dirroot/theme/standardtotararesponsive"), realpath($candidatedirs[1]));
     }
 
-    public function test_protected_merge_flex_icons_file() {
+    public function test_protected_merge_flex_icons_file_overriding() {
         $reflectionclass = new \ReflectionClass('core\output\flex_icon_helper');
         $function = $reflectionclass->getMethod('merge_flex_icons_file');
         $function->setAccessible(true);
@@ -116,7 +116,7 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
             'deprecated' => array(),
             'icons' => array(),
         );
-        $merged1 = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons1.php', $iconsdata);
+        $merged1 = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons1.php', $iconsdata, true);
         $this->assertSame(array_keys($iconsdata), array_keys($merged1));
         $this->assertSame(array('add' => 'plus'), $merged1['aliases']);
         $this->assertSame(array('nav_exit' => 'caret-up'), $merged1['deprecated']);
@@ -125,19 +125,54 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
             'fancy' => array('data' => array('classes' => 'fa-circle')),
         ), $merged1['icons']);
 
-        $merged1b = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons1.php', $merged1);
+        $merged1b = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons1.php', $merged1, true);
         $this->assertSame($merged1, $merged1b);
 
-        $merged2 = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons2.php', $merged1);
+        $merged2 = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons2.php', $merged1, true);
         $this->assertSame($merged1, $merged2);
 
-        $merged3 = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons3.php', $merged2);
+        $merged3 = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons3.php', $merged2, true);
         $this->assertSame(array_keys($iconsdata), array_keys($merged3));
         $this->assertSame(array('add' => 'minus', 'remove' => 'plus'), $merged3['aliases']);
         $this->assertSame(array('nav_exit' => 'caret-up', 'nav_entry' => 'caret-down'), $merged3['deprecated']);
         $this->assertSame(array(
             'icon' => array('data' => array('classes' => 'fa-edit ft-state-warning')),
             'fancy' => array('template' => 'core/flex_icon_stack', 'data' => array('classes' => 'fa-circle')),
+        ), $merged3['icons']);
+    }
+
+    public function test_protected_merge_flex_icons_file_no_overriding() {
+        $reflectionclass = new \ReflectionClass('core\output\flex_icon_helper');
+        $function = $reflectionclass->getMethod('merge_flex_icons_file');
+        $function->setAccessible(true);
+
+        $iconsdata = array(
+            'aliases' => array(),
+            'deprecated' => array(),
+            'icons' => array(),
+        );
+        $merged1 = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons1.php', $iconsdata, false);
+        $this->assertSame(array_keys($iconsdata), array_keys($merged1));
+        $this->assertSame(array('add' => 'plus'), $merged1['aliases']);
+        $this->assertSame(array('nav_exit' => 'caret-up'), $merged1['deprecated']);
+        $this->assertSame(array(
+            'icon' => array('data' => array('classes' => 'fa-edit')),
+            'fancy' => array('data' => array('classes' => 'fa-circle')),
+        ), $merged1['icons']);
+
+        $merged1b = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons1.php', $merged1, false);
+        $this->assertSame($merged1, $merged1b);
+
+        $merged2 = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons2.php', $merged1, false);
+        $this->assertSame($merged1, $merged2);
+
+        $merged3 = $function->invoke(null, __DIR__ . '/fixtures/test_flex_icons3.php', $merged2, false);
+        $this->assertSame(array_keys($iconsdata), array_keys($merged3));
+        $this->assertSame(array('add' => 'plus', 'remove' => 'plus'), $merged3['aliases']);
+        $this->assertSame(array('nav_entry' => 'caret-down', 'nav_exit' => 'caret-up'), $merged3['deprecated']);
+        $this->assertSame(array(
+            'icon' => array('data' => array('classes' => 'fa-edit')),
+            'fancy' => array('data' => array('classes' => 'fa-circle')),
         ), $merged3['icons']);
     }
 

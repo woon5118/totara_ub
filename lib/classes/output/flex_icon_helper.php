@@ -188,25 +188,26 @@ class flex_icon_helper {
             'icons' => array(),
         );
 
-        // Load all plugins in the standard order.
+        // Load all plugins in the standard order, the first one wins - no overriding.
         $plugintypes = \core_component::get_plugin_types();
         foreach ($plugintypes as $type => $unused) {
             $plugs = \core_component::get_plugin_list($type);
             foreach ($plugs as $name => $location) {
-                $iconsdata = self::merge_flex_icons_file($location . $flexiconsfile, $iconsdata);
+                $iconsdata = self::merge_flex_icons_file($location . $flexiconsfile, $iconsdata, false);
             }
         }
 
-        // Load core translation and map.
-        $iconsdata = self::merge_flex_icons_file($CFG->dirroot. $flexiconsfile, $iconsdata);
+        // Load core translation and map overriding any plugins trying to change the core icons.
+        $iconsdata = self::merge_flex_icons_file($CFG->dirroot. $flexiconsfile, $iconsdata, true);
 
         // Then parent theme and at the very end load the current theme.
         $theme = \theme_config::load($themename);
-        $candidatedirs = $theme->get_flex_icon_candidate_dirs();
+        $candidatedirs = $theme->get_related_theme_dirs();
         foreach ($candidatedirs as $candidatedir) {
-            $iconsdata = self::merge_flex_icons_file($candidatedir . $flexiconsfile, $iconsdata);
+            $iconsdata = self::merge_flex_icons_file($candidatedir . $flexiconsfile, $iconsdata, true);
         }
 
+        // Flatten the icons structure.
         $iconsmap = self::resolve_aliases($iconsdata);
         $cache->set($themename, $iconsmap);
         return $iconsmap;
@@ -217,9 +218,10 @@ class flex_icon_helper {
      *
      * @param string $file
      * @param array $iconsdata
+     * @param bool $allowoverride
      * @return array the new icons data
      */
-    protected static function merge_flex_icons_file($file, $iconsdata) {
+    protected static function merge_flex_icons_file($file, $iconsdata, $allowoverride) {
         if (!file_exists($file)) {
             return $iconsdata;
         }
@@ -230,13 +232,25 @@ class flex_icon_helper {
         require($file);
 
         if ($deprecated) {
-            $iconsdata['deprecated'] = array_merge($iconsdata['deprecated'], $deprecated);
+            if ($allowoverride) {
+                $iconsdata['deprecated'] = array_merge($iconsdata['deprecated'], $deprecated);
+            } else {
+                $iconsdata['deprecated'] = array_merge($deprecated, $iconsdata['deprecated']);
+            }
         }
         if ($aliases) {
-            $iconsdata['aliases'] = array_merge($iconsdata['aliases'], $aliases);
+            if ($allowoverride) {
+                $iconsdata['aliases'] = array_merge($iconsdata['aliases'], $aliases);
+            } else {
+                $iconsdata['aliases'] = array_merge($aliases, $iconsdata['aliases']);
+            }
         }
         if ($icons) {
-            $iconsdata['icons'] = array_merge($iconsdata['icons'], $icons);
+            if ($allowoverride) {
+                $iconsdata['icons'] = array_merge($iconsdata['icons'], $icons);
+            } else {
+                $iconsdata['icons'] = array_merge($icons, $iconsdata['icons']);
+            }
         }
         return $iconsdata;
     }

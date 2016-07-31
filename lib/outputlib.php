@@ -2045,13 +2045,13 @@ class theme_config {
     }
 
     /**
-     * Return an array of paths to potential theme directories for the current theme.
+     * Return an array of paths to theme directories for the current theme.
      *
-     * The returned array is in order of precedence highest lowest to highest last.
+     * The returned array is in order of precedence oldest parent to current theme.
      *
      * @return array
      */
-    public function get_flex_icon_candidate_dirs() {
+    public function get_related_theme_dirs() {
         $themedirs = array($this->dir);
         foreach ($this->parent_configs as $parent_config) {
             $themedirs[] = $parent_config->dir;
