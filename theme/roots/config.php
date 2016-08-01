@@ -30,7 +30,7 @@ $THEME->name = 'roots';
 $THEME->parents = array('bootstrap');
 $THEME->yuicssmodules = array();
 $THEME->enable_dock = true;
-$THEME->sheets = array('totara');
+$THEME->sheets = array('totara','font-awesome','font-totara');
 $THEME->supportscssoptimisation = false;
 
 // Use CSS preprocessing to facilitate style inheritance.
