@@ -33,8 +33,8 @@
 $THEME->doctype = 'html5';
 $THEME->yuicssmodules = array();
 $THEME->name = 'bootstrapbase';
-$THEME->parents = array();
-$THEME->sheets = array('moodle', 'font-awesome', 'font-totara');
+$THEME->parents = array('base');
+$THEME->sheets = array('moodle');
 $THEME->supportscssoptimisation = false;
 $THEME->enable_dock = false;
 $THEME->editor_sheets = array('editor');

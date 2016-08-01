@@ -24,7 +24,7 @@
  */
 
 $THEME->name = 'kiwifruitresponsive';
-$THEME->parents = array('standardtotararesponsive', 'bootstrapbase');
+$THEME->parents = array('standardtotararesponsive', 'bootstrapbase', 'base');
 $THEME->parents_exclude_sheets = array('standardtotararesponsive', 'admin');
 $THEME->sheets = array(
     'fonts', 'core', 'blocks', 'navigation', 'course', 'dock', 'css3', 'ie7', 'custom'

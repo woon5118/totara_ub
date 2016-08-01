@@ -27,7 +27,7 @@
 $THEME->doctype = 'html5';
 $THEME->yuicssmodules = array();
 $THEME->name = 'bootstrap';
-$THEME->parents = array();
+$THEME->parents = array('base');
 if ('ltr' === get_string('thisdirection', 'langconfig')) {
     $THEME->sheets = array('moodle');
 } else {

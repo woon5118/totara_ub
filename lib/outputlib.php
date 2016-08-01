@@ -515,6 +515,12 @@ class theme_config {
             }
         }
 
+        // Totara: all themes must extend the bare bones basic theme.
+        if ($this->name !== 'base' and !in_array('base', $this->parents)) {
+            error_log("All themes in Totara must extend the 'base' theme, it needs to be added as the last parent theme in {$config->dir}/config.php");
+            $this->parents[] = 'base';
+        }
+
         // verify all parents and load configs and renderers
         foreach ($this->parents as $parent) {
             if ($parent == 'base') {

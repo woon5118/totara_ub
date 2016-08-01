@@ -31,7 +31,7 @@ use core\output\mustache_template_finder;
  * Unit tests for the Mustache template finder class (contains logic about
  * resolving mustache template locations.
  */
-class core_output_mustache_template_finder_testcase extends advanced_testcase {
+class core_mustache_template_finder_testcase extends advanced_testcase {
 
     public function test_get_template_directories_for_component() {
         global $CFG;
@@ -42,6 +42,7 @@ class core_output_mustache_template_finder_testcase extends advanced_testcase {
         $correct = array(
             'theme/clean/templates/mod_assign/',
             'theme/bootstrapbase/templates/mod_assign/',
+            'theme/base/templates/mod_assign/',
             'mod/assign/templates/'
         );
         foreach ($dirs as $index => $dir) {
@@ -53,6 +54,7 @@ class core_output_mustache_template_finder_testcase extends advanced_testcase {
         $correct = array(
             'theme/clean/templates/core_user/',
             'theme/bootstrapbase/templates/core_user/',
+            'theme/base/templates/core_user/',
             'user/templates/'
         );
         foreach ($dirs as $index => $dir) {
@@ -64,6 +66,7 @@ class core_output_mustache_template_finder_testcase extends advanced_testcase {
         $correct = array(
             'theme/clean/templates/core/',
             'theme/bootstrapbase/templates/core/',
+            'theme/base/templates/core/',
             'lib/templates/'
         );
         foreach ($dirs as $index => $dir) {

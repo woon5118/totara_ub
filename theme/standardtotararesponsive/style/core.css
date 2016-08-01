@@ -1532,3 +1532,15 @@ div.criteria-description {
 .form-autocomplete-downarrow {
     top: 0.15em
 }
+
+/* flex icon fixes */
+.fp-navbar .flex-icon {
+    font-size: 18px;
+    padding: 6px 2px;
+}
+.form-required,
+.form-advanced,
+.fdescription.required .flex-icon {
+    font-size: 0.5em;
+    vertical-align: text-top;
+}

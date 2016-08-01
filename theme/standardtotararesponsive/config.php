@@ -23,7 +23,7 @@
  */
 
 $THEME->name = 'standardtotararesponsive';
-$THEME->parents = array('bootstrapbase');
+$THEME->parents = array('bootstrapbase', 'base');
 $THEME->sheets = array(
     'core',     // Must come first.
     'navigation',
