@@ -80,7 +80,7 @@ class block_site_main_menu extends block_list {
                         if (!$cm->visible) {
                             $attrs['class'] .= ' dimmed';
                         }
-                        $icon = '<img src="' . $cm->get_icon_url() . '" class="icon" alt="" />';
+                        $icon = $cm->render_icon($OUTPUT);
                         $content = html_writer::link($cm->url, $icon . $cm->get_formatted_name(), $attrs);
                     } else {
                         $content = $cm->get_formatted_content(array('overflowdiv' => true, 'noclean' => true));
@@ -170,7 +170,7 @@ class block_site_main_menu extends block_list {
                             $attrs['class'] .= ' dimmed';
                         }
 
-                        $icon = '<img src="' . $mod->get_icon_url() . '" class="icon" alt="" />';
+                        $icon = $mod->render_icon($OUTPUT);
                         $content = html_writer::link($url, $icon . $mod->get_formatted_name(), $attrs);
                     }
                     $this->content->items[] = $indent.html_writer::div($content . $editbuttons, 'main-menu-content');

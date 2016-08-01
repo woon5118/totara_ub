@@ -977,7 +977,7 @@ class core_modinfolib_testcase extends advanced_testcase {
         $flexicon->customdata['classes'] = 'activityicon';
 
         $expected = $OUTPUT->render($flexicon);
-        $actual = $cminfo->get_icon();
+        $actual = $cminfo->render_icon($OUTPUT, 'activityicon');
 
         $this->assertEquals($expected, $actual);
     }
@@ -989,7 +989,6 @@ class core_modinfolib_testcase extends advanced_testcase {
      * the hook within a module's lib.php file.
      */
     public function test_cm_info_get_icon_output_when_overridden() {
-
         global $GLOBALS, $OUTPUT;
 
         $this->resetAfterTest();
@@ -1010,10 +1009,9 @@ class core_modinfolib_testcase extends advanced_testcase {
         $cminfo->set_icon_url($overrideurl);
 
         $expected = html_writer::img($overrideurl, '', $pixicon->attributes);
-        $actual = $cminfo->get_icon();
+        $actual = $cminfo->render_icon($OUTPUT, 'iconlarge activityicon');
 
         $this->assertEquals($expected, $actual);
-
     }
 
 }

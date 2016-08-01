@@ -151,17 +151,17 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         // The Sign-up period open date will always been first in the string, so we can check that it will indeed
         // be part of a a title attribute.
         if (isset($registrationtimestart)) {
-            $this->assertNotFalse(strpos($returnedoutput, 'title="Sign-up period opens:'));
+            $this->assertContains('title="Sign-up period opens:', $returnedoutput);
         } else {
-            $this->assertFalse(strpos($returnedoutput, 'title="Sign-up period opens:'));
+            $this->assertNotContains('title="Sign-up period opens:', $returnedoutput);
         }
 
         // Currently, text like in the strings below only appears in the Sign-up period tooltip. If other elements start
         // using the same text, then the below assertions may be less useful.
         if (isset($registrationtimefinish)) {
-            $this->assertNotFalse(strpos($returnedoutput, 'Sign-up period closes:'));
+            $this->assertContains('Sign-up period closes:', $returnedoutput);
         } else {
-            $this->assertFalse(strpos($returnedoutput, 'Sign-up period closes:'));
+            $this->assertNotContains('Sign-up period closes:', $returnedoutput);
         }
 
         // Now with minimal set to false, meaning other fixed strings are used for the tooltip instead of get_regdates_tooltip_info.

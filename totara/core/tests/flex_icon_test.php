@@ -202,45 +202,38 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $this->assertSame('mod_forum|icon', $flexicon->identifier);
         $this->assertSame(array('classes' => 'activityicon', 'alt' => 'Alt text'), $flexicon->customdata);
 
-        $pixicon = new pix_icon('f/archive-256', '');
-        $flexicon = flex_icon::create_from_pix_icon($pixicon);
-        $this->assertInstanceOf('core\output\flex_icon', $flexicon);
-        $this->assertSame('core|f/archive', $flexicon->identifier);
-        $this->assertSame(array('classes' => 'ft-size-700', 'alt' => ''), $flexicon->customdata);
-
-        $pixicon = new pix_icon('f/archive-32', '');
-        $flexicon = flex_icon::create_from_pix_icon($pixicon);
-        $this->assertInstanceOf('core\output\flex_icon', $flexicon);
-        $this->assertSame('core|f/archive', $flexicon->identifier);
-        $this->assertSame(array('classes' => 'ft-size-600', 'alt' => ''), $flexicon->customdata);
-
-        $pixicon = new pix_icon('f/archive-31', '');
-        $flexicon = flex_icon::create_from_pix_icon($pixicon);
-        $this->assertInstanceOf('core\output\flex_icon', $flexicon);
-        $this->assertSame('core|f/archive', $flexicon->identifier);
-        $this->assertSame(array('classes' => 'ft-size-600', 'alt' => ''), $flexicon->customdata);
-
-        $pixicon = new pix_icon('f/archive-25', '');
-        $flexicon = flex_icon::create_from_pix_icon($pixicon);
-        $this->assertInstanceOf('core\output\flex_icon', $flexicon);
-        $this->assertSame('core|f/archive', $flexicon->identifier);
-        $this->assertSame(array('classes' => 'ft-size-600', 'alt' => ''), $flexicon->customdata);
-
-        $pixicon = new pix_icon('f/archive-24', '');
-        $flexicon = flex_icon::create_from_pix_icon($pixicon);
-        $this->assertInstanceOf('core\output\flex_icon', $flexicon);
-        $this->assertSame('core|f/archive', $flexicon->identifier);
-        $this->assertSame(array('classes' => 'ft-size-400', 'alt' => ''), $flexicon->customdata);
-
-        $pixicon = new pix_icon('f/archive-13', '');
-        $flexicon = flex_icon::create_from_pix_icon($pixicon);
-        $this->assertInstanceOf('core\output\flex_icon', $flexicon);
-        $this->assertSame('core|f/archive', $flexicon->identifier);
-        $this->assertSame(array('alt' => ''), $flexicon->customdata);
-
         $pixicon = new pix_icon('grrrrgrgrg', 'Some Forum', 'forum');
         $flexicon = flex_icon::create_from_pix_icon($pixicon);
         $this->assertNull($flexicon);
+    }
+
+    public function test_create_from_pix_url() {
+        global $CFG, $PAGE;
+        $this->resetAfterTest();
+
+        $url = 'http://www.example.com/moodle/theme/image.php/_s/standardtotararesponsive/forum/1/icon';
+        $flexicon = flex_icon::create_from_pix_url($url);
+        $this->assertInstanceOf('core\output\flex_icon', $flexicon);
+        $this->assertSame('mod_forum|icon', $flexicon->identifier);
+
+        $CFG->slasharguments = 1;
+        $pixurl = $PAGE->theme->pix_url('i/edit', 'core');
+        $flexicon = flex_icon::create_from_pix_url($pixurl);
+        $expected = new flex_icon('core|i/edit');
+        $this->assertEquals($expected, $flexicon);
+
+        $pixurl = $PAGE->theme->pix_url('xxx/zzz', 'eee');
+        $flexicon = flex_icon::create_from_pix_url($pixurl);
+        $this->assertNull($flexicon);
+
+        $flexicon = flex_icon::create_from_pix_url('xxx.xx');
+        $this->assertNull($flexicon);
+
+        $CFG->slasharguments = 0;
+        $pixurl = $PAGE->theme->pix_url('i/edit', 'core');
+        $flexicon = flex_icon::create_from_pix_url($pixurl);
+        $expected = new flex_icon('core|i/edit');
+        $this->assertEquals($expected, $flexicon);
     }
 
     /**

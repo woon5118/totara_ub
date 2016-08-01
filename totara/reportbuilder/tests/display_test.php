@@ -243,7 +243,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertSame($fileiconlink, $processed[1]);
 
         $this->assertSame('volba1', $processed[2]);
-        $this->assertSame('<img src="http://www.example.com/moodle/theme/image.php/_s/standardtotararesponsive/totara_core/1//courseicons/business-modelling" id="icon_preview" class="course_icon" alt="volba1" title="volba1" />', $processed[3]);
+        $this->assertSame('<img src="http://www.example.com/moodle/theme/image.php/_s/standardtotararesponsive/totara_core/1/courseicons/business-modelling" id="icon_preview" class="course_icon" alt="volba1" title="volba1" />', $processed[3]);
         $this->assertSame('Some html <strong>text</strong><script></script>', $processed[4]);
 
         $processed = $report->src->process_data_row($row, 'pdf', $report);

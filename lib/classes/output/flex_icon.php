@@ -149,7 +149,7 @@ class flex_icon extends \pix_icon {
             return null;
         }
 
-        $customdata = self::get_customdata_from_pix_icon($icon);
+        $customdata = array();
 
         if (isset($customclasses)) {
             self::add_class_to_customdata($customdata, $customclasses);
@@ -165,6 +165,38 @@ class flex_icon extends \pix_icon {
 
         if (isset($icon->attributes['alt'])) {
             $customdata['alt'] = $icon->attributes['alt'];
+        }
+
+        return new flex_icon($flexidentifier, $customdata);
+    }
+
+    /**
+     * Create a flex icon from legacy pix_icon if possible.
+     *
+     * @param string|\moodle_url $pixurl
+     * @param string|array $customdata list of custom classes added to flex icon
+     * @return flex_icon|null returns null if flex matching flex icon cannot be found
+     */
+    public static function create_from_pix_url($pixurl, $customdata = null) {
+        $pixurl = (string)$pixurl;
+
+        if (strpos($pixurl, 'image=') !== false) {
+            // Slasharguments disabled.
+            $pixurl = urldecode($pixurl);
+            if (!preg_match('|component=([0-9a-z_]+).*image=([0-9a-z_/]+)|', $pixurl, $matches)) {
+                return null;
+            }
+            $flexidentifier = \core_component::normalize_componentname($matches[1]) . '|' . $matches[2];
+
+        } else {
+            if (!preg_match('|\.php/(_s/)?[a-z0-9_]+/([0-9a-z_]+)/-?[0-9]+/([0-9a-z_/]+)|', $pixurl, $matches)) {
+                return null;
+            }
+            $flexidentifier = \core_component::normalize_componentname($matches[2]) . '|' . $matches[3];
+        }
+
+        if (!self::exists($flexidentifier)) {
+            return null;
         }
 
         return new flex_icon($flexidentifier, $customdata);
@@ -210,39 +242,5 @@ class flex_icon extends \pix_icon {
         $component = \core_component::normalize_componentname((string)$icon->component);
 
         return "{$component}|{$pixpath}";
-    }
-
-    /**
-     * Return custom data required to display pix icon.
-     *
-     * Works around the fact that image-based pix-icons under certain directories
-     * were expected to have specific over-sized dimensions.
-     *
-     * This is not intended to deal with 12x12 or 16x16 sizes,
-     * those are handled using normal font sizes of texts where icons are used.
-     *
-     * @param pix_icon $icon
-     * @return array
-     */
-    protected static function get_customdata_from_pix_icon(pix_icon $icon) {
-        $customdata = array();
-        $pixpath = $icon->pix;
-
-        if (strpos($pixpath, '/') === 0) {
-            return $customdata;
-        }
-
-        if (preg_match('#f/.+-(\d+)$#', $pixpath, $matches)) {
-            $iconsize = $matches[1];
-            if ($iconsize > 32) {
-                $customdata['classes'] = 'ft-size-700';
-            } else if ($iconsize > 24) {
-                $customdata['classes'] = 'ft-size-600';
-            } else if ($iconsize == 24) {
-                $customdata['classes'] = 'ft-size-400';
-            }
-        }
-
-        return $customdata;
     }
 }

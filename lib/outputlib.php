@@ -1458,7 +1458,7 @@ class theme_config {
             $params['rev'] = $rev;
         }
 
-        $params['image'] = $imagename;
+        $params['image'] = ltrim($imagename, '/'); // Totara: always remove leading slashes.
 
         $url = new moodle_url("$CFG->httpswwwroot/theme/image.php");
         if (!empty($CFG->slasharguments) and $rev > 0) {

@@ -794,8 +794,9 @@ class core_course_renderer extends plugin_renderer_base {
 
         $groupinglabel = $mod->get_grouping_label($textclasses);
 
-        // Display link itself.
-        $activitylink  = $mod->get_icon();
+        // Totara: Display link itself with flex icon.
+        global $OUTPUT;
+        $activitylink  = $mod->render_icon($OUTPUT, 'activityicon');
         $activitylink .= $accesstext;
         $activitylink .= html_writer::tag('span', $instancename . $altname, array('class' => 'instancename'));
 

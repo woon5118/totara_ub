@@ -1358,7 +1358,7 @@ class cm_info implements IteratorAggregate {
     }
 
     /**
-     * @param moodle_core_renderer $output Output render to use, or null for default (global)
+     * @param core_renderer $output Output render to use, or null for default (global)
      * @return moodle_url Icon URL for a suitable icon to put beside this cm
      */
     public function get_icon_url($output = null) {
@@ -1389,6 +1389,43 @@ class cm_info implements IteratorAggregate {
             $icon = $output->pix_url('icon', $this->modname);
         }
         return $icon;
+    }
+
+    /**
+     * Return an activity icon markup.
+     *
+     * @param core_renderer $output Output render to use, or null for default (global)
+     * @param string $classes CSS classes
+     * @return string html
+     */
+    public function render_icon($output = null, $classes = '') {
+        global $OUTPUT;
+        if (!$output) {
+            $output = $OUTPUT;
+        }
+
+        $iconpixurl = $this->get_icon_url($output);
+        $customdata = array();
+        if ($classes) {
+            $customdata['classes'] = $classes;
+        }
+
+        $flexicon = \core\output\flex_icon::create_from_pix_url($iconpixurl, $customdata);
+        if ($flexicon) {
+            return $output->render($flexicon);
+        }
+
+        if (\core\output\flex_icon::exists($this->modname . '|icon')) {
+            $flexicon = new \core\output\flex_icon($this->modname . '|icon', $customdata);
+            return $output->render($flexicon);
+        }
+
+        $attributes = array(
+            'class' => $classes,
+            'role' => 'presentation',
+            'alt' => '',
+        );
+        return html_writer::img($iconpixurl, '', $attributes);
     }
 
     /**
@@ -1994,42 +2031,6 @@ class cm_info implements IteratorAggregate {
         // Let module make changes at this point
         $this->call_mod_function('cm_info_view');
         $this->state = self::STATE_VIEW;
-    }
-
-    /**
-     * Return a rendered icon (flex icon or pix icon).
-     */
-    public function get_icon() {
-        global $OUTPUT, $PAGE;
-
-        $pixicon = new pix_icon('icon', '', $this->modname, array(
-            'class' => 'iconlarge activityicon',
-            'role' => 'presentation',
-        ));
-
-        // TODO note that the following does not work for activity icons
-        // and that an update to the API has been agreed on. We must duplicate
-        // some of the logic from get_icon_url and update so that the icon may
-        // be set as a flex icon in the activity lib.php hook <mod>_get_coursemodule_info().
-
-        // Respect icon overrides.
-        // The following comparison seems a little convoluted
-        // the reason for this approach is so that we do not
-        // need to refactor get_icon_url() which would make
-        // merging upstream changes more difficult going forward.
-        $iconpixurl = $this->get_icon_url()->out();
-        $defaultpixurl = $OUTPUT->pix_url('icon', $this->modname)->out();
-
-        if ($iconpixurl !== $defaultpixurl) {
-            // We manually generate the output as pix_icon()
-            // doesn't provide a way to explicitly pass a URL.
-            // This is how the course renderer was already
-            // handling this situation meaning this icon is not
-            // compatible with templating.
-            return html_writer::img($iconpixurl, '', $pixicon->attributes);
-        }
-
-        return $OUTPUT->render($pixicon);
     }
 }
 
