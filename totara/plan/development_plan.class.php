@@ -1031,7 +1031,7 @@ class development_plan {
         if ($message == '') {
             return $OUTPUT->container(null, 'plan_box');
         }
-        return $OUTPUT->container($message, "plan_box {$style} clearfix");
+        return $OUTPUT->container($message, "plan_box {$style} clearfix alert alert-info");
     }
 
 
