@@ -35,44 +35,48 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
 
     public function test_get_template_directories_for_component() {
         global $CFG;
-
         // Test a plugin.
-        $dirs = mustache_template_finder::get_template_directories_for_component('mod_assign', 'clean');
-
+        $dirs = mustache_template_finder::get_template_directories_for_component('mod_assign', 'kiwifruitresponsive');
         $correct = array(
-            'theme/clean/templates/mod_assign/',
-            'theme/bootstrapbase/templates/mod_assign/',
-            'theme/base/templates/mod_assign/',
-            'mod/assign/templates/'
+            $CFG->dirroot . '/theme/kiwifruitresponsive/templates/mod_assign/',
+            $CFG->dirroot . '/theme/standardtotararesponsive/templates/mod_assign/',
+            $CFG->dirroot . '/theme/bootstrapbase/templates/mod_assign/',
+            $CFG->dirroot . '/theme/base/templates/mod_assign/',
+            $CFG->dirroot . '/mod/assign/templates/'
         );
-        foreach ($dirs as $index => $dir) {
-            $this->assertSame($dir, $CFG->dirroot . '/' . $correct[$index]);
-        }
+        $this->assertEquals($correct, $dirs);
+
         // Test a subsystem.
-        $dirs = mustache_template_finder::get_template_directories_for_component('core_user', 'clean');
-
+        $dirs = mustache_template_finder::get_template_directories_for_component('core_user', 'kiwifruitresponsive');
         $correct = array(
-            'theme/clean/templates/core_user/',
-            'theme/bootstrapbase/templates/core_user/',
-            'theme/base/templates/core_user/',
-            'user/templates/'
+            $CFG->dirroot . '/theme/kiwifruitresponsive/templates/core_user/',
+            $CFG->dirroot . '/theme/standardtotararesponsive/templates/core_user/',
+            $CFG->dirroot . '/theme/bootstrapbase/templates/core_user/',
+            $CFG->dirroot . '/theme/base/templates/core_user/',
+            $CFG->dirroot . '/user/templates/'
         );
-        foreach ($dirs as $index => $dir) {
-            $this->assertSame($dir, $CFG->dirroot . '/' . $correct[$index]);
-        }
+        $this->assertEquals($correct, $dirs);
+
         // Test core.
-        $dirs = mustache_template_finder::get_template_directories_for_component('core', 'clean');
-
+        $dirs = mustache_template_finder::get_template_directories_for_component('core', 'kiwifruitresponsive');
         $correct = array(
-            'theme/clean/templates/core/',
-            'theme/bootstrapbase/templates/core/',
-            'theme/base/templates/core/',
-            'lib/templates/'
+            $CFG->dirroot . '/theme/kiwifruitresponsive/templates/core/',
+            $CFG->dirroot . '/theme/standardtotararesponsive/templates/core/',
+            $CFG->dirroot . '/theme/bootstrapbase/templates/core/',
+            $CFG->dirroot . '/theme/base/templates/core/',
+            $CFG->dirroot . '/lib/templates/'
         );
-        foreach ($dirs as $index => $dir) {
-            $this->assertSame($dir, $CFG->dirroot . '/' . $correct[$index]);
-        }
-        return;
+        $this->assertEquals($correct, $dirs);
+
+        // Test invalid theme.
+        $dirs = mustache_template_finder::get_template_directories_for_component('mod_assign', 'xxsdsds');
+        $correct = array(
+            $CFG->dirroot . '/theme/standardtotararesponsive/templates/mod_assign/',
+            $CFG->dirroot . '/theme/bootstrapbase/templates/mod_assign/',
+            $CFG->dirroot . '/theme/base/templates/mod_assign/',
+            $CFG->dirroot . '/mod/assign/templates/'
+        );
+        $this->assertEquals($correct, $dirs);
     }
 
     /**
@@ -80,13 +84,13 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
      */
     public function test_invalid_get_template_directories_for_component() {
         // Test something invalid.
-        $dirs = mustache_template_finder::get_template_directories_for_component('octopus', 'clean');
+        $dirs = mustache_template_finder::get_template_directories_for_component('octopus', 'kiwifruitresponsive');
     }
 
     public function test_get_template_filepath() {
         global $CFG;
 
-        $filename = mustache_template_finder::get_template_filepath('core/pix_icon', 'clean');
+        $filename = mustache_template_finder::get_template_filepath('core/pix_icon', 'kiwifruitresponsive');
         $correct = $CFG->dirroot . '/lib/templates/pix_icon.mustache';
         $this->assertSame($correct, $filename);
     }
@@ -96,6 +100,6 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
      */
     public function test_invalid_get_template_filepath() {
         // Test something invalid.
-        $dirs = mustache_template_finder::get_template_filepath('core/octopus', 'clean');
+        $dirs = mustache_template_finder::get_template_filepath('core/octopus', 'kiwifruitresponsive');
     }
 }
