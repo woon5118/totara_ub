@@ -20,17 +20,19 @@
  * @copyright 2016 onwards Totara Learning Solutions LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @package   theme_roots
+ * @author    Joby Harding <joby.harding@totaralearning.com>
+ * @author    Petr Skoda <petr.skoda@totaralms.com>
+ * @package   theme_roots
+ *
+ * NOTE: this code is based on code from bootstrap theme by Bas Brands and other contributors.
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// We need this for bootstrap_grid().
-require_once("{$CFG->dirroot}/theme/bootstrap/lib.php");
-
 $knownregionpre = $PAGE->blocks->is_known_region('side-pre');
 $knownregionpost = $PAGE->blocks->is_known_region('side-post');
 
-$grid = new theme_roots\bootstrap_grid();
+$grid = new theme_roots\output\bootstrap_grid();
 
 if ($PAGE->blocks->region_has_content('side-pre', $OUTPUT)) {
     $grid->has_side_pre();
@@ -67,42 +69,27 @@ echo $OUTPUT->doctype() ?>
 </head>
 
 <body <?php echo $OUTPUT->body_attributes(); ?>>
-
 <?php echo $OUTPUT->standard_top_of_body_html() ?>
 
-<nav role="navigation" class="navbar navbar-default">
-    <div class="container-fluid">
+<!-- Main navigation -->
+<?php require("{$CFG->dirroot}/theme/roots/layout/partials/header.php"); ?>
 
-        <div class="navbar-header pull-left">
-            <?php echo $themerenderer->render(new theme_roots\site_logo($SITE->shortname)); ?>
+<!-- Breadcrumb and edit buttons -->
+<div class="container-fluid breadcrumb-container">
+    <div class="row">
+        <div class="col-sm-12">
+            <?php echo $OUTPUT->full_header(); ?>
         </div>
-
-        <div class="navbar-header pull-right">
-            <?php echo $OUTPUT->navbar_button(); ?>
-            <?php echo $OUTPUT->user_menu(); ?>
-        </div>
-
     </div>
-    <?php
-    if ($hastotaramenu) {
-        echo '<div class="container-fluid">';
-        echo '    <div id="totara-navbar" class="totara-navbar navbar-collapse collapse">' . $totaramenu . '</div>';
-        echo '</div>';
-    }
-    ?>
-</nav>
+</div>
 
+<!-- Content -->
 <div id="page" class="container-fluid">
-    <?php echo $OUTPUT->full_header(); ?>
-
     <div id="page-content" class="row">
         <div id="region-main" class="<?php echo $regions['content']; ?>">
-            <?php
-            echo $OUTPUT->course_content_header();
-
-            echo $OUTPUT->main_content();
-            echo $OUTPUT->course_content_footer();
-            ?>
+            <?php echo $OUTPUT->course_content_header(); ?>
+            <?php echo $OUTPUT->main_content(); ?>
+            <?php echo $OUTPUT->course_content_footer(); ?>
         </div>
 
         <?php
@@ -114,19 +101,10 @@ echo $OUTPUT->doctype() ?>
             echo $OUTPUT->blocks('side-post', $regions['post']);
         }?>
     </div>
-
 </div>
 
-<footer id="page-footer" class="footer">
-    <div class="container-fluid">
-        <div id="course-footer"><?php echo $OUTPUT->course_footer(); ?></div>
-        <?php
-        echo $OUTPUT->login_info();
-        echo $OUTPUT->powered_by_totara();
-        echo $OUTPUT->standard_footer_html();
-        ?>
-    </div>
-</footer>
+<!-- Footer -->
+<?php require("{$CFG->dirroot}/theme/roots/layout/partials/footer.php"); ?>
 
 <?php echo $OUTPUT->standard_end_of_body_html() ?>
 </body>

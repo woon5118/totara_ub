@@ -27,14 +27,11 @@ defined('MOODLE_INTERNAL' || die());
 
 $THEME->doctype = 'html5';
 $THEME->name = 'roots';
-$THEME->parents = array('bootstrap', 'base');
+$THEME->parents = array('base');
 $THEME->yuicssmodules = array();
 $THEME->enable_dock = true;
 $THEME->sheets = array('totara');
 $THEME->supportscssoptimisation = false;
-
-// Use CSS preprocessing to facilitate style inheritance.
-$THEME->parents_exclude_sheets = array('bootstrap' => array('moodle', 'moodle-rtl'));
 
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->plugins_exclude_sheets = array(
@@ -167,3 +164,7 @@ $THEME->layouts = array(
 );
 
 $THEME->hidefromselector = true;
+
+$THEME->javascripts_footer = array(
+    'moodlebootstrap', 'dock'
+);

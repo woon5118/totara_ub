@@ -68,7 +68,7 @@ module.exports = function(grunt) {
      */
     var preprocessTheme = function(path) {
         var dontProcess = [
-            'base', 'bootstrap', 'bootstrapbase', 'standardtotararesponsive',
+            'base', 'bootstrapbase', 'standardtotararesponsive',
             'customtotararesponsive', 'kiwifruitresponsive'
         ];
 
@@ -112,8 +112,7 @@ module.exports = function(grunt) {
         // All theme and component less files.
         lessSrc = [
             '**/less/styles.less',
-            'theme/*/less/*.less',
-            '!theme/bootstrap/less/**'
+            'theme/*/less/*.less'
         ];
     }
 

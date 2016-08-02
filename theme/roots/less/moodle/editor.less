@@ -18,7 +18,13 @@
 //
 // @copyright 2016 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Joby Harding <joby.harding@totaralearning.com>
 // @package   theme_roots
+//
+//  NOTE: this code is based on code from bootstrap theme by Bas Brands and other contributors.
 
-@import "bootstrap/less/moodle/editor";
+// Fix by Simon Lewis to sort weird issue with atto images.
+// https://moodle.org/mod/forum/discuss.php?d=272510
+
+.editor_atto_content .img-responsive {
+    display: inline-block;
+}

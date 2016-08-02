@@ -18,7 +18,17 @@
 //
 // @copyright 2016 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Joby Harding <joby.harding@totaralearning.com>
 // @package   theme_roots
+//
+//  NOTE: this code is based on code from bootstrap theme by Bas Brands and other contributors.
 
-@import "bootstrap/less/moodle/reports";
+/* reports.less */
+
+// The home for small tweaks to reports that don't require
+// changes drastic enough to pull in the full module css
+// and replace it completely.
+
+#page-report-participation-index .participationselectform div label { // Using 'div' here to override the report styles.css
+    display: inline;
+    margin: 0 5px 0 0;
+}

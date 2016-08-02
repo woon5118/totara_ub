@@ -25,13 +25,13 @@
 
 defined('MOODLE_INTERNAL' || die());
 
-use theme_roots\bootstrap_grid;
+use theme_roots\output\bootstrap_grid;
 
-class bootstrap_grid_testcase extends basic_testcase {
+class theme_roots_bootstrap_grid_testcase extends basic_testcase {
 
     public function test_it_can_be_initialised() {
 
-        $expected = 'theme_roots\bootstrap_grid';
+        $expected = 'theme_roots\output\bootstrap_grid';
         $actual = get_class(new bootstrap_grid());
 
         $this->assertEquals($expected, $actual);
