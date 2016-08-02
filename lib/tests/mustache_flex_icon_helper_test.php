@@ -36,9 +36,9 @@ class mustache_flex_icon_helper_testcase extends basic_testcase {
     protected static $renderer;
 
     /**
-     * @var Mustache_LambdaHelper
+     * @var \Mustache_Engine
      */
-    protected static $lambdahelper;
+    protected static $engine;
 
 
     public static function setUpBeforeClass() {
@@ -49,8 +49,21 @@ class mustache_flex_icon_helper_testcase extends basic_testcase {
         Mustache_Autoloader::register();
 
         self::$renderer = new \core_renderer(new moodle_page(), '/');
-        self::$lambdahelper = new \Mustache_LambdaHelper(new \Mustache_Engine(), new \Mustache_Context());
+        // Get the engine from the renderer. We do this once cause its mad.
+        $class = new ReflectionClass(self::$renderer);
+        $method = $class->getMethod('get_mustache');
+        $method->setAccessible(true);
+        self::$engine = $method->invoke(self::$renderer);
+    }
 
+    /**
+     * Returns a LambdaHelper populated with the given contextdata.
+     *
+     * @param array|stdClass $contextdata
+     * @return Mustache_LambdaHelper
+     */
+    protected function get_lambda_helper($contextdata = []) {
+        return new \Mustache_LambdaHelper(self::$engine, new \Mustache_Context($contextdata));
     }
 
     /**
@@ -61,13 +74,11 @@ class mustache_flex_icon_helper_testcase extends basic_testcase {
      */
     public function test_flex_icon_output_without_customdata() {
 
-        global $OUTPUT;
-
         $identifier = 'check-permissions';
         $mustachehelper = new mustache_flex_icon_helper(self::$renderer);
 
-        $expected = $OUTPUT->render(new flex_icon($identifier));
-        $actual = $mustachehelper->flex_icon($identifier, self::$lambdahelper);
+        $expected = self::$renderer->render(new flex_icon($identifier));
+        $actual = $mustachehelper->flex_icon($identifier, $this->get_lambda_helper());
 
         $this->assertEquals($expected, $actual);
 
@@ -80,8 +91,6 @@ class mustache_flex_icon_helper_testcase extends basic_testcase {
      */
     public function test_flex_icon_output_with_customdata() {
 
-        global $OUTPUT;
-
         $identifier = 'check-permissions';
         $customdata = array(
             'classes' => 'ft-state-success ft-size-700'
@@ -90,8 +99,8 @@ class mustache_flex_icon_helper_testcase extends basic_testcase {
 
         $mustachehelper = new mustache_flex_icon_helper(self::$renderer);
 
-        $expected = $OUTPUT->render(new flex_icon($identifier, $customdata));
-        $actual = $mustachehelper->flex_icon($helperstring, self::$lambdahelper);
+        $expected = self::$renderer->render(new flex_icon($identifier, $customdata));
+        $actual = $mustachehelper->flex_icon($helperstring, $this->get_lambda_helper());
 
         $this->assertEquals($expected, $actual);
 
@@ -110,8 +119,70 @@ class mustache_flex_icon_helper_testcase extends basic_testcase {
         $mustachehelper = new mustache_flex_icon_helper(self::$renderer);
 
         $this->setExpectedException('\coding_exception');
-        $mustachehelper->flex_icon($helperstring, self::$lambdahelper);
+        $mustachehelper->flex_icon($helperstring, $this->get_lambda_helper());
 
     }
 
+    /**
+     * It should generate the same output as rendering the renderable with customdata.
+     *
+     * @covers \core\output\mustache_flex_icon_helper::flex_icon
+     */
+    public function test_flex_icon_output_with_variable_identifier() {
+
+        $actualidentifier = 'settings';
+        $variableidentifier = '{{test_icon}}';
+        $customdata = array(
+            'classes' => 'ft-state-success ft-size-700'
+        );
+        $helperstring = "{$variableidentifier}, " . json_encode($customdata);
+
+        $expected = self::$renderer->render(new flex_icon($actualidentifier, $customdata));
+
+        $lambdahelper = $this->get_lambda_helper(['test_icon' => $actualidentifier]);
+        $mustachehelper = new mustache_flex_icon_helper(self::$renderer);
+        $actual = $mustachehelper->flex_icon($helperstring, $lambdahelper);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * It should generate the same output as rendering the renderable with customdata.
+     *
+     * @covers \core\output\mustache_flex_icon_helper::flex_icon
+     */
+    public function test_flex_icon_output_with_variable_alt() {
+
+        $actualidentifier = 'settings';
+        $helperstring = '{{test_icon}}, { "alt": "{{alt}}" }';
+
+        $expected = self::$renderer->render(new flex_icon($actualidentifier, ['alt' => get_string('settings')]));
+
+        $lambdahelper = $this->get_lambda_helper(['test_icon' => $actualidentifier, 'alt' => get_string('settings')]);
+        $mustachehelper = new mustache_flex_icon_helper(self::$renderer);
+        $actual = $mustachehelper->flex_icon($helperstring, $lambdahelper);
+
+        $this->assertEquals($expected, $actual);
+
+    }
+
+    /**
+     * It should generate the same output as rendering the renderable with customdata.
+     *
+     * @covers \core\output\mustache_flex_icon_helper::flex_icon
+     */
+    public function test_flex_icon_output_with_complex_structure() {
+
+        $actualidentifier = 'core|i/edit';
+        $helperstring = '{{test_icon}}, { "alt": "{{alt}}", "classes": "{{classes}}" }';
+
+        $expected = self::$renderer->render(new flex_icon($actualidentifier, ['alt' => get_string('settings'), 'classes' => 'test testing']));
+
+        $lambdahelper = $this->get_lambda_helper(['test_icon' => $actualidentifier, 'alt' => get_string('settings'), 'classes' => 'test testing']);
+        $mustachehelper = new mustache_flex_icon_helper(self::$renderer);
+        $actual = $mustachehelper->flex_icon($helperstring, $lambdahelper);
+
+        $this->assertEquals($expected, $actual);
+
+    }
 }

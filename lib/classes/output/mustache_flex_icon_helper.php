@@ -70,18 +70,24 @@ class mustache_flex_icon_helper {
 
         $parameters = array_map(function($parameter) {
             return trim($parameter);
-        }, explode(',', $string));
+        }, explode(',', $string, 2));
 
-        $identifier = $parameters[0];
-        $customdata = array_slice($parameters, 1, 1);
+        $identifier = array_shift($parameters);
+        if (count($parameters)) {
+            $customdata = array_shift($parameters);
+        }
 
+        // This applies the same logic as in {{@see \Mustache_Compiler::SECTION}}
+        if (strpos($identifier, '{{') !== false) {
+            $identifier = $helper->render($identifier);
+        }
         if (empty($customdata)) {
             $flexicon = new flex_icon($identifier);
             return $this->renderer->render($flexicon);
         }
 
-        $customdata = $helper->render(array_shift($customdata));
-        $customdata = json_decode($customdata, true);
+        $customdata = $helper->render($customdata);
+        $customdata = @json_decode($customdata, true);
 
         if ($customdata === null) {
             throw new \coding_exception("flex_icon helper was unable to decode JSON");
