@@ -47,7 +47,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And I press "Save changes"
     And I log out
 
-  Scenario: Manual enrol using seminar direct
+  Scenario: Enrol using seminar direct enrolment
     Given I log in as "teacher1"
     And I follow "Course 1"
     When I add "Seminar direct enrolment" enrolment method with:
@@ -57,9 +57,17 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
-    #And I click on "[name^='sid']" "css_element" in the "1 January 2020" "table_row"
+    And I set the following fields to these values:
+      | Requests for session organiser | Lorem ipsum dolor sit amet |
     And I press "Sign-up"
-    Then I should see "Topic 1"
+    Then I should see "Test seminar name: Your booking has been completed."
+    And I log out
+    # Check signup note
+    And I log in as "admin"
+    And I follow "Course 1"
+    And I follow "Test seminar name"
+    When I click on "Attendees" "link"
+    Then I should see "Lorem ipsum dolor sit amet" in the "Student 1" "table_row"
 
   Scenario: Seminar direct enrolment disabled
     Given I log in as "student1"
