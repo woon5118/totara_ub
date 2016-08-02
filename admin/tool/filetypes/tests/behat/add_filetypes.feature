@@ -133,4 +133,4 @@ Feature: Add customised file types
     And I set the field "Show type" to "1"
     And I press "Save and return to course"
     Then I should see "Froggy file"
-    And the "src" attribute of ".modtype_resource a img" "css_element" should contain "archive"
+    And the "class" attribute of ".modtype_resource a span" "css_element" should contain "ft-box-alt"
