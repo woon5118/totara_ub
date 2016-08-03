@@ -19,11 +19,21 @@
 // @copyright 2016 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @author    Joby Harding <joby.harding@totaralearning.com>
-// @package   theme_roots
+// @package   theme_basis
+
+// Note: theme_roots is automatically added to
+// the less compiler import search path therefore
+// any files here which are not found locally are
+// then looked for under theme/roots/less.
+@import "bootstrap3/bootstrap";
 
 // Bootstrap 3.
 @import "bootstrap3/bootstrap";
 
+// Theme level bootstrap overrides.
+@import "theme/basis";
+
+// All variables (including theme/variables).
 @import "variables.less";
 
 // Override Bootstrap defaults.
@@ -63,16 +73,17 @@
 @import "totara/feedback";
 
 //
-// Modules
+// Custom components.
 //
 @import "totara/totara-menu";
 @import "totara/totara-dialog";
+@import "totara/avatar";
+@import "totara/page-footer";
 
 //
 // Legacy & Misc
 //
-@import "totara/fixes"; // TODO integrate and remove file.
-
 @import "totara/totara_jquery/totara_jquery_datatables";
 @import "totara/totara_jquery/totara_jquery_treeview";
 @import "totara/totara_jquery/totara_jquery_ui_dialog";
+@import "totara/fixes"; // TODO integrate and remove file.

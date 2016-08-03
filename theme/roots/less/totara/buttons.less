@@ -22,3 +22,26 @@
 // @package   theme_roots
 
 @import "moodle/buttons";
+
+button, input.form-submit,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+    margin: 0;
+}
+
+.singlebutton div {
+    margin: 0;
+}
+
+.singlebutton + .singlebutton div {
+    margin-left: ceil(@grid-gutter-width / 2);
+}
+
+.breadcrumb-button {
+    margin-top: 0;
+}
+
+.breadcrumb-button .singlebutton {
+    margin: 0;
+}

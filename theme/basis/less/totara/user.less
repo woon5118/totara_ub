@@ -19,8 +19,10 @@
 // @copyright 2016 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @author    Joby Harding <joby.harding@totaralearning.com>
-// @package   theme_roots
+// @package   theme_basis
 
-#page-navbar .singlebutton {
-    float: left;
+@import "roots/less/totara/user";
+
+.usermenu {
+    padding-top: ceil(@navbar-padding-vertical * 1.25);
 }

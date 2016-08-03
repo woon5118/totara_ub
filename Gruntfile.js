@@ -151,7 +151,7 @@ module.exports = function(grunt) {
      * @param {String} srcPath
      */
     var less_filter = function(srcPath) {
-        return !(grunt.file.isMatch('**/roots/less/variables.less', srcPath));
+        return !(grunt.file.isMatch('**/*/variables.less', srcPath));
     };
 
     var rtlSrc = 'theme/roots/style/*.css';

@@ -19,14 +19,13 @@
 // @copyright 2016 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @author    Joby Harding <joby.harding@totaralearning.com>
-// @package   theme_roots
+// @package   theme_basis
+//
+// Additional modules and Totara-specific variable overrides.
 
-@flex-icon-margin-base: 0.25em;
+@import "roots/less/totara/variables";
 
-.flex-icon-pre {
-    margin-right: @flex-icon-margin-base;
-}
-
-.flex-icon-post {
-    margin-left: @flex-icon-margin-base;
-}
+@totara-menu-bg: @gray-dark;
+@totara-menu-border-width: 0;
+@totara-menu-dropdown-bg: #f0f2f4;
+@totara-menu-padding-vertical: ceil(@navbar-padding-vertical * 0.25);

@@ -19,8 +19,32 @@
 // @copyright 2016 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @author    Joby Harding <joby.harding@totaralearning.com>
-// @package   theme_roots
+// @package   theme_basis
+//
+// This file contains Bootstrap overrides for styles and mixins etc.
 
-#page-navbar .singlebutton {
-    float: left;
+//
+// Navbar.
+//
+.navbar {
+  margin-bottom: 0;
+}
+
+.navbar-site{
+  margin-bottom: 0;
+}
+
+.navbar {
+  border: none;
+}
+
+//
+// Breadcrumb.
+//
+.breadcrumb-container {
+  min-height: ceil(@line-height-computed * 2.3);
+}
+
+.breadcrumb {
+  background: transparent;
 }

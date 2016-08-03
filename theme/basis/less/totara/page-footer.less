@@ -19,8 +19,46 @@
 // @copyright 2016 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @author    Joby Harding <joby.harding@totaralearning.com>
-// @package   theme_roots
+// @package   theme_basis
 
-#page-navbar .singlebutton {
-    float: left;
+// We prefer not to use IDs for styles but necessary
+// due to existing implementation.
+#page-footer {
+    margin-top: 0;
+    padding: ceil(@line-height-computed * 1.5) 0 0;
+    border-top: @basis-border-thick solid @brand-primary;
+    background-color: @totara-menu-bg;
+    color: #fff;
+
+    a:link,
+    a:visited,
+    a:hover,
+    a:active {
+        color: #fff;
+        text-decoration: none;
+    }
+    a:hover,
+    a:active {
+        border-bottom: 1px dotted #fff;
+    }
 }
+
+.page-footer-main-content small {
+    font-size: @font-size-base;
+}
+
+.page-footer-poweredby {
+    display: block;
+    margin-top: ceil(@line-height-computed * 1.5);
+    padding: @padding-base-vertical 0;
+    background-color: @brand-primary;
+}
+
+.page-footer-main-content div {
+    padding: 0 0 ceil(@line-height-computed / 2) 0;
+}
+
+.page-footer-main-content div:last-child {
+    padding-bottom: 0;
+}
+
