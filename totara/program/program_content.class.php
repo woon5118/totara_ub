@@ -696,18 +696,35 @@ class prog_content {
      */
     public function get_courseset_groups($certifpath) {
 
+        $courseset_groups = prog_content::group_coursesets($certifpath, $this->coursesets);
+
+        return $courseset_groups;
+    }
+
+    /**
+     * Groups program coursesets
+     *
+     * @param integer $certifpath the path that the sets are part of
+     * @param array $coursesets An array of program coursesets
+     * @return array An array of grouped sets.
+     */
+    public static function group_coursesets($certificationpath, $coursesets) {
+        global $CFG;
+
         $courseset_groups = array();
 
-        if (empty($this->coursesets)) {
+        if (empty($coursesets)) {
             return $courseset_groups;
         }
+
+        require_once($CFG->dirroot . '/totara/program/program_courseset.class.php');
 
         // Helpers for handling the sets of AND's and OR's.
         $last_handled_and_or_operator = false;
         $courseset_group = array();
 
-        foreach ($this->coursesets as $courseset) {
-            if ($courseset->certifpath != $certifpath) {
+        foreach ($coursesets as $courseset) {
+            if ($courseset->certifpath != $certificationpath) {
                 continue;
             }
 

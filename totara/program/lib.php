@@ -86,10 +86,11 @@ function prog_can_view_users_required_learning($learnerid) {
  * @param bool $showhidden Whether to include hidden programs in records returned when using normal visibility
  * @param bool $onlyprograms Only return programs (excludes certifications)
  * @param bool $onlyactive Only return active programs.
+ * @param bool $onlycertifications Only return certifications (excludes programs)
  * @return array|int
  */
 function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum = '', $returncount = false,
-                               $showhidden = false, $onlyprograms = false, $onlyactive = true) {
+                               $showhidden = false, $onlyprograms = false, $onlyactive = true, $onlycertifications = false) {
     global $DB;
 
     // Construct sql query.
@@ -115,6 +116,9 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
     }
     if ($onlyprograms) {
         $where .= " AND p.certifid IS NULL";
+    }
+    if ($onlycertifications) {
+        $where .= " AND p.certifid IS NOT NULL";
     }
 
     $params['contextlevel'] = CONTEXT_PROGRAM;

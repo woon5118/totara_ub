@@ -360,6 +360,7 @@ class totara_program_generator extends component_generator_base {
 
     /**
      * Creates an individual assignment for a user.
+     * TODO: Either fix or remove this function.
      *
      * @param array $data   The array should contain programid and userid
      * @return boolean      Success/failure

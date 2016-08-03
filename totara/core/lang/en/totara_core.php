@@ -99,6 +99,7 @@ $string['couldntreaddataforcourseid'] = 'Could not ready data for courseid={$a}'
 $string['coursecategoryicon'] = 'Category icon';
 $string['coursecompletion'] = 'Course completion';
 $string['coursecompletionsfor'] = 'Course Completions for ';
+$string['courseduex'] = 'Course due {$a}';
 $string['courseicon'] = 'Course icon';
 $string['courseprogress'] = 'Course progress';
 $string['courseprogresshelp'] = 'This specifies if the course progress block appears on the homepage';
@@ -612,11 +613,14 @@ $string['updatetemporarymanagerstask'] = 'Update temporary managers';
 $string['upgradenonlinear'] = 'Upgrades must be to a higher version built on or after the date of the current version {$a}';
 $string['uploadcompletionrecords'] = 'Upload completion records';
 $string['userdoesnotexist'] = 'User does not exist';
+$string['userlearningdueonx'] = 'due on {$a}';
+$string['userlearningoverduesincex'] = 'overdue since {$a}';
+$string['userlearningoverduesincextooltip'] = 'Overdue since {$a}';
 $string['viewmyteam'] = 'View My Team';
 $string['weeklyon'] = 'Weekly on';
 $string['xofy'] = '{$a->count} / {$a->total}';
 $string['xpercent'] = '{$a}%';
-$string['xpercentcomplete'] = '{$a} % complete';
+$string['xpercentcomplete'] = '{$a}% complete';
 $string['xpositions'] = '{$a}\'s Positions';
 $string['xresultsfory'] = '<strong>{$a->count}</strong> results found for "{$a->query}"';
 

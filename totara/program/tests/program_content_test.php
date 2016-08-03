@@ -244,3 +244,4 @@ class totara_program_program_content_testcase extends advanced_testcase {
         $this->assertTrue($DB->record_exists('prog_courseset_course', array('coursesetid' => $courseset2->id)));
     }
 }
+

@@ -219,6 +219,7 @@ class dp_course_component extends dp_base_component {
                 a.id AS omgid,
                 {$completion_field}
                 c.fullname,
+                c.shortname,
                 c.fullname AS name,
                 c.icon,
                 {$countselect}

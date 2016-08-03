@@ -54,6 +54,7 @@ $string['certificationcontent'] = 'Define the program content by adding sets of 
 $string['certificationcreatesuccess'] = 'Certification created sucessfully';
 $string['certificationdeletesuccess'] = 'Certification "{$a}" deleted sucessfully';
 $string['certificationdetailssaved'] = 'Certification details saved';
+$string['certificationduex'] = 'Certification due {$a}';
 $string['certificationhistory'] = 'Previous Certification';
 $string['certificationmembership'] = 'Certification Membership';
 $string['certifications'] = 'Certifications';

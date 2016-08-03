@@ -1207,6 +1207,25 @@ class program {
     }
 
     /**
+     * Gets completion date for a user.
+     *
+     * @param int|stdClass $userorid
+     * @return stdClass A record from the prog_completion table.
+     */
+    public function get_completion_data($userorid) {
+        global $DB;
+        if (is_object($userorid)) {
+            $userid = $userorid->id;
+        } else {
+            $userid = $userorid;
+        }
+
+        $completion = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $userid, 'coursesetid' => 0));
+
+        return $completion;
+    }
+
+    /**
      * Returns true or false depending on whether or not the specified user
      * can access the specified course based on whether or not the program
      * contains the course in any of its course sets and whether or not the
