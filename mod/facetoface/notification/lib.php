@@ -398,7 +398,8 @@ class facetoface_notification extends data_object {
             INNER JOIN
                 {facetoface} f
              ON s.facetoface = f.id
-            WHERE ' . $where;
+            WHERE ' . $where . '
+         ORDER BY u.id';
 
         $recordset = $DB->get_recordset_sql($sql, $params);
 
@@ -446,6 +447,7 @@ class facetoface_notification extends data_object {
                 ) sd
              ON sd.sessionid = s.id
              WHERE s.facetoface = ?
+          ORDER BY s.id ASC, sd.timestart ASC
         ';
 
         $recordset = $DB->get_recordset_sql($sql, array($this->facetofaceid));
