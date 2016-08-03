@@ -19,6 +19,7 @@
 // @copyright 2016 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @author    Joby Harding <joby.harding@totaralearning.com>
+// @author    Rob Tyler <rob.tyler@totaralearning.com>
 // @package   theme_roots
 
 // Mixin for form labels - will NOT be output.
@@ -182,7 +183,7 @@ select.singleselect {
   width: auto;
   max-width: 300px;
   display: inline;
-  margin: 0 0 5px 0;
+  margin: 0 0 5px @padding-small-horizontal;
 }
 
 // In some places, selects are incorrectly used outside of a form tag, resulting
@@ -547,4 +548,67 @@ div#dateselector-calendar-panel {
       color: @link-hover-color;
     }
   }
+}
+
+//
+// Fix multi-line user selection forms.
+//
+
+#hierarchy-bulk-actions-form label[for="addselect"],
+#hierarchy-bulk-actions-form label[for="removeselect"],
+.user-multiselect label[for="addselect"],
+.user-multiselect label[for="removeselect"] {
+  display: block;
+}
+
+.user-multiselect .controls {
+  margin-top: @line-height-computed * 9;
+  padding: 0;
+}
+
+#hierarchy-bulk-actions-form div.controls {
+  margin-top: @line-height-computed * 12;
+  padding: 0;
+}
+
+#id_remove_all_items {
+  margin-bottom: @padding-small-vertical;
+}
+
+#hierarchy-bulk-actions-form .controls input,
+.user-multiselect .controls button,
+.user-multiselect .controls input {
+  display: block;
+  margin: @padding-large-vertical auto;
+}
+
+#hierarchy-bulk-actions-form select[multiple='multiple'],
+.user-multiselect select[multiple='multiple'] {
+  max-width: none;
+  width: 100%;
+  margin-bottom: @line-height-computed;
+  margin-left: 0;
+  height: @line-height-computed * 20;
+}
+
+#hierarchy-bulk-actions-form .action {
+  text-align: center;
+  margin-top: @padding-large-vertical * 4;
+}
+
+#hierarchy-bulk-actions-form .action input,
+#hierarchy-bulk-actions-form .action select {
+  margin: 0 0 0 @padding-small-horizontal;
+}
+
+#assignform .userselector label,
+#assignform .userselector input[type='text'],
+#assignform .userselector input[type='button'] {
+  margin: 0 @padding-small-horizontal 0 0;
+}
+
+#userselector_options p input,
+#userselector_options p label {
+  vertical-align: middle;
+  margin: 0 @padding-xs-horizontal 0 0;
 }
