@@ -1935,7 +1935,7 @@ function quiz_question_tostring($question, $showicon = false, $showquestiontext 
     if ($showicon) {
         $name .= print_question_icon($question) . ' ' . $name;
     }
-    $result .= html_writer::span($name, 'questionname');
+    $result .= html_writer::span($name, 'questionname', array('data-movetext' => 'true'));
 
     if ($showquestiontext) {
         $questiontext = question_utils::to_plain_text($question->questiontext,

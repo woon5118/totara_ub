@@ -798,7 +798,7 @@ class core_course_renderer extends plugin_renderer_base {
         global $OUTPUT;
         $activitylink  = $mod->render_icon($OUTPUT, 'activityicon');
         $activitylink .= $accesstext;
-        $activitylink .= html_writer::tag('span', $instancename . $altname, array('class' => 'instancename'));
+        $activitylink .= html_writer::tag('span', $instancename . $altname, array('class' => 'instancename', 'data-movetext' => 'true'));
 
         if ($mod->uservisible) {
             $output .= html_writer::link($url, $activitylink, array('class' => $linkclasses, 'onclick' => $onclick)) .

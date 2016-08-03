@@ -455,7 +455,7 @@ class edit_renderer extends \plugin_renderer_base {
         $pagenumber = $structure->get_page_number_for_slot($slot);
 
         // Put page in a heading for accessibility and styling.
-        $page = $this->heading(get_string('page') . ' ' . $pagenumber, 4);
+        $page = html_writer::tag('h4', get_string('pagex', 'quiz', $pagenumber), array('data-movetext' => 'true'));
 
         if ($structure->is_first_slot_on_page($slot)) {
             // Add the add-menu at the page level.

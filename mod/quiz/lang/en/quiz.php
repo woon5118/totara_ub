@@ -600,6 +600,7 @@ $string['page-mod-quiz-review'] = 'Review quiz attempt page';
 $string['page-mod-quiz-summary'] = 'Quiz attempt summary page';
 $string['page-mod-quiz-view'] = 'Quiz information page';
 $string['pagesize'] = 'Page size';
+$string['pagex'] = 'Page {$a}';
 $string['parent'] = 'Parent';
 $string['parentcategory'] = 'Parent category';
 $string['parsingquestions'] = 'Parsing questions from import file.';
