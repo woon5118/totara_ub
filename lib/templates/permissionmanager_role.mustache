@@ -36,18 +36,20 @@
     * imageurl moodle url for delete(x) image
 
     Example context (json):
-    {"rolename" : "Manager",
-     "roleid" : 1,
-     "action": "prevent",
-     "spanclass": "allowed",
-     "linkclass": "preventlink",
-     "adminurl" : "http://example.com/",
-     "imageurl": "__WWWROOT__/theme/image.php?theme=__THEME__&component=core&image=t%2Fdelete"}
+    {
+        "rolename" : "Manager",
+        "roleid" : 1,
+        "action": "prevent",
+        "spanclass": "allowed",
+        "linkclass": "preventlink",
+        "adminurl" : "http://example.com/",
+        "imageurl" : "delete"
+     }
 }}
 <span style="display:inline-block;" class="{{spanclass}}">&nbsp;{{rolename}}&nbsp;
     {{#imageurl}}
         <a href="{{adminurl}}roles/permissions.php" class="{{linkclass}}" data-role-id="{{roleid}}" data-action="{{action}}">
-            <img src="{{imageurl}}" alt="{{action}}" />
+            {{#flex_icon}} {{imageurl}}, {"alt" : "{{action}}" }{{/flex_icon}}
         </a>
     {{/imageurl}}
 </span>
