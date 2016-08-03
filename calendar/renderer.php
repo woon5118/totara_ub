@@ -259,7 +259,12 @@ class core_calendar_renderer extends plugin_renderer_base {
         $eventdetailshtml = '';
         $eventdetailsclasses = '';
 
-        $eventdetailshtml .= format_text($event->description, $event->format, array('context' => $context));
+        if ($event->modulename == 'facetoface') {
+            $session = facetoface_get_session($event->uuid);
+            $eventdetailshtml .= facetoface_print_session($session, false, true);
+        } else {
+            $eventdetailshtml .= format_text($event->description, $event->format, array('context' => $context));
+        }
         $eventdetailsclasses .= 'description';
         if (isset($event->cssclass)) {
             $eventdetailsclasses .= ' '.$event->cssclass;
