@@ -53,6 +53,8 @@ class block_settings_renderer extends plugin_renderer_base {
             if (!$item->display) {
                 continue;
             }
+            $collapsed = false;
+            $icon = '';
 
             $isbranch = ($item->children->count()>0  || $item->nodetype==navigation_node::NODETYPE_BRANCH);
             $hasicon = (!$isbranch && $item->icon instanceof renderable);
@@ -66,11 +68,14 @@ class block_settings_renderer extends plugin_renderer_base {
             $liclasses = array($item->get_css_type());
             $liexpandable = array();
             if (!$item->forceopen || (!$item->forceopen && $item->collapse) || ($item->children->count()==0  && $item->nodetype==navigation_node::NODETYPE_BRANCH)) {
+                $collapsed = true;
                 $liclasses[] = 'collapsed';
             }
             if ($isbranch) {
                 $liclasses[] = 'contains_branch';
-                $liexpandable = array('aria-expanded' => in_array('collapsed', $liclasses) ? "false" : "true");
+                $liexpandable = array('aria-expanded' => ($collapsed ? "false" : "true"));
+                $icon = new \core\output\flex_icon($collapsed ? 'collapsed' : 'expanded');
+                $icon = $this->render($icon);
             } else if ($hasicon) {
                 $liclasses[] = 'item_with_icon';
             }
@@ -92,7 +97,7 @@ class block_settings_renderer extends plugin_renderer_base {
             if (!empty($item->id)) {
                 $divattr['id'] = $item->id;
             }
-            $content = html_writer::tag('p', $content, $divattr) . $this->navigation_node($item);
+            $content = html_writer::tag('p', $icon . $content, $divattr) . $this->navigation_node($item);
             if (!empty($item->preceedwithhr) && $item->preceedwithhr===true) {
                 $content = html_writer::empty_tag('hr') . $content;
             }

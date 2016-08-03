@@ -550,6 +550,20 @@ $icons = array(
                     'classes' => 'fa-cog',
                 ),
         ),
+    'collapsed' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-caret-right ft-flip-rtl'
+                ),
+        ),
+    'collapsed-empty' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-caret-right ft-flip-rtl ft-state-disabled'
+                ),
+        ),
     'columns' =>
         array(
             'data' =>
@@ -893,6 +907,13 @@ $icons = array(
                     'classes' => 'fa-expand',
                 ),
         ),
+    'expanded' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-caret-down'
+                ),
+        ),
     'explore' =>
         array(
             'template' => 'core/flex_icon_stack',
@@ -1203,6 +1224,13 @@ $icons = array(
                     'classes' => 'fa-list-ol',
                 ),
         ),
+    'loading' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-spinner fa-pulse',
+                ),
+        ),
     'lock' =>
         array(
             'data' =>
@@ -1290,6 +1318,13 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-mouse-pointer',
+                ),
+        ),
+    'navitem' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-square',
                 ),
         ),
     'new' => // Something recently added.
@@ -2305,6 +2340,7 @@ $deprecated = array(
     'core|i/mnethost' => 'mnet-host',
     'core|i/moodle_host' => 'moodle',
     'core|i/move_2d' => 'arrows',
+    'core|i/navigationitem' => 'navitem',
     'core|i/new' => 'new',
     'core|i/news' => 'newspaper-o',
     'core|i/nosubcat' => 'no-subcategory',
