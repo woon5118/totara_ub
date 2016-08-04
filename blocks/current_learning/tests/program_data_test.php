@@ -193,6 +193,103 @@ class block_current_learning_program_data_testcase extends block_current_learnin
         $this->assertNotTrue($this->program_in_learning_data($this->program1, $learning_data));
     }
 
+    public function test_course_direct_enrol_and_in_program() {
+
+        // If a user in directly enrolled into a course and the course is also within a program, the course should not show
+        // as a standalone course, unless the courseset is complete or unavailable.
+
+        // Enrol user to course1, course2, course3 and course4.
+        $this->generator->enrol_user($this->user1->id, $this->course1->id);
+        $this->generator->enrol_user($this->user1->id, $this->course2->id);
+        $this->generator->enrol_user($this->user1->id, $this->course3->id);
+        $this->generator->enrol_user($this->user1->id, $this->course4->id);
+        $learning_data = $this->get_learning_data($this->user1->id);
+        $this->assertTrue($this->course_in_learning_data($this->course1->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($this->course2->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($this->course3->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($this->course4->id, $learning_data));
+
+        // Create a program and set the program content as follows:
+        // CS1 (must complete one of Course A or B) THEN CS2 (must complete all of Course C) THEN CS3 (must complete course D)
+        $progcontent = new prog_content($this->program1->id);
+        $progcontent->add_set(CONTENTTYPE_MULTICOURSE);
+        $progcontent->add_set(CONTENTTYPE_MULTICOURSE);
+        $progcontent->add_set(CONTENTTYPE_MULTICOURSE);
+
+        $coursesets = $progcontent->get_course_sets();
+
+        // Set completion type.
+        $coursesets[0]->completiontype = COMPLETIONTYPE_ANY;
+        $coursesets[1]->completiontype = COMPLETIONTYPE_ALL;
+        $coursesets[2]->completiontype = COMPLETIONTYPE_ALL;
+
+        // Set certifpath.
+        $coursesets[0]->certifpath = CERTIFPATH_STD;
+        $coursesets[1]->certifpath = CERTIFPATH_STD;
+        $coursesets[2]->certifpath = CERTIFPATH_STD;
+
+        $coursedata = new stdClass();
+
+        // Set 1.
+        $coursedata->{$coursesets[0]->get_set_prefix() . 'courseid'} = $this->course1->id;
+        $progcontent->add_course(1, $coursedata);
+
+        $coursedata->{$coursesets[0]->get_set_prefix() . 'courseid'} = $this->course2->id;
+        $progcontent->add_course(1, $coursedata);
+
+        // Set the operator for Set 1 to be THEN.
+        $coursesets[0]->nextsetoperator = NEXTSETOPERATOR_THEN;
+
+        // Set 2.
+        $coursedata->{$coursesets[1]->get_set_prefix() . 'courseid'} = $this->course3->id;
+        $progcontent->add_course(2, $coursedata);
+
+        // Set the operator for Set 2 to be THEN.
+        $coursesets[1]->nextsetoperator = NEXTSETOPERATOR_THEN;
+
+        // Set 3.
+        $coursedata->{$coursesets[2]->get_set_prefix() . 'courseid'} = $this->course4->id;
+        $progcontent->add_course(3, $coursedata);
+
+        $progcontent->save_content();
+
+        // Assign user to the program.
+        $this->program_generator->assign_program($this->program1->id, array($this->user1->id));
+
+        // Get the learning data.
+        $learning_data = $this->get_learning_data($this->user1->id);
+
+        // Only course1 and course2 should appear in the program.
+        $this->assertTrue($this->course_program_in_learning_data($this->program1, $this->course1, $learning_data));
+        $this->assertTrue($this->course_program_in_learning_data($this->program1, $this->course2, $learning_data));
+        $this->assertNotTrue($this->course_program_in_learning_data($this->program1, $this->course3, $learning_data));
+        $this->assertNotTrue($this->course_program_in_learning_data($this->program1, $this->course4, $learning_data));
+
+        // Only course3 and course4 should appear as standalone courses.
+        $this->assertNotTrue($this->course_in_learning_data($this->course1->id, $learning_data));
+        $this->assertNotTrue($this->course_in_learning_data($this->course2->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($this->course3->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($this->course4->id, $learning_data));
+
+        // Now lets complete course2.
+        $this->completion_generator->complete_course($this->course2, $this->user1);
+
+        // Get the learning data.
+        $learning_data = $this->get_learning_data($this->user1->id);
+
+        // Only course3 should appear in the program.
+        $this->assertNotTrue($this->course_program_in_learning_data($this->program1, $this->course1, $learning_data));
+        $this->assertNotTrue($this->course_program_in_learning_data($this->program1, $this->course2, $learning_data));
+        $this->assertTrue($this->course_program_in_learning_data($this->program1, $this->course3, $learning_data));
+        $this->assertNotTrue($this->course_program_in_learning_data($this->program1, $this->course4, $learning_data));
+
+        // Only course1 and course4 should appear as standalone courses.
+        $this->assertTrue($this->course_in_learning_data($this->course1->id, $learning_data));
+        $this->assertNotTrue($this->course_in_learning_data($this->course2->id, $learning_data));
+        $this->assertNotTrue($this->course_in_learning_data($this->course3->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($this->course4->id, $learning_data));
+    }
+
     public function test_courseset_and_operator() {
 
         // Add content to program 1.

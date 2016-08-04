@@ -96,13 +96,23 @@ trait program_common {
     /**
      * Get the courses within the coursesets for the program
      *
+     * @param $includeunavailable bool Include courses from coursesets that that are completed or unavailable
+     *
      * @return array An array of course learning items
      */
-    public function get_courseset_courses() {
+    public function get_courseset_courses($includeunavailable = true) {
         $this->ensure_course_sets_loaded();
         $courses = [];
+
+        $coursesets = $this->coursesets;
+
+        if ($includeunavailable === false) {
+            $processed_coursesets = $this->process_coursesets($coursesets);
+            $coursesets = $processed_coursesets->sets;
+        }
+
         /** @var \totara_certification\user_learning\courseset $courseset */
-        foreach ($this->coursesets as $courseset) {
+        foreach ($coursesets as $courseset) {
             $courses = array_merge($courses, $courseset->get_courses());
         }
         return $courses;

@@ -247,11 +247,12 @@ class block_current_learning extends block_base {
             return [];
         }
 
-        // First up we need to remove any courses from the top level that are within a program or certification that is not complete.
+        // First up we need to remove any courses from the top level that are within a program or certification that
+        // is not complete or unavailable.
         $progcertcourses = [];
         foreach ($items as $item) {
             if ($item instanceof \totara_program\user_learning\item || $item instanceof \totara_certification\user_learning\item) {
-                $courses = $item->get_courseset_courses();
+                $courses = $item->get_courseset_courses(false);
                 foreach ($courses as $course) {
                     $progcertcourses[$course->id] = $course;
                 }
