@@ -109,4 +109,31 @@ class block_current_learning_plan_data_testcase extends block_current_learning_t
         $learning_data = $this->get_learning_data($this->user1->id);
         $this->assertNotTrue($this->course_in_learning_data($this->course1->id, $learning_data));
     }
+
+    public function test_courses_duplication() {
+
+        // If a user in enrolled into a course directly and also via a plan, the course should only de displayed once.
+
+        // Enroll user directly into course1.
+        $this->generator->enrol_user($this->user1->id, $this->course1->id);
+        $learning_data = $this->get_learning_data($this->user1->id);
+        $this->assertTrue($this->course_in_learning_data($this->course1->id, $learning_data));
+
+        // Now add the same course to an approved learning plan.
+        $plan = new development_plan($this->planrecord1->id);
+        $this->plan_generator->add_learning_plan_course($plan->id, $this->course1->id);
+        $plan->set_status(DP_PLAN_STATUS_APPROVED, DP_PLAN_REASON_CREATE);
+
+        // Get the new learning data.
+        $learning_data = $this->get_learning_data($this->user1->id);
+
+        // The course should only appear once.
+        $count = 0;
+        foreach ($learning_data['learningitems'] as $item) {
+            if ($item->id == $this->course1->id && $item->type == 'course') {
+                $count++;
+            }
+        }
+        $this->assertEquals(1, $count);
+    }
 }

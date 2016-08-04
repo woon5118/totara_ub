@@ -209,15 +209,11 @@ class block_current_learning extends block_base {
             $component = $item->get_component();
             $type = $item->get_type();
 
-            if (!isset($instances[$component])) {
-                $instances[$component] = [$type => [$item->id => $key]];
-            } else if (!isset($instance[$component][$type])) {
-                $instances[$component][$type] = [$item->id => $key];
-            } else if (!isset($instance[$component][$type][$item->id])) {
-                $instance[$component][$type][$item->id] = $key;
+            if (!isset($instances[$component][$type][$item->id])) {
+                $instances[$component][$type][$item->id] = $key;
             } else {
                 // There are two and they are not the same :(
-                $oldisprimary = $items[$instance[$component][$type][$item->id]]->is_primary_user_learning_item();
+                $oldisprimary = $items[$instances[$component][$type][$item->id]]->is_primary_user_learning_item();
                 $newisprimary = $item->is_primary_user_learning_item();
                 if ($oldisprimary && $newisprimary) {
                     // We should never ever be here!
@@ -226,14 +222,15 @@ class block_current_learning extends block_base {
                     unset($items[$key]);
                 } else if ($newisprimary) {
                     // The new item is primary and the old is not, unset the old.
-                    unset($items[$instance[$component][$type][$item->id]]);
-                    $instance[$component][$type][$item->id] = $key;
+                    unset($items[$instances[$component][$type][$item->id]]);
+                    $instances[$component][$type][$item->id] = $key;
                 } else {
                     // The old is primary and the new is not, unset the new.
                     unset($items[$key]);
                 }
             }
         }
+
         return $items;
     }
 
