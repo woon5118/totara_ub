@@ -124,14 +124,6 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'pos_type',
                 'required' => array('fullname', 'idnumber'),
             ),
-            'position assignments' => array(
-                'datagenerator' => 'pos_assign',
-                'required' => array('user', 'position'),
-                'switchids' => array(
-                    'user' => 'userid',
-                    'position' => 'positionid',
-                ),
-            ),
             'organisation frameworks' => array(
                 'datagenerator' => 'org_frame',
                 'required' => array('idnumber'),
@@ -146,14 +138,6 @@ class behat_totara_data_generators extends behat_base {
             'organisation type' => array(
                 'datagenerator' => 'org_type',
                 'required' => array('fullname', 'idnumber'),
-            ),
-            'organisation assignments' => array(
-                'datagenerator' => 'org_assign',
-                'required' => array('user', 'organisation'),
-                'switchids' => array(
-                    'user' => 'userid',
-                    'organisation' => 'organisationid',
-                ),
             ),
             'competency frameworks' => array(
                 'datagenerator' => 'comp_frame',
@@ -200,25 +184,6 @@ class behat_totara_data_generators extends behat_base {
             'textinput field for hierarchy type' => array(
                 'datagenerator' => 'hierarchy_type_text',
                 'required' => array('hierarchy', 'typeidnumber', 'value'),
-            ),
-            'manager assignments' => array(
-                'datagenerator' => 'man_assign',
-                'required' => array('user', 'manager'),
-                'switchids' => array(
-                    'user' => 'userid',
-                    'manager' => 'managerid',
-                ),
-            ),
-            'goals' => array(
-                'datagenerator' => 'goal',
-                'required' => array('fullname', 'idnumber', 'goal_framework'),
-                'switchids' => array(
-                    'goal_framework' => 'frameworkid',
-                ),
-            ),
-            'goal frameworks' => array(
-                'datagenerator' => 'goal_frame',
-                'required' => array('idnumber'),
             ),
             'goal assignments' => array(
                 'datagenerator' => 'goal_assign',

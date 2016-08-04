@@ -120,9 +120,9 @@ if ($ADMIN->fulltree) { // Improve performance.
 
     $settings->add(
         new admin_setting_configcheckbox(
-            'facetoface_selectpositiononsignupglobal',
-            new lang_string('setting:selectpositiononsignupglobal', 'facetoface'),
-            new lang_string('setting:selectpositiononsignupglobal_caption', 'facetoface'),
+            'facetoface_selectjobassignmentonsignupglobal',
+            new lang_string('setting:selectjobassignmentonsignupglobal', 'facetoface'),
+            new lang_string('setting:selectjobassignmentonsignupglobal_caption', 'facetoface'),
             0
         )
     );

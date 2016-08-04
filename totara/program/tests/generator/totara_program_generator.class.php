@@ -83,7 +83,7 @@ class totara_program_generator extends component_generator_base {
                     'org' => ASSIGNTYPE_ORGANISATION,
                     'pos' => ASSIGNTYPE_POSITION,
                     'cohort' => ASSIGNTYPE_COHORT,
-                    'manager' => ASSIGNTYPE_MANAGER,
+                    'manager' => ASSIGNTYPE_MANAGERJA,
                     'individual' => ASSIGNTYPE_INDIVIDUAL,
             );
             // Add at least 2 assignment types.
@@ -221,15 +221,18 @@ class totara_program_generator extends component_generator_base {
             case ASSIGNTYPE_COHORT:
                 $table = 'cohort';
                 break;
-            case ASSIGNTYPE_MANAGER:
-                $table = 'user';
+            case ASSIGNTYPE_MANAGERJA:
                 $like = $DB->sql_like('username', '?');
                 $managers = $DB->get_fieldset_select('user', 'id', $like, array(totara_generator_site_backend::MANAGER_TOOL_GENERATOR . '%'));
                 $keys = array_rand($managers, $numitems);
                 if (!is_array($keys)) { $keys = array($keys);}
                 foreach ($keys as $key) {
                     if (isset($managers[$key])) {
-                        $items[] = $managers[$key];
+                        $jobassignment = \totara_job\job_assignment::get_first($managers[$key], false);
+                        if (empty($jobassignment)) {
+                            $jobassignment = \totara_job\job_assignment::create_default($managers[$key]);
+                        }
+                        $items[] = $jobassignment->id;
                     }
                 }
                 return $items;

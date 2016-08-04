@@ -62,9 +62,9 @@ Feature: Users are forced to get manager approval where required
     And the following "position" hierarchy exists:
       | framework | idnumber | fullname   |
       | FW001     | POS001   | Position1  |
-    And the following position assignments exist:
-      | user     | position | type      | manager  |
-      | student1 | POS001   | primary   | teacher1 |
+    And the following job assignments exist:
+      | user     | position | manager  |
+      | student1 | POS001   | teacher1 |
 
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu

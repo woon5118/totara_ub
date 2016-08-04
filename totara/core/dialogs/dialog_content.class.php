@@ -178,6 +178,18 @@ class totara_dialog_content {
      */
     public $disabled_items = array();
 
+    /**
+     * Array of items that can be expanded, but can not be selected.
+     *
+     * However, sub items may be selectable so do not add 'unclickable' class which
+     * fades them.
+     *
+     * These items must still be added to the $parent_items array for them to be expandable in the first place.
+     *
+     * @var array
+     */
+    public $expandonly_items = array();
+
 
     /**
      * Array of items that are already selected (e.g. appear in the selected pane)
@@ -212,6 +224,11 @@ class totara_dialog_content {
      * @var array
      */
     protected $datakeys = array();
+
+    /**
+     * @var bool When you have an expandable parent item, a folder icon will be shown if this is set to true.
+     */
+    protected $showfoldericons = true;
 
     /**
      * Generate markup from configuration and return
@@ -371,7 +388,9 @@ class totara_dialog_content {
                     if (array_key_exists($element->id, $this->parent_items)) {
                         $li_class .= ' expandable';
                         $div_class .= ' hitarea expandable-hitarea';
-                        $span_class .= ' folder';
+                        if ($this->showfoldericons) {
+                            $span_class .= ' folder';
+                        }
 
                         if ($count == $total) {
                             $li_class .= ' lastExpandable';
@@ -380,8 +399,10 @@ class totara_dialog_content {
                     }
 
                     // Make disabled elements non-draggable and greyed out
-                    if (array_key_exists($element->id, $this->disabled_items)){
+                    if (array_key_exists($element->id, $this->disabled_items)) {
                         $span_class .= ' unclickable';
+                    } else if (array_key_exists($element->id, $this->expandonly_items)) {
+                        $span_class .= ' expandonly';
                     } else {
                         $span_class .= ' clickable';
                     }
@@ -479,7 +500,15 @@ class totara_dialog_content {
                 $class .= 'unremovable ';
             }
 
-            $html .= '<div class="treeview-selected-item"><span id="item_'.$element->id.'" class="'.$class.'">';
+            $datalist = array();
+            foreach ($this->datakeys as $key) {
+                if (isset($element->$key)) {
+                    $datalist[] = 'data-' . $key .'="' . htmlspecialchars($element->$key) . '"';
+                }
+            }
+            $datahtml = implode(' ', $datalist);
+
+            $html .= '<div class="treeview-selected-item"><span id="item_'.$element->id.'" class="'.$class.'" ' . $datahtml .'>';
             $html .= '<a href="#">';
             $html .= format_string($element->fullname);
             $html .= '</a>';
@@ -487,6 +516,10 @@ class totara_dialog_content {
             $html .= '</span></div>';
         }
         return $html;
+    }
+
+    public function set_datakeys($datakeys) {
+        $this->datakeys = $datakeys;
     }
 }
 

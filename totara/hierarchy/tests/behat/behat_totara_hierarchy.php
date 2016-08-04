@@ -156,15 +156,15 @@ class behat_totara_hierarchy extends behat_base {
     }
 
     /**
-     * Create or update the requested position assignment
+     * Create or update the requested job assignment
      *
-     * @Given /^the following position assignments exist:$/
+     * @Given /^the following job assignments exist:$/
      * @param TableNode $table
      * @throws Exception
      * @throws coding_exception
      */
-    public function the_following_position_assignments_exist(TableNode $table) {
-        global $DB, $CFG, $POSITION_CODES;
+    public function the_following_job_assignments_exist(TableNode $table) {
+        global $DB, $CFG;
 
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 
@@ -172,12 +172,14 @@ class behat_totara_hierarchy extends behat_base {
             'user', // Username.
         );
         $optional = array(
-            'type',
+            'fullname',
+            'shortname',
+            'idnumber',
             'manager', // Username.
+            'managerjaidnumber', // String.
             'appraiser', // Username.
             'organisation', // ID number.
             'position', // ID number.
-            'positiontitle', // position assignment title.
         );
 
         $data = $table->getHash();
@@ -186,7 +188,7 @@ class behat_totara_hierarchy extends behat_base {
         // Check required fields are present.
         foreach ($required as $reqname) {
             if (!isset($firstrow[$reqname])) {
-                throw new Exception('Position assignments require the field '.$reqname.' to be set');
+                throw new Exception('Job assignments require the field '.$reqname.' to be set');
             }
         }
 
@@ -199,30 +201,46 @@ class behat_totara_hierarchy extends behat_base {
                 } else if (in_array($fieldname, $optional)) {
                     $record[$fieldname] = $value;
                 } else {
-                    throw new Exception('Unknown field '.$fieldname.' in position assignment definition');
+                    throw new Exception('Unknown field '.$fieldname.' in job assignment definition');
                 }
             }
 
             // Pre-process any fields that require transforming.
             if (!$userid = $DB->get_field('user', 'id', array('username' => $record['user']))) {
-                throw new Exception('Unknown user '.$record['user'].' in position assignment definition');
+                throw new Exception('Unknown user '.$record['user'].' in job assignment definition');
             }
-            $record['userid'] = $userid;
             unset($record['user']);
 
-            // Map Manager to a user.
-            if (!empty($record['manager'])) {
-                if (!$managerid = $DB->get_field('user', 'id', array('username' => $record['manager']))) {
-                    throw new Exception('Unknown manager '.$record['manager'].' in position assignment definition');
+            // Map Manager and managershortname to a user.
+            if (!empty($record['managerjaidnumber'])) {
+                if (empty($record['manager'])) {
+                    throw new Exception('Must provide manager when specifying managerjaidnumber in job assignment definition');
                 }
-                $record['managerid'] = $managerid;
+                if (!$managerid = $DB->get_field('user', 'id', array('username' => $record['manager']))) {
+                    throw new Exception('Unknown manager '.$record['manager'].' in job assignment definition');
+                }
+                $managerja = \totara_job\job_assignment::get_with_idnumber($managerid, $record['managerjaidnumber']);
+                if (empty($managerja)) {
+                    throw new Exception('Unknown managerjaidnumber '.$record['managerjaidnumber'].' for manager '.$record['manager'].' in job assignment definition');
+                }
+                $record['managerjaid'] = $managerja->id;
+            } else if (!empty($record['manager'])) {
+                if (!$managerid = $DB->get_field('user', 'id', array('username' => $record['manager']))) {
+                    throw new Exception('Unknown manager '.$record['manager'].' in job assignment definition');
+                }
+                $managerja = \totara_job\job_assignment::get_first($managerid, false);
+                if (empty($managerja)) {
+                    $managerja = \totara_job\job_assignment::create_default($managerid);
+                }
+                $record['managerjaid'] = $managerja->id;
             }
+            unset($record['managerjaidnumber']);
             unset($record['manager']);
 
             // Map Appraiser to a user.
             if (!empty($record['appraiser'])) {
                 if (!$appraiserid = $DB->get_field('user', 'id', array('username' => $record['appraiser']))) {
-                    throw new Exception('Unknown appraiser '.$record['appraiser'].' in position assignment definition');
+                    throw new Exception('Unknown appraiser '.$record['appraiser'].' in job assignment definition');
                 }
                 $record['appraiserid'] = $appraiserid;
             }
@@ -231,7 +249,7 @@ class behat_totara_hierarchy extends behat_base {
             // Map Organisation ID Number to an organisation.
             if (!empty($record['organisation'])) {
                 if (!$organisationid = $DB->get_field('org', 'id', array('idnumber' => $record['organisation']))) {
-                    throw new Exception('Unknown organisation '.$record['organisation'].' in position assignment definition');
+                    throw new Exception('Unknown organisation '.$record['organisation'].' in job assignment definition');
                 }
                 $record['organisationid'] = $organisationid;
             }
@@ -240,33 +258,23 @@ class behat_totara_hierarchy extends behat_base {
             // Map Position ID Number to a position.
             if (!empty($record['position'])) {
                 if (!$positionid = $DB->get_field('pos', 'id', array('idnumber' => $record['position']))) {
-                    throw new Exception('Unknown position '.$record['position'].' in position assignment definition');
+                    throw new Exception('Unknown position '.$record['position'].' in job assignment definition');
                 }
                 $record['positionid'] = $positionid;
             }
             unset($record['position']);
 
-            // Make sure we have a valid position type.
-            if (!empty($record['type'])) {
-                if (!isset($POSITION_CODES[$record['type']])) {
-                    throw new Exception('Unknown position type '.$record['type']);
+            // Check if this is an update.
+            if (!empty($record['idnumber'])) {
+                $ja = \totara_job\job_assignment::get_with_idnumber($userid, $record['idnumber'], false);
+                if (!empty($ja)) {
+                    $ja->update($record);
+                    continue; // Don't need to create new job assignment.
                 }
-                $record['type'] = $POSITION_CODES[$record['type']];
-            } else {
-                unset($record['type']);
             }
 
-            // Map position assignment title.
-            if (!empty($record['positiontitle'])) {
-                $title = $record['positiontitle'];
-                $record['fullname'] = $title;
-                $record['shortname'] = $title;
-
-                unset($record['positiontitle']);
-            }
-
-            // Internally, the userid, managerid, etc. specified inside $record take priority over those specified as parameters.
-            $this->get_data_generator()->assign_primary_position(null, null, null, null, $record);
+            // Create using the default function because it will set default idnumber if it is not specified.
+            \totara_job\job_assignment::create_default($userid, $record);
         }
     }
 }

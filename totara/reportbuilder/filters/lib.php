@@ -156,7 +156,7 @@ class rb_filter_type {
      *
      * @return object|false A filteroption, or false if not found
      */
-    private function get_filteroption($type, $value) {
+    protected function get_filteroption($type, $value) {
         $sourcename = get_class($this->report->src);
         $filteroption = reportbuilder::get_single_item($this->report->src->filteroptions, $type, $value);
 
@@ -207,7 +207,7 @@ class rb_filter_type {
      *                             null if not required
      * @return string The SQL snippet to use in WHERE or HAVING clause
      */
-    private function define_field($filteroption, $columnoption) {
+    protected function define_field($filteroption, $columnoption) {
         // determine whether to get field data from a column or the filter itself
         $option = empty($filteroption->field) ? $columnoption : $filteroption;
 
@@ -240,7 +240,7 @@ class rb_filter_type {
      *                             null if not required
      * @return string|array Joins to include in the query when this filter is active
      */
-    private function get_joins($filteroption, $columnoption) {
+    protected function get_joins($filteroption, $columnoption) {
         // determine whether to get joins from a column or the filter itself
         $option = empty($filteroption->field) ? $columnoption : $filteroption;
 

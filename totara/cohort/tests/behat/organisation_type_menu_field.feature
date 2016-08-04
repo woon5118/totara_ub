@@ -28,7 +28,7 @@ Feature: Test audience with organisation type menu field.
       | fin20 | finf20 | finl20 |
       | fin21 | finf21 | finl21 |
       | fin22 | finf22 | finl22 |
-    And the following "organisation assignments" exist in "totara_hierarchy" plugin:
+    And the following job assignments exist:
       | user      | organisation |
       | it10      | ORG001       |
       | it11      | ORG001       |

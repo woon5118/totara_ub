@@ -28,7 +28,7 @@ Feature: Seminar Signup No Approval
       | timmy   | CCC    | student        |
       | sammy   | CCC    | student        |
       | sally   | CCC    | student        |
-    And the following position assignments exist:
+    And the following job assignments exist:
       | user  | manager |
       | jimmy | manager |
       | timmy | manager |

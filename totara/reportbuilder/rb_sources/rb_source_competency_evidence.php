@@ -113,10 +113,8 @@ class rb_source_competency_evidence extends rb_base_source {
 
         // include some standard joins
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
-        // requires the position_assignment join
-        $this->add_manager_tables_to_joinlist($joinlist,
-            'position_assignment', 'reportstoid');
+        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
 
         return $joinlist;
@@ -303,8 +301,8 @@ class rb_source_competency_evidence extends rb_base_source {
 
         // include some standard columns
         $this->add_user_fields_to_columns($columnoptions);
-        $this->add_position_fields_to_columns($columnoptions);
-        $this->add_manager_fields_to_columns($columnoptions);
+        $this->add_all_job_assignments_fields_to_columns($columnoptions);
+        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
         $this->add_cohort_user_fields_to_columns($columnoptions);
 
         return $columnoptions;
@@ -437,50 +435,32 @@ class rb_source_competency_evidence extends rb_base_source {
         );
         // include some standard filters
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_position_fields_to_filters($filteroptions);
-        $this->add_manager_fields_to_filters($filteroptions);
+        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
+        $this->add_all_job_assignments_fields_to_filters($filteroptions);
         $this->add_cohort_user_fields_to_filters($filteroptions);
 
         return $filteroptions;
     }
 
     protected function define_contentoptions() {
-        $contentoptions = array(
-            new rb_content_option(
-                'current_pos',
-                get_string('currentpos', 'totara_reportbuilder'),
-                'position.path',
-                'position'
-            ),
-            new rb_content_option(
-                'current_org',
-                get_string('currentorg', 'totara_reportbuilder'),
-                'organisation.path',
-                'organisation'
-            ),
-            new rb_content_option(
-                'completed_org',
-                get_string('completedorg', 'rb_source_competency_evidence'),
-                'completion_organisation.path',
-                'completion_organisation'
-            ),
-            new rb_content_option(
-                'user',
-                get_string('user', 'rb_source_competency_evidence'),
-                array(
-                    'userid' => 'base.userid',
-                    'managerid' => 'position_assignment.managerid',
-                    'managerpath' => 'position_assignment.managerpath',
-                    'postype' => 'position_assignment.type',
-                ),
-                'position_assignment'
-            ),
-            new rb_content_option(
-                'date',
-                get_string('completiondate', 'rb_source_competency_evidence'),
-                'base.timemodified'
-            ),
+        $contentoptions = array();
+
+        // Add the manager/position/organisation content options.
+        $this->add_basic_user_content_options($contentoptions);
+
+        $contentoptions[] = new rb_content_option(
+            'completed_org',
+            get_string('completedorg', 'rb_source_competency_evidence'),
+            'completion_organisation.path',
+            'completion_organisation'
         );
+
+        $contentoptions[] = new rb_content_option(
+            'date',
+            get_string('completiondate', 'rb_source_competency_evidence'),
+            'base.timemodified'
+        );
+
         return $contentoptions;
     }
 
@@ -503,35 +483,35 @@ class rb_source_competency_evidence extends rb_base_source {
     protected function define_defaultcolumns() {
         $defaultcolumns = array(
             array(
-                'type' => 'user',
+                'type'  => 'user',
                 'value' => 'namelink'
             ),
             array(
-                'type' => 'competency',
+                'type'  => 'competency',
                 'value' => 'competencylink',
             ),
             array(
-                'type' => 'user',
+                'type'  => 'primary_job',
                 'value' => 'organisation',
             ),
             array(
-                'type' => 'competency_evidence',
+                'type'  => 'competency_evidence',
                 'value' => 'organisation',
             ),
             array(
-                'type' => 'user',
+                'type'  => 'primary_job',
                 'value' => 'position',
             ),
             array(
-                'type' => 'competency_evidence',
+                'type'  => 'competency_evidence',
                 'value' => 'position',
             ),
             array(
-                'type' => 'competency_evidence',
+                'type'  => 'competency_evidence',
                 'value' => 'proficiency',
             ),
             array(
-                'type' => 'competency_evidence',
+                'type'  => 'competency_evidence',
                 'value' => 'completeddate',
             ),
         );
@@ -546,7 +526,7 @@ class rb_source_competency_evidence extends rb_base_source {
                 'advanced' => 0,
             ),
             array(
-                'type' => 'user',
+                'type' => 'primary_job',
                 'value' => 'organisationpath',
                 'advanced' => 1,
             ),
@@ -556,7 +536,7 @@ class rb_source_competency_evidence extends rb_base_source {
                 'advanced' => 1,
             ),
             array(
-                'type' => 'user',
+                'type' => 'primary_job',
                 'value' => 'positionpath',
                 'advanced' => 1,
             ),

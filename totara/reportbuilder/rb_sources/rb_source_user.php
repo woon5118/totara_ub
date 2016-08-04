@@ -153,8 +153,8 @@ class rb_source_user extends rb_base_source {
         );
 
         $this->add_user_table_to_joinlist($joinlist, 'base', 'id');
-        $this->add_position_tables_to_joinlist($joinlist, 'base', 'id');
-        $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
+        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'id');
+        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'id');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'id');
 
         return $joinlist;
@@ -171,8 +171,8 @@ class rb_source_user extends rb_base_source {
 
         $columnoptions = array();
         $this->add_user_fields_to_columns($columnoptions, 'base');
-        $this->add_position_fields_to_columns($columnoptions);
-        $this->add_manager_fields_to_columns($columnoptions);
+        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
+        $this->add_all_job_assignments_fields_to_columns($columnoptions);
 
         // A column to display a user's profile picture
         $columnoptions[] = new rb_column_option(
@@ -308,8 +308,8 @@ class rb_source_user extends rb_base_source {
         $filteroptions = array();
 
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_position_fields_to_filters($filteroptions);
-        $this->add_manager_fields_to_filters($filteroptions);
+        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
+        $this->add_all_job_assignments_fields_to_filters($filteroptions, 'base');
         $this->add_cohort_user_fields_to_filters($filteroptions);
 
         return $filteroptions;
@@ -349,37 +349,18 @@ class rb_source_user extends rb_base_source {
      * @return array
      */
     protected function define_contentoptions() {
-        // Include the rb_user_content content options for this report
-        $contentoptions = array(
-            new rb_content_option(
-                'user',
-                get_string('user', 'rb_source_user'),
-                array(
-                    'userid' => 'base.id',
-                    'managerid' => 'position_assignment.managerid',
-                    'managerpath' => 'position_assignment.managerpath',
-                    'postype' => 'position_assignment.type',
-                ),
-                'position_assignment'
-            ),
-            new rb_content_option(
-                'current_pos',
-                get_string('currentpos', 'totara_reportbuilder'),
-                'position.path',
-                'position'
-            ),
-            new rb_content_option(
-                'current_org',
-                get_string('currentorg', 'totara_reportbuilder'),
-                'organisation.path',
-                'organisation'
-            ),
-            new rb_content_option(
-                'date',
-                get_string('timecreated', 'rb_source_user'),
-                'base.timecreated'
-            ),
+        $contentoptions = array();
+
+        // Add the manager/position/organisation content options.
+        $this->add_basic_user_content_options($contentoptions, 'base');
+
+        // Add the time created content option.
+        $contentoptions[] = new rb_content_option(
+            'date',
+            get_string('timecreated', 'rb_source_user'),
+            'base.timecreated'
         );
+
         return $contentoptions;
     }
 
@@ -514,9 +495,10 @@ class rb_source_user extends rb_base_source {
         $links .= html_writer::tag('li', $profile_link);
         $links .= html_writer::tag('li', $booking_link);
         $links .= html_writer::tag('li', $rol_link);
-        // Hide link for temporary managers.
-        $tempman = totara_get_manager($userid, null, false, true);
-        if ((!$tempman || $tempman->id != $USER->id) && totara_feature_visible('appraisals')) {
+
+        // Show link to managers, but not to temporary managers.
+        $ismanager = \totara_job\job_assignment::is_managing($USER->id, $userid, null, false);
+        if ($ismanager && totara_feature_visible('appraisals')) {
             $links .= html_writer::tag('li', $appraisal_link);
         }
 

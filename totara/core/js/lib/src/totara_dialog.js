@@ -800,9 +800,22 @@ totaraDialog_handler_treeview.prototype._partial_load = function(parent_element)
 totaraDialog_handler_treeview.prototype._make_hierarchy = function(parent_element) {
     var handler = this;
 
+    // Make any expandonly items unselectable. This needs to be done before
+    // adding expandable/parent_element click events.
+    $('span.expandonly', parent_element).each(function() {
+        var elid = $(this).attr('id');
+        var selectable_spans = $('.treeview', handler._container).find('span#'+elid);
+
+        // Disable the anchor
+        $('a', selectable_spans).unbind('click');
+        $('a', selectable_spans).click(function(e) {
+            e.preventDefault();
+        });
+    });
+
     // Load children on parent click
    // $('span.folder, div.hitarea', parent_element).unbind('click');
-    $('span.folder, div.hitarea', parent_element).bind('click', function() {
+    $('span.folder, div.hitarea, span.expandonly', parent_element).bind('click', function() {
         // Get parent
         var par = $(this).parent();
 
@@ -943,6 +956,11 @@ totaraDialog_handler_treeview.prototype._append_to_selected = function(element) 
 
         // Wrap item in a div
         var wrapped = $('<div></div>').append(clone);
+
+        var displayString = wrapped.find('span').first().data().displaystring;
+        if (displayString) {
+            wrapped.find('a').first().text(displayString);
+        }
 
         // Append item clone to selected items
         selected_area.append(wrapped);
@@ -1179,7 +1197,7 @@ totaraDialog_handler_treeview_singleselect.prototype._set_current_selected = fun
     var current_text = $('#'+this.text_element_id).clone();
 
     // Strip delete button from current text
-    $('span', current_text).remove();
+    $('.dialog-singleselect-deletable', current_text).remove();
     current_text = current_text.text();
 
     var max_title_length = 60;
@@ -1322,7 +1340,9 @@ totaraDialog_handler_treeview_singleselect.prototype._make_selectable = function
         dialog._toggle_items($(this).attr('id'), false);
 
         label_length = $('#treeview_currently_selected_span_'+dialog._title+' label').html().length;
-        if ($('a', clone).html().length+label_length > max_title_length) {
+        if (dialog.get_selected_title) {
+            selected_title = dialog.get_selected_title(clone);
+        } else if ($('a', clone).html().length+label_length > max_title_length) {
             selected_title = $('a', clone).html().substring(0, max_title_length-label_length)+'...';
         } else {
             selected_title = $('a', clone).html();

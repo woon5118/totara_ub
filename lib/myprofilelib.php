@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/tag/lib.php');
+require_once($CFG->dirroot . '/totara/job/lib.php');
 
 /**
  * Defines core nodes for my profile navigation tree.
@@ -122,9 +123,6 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $node = new  core_user\output\myprofile\node('administration', 'loginas', get_string('loginas'), null, $url);
         $tree->add_node($node);
     }
-
-    // Position links.
-    pos_add_node_positions_links($course, $user, $tree);
 
     // Contact details.
     if (has_capability('moodle/user:viewhiddendetails', $courseorusercontext)) {

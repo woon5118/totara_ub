@@ -45,8 +45,6 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
 
         /** @var mod_facetoface_generator $facetofacegenerator */
         $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
-        /** @var totara_hierarchy_generator $hierarchygenerator */
-        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
 
         // To test this method we are going to use 3 learners, 1 manager, and 1 course with a facetoface activity with
         // approval required turned on.
@@ -55,9 +53,10 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
         $manager1 = $this->getDataGenerator()->create_user();
-        $hierarchygenerator->assign_primary_position($user1->id, $manager1->id, null, null);
-        $hierarchygenerator->assign_primary_position($user2->id, $manager1->id, null, null);
-        $hierarchygenerator->assign_primary_position($user3->id, $manager1->id, null, null);
+        $managerja = \totara_job\job_assignment::create_default($manager1->id);
+        \totara_job\job_assignment::create_default($user1->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($user3->id, array('managerjaid' => $managerja->id));
         $course = $this->getDataGenerator()->create_course();
         $facetoface = $this->getDataGenerator()->create_module('facetoface', array('course' => $course->id, 'approvaloptions' => 'approval_manager'));
         $sid = $facetofacegenerator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => array()));
@@ -277,9 +276,10 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
         $manager1 = $this->getDataGenerator()->create_user();
-        $hierarchygenerator->assign_primary_position($user1->id, $manager1->id, null, null);
-        $hierarchygenerator->assign_primary_position($user2->id, $manager1->id, null, null);
-        $hierarchygenerator->assign_primary_position($user3->id, $manager1->id, null, null);
+        $managerja = \totara_job\job_assignment::create_default($manager1->id);
+        \totara_job\job_assignment::create_default($user1->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($user3->id, array('managerjaid' => $managerja->id));
         $course = $this->getDataGenerator()->create_course();
         $facetoface = $this->getDataGenerator()->create_module('facetoface', array('course' => $course->id, 'approvaloptions' => 'approval_manager'));
         $sid = $facetofacegenerator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => array()));
@@ -473,9 +473,10 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
         $manager1 = $this->getDataGenerator()->create_user();
-        $hierarchygenerator->assign_primary_position($user1->id, $manager1->id, null, null);
-        $hierarchygenerator->assign_primary_position($user2->id, $manager1->id, null, null);
-        $hierarchygenerator->assign_primary_position($user3->id, $manager1->id, null, null);
+        $managerja = \totara_job\job_assignment::create_default($manager1->id);
+        \totara_job\job_assignment::create_default($user1->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($user3->id, array('managerjaid' => $managerja->id));
         $course = $this->getDataGenerator()->create_course();
         $facetoface = $this->getDataGenerator()->create_module('facetoface', array('course' => $course->id, 'approvaloptions' => 'approval_manager'));
         $sid = $facetofacegenerator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => array()));
@@ -711,9 +712,10 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
         $manager1 = $this->getDataGenerator()->create_user();
-        $hierarchygenerator->assign_primary_position($user1->id, $manager1->id, null, null);
-        $hierarchygenerator->assign_primary_position($user2->id, $manager1->id, null, null);
-        $hierarchygenerator->assign_primary_position($user3->id, $manager1->id, null, null);
+        $managerja = \totara_job\job_assignment::create_default($manager1->id);
+        \totara_job\job_assignment::create_default($user1->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($user3->id, array('managerjaid' => $managerja->id));
         $course = $this->getDataGenerator()->create_course();
         $facetoface = $this->getDataGenerator()->create_module('facetoface', array('course' => $course->id, 'approvaloptions' => 'approval_manager'));
         $sid = $facetofacegenerator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => array()));

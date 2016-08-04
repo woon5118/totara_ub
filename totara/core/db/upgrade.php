@@ -731,27 +731,9 @@ function xmldb_totara_core_upgrade($oldversion) {
     }
 
     if ($oldversion < 2013092000) {
-        // Define table temporary_manager to be created.
-        $table = new xmldb_table('temporary_manager');
-
-        // Adding fields to table temporary_manager.
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('tempmanagerid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('expirytime', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-
-        // Adding keys to table temporary_manager.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
-        $table->add_key('tempmanagerid', XMLDB_KEY_FOREIGN, array('tempmanagerid'), 'user', array('id'));
-        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, array('usermodified'), 'user', array('id'));
-
-        // Conditionally launch create table for temporary_manager.
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
-        }
+        // Originally the temporary_manager table was being added here (version: 2013092000)
+        // However in Totara 9.0 this gets removed by the multiple jobs work.
+        // It is removed during the installation to totara_job (see its install.php).
 
         // Core savepoint reached.
         upgrade_plugin_savepoint(true, 2013092000, 'totara', 'core');
@@ -1533,6 +1515,12 @@ function xmldb_totara_core_upgrade($oldversion) {
         // This setting was never necessary because it already used the totara_core version to execute it only once.
         unset_config('completion_reaggregation_fix_has_run', 'totara_core');
         upgrade_plugin_savepoint(true, 2016061401, 'totara', 'core');
+    }
+
+    // TL-8945 Upgrade pre-9 sites from pos_assignment tables to job_assignment tables.
+    if ($oldversion < 2016080100) {
+        totara_core_upgrade_multiple_jobs();
+        upgrade_plugin_savepoint(true, 2016080100, 'totara', 'core');
     }
 
     return true;

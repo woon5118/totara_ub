@@ -9,7 +9,7 @@ Background:
     | learner2 | Learner2  | Learner2 | learner2@example.com |
     | learner3 | Learner3  | Learner3 | learner3@example.com |
     | manager1 | Manager1  | Manager1 | manager1@example.com |
-  And the following "manager assignments" exist in "totara_hierarchy" plugin:
+  And the following job assignments exist:
     | user     | manager  |
     | learner1 | manager1 |
   And the following "cohorts" exist:

@@ -53,7 +53,7 @@ $PAGE->set_context($systemcontext);
 $PAGE->set_pagelayout('report');
 $PAGE->set_url('/totara/plan/record/evidence/view.php', array('id' => $evidenceid));
 
-if ($USER->id != $userid && !totara_is_manager($userid) && !has_capability('totara/plan:accessanyplan', context_system::instance())) {
+if ($USER->id != $userid && !(\totara_job\job_assignment::is_managing($USER->id, $userid)) && !has_capability('totara/plan:accessanyplan', context_system::instance())) {
     print_error('error:cannotviewpage', 'totara_plan');
 }
 

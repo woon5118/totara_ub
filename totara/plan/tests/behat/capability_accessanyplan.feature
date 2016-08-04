@@ -12,9 +12,9 @@ Feature: Verify capability accessanyplan.
       | user     | role    |
       | manager2 | manager |
     # Assign the user a line manager so their plan can be sent for approval.
-    And the following "manager assignments" exist in "totara_hierarchy" plugin:
-      | user     | manager  |
-      | learner1 | manager3 |
+    And the following job assignments exist:
+      | user     | fullname       | manager  |
+      | learner1 | jobassignment1 | manager3 |
     And the following "courses" exist:
       | fullname | shortname | enablecompletion |
       | Course 1 | Course 1  | 1                |

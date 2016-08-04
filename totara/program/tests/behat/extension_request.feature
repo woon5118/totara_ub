@@ -22,9 +22,9 @@ Feature: Request extensions in programs
     And the following "position" hierarchy exists:
       | framework | idnumber | fullname   |
       | FW001     | POS001   | Position1  |
-    And the following position assignments exist:
-      | user     | position | manager  |
-      | student1 | POS001   | manager1 |
+    And the following job assignments exist:
+      | user     | position | manager  | fullname       |
+      | student1 | POS001   | manager1 | jobassignment1 |
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable program extension requests | 1 |
@@ -136,9 +136,9 @@ Feature: Request extensions in programs
     Given I log in as "admin"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Sam Student"
-    And I click on "Primary position" "link"
+    And I click on "jobassignment1" "link"
     And I click on "Delete" "link" in the "#managertitle" "css_element"
-    And I click on "Update position" "button"
+    And I click on "Update job assignment" "button"
     And I log out
 
     When I log in as "student1"
@@ -166,7 +166,7 @@ Feature: Request extensions in programs
       | extensiontimehour   | 14                  |
       | extensiontimeminute | 55                  |
     And I press "Ok"
-    Then I should see "Request for program extension sent to manager"
+    Then I should see "Request for program extension has been sent to your manager(s)"
     When I log out
     And I log in as "manager1"
     And I click on "My Team" in the totara menu
@@ -193,7 +193,7 @@ Feature: Request extensions in programs
       | extensiontimehour   | 14                  |
       | extensiontimeminute | 55                  |
     And I press "Ok"
-    Then I should see "Request for program extension sent to manager"
+    Then I should see "Request for program extension has been sent to your manager(s)"
     When I log out
     And I log in as "manager1"
     And I click on "My Team" in the totara menu

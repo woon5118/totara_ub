@@ -24,6 +24,7 @@
  */
 
 namespace totara_hierarchy\task;
+use totara_job\job_assignment;
 
 /**
  * Update competency evidence
@@ -381,11 +382,11 @@ class update_competencies_task extends \core\task\scheduled_task {
 
                     // Update the competency evidence.
                     $details = new \stdClass();
-                    // Get user's current primary position and organisation (if any).
-                    $posrec = $DB->get_record('pos_assignment', array('userid' => $current_user, 'type' => POSITION_TYPE_PRIMARY), 'id, positionid, organisationid');
-                    if ($posrec) {
-                        $details->positionid = $posrec->positionid;
-                        $details->organisationid = $posrec->organisationid;
+                    // Get user's current first job assignment position and organisation (if any).
+                    $jobassignment = job_assignment::get_first($current_user, false);
+                    if ($jobassignment) {
+                        $details->positionid = $jobassignment->positionid;
+                        $details->organisationid = $jobassignment->organisationid;
                         unset($posrec);
                     }
 

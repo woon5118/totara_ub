@@ -121,7 +121,7 @@ class rb_source_cohort extends rb_base_source {
         );
 
         $this->add_user_table_to_joinlist($joinlist, 'members', 'userid');
-        $this->add_position_tables_to_joinlist($joinlist, 'members', 'userid');
+        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'members', 'userid');
         $this->add_tag_tables_to_joinlist('cohort', $joinlist, 'base', 'id');
 
         return $joinlist;
@@ -257,7 +257,7 @@ class rb_source_cohort extends rb_base_source {
         );
 
         $this->add_user_fields_to_columns($columnoptions);
-        $this->add_position_fields_to_columns($columnoptions);
+        $this->add_all_job_assignments_fields_to_columns($columnoptions);
         $this->add_tag_fields_to_columns('cohort', $columnoptions);
 
         return $columnoptions;
@@ -332,19 +332,15 @@ class rb_source_cohort extends rb_base_source {
      * @return array
      */
     protected function define_contentoptions() {
-        $contentoptions = array(
-            new rb_content_option(
-                'current_pos',
-                get_string('currentpos', 'totara_reportbuilder'),
-                'position.path',
-                'position'
-            ),
-            new rb_content_option(
-                'current_org',
-                get_string('currentorg', 'totara_reportbuilder'),
-                'organisation.path',
-                'organisation'
-            )
+        $contentoptions = array();
+
+        // Add the manager/position/organisation content options.
+        $this->add_basic_user_content_options($contentoptions);
+
+        $contentoptions[] = new rb_content_option(
+            'date',
+            get_string('modifieddate', 'rb_source_goal_status_history'),
+            'base.timemodified'
         );
 
         return $contentoptions;

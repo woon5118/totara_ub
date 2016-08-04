@@ -122,6 +122,39 @@ switch ($searchtype) {
         $search_info->params = $params;
         break;
 
+    /**
+     * All users search, including the current user.
+     */
+    case 'users':
+
+        // Generate search SQL
+        $keywords = totara_search_parse_keywords($query);
+        $fields = get_all_user_name_fields();
+
+        list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $canviewemail ? array_merge ($fields, array('email' => 'email')) : $fields);
+        $search_info->fullnamefields = implode(',', $fields);
+        if ($canviewemail) {
+            $search_info->email = 'email';
+        }
+
+        // exclude deleted, guest users and self
+        $guest = guest_user();
+
+        $search_info->sql = "
+            FROM
+                {user}
+            WHERE
+                {$searchsql}
+                AND deleted = 0
+                AND suspended = 0
+                AND id != ?
+        ";
+        $params[] = $guest->id;
+
+        $search_info->order = " ORDER BY firstname, lastname, email";
+        $search_info->params = $params;
+        break;
+
 
     /**
      * Hierarchy search
@@ -343,7 +376,41 @@ switch ($searchtype) {
     case 'manager':
         // Generate search SQL.
         $keywords = totara_search_parse_keywords($query);
-        $fields = get_all_user_name_fields(false, '','u.');
+        $fields = get_all_user_name_fields(false, '','manager.');
+
+        if ($canviewemail) {
+            $allfields = array_merge ($fields, array('email' => 'manager.email'));
+        } else {
+            $allfields = $fields;
+        }
+
+        list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $allfields);
+        $search_info->id = 'managerja.userid';
+        $search_info->fullnamefields = implode(',', $fields);
+        if ($canviewemail) {
+            $search_info->email = 'manager.email';
+        }
+        $search_info->sql = "
+            FROM {job_assignment} managerja
+            JOIN {job_assignment} staffja ON staffja.managerjaid = managerja.id
+            JOIN {user} manager ON managerja.userid = manager.id
+           WHERE {$searchsql}
+        ";
+        $search_info->order = "
+           GROUP BY managerja.userid, " . implode(',', $allfields) . ", manager.id
+           ORDER BY manager.firstname, manager.lastname, manager.id
+        ";
+        $search_info->params = $params;
+        break;
+
+    /**
+     * For selecting a manager and position. This will show all users (apart from guest, deleted etc).
+     * Each can be expanded to reveal their positions which are selectable.
+     */
+    case 'assign_manager':
+        list($sql, $params) = $this->get_managers_joinsql_and_params(true);
+
+        $fields = get_all_user_name_fields(false, 'u');
 
         if ($canviewemail) {
             $allfields = array_merge ($fields, array('email' => 'u.email'));
@@ -351,22 +418,20 @@ switch ($searchtype) {
             $allfields = $fields;
         }
 
-        list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $allfields);
-        $search_info->id = 'pa.managerid';
-        $search_info->fullnamefields = implode(',', $fields);
-        if ($canviewemail) {
-            $search_info->email = 'u.email';
-        }
-        $search_info->sql = "
-            FROM {pos_assignment} pa
-            INNER JOIN {user} u
-            ON pa.managerid = u.id
-            WHERE
-                pa.type = " . POSITION_TYPE_PRIMARY . "
-                AND {$searchsql}
-        ";
-        $search_info->order = " GROUP BY pa.managerid, " . implode(',', $allfields) . ", u.id ORDER BY u.firstname, u.lastname, u.id";
+        $search_info->id = 'COALESCE((' . $DB->sql_concat_join('\'-\'', array('u.id', 'managerja.id')) . '), '
+            . $DB->sql_concat('u.id', '\'-\'') . ')';
+        $search_info->fullnamefields = 'managerja.fullname, managerja.idnumber, u.id AS userid, managerja.id AS jaid, ' . implode(',', $allfields);
+
+        $keywords = totara_search_parse_keywords($query);
+        list($searchsql, $searchparams) = totara_search_get_keyword_where_clause($keywords, $allfields, SQL_PARAMS_NAMED, 'u');
+
+        $sql .= ' AND ' . $searchsql;
+        $params = array_merge($params, $searchparams);
+        $search_info->sql = $sql;
         $search_info->params = $params;
+        $search_info->order = ' ORDER BY ' . implode(',', $fields);
+        $search_info->datakeys = array('userid', 'jaid', 'displaystring');
+
         break;
 
     /**
@@ -492,10 +557,11 @@ switch ($searchtype) {
         $managersql = '';
         if ($CFG->tempmanagerrestrictselection) {
             // Current managers.
-            $managersql = "AND u.id IN (SELECT DISTINCT pa.managerid
-                                      FROM {pos_assignment} pa
-                                     WHERE pa.type = ?)";
-            $params[] = POSITION_TYPE_PRIMARY;
+            $managersql = "AND u.id IN (
+                                SELECT DISTINCT managerja.userid
+                                  FROM {job_assignment} managerja
+                                  JOIN {job_assignment} staffja ON staffja.managerjaid = managerja.id
+                                  )";
         }
 
         $search_info->id = 'u.id';
@@ -633,33 +699,40 @@ if (strlen($query)) {
             $dialog->items = array();
             $dialog->parent_items = array();
             $dialog->disabled_items = $this->disabled_items;
+            if (isset($search_info->datakeys)) {
+                $dialog->set_datakeys($search_info->datakeys);
+            }
 
-            foreach ($results as $result) {
-                $item = new stdClass();
+            if (method_exists($this, 'get_search_items_array')) {
+                $dialog->items = $this->get_search_items_array($results);
+            } else {
+                foreach ($results as $result) {
+                    $item = new stdClass();
 
-                if (method_exists($this, 'search_can_display_result') && !$this->search_can_display_result($result->id)) {
-                   continue;
-                }
-
-                $item->id = $result->id;
-                if (isset($result->email)) {
-                    $username = new stdClass();
-                    $username->fullname = isset($result->fullname) ? $result->fullname : fullname($result);
-                    $username->email = $result->email;
-                    $item->fullname = get_string('assignindividual', 'totara_program', $username);
-                } else {
-                    if (isset($result->fullname)) {
-                        $item->fullname = format_string($result->fullname);
-                    } else {
-                        $item->fullname = format_string(fullname($result));
+                    if (method_exists($this, 'search_can_display_result') && !$this->search_can_display_result($result->id)) {
+                        continue;
                     }
-                }
 
-                if (method_exists($this, 'search_get_item_hover_data')) {
-                    $item->hover = $this->search_get_item_hover_data($item->id);
-                }
+                    $item->id = $result->id;
+                    if (isset($result->email)) {
+                        $username = new stdClass();
+                        $username->fullname = isset($result->fullname) ? $result->fullname : fullname($result);
+                        $username->email = $result->email;
+                        $item->fullname = get_string('assignindividual', 'totara_program', $username);
+                    } else {
+                        if (isset($result->fullname)) {
+                            $item->fullname = format_string($result->fullname);
+                        } else {
+                            $item->fullname = format_string(fullname($result));
+                        }
+                    }
 
-                $dialog->items[$item->id] = $item;
+                    if (method_exists($this, 'search_get_item_hover_data')) {
+                        $item->hover = $this->search_get_item_hover_data($item->id);
+                    }
+
+                    $dialog->items[$item->id] = $item;
+                }
             }
 
             echo $dialog->generate_treeview();

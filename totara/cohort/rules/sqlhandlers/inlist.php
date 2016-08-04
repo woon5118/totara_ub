@@ -267,11 +267,11 @@ class cohort_rule_sqlhandler_in_posfield extends cohort_rule_sqlhandler_in {
 
         $sql = "EXISTS (
                         SELECT 1
-                        FROM {pos_assignment} pa
+                        FROM {job_assignment} ja
                         INNER JOIN {pos} p
-                          ON pa.positionid = p.id
-                        WHERE pa.userid = u.id
-                          AND pa.type = ". POSITION_TYPE_PRIMARY . "
+                          ON ja.positionid = p.id
+                        WHERE ja.userid = u.id
+                          AND ja.sortorder = 1
                           AND ( ";
 
         $query = "p.{$field}";
@@ -308,11 +308,11 @@ class cohort_rule_sqlhandler_in_poscustomfield extends cohort_rule_sqlhandler_in
 
         $sql = "EXISTS (
                         SELECT 1
-                        FROM {pos_assignment} pa
+                        FROM {job_assignment} ja
                         INNER JOIN {pos_type_info_data} ptid
-                          ON pa.positionid = ptid.positionid
-                        WHERE pa.userid = u.id
-                          AND pa.type = " . POSITION_TYPE_PRIMARY . "
+                          ON ja.positionid = ptid.positionid
+                        WHERE ja.userid = u.id
+                          AND ja.sortorder = 1
                           AND ptid.fieldid = {$field}
                           AND ( ";
         $query = " ptid.data";
@@ -336,11 +336,11 @@ class cohort_rule_sqlhandler_in_posorgfield extends cohort_rule_sqlhandler_in {
 
         $sql = "EXISTS (
                        SELECT 1
-                       FROM {pos_assignment} pa
+                       FROM {job_assignment} ja
                        INNER JOIN {org} o
-                         ON pa.organisationid = o.id
-                       WHERE pa.userid = u.id
-                         AND pa.type = ".POSITION_TYPE_PRIMARY."
+                         ON ja.organisationid = o.id
+                       WHERE ja.userid = u.id
+                         AND ja.sortorder = 1
                          AND ( ";
 
         $query = "o.{$field}";
@@ -373,15 +373,13 @@ class cohort_rule_sqlhandler_in_posorgcustomfield extends cohort_rule_sqlhandler
     }
 
     protected function construct_sql_snippet($field, $not, $lov) {
-        global $DB;
-
         $sql = "EXISTS (
             SELECT 1
-            FROM {pos_assignment} pa
+            FROM {job_assignment} ja
             INNER JOIN {org_type_info_data} otid
-              ON pa.organisationid = otid.organisationid
-            WHERE pa.userid = u.id
-            AND pa.type = ".POSITION_TYPE_PRIMARY."
+              ON ja.organisationid = otid.organisationid
+            WHERE ja.userid = u.id
+            AND ja.sortorder = 1
             AND otid.fieldid = {$field}
             AND ( ";
         $query = " otid.data";
@@ -467,12 +465,36 @@ class cohort_rule_sqlhandler_in_listofids_pos extends cohort_rule_sqlhandler_in_
         $sqlhandler = new stdClass();
         list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'ilp'.$this->ruleid);
         $sqlhandler->sql = "{$not} exists ("
-                ."select 1 from {pos_assignment} pa "
+                ."select 1 from {job_assignment} ja "
                 ."inner join {pos} pos "
-                ."on pa.positionid=pos.id "
-                ."where pa.userid=u.id "
-                ."and pa.type=".POSITION_TYPE_PRIMARY." "
-                ."and (pa.positionid {$sqlin} ";
+                ."on ja.positionid=pos.id "
+                ."where ja.userid=u.id "
+                ."and ja.sortorder = 1 "
+                ."and (ja.positionid {$sqlin} ";
+        $sqlhandler->params = $params;
+        return $sqlhandler;
+    }
+}
+
+/**
+ * SQL Snippet for a list of positions by ID (matching any of the user's job assignments)
+ */
+class cohort_rule_sqlhandler_in_listofids_allpos extends cohort_rule_sqlhandler_in_hierarchyid {
+
+    protected function likefield() {
+        return 'pos.path';
+    }
+
+    protected function construct_sql_snippet_firsthalf($not, $lov) {
+        global $DB;
+        $sqlhandler = new stdClass();
+        list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'ilp'.$this->ruleid);
+        $sqlhandler->sql = "{$not} exists ("
+                ."select 1 from {job_assignment} ja "
+                ."inner join {pos} pos "
+                ."on ja.positionid=pos.id "
+                ."where ja.userid=u.id "
+                ."and (ja.positionid {$sqlin} ";
         $sqlhandler->params = $params;
         return $sqlhandler;
     }
@@ -492,33 +514,57 @@ class cohort_rule_sqlhandler_in_listofids_org extends cohort_rule_sqlhandler_in_
         $sqlhandler = new stdClass();
         list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'ilo'.$this->ruleid);
         $sqlhandler->sql = "{$not} exists ("
-                ."select 1 from {pos_assignment} pa "
+                ."select 1 from {job_assignment} ja "
                 ."inner join {org} org "
-                ."on pa.organisationid=org.id "
-                ."where pa.userid=u.id "
-                ."and pa.type=".POSITION_TYPE_PRIMARY." "
-                ."and (pa.organisationid {$sqlin} ";
+                ."on ja.organisationid=org.id "
+                ."where ja.userid=u.id "
+                ."and ja.sortorder = 1 "
+                ."and (ja.organisationid {$sqlin} ";
         $sqlhandler->params = $params;
         return $sqlhandler;
     }
 }
 
 /**
- * SQL snippet for a field of mdl_pos_assignment, representing the user's primary position.
+ * SQL Snippet for a list of organisations by ID (matching any of the user's job assignments)
+ */
+class cohort_rule_sqlhandler_in_listofids_allorg extends cohort_rule_sqlhandler_in_hierarchyid {
+
+    protected function likefield() {
+        return 'org.path';
+    }
+
+    protected function construct_sql_snippet_firsthalf($not, $lov) {
+        global $DB;
+        $sqlhandler = new stdClass();
+        list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'ilo'.$this->ruleid);
+        $sqlhandler->sql = "{$not} exists ("
+                ."select 1 from {job_assignment} ja "
+                ."inner join {org} org "
+                ."on ja.organisationid=org.id "
+                ."where ja.userid=u.id "
+                ."and (ja.organisationid {$sqlin} ";
+        $sqlhandler->params = $params;
+        return $sqlhandler;
+    }
+}
+
+/**
+ * SQL snippet for a field of mdl_job_assignment, representing the user's first job assignment.
  * @author Aldo Paradiso (aparadiso@multamedio.de)
  */
-class cohort_rule_sqlhandler_in_posassignfield extends cohort_rule_sqlhandler_in {
+class cohort_rule_sqlhandler_in_jobassignfield extends cohort_rule_sqlhandler_in {
     protected function construct_sql_snippet($field, $not, $lov) {
         global $DB;
 
         $sql = "EXISTS (
                         SELECT 1
-                        FROM {pos_assignment} pa
-                        WHERE pa.userid = u.id
-                          AND pa.type = ". POSITION_TYPE_PRIMARY . "
+                        FROM {job_assignment} ja
+                        WHERE ja.userid = u.id
+                          AND ja.sortorder = 1
                           AND ( ";
 
-        $query = "pa.{$field}";
+        $query = "ja.{$field}";
 
         if ($this->ischarfield) {
             $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
@@ -529,6 +575,167 @@ class cohort_rule_sqlhandler_in_posassignfield extends cohort_rule_sqlhandler_in
             $sqlhandler->sql = "{$sql} {$query} {$sqlin} ) ) ";
             $sqlhandler->params = $params;
         }
+
+        return $sqlhandler;
+    }
+}
+
+/**
+ * SQL snippet for a field of mdl_job_assignment, applied across all the users job assignments.
+ * @author Aldo Paradiso (aparadiso@multamedio.de)
+ */
+class cohort_rule_sqlhandler_in_alljobassignfield extends cohort_rule_sqlhandler_in {
+    protected function construct_sql_snippet($field, $not, $lov) {
+        global $DB;
+
+        $sql = "EXISTS (SELECT 1
+                          FROM {job_assignment} ja
+                         WHERE ja.userid = u.id
+                           AND ( ";
+
+        $query = "ja.{$field}";
+
+        if ($this->ischarfield) {
+            $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
+            $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
+        } else {
+            $sqlhandler = new stdClass();
+            list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'iu'.$this->ruleid, ($not != 'not'));
+            $sqlhandler->sql = "{$sql} {$query} {$sqlin} ) ) ";
+            $sqlhandler->params = $params;
+        }
+
+        return $sqlhandler;
+    }
+}
+
+/**
+ * SQL snippet for a field from mdl_pos, joined across all of the users job assignments.
+ */
+class cohort_rule_sqlhandler_in_alljobassign_posfield extends cohort_rule_sqlhandler_in {
+    protected function construct_sql_snippet($field, $not, $lov) {
+        global $DB;
+
+        $sql = "EXISTS (SELECT 1
+                          FROM {job_assignment} ja
+                    INNER JOIN {pos} p
+                            ON ja.positionid = p.id
+                         WHERE ja.userid = u.id
+                           AND ( ";
+
+        $query = "p.{$field}";
+
+        if ($this->ischarfield) {
+            $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
+            $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
+        } else {
+            $sqlhandler = new stdClass();
+            list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'iu'.$this->ruleid, ($not != 'not'));
+            $sqlhandler->sql = "{$sql} {$query} {$sqlin} ) ) ";
+            $sqlhandler->params = $params;
+        }
+
+        return $sqlhandler;
+    }
+}
+
+/**
+ * SQL snippet for a field from mdl_pos_info_field, joined across all of the users job assignments.
+ */
+class cohort_rule_sqlhandler_in_alljobassign_poscustomfield extends cohort_rule_sqlhandler_in {
+    /**
+     * These fields are always char
+     */
+    public function __construct($field, $datatype) {
+
+        $this->fielddatatype = $datatype;
+        parent::__construct($field, true);
+    }
+
+    protected function construct_sql_snippet($field, $not, $lov) {
+
+        $sql = "EXISTS (SELECT 1
+                          FROM {job_assignment} ja
+                    INNER JOIN {pos_type_info_data} ptid
+                            ON ja.positionid = ptid.positionid
+                         WHERE ja.userid = u.id
+                           AND ptid.fieldid = {$field}
+                           AND ( ";
+        $query = " ptid.data";
+        $equal = $this->equal;
+        if ($this->fielddatatype == 'menu') {
+            $equal = $this->equal == COHORT_RULES_OP_IN_EQUAL ? COHORT_RULES_OP_IN_ISEQUALTO : COHORT_RULES_OP_IN_NOTEQUALTO;
+        }
+        $sqlhandler = $this->get_query_base_operator($equal, $query, $lov);
+        $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
+        return $sqlhandler;
+    }
+}
+
+/**
+ * SQL snippet for a field from mdl_org, joined across all of the users job assignments.
+ */
+class cohort_rule_sqlhandler_in_alljobassign_orgfield extends cohort_rule_sqlhandler_in {
+    protected function construct_sql_snippet($field, $not, $lov) {
+        global $DB;
+
+        $sql = "EXISTS (SELECT 1
+                          FROM {job_assignment} ja
+                    INNER JOIN {org} o
+                            ON ja.organisationid = o.id
+                         WHERE ja.userid = u.id
+                           AND ( ";
+
+        $query = "o.{$field}";
+
+        if ($this->ischarfield) {
+            $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
+            $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
+        } else {
+            $sqlhandler = new stdClass();
+            list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'iu'.$this->ruleid, ($not != 'not'));
+            $sqlhandler->sql = "{$sql} {$query} {$sqlin} ) ) ";
+            $sqlhandler->params = $params;
+        }
+
+        return $sqlhandler;
+    }
+}
+
+/**
+ * SQL snippet for a field from mdl_org_info_field, joined across all of the users job assignments.
+ */
+class cohort_rule_sqlhandler_in_alljobassign_orgcustomfield extends cohort_rule_sqlhandler_in {
+    /**
+     * These fields are always char
+     */
+    public function __construct($field, $datatype) {
+        $this->fielddatatype = $datatype;
+        parent::__construct($field, true);
+    }
+
+    protected function construct_sql_snippet($field, $not, $lov) {
+        $sql = "EXISTS (SELECT 1
+                          FROM {job_assignment} ja
+                    INNER JOIN {org_type_info_data} otid
+                            ON ja.organisationid = otid.organisationid
+                         WHERE ja.userid = u.id
+                           AND otid.fieldid = {$field}
+                           AND ( ";
+        $query = " otid.data";
+        $equal = $this->equal;
+
+        // A menu custom field allows two operators when it is used as a filter
+        // in dynamic audience rules: equals and not equals. In the UI, when the
+        // user selects an operator, it is submitted as an enumerated integer to
+        // the filter module. The filter module however, works with a completely
+        // different set of enumerations. Therefore, this code exists to map the
+        // UI enumeration into the correct filter module enumeration.
+        if ($this->fielddatatype == 'menu') {
+            $equal = $this->equal == COHORT_RULES_OP_IN_EQUAL ? COHORT_RULES_OP_IN_ISEQUALTO : COHORT_RULES_OP_IN_NOTEQUALTO;
+        }
+        $sqlhandler = $this->get_query_base_operator($equal, $query, $lov);
+        $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
 
         return $sqlhandler;
     }

@@ -148,8 +148,7 @@ class goal extends hierarchy {
             TOTARA_JS_TREEVIEW
         ));
 
-        $PAGE->requires->strings_for_js(array('chooseposition', 'choosemanager', 'chooseorganisation', 'assigngroup'),
-                'totara_hierarchy');
+        $PAGE->requires->strings_for_js(array('assigngroup'), 'totara_hierarchy');
 
         // Selector setup.
         $jsmodule = array(
@@ -444,13 +443,13 @@ class goal extends hierarchy {
                 $include_children = false;
                 break;
             case GOAL_ASSIGNMENT_POSITION:
-                $item_table = 'pos_assignment';
+                $item_table = 'job_assignment';
                 $item_field = 'positionid';
                 $assign_field = 'posid';
                 $include_children = $assignment->includechildren;
                 break;
             case GOAL_ASSIGNMENT_ORGANISATION:
-                $item_table = 'pos_assignment';
+                $item_table = 'job_assignment';
                 $item_field = 'organisationid';
                 $assign_field = 'orgid';
                 $include_children = $assignment->includechildren;
@@ -1152,7 +1151,7 @@ class goal extends hierarchy {
                 $assigntype_info->modname = !empty($modid) ? $DB->get_field('cohort', 'name', array('id' => $modid)) : '';
                 break;
             case GOAL_ASSIGNMENT_POSITION:
-                $assigntype_info->members_table= 'pos_assignment';
+                $assigntype_info->members_table= 'job_assignment';
                 $assigntype_info->members_field= 'positionid';
                 $assigntype_info->table = 'goal_grp_pos';
                 $assigntype_info->field = 'posid';
@@ -1168,7 +1167,7 @@ class goal extends hierarchy {
                 $assigntype_info->modname = !empty($modid) ? $DB->get_field('pos', 'fullname', array('id' => $modid)) : '';
                 break;
             case GOAL_ASSIGNMENT_ORGANISATION:
-                $assigntype_info->members_table = 'pos_assignment';
+                $assigntype_info->members_table = 'job_assignment';
                 $assigntype_info->members_field = 'organisationid';
                 $assigntype_info->table = 'goal_grp_org';
                 $assigntype_info->field = 'orgid';

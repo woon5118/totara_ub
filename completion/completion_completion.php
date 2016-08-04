@@ -286,11 +286,14 @@ class completion_completion extends data_object {
 
         // Get user's positionid and organisationid if not already set
         if ($this->positionid === null) {
-            require_once("{$CFG->dirroot}/totara/hierarchy/prefix/position/lib.php");
-            $ids = pos_get_current_position_data($this->userid);
-
-            $this->positionid = $ids['positionid'];
-            $this->organisationid = $ids['organisationid'];
+            $jobassignment = \totara_job\job_assignment::get_first($this->userid, false);
+            if ($jobassignment) {
+                $this->positionid = $jobassignment->positionid;
+                $this->organisationid = $jobassignment->organisationid;
+            } else {
+                $this->positionid = 0;
+                $this->organisationid = 0;
+            }
         }
 
         // Save record.

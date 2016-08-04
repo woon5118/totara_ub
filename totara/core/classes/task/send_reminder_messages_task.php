@@ -201,8 +201,13 @@ class send_reminder_messages_task extends \core\task\scheduled_task {
                                 continue;
                             }
 
-                            // Get user's manager.
-                            $manager = totara_get_manager($user->id);
+                            // Get the manager on the users first job assignment - if there is a manager there.
+                            $jobassignment = \totara_job\job_assignment::get_first($user->id);
+                            if (!empty($jobassignment->managerid)) {
+                                $manager = $DB->get_record('user', ['id' => $user->id], '*', MUST_EXIST);
+                            } else {
+                                $manager = false;
+                            }
 
                             // Generate email content.
                             $user->manager = $manager;

@@ -487,8 +487,8 @@ function build_nojs_frameworkpicker($hierarchy, $url, $urlparams) {
  * @params array $urlparams array of url parameters to pass along with URL
  * @return string HTML to print the position picker list
  */
-function build_nojs_positionpicker($url, $urlparams) {
-    global $USER, $CFG, $OUTPUT;
+function build_nojs_jobassignmentpicker($url, $urlparams) {
+    global $USER, $OUTPUT;
     // TODO add other html to this function (see picker above)
     $murl = new moodle_url($url, $urlparams);
     $html = '';
@@ -497,41 +497,32 @@ function build_nojs_positionpicker($url, $urlparams) {
     if ($positions) {
         $html .= $OUTPUT->container_start(null, 'nojsinstructions');
         $html .= html_writer::start_tag('p');
-        $html .= get_string('chooseposition','position');
+        $html .= get_string('chooseposition','totara_hierarchy');
         $html .= html_writer::end_tag('p');
         $html .= $OUTPUT->container_end();
         $html .= $OUTPUT->container_start('nojsselect');
         $html .= html_writer::start_tag('ul');
-        foreach ($positions as $position) {
+        foreach ($positions as $jobassignid => $position) {
             $fullurl = $murl->out(false, array('frameworkid' => $position->id));
             $html .= html_writer::start_tag('li');
             $html .= html_writer::link($fullurl, format_string($position->fullname));
-            switch ($position->type) {
-            case 1:
-                $html .= ' (' . get_string('typeprimary', 'totara_hierarchy') . ')';
-                break;
-            case 2:
-                $html .= ' (' . get_string('typesecondary', 'totara_hierarchy') . ')';
-                break;
-            case 3:
-                $html .= ' (' . get_string('typeaspirational', 'totara_hierarchy') . ')';
-                break;
-            }
+            $jobassignment = \totara_job\job_assignment::get_with_id($jobassignid);
+            $html .= ' (' . $jobassignment->fullname . ')';
             $html .= html_writer::end_tag('li');
         }
         $html .= html_writer::end_tag('ul');
         $html .= $OUTPUT->container_end();
     } else {
-        print_error('nopositions', 'position');
+        print_error('nopositionsassigned', 'totara_hierarchy');
     }
     return $html;
 }
 
 /**
  * Return markup for 'Currently selected' info in a dialog
- * @param $label the label
- * @param $title the unique title of the dialog
- * @return  $html
+ * @param string $label the label
+ * @param string $title the unique title of the dialog
+ * @return string
  */
 function dialog_display_currently_selected($label, $title='') {
 

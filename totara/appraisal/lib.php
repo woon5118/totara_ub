@@ -23,8 +23,13 @@
  */
 require_once($CFG->dirroot.'/totara/core/lib.php');
 require_once($CFG->dirroot.'/totara/question/lib.php');
-require_once($CFG->dirroot.'/totara/appraisal/lib/assign/lib.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
+require_once($CFG->dirroot.'/totara/job/classes/job_assignment.php');
+require_once($CFG->dirroot.'/totara/appraisal/lib/assign/lib.php');
+require_once($CFG->dirroot.'/user/lib.php');
+
+use totara_job\job_assignment;
+
 
 class appraisal {
     /**
@@ -251,6 +256,7 @@ class appraisal {
 
         $assign = new totara_assign_appraisal('appraisal', $this);
         $assign->store_user_assignments();
+        $assign->store_role_assignments();
 
         $this->create_answers_table();
         $this->activate_questions();
@@ -304,12 +310,22 @@ class appraisal {
             $err['roles'] = get_string('appraisalinvalid:roles', 'totara_appraisal');
         }
 
-        if ($CFG->dynamicappraisals) {
-            // If dynamic appraisals are enabled warn about missing roles.
-            $war += $this->validate_roles();
-        } else {
-            // If appraisals are static don't allow activation with missing roles.
-            $err += $this->validate_roles();
+        // With the new job assignments feature, appraisals have to be activated
+        // before any managers or appraisers can be assigned. Thus, an appraisee
+        // has to first see the appraisal and select a job assignment to go with
+        // it. Only then can the system infer manager(s) for the appraisal. So
+        // unlike the previous versions, validation here is reduced to checking
+        // for appraisees.
+        $assignment = new totara_assign_appraisal('appraisal', $this);
+        if ($assignment->get_current_users_count() < 1) {
+            $key = 'learners';
+            $err = get_string('appraisalinvalid:learners', 'totara_appraisal');
+            if ($CFG->dynamicappraisals) {
+                $war[$key] = $err;
+            }
+            else {
+                $err[$key] = $err;
+            }
         }
 
         // Check that all stages are valid.
@@ -360,111 +376,74 @@ class appraisal {
     }
 
     /**
-     * Check for potential problems with role assignments
-     * used on activation and updating of user assignments, and the warnings page.
+     * Check for potential problems with role assignments used on activation and
+     * updating of user assignments, and the warnings page.
      *
-     * @param $live boolean     A flag to switch between live data and groups data.
-     * @return $war Array       Array of warning strings to combine with any existing warnings
+     * @return array $war array of warning strings to combine with any existing
+     *         warnings
      */
-    public function validate_roles($live = false) {
-        global $DB, $CFG;
-        require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
-
-        if (!defined('APPRAISAL_VALIDATION_MAX_BAD_ROLES')) {
-            define('APPRAISAL_VALIDATION_MAX_BAD_ROLES', 500);
-        }
-
-        $war = array(); // Warnings.
-
+    public function validate_roles() {
         $assign = new totara_assign_appraisal('appraisal', $this);
-        $learnercount = $assign->get_current_users_count();
-        if (!$learnercount) {
-            $war['learners'] = get_string('appraisalinvalid:learners', 'totara_appraisal');
-            return $war;
+        $missing = $assign->missing_role_assignments();
+        if ($missing->appraiseecount === 0) {
+            $err = get_string('appraisalinvalid:learners', 'totara_appraisal');
+            return ['learners' => $err];
         }
 
-        // Get user info and roles for all users involved.
-        // in this appraisal who have at least one role.
-        // missing.
-        $usernamefields = get_all_user_name_fields(true, 'u');
-        $select = "SELECT
-            u.id,
-            {$usernamefields},
-            pa.managerid,
-            pa2.managerid AS teamleadid,
-            pa.appraiserid";
-        $count = "SELECT COUNT(*)";
+        // Due to the potentially large amounts of missing roles, only the first
+        // few missing appraisee roles should be displayed.
+        $shownlimit = 10;
+        $allmissing = $missing->roles;
+        $shown = array_slice($allmissing, 0, $shownlimit, true);
 
-        $from = " FROM {user} u
-            LEFT JOIN {pos_assignment} pa
-                ON (u.id = pa.userid AND pa.type = ?)
-            LEFT JOIN {pos_assignment} pa2
-                ON (pa.managerid = pa2.userid AND pa2.type = ?)";
-        $params = array(POSITION_TYPE_PRIMARY, POSITION_TYPE_PRIMARY);
-
-        if ($live) {
-            // User the appraisals user assignments instead of group assignments.
-            $joinsql = " JOIN ( SELECT aua.userid AS userid FROM {appraisal_user_assignment} aua WHERE aua.appraisalid = ? AND aua.status = ? ) liveusers ON liveusers.userid = u.id ";
-            $joinparams = array($this->id, self::STATUS_ACTIVE);
-        } else {
-            // Get SQL to limit to only users involved in this appraisal.
-            list($joinsql, $joinparams) = $assign->get_users_from_groups_sql('u', 'id');
+        $fullnames = [];
+        foreach (user_get_users_by_id(array_keys($shown)) as $user) {
+            $fullnames[$user->id] = fullname($user);
         }
 
-        $params = array_merge($params, $joinparams);
+        $war = [];
+        $roledesc = $this->get_roles();
+        foreach ($shown as $appraiseeid => $roles) {
+            $csv = array_reduce(
+                $roles,
 
-        // Only get rows that are missing data if we require that role.
-        $allroles = $this->get_roles();
-        $rolesinvolved = $this->get_roles_involved(self::ACCESS_MUSTANSWER);
-        $rolestocheck = array();
-        foreach ($rolesinvolved as $roleinvolved) {
-            if ($roleinvolved == self::ROLE_MANAGER) {
-                $rolestocheck[] = 'pa.managerid IS NULL';
-            } else if ($roleinvolved == self::ROLE_TEAM_LEAD) {
-                $rolestocheck[] = 'pa2.managerid IS NULL';
-            } else if ($roleinvolved == self::ROLE_APPRAISER) {
-                $rolestocheck[] = 'pa.appraiserid IS NULL';
-            }
+                function ($accumulated, $role) use ($roledesc) {
+                    $desc = get_string($roledesc[$role], 'totara_appraisal');
+                    return empty($accumulated) ? $desc : "$accumulated, $desc";
+                },
+
+                ''
+            );
+
+            $param = new stdClass();
+            $param->user = $fullnames[$appraiseeid];
+            $param->role = $csv;
+            $error = get_string(
+                'appraisalinvalid:missingrole', 'totara_appraisal', $param
+            );
+
+            $count = count($war);
+            $war["missingroles$count"] = $error;
         }
 
-        // No roles to check, no need to run query.
-        if (empty($rolestocheck)) {
-            return $war;
-        }
-        $wheresql = ' WHERE ' . implode(' OR ', $rolestocheck);
-
-        // Limit retrieved records but also count to see the total.
-        $missingroles = $DB->get_records_sql($select.$from.$joinsql.$wheresql, $params, 0, APPRAISAL_VALIDATION_MAX_BAD_ROLES);
-        $nummissing = $DB->count_records_sql($count.$from.$joinsql.$wheresql, $params);
-
-        // Add a warning for each missing role.
-        $rolefieldmap = array(
-            self::ROLE_LEARNER => 'id',
-            self::ROLE_MANAGER => 'managerid',
-            self::ROLE_TEAM_LEAD => 'teamleadid',
-            self::ROLE_APPRAISER => 'appraiserid'
-        );
-        foreach ($missingroles as $missingrole) {
-            foreach ($rolesinvolved as $role) {
-                $field = $rolefieldmap[$role];
-                if (empty($missingrole->$field)) {
-                    $a = new stdClass();
-                    $a->user = fullname($missingrole);
-                    $a->role = get_string($allroles[$role], 'totara_appraisal');
-                    $war['missingrole' . $allroles[$role] . $missingrole->id] =
-                        get_string('appraisalinvalid:missingrole',
-                        'totara_appraisal', $a);
-                }
-            }
-        }
-
-        // If there were more records to show, add one more warning listing how many have been truncated.
-        if ($nummissing > APPRAISAL_VALIDATION_MAX_BAD_ROLES) {
-            $war['missingrolesmore'] = get_string('xmoremissingroles', 'totara_appraisal',
-                ($nummissing - APPRAISAL_VALIDATION_MAX_BAD_ROLES));
+        $excess = count($allmissing) - count($shown);
+        if ($excess > 0) {
+            $err = get_string('xmoremissingroles', 'totara_appraisal', $excess);
+            $war['missingrolesmore'] = $err;
         }
 
         return $war;
+    }
+
+    /**
+     * Update an appraisee's role assignments for a live appraisal. This is done
+     * when the appraisee selects a job assignment in an appraisal.
+     *
+     * @param int $appraiseeid appraisee id
+     */
+    public function assignment_changed_for_appraisee($appraiseeid) {
+        $assignment = new totara_assign_appraisal('appraisal', $this);
+        $assignment->store_role_assignment_for_appraisee($appraiseeid);
     }
 
 
@@ -519,207 +498,8 @@ class appraisal {
             }
         }
 
-        // Find role changes for appraisal assignments.
-        $changed = $this->get_changedrole_users();
-        $transaction = $DB->start_delegated_transaction();
-
-        // Check for existing data.
-        foreach ($changed as $rolechange) {
-
-            // Add record to new 'role changes' table.
-            $changerecord = new stdClass();
-            $changerecord->userassignmentid = $rolechange->userassignment;
-            $changerecord->originaluserid = $rolechange->olduserid;
-            $changerecord->newuserid = $rolechange->newuserid;
-            $changerecord->role = $rolechange->role;
-            $changerecord->timecreated = time();
-
-            $DB->insert_record('appraisal_role_changes', $changerecord);
-
-            // Switch user in role assignment.
-            $roleupdate = new stdClass();
-            $roleupdate->id = $rolechange->roleassignment;
-            $roleupdate->userid = is_null($rolechange->newuserid) ? 0 : $rolechange->newuserid;
-
-            $DB->update_record('appraisal_role_assignment', $roleupdate);
-        }
-
-        $transaction->allow_commit();
-    }
-
-    /**
-     * Check for user assignments with missing roles.
-     *
-     * @return Array
-     */
-    public function get_missingrole_users() {
-        global $DB;
-
-        $assign = new totara_assign_appraisal('appraisal', $this);
-
-        $select = "SELECT
-            ara.id,
-            u.userid,
-            ara.appraisalrole,
-            pa.managerid,
-            pa2.managerid AS teamleadid,
-            pa.appraiserid";
-
-        $from = " FROM {appraisal_user_assignment} u
-            LEFT JOIN (SELECT * FROM {pos_assignment} WHERE type = 1) pa
-                ON u.userid = pa.userid
-            LEFT JOIN (SELECT * FROM {pos_assignment} WHERE type = 1) pa2
-                ON pa.managerid = pa2.userid
-            JOIN {appraisal_role_assignment} ara
-              ON u.id = ara.appraisaluserassignmentid ";
-
-        // Get SQL to limit to only users involved in this appraisal.
-        list($joinsql, $params) = $assign->get_users_from_assignments_sql('u', 'id');
-
-        // Only get rows that are missing data if we require that role.
-        $allroles = $this->get_roles();
-        $rolesinvolved = $this->get_roles_involved();
-        $rolestocheck = array();
-        foreach ($rolesinvolved as $roleinvolved) {
-            if ($roleinvolved == self::ROLE_MANAGER) {
-                $rolestocheck[] = 'pa.managerid IS NULL';
-            } else if ($roleinvolved == self::ROLE_TEAM_LEAD) {
-                $rolestocheck[] = 'pa2.managerid IS NULL';
-            } else if ($roleinvolved == self::ROLE_APPRAISER) {
-                $rolestocheck[] = 'pa.appraiserid IS NULL';
-            }
-        }
-
-        // No roles to check, no need to run query.
-        if (empty($rolestocheck)) {
-            return array();
-        }
-        $wheresql = 'WHERE u.appraisalid = ? AND ( ' . implode(' OR ', $rolestocheck) . ' )';
-        $params = array($this->id);
-
-        // Limit retrieved records but also count to see the total.
-        $missingroles = $DB->get_records_sql($select.$from.$wheresql, $params);
-
-        // Find each role that has changed.
-        $rolefieldmap = array(
-            self::ROLE_LEARNER => 'userid',
-            self::ROLE_MANAGER => 'managerid',
-            self::ROLE_TEAM_LEAD => 'teamleadid',
-            self::ROLE_APPRAISER => 'appraiserid'
-        );
-
-        $userassmissingroles = array();
-
-        foreach ($missingroles as $missingrole) {
-            $appraisalrole = array();
-            foreach ($rolesinvolved as $role) {
-                $field = $rolefieldmap[$role];
-
-                if (empty($missingrole->$field)) {
-                    $appraisalrole[] = $role;
-                }
-            }
-
-            $userassmissingroles[$missingrole->userid] = $appraisalrole;
-        }
-
-        return $userassmissingroles;
-    }
-
-
-    /**
-     * Get role changes for user assignments for the current appraisal
-     *
-     * @return Array
-     */
-    public function get_changedrole_users() {
-        global $DB;
-
-        $select = "SELECT
-            ara.id,
-            u.userid,
-            u.id as userassignmentid,
-            ara.userid as roleuserid,
-            ara.appraisalrole";
-
-        $from = " FROM {appraisal_user_assignment} u
-            LEFT JOIN {appraisal_role_assignment} ara
-                ON u.id = ara.appraisaluserassignmentid";
-
-        $rolesinvolved = $this->get_roles_involved();
-
-        $posjoin = false;
-        $posjoin2 = false;
-
-        foreach ($rolesinvolved as $roleinvolved) {
-            if ($roleinvolved == self::ROLE_MANAGER) {
-                $select .= ", CASE WHEN pa.managerid IS NULL THEN 0 ELSE pa.managerid END AS managerid";
-                $posjoin = true;
-            } else if ($roleinvolved == self::ROLE_TEAM_LEAD) {
-                $select .= ", CASE WHEN pa2.managerid IS NULL THEN 0 ELSE pa2.managerid END AS teamleader";
-                $posjoin2 = true;
-            } else if ($roleinvolved == self::ROLE_APPRAISER) {
-                $select .= ", CASE WHEN pa.appraiserid IS NULL THEN 0 ELSE pa.appraiserid END AS appraiserid";
-                $posjoin = true;
-            }
-        }
-
-        if ($posjoin) {
-            $from .= " JOIN {pos_assignment} pa
-                ON pa.userid = u.userid AND pa.type = 1 ";
-        }
-
-        if ($posjoin2) {
-            $from .= " LEFT JOIN {pos_assignment} pa2
-                ON pa2.userid = pa.managerid AND pa2.type = 1 ";
-        }
-
-        $wheresql = " WHERE u.status = 1 AND u.appraisalid = ?";
-
-        $currentroleassignments = $DB->get_records_sql($select.$from.$wheresql, array($this->id));
-
-        $changedroles = array();
-        foreach ($currentroleassignments as $roleassignment) {
-            if ($roleassignment->appraisalrole == self::ROLE_MANAGER) {
-                if ($roleassignment->roleuserid != $roleassignment->managerid) {
-                    $change = new stdClass();
-                    $change->userassignment  = $roleassignment->userassignmentid;
-                    $change->role = $roleassignment->appraisalrole;
-                    $change->roleassignment = $roleassignment->id;
-                    $change->olduserid = $roleassignment->roleuserid;
-                    $change->newuserid = $roleassignment->managerid;
-                    $change->timecreated = time();
-
-                    $changedroles[] = $change;
-                }
-            } else if ($roleassignment->appraisalrole == self::ROLE_TEAM_LEAD) {
-                if ($roleassignment->roleuserid != $roleassignment->teamleader) {
-                    $change = new stdClass();
-                    $change->userassignment  = $roleassignment->userassignmentid;
-                    $change->role = $roleassignment->appraisalrole;
-                    $change->roleassignment = $roleassignment->id;
-                    $change->olduserid = $roleassignment->roleuserid;
-                    $change->newuserid = $roleassignment->teamleader;
-                    $change->timecreated = time();
-
-                    $changedroles[] = $change;
-                }
-            } else if ($roleassignment->appraisalrole == self::ROLE_APPRAISER) {
-                if ($roleassignment->roleuserid != $roleassignment->appraiserid) {
-                    $change = new stdClass();
-                    $change->userassignment  = $roleassignment->userassignmentid;
-                    $change->role = $roleassignment->appraisalrole;
-                    $change->roleassignment = $roleassignment->id;
-                    $change->olduserid = $roleassignment->roleuserid;
-                    $change->newuserid = $roleassignment->appraiserid;
-                    $change->timecreated = time();
-
-                    $changedroles[] = $change;
-                }
-            }
-        }
-
-        return $changedroles;
+        // Role (re)assignments.
+        $assign->store_role_assignments();
     }
 
     /**
@@ -1307,27 +1087,6 @@ class appraisal {
             self::ROLE_TEAM_LEAD => 'roleteamlead',
             self::ROLE_APPRAISER => 'roleappraiser'
             );
-        return $roles;
-    }
-
-    /**
-     * Get the current position assignments for a users appraisal role assignments
-     *
-     * @param int userid The id of the user to get the current assignments for
-     * @return array(appraisal::ROLE_* => userid)
-     */
-    public static function get_live_role_assignments($userid) {
-        $manager = totara_get_manager($userid);
-        $teamleader = totara_get_teamleader($userid);
-        $appraiser = totara_get_appraiser($userid);
-
-        $roles = array(
-            self::ROLE_LEARNER => $userid,
-            self::ROLE_MANAGER => $manager ? $manager->id : 0,
-            self::ROLE_TEAM_LEAD => $teamleader ? $teamleader->id : 0,
-            self::ROLE_APPRAISER => $appraiser ? $appraiser->id : 0,
-        );
-
         return $roles;
     }
 
@@ -5412,7 +5171,6 @@ class appraisal_role_assignment {
 
 /**
  * User (Learner) assignment to appraisal
- * TODO: get_user_assignment
  */
 class appraisal_user_assignment {
     /**
@@ -5464,6 +5222,19 @@ class appraisal_user_assignment {
     protected $status = 0;
 
     /**
+     * The user's job assignment associated with this appraisal.
+     * @var int
+     */
+    protected $jobassignmentid = null;
+
+    /**
+     * The last modified time that external job assignment record was modified.
+     * Used to determine whether appraisal role assignments need to be changed.
+     * @var int
+     */
+    protected $jobassignmentlastmodified = null;
+
+    /**
      * Load role assignment
      * @param int $id
      */
@@ -5502,6 +5273,8 @@ class appraisal_user_assignment {
         $this->activestageid = $userass->activestageid;
         $this->timecompleted = $userass->timecompleted;
         $this->status = $userass->status;
+        $this->jobassignmentid = $userass->jobassignmentid;
+        $this->jobassignmentlastmodified = $userass->jobassignmentlastmodified;
         $this->preview = false;
         $this->user = $DB->get_record('user', array('id' => $this->userid));
     }
@@ -5529,23 +5302,16 @@ class appraisal_user_assignment {
             return $userassignment;
         }
         $record = $DB->get_record('appraisal_user_assignment', array('userid' => $userid, 'appraisalid' => $appraisalid));
-
-        $userassignment = new appraisal_user_assignment($record->id);
-        return $userassignment;
+        return empty($record)
+               ? new appraisal_user_assignment()
+               : new appraisal_user_assignment($record->id);
     }
 
     /**
      * Closes the appraisal for a user.
      */
     public function close() {
-        global $DB;
-
-        $this->status = appraisal::STATUS_CLOSED;
-
-        $todb = new stdClass();
-        $todb->id = $this->id;
-        $todb->status = $this->status;
-        $DB->update_record('appraisal_user_assignment', $todb);
+        $this->update(['status' => appraisal::STATUS_CLOSED]);
     }
 
     /**
@@ -5553,5 +5319,151 @@ class appraisal_user_assignment {
      */
     public function is_closed() {
         return $this->status == appraisal::STATUS_CLOSED;
+    }
+
+    /**
+     * Associates a job assignment with this appraisal.
+     *
+     * @param int $jobassignmentid job assignment identifer.
+     *
+     * @return \appraisal_user_assignment the updated assignment.
+     */
+    public function with_job_assignment($jobassignmentid) {
+        if (empty($jobassignmentid) || !is_numeric($jobassignmentid)) {
+            throw new \InvalidArgumentException(
+                "invalid parameter [user_assignment job id]: '$jobassignmentid'"
+            );
+        }
+
+        $values = [
+            'jobassignmentid' => (int)$jobassignmentid,
+            'jobassignmentlastmodified' => null
+        ];
+        $this->update($values);
+
+        $appraisal = new appraisal($this->appraisalid);
+        $appraisal->assignment_changed_for_appraisee($this->userid);
+
+        return $this;
+    }
+
+    /**
+     * Disassociates the existing job assignment from this appraisal. This could
+     * happen for example when the user deletes a job assignment from his user
+     * profile.
+     *
+     * @return \appraisal_user_assignment the updated assignment.
+     */
+    public function remove_job_assignment() {
+        if (!empty($this->jobassignmentid)) {
+            $values = [
+                'jobassignmentid' => null,
+                'jobassignmentlastmodified' => null
+            ];
+            $this->update($values);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets the last modification time for the linked job assignment.
+     *
+     * Note this is not the time the *jobassignmentid field* was changed but the
+     * time a job assignment *record* (to which jobassignmentid points) changed.
+     * Because if a parent record changed => job assignment details (eg manager)
+     * changed => need to regenerate the role assignments for the appraisee.
+     *
+     * @param int $time the last modification time in milliseconds since the
+     *        Epoch.
+     *
+     * @return \appraisal_user_assignment the updated assignment.
+     */
+    public function with_job_assignment_record_time($time) {
+        if (empty($time) || !is_numeric($time)) {
+            throw new \InvalidArgumentException(
+                "invalid parameter [user_assignment job timestamp]: '$time'"
+            );
+        }
+
+        $this->update(['jobassignmentlastmodified' => (int)$time]);
+        return $this;
+    }
+
+    /**
+     * Automatically links a job assignment with this appraisee assignment. This
+     * uses the following rules:
+     * - If there is already a job assignment for the appraisee assignment, then
+     *   check if the job assignment is valid (ie not deleted). If invalid, then
+     *   auto generate a new job assignment if possible.
+     * - If there is no existing job assignment for the appraisee, then create a
+     *   default job assignment and link that to the appraisee assignment.
+     * - If there is a single existing job assignment, then link that.
+     * - If there are multiple existing job assignments, then link the first job
+     *   assignment if the 'linkfirst' value is true.
+     *
+     * @param boolean linkfirst if true, links the first existing job assignment
+     *        to the appraisee assignment. Note "first" here is the first in the
+     *        list that job_assignment::get_all() returns.
+     *
+     * @return array (\appraisal_user_assignment, \job_assignment) tuple with an
+     *         updated appraisee assignment and assigned job. This could be an
+     *         empty array if there were multiple job assignments from which to
+     *         choose and the passed 'linkfirst' value was false.
+     */
+    public function with_auto_job_assignment($linkfirst) {
+        // For the appraisee who has already specified a job for this appraisal.
+        $jobassignmentid = $this->jobassignmentid;
+        if (!empty($jobassignmentid)) {
+            $job = job_assignment::get_with_id($jobassignmentid, false);
+            if (!empty($job)) {
+                // Job assignment exists and it has already been linked.
+                return [$this, $job];
+            }
+
+            // Linked job assignment was removed in the interim and things were
+            // not cleaned up. Note processing continues on after this step and
+            // creates a new job assignment link if necessary.
+            $this->remove_job_assignment();
+        }
+
+        // For an appraisee who has not associated any job with the appraisal.
+        $appraisee = $this->userid;
+        $jobs = job_assignment::get_all($appraisee);
+        $noofjobs = count($jobs);
+
+        if ($noofjobs === 0) {
+            $job = job_assignment::create_default($appraisee);
+            return [$this->with_job_assignment($job->id), $job];
+        }
+        else if ($noofjobs === 1
+                 || ($noofjobs > 1 && $linkfirst)) {
+            $job = current($jobs);
+            return [$this->with_job_assignment($job->id), $job];
+        }
+        else {
+            // For an appraisee with multiple formal job assignments and cannot
+            // link the first one.
+            return null;
+        }
+    }
+
+    /**
+     * Updates the persistent record for this assignment.
+     *
+     * @param \array $fields a mapping of field names to their new values.
+     */
+    private function update(array $fields) {
+        global $DB;
+
+        $dto = new \stdClass();
+        $dto->id = $this->id;
+
+        foreach ($fields as $field => $value) {
+            $this->$field = $value;
+            $dto->$field = $value;
+        }
+
+        $DB->update_record('appraisal_user_assignment', $dto);
     }
 }

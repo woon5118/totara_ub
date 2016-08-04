@@ -26,10 +26,10 @@ Feature: See that certification visibility affects Record of Learning: Certifica
       | user001 | testcert1 |
       | user002 | testcert1 |
       | user002 | testcert2 |
-    And the following "manager assignments" exist in "totara_hierarchy" plugin:
-      | user    | manager |
-      | user001 | mana003 |
-      | user002 | mana003 |
+    And the following job assignments exist:
+      | user    | fullname       | manager |
+      | user001 | jobassignment1 | mana003 |
+      | user002 | jobassignment2 | mana003 |
 
   @javascript
   Scenario: Normal visibility (default), visible (default).

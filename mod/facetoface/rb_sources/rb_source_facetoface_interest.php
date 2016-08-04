@@ -99,7 +99,8 @@ class rb_source_facetoface_interest extends rb_base_source {
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
         $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course');
         $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
-        $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
@@ -150,6 +151,8 @@ class rb_source_facetoface_interest extends rb_base_source {
 
         // Include some standard columns.
         $this->add_user_fields_to_columns($columnoptions);
+        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
+        $this->add_all_job_assignments_fields_to_columns($columnoptions);
         $this->add_course_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions);
         // Redirect the display of 'user' columns (to insert 'unassigned' when needed).
@@ -189,6 +192,8 @@ class rb_source_facetoface_interest extends rb_base_source {
 
         // Include some standard filters.
         $this->add_user_fields_to_filters($filteroptions);
+        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
+        $this->add_all_job_assignments_fields_to_filters($filteroptions);
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
 
@@ -196,37 +201,18 @@ class rb_source_facetoface_interest extends rb_base_source {
     }
 
     protected function define_contentoptions() {
-        $contentoptions = array(
-            new rb_content_option(
-                'current_pos',
-                get_string('currentpos', 'totara_reportbuilder'),
-                'position.path',
-                'position'
-            ),
-            new rb_content_option(
-                'current_org',
-                get_string('currentorg', 'totara_reportbuilder'),
-                'organisation.path',
-                'organisation'
-            ),
-            new rb_content_option(
-                'user',
-                get_string('user', 'rb_source_facetoface_sessions'),
-                array(
-                    'userid' => 'base.userid',
-                    'managerid' => 'position_assignment.managerid',
-                    'managerpath' => 'position_assignment.managerpath',
-                    'postype' => 'position_assignment.type',
-                ),
-                'position_assignment'
-            ),
-            new rb_content_option(
-                'date',
-                get_string('thedate', 'rb_source_facetoface_interest'),
-                'sessiondate.timestart',
-                'sessiondate'
-            ),
+        $contentoptions = array();
+
+        // Add the manager/position/organisation content options.
+        $this->add_basic_user_content_options($contentoptions);
+
+        $contentoptions[] = new rb_content_option(
+            'date',
+            get_string('thedate', 'rb_source_facetoface_interest'),
+            'sessiondate.timestart',
+            'sessiondate'
         );
+
         return $contentoptions;
     }
 

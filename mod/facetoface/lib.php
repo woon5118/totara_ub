@@ -303,11 +303,11 @@ function facetoface_fix_settings($facetoface) {
     if (empty($facetoface->interestonlyiffull) || !$facetoface->declareinterest) {
         $facetoface->interestonlyiffull = 0;
     }
-    if (empty($facetoface->selectpositiononsignup) || !$facetoface->selectpositiononsignup) {
-        $facetoface->selectpositiononsignup = 0;
+    if (empty($facetoface->selectjobassignmentonsignup) || !$facetoface->selectjobassignmentonsignup) {
+        $facetoface->selectjobassignmentonsignup = 0;
     }
-    if (empty($facetoface->forceselectposition) || !$facetoface->forceselectposition) {
-        $facetoface->forceselectposition = 0;
+    if (empty($facetoface->forceselectjobassignment) || !$facetoface->forceselectjobassignment) {
+        $facetoface->forceselectjobassignment = 0;
     }
 }
 
@@ -1633,9 +1633,8 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
                 WHERE ss2.signupid = ss.signupid AND ss2.statuscode IN (?, ?)
             ) as timesignedup,
             ss.timecreated,
-            p.fullname as positionname,
-            pa.type as positiontype,
-            pa.fullname as positionassignmentname
+            ja.id AS jobassignmentid,
+            ja.fullname AS jobassignmentname
         FROM
             {facetoface} f
         JOIN
@@ -1648,11 +1647,8 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
             {facetoface_signups_status} ss
          ON su.id = ss.signupid
    LEFT JOIN
-            {pos} p
-         ON p.id = su.positionid
-   LEFT JOIN
-            {pos_assignment} pa
-         ON pa.id = su.positionassignmentid
+            {job_assignment} ja
+         ON ja.id = su.jobassignmentid
        {$userjoin}
             {user} u
          ON u.id = su.userid
@@ -1834,9 +1830,9 @@ function facetoface_write_worksheet_header(&$worksheet, $context) {
         $worksheet->write_string(0, $pos++, $fullname);
     }
 
-    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-    if (!empty($selectpositiononsignupglobal)) {
-        $worksheet->write_string(0, $pos++, get_string('selectedposition', 'mod_facetoface'));
+    $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
+    if (!empty($selectjobassignmentonsignupglobal)) {
+        $worksheet->write_string(0, $pos++, get_string('selectedjobassignment', 'mod_facetoface'));
     }
 
     $worksheet->write_string(0, $pos++, get_string('attendance', 'facetoface'));
@@ -1882,10 +1878,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             f.course AS courseid,
             ss.grade,
             sign.timecreated,
-            COALESCE (mu1.email, mu2.email) AS managersemail,
-            p.fullname as positionname,
-            pa.type as positiontype,
-            pa.fullname as positionassignmentname
+            su.jobassignmentid
         FROM
             {facetoface} f
         JOIN
@@ -1920,21 +1913,6 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
         JOIN
             {user} u
             ON u.id = su.userid
-        LEFT JOIN
-            {pos} p
-         ON p.id = su.positionid
-        LEFT JOIN
-            {pos_assignment} pa
-         ON pa.id = su.positionassignmentid
-        LEFT JOIN
-            {user} mu1
-            ON mu1.id = pa.managerid
-        LEFT JOIN
-            {pos_assignment} pa2
-         ON pa2.userid = u.id AND pa2.type = :primary
-        LEFT JOIN
-            {user} mu2
-            ON mu2.id = pa2.managerid
         WHERE
             f.id = :fid
         AND ss.superceded != 1
@@ -1944,7 +1922,6 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
     $signupparams =  array(
         'booked' => MDL_F2F_STATUS_BOOKED,
         'waitlisted' => MDL_F2F_STATUS_WAITLISTED,
-        'primary' => POSITION_TYPE_PRIMARY,
         'fid' => $facetofaceid,
         'waitlisted2' => MDL_F2F_STATUS_WAITLISTED
     );
@@ -2143,9 +2120,13 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
                     }
                 }
 
-                $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-                if (!empty($selectpositiononsignupglobal)) {
-                    $label = position::position_label($attendee);
+                $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
+                if (!empty($selectjobassignmentonsignupglobal)) {
+                    $jobassignment = \totara_job\job_assignment::get_with_id($attendee->jobassignmentid);
+                    if ($jobassignment->userid != $attendee->userid) {
+                        // Error!!!
+                    }
+                    $label = position::job_position_label($jobassignment);
                     $worksheet->write_string($i, $j++, $label);
                 }
                 $worksheet->write_string($i,$j++,$attendee->grade);
@@ -2296,23 +2277,23 @@ function facetoface_get_user_customfields($userid, $fieldstoinclude=null) {
  * Add a record to the facetoface submissions table and sends out an
  * email confirmation
  *
- * @param class $session record from the facetoface_sessions table
- * @param class $facetoface record from the facetoface table
- * @param class $course record from the course table
+ * @param object $session record from the facetoface_sessions table
+ * @param object $facetoface record from the facetoface table
+ * @param object $course record from the course table
  * @param string $discountcode code entered by the user
  * @param integer $notificationtype type of notifications to send to user
  * @see {{MDL_F2F_INVITE}}
  * @param integer $statuscode Status code to set
- * @param integer $userid user to signup
+ * @param integer|bool $userid user to signup
  * @param bool $notifyuser whether or not to send an email confirmation
  * @param object $fromuser User object describing who the email is from.
- * @param class $positionassignment object containing information on selected position (positionid, type, assignmnetid)
- * @param int   $managerid          The id of the user selected as the session manager when managerselect is enabled.
+ * @param \totara_job\job_assignment $jobassignment object containing the selected job assignment
+ * @param int $managerid Manager id selected by user
+ * @return bool
  */
 function facetoface_user_signup($session, $facetoface, $course, $discountcode,
                                 $notificationtype, $statuscode, $userid = false,
-                                $notifyuser = true, $fromuser = null,
-                                $positionassignment = null, $managerid = null) {
+                                $notifyuser = true, $fromuser = null, $jobassignment = null, $managerid = null) {
 
     global $DB, $USER;
 
@@ -2321,7 +2302,6 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
         $userid = $USER->id;
     }
 
-    $return = false;
     $timenow = time();
 
     // Check to see if a signup already exists
@@ -2338,30 +2318,26 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
     $usersignup->mailedreminder = 0;
     $usersignup->notificationtype = $notificationtype;
 
-    // If the selected position information hasn't been supplied then we need to try to default it
+    // If the selected job assignment information hasn't been supplied then we need to try to default it
     // we won't throw errors if it's not present as all we can do is throw exceptions that won't be handled and may break cron
     // in theory the only routes here that don't go through facetoface_user_import handle reservations which handled by a manager
-    // or come from a wait list and so a position assignment should always be available.
-    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-    $positionrequired = !empty($selectpositiononsignupglobal) && !empty($facetoface->selectpositiononsignup);
+    // or come from a wait list and so a job assignment should always be available.
+    $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
+    $jobassignmentrequired = !empty($selectjobassignmentonsignupglobal) && !empty($facetoface->selectjobassignmentonsignup);
 
-    if ($positionrequired) {
-        if ($positionassignment === null) {
-            $positionassignment = pos_get_most_primary_position_assignment($userid);
+    if ($jobassignmentrequired) {
+        if ($jobassignment === null) {
+            $jobassignment = \totara_job\job_assignment::get_first($userid, false);
         }
 
-        if (!empty($positionassignment)) {
-            $usersignup->positionid = $positionassignment->positionid;
-            $usersignup->positiontype = $positionassignment->positiontype;
-            $usersignup->positionassignmentid = $positionassignment->id;
+        if (!empty($jobassignment)) {
+            $usersignup->jobassignmentid = $jobassignment->id;
         }
     }
 
-    // If no position is wanted by the face to face or none is provided then record all info as null.
-    if (!$positionrequired || empty($positionassignment)) {
-        $usersignup->positionid = null;
-        $usersignup->positiontype = null;
-        $usersignup->positionassignmentid = null;
+    // If no job assignment is wanted by the face to face or none is provided then record all info as null.
+    if (!$jobassignmentrequired || empty($jobassignment)) {
+        $usersignup->jobassignmentid = null;
     }
 
     $managerselect = get_config(null, 'facetoface_managerselect');
@@ -4241,9 +4217,7 @@ function facetoface_get_cancellations($sessionid) {
                 u.id,
                 su.id AS submissionid,
                 {$usernamefields},
-                p.fullname as positionname,
-                pa.fullname as positionassignmentname,
-                pa.type as positiontype,
+                su.jobassignmentid,
                 MAX(ss.timecreated) AS timesignedup,
                 c.timecreated AS timecancelled,
                 c.statuscode
@@ -4262,12 +4236,6 @@ function facetoface_get_cancellations($sessionid) {
              ON su.id = ss.signupid
              AND ss.statuscode $insql
              AND ss.superceded = 1
-           LEFT JOIN
-             {pos} p
-             ON p.id = su.positionid
-           LEFT JOIN
-             {pos_assignment} pa
-             ON pa.id = su.positionassignmentid
             WHERE
                 su.sessionid = ?
             GROUP BY
@@ -4275,9 +4243,7 @@ function facetoface_get_cancellations($sessionid) {
                 u.id,
                 {$usernamefields},
                 c.timecreated,
-                p.fullname,
-                pa.type,
-                pa.fullname,
+                su.jobassignmentid,
                 c.statuscode,
                 c.id
             ORDER BY
@@ -4795,28 +4761,23 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         $status = MDL_F2F_STATUS_WAITLISTED;
     }
 
-    $positionassignment = null;
+    $jobassignment = null;
 
-    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-    if (!empty($selectpositiononsignupglobal) && !empty($facetoface->selectpositiononsignup)) {
+    $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
+    if (!empty($selectjobassignmentonsignupglobal) && !empty($facetoface->selectjobassignmentonsignup)) {
 
-        // Get the position assignment record while checking that it is applicable for this activity/session.
-        if (!empty($params['positionassignment'])) {
-            $positionassignmentid = $params['positionassignment'];
-            $applicablepositionassignments = get_position_assignments(false, $userid);
-            if (!empty($applicablepositionassignments[$positionassignmentid])) {
-                $positionassignment = $applicablepositionassignments[$positionassignmentid];
+        if (!empty($params['jobassignmentid'])) {
+            $jobassignment = \totara_job\job_assignment::get_with_id($params['jobassignmentid']);
+            if ($jobassignment->userid != $userid) {
+                // There was an error!
             }
+        } else {
+            $jobassignment = \totara_job\job_assignment::get_first($userid, false);
         }
 
-        // If that didn't work or no positionassignmentid provided try defaulting.
-        if (!$positionassignment) {
-            $positionassignment = pos_get_most_primary_position_assignment($userid);
-        }
-
-        // If we still don't have a position and it's mandated then error.
-        if (!$positionassignment && !empty($facetoface->forceselectposition)) {
-            $result['result'] = get_string('error:nopositionselected', 'facetoface');
+        // If we still don't have a job assignment and it's mandated then error.
+        if (!$jobassignment && !empty($facetoface->forceselectjobassignment)) {
+            $result['result'] = get_string('error:nojobassignmentselected', 'facetoface');
             $result['nogoodpos'] = true;
             return $result;
         }
@@ -4845,7 +4806,7 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         $user->id,
         !$suppressemail,
         null,
-        $positionassignment,
+        $jobassignment,
         $managerid)) {
             $result['result'] = get_string('error:addattendee', 'facetoface', fullname($user));
             return $result;
@@ -5592,7 +5553,7 @@ function facetoface_can_reserve_or_allocate($facetoface, $sessions, $context, $m
         return $ret; // Manager is not allowed to reserve/allocate any spaces.
     }
 
-    if (!totara_get_staff($managerid)) {
+    if (!\totara_job\job_assignment::has_staff($managerid)) {
         return $ret; // No staff to allocate spaces to.
     }
 
@@ -5928,7 +5889,8 @@ function facetoface_get_staff_to_allocate($facetoface, $session, $managerid = nu
     }
 
     $ret = (object)array('potential' => array(), 'current' => array(), 'othersession' => array(), 'cannotunallocate' => array());
-    if (!$staff = totara_get_staff($managerid, null, true)) {
+    $staff = \totara_job\job_assignment::get_staff_userids($managerid);
+    if (empty($staff)) {
         return $ret;
     }
 
@@ -6035,30 +5997,40 @@ function facetoface_user_can_be_unallocated(&$user, $managerid) {
  *
  * @param int   $userid     The user whose manager we are looking for
  * @param int   $sessionid  The session where the manager is assigned
- * @param int   $postype    The position type when users are allowed to select their secondary positions
- * @return object   The user object (including fullname) of the user assigned as the learners manager
+ * @param int   $jobassignmentid The job when users are allowed to select their secondary jobs !!! "Seconardy" jobs ???
+ * @return array of object   The user object (including fullname) of the user assigned as the learners managers
  */
-function facetoface_get_session_manager($userid, $sessionid, $postype = null) {
+function facetoface_get_session_managers($userid, $sessionid, $jobassignmentid = null) {
     global $DB;
 
     $managerselect = get_config(null, 'facetoface_managerselect');
-    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+    $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
     $signup = $DB->get_record('facetoface_signups', array('userid' => $userid, 'sessionid' => $sessionid));
+
+    $managers = array();
 
     if ($managerselect && !empty($signup->managerid)) {
         // Check if they selected a manager for their signup.
         $manager = $DB->get_record('user', array('id' => $signup->managerid));
-    } else if ($selectpositiononsignupglobal && !empty($postype)) {
-        $manager = totara_get_manager($userid, $postype);
+        $managers[] = $manager;
+    } else if ($selectjobassignmentonsignupglobal && !empty($jobassignmentid)) {
+        $ja = \totara_job\job_assignment::get_with_id($jobassignmentid);
+        if ($ja->managerid) {
+            $managers[] = $DB->get_record('user', array('id' => $ja->managerid));
+        }
     } else {
-        $manager = totara_get_manager($userid);
+        $managerids = \totara_job\job_assignment::get_all_manager_userids($userid);
+        if (!empty($managerids)) {
+            list($mansql, $manparams) = $DB->get_in_or_equal($managerids, SQL_PARAMS_NAMED);
+            $managers = $DB->get_records_select('user', "id $mansql", $manparams);
+        }
     }
 
-    if ($manager) {
+    foreach ($managers as &$manager) {
         $manager->fullname = fullname($manager);
     }
 
-    return $manager;
+    return $managers;
 }
 
 /**
@@ -6071,11 +6043,11 @@ function facetoface_get_manager_list() {
 
     $ret = array();
 
-
     $usernamefields = get_all_user_name_fields(true, 'u');
     $sql = "SELECT DISTINCT u.id, {$usernamefields}
-              FROM {pos_assignment} pa
-              JOIN {user} u ON u.id = pa.managerid
+              FROM {job_assignment} staffja
+              JOIN {job_assignment} managerja ON staffja.managerjaid = managerja.id
+              JOIN {user} u ON u.id = managerja.userid
              ORDER BY u.lastname, u.firstname";
     $managers = $DB->get_records_sql($sql);
     foreach ($managers as $manager) {
@@ -6084,9 +6056,9 @@ function facetoface_get_manager_list() {
 
     if (!empty($CFG->enabletempmanagers)) {
         $sql = "SELECT DISTINCT u.id, {$usernamefields}
-                  FROM {temporary_manager} tm
-                  JOIN {user} u ON u.id = tm.tempmanagerid
-                 WHERE tm.expirytime > ?
+                  FROM {job_assignment} staffja
+                  JOIN {job_assignment} tempmanagerja ON staffja.tempmanagerjaid = tempmanagerja.id
+                  JOIN {user} u ON u.id = tempmanagerja.userid
                  ORDER BY u.lastname, u.firstname";
         $params = array(time());
         $tempmanagers = $DB->get_records_sql($sql, $params);

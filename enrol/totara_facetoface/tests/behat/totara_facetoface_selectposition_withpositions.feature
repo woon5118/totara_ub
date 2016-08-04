@@ -20,7 +20,7 @@ Feature: Users can enrol themself in courses with selected position where semina
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Seminars"
     And I set the following fields to these values:
-      | Select position on signup | 1 |
+      | Select job assignment on signup | 1 |
     And I press "Save changes"
 
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
@@ -33,10 +33,10 @@ Feature: Users can enrol themself in courses with selected position where semina
       | framework | idnumber | fullname   |
       | FW001     | POS001   | Position1  |
       | FW001     | POS002   | Position2  |
-    And the following position assignments exist:
-      | user     | position | type      |
-      | student1 | POS001   | primary   |
-      | student1 | POS002   | secondary |
+    And the following job assignments exist:
+      | user     | position | fullname       |
+      | student1 | POS001   | jobassignment1 |
+      | student1 | POS002   | jobassignment2 |
 
     And I set the following administration settings values:
       | Enhanced catalog | 1 |
@@ -53,7 +53,7 @@ Feature: Users can enrol themself in courses with selected position where semina
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Test seminar name        |
       | Description | Test seminar description |
-      | Select position on signup | 1             |
+      | Select job assignment on signup | 1             |
     And I follow "View all events"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -79,7 +79,7 @@ Feature: Users can enrol themself in courses with selected position where semina
     And I click on "Course 1" "link"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I set the following fields to these values:
-      | Select a position | Secondary position (Position2) |
+      | Select a job assignment | jobassignment2 (Position2) |
     And I press "Sign-up"
     Then I should see "Topic 1"
     And I log out
@@ -97,7 +97,7 @@ Feature: Users can enrol themself in courses with selected position where semina
     And I follow "Course 1"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
     And I set the following fields to these values:
-      | Select a position | Secondary position (Position2) |
+      | Select a job assignment | jobassignment2 (Position2) |
     And I press "Sign-up"
     Then I should see "Your booking has been completed."
     And I log out

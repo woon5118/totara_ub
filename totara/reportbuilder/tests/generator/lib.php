@@ -321,17 +321,23 @@ class totara_reportbuilder_cache_generator extends testing_data_generator {
      * @return stdClass
      */
     public function create_user($record = null, array $options = null) {
-        global $DB;
         $user = parent::create_user($record, $options);
 
         if (is_object($record)) {
             $record = (array)$record;
         }
         // Assign manager for correct event messaging handler work.
-        $managerid = isset($record['managerid']) ? $record['managerid'] : 2;
-        $manager = array('managerid' => $managerid, 'fullname' => '', 'timecreated' => time(),
-            'timemodified' => time(), 'usermodified' => 2, 'userid' => $user->id);
-        $DB->insert_record('pos_assignment', (object)$manager);
+        if (isset($record['managerid'])) {
+            $managerid = $record['managerid'];
+        } else {
+            $admin = get_admin();
+            $managerid = $admin->id;
+        }
+        $managerja = \totara_job\job_assignment::get_first($managerid, false);
+        if (empty($managerja)) {
+            $managerja = \totara_job\job_assignment::create_default($managerid);
+        }
+        \totara_job\job_assignment::create_default($user->id, array('managerjaid' => $managerja->id));
 
         return $user;
     }
@@ -366,6 +372,7 @@ class totara_reportbuilder_cache_generator extends testing_data_generator {
         $completiontime = (isset($record['completiontime'])) ? $record['completiontime'] : -1;
         $completionevent = (isset($record['completionevent'])) ? $record['completionevent'] : 0;
         $completioninstance = (isset($record['completioninstance'])) ? $record['completioninstance'] : 0;
+        $includechildren = (isset($record['includechildren'])) ? $record['includechildren'] : 0;
 
         // Create data.
         $data = new stdClass();
@@ -374,6 +381,7 @@ class totara_reportbuilder_cache_generator extends testing_data_generator {
         $data->completiontime = array($assignmenttype => array($itemid => $completiontime));
         $data->completionevent = array($assignmenttype => array($itemid => $completionevent));
         $data->completioninstance = array($assignmenttype => array($itemid => $completioninstance));
+        $data->includechildren = array ($assignmenttype => array($itemid => $includechildren));
 
         // Assign item to program.
         $assignmenttoprog = prog_assignments::factory($assignmenttype);

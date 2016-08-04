@@ -7,9 +7,9 @@ Feature: Verify competency course count within learning plan
       | username | firstname  | lastname  | email                |
       | learner1 | learner1 | learner1 | learner1@example.com |
       | manager1 | manager1 | manager1| manager1@example.com |
-    And the following "manager assignments" exist in "totara_hierarchy" plugin:
-      | user     | manager  |
-      | learner1 | admin |
+    And the following job assignments exist:
+      | user     | fullname       | manager  |
+      | learner1 | jobassignment1 | admin    |
     And the following "courses" exist:
       | fullname | shortname | enablecompletion |
       | Course 1 | Course 1  | 1                |

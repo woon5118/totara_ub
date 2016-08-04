@@ -29,7 +29,7 @@ Feature: Test audience with organisation checkbox profile field.
     And the following "hierarchy type assignments" exist in "totara_hierarchy" plugin:
       | hierarchy    | field    | typeidnumber | idnumber | value |
       | organisation | checkbox | ORGTYPE001   | ORG001   | 1     |
-    And the following "organisation assignments" exist in "totara_hierarchy" plugin:
+    And the following job assignments exist:
       | user      | organisation |
       | learner10 | ORG001       |
       | learner20 | ORG001       |

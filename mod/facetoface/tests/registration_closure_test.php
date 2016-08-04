@@ -66,7 +66,6 @@ class mod_facetoface_session_registration_closure_testcase extends advanced_test
 
         $generator = $this->getDataGenerator();
         $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
-        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
 
         $manager = $generator->create_user();
         $user1 = $generator->create_user();
@@ -74,10 +73,11 @@ class mod_facetoface_session_registration_closure_testcase extends advanced_test
         $user3 = $generator->create_user();
         $user4 = $generator->create_user();
 
-        $hierarchygenerator->assign_primary_position($user1->id, $manager->id, null, null);
-        $hierarchygenerator->assign_primary_position($user2->id, $manager->id, null, null);
-        $hierarchygenerator->assign_primary_position($user3->id, $manager->id, null, null);
-        $hierarchygenerator->assign_primary_position($user4->id, $manager->id, null, null);
+        $managerja = \totara_job\job_assignment::create_default($manager->id);
+        \totara_job\job_assignment::create_default($user1->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($user3->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($user4->id, array('managerjaid' => $managerja->id));
 
         $course = $generator->create_course();
         $facetoface = $facetofacegenerator->create_instance(array('course' => $course->id));

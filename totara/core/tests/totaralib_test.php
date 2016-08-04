@@ -33,27 +33,7 @@ require_once($CFG->dirroot . '/completion/cron.php');
 class totaralib_test extends advanced_testcase {
     protected $user, $manager, $teamleader, $appraiser, $invaliduserid = 9999;
 
-    protected $context_data = array('id' => '1', 'contextlevel' => CONTEXT_USER, 'instanceid' => 999);
-
-    protected $role_data = array(
-        array('id' => 1, 'name' => 'Manager', 'shortname' => 'manager', 'description' => 'Manager Role', 'sortorder' => 1),
-        array('id' => 2, 'name' => 'Teamleader', 'shortname' => 'teamleader', 'description' => 'Team Leader Role', 'sortorder' => 2),
-        array('id' => 3, 'name' => 'Appraiser', 'shortname' => 'appraiser', 'description' => 'Appraiser Role', 'sortorder' => 3),
-    );
-
-    protected $role_assignments_data = array(
-        array('id' => 1, 'roleid' => 1, 'contextid' => 1),
-        array('id' => 2, 'roleid' => 2, 'contextid' => 1),
-        array('id' => 3, 'roleid' => 3, 'contextid' => 1),
-    );
-
-    protected $pos_assignment_data = array(
-        array('id' => 1, 'fullname' => 'Pos fullname 1', 'type' => POSITION_TYPE_PRIMARY, 'timecreated' => 0, 'timemodified' => 0, 'usermodified' => 1),
-        array('id' => 2, 'fullname' => 'Pos fullname 2', 'type' => POSITION_TYPE_PRIMARY, 'timecreated' => 0, 'timemodified' => 0, 'usermodified' => 1),
-    );
-
     protected function setUp() {
-        global $DB;
         parent::setUp();
 
         $this->user = $this->getDataGenerator()->create_user();
@@ -61,18 +41,11 @@ class totaralib_test extends advanced_testcase {
         $this->teamleader = $this->getDataGenerator()->create_user();
         $this->appraiser = $this->getDataGenerator()->create_user();
 
-        $DB->insert_record('context', $this->context_data);
-        $DB->delete_records('role');
-        $DB->insert_record('role', $this->role_data[0]);
-        $DB->insert_record('role', $this->role_data[1]);
-        $DB->insert_record('role', $this->role_data[2]);
-        $DB->insert_record('role_assignments', array_merge($this->role_assignments_data[0], array('userid' => $this->manager->id)));
-        $DB->insert_record('role_assignments', array_merge($this->role_assignments_data[1], array('userid' => $this->teamleader->id)));
-        $DB->insert_record('role_assignments', array_merge($this->role_assignments_data[2], array('userid' => $this->appraiser->id)));
-        $DB->insert_record('pos_assignment', array_merge($this->pos_assignment_data[0],
-                           array('userid' => $this->user->id, 'managerid' => $this->manager->id, 'appraiserid' => $this->appraiser->id)));
-        $DB->insert_record('pos_assignment', array_merge($this->pos_assignment_data[1],
-                           array('userid' => $this->manager->id, 'managerid' => $this->teamleader->id)));
+        $teamleaderja = \totara_job\job_assignment::create_default($this->teamleader->id);
+        $managerja = \totara_job\job_assignment::create_default($this->manager->id,
+            array('managerjaid' => $teamleaderja->id));
+        \totara_job\job_assignment::create_default($this->user->id,
+            array('managerjaid' => $managerja->id, 'appraiserid' => $this->appraiser->id));
     }
 
     public function test_totara_is_manager() {
@@ -101,7 +74,7 @@ class totaralib_test extends advanced_testcase {
         $this->resetAfterTest();
 
         // Return value should be user object.
-        $this->assertEquals(totara_get_teamleader($this->user->id)->id, $this->teamleader->id);
+        $this->assertEquals($this->teamleader->id, totara_get_teamleader($this->user->id)->id);
 
         // Totara_get_manager returns get_record_sql. expecting false here.
         $this->assertFalse(totara_get_teamleader($this->manager->id));
@@ -111,7 +84,7 @@ class totaralib_test extends advanced_testcase {
         $this->resetAfterTest();
 
         // Return value should be user object.
-        $this->assertEquals(totara_get_appraiser($this->user->id)->id, $this->appraiser->id);
+        $this->assertEquals($this->appraiser->id, totara_get_appraiser($this->user->id)->id);
 
         // Totara_get_manager returns get_record_sql. expecting false here.
         $this->assertFalse(totara_get_appraiser($this->manager->id));
@@ -121,7 +94,7 @@ class totaralib_test extends advanced_testcase {
         $this->resetAfterTest();
 
         // Expect array of id numbers.
-        $this->assertEquals(totara_get_staff($this->manager->id), array($this->user->id));
+        $this->assertEquals(array($this->user->id), totara_get_staff($this->manager->id));
 
         // Expect false when the 'managerid' being inspected has no staff.
         $this->assertFalse(totara_get_staff($this->user->id));

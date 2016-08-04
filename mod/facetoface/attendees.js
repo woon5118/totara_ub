@@ -222,10 +222,10 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 });
                 return false;
             });
-            // Add handler to edit position button.
-            $('a.attendee-edit-position').on('click', function(){
+            // Add handler to edit job assignment button.
+            $('a.attendee-edit-job-assignment').on('click', function(){
                 $.get($(this).attr('href'), function(href){
-                    editPositionModalForm(href);
+                    editJobAssignmentModalForm(href);
                 });
                 return false;
             });
@@ -309,10 +309,10 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
         }
 
         /**
-         * Modal popup for edit position single stage form. Requires the existence of standard mform with buttons #id_submitbutton and #id_cancel
+         * Modal popup for edit jbo assignment single stage form. Requires the existence of standard mform with buttons #id_submitbutton and #id_cancel
          * @param href The desired contents of the panel
          */
-        function editPositionModalForm(href) {
+        function editJobAssignmentModalForm(href) {
             this.Y.use('panel', function(Y) {
                 var panel = new Y.Panel({
                     headerContent: null,
@@ -331,11 +331,11 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     apprObj += ('&submitbutton=' + $(this).attr('value'));
                     $.post($theFrm.attr('action'), apprObj).done(function(data){
                         if (data.result == 'success') {
-                            var span = "#position"+data.id;
-                            $(span).html(data.positiondisplayname);
+                            var span = "#jobassign"+data.id;
+                            $(span).html(data.jobassignmentdisplayname);
                             panel.destroy(true);
                         } else {
-                            $("#attendee_position_err").text(data.error);
+                            $("#attendee_job_assignment_err").text(data.error);
                         }
                     });
                     return false;

@@ -82,8 +82,6 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
      * - Create four bookings (for each users in inverted time
      */
     protected function setUp() {
-        global $POSITION_CODES, $POSITION_TYPES;
-
         parent::setup();
         $this->setAdminUser();
         // Common parts of test cases:
@@ -113,15 +111,9 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
         $this->create_booking($this->user1, $this->user2, $this->course1);
         $this->create_booking($this->user1, $this->user3, $this->course1);
 
-        // Assign user2 to be user1's manager and remove viewallmessages from manager role.
-        $assignment = new position_assignment(
-            array(
-                'userid'    => $this->user1->id,
-                'type'      => $POSITION_CODES[reset($POSITION_TYPES)]
-            )
-        );
-        $assignment->managerid = $this->user2->id;
-        assign_user_position($assignment, true);
+        // Assign user2 to be user1's manager.
+        $managerja = \totara_job\job_assignment::create_default($this->user2->id);
+        \totara_job\job_assignment::create_default($this->user1->id, array('managerjaid' => $managerja->id));
     }
 
      /**

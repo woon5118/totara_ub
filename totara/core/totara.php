@@ -859,8 +859,8 @@ function totara_print_my_team_nav() {
     $managerroleid = $CFG->managerroleid;
 
     // return users with this user as manager
-    $staff = totara_get_staff();
-    $teammembers = ($staff) ? count($staff) : 0;
+    $staff = \totara_job\job_assignment::get_staff_userids($USER->id);
+    $teammembers = count($staff);
 
     //call renderer
     $renderer = $PAGE->get_renderer('totara_core');
@@ -1046,347 +1046,141 @@ function totara_print_my_courses() {
 /**
  * Check if a user is a manager of another user
  *
+ * If managerid is not set, uses the current user
+ *
  * @param int $userid       ID of user
  * @param int $managerid    ID of a potential manager to check (optional)
- * @param int $postype      Type of the position to check (POSITION_TYPE_* constant). Defaults to all positions (optional)
  * @return boolean true if user $userid is managed by user $managerid
- *
- * If managerid is not set, uses the current user
-**/
-function totara_is_manager($userid, $managerid=null, $postype=null) {
-    global $DB, $USER;
+ **/
+function totara_is_manager($userid, $managerid = null) {
+    global $USER;
 
-    $userid = (int) $userid;
-    $now = time();
+    // Deprecate!
 
-    if (!isset($managerid)) {
-        // Use logged in user as default
+    if (empty($managerid)) {
         $managerid = $USER->id;
     }
 
-    if ($DB->record_exists_select('temporary_manager', 'userid = ? AND tempmanagerid = ? AND expirytime > ?',
-            array($userid, $managerid, $now))) {
-
-        // This is a temporary manager of the user.
-        return true;
-    }
-
-    $params = array($userid, $managerid);
-    if ($postype) {
-        $postypewhere = "AND pa.type = ?";
-        $params[] = $postype;
-    } else {
-        $postypewhere = '';
-    }
-
-    return $DB->record_exists_select('pos_assignment', "userid = ? AND managerid = ?" . $postypewhere, $params);
+    return \totara_job\job_assignment::is_managing($managerid, $userid);
 }
 
 /**
  * Returns the staff of the specified user
  *
- * @param int $userid ID of a user to get the staff of, If $userid is not set, returns staff of current user
- * @param mixed $postype Type of the position to check (POSITION_TYPE_* constant). Defaults to primary position (optional)
+ * @param int $managerid ID of a user to get the staff of, If $managerid is not set, returns staff of current user
+ * @param int $jobassignid ID of the job assignment to check. Defaults to all job assignments belonging to the manager
  * @param bool $sort optional ordering by lastname, firstname
- * @return array Array of userids of staff who are managed by user $userid , or false if none
+ * @return array|bool Array of userids of staff who are managed by user $userid , or false if none
  **/
-function totara_get_staff($userid=null, $postype=null, $sort = false) {
-    global $CFG, $DB, $USER;
+function totara_get_staff($managerid = null, $jobassignid = 0, $sort = false) {
+    global $USER;
 
-    require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
+    // Deprecate!
 
-    $postype = ($postype === null) ? POSITION_TYPE_PRIMARY : (int) $postype;
-    $now = time();
-    $userid = !empty($userid) ? (int) $userid : $USER->id;
-
-    $orderby = '';
-    $select = 'u.id';
-    if ($sort) {
-        $orderby = "ORDER BY u.lastname ASC, u.firstname ASC";
-        $select = "u.id, u.lastname, u.firstname";
+    if (empty($managerid)) {
+        $managerid = $USER->id;
     }
 
-    if (!empty($CFG->enabletempmanagers) && $postype == POSITION_TYPE_PRIMARY) {
-        // Include temporary staff.
-        $sql = "SELECT DISTINCT $select
-                  FROM {user} u
-             LEFT JOIN {pos_assignment} pa ON (pa.userid = u.id AND pa.type = :type AND pa.managerid = :managerid)
-             LEFT JOIN {temporary_manager} tm ON (tm.userid = u.id AND tm.tempmanagerid = :managerid2 AND tm.expirytime > :expiry)
-                 WHERE u.deleted = 0 AND (pa.id IS NOT NULL OR tm.id IS NOT NULL)
-              $orderby";
-        $params = array('type' => $postype, 'managerid' => $userid, 'managerid2' => $userid, 'expiry' => $now);
-        $staff = $DB->get_fieldset_sql($sql, $params);
-
+    $result = \totara_job\job_assignment::get_staff_userids($managerid, $jobassignid, true);
+    if (empty($result)) {
+        return false;
     } else {
-        // This works because:
-        // - old pos_assignment records are deleted when a user is deleted by {@link delete_user()}
-        //   so no need to check if the record is for a real user
-        // - there is a unique key on (type, userid) on pos_assignment so no need to use
-        //   DISTINCT on the userid
-        $sql = "SELECT $select
-                  FROM {user} u
-                  JOIN {pos_assignment} pa ON (pa.userid = u.id AND pa.type = :type AND pa.managerid = :managerid)
-                 WHERE u.deleted = 0
-              $orderby";
-        $params = array('type' => $postype, 'managerid' => $userid);
-        $staff = $DB->get_fieldset_sql($sql, $params);
+        return $result;
     }
-
-    return (empty($staff)) ? false : $staff;
 }
 
 /**
  * Find out a user's manager.
  *
  * @param int $userid Id of the user whose manager we want
- * @param int $postype Type of the position we want the manager for (POSITION_TYPE_* constant). Defaults to primary position(optional)
  * @param boolean $skiptemp Skip check and return of temporary manager
  * @param boolean $skipreal Skip check and return of real manager
  * @return mixed False if no manager. Manager user object from mdl_user if the user has a manager.
  */
-function totara_get_manager($userid, $postype=null, $skiptemp=false, $skipreal=false) {
+function totara_get_manager($userid, $skiptemp = false, $skipreal = false) {
     global $CFG, $DB;
 
-    require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
+    // Deprecate!
 
-    $postype = ($postype === null) ? POSITION_TYPE_PRIMARY : (int) $postype;
-    $userid = (int) $userid;
-    $now = time();
+    $jobassignments = \totara_job\job_assignment::get_all($userid);
 
-    if (!empty($CFG->enabletempmanagers) && $postype == POSITION_TYPE_PRIMARY && !$skiptemp) {
-        // Temporary manager.
-        $sql = "SELECT u.*, tm.expirytime
-                  FROM {temporary_manager} tm
-            INNER JOIN {user} u ON tm.tempmanagerid = u.id
-                 WHERE tm.userid = ? AND tm.expirytime > ?";
-        if ($tempmanager = $DB->get_record_sql($sql, array($userid, $now))) {
-            return $tempmanager;
+    $managerid = false;
+    foreach ($jobassignments as $jobassignment) {
+        if (!$skiptemp && $jobassignment->tempmanagerjaid && !empty($CFG->enabletempmanagers)) {
+            $managerid = $jobassignment->tempmanagerid;
+            break;
+        }
+        if (!$skipreal && $jobassignment->managerjaid) {
+            $managerid = $jobassignment->managerid;
+            break;
         }
     }
 
-    if (!$skipreal) {
-        $sql = "
-            SELECT manager.*
-              FROM {pos_assignment} pa
-        INNER JOIN {user} manager
-                ON pa.managerid = manager.id
-             WHERE pa.userid = ?
-               AND pa.type = ?";
-
-        // Return a manager if they have one otherwise false.
-        return $DB->get_record_sql($sql, array($userid, $postype));
+    if ($managerid) {
+        return $DB->get_record('user', array('id' => $managerid));
+    } else {
+        return false;
     }
-
-    return false;
 }
 
 /**
- * Find the manager of the user's 'most primary' position.
+ * Find the manager of the user's 'first' job.
  *
- * @param int $userid Id of the user whose manager we want
+ * This function probably returns a result, but it's probably not the best result.
+ * It might actually be better to rethink the places where this is used and deprecate this function.
+ *
+ * @deprecated since version 9.0
+ * @param int|bool $userid Id of the user whose manager we want
  * @return mixed False if no manager. Manager user object from mdl_user if the user has a manager.
  */
 function totara_get_most_primary_manager($userid = false) {
     global $DB, $USER;
 
+    debugging("totara_get_most_primary_manager is deprecated. Use \\totara_job\\job_assignment methods instead.");
+
     if ($userid === false) {
         $userid = $USER->id;
     }
 
-    $enabletempmanagers = get_config(null, 'enabletempmanagers');
-    if (!empty($enabletempmanagers)) {
-        if ($tempmanager = totara_get_manager($userid, null, false, true)) {
-            $mostprimarymanagers[$userid] = $tempmanager;
-            return $tempmanager;
-        }
+    $managers = \totara_job\job_assignment::get_all_manager_userids($userid);
+    if (!empty($managers)) {
+        return $DB->get_record('user', array('id' => $managers[0]));
     }
-
-    $sql = "SELECT u.*
-                  FROM {pos_assignment} pa
-                  JOIN {user} u ON u.id = pa.managerid
-                 WHERE pa.userid = :userid
-                    AND (pa.timevalidfrom is null OR pa.timevalidfrom <= :from)
-                    AND (pa.timevalidto is null OR pa.timevalidto >= :to)
-              ORDER BY pa.type ASC";
-
-    if ($manager = $DB->get_record_sql($sql, array('userid' => $userid, 'from' => time(), 'to' => time()), IGNORE_MULTIPLE)) {
-        return $manager;
-    }
-
     return false;
 }
 
-/**
- * Update/set a temp manager for the specified user
- *
- * @param int $userid Id of user to set temp manager for
- * @param int $managerid Id of temp manager to be assigned to user.
- * @param int $expiry Temp manager expiry epoch timestamp
- */
-function totara_update_temporary_manager($userid, $managerid, $expiry) {
-    global $CFG, $DB, $USER;
-
-    if (!$user = $DB->get_record('user', array('id' => $userid))) {
-        return false;
-    }
-
-    $usercontext = context_user::instance($userid);
-    $realmanager = totara_get_manager($userid, null, true);
-    $oldtempmanager = $DB->get_record('temporary_manager', array('userid' => $userid));
-
-    if (!$newtempmanager = $DB->get_record('user', array('id' => $managerid))) {
-        return false;
-    }
-
-    // Set up messaging.
-    require_once($CFG->dirroot.'/totara/message/messagelib.php');
-    $msg = new stdClass();
-    $msg->userfrom = $USER;
-    $msg->msgstatus = TOTARA_MSG_STATUS_OK;
-    $msg->contexturl = $CFG->wwwroot.'/user/positions.php?user='.$userid.'&courseid='.SITEID;
-    $msg->contexturlname = get_string('xpositions', 'totara_core', fullname($user));
-    $msgparams = (object)array('staffmember' => fullname($user), 'tempmanager' => fullname($newtempmanager),
-        'expirytime' => userdate($expiry, get_string('datepickerlongyearphpuserdate', 'totara_core')), 'url' => $msg->contexturl);
-
-    if (!empty($oldtempmanager) && $newtempmanager->id == $oldtempmanager->tempmanagerid) {
-        if ($oldtempmanager->expirytime == $expiry) {
-            // Nothing to do here.
-            return true;
-        } else {
-            // Update expiry time.
-            $oldtempmanager->expirytime = $expiry;
-            $oldtempmanager->timemodified = time();
-
-            $DB->update_record('temporary_manager', $oldtempmanager);
-
-            // Expiry change notifications.
-
-            // Notify staff member.
-            $msg->userto = $user;
-            $msg->subject = get_string('tempmanagerexpiryupdatemsgstaffsubject', 'totara_core', $msgparams);
-            $msg->fullmessage = get_string('tempmanagerexpiryupdatemsgstaff', 'totara_core', $msgparams);
-            $msg->fullmessagehtml = get_string('tempmanagerexpiryupdatemsgstaff', 'totara_core', $msgparams);
-            tm_alert_send($msg);
-
-            // Notify real manager.
-            if (!empty($realmanager)) {
-                $msg->userto = $realmanager;
-                $msg->subject = get_string('tempmanagerexpiryupdatemsgmgrsubject', 'totara_core', $msgparams);
-                $msg->fullmessage = get_string('tempmanagerexpiryupdatemsgmgr', 'totara_core', $msgparams);
-                $msg->fullmessagehtml = get_string('tempmanagerexpiryupdatemsgmgr', 'totara_core', $msgparams);
-                $msg->roleid = $CFG->managerroleid;
-                tm_alert_send($msg);
-            }
-
-            // Notify temp manager.
-            $msg->userto = $newtempmanager;
-            $msg->subject = get_string('tempmanagerexpiryupdatemsgtmpmgrsubject', 'totara_core', $msgparams);
-            $msg->fullmessage = get_string('tempmanagerexpiryupdatemsgtmpmgr', 'totara_core', $msgparams);
-            $msg->fullmessagehtml = get_string('tempmanagerexpiryupdatemsgtmpmgr', 'totara_core', $msgparams);
-            $msg->roleid = $CFG->managerroleid;
-            tm_alert_send($msg);
-
-            return true;
-        }
-    }
-
-    $transaction = $DB->start_delegated_transaction();
-
-    // Unassign the current temporary manager.
-    totara_unassign_temporary_manager($userid);
-
-    // Assign new temporary manager.
-    $record = new stdClass();
-    $record->userid = $userid;
-    $record->tempmanagerid = $managerid;
-    $record->expirytime = $expiry;
-    $record->timemodified = time();
-    $record->usermodified = $USER->id;
-
-    $record->id = $DB->insert_record('temporary_manager', $record);
-
-    // Assign/update temp manager role assignment.
-    role_assign($CFG->managerroleid, $managerid, $usercontext->id, '', 0, time());
-
-    $transaction->allow_commit();
-
-    // Send assignment notifications.
-
-    // Notify staff member.
-    $msg->userto = $user;
-    $msg->subject = get_string('tempmanagerassignmsgstaffsubject', 'totara_core', $msgparams);
-    $msg->fullmessage = get_string('tempmanagerassignmsgstaff', 'totara_core', $msgparams);
-    $msg->fullmessagehtml = get_string('tempmanagerassignmsgstaff', 'totara_core', $msgparams);
-    tm_alert_send($msg);
-
-    // Notify real manager.
-    if (!empty($realmanager)) {
-        $msg->userto = $realmanager;
-        $msg->subject = get_string('tempmanagerassignmsgmgrsubject', 'totara_core', $msgparams);
-        $msg->fullmessage = get_string('tempmanagerassignmsgmgr', 'totara_core', $msgparams);
-        $msg->fullmessagehtml = get_string('tempmanagerassignmsgmgr', 'totara_core', $msgparams);
-        $msg->roleid = $CFG->managerroleid;
-        tm_alert_send($msg);
-    }
-
-    // Notify temp manager.
-    $msg->userto = $newtempmanager;
-    $msg->subject = get_string('tempmanagerassignmsgtmpmgrsubject', 'totara_core', $msgparams);
-    $msg->fullmessage = get_string('tempmanagerassignmsgtmpmgr', 'totara_core', $msgparams);
-    $msg->fullmessagehtml = get_string('tempmanagerassignmsgtmpmgr', 'totara_core', $msgparams);
-    $msg->roleid = $CFG->managerroleid;
-    tm_alert_send($msg);
-}
-
-/**
- * Unassign the temporary manager of the specified user
- *
- * @param int $userid
- * @return boolean true on success
- * @throws Exception
- */
-function totara_unassign_temporary_manager($userid) {
-    global $DB, $CFG;
-
-    if (!$tempmanager = $DB->get_record('temporary_manager', array('userid' => $userid))) {
-        // Nothing to do.
-        return true;
-    }
-    $realmanager = totara_get_manager($userid, null, true);
-
-    $transaction = $DB->start_delegated_transaction();
-
-    // Unassign temp manager from user's context.
-    if (empty($realmanager) || $tempmanager->tempmanagerid != $realmanager->id) {
-        // Unassign old temp manager, if this is not somehow the real manager as well.
-        $usercontext = context_user::instance($userid);
-        role_unassign($CFG->managerroleid, $tempmanager->tempmanagerid, $usercontext->id);
-    }
-
-    // Delete temp manager record.
-    $DB->delete_records('temporary_manager', array('id' => $tempmanager->id));
-
-    $transaction->allow_commit();
-
-    return true;
-}
 
 /**
  * Find out a user's teamleader (manager's manager).
  *
  * @param int $userid Id of the user whose teamleader we want
- * @param int $postype Type of the position we want the teamleader for (POSITION_TYPE_* constant).
- *                     Defaults to primary position(optional)
+ * @param int $jobassignid ID of the job assignment we want the teamleader for. Defaults to user's first job assignment (optional)
  * @return mixed False if no teamleader. Teamleader user object from mdl_user if the user has a teamleader.
  */
-function totara_get_teamleader($userid, $postype=null) {
-    $manager = totara_get_manager($userid, $postype);
-    if ($manager) {
-        // We use the default postype for the manager's manager.
-        return totara_get_manager($manager->id);
-    } else {
+function totara_get_teamleader($userid, $jobassignid = null) {
+    global $DB;
+
+    // Deprecate?
+    // If all calling code is redesigned to allow selection of job assignment then this function shouldn't be needed.
+    if ($jobassignid) {
+        $staffja = \totara_job\job_assignment::get_with_id($jobassignid, false);
+        if (!empty($staffja) && $staffja->userid != $userid) {
+            throw new exception('Userid does not match job assignment userid in totara_get_appraiser');
+        }
+    }
+
+    if (empty($staffja)) {
+        $staffja = \totara_job\job_assignment::get_first($userid, false);
+    }
+
+    if (empty($staffja) || is_null($staffja->managerjaid)) {
         return false;
     }
+
+    $managerja = \totara_job\job_assignment::get_with_id($staffja->managerjaid);
+
+    // Note that all current calls to this function only use the user id, so this is a waste of effort.
+    return $DB->get_record('user', array('id' => $managerja->managerid));
 }
 
 
@@ -1394,26 +1188,31 @@ function totara_get_teamleader($userid, $postype=null) {
  * Find out a user's appraiser.
  *
  * @param int $userid Id of the user whose appraiser we want
- * @param int $postype Type of the position we want the appraiser for (POSITION_TYPE_* constant).
- *                     Defaults to primary position(optional)
+ * @param int $jobassignid ID of the job assignment we want the appraiser for. Defaults to user's first job assignment (optional)
  * @return mixed False if no appraiser. Appraiser user object from mdl_user if the user has a appraiser.
  */
-function totara_get_appraiser($userid, $postype=null) {
-    global $CFG, $DB;
-    require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
-    $postype = ($postype === null) ? POSITION_TYPE_PRIMARY : (int) $postype;
+function totara_get_appraiser($userid, $jobassignid = null) {
+    global $DB;
 
-    $userid = (int) $userid;
-    $sql = "
-        SELECT appraiser.*
-          FROM {pos_assignment} pa
-    INNER JOIN {user} appraiser
-            ON pa.appraiserid = appraiser.id
-         WHERE pa.userid = ?
-           AND pa.type = ?";
+    // Deprecate?
+    // If all calling code is redesigned to allow selection of job assignment then this function shouldn't be needed.
+    if ($jobassignid) {
+        $jobassignment = \totara_job\job_assignment::get_with_id($jobassignid, false);
+        if (!empty($jobassignment) && $jobassignment->userid != $userid) {
+            throw new exception('Userid does not match job assignment userid in totara_get_appraiser');
+        }
+    }
 
-    // Return an appraiser if they have one otherwise false.
-    return $DB->get_record_sql($sql, array($userid, $postype));
+    if (empty($jobassignment)) {
+        $jobassignment = \totara_job\job_assignment::get_first($userid, false);
+    }
+
+    if (empty($jobassignment) || is_null($jobassignment->appraiserid)) {
+        return false;
+    }
+
+    // Note that all current calls to this function only use the user id, so this is a waste of effort.
+    return $DB->get_record('user', array('id' => $jobassignment->appraiserid));
 }
 
 
@@ -1733,85 +1532,11 @@ function mssql_get_collation($casesensitive = true, $accentsensitive = true) {
 /**
  * Assign a user a position assignment and create/delete role assignments as required
  *
- * @param $assignment position_assignment object, include old reportstoid field (if any) and
- *                    new managerid
- * @param $unittest set to true if using for unit tests (optional)
+ * @param $assignment
+ * @param bool $unittest set to true if using for unit tests (optional)
  */
 function assign_user_position($assignment, $unittest=false) {
-    global $CFG, $DB;
-
-    $transaction = $DB->start_delegated_transaction();
-    // Start a try...catch, if anything goes wrong we want to rollback the transaction.
-    try {
-        // Get old position and organisation (used to inform event of what changed or was removed).
-        $assignment->oldmanagerid = null;
-        $assignment->oldmanagerpath = null;
-        $assignment->oldpositionid = null;
-        $assignment->oldorganisationid = null;
-        if ($assignment->type == POSITION_TYPE_PRIMARY) {
-            $oldassignment = $DB->get_record('pos_assignment', array('userid' => $assignment->userid, 'type' => POSITION_TYPE_PRIMARY));
-            if ($oldassignment) {
-                $assignment->oldmanagerid = $oldassignment->managerid;
-                $assignment->oldmanagerpath = $oldassignment->managerpath;
-                $assignment->oldpositionid = $oldassignment->positionid;
-                $assignment->oldorganisationid = $oldassignment->organisationid;
-            }
-        }
-
-        // Get old user id.
-        if (!empty($assignment->reportstoid)) {
-            $old_managerid = $DB->get_field('role_assignments', 'userid', array('id' => $assignment->reportstoid));
-        } else {
-            $old_managerid = null;
-        }
-        $managerchanged = false;
-        if ($old_managerid != $assignment->managerid) {
-            $managerchanged = true;
-        }
-        // TODO SCANMSG: Need to figure out how to re-add start time and end time into manager role assignment
-        //          now that the role_assignment record no longer has start/end fields. See:
-        //          http://docs.moodle.org/dev/New_enrolments_in_2.0
-        //          and mdl_enrol and mdl_user_enrolments.
-
-        // Skip this bit during testing as we don't have all the required tables for role assignments.
-        // Get context.
-        $context = context_user::instance($assignment->userid);
-
-        if (!$unittest) {
-            // Get manager role id.
-            $roleid = $CFG->managerroleid;
-            // Delete role assignment if there was a manager but it changed.
-            if ($old_managerid && $managerchanged) {
-                role_unassign($roleid, $old_managerid, $context->id);
-            }
-            // Create new role assignment if there is now and a manager but it changed.
-            if ($assignment->managerid && $managerchanged) {
-                // Assign manager to user.
-                $raid = role_assign(
-                    $roleid,
-                    $assignment->managerid,
-                    $context->id
-                );
-                // Update reportstoid.
-                $assignment->reportstoid = $raid;
-            }
-        }
-        // Store the date of this assignment.
-        require_once($CFG->dirroot . '/totara/program/lib.php');
-        prog_store_position_assignment($assignment);
-        // Save assignment.
-        $assignment->save($managerchanged);
-        $transaction->allow_commit();
-
-    } catch (Exception $e) {
-
-        // Something has gone wrong, drat, we need to rollback.
-        // The rollback method will throw the exception again for us when its done.
-        $transaction->rollback($e);
-    }
-
-    // Event.
-    \totara_core\event\position_updated::create_from_instance($assignment, $context)->trigger();
+    // Deprecated!
 }
 
 /**

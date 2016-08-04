@@ -27,61 +27,16 @@ Feature: Seminar Approval required
       | student5 | C1     | student        |
       | student6 | C1     | student        |
 
+    And the following job assignments exist:
+      | user     | fullname           | idnumber | manager |
+      | student1 | Job Assignment One | 1        | admin   |
+      | student2 | Job Assignment One | 1        | admin   |
+      | student3 | Job Assignment One | 1        | admin   |
+      | student4 | Job Assignment One | 1        | admin   |
+      | student5 | Job Assignment One | 1        | admin   |
+      | student6 | Job Assignment One | 1        | admin   |
+
     And I log in as "admin"
-
-   # Set manager for Sam1 Student1
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I click on "Sam1 Student1" "link"
-    And I click on "Primary position" "link"
-    And I press "Choose manager"
-    And I click on "Admin User" "link" in the "Choose manager" "totaradialogue"
-    And I click on "OK" "button" in the "Choose manager" "totaradialogue"
-    And I press "Update position"
-
-    # Set manager for Sam2 Student2
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I click on "Sam2 Student2" "link"
-    And I click on "Primary position" "link"
-    And I press "Choose manager"
-    And I click on "Admin User" "link" in the "Choose manager" "totaradialogue"
-    And I click on "OK" "button" in the "Choose manager" "totaradialogue"
-    And I press "Update position"
-
-    # Set manager for Sam3 Student3
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I click on "Sam3 Student3" "link"
-    And I click on "Primary position" "link"
-    And I press "Choose manager"
-    And I click on "Admin User" "link" in the "Choose manager" "totaradialogue"
-    And I click on "OK" "button" in the "Choose manager" "totaradialogue"
-    And I press "Update position"
-
-    # Set manager for Sam4 Student4
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I click on "Sam4 Student4" "link"
-    And I click on "Primary position" "link"
-    And I press "Choose manager"
-    And I click on "Admin User" "link" in the "Choose manager" "totaradialogue"
-    And I click on "OK" "button" in the "Choose manager" "totaradialogue"
-    And I press "Update position"
-
-    # Set manager for Sam5 Student5
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I click on "Sam5 Student5" "link"
-    And I click on "Primary position" "link"
-    And I press "Choose manager"
-    And I click on "Admin User" "link" in the "Choose manager" "totaradialogue"
-    And I click on "OK" "button" in the "Choose manager" "totaradialogue"
-    And I press "Update position"
-
-    # Set manager for Sam6 Student6
-    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
-    And I click on "Sam6 Student6" "link"
-    And I click on "Primary position" "link"
-    And I press "Choose manager"
-    And I click on "Admin User" "link" in the "Choose manager" "totaradialogue"
-    And I click on "OK" "button" in the "Choose manager" "totaradialogue"
-    And I press "Update position"
 
   @javascript
   Scenario: Update user's status code depending from session capacity when seminar approval required is changed to false

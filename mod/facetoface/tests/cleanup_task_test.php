@@ -63,11 +63,10 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         $this->getDataGenerator()->enrol_user($user3->id, $course1->id, $studentrole->id);
         $this->getDataGenerator()->enrol_user($user4->id, $course1->id, $studentrole->id);
 
-        /** @var totara_hierarchy_generator $hierarchygenerator */
-        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
-        $hierarchygenerator->assign_primary_position($user2->id, $user1->id, null, null);
-        $hierarchygenerator->assign_primary_position($user3->id, $user1->id, null, null);
-        $hierarchygenerator->assign_primary_position($user4->id, $user1->id, null, null);
+        $user1ja = \totara_job\job_assignment::create_default($user1->id); // Manager.
+        \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $user1ja->id));
+        \totara_job\job_assignment::create_default($user3->id, array('managerjaid' => $user1ja->id));
+        \totara_job\job_assignment::create_default($user4->id, array('managerjaid' => $user1ja->id));
 
         /** @var mod_facetoface_generator $facetofacegenerator */
         $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');

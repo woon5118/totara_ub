@@ -785,24 +785,25 @@ class dp_objective_component extends dp_base_component {
         global $USER, $CFG, $DB, $OUTPUT;
         require_once($CFG->dirroot.'/totara/message/messagelib.php');
 
-        $event = new stdClass();
-        $userfrom = $DB->get_record('user', array('id' => $USER->id));
-        $event->userfrom = $userfrom;
-        $event->contexturl = new moodle_url("/totara/plan/view.php", array('id' => $this->plan->id));
-        $event->icon = 'objective-remove';
-        $a = new stdClass();
-        $a->objective = $objective->fullname;
-        $a->userfrom = fullname($USER);
-        $a->userfromhtml = $this->current_user_link();
-        $a->plan = $this->plan->name;
-        $a->planhtml = $OUTPUT->action_link($event->contexturl, $this->plan->name, null, array('title' => $this->plan->name));
         $stringmanager = get_string_manager();
         // did they delete it themselves?
         if ($USER->id == $this->plan->userid) {
             // don't bother if the plan is not active
             if ($this->plan->is_active()) {
                 // notify their manager
-                if ($manager = totara_get_manager($this->plan->userid)) {
+                $managers = $this->plan->get_all_managers();
+                foreach($managers as $manager) {
+                    $event = new stdClass();
+                    $userfrom = $DB->get_record('user', array('id' => $USER->id));
+                    $event->userfrom = $userfrom;
+                    $event->contexturl = new moodle_url("/totara/plan/view.php", array('id' => $this->plan->id));
+                    $event->icon = 'objective-remove';
+                    $a = new stdClass();
+                    $a->objective = $objective->fullname;
+                    $a->userfrom = fullname($USER);
+                    $a->userfromhtml = $this->current_user_link();
+                    $a->plan = $this->plan->name;
+                    $a->planhtml = $OUTPUT->action_link($event->contexturl, $this->plan->name, null, array('title' => $this->plan->name));
                     $event->userto = $manager;
                     $event->subject = $stringmanager->get_string('objectivedeleteshortmanager', 'totara_plan', fullname($USER), $manager->lang);
                     $event->fullmessage = $stringmanager->get_string('objectivedeletelongmanager', 'totara_plan', $a, $manager->lang);
@@ -813,6 +814,17 @@ class dp_objective_component extends dp_base_component {
         }
         // notify user that someone else did it
         else {
+            $event = new stdClass();
+            $userfrom = $DB->get_record('user', array('id' => $USER->id));
+            $event->userfrom = $userfrom;
+            $event->contexturl = new moodle_url("/totara/plan/view.php", array('id' => $this->plan->id));
+            $event->icon = 'objective-remove';
+            $a = new stdClass();
+            $a->objective = $objective->fullname;
+            $a->userfrom = fullname($USER);
+            $a->userfromhtml = $this->current_user_link();
+            $a->plan = $this->plan->name;
+            $a->planhtml = $OUTPUT->action_link($event->contexturl, $this->plan->name, null, array('title' => $this->plan->name));
             $userto = $DB->get_record('user', array('id' => $this->plan->userid));
             $event->userto = $userto;
             $event->subject = $stringmanager->get_string('objectivedeleteshortlearner', 'totara_plan', $a->objective, $userto->lang);
@@ -833,27 +845,27 @@ class dp_objective_component extends dp_base_component {
         global $USER, $CFG, $DB, $OUTPUT;
         require_once($CFG->dirroot.'/totara/message/messagelib.php');
 
-        $event = new stdClass();
-        $userfrom = $DB->get_record('user', array('id' => $USER->id));
-        $event->userfrom = $userfrom;
-        $event->contexturl = new moodle_url('/totara/plan/components/objective/view.php', array('id' => $this->plan->id, 'itemid' => $objid));
-        $event->icon = 'objective-add';
-        $a = new stdClass();
-        $a->objective = $fullname;
-        $a->objectivehtml = $OUTPUT->action_link($event->contexturl, $fullname);
-        $url = new moodle_url('/totara/plan/view.php', array('id' => $this->plan->id));
-        $a->plan = $this->plan->name;
-        $a->planhtml = $OUTPUT->action_link($url, $this->plan->name, null, array('title' => $this->plan->name));
-        $a->userfrom = fullname($USER);
-        $a->userfromhtml = $this->current_user_link();
-
         $stringmanager = get_string_manager();
         // did they create it themselves?
         if ($USER->id == $this->plan->userid) {
             // don't bother if the plan is not active
             if ($this->plan->is_active()) {
                 // notify their manager
-                if ($manager = totara_get_manager($this->plan->userid)) {
+                $managers = $this->plan->get_all_managers();
+                foreach($managers as $manager) {
+                    $event = new stdClass();
+                    $userfrom = $DB->get_record('user', array('id' => $USER->id));
+                    $event->userfrom = $userfrom;
+                    $event->contexturl = new moodle_url('/totara/plan/components/objective/view.php', array('id' => $this->plan->id, 'itemid' => $objid));
+                    $event->icon = 'objective-add';
+                    $a = new stdClass();
+                    $a->objective = $fullname;
+                    $a->objectivehtml = $OUTPUT->action_link($event->contexturl, $fullname);
+                    $url = new moodle_url('/totara/plan/view.php', array('id' => $this->plan->id));
+                    $a->plan = $this->plan->name;
+                    $a->planhtml = $OUTPUT->action_link($url, $this->plan->name, null, array('title' => $this->plan->name));
+                    $a->userfrom = fullname($USER);
+                    $a->userfromhtml = $this->current_user_link();
                     $event->userto = $manager;
                     $event->subject = $stringmanager->get_string('objectivenewshortmanager', 'totara_plan', fullname($USER), $manager->lang);
                     $event->fullmessage = $stringmanager->get_string('objectivenewlongmanager', 'totara_plan', $a, $manager->lang);
@@ -864,6 +876,19 @@ class dp_objective_component extends dp_base_component {
         }
         // notify user that someone else did it
         else {
+            $event = new stdClass();
+            $userfrom = $DB->get_record('user', array('id' => $USER->id));
+            $event->userfrom = $userfrom;
+            $event->contexturl = new moodle_url('/totara/plan/components/objective/view.php', array('id' => $this->plan->id, 'itemid' => $objid));
+            $event->icon = 'objective-add';
+            $a = new stdClass();
+            $a->objective = $fullname;
+            $a->objectivehtml = $OUTPUT->action_link($event->contexturl, $fullname);
+            $url = new moodle_url('/totara/plan/view.php', array('id' => $this->plan->id));
+            $a->plan = $this->plan->name;
+            $a->planhtml = $OUTPUT->action_link($url, $this->plan->name, null, array('title' => $this->plan->name));
+            $a->userfrom = fullname($USER);
+            $a->userfromhtml = $this->current_user_link();
             $userto = $DB->get_record('user', array('id' => $this->plan->userid));
             $event->userto = $userto;
             $event->subject = $stringmanager->get_string('objectivenewshortlearner', 'totara_plan', $fullname, $userto->lang);
@@ -885,27 +910,27 @@ class dp_objective_component extends dp_base_component {
         global $USER, $CFG, $DB, $OUTPUT;
         require_once($CFG->dirroot.'/totara/message/messagelib.php');
 
-        $event = new stdClass();
-        $userfrom = $DB->get_record('user', array('id' => $USER->id));
-        $event->userfrom = $userfrom;
-        $event->contexturl = new moodle_url("/totara/plan/components/objective/view.php", array('id' => $this->plan->id, 'itemid' => $objective->id));
-        $event->icon = 'objective-update';
-        $a = new stdClass();
-        $a->objective = format_string($objective->fullname);
-        $a->objectivehtml = $OUTPUT->action_link($event->contexturl, format_string($objective->fullname));
-        $url = new moodle_url('/totara/plan/view.php', array('id' => $this->plan->id));
-        $a->plan = $this->plan->name;
-        $a->planhtml = $OUTPUT->action_link($url, $this->plan->name, null, array('title' => $this->plan->name));
-        $a->userfrom = fullname($USER);
-        $a->userfromhtml = $this->current_user_link();
-
         $stringmanager = get_string_manager();
         // did they edit it themselves?
         if ($USER->id == $this->plan->userid) {
             // don't bother if the plan is not active
             if ($this->plan->is_active()) {
                 // notify their manager
-                if ($manager = totara_get_manager($this->plan->userid)) {
+                $managers = $this->plan->get_all_managers();
+                foreach($managers as $manager) {
+                    $event = new stdClass();
+                    $userfrom = $DB->get_record('user', array('id' => $USER->id));
+                    $event->userfrom = $userfrom;
+                    $event->contexturl = new moodle_url("/totara/plan/components/objective/view.php", array('id' => $this->plan->id, 'itemid' => $objective->id));
+                    $event->icon = 'objective-update';
+                    $a = new stdClass();
+                    $a->objective = format_string($objective->fullname);
+                    $a->objectivehtml = $OUTPUT->action_link($event->contexturl, format_string($objective->fullname));
+                    $url = new moodle_url('/totara/plan/view.php', array('id' => $this->plan->id));
+                    $a->plan = $this->plan->name;
+                    $a->planhtml = $OUTPUT->action_link($url, $this->plan->name, null, array('title' => $this->plan->name));
+                    $a->userfrom = fullname($USER);
+                    $a->userfromhtml = $this->current_user_link();
                     $a->field = $stringmanager->get_string('objective'.$field, 'totara_plan', $manager->lang);
                     $event->userto = $manager;
                     $event->subject = $stringmanager->get_string('objectiveeditshortmanager', 'totara_plan', fullname($USER), $manager->lang);
@@ -915,6 +940,19 @@ class dp_objective_component extends dp_base_component {
                 }
             }
         } else {
+            $event = new stdClass();
+            $userfrom = $DB->get_record('user', array('id' => $USER->id));
+            $event->userfrom = $userfrom;
+            $event->contexturl = new moodle_url("/totara/plan/components/objective/view.php", array('id' => $this->plan->id, 'itemid' => $objective->id));
+            $event->icon = 'objective-update';
+            $a = new stdClass();
+            $a->objective = format_string($objective->fullname);
+            $a->objectivehtml = $OUTPUT->action_link($event->contexturl, format_string($objective->fullname));
+            $url = new moodle_url('/totara/plan/view.php', array('id' => $this->plan->id));
+            $a->plan = $this->plan->name;
+            $a->planhtml = $OUTPUT->action_link($url, $this->plan->name, null, array('title' => $this->plan->name));
+            $a->userfrom = fullname($USER);
+            $a->userfromhtml = $this->current_user_link();
             // notify user that someone else did it
             $userto = $DB->get_record('user', array('id' => $this->plan->userid));
             $a->field = $stringmanager->get_string('objective'.$field, 'totara_plan', null, $userto->lang);
@@ -943,28 +981,28 @@ class dp_objective_component extends dp_base_component {
         $achieved = $DB->get_field('dp_objective_scale_value', 'achieved', array('id' => $objective->scalevalueid));
         $status = ($achieved ? 'complete' : 'incomplete');
 
-        // build event message
-        $event = new stdClass();
-        $userfrom = $DB->get_record('user', array('id' => $USER->id));
-        $event->userfrom = $userfrom;
-        $event->contexturl = new moodle_url("/totara/plan/components/objective/view.php", array('id' => $this->plan->id, 'itemid' => $objective->id));
-        $event->icon = 'objective-'.($status == 'complete' ? 'complete' : 'fail');
-        $a = new stdClass;
-        $a->objective = format_string($objective->fullname);
-        $a->objectivehtml = $OUTPUT->action_link($event->contexturl, format_string($objective->fullname));
-        $url = new moodle_url('/totara/plan/view.php', array('id' => $this->plan->id));
-        $a->plan = $this->plan->name;
-        $a->planhtml = $OUTPUT->action_link($url, $this->plan->name, null, array('title' => $this->plan->name));
-        $a->userfrom = fullname($USER);
-        $a->userfromhtml = $this->current_user_link();
-
         $stringmanager = get_string_manager();
         // did they complete it themselves?
         if ($USER->id == $this->plan->userid) {
             // don't bother if the plan is not active
             if ($this->plan->is_active()) {
                 // notify their manager
-                if ($manager = totara_get_manager($this->plan->userid)) {
+                $managers = $this->plan->get_all_managers();
+                foreach($managers as $manager) {
+                    // build event message
+                    $event = new stdClass();
+                    $userfrom = $DB->get_record('user', array('id' => $USER->id));
+                    $event->userfrom = $userfrom;
+                    $event->contexturl = new moodle_url("/totara/plan/components/objective/view.php", array('id' => $this->plan->id, 'itemid' => $objective->id));
+                    $event->icon = 'objective-'.($status == 'complete' ? 'complete' : 'fail');
+                    $a = new stdClass;
+                    $a->objective = format_string($objective->fullname);
+                    $a->objectivehtml = $OUTPUT->action_link($event->contexturl, format_string($objective->fullname));
+                    $url = new moodle_url('/totara/plan/view.php', array('id' => $this->plan->id));
+                    $a->plan = $this->plan->name;
+                    $a->planhtml = $OUTPUT->action_link($url, $this->plan->name, null, array('title' => $this->plan->name));
+                    $a->userfrom = fullname($USER);
+                    $a->userfromhtml = $this->current_user_link();
                     $event->userto = $manager;
                     $event->subject = $stringmanager->get_string('objective'.$status.'shortmanager', 'totara_plan', fullname($USER), $manager->lang);
                     $event->fullmessage = $stringmanager->get_string('objective'.$status.'longmanager', 'totara_plan', $a, $manager->lang);
@@ -973,6 +1011,20 @@ class dp_objective_component extends dp_base_component {
                 }
             }
         } else {
+            // build event message
+            $event = new stdClass();
+            $userfrom = $DB->get_record('user', array('id' => $USER->id));
+            $event->userfrom = $userfrom;
+            $event->contexturl = new moodle_url("/totara/plan/components/objective/view.php", array('id' => $this->plan->id, 'itemid' => $objective->id));
+            $event->icon = 'objective-'.($status == 'complete' ? 'complete' : 'fail');
+            $a = new stdClass;
+            $a->objective = format_string($objective->fullname);
+            $a->objectivehtml = $OUTPUT->action_link($event->contexturl, format_string($objective->fullname));
+            $url = new moodle_url('/totara/plan/view.php', array('id' => $this->plan->id));
+            $a->plan = $this->plan->name;
+            $a->planhtml = $OUTPUT->action_link($url, $this->plan->name, null, array('title' => $this->plan->name));
+            $a->userfrom = fullname($USER);
+            $a->userfromhtml = $this->current_user_link();
             // notify user that someone else did it
             $userto = $DB->get_record('user', array('id' => $this->plan->userid));
             $event->userto = $userto;

@@ -56,8 +56,8 @@ class rb_facetoface_sessions_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'session',
-                'value' => 'positionnameedit',
-                'heading' => get_string('selectedposition', 'mod_facetoface'),
+                'value' => 'jobassignmentnameedit',
+                'heading' => get_string('selectedjobassignment', 'mod_facetoface'),
             ),
             array(
                 'type' => 'facetoface_signup',

@@ -120,18 +120,10 @@ class organisation extends hierarchy {
             WHERE organisationid $in_sql";
         $DB->execute($sql, $params);
 
-        // nullify all references to these organisations in pos_assignment table
-        $prefix = hierarchy::get_short_prefix('position');
-        $sql = "UPDATE {{$prefix}_assignment}
-            SET organisationid = NULL
-            WHERE organisationid $in_sql";
-        $DB->execute($sql, $params);
-
-        // nullify all references to these organisations in pos_assignment_history table
-        $sql = "UPDATE {{$prefix}_assignment_history}
-            SET organisationid = NULL
-            WHERE organisationid $in_sql";
-        $DB->execute($sql, $params);
+        // Remove all references to these organisations in job_assignment table.
+        foreach ($items as $organisationid) {
+            \totara_job\job_assignment::update_to_empty_by_criteria('organisationid', $organisationid);
+        }
 
         return true;
     }
@@ -361,8 +353,8 @@ class organisation extends hierarchy {
         $ids = array_keys($children);
 
         list($idssql, $idsparams) = sql_sequence('organisationid', $ids);
-        // number of organisation assignment records
-        $data['org_assignment'] = $DB->count_records_select('pos_assignment', $idssql, $idsparams);
+        // Number of job assignment records with matching organisation.
+        $data['job_assignment'] = $DB->count_records_select('job_assignment', $idssql, $idsparams);
 
         // number of assigned competencies
         $data['assigned_comps'] = $DB->count_records_select('org_competencies', $idssql, $idsparams);
@@ -380,12 +372,14 @@ class organisation extends hierarchy {
     public function output_delete_message($stats) {
         $message = parent::output_delete_message($stats);
 
-        if ($stats['org_assignment'] > 0) {
-            $message .= get_string('organisationdeleteincludexposassignments', 'totara_hierarchy', $stats['org_assignment']) . html_writer::empty_tag('br');
+        if ($stats['job_assignment'] > 0) {
+            $message .= get_string('organisationdeleteincludexjobassignments', 'totara_hierarchy', $stats['job_assignment']) .
+                html_writer::empty_tag('br');
         }
 
         if ($stats['assigned_comps'] > 0) {
-            $message .= get_string('organisationdeleteincludexlinkedcompetencies', 'totara_hierarchy', $stats['assigned_comps']). html_writer::empty_tag('br');
+            $message .= get_string('organisationdeleteincludexlinkedcompetencies', 'totara_hierarchy', $stats['assigned_comps']).
+                html_writer::empty_tag('br');
         }
 
         return $message;

@@ -49,11 +49,6 @@ class enrol_totara_facetoface_testcase extends advanced_testcase {
             'usermodified' => 2)
     );
 
-    protected $pos_assignment_data = array(
-        array('id' => 1, 'fullname' => 'Test Assignment 1', 'shortname' => 'Test 1', 'positionid' => 1,
-            'timecreated' => 0, 'timemodified' => 0, 'usermodified' => 2),
-    );
-
     protected function enable_plugin() {
         $enabled = enrol_get_plugins(true);
         $enabled['totara_facetoface'] = true;

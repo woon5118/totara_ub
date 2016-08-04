@@ -23,6 +23,7 @@
  */
 
 require_once($CFG->dirroot . '/totara/core/db/utils.php');
+require_once($CFG->dirroot . '/totara/cohort/db/upgradelib.php');
 
 /**
  * DB upgrades for Totara dynamic cohorts
@@ -784,6 +785,15 @@ function xmldb_totara_cohort_upgrade($oldversion) {
         }
 
         upgrade_plugin_savepoint(true, 2016071800, 'totara', 'cohort');
+    }
+
+    if ($oldversion < 2016072800) {
+
+        // Move old pos_assignment rules to job_assignment rules.
+        totara_cohort_migrate_position_rules();
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2016072800, 'totara', 'cohort');
     }
 
     return true;

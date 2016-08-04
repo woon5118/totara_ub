@@ -27,6 +27,7 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/program/lib.php');
 require_once($CFG->dirroot . '/totara/program/program.class.php');
+require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 
 /**
  * Test update_learner_assignments function.
@@ -35,13 +36,15 @@ require_once($CFG->dirroot . '/totara/program/program.class.php');
  * vendor/bin/phpunit totara_program_update_learner_assignments_testcase totara/program/tests/update_learner_assignments_test.php
  *
  */
-class totara_program_update_learner_assignments_testcase extends advanced_testcase {
+class totara_program_update_learner_assignments_testcase extends reportcache_advanced_testcase {
 
+    /** @var totara_program_generator */
     private $programgenerator = null;
     private $users = array();
     private $audiences = array();
     private $audienceusers = array();
 
+    /** @var program */
     private $program = null;
 
     private $controlprogram = null;
@@ -1699,6 +1702,247 @@ class totara_program_update_learner_assignments_testcase extends advanced_testca
             array('programid' => $this->program->id)));
     }
 
+    /**
+     * Assign a manager hierarchy to a program.
+     *
+     * Check that audience assignment works.
+     */
+    public function test_assigning_manager_hierarchy() {
+        global $DB;
+
+        $timebefore = time();
+
+        $topmanager1 = $this->getDataGenerator()->create_user();
+        $topmanager1ja = \totara_job\job_assignment::create_default($topmanager1->id);
+        $topmanager2 = $this->getDataGenerator()->create_user();
+        $topmanager2ja = \totara_job\job_assignment::create_default($topmanager2->id);
+        $manager1 = $this->getDataGenerator()->create_user();
+        $manager1ja = \totara_job\job_assignment::create_default($manager1->id, array('managerjaid' => $topmanager1ja->id));
+        $manager2 = $this->getDataGenerator()->create_user();
+        $manager2ja = \totara_job\job_assignment::create_default($manager2->id, array('managerjaid' => $topmanager1ja->id));
+        $manager3 = $this->getDataGenerator()->create_user();
+        $manager3ja = \totara_job\job_assignment::create_default($manager3->id);
+        $manager4 = $this->getDataGenerator()->create_user();
+        $manager4ja = \totara_job\job_assignment::create_default($manager4->id,  array('managerjaid' => $topmanager2ja->id));
+        $user1 = $this->users[1];
+        $user1ja = \totara_job\job_assignment::create_default($user1->id, array('managerjaid' => $manager1ja->id));
+        $user2 = $this->users[2];
+        $user2ja = \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $manager1ja->id));
+        $user3 = $this->users[3];
+        $user3ja = \totara_job\job_assignment::create_default($user3->id, array('managerjaid' => $manager2ja->id));
+        $user4 = $this->users[4];
+        $user4ja = \totara_job\job_assignment::create_default($user4->id, array('managerjaid' => $manager3ja->id));
+        $user5 = $this->users[5];
+        $user5ja = \totara_job\job_assignment::create_default($user5->id, array('managerjaid' => $manager4ja->id));
+
+        $assignedusers = array($manager1, $manager2, $manager4, $user1, $user2, $user3);
+        $notassignedusers = array($topmanager1, $topmanager2, $manager3, $user4, $user5);
+
+        // Check we have a clean slate.
+        $this->assertEquals(0, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(0, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(0, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Update_learner_assignments is also run within the assign_to_program generator methods.
+        $generator = $this->getDataGenerator();
+        $generator->assign_to_program($this->program->id, ASSIGNTYPE_MANAGERJA, $topmanager1ja->id,
+            array('includechildren' => 1));
+        $generator->assign_to_program($this->program->id, ASSIGNTYPE_MANAGERJA, $topmanager2ja->id);
+
+        $timeafter = time();
+
+        // Check that records exist.
+        $this->assertEquals(2, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(6, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(6, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Check prog_assignment records.
+        $progassignment = $DB->get_record('prog_assignment',
+            array('programid' => $this->program->id, 'assignmenttype' => ASSIGNTYPE_MANAGERJA, 'assignmenttypeid' => $topmanager1ja->id));
+        $this->assertNotEmpty($progassignment);
+        $this->assertEquals(1, $progassignment->includechildren);
+        $this->assertEquals(-1, $progassignment->completiontime);
+        $this->assertEquals(0, $progassignment->completionevent);
+        $this->assertEquals(0, $progassignment->completioninstance);
+
+        $progassignment = $DB->get_record('prog_assignment',
+            array('programid' => $this->program->id, 'assignmenttype' => ASSIGNTYPE_MANAGERJA, 'assignmenttypeid' => $topmanager2ja->id));
+        $this->assertNotEmpty($progassignment);
+        $this->assertEquals(0, $progassignment->includechildren);
+        $this->assertEquals(-1, $progassignment->completiontime);
+        $this->assertEquals(0, $progassignment->completionevent);
+        $this->assertEquals(0, $progassignment->completioninstance);
+
+        // Check records of assigned users.
+        foreach ($assignedusers as $user) {
+            // Check prog_user_assignment records.
+            $proguserassignment = $DB->get_record('prog_user_assignment',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($proguserassignment);
+
+            $this->assertGreaterThanOrEqual($timebefore, $proguserassignment->timeassigned);
+            $this->assertLessThanOrEqual($timeafter, $proguserassignment->timeassigned);
+            $this->assertEquals(0, $proguserassignment->exceptionstatus);
+
+            // Check prog_completion records.
+            $progcompletion = $DB->get_record('prog_completion',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($progcompletion);
+
+            $this->assertEquals(0, $progcompletion->coursesetid);
+            $this->assertEquals(0, $progcompletion->status);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertEquals(-1, $progcompletion->timedue);
+            $this->assertEquals(0, $progcompletion->timecompleted);
+        }
+
+        // Check records of users that aren't assigned.
+        foreach ($notassignedusers as $user) {
+            $proguserassignment = $DB->get_record('prog_user_assignment',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            // It should have come back false as no record exists.
+            $this->assertFalse($proguserassignment);
+        }
+    }
+
+    /**
+     * Assigns users to program via manager hierarchy, then changes staff within that
+     * hierarchy and ensures the correct records exist.
+     *
+     * @throws \Horde\Socket\Client\Exception
+     * @throws coding_exception
+     */
+    public function test_change_in_manager_hierarchy() {
+        global $DB;
+
+        $timebefore = time();
+
+        $topmanager1 = $this->getDataGenerator()->create_user();
+        $topmanager1ja = \totara_job\job_assignment::create_default($topmanager1->id);
+        $topmanager2 = $this->getDataGenerator()->create_user();
+        $topmanager2ja = \totara_job\job_assignment::create_default($topmanager2->id);
+        $manager1 = $this->getDataGenerator()->create_user();
+        $manager1ja = \totara_job\job_assignment::create_default($manager1->id, array('managerjaid' => $topmanager1ja->id));
+        $manager2 = $this->getDataGenerator()->create_user();
+        $manager2ja = \totara_job\job_assignment::create_default($manager2->id, array('managerjaid' => $topmanager1ja->id));
+        $manager3 = $this->getDataGenerator()->create_user();
+        $manager3ja = \totara_job\job_assignment::create_default($manager3->id);
+        $manager4 = $this->getDataGenerator()->create_user();
+        $manager4ja = \totara_job\job_assignment::create_default($manager4->id,  array('managerjaid' => $topmanager2ja->id));
+        $user1 = $this->users[1];
+        $user1ja = \totara_job\job_assignment::create_default($user1->id, array('managerjaid' => $manager1ja->id));
+        $user2 = $this->users[2];
+        $user2ja = \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $manager1ja->id));
+        $user3 = $this->users[3];
+        $user3ja = \totara_job\job_assignment::create_default($user3->id, array('managerjaid' => $manager2ja->id));
+        $user4 = $this->users[4];
+        $user4ja = \totara_job\job_assignment::create_default($user4->id, array('managerjaid' => $manager3ja->id));
+        $user5 = $this->users[5];
+        $user5ja = \totara_job\job_assignment::create_default($user5->id, array('managerjaid' => $manager4ja->id));
+
+        // Check we have a clean slate.
+        $this->assertEquals(0, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(0, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(0, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Update_learner_assignments is also run within the assign_to_program generator methods.
+        $generator = $this->getDataGenerator();
+        $generator->assign_to_program($this->program->id, ASSIGNTYPE_MANAGERJA, $topmanager1ja->id,
+            array('includechildren' => 1));
+        $generator->assign_to_program($this->program->id, ASSIGNTYPE_MANAGERJA, $topmanager2ja->id);
+
+        $timeafter = time();
+
+        // Check that records exist.
+        $this->assertEquals(2, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(6, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(6, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // This should now be in the same state as what we have in test_assigning_manager_hierarchy.
+        // So no need to check each record and user.
+
+        // Now change the management hierarchy by adding/removing managers in a couple of job assignments.
+        $manager1ja->update(array('managerjaid' => 0));
+        $manager3ja->update(array('managerjaid' => $topmanager1ja->id));
+
+        // Update learner assignments and then we'll check each record is correct.
+        $this->program->update_learner_assignments(true);
+
+        // $manager3 and $user4 should now been assigned.
+        $assignedusers = array($manager2, $manager4, $user3, $manager3, $user4);
+        // $manager1, $user1 and $user2 should no longer be assigned.
+        $notassignedusers = array($topmanager1, $topmanager2, $user5, $manager1, $user1, $user2);
+
+        $this->assertEquals(2, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(5, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(5, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Check prog_assignment records.
+        $progassignment = $DB->get_record('prog_assignment',
+            array('programid' => $this->program->id, 'assignmenttype' => ASSIGNTYPE_MANAGERJA, 'assignmenttypeid' => $topmanager1ja->id));
+        $this->assertNotEmpty($progassignment);
+        $this->assertEquals(1, $progassignment->includechildren);
+        $this->assertEquals(-1, $progassignment->completiontime);
+        $this->assertEquals(0, $progassignment->completionevent);
+        $this->assertEquals(0, $progassignment->completioninstance);
+
+        $progassignment = $DB->get_record('prog_assignment',
+            array('programid' => $this->program->id, 'assignmenttype' => ASSIGNTYPE_MANAGERJA, 'assignmenttypeid' => $topmanager2ja->id));
+        $this->assertNotEmpty($progassignment);
+        $this->assertEquals(0, $progassignment->includechildren);
+        $this->assertEquals(-1, $progassignment->completiontime);
+        $this->assertEquals(0, $progassignment->completionevent);
+        $this->assertEquals(0, $progassignment->completioninstance);
+
+        // Check records of assigned users.
+        foreach ($assignedusers as $user) {
+            // Check prog_user_assignment records.
+            $proguserassignment = $DB->get_record('prog_user_assignment',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($proguserassignment);
+
+            $this->assertGreaterThanOrEqual($timebefore, $proguserassignment->timeassigned);
+            $this->assertLessThanOrEqual($timeafter, $proguserassignment->timeassigned);
+            $this->assertEquals(0, $proguserassignment->exceptionstatus);
+
+            // Check prog_completion records.
+            $progcompletion = $DB->get_record('prog_completion',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($progcompletion);
+
+            $this->assertEquals(0, $progcompletion->coursesetid);
+            $this->assertEquals(0, $progcompletion->status);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertEquals(-1, $progcompletion->timedue);
+            $this->assertEquals(0, $progcompletion->timecompleted);
+        }
+
+        // Check records of users that aren't assigned.
+        foreach ($notassignedusers as $user) {
+            $proguserassignment = $DB->get_record('prog_user_assignment',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            // It should have come back false as no record exists.
+            $this->assertFalse($proguserassignment);
+        }
+    }
+
     /*
      * Other things that could be tested, although some may be better tested seperately (or may be already) as they
      * may be things user by update_learner_assignments rather than things that it does itself.
@@ -1707,6 +1951,6 @@ class totara_program_update_learner_assignments_testcase extends advanced_testca
      *      - make_timedue()
      *      - Program unassignment messages
      *      - Exceptions
-     *      - Pos/org/manager assignments
+     *      - Pos/org assignments
      */
 }

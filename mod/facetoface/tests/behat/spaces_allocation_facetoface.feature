@@ -35,7 +35,7 @@ Feature: Allocate spaces for team in seminar
     And the following "position" hierarchy exists:
       | framework | idnumber | fullname   |
       | FW001     | POS001   | Position1  |
-    And the following position assignments exist:
+    And the following job assignments exist:
       | user     | position | manager      |
       | student1 | POS001   | sitemanager1 |
       | student2 | POS001   | sitemanager1 |

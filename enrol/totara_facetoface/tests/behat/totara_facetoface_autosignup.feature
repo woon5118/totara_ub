@@ -86,9 +86,9 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And the following "position" hierarchy exists:
       | framework | idnumber | fullname   |
       | FW001     | POS001   | Position1  |
-    And the following position assignments exist:
-      | user     | position | type      | manager  |
-      | student1 | POS001   | primary   | teacher1 |
+    And the following job assignments exist:
+      | user     | position | manager  |
+      | student1 | POS001   | teacher1 |
 
     And I log in as "teacher1"
     And I follow "Course 1"

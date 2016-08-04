@@ -861,41 +861,42 @@ class facetoface_notification extends data_object {
         }
 
         $params = array('userid'=>$user->id, 'sessionid'=>$sessionid);
-        $positiontype = $DB->get_field('facetoface_signups', 'positiontype', $params);
-        $manager = facetoface_get_session_manager($user->id, $sessionid, $positiontype);
+        $jobassignmentid = $DB->get_field('facetoface_signups', 'jobassignmentid', $params);
+        $managers = facetoface_get_session_managers($user->id, $sessionid, $jobassignmentid);
 
-        if ($this->ccmanager && !empty($manager)) {
+        if ($this->ccmanager && !empty($managers)) {
+            foreach ($managers as $manager) {
+                $event = clone $this->_event;
 
-            $event = clone $this->_event;
+                $event->userto = $manager;
+                $event->roleid = $CFG->managerroleid;
+                $event->fullmessage       = $event->manager->fullmessage . $event->fullmessage;
+                $event->fullmessagehtml   = $event->manager->fullmessagehtml . $event->fullmessagehtml;
+                $event->smallmessage      = $event->manager->smallmessage . $event->smallmessage;
+                // Do not send iCal attachment.
+                $event->attachment = $event->attachname = null;
 
-            $event->userto = $manager;
-            $event->roleid = $CFG->managerroleid;
-            $event->fullmessage       = $event->manager->fullmessage . $event->fullmessage;
-            $event->fullmessagehtml   = $event->manager->fullmessagehtml . $event->fullmessagehtml;
-            $event->smallmessage      = $event->manager->smallmessage . $event->smallmessage;
-            // Do not send iCal attachment.
-            $event->attachment = $event->attachname = null;
+                if ($this->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER ||
+                    $this->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN) {
+                    // Do the facetoface workflow event.
+                    $strmgr = get_string_manager();
+                    $onaccept = new stdClass();
+                    $onaccept->action = 'facetoface';
+                    $onaccept->text = $strmgr->get_string('approveinstruction', 'facetoface', null, $manager->lang);
+                    $onaccept->data = array('userid' => $user->id, 'session' => $this->_sessions[$sessionid], 'facetoface' => $this->_facetoface);
+                    $event->onaccept = $onaccept;
+                    $onreject = new stdClass();
+                    $onreject->action = 'facetoface';
+                    $onreject->text = $strmgr->get_string('rejectinstruction', 'facetoface', null, $manager->lang);
+                    $onreject->data = array('userid' => $user->id, 'session' => $this->_sessions[$sessionid], 'facetoface' => $this->_facetoface);
+                    $event->onreject = $onreject;
 
-            if ($this->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER ||
-                $this->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN) {
-                // Do the facetoface workflow event.
-                $strmgr = get_string_manager();
-                $onaccept = new stdClass();
-                $onaccept->action = 'facetoface';
-                $onaccept->text = $strmgr->get_string('approveinstruction', 'facetoface', null, $manager->lang);
-                $onaccept->data = array('userid' => $user->id, 'session' => $this->_sessions[$sessionid], 'facetoface' => $this->_facetoface);
-                $event->onaccept = $onaccept;
-                $onreject = new stdClass();
-                $onreject->action = 'facetoface';
-                $onreject->text = $strmgr->get_string('rejectinstruction', 'facetoface', null, $manager->lang);
-                $onreject->data = array('userid' => $user->id, 'session' => $this->_sessions[$sessionid], 'facetoface' => $this->_facetoface);
-                $event->onreject = $onreject;
-
-                $event->name = 'task';
-                message_send($event);
-            } else {
-                $event->name = 'alert';
-                message_send($event);
+                    $event->name = 'task';
+                    message_send($event);
+                } else {
+                    $event->name = 'alert';
+                    message_send($event);
+                }
             }
         }
     }
@@ -1487,23 +1488,27 @@ function facetoface_send_trainer_session_unassignment_notice($facetoface, $sessi
  * @return  string  Error string, empty on success
  */
 function facetoface_send_request_notice($facetoface, $session, $userid) {
-    global $DB, $USER;
+    global $DB;
 
     $params = array('userid' => $userid, 'sessionid' => $session->id);
-    $positiontype = $DB->get_field('facetoface_signups', 'positiontype', $params);
-    $manager = facetoface_get_session_manager($userid, $session->id, $positiontype);
+    $jobassignmentid = $DB->get_field('facetoface_signups', 'jobassignmentid', $params);
+    $managers = facetoface_get_session_managers($userid, $session->id, $jobassignmentid);
+    $sent = false;
 
-    if (empty($manager->email)) {
-        return 'error:nomanagersemailset';
+    foreach ($managers as $manager) {
+        if (empty($manager->email)) {
+            continue;
+        }
+        $sent = true;
+
+        $params = array(
+            'facetofaceid'  => $facetoface->id,
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER
+        );
+        return facetoface_send_notice($facetoface, $session, $userid, $params);
     }
-
-    $params = array(
-        'facetofaceid'  => $facetoface->id,
-        'type'          => MDL_F2F_NOTIFICATION_AUTO,
-        'conditiontype' => MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER
-    );
-
-    return facetoface_send_notice($facetoface, $session, $userid, $params);
+    return 'error:nomanagersemailset';
 }
 
 /**

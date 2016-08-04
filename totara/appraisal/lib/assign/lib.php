@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
+ * @author Murali Nair <murali.nair@totaralearning.com>
  * @package totara
  * @subpackage appraisal
  */
@@ -25,9 +26,12 @@
 global $CFG;
 require_once($CFG->dirroot.'/totara/core/lib/assign/lib.php');
 require_once($CFG->dirroot.'/totara/appraisal/lib.php');
+require_once($CFG->dirroot.'/totara/job/classes/job_assignment.php');
+
+use totara_job\job_assignment;
+
 
 class totara_assign_appraisal extends totara_assign_core {
-
     protected static $module = 'appraisal';
 
     public function store_user_assignments($newusers = null, $processor = null) {
@@ -41,76 +45,380 @@ class totara_assign_appraisal extends totara_assign_core {
         };
 
         parent::store_user_assignments($newusers, $processor);
-
-        $this->store_role_assignments();
     }
 
     /**
-     * Create appraisal role assignment records
-     *
-     * @access private
-     * @return void
+     * Create appraisal role assignment records for all appraisees associated
+     * with the current appraisal.
      */
-    private function store_role_assignments() {
+    public function store_role_assignments() {
+        $appraiseeids = $this->get_current_appraisee_ids();
+
         global $DB;
+        $transaction = $DB->start_delegated_transaction();
 
-        // Get all roles required for this appraisal.
-        $appraisal = new appraisal($this->moduleinstanceid);
-        $roles = $appraisal->get_roles_involved();
+        try {
+            $allassignments = array_reduce(
+                $appraiseeids,
 
-        foreach ($roles as $key => $role) {
-            switch ($role) {
-                case appraisal::ROLE_LEARNER:
-                    $select = "SELECT ua.id, ua.userid, {$role}
-                                 FROM {appraisal_user_assignment} ua
-                               WHERE ua.appraisalid = {$this->moduleinstanceid}
-                                 AND NOT EXISTS (
-                                     SELECT id FROM {appraisal_role_assignment} ara WHERE ara.appraisaluserassignmentid = ua.id AND userid = ua.userid)";
-                    $params = array();
-                    break;
-                case appraisal::ROLE_MANAGER:
-                    $select = "SELECT ua.id, CASE WHEN pa.managerid IS NULL THEN 0 ELSE pa.managerid END, ?
-                                 FROM (SELECT * FROM {appraisal_user_assignment}
-                                        WHERE appraisalid = ?) ua
-                                 LEFT JOIN (SELECT * FROM {pos_assignment} WHERE type = ?) pa
-                                   ON ua.userid = pa.userid
-                                 WHERE NOT EXISTS (
-                                       SELECT id FROM {appraisal_role_assignment} ara WHERE ara.appraisaluserassignmentid = ua.id AND ara.appraisalrole = ?)";
-                    $params = array($role, $this->moduleinstanceid, POSITION_TYPE_PRIMARY, $role);
-                    break;
-                case appraisal::ROLE_TEAM_LEAD:
-                    $select = "SELECT ua.id, CASE WHEN pa2.managerid IS NULL THEN 0 ELSE pa2.managerid END, ?
-                                 FROM (SELECT * FROM {appraisal_user_assignment}
-                                        WHERE appraisalid = ?) ua
-                                 LEFT JOIN (SELECT * FROM {pos_assignment} WHERE type = ?) pa
-                                   ON ua.userid = pa.userid
-                                 LEFT JOIN (SELECT * FROM {pos_assignment} WHERE type = ?) pa2
-                                   ON pa.managerid = pa2.userid
-                                 WHERE NOT EXISTS (
-                                       SELECT id FROM {appraisal_role_assignment} ara WHERE ara.appraisaluserassignmentid = ua.id AND ara.appraisalrole = ?)";
-                    $params = array($role, $this->moduleinstanceid, POSITION_TYPE_PRIMARY, POSITION_TYPE_PRIMARY, $role);
-                    break;
-                case appraisal::ROLE_APPRAISER:
-                    $select = "SELECT ua.id, CASE WHEN pa.appraiserid IS NULL THEN 0 ELSE pa.appraiserid END, ?
-                                 FROM (SELECT * FROM {appraisal_user_assignment}
-                                        WHERE appraisalid = ?) ua
-                                 LEFT JOIN (SELECT * FROM {pos_assignment} WHERE type = ?) pa
-                                   ON ua.userid = pa.userid
-                                 WHERE NOT EXISTS (
-                                        SELECT id FROM {appraisal_role_assignment} ara WHERE ara.appraisaluserassignmentid = ua.id AND ara.appraisalrole = ?)";
-                    $params = array($role, $this->moduleinstanceid, POSITION_TYPE_PRIMARY, $role);
-                    break;
-                default:
-                    // Error.
-                    continue 2;
-                    break;
+                function (array $accumulated, $id) {
+                    return array_merge(
+                        $accumulated, $this->role_assignments_for_appraisee($id)
+                    );
+                },
+
+                []
+            );
+
+            $this->update_role_assignments($allassignments);
+            $transaction->allow_commit();
+        }
+        catch (Exception $e) {
+            $transaction->rollback($e);
+        }
+    }
+
+    /**
+     * Returns the user ids for the current appraisees.
+     *
+     * @return array list of integer appraisee user ids.
+     */
+    public function get_current_appraisee_ids() {
+        $appraiseeids = [];
+        $appraisees = $this->get_current_users();
+        foreach ($appraisees as $appraisee) {
+            $appraiseeids[] = $appraisee->id;
+        }
+        $appraisees->close();
+
+        return $appraiseeids;
+    }
+
+    /**
+     * Create appraisal role assignment records for the appraisal for the given
+     * appraisee.
+     *
+     * @param int $user appraisee id.
+     */
+    public function store_role_assignment_for_appraisee($user) {
+        global $DB;
+        $transaction = $DB->start_delegated_transaction();
+
+        try {
+            $assignments = $this->role_assignments_for_appraisee($user);
+            $this->update_role_assignments($assignments);
+
+            $transaction->allow_commit();
+        }
+        catch (Exception $e) {
+            $transaction->rollback($e);
+        }
+    }
+
+    /**
+     * Determines the appraisal role assignments for the given appraisee. This
+     * updates user assignments in the database with job assignment timestamps
+     * but leaves transaction management to the caller.
+     *
+     * @param int $appraiseeid appraisee id.
+     *
+     * @return array a list comprising a single \appraisal_assignments role
+     *         object assignment or an empty list if there is nothing to update.
+     */
+    private function role_assignments_for_appraisee($appraiseeid) {
+        $appraisal = $this->moduleinstance;
+        $assignment = appraisal_user_assignment::get_user(
+            $appraisal->id, $appraiseeid
+        );
+        $roleassignments = (
+            new \appraisal_assignments($assignment->id)
+        )->with_user(
+            appraisal::ROLE_LEARNER, $appraiseeid
+        );
+
+        $jobassignmentid = $assignment->jobassignmentid;
+        if (empty($jobassignmentid)) {
+            // Even if no job assignments have been linked to the appraisal, the
+            // fact that there is an appraisee means there must be at least one
+            // entry for the role assignments. Otherwise the appraisee will not
+            // be able to see the appraisal let alone select a job assignment!
+            return [$roleassignments];
+        }
+
+        $job = job_assignment::get_with_id($jobassignmentid, false);
+        if (empty($job)) {
+            // This situation is possible if the job assignment was deleted in
+            // interim and things were not cleaned up.
+            $assignment->remove_job_assignment();
+            return [$roleassignments];
+        }
+        else {
+            $joblastmodified = $job->timemodified;
+            $assignmentjobtimestamp = $assignment->jobassignmentlastmodified;
+            if (!empty($assignmentjobtimestamp)
+                && $assignmentjobtimestamp === $joblastmodified
+            ) {
+                // Implies the parent job assignment has not changed => manager,
+                // etc have not changed => no roles need to reassigned.
+                return [];
             }
 
-            $sql = "INSERT INTO {appraisal_role_assignment}
-                        (appraisaluserassignmentid, userid, appraisalrole)
-                        ({$select})";
-            $DB->execute($sql, $params);
+            if (empty($assignmentjobtimestamp)
+                || $assignmentjobtimestamp !== $joblastmodified
+            ) {
+                $assignment->with_job_assignment_record_time($joblastmodified);
+            }
         }
+
+        $finalassignments = array_reduce(
+            $appraisal->get_roles_involved(),
+
+            function (\appraisal_assignments $assignments, $role) use ($job) {
+                return $assignments->with_role_from_job($role, $job);
+            },
+
+            $roleassignments
+        );
+
+        return [$finalassignments];
+    }
+
+    /**
+     * Updates the appraisal role assignment records. Note this leaves database
+     * transaction management to the caller.
+     *
+     * @param array $allassignments list of \appraisal_assignments.
+     */
+    private function update_role_assignments(array $allassignments) {
+        global $DB;
+
+        if (empty($allassignments)) {
+            return;
+        }
+
+        $auditlogs = array_reduce(
+            $allassignments,
+
+            function (array $accumulated, \appraisal_assignments $assigned) {
+                return array_merge($accumulated, $this->audit_logs($assigned));
+            },
+
+            []
+        );
+
+        $todelete = appraisal_assignments::assignment_ids($allassignments);
+        $toinsert = appraisal_assignments::storage_dtos($allassignments);
+
+        $table = 'appraisal_role_assignment';
+        $field = 'appraisaluserassignmentid';
+        $DB->delete_records_list($table, $field, $todelete);
+        $DB->insert_records_via_batch($table, $toinsert);
+        $DB->insert_records_via_batch('appraisal_role_changes', $auditlogs);
+    }
+
+    /**
+     * Returns the audit trails to be created for a given set of appraisal role
+     * assignments.
+     *
+     * @param \appraisal_assignments $assignments the new appraisal assignments.
+     *
+     * @return array a list of \stdClass objects whose fields mirror the column
+     *         names in the appraisal_role_changes table.
+     */
+    private function audit_logs(
+        \appraisal_assignments $assignments
+    ) {
+        global $DB;
+
+        $sql = '
+            SELECT
+                   id                        AS id,
+                   appraisaluserassignmentid AS assignid,
+                   userid                    AS originaluser,
+                   appraisalrole             AS role
+              FROM {appraisal_role_assignment}
+             WHERE appraisaluserassignmentid = :appraiseeassignmentid
+               AND (
+                       (appraisalrole = :learnerrole   AND userid != :learner)
+                    OR (appraisalrole = :managerrole   AND userid != :manager)
+                    OR (appraisalrole = :leadrole      AND userid != :lead)
+                    OR (appraisalrole = :appraiserrole AND userid != :appraiser)
+               )
+        ';
+
+        $placeholders = [
+            appraisal::ROLE_LEARNER => 'learner',
+            appraisal::ROLE_MANAGER => 'manager',
+            appraisal::ROLE_TEAM_LEAD => 'lead',
+            appraisal::ROLE_APPRAISER => 'appraiser'
+        ];
+
+        $users = $assignments->users();
+        $params = ['appraiseeassignmentid' => $assignments->id()];
+        foreach ($assignments->users() as $role => $user) {
+            $placeholder = $placeholders[$role];
+            $params[$placeholder] = empty($user) ? 0 : $user;
+            $params[$placeholder . 'role'] = $role;
+        }
+
+        return array_map(
+            function (\stdClass $existing) use ($users) {
+                $role = $existing->role;
+
+                $audit = new \stdClass();
+                $audit->userassignmentid = $existing->assignid;
+                $audit->originaluserid = $existing->originaluser;
+                $audit->newuserid = $users[$role];
+                $audit->role = $role;
+                $audit->timecreated = time();
+
+                return $audit;
+            },
+
+            $DB->get_records_sql($sql, $params)
+        );
+    }
+
+    /**
+     * Determines which role assignments *will be* missing for an appraisal. It
+     * is just a comparison of current job assignment roles against *expected*
+     * appraisal roles. It does not compare against the *actual* assigned roles;
+     * that may NOT have been updated yet because it requires a cron run.
+     *
+     * @return \stdClass comprising the following fields:
+     *         - int $appraiseecount: no of appraisees for this appraisal.
+     *         - array $roles: mapping of appraisee ids to missing roles or an
+     *           empty mapping if nothing is missing.
+     */
+    public function missing_role_assignments() {
+        $appraiseeids = $this->get_current_appraisee_ids();
+
+        $allmissing = new \stdClass();
+        $allmissing->appraiseecount = count($appraiseeids);
+        $allmissing->roles = [];
+
+        if (empty($appraiseeids)) {
+            return $allmissing;
+        }
+
+        return array_reduce(
+            $appraiseeids,
+
+            function (\stdClass $missing, $appraisee) {
+                $roles = $this->missing_role_assignments_for_appraisee(
+                    $appraisee
+                );
+
+                if (!empty($roles)) {
+                    $missing->roles[$appraisee] = $roles;
+                }
+
+                return $missing;
+            },
+
+            $allmissing
+        );
+    }
+
+    /**
+     * Determines which role assignments are missing for the given appraisee for
+     * the current appraisal. Note this is just a check of the associated job
+     * roles against the expected appraisal roles.
+     *
+     * @param int $appraiseeid appraisee id.
+     *
+     * @return array list of the missing roles (an appraisal::ROLE_XYZ constant)
+     *         or an empty array if nothing is missing.
+     */
+    private function missing_role_assignments_for_appraisee($appraiseeid) {
+        $appraisal = $this->moduleinstance;
+        $requiredroles = $appraisal->get_roles_involved();
+
+        $assignment = appraisal_user_assignment::get_user(
+            $appraisal->id, $appraiseeid
+        );
+
+        $jobassignmentid = $assignment->jobassignmentid;
+        $job = empty($jobassignmentid)
+               ? null
+               : job_assignment::get_with_id($jobassignmentid, false);
+        if (empty($job)) {
+            // Even if no job assignments have been linked to the appraisal, the
+            // fact that there is an appraisee means there is already a learner
+            // role assignment. So the learner role does not need to be listed.
+            return array_filter(
+                $requiredroles,
+
+                function ($role) {
+                    return $role != appraisal::ROLE_LEARNER;
+                }
+            );
+        }
+
+        return appraisal_assignments::missing_appraisal_roles_from_job(
+            $requiredroles, $job
+        );
+    }
+
+    /**
+     * Determines which *actual* role assignments have changed for the current
+     * appraisal. Note if the cron job does not run, there could be *no* role
+     * changes.
+     *
+     * @return array mapping of appraisee ids to changes or an empty mapping if
+     *         nothing is missing. Each change is a \stdClass with these fields:
+     *         - role: changed role.
+     *         - original: user originally assigned to the role.
+     *         - current: user currently assigned to the role.
+     */
+    public function changed_role_assignments() {
+        $changed = [];
+
+        foreach ($this->get_current_appraisee_ids() as $appraisee) {
+            $roles = $this->changed_role_assignments_for_appraisee($appraisee);
+            if (!empty($roles)) {
+                $changed[$appraisee] = $roles;
+            }
+        }
+
+        return $changed;
+    }
+
+    /**
+     * Determines which role assignments have changed for a given appraisee for
+     * the current appraisal.
+     *
+     * @param int $appraiseeid appraisee id.
+     *
+     * @return array a list of \stdClass objects with these fields:
+     *         - role: changed role.
+     *         - original: user originally assigned to the role.
+     *         - current: user currently assigned to the role.
+     */
+    private function changed_role_assignments_for_appraisee($appraiseeid) {
+        global $DB;
+
+        $sql = '
+            SELECT
+                   t.originaluserid AS original,
+                   t.newuserid      AS current,
+                   t.role           AS role
+              FROM {appraisal_role_changes} t
+             WHERE userassignmentid = :appraiseeassignmentid
+               AND t.timecreated = (
+                   SELECT MAX(ti.timecreated)
+                     FROM {appraisal_role_changes} ti
+                    WHERE ti.role = t.role
+               )
+        ';
+
+        $appraisal = $this->moduleinstance;
+        $assignment = appraisal_user_assignment::get_user(
+            $appraisal->id, $appraiseeid
+        );
+        $params = ['appraiseeassignmentid' => $assignment->id];
+
+        return $DB->get_records_sql($sql, $params);
     }
 
     /**
@@ -192,4 +500,181 @@ class totara_assign_appraisal extends totara_assign_core {
         return array($sql, $params);
     }
 
+}
+
+/**
+ * Holds role assignments for an appraisal with a given appraisee. This is meant
+ * for totara_assign_appraisal's internal use only.
+ */
+class appraisal_assignments {
+    /**
+     *  @var array mapping of \job_assignment fields to roles.
+     */
+    private static $job_assignment_roles = [
+        appraisal::ROLE_LEARNER => 'userid',
+        appraisal::ROLE_MANAGER => 'managerid',
+        appraisal::ROLE_TEAM_LEAD => 'tempmanagerid',
+        appraisal::ROLE_APPRAISER => 'appraiserid'
+    ];
+
+    /**
+     * @var int appraisal appraisee assignment id.
+     */
+    private $appraiseeassignmentid = null;
+
+    /**
+     * @var array current user/role assignments.
+     */
+    private $assignments = [
+        appraisal::ROLE_LEARNER => null,
+        appraisal::ROLE_MANAGER => null,
+        appraisal::ROLE_TEAM_LEAD => null,
+        appraisal::ROLE_APPRAISER => null
+    ];
+
+    /**
+     * Extracts appraisee assignment ids from \appraisal_assignments instances.
+     *
+     * @param array $allassignments instances to process.
+     *
+     * @return array list of assignment ids.
+     */
+    public static function assignment_ids(array $allassignments) {
+        return array_map(
+            function (\appraisal_assignments $assignments) {
+                return $assignments->appraiseeassignmentid;
+            },
+
+            $allassignments
+        );
+    }
+
+    /**
+     * Extracts a set of DTOs to use to store role assignments in the database.
+     *
+     * @param array $allassignments instances to process.
+     *
+     * @return array list of \stdClass objects to use for storage.
+     */
+    public static function storage_dtos(array $allassignments) {
+        return array_reduce(
+            $allassignments,
+
+            function (array $accumulated, \appraisal_assignments $assignments) {
+                return array_merge($accumulated, $assignments->for_storage());
+            },
+
+            []
+        );
+    }
+
+    /**
+     * Indicates appraisal roles that are missing from the given job assignment.
+     *
+     * @param array $required required appraisal roles.
+     * @param \job_assignment $job reference job assignment.
+     *
+     * @return array list of the missing roles (an appraisal::ROLE_XYZ constant)
+     *         or an empty array if nothing is missing.
+     */
+    public static function missing_appraisal_roles_from_job(
+        array $required, job_assignment $job
+    ) {
+        return array_reduce(
+            $required,
+
+            function (array $accumulated, $role) use ($job) {
+                $field = self::$job_assignment_roles[$role];
+                return !empty($job->$field)
+                       ? $accumulated
+                       : array_merge($accumulated, [$role]);
+            },
+
+            []
+        );
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param int $appraiseeassignmentid appraisee assignment id.
+     */
+    public function __construct($appraiseeassignmentid) {
+        $this->appraiseeassignmentid = $appraiseeassignmentid;
+    }
+
+    /**
+     * Returns the appraisee assignment id.
+     *
+     * @return int appraisee assignment id.
+     */
+    public function id() {
+        return $this->appraiseeassignmentid;
+    }
+
+    /**
+     * Sets the assigned user from a job assignment for the given role.
+     *
+     * @param int $role one of the appraisal::ROLE_XYZ constants.
+     * @param \job_assignment $job reference job assignment.
+     *
+     * @return \appraisal_assignments the updated role assignment.
+     */
+    public function with_role_from_job($role, job_assignment $job) {
+        $field = self::$job_assignment_roles[$role];
+        return $this->with_user($role, $job->$field);
+    }
+
+    /**
+     * Sets the assigned user for the given role.
+     *
+     * @param int $role one of the appraisal::ROLE_XYZ constants.
+     * @param int $user assigned user.
+     *
+     * @return \appraisal_assignments the updated role assignment.
+     */
+    public function with_user($role, $user) {
+        $this->assignments[$role] = $user;
+        return $this;
+    }
+
+    /**
+     * Returns a mapping of roles to assigned users. Note this includes empty
+     * assignments.
+     *
+     * @return array a mapping of roles to assigned users.
+     */
+    public function users() {
+        return $this->assignments;
+    }
+
+    /**
+     * Returns a DTOs to use when storing role assignments in the database. Note
+     * only non empty assignments are considered.
+     *
+     * @return array list of \stdClass whose field names mirror column names in
+     *         the appraisal_role_assignment table.
+     */
+    public function for_storage() {
+        return array_reduce(
+            array_keys(self::$job_assignment_roles),
+
+            function (array $accumulated, $role) {
+                $user = $this->assignments[$role];
+                if (empty($user)) {
+                    return $accumulated;
+                }
+
+                $dto = new stdClass();
+                $dto->appraisaluserassignmentid = $this->appraiseeassignmentid;
+                $dto->userid = $user;
+                $dto->appraisalrole = $role;
+                $dto->timecreated = time();
+
+                return array_merge($accumulated, [$dto]);
+            },
+
+            []
+        );
+    }
 }

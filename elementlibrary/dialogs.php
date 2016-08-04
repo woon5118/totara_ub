@@ -19,15 +19,15 @@ local_js(array(
     TOTARA_JS_DIALOG,
     TOTARA_JS_TREEVIEW
 ));
-$PAGE->requires->strings_for_js(array('chooseposition', 'choosemanager','chooseorganisation'), 'totara_hierarchy');
-$PAGE->requires->string_for_js('currentlyselected', 'totara_hierarchy');
+$PAGE->requires->strings_for_js(array('chooseposition', 'choosemanager', 'chooseorganisation'), 'totara_job');
+$PAGE->requires->strings_for_js(array('error:positionnotselected', 'error:organisationnotselected', 'error:managernotselected'), 'totara_job');
 $jsmodule = array(
-        'name' => 'totara_positionuser',
-        'fullpath' => '/totara/core/js/position.user.js',
+        'name' => 'totara_jobassignment',
+        'fullpath' => '/totara/job/js/totara_jobassignment.js',
         'requires' => array('json'));
-$selected_position = json_encode( dialog_display_currently_selected(get_string('selected', 'totara_hierarchy'), 'position') );
-$selected_organisation = json_encode( dialog_display_currently_selected(get_string("currentlyselected", "totara_hierarchy"), "organisation") );
-$selected_manager = json_encode( dialog_display_currently_selected(get_string("selected", "totara_hierarchy"), "manager") );
+$selected_position = json_encode( dialog_display_currently_selected(get_string('selected', 'totara_job'), 'position') );
+$selected_organisation = json_encode( dialog_display_currently_selected(get_string("selected", "totara_job"), "organisation") );
+$selected_manager = json_encode( dialog_display_currently_selected(get_string("selected", "totara_job"), "manager") );
 $args = array('args'=>'{"userid":0,'.
         '"can_edit":true,'.
         '"dialog_display_position":'.$selected_position.','.
@@ -51,17 +51,17 @@ echo $OUTPUT->box_start();
 
 echo $OUTPUT->container_start();
 echo html_writer::tag('span', '', array('class' => '', 'id' => 'positiontitle'));
-echo html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseposition', 'totara_hierarchy'), 'id' => 'show-position-dialog'));
+echo html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseposition', 'totara_job'), 'id' => 'show-position-dialog'));
 echo $OUTPUT->container_end();
 
 echo $OUTPUT->container_start();
 echo html_writer::tag('span', '', array('class' => '', 'id' => 'organisationtitle'));
-echo html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseorganisation', 'totara_hierarchy'), 'id' => 'show-organisation-dialog'));
+echo html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseorganisation', 'totara_job'), 'id' => 'show-organisation-dialog'));
 echo $OUTPUT->container_end();
 
 echo $OUTPUT->container_start();
 echo html_writer::tag('span', '', array('class' => '', 'id' => 'managertitle'));
-echo html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_hierarchy'), 'id' => 'show-manager-dialog'));
+echo html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'));
 echo $OUTPUT->container_end();
 
 echo $OUTPUT->box_end();

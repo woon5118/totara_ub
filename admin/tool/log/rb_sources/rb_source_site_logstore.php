@@ -71,10 +71,8 @@ class rb_source_site_logstore extends rb_base_source {
         // Requires the course join.
         $this->add_course_category_table_to_joinlist($joinlist,
             'course', 'category');
-        $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
-        // Requires the position_assignment join.
-        $this->add_manager_tables_to_joinlist($joinlist,
-            'position_assignment', 'reportstoid');
+        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_tag_tables_to_joinlist('course', $joinlist, 'base', 'courseid');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_cohort_course_tables_to_joinlist($joinlist, 'base', 'courseid');
@@ -249,8 +247,8 @@ class rb_source_site_logstore extends rb_base_source {
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_course_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions);
-        $this->add_position_fields_to_columns($columnoptions);
-        $this->add_manager_fields_to_columns($columnoptions);
+        $this->add_all_job_assignments_fields_to_columns($columnoptions);
+        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
         $this->add_tag_fields_to_columns('course', $columnoptions);
         $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_course_fields_to_columns($columnoptions);
@@ -312,8 +310,8 @@ class rb_source_site_logstore extends rb_base_source {
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
-        $this->add_position_fields_to_filters($filteroptions);
-        $this->add_manager_fields_to_filters($filteroptions);
+        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
+        $this->add_all_job_assignments_fields_to_filters($filteroptions);
         $this->add_tag_fields_to_filters('course', $filteroptions);
         $this->add_cohort_user_fields_to_filters($filteroptions);
         $this->add_cohort_course_fields_to_filters($filteroptions);
@@ -322,36 +320,17 @@ class rb_source_site_logstore extends rb_base_source {
     }
 
     protected function define_contentoptions() {
-        $contentoptions = array(
-            new rb_content_option(
-                'current_pos',
-                get_string('currentpos', 'totara_reportbuilder'),
-                'position.path',
-                'position'
-            ),
-            new rb_content_option(
-                'current_org',
-                get_string('currentorg', 'totara_reportbuilder'),
-                'organisation.path',
-                'organisation'
-            ),
-            new rb_content_option(
-                'user',
-                get_string('user', 'rb_source_site_logs'),
-                array(
-                    'userid' => 'base.userid',
-                    'managerid' => 'position_assignment.managerid',
-                    'managerpath' => 'position_assignment.managerpath',
-                    'postype' => 'position_assignment.type',
-                ),
-                'position_assignment'
-            ),
-            new rb_content_option(
-                'date',
-                get_string('date', 'rb_source_site_logstore'),
-                'base.timecreated'
-            ),
+        $contentoptions = array();
+
+        // Add the manager/position/organisation content options.
+        $this->add_basic_user_content_options($contentoptions);
+
+        $contentoptions[] = new rb_content_option(
+            'date',
+            get_string('date', 'rb_source_site_logstore'),
+            'base.timecreated'
         );
+
         return $contentoptions;
     }
 
@@ -424,12 +403,12 @@ class rb_source_site_logstore extends rb_base_source {
                 'advanced' => 1,
             ),
             array(
-                'type' => 'user',
+                'type' => 'primary_job',
                 'value' => 'positionpath',
                 'advanced' => 1,
             ),
             array(
-                'type' => 'user',
+                'type' => 'primary_job',
                 'value' => 'organisationpath',
                 'advanced' => 1,
             ),

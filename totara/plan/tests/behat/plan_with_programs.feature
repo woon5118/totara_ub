@@ -7,9 +7,9 @@ Feature: Learner creates learning plan with programs
       | username | firstname  | lastname  | email                |
       | learner1 | firstname1 | lastname1 | learner1@example.com |
       | manager2 | firstname2 | lastname2 | manager2@example.com |
-    And the following "manager assignments" exist in "totara_hierarchy" plugin:
-      | user     | manager  |
-      | learner1 | manager2 |
+    And the following job assignments exist:
+      | user     | fullname       | manager  |
+      | learner1 | jobassignment1 | manager2 |
     And the following "programs" exist in "totara_program" plugin:
       | fullname  | shortname |
       | Program 1 | P1   |

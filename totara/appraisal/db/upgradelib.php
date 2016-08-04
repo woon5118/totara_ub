@@ -21,6 +21,11 @@
  * @package totara_appraisal
  */
 
+
+require_once($CFG->dirroot.'/totara/job/classes/job_assignment.php');
+
+use totara_job\job_assignment;
+
 /**
  * Make sure $param1 is json encoded for all aggregate questions.
  */

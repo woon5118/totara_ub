@@ -28,50 +28,70 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 
 class event_user_position_test extends advanced_testcase {
 
-    public function test_position_updated_event() {
-        global $POSITION_CODES;
+    public function test_job_assignment_updated_event() {
+        global $DB;
+
         $this->resetAfterTest();
         $sink = $this->redirectEvents();
 
         $user = $this->getDataGenerator()->create_user();
-        $type = $POSITION_CODES['primary'];
+        $manager = $this->getDataGenerator()->create_user();
+        $managerja = \totara_job\job_assignment::create_default($manager->id);
 
-        $assignment = new position_assignment();
-        $assignment->userid = $user->id;
-        $assignment->managerid = 2;
-        $assignment->type = $type;
+        $sink->clear();
 
-        assign_user_position($assignment, true);
+        $data = array(
+            'userid' => $user->id,
+            'fullname' => 'ja1',
+            'shortname' => 'ja1',
+            'idnumber' => 'ja1',
+            'managerjaid' => $managerja->id,
+        );
+        $jobassignment = \totara_job\job_assignment::create($data);
 
         $events = $sink->get_events();
         $sink->clear();
 
-        $this->assertEquals(count($events), 1);
-        $eventdata = $events[0]->get_data();
+        $this->assertEquals(count($events), 2);
+        $eventdata1 = $events[0]->get_data();
+        if ($eventdata1['eventname'] == '\totara_job\event\job_assignment_updated') {
+            $eventdata2 = $events[1]->get_data();
+        } else {
+            $eventdata2 = $eventdata1;
+            $eventdata1 = $events[1]->get_data();
+        }
 
-        $this->assertEquals($eventdata['component'], 'totara_core');
-        $this->assertEquals($eventdata['eventname'], '\totara_core\event\position_updated');
-        $this->assertEquals($eventdata['action'], 'updated');
-        $this->assertEquals($type, $eventdata['other']['type']);
+        $this->assertEquals('totara_job', $eventdata1['component']);
+        $this->assertEquals('\totara_job\event\job_assignment_updated', $eventdata1['eventname']);
+        $this->assertEquals('updated', $eventdata1['action']);
+        $this->assertEquals($jobassignment->id, $eventdata1['objectid']);
+
+        $this->assertEquals('core', $eventdata2['component']);
+        $this->assertEquals('\core\event\role_assigned', $eventdata2['eventname']);
+        $this->assertEquals('assigned', $eventdata2['action']);
+        $managerroleid = $DB->get_field('role', 'id', array('shortname' => 'staffmanager'));
+        $this->assertEquals($managerroleid, $eventdata2['objectid']);
+        $this->assertEquals($manager->id, $eventdata2['relateduserid']);
     }
 
-    public function test_position_viewed_event() {
-        global $POSITION_CODES;
+    public function test_job_assignment_viewed_event() {
         $this->resetAfterTest();
         // Create user and course.
         $user = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();
-        $type = $POSITION_CODES['primary'];
 
-        $assignment = new position_assignment();
-        $assignment->userid = $user->id;
-        $assignment->type = $type;
-
+        $data = array(
+            'userid' => $user->id,
+            'fullname' => 'ja1',
+            'shortname' => 'ja1',
+            'idnumber' => 'ja1',
+        );
+        $jobassignment = \totara_job\job_assignment::create($data);
 
         // Trigger event of viewing his position.
         $coursecontext = context_course::instance($course->id);
 
-        $event = \totara_core\event\position_viewed::create_from_instance($assignment, $coursecontext);
+        $event = \totara_job\event\job_assignment_viewed::create_from_instance($jobassignment, $coursecontext);
         $event->trigger();
         $data = $event->get_data();
 
@@ -79,43 +99,7 @@ class event_user_position_test extends advanced_testcase {
         $this->assertSame('r', $data['crud']);
         $this->assertSame(\core\event\base::LEVEL_OTHER, $data['edulevel']);
         $this->assertSame($user->id, $data['relateduserid']);
-        $this->assertSame($assignment->type, $data['other']['type']);
+        $this->assertSame($jobassignment->id, $data['objectid']);
         $this->assertEventContextNotUsed($event);
-    }
-
-    public function test_position_viewed_event_wrong_data() {
-        $this->resetAfterTest();
-        // Create user and course.
-        $user = $this->getDataGenerator()->create_user();
-        $course = $this->getDataGenerator()->create_course();
-
-        $assignment = new position_assignment();
-        $assignment->userid = $user->id;
-        $assignment->type = 999;
-
-
-        // Trigger event of viewing his position.
-        $coursecontext = context_course::instance($course->id);
-
-        $this->setExpectedException('coding_exception');
-        $event = \totara_core\event\position_viewed::create_from_instance($assignment, $coursecontext);
-        $event->trigger();
-
-    }
-
-    public function test_position_updated_event_wrong_data() {
-        $this->resetAfterTest();
-        $sink = $this->redirectEvents();
-
-        $user = $this->getDataGenerator()->create_user();
-
-        $assignment = new position_assignment();
-        $assignment->userid = $user->id;
-        $assignment->managerid = 2;
-        $assignment->type = 999;
-
-        $this->setExpectedException('coding_exception');
-        assign_user_position($assignment, true);
-
     }
 }

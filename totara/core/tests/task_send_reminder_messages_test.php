@@ -91,6 +91,12 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
         $this->learner1 = $generator->create_user(array('username' => 'learner1', 'managerid' => $this->manager->id));
         $this->learner2 = $generator->create_user(array('username' => 'learner2', 'managerid' => $this->manager->id));
 
+        // Give each user a second manager.
+        $secondmanager = $generator->create_user(['username' => 'butter_manager']);
+        $managerja = \totara_job\job_assignment::create_default($secondmanager->id);
+        \totara_job\job_assignment::create_default($this->learner1->id, array('managerjaid' => $managerja->id, 'fullname' => 'Head banana ripener'));
+        \totara_job\job_assignment::create_default($this->learner2->id, array('managerjaid' => $managerja->id, 'fullname' => 'Internet explorer'));
+
         // Enrol the user into the course.
         $generator->enrol_user($this->learner1->id, $this->course->id);
         $generator->enrol_user($this->learner2->id, $this->course->id);
@@ -300,7 +306,8 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
         ob_start();
         $task->execute();
         $output = ob_get_clean();
-        // There should be four messages, three to the learner and 1 to the learners manager.
+        // There should be four messages, three to the learner and 1 to the learners first manager.
+        // The learner has a second manager, but only the first should get messaged.
         $this->assertSame(4, $sink->count());
         $this->assertContains('1 "invitation" type messages sent', $output);
         $this->assertContains('1 "reminder" type messages sent', $output);

@@ -26,7 +26,6 @@
  * Face-to-Face Direct enrolment plugin.
  */
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 
 class enrol_totara_facetoface_plugin extends enrol_plugin {
 
@@ -247,14 +246,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         $context = context_course::instance($course->id);
 
         $hasselfapproval = $facetoface->approvaltype == APPROVAL_SELF;
-
-        // Manager.
-        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-        if ($selectpositiononsignupglobal) {
-            $manager = totara_get_most_primary_manager($USER->id);
-        } else {
-            $manager = totara_get_manager($USER->id);
-        }
+        $managers = \totara_job\job_assignment::get_all_manager_userids($USER->id);
 
         if (!facetoface_session_has_capacity($session, $context) && (!$session->allowoverbook)) {
             return array('result' => false, 'message' => get_string('sessionisfull', 'facetoface'));
@@ -266,7 +258,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             $multisessionid)
         ) {
             return array('result' => true, 'message' => get_string('alreadysignedup', 'facetoface'));
-        } else if (facetoface_manager_needed($facetoface) && empty($manager->email) && !$hasselfapproval) {
+        } else if (facetoface_manager_needed($facetoface) && empty($managers) && !$hasselfapproval) {
             return array('result' => false, 'message' => get_string('error:manageremailaddressmissing', 'facetoface'));
         }
 
@@ -398,9 +390,9 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                     $signupnote = empty($fromform->customfield_signupnote) ? '' : $fromform->customfield_signupnote;
                 }
 
-                // Selected position choice.
-                if (!empty($fromform->{'selectedposition_' . $session->facetoface})) {
-                    $signupparams['positionassignment'] = $fromform->{'selectedposition_' . $session->facetoface};
+                // Selected job assignment choice.
+                if (!empty($fromform->{'selectedjobassignment_' . $session->facetoface})) {
+                    $signupparams['jobassignmentid'] = $fromform->{'selectedjobassignment_' . $session->facetoface};
                 }
 
                 $session = $sessions[$sid];
@@ -1157,12 +1149,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             }
         }
 
-        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-        if ($selectpositiononsignupglobal) {
-            $manager = totara_get_most_primary_manager($USER->id);
-        } else {
-            $manager = totara_get_manager($USER->id);
-        }
+        $managers = \totara_job\job_assignment::get_all_manager_userids($USER->id);
 
         foreach ($sessions as $session) {
             $session->signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_REQUESTED);
@@ -1183,7 +1170,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 continue;
             }
             $session->hasselfapproval = $session->approvaltype == APPROVAL_SELF;
-            if (!$ignoreapprovals && facetoface_manager_needed($session) && empty($manager->email) && !$session->hasselfapproval) {
+            if (!$ignoreapprovals && facetoface_manager_needed($session) && empty($managers) && !$session->hasselfapproval) {
                 $this->removednomanager = true;
                 continue;
             }

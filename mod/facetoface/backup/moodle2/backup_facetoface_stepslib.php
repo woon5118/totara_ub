@@ -72,8 +72,8 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             'timecreated', 'timemodified', 'shortname', 'showoncalendar', 'usercalentry',
             'multiplesessions', 'completionstatusrequired', 'managerreserve', 'maxmanagerreserves',
             'reservecanceldays', 'reservedays', 'declareinterest', 'interestonlyiffull',
-            'allowcancellationsdefault', 'cancellationscutoffdefault', 'selectpositiononsignup',
-            'forceselectposition', 'approvaltype', 'approvalrole', 'approvalterms', 'approvaladmins'));
+            'allowcancellationsdefault', 'cancellationscutoffdefault', 'selectjobassignmentonsignup',
+            'forceselectjobassignment', 'approvaltype', 'approvalrole', 'approvalterms', 'approvaladmins'));
 
         $notifications = new backup_nested_element('notifications');
         $notification = new backup_nested_element('notification', array('id'), array(
@@ -103,7 +103,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $signups = new backup_nested_element('signups');
         $signup = new backup_nested_element('signup', array('id'), array(
             'userid', 'discountcode', 'notificationtype', 'archived', 'bookedby',
-            'positionid', 'positiontype', 'positionassignmentid', 'managerid'));
+            'jobassignmentid', 'managerid'));
 
         $signups_status = new backup_nested_element('signups_status');
         $signup_status = new backup_nested_element('signup_status', array('id'), array(

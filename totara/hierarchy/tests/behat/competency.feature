@@ -44,11 +44,15 @@ Feature: Test competencies achieved is updated
     And I click on "Home" in the totara menu
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "Bilbo Baggins" "link"
-    And I click on "Primary position" "link"
+    And I click on "Add job assignment" "link"
+    And I set the following fields to these values:
+      | Full name    | Burglar Contracted By Dwarves |
+      | Short name   | Burglar Contracted By Dwarves |
+      | ID Number    | 12345                         |
     And I click on "Choose manager" "button"
     And I click on "Gandalf the Grey" "link"
     And I click on "OK" "button" in the ".totara-dialog[aria-describedby=manager]" "css_element"
-    And I click on "Update position" "button"
+    And I click on "Add job assignment" "button"
     And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
     And I click on "Reclaim the Lonely Mountain" "link"
     And I click on "Kill the Smaug" "link"

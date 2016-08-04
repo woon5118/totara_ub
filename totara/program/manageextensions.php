@@ -88,8 +88,8 @@ if (!empty($userid)) {
     $user_fullname = fullname($user);
 
     $staff_ids = $userid;
-} elseif ($staff_members = totara_get_staff()) {
-    $staff_ids = $staff_members;
+} else {
+    $staff_ids = \totara_job\job_assignment::get_staff_userids($USER->id);
 }
 
 if (!empty($staff_ids)) {

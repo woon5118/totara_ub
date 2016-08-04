@@ -33,7 +33,7 @@ class totara_reportbuilder_clone_testcase extends advanced_testcase {
         $rid = $this->create_report('user', 'Test user report');
 
         // Add filters.
-        $this->add_filter($rid, 'user', 'managername', 0, 'Manager', 1, 0);
+        $this->add_filter($rid, 'primary_job', 'managername', 0, 'Manager', 1, 0);
         $this->add_filter($rid, 'user', 'fullname', 1, 'Name', 1, 1);
 
         // Add settings.
@@ -84,7 +84,7 @@ class totara_reportbuilder_clone_testcase extends advanced_testcase {
         $this->assertEquals('1', $filter->region);
 
         $filter = array_shift($filters);
-        $this->assertEquals('user', $filter->type);
+        $this->assertEquals('primary_job', $filter->type);
         $this->assertEquals('managername', $filter->value);
         $this->assertEquals('0', $filter->advanced);
         $this->assertEquals('Manager', $filter->label);

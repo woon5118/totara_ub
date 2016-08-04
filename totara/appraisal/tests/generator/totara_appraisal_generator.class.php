@@ -493,6 +493,7 @@ class totara_appraisal_generator extends component_generator_base {
         $data['roles'] = array(
             appraisal::ROLE_LEARNER => appraisal::ACCESS_CANANSWER,
             appraisal::ROLE_MANAGER => appraisal::ACCESS_CANANSWER + appraisal::ACCESS_CANVIEWOTHER,
+            appraisal::ROLE_APPRAISER => appraisal::ACCESS_CANANSWER + appraisal::ACCESS_CANVIEWOTHER
         );
 
         if (!isset($data['type'])) {

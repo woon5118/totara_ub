@@ -186,76 +186,52 @@ $requests = array();
 
 $staff = null;
 if ($facetoface->approvaltype == APPROVAL_MANAGER || $facetoface->approvaltype == APPROVAL_ADMIN) {
-    $managerselect = get_config(null, 'facetoface_managerselect');
-    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-    if (!empty($selectpositiononsignupglobal) && !empty($facetoface->selectpositiononsignup)) {
-        if ($managerselect) {
-            // If they are set as the session manager, or there is no session manager but they are the position manager.
-            $managersql = '(fs.managerid = :manid OR (fs.managerid IS NULL AND pa.managerid = :manid2))';
-            $managerparams = array('manid' => $USER->id, 'manid2' => $USER->id);
-        } else {
-            $managersql = 'pa.managerid = :manid';
-            $managerparams = array('manid' => $USER->id);
-        }
+    $managersql = "1=0";
+    $sqlparams = array();
 
-        // Check if the user is manager of a position selected by staff signed up to this session.
-        $requestssql = "SELECT fs.userid
-                          FROM {facetoface_signups} fs
-                          JOIN {pos_assignment} pa
-                            ON fs.positionassignmentid = pa.id
-                          JOIN {facetoface_signups_status} fss
-                            ON fss.signupid = fs.id AND fss.superceded = 0
-                         WHERE fs.sessionid = :sessionid
-                           AND {$managersql}
-                           AND fss.statuscode = :status
-                           AND fss.superceded = 0";
-        $params = array_merge($managerparams, array('sessionid' => $session->id, 'status' => MDL_F2F_STATUS_REQUESTED));
-        $staff = $DB->get_fieldset_sql($requestssql, $params);
+    // Use job assignment API: This can fail with large amount of users managed by current user.
+    $staffids = \totara_job\job_assignment::get_staff_userids($USER->id);
+    if (!empty($staffids)) {
+        list($staffsql, $sqlparams) = $DB->get_in_or_equal($staffids, SQL_PARAMS_NAMED);
+        $managersql = "fs.userid $staffsql";
+    }
 
-        // Get temporary staff.
+    $selectjobassignmentsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
+    if (!empty($selectjobassignmentsignupglobal) && !empty($facetoface->selectjobassignmentonsignup)) {
+        // Prioritise selecteded job assignment
+        $managersql = "(selectedmanagerja.userid = :selectedmanid OR (selectedmanagerja.userid IS NULL AND $managersql))";
+        $sqlparams['selectedmanid'] = $USER->id;
+
         if (!empty($CFG->enabletempmanagers)) {
-            $tempstaff = $DB->get_fieldset_select('temporary_manager', 'userid', 'tempmanagerid = ? AND expirytime > ?',
-                array($USER->id, time()));
-
-            $staff = array_unique(array_merge($staff, $tempstaff));
-        }
-    } else {
-        if ($managerselect) {
-            // If they are set as the session manager, or there is no session manager but they are the position manager.
-            $managersql = '(fs.managerid = :manid OR (fs.managerid IS NULL AND pa.managerid = :manid2))';
-            $managerparams = array('manid' => $USER->id, 'manid2' => $USER->id);
-        } else {
-            $managersql = 'pa.managerid = :manid';
-            $managerparams = array('manid' => $USER->id);
-        }
-
-        $requestssql = "SELECT fs.userid
-                          FROM {facetoface_signups} fs
-                     LEFT JOIN {pos_assignment} pa
-                            ON fs.userid = pa.userid AND pa.type = :ptype
-                          JOIN {facetoface_signups_status} fss
-                            ON fss.signupid = fs.id AND fss.superceded = 0
-                         WHERE fs.sessionid = :sessionid
-                           AND {$managersql}
-                           AND fss.statuscode = :status
-                           AND fss.superceded = 0";
-
-        $params = array('ptype' => POSITION_TYPE_PRIMARY,
-                        'sessionid' => $session->id,
-                        'status' => MDL_F2F_STATUS_REQUESTED
-                       );
-        $params = array_merge($managerparams, $params);
-
-        $staff = $DB->get_fieldset_sql($requestssql, $params);
-
-        // Get temporary staff.
-        if (!empty($CFG->enabletempmanagers)) {
-            $tempstaff = $DB->get_fieldset_select('temporary_manager', 'userid', 'tempmanagerid = ? AND expirytime > ?',
-                array($USER->id, time()));
-
-            $staff = array_unique(array_merge($staff, $tempstaff));
+            $managersql = "(selectedtempmanagerja.userid = :selectedtempmanid
+                            OR (selectedtempmanagerja.userid IS NULL AND $managersql))";
+            $sqlparams['selectedtempmanid'] = $USER->id;
         }
     }
+
+    $managerselect = get_config(null, 'facetoface_managerselect');
+    if ($managerselect) {
+        // Prioritise selected manager.
+        $managersql = "((fs.managerid = :manid) OR (fs.managerid IS NULL AND $managersql))";
+        $sqlparams['manid'] = $USER->id;
+    }
+
+    // Check if the user is manager of a job assignment selected by staff signed up to this session.
+    $requestssql = "SELECT DISTINCT fs.userid
+                      FROM {facetoface_signups} fs
+                      JOIN {facetoface_signups_status} fss
+                        ON (fss.signupid = fs.id AND fss.superceded = 0)
+                      LEFT JOIN {job_assignment} selectedja
+                        ON fs.jobassignmentid = selectedja.id
+                      LEFT JOIN {job_assignment} selectedmanagerja
+                        ON selectedmanagerja.id = selectedja.managerjaid
+                      LEFT JOIN {job_assignment} selectedtempmanagerja
+                        ON (selectedtempmanagerja.id = selectedja.tempmanagerjaid AND selectedja.tempmanagerexpirydate > :now)
+                     WHERE fs.sessionid = :sessionid
+                       AND {$managersql}
+                       AND fss.statuscode = :status";
+    $sqlparams = array_merge($sqlparams, array('sessionid' => $session->id, 'status' => MDL_F2F_STATUS_REQUESTED ,'now' => time()));
+    $staff = $DB->get_fieldset_sql($requestssql, $sqlparams);
 }
 
 if ($facetoface->approvaltype == APPROVAL_ROLE) {
@@ -542,7 +518,7 @@ if ($form = data_submitted()) {
                     if (!$value) {
                         continue;
                     }
-                    $recipients = $recipients + facetoface_get_users_by_status($s, $key, 'u.id, u.*, su.positiontype');
+                    $recipients = $recipients + facetoface_get_users_by_status($s, $key, 'u.id, u.*, su.jobassignmentid');
                 }
             }
 
@@ -570,17 +546,29 @@ if ($form = data_submitted()) {
                 if (email_to_user($recipient, $facetofaceuser, $data->subject, $bodyplain, $body) === true) {
                     $emailcount += 1;
 
-                    // Are sending to managers and does user have a manager assigned for the position type they signedup with.
-                    if (empty($data->cc_managers) || !$manager = totara_get_manager($recipient->id, $recipient->positiontype)) {
+                    // Are sending to managers
+                    if (empty($data->cc_managers)) {
                         continue;
                     }
 
-                    // Append to message.
-                    $body = get_string('messagesenttostaffmember', 'facetoface', fullname($recipient))."\n\n".$data->body['text'];
-                    $bodyplain = html_to_text($body);
+                    // User have a manager assigned for the job assignment they signedup with (or all managers otherwise).
+                    $managers = array();
+                    if (!empty($recipient->jobassignmentid)) {
+                        $ja = \totara_job\job_assignment::get_with_id($recipient->jobassignmentid);
+                        $managers[] = $ja->managerid;
+                    } else {
+                        $managers = \totara_job\job_assignment::get_all_manager_userids($recipient->id);
+                    }
+                    if (!empty($managers)) {
+                        // Append to message.
+                        $body = get_string('messagesenttostaffmember', 'facetoface', fullname($recipient))."\n\n".$data->body['text'];
+                        $bodyplain = html_to_text($body);
 
-                    if (email_to_user($manager, $facetofaceuser, $data->subject, $bodyplain, $body) === true) {
-                        $emailcount += 1;
+                        foreach ($managers as $manager) {
+                            if (email_to_user($manager, $facetofaceuser, $data->subject, $bodyplain, $body) === true) {
+                                $emailcount += 1;
+                            }
+                        }
                     }
                 } else {
                     $emailerrors += 1;
@@ -858,12 +846,12 @@ if ($show_table) {
 
         $hidecost = get_config(null, 'facetoface_hidecost');
         $hidediscount = get_config(NULL, 'facetoface_hidediscount');
-        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+        $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
 
-        $showpositions = !empty($selectpositiononsignupglobal) && !empty($facetoface->selectpositiononsignup);
-        if ($showpositions) {
-            $headers[] = get_string('selectedposition', 'mod_facetoface');
-            $columns[] = 'position';
+        $showjobassignments = !empty($selectjobassignmentonsignupglobal) && !empty($facetoface->selectjobassignmentonsignup);
+        if ($showjobassignments) {
+            $headers[] = get_string('selectedjobassignment', 'mod_facetoface');
+            $columns[] = 'jobassignment';
         }
 
         if ($action == 'takeattendance' && !$download) {
@@ -933,7 +921,7 @@ if ($show_table) {
             }
         }
         $cancancelreservations = has_capability('mod/facetoface:reserveother', $context);
-        $canchangesignedupjobposition = has_capability('mod/facetoface:changesignedupjobposition', $context);
+        $canchangesignedupjobassignment = has_capability('mod/facetoface:changesignedupjobassignment', $context);
 
         foreach ($rows as $attendee) {
             $data = array();
@@ -986,17 +974,18 @@ if ($show_table) {
 
             $data[] = userdate($attendee->timesignedup, get_string('strftimedatetime'));
 
-            if ($showpositions) {
-                $label = position::position_label($attendee);
+            if ($showjobassignments) {
+                $jobassignment = \totara_job\job_assignment::get_with_id($attendee->jobassignmentid);
+                $label = position::job_position_label($jobassignment);
 
-                $url = new moodle_url('/mod/facetoface/attendee_position.php', array('s' => $session->id, 'id' => $attendee->id));
-                $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-position pull-right'));
-                $position = html_writer::span($label, 'position'.$attendee->id, array('id' => 'position'.$attendee->id));
+                $url = new moodle_url('/mod/facetoface/attendee_job_assignment.php', array('s' => $session->id, 'id' => $attendee->id));
+                $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-job-assignment pull-right'));
+                $jobassign = html_writer::span($label, 'jobassign'.$attendee->id, array('id' => 'jobassign'.$attendee->id));
 
-                if ($canchangesignedupjobposition) {
-                    $data[] = $icon . $position;
+                if ($canchangesignedupjobassignment) {
+                    $data[] = $icon . $jobassign;
                 } else {
-                    $data[] = $position;
+                    $data[] = $jobassign;
                 }
             }
 
@@ -1212,6 +1201,7 @@ if ($action == 'approvalrequired') {
     $availablespaces = $session->capacity - $numattendees;
     $allowoverbook = $session->allowoverbook;
     $canoverbook = has_capability('mod/facetoface:signupwaitlist', $context);
+
     // Are there more users waiting than spaces available?
     // Note this does not apply to people with overbook capability (see facetoface_session_has_capacity).
     if (!$canoverbook && ($numwaiting > $availablespaces)) {
@@ -1285,9 +1275,13 @@ if ($action == 'approvalrequired') {
 
         // Additional approval columns for the approval tab.
         if ($facetoface->approvaltype == APPROVAL_MANAGER || $facetoface->approvaltype == APPROVAL_ADMIN) {
-            $manager = facetoface_get_session_manager($attendee->id, $session->id);
-            $managername = empty($manager) ? '' : $manager->fullname;
-            $data[] = html_writer::span($managername, 'managername' . $attendee->id, array('id' => 'managername' . $attendee->id));
+            $managers = facetoface_get_session_managers($attendee->id, $session->id);
+            $managernames = array();
+            $state = '';
+            $time = '';
+            foreach ($managers as $manager) {
+                $managernames[] =  $manager->fullname;
+            }
             if ($facetoface->approvaltype == APPROVAL_ADMIN) {
                 switch ($attendee->statuscode) {
                     case MDL_F2F_STATUS_REQUESTED:
@@ -1302,9 +1296,13 @@ if ($action == 'approvalrequired') {
                         print_error('error:invalidstatus', 'mod_facetoface');
                         break;
                 }
+            }
+            $managernamestr = implode(', ', $managernames);
+            $data[] = html_writer::span($managernamestr, 'managername' . $attendee->id, array('id' => 'managername' . $attendee->id));
+            if ($facetoface->approvaltype == APPROVAL_ADMIN) {
                 $data[] = html_writer::span($state, 'approvalstate' . $attendee->id, array('id' => 'approvalstate' . $attendee->id));
                 $data[] = html_writer::span($time, 'approvaltime' . $attendee->id, array('id' => 'approvaltime' . $attendee->id));
-        }
+            }
     }
 
 

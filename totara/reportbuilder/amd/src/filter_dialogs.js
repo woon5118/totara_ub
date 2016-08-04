@@ -71,6 +71,9 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                     case "badge":
                         handler.rb_load_badge_filters(this);
                         break;
+                    case "jobassign_multi":
+                        handler.rb_load_jobassign_multi_filters();
+                        // Note: no break here since we also want to load hierarchy.
                     case "hierarchy_multi":
                         handler.rb_load_hierarchy_multi_filters();
                         break;
@@ -202,8 +205,45 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
         },
 
-        rb_load_hierarchy_multi_filters: function() {
+        rb_load_jobassign_multi_filters: function() {
+            // Bind multi-managers report filter.
+            $('div.rb-man-add-link a').each(function() {
+                var id = $(this).attr('id');
+                // Remove 'show-' and '-dialog' from ID.
+                id = id.substr(5, id.length - 12);
 
+                var url = mdlcfg.wwwroot + '/totara/job/assignfilter/manager/';
+
+                mdlstrings.get_string('choosemanplural', 'totara_reportbuilder').done(function (choosemanplural) {
+                    totaraMultiSelectDialogRbFilter(
+                        id,
+                        choosemanplural,
+                        url + 'find.php?',
+                        url + 'save.php?filtername=' + id + '&ids='
+                    );
+                });
+            });
+
+            // Bind multi-appraisers report filter.
+            $('div.rb-app-add-link a').each(function() {
+                var id = $(this).attr('id');
+                // Remove 'show-' and '-dialog' from ID.
+                id = id.substr(5, id.length - 12);
+
+                var url = mdlcfg.wwwroot + '/totara/job/assignfilter/appraiser/';
+
+                mdlstrings.get_string('chooseappplural', 'totara_reportbuilder').done(function (choosemanplural) {
+                    totaraMultiSelectDialogRbFilter(
+                        id,
+                        choosemanplural,
+                        url + 'find.php?',
+                        url + 'save.php?filtername=' + id + '&ids='
+                    );
+                });
+            });
+        },
+
+        rb_load_hierarchy_multi_filters: function() {
             // Bind multi-organisation report filter.
             $('div.rb-org-add-link a').each(function() {
                 var id = $(this).attr('id');
@@ -239,7 +279,6 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                     );
                 });
             });
-
 
             // Bind multi-competency report filter.
             $('div.rb-comp-add-link a').each(function() {

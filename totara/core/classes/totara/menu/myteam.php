@@ -26,6 +26,7 @@
 namespace totara_core\totara\menu;
 
 use \totara_core\totara\menu\menu as menu;
+use totara_job\job_assignment;
 
 class myteam extends \totara_core\totara\menu\item {
 
@@ -46,6 +47,8 @@ class myteam extends \totara_core\totara\menu\item {
     }
 
     protected function check_visibility() {
+        global $USER;
+
         static $cache = null;
 
         if (!totara_feature_visible('myteam')) {
@@ -57,7 +60,7 @@ class myteam extends \totara_core\totara\menu\item {
             return $cache;
         }
 
-        if ($staff = totara_get_staff() || is_siteadmin()) {
+        if (job_assignment::has_staff($USER->id) || is_siteadmin()) {
             $cache = menu::SHOW_ALWAYS;
         } else {
             $cache = menu::HIDE_ALWAYS;

@@ -149,20 +149,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'bookedby.id = CASE WHEN base.bookedby = 0 THEN base.userid ELSE base.bookedby END',
                 REPORT_BUILDER_RELATION_MANY_TO_ONE
             ),
-            new rb_join(
-                'pos',
-                'LEFT',
-                '{pos}',
-                'pos.id = base.positionid',
-                REPORT_BUILDER_RELATION_MANY_TO_ONE
-            ),
-            new rb_join(
-                'pos_assignment',
-                'LEFT',
-                '{pos_assignment}',
-                'pos_assignment.id = base.positionassignmentid',
-                REPORT_BUILDER_RELATION_MANY_TO_ONE
-            ),
         );
 
         // Include some standard joins.
@@ -170,8 +156,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course', 'INNER');
         $this->add_context_table_to_joinlist($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
         $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
-        $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
+        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_tag_tables_to_joinlist('course', $joinlist, 'facetoface', 'course');
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
@@ -337,33 +323,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 )
             ),
             new rb_column_option(
-                'session',
-                'positionname',
-                get_string('selectedposition', 'mod_facetoface'),
-                'pos.fullname',
-                array('joins' => 'pos',
-                    'dbdatatype' => 'text',
-                    'outputformat' => 'text')
-            ),
-            new rb_column_option(
-                'session',
-                'positionassignmentname',
-                get_string('selectedpositionassignment', 'mod_facetoface'),
-                'pos_assignment.fullname',
-                array('joins' => 'pos_assignment',
-                    'dbdatatype' => 'text',
-                    'outputformat' => 'text')
-            ),
-            new rb_column_option(
-                'session',
-                'positiontype',
-                get_string('selectedpositiontype', 'mod_facetoface'),
-                'base.positiontype',
-                array('dbdatatype' => 'text',
-                    'outputformat' => 'text',
-                    'displayfunc' => 'position_type')
-            ),
-            new rb_column_option(
                 'user_signups',
                 'signature',
                 get_string('signature', 'mod_facetoface'),
@@ -414,8 +373,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_course_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions);
-        $this->add_position_fields_to_columns($columnoptions);
-        $this->add_manager_fields_to_columns($columnoptions);
+        $this->add_all_job_assignments_fields_to_columns($columnoptions);
+        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
         $this->add_tag_fields_to_columns('course', $columnoptions);
         $this->add_facetoface_session_roles_to_columns($columnoptions);
         $this->add_cohort_user_fields_to_columns($columnoptions);
@@ -503,38 +462,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 ),
                 'base.userid'
             ),
-            new rb_filter_option(
-                'session',
-                'positionname',
-                get_string('selectedpositionname', 'mod_facetoface'),
-                'select',
-                array(
-                    'selectfunc' => 'positions_list',
-                    'attributes' => rb_filter_option::select_width_limiter(),
-                ),
-                'pos.id',
-                'pos'
-            ),
-            new rb_filter_option(
-                'session',
-                'positionassignment',
-                get_string('selectedpositionassignment', 'mod_facetoface'),
-                'text',
-                array(),
-                'pos_assignment.fullname',
-                'pos_assignment'
-            ),
-            new rb_filter_option(
-                'session',
-                'positiontype',
-                get_string('selectedpositiontype', 'mod_facetoface'),
-                'select',
-                array(
-                    'selectfunc' => 'position_types_list',
-                    'attributes' => rb_filter_option::select_width_limiter(),
-                ),
-                'base.positiontype'
-            ),
         );
 
         if (!get_config(null, 'facetoface_hidecost')) {
@@ -565,8 +492,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
-        $this->add_position_fields_to_filters($filteroptions);
-        $this->add_manager_fields_to_filters($filteroptions);
+        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
+        $this->add_all_job_assignments_fields_to_filters($filteroptions);
         $this->add_tag_fields_to_filters('course', $filteroptions);
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
         $this->add_cohort_user_fields_to_filters($filteroptions);
@@ -576,55 +503,23 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
     }
 
     /**
-     * Position types filter.
-     *
-     * @return array
-     */
-    public function rb_filter_position_types_list() {
-        global $CFG, $POSITION_TYPES;
-
-        include_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
-
-        return $POSITION_TYPES;
-    }
-
-    /**
      * Define the available content options for this report.
      *
      * @return array
      */
     protected function define_contentoptions() {
-        $contentoptions = array(
-            new rb_content_option(
-                'current_pos',
-                get_string('currentpos', 'totara_reportbuilder'),
-                'position.path',
-                'position'
-            ),
-            new rb_content_option(
-                'current_org',
-                get_string('currentorg', 'totara_reportbuilder'),
-                'organisation.path',
-                'organisation'
-            ),
-            new rb_content_option(
-                'user',
-                get_string('user', 'rb_source_facetoface_signin'),
-                array(
-                    'userid' => 'base.userid',
-                    'managerid' => 'position_assignment.managerid',
-                    'managerpath' => 'position_assignment.managerpath',
-                    'postype' => 'position_assignment.type',
-                ),
-                'position_assignment'
-            ),
-            new rb_content_option(
-                'date',
-                get_string('thedate', 'rb_source_facetoface_signin'),
-                'sessiondate.timestart',
-                'sessiondate'
-            ),
+        $contentoptions = array();
+
+        // Add the manager/position/organisation content options.
+        $this->add_basic_user_content_options($contentoptions);
+
+        $contentoptions[] = new rb_content_option(
+            'date',
+            get_string('thedate', 'rb_source_facetoface_signin'),
+            'sessiondate.timestart',
+            'sessiondate'
         );
+
         return $contentoptions;
     }
 
@@ -803,18 +698,15 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
     }
 
     /**
-     * Display function for position type.
+     * Display function for job.
      *
-     * @param $position
+     * @param $jobassignmentid
      * @param $row
      * @return string
      */
-    public function rb_display_position_type($position, $row) {
-        global $CFG, $POSITION_TYPES;
-
-        include_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
-
-        return get_string('type'.$POSITION_TYPES[$position], 'totara_hierarchy');
+    public function rb_display_position_type($jobassignmentid, $row) {
+        // Deprecate - you should probably link to the job table and get the full name (unless we want default lang string names).
+        return 'fixme';
     }
 
     /**

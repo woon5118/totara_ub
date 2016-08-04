@@ -84,7 +84,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         $rbcol3 = new stdClass();
         $rbcol3->reportid = $report->id;
-        $rbcol3->type = 'user';
+        $rbcol3->type = 'primary_job';
         $rbcol3->value = 'organisation';
         $rbcol3->heading = 'Office';
         $rbcol3->sortorder = 3;
@@ -105,7 +105,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         $rbcol5 = new stdClass();
         $rbcol5->reportid = $report->id;
-        $rbcol5->type = 'user';
+        $rbcol5->type = 'primary_job';
         $rbcol5->value = 'position';
         $rbcol5->heading = 'Position';
         $rbcol5->sortorder = 5;
@@ -154,7 +154,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         $rbfilter2 = new stdClass();
         $rbfilter2->reportid = $report->id;
-        $rbfilter2->type = 'user';
+        $rbfilter2->type = 'primary_job';
         $rbfilter2->value = 'organisationid';
         $rbfilter2->advanced = 0;
         $rbfilter2->sortorder = 2;
@@ -170,7 +170,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         $rbfilter4 = new stdClass();
         $rbfilter4->reportid = $report->id;
-        $rbfilter4->type = 'user';
+        $rbfilter4->type = 'primary_job';
         $rbfilter4->value = 'positionid';
         $rbfilter4->advanced = 0;
         $rbfilter4->sortorder = 4;
@@ -502,17 +502,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $comprecord->manual = 1;
         $comprecord->id = $DB->insert_record('comp_record', $comprecord);
 
-        $posassignment = new stdClass();
-        $posassignment->fullname = 'Title';
-        $posassignment->shortname = 'Title';
-        $posassignment->organisationid = 1;
-        $posassignment->positionid = 1;
-        $posassignment->userid = $user->id;
-        $posassignment->type = 1;
-        $posassignment->timecreated = 1;
-        $posassignment->timemodified = 1;
-        $posassignment->usermodified = $user->id;
-        $posassignment->id = $DB->insert_record('pos_assignment', $posassignment);
+        \totara_job\job_assignment::create_default($user->id, array('organisationid' => 1, 'positionid' => 1));
 
         $tag = new stdClass();
         $tag->userid = $user->id;
@@ -749,12 +739,12 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $rb = new reportbuilder($reportid);
         $restrictions = $rb->get_content_restrictions();
         // should return the appropriate SQL snippet to OR the restrictions if content mode = 1
-        $this->assertRegExp('/\(base\.userid\s+=\s+:[a-z0-9_]+\s+OR\s+\(base\.timemodified\s+>\s+[0-9]+\s+AND\s+base\.timemodified\s+!=\s+0\s+\)\)/', $restrictions[0]);
+        $this->assertRegExp('/\(\s\(user\.id\s+=\s+:[a-z0-9_]+\)\s+OR\s+\(base\.timemodified\s+>\s+[0-9]+\s+AND\s+base\.timemodified\s+!=\s+0\s+\)\)/', $restrictions[0]);
         $DB->set_field('report_builder', 'contentmode', REPORT_BUILDER_CONTENT_MODE_ALL, array('id' => $reportid));
         $rb = new reportbuilder($reportid);
         $restrictions = $rb->get_content_restrictions();
         // should return the appropriate SQL snippet to AND the restrictions if content mode = 2
-        $this->assertRegExp('/\(base\.userid\s+=\s+:[a-z0-9_]+\s+AND\s+\(base\.timemodified\s+>\s+[0-9]+\s+AND\s+base\.timemodified\s+!=\s+0\s+\)\)/', $restrictions[0]);
+        $this->assertRegExp('/\(\s\(user\.id\s+=\s+:[a-z0-9_]+\)\s+AND\s+\(base\.timemodified\s+>\s+[0-9]+\s+AND\s+base\.timemodified\s+!=\s+0\s+\)\)/', $restrictions[0]);
 
         $this->resetAfterTest(true);
     }
@@ -788,14 +778,14 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $DB->insert_record('report_builder_settings', $todb);
         $rb = new reportbuilder($reportid);
         // should return the appropriate text description if content mode = 1
-        $this->assertRegExp('/The user is ".*" or The completion date occurred after .*/', current($rb->get_restriction_descriptions('content')));
+        $this->assertRegExp('/The User is ".*" or The completion date occurred after .*/', current($rb->get_restriction_descriptions('content')));
         $DB->set_field('report_builder', 'contentmode', REPORT_BUILDER_CONTENT_MODE_ALL, array('id' => $reportid));
         $rb = new reportbuilder($reportid);
         // should return the appropriate array of text descriptions if content mode = 2
         $restrictions = $rb->get_restriction_descriptions('content');
         $firstrestriction = current($restrictions);
         $secondrestriction = next($restrictions);
-        $this->assertRegExp('/^The user is ".*"$/', $firstrestriction);
+        $this->assertRegExp('/^The User is ".*"$/', $firstrestriction);
         $this->assertRegExp('/^The completion date occurred after/', $secondrestriction);
 
         $this->resetAfterTest(true);
@@ -823,12 +813,12 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $obj1 = new stdClass();
         $obj1->joins = array('auser','competency');
         $obj2 = new stdClass();
-        $obj2->joins = 'position';
-        $columns = $rb->get_joins($obj1, 'test');
+        $obj2->joins = 'primary_position';
+        $joins = $rb->get_joins($obj1, 'test');
         // should return an array
-        $this->assertTrue((bool)is_array($columns));
+        $this->assertTrue((bool)is_array($joins));
         // the array should contain the correct number of columns
-        $this->assertEquals(2, count($columns));
+        $this->assertEquals(2, count($joins));
         $userjoin = new rb_join(
             'auser',
             'LEFT',
@@ -838,22 +828,22 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
             'base'
         );
         // the strings should have the correct format
-        $this->assertEquals($userjoin, current($columns));
+        $this->assertEquals($userjoin, current($joins));
         // should also work with string instead of array
-        $columns2 = $rb->get_joins($obj2, 'test');
-        $this->assertTrue((bool)is_array($columns2));
-        // the array should contain the correct number of columns
-        $this->assertEquals(2, count($columns2));
+        $joins2 = $rb->get_joins($obj2, 'test');
+        $this->assertTrue((bool)is_array($joins2));
+        // the array should contain the correct number of joins
+        $this->assertEquals(2, count($joins2));
         $posjoin = new rb_join(
-            'position',
+            'primary_position',
             'LEFT',
             '{pos}',
-            'position.id = position_assignment.positionid',
+            'primary_position.id = primary_job_assignment.positionid',
             1,
-            'position_assignment'
+            'primary_job_assignment'
         );
         // the strings should have the correct format
-        $this->assertEquals($posjoin, current($columns2));
+        $this->assertEquals($posjoin, current($joins2));
 
         $this->resetAfterTest(true);
     }
@@ -894,12 +884,12 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         global $CFG,$SESSION;
         $rb = $this->rb;
         // set a filter session var
-        $SESSION->reportbuilder[$rb->get_uniqueid()] = array('user-fullname' => 'unused', 'user-positionid' => 'unused');
-        $columns = $rb->get_filter_joins();
+        $SESSION->reportbuilder[$rb->get_uniqueid()] = array('user-fullname' => 'unused', 'primary_job-positionid' => 'unused');
+        $joins = $rb->get_filter_joins();
         // should return an array
-        $this->assertTrue((bool)is_array($columns));
-        // the array should contain the correct number of columns
-        $this->assertEquals(2, count($columns));
+        $this->assertTrue((bool)is_array($joins));
+        // the array should contain the correct number of joins
+        $this->assertEquals(2, count($joins));
 
         $userjoin = new rb_join(
             'auser',
@@ -910,7 +900,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
             'base'
         );
         // the strings should have the correct format
-        $this->assertEquals($userjoin, current($columns));
+        $this->assertEquals($userjoin, current($joins));
         unset($SESSION->reportbuilder[$rb->get_uniqueid()]);
 
         $this->resetAfterTest(true);
@@ -1065,22 +1055,22 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->assertSame(' ORDER BY base.id', $rb->get_report_sort(false));
 
         unset($SESSION->flextable);
-        $DB->set_field('report_builder', 'defaultsortcolumn', 'user_position', array('id' => $this->rb->_id));
+        $DB->set_field('report_builder', 'defaultsortcolumn', 'primary_job_position', array('id' => $this->rb->_id));
         $DB->set_field('report_builder', 'defaultsortorder', SORT_DESC, array('id' => $this->rb->_id));
         $rb = new reportbuilder($this->rb->_id);
-        $this->assertSame(' ORDER BY user_position DESC, base.id', $rb->get_report_sort());
-        $this->assertSame(' ORDER BY user_position DESC, base.id', $rb->get_report_sort(false));
+        $this->assertSame(' ORDER BY primary_job_position DESC, base.id', $rb->get_report_sort());
+        $this->assertSame(' ORDER BY primary_job_position DESC, base.id', $rb->get_report_sort(false));
 
         $SESSION->flextable[$this->rb->get_uniqueid('rb')] = array(
             'collapse' => array(),
-            'sortby'   => array('user_organisation' => SORT_ASC),
+            'sortby'   => array('primary_job_organisation' => SORT_ASC),
             'i_first'  => '',
             'i_last'   => '',
             'textsort' => array(),
         );
         $rb = new reportbuilder($this->rb->_id);
-        $this->assertSame(' ORDER BY user_organisation ASC, base.id', $rb->get_report_sort());
-        $this->assertSame(' ORDER BY user_position DESC, base.id', $rb->get_report_sort(false));
+        $this->assertSame(' ORDER BY primary_job_organisation ASC, base.id', $rb->get_report_sort());
+        $this->assertSame(' ORDER BY primary_job_position DESC, base.id', $rb->get_report_sort(false));
     }
 
     // skipping tests for the following as they just print HTML
@@ -1093,10 +1083,15 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     function test_reportbuilder_get_content_options() {
         $rb = $this->rb;
         $contentoptions = $rb->get_content_options();
-        // should return an array of content options
+        // Should return an array of content options.
         $this->assertTrue((bool)is_array($contentoptions));
-        // should have the appropriate format
-        $this->assertEquals('current_pos', current($contentoptions));
+        // Should have the right amount of options in the appropriate format.
+        $this->assertCount(5, $contentoptions);
+        $this->assertTrue(in_array('user', $contentoptions));
+        $this->assertTrue(in_array('current_pos', $contentoptions));
+        $this->assertTrue(in_array('current_org', $contentoptions));
+        $this->assertTrue(in_array('completed_org', $contentoptions));
+        $this->assertTrue(in_array('date', $contentoptions));
 
         $this->resetAfterTest(true);
     }

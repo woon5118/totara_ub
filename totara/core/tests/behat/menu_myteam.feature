@@ -26,10 +26,10 @@ Feature: Test My Team menu item
     And the following "position" hierarchy exists:
       | framework | idnumber | fullname   |
       | FW001     | POS001   | Position1  |
-    And the following position assignments exist:
-      | user     | position | type      | manager  |
-      | user001  | POS001   | primary   | manager |
-      | user002  | POS001   | primary   | manager |
+    And the following job assignments exist:
+      | user     | position | idnumber | manager |
+      | user001  | POS001   | 1        | manager |
+      | user002  | POS001   | 1        | manager |
 
     When I log in as "manager"
     And I click on "My Team" in the totara menu
@@ -51,10 +51,10 @@ Feature: Test My Team menu item
     And the following "position" hierarchy exists:
       | framework | idnumber | fullname   |
       | FW001     | POS001   | Position1  |
-    And the following position assignments exist:
-      | user     | position | type      | manager  |
-      | user001  | POS001   | primary   | manager |
-      | user002  | POS001   | primary   | manager |
+    And the following job assignments exist:
+      | user     | position | idnumber | manager |
+      | user001  | POS001   | 1        | manager |
+      | user002  | POS001   | 1        | manager |
 
     When I log in as "user001"
     Then I should not see "My Team" in the totara menu

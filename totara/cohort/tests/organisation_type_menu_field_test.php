@@ -141,8 +141,7 @@ extends advanced_testcase {
                 )
             );
 
-            $parms = array('organisationid' => $org->id, 'userid' => $user->id);
-            $hierarchies->create_org_assign($parms);
+            \totara_job\job_assignment::create_default($user->id, array('organisationid' => $org->id));
         }
 
         cohort_rules_list(true);
@@ -164,8 +163,8 @@ extends advanced_testcase {
     public function test_equals() {
         $this->cohorts->create_cohort_rule_params(
             $this->rules->id,
-            'org',
-            'customfield'.$this->custom_field->id,
+            'primaryjobassign',
+            'orgcustomfield'.$this->custom_field->id,
             array('equal' => COHORT_RULES_OP_IN_EQUAL),
             array('IT') // 1st menu option.
         );
@@ -181,8 +180,8 @@ extends advanced_testcase {
     public function test_not_equals() {
         $this->cohorts->create_cohort_rule_params(
             $this->rules->id,
-            'org',
-            'customfield'.$this->custom_field->id,
+            'primaryjobassign',
+            'orgcustomfield'.$this->custom_field->id,
             array('equal' => COHORT_RULES_OP_IN_NOTEQUAL),
             array('IT') // 1st menu option.
         );

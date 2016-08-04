@@ -20,12 +20,6 @@ Feature: Use the multi-item hierarchy filter
       | fullname         | idnumber | org_framework |
       | Organisation One | org1     | orgfw         |
       | Organisation Two | org2     | orgfw         |
-    And the following "organisation assignments" exist in "totara_hierarchy" plugin:
-      | user  | organisation |
-      | user1 | org1         |
-      | user2 | org2         |
-      | user3 | org1         |
-      | user4 | org2         |
     And the following "position frameworks" exist in "totara_hierarchy" plugin:
       | fullname           | idnumber |
       | Position Framework | posfw    |
@@ -33,12 +27,12 @@ Feature: Use the multi-item hierarchy filter
       | fullname     | idnumber | pos_framework |
       | Position One | pos1     | posfw         |
       | Position Two | pos2     | posfw         |
-    And the following "position assignments" exist in "totara_hierarchy" plugin:
-      | user    | position |
-      | user1 | pos1     |
-      | user2 | pos1     |
-      | user3 | pos2     |
-      | user4 | pos2     |
+    And the following job assignments exist:
+      | user  | position | organisation |
+      | user1 | pos1     | org1         |
+      | user2 | pos1     | org2         |
+      | user3 | pos2     | org1         |
+      | user4 | pos2     | org2         |
     And I log in as "admin"
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
 
@@ -50,7 +44,7 @@ Feature: Use the multi-item hierarchy filter
     And I click on "Filters" "link" in the ".tabtree" "css_element"
     And I select "User's Position (multi-item)" from the "newstandardfilter" singleselect
     And I press "Add"
-    And I select "User's Position Framework ID" from the "newstandardfilter" singleselect
+    And I select "User's Position Framework ID Number" from the "newstandardfilter" singleselect
     And I press "Save changes"
     And I follow "View This Report"
     Then I should see "user1" in the ".reportbuilder-table" "css_element"
@@ -58,8 +52,8 @@ Feature: Use the multi-item hierarchy filter
     And I should see "user3" in the ".reportbuilder-table" "css_element"
     And I should see "user4" in the ".reportbuilder-table" "css_element"
     And I should see "user5" in the ".reportbuilder-table" "css_element"
-    When I select "is greater than or equal to" from the "user-positionframeworkid_op" singleselect
-    And I set the field "user-positionframeworkid" to "1"
+    When I select "is equal to" from the "User's Position Framework ID Number field limiter" singleselect
+    And I set the field "User's Position Framework ID Number value" to "posfw"
     And I click on "Search" "button" in the "#fgroup_id_submitgroupstandard" "css_element"
     Then I should see "user1"
     And I should see "user2" in the ".reportbuilder-table" "css_element"

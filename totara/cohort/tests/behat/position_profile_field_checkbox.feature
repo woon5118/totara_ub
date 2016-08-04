@@ -29,7 +29,7 @@ Feature: Test audience with position checkbox profile field.
     And the following "hierarchy type assignments" exist in "totara_hierarchy" plugin:
       | hierarchy | field    | typeidnumber | idnumber | value |
       | position  | checkbox | POSTYPE001   | POS001   | 1     |
-    And the following "position assignments" exist in "totara_hierarchy" plugin:
+    And the following job assignments exist:
       | user      | position |
       | learner10 | POS001   |
       | learner20 | POS001   |

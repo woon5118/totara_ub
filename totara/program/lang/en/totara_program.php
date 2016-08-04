@@ -110,6 +110,15 @@ $string['assignindividual'] = '{$a->fullname} ({$a->email})';
 $string['assignmentcriterialearner'] = 'You are required to complete this program under the following criteria:';
 $string['assignmentcriteriamanager'] = 'The learner is required to complete this program under the following criteria:';
 $string['assignmentduedate'] = 'Assignment due date';
+$string['assignmentduedate_help'] = '<p>The due date for users in the assignment can be calculated with these options:</p>
+* Fixed completion date - Select a fixed time to be set as the due date for all the users in the assignment
+* First login - Relative to the users first log in to the system
+* Position assignment date - Relative to the time a position was assigned in any of the users job assignments with the specified position
+* Job assignment start date - Relative to the startdate field in any of the users job assignments with the specified position
+* Program completion - Relative to the time a specified program was completed by the user
+* Course completion - Relative to the time a specified program was completed by the user
+* Profile field date - Relative to the value of a date/time custom field in the users profile
+* Program enrolment date - Relative to the time a user is enrolled in this program';
 $string['assignments'] = 'Assignments';
 $string['assignmentsdeferred'] = 'Program assignment changes have been deferred and will be applied during the next cron run';
 $string['assignmentsdeferredtask'] = 'Deferred program assignments changes';
@@ -438,7 +447,7 @@ $string['extensionrequestfailed:nomanager'] = 'Extension request was not sent. M
 $string['extensionrequestmessage'] = '<p>A user has requested an extension for program <em>{$a->programfullname}</em>. The details of the request are:</p><ul><li>Date: {$a->extensiondatestr}</li><li>Reason: {$a->extensionreason}</li></ul><p><a href=\'{$a->manageurl}\'>Click here to manage extensions</a></p>';
 $string['extensionrequestmessage_help'] = 'This message will be sent to the student\'s manager whenever a program extension request is made.';
 $string['extensionrequestnotsent'] = 'The extension request could NOT be sent. Please try again.';
-$string['extensionrequestsent'] = 'Request for program extension sent to manager';
+$string['extensionrequestsent'] = 'Request for program extension has been sent to your manager(s)';
 $string['extensions'] = 'Extensions';
 $string['failedtoresolve'] = 'Failed to resolve the following exceptions';
 $string['findprograms'] = 'Find Programs';
@@ -522,6 +531,7 @@ $string['instructions:programexceptions'] = 'Quickly resolve assignment issues b
 $string['instructions:programmessages'] = 'Define program messages and reminders as required';
 $string['invalidtype'] = 'Invalid type param';
 $string['itemdeleted'] = 'Item Deleted';
+$string['jobassignmentstartdate'] = 'Job assignment start date';
 $string['label:competencyname'] = 'Competency name';
 $string['label:coursecreation'] = 'When to create new course';
 $string['label:coursescorefield'] = 'Course score field';

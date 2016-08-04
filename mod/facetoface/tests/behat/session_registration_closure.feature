@@ -23,7 +23,7 @@ Feature: Seminar Event Registration Closure
       | jelly   | C1     | student        |
       | minny   | C1     | student        |
       | moxxy   | C1     | student        |
-    And the following position assignments exist:
+    And the following job assignments exist:
       | user  | manager |
       | sally | manager |
       | jelly | manager |

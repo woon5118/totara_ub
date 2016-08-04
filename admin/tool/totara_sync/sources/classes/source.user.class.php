@@ -73,10 +73,12 @@ abstract class totara_sync_source_user extends totara_sync_source {
             'address',
             'orgidnumber',
             'manageridnumber',
+            'managerjobassignmentidnumber',
             'appraiseridnumber',
             'auth',
             'password',
             'suspended',
+            'jobassignmentidnumber',
             'postitle',
             'posstartdate',
             'posenddate'
@@ -121,6 +123,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
     }
 
     function config_form(&$mform) {
+        global $CFG;
         // Fields to import
         $mform->addElement('header', 'importheader', get_string('importfields', 'tool_totara_sync'));
         $mform->setExpanded('importheader');
@@ -129,6 +132,17 @@ abstract class totara_sync_source_user extends totara_sync_source {
             $name = 'import_'.$f;
             if (in_array($f, array('idnumber', 'username', 'timemodified'))) {
                 $mform->addElement('hidden', $name, '1');
+                $mform->setType($name, PARAM_INT);
+            } else if (!empty($CFG->totara_job_allowmultiplejobs) && !empty($this->element->config->multijobassign) && $f == 'jobassignmentidnumber') {
+                $mform->addElement('hidden', $name, '1');
+                $mform->setType($name, PARAM_INT);
+            } else if (!empty($CFG->totara_job_allowmultiplejobs) && !empty($this->element->config->multijobassign) && $f == 'managerjobassignmentidnumber') {
+                // Enforce managers job assignment only if manager idnumber is set.
+                if (!empty($this->config->import_manageridnumber)) {
+                    $mform->addElement('hidden', $name, '1');
+                } else {
+                    $mform->addElement('hidden', $name, '0');
+                }
                 $mform->setType($name, PARAM_INT);
             } else if (in_array($f, array('firstname', 'lastname')) && $this->element->config->allow_create) {
                 $mform->addElement('hidden', $name, '1');
@@ -153,6 +167,10 @@ abstract class totara_sync_source_user extends totara_sync_source {
                 }
             }
         }
+
+        // Manager's job assignment can only be set if manageridnumber is set.
+        $mform->disabledIf('import_managerjobassignmentidnumber', 'import_manageridnumber', 'notchecked');
+
         foreach ($this->customfieldtitles as $field => $name) {
             $mform->addElement('checkbox', 'import_'.$field, $name);
         }
@@ -180,6 +198,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
     }
 
     function config_save($data) {
+        global $CFG;
         foreach ($this->fields as $f) {
             $this->set_config('import_'.$f, !empty($data->{'import_'.$f}));
         }
@@ -191,6 +210,12 @@ abstract class totara_sync_source_user extends totara_sync_source {
         }
         foreach (array_keys($this->customfields) as $f) {
             $this->set_config('fieldmapping_'.$f, $data->{'fieldmapping_'.$f});
+        }
+        // Remove management job assignment if no manager id number is set and enforce if set and multiple jobs enabled.
+        if (empty($data->import_manageridnumber)) {
+            $this->set_config('import_managerjobassignmentidnumber', 0);
+        } else if (!empty($CFG->totara_job_allowmultiplejobs) && !empty($this->element->config->multijobassign)) {
+            $this->set_config('import_managerjobassignmentidnumber', 1);
         }
     }
 
@@ -299,6 +324,12 @@ abstract class totara_sync_source_user extends totara_sync_source {
         }
         if (!empty($this->config->import_manageridnumber)) {
             $table->add_field('manageridnumber', XMLDB_TYPE_CHAR, '100');
+        }
+        if (!empty($this->config->import_managerjobassignmentidnumber)) {
+            $table->add_field('managerjobassignmentidnumber', XMLDB_TYPE_CHAR, '100');
+        }
+        if (!empty($this->config->import_jobassignmentidnumber)) {
+            $table->add_field('jobassignmentidnumber', XMLDB_TYPE_CHAR, '100');
         }
         if (!empty($this->config->import_appraiseridnumber)) {
             $table->add_field('appraiseridnumber', XMLDB_TYPE_CHAR, '100');

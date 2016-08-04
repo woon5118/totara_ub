@@ -101,7 +101,7 @@ class rb_filter_hierarchy_multi extends rb_filter_type {
             list($isql, $iparams) = $DB->get_in_or_equal(explode(',', $ids));
             $items = $DB->get_records_select($type, "id {$isql}", $iparams);
             if (!empty($items)) {
-                $out = html_writer::start_tag('div', array('class' => 'list-' . $this->name ));
+                $out = html_writer::start_tag('div', array('class' => 'list-' . $this->name));
                 foreach ($items as $item) {
                     $out .= display_selected_hierarchy_item($item, $this->name);
                 }

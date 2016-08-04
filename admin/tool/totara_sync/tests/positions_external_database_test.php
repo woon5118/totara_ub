@@ -288,7 +288,7 @@ class tool_totara_sync_user_database_testcase extends advanced_testcase {
         $this->assertTrue($this->run_sync());
 
         // Check dates synced correctly.
-        $this->assertTrue($DB->record_exists('pos_assignment', array("positionid" => 1, "timevalidfrom" => 1445731200, "timevalidto" => 1477353600)));
+        $this->assertTrue($DB->record_exists('job_assignment', array("positionid" => 1, "timevalidfrom" => 1445731200, "timevalidto" => 1477353600)));
     }
 
     public function test_position_dates_with_date_string() {
@@ -305,7 +305,7 @@ class tool_totara_sync_user_database_testcase extends advanced_testcase {
         $this->assertTrue($this->run_sync());
 
         // Check dates synced correctly.
-        $record = $DB->get_record("pos_assignment", array("positionid" => 1));
+        $record = $DB->get_record("job_assignment", array("positionid" => 1));
         $this->assertEquals("2015-10-25", date('Y-m-d', $record->timevalidfrom));
         $this->assertEquals("2016-10-25", date('Y-m-d', $record->timevalidto));
     }
@@ -324,7 +324,7 @@ class tool_totara_sync_user_database_testcase extends advanced_testcase {
         $this->assertTrue($this->run_sync());
 
         // Check dates synced correctly.
-        $this->assertTrue($DB->record_exists('pos_assignment', array("positionid" => 1, "timevalidfrom" => null, "timevalidto" => null)));
+        $this->assertTrue($DB->record_exists('job_assignment', array("positionid" => 1, "timevalidfrom" => null, "timevalidto" => null)));
     }
 
     public function test_position_dates_with_zero_data() {
@@ -341,7 +341,7 @@ class tool_totara_sync_user_database_testcase extends advanced_testcase {
         $this->assertTrue($this->run_sync());
 
         // Check dates synced correctly.
-        $this->assertTrue($DB->record_exists('pos_assignment', array("positionid" => 1, "timevalidfrom" => null, "timevalidto" => null)));
+        $this->assertTrue($DB->record_exists('job_assignment', array("positionid" => 1, "timevalidfrom" => null, "timevalidto" => null)));
     }
 
     public function test_position_dates_with_null_data() {
@@ -358,7 +358,7 @@ class tool_totara_sync_user_database_testcase extends advanced_testcase {
         $this->assertTrue($this->run_sync());
 
         // Check dates synced correctly.
-        $this->assertTrue($DB->record_exists('pos_assignment', array("positionid" => 1, "timevalidfrom" => null, "timevalidto" => null)));
+        $this->assertTrue($DB->record_exists('job_assignment', array("positionid" => 1, "timevalidfrom" => null, "timevalidto" => null)));
     }
 
     public function test_position_dates_resync_with_empty_data() {
@@ -372,15 +372,15 @@ class tool_totara_sync_user_database_testcase extends advanced_testcase {
         $this->populate_external_user_table(array("posidnumber" => 1, "posstartdate" => '', "posenddate" => ''));
 
         // Create a user position assignment.
-        $DB->insert_record("pos_assignment", array("fullname" => "pos1", "timecreated" => 0, "timemodified" => 0, "usermodified" => 0, "userid" => 3, "positionid" => 1, "timevalidfrom" => 1445731200, "timevalidto" => 1477353600 ));
+        $DB->insert_record("job_assignment", array("fullname" => "job1", "timecreated" => 0, "timemodified" => 0, "usermodified" => 0, "userid" => 3, "positionid" => 1, "timevalidfrom" => 1445731200, "timevalidto" => 1477353600 ));
 
         // Check record inserted.
-        $this->assertTrue($DB->record_exists('pos_assignment', array("userid" => 3, "positionid" => 1, "timevalidfrom" => 1445731200, "timevalidto" => 1477353600)));
+        $this->assertTrue($DB->record_exists('job_assignment', array("userid" => 3, "positionid" => 1, "timevalidfrom" => 1445731200, "timevalidto" => 1477353600)));
 
         // Run and test the sync.
         $this->assertTrue($this->run_sync());
 
         // Check dates synced correctly.
-        $this->assertTrue($DB->record_exists('pos_assignment', array("positionid" => 1, "timevalidfrom" => null, "timevalidto" => null)));
+        $this->assertTrue($DB->record_exists('job_assignment', array("positionid" => 1, "timevalidfrom" => null, "timevalidto" => null)));
     }
 }

@@ -16,9 +16,9 @@ Feature: Complete the example appraisal
     And the following "position" hierarchy exists:
       | fullname     | idnumber | framework |
       | Position One | pos1     | posfw     |
-    And the following position assignments exist:
-      | user     | position | manager  |
-      | learner1 | pos1     | manager1 |
+    And the following job assignments exist:
+      | user     | fullname         | idnumber | manager  | position |
+      | learner1 | Learner1 Day Job | l1ja     | manager1 | pos1     |
     And the following "goal" frameworks exist:
       | fullname       | idnumber |
       | Goal Framework | goalfw   |
@@ -85,6 +85,7 @@ Feature: Complete the example appraisal
     And I log in as "learner1"
     And I click on "Latest Appraisal" in the totara menu
     Then I should see "Example appraisal"
+    And I should see "Learner1 Day Job"
     When I press "Start"
     Then I should see "Review your goals"
     When I press "Choose goals to review"

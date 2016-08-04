@@ -21,12 +21,12 @@ Feature: Single hierarchy report filter
       | Organisation 1a | org1a    | orgfw         |
       | Organisation 1b | org1b    | orgfw         |
       | Organisation 2z | org2z    | orgfw         |
-    And the following "organisation assignments" exist in "totara_hierarchy" plugin:
+    And the following job assignments exist:
       | user  | organisation |
       | user1 | org1z        |
       | user2 | org1a        |
       | user3 | org1b        |
-      | user4 | org2         |
+      | user4 | org2z        |
     And I log in as "admin"
     And I navigate to "Manage organisations" node in "Site administration > Hierarchies > Organisations"
     And I click on "Org Fram" "link"
@@ -54,15 +54,15 @@ Feature: Single hierarchy report filter
     And the "Choose Organisation" "button" should be disabled
 
   Scenario: Test the enable/disable choose orgainisation button
-    Given I set the field "user-organisationpath_op" to "is equal to"
+    Given I set the field "primary_job-organisationpath_op" to "is equal to"
     Then the "Choose Organisation" "button" should be enabled
-    When I set the field "user-organisationpath_op" to "is any value"
+    When I set the field "primary_job-organisationpath_op" to "is any value"
     Then the "Choose Organisation" "button" should be disabled
-    When I set the field "user-organisationpath_op" to "isn't equal to"
+    When I set the field "primary_job-organisationpath_op" to "isn't equal to"
     Then the "Choose Organisation" "button" should be enabled
 
   Scenario Outline: Test organisation report builder filter
-    Given I set the field "user-organisationpath_op" to "<type>"
+    Given I set the field "primary_job-organisationpath_op" to "<type>"
     And I click on "Choose Organisation" "button"
     And I click on "Organisation 1z" "link" in the "Choose organisation" "totaradialogue"
     And I click on "OK" "button" in the "Choose organisation" "totaradialogue"

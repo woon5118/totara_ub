@@ -74,7 +74,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
      * @throws dml_exception
      */
     private function add_signup_elements($mform, $instance, $totara_facetoface) {
-        global $DB, $CFG, $OUTPUT;
+        global $DB, $OUTPUT, $USER;
 
         $courseid = $instance->courseid;
 
@@ -123,10 +123,10 @@ class enrol_totara_facetoface_signup_form extends moodleform {
 
                 $mform->addElement('html', html_writer::start_div('f2factivity', array('id' => 'f2factivity' . $facetofaceid)));
                 $mform->addElement('html', $OUTPUT->heading($facetoface->name, 3));
-
                 $managerreqd = facetoface_manager_needed($facetoface);
-                if ($facetoface->forceselectposition && !get_position_assignments($managerreqd)) {
-                    $msg = get_string('error:nopositionselectedactivity', 'facetoface');
+                $activejobassigns = \totara_job\job_assignment::get_all($USER->id, $managerreqd);
+                if ($facetoface->forceselectjobassignment && empty($activejobassigns)) {
+                    $msg = get_string('error:nojobassignmentselectedactivity', 'facetoface');
                     $mform->addElement('html', html_writer::tag('div', $msg));
                 } else {
                     $this->enrol_totara_facetoface_addsessrows($mform, $sessions, $facetoface, $force);
@@ -283,7 +283,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
                 $mform->addElement('checkbox', $elementid, $tandcurl);
             }
 
-            mod_facetoface_signup_form::add_position_selection_formelem($mform, $facetoface->id, $session->id);
+            mod_facetoface_signup_form::add_jobassignment_selection_formelem($mform, $facetoface->id, $session->id);
 
             $mform->addElement('html', html_writer::end_tag('td'));
 

@@ -25,6 +25,9 @@
 
 global $CFG;
 require_once($CFG->dirroot .'/user/profile/lib.php');
+require_once($CFG->dirroot.'/totara/job/classes/job_assignment.php');
+
+use totara_job\job_assignment;
 
 class question_userinfo extends question_base{
 
@@ -205,16 +208,17 @@ class question_userinfo extends question_base{
                         $form->addElement('static', $this->get_prefix_form(), $fieldname, format_string($user->address));
                         break;
                     case 'profile_managername':
-                        if ($manager = totara_get_manager($user->id)) {
-                            $form->addElement('static', $this->get_prefix_form(), $fieldname, format_string(fullname($manager)));
+                        $jobs = $this->job_assignments($user->id);
+                        if (!empty($jobs)) {
+                            $form->addElement('static', $this->get_prefix_form(), $fieldname, $jobs);
                         }
                         break;
                     case 'profile_position':
                         $query = 'SELECT pos.fullname
                             FROM {pos} pos
-                            JOIN {pos_assignment} pa
+                            JOIN {job_assignment} ja
                             ON pos.id = pa.positionid
-                            WHERE pa.userid = ?';
+                            WHERE ja.userid = ?';
                         $position = $DB->get_record_sql($query, array($user->id));
                         $fullname = ($position) ? format_string($position->fullname) : '';
                         $form->addElement('static', $this->get_prefix_form(), $fieldname, $fullname);
@@ -222,9 +226,9 @@ class question_userinfo extends question_base{
                     case 'profile_organisation':
                         $query = 'SELECT org.fullname
                             FROM {org} org
-                            JOIN {pos_assignment} pa
-                            ON org.id = pa.organisationid
-                            WHERE pa.userid = ?';
+                            JOIN {job_assignment} ja
+                            ON org.id = ja.organisationid
+                            WHERE ja.userid = ?';
                         $organisation = $DB->get_record_sql($query, array($user->id));
                         $fullname = ($organisation) ? format_string($organisation->fullname) : '';
                         $form->addElement('static', $this->get_prefix_form(), $fieldname, $fullname);
@@ -249,6 +253,44 @@ class question_userinfo extends question_base{
         $form->addElement('html', '</div>');
     }
 
+
+    /**
+     * Returns a list of job assignments to be displayed for a given user.
+     *
+     * @param int $userid the user to look up.
+     *
+     * @return string job assignments to display or an empty string if there are
+     *         none.
+     */
+    private function job_assignments($userid) {
+        $mgrids = [];
+        $jobs = [];
+        foreach (job_assignment::get_all($userid, true) as $job) {
+            $mgrid = empty($job->managerid)
+                  ? $job->tempmanagerid
+                  : $job->managerid;
+
+            $jobs[] = [$mgrid, $job->fullname];
+            if (!in_array($mgrid, $mgrids)) {
+                $mgrids[] = $mgrid;
+            }
+        }
+
+        $mgrs = user_get_users_by_id($mgrids);
+        return array_reduce(
+            $jobs,
+
+            function ($accumulated, array $job) use ($mgrs) {
+                list($mgrid, $jobname) = $job;
+                $managername = fullname($mgrs[$mgrid]);
+                $name = format_string("$jobname [$managername]");
+
+                return empty($accumulated) ? $name : "$accumulated<br/>$name";
+            },
+
+            ''
+        );
+    }
 
     /**
      * If this element has any answerable form fields, or it's a view only (informational or static) element.

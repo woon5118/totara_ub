@@ -73,7 +73,7 @@ if (!empty($evidenceid)) {
 }
 
 // users can only view their own and their staff's pages
-if ($USER->id != $userid && !totara_is_manager($userid) && !($canaccess || $canedit)) {
+if ($USER->id != $userid && !(\totara_job\job_assignment::is_managing($USER->id, $userid)) && !($canaccess || $canedit)) {
     print_error('error:cannotviewpage', 'totara_plan');
 }
 

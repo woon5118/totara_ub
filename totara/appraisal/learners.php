@@ -114,7 +114,7 @@ if ($appraisal->id) {
 }
 
 if (!empty($CFG->dynamicappraisals) && $appraisal->status == appraisal::STATUS_ACTIVE) {
-    $warnings = $appraisal->validate_roles(true);
+    $warnings = $appraisal->validate_roles();
     echo $output->display_learner_warnings($appraisal->id, $warnings, $canviewusers);
 }
 

@@ -187,4 +187,9 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('enableprogramcompletioneditor', 'totara_program'),
         new lang_string('enableprogramcompletioneditor_desc', 'totara_program'),
         0));
+
+    $optionalsubsystems->add(new admin_setting_configcheckbox('totara_job_allowmultiplejobs',
+        new lang_string('setting:allowmultiplejobs', 'totara_job'),
+        new lang_string('setting:allowmultiplejobs_description', 'totara_job'),
+        1));
 }

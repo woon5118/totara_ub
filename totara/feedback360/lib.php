@@ -787,7 +787,7 @@ class feedback360 {
     public static function check_managing_assigned($feedback360id, $userid) {
         global $DB;
 
-        $staff = totara_get_staff($userid);
+        $staff = \totara_job\job_assignment::get_staff_userids($userid);
 
         if (!empty($staff)) {
             list($insql, $inparams) = $DB->get_in_or_equal($staff);

@@ -89,13 +89,9 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         $student2 = $this->getDataGenerator()->create_user();
         $manager = $this->getDataGenerator()->create_user();
 
-        $assignment = new position_assignment(array('userid' => $student1->id, 'type' => POSITION_TYPE_PRIMARY));
-        $assignment->managerid = $manager->id;
-        assign_user_position($assignment, true);
-
-        $assignment = new position_assignment(array('userid' => $student2->id, 'type' => POSITION_TYPE_PRIMARY));
-        $assignment->managerid = $manager->id;
-        assign_user_position($assignment, true);
+        $managerja = \totara_job\job_assignment::create_default($manager->id);
+        \totara_job\job_assignment::create_default($student1->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($student2->id, array('managerjaid' => $managerja->id));
 
         $course = $this->getDataGenerator()->create_course();
 
@@ -1095,13 +1091,9 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         $student2 = $this->getDataGenerator()->create_user();
         $manager  = $this->getDataGenerator()->create_user();
 
-        $assignment = new position_assignment(array('userid' => $student1->id, 'type' => POSITION_TYPE_PRIMARY));
-        $assignment->managerid = $manager->id;
-        assign_user_position($assignment, true);
-
-        $assignment = new position_assignment(array('userid' => $student2->id, 'type' => POSITION_TYPE_PRIMARY));
-        $assignment->managerid = $manager->id;
-        assign_user_position($assignment, true);
+        $managerja = \totara_job\job_assignment::create_default($manager->id);
+        \totara_job\job_assignment::create_default($student1->id, array('managerjaid' => $managerja->id));
+        \totara_job\job_assignment::create_default($student2->id, array('managerjaid' => $managerja->id));
 
         $course = $this->getDataGenerator()->create_course();
 
@@ -1502,12 +1494,9 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         $this->assertEquals($student2->timezone, 'Pacific/Auckland');
         $this->assertEquals($student3->timezone, $CFG->timezone);
 
-        $assignment = new position_assignment(array('userid' => $student1->id, 'type' => POSITION_TYPE_PRIMARY));
-        assign_user_position($assignment, true);
-        $assignment = new position_assignment(array('userid' => $student2->id, 'type' => POSITION_TYPE_PRIMARY));
-        assign_user_position($assignment, true);
-        $assignment = new position_assignment(array('userid' => $student3->id, 'type' => POSITION_TYPE_PRIMARY));
-        assign_user_position($assignment, true);
+        \totara_job\job_assignment::create_default($student1->id);
+        \totara_job\job_assignment::create_default($student2->id);
+        \totara_job\job_assignment::create_default($student3->id);
 
         $course = $this->getDataGenerator()->create_course();
 

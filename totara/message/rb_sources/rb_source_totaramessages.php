@@ -105,7 +105,8 @@ class rb_source_totaramessages extends rb_base_source {
 
         // Include some standard joins. Including the user the message was sent from.
         $this->add_user_table_to_joinlist($joinlist, 'msg', 'useridfrom');
-        $this->add_position_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
+        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
+        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
 
         return $joinlist;
@@ -222,7 +223,8 @@ class rb_source_totaramessages extends rb_base_source {
 
         // Include some standard columns. Including the user that the message was sent from.
         $this->add_user_fields_to_columns($columnoptions, 'auser', 'user', true);
-        $this->add_position_fields_to_columns($columnoptions);
+        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
+        $this->add_all_job_assignments_fields_to_columns($columnoptions);
         $this->add_cohort_user_fields_to_columns($columnoptions);
 
         return $columnoptions;
@@ -269,27 +271,26 @@ class rb_source_totaramessages extends rb_base_source {
 
         // Include some standard filters. Including the user that the message was sent from.
         $this->add_user_fields_to_filters($filteroptions, 'user', true);
-        $this->add_position_fields_to_filters($filteroptions);
+        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
+        $this->add_all_job_assignments_fields_to_filters($filteroptions);
         $this->add_cohort_user_fields_to_filters($filteroptions);
 
         return $filteroptions;
     }
 
     protected function define_contentoptions() {
-        $contentoptions = array(
-            new rb_content_option(
-                'current_pos',
-                get_string('currentpos', 'totara_reportbuilder'),
-                'position.path',
-                'position'
-            ),
-            new rb_content_option(
-                'current_org',
-                get_string('currentorg', 'totara_reportbuilder'),
-                'organisation.path',
-                'organisation'
-            )
+        $contentoptions = array();
+
+        // Add the manager/position/organisation content options.
+        $this->add_basic_user_content_options($contentoptions, 'user');
+
+        // Add the time created content option.
+        $contentoptions[] = new rb_content_option(
+            'date',
+            get_string('timecreated', 'rb_source_user'),
+            'base.timecreated'
         );
+
         return $contentoptions;
     }
 

@@ -67,11 +67,10 @@ $competencyname = $DB->get_field('comp', 'fullname', array('id' => $competencyid
 $details = new stdClass();
 
 // Get user's current primary position and organisation (if any)
-$posrec = $DB->get_record('pos_assignment', array('userid' => $userid, 'type' => POSITION_TYPE_PRIMARY), 'id, positionid, organisationid');
-if ($posrec) {
-    $details->positionid = $posrec->positionid;
-    $details->organisationid = $posrec->organisationid;
-    unset($posrec);
+$jobassignment = \totara_job\job_assignment::get_first($this->plan->userid, false);
+if ($jobassignment) {
+    $details->positionid = $jobassignment->positionid;
+    $details->organisationid = $jobassignment->organisationid;
 }
 
 $details->assessorname = fullname($USER);

@@ -34,7 +34,7 @@ If multiple enrolment is enabled then the user will be signed up to every event 
 $string['cannotenrol'] = 'Enrolment is disabled or inactive';
 $string['cannotenrolalreadyrequested'] = 'It is not possible to sign up for these events (manager request already pending).';
 $string['cannotenrolnosessions'] = 'Cannot enrol (no seminar events in this course)';
-$string['cannnotupdatemanageremail'] = 'Manager email cannot be updated, configure using positions instead.';
+$string['cannnotupdatemanageremail'] = 'Manager email cannot be updated, configure using job assignments instead.';
 $string['cohortnonmemberinfo'] = 'Only members of cohort \'{$a}\' can use seminar enrolment.';
 $string['cohortonly'] = 'Only cohort members';
 $string['cohortonly_help'] = 'Seminar Direct enrolment may be restricted to members of a specified cohort only. Note that changing this setting has no effect on existing enrolments.';

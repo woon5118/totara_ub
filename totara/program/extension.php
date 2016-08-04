@@ -60,7 +60,8 @@ if (!$extensionrequest || !$extensiondate || !$extensionreason) {
     return;
 }
 
-if (!$manager = totara_get_manager($userid)) {
+$managers = \totara_job\job_assignment::get_all_manager_userids($userid);
+if (empty($managers)) {
     $result['success'] = false;
     $result['message'] = get_string('extensionrequestfailed:nomanager', 'totara_program');
     echo json_encode($result);
@@ -113,49 +114,55 @@ if ($extensionid = $DB->insert_record('prog_extension', $extension)) {
     $data = array();
     $data['extensionid'] = $extensionid;
 
-    //send request in managers language
+    // We'll need this to Send requests in the managers language.
     $strmgr = get_string_manager();
-
-    // Create object to add into extensionrequestmessage string (for the content of the email to the manager).
-    $extensiontime = userdate($extensiondate_timestamp, $strmgr->get_string('strftimedatetime', 'langconfig', null, $manager->lang), core_date::get_user_timezone($manager));
-    $manageurl = new moodle_url('/totara/program/manageextensions.php');
-    $extensiondata = array(
-        'extensiondatestr'      => $extensiontime,
-        'extensionreason'       => $extensionreason,
-        'programfullname'       => format_string($program->fullname),
-        'manageurl'             => $manageurl->out()
-    );
 
     // Get record for learner requesting extension.
     $user = $DB->get_record('user', array('id' => $userid));
     $userfullname = fullname($user);
 
-    $extension_message = new prog_extension_request_message($program->id, $extension->userid, null, null, $data);
-    $managermessagedata = $extension_message->get_manager_message_data();
-    $managermessagedata->subject = $strmgr->get_string('extensionrequest', 'totara_program', $userfullname, $manager->lang);
-    $managermessagedata->fullmessage = $strmgr->get_string('extensionrequestmessage', 'totara_program', (object)$extensiondata, $manager->lang);
-    $managermessagedata->contexturlname = $strmgr->get_string('manageextensionrequests', 'totara_program', null, $manager->lang);
-    $managermessagedata->infobutton = $strmgr->get_string('extensioninfo_button', 'totara_program', null, $manager->lang);
-    $managermessagedata->infotext = $strmgr->get_string('extensioninfo_text', 'totara_program', null, $manager->lang);
+    // Send to all the users managers.
+    $messagesent = false;
+    foreach ($managers as $managerid) {
+        $manager = core_user::get_user($managerid, '*', MUST_EXIST);
 
-    $managermessagedata->acceptbutton = $strmgr->get_string('extensionacceptbutton', 'totara_program', null, $manager->lang);
-    $managermessagedata->accepttext = $strmgr->get_string('extensionaccepttext', 'totara_program', null, $manager->lang);
+        // Create object to add into extensionrequestmessage string (for the content of the email to the manager).
+        $extensiontime = userdate($extensiondate_timestamp, $strmgr->get_string('strftimedatetime', 'langconfig', null, $manager->lang), core_date::get_user_timezone($manager));
+        $manageurl = new moodle_url('/totara/program/manageextensions.php');
+        $extensiondata = array(
+            'extensiondatestr'      => $extensiontime,
+            'extensionreason'       => $extensionreason,
+            'programfullname'       => format_string($program->fullname),
+            'manageurl'             => $manageurl->out()
+        );
 
-    $managermessagedata->rejectbutton = $strmgr->get_string('extensionrejectbutton', 'totara_program', null, $manager->lang);
-    $managermessagedata->rejecttext = $strmgr->get_string('extensionrejecttext', 'totara_program', null, $manager->lang);
+        $extension_message = new prog_extension_request_message($program->id, $extension->userid, null, null, $data);
+        $managermessagedata = $extension_message->get_manager_message_data();
+        $managermessagedata->subject = $strmgr->get_string('extensionrequest', 'totara_program', $userfullname, $manager->lang);
+        $managermessagedata->fullmessage = $strmgr->get_string('extensionrequestmessage', 'totara_program', (object)$extensiondata, $manager->lang);
+        $managermessagedata->contexturlname = $strmgr->get_string('manageextensionrequests', 'totara_program', null, $manager->lang);
+        $managermessagedata->infobutton = $strmgr->get_string('extensioninfo_button', 'totara_program', null, $manager->lang);
+        $managermessagedata->infotext = $strmgr->get_string('extensioninfo_text', 'totara_program', null, $manager->lang);
 
-    if ($extension_message->send_message($manager, $user)) {
+        $managermessagedata->acceptbutton = $strmgr->get_string('extensionacceptbutton', 'totara_program', null, $manager->lang);
+        $managermessagedata->accepttext = $strmgr->get_string('extensionaccepttext', 'totara_program', null, $manager->lang);
+
+        $managermessagedata->rejectbutton = $strmgr->get_string('extensionrejectbutton', 'totara_program', null, $manager->lang);
+        $managermessagedata->rejecttext = $strmgr->get_string('extensionrejecttext', 'totara_program', null, $manager->lang);
+
+        $messagesent = $messagesent || $extension_message->send_message($manager, $user);
+    }
+
+    if ($messagesent) {
+        // If any of the managers have been notified mark the request as pending.
         $result['success'] = true;
         $result['message'] = get_string('pendingextension', 'totara_program');
-        echo json_encode($result);
-        return;
     } else {
         $result['success'] = false;
         $result['message'] = get_string('extensionrequestnotsent', 'totara_program');
-        echo json_encode($result);
-        return;
     }
-
+    echo json_encode($result);
+    return;
 } else {
     $result['success'] = false;
     $result['message'] = get_string('extensionrequestfailed', 'totara_program');

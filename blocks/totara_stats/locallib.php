@@ -110,6 +110,7 @@ function totara_stats_timespent($from, $to) {
  * used to return stats for manager stats view
  *
  * @param object $user - Full $USER record (usually from $USER)
+ * @param object $config
  * @return array
  */
 function totara_stats_manager_stats($user, $config=null) {
@@ -126,7 +127,7 @@ function totara_stats_manager_stats($user, $config=null) {
     //might need to be careful with length of sql query limit - list of userids could be very large.
 
     // return users with this user as manager
-    $staff = totara_get_staff($user->id);
+    $staff = \totara_job\job_assignment::get_staff_userids($user->id);
     list($staffsqlin, $params) = $DB->get_in_or_equal($staff, SQL_PARAMS_NAMED, 'stf');
     $commonsql = " AND userid {$staffsqlin}
                    AND timestamp > :from AND timestamp < :to ";

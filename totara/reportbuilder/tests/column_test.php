@@ -69,11 +69,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         'timecreated' => 0, 'timemodified' => 0, 'usermodified' => 2,
     );
 
-    protected $pos_assignment_data = array(
-        'id' => 1, 'fullname' => 'Title', 'shortname' => 'Title', 'organisationid' => 1, 'positionid' => 1,
-        'userid' => 2, 'type' => 1, 'timecreated' => 1, 'timemodified' => 1, 'usermodified' => 2,
-    );
-
     protected $f2f_session_data_data = array(
         'id' => 1, 'fieldid' => 1, 'facetofacesessionid' => 1, 'data' => 'Training Centre',
     );
@@ -581,6 +576,9 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
         $DB->delete_records('upgrade_log', array());
 
+        // Create a job assignment.
+        \totara_job\job_assignment::create_default(2, array('organisationid' => 1, 'positionid' => 1));
+
         $this->loadDataSet($this->createArrayDataset(array(
             'user_info_field' => array($this->user_info_field_data),
             'user_info_data' => array($this->user_info_data_data),
@@ -590,7 +588,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'pos_framework' => array($this->pos_framework_data),
             'pos_type' => $this->type_data,
             'pos' => array($this->pos_data),
-            'pos_assignment' => array($this->pos_assignment_data),
             'facetoface_session_info_data' => array($this->f2f_session_data_data),
             'course_completion_crit_compl' => array($this->course_completion_crit_compl_data),
             'course_completion_criteria' => array($this->course_completion_criteria_data),

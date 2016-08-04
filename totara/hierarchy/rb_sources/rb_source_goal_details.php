@@ -103,8 +103,8 @@ class rb_source_goal_details extends rb_base_source {
         );
 
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
+        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
@@ -169,8 +169,8 @@ class rb_source_goal_details extends rb_base_source {
         );
 
         $this->add_user_fields_to_columns($columnoptions);
-        $this->add_position_fields_to_columns($columnoptions);
-        $this->add_manager_fields_to_columns($columnoptions);
+        $this->add_all_job_assignments_fields_to_columns($columnoptions);
+        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -195,8 +195,8 @@ class rb_source_goal_details extends rb_base_source {
         );
 
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_position_fields_to_filters($filteroptions);
-        $this->add_manager_fields_to_filters($filteroptions);
+        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
+        $this->add_all_job_assignments_fields_to_filters($filteroptions);
 
         return $filteroptions;
     }
@@ -215,31 +215,11 @@ class rb_source_goal_details extends rb_base_source {
 
 
     protected function define_contentoptions() {
-        $contentoptions = array(
-            new rb_content_option(
-                'current_pos',
-                get_string('currentpos', 'totara_reportbuilder'),
-                'position.path',
-                'position'
-            ),
-            new rb_content_option(
-                'current_org',
-                get_string('currentorg', 'totara_reportbuilder'),
-                'organisation.path',
-                'organisation'
-            ),
-            new rb_content_option(
-                'user',
-                get_string('user', 'rb_source_goal_details'),
-                array(
-                    'userid' => 'base.userid',
-                    'managerid' => 'position_assignment.managerid',
-                    'managerpath' => 'position_assignment.managerpath',
-                    'postype' => 'position_assignment.type',
-                ),
-                'position_assignment'
-            ),
-        );
+        $contentoptions = array();
+
+        // Add the manager/position/organisation content options.
+        $this->add_basic_user_content_options($contentoptions);
+
         return $contentoptions;
     }
 
@@ -324,15 +304,15 @@ class rb_source_goal_details extends rb_base_source {
                 'value' => 'namelink'
             ),
             array(
-                'type' => 'user',
+                'type' => 'primary_job',
                 'value' => 'position'
             ),
             array(
-                'type' => 'user',
+                'type' => 'primary_job',
                 'value' => 'organisation'
             ),
             array(
-                'type' => 'user',
+                'type' => 'primary_job',
                 'value' => 'managername'
             ),
             array(

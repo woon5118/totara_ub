@@ -253,29 +253,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         array(4,  4,  3,  2,  0,  0,  0),
     );
 
-    protected $pos_assignment_data = array(
-        array('id', 'fullname', 'shortname', 'idnumber', 'description',
-            'timevalidfrom', 'timevalidto', 'timecreated', 'timemodified',
-            'usermodified', 'organisationid', 'userid', 'positionid',
-            'reportstoid', 'type', 'managerid'),
-        array(1, 'fullname1', 'shortname1', 'idnumber1', 'desc1',
-             900, 1000,  800, 1300,
-            1, 1122, 1, 2,
-            1, 1, 2),
-        array(2, 'fullname2', 'shortname2', 'idnumber2', 'desc2',
-             900, 2000,  800, 2300,
-            2, 2222, 2, 2,
-            2, 2, 1),
-        array(3, 'fullname3', 'shortname3', 'idnumber3', 'desc3',
-             900, 3000,  800, 3300,
-            3, 3322, 3, 2,
-            3, 3, 1),
-        array(4, 'fullname4', 'shortname4', 'idnumber4', 'desc4',
-             900, 4000,  800, 4300,
-            4, 4422, 4, 2,
-            4, 4, 1),
-    );
-
 
     // The module is always 8 as this is the f2f module. They are inserted
     // into the mdl_modules table by the unit tests in alphabetical order and
@@ -773,7 +750,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
                     'facetoface_signups_status'     => $this->facetoface_signups_status_data,
                     'event'                         => $this->event_data,
                     'role_assignments'              => $this->role_assignments_data,
-                    'pos_assignment'                => $this->pos_assignment_data,
                     'course_modules'                => $this->course_modules_data,
                     'grade_items'                   => $this->grade_items_data,
                     'grade_categories'              => $this->grade_categories_data,
@@ -793,10 +769,62 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->user3 = $this->getDataGenerator()->create_user();
         $this->user4 = $this->getDataGenerator()->create_user();
 
-        $this->course1 = $this->getDataGenerator()->create_course(array('fullname'=> 'Into'));
+        $this->course1 = $this->getDataGenerator()->create_course(array('fullname'=> 'Intro'));
         $this->course2 = $this->getDataGenerator()->create_course(array('fullname'=> 'Basics'));
         $this->course3 = $this->getDataGenerator()->create_course(array('fullname'=> 'Advanced'));
         $this->course4 = $this->getDataGenerator()->create_course(array('fullname'=> 'Pro'));
+
+        // Set up stuff which couldn't be done above.
+        $guestja = \totara_job\job_assignment::create_default(1);
+        $adminja = \totara_job\job_assignment::create_default(2);
+        $data = array(
+            'userid' => $this->user1->id,
+            'fullname' => 'fullname1',
+            'shortname' => 'shortname1',
+            'idnumber' => 'idnumber1',
+            'description' => 'desc1',
+            'startdate' => 900,
+            'enddate' => 1000,
+            'organisationid' => 1122,
+            'positionid' => 2,
+            'managerjaid' => $adminja->id);
+        \totara_job\job_assignment::create($data);
+        $data = array(
+            'userid' => $this->user2->id,
+            'fullname' => 'fullname2',
+            'shortname' => 'shortname2',
+            'idnumber' => 'idnumber2',
+            'description' => 'desc2',
+            'startdate' => 900,
+            'enddate' => 2000,
+            'organisationid' => 2222,
+            'positionid' => 2,
+            'managerjaid' => $guestja->id);
+        \totara_job\job_assignment::create($data);
+        $data = array(
+            'userid' => $this->user3->id,
+            'fullname' => 'fullname3',
+            'shortname' => 'shortname3',
+            'idnumber' => 'idnumber3',
+            'description' => 'desc3',
+            'startdate' => 900,
+            'enddate' => 3000,
+            'organisationid' => 3322,
+            'positionid' => 2,
+            'managerjaid' => $guestja->id);
+        \totara_job\job_assignment::create($data);
+        $data = array(
+            'userid' => $this->user4->id,
+            'fullname' => 'fullname4',
+            'shortname' => 'shortname4',
+            'idnumber' => 'idnumber4',
+            'description' => 'desc4',
+            'startdate' => 900,
+            'enddate' => 4000,
+            'organisationid' => 4422,
+            'positionid' => 2,
+            'managerjaid' => $guestja->id);
+        \totara_job\job_assignment::create($data);
     }
 
     function test_facetoface_get_status() {
@@ -969,18 +997,28 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $student3 = $this->getDataGenerator()->create_user(); // Signup and cancel.
         $manager = $this->getDataGenerator()->create_user();
 
-        // Set up some position assignments,
-        $assignment = new position_assignment(array('userid' => $student1->id, 'type' => POSITION_TYPE_PRIMARY));
-        $assignment->managerid = $manager->id;
-        assign_user_position($assignment, true);
-
-        $assignment = new position_assignment(array('userid' => $student2->id, 'type' => POSITION_TYPE_PRIMARY));
-        $assignment->managerid = $manager->id;
-        assign_user_position($assignment, true);
-
-        $assignment = new position_assignment(array('userid' => $student3->id, 'type' => POSITION_TYPE_PRIMARY));
-        $assignment->managerid = $manager->id;
-        assign_user_position($assignment, true);
+        $managerja = \totara_job\job_assignment::create_default($manager->id);
+        $data = array(
+            'userid' => $student1->id,
+            'fullname' => 'student1ja',
+            'shortname' => 'student1ja',
+            'idnumber' => 'student1ja',
+            'managerjaid' => $managerja->id);
+        \totara_job\job_assignment::create($data);
+        $data = array(
+            'userid' => $student2->id,
+            'fullname' => 'student2ja',
+            'shortname' => 'student2ja',
+            'idnumber' => 'student2ja',
+            'managerjaid' => $managerja->id);
+        \totara_job\job_assignment::create($data);
+        $data = array(
+            'userid' => $student3->id,
+            'fullname' => 'student3ja',
+            'shortname' => 'student3ja',
+            'idnumber' => 'student3ja',
+            'managerjaid' => $managerja->id);
+        \totara_job\job_assignment::create($data);
 
         // Set up a course.
         $course1 = $this->getDataGenerator()->create_course();
@@ -1401,9 +1439,14 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $student2 = $this->getDataGenerator()->create_user();
         $manager = $this->getDataGenerator()->create_user();
 
-        $assignment = new position_assignment(array('userid' => $student2->id, 'type' => POSITION_TYPE_PRIMARY));
-        $assignment->managerid = $manager->id;
-        assign_user_position($assignment, true);
+        $managerja = \totara_job\job_assignment::create_default($manager->id);
+        $data = array(
+            'userid' => $student2->id,
+            'fullname' => 'student2ja',
+            'shortname' => 'student2ja',
+            'idnumber' => 'student2ja',
+            'managerjaid' => $managerja->id);
+        \totara_job\job_assignment::create($data);
 
         $course1 = $this->getDataGenerator()->create_course();
 
@@ -1462,7 +1505,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         global $DB, $CFG;
         $this->init_sample_data();
 
-        set_config('facetoface_selectpositiononsignupglobal', true);
+        set_config('facetoface_selectjobassignmentonsignupglobal', true);
 
         $this->preventResetByRollback();
 
@@ -1470,26 +1513,28 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
-        $assignmentprim = new position_assignment(
-            array('userid' => $user1->id, 'type' => POSITION_TYPE_PRIMARY, 'managerid' => $user2->id)
-        );
-        $assignmentsec = new position_assignment(
-            array('userid' => $user1->id, 'type' => POSITION_TYPE_SECONDARY, 'managerid' => $user3->id)
-        );
-        assign_user_position($assignmentprim, true);
-        assign_user_position($assignmentsec, true);
 
-        // Get position assignment records.
-        $posassprim = $DB->get_record('pos_assignment', array('userid' => $user1->id, 'type' => POSITION_TYPE_PRIMARY));
-        $posassprim->positiontype = $posassprim->type;
-        $posasssec = $DB->get_record('pos_assignment', array('userid' => $user1->id, 'type' => POSITION_TYPE_SECONDARY));
-        $posasssec->positiontype = $posasssec->type;
+        $user3ja = \totara_job\job_assignment::create_default($user3->id);
+        $data = array(
+            'userid' => $user2->id,
+            'fullname' => 'user2ja',
+            'shortname' => 'user2ja',
+            'idnumber' => 'user2ja',
+            'managerjaid' => $user3ja->id);
+        $user2ja = \totara_job\job_assignment::create($data);
+        $data = array(
+            'userid' => $user1->id,
+            'fullname' => 'user1ja',
+            'shortname' => 'user1ja',
+            'idnumber' => 'user1ja',
+            'managerjaid' => $user2ja->id);
+        $user1ja = \totara_job\job_assignment::create($data);
 
         // Set up a face to face session that requires you to get manager approval and select a position.
         $facetofacedata = array(
             'course' => $this->course1->id,
             'multiplesessions' => 1,
-            'selectpositiononsignup' => 1,
+            'selectjobassignmentonsignup' => 1,
             'approvalreqd' => 1
         );
         $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
@@ -1524,7 +1569,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             $user1->id,
             true,
             null,
-            $posasssec
+            $user2ja
         );
 
         // Grab the messages that got sent.
@@ -1852,9 +1897,14 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $userdata['email'] = 'manager@local.host';
         $user2 = $this->getDataGenerator()->create_user($userdata);
 
-        $assignment = new position_assignment(array('userid' => $user1->id, 'type' => POSITION_TYPE_PRIMARY));
-        $assignment->managerid = $user2->id;
-        assign_user_position($assignment, true);
+        $managerja = \totara_job\job_assignment::create_default($user2->id);
+        $data = array(
+            'userid' => $user1->id,
+            'fullname' => 'user1ja',
+            'shortname' => 'user1ja',
+            'idnumber' => 'user1ja',
+            'managerjaid' => $managerja->id);
+        \totara_job\job_assignment::create($data);
 
         $course1 = $this->getDataGenerator()->create_course();
 
@@ -2774,7 +2824,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->preventResetByRollback();
         $this->setAdminUser();
 
-        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
 
         $user1 = $this->getDataGenerator()->create_user(array('email' => 'user1@example.com'));
@@ -2785,8 +2834,10 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $manager2 = $this->getDataGenerator()->create_user(array('email' => 'manager2@example.com'));
 
         // Assign managers to students.
-        $hierarchygenerator->assign_primary_position($user1->id, $manager1->id, null, null);
-        $hierarchygenerator->assign_primary_position($user2->id, $manager2->id, null, null);
+        $manager1ja = \totara_job\job_assignment::create_default($manager1->id);
+        $manager2ja = \totara_job\job_assignment::create_default($manager2->id);
+        \totara_job\job_assignment::create_default($user1->id, array('managerjaid' => $manager1ja->id));
+        \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $manager2ja->id));
 
         set_config('emailonlyfromnoreplyaddress', $emailonlyfromnoreplyaddress);
         set_config('noreplyaddress', $noreplyaddress);

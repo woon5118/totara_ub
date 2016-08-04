@@ -42,5 +42,5 @@ $watchers = [
         'hookname' => '\core_course\hook\edit_form_save_changes',
         'callback' => 'totara_core\watcher\core_course_edit_form::save_form',
         'priority' => 100,
-    ],
+    ]
 ];

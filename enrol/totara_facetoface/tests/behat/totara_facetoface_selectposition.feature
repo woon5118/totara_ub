@@ -23,17 +23,17 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I navigate to "Global settings" node in "Site administration > Seminars"
-    And I set the field "Select position on signup" to "checked_checkbox"
+    And I set the field "Select job assignment on signup" to "checked_checkbox"
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name 1       |
-      | Description | Test seminar description 1 |
-      | Select position on signup | 1 |
-      | Prevent signup if no position is selected or can be found | 0 |
+      | Name                                                            | Test seminar name 1        |
+      | Description                                                     | Test seminar description 1 |
+      | Select job assignment on signup                                 | 1                          |
+      | Prevent signup if no job assignment is selected or can be found | 0                          |
     And I follow "Test seminar name 1"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -55,10 +55,10 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I follow "Course 2"
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name 1       |
-      | Description | Test seminar description 1 |
-      | Select position on signup | 1 |
-      | Prevent signup if no position is selected or can be found | 1 |
+      | Name                                                            | Test seminar name 1        |
+      | Description                                                     | Test seminar description 1 |
+      | Select job assignment on signup                                 | 1                          |
+      | Prevent signup if no job assignment is selected or can be found | 1                          |
     And I follow "Test seminar name 1"
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -102,4 +102,4 @@ Feature: Users can enrol on courses that have position signup enabled and get si
     And I click on "Find Learning" in the totara menu
     And I follow "Course 2"
     And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
-    Then I should see "You must have a suitable position assigned to sign up for this seminar activity."
+    Then I should see "You must have a suitable job assignment to sign up for this seminar activity."

@@ -176,7 +176,7 @@ function totara_plan_pluginfile($course, $cm, $context, $filearea, $args, $force
     $userid = $evidence->userid;
 
     // Check the current user is able to see the evidence.
-    if ($USER->id != $evidence->userid && !totara_is_manager($userid) && !has_capability('totara/plan:accessanyplan', $context)) {
+    if ($USER->id != $evidence->userid && !(\totara_job\job_assignment::is_managing($USER->id, $userid)) && !has_capability('totara/plan:accessanyplan', $context)) {
         // The user does not own the evidence, is not the manager of the user the evidence belongs to and does not have the required
         // capability to access all plans.
         return false;
@@ -230,7 +230,7 @@ function dp_can_view_users_plans($ownerid) {
         return true;
     }
 
-    if (totara_is_manager($ownerid)) {
+    if (\totara_job\job_assignment::is_managing($USER->id, $ownerid)) {
         // The current user is the actual manager.
         return true;
     }
@@ -275,7 +275,7 @@ function dp_can_manage_users_plans($ownerid) {
         return true;
     }
 
-    if (totara_is_manager($ownerid)) {
+    if (\totara_job\job_assignment::is_managing($USER->id, $ownerid)) {
         // The current user is the actual manager.
         return true;
     }
@@ -1477,7 +1477,7 @@ function totara_plan_comment_add($comment) {
     $commentuser = $DB->get_record('user', array('id' => $comment->userid));
     switch ($comment->commentarea) {
         case 'plan_overview':
-            $plan = $DB->get_record('dp_plan', array('id' => $comment->itemid));
+            $plan = new development_plan($comment->itemid);
 
             $msgobj = new stdClass();
             $msgobj->plan = $plan->name;
@@ -1498,7 +1498,7 @@ function totara_plan_comment_add($comment) {
             if (!$record = $DB->get_record_sql($sql, $params)) {
                 print_error('commenterror:itemnotfound', 'totara_plan');
             }
-            $plan = $DB->get_record('dp_plan', array('id' => $record->planid));
+            $plan = new development_plan($record->planid);
 
             $msgobj = new stdClass();
             $msgobj->plan = $plan->name;
@@ -1521,7 +1521,7 @@ function totara_plan_comment_add($comment) {
             if (!$record = $DB->get_record_sql($sql, $params)) {
                 print_error('commenterror:itemnotfound', 'totara_plan');
             }
-            $plan = $DB->get_record('dp_plan', array('id' => $record->planid));
+            $plan = new development_plan($record->planid);
 
             $msgobj = new stdClass();
             $msgobj->plan = $plan->name;
@@ -1539,7 +1539,7 @@ function totara_plan_comment_add($comment) {
             if (!$record = $DB->get_record('dp_plan_objective', array('id' => $comment->itemid))) {
                 print_error('commenterror:itemnotfound', 'totara_plan');
             }
-            $plan = $DB->get_record('dp_plan', array('id' => $record->planid));
+            $plan = new development_plan($record->planid);
 
             $msgobj = new stdClass();
             $msgobj->plan = $plan->name;
@@ -1562,7 +1562,7 @@ function totara_plan_comment_add($comment) {
             if (!$record = $DB->get_record_sql($sql, $params)) {
                 print_error('comment_error:itemnotfound', 'totara_plan');
             }
-            $plan = $DB->get_record('dp_plan', array('id' => $record->planid));
+            $plan = new development_plan($record->planid);
 
             $msgobj = new stdClass();
             $msgobj->plan = $plan->name;
@@ -1595,21 +1595,20 @@ function totara_plan_comment_add($comment) {
     $subscribers = $subscriberkeys;
     unset($subscriberkeys);
 
-    $manager = totara_get_manager($plan->userid);
+    $managers = $plan->get_all_managers();
     $learner = $DB->get_record('user', array('id' => $plan->userid));
     if ($comment->userid == $learner->id) {
         // Make sure manager is added to subscriber list
-        if (!empty($manager)) {
+        foreach($managers as $manager) {
             $subscribers[$manager->id] = $manager->id;
         }
-    } else if (!empty($manager) && $comment->userid == $manager->id) {
-        // Make sure learner is added to subscriber list
-        $subscribers[$learner->id] = $learner->id;
     } else {
         // Other commenter, so ensure learner and manager are added
         $subscribers[$learner->id] = $learner->id;
-        if (!empty($manager)) {
-            $subscribers[$manager->id] = $manager->id;
+        foreach($managers as $manager) {
+            if ($comment->id != $manager->id) {
+                $subscribers[$manager->id] = $manager->id;
+            }
         }
     }
 
@@ -1769,7 +1768,7 @@ function totara_plan_myprofile_navigation(\core_user\output\myprofile\tree $tree
 
     // Record of learning.
     if (totara_feature_visible('recordoflearning')) {
-        if ($currentuser || totara_is_manager($user->id) || has_capability('totara/core:viewrecordoflearning', $usercontext)) {
+        if ($currentuser || \totara_job\job_assignment::is_managing($USER->id, $user->id) || has_capability('totara/core:viewrecordoflearning', $usercontext)) {
             $title = get_string('recordoflearning', 'totara_core');
             $url = new moodle_url('/totara/plan/record/index.php', array('userid' => $user->id));
             $content =  html_writer::link($url, $title);

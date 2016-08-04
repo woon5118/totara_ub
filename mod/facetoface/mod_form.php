@@ -105,10 +105,10 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->addElement('select', 'declareinterest', get_string('declareinterestenable', 'facetoface'), $declareinterestops);
         $mform->addHelpButton('declareinterest', 'declareinterest', 'mod_facetoface');
 
-        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-        if (!empty($selectpositiononsignupglobal)) {
-            $mform->addElement('checkbox', 'selectpositiononsignup', get_string('selectpositiononsignup', 'facetoface'));
-            $mform->addElement('checkbox', 'forceselectposition', get_string('forceselectposition', 'facetoface'));
+        $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
+        if (!empty($selectjobassignmentonsignupglobal)) {
+            $mform->addElement('checkbox', 'selectjobassignmentonsignup', get_string('selectjobassignmentsignup', 'facetoface'));
+            $mform->addElement('checkbox', 'forceselectjobassignment', get_string('forceselectjobassignment', 'facetoface'));
         }
 
         $conf = get_config('facetoface');

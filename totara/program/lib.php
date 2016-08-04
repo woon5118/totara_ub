@@ -1071,25 +1071,7 @@ function prog_get_programs_search($searchterms, $sort='fullname ASC', $page=0, $
 }
 
 function prog_store_position_assignment($assignment) {
-    global $DB;
-
-    // Need to check this since this is not necessarily set now.
-    $currentpositionid = isset($assignment->positionid) ? $assignment->positionid : null;
-
-    $position_assignment_history = $DB->get_record('prog_pos_assignment', array('userid' => $assignment->userid, 'type' => $assignment->type));
-
-    if (!$position_assignment_history) {
-        $position_assignment_history = new stdClass();
-        $position_assignment_history->userid = $assignment->userid;
-        $position_assignment_history->positionid = $currentpositionid;
-        $position_assignment_history->type = $assignment->type;
-        $position_assignment_history->timeassigned = time();
-        $DB->insert_record('prog_pos_assignment', $position_assignment_history);
-    } else if ($position_assignment_history->positionid != $currentpositionid) {
-        $position_assignment_history->positionid = $currentpositionid;
-        $position_assignment_history->timeassigned = time();
-        $DB->update_record('prog_pos_assignment', $position_assignment_history);
-    }
+    // Deprecated - done inside $job_assignment->update();
 }
 
 /**
@@ -1192,7 +1174,10 @@ function prog_process_extensions($extensionslist, $reasonfordecision = array()) 
 
             $update_extension_count++;
 
-            if (!totara_is_manager($extension->userid)) {
+            // Ensure that the message is actually coming from $user's manager.
+            if (\totara_job\job_assignment::is_managing($USER->id, $extension->userid)) {
+                $userfrom = $USER;
+            } else {
                 print_error('error:notusersmanager', 'totara_program');
             }
 
@@ -1200,8 +1185,6 @@ function prog_process_extensions($extensionslist, $reasonfordecision = array()) 
 
                 $userto = $DB->get_record('user', array('id' => $extension->userid));
                 $stringmanager = get_string_manager();
-                //ensure the message is actually coming from $user's manager, default to support
-                $userfrom = totara_is_manager($extension->userid, $USER->id) ? $USER : core_user::get_support_user();
 
                 $program = $DB->get_record('prog', array('id' => $extension->programid), 'fullname');
 

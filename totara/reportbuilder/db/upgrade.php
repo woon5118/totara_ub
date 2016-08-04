@@ -24,6 +24,7 @@
 
 require_once($CFG->dirroot.'/totara/core/db/utils.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+require_once($CFG->dirroot . '/totara/reportbuilder/db/upgradelib.php');
 
 /**
  * Local database upgrade script
@@ -379,8 +380,8 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
         $changes = array(
             'own' => rb_user_content::USER_OWN,
-            'reports' => rb_user_content::USER_DIRECT_REPORTS,
-            'ownandreports' => (rb_user_content::USER_OWN | rb_user_content::USER_DIRECT_REPORTS)
+            'reports' => rb_user_content::PRIMARY_DIRECT_REPORTS,
+            'ownandreports' => (rb_user_content::USER_OWN | rb_user_content::PRIMARY_DIRECT_REPORTS)
         );
         // Update both 'value' and 'cachedvalue'.
         $sql = "UPDATE {report_builder_settings}
@@ -1072,6 +1073,38 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
 
         // Reportbuilder savepoint reached.
         upgrade_plugin_savepoint(true, 2015100902, 'totara', 'reportbuilder');
+    }
+
+    if ($oldversion < 2016080300) {
+        // List of all the columns etc to move from user to primary_job.
+        $values = array('title','startdate','enddate','managername','managerfirstname','managerlastname',
+            'managerid','manageridnumber','manageremail','manageremailunobscured',
+            'position','positionpath','positionid','positionid2','positionidnumber','pos_type','pos_type_id',
+            'positionframework','positionframeworkid','positionframeworkidnumber','positionframeworkdescription',
+            'organisation','organisationpath','organisationid','organisationid2','organisationidnumber','org_type','org_type_id',
+            'organisationframework','organisationframeworkid','organisationframeworkidnumber','organisationframeworkdescription'
+        );
+
+        // First map across the startdate/enddate values.
+        $DB->execute("UPDATE {report_builder_columns} SET value = 'startdate' WHERE value = 'posstartdate'");
+        $DB->execute("UPDATE {report_builder_columns} SET value = 'enddate' WHERE value = 'posenddate'");
+        // Then move all position assignment columns to job assignment columns.
+        totara_reportbuilder_migrate_column_types($values, 'user', 'primary_job');
+
+        // First map across the startdate/enddate values.
+        $DB->execute("UPDATE {report_builder_filters} SET value = 'startdate' WHERE value = 'posstartdate'");
+        $DB->execute("UPDATE {report_builder_filters} SET value = 'enddate' WHERE value = 'posenddate'");
+        // Then move position assignment filters to job assignment filters.
+        totara_reportbuilder_migrate_filter_types($values, 'user', 'primary_job');
+
+        // Update the filters in any saved searches to match updated filters.
+        totara_reportbuilder_migrate_saved_search_filters($values, 'user', 'primary_job');
+
+        // Move default sort columns to the new job assignment columns.
+        totara_reportbuilder_migrate_default_sort_columns($values, 'user', 'primary_job');
+
+        // Reportbuilder savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2016080300, 'totara_reportbuilder');
     }
 
     return true;

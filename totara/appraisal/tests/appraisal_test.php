@@ -118,6 +118,7 @@ class appraisal_test extends appraisal_testcase {
         $this->assertEmpty($warnings);
 
         $appraisal1->activate();
+        $this->update_job_assignments($appraisal1);
 
         $this->assertEquals(appraisal::STATUS_ACTIVE, $appraisal1->status);
         $dbman = $DB->get_manager();
@@ -143,6 +144,7 @@ class appraisal_test extends appraisal_testcase {
         $this->assertEmpty($errors);
         $this->assertEmpty($warnings);
         $appraisal->activate();
+        $this->update_job_assignments($appraisal);
 
         list($errors, $warnings) = $appraisal->validate();
         $this->assertCount(1, $errors);
@@ -171,6 +173,7 @@ class appraisal_test extends appraisal_testcase {
         list($appraisal, $users) = $this->prepare_appraisal_with_users();
         $appraisal->validate();
         $appraisal->activate();
+        $this->update_job_assignments($appraisal);
 
         $roleassignment = appraisal_role_assignment::get_role($appraisal->id, $users[0]->id, $users[0]->id,
                 appraisal::ROLE_LEARNER);
@@ -192,6 +195,7 @@ class appraisal_test extends appraisal_testcase {
         list($appraisal, $users) = $this->prepare_appraisal_with_users();
         $appraisal->validate();
         $appraisal->activate();
+        $this->update_job_assignments($appraisal);
 
         $this->assertEquals(2, $appraisal->count_incomplete_userassignments());
 
@@ -214,6 +218,7 @@ class appraisal_test extends appraisal_testcase {
         list($appraisal, $users) = $this->prepare_appraisal_with_users();
         $appraisal->validate();
         $appraisal->activate();
+        $this->update_job_assignments($appraisal);
 
         $this->assertEquals(2, $appraisal->count_incomplete_userassignments());
 
@@ -280,6 +285,7 @@ class appraisal_test extends appraisal_testcase {
         foreach (array($appraisal1, $appraisal2, $appraisal3) as $appr) {
             $appr->validate();
             $appr->activate();
+            $this->update_job_assignments($appr);
         }
         $appraisal2->close();
         $user4 = $this->getDataGenerator()->create_user();
@@ -321,6 +327,7 @@ class appraisal_test extends appraisal_testcase {
         $this->assertEquals(0, $count);
 
         $appraisal->activate();
+        $this->update_job_assignments($appraisal);
 
         $this->assertEquals(appraisal::STATUS_ACTIVE, $appraisal->status);
         $count = $DB->count_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
@@ -385,6 +392,7 @@ class appraisal_test extends appraisal_testcase {
         $this->assertEquals(0, $count);
 
         $appraisal->activate();
+        $this->update_job_assignments($appraisal);
 
         $this->assertEquals(appraisal::STATUS_ACTIVE, $appraisal->status);
         $count = $DB->count_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
@@ -457,21 +465,26 @@ class appraisal_test extends appraisal_testcase {
         list($appraisal) = $this->prepare_appraisal_with_users($def, array($user1));
         list($errors, $warnings) = $appraisal->validate();
 
-        // This should only generate role warnings not errors.
+        // There should be no errors or warnings before activation; these come
+        // after a job assignment has been linked to the appraisal. Only then
+        // will roles be assigned and missing ones flagged.
         $this->assertEmpty($errors);
-
-        // There should be a warning for manager, teamlead and appraiser.
-        $this->assertEquals(3, count($warnings));
+        $this->assertEmpty($warnings);
 
         $this->assertEquals(appraisal::STATUS_DRAFT, $appraisal->status);
         $count = $DB->count_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
         $this->assertEquals(0, $count);
 
         $appraisal->activate();
+        $this->update_job_assignments($appraisal);
 
         $this->assertEquals(appraisal::STATUS_ACTIVE, $appraisal->status);
         $count = $DB->count_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
         $this->assertEquals(1, $count);
+
+        // Now we check for missing role warnings!
+        $warnings = $appraisal->validate_roles();
+        $this->assertEquals(1, count($warnings));
     }
 
     /**
@@ -518,19 +531,17 @@ class appraisal_test extends appraisal_testcase {
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        $assignment = new position_assignment(array('userid' => $manager->id, 'type' => 1));
-        $assignment->managerid = $teamlead->id;
-        assign_user_position($assignment, true);
+        $teamleadja = \totara_job\job_assignment::create_default($teamlead->id);
+        $managerja = \totara_job\job_assignment::create_default($manager->id);
+        $jobassignmentmanagers = [
+            'managerjaid' => $managerja->id,
+            'appraiserid' => $appraiser->id,
+            'tempmanagerjaid' => $teamleadja->id,
+            'tempmanagerexpirydate' => time() + YEARSECS * 2
+        ];
 
-        $assignment = new position_assignment(array('userid' => $user1->id, 'type' => 1));
-        $assignment->managerid = $manager->id;
-        $assignment->appraiserid = $appraiser->id;
-        assign_user_position($assignment, true);
-
-        $assignment = new position_assignment(array('userid' => $user2->id, 'type' => 1));
-        $assignment->managerid = $manager->id;
-        $assignment->appraiserid = $appraiser->id;
-        assign_user_position($assignment, true);
+        $user1ja = \totara_job\job_assignment::create_default($user1->id, $jobassignmentmanagers);
+        $user2ja = \totara_job\job_assignment::create_default($user2->id, $jobassignmentmanagers);
 
         $cohort = $this->getDataGenerator()->create_cohort();
         cohort_add_member($cohort->id, $user1->id);
@@ -543,6 +554,7 @@ class appraisal_test extends appraisal_testcase {
         $grouptypeobj->handle_item_selector($urlparams);
 
         $appraisal->activate();
+        $this->update_job_assignments($appraisal);
 
         // That should have created 2 user assignments.
         $userassignments = $DB->get_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
@@ -554,45 +566,82 @@ class appraisal_test extends appraisal_testcase {
             $this->assertEquals(4, $countrole);
         }
 
-        // Now Change user1s position assignment.
-        $assignment = new position_assignment(array('userid' => $user1->id, 'type' => 1));
-        $assignment->managerid = 0;
-        $assignment->appraiserid = 0;
-        assign_user_position($assignment, true);
+        // Now Change user1s job assignment.
+        $removedroles = [
+            appraisal::ROLE_MANAGER => 'managerjaid',
+            appraisal::ROLE_TEAM_LEAD => 'tempmanagerjaid',
+            appraisal::ROLE_APPRAISER => 'appraiserid'
+        ];
 
-        // User1 should now be missing all roles (except learner).
-        $missing = $appraisal->get_missingrole_users(true);
-        $this->assertEquals(1, count($missing));
-        $this->assertEquals(3, count($missing[$user1->id]));
+        $jobroleupdates = [];
+        foreach ($removedroles as $role => $jobrolefield) {
+            $jobroleupdates[$jobrolefield] = null;
+        }
+        $user1ja->update($jobroleupdates);
 
-        // Check that the changedrole function finds the 3 roles that have changed.
-        $changedroles = $appraisal->get_changedrole_users();
-        $this->assertEquals(3, count($changedroles));
+        // User1 should now be missing roles (except learner). Note the actual
+        // roles assigned to the appraisal has not changed yet; this is just a
+        // "prediction" of what will be missing when the cron task executes.
+        $missing = $assign->missing_role_assignments()->roles;
+        $this->assertTrue(array_key_exists($user1->id, $missing));
+        $this->assertEquals(count($removedroles), count($missing[$user1->id]));
 
+        // Simulate a cron run.
         $appraisal->check_assignment_changes();
 
-        // Check that the changedrole function now resolves to 0.
-        $changedroles = $appraisal->get_changedrole_users();
-        $this->assertEquals(0, count($changedroles));
+        // Now the appraisal assignments will really be changed for User1 and
+        // the changed roles will reflect that.
+        $changed = $assign->changed_role_assignments();
+        $expectedchangecount = count($roles) - count($removedroles) > 0 ? 1 : 0;
+        $this->assertEquals($expectedchangecount, count($changed));
+        $this->assertTrue(array_key_exists($user1->id, $changed));
+        $this->assertEquals(count($removedroles), count($changed[$user1->id]));
+
+        // And the role assignments for the removed roles will be physically
+        // gone from the appraisal assignments.
+        $retainedroles = array_filter(
+            array_keys($roles),
+
+            function ($role) use ($removedroles) {
+                return !array_key_exists($role, $removedroles);
+            }
+        );
+
+        $currentassignments = $appraisal->get_all_assignments($user1->id);
+        $this->assertEquals(count($retainedroles), count($currentassignments));
+        foreach ($currentassignments as $assigned) {
+            $role = $assigned->appraisalrole;
+            $this->assertTrue(in_array($role, $retainedroles));
+
+            $user = null;
+            switch ($role) {
+                case appraisal::ROLE_LEARNER:
+                    $user = $user1;
+                    break;
+
+                case appraisal::ROLE_MANAGER:
+                    $user = $manager;
+                    break;
+
+                case appraisal::ROLE_TEAM_LEAD:
+                    $user = $teamlead;
+                    break;
+
+                case appraisal::ROLE_APPRAISER:
+                default:
+                    $user = $appraiser;
+            }
+
+            $this->assertEquals($user->id, $assigned->userid);
+        }
 
         // There should still be 2 user assignments.
         $userassignments = $DB->get_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
         $this->assertEquals(2, count($userassignments));
 
-        // Each with the corresponding 4 role assignments.
-        foreach ($userassignments as $aua) {
-            $countrole = $DB->count_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $aua->id));
-            $this->assertEquals(4, $countrole);
-
-            // Find the user assignment for user1.
-            if ($aua->userid == $user1->id) {
-                $userassig = $aua;
-            }
-        }
-
-        // But user1s role assignments should have the userid set to 0.
-        $countrole = $DB->count_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $userassig->id, 'userid' => 0));
-        $this->assertEquals(3, $countrole);
+        // And user2 should still have his current assignments.
+        $currentassignments = $appraisal->get_all_assignments($user2->id);
+        $this->assertEquals(4, count($currentassignments));
     }
 
     /**
@@ -635,8 +684,8 @@ class appraisal_test extends appraisal_testcase {
         $appraisal = appraisal::build($def);
 
         // Set up group.
-        $teamlead = $this->getDataGenerator()->create_user();
-        $manager = $this->getDataGenerator()->create_user();
+        $teamlead1 = $this->getDataGenerator()->create_user();
+        $manager1 = $this->getDataGenerator()->create_user();
         $appraiser = $this->getDataGenerator()->create_user();
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -645,23 +694,30 @@ class appraisal_test extends appraisal_testcase {
         $manager2 = $this->getDataGenerator()->create_user();
         $appraiser2 = $this->getDataGenerator()->create_user();
 
-        $assignment = new position_assignment(array('userid' => $manager->id, 'type' => 1));
-        $assignment->managerid = $teamlead->id;
-        assign_user_position($assignment, true);
+        $teamlead1ja = \totara_job\job_assignment::create_default($teamlead1->id);
+        $teamlead2ja = \totara_job\job_assignment::create_default($teamlead2->id);
+        $manager1ja = \totara_job\job_assignment::create_default($manager1->id);
+        $manager2ja = \totara_job\job_assignment::create_default($manager2->id);
+        $user1ja = \totara_job\job_assignment::create_default(
+            $user1->id,
+            [
+                'managerjaid' => $manager1ja->id,
+                'tempmanagerjaid' => $teamlead1ja->id,
+                'appraiserid' => $appraiser->id,
+                'tempmanagerexpirydate' => time() + YEARSECS * 2
+            ]
+        );
 
-        $assignment = new position_assignment(array('userid' => $manager2->id, 'type' => 1));
-        $assignment->managerid = $teamlead2->id;
-        assign_user_position($assignment, true);
+        $user2ja = \totara_job\job_assignment::create_default(
+            $user2->id,
+            [
+                'managerjaid' => $manager1ja->id,
+                'tempmanagerjaid' => $teamlead2ja->id,
+                'appraiserid' => $appraiser->id,
+                'tempmanagerexpirydate' => time() + YEARSECS * 2
 
-        $assignment = new position_assignment(array('userid' => $user1->id, 'type' => 1));
-        $assignment->managerid = $manager->id;
-        $assignment->appraiserid = $appraiser->id;
-        assign_user_position($assignment, true);
-
-        $assignment = new position_assignment(array('userid' => $user2->id, 'type' => 1));
-        $assignment->managerid = $manager->id;
-        $assignment->appraiserid = $appraiser->id;
-        assign_user_position($assignment, true);
+            ]
+        );
 
         $cohort = $this->getDataGenerator()->create_cohort();
         cohort_add_member($cohort->id, $user1->id);
@@ -674,6 +730,7 @@ class appraisal_test extends appraisal_testcase {
         $grouptypeobj->handle_item_selector($urlparams);
 
         $appraisal->activate();
+        $this->update_job_assignments($appraisal);
 
         // That should have created 2 user assignments.
         $userassignments = $DB->get_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
@@ -685,59 +742,57 @@ class appraisal_test extends appraisal_testcase {
             $this->assertEquals(4, $countrole);
         }
 
-        // Now Change user1s position assignment.
-        $assignment = new position_assignment(array('userid' => $user1->id, 'type' => 1));
-        $assignment->managerid = $manager2->id;
-        $assignment->appraiserid = $appraiser2->id;
-        assign_user_position($assignment, true);
+        // Now Change user1s job assignment.
+        $user1ja->update(array('managerjaid' => $manager2ja->id, 'appraiserid' => $appraiser2->id));
 
         // There should be no missing roles.
-        $missing = $appraisal->get_missingrole_users(true);
+        $missing = $assign->missing_role_assignments()->roles;
         $this->assertEquals(0, count($missing));
 
-        // Check that the changedrole function finds the 3 roles that have changed.
-        $changedroles = $appraisal->get_changedrole_users();
-        $this->assertEquals(3, count($changedroles));
-
+        // Simulate a cron run.
         $appraisal->check_assignment_changes();
 
-        // Check that the changedrole function now resolves to 0.
-        $changedroles = $appraisal->get_changedrole_users();
-        $this->assertEquals(0, count($changedroles));
+        // Now the appraisal assignments will really be changed for User1 and
+        // the changed roles will reflect that.
+        $changed = $assign->changed_role_assignments();
+        $this->assertEquals(1, count($changed));
+        $this->assertTrue(array_key_exists($user1->id, $changed));
+        $this->assertEquals(2, count($changed[$user1->id]));
+
+        $currentassignments = $appraisal->get_all_assignments($user1->id);
+        $this->assertEquals(4, count($currentassignments));
+        foreach ($currentassignments as $assigned) {
+            $role = $assigned->appraisalrole;
+
+            $user = null;
+            switch ($role) {
+                case appraisal::ROLE_LEARNER:
+                    $user = $user1;
+                    break;
+
+                case appraisal::ROLE_MANAGER:
+                    $user = $manager2;
+                    break;
+
+                case appraisal::ROLE_TEAM_LEAD:
+                    $user = $teamlead1;
+                    break;
+
+                case appraisal::ROLE_APPRAISER:
+                default:
+                    $user = $appraiser2;
+            }
+
+            $this->assertEquals($user->id, $assigned->userid);
+        }
 
         // There should still be 2 user assignments.
         $userassignments = $DB->get_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
         $this->assertEquals(2, count($userassignments));
 
-        // Each with the corresponding 4 role assignments.
-        foreach ($userassignments as $aua) {
-            $countrole = $DB->count_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $aua->id));
-            $this->assertEquals(4, $countrole);
-
-            // Find the user assignment for user1.
-            if ($aua->userid == $user1->id) {
-                $userassig = $aua;
-            }
-        }
-
-        // Check user1s role assignments have been swapped to the new users.
-        $roles = $DB->get_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $userassig->id));
-        foreach ($roles as $role) {
-            switch ($role->appraisalrole) {
-                case appraisal::ROLE_LEARNER :
-                    $this->assertEquals($user1->id, $role->userid);
-                    break;
-                case appraisal::ROLE_MANAGER :
-                    $this->assertEquals($manager2->id, $role->userid);
-                    break;
-                case appraisal::ROLE_TEAM_LEAD :
-                    $this->assertEquals($teamlead2->id, $role->userid);
-                    break;
-                case appraisal::ROLE_APPRAISER :
-                    $this->assertEquals($appraiser2->id, $role->userid);
-                    break;
-            }
-        }
+        // And user2 should still have his current assignments.
+        $currentassignments = $appraisal->get_all_assignments($user2->id);
+        $this->assertEquals(4, count($currentassignments));
     }
 
     /**
@@ -784,20 +839,26 @@ class appraisal_test extends appraisal_testcase {
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        // Set up position assignments.
-        $assignment = new position_assignment(array('userid' => $manager->id, 'type' => 1));
-        $assignment->managerid = $teamlead->id;
-        assign_user_position($assignment, true);
-
-        $assignment = new position_assignment(array('userid' => $user1->id, 'type' => 1));
-        $assignment->managerid = $manager->id;
-        $assignment->appraiserid = $appraiser->id;
-        assign_user_position($assignment, true);
-
-        $assignment = new position_assignment(array('userid' => $user2->id, 'type' => 1));
-        $assignment->managerid = $user1->id;
-        $assignment->appraiserid = $appraiser->id;
-        assign_user_position($assignment, true);
+        $teamleadja = \totara_job\job_assignment::create_default($teamlead->id);
+        $managerja = \totara_job\job_assignment::create_default($manager->id);
+        $user1ja = \totara_job\job_assignment::create_default(
+            $user1->id,
+            [
+                'managerjaid' => $managerja->id,
+                'tempmanagerjaid' => $teamleadja->id,
+                'appraiserid' => $appraiser->id,
+                'tempmanagerexpirydate' => time() + YEARSECS * 2
+            ]
+        );
+        $user2ja = \totara_job\job_assignment::create_default(
+            $user2->id,
+            [
+                'managerjaid' => $user1ja->id,
+                'tempmanagerjaid' => $teamleadja->id,
+                'appraiserid' => $appraiser->id,
+                'tempmanagerexpirydate' => time() + YEARSECS * 2
+            ]
+        );
 
         // Create group and assign users.
         $cohort = $this->getDataGenerator()->create_cohort();
@@ -811,6 +872,7 @@ class appraisal_test extends appraisal_testcase {
         $grouptypeobj->handle_item_selector($urlparams);
 
         $appraisal->activate();
+        $this->update_job_assignments($appraisal);
 
         $ua1 = $DB->get_record('appraisal_user_assignment', array('appraisalid' => $appraisal->id, 'userid' => $user1->id));
         $ua2 = $DB->get_record('appraisal_user_assignment', array('appraisalid' => $appraisal->id, 'userid' => $user2->id));
@@ -849,7 +911,7 @@ class appraisal_test extends appraisal_testcase {
                 appraisal::ROLE_MANAGER);
         $user2roles[] = $roleassignment->id;
         $this->answer_question($appraisal, $roleassignment, 0, 'completestage');
-        $roleassignment = appraisal_role_assignment::get_role($appraisal->id, $user2->id, $manager->id,
+        $roleassignment = appraisal_role_assignment::get_role($appraisal->id, $user2->id, $teamlead->id,
                 appraisal::ROLE_TEAM_LEAD);
         $user2roles[] = $roleassignment->id;
         $this->answer_question($appraisal, $roleassignment, 0, 'completestage');
@@ -901,6 +963,7 @@ class appraisal_test extends appraisal_testcase {
         // Create appraisal and activate it.
         list($appraisal, $users) = $this->prepare_appraisal_with_users();
         $appraisal->activate();
+        $this->update_job_assignments($appraisal);
 
         // Get user assignments.
         $userassignments = $DB->get_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));

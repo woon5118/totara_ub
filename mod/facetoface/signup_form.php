@@ -33,8 +33,19 @@ class mod_facetoface_signup_form extends moodleform {
         $showdiscountcode = $this->_customdata['showdiscountcode'];
         $approvaltype = $this->_customdata['approvaltype'];
         $approvaladmins = $this->_customdata['approvaladmins'];
-        $managerid = $this->_customdata['managerid'];
-        $manager = core_user::get_user($managerid);
+
+        $managerids = array();
+        $manager_title = '';
+        if (!empty($this->_customdata['managerids'])) {
+            $managerids = $this->_customdata['managerids'];
+            $manager_title = get_string('alljamanagers', 'mod_facetoface');
+        }
+        $managerid = 0;
+        if (!empty($this->_customdata['managerid'])) {
+            $managerid = $this->_customdata['managerid'];
+            $manager = core_user::get_user($managerid);
+            $manager_title = fullname($manager);
+        }
 
         $mform->addElement('hidden', 's', $this->_customdata['s']);
         $mform->setType('s', PARAM_INT);
@@ -61,21 +72,25 @@ class mod_facetoface_signup_form extends moodleform {
             $mform->setDefault('managerid', $managerid);
 
             $select = get_config(null, 'facetoface_managerselect');
+
+            $manager_class = '';
+            if ($managerid || !empty($managerids)) {
+                $manager_class = 'nonempty';
+            }
+
             if ($select) {
-                $manager_title = fullname($manager);
-                $manager_class = strlen($manager_title) ? 'nonempty' : '';
                 $mform->addElement(
                     'static',
                     'managerselector',
-                    get_string('manager', 'totara_hierarchy'),
+                    get_string('manager', 'totara_job'),
                     html_writer::tag('span', format_string($manager_title), array('class' => $manager_class, 'id' => 'managertitle'))
-                    . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_hierarchy'), 'id' => 'show-manager-dialog'))
+                    . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
                 );
 
-                $mform->addHelpButton('managerselector', 'choosemanager', 'totara_hierarchy');
+                $mform->addHelpButton('managerselector', 'choosemanager', 'totara_job');
             } else {
                 // Display the average manager approval string.
-                $mform->addElement('static', 'managername', get_string('managername', 'mod_facetoface'), fullname($manager));
+                $mform->addElement('static', 'managername', get_string('managername', 'mod_facetoface'), $manager_title);
                 $mform->setType('managername', PARAM_TEXT);
                 $mform->addHelpButton('managername', 'managername', 'facetoface');
             }
@@ -84,22 +99,25 @@ class mod_facetoface_signup_form extends moodleform {
             $mform->setType('managerid', PARAM_INT);
             $mform->setDefault('managerid', $managerid);
 
+            $manager_class = '';
+            if ($managerid || !empty($managerids)) {
+                $manager_class = 'nonempty';
+            }
+
             $select = get_config(null, 'facetoface_managerselect');
             if ($select) {
-                $manager_title = fullname($manager);
-                $manager_class = strlen($manager_title) ? 'nonempty' : '';
                 $mform->addElement(
                     'static',
                     'managerselector',
-                    get_string('manager', 'totara_hierarchy'),
+                    get_string('manager', 'totara_job'),
                     html_writer::tag('span', format_string($manager_title), array('class' => $manager_class, 'id' => 'managertitle'))
-                    . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_hierarchy'), 'id' => 'show-manager-dialog'))
+                    . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
                 );
 
-                $mform->addHelpButton('managerselector', 'choosemanager', 'totara_hierarchy');
+                $mform->addHelpButton('managerselector', 'choosemanager', 'totara_job');
             } else {
                 // Display the average manager&admin approval string.
-                $mform->addElement('static', 'managername', get_string('managername', 'mod_facetoface'), fullname($manager));
+                $mform->addElement('static', 'managername', get_string('managername', 'mod_facetoface'), $manager_title);
                 $mform->setType('managername', PARAM_TEXT);
                 $mform->addHelpButton('managername', 'managername', 'facetoface');
             }
@@ -112,7 +130,7 @@ class mod_facetoface_signup_form extends moodleform {
             foreach ($sysapps as $approver) {
                 if (!empty($approver)) {
                     $approvallist .= html_writer::tag('li', fullname($approver));
-                    $approvers = get_users_from_config(get_config(null, 'facetoface_adminapprovers'), 'mod/facetoface:approveanyrequest');
+                    //$approvers = get_users_from_config(get_config(null, 'facetoface_adminapprovers'), 'mod/facetoface:approveanyrequest');
                 }
             }
 
@@ -158,7 +176,7 @@ class mod_facetoface_signup_form extends moodleform {
         }
         $mform->setType('notificationtype', PARAM_INT);
 
-        self::add_position_selection_formelem($mform, $this->_customdata['f2fid'], $this->_customdata['s']);
+        self::add_jobassignment_selection_formelem($mform, $this->_customdata['f2fid'], $this->_customdata['s']);
 
         if ($this->_customdata['waitlisteveryone']) {
             $mform->addElement(
@@ -181,34 +199,33 @@ class mod_facetoface_signup_form extends moodleform {
         $this->add_action_buttons(true, get_string($signupstr, 'facetoface'));
     }
 
-    public static function add_position_selection_formelem ($mform, $f2fid, $sessionid) {
-        global $DB;
+    public static function add_jobassignment_selection_formelem ($mform, $f2fid, $sessionid) {
+        global $DB, $USER;
 
-        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-        if (empty($selectpositiononsignupglobal)) {
+        $selectjobassignmentonsignupglobal = get_config(null, 'facetoface_selectjobassignmentonsignupglobal');
+        if (empty($selectjobassignmentonsignupglobal)) {
             return;
         }
 
         $facetoface = $DB->get_record('facetoface', array('id' => $f2fid));
-        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
 
-        if (empty($facetoface->selectpositiononsignup)) {
+        if (empty($facetoface->selectjobassignmentonsignup)) {
             return;
         }
 
-        $controlname = 'selectedposition_'.$f2fid;
+        $controlname = 'selectedjobassignment_'.$f2fid;
 
         $managerrequired = facetoface_manager_needed($facetoface);
-        $applicablepositions = get_position_assignments($managerrequired);
+        $jobassignments = \totara_job\job_assignment::get_all($USER->id, $managerrequired);
 
-        if (count($applicablepositions) > 1) {
-            $posselectelement = $mform->addElement('select', $controlname, get_string('selectposition', 'mod_facetoface'));
-            $mform->addHelpButton($controlname, 'selectedposition', 'mod_facetoface');
+        if (count($jobassignments) > 1) {
+            $posselectelement = $mform->addElement('select', $controlname, get_string('selectjobassignment', 'mod_facetoface'));
+            $mform->addHelpButton($controlname, 'selectedjobassignment', 'mod_facetoface');
             $mform->setType($controlname, PARAM_INT);
 
-            foreach ($applicablepositions as $posassignment) {
-                $label = position::position_label($posassignment);
-                $posselectelement->addOption($label, $posassignment->id);
+            foreach ($jobassignments as $jobassignment) {
+                $label = position::job_position_label($jobassignment);
+                $posselectelement->addOption($label, $jobassignment->id);
             }
         }
     }
@@ -222,11 +239,12 @@ class mod_facetoface_signup_form extends moodleform {
         // Manager validation if approval type requires it.
         if ($approvaltype == APPROVAL_MANAGER || $approvaltype == APPROVAL_ADMIN) {
             $manager = isset($data['managerid']) ? $data['managerid'] : null;
+            $managers = isset($this->_customdata['managerids']) ? $this->_customdata['managerids'] : null;
             if (empty($manager)) {
                 $select = get_config(null, 'facetoface_managerselect');
                 if ($select) {
                     $errors['managerselector'] = get_string('error:missingselectedmanager', 'mod_facetoface');
-                } else {
+                } else if (empty($managers)) {
                     $errors['managername'] = get_string('error:missingrequiredmanager', 'mod_facetoface');
                 }
             }

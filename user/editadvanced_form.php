@@ -145,6 +145,10 @@ class user_editadvanced_form extends moodleform {
 
         $this->add_action_buttons(false, $btnstring);
 
+        // Called at the end of the definition, prior to data being set.
+        $hook = new core_user\hook\editadvanced_form_definition_complete($this, $this->_customdata);
+        $hook->execute();
+
         $this->set_data($user);
     }
 
@@ -315,6 +319,17 @@ class user_editadvanced_form extends moodleform {
         } else {
             return $err;
         }
+    }
+
+    /**
+     * Overridden display method so that we can call our edit_form_display hook.
+     */
+    public function display() {
+
+        $hook = new core_user\hook\editadvanced_form_display($this, $this->_customdata);
+        $hook->execute();
+
+        parent::display();
     }
 }
 

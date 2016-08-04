@@ -242,11 +242,10 @@ class question_compfromplan extends reviewrating {
 
         // Update the competency evidence.
         $details = new stdClass();
-        $posrec = $DB->get_record('pos_assignment', array('userid' => $this->subjectid, 'type' => POSITION_TYPE_PRIMARY),
-                'id, positionid, organisationid');
-        if ($posrec) {
-            $details->positionid = $posrec->positionid;
-            $details->organisationid = $posrec->organisationid;
+        $jobassignment = \totara_job\job_assignment::get_first($this->subjectid, false);
+        if ($jobassignment) {
+            $details->positionid = $jobassignment->positionid;
+            $details->organisationid = $jobassignment->organisationid;
             unset($posrec);
         }
         $details->assessorname = fullname($USER);

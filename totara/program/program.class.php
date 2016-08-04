@@ -1069,10 +1069,6 @@ class program {
 
                 // flag that we need to trigger the program_completed event
                 $progcompleted_eventtrigger = true;
-
-                // get the user's position/organisation at time of completion
-                require_once("{$CFG->dirroot}/totara/hierarchy/prefix/position/lib.php");
-                $posids = pos_get_current_position_data($userid);
             }
         }
 
@@ -1083,9 +1079,15 @@ class program {
             }
 
             if ($progcompleted_eventtrigger) {
-                // record the user's pos/org at time of completion
-                $completion->positionid = $posids['positionid'];
-                $completion->organisationid = $posids['organisationid'];
+                // Record the user's pos/org at time of completion.
+                $jobassignment = \totara_job\job_assignment::get_first($userid, false);
+                if ($jobassignment) {
+                    $completion->positionid = $jobassignment->positionid;
+                    $completion->organisationid = $jobassignment->organisationid;
+                } else {
+                    $completion->positionid = 0;
+                    $completion->organisationid = 0;
+                }
             }
 
             $update_success = $DB->update_record('prog_completion', $completion);
@@ -1406,7 +1408,7 @@ class program {
                 // Only show the extension link if the user is assigned via required learning, and it has a due date and they haven't completed it yet.
                 // And program extension request is enabled in site level and for this program instance.
                 if (!$extension = $DB->get_record('prog_extension', array('userid' => $userid, 'programid' => $this->id, 'status' => 0))) {
-                    if (!$viewinganothersprogram && totara_get_manager($userid)) {
+                    if (!$viewinganothersprogram && \totara_job\job_assignment::has_manager($userid)) {
                         // Show extension request link if it is their assignment and they have a manager to request it from.
                         $url = new moodle_url('/totara/program/view.php', array('id' => $this->id, 'extrequest' => '1'));
                         $request = ' ' . html_writer::link($url, get_string('requestextension', 'totara_program'), array('id' => 'extrequestlink'));

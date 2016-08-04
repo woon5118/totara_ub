@@ -25,8 +25,10 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/totara/appraisal/lib.php');
+require_once($CFG->dirroot . '/totara/appraisal/constants.php');
 require_once($CFG->dirroot . '/totara/appraisal/appraisal_forms.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
+
 
 // Check if Appraisals are enabled.
 appraisal::check_feature_enabled();
@@ -241,6 +243,29 @@ if ($action == 'pages') {
     echo 'success';
     return;
 }
+else if ($action == totara_appraisal_constants::ACTION_ASSIGN_JOB) {
+    $jobassignmentid = optional_param(
+        totara_appraisal_constants::PARAM_JOB_ID, null, PARAM_INT
+    );
+
+    if (empty($jobassignmentid)) {
+        $msg = get_string('error:cannotassignjob', 'totara_appraisal');
+        throw new appraisal_exception($msg);
+    }
+
+    $roleassignment->get_user_assignment()->with_job_assignment($jobassignmentid);
+    $urlparams = [
+        'role' => $role,
+        'subjectid' => $subjectid,
+        'appraisalid' => $appraisalid,
+        'action' => 'stages'
+    ];
+    totara_set_notification(
+        get_string('jobassignmentselected', 'totara_appraisal'),
+        new moodle_url(totara_appraisal_constants::URL_MYAPPRAISAL, $urlparams),
+        array('class' => 'notifysuccess')
+    );
+}
 
 // Include JS file.
 // Setup custom javascript.
@@ -311,7 +336,8 @@ if ($action == 'stages') {
         }
     }
     echo $renderer->display_stages($appraisal, $stages, $roleassignment, $showprint, $preview);
-} else {
+}
+else {
     if (isset($form)) {
         echo $renderer->display_pages($visiblepages, $page, $roleassignment, $preview, true);
         echo $renderer->container_start('verticaltabtree-content');

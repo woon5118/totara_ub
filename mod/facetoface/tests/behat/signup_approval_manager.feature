@@ -28,7 +28,7 @@ Feature: Seminar Signup Manager Approval
       | timmy   | CCC    | student        |
       | sammy   | CCC    | student        |
       | sally   | CCC    | student        |
-    And the following position assignments exist:
+    And the following job assignments exist:
       | user  | manager |
       | jimmy | manager |
       | timmy | manager |
@@ -73,7 +73,7 @@ Feature: Seminar Signup Manager Approval
     And I should see "Manager Approval"
     And I should see "This seminar requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
 
-  Scenario: Student signs up with no manager assigned with manager select enabled
+  Scenario: Student signs up with no manager assigned with manager select enabled and manager approval required
     When I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "s__facetoface_managerselect" "checkbox"
     And I press "Save changes"

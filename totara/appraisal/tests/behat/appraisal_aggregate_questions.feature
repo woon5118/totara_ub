@@ -8,18 +8,16 @@ Feature: Perform basic actions for aggregate questions
     Given I am on a totara site
     And the following "users" exist:
       | username  | firstname | lastname | email                 |
-      | teamlead  | Larry     | Lar      | teamlead@example.com  |
       | appraiser | Sally     | Sal      | appraiser@example.com |
       | manager   | Terry     | Ter      | manager@example.com   |
       | jimmy     | Jimmy     | Jim      | jimmy@example.com     |
       | bobby     | Bobby     | Bob      | bobby@example.com     |
       | dobby     | Dobby     | Dob      | dobby@example.com     |
-    And the following position assignments exist:
-      | user    | manager  | appraiser |
-      | manager | teamlead |           |
-      | jimmy   | manager  | appraiser |
-      | bobby   | manager  | appraiser |
-      | dobby   | manager  | appraiser |
+    And the following job assignments exist:
+      | user  | fullname      | idnumber | manager | appraiser |
+      | jimmy | jimmy Day Job | l1ja     | manager | appraiser |
+      | bobby | bobby Day Job | l2ja     | manager | appraiser |
+      | dobby | dobby Day Job | l3ja     | manager | appraiser |
     And the following "cohorts" exist:
       | name                | idnumber | description            | contextlevel | reference |
       | Appraisals Audience | AppAud   | Appraisals Assignments | System       | 0         |
@@ -115,6 +113,20 @@ Feature: Perform basic actions for aggregate questions
 
       When I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
       And I log out
+      And I log in as "appraiser"
+      And I click on "All Appraisals" in the totara menu
+      And I click on "Aggregate Tests" "link" in the "Jimmy Jim" "table_row"
+      And I press "Start"
+      And I click on "choice1" "radio"
+      And I click on "Next" "button"
+
+      Then I should see "Average score: 3.5"
+      And I should see "Median score: 3.5"
+      And I should see "Average score: 5.5"
+      And I should see "Median score: 5.5"
+
+      When I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+      And I log out
       And I log in as "jimmy"
       And I click on "All Appraisals" in the totara menu
       And I click on "Aggregate Tests" "link" in the "Aggregate Tests" "table_row"
@@ -128,6 +140,22 @@ Feature: Perform basic actions for aggregate questions
       When I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
       And I log out
       And I log in as "manager"
+      And I click on "All Appraisals" in the totara menu
+      And I click on "Aggregate Tests" "link" in the "Jimmy Jim" "table_row"
+      And I press "Start"
+      And I click on "choice1" "radio"
+      And I click on "Next" "button"
+
+      Then I should see "Average score: 3"
+      And I should see "Median score: 3"
+      And I should see "Average score: 4"
+      And I should see "Median score: 4"
+      And I should see "Average score: 6"
+      And I should see "Median score: 6"
+
+      When I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+      And I log out
+      And I log in as "appraiser"
       And I click on "All Appraisals" in the totara menu
       And I click on "Aggregate Tests" "link" in the "Jimmy Jim" "table_row"
       And I press "Start"

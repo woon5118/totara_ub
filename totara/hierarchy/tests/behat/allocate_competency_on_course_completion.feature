@@ -7,7 +7,7 @@ Feature: Verify completion of a course triggers assigning a competency.
       | username | firstname  | lastname  | email                |
       | learner1 | Bob1       | Learner1  | learner1@example.com |
       | manager1 | Dave1      | Manager1  | manager1@example.com |
-    And the following "manager assignments" exist in "totara_hierarchy" plugin:
+    And the following job assignments exist:
       | user     | manager  |
       | learner1 | manager1 |
     And the following "courses" exist:

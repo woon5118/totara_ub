@@ -144,7 +144,7 @@ Feature: Create global report view restrictions
     And the following "organisation" hierarchy exists:
       | framework | fullname           | idnumber | description             |
       | FW002     | Test Organisation  | ORG001   | This is an organisation |
-    Given the following position assignments exist:
+    Given the following job assignments exist:
       | user  | organisation |
       | user1 | ORG001       |
       | user2 | ORG001       |

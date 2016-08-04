@@ -12,10 +12,10 @@ Feature: Create a large appraisal
             | learner2   | firstname2 | lastname2  | learner2@example.com   |
             | manager1   | manager1   | manager1   | manager1@example.com   |
             | appraiser1 | appraiser1 | appraiser1 | appraiser1@example.com |
-        And the following position assignments exist:
-            | user     | manager  | appraiser  |
-            | learner1 | manager1 | appraiser1 |
-            | learner2 | manager1 | appraiser1 |
+        And the following job assignments exist:
+          | user     | fullname         | idnumber | manager  | appraiser  |
+          | learner1 | learner1 Day Job | l1ja     | manager1 | appraiser1 |
+          | learner2 | learner2 Day Job | l2ja     | manager1 | appraiser1 |
         And the following "cohorts" exist:
             | name       | idnumber |
             | Audience 1 | A1       |

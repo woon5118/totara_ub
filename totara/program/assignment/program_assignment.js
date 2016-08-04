@@ -823,9 +823,17 @@ function category(id, name, find_url, title) {
         elements.each(function() {
 
             // Get id
-            var itemid = $(this).attr('id').split('_');
-            itemid = itemid[itemid.length-1];  // The last item is the actual id
-            itemid = parseInt(itemid);
+            var itemid;
+            var element = $(this);
+            var elementdata = element.data();
+            if (elementdata.jaid) {
+                // Hack: if there's a jaid data attribute, use that.
+                itemid = parseInt(elementdata.jaid);
+            } else {
+                itemid = element.attr('id').split('_');
+                itemid = itemid[itemid.length-1];  // The last item is the actual id
+                itemid = parseInt(itemid);
+            }
 
             if (!self.item_exists(itemid)) {
                 newids.push(itemid);

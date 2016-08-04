@@ -86,19 +86,6 @@ if (isguestuser()) {
     exit();
 }
 
-$selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
-if ($selectpositiononsignupglobal) {
-    $manager = totara_get_most_primary_manager($USER->id);
-} else {
-    $manager = totara_get_manager($USER->id);
-}
-
-if (!empty($manager)) {
-    $managerid = $manager->id;
-} else {
-    $managerid = 0;
-}
-
 $showdiscountcode = (!get_config(null, 'facetoface_hidecost') && !get_config(null, 'facetoface_hidediscount') && $session->discountcost > 0);
 
 $approvaltype = $facetoface->approvaltype;
@@ -112,7 +99,9 @@ $signupbywaitlist = facetoface_is_signup_by_waitlist($session);
 
 $f2fid = $session->facetoface;
 
-$params = compact('s', 'backtoallsessions', 'managerid', 'showdiscountcode', 'approvaltype',
+$managerids = \totara_job\job_assignment::get_all_manager_userids($USER->id);
+
+$params = compact('s', 'backtoallsessions', 'managerid', 'managerids', 'showdiscountcode', 'approvaltype',
     'approvalterms', 'approvaladmins', 'f2fid', 'waitlisteveryone', 'signupbywaitlist');
 $mform = new mod_facetoface_signup_form(null, $params);
 
@@ -164,10 +153,10 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $params['discountcode']     = $fromform->discountcode;
     $params['notificationtype'] = $fromform->notificationtype;
 
-    $f2fselectedpositionelemid = 'selectedposition_' . $session->facetoface;
+    $f2fselectedjobassignmentelemid = 'selectedjobassignment_' . $session->facetoface;
 
-    if (property_exists($fromform, $f2fselectedpositionelemid)) {
-        $params['positionassignment'] = $fromform->$f2fselectedpositionelemid;
+    if (property_exists($fromform, $f2fselectedjobassignmentelemid)) {
+        $params['jobassignmentid'] = $fromform->$f2fselectedjobassignmentelemid;
     }
 
     $managerselect = get_config(null, 'facetoface_managerselect');
@@ -315,8 +304,8 @@ if ($signedup) {
 } else if (!has_capability('mod/facetoface:signup', $context) && !$candirectenrol) {
     echo html_writer::tag('p', html_writer::tag('strong', get_string('error:nopermissiontosignup', 'facetoface')));
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
-} else if ($facetoface->forceselectposition && !get_position_assignments(facetoface_approval_required($facetoface))) {
-    echo html_writer::tag('p', html_writer::tag('strong', get_string('error:nopositionselectedactivity', 'facetoface')));
+} else if ($facetoface->forceselectjobassignment && !boolval(\totara_job\job_assignment::get_all($USER->id, facetoface_approval_required($facetoface)))) {
+    echo html_writer::tag('p', html_writer::tag('strong', get_string('error:nojobassignmentselectedactivity', 'facetoface')));
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
 } else if (!empty($session->registrationtimestart) && ($session->registrationtimestart > time())) {
     $datetimetz = new stdClass();
@@ -338,7 +327,7 @@ if ($signedup) {
     echo html_writer::tag('p', html_writer::tag('strong', $conflict));
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
 // If manager approval is required and no manager is defined, warn the user.
-} else if (!totara_get_manager($USER->id) && !get_config(null, 'facetoface_managerselect') && ($approvaltype == APPROVAL_MANAGER || $approvaltype == APPROVAL_ADMIN)) {
+} else if (empty($managerids) && !get_config(null, 'facetoface_managerselect') && ($approvaltype == APPROVAL_MANAGER || $approvaltype == APPROVAL_ADMIN)) {
     echo $OUTPUT->notification(get_string('error:missingrequiredmanager', 'mod_facetoface'), 'notifyproblem');
 } else {
     // Signup form.

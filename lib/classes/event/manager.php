@@ -16,6 +16,8 @@
 
 namespace core\event;
 
+use totara_job\job_event_handler;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**

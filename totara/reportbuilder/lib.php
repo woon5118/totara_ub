@@ -1,4 +1,6 @@
 <?php
+use Behat\Behat\Exception\Exception;
+
 /*
  * This file is part of Totara LMS
  *
@@ -2437,6 +2439,7 @@ class reportbuilder {
             if ($join == 'base') {
                 continue;
             }
+
             $joinobj = $this->get_single_join($join, $usage);
             $output[] = $joinobj;
 
@@ -4908,7 +4911,7 @@ class reportbuilder {
     }
 } // End of reportbuilder class
 
-class ReportBuilderException extends Exception { }
+class ReportBuilderException extends \Exception { }
 
 /**
  * Returns the proper SQL to create table based on a query

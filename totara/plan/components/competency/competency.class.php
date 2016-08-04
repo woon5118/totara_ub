@@ -935,11 +935,10 @@ class dp_competency_component extends dp_base_component {
                     $details = new stdClass();
 
                     // Get user's current primary position and organisation (if any)
-                    $posrec = $DB->get_record('pos_assignment', array('userid' => $this->plan->userid, 'type' => POSITION_TYPE_PRIMARY), 'id, positionid, organisationid');
-                    if ($posrec) {
-                        $details->positionid = $posrec->positionid;
-                        $details->organisationid = $posrec->organisationid;
-                        unset($posrec);
+                    $jobassignment = \totara_job\job_assignment::get_first($this->plan->userid, false);
+                    if ($jobassignment) {
+                        $details->positionid = $jobassignment->positionid;
+                        $details->organisationid = $jobassignment->organisationid;
                     }
 
                     $details->assessorname = fullname($USER);
@@ -1370,29 +1369,23 @@ class dp_competency_component extends dp_base_component {
 
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 
-        // Get primary position
-        $position_assignment = new position_assignment(
-            array(
-                'userid'    => $this->plan->userid,
-                'type'      => POSITION_TYPE_PRIMARY
-            )
-        );
+        $jobassignment = \totara_job\job_assignment::get_first($this->plan->userid);
 
-        if (empty($position_assignment->positionid)) {
-            // No position assigned to the primary position, so just go away
+        if (empty($jobassignment) || empty($jobassignment->positionid)) {
+            // No position assigned to the primary job assignment, so just go away
             return true;
         }
 
         $position = new position();
         if ($includecompleted) {
-            $competencies = $position->get_assigned_competencies($position_assignment->positionid);
+            $competencies = $position->get_assigned_competencies($jobassignment->positionid);
         } else {
             $completed_competency_ids = competency::get_user_completed_competencies($this->plan->userid);
-            $competencies = $position->get_assigned_competencies($position_assignment->positionid, 0, $completed_competency_ids);
+            $competencies = $position->get_assigned_competencies($jobassignment->positionid, 0, $completed_competency_ids);
         }
 
         if ($competencies) {
-            $relation = array('component' => 'position', 'id' => $position_assignment->positionid);
+            $relation = array('component' => 'position', 'id' => $jobassignment->positionid);
             if ($this->auto_assign_competencies($competencies, false, $relation)) {
                 // Assign courses
                 if ($includecourses) {
@@ -1419,13 +1412,9 @@ class dp_competency_component extends dp_base_component {
 
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
         // Get primary position
-        $position_assignment = new position_assignment(
-            array(
-                'userid'    => $this->plan->userid,
-                'type'      => POSITION_TYPE_PRIMARY
-            )
-        );
-        if (empty($position_assignment->organisationid)) {
+        $jobassignment = \totara_job\job_assignment::get_first($this->plan->userid);
+        $organisationid = $jobassignment->organisationid;
+        if (empty($organisationid)) {
             // No organisation assigned to the primary position, so just go away
             return true;
         }
@@ -1433,14 +1422,14 @@ class dp_competency_component extends dp_base_component {
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/organisation/lib.php');
         $org = new organisation();
         if ($includecompleted) {
-            $competencies = $org->get_assigned_competencies($position_assignment->organisationid);
+            $competencies = $org->get_assigned_competencies($organisationid);
         } else {
             $completed_competency_ids = competency::get_user_completed_competencies($this->plan->userid);
-            $competencies = $org->get_assigned_competencies($position_assignment->organisationid, 0, $completed_competency_ids);
+            $competencies = $org->get_assigned_competencies($organisationid, 0, $completed_competency_ids);
         }
 
         if ($competencies) {
-            $relation = array('component' => 'organisation', 'id' => $position_assignment->organisationid);
+            $relation = array('component' => 'organisation', 'id' => $organisationid);
             if ($this->auto_assign_competencies($competencies, false, $relation)) {
                 // assign courses
                 if ($includecourses) {

@@ -29,8 +29,8 @@
         <FIELD NAME="interestonlyiffull" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Only allow users to declare interest if all sessions are full"/>
         <FIELD NAME="allowcancellationsdefault" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="cancellationscutoffdefault" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="86400" SEQUENCE="false"/>
-        <FIELD NAME="selectpositiononsignup" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Users with multiple positions will select one on signup"/>
-        <FIELD NAME="forceselectposition" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Error if no suitable position is available when signing up"/>
+        <FIELD NAME="selectjobassignmentonsignup" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Users with multiple job assignments will select one on signup"/>
+        <FIELD NAME="forceselectjobassignment" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Error if no suitable job assignment is available when signing up"/>
         <FIELD NAME="approvaltype" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="approvalrole" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="approvalterms" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
@@ -108,15 +108,15 @@
         <FIELD NAME="notificationtype" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="archived" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Has this sign up been archived by the archive completion feature."/>
         <FIELD NAME="bookedby" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The manager who reserved / booked this space"/>
-        <FIELD NAME="positionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="If required, the position the user is doing the training for"/>
-        <FIELD NAME="positiontype" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="If required, the position type (prim, sec, asp) the user is doing the training for"/>
-        <FIELD NAME="positionassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="If required, the position assignment the user is doing the training for"/>
-        <FIELD NAME="managerid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="managerid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Manager can be selected by user (if allowed), which will override other managers settings"/>
+        <FIELD NAME="jobassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="If required, the job the user is doing the training for"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="sessionid" TYPE="foreign" FIELDS="sessionid" REFTABLE="facetoface_sessions" REFFIELDS="id"/>
         <KEY NAME="facesign_use_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="facesign_man_fk" TYPE="foreign" FIELDS="managerid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="facesign_job_fk" TYPE="foreign" FIELDS="jobassignmentid" REFTABLE="job_assignment" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="facetoface_signups_status" COMMENT="Status of user signups, this table keeps the history for each user signup, no data is deleted">

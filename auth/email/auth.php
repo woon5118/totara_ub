@@ -241,9 +241,9 @@ class auth_plugin_email extends auth_plugin_base {
 
         // save settings
         set_config('recaptcha', $config->recaptcha, 'auth/email');
-        set_config('allowsignupposition', $config->allowsignupposition, 'totara_hierarchy');
-        set_config('allowsignuporganisation', $config->allowsignuporganisation, 'totara_hierarchy');
-        set_config('allowsignupmanager', $config->allowsignupmanager, 'totara_hierarchy');
+        set_config('allowsignupposition', $config->allowsignupposition, 'totara_job');
+        set_config('allowsignuporganisation', $config->allowsignuporganisation, 'totara_job');
+        set_config('allowsignupmanager', $config->allowsignupmanager, 'totara_job');
         return true;
     }
 

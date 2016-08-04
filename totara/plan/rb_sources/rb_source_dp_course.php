@@ -202,8 +202,8 @@ class rb_source_dp_course extends rb_base_source {
         $this->add_course_table_to_joinlist($joinlist, 'base', 'courseid', 'INNER');
         $this->add_context_table_to_joinlist($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
         $this->add_user_table_to_joinlist($joinlist, 'base','userid');
-        $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
+        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_cohort_course_tables_to_joinlist($joinlist, 'base', 'courseid');
 
@@ -464,8 +464,8 @@ class rb_source_dp_course extends rb_base_source {
              );
 
         $this->add_user_fields_to_columns($columnoptions);
-        $this->add_position_fields_to_columns($columnoptions);
-        $this->add_manager_fields_to_columns($columnoptions);
+        $this->add_all_job_assignments_fields_to_columns($columnoptions);
+        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
         $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_course_fields_to_columns($columnoptions);
 
@@ -539,8 +539,8 @@ class rb_source_dp_course extends rb_base_source {
         );
 
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_position_fields_to_filters($filteroptions);
-        $this->add_manager_fields_to_filters($filteroptions);
+        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
+        $this->add_all_job_assignments_fields_to_filters($filteroptions);
         $this->add_cohort_user_fields_to_filters($filteroptions);
         $this->add_cohort_course_fields_to_filters($filteroptions);
 
@@ -552,33 +552,11 @@ class rb_source_dp_course extends rb_base_source {
      * @return array
      */
     protected function define_contentoptions() {
-        $contentoptions = array(
-            new rb_content_option(
-                'current_pos',
-                get_string('currentpos', 'totara_reportbuilder'),
-                'position.path',
-                'position'
-            ),
-            new rb_content_option(
-                'current_org',
-                get_string('currentorg', 'totara_reportbuilder'),
-                'organisation.path',
-                'organisation'
-            )
-        );
+        $contentoptions = array();
 
-        // Include the rb_user_content content options for this report
-        $contentoptions[] = new rb_content_option(
-            'user',
-            get_string('users'),
-            array(
-                'userid' => 'base.userid',
-                'managerid' => 'position_assignment.managerid',
-                'managerpath' => 'position_assignment.managerpath',
-                'postype' => 'position_assignment.type',
-            ),
-            'position_assignment'
-        );
+        // Add the manager/position/organisation content options.
+        $this->add_basic_user_content_options($contentoptions);
+
         return $contentoptions;
     }
 

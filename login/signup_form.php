@@ -103,19 +103,19 @@ class login_signup_form extends moodleform {
         $nojs = optional_param('nojs', 0, PARAM_BOOL);
 
         // Manage positions in signup self-registration.
-        if (get_config('totara_hierarchy', 'allowsignupposition')) {
+        if (get_config('totara_job', 'allowsignupposition')) {
             profile_signup_position($mform, $nojs, $positionid);
             $requirenojs = true;
         }
 
         // Manage organisations in signup self-registration.
-        if (get_config('totara_hierarchy', 'allowsignuporganisation')) {
+        if (get_config('totara_job', 'allowsignuporganisation')) {
             profile_signup_organisation($mform, $nojs, $organisationid);
             $requirenojs = true;
         }
 
         // Manage managers in signup self-registration.
-        if (get_config('totara_hierarchy', 'allowsignupmanager')) {
+        if (get_config('totara_job', 'allowsignupmanager')) {
             profile_signup_manager($mform, $nojs, $managerid);
             $requirenojs = true;
         }

@@ -28,10 +28,10 @@ Feature: Add - Remove manager reservations in Seminar
     And the following "position" hierarchy exists:
       | framework | idnumber | fullname   |
       | FW001     | POS001   | Position1  |
-    And the following position assignments exist:
-      | user     | position | type      | manager |
-      | student1 | POS001   | primary   | manager |
-      | student2 | POS001   | primary   | manager |
+    And the following job assignments exist:
+      | user     | position | manager |
+      | student1 | POS001   | manager |
+      | student2 | POS001   | manager |
 
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu

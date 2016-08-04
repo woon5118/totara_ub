@@ -262,15 +262,13 @@ class facetoface_events_testcase extends advanced_testcase {
         $usersignup = new stdClass();
         $usersignup->sessionid = $this->session->id;
         $usersignup->userid = $user1->id;
-        $usersignup->positionid = null;
-        $usersignup->positiontype = null;
-        $usersignup->positionassignmentid = null;
+        $usersignup->jobassignmentid = null;
         $usersignup->bookedby = $user1->id;
         $usersignup->mailedreminder = 0;
         $usersignup->notificationtype = 1;
         $usersignup->id = $DB->insert_record('facetoface_signups', $usersignup);
 
-        $event = \mod_facetoface\event\attendee_position_updated::create(
+        $event = \mod_facetoface\event\attendee_job_assignment_updated::create(
             array(
                 'objectid' => $usersignup->id,
                 'context' => $this->context,

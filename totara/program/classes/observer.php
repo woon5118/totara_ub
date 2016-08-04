@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/totara/program/program_assignments.class.php'); // Needed for ASSIGNTYPE_XXX constants.
+
 class totara_program_observer {
 
     /**
@@ -268,64 +270,64 @@ class totara_program_observer {
     }
 
     /**
-     * This function is triggered when a user's position is updated. Their manager, position or organisation may
+     * This function is triggered when a user's job assignment is updated. Their manager, position or organisation may
      * have changed, in which case we mark the programs and certifications which contain both the new and old
      * management hierarchy, position and organisation for deferred update.
      *
-     * @param \totara_core\event\position_updated $event
+     * @param \totara_job\event\job_assignment_updated $event
      * @return boolean True if successful
      */
-    public static function position_updated(\totara_core\event\position_updated $event) {
+    public static function job_assignment_updated(\totara_job\event\job_assignment_updated $event) {
         global $DB;
 
+        // TODO: This needs to be checked and fixed.
+
         // Only process the primary position assignment.
-        if ($event->other['type'] != POSITION_TYPE_PRIMARY) {
-            return true;
+        $newjobassignment = \totara_job\job_assignment::get_with_id($event->objectid);
+        if ($newjobassignment->userid != $event->relateduserid) {
+            throw new Exception('Job assignment userid does not match relateduserid in totara_program_observer::job_assignment_updated');
         }
 
-        $newassignment = $DB->get_record('pos_assignment',
-            array('userid' => $event->relateduserid, 'type' => POSITION_TYPE_PRIMARY));
+        if ($newjobassignment->managerjaid != $event->other['oldmanagerjaid']) {
+            $directmanagerjaidstoprocess = array();
+            $indirectmanagerjaidstoprocess = array();
 
-        if ($newassignment->managerid != $event->other['oldmanagerid']) {
-            $directmanagerstoprocess = array();
-            $indirectmanagerstoprocess = array();
-
-            if ($newassignment->managerid) {
-                $directmanagerstoprocess[] = $newassignment->managerid;
-                $path = explode('/', substr($newassignment->managerpath, 1));
+            if ($newjobassignment->managerjaid) {
+                $directmanagerjaidstoprocess[] = $newjobassignment->managerjaid;
+                $path = explode('/', substr($newjobassignment->managerjapath, 1));
                 $countpath = count($path);
                 if ($countpath > 2) {
                     // Don't include the user or their manager here.
-                    $indirectmanagerstoprocess = array_merge($indirectmanagerstoprocess, array_slice($path, 0, $countpath - 2));
+                    $indirectmanagerjaidstoprocess = array_merge($indirectmanagerjaidstoprocess, array_slice($path, 0, $countpath - 2));
                 }
             }
 
-            if ($event->other['oldmanagerid']) {
-                $directmanagerstoprocess[] = $event->other['oldmanagerid'];
-                $path = explode('/', substr($event->other['oldmanagerpath'], 1));
+            if ($event->other['oldmanagerjaid']) {
+                $directmanagerstoprocess[] = $event->other['oldmanagerjaid'];
+                $path = explode('/', substr($event->other['oldmanagerjapath'], 1));
                 $countpath = count($path);
                 if ($countpath > 2) {
                     // Don't include the user or their manager here.
-                    $indirectmanagerstoprocess = array_merge($indirectmanagerstoprocess, array_slice($path, 0, $countpath - 2));
+                    $indirectmanagerstoprocess = array_merge($indirectmanagerjaidstoprocess, array_slice($path, 0, $countpath - 2));
                 }
             }
 
-            if (!empty($directmanagerstoprocess) || !empty($indirectmanagerstoprocess)) {
-                $params = array('assignmenttypemanager' => ASSIGNTYPE_MANAGER);
+            if (!empty($directmanagerjaidstoprocess) || !empty($indirectmanagerjaidstoprocess)) {
+                $params = array('assignmenttypemanager' => ASSIGNTYPE_MANAGERJA);
                 $managersql = "";
 
-                if (!empty($directmanagerstoprocess)) {
-                    list($directinsql, $directparams) = $DB->get_in_or_equal($directmanagerstoprocess, SQL_PARAMS_NAMED);
+                if (!empty($directmanagerjaidstoprocess)) {
+                    list($directinsql, $directparams) = $DB->get_in_or_equal($directmanagerjaidstoprocess, SQL_PARAMS_NAMED);
                     $managersql .= "assignmenttypeid " . $directinsql;
                     $params = array_merge($params, $directparams);
                 }
 
-                if (!empty($indirectmanagerstoprocess)) {
+                if (!empty($indirectmanagerjaidstoprocess)) {
                     if (!empty($managersql)) {
                         $managersql .= " OR ";
                     }
 
-                    list($indirectinsql, $indirectparams) = $DB->get_in_or_equal($indirectmanagerstoprocess, SQL_PARAMS_NAMED);
+                    list($indirectinsql, $indirectparams) = $DB->get_in_or_equal($indirectmanagerjaidstoprocess, SQL_PARAMS_NAMED);
                     $managersql .= "assignmenttypeid {$indirectinsql} AND includechildren = 1";
                     $params = array_merge($params, $indirectparams);
                 }
@@ -339,11 +341,11 @@ class totara_program_observer {
             }
         }
 
-        if ($newassignment->positionid != $event->other['oldpositionid']) {
+        if ($newjobassignment->positionid != $event->other['oldpositionid']) {
             $positionstoprocess = array();
 
-            if ($newassignment->positionid) {
-                $positionstoprocess[] = $newassignment->positionid;
+            if ($newjobassignment->positionid) {
+                $positionstoprocess[] = $newjobassignment->positionid;
             }
 
             if ($event->other['oldpositionid']) {
@@ -362,11 +364,11 @@ class totara_program_observer {
             }
         }
 
-        if ($newassignment->organisationid != $event->other['oldorganisationid']) {
+        if ($newjobassignment->organisationid != $event->other['oldorganisationid']) {
             $organisationstoprocess = array();
 
-            if ($newassignment->organisationid) {
-                $organisationstoprocess[] = $newassignment->organisationid;
+            if ($newjobassignment->organisationid) {
+                $organisationstoprocess[] = $newjobassignment->organisationid;
             }
 
             if ($event->other['oldorganisationid']) {

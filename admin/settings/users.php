@@ -229,23 +229,23 @@ if ($hassiteconfig
 
     // Temporary managers.
     $temp->add(new admin_setting_heading('tempmanagers',
-            new lang_string('tempmanagers', 'totara_core'), ''));
+            new lang_string('tempmanagers', 'totara_job'), ''));
 
     $temp->add(new admin_setting_configcheckbox('enabletempmanagers',
-            new lang_string('enabletempmanagers', 'totara_core'),
-            new lang_string('enabletempmanagersdesc', 'totara_core'),
+            new lang_string('enabletempmanagers', 'totara_job'),
+            new lang_string('enabletempmanagersdesc', 'totara_job'),
             1));
 
     $temp->add(new admin_setting_configselect('tempmanagerrestrictselection',
-            new lang_string('tempmanagerrestrictselection', 'totara_core'),
-            new lang_string('tempmanagerrestrictselectiondesc', 'totara_core'),
+            new lang_string('tempmanagerrestrictselection', 'totara_job'),
+            new lang_string('tempmanagerrestrictselectiondesc', 'totara_job'),
             0,
-            array(0 => get_string('tempmanagerselectionallusers', 'totara_core'),
-                  1 => get_string('tempmanagerselectiononlymanagers', 'totara_core'))));
+            array(0 => get_string('tempmanagerselectionallusers', 'totara_job'),
+                  1 => get_string('tempmanagerselectiononlymanagers', 'totara_job'))));
 
     $temp->add(new admin_setting_configtext('tempmanagerexpirydays',
-            new lang_string('tempmanagerexpirydays', 'totara_core'),
-            new lang_string('tempmanagerexpirydaysdesc', 'totara_core'),
+            new lang_string('tempmanagerexpirydays', 'totara_job'),
+            new lang_string('tempmanagerexpirydaysdesc', 'totara_job'),
             '30', PARAM_INT));
 
     $ADMIN->add('roles', $temp);

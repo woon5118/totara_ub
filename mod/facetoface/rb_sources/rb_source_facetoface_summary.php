@@ -102,7 +102,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->add_session_status_to_joinlist($joinlist);
         $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course');
         $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
-        $this->add_position_tables_to_joinlist($joinlist, 'allattendees', 'userid');
+        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'allattendees', 'userid');
+        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'allattendees', 'userid');
         $this->add_user_table_to_joinlist($joinlist, 'allattendees', 'userid');
         $this->add_facetoface_session_roles_to_joinlist($joinlist, 'sessions.id');
 
@@ -415,30 +416,17 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
     }
 
     protected function define_contentoptions() {
-        $contentoptions = array(
-            new rb_content_option(
-                'current_org',                      // class name
-                get_string('currentorg', 'rb_source_facetoface_sessions'),  // title
-                'organisation.path',                // field
-                'organisation'                      // joins
-            ),
-            new rb_content_option(
-                'user',
-                get_string('user', 'rb_source_facetoface_sessions'),
-                array(
-                    'userid' => 'attendees.userid',
-                    'managerid' => 'position_assignment.managerid',
-                    'managerpath' => 'position_assignment.managerpath',
-                    'postype' => 'position_assignment.type',
-                ),
-                array('attendees', 'position_assignment')
-            ),
-            new rb_content_option(
-                'date',
-                get_string('thedate', 'rb_source_facetoface_sessions'),
-                'base.timestart'
-            ),
+        $contentoptions = array();
+
+        // Add the manager/position/organisation content options.
+        $this->add_basic_user_content_options($contentoptions);
+
+        $contentoptions[] = new rb_content_option(
+            'date',
+            get_string('thedate', 'rb_source_facetoface_sessions'),
+            'base.timestart'
         );
+
         return $contentoptions;
     }
 

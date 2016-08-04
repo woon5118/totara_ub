@@ -260,8 +260,8 @@ $capabilities = array(
         )
     ),
 
-    // Ability to edit the position a learner has used to sign up to a session.
-    'mod/facetoface:changesignedupjobposition' => array(
+    // Ability to edit the jbo assignment a learner has used to sign up to a session.
+    'mod/facetoface:changesignedupjobassignment' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(

@@ -38,7 +38,7 @@ M.mod_facetoface.signupform = {
          *  Attaches mouse events to the loaded content.
          */
         this.attachCustomClickEvents = function() {
-            // Add handler to edit position button.
+            // Add handler to edit job assignment button.
             Y.all('a.ajax-action').each(function(node) {
                 node.on('click', function(e){
                     Y.io(node.getAttribute('href'), {

@@ -15,7 +15,7 @@ Feature: Seminar event cancellation notifications
       | learner4 | Learner   | Four     | learner4@example.com |
       | manager4 | Manager   | Four     | manager4@example.com |
 
-    And the following "manager assignments" exist in "totara_hierarchy" plugin:
+    And the following job assignments exist:
       | user     | manager  |
       | learner4 | manager4 |
 
