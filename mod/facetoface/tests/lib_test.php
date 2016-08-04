@@ -737,6 +737,18 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
      * NOTE: please set up your site with generators for more complex testing scenarios.
      */
     protected function init_sample_data() {
+        global $DB;
+
+        // Fix the facetoface module id, as other non-core modules might be installed that could change the id.
+        $f2fmid = $DB->get_field('modules', 'id', array('name' => 'facetoface'));
+        foreach ($this->course_modules_data as $i => $md) {
+            if ($i == 0) {
+                // Skip table headers.
+                continue;
+            }
+            $this->course_modules_data[$i][2] = $f2fmid;
+        }
+
         $this->loadDataSet(
             $this->createArrayDataSet(
                 array(
