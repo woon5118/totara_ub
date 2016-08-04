@@ -96,7 +96,7 @@ class core_role_permissions_table extends core_role_capability_table_base {
                     "rolename" => $name,
                     "roleid" => $id,
                     "action" => "prevent",
-                    "spanclass" => "allowed",
+                    "spanclass" => "label label-success allowed",
                     "linkclass" => "preventlink",
                     "adminurl" => '#',
                     "imageurl" => ""
@@ -116,7 +116,7 @@ class core_role_permissions_table extends core_role_capability_table_base {
                     "rolename" => $name,
                     "roleid" => $id,
                     "action" => "unprohibit",
-                    "spanclass" => "forbidden",
+                    "spanclass" => "label label-danger forbidden",
                     "linkclass" => "unprohibitlink",
                     "adminurl" => '#',
                     "imageurl" => ""

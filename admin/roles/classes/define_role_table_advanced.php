@@ -591,7 +591,7 @@ class core_role_define_role_table_advanced extends core_role_capability_table_wi
         } else {
             $extraclass = '';
         }
-        echo '<div class="felement' . $extraclass . '">';
+        echo '<div id="rolesform_'. $name . '" class="felement' . $extraclass . '">';
         echo $field;
         if (isset($this->errors[$name])) {
             echo $OUTPUT->error_text($this->errors[$name]);

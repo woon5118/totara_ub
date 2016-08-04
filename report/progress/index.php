@@ -300,10 +300,10 @@ foreach($activities as $activity) {
         $shortenedname = shorten_text($displayname);
         print '<th scope="col" class="'.$datepassedclass.'">'.
             '<a href="'.$CFG->wwwroot.'/mod/'.$activity->modname.
-            '/view.php?id='.$activity->id.'" title="' . s($displayname) . '">'.
+            '/view.php?id='.$activity->id.'" title="' . s($displayname) . '" class="activity">'.
+            '<span class="completion-activityname">'.$shortenedname.'</span>'.
             $OUTPUT->flex_icon('mod_' . $activity->modname . '|icon', array('alt' => s(get_string('modulename', $activity->modname)))) .
-            '<span class="completion-activityname">'.
-            $shortenedname.'</span></a>';
+            '</a>';
         if ($activity->completionexpected) {
             print '<div class="completion-expected"><span>'.$datetext.'</span></div>';
         }

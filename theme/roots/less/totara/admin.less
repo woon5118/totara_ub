@@ -19,6 +19,7 @@
 // @copyright 2016 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @author    Joby Harding <joby.harding@totaralearning.com>
+// @author    Rob Tyler <rob.tyler@totaralearning.com>
 // @package   theme_roots
 
 /* admin.less  */
@@ -724,4 +725,127 @@ img.iconsmall {
     input {
         clear: left;
     }
+}
+
+#plugins-check-page #plugins-check .status-missing td {
+    background-color: @body-bg;
+}
+
+.advancedoverride label,
+.capabilitysearchui label {
+    margin-right: @padding-small-horizontal;
+}
+
+#page-admin-roles-override .overridenotice,
+#page-admin-roles-define .definenotice {
+    margin-left: 0;
+}
+
+#permissions .allowedroles .allowed,
+#permissions .forbiddenroles .forbidden {
+    margin-right: @padding-small-horizontal;
+}
+
+#permissions .allowedroles .allowmore,
+#permissions .forbiddenroles .prohibitmore {
+    display: inline;
+}
+
+#page-user-preferences .row-fluid {
+    margin: 0;
+}
+
+#page-admin-user-profile-index .profileeditor div {
+    display: inline-block;
+}
+
+#page-admin-user-profile-index .profileeditor select {
+    margin: 0 @padding-small-horizontal;
+}
+
+#page-admin-roles-define #rolesform_description > div {
+    margin-left: @grid-gutter-width / 2;
+    width: 70%;
+    float: left;
+}
+
+// Fix for some old authentication admin pages that use tables for layout.
+.path-admin-auth table td {
+    padding: @padding-small-horizontal;
+}
+.path-admin-auth table label {
+    margin-right: @padding-small-horizontal;
+    white-space: nowrap;
+}
+
+// Tab fixes for LTI activity plugin.
+#lti_tab_heading.yui-nav,
+#tp_tab_heading.yui-nav {
+    padding: 0;
+    border-bottom:1px solid @nav-tabs-border-color;
+}
+
+#lti_tab_heading.yui-nav li,
+#tp_tab_heading.yui-nav li {
+    margin-bottom: -1px;
+    padding: 0;
+}
+
+#lti_tab_heading.yui-nav li a,
+#tp_tab_heading.yui-nav li a {
+    background-color: @body-bg;
+    background-image: none;
+    border: none;
+    margin: 0;
+}
+
+#lti_tab_heading.yui-nav li a:hover,
+#tp_tab_heading.yui-nav li a:hover {
+    background-color: @gray-lighter;
+}
+
+#lti_tab_heading.yui-nav li a em,
+#tp_tab_heading.yui-nav li a em {
+    background: none;
+    border: none;
+    color: #555;
+    padding: 0;
+}
+
+#lti_tab_heading.yui-nav li.selected a,
+#tp_tab_heading.yui-nav li.selected a {
+    border-top: 1px solid @nav-tabs-border-color;
+    border-left: 1px solid @nav-tabs-border-color;
+    border-right: 1px solid @nav-tabs-border-color;
+    border-bottom: none;
+    border-top-left-radius: @border-radius-base;
+    border-top-right-radius: @border-radius-base;
+}
+
+#lti_tab_heading.yui-nav li.selected a em,
+#tp_tab_heading.yui-nav li.selected a em {
+    border: none;
+}
+
+#tp_tabs .yui-content,
+#lti_tabs .yui-content {
+    border: none;
+    background-color: #fff;
+}
+
+// Tidy up Default Role Settings tables.
+#page-admin-roles-roledefaults .admintable td {
+    width: 20%;
+}
+#page-admin-roles-roledefaults .admintable td:nth-child(1) {
+    width: 60%;
+}
+
+// Tidy up Define Role page.
+#page-admin-roles-define .advancedbutton,
+#page-admin-roles-define .capabilitysearchui {
+    display: inline;
+}
+#page-admin-roles-define .advancedbutton {
+    margin-right: @padding-large-horizontal;
 }
