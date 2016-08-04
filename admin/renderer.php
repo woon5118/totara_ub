@@ -309,7 +309,8 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $totara_renderer->totara_print_copyright($totara_release);
 
         // skodak: Martin likes to threaten people, so just style his copyright notice the standard way.
-        $output .= $this->output->box_start('generalbox adminwarning copyright-acknowledgements');
+        // Totara: Remove generalbox markup.
+        $output .= html_writer::start_div('copyright-acknowledgements');
         $output .= get_string('totaracopyrightacknowledge', 'totara_core');
 
         //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -317,7 +318,8 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $this->moodle_copyright();
         //////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $output .= $this->output->box_end();
+        // Totara: Remove generalbox markup.
+        $output .= html_writer::end_div();
 
         $output .= $this->footer();
 

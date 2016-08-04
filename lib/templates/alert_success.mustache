@@ -17,9 +17,9 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template totara_core/is_registered
+    @template core/alert_success
 
-    Display Totara registered text..
+    Bootstrap 3 success alert.
 
     Classes required for JS:
     * none
@@ -32,7 +32,7 @@
 
     Example context (json):
     {
-        "content": "This site has successfully registered with Totara."
+        "content": "2051 users have logged in to this site in the last year"
     }
 }}
-{{> core/alert_warning }}
+<div class="alert alert-success" role="alert">{{{content}}}</div>

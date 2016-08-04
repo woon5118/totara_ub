@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 class theme_bootstrapbase_core_renderer extends core_renderer {
 
     /**
@@ -137,17 +139,3 @@ class theme_bootstrapbase_core_renderer extends core_renderer {
     }
 }
 
-/**
- * Overridden core maintenance renderer.
- *
- * This renderer gets used instead of the standard core_renderer during maintenance
- * tasks such as installation and upgrade.
- * We override it in order to style those scenarios consistently with the regular
- * bootstrap look and feel.
- *
- * @package    theme_bootstrapbase
- * @copyright  2014 Sam Hemelryk
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class theme_bootstrapbase_core_renderer_maintenance extends core_renderer_maintenance {
-}

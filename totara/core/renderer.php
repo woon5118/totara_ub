@@ -51,9 +51,9 @@ class totara_core_renderer extends plugin_renderer_base {
     */
     public function active_users($activeusers) {
         $data = new stdClass();
-        $data->activeusers = $activeusers;
+        $data->content = get_string('numberofactiveusers', 'totara_core', $activeusers);
 
-        return $this->output->render_from_template('totara_core/active_users', $data);
+        return $this->output->render_from_template('core/alert_info', $data);
     }
 
     /**
@@ -85,7 +85,7 @@ class totara_core_renderer extends plugin_renderer_base {
         // Add admin warning box and return the output.
         $data = new stdClass();
         $data->content = $output;
-        return $this->render_from_template('core/admin_warning', $data);
+        return $this->render_from_template('core/alert_warning', $data);
     }
 
     /**
@@ -97,7 +97,7 @@ class totara_core_renderer extends plugin_renderer_base {
      */
     public function totara_print_copyright($totara_release) {
         $output = '';
-        $output .= $this->output->box_start('generalbox adminwarning totara-copyright');
+        $output .= html_writer::start_div('totara-copyright');
         $text = get_string('totaralogo', 'totara_core');
         $icon = new pix_icon('logo', $text, 'totara_core',
             array('width' => 253, 'height' => 177, 'class' => 'totaralogo'));
@@ -122,7 +122,7 @@ class totara_core_renderer extends plugin_renderer_base {
         $output .= html_writer::empty_tag('br');
         $output .= html_writer::empty_tag('br');
         $output .= get_string('totaracopyright', 'totara_core');
-        $output .= $this->output->box_end();
+        $output .= html_writer::end_div();
         return $output;
     }
 

@@ -17,12 +17,9 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template core/alert_warning
 
-    @template totara_core/active_users
-
-    notification Active Users.
-
-    This templates generates a box on thr notifications page dispaying how many users are active.
+    Bootstrap 3 warning alert.
 
     Classes required for JS:
     * none
@@ -31,12 +28,11 @@
     * none
 
     Context variables required for this template:
-    * activeusers integer The number of active users.
+    * content The text/html content
 
     Example context (json):
     {
-        "activeusers": "9"
+        "content": "2051 users have logged in to this site in the last year"
     }
-
 }}
-<div class="box generalbox adminwarning">{{#str}}numberofactiveusers,totara_core,{{activeusers}}{{/str}}</div>
+<div class="alert alert-warning" role="alert">{{{content}}}</div>

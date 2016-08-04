@@ -281,34 +281,3 @@ class theme_standardtotararesponsive_core_renderer_ajax extends core_renderer_aj
         return html_writer::tag('div', $output, array('class' => 'paging'));
     }
 }
-
-require_once("{$CFG->dirroot}/admin/renderer.php");
-class theme_standardtotararesponsive_admin_renderer extends core_admin_renderer {
-
-    public function plugins_check_table(core_plugin_manager $pluginman, $version, array $options = array()) {
-        $html = parent::plugins_check_table($pluginman, $version, $options);
-
-        // Replace Bootstrap 3 label classes with Bootstrap 2 equivalents.
-        return str_replace('label-danger', 'label-important', $html);
-    }
-
-    public function plugins_control_panel(core_plugin_manager $pluginman, array $options = array()) {
-
-        $html = parent::plugins_control_panel($pluginman, $options);
-
-        // Replace Bootstrap 3 label classes with Bootstrap 2 equivalents.
-        return str_replace('label-danger', 'label-important', $html);
-
-    }
-
-    /**
-     * Output a warning message, of the type that appears on the admin notifications page.
-     * @param string $message the message to display.
-     * @param string $type type class
-     * @return string HTML to output.
-     */
-    protected function warning($message, $type = 'warning') {
-        return $this->box($message, 'generalbox admin' . $type);
-    }
-
-}

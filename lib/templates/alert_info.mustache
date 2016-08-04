@@ -17,9 +17,9 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core/admin_warning
+    @template core/alert_info
 
-    Create a warning box.
+    Bootstrap 3 info alert.
 
     Classes required for JS:
     * none
@@ -35,6 +35,4 @@
         "content": "2051 users have logged in to this site in the last year"
     }
 }}
-<div class="box generalbox adminwarning">
-    {{{content}}}
-</div>
+<div class="alert alert-info" role="alert">{{{content}}}</div>
