@@ -70,5 +70,5 @@ Feature: Find cohort through totara dialog window
       And I should see "Audience TL-9074A (AUD9074A)"
       And I should see "Audience TL-9074B (AUD9074B)"
 
-      And I wait "5" seconds
-
+      And I click on "Cancel" "button" in the "add-assignment-dialog-3" "totaradialogue"
+      And I click on "Clear unsaved changes" "link"
