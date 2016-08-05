@@ -249,7 +249,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
         // Totara: this is needed for unique indexes on nullable columns, we do not want any space trimming anyway.
         $sql = "SET ANSI_PADDING ON";
         $this->query_start($sql, null, SQL_QUERY_AUX);
-        $result = mssql_query($sql, $this->mssql);
+        $result = sqlsrv_query($this->sqlsrv, $sql);
         $this->query_end($result);
         $this->free_result($result);
 
