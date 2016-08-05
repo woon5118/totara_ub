@@ -191,7 +191,6 @@ define(['jquery',
             'block_current_learning/main_content',
             'block_current_learning/course_row',
             'block_current_learning/program_row',
-            'block_current_learning/paging'
         ];
 
         // Preload Templates to cache them on the client
@@ -202,9 +201,15 @@ define(['jquery',
         });
 
         if (blockData.pagination) {
+            // Separate preloader for paging as it needs some dummy data.
+            var dummyPagingData = {'pagination': {'onepage': false, 'previousclass': 'disabled', 'nextclass': ''}};
+            templates.render('block_current_learning/paging', dummyPagingData);
+            mdlstr.get_string('displayingxofx', 'block_current_learning', {'start': 1, 'end': 2, 'total': 2});
+
             initPaginationHandlers();
             initStyles(blockData);
         }
+
         if (bsjavascript) {
             initTooltips();
         }
