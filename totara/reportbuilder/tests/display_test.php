@@ -27,7 +27,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
     public function test_aggregation() {
-        global $DB, $CFG, $OUTPUT;
+        global $DB, $CFG, $OUTPUT, $PAGE;
         require_once($CFG->libdir . '/excellib.class.php');
         require_once($CFG->libdir . '/odslib.class.php');
 
@@ -238,12 +238,13 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
 
         $this->assertSame('<div class="text_to_html">Some summary</div>', $processed[0]);
 
+        $theme = $PAGE->theme->name;
         $fileicon = $OUTPUT->flex_icon('file-text-o', array('alt' => get_string('file')));
         $fileiconlink = html_writer::link($fileurl, $fileicon . 'readme.txt', array('class' => 'icon'));
         $this->assertSame($fileiconlink, $processed[1]);
 
         $this->assertSame('volba1', $processed[2]);
-        $this->assertSame('<img src="http://www.example.com/moodle/theme/image.php/_s/standardtotararesponsive/totara_core/1/courseicons/business-modelling" id="icon_preview" class="course_icon" alt="volba1" title="volba1" />', $processed[3]);
+        $this->assertSame('<img src="http://www.example.com/moodle/theme/image.php/_s/' . $theme . '/totara_core/1/courseicons/business-modelling" id="icon_preview" class="course_icon" alt="volba1" title="volba1" />', $processed[3]);
         $this->assertSame('Some html <strong>text</strong><script></script>', $processed[4]);
 
         $processed = $report->src->process_data_row($row, 'pdf', $report);

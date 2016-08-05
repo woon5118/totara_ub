@@ -37,6 +37,7 @@ class filter_emoticon_testcase extends advanced_testcase {
      * Verify configured target formats are observed. Just that.
      */
     public function test_filter_emoticon_formats() {
+        global $PAGE;
 
         $this->resetAfterTest(true); // We are modifying the config.
 
@@ -55,7 +56,7 @@ class filter_emoticon_testcase extends advanced_testcase {
 
         // And texts matching target formats are filtered.
         $expected = '<img class="emoticon" alt="angry" title="angry"'.
-                    ' src="http://www.example.com/moodle/theme/image.php/_s/standardtotararesponsive/core/1/s/angry" />';
+                    ' src="http://www.example.com/moodle/theme/image.php/_s/' . $PAGE->theme->name . '/core/1/s/angry" />';
         $options = array('originalformat' => FORMAT_HTML); // Only FORMAT_HTML is filtered, see {@link testable_filter_emoticon}.
         $this->assertEquals($expected, $filter->filter('(grr)', $options));
     }

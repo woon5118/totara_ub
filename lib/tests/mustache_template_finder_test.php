@@ -70,12 +70,18 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
 
         // Test invalid theme.
         $dirs = mustache_template_finder::get_template_directories_for_component('mod_assign', 'xxsdsds');
-        $correct = array(
-            $CFG->dirroot . '/theme/standardtotararesponsive/templates/mod_assign/',
-            $CFG->dirroot . '/theme/bootstrapbase/templates/mod_assign/',
-            $CFG->dirroot . '/theme/base/templates/mod_assign/',
-            $CFG->dirroot . '/mod/assign/templates/'
-        );
+        $defaulttheme = $CFG->theme;
+        $themeconfig = theme_config::load($defaulttheme);
+        $theme_parents = $themeconfig->parents;
+        $correct = array();
+
+        $correct[] = $CFG->dirroot . '/theme/' . $defaulttheme . '/templates/mod_assign/';
+        foreach ($theme_parents as $parent) {
+            $correct[] = $CFG->dirroot . '/theme/' . $parent . '/templates/mod_assign/';
+        }
+
+        $correct[] = $CFG->dirroot . '/mod/assign/templates/';
+
         $this->assertEquals($correct, $dirs);
     }
 

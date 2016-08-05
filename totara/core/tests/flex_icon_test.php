@@ -302,10 +302,10 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
     }
 
     public function test_pix_icon_url() {
-        global $PAGE;
+        global $PAGE, $CFG;
 
         $url = $PAGE->theme->pix_url('i/edit', 'core');
         $this->assertInstanceOf('moodle_url', $url);
-        $this->assertSame('http://www.example.com/moodle/theme/image.php/_s/standardtotararesponsive/core/1/i/edit', $url->out());
+        $this->assertSame("http://www.example.com/moodle/theme/image.php/_s/{$CFG->theme}/core/1/i/edit", $url->out());
     }
 }

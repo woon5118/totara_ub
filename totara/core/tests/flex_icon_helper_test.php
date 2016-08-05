@@ -96,15 +96,21 @@ class totara_core_flex_icon_helper_testcase extends advanced_testcase {
 
     public function test_get_related_theme_dirs() {
         global $CFG;
-        $this->assertSame('standardtotararesponsive', $CFG->theme);
 
-        $theme = \theme_config::load('standardtotararesponsive');
+        $themedefault = \theme_config::DEFAULT_THEME;
+
+        $this->assertSame($themedefault, $CFG->theme);
+
+        $theme = \theme_config::load($themedefault);
         $candidatedirs = $theme->get_related_theme_dirs();
-        $this->assertCount(3, $candidatedirs);
 
-        $this->assertSame(realpath("$CFG->dirroot/theme/base"), realpath($candidatedirs[0]));
-        $this->assertSame(realpath("$CFG->dirroot/theme/bootstrapbase"), realpath($candidatedirs[1]));
-        $this->assertSame(realpath("$CFG->dirroot/theme/standardtotararesponsive"), realpath($candidatedirs[2]));
+        $themehierarchy = array_reverse($theme->parents);
+        $themehierarchy[] = $themedefault;
+        $this->assertCount(count($themehierarchy), $candidatedirs);
+
+        for ($i = 0; $i < count($themehierarchy); $i++) {
+            $this->assertSame(realpath("$CFG->dirroot/theme/{$themehierarchy[$i]}"), realpath($candidatedirs[$i]));
+        }
     }
 
     public function test_protected_merge_flex_icons_file_overriding() {
