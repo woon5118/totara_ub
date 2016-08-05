@@ -692,7 +692,7 @@ class core_badges_renderer extends plugin_renderer_base {
 
             }
 
-            $style = $badge->is_active() ? 'generalbox statusbox active' : 'generalbox statusbox inactive';
+            $style = 'alert alert-warning generalbox statusbox ' . ($badge->is_active() ? 'active' : 'inactive');
             return $this->output->box($message, $style);
         }
 

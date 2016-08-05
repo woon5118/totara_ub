@@ -19,8 +19,8 @@
 // @copyright 2016 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @author    Joby Harding <joby.harding@totaralearning.com>
+// @author    Rob Tyler <rob.tyler@totaralearning.com>
 // @package   theme_roots
-
 
 table.collection {
   .table;
@@ -176,3 +176,28 @@ img#persona_signin {
 }
 
 // End of original bootstrap theme code.
+
+#badge-overview dl dt,
+#badge-overview dl dd {
+  display: inline-block;
+  margin-bottom: @line-height-computed;
+}
+
+#badge-overview dl dt {
+  width: 20%;
+  min-width: 100px;
+}
+
+#badge-overview dl dd {
+  width: 80%;
+}
+
+.path-badges .statusbox > div,
+#badge-overview .activatebadge {
+  display: inline-block;
+  margin-left: @padding-small-horizontal;
+}
+
+#page-badges-criteria .singleselect label {
+  margin-right: @padding-small-horizontal;
+}
