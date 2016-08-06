@@ -1284,6 +1284,9 @@ class job_assignment {
             $params['userjaid'] = $userjaid;
         }
 
+        // We need consistent results for tests.
+        $sql .= "ORDER BY uja.id ASC";
+
         $records = $DB->get_records_sql($sql, $params);
 
         $managers = array();
