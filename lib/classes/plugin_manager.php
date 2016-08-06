@@ -1739,7 +1739,8 @@ class core_plugin_manager {
                 'totara_my_learning_nav', 'totara_my_team_nav', 'totara_quicklinks',
                 'totara_recent_learning', 'totara_report_graph', 'totara_report_manager', 'totara_stats',
                 'totara_tasks', 'totara_certifications', 'gaccess', 'totara_program_completion',
-                'totara_dashboard', 'totara_report_table', 'last_course_accessed'
+                'totara_dashboard', 'totara_report_table', 'last_course_accessed',
+                'current_learning',
             ),
 
             'booktool' => array(
@@ -1943,6 +1944,7 @@ class core_plugin_manager {
                 'appraisal', 'cohort', 'core', 'coursecatalog', 'customfield', 'dashboard', 'feedback360', 'flavour',
                 'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
                 'certification', 'completionimport', 'mssql', 'generator', 'connect', 'form',
+                'gap', 'job',
             ),
             'tabexport' => array(
                 'csv', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',
