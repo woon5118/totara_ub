@@ -248,11 +248,32 @@ $icons = array(
                     'classes' => 'ft-blended',
                 ),
         ),
-    'block_to_dock' =>
+    'block-dock' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-square-o-left',
+                    'classes' => 'fa-caret-square-o-left ft-flip-rtl',
+                ),
+        ),
+    'block-hide' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-minus-square',
+                ),
+        ),
+    'block-show' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-plus-square',
+                ),
+        ),
+    'block-undock' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-caret-square-o-right ft-flip-rtl',
                 ),
         ),
     'bookmark-o' =>
@@ -697,13 +718,6 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-times ft-state-danger',
-                ),
-        ),
-    'dock_to_block' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-caret-square-o-right',
                 ),
         ),
     'document-edit' =>
@@ -2351,8 +2365,8 @@ $deprecated = array(
     'core|t/backpack' => 'backpack',
     'core|t/backup' => 'upload',
     'core|t/block' => 'ban',
-    'core|t/block_to_dock' => 'block_to_dock',
-    'core|t/block_to_dock_rtl' => 'dock_to_block',
+    'core|t/block_to_dock' => 'block-dock',
+    'core|t/block_to_dock_rtl' => 'block-dock',
     'core|t/cache' => 'cache',
     'core|t/calc' => 'calculator',
     'core|t/calc_off' => 'calculator-off',
@@ -2368,8 +2382,8 @@ $deprecated = array(
     'core|t/delete' => 'delete',
     'core|t/disable_down' => 'arrow-down',
     'core|t/disable_up' => 'arrow-up',
-    'core|t/dock_to_block' => 'dock_to_block',
-    'core|t/dock_to_block_rtl' => 'block_to_dock',
+    'core|t/dock_to_block' => 'block-undock',
+    'core|t/dock_to_block_rtl' => 'block-undock',
     'core|t/dockclose' => 'times-circle-o',
     'core|t/down' => 'arrow-down',
     'core|t/download' => 'download',
