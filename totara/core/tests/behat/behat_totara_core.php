@@ -425,4 +425,20 @@ class behat_totara_core extends behat_base {
             'No associated issue given for skipped scenario'
         );
     }
+
+    /**
+     * Am I on the right page? This is intended to be used
+     * instead of 'I should see "Course 1"' when on course page.
+     *
+     * @Then /^I should see "([^"]*)" in the page title$/
+     */
+    public function i_should_see_in_the_page_title($text) {
+        $text = $this->getSession()->getSelectorsHandler()->xpathLiteral($text);
+        $xpath = "//title[contains(text(), {$text})]";
+        $this->find(
+            'xpath',
+            $xpath,
+            new ExpectationException('Text "'.$text.'" was not found in page header', $this->getSession())
+        );
+    }
 }
