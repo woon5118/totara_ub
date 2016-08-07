@@ -82,6 +82,7 @@ Feature: Users completion of courses
     And I click on "Record of Learning" in the totara menu
     And I log out
     And I log in as "admin"
+    And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "link"
     And I navigate to "Completions archive" node in "Course administration"
     And I press "Continue"
@@ -104,7 +105,7 @@ Feature: Users completion of courses
     And I click on "delete" action for "Course 1" in management course listing
     And I press "Delete"
     And I press "Continue"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I click on "Historic Completions Report" "link"
     Then I should not see "Course 1"
     And I should see "Course 2"

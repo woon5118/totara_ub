@@ -1,7 +1,7 @@
 @totara @totara_reportbuilder @tabexport
 Feature: Test that report builder reports can be scheduled
   Create a report
-  Go to My Reports
+  Go to Reports
   Create a schedule
   Check that it shows the scheduled report in the list
 
@@ -15,7 +15,7 @@ Feature: Test that report builder reports can be scheduled
 
   @javascript
   Scenario: Report builder reports can be scheduled daily
-    When I click on "My Reports" in the totara menu
+    When I click on "Reports" in the totara menu
     And I press "Add scheduled report"
     Then I should see "Schedulable Report"
     When I set the field "schedulegroup[frequency]" to "Daily"
@@ -32,7 +32,7 @@ Feature: Test that report builder reports can be scheduled
 
   @javascript
   Scenario: Report builder reports can be scheduled weekly
-    When I click on "My Reports" in the totara menu
+    When I click on "Reports" in the totara menu
     And I press "Add scheduled report"
     Then I should see "Schedulable Report"
     When I set the field "schedulegroup[frequency]" to "Weekly"
@@ -49,7 +49,7 @@ Feature: Test that report builder reports can be scheduled
 
   @javascript
   Scenario: Report builder reports can be scheduled monthly
-    When I click on "My Reports" in the totara menu
+    When I click on "Reports" in the totara menu
     And I press "Add scheduled report"
     Then I should see "Schedulable Report"
     When I set the field "schedulegroup[frequency]" to "Monthly"
@@ -66,7 +66,7 @@ Feature: Test that report builder reports can be scheduled
 
   @javascript
   Scenario: Report builder reports can be scheduled hourly
-    When I click on "My Reports" in the totara menu
+    When I click on "Reports" in the totara menu
     And I press "Add scheduled report"
     Then I should see "Schedulable Report"
     When I set the field "schedulegroup[frequency]" to "Every X hours"
@@ -83,7 +83,7 @@ Feature: Test that report builder reports can be scheduled
 
   @javascript
   Scenario: Report builder reports can be scheduled minutely
-    When I click on "My Reports" in the totara menu
+    When I click on "Reports" in the totara menu
     And I press "Add scheduled report"
     Then I should see "Schedulable Report"
     When I set the field "schedulegroup[frequency]" to "Every X minutes"
@@ -100,7 +100,7 @@ Feature: Test that report builder reports can be scheduled
 
   @javascript
   Scenario: Report builder reports can be exported in different formats
-    When I click on "My Reports" in the totara menu
+    When I click on "Reports" in the totara menu
     And I press "Add scheduled report"
     Then I should see "Schedulable Report"
     When I set the field "Export" to "CSV"

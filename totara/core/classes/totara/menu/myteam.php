@@ -31,7 +31,7 @@ use totara_job\job_assignment;
 class myteam extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
-        return get_string('myteam', 'totara_core');
+        return get_string('team', 'totara_core');
     }
 
     protected function get_default_url() {
@@ -43,7 +43,7 @@ class myteam extends \totara_core\totara\menu\item {
     }
 
     public function get_default_sortorder() {
-        return 40000;
+        return 50000;
     }
 
     protected function check_visibility() {

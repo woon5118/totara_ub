@@ -45,7 +45,7 @@ Feature: Test course visibility
 
   Scenario: Traditional course visibility works as expected
     Given I log in as "trainer1"
-    When I click on "My Learning" in the totara menu
+    When I click on "Dashboard" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -58,7 +58,7 @@ Feature: Test course visibility
 
     When I log out
     And I log in as "learner1"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should not see "Physics"
@@ -70,13 +70,14 @@ Feature: Test course visibility
     And I should not see "Calculus"
 
     When I click on "Home" in the totara menu
+    When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
     Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
 
     When I log out
     And I log in as "learner2"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should not see "Biology"
     And I should see "Chemistry"
     And I should not see "Physics"
@@ -88,13 +89,14 @@ Feature: Test course visibility
     And I should not see "Calculus"
 
     When I click on "Home" in the totara menu
+    When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
     Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
 
     When I log out
     And I log in as "learner3"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should not see "Biology"
     And I should not see "Chemistry"
     And I should not see "Physics"
@@ -106,6 +108,7 @@ Feature: Test course visibility
     And I should not see "Calculus"
 
     When I click on "Home" in the totara menu
+    When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
     Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
@@ -157,7 +160,7 @@ Feature: Test course visibility
 
     When I log out
     And I log in as "trainer1"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -169,12 +172,14 @@ Feature: Test course visibility
     And I should not see "Calculus"
 
     When I click on "Home" in the totara menu
+    When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
     Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
 
     When I log out
     And I log in as "learner1"
+    And I click on "Home" "link" in the "Navigation" "block"
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -186,12 +191,14 @@ Feature: Test course visibility
     And I should not see "Calculus"
 
     When I click on "Home" in the totara menu
+    When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
     Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
 
     When I log out
     And I log in as "learner2"
+    And I click on "Home" "link" in the "Navigation" "block"
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -203,12 +210,15 @@ Feature: Test course visibility
     And I should not see "Calculus"
 
     When I click on "Home" in the totara menu
+    When I click on "Home" "link" in the "Navigation" "block"
+
     And I follow the more information icon for the "Biology" course
     Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
 
     When I log out
     And I log in as "learner3"
+    And I click on "Home" "link" in the "Navigation" "block"
     Then I should see "Biology"
     And I should not see "Chemistry"
     And I should not see "Physics"
@@ -220,6 +230,7 @@ Feature: Test course visibility
     And I should not see "Calculus"
 
     When I click on "Home" in the totara menu
+    When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
     Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"

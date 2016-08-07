@@ -541,6 +541,7 @@ $string['fullnametype_help'] = 'Type full name';
 $string['fullnameview'] = 'Full name';
 $string['globalsettings'] = 'Global settings';
 $string['goal'] = 'Goal';
+$string['goals'] = 'Goals';
 $string['goaladdedframework'] = 'The goal framework "{$a}" has been added';
 $string['goaladdnew'] = 'Add a new goal';
 $string['goaladdnewframework'] = 'Add new goal framework';
@@ -910,7 +911,6 @@ $string['missingshortnametemplate'] = 'Missing template short name';
 $string['missingshortnametype'] = 'Missing type short name';
 $string['missingtypename'] = 'Missing type name';
 $string['moveselectedxto'] = 'Move selected {$a} to: ';
-$string['mygoals'] = 'My Goals';
 $string['mygoalsteam'] = '{$a}\'s Goals';
 $string['name'] = 'Name';
 $string['newtype'] = 'New type';
@@ -1285,3 +1285,4 @@ $string['xitemsmoved'] = '{$a->num} {$a->items} and all children have been moved
 
 // Deprecated.
 $string['typeaspirational'] = 'Aspirational position';
+$string['mygoals'] = 'My Goals';

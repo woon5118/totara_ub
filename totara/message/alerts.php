@@ -84,7 +84,6 @@ $PAGE->requires->js_init_call('M.totara_message.init');
 ///
 /// Display the page
 ///
-$PAGE->navbar->add(get_string('mylearning', 'totara_core'), new moodle_url('/my/'));
 $PAGE->navbar->add($strheading);
 
 $PAGE->set_title($strheading);
@@ -95,7 +94,6 @@ $output = $PAGE->get_renderer('totara_reportbuilder');
 
 echo $output->header();
 echo $output->heading($strheading);
-echo html_writer::tag('p', html_writer::link("{$CFG->wwwroot}/my/", "<< " . get_string('mylearning', 'totara_core')));
 
 $report->display_restrictions();
 

@@ -1208,7 +1208,6 @@ function dp_get_plan_base_navlinks($userid) {
     global $USER, $PAGE, $DB;
     // the user is viewing their own plan
     if ($userid == $USER->id) {
-        $PAGE->navbar->add(get_string('mylearning', 'totara_core'), new moodle_url('/my/'));
         $PAGE->navbar->add(get_string('learningplans', 'totara_plan'), new moodle_url('/totara/plan/index.php'));
         return true;
     }
@@ -1217,7 +1216,7 @@ function dp_get_plan_base_navlinks($userid) {
     $user = $DB->get_record('user', array('id' => $userid));
     if ($user) {
         if (totara_feature_visible('myteam')) {
-            $PAGE->navbar->add(get_string('myteam', 'totara_core'), new moodle_url('/my/teammembers.php'));
+            $PAGE->navbar->add(get_string('team', 'totara_core'), new moodle_url('/my/teammembers.php'));
         }
         $PAGE->navbar->add(get_string('xslearningplans', 'totara_plan', fullname($user)), new moodle_url('/totara/plan/index.php', array('userid' => $userid)));
     } else {

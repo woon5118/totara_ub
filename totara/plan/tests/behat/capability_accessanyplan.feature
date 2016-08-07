@@ -50,7 +50,8 @@ Feature: Verify capability accessanyplan.
     Then I should see "Evidence created"
 
     # Navigate to the learners plan
-    And I click on "Learning Plans" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I click on "Learning Plans" "link"
     And I click on "learner1 Learning Plan" "link"
 
     # Add some courses to the plan.
@@ -85,7 +86,8 @@ Feature: Verify capability accessanyplan.
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    When I click on "Learning Plans" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    When I click on "Learning Plans" "link" in the "My Learning" "block"
     And I click on "learner1 Learning Plan" "link"
     # Send the plan to the manager for approval.
     And I press "Send approval request"

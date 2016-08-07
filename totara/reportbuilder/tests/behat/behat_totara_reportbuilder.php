@@ -52,7 +52,7 @@ class behat_totara_reportbuilder extends behat_base {
      */
     public function i_navigate_to_my_report($reportname) {
         return array(
-            new Given('I click on "My Reports" in the totara menu'),
+            new Given('I click on "Reports" in the totara menu'),
             new Given('I click on "'.$reportname.'" "link" in the ".reportmanager" "css_element"'),
             new Given('I should see "'.$reportname.'" in the "h2" "css_element"'),
         );

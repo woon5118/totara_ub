@@ -85,14 +85,13 @@ Feature: User with moodle/cohort:view can view but not manage audience details
   Scenario: View audience management tabs with moodle/cohort:view capability in category context
     Given I log in as "audviewcat"
     And I am on site homepage
-    And "Administration" "block" should not exist
+    And I should not see "Audiences"
     And I follow "CourseThree"
     And I follow "CategoryTwo"
-    And "Administration" "block" should not exist
+    And I should not see "Audiences"
     And I am on site homepage
     And I follow "CourseOne"
     And I follow "CategoryOne"
-    And "Administration" "block" should be visible
     And I navigate to "Audiences" node in "Category: CategoryOne"
     And I follow "Category Audience"
     Then I should see "Overview"

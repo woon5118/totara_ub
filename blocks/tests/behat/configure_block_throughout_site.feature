@@ -50,7 +50,7 @@ Feature: Add and configure blocks throughout the site
 
   Scenario: Blocks on the My learning page can have roles assigned to them
     Given I log in as "manager1"
-    And I click on "My learning" "link" in the "Navigation" "block"
+    And I click on "Dashboard" "link" in the "Navigation" "block"
     When I press "Customise this page"
     Then I should see "Assign roles in Navigation block"
 
@@ -63,7 +63,7 @@ Feature: Add and configure blocks throughout the site
   @javascript
   Scenario: Blocks can safely be customised
     Given I log in as "admin"
-    And I click on "My learning" "link" in the "Navigation" "block"
+    And I click on "Dashboard" "link" in the "Navigation" "block"
     And I press "Customise this page"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block

@@ -73,12 +73,12 @@ if ($USER->id != $userid) {
         $url = new moodle_url('/my/teammembers.php');
     } else {
         $menuitem = null;
-        $url = nulls;
+        $url = null;
     }
 } else {
     $strheading = get_string('recordoflearning', 'totara_core');
-    $menuitem = 'mylearning';
-    $url = new moodle_url('/my/');
+    $menuitem = null;
+    $url = null;
 }
 // Get subheading name for display.
 $strsubheading = get_string($rolstatus.'objectivessubhead', 'totara_plan');

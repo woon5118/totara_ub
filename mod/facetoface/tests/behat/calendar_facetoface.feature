@@ -53,7 +53,8 @@ Feature: Seminar calendar
     And I log out
 
     When I log in as "student1"
-    And I click on "Calendar" "link"
+    And I click on "Dashboard" in the totara menu
+    And I click on "Go to calendar" "link"
 #    Make step to see the date.
 #    see calendar_format_event_time function to get the expected result.
     And I should see "(time zone: Pacific/Auckland)"

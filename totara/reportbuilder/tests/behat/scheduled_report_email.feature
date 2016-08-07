@@ -1,7 +1,7 @@
 @totara @totara_reportbuilder @tabexport @javascript
 Feature: Test that report builder reports can be scheduled to be emailed
   Create a report
-  Go to My Reports
+  Go to Reports
   Create a schedule
   Check that it shows the scheduled report in the list
   #NOTE: This only confirms that the emails are added to the list, it can't test that the e-mails actually get sent
@@ -13,7 +13,7 @@ Feature: Test that report builder reports can be scheduled to be emailed
     And I set the field "Report Name" to "Schedulable Report"
     And I set the field "Source" to "User"
     And I press "Create report"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I press "Add scheduled report"
 
   Scenario: Add audiences to report e-mail recipients

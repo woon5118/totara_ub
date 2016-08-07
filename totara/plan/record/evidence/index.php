@@ -51,14 +51,14 @@ if ($USER->id == $userid) {
     $strheading = get_string('recordoflearning', 'totara_core');
     $usertype = 'learner';
     $menuitem = 'recordoflearning';
-    $menunavitem = 'mylearning';
-    $url = new moodle_url('/my/');
+    $menunavitem = '';
+    $url = null;
 } else {
     $strheading = get_string('recordoflearningforname', 'totara_core', fullname($user, true));
     $usertype = 'manager';
     if (totara_feature_visible('myteam')) {
         $menuitem = 'myteam';
-        $menunavitem = 'myteam';
+        $menunavitem = 'team';
         $url = new moodle_url('/my/teammembers.php');
     } else {
         $menuitem = null;

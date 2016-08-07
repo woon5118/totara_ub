@@ -386,12 +386,8 @@ class behat_course extends behat_base {
      * @param int $sectionnumber The section number
      */
     public function section_should_be_highlighted($sectionnumber) {
-
-        // Ensures the section exists.
-        $xpath = $this->section_exists($sectionnumber);
-
-        // The important checking, we can not check the img.
-        $xpath = $xpath . "/descendant::*[@class='menu-action-text'][text()='Remove highlight']";
+        // Totara: is the section marked as current, make it work even when edit mode off!
+        $xpath = "//li[@id='section-" . $sectionnumber . "' and contains(concat(' ', normalize-space(@class), ' '), ' current ')]";
         $exception = new ExpectationException('The "' . $sectionnumber . '" section is not highlighted', $this->getSession());
         $this->find('xpath', $xpath, $exception);
     }

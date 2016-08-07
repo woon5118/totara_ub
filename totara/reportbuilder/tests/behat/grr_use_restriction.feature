@@ -56,7 +56,7 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user1"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist
@@ -77,7 +77,7 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user3"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist
@@ -90,13 +90,13 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user4"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     And ".globalrestrictionscontainer" "css_element" should not exist
     And I log out
 
     When I log in as "user6"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     And ".globalrestrictionscontainer" "css_element" should not exist
     And I log out
@@ -121,7 +121,7 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user1"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist
@@ -134,7 +134,7 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user3"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist
@@ -147,13 +147,13 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user4"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     And ".globalrestrictionscontainer" "css_element" should not exist
     And I log out
 
     When I log in as "user6"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     And ".globalrestrictionscontainer" "css_element" should not exist
     And I log out
@@ -182,7 +182,7 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user4"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist
@@ -195,7 +195,7 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user5"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist
@@ -208,13 +208,13 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user1"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     And ".globalrestrictionscontainer" "css_element" should not exist
     And I log out
 
     When I log in as "user6"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     And ".globalrestrictionscontainer" "css_element" should not exist
     And I log out
@@ -242,7 +242,7 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user1"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist
@@ -255,7 +255,7 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user3"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist
@@ -268,13 +268,13 @@ Feature: Create global report use restrictions
     And I log out
 
     When I log in as "user4"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     And ".globalrestrictionscontainer" "css_element" should not exist
     And I log out
 
     When I log in as "user6"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     And ".globalrestrictionscontainer" "css_element" should not exist
     And I log out

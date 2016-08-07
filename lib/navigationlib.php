@@ -1021,15 +1021,7 @@ class global_navigation extends navigation_node {
             return;
         }
 
-        if (get_home_page() == HOMEPAGE_SITE) {
-            // We are using the site home for the root element
-            $properties = array(
-                'key' => 'home',
-                'type' => navigation_node::TYPE_SYSTEM,
-                'text' => get_string('home'),
-                'action' => new moodle_url('/')
-            );
-        } else if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD && totara_feature_visible('totaradashboard')) {
+        if (totara_feature_visible('totaradashboard') && get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
             // We are using totara dashboard for the root element.
             $properties = array(
                 'key' => 'mydashboard',
@@ -1038,12 +1030,12 @@ class global_navigation extends navigation_node {
                 'action' => new moodle_url('/totara/dashboard/index.php')
             );
         } else {
-            // We are using the users my moodle for the root element
+            // We are using the site home for the root element
             $properties = array(
-                'key' => 'myhome',
+                'key' => 'home',
                 'type' => navigation_node::TYPE_SYSTEM,
-                'text' => get_string('myhome'),
-                'action' => new moodle_url('/my/')
+                'text' => get_string('home'),
+                'action' => new moodle_url('/')
             );
         }
 
@@ -1100,29 +1092,17 @@ class global_navigation extends navigation_node {
         // courses: Additional courses are added here.
         // users: Other users information loaded here.
         $this->rootnodes = array();
-        if (get_home_page() == HOMEPAGE_SITE) {
-            // The home element should be my moodle because the root element is the site
-            if (isloggedin() && !isguestuser()) {  // Makes no sense if you aren't logged in
-                $this->rootnodes['home'] = $this->add(get_string('myhome'), new moodle_url('/my/'), self::TYPE_SETTING, null, 'home');
+        if (!isloggedin() or isguestuser()) {
+            // Totara: One home entry is enough, do not link Dashboard.
+        } else if (get_home_page() == HOMEPAGE_SITE) {
+            // The home element should be dashboard because the root node is site.
+            // But only show if the user has dashboards.
+            if (totara_feature_visible('totaradashboard') && (count(totara_dashboard::get_user_dashboards($USER->id)))) {
+                $this->rootnodes['home'] = $this->add(get_string('dashboard'), new moodle_url('/totara/dashboard/index.php'));
             }
         } else {
-            // The home element should be the site because the root node is my moodle
-            $this->rootnodes['home'] = $this->add(get_string('sitehome'), new moodle_url('/'), self::TYPE_SETTING, null, 'home');
-            if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_MY ||
-                    $CFG->defaulthomepage == HOMEPAGE_TOTARA_DASHBOARD)) {
-                // We need to stop automatic redirection
-                $this->rootnodes['home']->action->param('redirect', '0');
-            }
-        }
-
-        if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
-            // Add access to my home as well.
-            $this->rootnodes['myhome'] = $this->add(get_string('myhome'), new moodle_url('/my/'), self::TYPE_SETTING, null,
-                    'myhome');
-        } else if (totara_feature_visible('totaradashboard') && (count(totara_dashboard::get_user_dashboards($USER->id)))) {
-            // Dashboards not in the root, so add here.
-            $this->rootnodes['dashboard'] = $this->add(get_string('dashboard'), new moodle_url('/totara/dashboard/index.php'),
-                    self::TYPE_ROOTNODE, null, 'dashboard');
+            // The home element should be the site because the root node is totara dashboard
+            $this->rootnodes['home'] = $this->add(get_string('home'), new moodle_url('/', array('redirect' => 0)), self::TYPE_SETTING, null, 'home');
         }
 
         $this->rootnodes['site'] = $this->add_course($SITE);
@@ -1157,7 +1137,7 @@ class global_navigation extends navigation_node {
 
         // Load the users enrolled courses if they are viewing the My Moodle page AND the admin has not
         // set that they wish to keep the My Courses branch collapsed by default.
-        if (!empty($CFG->navexpandmycourses) && $this->page->pagelayout === 'mydashboard'){
+        if (!empty($CFG->navexpandmycourses) && $this->page->pagelayout === 'dashboard') { // Totara has separate dashboard layout.
             $this->rootnodes['mycourses']->forceopen = true;
             $this->load_courses_enrolled();
         } else {
@@ -2859,7 +2839,7 @@ class global_navigation_for_ajax extends global_navigation {
 
         $this->rootnodes = array();
         $this->rootnodes['site']    = $this->add_course($SITE);
-        $this->rootnodes['mycourses'] = $this->add(get_string('mycourses'), new moodle_url('/my'), self::TYPE_ROOTNODE, null, 'mycourses');
+        $this->rootnodes['mycourses'] = $this->add(get_string('mycourses'), null, self::TYPE_ROOTNODE, null, 'mycourses');
         $this->rootnodes['courses'] = $this->add(get_string('courses'), null, self::TYPE_ROOTNODE, null, 'courses');
         // The courses branch is always displayed, and is always expandable (although may be empty).
         // This mimicks what is done during {@link global_navigation::initialise()}.
@@ -4253,13 +4233,11 @@ class settings_navigation extends navigation_node {
 
         // Add a user setting branch.
         if ($gstitle == 'usercurrentsettings') {
-            $dashboard = $this->add(get_string('myhome'), new moodle_url('/my/'), self::TYPE_CONTAINER, null, 'dashboard');
+            $dashboard = $this->add(get_string('home'), null, self::TYPE_CONTAINER);
             // This should be set to false as we don't want to show this to the user. It's only for generating the correct
             // breadcrumb.
             $dashboard->display = false;
-            if (get_home_page() == HOMEPAGE_MY) {
-                $dashboard->mainnavonly = true;
-            }
+            $dashboard->mainnavonly = true;
 
             $iscurrentuser = ($user->id == $USER->id);
 
@@ -4328,7 +4306,7 @@ class settings_navigation extends navigation_node {
             // This link doesn't have a unique display for course context so only display it under the user's profile.
             if ($issitecourse && $iscurrentuser && has_capability('moodle/user:manageownfiles', $usercontext)) {
                 $url = new moodle_url('/user/files.php');
-                $dashboard->add(get_string('privatefiles'), $url, self::TYPE_SETTING);
+                $profilenode->add(get_string('privatefiles'), $url, self::TYPE_SETTING);
             }
 
             // Add a node to view the users notes if permitted.
@@ -4348,7 +4326,7 @@ class settings_navigation extends navigation_node {
                 if ($course->id == SITEID) {
                     $url = user_mygrades_url($user->id, $course->id);
                 } else { // Otherwise we are in a course and should redirect to the user grade report (Activity report version).
-                    $url = new moodle_url('/course/user.php', array('mode' => 'grade', 'id' => $course->id, 'user' => $user->id));
+                    $url = new moodle_url('/course/user.php', array('mode' => 'grade', 'user' => $user->id));
                 }
                 $dashboard->add(get_string('grades', 'grades'), $url, self::TYPE_SETTING, null, 'mygrades');
             }

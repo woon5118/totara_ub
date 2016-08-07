@@ -52,10 +52,17 @@ Feature: View the quiz being due
     And quiz "Quiz 2A Future deadline" contains the following questions:
       | question       | page |
       | First question | 1    |
+    And I log in as "student1"
+    And I press "Customise this page"
+    And I add the "Course overview" block
+    And I log out
+    And I log in as "student2"
+    And I press "Customise this page"
+    And I add the "Course overview" block
+    And I log out
 
   Scenario: View my quizzes that are due
     Given I log in as "student1"
-    When I am on homepage
     Then I should see "You have quizzes that are due" in the "Course overview" "block"
     And I should see "Quiz 1C Future deadline" in the "Course overview" "block"
     And I should see "Quiz 1D Future deadline" in the "Course overview" "block"

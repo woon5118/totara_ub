@@ -57,7 +57,7 @@ Feature: Create global report no restrictions
       | Global restriction behaviour for users with no active restrictions | Show no records |
     And I log out
     And I log in as "user4"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     Then I should see "There are no records in this report"
     # Do not tell users what is going on, this is a required feature.
@@ -68,7 +68,7 @@ Feature: Create global report no restrictions
       | Global restriction behaviour for users with no active restrictions | Show all records |
     And I log out
     And I log in as "user4"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     Then ".globalrestrictionscontainer" "css_element" should not exist
     And I should see "User One" in the ".reportbuilder-table" "css_element"

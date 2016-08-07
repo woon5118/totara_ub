@@ -5,6 +5,7 @@ Feature: Add images to Atto
   @javascript
   Scenario: Insert an image
     Given I log in as "admin"
+    And I follow "Profile" in the user menu
     And I follow "Manage private files..."
     And I upload "lib/editor/atto/tests/fixtures/moodle-logo.png" file to "Files" filemanager
     And I click on "Save changes" "button"

@@ -9,7 +9,9 @@ Feature: View a site event on the frontpage
       | username | firstname | lastname | email | idnumber |
       | teacher1 | Teacher | 1 | teacher1@example.com | T1 |
     And I log in as "admin"
-    And I create a calendar event with form data:
+    And I click on "Dashboard" in the totara menu
+    And I click on "Go to calendar" "link"
+    And I create a calendar event:
       | id_eventtype | Site |
       | id_name | My Site Event |
     And I am on site homepage

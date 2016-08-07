@@ -123,15 +123,15 @@ $ownplan = $USER->id == $userid;
 $usertype = ($ownplan) ? 'learner' : 'manager';
 if ($usertype == 'manager') {
     if (totara_feature_visible('myteam')) {
-        $menuitem = 'myteam';
+        $menuitem = 'team';
         $url = new moodle_url('/my/teammembers.php');
     } else {
         $menuitem = null;
         $url = null;
     }
 } else {
-    $menuitem = 'mylearning';
-    $url = new moodle_url('/my/');
+    $menuitem = null;
+    $url = null;
 }
 if ($url) {
     $PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);

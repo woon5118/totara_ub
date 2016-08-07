@@ -30,8 +30,6 @@ require_once($CFG->dirroot . '/totara/program/lib.php');
 require_login();
 require_sesskey();
 
-$OUTPUT->header();
-
 $programid = required_param('id', PARAM_INT);
 $userid = required_param('userid', PARAM_INT);
 $extensionrequest = optional_param('extrequest', false, PARAM_BOOL);
@@ -41,6 +39,8 @@ $extensionminute = optional_param('extminute', 0, PARAM_INT);
 $extensionreason = optional_param('extreason', '', PARAM_TEXT);
 
 $PAGE->set_context(context_program::instance($programid));
+
+$OUTPUT->header();
 
 $result = array();
 

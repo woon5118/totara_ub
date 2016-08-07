@@ -16,7 +16,9 @@ Feature: Enable the calendar block in a course
       | user | course | role |
       | teacher1 | C1 | editingteacher |
     When I log in as "admin"
-    And I create a calendar event with form data:
+    And I click on "Dashboard" in the totara menu
+    And I click on "Go to calendar" "link"
+    And I create a calendar event:
       | id_eventtype | Site |
       | id_name | Site Event |
     And I log out

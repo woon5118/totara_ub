@@ -34,11 +34,13 @@ require_once($CFG->libdir .'/filelib.php');
 redirect_if_major_upgrade_required();
 
 $urlparams = array();
-if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_MY) && optional_param('redirect', 1, PARAM_BOOL) === 0) {
-    $urlparams['redirect'] = 0;
-}
 
-$redirect = optional_param('redirect', 1, PARAM_BOOL);
+$redirect = optional_param('redirect', null, PARAM_BOOL);
+if ($redirect === null) {
+    $redirect = 1;
+} else {
+    $urlparams['redirect'] = $redirect;
+}
 // If adding, editing, hiding, showing, moving or deleting a Block, we don't want to redirect.
 $bui_addblock = optional_param('bui_addblock', '', PARAM_TEXT);
 $bui_editid   = optional_param('bui_editid', '', PARAM_INT);
@@ -77,36 +79,30 @@ if ($hassiteconfig && moodle_needs_upgrading()) {
     redirect($CFG->wwwroot .'/'. $CFG->admin .'/index.php');
 }
 
-if (get_home_page() != HOMEPAGE_SITE) {
-    // Redirect logged-in users to My Moodle overview if required.
-    if (optional_param('setdefaulthome', false, PARAM_BOOL)) {
-        set_user_preference('user_home_page_preference', HOMEPAGE_SITE);
-    } else if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_MY) && $redirect === 1) {
-        redirect($CFG->wwwroot .'/my/');
-    } else if (!empty($CFG->defaulthomepage) && $CFG->defaulthomepage == HOMEPAGE_TOTARA_DASHBOARD && $redirect === 1) {
+if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
+    // Totara: the only other option is HOMEPAGE_SITE
+    //         and only real logged in users may have dashboards.
+    if (!empty($CFG->allowdefaultpageselection)) {
+        if (optional_param('setdefaulthome', 0, PARAM_BOOL)) {
+            require_sesskey();
+            set_user_preference('user_home_page_preference', HOMEPAGE_SITE);
+            $url = new moodle_url('/');
+            totara_set_notification(get_string('userhomepagechanged', 'totara_dashboard'), $url, array('class' => 'notifysuccess'));
+        }
+        $newhomeurl = new moodle_url('/', array('setdefaulthome' => 1, 'sesskey' => sesskey()));
+        $PAGE->settingsnav->add(get_string('makesitemyhomepage', 'totara_dashboard'), $newhomeurl, navigation_node::TYPE_SETTING);
+    }
+    // Redirect logged-in users to dashboard if required.
+    if ($redirect === 1) {
         require_once($CFG->dirroot . '/totara/dashboard/lib.php');
 
         // Check for dashboard assignments.
         if (count(totara_dashboard::get_user_dashboards($USER->id))) {
             redirect(new moodle_url('/totara/dashboard/index.php'));
         }
-        redirect($CFG->wwwroot .'/my/');
-    } else if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_USER)) {
-        $frontpagenode = $PAGE->settingsnav->find('frontpage', null);
-        if ($frontpagenode) {
-            $frontpagenode->add(
-                get_string('makethismyhome'),
-                new moodle_url('/', array('setdefaulthome' => true)),
-                navigation_node::TYPE_SETTING);
-        } else {
-            $frontpagenode = $PAGE->settingsnav->add(get_string('frontpagesettings'), null, navigation_node::TYPE_SETTING, null);
-            $frontpagenode->force_open();
-            $frontpagenode->add(get_string('makethismyhome'),
-                new moodle_url('/', array('setdefaulthome' => true)),
-                navigation_node::TYPE_SETTING);
-        }
     }
 }
+$PAGE->set_totara_menu_selected('home');
 
 // Trigger event.
 course_view(context_course::instance(SITEID));

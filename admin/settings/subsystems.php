@@ -179,8 +179,8 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         TOTARA_SHOWFEATURE));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablemyteam',
-        new lang_string('enablemyteam', 'totara_core'),
-        new lang_string('enablemyteam_desc', 'totara_core'),
+        new lang_string('enableteam', 'totara_core'),
+        new lang_string('enableteam_desc', 'totara_core'),
         TOTARA_SHOWFEATURE));
 
     $optionalsubsystems->add(new admin_setting_configcheckbox('enableprogramcompletioneditor',

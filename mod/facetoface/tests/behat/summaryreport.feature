@@ -120,7 +120,7 @@ Feature: Seminar sessions report overview
   Scenario: Check canceled seminar sessions summary report
     Given I click on "Cancel event" "link"
     And I press "Yes"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     When I click on "Seminar Summary" "link"
     Then I should see "N/A" in the "1.11" "table_row"
 
@@ -277,7 +277,7 @@ Feature: Seminar sessions report overview
     And I press "Continue"
     And I press "Confirm"
 
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     When I click on "Seminar Summary" "link"
     Then I should see "Course 1" in the "2.22" "table_row"
     And I should see "No" in the "1.11" "table_row"
@@ -431,7 +431,7 @@ Feature: Seminar sessions report overview
     # Trainer is ambigous with Editing Trainer
     And I click on "s__facetoface_session_roles[4]" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
     And I press "Save changes"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "Seminar Summary"
     Then "Event Learner" "link" should exist in the ".reportbuilder-table" "css_element"
     And "Event Trainer" "link" should not exist in the ".reportbuilder-table" "css_element"

@@ -303,7 +303,7 @@ $string['missingroleslink'] = 'View full list of missing roles';
 $string['missingrolesnone'] = 'There are no missing roles for the user assignments of this appraisal.';
 $string['missingrolestitle'] = 'Appraisals Missing Roles - {$a}';
 $string['myappraisals'] = 'My Appraisals';
-$string['myteamappraisals'] = 'My Team\'s Appraisals';
+$string['teamappraisals'] = 'Team\'s Appraisals';
 $string['name'] = 'Name';
 $string['name_help'] = 'This is the name that will appear at the top of your appraisal forms and reports';
 $string['namestage'] = 'Name';
@@ -327,6 +327,7 @@ $string['pagename'] = 'Page: {$a}';
 $string['pagedefaultname'] = 'New Page';
 $string['pageupdated'] = 'Page updated';
 $string['participants'] = 'Participants:';
+$string['performance'] = 'Performance';
 $string['periodchoose'] = 'How much earlier/later?';
 $string['perioddays'] = 'days';
 $string['periodmonths'] = 'months';
@@ -420,3 +421,4 @@ $string['youareviewingxsappraisal'] = '<strong>You are viewing <a href="{$a->sit
 
 // DEPRECATED OR UNUSED STRINGS
 $string['rolehaschanged'] = 'This role is due to change';
+$string['myteamappraisals'] = 'My Team\'s Appraisals';

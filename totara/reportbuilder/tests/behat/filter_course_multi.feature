@@ -65,7 +65,7 @@ Feature: Use the multi-item course filter
     Then "View a saved search..." "select" should be visible
     When I log out
     And I log in as "user1"
-    And I follow "My Reports"
+    And I click on "Reports" in the totara menu
     And I click on "Courses" "link" in the ".reportmanager" "css_element"
     And I select "Not1or2" from the "View a saved search..." singleselect
     Then I should not see "CourseOne" in the "Course (multi-item)" "fieldset"

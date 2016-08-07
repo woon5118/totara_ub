@@ -478,11 +478,15 @@ define('EXTERNAL_TOKEN_EMBEDDED', 1);
  */
 define('HOMEPAGE_SITE', 0);
 /**
- * The home page should be the users my page
+ * HOMEPAGE_MY was removed in Totara 9, it is
+ * replaced with a default totara dashboard.
+ * @deprecated
  */
 define('HOMEPAGE_MY', 1);
 /**
- * The home page can be chosen by the user
+ * HOMEPAGE_USER was removed in Totara 9, it is
+ * replaced with by $CFG->allowdefaultpageselection.
+ * @deprecated
  */
 define('HOMEPAGE_USER', 2);
 
@@ -9769,27 +9773,43 @@ function mnet_get_idp_jump_url($user) {
 /**
  * Gets the homepage to use for the current user
  *
- * @return int One of HOMEPAGE_*
+ * @return int HOMEPAGE_TOTARA_DASHBOARD or HOMEPAGE_SITE
  */
 function get_home_page() {
     global $CFG, $USER;
 
-    if (isloggedin() && !isguestuser() && (!empty($CFG->defaulthomepage))) {
-        if ($CFG->defaulthomepage == HOMEPAGE_TOTARA_DASHBOARD) {
-            require_once($CFG->dirroot . '/totara/dashboard/lib.php');
+    if (!isloggedin() or isguestuser()) {
+        return HOMEPAGE_SITE;
+    }
 
-            // Check for dashboard assignments.
-            if (count(totara_dashboard::get_user_dashboards($USER->id))) {
-                return HOMEPAGE_TOTARA_DASHBOARD;
-            }
-            return HOMEPAGE_MY;
+    if (totara_feature_disabled('totaradashboard')) {
+        return HOMEPAGE_SITE;
+    }
+
+    if (empty($CFG->allowdefaultpageselection)) {
+        if (isset($CFG->defaulthomepage) and $CFG->defaulthomepage == HOMEPAGE_SITE) {
+            return HOMEPAGE_SITE;
         }
-        if ($CFG->defaulthomepage == HOMEPAGE_MY) {
-            return HOMEPAGE_MY;
-        } else {
-            return (int)get_user_preferences('user_home_page_preference', HOMEPAGE_MY);
+        return HOMEPAGE_TOTARA_DASHBOARD;
+    }
+
+    $pref = get_user_preferences('user_home_page_preference', -1);
+    if ($pref == -1) {
+        if (isset($CFG->defaulthomepage) and $CFG->defaulthomepage == HOMEPAGE_SITE) {
+            return HOMEPAGE_SITE;
         }
     }
+    if ($pref == HOMEPAGE_SITE) {
+        return HOMEPAGE_SITE;
+    }
+
+    require_once($CFG->dirroot . '/totara/dashboard/lib.php');
+
+    // Check for dashboard assignments.
+    if (count(totara_dashboard::get_user_dashboards($USER->id))) {
+        return HOMEPAGE_TOTARA_DASHBOARD;
+    }
+
     return HOMEPAGE_SITE;
 }
 

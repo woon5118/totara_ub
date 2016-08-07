@@ -20,6 +20,7 @@ Feature: Suspend user in different session times
   @javascript
   Scenario: Create sessions with different dates and add users to a face to face sessions
     Given I log in as "admin"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Test seminar name"
 

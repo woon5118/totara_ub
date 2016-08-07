@@ -60,7 +60,7 @@ Feature: Global report restrictions complex interactions
     And I press "Make this restriction available to all users"
 
   Scenario: Show all records with default settings
-    Given I click on "My Reports" in the totara menu
+    Given I click on "Reports" in the totara menu
     And I follow "User report"
     Then I should see "User One" in the ".reportbuilder-table" "css_element"
     And I should see "User Two" in the ".reportbuilder-table" "css_element"
@@ -72,7 +72,7 @@ Feature: Global report restrictions complex interactions
   Scenario: Show no records when a global report restriction is required
     Given I set the following administration settings values:
       | Global restriction behaviour for users with no active restrictions | Show no records |
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     Then I should see "Viewing records restricted by: test restriction 1" in the ".globalrestrictionscontainer" "css_element"
     And I should see "User One" in the ".reportbuilder-table" "css_element"

@@ -349,6 +349,8 @@ class behat_hooks extends behat_base {
             $this->wait_for_pending_js();
         } catch (Exception $e) {
             try {
+                // We get here when devs do not close changed form at end of test and unsaved form data alert pops up.
+                $session->restart();
                 sleep(5);
                 $session->visit($this->locate_path('/'));
                 sleep(2);

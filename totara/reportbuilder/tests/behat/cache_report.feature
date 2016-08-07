@@ -23,7 +23,7 @@ Feature: Caching works as expected
     And I click on "Save changes" "button"
 
   Scenario: Confirm report caching works as expected
-    Given I click on "My Reports" in the totara menu
+    Given I click on "Reports" in the totara menu
     And I click on "Some User Report" "link"
     And I run the scheduled task "totara_reportbuilder\task\refresh_cache_task"
     Then I should see "Report data last updated"
@@ -34,7 +34,7 @@ Feature: Caching works as expected
     When the following "users" exist:
       | username | firstname | lastname | email             |
       | user3    | User      | Three    | user3@example.com |
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I click on "Some User Report" "link"
     Then I should see "User One"
     And I should see "User Two"

@@ -52,7 +52,7 @@ if (!$permissions = $goal->get_permissions(null, $userid)) {
 
 extract($permissions);
 
-$strmygoals = get_string('mygoals', 'totara_hierarchy');
+$strmygoals = get_string('goals', 'totara_hierarchy');
 $mygoalsurl = new moodle_url('/totara/hierarchy/prefix/goal/mygoals.php', array('userid' => $userid));
 $pageurl = new moodle_url('/totara/hierarchy/prefix/goal/item/edit_personal.php', array('userid' => $userid));
 

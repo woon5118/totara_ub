@@ -237,6 +237,13 @@ function xmldb_main_install() {
     $admin->lastip       = CLI_SCRIPT ? '0.0.0.0' : getremoteaddr(); // installation hijacking prevention
     $admin->id = $DB->insert_record('user', $admin);
 
+    // Totara: set the homepage to site for admin via direct DB insert, we do not want them to use dashboard by default.
+    $preference = new stdClass();
+    $preference->userid = $admin->id;
+    $preference->name   = 'user_home_page_preference';
+    $preference->value  = HOMEPAGE_SITE;
+    $DB->insert_record('user_preferences', $preference);
+
     if ($admin->id != 2) {
         echo $OUTPUT->notification('Unexpected id generated for the Admin account. Your database configuration or clustering setup may not be fully supported', 'notifyproblem');
     }

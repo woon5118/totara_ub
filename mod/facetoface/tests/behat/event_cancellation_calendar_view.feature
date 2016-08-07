@@ -81,7 +81,8 @@ Feature: Seminar event cancellation calendar views
   Scenario: mod_facetoface_cancel_800: cancelled events removed from learner calendar.
     When I log out
     And I log in as "learner1"
-    And I click on "Calendar" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I click on "Go to calendar" "link"
     Then I should see date "1 day" formatted "%d %B %Y"
     Then I should see "Course 1"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland"
@@ -105,7 +106,8 @@ Feature: Seminar event cancellation calendar views
     And I should see "Event cancelled" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
     And I should see "Sign-up unavailable" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
 
-    When I click on "Calendar" in the totara menu
+    When I click on "Dashboard" in the totara menu
+    And I click on "Go to calendar" "link"
     Then I should not see "Course 1"
     And I should not see "10:00 AM - 4:00 PM Pacific/Auckland"
     And I should not see "You are booked for this Seminar event"
@@ -115,7 +117,8 @@ Feature: Seminar event cancellation calendar views
   Scenario: mod_facetoface_cancel_801: cancelled events removed from session role calendar.
     When I log out
     And I log in as "teacher1"
-    And I click on "Calendar" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I click on "Go to calendar" "link"
     Then I should see date "1 day" formatted "%d %B %Y"
     Then I should see "Course 1"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland"
@@ -139,7 +142,8 @@ Feature: Seminar event cancellation calendar views
     And I should see "Event cancelled" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
     And I should see "Sign-up unavailable" in the "10:00 AM - 4:00 PM Pacific/Auckland" "table_row"
 
-    When I click on "Calendar" in the totara menu
+    When I click on "Dashboard" in the totara menu
+    And I click on "Go to calendar" "link"
     Then I should not see "Course 1"
     And I should not see "10:00 AM - 4:00 PM Pacific/Auckland"
     And I should not see "You are booked for this Seminar event"

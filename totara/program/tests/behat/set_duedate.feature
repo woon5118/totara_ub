@@ -27,6 +27,11 @@ Feature: Set due date for program assignments
       | fullname     | idnumber  | pos_framework |
       | Position One | pos1      | pframe        |
     And I log in as "admin"
+    # Get back the removed dashboard item for now.
+    And I navigate to "Main menu" node in "Site administration > Appearance"
+    And I click on "Edit" "link" in the "Required Learning" "table_row"
+    And I set the field "Parent item" to "Top"
+    And I press "Save changes"
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "Edit" "link" in the "Admin User" "table_row"
     And I select "Europe/Rome" from the "Timezone" singleselect

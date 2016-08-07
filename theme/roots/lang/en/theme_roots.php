@@ -25,6 +25,7 @@
 
 $string['pluginname'] = 'Roots';
 $string['choosereadme'] = 'A Bootstrap 3 base theme for Totara.';
+$string['region-main'] = 'Main';
 $string['region-side-post'] = 'Right';
 $string['region-side-pre'] = 'Left';
 $string['fullscreen'] = 'Full screen';

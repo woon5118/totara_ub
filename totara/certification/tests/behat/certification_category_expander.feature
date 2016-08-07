@@ -1,4 +1,4 @@
-@core @core_course @javascript
+@totara @totara_certification @javascript
 Feature: Find learning certificate category management
   As any user I should be able to expand and contract categories
 

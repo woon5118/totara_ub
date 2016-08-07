@@ -1,5 +1,5 @@
-@block_last_course_accessed @javascript @totara @totara_dashboard
-Feature: User can add and remove block to / from dashboard.
+@totara @block @block_last_course_accessed @javascript @totara_dashboard
+Feature: User can add and remove LCA block to / from dashboard.
 
   Background:
     Given I am on a totara site
@@ -10,15 +10,9 @@ Feature: User can add and remove block to / from dashboard.
       | name       | idnumber | description            | contextlevel | reference |
       | Audience 1 | A1       | Audience 1 description | System       | 0         |
 
-    # Allow the homepage to use a dashboard.
-    When I log in as "admin"
-    And I navigate to "Navigation" node in "Site administration > Appearance"
-    And I set the field "Default home page for users" to "Totara dashboard"
-    And I press "Save changes"
-    Then I should see "Changes saved"
-
     # Set up the dashboard.
-    When I navigate to "Dashboards" node in "Site administration > Appearance"
+    When I log in as "admin"
+    And I navigate to "Dashboards" node in "Site administration > Appearance"
     And I press "Create dashboard"
     And I set the field "Name" to "My Dashboard"
     And I click on "Available only to the following audiences" "radio"
@@ -27,6 +21,7 @@ Feature: User can add and remove block to / from dashboard.
     And I press "OK"
     And I press "Create dashboard"
     Then I should see "Dashboard saved"
+    And I click on "moveup" "link"
 
     # Create an audience that we can allocate to the dashboard.
     When I navigate to "Audiences" node in "Site administration > Users > Accounts"
@@ -43,10 +38,10 @@ Feature: User can add and remove block to / from dashboard.
 
   Scenario: Verify the Site Administrator can add and remove the LCA block to / from a dashboard.
     Given I log in as "admin"
-
+    And I click on "Dashboard" in the totara menu
     # Add the block and check it's removed from the available blocks list.
-    When I press "Customize dashboard"
-    And I set the field "Add a block" to "Last Course Accessed"
+    When I press "Customise this page"
+    And I add the "Last Course Accessed" block
     Then I should not see "Last Course Accessed" in the "Add a block" "select"
     And I should see "Last Course Accessed" in the "Last Course Accessed" "block"
 
@@ -56,16 +51,16 @@ Feature: User can add and remove block to / from dashboard.
     Then I should see "Are you sure that you want to delete this block titled Last Course Accessed?"
     When I press "Yes"
     Then I should see "Last Course Accessed" in the "Add a block" "select"
-    And I should not see "Last Course Accessed" in the "aside" "css_element"
 
     And I log out
 
   Scenario: Verify a learner can add and remove the LCA block to / from a dashboard.
     Given I log in as "learner1"
+    And I click on "Dashboard" in the totara menu
 
     # Add the block and check it's removed from the available blocks list.
-    When I press "Customize dashboard"
-    And I set the field "Add a block" to "Last Course Accessed"
+    When I press "Customise this page"
+    And I add the "Last Course Accessed" block
     Then I should not see "Last Course Accessed" in the "Add a block" "select"
     And I should see "Last Course Accessed" in the "Last Course Accessed" "block"
 
@@ -75,6 +70,5 @@ Feature: User can add and remove block to / from dashboard.
     Then I should see "Are you sure that you want to delete this block titled Last Course Accessed?"
     When I press "Yes"
     Then I should see "Last Course Accessed" in the "Add a block" "select"
-    And I should not see "Last Course Accessed" in the "aside" "css_element"
 
     And I log out

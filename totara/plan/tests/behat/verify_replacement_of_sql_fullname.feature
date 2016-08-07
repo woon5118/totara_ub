@@ -43,7 +43,8 @@ Feature: Verify replacement of sql_fullname
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I click on "Learning Plans" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I click on "Learning Plans" "link"
     And I follow "learner1 Learning Plan"
 
     # Add some competencies to the plan.

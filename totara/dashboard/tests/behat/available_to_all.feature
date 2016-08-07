@@ -23,24 +23,21 @@ Feature: Dashboard available for all logged in users
 
   Scenario: Check that user that have cohort dashboard and available to all can access and change "available to all"
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
     And I should see "Audience dashboard"
     And I should see "Public dashboard"
     When I click on "Public dashboard" "link"
-    Then I press "Customize dashboard"
+    Then I press "Customise this page"
 
   Scenario: Check that user that doesn't have any cohort dashboards can access and change "available to all"
     Given I log in as "learner2"
     And I should see "Dashboard" in the totara menu
     When I click on "Dashboard" in the totara menu
-    Then I press "Customize dashboard"
+    Then I press "Customise this page"
 
-  Scenario: Check that guest can access available to all dashboard but not change it
+  Scenario: Check that guest cannot access any dashboards
     Given I log in as "admin"
     And I set the following administration settings values:
       | Guest login button | Show |
     And I log out
     And I click on "#guestlogin input[type=submit]" "css_element"
-    And I should see "Dashboard" in the totara menu
-    When I click on "Dashboard" in the totara menu
-    Then I should not see "Customize dashboard"
+    And I should not see "Dashboard"

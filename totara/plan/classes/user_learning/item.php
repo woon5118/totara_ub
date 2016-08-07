@@ -206,18 +206,20 @@ class item extends item_base implements item_has_progress {
                 return;
             }
 
-            $courseids = array();
-            foreach ($content['course'] as $plancourse) {
-                $courseids[$plancourse->courseid] = $plancourse;
-            }
-            $courses = $DB->get_records_list('course', 'id', array_keys($courseids));
-            foreach ($courses as $id => $course) {
-                $plancourse = $courseids[$id];
-                $item = course::one($this->user, $course);
-                $item->set_owner($this);
-                // Set the course due date by using the plan course due date.
-                $item->duedate = $plancourse->duedate;
-                $this->courses[] = $item;
+            if (!empty($content['course'])) {
+                $courseids = array();
+                foreach ($content['course'] as $plancourse) {
+                    $courseids[$plancourse->courseid] = $plancourse;
+                }
+                $courses = $DB->get_records_list('course', 'id', array_keys($courseids));
+                foreach ($courses as $id => $course) {
+                    $plancourse = $courseids[$id];
+                    $item = course::one($this->user, $course);
+                    $item->set_owner($this);
+                    // Set the course due date by using the plan course due date.
+                    $item->duedate = $plancourse->duedate;
+                    $this->courses[] = $item;
+                }
             }
 
             // TODO: Finish this for the rest of plan content.

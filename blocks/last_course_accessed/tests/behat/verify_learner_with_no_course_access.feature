@@ -1,5 +1,5 @@
-@totara @block_last_course_accessed @javascript
-Feature: Verify a learner cannot access a course they don't have access to via the Last Course Accessed block.
+@totara @block @block_last_course_accessed @javascript
+Feature: Verify a learner cannot access a course they don't have access to via the LCA block.
 
   Background:
     Given I am on a totara site
@@ -17,16 +17,11 @@ Feature: Verify a learner cannot access a course they don't have access to via t
 
     Given I log in as "learner1"
 
-    # Add the block to the My Learning page.
-    When I click on "My Learning" in the totara menu
-    And I press "Customise this page"
-    And I set the field "Add a block" to "Last Course Accessed"
-    Then I should not see "Last Course Accessed" in the "Add a block" "select"
-    And I should see "Last Course Accessed" in the "Last Course Accessed" "block"
+    When I click on "Dashboard" in the totara menu
 
     # Visit the course.
     When I follow "Course 1"
-    Then I should see "Course 1"
+    Then I should see "C1" in the ".breadcrumb-nav" "css_element"
     And I log out
 
     # Hide the course.
@@ -37,7 +32,7 @@ Feature: Verify a learner cannot access a course they don't have access to via t
 
     # Login in as the learner and check the course can't be accessed.
     When I log in as "learner1"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     And I click on "Course 1" "link" in the "Last Course Accessed" "block"
     Then I should see "This course is currently unavailable to students"
 

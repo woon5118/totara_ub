@@ -189,8 +189,8 @@ if ($usertype == 'manager') {
         $url = null;
     }
 } else {
-    $menuitem = 'mylearning';
-    $url = new moodle_url('/my/');
+    $menuitem = null;
+    $url = null;
 }
 if ($url) {
     $PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);

@@ -140,6 +140,7 @@ function make_log_url($module, $url) {
             $url = '/totara/plan/' . $module . '/' . $url;
             break;
         case 'my':
+            // Totara: we need to keep this even after My learning removal, this is for data in database.
             $url = '/my/' . $url;
             break;
         // End Totara specific modules

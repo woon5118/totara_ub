@@ -163,7 +163,8 @@ Feature: Seminar event cancellation learner views
 
     When I log out
     And I log in as "learner1"
-    And I click on "My Bookings" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I click on "Bookings" "link"
     Then I should see "Course 1" in the "Test Seminar" "table_row"
     And I should see "10 February 2025" in the "Test Seminar" "table_row"
     And I should see "9:00 AM Pacific/Auckland" in the "Test Seminar" "table_row"
@@ -200,7 +201,8 @@ Feature: Seminar event cancellation learner views
     And I log out
 
     And I log in as "learner1"
-    And I click on "My Bookings" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I click on "Bookings" "link"
     And I click on "Past Bookings" "link"
     Then I should see "Course 1" in the "Test Seminar" "table_row"
     And I should see "10 April 2015" in the "Test Seminar" "table_row"
@@ -233,7 +235,8 @@ Feature: Seminar event cancellation learner views
 
     When I log out
     And I log in as "learner1"
-    And I click on "My Bookings" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I click on "Bookings" "link"
 
     # --------------------------------------------------------------------------
     # THIS PART WILL FAIL WITH THE CURRENT SEMINAR CANCELLATION CODE. This is

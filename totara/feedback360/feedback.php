@@ -168,7 +168,7 @@ if ($isexternaluser) {
     $PAGE->set_heading($userxfeedback);
     if (totara_feature_visible('myteam')) {
         $PAGE->set_totara_menu_selected('myteam');
-        $PAGE->navbar->add(get_string('myteam', 'totara_core'), new moodle_url('/my/teammembers.php'));
+        $PAGE->navbar->add(get_string('team', 'totara_core'), new moodle_url('/my/teammembers.php'));
     }
     $PAGE->navbar->add($userxfeedback);
     $PAGE->navbar->add(get_string('viewresponse', 'totara_feedback360'));

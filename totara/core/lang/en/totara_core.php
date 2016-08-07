@@ -175,11 +175,11 @@ $string['elearning'] = 'E-learning';
 $string['elementlibrary'] = 'Element Library';
 $string['emptyassignments'] = 'No assignments';
 $string['enabledisabletotarasync'] = 'Select Enable or Disable and then click continue to update HR Import for {$a}';
-$string['enablemyteam'] = 'Enable My Team';
-$string['enablemyteam_desc'] = 'This option will let you: Enable(show)/Disable My Team feature from users on this site.
+$string['enableteam'] = 'Enable Team';
+$string['enableteam_desc'] = 'This option will let you: Enable(show)/Disable Team feature from users on this site.
 
-* If Show is chosen, all links, menus, tabs and option related to My Team will be accessible.
-* If Disable is chosen, My Team will disappear from any menu on the site and will not be accessible.';
+* If Show is chosen, all links, menus, tabs and option related to Team will be accessible.
+* If Disable is chosen, Team will disappear from any menu on the site and will not be accessible.';
 $string['enableprogramextensionrequests'] = 'Enable program extension requests';
 $string['enableprogramextensionrequests_help'] = 'When enabled extension requests can be turned on for individual programs. This allows the program assignee to request an extension to the due date for a program. This extension can then be accepted or denied by the assignees manager.';
 $string['enhancedcatalog'] = 'Enhanced catalog';
@@ -366,14 +366,14 @@ Whether they need to have any of the selected roles or all of the selected roles
 
 The **Context** setting can be used to control whether the role is assigned to the user as a system wide role or whether it can occur in any other context.';
 $string['menuitem:rulepreset_can_view_allappraisals'] = 'User can view All Appraisals menu item';
-$string['menuitem:rulepreset_can_view_appraisal'] = 'User can view Appraisal menu item';
+$string['menuitem:rulepreset_can_view_appraisal'] = 'User can view Performance menu item';
 $string['menuitem:rulepreset_can_view_certifications'] = 'User can view Certifications menu item';
 $string['menuitem:rulepreset_can_view_feedback_360s'] = 'User can view 360&deg; Feedback menu item';
 $string['menuitem:rulepreset_can_view_latest_appraisal'] = 'User can view Latest Appraisal menu item';
 $string['menuitem:rulepreset_can_view_learning_plans'] = 'User can view Learning Plans menu item';
-$string['menuitem:rulepreset_can_view_my_goals'] = 'User can view My Goals menu item';
-$string['menuitem:rulepreset_can_view_my_reports'] = 'User can view My Reports menu item';
-$string['menuitem:rulepreset_can_view_my_team'] = 'User can view My Team menu item';
+$string['menuitem:rulepreset_can_view_my_goals'] = 'User can view Goals menu item';
+$string['menuitem:rulepreset_can_view_my_reports'] = 'User can view Reports menu item';
+$string['menuitem:rulepreset_can_view_my_team'] = 'User can view Team menu item';
 $string['menuitem:rulepreset_can_view_programs'] = 'User can view Programs menu item';
 $string['menuitem:rulepreset_can_view_required_learning'] = 'User can view Required Learning menu item';
 $string['menuitem:rulepreset_is_guest'] = 'User is logged in as guest';
@@ -410,11 +410,9 @@ $string['mylearning'] = 'My Learning';
 $string['mypastbookings'] = 'My Past Bookings';
 $string['myprofile'] = 'My Profile';
 $string['myrecordoflearning'] = 'My Record of Learning';
-$string['myreports'] = 'My Reports';
 $string['mysqlneedsbarracuda'] = 'Advanced Totara features require InnoDB Barracuda storage format';
 $string['mysqlneedsfilepertable'] = 'Advanced Totara features require InnoDB File-Per-Table mode to be enabled';
 $string['mysqlneedsinnodb'] = 'The current database engine "{$a}" may not be compatible with Totara, it is strongly recommended to use InnoDB or XtraDB engine.';
-$string['myteam'] = 'My Team';
 $string['myteaminstructionaltext'] = 'Choose a team member from the table on the right.';
 $string['noassessors'] = 'No assessors found';
 $string['nogroupassignments'] = 'No groups assigned';
@@ -470,6 +468,7 @@ $string['replaceenternewstring'] = 'Enter new string:';
 $string['replacemissingparam'] = 'Missing either Search or Replace parameters.';
 $string['replacereallysure'] = 'Are you really sure? This will replace all instances of \'{$a->search}\' with \'{$a->replace}\' and may break your database! (y/n)';
 $string['report'] = 'Report';
+$string['reports'] = 'Reports';
 $string['reportedat'] = 'Reported at';
 $string['requiresjs'] = 'This {$a} requires Javascript to be enabled.';
 $string['returntocourse'] = 'Return to the course';
@@ -518,6 +517,7 @@ $string['supported_branch_text'] = 'You may want to consider upgrading from {$a}
 $string['tab:futurebookings'] = 'Future Bookings';
 $string['tab:pastbookings'] = 'Past Bookings';
 $string['tabexports'] = 'Tabular exports';
+$string['team'] = 'Team';
 $string['teammembers'] = 'Team Members';
 $string['teammembers_text'] = 'All members of your team are shown below.';
 $string['template'] = 'Template';
@@ -569,6 +569,7 @@ $string['unexpected_installer_result'] = 'Unspecified component install error: {
 $string['unlockcompletion'] = 'Unlock completion and delete completion data';
 $string['unlockcompletionnoreset'] = 'Unlock completion and keep completion data';
 $string['unsupported_branch_text'] = 'The version you are using ({$a})  is no longer supported. That means that bugs and security issues are no longer being fixed. You should upgrade to a supported version (such as [[CURRENT_MAJOR_VERSION]]) as soon as possible';
+$string['unused'] = 'Unused';
 $string['upgradenonlinear'] = 'Upgrades must be to a higher version built on or after the date of the current version {$a}';
 $string['uploadcompletionrecords'] = 'Upload completion records';
 $string['userdoesnotexist'] = 'User does not exist';
@@ -588,3 +589,11 @@ $string['xresultsfory'] = '<strong>{$a->count}</strong> results found for "{$a->
 
 $string['recordoflearningfor'] = 'Record of Learning for ';
 $string['developmentplan'] = 'Development Planner';
+$string['enablemyteam'] = 'Enable My Team';
+$string['enablemyteam_desc'] = 'This option will let you: Enable(show)/Disable My Team feature from users on this site.
+
+* If Show is chosen, all links, menus, tabs and option related to My Team will be accessible.
+* If Disable is chosen, My Team will disappear from any menu on the site and will not be accessible.';
+$string['myreports'] = 'My Reports';
+$string['myteam'] = 'My Team';
+$string['viewmyteam'] = 'View My Team';

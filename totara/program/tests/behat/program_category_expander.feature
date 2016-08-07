@@ -1,4 +1,4 @@
-@core @core_course @javascript
+@totara @totara_program @javascript
 Feature: Find learning program category management
   As any user I should be able to expand and contract categories
 

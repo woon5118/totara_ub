@@ -171,7 +171,7 @@ Scenario: Verify custom fields can be successfully added to a company goal type 
   # Login as a learner and create a company goal with the custom fields.
   When I log out
   And I log in as "learner1"
-  And I click on "My Goals" in the totara menu
+  And I click on "Goals" in the totara menu
   Then I should see "Company Goals"
 
   # Add a company goal to the learner goals.

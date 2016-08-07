@@ -129,7 +129,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "learner1"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
@@ -144,7 +144,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "learner2"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
@@ -159,7 +159,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "learner3"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
@@ -174,7 +174,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "teacher1"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
@@ -235,7 +235,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "learner1"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
@@ -251,7 +251,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "learner2"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
@@ -267,7 +267,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "learner3"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
@@ -283,7 +283,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "teacher1"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
@@ -316,7 +316,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "learner1"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
 
     When I click on "View all alerts" "link"
     And I click on "All" "link"
@@ -334,7 +334,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "learner1"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should not see "Seminar event cancellation"
 
 
@@ -371,7 +371,7 @@ Feature: Seminar event cancellation notifications
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
     And I should see "Sign-up unavailable" in the "10 February 2025" "table_row"
 
-    When I click on "My Learning" in the totara menu
+    When I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
@@ -412,7 +412,7 @@ Feature: Seminar event cancellation notifications
 
     When I log out
     And I log in as "learner4"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"
@@ -434,7 +434,7 @@ Feature: Seminar event cancellation notifications
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
     And I should see "Sign-up unavailable" in the "10 February 2025" "table_row"
 
-    When I click on "My Learning" in the totara menu
+    When I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"

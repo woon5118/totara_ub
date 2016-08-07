@@ -42,7 +42,7 @@ class totara_menu implements \renderable, \templatable {
                     if (!empty($relationships[$item->parent])) {
                         $relationships[$item->name] = array_merge($relationships[$item->name], $relationships[$item->parent]);
                     } elseif (!isset($relationships[$item->parent])) {
-                        throw new coding_exception('Totara menu definition is incorrect');
+                        throw new \coding_exception('Totara menu definition is incorrect');
                     }
                 }
             }

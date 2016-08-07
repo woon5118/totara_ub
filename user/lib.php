@@ -834,14 +834,6 @@ function user_get_user_navigation_info($user, $page, $options = array()) {
         }
     }
 
-    // Links: Dashboard.
-    $myhome = new stdClass();
-    $myhome->itemtype = 'link';
-    $myhome->url = new moodle_url('/my/');
-    $myhome->title = get_string('mymoodle', 'admin');
-    $myhome->pix = "i/course";
-    $returnobject->navitems[] = $myhome;
-
     // Links: My Profile.
     $myprofile = new stdClass();
     $myprofile->itemtype = 'link';
@@ -1150,4 +1142,37 @@ function user_can_view_profile($user, $course = null, $usercontext = null) {
         }
     }
     return false;
+}
+
+/**
+ * Totara: Add my private files to my profile page,
+ * because it is not linked from anywhere else by default.
+ *
+ * @param \core_user\output\myprofile\tree $tree Tree object
+ * @param stdClass $user user object
+ * @param bool $iscurrentuser
+ * @param stdClass $course Course object
+ *
+ * @return bool
+ */
+function core_user_myprofile_navigation(core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
+    global $CFG;
+
+    if (isguestuser($user)) {
+        return false;
+    }
+
+    if (!$iscurrentuser) {
+        return false;
+    }
+
+    $usercontext = context_user::instance($user->id);
+    if (!has_capability('moodle/user:manageownfiles', $usercontext)) {
+        return false;
+    }
+
+    $url = new moodle_url('/user/files.php', array('returnurl' => $CFG->wwwroot. '/user/profile.php'));
+    $title = get_string('privatefilesmanage') . '...';
+    $notesnode = new core_user\output\myprofile\node('administration', 'privatefiles', $title, null, $url);
+    $tree->add_node($notesnode);
 }

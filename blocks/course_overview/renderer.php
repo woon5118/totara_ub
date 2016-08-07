@@ -216,7 +216,7 @@ class block_course_overview_renderer extends plugin_renderer_base {
         for ($i = 1; $i <= $max; $i++) {
             $options[$i] = $i;
         }
-        $url = new moodle_url('/my/index.php');
+        $url = new moodle_url('/totara/dashboard/index.php');
         $select = new single_select($url, 'mynumber', $options, block_course_overview_get_max_user_courses(), array());
         $select->set_label(get_string('numtodisplay', 'block_course_overview'));
         $output .= $this->output->render($select);
@@ -256,7 +256,7 @@ class block_course_overview_renderer extends plugin_renderer_base {
         } else {
             $a = new stdClass();
             $a->coursecount = $hiddencourses;
-            $a->showalllink = html_writer::link(new moodle_url('/my/index.php', array('mynumber' => block_course_overview::SHOW_ALL_COURSES)),
+            $a->showalllink = html_writer::link(new moodle_url('/totara/dashboard/index.php', array('mynumber' => block_course_overview::SHOW_ALL_COURSES)),
                     get_string('showallcourses'));
             $output .= get_string('hiddencoursecountwithshowall'.$plural, 'block_course_overview', $a);
         }

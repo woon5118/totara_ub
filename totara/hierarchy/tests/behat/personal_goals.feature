@@ -205,7 +205,7 @@ Scenario: Verify custom fields can be successfully added to a personal goal type
   # Login as a learner and create a personal goal with the custom fields.
   When I log out
   And I log in as "learner1"
-  And I click on "My Goals" in the totara menu
+  And I click on "Goals" in the totara menu
   Then I should see "Personal Goals"
 
   # Create a new personal goal
@@ -388,7 +388,7 @@ Scenario: Verify personal goal data can be added to an appraisal.
   # Login as a learner and create a personal goal with the custom fields.
   When I log out
   And I log in as "learner1"
-  And I click on "My Goals" in the totara menu
+  And I click on "Goals" in the totara menu
   Then I should see "Personal Goals"
 
   # Create a new personal goal

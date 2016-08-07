@@ -23,6 +23,8 @@
  * these should be called like get_string('key', 'totara_dashboard');
  */
 
+$string['allowdefaultpageselection'] = "Allow default page selection";
+$string['allowdefaultpageselection_desc'] = "Allow users to select their default page - it can be the Home page or their Dashboard.";
 $string['assigncohorts'] = 'Assign new audiences';
 $string['assignedcohorts'] = 'Assigned audiences';
 $string['availability'] = 'Availability';
@@ -42,6 +44,8 @@ $string['configenabletotaradashboard'] = 'This option will let you: Enable(show)
 * If Disable is chosen, Totara Dashboard will disappear from any menu on the site and will not be accessible.
 ';
 $string['createdashboard'] = 'Create dashboard';
+$string['customiseon'] = 'Customise this page';
+$string['customiseoff'] = 'Stop customising this page';
 $string['dashboard'] = 'Dashboard';
 $string['dashboard:manage'] = 'Manage dashboard';
 $string['dashboard:manageblocks'] = 'Manage dashboard blocks';
@@ -56,8 +60,11 @@ $string['editdashboard'] = 'Edit dashboard';
 $string['editdashboardsettings'] = 'Edit dashboard settings';
 $string['enabletotaradashboard'] = 'Enable Totara Dashboard';
 $string['error:unknownbuttonclicked'] = 'Error: unknown button clicked.';
+$string['legacymylearning'] = 'Legacy My Learning';
 $string['locked'] = 'Locked';
 $string['locked_help'] = 'When locked, users will not be able to change dashboard layout. Their previous changes will be hidden but not removed. After unlock users changes to their dashboard will reappear.';
+$string['makedashboardmyhomepage'] = 'Make Dashboard my default page';
+$string['makesitemyhomepage'] = 'Make Home my default page';
 $string['managedashboards'] = 'Manage dashboards';
 $string['name'] = 'Name';
 $string['noavailabledashboards'] = 'No available dashboards found';
@@ -71,5 +78,8 @@ $string['resetdashboardconfirm'] = 'Do you really want to reset dashboard {$a} l
 $string['savechanges'] = 'Save changes';
 $string['totaradashboarddisabled'] = 'Totara Dashboard is not enabled on this site';
 $string['unpublish'] = 'Unpublish';
+$string['userhomepagechanged'] = 'Your default page was changed';
+
+// Deprecated in 9.0
 $string['updatelayoutoff'] = 'Stop customizing this dashboard';
 $string['updatelayouton'] = 'Customize dashboard';

@@ -95,7 +95,7 @@ Feature: Confirm global report restrictions work accross multiple reports
 
   Scenario: View multiple restriction names
     And I log in as "user1"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "Audience report"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
     And I wait "1" seconds
@@ -121,7 +121,7 @@ Feature: Confirm global report restrictions work accross multiple reports
 
   Scenario: View restrictions accross multiple reports
     Given I log in as "user1"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "Audience report"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
     And I wait "1" seconds
@@ -129,7 +129,7 @@ Feature: Confirm global report restrictions work accross multiple reports
     And I should see "test restriction" in the "Viewing records for:" "totaradialogue"
     And I click on "Cancel" "button" in the "Viewing records for:" "totaradialogue"
     And I wait "1" seconds
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
     And I wait "1" seconds
@@ -140,7 +140,7 @@ Feature: Confirm global report restrictions work accross multiple reports
     And I log out
 
     Given I log in as "user2"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "Audience report"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
     And I wait "1" seconds
@@ -148,7 +148,7 @@ Feature: Confirm global report restrictions work accross multiple reports
     And I should see "test restriction" in the "Viewing records for:" "totaradialogue"
     And I click on "Cancel" "button" in the "Viewing records for:" "totaradialogue"
     And I wait "1" seconds
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
     And I wait "1" seconds
@@ -159,7 +159,7 @@ Feature: Confirm global report restrictions work accross multiple reports
     And I log out
 
     Given I log in as "user3"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "Audience report"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
     And I wait "1" seconds
@@ -167,7 +167,7 @@ Feature: Confirm global report restrictions work accross multiple reports
     And I should see "test restriction" in the "Viewing records for:" "totaradialogue"
     And I click on "Cancel" "button" in the "Viewing records for:" "totaradialogue"
     And I wait "1" seconds
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I follow "User report"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
     And I wait "1" seconds

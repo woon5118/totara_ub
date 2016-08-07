@@ -37,7 +37,7 @@ Feature: Complete the example appraisal
       | user     | name                      |
       | learner1 | Learner One Learning Plan |
     And I log in as "learner1"
-    And I click on "My Goals" in the totara menu
+    And I click on "Goals" in the totara menu
     And I press "Add company goal"
     And I click on "Company Goal One" "link" in the "Assign goals" "totaradialogue"
     And I click on "Company Goal Two" "link" in the "Assign goals" "totaradialogue"
@@ -51,7 +51,8 @@ Feature: Complete the example appraisal
     And I set the following fields to these values:
       | Name | Personal Goal Two |
     And I press "Save changes"
-    And I click on "Learning Plans" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I click on "Learning Plans" "link"
     And I click on "Learner One Learning Plan" "link"
     And I click on "Competencies" "link" in the ".tabtree" "css_element"
     And I press "Add competencies"
@@ -62,7 +63,7 @@ Feature: Complete the example appraisal
     And I press "Send approval request"
     And I log out
     And I log in as "manager1"
-    And I click on "My Team" in the totara menu
+    And I click on "Team" in the totara menu
     And I click on "Plans" "link" in the "Learner One" "table_row"
     And I click on "Approve" "link" in the "Learner One Learning Plan" "table_row"
     And I log out

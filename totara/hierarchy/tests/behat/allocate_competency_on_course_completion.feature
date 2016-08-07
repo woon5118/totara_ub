@@ -20,7 +20,7 @@ Feature: Verify completion of a course triggers assigning a competency.
 
     # Add a page activity to course 2.
     When I log in as "admin"
-    And I am on site homepage
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Page" to section "1" and I fill the form with:
@@ -31,7 +31,7 @@ Feature: Verify completion of a course triggers assigning a competency.
       | Require view        | 1         |
 
     # Set course completion on course 2.
-    And I am on homepage
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
@@ -79,7 +79,7 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I press "Save changes"
     Then I should see "My Template"
 
-    When I am on homepage
+    When I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I navigate to "Competencies" node in "Course administration"
     And I press "Assign course completion to competencies"

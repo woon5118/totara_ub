@@ -76,7 +76,7 @@ $report->include_js();
 
 /* End of defining the report */
 
-$PAGE->navbar->add(get_string('myteam', 'totara_core'));
+$PAGE->navbar->add(get_string('team', 'totara_core'));
 $PAGE->navbar->add($strheading);
 
 $editbutton = '';

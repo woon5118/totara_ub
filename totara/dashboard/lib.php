@@ -571,7 +571,7 @@ class totara_dashboard {
 
         $page = new moodle_page();
         $page->set_context(context_system::instance());
-        $page->set_pagelayout('mydashboard');
+        $page->set_pagelayout('dashboard');
         $page->set_pagetype('my-totara-dashboard-' . $this->id);
         $page->set_subpage('default');
 

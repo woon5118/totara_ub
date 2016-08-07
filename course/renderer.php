@@ -2039,7 +2039,7 @@ class core_course_renderer extends plugin_renderer_base {
                 $totalcount = count($courses);
                 $courses = array_slice($courses, 0, $CFG->frontpagecourselimit, true);
                 $chelper->set_courses_display_options(array(
-                        'viewmoreurl' => new moodle_url('/my/'),
+                        'viewmoreurl' => new moodle_url('/totara/dashboard/'),
                         'viewmoretext' => new lang_string('mycourses')
                     ));
             } else {

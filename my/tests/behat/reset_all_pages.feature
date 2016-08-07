@@ -17,7 +17,7 @@ Feature: Reset all personalised pages to default
     And I log out
 
     And I log in as "student1"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     And I press "Customise this page"
     And I add the "Comments" block
     And I press "Stop customising this page"
@@ -34,59 +34,11 @@ Feature: Reset all personalised pages to default
     And I log out
 
     And I log in as "student3"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     And I should not see "Comments"
     And I follow "Profile" in the user menu
     And I should not see "Logged in user"
     And I log out
-
-  Scenario: Reset My Learning for all users
-    Given I log in as "admin"
-    And I navigate to "Default My Learning page" node in "Site administration > Appearance"
-    And I press "Blocks editing on"
-    And I add the "Latest news" block
-    And I open the "Online users" blocks action menu
-    And I follow "Delete Online users"
-    And I press "Yes"
-    And I press "Blocks editing off"
-    And I log out
-
-    And I log in as "student1"
-    And I click on "My Learning" in the totara menu
-    And I should not see "Latest news"
-    And I should see "Online users"
-    And I log out
-
-    And I log in as "student3"
-    And I click on "My Learning" in the totara menu
-    And I should not see "Latest news"
-    And I should see "Online users"
-    And I log out
-
-    And I log in as "admin"
-    And I navigate to "Default My Learning page" node in "Site administration > Appearance"
-    When I press "Reset My Learning for all users"
-    And I follow "Continue"
-    And I log out
-
-    And I log in as "student1"
-    And I click on "My Learning" in the totara menu
-    Then I should see "Latest news"
-    And I should not see "Comments"
-    And I should not see "Online users"
-    And I log out
-
-    And I log in as "student3"
-    And I click on "My Learning" in the totara menu
-    And I should see "Latest news"
-    And I should not see "Online users"
-    And I log out
-
-    # Check that this did not affect the customised profiles.
-    And I log in as "student2"
-    And I follow "Profile" in the user menu
-    And I should see "Logged in user"
-    And I should not see "Latest news"
 
   Scenario: Reset profile for all users
     Given I log in as "admin"
@@ -121,9 +73,3 @@ Feature: Reset all personalised pages to default
     And I follow "Profile" in the user menu
     And I should see "Latest news"
     And I log out
-
-    # Check that this did not affect the customised dashboards.
-    And I log in as "student1"
-    And I click on "My Learning" in the totara menu
-    And I should see "Comments"
-    And I should not see "Latest news"

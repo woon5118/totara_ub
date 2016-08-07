@@ -1,4 +1,4 @@
-@javascript @mod_facetoface @totara
+@mod_facetoface @totara
 Feature: Filter seminar events in calendar by their customfields
   In order to test the seminar filtering in calendar
   As user
@@ -258,13 +258,15 @@ Feature: Filter seminar events in calendar by their customfields
     And I click on "#id_customfield_multiselect_0" "css_element"
     And I click on "#id_customfield_multiselect_1" "css_element"
     And I press "Save changes"
-
     And I log out
 
+  @javascript
   Scenario: Check that seminar customfields can be used to filter events in calendar
     When I log in as "student1"
-    And I click on "Calendar" in the totara menu
-    And I click on "Calendar" "link" in the "Navigation" "block"
+    And I click on "Dashboard" in the totara menu
+    And I press "Customise this page"
+    And I add the "Calendar" block
+    And I follow "This month"
     And I should see "Sam1 Student1"
     And I should see "Seminar one"
     And I should see "Seminar two"

@@ -61,8 +61,8 @@ if ($USER->id != $userid) {
     }
 } else {
     $strheading = get_string('mypastbookings', 'totara_core');
-    $menuitem = 'mylearning';
-    $url = new moodle_url('/my/');
+    $menuitem = null;
+    $url = null;
 }
 
 $shortname = 'pastbookings';

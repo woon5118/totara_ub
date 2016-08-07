@@ -80,6 +80,9 @@ Feature: Perform basic dashboard administration
     And I click on ".delete" "css_element" in the "Dashboard for edit" "table_row"
     And I should see "Do you really want to remove dashboard"
     And I press "Continue"
+    And I click on ".delete" "css_element" in the "My Learning" "table_row"
+    And I should see "Do you really want to remove dashboard"
+    And I press "Continue"
     Then ".generaltable" "css_element" should not exist
     And I should see "No dashboards"
 

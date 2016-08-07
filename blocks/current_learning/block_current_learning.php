@@ -90,7 +90,7 @@ class block_current_learning extends block_base {
      * @return true
      */
     public function has_config() {
-        return true;
+        return false;
     }
 
     /**

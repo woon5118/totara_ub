@@ -38,7 +38,7 @@ $userid = $goalpersonal->userid;
 $context = context_user::instance($userid);
 $PAGE->set_context($context);
 
-$strmygoals = get_string('mygoals', 'totara_hierarchy');
+$strmygoals = get_string('goals', 'totara_hierarchy');
 $mygoalsurl = new moodle_url('/totara/hierarchy/prefix/goal/mygoals.php', array('userid' => $userid));
 
 $goal = new goal();

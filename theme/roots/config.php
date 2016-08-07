@@ -90,11 +90,21 @@ $THEME->layouts = array(
         'defaultregion' => 'side-pre',
         'options' => array('fluid' => true),
     ),
-    // My dashboard page.
+    // This would be better described as "user profile" but we've left it as mydashboard
+    // for backward compatibilty for existing themes. This layout is NOT used by Totara
+    // dashboards but is used by user related pages such as the user profile, private files
+    // and badges.
     'mydashboard' => array(
         'file' => 'default.php',
         'regions' => array('side-pre', 'side-post'),
         'defaultregion' => 'side-pre',
+    ),
+    // The dashboard layout differs from the one above in that it includes a central block region.
+    // It is used by Totara dashboards.
+    'dashboard' => array(
+        'file' => 'dashboard.php',
+        'regions' => array('main', 'side-pre', 'side-post'),
+        'defaultregion' => 'main',
         'options' => array('langmenu' => true),
     ),
     // My public page.

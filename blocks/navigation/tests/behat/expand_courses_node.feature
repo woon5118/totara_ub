@@ -76,7 +76,7 @@ Feature: Expand the courses nodes within the navigation block
   Scenario: As the admin user I expand the courses and category nodes to see courses.
     When I log in as "admin"
     And I am on site homepage
-    And I should see "Site home" in the "Navigation" "block"
+    And I should see "Home" in the "Navigation" "block"
     And I should see "Courses" in the "Navigation" "block"
     And I expand "Courses" node
     And I should see "cat1" in the "Navigation" "block"
@@ -110,7 +110,7 @@ Feature: Expand the courses nodes within the navigation block
   Scenario: As teacher1 I expand the courses and category nodes to see courses.
     When I log in as "teacher1"
     And I am on site homepage
-    And I should see "Site home" in the "Navigation" "block"
+    And I should see "Home" in the "Navigation" "block"
     And I should see "Courses" in the "Navigation" "block"
     And I expand "Courses" node
     And I should see "cat1" in the "Navigation" "block"
@@ -140,7 +140,7 @@ Feature: Expand the courses nodes within the navigation block
   Scenario: As student1 I expand the courses and category nodes to see courses.
     When I log in as "student1"
     And I am on site homepage
-    And I should see "Site home" in the "Navigation" "block"
+    And I should see "Home" in the "Navigation" "block"
     And I should see "Courses" in the "Navigation" "block"
     And I expand "Courses" node
     And I should see "cat1" in the "Navigation" "block"

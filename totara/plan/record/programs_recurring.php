@@ -92,8 +92,8 @@ if ($USER->id != $userid) {
     }
 } else {
     $strheading = get_string('recurringprogramhistory', 'totara_program', format_string($program->fullname));
-    $menuitem = 'mylearning';
-    $url = new moodle_url('/my/');
+    $menuitem = null;
+    $url = null;
 }
 // Get subheading name for display.
 $strsubheading = get_string('recurringprograms', 'totara_program');

@@ -159,7 +159,7 @@ Feature: Global report restrictions multiple interactions
     And I press "Save changes"
 
   Scenario: Test complex global report visibility
-    Given I click on "My Reports" in the totara menu
+    Given I click on "Reports" in the totara menu
     When I follow "User report"
     Then I should see "change" in the ".globalrestrictionscontainer" "css_element"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
@@ -177,7 +177,7 @@ Feature: Global report restrictions multiple interactions
     And I log out
 
     When I log in as "user1"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     When I follow "User report"
     Then I should see "change" in the ".globalrestrictionscontainer" "css_element"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
@@ -192,7 +192,7 @@ Feature: Global report restrictions multiple interactions
     And I log out
 
     When I log in as "user2"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     When I follow "User report"
     Then I should see "change" in the ".globalrestrictionscontainer" "css_element"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
@@ -207,7 +207,7 @@ Feature: Global report restrictions multiple interactions
     And I log out
 
     When I log in as "user4"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     When I follow "User report"
     Then I should see "change" in the ".globalrestrictionscontainer" "css_element"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
@@ -222,7 +222,7 @@ Feature: Global report restrictions multiple interactions
     And I log out
 
     When I log in as "user6"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     When I follow "User report"
     Then I should see "change" in the ".globalrestrictionscontainer" "css_element"
     When I click on "change" "link" in the ".globalrestrictionscontainer" "css_element"
@@ -239,7 +239,7 @@ Feature: Global report restrictions multiple interactions
   Scenario: Test complex global report display users
     Given I log out
     When I log in as "user1"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     When I follow "User report"
 
     Then I should see "change" in the ".globalrestrictionscontainer" "css_element"

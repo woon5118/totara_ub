@@ -24,7 +24,7 @@ Feature: Verify user prompts to progress plan are correct
 
     # As the manager, access the learners plans.
     Given I log in as "manager2"
-    And I click on "My Team" in the totara menu
+    And I click on "Team" in the totara menu
     And I click on "Plans" "link" in the "firstname1 lastname1" "table_row"
 
     # Access the learners plans and verify it hasn't been approved.
@@ -53,7 +53,8 @@ Feature: Verify user prompts to progress plan are correct
 
     # Login as the learner and navigate to the learning plan.
     When I log in as "learner1"
-    And I click on "Learning Plans" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I click on "Learning Plans" "link"
     And I click on "learner1 Learning Plan" "link"
 
     # Activate the plan.

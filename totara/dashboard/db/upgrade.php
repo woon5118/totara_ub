@@ -21,6 +21,8 @@
  * @package totara_dashboard
  */
 
+require_once($CFG->dirroot.'/totara/dashboard/db/upgradelib.php');
+
 /**
  * Local database upgrade script
  *
@@ -77,6 +79,56 @@ function xmldb_totara_dashboard_upgrade($oldversion) {
         }
 
         totara_upgrade_mod_savepoint(true, 2015120900, 'totara_dashboard');
+    }
+
+    if ($oldversion < 2016072600) {
+
+        totara_dashboard_migrate_my_learning_on_upgrade();
+
+        totara_upgrade_mod_savepoint(true, 2016072600, 'totara_dashboard');
+    }
+
+    if ($oldversion < 2016072601) {
+
+        totara_dashboard_add_my_learning_dashboard_on_upgrade();
+
+        totara_upgrade_mod_savepoint(true, 2016072601, 'totara_dashboard');
+    }
+
+    if ($oldversion < 2016072602) {
+
+        // Migrate block instances belonging to totara dashboards from 'content'
+        // to 'main' region.
+        // Note: this must happen *after* my learning is migrated to a dashboard
+        // to ensure the my learning block regions are updated to 'main' too.
+        $sql = "UPDATE {block_instances} SET defaultregion = 'main'
+            WHERE defaultregion = 'content' AND
+            pagetypepattern LIKE ?";
+        $params = ['my-totara-dashboard-%'];
+        $DB->execute($sql, $params);
+
+        totara_upgrade_mod_savepoint(true, 2016072602, 'totara_dashboard');
+    }
+
+    if ($oldversion < 2016080501) {
+        // Cleanup and migrate My learning related settings.
+        if (isset($CFG->defaulthomepage)) {
+            if ($CFG->defaulthomepage == HOMEPAGE_MY) {
+                set_config('defaulthomepage', HOMEPAGE_TOTARA_DASHBOARD);
+            } else if ($CFG->defaulthomepage == HOMEPAGE_USER) {
+                set_config('defaulthomepage', HOMEPAGE_TOTARA_DASHBOARD);
+                set_config('allowdefaultpageselection', 1);
+            }
+        }
+        unset_config('allowguestmymoodle');
+
+        // Disable dashboards for the main admin to make it backwards compatible with Totara 2.9.
+        $admin = get_admin();
+        if ($admin) {
+            set_user_preference('user_home_page_preference', HOMEPAGE_SITE, $admin->id);
+        }
+
+        totara_upgrade_mod_savepoint(true, 2016080501, 'totara_dashboard');
     }
 
     return true;

@@ -30,6 +30,11 @@ Feature: Users completion of programs and coursesets
     And I set self completion for "Course 1" in the "Miscellaneous" category
     And I set self completion for "Course 2" in the "Miscellaneous" category
     And I set self completion for "Course 3" in the "Miscellaneous" category
+    # Get back the removed dashboard item for now.
+    And I navigate to "Main menu" node in "Site administration > Appearance"
+    And I click on "Edit" "link" in the "Required Learning" "table_row"
+    And I set the field "Parent item" to "Top"
+    And I press "Save changes"
     And I log out
 
   # Completion of a program with content like so:

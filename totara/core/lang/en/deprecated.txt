@@ -1,2 +1,6 @@
 recordoflearningfor,totara_core
-developmentplan,totara_core
+enablemyteam,totara_core
+enablemyteam_desc,totara_core
+myreports,totara_core
+myteam,totara_core
+viewmyteam,totara_core

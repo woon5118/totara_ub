@@ -18,6 +18,14 @@ Feature: View the course overview block on the dashboard and test it's functiona
       | Course 1 | C1        | 0        |
       | Course 2 | C2        | CAT1     |
       | Course 3 | C3        | CAT2     |
+    And I log in as "student1"
+    And I press "Customise this page"
+    And I add the "Course overview" block
+    And I log out
+    And I log in as "teacher1"
+    And I press "Customise this page"
+    And I add the "Course overview" block
+    And I log out
 
   Scenario: View the block by a user without any enrolments
     Given I log in as "student1"
@@ -39,6 +47,7 @@ Feature: View the course overview block on the dashboard and test it's functiona
       | student1 | C2 | student |
       | student1 | C3 | student |
     When I log in as "student1"
+    And I click on "Dashboard" in the totara menu
     And I press "Customise this page"
     And I select "1" from the "Number of courses to display:" singleselect
     Then I should see "Course 1" in the "Course overview" "block"
@@ -59,6 +68,7 @@ Feature: View the course overview block on the dashboard and test it's functiona
       | student1 | C2 | student |
       | student1 | C3 | student |
     When I log in as "student1"
+    And I click on "Dashboard" in the totara menu
     Then I should see "Course 1" in the "Course overview" "block"
     And I should see "Course 2" in the "Course overview" "block"
     And I should see "You have 1 hidden course"

@@ -36,10 +36,10 @@ Feature: Perform basic dashboard user changes
     And I follow "Dashboard unlocked published"
 
     # Add block.
-    When I press "Customize dashboard"
+    When I press "Customise this page"
     And I add the "Latest news" block
     Then "Latest news" "block" should exist
-    And I press "Stop customizing this dashboard"
+    And I press "Stop customising this page"
     And "Latest news" "block" should exist
     And I log out
 
@@ -53,15 +53,15 @@ Feature: Perform basic dashboard user changes
     When I log in as "learner1"
     And I follow "Dashboard unlocked published"
     And "Latest news" "block" should exist
-    And "Customize dashboard" "button" should exist
-    And I press "Customize dashboard"
+    And "Customise this page" "button" should exist
+    And I press "Customise this page"
     And I press "Reset dashboard to default"
     Then "Latest news" "block" should not exist
 
   Scenario: Cannot change locked dashboard
     When I log in as "learner1"
     And I follow "Dashboard locked published"
-    Then "Customize dashboard" "button" should not exist
+    Then "Customise this page" "button" should not exist
 
   Scenario: Cannot see dashboard that is unpublished/unassigned
     When I log in as "learner1"

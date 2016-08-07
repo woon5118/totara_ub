@@ -44,6 +44,11 @@ Feature: User recertification and expiry of certification
     And I click on "Use certification completion date" "option" in the "#id_recertifydatetype" "css_element"
     And I press "Save changes"
     And I click on "Save all changes" "button"
+    # Get back the removed dashboard item for now.
+    And I navigate to "Main menu" node in "Site administration > Appearance"
+    And I click on "Edit" "link" in the "Required Learning" "table_row"
+    And I set the field "Parent item" to "Top"
+    And I press "Save changes"
     And I log out
     And the following "program assignments" exist in "totara_program" plugin:
       | program | user    |

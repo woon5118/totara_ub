@@ -50,7 +50,7 @@ Feature: Create global report view restrictions
     And I should not see "User Six" in the "#assignedusers" "css_element"
     And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
     And I press "Make this restriction available to all users"
-    When I click on "My Reports" in the totara menu
+    When I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist
@@ -86,7 +86,7 @@ Feature: Create global report view restrictions
     And I should not see "User Six" in the "#assignedusers" "css_element"
     And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
     And I press "Make this restriction available to all users"
-    When I click on "My Reports" in the totara menu
+    When I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist
@@ -126,7 +126,7 @@ Feature: Create global report view restrictions
     And I should not see "User Six" in the "#assignedusers" "css_element"
     And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
     And I press "Make this restriction available to all users"
-    When I click on "My Reports" in the totara menu
+    When I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist
@@ -165,7 +165,7 @@ Feature: Create global report view restrictions
     And I should not see "User Six" in the "#assignedusers" "css_element"
     And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
     And I press "Make this restriction available to all users"
-    When I click on "My Reports" in the totara menu
+    When I click on "Reports" in the totara menu
     And I follow "User report"
     # Do not tell users what is going on, this is a required feature.
     Then ".globalrestrictionscontainer" "css_element" should not exist

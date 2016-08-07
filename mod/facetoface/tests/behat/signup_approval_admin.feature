@@ -106,7 +106,7 @@ Feature: Seminar Signup Admin Approval
 
     When I log out
     And I log in as "manager"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     And I click on "View all tasks" "link"
     And I click on "Attendees" "link"
 
@@ -117,7 +117,7 @@ Feature: Seminar Signup Admin Approval
 
     When I log out
     And I log in as "actapprover"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar booking admin request"
     And I click on "View all alerts" "link"
     And I click on "Attendees" "link" in the "1 January 2020" "table_row"
@@ -134,7 +134,7 @@ Feature: Seminar Signup Admin Approval
     And I log out
 
     And I log in as "manager"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar booking admin request"
     And I click on "View all tasks" "link"
     And I click on "Attendees" "link" in the "1 January 2020" "table_row"
@@ -148,7 +148,7 @@ Feature: Seminar Signup Admin Approval
 
     When I log out
     And I log in as "actapprover"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar booking admin request"
     And I click on "View all alerts" "link"
     And I click on "Attendees" "link" in the "1 January 2020" "table_row"
@@ -160,7 +160,7 @@ Feature: Seminar Signup Admin Approval
 
     When I log out
     And I log in as "jimmy"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     Then I should see "Seminar booking confirmation"
 
     When I click on "Find Learning" in the totara menu

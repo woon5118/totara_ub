@@ -88,7 +88,6 @@ $output = $PAGE->get_renderer('totara_reportbuilder');
 
 echo $output->header();
 echo $output->heading($strheading, 2);
-echo html_writer::tag('p', html_writer::link("{$CFG->wwwroot}/my/", "<< " . get_string('mylearning', 'totara_core')));
 
 $report->display_restrictions();
 

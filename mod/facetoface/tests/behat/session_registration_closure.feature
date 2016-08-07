@@ -115,7 +115,7 @@ Feature: Seminar Event Registration Closure
       | registrationtimefinish[minute]  | 00   |
     And I press "Save changes"
     And I run the "\mod_facetoface\task\close_registrations_task" task
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I click on "Global Session Status" "link" in the "#myreports_section" "css_element"
     Then I should not see "Moxxy Mox"
     And I should see "Declined" in the "Jelly Jel" "table_row"
@@ -124,13 +124,13 @@ Feature: Seminar Event Registration Closure
 
     When I log out
     And I log in as "manager"
-    And I click on "My Learning" in the totara menu
+    And I click on "Dashboard" in the totara menu
     And I should see "Seminar event registration closure" in the ".block_totara_alerts" "css_element"
     And I click on "#detailtask2-dialog" "css_element" in the ".block_totara_tasks" "css_element"
     And I click on "Attendees" "link" in the "#detailtask2" "css_element"
     Then I should see "No pending approvals"
 
-    When I click on "My Learning" in the totara menu
+    When I click on "Dashboard" in the totara menu
     And I click on "#detailtask2-dialog" "css_element" in the ".block_totara_tasks" "css_element"
     And I click on "Accept" "button" in the "detailtask2" "totaradialogue"
     And I click on "#detailtask4-dialog" "css_element" in the ".block_totara_tasks" "css_element"
@@ -139,7 +139,7 @@ Feature: Seminar Event Registration Closure
     And I click on "Accept" "button" in the "detailtask6" "totaradialogue"
     And I log out
     And I log in as "admin"
-    And I click on "My Reports" in the totara menu
+    And I click on "Reports" in the totara menu
     And I click on "Global Session Status" "link" in the "#myreports_section" "css_element"
     Then I should see "Declined" in the "Jelly Jel" "table_row"
     And I should see "Declined" in the "Minny Min" "table_row"

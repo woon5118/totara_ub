@@ -35,7 +35,7 @@ require_login();
 
 $edit = optional_param('edit', -1, PARAM_BOOL);
 
-$strheading = get_string('myreports', 'totara_core');
+$strheading = get_string('reports', 'totara_core');
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');

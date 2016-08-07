@@ -41,7 +41,7 @@ Feature: Tagging courses
     And I set the following fields to these values:
       | Tags | Algebra |
     And I press "Save and display"
-    And I click on "My learning" "link" in the "Navigation" "block"
+    And I click on "Dashboard" "link" in the "Navigation" "block"
     And I follow "Course 2"
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
@@ -76,7 +76,7 @@ Feature: Tagging courses
     And I set the following fields to these values:
       | Tags | Algebra, |
     And I press "Save changes"
-    And I click on "My learning" "link" in the "Navigation" "block"
+    And I click on "Dashboard" "link" in the "Navigation" "block"
     And I follow "Course 2"
     And I click on "Course tags" "link" in the "Administration" "block"
     And I set the following fields to these values:

@@ -1,1 +1,2 @@
 typeaspirational,totara_hierarchy
+mygoals,totara_hierarchy

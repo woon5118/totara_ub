@@ -169,7 +169,7 @@ Feature: Request extensions in programs
     Then I should see "Request for program extension has been sent to your manager(s)"
     When I log out
     And I log in as "manager1"
-    And I click on "My Team" in the totara menu
+    And I click on "Team" in the totara menu
     And I click on "1" "link" in the "Sam Student" "table_row"
     Then I should see "14 January 2025, 2:55 PM"
     When I click on "Grant" "option" in the ".approval" "css_element"
@@ -196,7 +196,7 @@ Feature: Request extensions in programs
     Then I should see "Request for program extension has been sent to your manager(s)"
     When I log out
     And I log in as "manager1"
-    And I click on "My Team" in the totara menu
+    And I click on "Team" in the totara menu
     And I click on "1" "link" in the "Sam Student" "table_row"
     Then I should see "14 January 2025, 2:55 PM"
     When I click on "Deny" "option" in the ".approval" "css_element"

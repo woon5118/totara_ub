@@ -1063,7 +1063,11 @@ if (isset($CFG->maintenance_later) and $CFG->maintenance_later <= time()) {
 // note: we can not block non utf-8 installations here, because empty mysql database
 // might be converted to utf-8 in admin/index.php during installation
 
-
+// Totara: hack settings a bit so that we do not have to look for disabled subsystems everywhere.
+if (totara_feature_disabled('totaradashboard')) {
+    $CFG->defaulthomepage = (string)HOMEPAGE_SITE;
+    $CFG->allowdefaultpageselection = '0';
+}
 
 // this is a funny trick to make Eclipse believe that $OUTPUT and other globals
 // contains an instance of core_renderer, etc. which in turn fixes autocompletion ;-)

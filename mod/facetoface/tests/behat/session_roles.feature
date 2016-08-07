@@ -61,7 +61,7 @@ Feature: Use facetoface session roles
     And I press "Continue"
     And I press "Confirm"
 
-    When I follow "My Reports"
+    When I follow "Reports"
     And I follow "F2F sessions"
     Then I should see "Student3  Sam3" in the "Test facetoface name" "table_row"
     And I should see "Student1 Midsam1 Sam1" in the "Test facetoface name" "table_row"

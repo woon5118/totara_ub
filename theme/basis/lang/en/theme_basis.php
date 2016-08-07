@@ -25,3 +25,6 @@
 
 $string['pluginname'] = 'Basis';
 $string['choosereadme'] = 'Basis default theme for Totara.';
+$string['region-main'] = 'Main';
+$string['region-side-post'] = 'Right';
+$string['region-side-pre'] = 'Left';

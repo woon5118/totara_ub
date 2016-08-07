@@ -1,5 +1,5 @@
-@totara @block_last_course_accessed
-Feature: Site Administrator can enable and disable the block.
+@totara @block @block_last_course_accessed
+Feature: Site Administrator can enable and disable the LCA block.
 
   Background:
     Given I am on a totara site
@@ -10,7 +10,7 @@ Feature: Site Administrator can enable and disable the block.
     And I follow "Find Learning"
     And I follow "Course 1"
     And I press "Turn editing on"
-    And I set the field "Add a block" to "Last Course Accessed"
+    And I add the "Last Course Accessed" block
     Then I should see "Last Course Accessed"
     And I log out
 

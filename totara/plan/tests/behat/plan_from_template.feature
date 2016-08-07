@@ -16,7 +16,8 @@ Feature: Create plan from template.
     And I press "Save changes"
 
   Scenario: Create plan from template
-    And I click on "Learning Plans" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I click on "Learning Plans" "link"
     And I press "Create new learning plan"
     When I set the field "Plan template" to "test template"
     Then the following fields match these values:

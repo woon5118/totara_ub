@@ -1,8 +1,8 @@
 @core @core_my
-Feature: Add blocks to My learning page
-  In order to add more functionality to My learning page
+Feature: Add blocks to dashboard page
+  In order to add more functionality to dashboard page
   As a user
-  I need to add blocks to My learning page
+  I need to add blocks to dashboard page
 
   Background:
     Given the following "users" exist:
@@ -17,11 +17,12 @@ Feature: Add blocks to My learning page
       | student1 | C1 | student |
       | student2 | C1 | student |
     And I log in as "student1"
-    And I follow "My learning"
+    And I click on "Dashboard" in the totara menu
 
   Scenario: Add blocks to page
     When I press "Customise this page"
-    And I add the "Latest news" block
+    # Totara - we already have "Latest news" on Dashboard
+    And I add the "Calendar" block
     And I add the "Latest badges" block
     Then I should see "Latest news"
     And I should see "Latest badges"

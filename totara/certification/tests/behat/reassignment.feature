@@ -518,6 +518,12 @@ Feature: User reassignment to a certification
       And I set self completion for "Certify Course" in the "Miscellaneous" category
       And I set self completion for "Recertify Course" in the "Miscellaneous" category
 
+      # Get back the removed dashboard item for now.
+      And I navigate to "Main menu" node in "Site administration > Appearance"
+      And I click on "Edit" "link" in the "Required Learning" "table_row"
+      And I set the field "Parent item" to "Top"
+      And I press "Save changes"
+
       # Complete the certification.
       And I log out
       And I log in as "jimmy"

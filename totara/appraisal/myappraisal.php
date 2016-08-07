@@ -287,7 +287,7 @@ $PAGE->set_totara_menu_selected('appraisals');
 if ($role == appraisal::ROLE_LEARNER) {
     $PAGE->navbar->add(get_string('myappraisals', 'totara_appraisal'), new moodle_url('/totara/appraisal/index.php'));
 } else {
-    $PAGE->navbar->add(get_string('myteamappraisals', 'totara_appraisal'),
+    $PAGE->navbar->add(get_string('teamappraisals', 'totara_appraisal'),
             new moodle_url('/totara/appraisal/index.php', array('role' => $role)));
 }
 $PAGE->navbar->add($appraisal->name, $pageurl);

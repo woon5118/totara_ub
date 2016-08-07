@@ -15,10 +15,12 @@ Feature: Open calendar popup
       | user | course | role |
       | student1 | C1 | student |
     And I log in as "admin"
+    And I click on "Dashboard" in the totara menu
+    And I follow "Make Dashboard my default page"
 
   @javascript
   Scenario: I view calendar details of a day with multiple events
-    Given I follow "This month"
+    Given I follow "Go to calendar"
     And I create a calendar event:
       | Type of event     | site |
       | Event title       | Event 1:1 |
@@ -37,7 +39,7 @@ Feature: Open calendar popup
 
   @javascript
   Scenario: I view calendar details for today
-    Given I follow "This month"
+    Given I follow "Go to calendar"
     And I create a calendar event:
       | Type of event     | site |
       | Event title       | Today's event |
