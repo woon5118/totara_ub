@@ -63,7 +63,7 @@ Feature: Learner creates basic learning plan
 
     # As the manager, access the learners plans.
     Given I log in as "manager2"
-    And I click on "Team" "link" in the totara menu
+    And I click on "Team" in the totara menu
     And I click on "Plans" "link" in the "firstname1 lastname1" "table_row"
 
     # Access the learners plans and verify it hasn't been approved.
@@ -101,7 +101,7 @@ Feature: Learner creates basic learning plan
 
     # As the manager, access the learners plans.
     When I log in as "manager2"
-    And I click on "Team" "link" in the totara menu
+    And I click on "Team" in the totara menu
     And I click on "Plans" "link" in the "firstname1 lastname1" "table_row"
 
     # Access the learners plans and verify it hasn't been approved.
@@ -136,7 +136,7 @@ Feature: Learner creates basic learning plan
 
     # As the manager, access the learners plans.
     Given I log in as "manager2"
-    And I click on "Team" "link" in the totara menu
+    And I click on "Team" in the totara menu
     And I click on "Plans" "link" in the "firstname1 lastname1" "table_row"
     And I press "Create new learning plan"
     And I set the field "id_name" to "learner1 Learning Plan"

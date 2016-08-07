@@ -50,6 +50,7 @@ if ($USER->id != $userid) {
     if (totara_feature_visible('myteam')) {
         $menuitem = 'myteam';
         $url = new moodle_url('/my/teammembers.php');
+        $PAGE->navbar->add(get_string('team', 'totara_core'), $url);
     } else {
         $menuitem = null;
         $url = null;
@@ -88,9 +89,6 @@ $pagetitle = format_string(get_string('report', 'totara_core').': '.$fullname);
 
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($SITE->fullname));
-if ($url) {
-    $PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
-}
 $PAGE->navbar->add($strheading);
 
 if (!isset($USER->editing)) {

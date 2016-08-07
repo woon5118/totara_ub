@@ -125,6 +125,7 @@ if ($usertype == 'manager') {
     if (totara_feature_visible('myteam')) {
         $menuitem = 'team';
         $url = new moodle_url('/my/teammembers.php');
+        $PAGE->navbar->add(get_string('team', 'totara_core'), $url);
     } else {
         $menuitem = null;
         $url = null;
@@ -132,9 +133,6 @@ if ($usertype == 'manager') {
 } else {
     $menuitem = null;
     $url = null;
-}
-if ($url) {
-    $PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
 }
 $PAGE->navbar->add($strheading, new moodle_url('/totara/plan/record/index.php', array('userid' => $userid)));
 $PAGE->navbar->add($strsubheading);
