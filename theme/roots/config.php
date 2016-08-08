@@ -47,10 +47,13 @@ $THEME->plugins_exclude_sheets = array(
 );
 
 $THEME->layouts = array(
-    // Most backwards compatible layout without the blocks - this is the layout used by default.
+    // Most backwards compatible layout with blocks on the left - this is the layout used by default in Totara,
+    // it is also the fallback when page layout is set too late when initialising page.
+    // Standard Moodle themes have base layout without blocks.
     'base' => array(
         'file' => 'default.php',
-        'regions' => array(),
+        'regions' => array('side-pre'),
+        'defaultregion' => 'side-pre',
     ),
     // Standard layout with blocks, this is recommended for most pages with general information.
     'standard' => array(
