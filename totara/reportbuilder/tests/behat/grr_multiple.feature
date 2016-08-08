@@ -29,7 +29,7 @@ Feature: Global report restrictions multiple interactions
       | user3 | CH0    |
     And I navigate to "Audiences" node in "Site administration > Users > Accounts"
     And I follow "Dynamic audience"
-    And I click on "Rule sets" "link" in the ".tabtree" "css_element"
+    And I switch to "Rule sets" tab
     And I set the field "id_addrulesetmenu" to "Last name"
     And I wait "1" seconds
     And I set the field "listofvalues" to "F"
@@ -62,7 +62,7 @@ Feature: Global report restrictions multiple interactions
       | org static     | Restriction 6 | 1      | 0          | 0        |
     And I navigate to "Global report restrictions" node in "Site administration > Reports > Report builder"
     And I click on "Edit" "link" in the "limited uses" "table_row"
-    And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
+    And I switch to "Users allowed to select restriction" tab
     And I set the field "menugroupselector" to "Audience"
     And I wait "1" seconds
     And I click on "System audience" "link" in the "Assign a group to restriction" "totaradialogue"
@@ -71,7 +71,7 @@ Feature: Global report restrictions multiple interactions
     And I follow "All Restrictions"
 
     And I click on "Edit" "link" in the "limited user" "table_row"
-    And I click on "View records related to" "link" in the ".tabtree" "css_element"
+    And I switch to "View records related to" tab
     And I set the field "menugroupselector" to "Audience"
     And I wait "1" seconds
     And I click on "System audience" "link" in the "Assign a group to restriction" "totaradialogue"
@@ -80,14 +80,14 @@ Feature: Global report restrictions multiple interactions
     And I follow "All Restrictions"
 
     And I click on "Edit" "link" in the "dynamic static" "table_row"
-    And I click on "View records related to" "link" in the ".tabtree" "css_element"
+    And I switch to "View records related to" tab
     And I set the field "menugroupselector" to "Audience"
     And I wait "1" seconds
     And I click on "System audience" "link" in the "Assign a group to restriction" "totaradialogue"
     And I click on "Dynamic audience" "link" in the "Assign a group to restriction" "totaradialogue"
     And I click on "Save" "button" in the "Assign a group to restriction" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
+    And I switch to "Users allowed to select restriction" tab
     And I set the field "menugroupselector" to "Audience"
     And I wait "1" seconds
     And I click on "System audience" "link" in the "Assign a group to restriction" "totaradialogue"
@@ -97,7 +97,7 @@ Feature: Global report restrictions multiple interactions
     And I follow "All Restrictions"
 
     And I click on "Edit" "link" in the "org dynamic" "table_row"
-    And I click on "View records related to" "link" in the ".tabtree" "css_element"
+    And I switch to "View records related to" tab
     And I set the field "menugroupselector" to "Audience"
     And I wait "1" seconds
     And I click on "Dynamic audience" "link" in the "Assign a group to restriction" "totaradialogue"
@@ -108,7 +108,7 @@ Feature: Global report restrictions multiple interactions
     And I click on "Test Organisation" "link" in the "Assign a group to restriction" "totaradialogue"
     And I click on "Save" "button" in the "Assign a group to restriction" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
+    And I switch to "Users allowed to select restriction" tab
     And I set the field "menugroupselector" to "Audience"
     And I wait "1" seconds
     And I click on "Dynamic audience" "link" in the "Assign a group to restriction" "totaradialogue"
@@ -122,7 +122,7 @@ Feature: Global report restrictions multiple interactions
     And I follow "All Restrictions"
 
     And I click on "Edit" "link" in the "org static" "table_row"
-    And I click on "View records related to" "link" in the ".tabtree" "css_element"
+    And I switch to "View records related to" tab
     And I set the field "menugroupselector" to "Audience"
     And I wait "1" seconds
     And I click on "System audience" "link" in the "Assign a group to restriction" "totaradialogue"
@@ -133,7 +133,7 @@ Feature: Global report restrictions multiple interactions
     And I click on "Test Organisation" "link" in the "Assign a group to restriction" "totaradialogue"
     And I click on "Save" "button" in the "Assign a group to restriction" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
+    And I switch to "Users allowed to select restriction" tab
     And I set the field "menugroupselector" to "Audience"
     And I wait "1" seconds
     And I click on "System audience" "link" in the "Assign a group to restriction" "totaradialogue"
@@ -151,10 +151,10 @@ Feature: Global report restrictions multiple interactions
       | Report Name | User report |
       | Source      | User        |
     And I press "Create report"
-    And I click on "Content" "link" in the ".tabtree" "css_element"
+    And I switch to "Content" tab
     And I set the field "Global report restrictions" to "1"
     And I press "Save changes"
-    And I click on "Access" "link" in the ".tabtree" "css_element"
+    And I switch to "Access" tab
     And I set the field "All users can view this report" to "1"
     And I press "Save changes"
 

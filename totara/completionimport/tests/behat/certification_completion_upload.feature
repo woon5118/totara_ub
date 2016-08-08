@@ -25,7 +25,7 @@ Feature: Verify certification completion data can be successfully uploaded.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
-    And I click on "Certifications" "link" in the ".tabtree" "css_element"
+    And I switch to "Certifications" tab
     Then I should see "Certified" in the "Certification 1" "table_row"
 
     When I follow "Other Evidence"

@@ -22,7 +22,7 @@ Feature: Learner self approves plan with updated template.
     And I log in as "admin"
     And I navigate to "Manage templates" node in "Site administration > Learning Plans"
     And I click on "Learning Plan" "link" in the ".dp-templates" "css_element"
-    And I click on "Workflow" "link" in the ".tabtree" "css_element"
+    And I switch to "Workflow" tab
     And I click on "Custom workflow" "radio"
     And I click on "Advanced workflow settings" "button"
     # Update plan settings to allow self approval.
@@ -32,7 +32,7 @@ Feature: Learner self approves plan with updated template.
     Then I should see "Plan settings successfully updated"
 
     # Allow the learner to add RPL.
-    When I click on "Courses" "link" in the ".tabtree" "css_element"
+    When I switch to "Courses" tab
     And I set the field "updatecourselearner" to "Allow"
     And I set the field "setcompletionstatuslearner" to "Allow"
     When I click on "Save changes" "button"

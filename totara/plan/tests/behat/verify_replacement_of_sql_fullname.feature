@@ -26,12 +26,12 @@ Feature: Verify replacement of sql_fullname
       | assessorroleid | Staff Manager (staffmanager) |
     And I navigate to "Manage templates" node in "Site administration > Learning Plans"
     And I click on "Learning Plan" "link" in the ".dp-templates" "css_element"
-    And I click on "Workflow" "link" in the ".tabtree" "css_element"
+    And I switch to "Workflow" tab
     And I click on "Custom workflow" "radio"
     And I click on "Advanced workflow settings" "button"
 
     # Allow the learner to update the competency and set the assessor.
-    When I click on "Competencies" "link" in the ".tabtree" "css_element"
+    When I switch to "Competencies" tab
     And I set the field "updatecompetencylearner" to "Allow"
     And I set the field "setproficiencylearner" to "Allow"
     When I click on "Save changes" "button"

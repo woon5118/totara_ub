@@ -31,7 +31,7 @@ Feature: Test role access restrictions in Reportbuilder
     And I press "Create report"
 
   Scenario: Verify role access defaults in Reportbuilder
-    Given I click on "Access" "link" in the ".tabtree" "css_element"
+    Given I switch to "Access" tab
     Then the field "Only certain users can view this report (see below)" matches value "1"
     And the field "Context" matches value "site"
     And the field "Site Manager" matches value "1"
@@ -69,7 +69,7 @@ Feature: Test role access restrictions in Reportbuilder
     Then I should not see "Reports" in the totara menu
 
   Scenario: Set Reportbuilder role access restriction for role in any context
-    Given I click on "Access" "link" in the ".tabtree" "css_element"
+    Given I switch to "Access" tab
     And I set the field "Context" to "any"
     And I set the field "Site Manager" to ""
     And I set the field "Learner" to "1"
@@ -103,7 +103,7 @@ Feature: Test role access restrictions in Reportbuilder
     Then I should not see "Reports" in the totara menu
 
   Scenario: Set Reportbuilder role access restriction for role in system context
-    Given I click on "Access" "link" in the ".tabtree" "css_element"
+    Given I switch to "Access" tab
     And I set the field "Context" to "site"
     And I set the field "Site Manager" to "0"
     And I set the field "Learner" to "1"
@@ -134,7 +134,7 @@ Feature: Test role access restrictions in Reportbuilder
     Then I should not see "Reports" in the totara menu
 
   Scenario: Set Reportbuilder role access restriction for authenticated user
-    Given I click on "Access" "link" in the ".tabtree" "css_element"
+    Given I switch to "Access" tab
     And I set the field "Context" to "site"
     And I set the field "Site Manager" to "0"
     And I set the field "Authenticated user" to "1"
@@ -177,7 +177,7 @@ Feature: Test role access restrictions in Reportbuilder
     And I should see "usernobody"
 
   Scenario: Set Reportbuilder role access restriction for multiple roles
-    Given I click on "Access" "link" in the ".tabtree" "css_element"
+    Given I switch to "Access" tab
     And I set the field "Context" to "site"
     And I set the field "Site Manager" to "1"
     And I set the field "Course creator" to "1"
@@ -216,7 +216,7 @@ Feature: Test role access restrictions in Reportbuilder
     Then I should not see "Reports" in the totara menu
 
   Scenario: Disable Reportbuilder role access restrictions
-    Given I click on "Access" "link" in the ".tabtree" "css_element"
+    Given I switch to "Access" tab
     And I set the field "All users can view this report" to "1"
     And I press "Save changes"
 

@@ -111,7 +111,7 @@ Feature: Report builder table block
 
     Scenario: Test block settings by user that does not have access to report
     # Make report public
-    And I click on "Access" "link" in the ".tabtree" "css_element"
+    And I switch to "Access" tab
     And I click on "All users can view this report" "radio"
     And I press "Save changes"
     And I log out
@@ -132,7 +132,7 @@ Feature: Report builder table block
     And I log in as "admin"
     And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
     And I click on "Settings" "link" in the "User report" "table_row"
-    When I click on "Access" "link" in the ".tabtree" "css_element"
+    When I switch to "Access" tab
     And I click on "Only certain users can view this report (see below)" "radio"
     And I press "Save changes"
     And I log out

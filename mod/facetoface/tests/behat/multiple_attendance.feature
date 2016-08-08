@@ -108,7 +108,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Certifications" in the totara menu
     And I press "Create Certification"
     And I press "Save changes"
-    And I click on "Certification" "link" in the ".tabtree" "css_element"
+    And I switch to "Certification" tab
     And I set the following fields to these values:
       | recertifydatetype | 1   |
       | activenum         | 15  |
@@ -117,7 +117,7 @@ Feature: Take attendance for a seminar with multiple sessions
       | windowperiod      | day |
     And I click on "Save changes" "button"
     And I click on "Save all changes" "button"
-    And I click on "Content" "link" in the ".tabtree" "css_element"
+    And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#programcontent_ce" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "course1" "link" in the "addmulticourse" "totaradialogue"
@@ -132,7 +132,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I click on "Save all changes" "button"
 
     # Assign the user to the cert.
-    And I click on "Assignments" "link" in the ".tabtree" "css_element"
+    And I switch to "Assignments" tab
     And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
     And I click on "Add" "button" in the "#category_select" "css_element"
     And I click on "Add individuals to program" "button"
@@ -155,7 +155,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
-    And I click on "Take attendance" "link" in the ".tabtree" "css_element"
+    And I switch to "Take attendance" tab
     And I click on "Fully attended" "option" in the "first1 last1" "table_row"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
@@ -167,7 +167,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log out
     And I log in as "user1"
     And I click on "Record of Learning" in the totara menu
-    And I click on "Certifications" "link" in the ".tabtree" "css_element"
+    And I switch to "Certifications" tab
     # Due date (when it expired, -40 + 15).
     And I should see date "-25 day" formatted "%d %B %Y"
     And I should see "Overdue!" in the "Certification program fullname 101" "table_row"
@@ -186,7 +186,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
-    And I click on "Take attendance" "link" in the ".tabtree" "css_element"
+    And I switch to "Take attendance" tab
     And I click on "Fully attended" "option" in the "first1 last1" "table_row"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
@@ -198,7 +198,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log out
     And I log in as "user1"
     And I click on "Record of Learning" in the totara menu
-    And I click on "Certifications" "link" in the ".tabtree" "css_element"
+    And I switch to "Certifications" tab
     # Completion, window open and expiry.
     And I should see date "-10 day" formatted "%d %b %Y"
     And I should see date "-5 day" formatted "%d %b %Y"
@@ -219,7 +219,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
-    And I click on "Take attendance" "link" in the ".tabtree" "css_element"
+    And I switch to "Take attendance" tab
     And I click on "Fully attended" "option" in the "first1 last1" "table_row"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
@@ -231,7 +231,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log out
     And I log in as "user1"
     And I click on "Record of Learning" in the totara menu
-    And I click on "Certifications" "link" in the ".tabtree" "css_element"
+    And I switch to "Certifications" tab
     # Completion, window open and expiry.
     And I should see date "-10 day" formatted "%d %b %Y"
     And I should see date "-5 day" formatted "%d %b %Y"
@@ -253,7 +253,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
-    And I click on "Take attendance" "link" in the ".tabtree" "css_element"
+    And I switch to "Take attendance" tab
     And I click on "Fully attended" "option" in the "first1 last1" "table_row"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
@@ -265,7 +265,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log out
     And I log in as "user1"
     And I click on "Record of Learning" in the totara menu
-    And I click on "Certifications" "link" in the ".tabtree" "css_element"
+    And I switch to "Certifications" tab
     # Completion, window open and expiry.
     And I should see date "-10 day" formatted "%d %b %Y"
     And I should see date "-5 day" formatted "%d %b %Y"
@@ -285,7 +285,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
-    And I click on "Take attendance" "link" in the ".tabtree" "css_element"
+    And I switch to "Take attendance" tab
     And I click on "Fully attended" "option" in the "first1 last1" "table_row"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
@@ -310,7 +310,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
-    And I click on "Take attendance" "link" in the ".tabtree" "css_element"
+    And I switch to "Take attendance" tab
     And I click on "Fully attended" "option" in the "first1 last1" "table_row"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
@@ -357,7 +357,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
-    And I click on "Take attendance" "link" in the ".tabtree" "css_element"
+    And I switch to "Take attendance" tab
     And I click on "Fully attended" "option" in the "first1 last1" "table_row"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
@@ -382,7 +382,7 @@ Feature: Take attendance for a seminar with multiple sessions
     And I wait until the page is ready
     And I press "Continue"
     And I press "Confirm"
-    And I click on "Take attendance" "link" in the ".tabtree" "css_element"
+    And I switch to "Take attendance" tab
     And I click on "Fully attended" "option" in the "first1 last1" "table_row"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"

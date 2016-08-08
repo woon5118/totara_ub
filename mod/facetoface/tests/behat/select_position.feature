@@ -224,7 +224,7 @@ Feature: Add a seminar with select position
     And I set the field "Report Name" to "F2F sessions"
     And I set the field "Source" to "Seminar Sign-ups"
     And I press "Create report"
-    And I click on "Columns" "link" in the ".tabtree" "css_element"
+    And I switch to "Columns" tab
     And I add the "Position on sign up" column to the report
 
     When I navigate to my "F2F sessions" report

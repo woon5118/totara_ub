@@ -23,7 +23,7 @@ Feature: Create global report view restrictions
       | Report Name | User report |
       | Source      | User        |
     And I press "Create report"
-    And I click on "Content" "link" in the ".tabtree" "css_element"
+    And I switch to "Content" tab
     And I set the field "Global report restrictions" to "1"
     And I press "Save changes"
     And I navigate to "Global report restrictions" node in "Site administration > Reports > Report builder"
@@ -48,7 +48,7 @@ Feature: Create global report view restrictions
     And I should not see "User Four" in the "#assignedusers" "css_element"
     And I should not see "User Five" in the "#assignedusers" "css_element"
     And I should not see "User Six" in the "#assignedusers" "css_element"
-    And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
+    And I switch to "Users allowed to select restriction" tab
     And I press "Make this restriction available to all users"
     When I click on "Reports" in the totara menu
     And I follow "User report"
@@ -72,7 +72,7 @@ Feature: Create global report view restrictions
       | user3 | CH0    |
     And I navigate to "Global report restrictions" node in "Site administration > Reports > Report builder"
     And I click on "Edit" "link" in the "test restriction" "table_row"
-    And I click on "View records related to" "link" in the ".tabtree" "css_element"
+    And I switch to "View records related to" tab
     And I set the field "menugroupselector" to "Audience"
     And I wait "1" seconds
     And I click on "System audience" "link" in the "Assign a group to restriction" "totaradialogue"
@@ -84,7 +84,7 @@ Feature: Create global report view restrictions
     And I should not see "User Four" in the "#assignedusers" "css_element"
     And I should not see "User Five" in the "#assignedusers" "css_element"
     And I should not see "User Six" in the "#assignedusers" "css_element"
-    And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
+    And I switch to "Users allowed to select restriction" tab
     And I press "Make this restriction available to all users"
     When I click on "Reports" in the totara menu
     And I follow "User report"
@@ -103,7 +103,7 @@ Feature: Create global report view restrictions
       | Dynamic audience | A1       | 2          |
     And I navigate to "Audiences" node in "Site administration > Users > Accounts"
     And I follow "Dynamic audience"
-    And I click on "Rule sets" "link" in the ".tabtree" "css_element"
+    And I switch to "Rule sets" tab
     And I set the field "id_addrulesetmenu" to "Last name"
     And I wait "1" seconds
     And I set the field "listofvalues" to "F"
@@ -112,7 +112,7 @@ Feature: Create global report view restrictions
     And I press "Approve changes"
     And I navigate to "Global report restrictions" node in "Site administration > Reports > Report builder"
     And I click on "Edit" "link" in the "test restriction" "table_row"
-    And I click on "View records related to" "link" in the ".tabtree" "css_element"
+    And I switch to "View records related to" tab
     And I set the field "menugroupselector" to "Audience"
     And I wait "1" seconds
     And I click on "Dynamic audience" "link" in the "Assign a group to restriction" "totaradialogue"
@@ -124,7 +124,7 @@ Feature: Create global report view restrictions
     And I should see "User Four" in the "#assignedusers" "css_element"
     And I should see "User Five" in the "#assignedusers" "css_element"
     And I should not see "User Six" in the "#assignedusers" "css_element"
-    And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
+    And I switch to "Users allowed to select restriction" tab
     And I press "Make this restriction available to all users"
     When I click on "Reports" in the totara menu
     And I follow "User report"
@@ -151,7 +151,7 @@ Feature: Create global report view restrictions
       | user3 | ORG001       |
     And I navigate to "Global report restrictions" node in "Site administration > Reports > Report builder"
     And I click on "Edit" "link" in the "test restriction" "table_row"
-    And I click on "View records related to" "link" in the ".tabtree" "css_element"
+    And I switch to "View records related to" tab
     And I set the field "menugroupselector" to "Organisation"
     And I wait "1" seconds
     And I click on "Test Organisation" "link" in the "Assign a group to restriction" "totaradialogue"
@@ -163,7 +163,7 @@ Feature: Create global report view restrictions
     And I should not see "User Four" in the "#assignedusers" "css_element"
     And I should not see "User Five" in the "#assignedusers" "css_element"
     And I should not see "User Six" in the "#assignedusers" "css_element"
-    And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
+    And I switch to "Users allowed to select restriction" tab
     And I press "Make this restriction available to all users"
     When I click on "Reports" in the totara menu
     And I follow "User report"

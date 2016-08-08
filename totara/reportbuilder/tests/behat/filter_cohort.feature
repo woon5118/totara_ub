@@ -27,7 +27,7 @@ Feature: Cohort report filter
       | Report Name | User report  |
       | Source      | User         |
     And I click on "Create report" "button"
-    And I click on "Filters" "link" in the ".tabtree" "css_element"
+    And I switch to "Filters" tab
     And I set the field "newstandardfilter" to "User is a member of audience"
     And I click on "Add" "button"
     And I click on "View This Report" "link"

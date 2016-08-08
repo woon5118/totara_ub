@@ -54,7 +54,7 @@ Feature: Complete the example appraisal
     And I click on "Dashboard" in the totara menu
     And I click on "Learning Plans" "link"
     And I click on "Learner One Learning Plan" "link"
-    And I click on "Competencies" "link" in the ".tabtree" "css_element"
+    And I switch to "Competencies" tab
     And I press "Add competencies"
     And I click on "Competency One" "link" in the "Add competencies" "totaradialogue"
     And I click on "Competency Two" "link" in the "Add competencies" "totaradialogue"
@@ -75,7 +75,7 @@ Feature: Complete the example appraisal
     And I click on "Activate" "link" in the "Example appraisal" "table_row"
     And I should see "There are no assigned learners."
     And I press "Back to appraisal"
-    And I click on "Assignments" "link" in the ".tabtree" "css_element"
+    And I switch to "Assignments" tab
     And I select "Position" from the "groupselector" singleselect
     And I click on "Position One" "link" in the "Assign Learner Group To Appraisal" "totaradialogue"
     And I click on "Save" "button" in the "Assign Learner Group To Appraisal" "totaradialogue"

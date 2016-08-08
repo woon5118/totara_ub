@@ -43,7 +43,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Given I log in as "admin"
     And I navigate to "Audiences" node in "Site administration > Users > Accounts"
     And I follow "TestAudience"
-    And I click on "Rule sets" "link" in the ".tabtree" "css_element"
+    And I switch to "Rule sets" tab
     And I set the field "addrulesetmenu" to "uptxt (Text)"
 
 
@@ -55,7 +55,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should not see "User 2" in the "#cohort_members" "css_element"
@@ -72,7 +72,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"
@@ -89,7 +89,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should not see "User 2" in the "#cohort_members" "css_element"
@@ -106,7 +106,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "There are no records in this report"
 
 
@@ -118,7 +118,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"
@@ -135,7 +135,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should not see "User 0" in the "#cohort_members" "css_element"
     And I should not see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"
@@ -152,7 +152,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should not see "User 0" in the "#cohort_members" "css_element"
     And I should not see "User 1" in the "#cohort_members" "css_element"
     And I should not see "User 2" in the "#cohort_members" "css_element"
@@ -169,7 +169,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should not see "User 0" in the "#cohort_members" "css_element"
     And I should not see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"
@@ -186,7 +186,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should not see "User 2" in the "#cohort_members" "css_element"
@@ -203,7 +203,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should not see "User 0" in the "#cohort_members" "css_element"
     And I should not see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"
@@ -220,7 +220,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "There are no records in this report"
 
 
@@ -232,7 +232,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should not see "User 2" in the "#cohort_members" "css_element"
@@ -249,7 +249,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should not see "User 0" in the "#cohort_members" "css_element"
     And I should not see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"
@@ -266,7 +266,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"
@@ -283,7 +283,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should not see "User 2" in the "#cohort_members" "css_element"
@@ -300,7 +300,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should not see "User 0" in the "#cohort_members" "css_element"
     And I should not see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"
@@ -317,7 +317,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should not see "User 0" in the "#cohort_members" "css_element"
     And I should not see "User 1" in the "#cohort_members" "css_element"
     And I should not see "User 2" in the "#cohort_members" "css_element"
@@ -334,7 +334,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"
@@ -351,7 +351,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should not see "User 2" in the "#cohort_members" "css_element"
@@ -368,7 +368,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "There are no records in this report"
 
 
@@ -380,7 +380,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"
@@ -397,7 +397,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should not see "User 0" in the "#cohort_members" "css_element"
     And I should not see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"
@@ -414,7 +414,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "User 0" in the "#cohort_members" "css_element"
     And I should see "User 1" in the "#cohort_members" "css_element"
     And I should not see "User 2" in the "#cohort_members" "css_element"
@@ -431,7 +431,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should see "There are no records in this report"
 
 
@@ -443,7 +443,7 @@ Feature: Test dynamic audience with user profile custom text fields.
     Then I should see "Audience rules changed"
 
     When I press "Approve changes"
-    And I click on "Members" "link" in the ".tabtree" "css_element"
+    And I switch to "Members" tab
     Then I should not see "User 0" in the "#cohort_members" "css_element"
     And I should not see "User 1" in the "#cohort_members" "css_element"
     And I should see "User 2" in the "#cohort_members" "css_element"

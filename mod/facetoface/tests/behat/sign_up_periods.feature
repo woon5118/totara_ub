@@ -49,7 +49,7 @@ Feature: Seminar sign-up periods
     And I click on "Add" "button"
     And I click on "Continue" "button"
     And I click on "Confirm" "button"
-    And I click on "Wait-list" "link" in the ".tabtree" "css_element"
+    And I switch to "Wait-list" tab
     And I should see "Stu Dent"
 
   Examples:

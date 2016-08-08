@@ -40,7 +40,7 @@ Feature: Verify user prompts to progress plan are correct
     Given I log in as "admin"
     And I navigate to "Manage templates" node in "Site administration > Learning Plans"
     And I click on "Learning Plan" "link" in the ".dp-templates" "css_element"
-    And I click on "Workflow" "link" in the ".tabtree" "css_element"
+    And I switch to "Workflow" tab
     And I click on "Custom workflow" "radio"
     And I press "Advanced workflow settings"
     # Update plan settings to allow self approval.

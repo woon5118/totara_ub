@@ -41,7 +41,7 @@ Feature: Use the multi-item hierarchy filter
     Given I set the field "Report Name" to "Users"
     And I set the field "Source" to "user"
     And I press "Create report"
-    And I click on "Filters" "link" in the ".tabtree" "css_element"
+    And I switch to "Filters" tab
     And I select "User's Position (multi-item)" from the "newstandardfilter" singleselect
     And I press "Add"
     And I select "User's Position Framework ID Number" from the "newstandardfilter" singleselect
@@ -87,7 +87,7 @@ Feature: Use the multi-item hierarchy filter
     Given I set the field "Report Name" to "Users"
     And I set the field "Source" to "User"
     And I press "Create report"
-    And I click on "Filters" "link" in the ".tabtree" "css_element"
+    And I switch to "Filters" tab
     And I select "User's Organisation (multi-item)" from the "newstandardfilter" singleselect
     And I press "Save changes"
     And I follow "View This Report"

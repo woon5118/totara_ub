@@ -34,10 +34,10 @@ Feature: Use facetoface session roles
     And I set the field "Report Name" to "F2F sessions"
     And I set the field "Source" to "Seminar Sessions"
     And I press "Create report"
-    And I click on "Columns" "link" in the ".tabtree" "css_element"
+    And I switch to "Columns" tab
     And I add the "Event Learner" column to the report
     And I press "Save changes"
-    And I click on "Access" "link" in the ".tabtree" "css_element"
+    And I switch to "Access" tab
     And I set the field "All users can view this report" to "1"
     And I press "Save changes"
     And I log out

@@ -23,10 +23,10 @@ Feature: Create global report no restrictions
       | Report Name | User report |
       | Source      | User        |
     And I press "Create report"
-    And I click on "Content" "link" in the ".tabtree" "css_element"
+    And I switch to "Content" tab
     And I set the field "Global report restrictions" to "1"
     And I press "Save changes"
-    And I click on "Access" "link" in the ".tabtree" "css_element"
+    And I switch to "Access" tab
     And I set the field "All users can view this report" to "1"
     And I press "Save changes"
     And I navigate to "Global report restrictions" node in "Site administration > Reports > Report builder"
@@ -43,7 +43,7 @@ Feature: Create global report no restrictions
     And I click on "User Three" "link" in the "Assign a group to restriction" "totaradialogue"
     And I click on "Save" "button" in the "Assign a group to restriction" "totaradialogue"
     And I wait "1" seconds
-    And I click on "Users allowed to select restriction" "link" in the ".tabtree" "css_element"
+    And I switch to "Users allowed to select restriction" tab
     And I set the field "menugroupselector" to "Individual assignment"
     And I wait "1" seconds
     And I click on "User One" "link" in the "Assign a group to restriction" "totaradialogue"

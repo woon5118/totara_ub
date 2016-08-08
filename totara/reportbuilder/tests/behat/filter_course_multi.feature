@@ -25,10 +25,10 @@ Feature: Use the multi-item course filter
     Given I set the field "Report Name" to "Courses"
     And I set the field "Source" to "Courses"
     And I press "Create report"
-    And I click on "Filters" "link" in the ".tabtree" "css_element"
+    And I switch to "Filters" tab
     And I select "Course (multi-item)" from the "newstandardfilter" singleselect
     And I press "Save changes"
-    And I click on "Access" "link" in the ".tabtree" "css_element"
+    And I switch to "Access" tab
     And I set the field "Authenticated user" to "1"
     And I press "Save changes"
     When I follow "View This Report"
@@ -79,7 +79,7 @@ Feature: Use the multi-item course filter
     Given I set the field "Report Name" to "Seminar Sessions"
     And I set the field "Source" to "Seminar Sessions"
     And I press "Create report"
-    And I click on "Filters" "link" in the ".tabtree" "css_element"
+    And I switch to "Filters" tab
     And I select "Course (multi-item)" from the "newstandardfilter" singleselect
     And I press "Save changes"
     When I follow "View This Report"

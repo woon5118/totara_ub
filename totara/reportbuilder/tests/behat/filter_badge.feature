@@ -25,7 +25,7 @@ Feature: Badges report filter
     And I click on "Save" "button"
     And I click on "Enable access" "button"
     And I click on "Continue" "button"
-    And I click on "Recipients" "link" in the ".tabtree" "css_element"
+    And I switch to "Recipients" tab
     And I click on "Award badge" "button"
     And I click on "User One (user1@example.com)" "option"
     And I click on "User Two (user2@example.com)" "option"
@@ -46,7 +46,7 @@ Feature: Badges report filter
     And I click on "Save" "button"
     And I click on "Enable access" "button"
     And I click on "Continue" "button"
-    And I click on "Recipients" "link" in the ".tabtree" "css_element"
+    And I switch to "Recipients" tab
     And I click on "Award badge" "button"
     And I click on "User One (user1@example.com)" "option"
     And I click on "Award badge" "button"

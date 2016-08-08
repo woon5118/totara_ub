@@ -121,7 +121,7 @@ Feature: Seminar timezones in reports
     And I set the field "Report Name" to "F2F sessions"
     And I set the field "Source" to "Seminar Sign-ups"
     And I press "Create report"
-    And I click on "Columns" "link" in the ".tabtree" "css_element"
+    And I switch to "Columns" tab
     And I add the "Event Finish Time" column to the report
     And I add the "Event Start Time" column to the report
     #And I add the "Event Finish Time" column to the report
@@ -213,7 +213,7 @@ Feature: Seminar timezones in reports
     And I set the field "Report Name" to "F2F summary"
     And I set the field "Source" to "Seminar Sessions"
     And I press "Create report"
-    And I click on "Columns" "link" in the ".tabtree" "css_element"
+    And I switch to "Columns" tab
     And I add the "Session Start Date/Time (linked to attendees page)" column to the report
     And I add the "Session Start Date/Time" column to the report
 

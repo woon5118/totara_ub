@@ -58,7 +58,7 @@ Feature: Verify competency course count within learning plan
     Then I should see "Course 1"
     Then I should see "Course 2"
     Then I should see "Course 3"
-    And I click on "Courses" "link" in the ".tabtree" "css_element"
+    And I switch to "Courses" tab
     Then I should see "Course 1"
     Then I should see "Course 2"
     Then I should see "Course 3"
@@ -106,7 +106,7 @@ Feature: Verify competency course count within learning plan
     Then I should see "Course 1"
     Then I should not see "Course 2"
     Then I should see "Course 3"
-    And I click on "Courses" "link" in the ".tabtree" "css_element"
+    And I switch to "Courses" tab
     Then I should see "Course 1"
     Then I should not see "Course 2"
     Then I should see "Course 3"

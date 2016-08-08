@@ -98,6 +98,6 @@ Feature: Seminar Select position with Manager approval
     And I follow "Course 1"
     And I follow "Test seminar name"
     And I follow "Attendees"
-    And I click on "Approval required" "link" in the ".tabtree" "css_element"
+    And I switch to "Approval required" tab
     And I click on "input[value='2']" "css_element" in the "Sam1 Student1" "table_row"
     And I press "Update requests"

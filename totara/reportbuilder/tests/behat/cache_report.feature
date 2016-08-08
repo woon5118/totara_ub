@@ -17,7 +17,7 @@ Feature: Caching works as expected
     And I set the field "Report Name" to "Some User Report"
     And I set the field "Source" to "User"
     And I press "Create report"
-    And I click on "Performance" "link" in the ".tabtree" "css_element"
+    And I switch to "Performance" tab
     And I click on "Enable Report Caching" "text"
     And I click on "Generate Now" "text"
     And I click on "Save changes" "button"
@@ -42,7 +42,7 @@ Feature: Caching works as expected
 
     # Regenerate report
     When I click on "Edit this report" "button"
-    And I click on "Performance" "link" in the ".tabtree" "css_element"
+    And I switch to "Performance" tab
     And I click on "Generate Now" "button"
     And I click on "OK" "button" in the "cachenow" "totaradialogue"
     And I click on "View This Report" "link"

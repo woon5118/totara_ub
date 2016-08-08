@@ -147,7 +147,7 @@ Feature: Seminar Signup Admin Approval
     When I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
     And I click on "Update requests" "button"
     Then I should not see "Jimmy Jim"
-    And I click on "Attendees" "link" in the ".tabtree" "css_element"
+    And I switch to "Attendees" tab
     Then I should not see "Jimmy Jim"
 
     When I log out

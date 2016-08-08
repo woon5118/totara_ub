@@ -34,12 +34,12 @@ Feature: Test unrestricted user columns can be added and viewed by the admin
       | Source      | User        |
     And I press "Create report"
     And I should see "Edit Report 'User report'"
-    And I click on "Columns" "link" in the ".tabtree" "css_element"
+    And I switch to "Columns" tab
     And I add the "User's Email (ignoring user display setting)" column to the report
     And I add the "User's Email" column to the report
     And I add the "User's Manager's Email (ignoring user display setting)" column to the report
     And I add the "User's Manager Email" column to the report
-    And I click on "Access" "link" in the ".tabtree" "css_element"
+    And I switch to "Access" tab
     And I set the following fields to these values:
       | role_activeroles[7] | 1 |
     And I press "Save changes"

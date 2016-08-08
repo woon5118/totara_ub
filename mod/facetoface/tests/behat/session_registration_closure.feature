@@ -95,7 +95,7 @@ Feature: Seminar Event Registration Closure
       | Source      | Seminar Sign-ups      |
     And I press "Create report"
     And I should see "Global Session Status"
-    And I click on "Columns" "link" in the ".tabtree" "css_element"
+    And I switch to "Columns" tab
     And I add the "Status" column to the report
     And I click on "View This Report" "link" in the ".reportbuilder-navlinks" "css_element"
     Then I should not see "Moxxy Mox"

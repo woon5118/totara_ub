@@ -23,7 +23,7 @@ Feature: Certification completion date is based on course completion time
     And I click on "Certifications" in the totara menu
     And I follow "Certification One"
     And I press "Edit certification details"
-    And I click on "Content" "link" in the ".tabtree" "css_element"
+    And I switch to "Content" tab
     And I click on "addcontent_ce" "button" in the "#programcontent_ce" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course One" "link" in the "addmulticourse" "totaradialogue"
@@ -36,7 +36,7 @@ Feature: Certification completion date is based on course completion time
     And I wait "1" seconds
     And I press "Save changes"
     And I click on "Save all changes" "button"
-    And I click on "Assignments" "link" in the ".tabtree" "css_element"
+    And I switch to "Assignments" tab
     And I set the field "Add a new" to "Individuals"
     And I click on "Add" "button"
     And I click on "Add individuals to program" "button"
@@ -106,7 +106,7 @@ Feature: Certification completion date is based on course completion time
     And I click on "Certifications" in the totara menu
     And I follow "Certification One"
     And I press "Edit certification details"
-    And I click on "Completion" "link" in the ".tabtree" "css_element"
+    And I switch to "Completion" tab
     And I click on "Edit completion records" "link" in the "Learner One" "table_row"
     # This obviously doesn't look like expected behaviour at this point.
     # However changing the face-to-face completion time after the certification was complete

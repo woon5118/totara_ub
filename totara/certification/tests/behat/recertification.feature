@@ -35,7 +35,7 @@ Feature: User recertification and expiry of certification
     And I click on "Ok" "button" in the "addmulticourse" "totaradialogue"
     And I press "Save changes"
     And I click on "Save all changes" "button"
-    And I click on "Certification" "link" in the ".tabtree" "css_element"
+    And I switch to "Certification" tab
     And I set the following fields to these values:
         | activenum | 6 |
         | windownum | 2 |

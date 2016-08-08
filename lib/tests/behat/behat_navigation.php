@@ -301,6 +301,28 @@ class behat_navigation extends behat_base {
     }
 
     /**
+     * Click link in a tab tree
+     *
+     * @Given /^I switch to "(?P<nodetext_string>(?:[^"]|\\")*)" tab$/
+     *
+     * @throws ExpectationException
+     * @param string $nodetext tab to click.
+     * @return void
+     */
+    public function i_switch_to_tab($nodetext) {
+        $xpath = "//*[contains(concat(' ', normalize-space(@class), ' '), ' tabtree ') or contains(concat(' ', normalize-space(@class), ' '), ' nav-tabs ')]" .
+                "//a[normalize-space(.)='" . $nodetext . "']";
+        $nodetoclick = $this->find('xpath', $xpath);
+
+        // Throw exception if no node found.
+        if (!$nodetoclick) {
+            throw new ExpectationException('Tab "' . $nodetext . '" not found"', $this->getSession());
+        }
+
+        $nodetoclick->click();
+    }
+
+    /**
      * Helper function to get top navigation node in tree.
      *
      * @throws ExpectationException if note not found.
