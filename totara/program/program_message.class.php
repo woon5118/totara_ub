@@ -433,9 +433,9 @@ abstract class prog_message {
             $template_values['%'.$prefix.'messagesubject%'] = array('name'=>$prefix.'messagesubject', 'value'=>null);
         }
         $helpbutton = $OUTPUT->help_icon('messagesubject', 'totara_program');
-        $templatehtml .= html_writer::start_tag('div', array('class' => 'fline'));
-        $templatehtml .= html_writer::tag('div', html_writer::tag('label', get_string('label:subject', 'totara_program') . ' ' . $helpbutton, array('for' => $prefix.'messagesubject')), array('class' => 'flabel'));
-        $templatehtml .= html_writer::tag('div', '%'.$prefix.'messagesubject%', array('class' => 'fitem'));
+        $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
+        $templatehtml .= html_writer::tag('div', html_writer::tag('label', get_string('label:subject', 'totara_program') . ' ' . $helpbutton, array('for' => $prefix.'messagesubject')), array('class' => 'fitemtitle'));
+        $templatehtml .= html_writer::tag('div', '%'.$prefix.'messagesubject%', array('class' => 'felement'));
         $templatehtml .= html_writer::end_tag('div');
         $formdataobject->{$prefix.'messagesubject'} = $safe_messagesubject;
 
@@ -447,9 +447,9 @@ abstract class prog_message {
             $template_values['%'.$prefix.'mainmessage%'] = array('name'=>$prefix.'mainmessage', 'value'=>null);
         }
         $helpbutton = $OUTPUT->help_icon('mainmessage', 'totara_program');
-        $templatehtml .= html_writer::start_tag('div', array('class' => 'fline'));
-        $templatehtml .= html_writer::tag('div', html_writer::tag('label', get_string('label:message', 'totara_program') . ' ' . $helpbutton, array('for' => $prefix.'mainmessage')), array('class' => 'flabel'));
-        $templatehtml .= html_writer::tag('div', '%'.$prefix.'mainmessage%', array('class' => 'fitem'));
+        $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
+        $templatehtml .= html_writer::tag('div', html_writer::tag('label', get_string('label:message', 'totara_program') . ' ' . $helpbutton, array('for' => $prefix.'mainmessage')), array('class' => 'fitemtitle'));
+        $templatehtml .= html_writer::tag('div', '%'.$prefix.'mainmessage%', array('class' => 'felement'));
         $templatehtml .= html_writer::end_tag('div');
         $formdataobject->{$prefix.'mainmessage'} = $safe_mainmessage;
 
@@ -483,9 +483,9 @@ abstract class prog_message {
             $template_values['%'.$prefix.'notifymanager%'] = array('name'=>$prefix.'notifymanager', 'value'=>null);
         }
         $helpbutton = $OUTPUT->help_icon('notifymanager', 'totara_program');
-        $templatehtml .= html_writer::start_tag('div', array('class' => 'fline'));
-        $templatehtml .= html_writer::tag('div', html_writer::tag('label', get_string('label:sendnoticetomanager', 'totara_program') . ' ' . $helpbutton, array('for' => 'id_' . $prefix . 'notifymanager')), array('class' => 'flabel'));
-        $templatehtml .= html_writer::tag('div', '%'.$prefix.'notifymanager%', array('class' => 'fitem'));
+        $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
+        $templatehtml .= html_writer::tag('div', html_writer::tag('label', get_string('label:sendnoticetomanager', 'totara_program') . ' ' . $helpbutton, array('for' => 'id_' . $prefix . 'notifymanager')), array('class' => 'fitemtitle'));
+        $templatehtml .= html_writer::tag('div', '%'.$prefix.'notifymanager%', array('class' => 'felement'));
         $templatehtml .= html_writer::end_tag('div');
         $formdataobject->{$prefix.'notifymanager'} = (bool)$this->notifymanager;
 
@@ -498,9 +498,9 @@ abstract class prog_message {
             $template_values['%'.$prefix.'managermessage%'] = array('name'=>$prefix.'managermessage', 'value'=>null);
         }
         $helpbutton = $OUTPUT->help_icon('managermessage', 'totara_program');
-        $templatehtml .= html_writer::start_tag('div', array('class' => 'fline'));
-        $templatehtml .= html_writer::tag('div', html_writer::tag('label', get_string('label:noticeformanager', 'totara_program') . ' ' . $helpbutton, array('for' => $prefix . 'managermessage')), array('class' => 'flabel'));
-        $templatehtml .= html_writer::tag('div', '%'.$prefix.'managermessage%', array('class' => 'fitem'));
+        $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
+        $templatehtml .= html_writer::tag('div', html_writer::tag('label', get_string('label:noticeformanager', 'totara_program') . ' ' . $helpbutton, array('for' => $prefix . 'managermessage')), array('class' => 'fitemtitle'));
+        $templatehtml .= html_writer::tag('div', '%'.$prefix.'managermessage%', array('class' => 'felement'));
         $templatehtml .= html_writer::end_tag('div');
         $formdataobject->{$prefix.'managermessage'} = $safe_managermessage;
 
@@ -538,11 +538,11 @@ abstract class prog_message {
             $template_values['%'.$prefix.'triggerperiod%'] = array('name'=>$prefix.'triggerperiod', 'value'=>null);
         }
         $helpbutton = $OUTPUT->help_icon('trigger', 'totara_program');
-        $templatehtml .= html_writer::start_tag('div', array('class' => 'fline'));
-        $templatehtml .= html_writer::tag('div', html_writer::tag('label', get_string('label:trigger', 'totara_program') . ' ' . $helpbutton, array('for' => $prefix.'triggernum')), array('class' => 'flabel'));
         $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
+        $templatehtml .= html_writer::tag('div', html_writer::tag('label', get_string('label:trigger', 'totara_program') . ' ' . $helpbutton, array('for' => $prefix.'triggernum')), array('class' => 'fitemtitle'));
+        $templatehtml .= html_writer::start_tag('div', array('class' => 'felement'));
         $templatehtml .= '%'.$prefix.'triggernum% %' . $prefix . 'triggerperiod% ';
-        $templatehtml .= html_writer::tag('label', $this->triggereventstr, array('for' => $prefix.'triggerperiod'));
+        $templatehtml .= html_writer::tag('span', $this->triggereventstr);
         $templatehtml .= html_writer::end_tag('div');
         $templatehtml .= html_writer::end_tag('div');
         $formdataobject->{$prefix.'triggernum'} = $this->triggernum;

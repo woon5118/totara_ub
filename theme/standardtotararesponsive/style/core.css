@@ -622,6 +622,7 @@ hr {
  * Fieldset class with borders shown by default
  */
 fieldset.surround,
+.display-program,
 .mform fieldset.surround {
     border-radius: 6px;
     -webkit-border-radius: 6px;

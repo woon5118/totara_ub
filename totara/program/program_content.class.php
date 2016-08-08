@@ -1029,6 +1029,8 @@ class prog_content {
         $templatehtml .= html_writer::end_tag('div');
 
         if (!$recurring) {
+            $templatehtml .= html_writer::start_tag('div',array('id' => 'addtoselect'));
+
             // Add the add content drop down
             if ($updateform) {
 
@@ -1053,7 +1055,7 @@ class prog_content {
             $templatehtml .= html_writer::start_tag('label', array('for' => 'contenttype'.$suffix)) . get_string('addnew', 'totara_program')
                                 . html_writer::end_tag('label');
             $templatehtml .= '%contenttype'.$suffix.'%';
-            $templatehtml .= ' '.get_string('toprogram', 'totara_program').' ';
+            $templatehtml .= html_writer::tag('span', get_string('toprogram', 'totara_program'));
 
             // Add the add content button
             if ($updateform) {
@@ -1067,6 +1069,8 @@ class prog_content {
                 $helpbutton = $OUTPUT->help_icon('addprogramcontent', 'totara_program');
             }
             $templatehtml .= $helpbutton;
+
+            $templatehtml .= html_writer::end_tag('div');
         }
 
         if ($iscertif) {

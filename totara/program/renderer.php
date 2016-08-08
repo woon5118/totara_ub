@@ -138,7 +138,7 @@ class totara_program_renderer extends plugin_renderer_base {
             'id' => 'category-'. $assignment_class->id));
         $html .= html_writer::start_tag('legend') . $assignment_class->name .  html_writer::end_tag('legend');
         $table = new html_table();
-        $table->attributes['class'] = 'invisiblepadded fullwidth';
+        $table->attributes['class'] = 'table table-striped invisiblepadded fullwidth';
         $colcount = 0;
         // Add the headers
         foreach ($headers as $header) {
@@ -186,7 +186,7 @@ class totara_program_renderer extends plugin_renderer_base {
     public function display_edit_assignment_form($id, $categories, $certificationpath) {
         $dropdown_options = array();
         $out = '';
-        $out .= html_writer::start_tag('form', array('name' => 'form_prog_assignments', 'method' => 'post'));
+        $out .= html_writer::start_tag('form', array('name' => 'form_prog_assignments', 'method' => 'post', 'class' => 'mform'));
         $out .= $this->output->heading(get_string('programassignments', 'totara_program'), 3);
 
         // Show the program time required so people know the minimum to set completion to.
@@ -232,7 +232,7 @@ class totara_program_renderer extends plugin_renderer_base {
             $out .= html_writer::start_tag('div', array('id' => 'category_select'));
             $out .= html_writer::tag('label', get_string('addnew', 'totara_program'), array('for' => 'menucategory_select_dropdown'));
             $out .= html_writer::select($dropdown_options, 'category_select_dropdown', array('initialvalue' => 1));
-            $out .= get_string('toprogram', 'totara_program');
+            $out .= html_writer::tag('span', get_string('toprogram', 'totara_program'));
             $out .= html_writer::tag('button', get_string('add'));
             $out .= html_writer::end_tag('div');
         }
@@ -295,7 +295,7 @@ class totara_program_renderer extends plugin_renderer_base {
     */
     public function print_search($programid, $previoussearch='', $resultcount = 0) {
         $url = new moodle_url('/totara/program/exceptions.php', array('id' => $programid));
-        $out = html_writer::start_tag('form', array('action' => $url->out(), 'method' => 'get'));
+        $out = html_writer::start_tag('form', array('action' => $url->out(), 'method' => 'get', 'id' => 'exceptionssearchform'));
         $out .= html_writer::tag('label', get_string('searchforindividual', 'totara_program'), array('for' => 'exception_search'));
         $out .= html_writer::empty_tag('input', array('type' => 'text', 'id' => "exception_search", 'name' => 'search', 'value' => $previoussearch));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "id", 'value' => $programid));
@@ -342,7 +342,7 @@ class totara_program_renderer extends plugin_renderer_base {
             $out .= html_writer::end_tag('div');
 
             $table = new html_table();
-            $table->attributes['class'] = 'fullwidth';
+            $table->attributes['class'] = 'table table-striped fullwidth';
             $table->id = 'exceptions';
             $table->head = array(
                 get_string('header:hash', 'totara_program'),
@@ -461,8 +461,7 @@ class totara_program_renderer extends plugin_renderer_base {
         $out .= html_writer::end_tag('div');
 
         $out .= html_writer::start_tag('div', array('id' => 'prog-completion-relative-date'));
-        $out .= html_writer::start_tag('label', array('for' => 'timeamount')) . get_string('completewithin', 'totara_program') .
-            html_writer::end_tag('label');
+        $out .= html_writer::tag('span', get_string('completewithin', 'totara_program'));
         $out .= program_utilities::print_duration_selector($prefix = '', $periodelementname = 'timeperiod', $periodvalue = '', $numberelementname = 'timeamount', $numbervalue = '1', $includehours = false);
         $out .= ' ' . get_string('of', 'totara_program') . ' ';
         $out .= $this->completion_events_dropdown();
