@@ -161,10 +161,6 @@ table.role_matrix td div.fitem div.fitemtitle {
     width:0;
 }
 
-img.smallicon {
-    vertical-align: top;
-}
-
 .dir-ltr div.previewer {
     float: right;
 }
@@ -174,40 +170,6 @@ img.smallicon {
 
 li.yui3-dd-draggable {
     cursor: move;
-}
-
-.move-target {
-    background-color: #ddffd6 !important;
-}
-
-/* modal dialogs */
-.path-admin-totara-appraisal.yui3-skin-sam .yui3-panel-content,
-.path-totara-appraisal.yui3-skin-sam .yui3-panel-content {
-    border: none;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.path-admin-totara-appraisal.yui3-skin-sam .yui3-panel-content .yui3-widget-hd,
-.path-totara-appraisal.yui3-skin-sam .yui3-panel-content .yui3-widget-hd {
-    background: #f5f5f5;
-    color: #444444;
-    font-weight: bold;
-}
-
-.path-admin-totara-appraisal.yui3-skin-sam .yui3-panel-content .yui3-widget-hd,
-.path-admin-totara-appraisal.yui3-skin-sam .yui3-panel-content .yui3-widget-bd,
-.path-totara-appraisal.yui3-skin-sam .yui3-panel-content .yui3-widget-hd,
-.path-totara-appraisal.yui3-skin-sam .yui3-panel-content .yui3-widget-bd {
-    -webkit-border-top-left-radius: 5px;
-    -webkit-border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-}
-
-.path-admin-totara-appraisal.yui3-skin-sam .yui3-panel .yui3-widget-ft,
-.path-totara-appraisal.yui3-skin-sam .yui3-panel .yui3-widget-ft {
-    background: none;
 }
 
 .appraisal-stage {
@@ -256,13 +218,6 @@ li.yui3-dd-draggable {
     float: left;
 }
 
-.dir-ltr .appraisal-headerbuttons .singlebutton {
-    float: left;
-}
-.dir-rtl .appraisal-headerbuttons .singlebutton {
-    float: right;
-}
-
 .appraisal-stagelist {
     clear: both;
     margin: 15px 0;
@@ -305,18 +260,6 @@ li.yui3-dd-draggable {
 
 .appraisal-stageactions input[type="submit"] {
   width: 120px;
-}
-
-.dir-ltr .verticaltabtree img.smallicon {
-  margin-right: 3px;
-}
-
-.dir-rtl .verticaltabtree img.smallicon {
-  margin-left: 3px;
-}
-
-input[type=text] {
-  max-width: 335px;
 }
 
 input[type=text].appraisal-event-time {
@@ -394,10 +337,6 @@ form.print-stages-form .fitem .fitemtitle {
     margin-left: 5pt;
 }
 
-.fwhitespace {
-    height: 48pt;
-}
-
 #savepdf.yui-isloading {
     background-image: url([[pix:i/loading]]);
     background-repeat: no-repeat;
@@ -406,10 +345,6 @@ form.print-stages-form .fitem .fitemtitle {
 
 #assignedgroups {
     padding-top: 1em;
-}
-
-#assignedusers .dataTables_length {
-    padding-bottom: 1em;
 }
 
 @media print {

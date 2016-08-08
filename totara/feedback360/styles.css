@@ -94,14 +94,6 @@ ul.feedback360-quest-list li.selected {
     transition: background-color 100ms linear;
 }
 
-li.yui3-dd-draggable {
-    cursor: move;
-}
-
-.move-target {
-    background-color: #ddffd6 !important;
-}
-
 #id_requestedemails{
     width: 60%;
 }
