@@ -59,7 +59,7 @@ Feature: Administrators can add a custom URL field to complete during course cre
     When I set the following fields to these values:
       | customfield_url1[url] | https://www.totaralms.com  |
     And I press "Save and display"
-    Then I should see "Course 1"
+    Then I should see "Course 1" in the page title
     And I log out
 
 
@@ -83,7 +83,7 @@ Feature: Administrators can add a custom URL field to complete during course cre
       | Course full name  | Course 1 |
       | Course short name | course1  |
     And I press "Save and display"
-    Then I should see "Course 1"
+    Then I should see "Course 1" in the page title
     And I log out
 
 
@@ -177,7 +177,7 @@ Feature: Administrators can add a custom URL field to complete during course cre
       | customfield_url3[text]   | My Learning               |
       | customfield_url3[target] | 0                         |
     And I press "Save and display"
-    Then I should see "Course 1"
+    Then I should see "Course 1" in the page title
 
     # Check the field have been set correctly
     When I navigate to "Edit settings" node in "Course administration"

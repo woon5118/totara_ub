@@ -45,7 +45,7 @@ Feature: Administrators can add a regex to custom text input field
       | shortname             | course1                                        |
       | customfield_textinput | https://www.totaralms.com/solutions/totara-lms |
     And I press "Save and display"
-    Then I should see "Course One"
+    Then I should see "Course One" in the page title
     And I navigate to "Edit settings" node in "Course administration"
     And I expand all fieldsets
     And the field "customfield_textinput" matches value "https://www.totaralms.com/solutions/totara-lms"

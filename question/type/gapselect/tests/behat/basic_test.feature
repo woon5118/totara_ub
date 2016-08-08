@@ -128,7 +128,7 @@ Feature: Test all the basic functionality of this question type
       | Confirmation | Filename | test_backup.mbz |
     When I restore "test_backup.mbz" backup into a new course using this options:
       | Schema | Course name | Course 2 |
-    Then I should see "Course 2"
+    Then I should see "Course 2" in the page title
     When I navigate to "Question bank" node in "Course administration"
     Then I should see "Select missing words 001"
 

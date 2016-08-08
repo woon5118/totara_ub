@@ -49,7 +49,7 @@ Feature: Administrators can add a custom multi-select field to complete during c
       | shortname                         | course1    |
       | customfield_custommultiselect[0]  | 1          |
     And I press "Save and display"
-    Then I should see "Course One"
+    Then I should see "Course One" in the page title
 
     When I navigate to "Edit settings" node in "Course administration"
     And I expand all fieldsets
