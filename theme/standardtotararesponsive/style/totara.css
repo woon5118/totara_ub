@@ -541,3 +541,8 @@ fieldset .felement input[type='button'],
 fieldset .felement input[type='submit'] {
     margin-bottom: 0;
 }
+
+/* Old unhealthy CSS from totara/appraisal/styles.css */
+div.tabtree {
+    margin-bottom: 10px;
+}

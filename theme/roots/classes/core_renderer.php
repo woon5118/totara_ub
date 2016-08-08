@@ -111,7 +111,8 @@ class theme_roots_core_renderer extends core_renderer {
                 $secondrow = $this->tabtree($tab->subtree);
             }
         }
-        return html_writer::tag('ul', $firstrow, array('class' => 'nav nav-tabs')) . $secondrow;
+        // Note: the tabtree class is necessary to get existing behat tests pass both in new and old themes.
+        return html_writer::tag('ul', $firstrow, array('class' => 'tabtree nav nav-tabs')) . $secondrow;
     }
 
     protected function render_tabobject(tabobject $tab) {
