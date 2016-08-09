@@ -119,7 +119,7 @@ $THEME->layouts = array(
     'login' => array(
         'file' => 'default.php',
         'regions' => array(),
-        'options' => array('langmenu' => true, 'nonavbar' => true),
+        'options' => array('langmenu' => true, 'nocustommenu' => true, 'nonavbar' => true),
     ),
 
     // Pages that appear in pop-up windows - no navigation, no blocks, no header.

@@ -51,7 +51,7 @@ $themerenderer = $PAGE->get_renderer('theme_roots');
 // TODO improve on this legacy approach.
 $hastotaramenu = false;
 $totaramenu = '';
-if (isloggedin() && empty($PAGE->layout_options['nocustommenu'])) {
+if (empty($PAGE->layout_options['nocustommenu'])) {
     $menudata = totara_build_menu();
     $totara_core_renderer = $PAGE->get_renderer('totara_core');
     $totaramenu = $totara_core_renderer->totara_menu($menudata);
