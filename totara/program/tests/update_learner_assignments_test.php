@@ -1710,8 +1710,6 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
     public function test_assigning_manager_hierarchy() {
         global $DB;
 
-        $timebefore = time();
-
         $topmanager1 = $this->getDataGenerator()->create_user();
         $topmanager1ja = \totara_job\job_assignment::create_default($topmanager1->id);
         $topmanager2 = $this->getDataGenerator()->create_user();
@@ -1745,6 +1743,8 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
             array('programid' => $this->program->id)));
         $this->assertEquals(0, $DB->count_records('prog_completion',
             array('programid' => $this->program->id)));
+
+        $timebefore = time();
 
         // Update_learner_assignments is also run within the assign_to_program generator methods.
         $generator = $this->getDataGenerator();
@@ -1822,8 +1822,6 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
     public function test_change_in_manager_hierarchy() {
         global $DB;
 
-        $timebefore = time();
-
         $topmanager1 = $this->getDataGenerator()->create_user();
         $topmanager1ja = \totara_job\job_assignment::create_default($topmanager1->id);
         $topmanager2 = $this->getDataGenerator()->create_user();
@@ -1855,13 +1853,13 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         $this->assertEquals(0, $DB->count_records('prog_completion',
             array('programid' => $this->program->id)));
 
+        $timebefore = time();
+
         // Update_learner_assignments is also run within the assign_to_program generator methods.
         $generator = $this->getDataGenerator();
         $generator->assign_to_program($this->program->id, ASSIGNTYPE_MANAGERJA, $topmanager1ja->id,
             array('includechildren' => 1));
         $generator->assign_to_program($this->program->id, ASSIGNTYPE_MANAGERJA, $topmanager2ja->id);
-
-        $timeafter = time();
 
         // Check that records exist.
         $this->assertEquals(2, $DB->count_records('prog_assignment',
@@ -1880,6 +1878,8 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
         // Update learner assignments and then we'll check each record is correct.
         $this->program->update_learner_assignments(true);
+
+        $timeafter = time();
 
         // $manager3 and $user4 should now been assigned.
         $assignedusers = array($manager2, $manager4, $user3, $manager3, $user4);
