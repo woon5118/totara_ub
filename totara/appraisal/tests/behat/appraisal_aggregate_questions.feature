@@ -58,7 +58,7 @@ Feature: Perform basic actions for aggregate questions
       When I log in as "admin"
       And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
       And I click on "Aggregate Tests" "link"
-      And I click on "Content" "link" in the ".tabrow0" "css_element"
+      And I click on "Content" "link" in the ".tabtree" "css_element"
       And I click on "Stage1" "link" in the ".appraisal-stages" "css_element"
       And I click on "Stage1-Aggregates" "link" in the ".appraisal-page-container" "css_element"
       And I click on "Settings" "link" in the "S1-Aggregate" "list_item"

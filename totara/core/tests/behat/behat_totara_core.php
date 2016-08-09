@@ -48,6 +48,8 @@ class behat_totara_core extends behat_base {
     public function i_should_see_the_tab_is_disabled($text) {
         $text = $this->getSession()->getSelectorsHandler()->xpathLiteral($text);
         $xpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' tabtree ')]//a[contains(concat(' ', normalize-space(@class), ' '), ' nolink ') and not(@href)]/*[contains(text(), {$text})]";
+        // Bootstrap 3 has different markup.
+        $xpath .= "| //ul[contains(concat(' ', normalize-space(@class), ' '), ' tabtree ')]/li[contains(concat(' ', normalize-space(@class), ' '), ' disabled ')]/a[not(@href) and contains(text(), {$text})]";
         $this->find(
             'xpath',
             $xpath,

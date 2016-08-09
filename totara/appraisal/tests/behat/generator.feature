@@ -96,7 +96,7 @@ Feature: Verify appraisal data generators.
     And I should see "firstname2 lastname2"
     And I should see "firstname3 lastname3"
 
-    When I click on "Messages" "link" in the ".tabrow0" "css_element"
+    When I click on "Messages" "link" in the ".tabtree" "css_element"
     Then I should see "Message 1" in the "1" "table_row"
     Then I should see "Appraisal activation" in the "1" "table_row"
     Then I should see "Immediate" in the "1" "table_row"
