@@ -203,7 +203,7 @@ $removeenabled = $canunenrol ? '' : 'disabled="disabled"';
       <?php $potentialuserselector->display() ?>
     </div>
   </div>
-</form>
+</div></form>
 <?php
 
 
