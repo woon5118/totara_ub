@@ -79,8 +79,12 @@ $string['allowduplicatedemails'] = 'Allow duplicate emails';
 $string['allowduplicatedemailsdesc'] = 'If "Yes" duplicated emails are allowed from the source. If "No" only unique emails are allowed.';
 $string['defaultemailaddress'] = 'Default Email Address';
 $string['emailsettingsdesc'] = 'If duplicate emails are allowed you can set a default email address that will be used when creating/updating users with a blank or invalid email. If duplicates are not allowed every user must have a unique email, if they do not they will be skipped.';
-$string['multiplejobassignment'] = 'Multiple job assignments';
-$string['multiplejobassignmentdesc'] = 'Enabling this option will require user\'s job assignment and manager\'s job assignment fields in source to correctly assign users to their managers jobs. Otherwise all imported users will be assigned to managers first job assignment.';
+$string['linkjobassignmentidnumber'] = 'Link job assignments';
+$string['linkjobassignmentidnumberfalse'] = 'to the user\'s first job assignment';
+$string['linkjobassignmentidnumbertrue'] = 'using the user\'s job assignment ID number';
+$string['linkjobassignmentidnumberdesc'] = 'If job assignment data is provided in the import, it will be linked to existing job assignment records using this method. If linking to the user\'s first job assignment, only one job assignment record can be provided in the import for each user.<br>
+<br>
+Note that the first time an import is performed \'using the user\'s job assignment ID number\' setting, this will become permanently set and the setting will be removed from this form. Make sure that you import job assignment ID Numbers by linking \'to the user\'s first job assignment\' before changing this option.';
 $string['ignoreexistingpass'] = 'Only import new users\' passwords';
 $string['ignoreexistingpassdesc'] = 'If "Yes" passwords are only updated for new users, if "No" all users\' passwords are updated';
 $string['forcepwchange'] = 'Force password change for new users';
@@ -151,6 +155,7 @@ $string['phone2'] = 'Phone 2';
 $string['address'] = 'Address';
 $string['orgidnumber'] = 'Organisation';
 $string['jobassignmentidnumber'] = 'Job assignment ID number';
+$string['jobassignmentidnumberrequired'] = 'Job assignment ID number must be included when providing other job assignment fields';
 $string['jobassignmentfullname'] = 'Job assignment full name';
 $string['jobassignmentenddate'] = 'Job assignment end date';
 $string['jobassignmentstartdate'] = 'Job assignment start date';
@@ -197,6 +202,9 @@ $string['databaseemptynullinfo'] = 'The use of empty strings in your external da
 ///
 /// Log messages
 ///
+$string['jobassignmentidnumberemptyx'] = 'Job assignment id number cannot be empty. Skipped job assignment for user {$a->idnumber}';
+$string['multiplejobassignmentsdisabledmanagerx'] = 'Tried to create a manager\'s job assignment but multiple job assignments site setting is disabled and the manager already has a different job assignment. Skipped job assignment for user {$a->idnumber}';
+$string['multiplejobassignmentsdisabledx'] = 'Tried to create a job assignment but multiple job assignments site setting is disabled and a job assignment already exists. Skipped job assignment for user {$a->idnumber}';
 $string['syncnotconfiguredsummary'] = 'HR Import is not configured properly. Please, fix the issues before running: {$a}';
 $string['syncnotconfigured'] = 'HR Import is not configured properly. Please, fix the issues before running.';
 $string['temptableprepfail'] = 'temp table preparation failed';
@@ -247,8 +255,8 @@ $string['cannotsetuserpassword'] = 'cannot set user password (user:{$a})';
 $string['cannotsetuserpasswordnoauthsupport'] = 'cannot set user password (user:{$a}), auth plugin does not support password changes';
 $string['updateduserx'] = 'updated user {$a}';
 $string['reviveduserx'] = 'revived user {$a}';
+$string['cannotimportjobassignments'] = 'Cannot create job assignment (user: {$a})';
 $string['cannotreviveuserx'] = 'cannot revive user {$a}';
-$string['cannotcreateuserassignments'] = 'cannot create user assignments (user: {$a})';
 $string['createduserx'] = 'created user {$a}';
 $string['cannotcreateuserx'] = 'cannot create user {$a}';
 $string['invalidauthforuserx'] = 'invalid authentication plugin {$a}';
@@ -272,9 +280,6 @@ $string['duplicateusersemailxdb'] = 'Email {$a->email} is already registered. Sk
 $string['duplicateidnumberx'] = 'Duplicate idnumber {$a}';
 $string['emptyvalueemailx'] = 'Email cannot be empty (duplicates not allowed). Skipped user {$a->idnumber}';
 $string['emptyvaluefirstnamex'] = 'First name cannot be empty. Skipped user {$a->idnumber}';
-$string['emptyvaluejobassignmentidnumberx'] = 'Job assignment cannot be empty. Skipped user {$a->idnumber}';
-$string['emptyvaluemanagerjobassignmentidnumberx'] = 'Manager\'s job assignment cannot be empty. Skipped user {$a->idnumber}';
-$string['emptyvaluemanageridnumberx'] = 'Manager\'s id number cannot be empty. Skipped user {$a->idnumber}';
 $string['emptyvalueidnumberx'] = 'Idnumber cannot be empty. Skipped user {$a->idnumber}';
 $string['emptyvaluelastnamex'] = 'Last name cannot be empty. Skipped user {$a->idnumber}';
 $string['emptyvaluepasswordx'] = 'Password cannot be empty. Skipped user {$a->idnumber}';
@@ -285,7 +290,12 @@ $string['invalidlangx'] = 'Invalid language specified for user {$a->idnumber}';
 $string['nosynctablemethodforsourcex'] = 'Source {$a} has no get_sync_table method. This needs to be fixed by a programmer.';
 $string['sourcefilexnotfound'] = 'Source file {$a} not found.';
 $string['sourceclassxnotfound'] = 'Source class {$a} not found. This must be fixed by a programmer.';
+$string['managerassignmanagerxnotexist'] = 'Manager {$a->manageridnumber} does not exist. Skipped manager assignment for user {$a->idnumber}';
 $string['managerassignwoidnumberx'] = 'Manager idnumber is required when manager job assignment is provided. Skipped manager assignment for user {$a->idnumber}';
+$string['managerassignwojaidx'] = 'Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user {$a->idnumber}';
+$string['managerassigncanthavejaid'] = 'Manager\'s job assignment idnumber can only be provided if linking by idnumber (invalid configuration)';
+$string['managerassignmissingmanagerjobx'] = 'Manager\'s job assignment must already exist in database or be in the import. Skipped manager assignment for user {$a->idnumber}';
+$string['managerassignmissingjobx'] = 'User\'s job assignment must already exist in database or be in the import. Skipped manager assignment for user {$a->idnumber}';
 $string['nosourceenabled'] = 'No source enabled for this element.';
 
 $string['syncexecute'] = 'Run HR Import';
@@ -375,6 +385,7 @@ $string['csvencoding'] = 'CSV file encoding';
 $string['eventsynccompleted'] = 'HR Import completed';
 
 // Deprecated.
+$string['cannotcreateuserassignments'] = 'cannot create user assignments (user: {$a})';
 $string['posenddate'] = 'Position end date';
 $string['posstartdate'] = 'Position start date';
 $string['posstartdateafterenddate'] = 'Position start date must not be later than end date for user {$a->idnumber}';

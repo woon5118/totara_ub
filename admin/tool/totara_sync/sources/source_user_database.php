@@ -281,19 +281,12 @@ class totara_sync_source_user_database extends totara_sync_source_user {
             $database_dateformat = get_config('totara_sync_source_user_database', 'database_dateformat');
 
             foreach ($datefields as $datefield) {
-                if (isset($extdbrow[$datefield])) {
-                    if (empty($extdbrow[$datefield])) {
-                        $dbrow[$datefield] = 0;
-                    } else {
-                        // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
-                        $parsed_date = totara_date_parse_from_format($database_dateformat, trim($extdbrow[$datefield]), true);
-                        if ($parsed_date) {
-                            $dbrow[$datefield] = $parsed_date;
-                        }
+                if (!empty($extdbrow[$datefield])) {
+                    // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
+                    $parsed_date = totara_date_parse_from_format($database_dateformat, trim($extdbrow[$datefield]), true);
+                    if ($parsed_date) {
+                        $dbrow[$datefield] = $parsed_date;
                     }
-                } else {
-                    // This may be NULL, lets set to 0 to mirror behaviour of the CVS data source.
-                    $dbrow[$datefield] = 0;
                 }
             }
 

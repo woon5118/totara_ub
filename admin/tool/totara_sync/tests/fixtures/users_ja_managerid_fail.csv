@@ -1,4 +1,0 @@
-idnumber,username,email,firstname,lastname,password,timemodified,deleted,jobassignmentidnumber,manageridnumber,managerjobassignmentidnumber
-23,manager01,manager01@example.com,manager01,manager01,Totara+1,1429586866,0,m1,,
-15,learner13,learner13@example.com,learner13,learner13,Totara+1,1429586866,0,l1,,m1
-16,learner14,learner14@example.com,learner14,learner14,Totara+1,1429586866,0,l1,23,m1

@@ -110,8 +110,11 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
 
         $rs = $DB->get_recordset_sql($sql);
 
+        $iscsvimport = substr(get_class($this->get_source()), -4) === '_csv';
+        $saveemptyfields = !$iscsvimport || !empty($this->config->csvsaveemptyfields);
+
         foreach ($rs as $item) {
-            $this->sync_item($item, $synctable);
+            $this->sync_item($item, $synctable, $saveemptyfields);
         }
         $rs->close();
 
@@ -146,21 +149,17 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
      *
      * @param stdClass $newitem object with escaped values
      * @param string $synctable sync table name
+     * @param bool $saveemptyfields true if empty strings should erase data, false if the field should be ignored
      * @return bool true because someone didn't like calling return without a value
      * @throws totara_sync_exception
      */
-    function sync_item($newitem, $synctable) {
+    function sync_item($newitem, $synctable, $saveemptyfields) {
         global $DB;
 
         if (empty($this->config->allow_create) && empty($this->config->allow_update)) {
             // not allowed to create/update, so return early
             return true;
         }
-
-        $iscsvimport =
-            get_class($this->get_source()) === 'totara_sync_source_pos_csv' ||
-            get_class($this->get_source()) === 'totara_sync_source_org_csv';
-        $saveemptyfields = !$iscsvimport || !empty($this->config->csvsaveemptyfields);
 
         $elname = $this->get_name();
 
@@ -181,7 +180,7 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
                     $newitem->parentidnumber);
             }
             try {
-                $this->sync_item($newparent, $synctable);
+                $this->sync_item($newparent, $synctable, $saveemptyfields);
             } catch (totara_sync_exception $e) {
                 throw new totara_sync_exception($elname, 'syncitem', 'cannotsyncitemparent',
                     $newitem->parentidnumber, $e->getMessage());

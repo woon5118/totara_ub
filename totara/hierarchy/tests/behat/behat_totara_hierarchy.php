@@ -175,11 +175,13 @@ class behat_totara_hierarchy extends behat_base {
             'fullname',
             'shortname',
             'idnumber',
+            'startdate',
+            'enddate',
+            'organisation', // ID number.
+            'position', // ID number.
             'manager', // Username.
             'managerjaidnumber', // String.
             'appraiser', // Username.
-            'organisation', // ID number.
-            'position', // ID number.
             'tempmanager', // Username.
             'tempmanagerjaidnumber', // String.
             'tempmanagerexpirydate', // Unix datetime

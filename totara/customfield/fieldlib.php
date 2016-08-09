@@ -622,6 +622,11 @@ function customfield_save_data($itemnew, $prefix, $tableprefix, $sync = false, $
         $newfield = 'customfield_'.$field->datatype;
         $formfield = new $newfield($field->id, $itemnew, $prefix, $tableprefix, $addsuffix);
         if ($sync) {
+            $fieldname = $formfield->inputname;
+            if (!isset($itemnew->$fieldname)) {
+                // The data doesn't exist, so don't update the existing value.
+                continue;
+            }
             $itemnew = $formfield->sync_data_preprocess($itemnew);
         }
         $formfield->edit_save_data($itemnew, $prefix, $tableprefix);
