@@ -68,12 +68,19 @@ class behat_editor_atto extends behat_base {
      * @return array
      */
     public function assert_page_contains_list_from_atto($text) {
+        global $CFG;
+
         $driver = $this->getSession()->getDriver();
         if (method_exists($driver, 'getBrowser')) {
             $browser = $driver->getBrowser();
             if ($browser === 'chrome' or $browser === 'safari') {
-                $text = str_replace('<ol><li>', '<ol><li><span style=\\"color:rgb(51,51,51);\\">', $text);
-                $text = str_replace('<ul><li>', '<ul><li><span style=\\"color:rgb(51,51,51);\\">', $text);
+                if ($CFG->theme === 'standardtotararesponsive') {
+                    $text = str_replace('<ol><li>', '<ol><li><span style=\\"color:rgb(51,51,51);\\">', $text);
+                    $text = str_replace('<ul><li>', '<ul><li><span style=\\"color:rgb(51,51,51);\\">', $text);
+                } else {
+                    $text = str_replace('<ol><li>', '<ol><li><span style=\\"line-height:1.42857;\\">', $text);
+                    $text = str_replace('<ul><li>', '<ul><li><span style=\\"line-height:1.42857;\\">', $text);
+                }
             }
         }
 
