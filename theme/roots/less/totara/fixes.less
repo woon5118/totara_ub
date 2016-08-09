@@ -123,3 +123,12 @@ a.skip:focus {
     padding: 15px;
     width: auto;
 }
+
+// Behat sees the new sr-only stuff as visible,
+// but it must not see the old accesshide class for backwards compatibility.
+// This may be removed only after we drop support for old themes and fix all behat tests.
+body.behat-site {
+    .accesshide {
+        display:none
+    }
+}
