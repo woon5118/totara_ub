@@ -142,6 +142,16 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $sessiondata->facetoface = $facetoface->id;
         $sessiondata->registrationtimestart = $registrationtimestart;
         $sessiondata->registrationtimefinish = $registrationtimefinish;
+
+        // We need to ensure the session is in the future.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + 2 * DAYSECS;
+        $sessiondate->timefinish = time() + 3 * DAYSECS;
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondate->roomid = 0;
+        $sessiondate->assetids = array();
+        $sessiondata->sessiondates = array($sessiondate);
+
         $sessionid = $this->facetoface_generator->add_session($sessiondata);
         $session = facetoface_get_session($sessionid);
 
