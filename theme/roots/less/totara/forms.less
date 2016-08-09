@@ -22,3 +22,7 @@
 // @package   theme_roots
 
 @import "moodle/forms";
+
+div#dateselector-calendar-panel {
+    z-index: 3100; /* Fix for calendar pickers in dialogs & filepickers - see MDL-39047. */
+}
