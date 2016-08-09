@@ -380,6 +380,40 @@ function totara_core_upgrade_multiple_jobs() {
                                       WHERE u.deleted = 1)";
         $DB->execute($sql);
 
+        // Face to face 2014100902.
+        // As with hierarchies, facetoface upgrades to some columns need to happen before they are renamed or removed.
+        $facetofacetable = new xmldb_table('facetoface');
+        $field = new xmldb_field('selectpositiononsignup', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $field->setComment('Users with multiple positions will select one on signup');
+        if (!$dbman->field_exists($facetofacetable, $field)) {
+            $dbman->add_field($facetofacetable, $field);
+        }
+
+        $field = new xmldb_field('forceselectposition', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $field->setComment('Error if no suitable position is available when signing up');
+        if (!$dbman->field_exists($facetofacetable, $field)) {
+            $dbman->add_field($facetofacetable, $field);
+        }
+
+        $facetofacesignupstable = new xmldb_table('facetoface_signups');
+        $field = new xmldb_field('positionid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $field->setComment('If required, the position the user is doing the training for');
+        if (!$dbman->field_exists($facetofacesignupstable, $field)) {
+            $dbman->add_field($facetofacesignupstable, $field);
+        }
+
+        $field = new xmldb_field('positiontype', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $field->setComment('If required, the position type (prim, sec, asp) the user is doing the training for');
+        if (!$dbman->field_exists($facetofacesignupstable, $field)) {
+            $dbman->add_field($facetofacesignupstable, $field);
+        }
+
+        $field = new xmldb_field('positionassignmentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $field->setComment('If required, the position assignment the user is doing the training for');
+        if (!$dbman->field_exists($facetofacesignupstable, $field)) {
+            $dbman->add_field($facetofacesignupstable, $field);
+        }
+
         // Part 2: Move aspirational position data into new table.
         require_once($CFG->dirroot . '/totara/gap/db/upgradelib.php');
         totara_gap_install_aspirational_pos();
@@ -460,20 +494,27 @@ function totara_core_upgrade_multiple_jobs() {
 
         // Create default temp manager sortorder 1 records where the temp managers have none already.
         // Done here rather than later becase we're going to calculate the managerjapths next, on all records, regardless of manager.
-        $sql = "INSERT INTO {pos_assignment} (userid, idnumber, sortorder, timecreated, timemodified, usermodified, positionassignmentdate)
-                    (SELECT DISTINCT tm.tempmanagerid, 1, 1, {$now}, {$now}, {$modifiedid}, {$now}
-                       FROM {temporary_manager} tm
-                  LEFT JOIN {pos_assignment} pa ON tm.tempmanagerid = pa.userid AND pa.sortorder = 1
-                      WHERE pa.id IS NULL)";
-        $DB->execute($sql);
+        $tempmantable = new xmldb_table('temporary_manager');
+        if ($dbman->table_exists($tempmantable)) {
+            $sql = "INSERT INTO {pos_assignment} (userid, idnumber, sortorder, timecreated, timemodified, usermodified, positionassignmentdate)
+                        (SELECT DISTINCT tm.tempmanagerid, 1, 1, {$now}, {$now}, {$modifiedid}, {$now}
+                           FROM {temporary_manager} tm
+                      LEFT JOIN {pos_assignment} pa ON tm.tempmanagerid = pa.userid AND pa.sortorder = 1
+                          WHERE pa.id IS NULL)";
+            $DB->execute($sql);
+        }
 
         // Set managerjaid and tempmanagerjaid based on managerid and tempporary_manager.tempmanagerid.
         $allposassigns = $DB->get_recordset_select('pos_assignment', null, null, '', 'id, userid, managerid');
         $alluserfirstposassigns = $DB->get_records('pos_assignment', array('sortorder' => 1), '', 'userid, id');
-        $sql = "SELECT userid, tempmanagerid, MAX(expirytime) AS expirydate
-                  FROM {temporary_manager}
-                 GROUP BY userid, tempmanagerid";
-        $allusertempmanagers = $DB->get_records_sql($sql);
+        if ($dbman->table_exists($tempmantable)) {
+            $sql = "SELECT userid, tempmanagerid, MAX(expirytime) AS expirydate
+                      FROM {temporary_manager}
+                     GROUP BY userid, tempmanagerid";
+            $allusertempmanagers = $DB->get_records_sql($sql);
+        } else {
+            $allusertempmanagers = array();
+        }
         $i = 0;
         $total = $DB->count_records('pos_assignment');
         if ($total > 0) {
@@ -627,46 +668,48 @@ function totara_core_upgrade_multiple_jobs() {
         // that all primary pos_assignment records were created as sortorder 1 job assignments,
         // so there should be no changes to managers etc. Worst case, they will be tidied up by cron.
 
-        // Create default appriasee sortorder 1 records where the appraisees have none already.
-        $sql = "INSERT INTO {job_assignment} (userid, idnumber, sortorder, managerjapath, timecreated, timemodified, usermodified, positionassignmentdate)
-                    (SELECT DISTINCT aua.userid, 1, 1, 'setme', {$now}, {$now}, {$modifiedid}, {$now}
-                       FROM {appraisal_user_assignment} aua
-                  LEFT JOIN {job_assignment} ja ON aua.userid = ja.userid AND ja.sortorder = 1
-                      WHERE ja.id IS NULL)";
-        $DB->execute($sql);
-
-        // The user can't have a manager, so the managerjapath is trivial.
-        $sql = "UPDATE {job_assignment} SET managerjapath = " . $DB->sql_concat("'/'", 'id') . " WHERE managerjapath = 'setme'";
-        $DB->execute($sql);
-
         $appruserassigntable = new xmldb_table('appraisal_user_assignment');
-        $field = new xmldb_field('jobassignmentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'userid');
-        if (!$dbman->field_exists($appruserassigntable, $field)) {
-
-            // Add jobassignmentid and jobassignmentlastmodified fields to appraisal_user_assignment.
-            $dbman->add_field($appruserassigntable, $field);
-            $field = new xmldb_field('jobassignmentlastmodified', XMLDB_TYPE_INTEGER, '18');
-            $dbman->add_field($appruserassigntable, $field);
-
-            // And a key.
-            $dbman->add_key(
-                $appruserassigntable,
-                new xmldb_key('appruserassi_job_fk', XMLDB_KEY_FOREIGN, ['jobassignmentid'], 'job_assignment', ['id'])
-            );
-
-            // Update jobassignmentid and jobassignmentlastmodified fields.
-            $sql = "UPDATE {appraisal_user_assignment}
-                       SET jobassignmentid =
-                            (SELECT ja.id
-                               FROM {job_assignment} ja
-                              WHERE ja.userid = {appraisal_user_assignment}.userid
-                                AND ja.sortorder = 1),
-                           jobassignmentlastmodified =
-                            (SELECT ja.timemodified
-                               FROM {job_assignment} ja
-                              WHERE ja.userid = {appraisal_user_assignment}.userid
-                                AND ja.sortorder = 1)";
+        if ($dbman->table_exists($appruserassigntable)) {
+            // Create default appriasee sortorder 1 records where the appraisees have none already.
+            $sql = "INSERT INTO {job_assignment} (userid, idnumber, sortorder, managerjapath, timecreated, timemodified, usermodified, positionassignmentdate)
+                        (SELECT DISTINCT aua.userid, 1, 1, 'setme', {$now}, {$now}, {$modifiedid}, {$now}
+                           FROM {appraisal_user_assignment} aua
+                      LEFT JOIN {job_assignment} ja ON aua.userid = ja.userid AND ja.sortorder = 1
+                          WHERE ja.id IS NULL)";
             $DB->execute($sql);
+
+            // The user can't have a manager, so the managerjapath is trivial.
+            $sql = "UPDATE {job_assignment} SET managerjapath = " . $DB->sql_concat("'/'", 'id') . " WHERE managerjapath = 'setme'";
+            $DB->execute($sql);
+
+            $field = new xmldb_field('jobassignmentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'userid');
+            if (!$dbman->field_exists($appruserassigntable, $field)) {
+
+                // Add jobassignmentid and jobassignmentlastmodified fields to appraisal_user_assignment.
+                $dbman->add_field($appruserassigntable, $field);
+                $field = new xmldb_field('jobassignmentlastmodified', XMLDB_TYPE_INTEGER, '18');
+                $dbman->add_field($appruserassigntable, $field);
+
+                // And a key.
+                $dbman->add_key(
+                    $appruserassigntable,
+                    new xmldb_key('appruserassi_job_fk', XMLDB_KEY_FOREIGN, ['jobassignmentid'], 'job_assignment', ['id'])
+                );
+
+                // Update jobassignmentid and jobassignmentlastmodified fields.
+                $sql = "UPDATE {appraisal_user_assignment}
+                           SET jobassignmentid =
+                                (SELECT ja.id
+                                   FROM {job_assignment} ja
+                                  WHERE ja.userid = {appraisal_user_assignment}.userid
+                                    AND ja.sortorder = 1),
+                               jobassignmentlastmodified =
+                                (SELECT ja.timemodified
+                                   FROM {job_assignment} ja
+                                  WHERE ja.userid = {appraisal_user_assignment}.userid
+                                    AND ja.sortorder = 1)";
+                $DB->execute($sql);
+            }
         }
 
         // Part 8: Face to face.
@@ -680,7 +723,10 @@ function totara_core_upgrade_multiple_jobs() {
 
         // Remove positiontype and positionid fields (they always ment to be consistent to positionassignmentid).
         $table = new xmldb_table('facetoface_signups');
-        $oldfields = [new xmldb_field('positiontype'), new xmldb_field('positionid')];
+        $oldfields = [
+            new xmldb_field('positiontype'),
+            new xmldb_field('positionid'),
+        ];
         foreach ($oldfields as $oldfield) {
             if ($dbman->field_exists($table, $oldfield)) {
                 $dbman->drop_field($table, $oldfield);

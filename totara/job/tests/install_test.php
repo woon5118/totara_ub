@@ -201,10 +201,19 @@ class totara_job_install_testcase extends reportcache_advanced_testcase {
 
         // Field positiontype needs to be added to facetoface_signups.
         $table = new xmldb_table('facetoface_signups');
-        $field = new xmldb_field('positiontype', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'positionid');
-        //$dbman->add_field($table, $field);
+        $oldfield = new xmldb_field('jobassignmentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $dbman->rename_field($table, $oldfield, 'positionassignmentid');
+        $field = new xmldb_field('positiontype', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $dbman->add_field($table, $field);
+        $field = new xmldb_field('positionid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $dbman->add_field($table, $field);
+        $table = new xmldb_table('facetoface');
+        $oldfield = new xmldb_field('selectjobassignmentonsignup', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $dbman->rename_field($table, $oldfield, 'selectpositiononsignup');
+        $oldfield = new xmldb_field('forceselectjobassignment', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $dbman->rename_field($table, $oldfield, 'forceselectposition');
 
-        // TODO make sure f2f and appraisals and program assignments are tested.
+        // TODO make sure program assignments are tested.
     }
 
     /**
@@ -296,13 +305,7 @@ class totara_job_install_testcase extends reportcache_advanced_testcase {
         $DB->set_field('user', 'deleted', 1, array('id' => $users[37]->id));
 
         // Run the function.
-        try {
-            totara_core_upgrade_multiple_jobs();
-        } catch (Exception $e) {
-            // If it fails then phpunit may fail to reset correctly and will lose the results, so print the cause here.
-            var_dump($e, $e->getMessage());
-            throw $e;
-        }
+        totara_core_upgrade_multiple_jobs();
 
         // Get the raw data which will be used to calculate what the manager paths should look like.
         $managerrelations = $DB->get_records_menu('job_assignment', array(), 'id', 'id, managerjaid');
@@ -497,9 +500,6 @@ class totara_job_install_testcase extends reportcache_advanced_testcase {
             $schema->addTable($table);
         }
         $result = $dbman->check_database_schema($schema, array('extratables' => false));
-        if (!empty($result)) {
-            var_dump($result);
-        }
         $this->assertEmpty($result);
 
         // Check that these tables were removed.
@@ -545,12 +545,7 @@ class totara_job_install_testcase extends reportcache_advanced_testcase {
 
         // Run the function.
         $beforetime = time();
-        try {
-            totara_core_upgrade_multiple_jobs();
-        } catch (Exception $e) {
-            var_dump($e, $e->getMessage());
-            throw $e;
-        }
+        totara_core_upgrade_multiple_jobs();
         $aftertime = time();
 
         // Test results.
@@ -577,12 +572,7 @@ class totara_job_install_testcase extends reportcache_advanced_testcase {
 
 
         // Run the function.
-        try {
-            totara_core_upgrade_multiple_jobs();
-        } catch (Exception $e) {
-            var_dump($e, $e->getMessage());
-            throw $e;
-        }
+        totara_core_upgrade_multiple_jobs();
 
         // Test results.
     }
@@ -754,12 +744,7 @@ class totara_job_install_testcase extends reportcache_advanced_testcase {
         }
 
         // Run the function.
-        try {
-            totara_core_upgrade_multiple_jobs();
-        } catch (Exception $e) {
-            var_dump($e, $e->getMessage());
-            throw $e;
-        }
+        totara_core_upgrade_multiple_jobs();
 
         // Test results.
 
