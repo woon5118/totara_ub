@@ -38,7 +38,7 @@ Feature: Restore Moodle 2 course backups
       | Confirmation | Filename | test_backup.mbz |
     And I restore "test_backup.mbz" backup into a new course using this options:
       | Schema | Course name | Course 1 restored in a new course |
-    Then I should see "Course 1 restored in a new course"
+    Then I should see "Course 1 restored in a new course" in the page title
     And I should see "Community finder" in the "Community finder" "block"
     And I should see "Test forum name"
     And I click on "Edit settings" "link" in the "Administration" "block"
