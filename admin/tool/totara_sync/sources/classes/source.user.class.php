@@ -71,24 +71,23 @@ abstract class totara_sync_source_user extends totara_sync_source {
             'phone1',
             'phone2',
             'address',
-            'orgidnumber',
-            'manageridnumber',
-            'managerjobassignmentidnumber',
-            'appraiseridnumber',
             'auth',
             'password',
             'suspended',
             'jobassignmentidnumber',
-            'postitle',
-            'posstartdate',
-            'posenddate'
+            'jobassignmentfullname',
+            'jobassignmentstartdate',
+            'jobassignmentenddate',
+            'orgidnumber',
+            'posidnumber',
+            'manageridnumber',
+            'managerjobassignmentidnumber',
+            'appraiseridnumber',
         );
 
         // We need to be able to disable the position hierarchy fields if required so keep a copy of them separate.
         // This is currently only posidnumber.
         $this->positionfields = array ('posidnumber');
-
-        $this->fields = array_merge($this->fields, $this->positionfields);
 
         // Custom fields
         $this->customfields = array();
@@ -310,17 +309,17 @@ abstract class totara_sync_source_user extends totara_sync_source {
         if (!empty($this->config->import_orgidnumber)) {
             $table->add_field('orgidnumber', XMLDB_TYPE_CHAR, '100');
         }
-        if (!empty($this->config->import_postitle)) {
-            $table->add_field('postitle', XMLDB_TYPE_CHAR, '255');
+        if (!empty($this->config->import_jobassignmentfullname)) {
+            $table->add_field('jobassignmentfullname', XMLDB_TYPE_CHAR, '255');
         }
         if (!empty($this->config->import_posidnumber)) {
             $table->add_field('posidnumber', XMLDB_TYPE_CHAR, '100');
         }
-        if (!empty($this->config->import_posstartdate)) {
-            $table->add_field('posstartdate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        if (!empty($this->config->import_jobassignmentstartdate)) {
+            $table->add_field('jobassignmentstartdate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
         }
-        if (!empty($this->config->import_posenddate)) {
-            $table->add_field('posenddate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        if (!empty($this->config->import_jobassignmentenddate)) {
+            $table->add_field('jobassignmentenddate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
         }
         if (!empty($this->config->import_manageridnumber)) {
             $table->add_field('manageridnumber', XMLDB_TYPE_CHAR, '100');

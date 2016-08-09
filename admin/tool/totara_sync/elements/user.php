@@ -639,16 +639,19 @@ class totara_sync_element_user extends totara_sync_element {
         global $CFG, $DB;
 
         // If we have no job assignment info at all we do not need to set a job assignment.
-        if (!isset($suser->postitle) && empty($suser->posidnumber) && !isset($suser->posstartdate)
-            && !isset($suser->posenddate) && empty($suser->orgidnumber) && empty($suser->manageridnumber)
-            && empty($suser->appraiseridnumber) && empty($suser->jobassignmentidnumber)) {
+        if (!isset($suser->jobassignmentfullname) && !isset($suser->posidnumber) && !isset($suser->jobassignmentstartdate)
+            && !isset($suser->jobassignmentenddate) && !isset($suser->orgidnumber) && !isset($suser->manageridnumber)
+            && !isset($suser->appraiseridnumber) && !isset($suser->jobassignmentidnumber)) {
             return false;
         }
 
         $newjobdata = array();
-        if (isset($suser->postitle)) {
-            $newjobdata['fullname'] = $suser->postitle;
-            $newjobdata['shortname'] = empty($suser->postitleshortname) ? $suser->postitle : $suser->postitleshortname;
+        if (isset($suser->jobassignmentfullname)) {
+            if (empty($suser->jobassignmentfullname)) {
+                $newjobdata['fullname'] = null;
+            } else {
+                $newjobdata['fullname'] = $suser->jobassignmentfullname;
+            }
         }
         if (isset($suser->posidnumber)) {
             if (empty($suser->posidnumber)) {
@@ -659,18 +662,18 @@ class totara_sync_element_user extends totara_sync_element {
                 $newjobdata['positionid'] = $pos->id;
             }
         }
-        if (isset($suser->posstartdate)) {
-            if (empty($suser->posstartdate)) {
-                $newjobdata['timevalidfrom'] = null;
+        if (isset($suser->jobassignmentstartdate)) {
+            if (empty($suser->jobassignmentstartdate)) {
+                $newjobdata['startdate'] = null;
             } else {
-                $newjobdata['timevalidfrom'] = $suser->posstartdate;
+                $newjobdata['startdate'] = $suser->jobassignmentstartdate;
             }
         }
-        if (isset($suser->posenddate)) {
-            if (empty($suser->posenddate)) {
-                $newjobdata['timevalidto'] = null;
+        if (isset($suser->jobassignmentenddate)) {
+            if (empty($suser->jobassignmentenddate)) {
+                $newjobdata['enddate'] = null;
             } else {
-                $newjobdata['timevalidto'] = $suser->posenddate;
+                $newjobdata['enddate'] = $suser->jobassignmentenddate;
             }
         }
         if (isset($suser->orgidnumber)) {
@@ -686,7 +689,7 @@ class totara_sync_element_user extends totara_sync_element {
         if (!empty($suser->manageridnumber)) {
             $managerid = $DB->get_field('user', 'id', array('idnumber' => $suser->manageridnumber), MUST_EXIST);
             $managerja = null;
-            $managerjaidnumber = empty($suser->managerjobassignmentidnumber) ? '' : $suser->managerjobassignmentidnumber;
+            $managerjaidnumber = !isset($suser->managerjobassignmentidnumber) ? '' : $suser->managerjobassignmentidnumber;
             // Check if source has manager job assignment and create it for manager if not exists.
             if ($managerjaidnumber) {
                 $managerja = \totara_job\job_assignment::get_with_idnumber($managerid, $managerjaidnumber, false);
@@ -706,6 +709,8 @@ class totara_sync_element_user extends totara_sync_element {
             $newjobdata['managerjaid'] = $managerja->id;
         } else if (!empty($suser->managerjobassignmentidnumber)) {
             $this->addlog(get_string('managerassignwoidnumberx', 'tool_totara_sync', $suser->idnumber), 'warn', 'updateusers');
+        } else if (isset($suser->manageridnumber)) {
+            $newjobdata['managerjaid'] = null;
         }
 
         if (isset($suser->appraiseridnumber)) {
@@ -731,12 +736,12 @@ class totara_sync_element_user extends totara_sync_element {
             }
         }
 
-        // If job assignment with given idnumber not exists or idnumber not set then take user's first job assignment.
+        // If job assignment with given idnumber does not exist or idnumber is not set then take user's first job assignment.
         if (empty($jobassignment)) {
             $jobassignment = \totara_job\job_assignment::get_first($userid, false);
         }
 
-        // If user don't have any job assignments then create one. 
+        // If user doesn't have any job assignments then create one.
         if (empty($jobassignment)) {
             $jobassignment = \totara_job\job_assignment::create_default($userid, array('idnumber' => $jaidnumber));
         }
@@ -885,9 +890,10 @@ class totara_sync_element_user extends totara_sync_element {
             $invalidids = array_merge($invalidids, $badids);
         }
 
-        // Check position start date is not larger than position end date.
-        if (isset($syncfields->posstartdate) && isset($syncfields->posenddate)) {
-            $badids = $this->get_invalid_start_end_dates($synctable, 'posstartdate', 'posenddate', 'posstartdateafterenddate');
+        // Check job assignment start date is not larger than job assignment end date.
+        if (isset($syncfields->jobassignmentstartdate) && isset($syncfields->jobassignmentenddate)) {
+            $badids = $this->get_invalid_start_end_dates($synctable,
+                'jobassignmentstartdate', 'jobassignmentenddate', 'jobassignmentstartdateafterenddate');
             $invalidids = array_merge($invalidids, $badids);
         }
 

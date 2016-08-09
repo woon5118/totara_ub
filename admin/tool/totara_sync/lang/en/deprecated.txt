@@ -1,0 +1,4 @@
+posenddate,tool_totara_sync
+posstartdate,tool_totara_sync
+posstartdateafterenddate,tool_totara_sync
+postitle,tool_totara_sync

@@ -147,11 +147,11 @@ $string['phone1'] = 'Phone 1';
 $string['phone2'] = 'Phone 2';
 $string['address'] = 'Address';
 $string['orgidnumber'] = 'Organisation';
-$string['jobassignmentidnumber'] = 'Job assignment';
-$string['postitle'] = 'Position title';
+$string['jobassignmentidnumber'] = 'Job assignment ID number';
+$string['jobassignmentfullname'] = 'Job assignment full name';
+$string['jobassignmentenddate'] = 'Job assignment end date';
+$string['jobassignmentstartdate'] = 'Job assignment start date';
 $string['posidnumber'] = 'Position';
-$string['posstartdate'] = 'Position start date';
-$string['posenddate'] = 'Position end date';
 $string['manageridnumber'] = 'Manager';
 $string['managerjobassignmentidnumber'] = 'Manager\'s job assignment';
 $string['appraiseridnumber'] = 'Appraiser';
@@ -247,9 +247,9 @@ $string['cannotcreateuserassignments'] = 'cannot create user assignments (user: 
 $string['createduserx'] = 'created user {$a}';
 $string['cannotcreateuserx'] = 'cannot create user {$a}';
 $string['invalidauthforuserx'] = 'invalid authentication plugin {$a}';
+$string['jobassignmentstartdateafterenddate'] = 'Job assignment start date must not be later than end date for user {$a->idnumber}';
 $string['orgxnotexist'] = 'Organisation {$a->orgidnumber} does not exist. Skipped user {$a->idnumber}';
 $string['posxnotexist'] = 'Position {$a->posidnumber} does not exist. Skipped user {$a->idnumber}';
-$string['posstartdateafterenddate'] = 'Position start date must not be later than end date for user {$a->idnumber}';
 $string['managerxnotexist'] = 'Manager {$a->manageridnumber} does not exist. Skipped user {$a->idnumber}';
 $string['appraiserxnotexist'] = 'Appraiser {$a->appraiseridnumber} does not exist. Skipped user {$a->idnumber}';
 $string['selfassignedmanagerx'] = 'User {$a->idnumber} cannot be their own manager. Skipped user {$a->idnumber}';
@@ -354,3 +354,9 @@ $string['csvencoding'] = 'CSV file encoding';
 
 // Event.
 $string['eventsynccompleted'] = 'HR Import completed';
+
+// Deprecated.
+$string['posenddate'] = 'Position end date';
+$string['posstartdate'] = 'Position start date';
+$string['posstartdateafterenddate'] = 'Position start date must not be later than end date for user {$a->idnumber}';
+$string['postitle'] = 'Position title';

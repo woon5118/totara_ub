@@ -257,7 +257,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
             }
 
             // Optional date fields.
-            $datefields = array('posstartdate', 'posenddate');
+            $datefields = array('jobassignmentstartdate', 'jobassignmentenddate');
             $database_dateformat = get_config('totara_sync_source_user_database', 'database_dateformat');
 
             foreach ($datefields as $datefield) {

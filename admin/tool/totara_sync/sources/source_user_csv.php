@@ -343,16 +343,16 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 }
             }
 
-            $posdates = array('posstartdate', 'posenddate');
-            foreach ($posdates as $posdate) {
-                if (isset($dbrow[$posdate])) {
-                    if (empty($dbrow[$posdate])) {
-                        $dbrow[$posdate] = 0;
+            $datefields = array('jobassignmentstartdate', 'jobassignmentenddate');
+            foreach ($datefields as $datefield) {
+                if (isset($dbrow[$datefield])) {
+                    if (empty($dbrow[$datefield])) {
+                        $dbrow[$datefield] = 0;
                     } else {
                         // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                        $parsed_date = totara_date_parse_from_format($csvdateformat, trim($csvrow[$posdate]), true);
+                        $parsed_date = totara_date_parse_from_format($csvdateformat, trim($csvrow[$datefield]), true);
                         if ($parsed_date) {
-                            $dbrow[$posdate] = $parsed_date;
+                            $dbrow[$datefield] = $parsed_date;
                         }
                     }
                 }
