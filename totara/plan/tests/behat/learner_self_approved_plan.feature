@@ -32,7 +32,7 @@ Feature: Learner self approves plan with updated template.
     Then I should see "Plan settings successfully updated"
 
     # Allow the learner to add RPL.
-    When I click on "Courses" "link" in the ".tabtree2" "css_element"
+    When I click on "Courses" "link" in the ".tabtree" "css_element"
     And I set the field "updatecourselearner" to "Allow"
     And I set the field "setcompletionstatuslearner" to "Allow"
     When I click on "Save changes" "button"

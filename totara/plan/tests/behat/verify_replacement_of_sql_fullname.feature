@@ -31,7 +31,7 @@ Feature: Verify replacement of sql_fullname
     And I click on "Advanced workflow settings" "button"
 
     # Allow the learner to update the competency and set the assessor.
-    When I click on "Competencies" "link" in the ".tabtree2" "css_element"
+    When I click on "Competencies" "link" in the ".tabtree" "css_element"
     And I set the field "updatecompetencylearner" to "Allow"
     And I set the field "setproficiencylearner" to "Allow"
     When I click on "Save changes" "button"
