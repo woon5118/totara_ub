@@ -216,4 +216,27 @@ class totara_customfield_datetime_testcase extends advanced_testcase {
         $this->assertEquals('1593446400', $item->customfield_datetime);
     }
 
+    public function test_display_item_data_guessing() {
+        global $CFG;
+        $this->resetAfterTest(true);
+
+        // System timezone first with default admin timezone.
+        $date = make_timestamp(2014, 1, 2, 10, 37, 0);
+        $this->assertSame('Thursday, 2 January 2014, 10:37 AM', customfield_datetime::display_item_data($date));
+        $this->assertSame('Thursday, 2 January 2014, 10:37 AM', customfield_datetime::display_item_data('2014-01-02T10:37'));
+        $date = make_timestamp(2014, 1, 2, 0, 0, 10);
+        $this->assertSame('2 January 2014', customfield_datetime::display_item_data($date));
+        $this->assertSame('Not set', customfield_datetime::display_item_data(0));
+
+        // Try user timezones - the results are pretty unpredictable, right?
+        $user = $this->getDataGenerator()->create_user(array('timezone' => 'Europe/Prague'));
+        $this->setUser($user);
+        $date = make_timestamp(2014, 1, 2, 10, 37, 0, 'Europe/Prague');
+        $this->assertSame('Thursday, 2 January 2014, 10:37 AM', customfield_datetime::display_item_data($date));
+        $date = make_timestamp(2014, 1, 2, 0, 0, 10, 'Europe/Prague');
+        $this->assertSame('Thursday, 2 January 2014, 12:00 AM', customfield_datetime::display_item_data($date));
+        $date = make_timestamp(2014, 1, 2, 0, 0, 10, $CFG->timezone);
+        $this->assertSame('1 January 2014', customfield_datetime::display_item_data($date));
+        $this->assertSame('Not set', customfield_datetime::display_item_data(0));
+    }
 }

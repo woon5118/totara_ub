@@ -69,7 +69,7 @@ class customfield_datetime extends customfield_base {
         $data = $new_data ? $new_data : $data;
 
         // Only display the time if its been set.
-        if (date('G', $data) != 0) { // 12:00 am - assume no time was saved
+        if (date('G:i', $data) !== '0:00') { // 12:00 am - assume no time was saved
             $format = get_string('strftimedaydatetime', 'langconfig');
         } else {
             $format = get_string('strftimedate', 'langconfig');
