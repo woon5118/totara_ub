@@ -37,7 +37,7 @@ class login_signup_form extends moodleform {
         $mform = $this->_form;
         $positionid = $this->_customdata['positionid'];
         $organisationid = $this->_customdata['organisationid'];
-        $managerid = $this->_customdata['managerid'];
+        $managerjaid = $this->_customdata['managerjaid'];
 
         $mform->addElement('header', 'createuserandpass', get_string('createuserandpass'), '');
 
@@ -116,7 +116,7 @@ class login_signup_form extends moodleform {
 
         // Manage managers in signup self-registration.
         if (get_config('totara_job', 'allowsignupmanager')) {
-            profile_signup_manager($mform, $nojs, $managerid);
+            profile_signup_manager($mform, $nojs, $managerjaid);
             $requirenojs = true;
         }
 
