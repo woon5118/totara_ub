@@ -33,6 +33,13 @@ $THEME->enable_dock = true;
 $THEME->sheets = array('totara');
 $THEME->supportscssoptimisation = false;
 
+// We need to include the Less files directly
+// so that any variable overrides in this theme
+// are compiled into the output.
+$THEME->parents_exclude_sheets = array(
+    'base' => array('flexible-icons'),
+);
+
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->plugins_exclude_sheets = array(
     'block' => array(

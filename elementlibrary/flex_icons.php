@@ -169,7 +169,6 @@ $stateclasses = array(
     'ft-state-warning',
     'ft-state-danger',
     'ft-state-info',
-    'ft-state-other',
     'ft-state-disabled',
 );
 echo render_icons_table(array('alarm-warning', 'edit', 'permissions'), $stateclasses);

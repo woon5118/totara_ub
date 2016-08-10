@@ -44,4 +44,5 @@ $THEME->enable_dock = true;
 // Use CSS preprocessing to facilitate style inheritance.
 $THEME->parents_exclude_sheets = array(
     'roots' => array('totara', 'totara-rtl'),
+    'base' => array('flexible-icons'),
 );
