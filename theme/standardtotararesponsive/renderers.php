@@ -219,8 +219,7 @@ class theme_standardtotararesponsive_core_course_renderer extends core_course_re
         if ($chelper->get_show_courses() < self::COURSECAT_SHOW_COURSES_EXPANDED) {
             if ($course->has_summary() || $course->has_course_contacts() || $course->has_course_overviewfiles()) {
                 $url = new moodle_url('/course/info.php', array('id' => $course->id));
-                $image = html_writer::empty_tag('img', array('src' => $this->output->pix_url('i/info'),
-                    'alt' => $this->strings->summary));
+                $image = $this->render(new pix_icon('i/info', $this->strings->summary));
                 $content .= html_writer::link($url, $image, array('title' => $this->strings->summary));
                 // Make sure JS file to expand course content is included.
                 $this->coursecat_include_js();

@@ -72,7 +72,6 @@ Feature: Test course visibility
     When I click on "Home" in the totara menu
     When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
-    Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
 
     When I log out
@@ -91,7 +90,6 @@ Feature: Test course visibility
     When I click on "Home" in the totara menu
     When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
-    Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
 
     When I log out
@@ -110,7 +108,6 @@ Feature: Test course visibility
     When I click on "Home" in the totara menu
     When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
-    Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
 
 
@@ -174,7 +171,6 @@ Feature: Test course visibility
     When I click on "Home" in the totara menu
     When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
-    Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
 
     When I log out
@@ -193,7 +189,6 @@ Feature: Test course visibility
     When I click on "Home" in the totara menu
     When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
-    Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
 
     When I log out
@@ -213,7 +208,6 @@ Feature: Test course visibility
     When I click on "Home" "link" in the "Navigation" "block"
 
     And I follow the more information icon for the "Biology" course
-    Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"
 
     When I log out
@@ -232,5 +226,4 @@ Feature: Test course visibility
     When I click on "Home" in the totara menu
     When I click on "Home" "link" in the "Navigation" "block"
     And I follow the more information icon for the "Biology" course
-    Then I should see "Course info"
     And I should see "Editing Trainer: Trainer 1"

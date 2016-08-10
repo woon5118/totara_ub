@@ -1490,7 +1490,7 @@ class behat_course extends behat_base {
      */
     public function i_follow_the_more_information_icon_for_the_course($coursename) {
         $nameliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($coursename);
-        $xpath = "//div[@class='coursename']/a[text()={$nameliteral}]/ancestor::div[@class='info']//a[@title='Summary']";
+        $xpath = "//div[contains(@class, 'coursebox')]//a[text()={$nameliteral}]/ancestor::div[contains(@class, 'info')]//a[@title='Summary']";
         $nodes = $this->getSession()->getDriver()->find($xpath);
         if (count($nodes) > 0) {
             /** @var Behat\Mink\Element\NodeElement $node */
