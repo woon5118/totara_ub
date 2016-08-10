@@ -32,12 +32,6 @@ $THEME->yuicssmodules = array();
 $THEME->enable_dock = true;
 $THEME->sheets = array('totara');
 $THEME->supportscssoptimisation = false;
-
-$mainsheet = 'totara';
-
-$THEME->sheets = array($mainsheet);
-$THEME->supportscssoptimisation = false;
-
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->enable_dock = true;
 

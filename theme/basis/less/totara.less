@@ -26,68 +26,18 @@
 // any files here which are not found locally are
 // then looked for under theme/roots/less.
 
-//
-// Icons.
-//
-@import "base/less/flexible-icons";
-
-// Bootstrap 3.
-@import "bootstrap3/bootstrap";
+// Include everything from Roots.
+@import "roots/less/totara";
 
 // Theme level bootstrap overrides.
-@import "theme/basis";
+@import "bootstrap/bootstrap";
+@import "bootstrap/variables";
 
-// All variables (including theme/variables).
-@import "variables.less";
-
-// Override Bootstrap defaults.
-@import "totara/bootstrapoverride";
-
-// Roll back nameclashes.
-@import "totara/undo";
-
-@import "totara/core";
-@import "totara/admin";
-@import "totara/calendar";
-@import "totara/course";
-@import "totara/filemanager";
-@import "totara/message";
-@import "totara/question";
-@import "totara/user";
-@import "totara/userprofile";
-@import "totara/login";
-@import "totara/tags";
-@import "totara/badges";
-@import "totara/new";
-@import "totara/blocks";
-@import "totara/forms";
-@import "totara/modules";
-@import "totara/chat";
-@import "totara/reports";
-@import "totara/backup-restore";
-@import "totara/tables";
-@import "totara/buttons";
-@import "totara/navs";
-@import "totara/enrolment";
-@import "totara/responsive";
-@import "totara/debug";
-@import "totara/dock";
-@import "totara/grade";
-@import "totara/editor";
-@import "totara/feedback";
-
-//
-// Custom components.
-//
-@import "totara/totara-menu";
-@import "totara/totara-dialog";
+// Tweak the roots theme.
 @import "totara/avatar";
+@import "totara/buttons";
+@import "totara/core";
 @import "totara/page-footer";
-
-//
-// Legacy & Misc
-//
-@import "totara/totara_jquery/totara_jquery_datatables";
-@import "totara/totara_jquery/totara_jquery_treeview";
-@import "totara/totara_jquery/totara_jquery_ui_dialog";
-@import "totara/fixes"; // TODO integrate and remove file.
+@import "totara/totara-menu";
+@import "totara/user";
+@import "totara/variables";

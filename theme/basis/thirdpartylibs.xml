@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<libraries>
-    <library>
-        <location>fonts</location>
-        <name>OpenSans</name>
-        <license>Apache</license>
-        <licenseversion>2.0</licenseversion>
-    </library>
-</libraries>
