@@ -190,14 +190,14 @@ M.core_comment = {
                         val = val.replace('___name___', list[i].fullname);
                     }
                     if (list[i]['delete']||newcmt) {
-                        list[i].content = '<div class="comment-delete"><a href="#" id="comment-delete-'+this.client_id+'-'+list[i].id+'" title="'+M.util.get_string('deletecomment', 'moodle')+'"></a></div>' + list[i].content;
-                        var clientid = this.client_id;
-                        var listid = list[i].id;
-                        require(['core/templates'], function (templates) {
+                        var deletehtmlid = 'comment-delete-'+this.client_id+'-'+list[i].id;
+                        list[i].content = '<div class="comment-delete"><a href="#" id="' + deletehtmlid +'" title="'+M.util.get_string('deletecomment', 'moodle')+'"></a></div>' + list[i].content;
+                        // A closure is required as otherwise i is list.length
+                        require(['core/templates'], (function (deletehtmlid) {return function (templates) {
                             templates.renderIcon('delete', '').done(function (html) {
-                                Y.one('#comment-delete-' + clientid + '-' + listid).setContent(html);
-                            });
-                        });
+                                Y.one('#' + deletehtmlid).setContent(html);
+                            });};
+                        })(deletehtmlid));
                     }
                     val = val.replace('___time___', list[i].time);
                     val = val.replace('___picture___', list[i].avatar);
