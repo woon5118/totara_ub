@@ -21,6 +21,13 @@
 // @author    Joby Harding <joby.harding@totaralearning.com>
 // @package   theme_roots
 
+// All Totara plugins with less must go first,
+// because they are not allowed to override anything in theme or bootstrap.
+// These plugins must define all used variables with default values for legacy themes.
+@import "blocks/current_learning/less/styles";
+@import "totara/reportbuilder/less/styles";
+@import "totara/job/less/styles";
+
 //
 // Icons.
 //

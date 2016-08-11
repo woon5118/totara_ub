@@ -43,13 +43,18 @@ $THEME->parents_exclude_sheets = array(
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->plugins_exclude_sheets = array(
     'block' => array(
-        'search_forums'
+        'current_learning',
+        'search_forums',
     ),
     'tool' => array(
         'customlang'
     ),
     'mod' => array(
         'feedback'
+    ),
+    'totara' => array(
+        'reportbuilder',
+        'job',
     ),
 );
 
