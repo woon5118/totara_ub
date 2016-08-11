@@ -190,11 +190,11 @@ class core_files_renderer extends plugin_renderer_base {
             'add_file' => $this->output->flex_icon('document-new', ['alt' => get_string('addfiletext', 'repository')]),
             'create_folder' => $this->output->flex_icon('folder-create', ['alt' => get_string('createfolder', 'repository')]),
             'download_all' => $this->output->flex_icon('download', ['alt' => get_string('downloadallfiles', 'repository')]),
-            'loading_small' => $this->output->flex_icon('spinner-pulse', ['classes' => 'fp-img-downloading']),
+            'loading_small' => $this->output->flex_icon('loading', ['classes' => 'fp-img-downloading']),
             'view_icon_active' => $this->output->flex_icon('th-large', ['alt' => get_string('displayasicons', 'repository')]),
             'view_list_active' => $this->output->flex_icon('th-list', ['alt' => get_string('displayasdetails', 'repository')]),
             'view_tree_active' => $this->output->flex_icon('viewtreeactive', ['alt' => get_string('displayastree', 'repository')]),
-            'progress' => $this->output->flex_icon('spinner-pulse', ['alt' => get_string('loading', 'repository')])
+            'progress' => $this->output->flex_icon('loading', ['alt' => get_string('loading', 'repository')])
         );
 
         $html = '
@@ -381,7 +381,7 @@ class core_files_renderer extends plugin_renderer_base {
     private function fm_js_template_fileselectlayout() {
         global $OUTPUT;
         $strloading  = get_string('loading', 'repository');
-        $iconprogress = $this->output->flex_icon('spinner-pulse', ['alt' => $strloading]);
+        $iconprogress = $this->output->flex_icon('loading', ['alt' => $strloading]);
 
         $rv = '
 <div class="filemanager fp-select">
@@ -692,7 +692,7 @@ class core_files_renderer extends plugin_renderer_base {
         $rv = '
 <div class="fp-nextpage">
     <div class="fp-nextpage-link"><a href="#">'.get_string('more').'</a></div>
-    <div class="fp-nextpage-loading">'.$this->output->flex_icon('spinner-pulse').'</div>
+    <div class="fp-nextpage-loading">'.$this->output->flex_icon('loading').'</div>
 </div>';
         return $rv;
     }
@@ -728,7 +728,7 @@ class core_files_renderer extends plugin_renderer_base {
     private function fp_js_template_selectlayout() {
         $rv = '
 <div class="file-picker fp-select">
-    <div class="fp-select-loading">'.$this->output->flex_icon('spinner-pulse').'</div>
+    <div class="fp-select-loading">'.$this->output->flex_icon('loading').'</div>
     <form class="form-horizontal">
         <div class="fp-forminset">
                 <div class="fp-linktype-2 control-group control-radio clearfix">
@@ -855,7 +855,7 @@ class core_files_renderer extends plugin_renderer_base {
     private function fp_js_template_loading() {
         return '
 <div class="fp-content-loading">
-    <div class="fp-content-center">'.$this->output->flex_icon('spinner-pulse').'</div>
+    <div class="fp-content-center">'.$this->output->flex_icon('loading').'</div>
 </div>';
     }
 

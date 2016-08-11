@@ -1091,7 +1091,7 @@ function item(category, element, isexistingitem) {
     this.set_loading = function() {
         var that = this;
         require(['core/templates'], function (templates) {
-            templates.renderIcon('spinner-pulse', M.util.get_string('loading', 'admin')).done(function (html) {
+            templates.renderIcon('loading', M.util.get_string('loading', 'admin')).done(function (html) {
                 if (that.usersElement.data('complete') === false) {
                     that.usersElement.html(html);
                 }

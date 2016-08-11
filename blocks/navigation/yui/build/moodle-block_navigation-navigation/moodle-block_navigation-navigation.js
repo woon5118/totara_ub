@@ -768,7 +768,7 @@ BRANCH.prototype = {
         this.node.replaceClass('branch', 'emptybranch');
         require(['core/templates'], function (templates) {
             templates.renderIcon('collapsed-empty').done(function (html) {
-                that.node.one('.flex-icon').remove()
+                that.node.one('.flex-icon').remove();
                 that.node.prepend(html);
             });
         });

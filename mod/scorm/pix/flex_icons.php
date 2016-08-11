@@ -31,5 +31,5 @@ $aliases = array(
     'mod_scorm|passed' => 'check-square-o',
     'mod_scorm|plus' => 'plus-square-o',
     'mod_scorm|suspend' => 'moon-o',
-    'mod_scorm|wait' => 'spinner-pulse',
+    'mod_scorm|wait' => 'loading',
 );

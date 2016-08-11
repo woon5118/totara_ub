@@ -26,6 +26,6 @@
 
 $aliases = array(
     'totara_reportbuilder|report_icon' => 'pie-chart',
-    'totara_reportbuilder|wait' => 'spinner-pulse',
-    'totara_reportbuilder|waitbig' => 'spinner-pulse',
+    'totara_reportbuilder|wait' => 'loading',
+    'totara_reportbuilder|waitbig' => 'loading',
 );

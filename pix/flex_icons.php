@@ -1890,13 +1890,6 @@ $icons = array(
         array(
             'template' => 'core/flex_icon_spacer',
         ),
-    'spinner-pulse' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-spinner fa-pulse',
-                ),
-        ),
     'square-o' =>
         array(
             'data' =>
@@ -2274,7 +2267,7 @@ $deprecated = array(
     'core|i/admin' => 'settings',
     'core|i/agg_mean' => 'mean',
     'core|i/agg_sum' => 'sigma',
-    'core|i/ajaxloader' => 'spinner-pulse',
+    'core|i/ajaxloader' => 'loading',
     'core|i/assignroles' => 'user-plus',
     'core|i/backup' => 'upload',
     'core|i/badge' => 'trophy',
@@ -2327,8 +2320,8 @@ $deprecated = array(
     'core|i/info' => 'info-circle',
     'core|i/invalid' => 'times-danger',
     'core|i/key' => 'key',
-    'core|i/loading' => 'spinner-pulse',
-    'core|i/loading_small' => 'spinner-pulse',
+    'core|i/loading' => 'loading',
+    'core|i/loading_small' => 'loading',
     'core|i/lock' => 'lock',
     'core|i/log' => 'log',
     'core|i/mahara_host' => 'mahara',
@@ -2491,7 +2484,7 @@ $deprecated = array(
     'core|u/user100' => 'user-disabled',
     'core|u/user35' => 'user-disabled',
     'core|y/lm' => 'caret-down',
-    'core|y/loading' => 'spinner-pulse',
+    'core|y/loading' => 'loading',
     'core|y/lp' => 'caret-right',
     'core|y/lp_rtl' => 'caret-left',
     'core|y/tm' => 'caret-down',

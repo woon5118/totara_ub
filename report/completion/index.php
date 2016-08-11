@@ -224,7 +224,7 @@ if ($csv) {
             'pix_rply'    => $OUTPUT->flex_icon('check-square-o', ['classes' => 'ft-size-300']),
             'pix_rpln'    => $OUTPUT->flex_icon('square-o', ['classes' => 'ft-size-300']),
             'pix_cross'   => $OUTPUT->flex_icon('times-danger', ['classes' => 'ft-size-300']),
-            'pix_loading' => $OUTPUT->flex_icon('spinner-pulse', ['classes' => 'ft-size-300']),
+            'pix_loading' => $OUTPUT->flex_icon('loading', ['classes' => 'ft-size-300']),
         ))
     );
 

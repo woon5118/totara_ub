@@ -61,7 +61,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
         var that = this;
         require(['core/templates'], function (templates) {
             var iconscache = [];
-            iconscache.push(templates.renderIcon('spinner-pulse', M.util.get_string('saving', 'totara_reportbuilder')));
+            iconscache.push(templates.renderIcon('loading', M.util.get_string('saving', 'totara_reportbuilder')));
             iconscache.push(templates.renderIcon('delete', M.util.get_string('delete', 'totara_reportbuilder')));
             iconscache.push(templates.renderIcon('arrow-up', M.util.get_string('moveup', 'totara_reportbuilder')));
             iconscache.push(templates.renderIcon('arrow-down', M.util.get_string('movedown', 'totara_reportbuilder')));

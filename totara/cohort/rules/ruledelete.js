@@ -84,7 +84,7 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
                 }),
                 beforeSend: function() {
                     require(['core/templates'], function (templates) {
-                        templates.renderIcon('spinner-pulse', M.util.get_string('savingrule', 'totara_cohort')).done(function (html) {
+                        templates.renderIcon('loading', M.util.get_string('savingrule', 'totara_cohort')).done(function (html) {
                             link.replaceWith(html);
                         });
                     });
@@ -133,7 +133,7 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
                 }),
                 beforeSend: function() {
                     require(['core/templates'], function (templates) {
-                        templates.renderIcon('spinner-pulse', M.util.get_string('savingrule', 'totara_cohort')).done(function (html) {
+                        templates.renderIcon('loading', M.util.get_string('savingrule', 'totara_cohort')).done(function (html) {
                             link.replaceWith(html);
                         });
                     });
