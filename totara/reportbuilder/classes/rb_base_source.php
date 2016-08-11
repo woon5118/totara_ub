@@ -3410,7 +3410,7 @@ abstract class rb_base_source {
                   ON mja.id = uja.managerjaid
            LEFT JOIN {user} manager
                   ON mja.userid = manager.id
-            GROUP BY manlistid)";
+            GROUP BY u.id)";
 
         $joinlist[] = new rb_join(
             'manager_allnames',
@@ -3431,7 +3431,7 @@ abstract class rb_base_source {
                   ON uja.userid = u.id
            LEFT JOIN {user} appraiser
                   ON uja.appraiserid = appraiser.id
-            GROUP BY applistid)";
+            GROUP BY u.id)";
 
         $joinlist[] = new rb_join(
             'appraiser_allnames',
@@ -3451,7 +3451,7 @@ abstract class rb_base_source {
                   ON uja.userid = u.id
            LEFT JOIN {pos} position
                   ON uja.positionid = position.id
-            GROUP BY poslistid)";
+            GROUP BY u.id)";
 
         $joinlist[] = new rb_join(
             'position_allnames',
@@ -3471,7 +3471,7 @@ abstract class rb_base_source {
                   ON uja.userid = u.id
            LEFT JOIN {org} organisation
                   ON uja.organisationid = organisation.id
-            GROUP BY orglistid)";
+            GROUP BY u.id)";
 
         $joinlist[] = new rb_join(
             'organisation_allnames',
@@ -3489,7 +3489,7 @@ abstract class rb_base_source {
                 FROM {user} u
            LEFT JOIN {job_assignment} uja
                   ON uja.userid = u.id
-            GROUP BY titlelistid)";
+            GROUP BY u.id)";
 
         $joinlist[] = new rb_join(
             'title_allnames',
