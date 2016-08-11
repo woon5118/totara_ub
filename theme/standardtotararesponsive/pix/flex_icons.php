@@ -23,6 +23,17 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+/* Overrides of flexible icons for backwards compatibility with old themes */
+$icons = array(
+    'help' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-question-circle',
+                ),
+        ),
+);
+
 /* Pix only images are not supposed to be converted to flex icons. */
 $pixonlyimages = array(
     'screenshot',
