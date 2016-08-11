@@ -391,18 +391,18 @@ class totara_assign_appraisal extends totara_assign_core {
      * @param int $appraiseeid appraisee id.
      *
      * @return array a list of \stdClass objects with these fields:
+     *         - originaluserid: user originally assigned to the role.
+     *         - newuserid: user currently assigned to the role.
      *         - role: changed role.
-     *         - original: user originally assigned to the role.
-     *         - current: user currently assigned to the role.
      */
     private function changed_role_assignments_for_appraisee($appraiseeid) {
         global $DB;
 
         $sql = '
             SELECT
-                   t.originaluserid AS original,
-                   t.newuserid      AS current,
-                   t.role           AS role
+                   t.originaluserid,
+                   t.newuserid,
+                   t.role
               FROM {appraisal_role_changes} t
              WHERE userassignmentid = :appraiseeassignmentid
                AND t.timecreated = (
@@ -513,7 +513,7 @@ class appraisal_assignments {
     private static $job_assignment_roles = [
         appraisal::ROLE_LEARNER => 'userid',
         appraisal::ROLE_MANAGER => 'managerid',
-        appraisal::ROLE_TEAM_LEAD => 'tempmanagerid',
+        appraisal::ROLE_TEAM_LEAD => 'teamleaderid',
         appraisal::ROLE_APPRAISER => 'appraiserid'
     ];
 

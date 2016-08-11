@@ -1205,5 +1205,46 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Tests the retrieval of the team lead id.
+     *
+     * A team lead (which is the term appraisals uses) is currently defined as a
+     * user's manager's manager. This position is unique among all the fields in
+     * \totara_job\job_assignment in that it is totally computed on the fly.
+     */
+    public function test_get_team_leader() {
+        $teamleadja = \totara_job\job_assignment::create_default($this->users[1]->id);
+
+        $managerja = \totara_job\job_assignment::create([
+            'userid' => $this->users[2]->id,
+            'fullname' => 'manager',
+            'shortname' => 'manager',
+            'idnumber' => 'id1',
+            'managerjaid' => $teamleadja->id, // User 1.
+        ]);
+
+        $userja = \totara_job\job_assignment::create([
+            'userid' => $this->users[3]->id,
+            'fullname' => 'user',
+            'shortname' => 'user',
+            'idnumber' => 'id2',
+            'managerjaid' => $managerja->id, // User 2.
+        ]);
+
+        $this->assertEquals($userja->managerid, $managerja->userid);
+        $this->assertEquals($userja->teamleaderid, $teamleadja->userid);
+
+        $this->assertEquals($managerja->managerid, $teamleadja->userid);
+        $this->assertNull($managerja->teamleaderid);
+
+        $userdata = $userja->get_data();
+        $this->assertEquals($userdata->managerid, $managerja->userid);
+        $this->assertEquals($userdata->teamleaderid, $teamleadja->userid);
+
+        $mgrdata = $managerja->get_data();
+        $this->assertEquals($mgrdata->managerid, $teamleadja->userid);
+        $this->assertNull($mgrdata->teamleaderid);
+    }
+
     // TODO Write tests for the functions added after move_down (resort_user_job_assignments is being renamed, export_for_template).
 }

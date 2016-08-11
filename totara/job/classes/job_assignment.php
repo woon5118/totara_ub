@@ -50,6 +50,7 @@ defined('MOODLE_INTERNAL') || die();
  * @property-read int managerid               dynamic (if assigned, uses 1 db call to retrieve from manager job assignment)
  * @property-read int managerjaid             optional
  * @property-read string managerjapath        automatic (set when managerjaid changes, including when managerjaid is empty)
+ * @property-read int teamleaderid            dynamic (if assigned, uses 1 db call to retrieve from manager's manager job assignment)
  * @property-read int tempmanagerid           dynamic (if assigned, uses 1 db call to retrieve from temp manager job assignment)
  * @property-read int tempmanagerjaid         optional
  * @property-read int tempmanagerexpirydate   optional
@@ -434,7 +435,7 @@ class job_assignment {
      * @return mixed type depends on field accessed
      */
     public function __get($name) {
-        global $TEXTAREA_OPTIONS;
+        global $DB, $TEXTAREA_OPTIONS;
 
         if ($name === 'description') {
             $description = file_rewrite_pluginfile_urls($this->description, 'pluginfile.php', $TEXTAREA_OPTIONS['context']->id,
@@ -451,19 +452,40 @@ class job_assignment {
 
         } else if ($name === 'managerid') {
             if ($this->managerjaid) {
-                $managerja = self::get_with_id($this->managerjaid);
-                return $managerja->userid;
-            } else {
-                return null;
+                $sql = "SELECT managerja.userid
+                          FROM {job_assignment} managerja
+                         WHERE managerja.id = :managerjaid";
+                $result = $DB->get_field_sql($sql, array('managerjaid' => $this->managerjaid));
+                if ($result) {
+                    return $result;
+                }
             }
+            return null;
+
+        } else if ($name === 'teamleaderid') {
+            if ($this->managerjaid) {
+                $sql = "SELECT teamleadja.userid
+                          FROM {job_assignment} managerja
+                          JOIN {job_assignment} teamleadja ON managerja.managerjaid = teamleadja.id
+                         WHERE managerja.id = :managerjaid";
+                $result = $DB->get_field_sql($sql, array('managerjaid' => $this->managerjaid));
+                if ($result) {
+                    return $result;
+                }
+            }
+            return null;
 
         } else if ($name === 'tempmanagerid') {
             if ($this->tempmanagerjaid) {
-                $tempmanagerja = self::get_with_id($this->tempmanagerjaid);
-                return $tempmanagerja->userid;
-            } else {
-                return null;
+                $sql = "SELECT tempmanagerja.userid
+                          FROM {job_assignment} tempmanagerja
+                         WHERE tempmanagerja.id = :tempmanagerjaid";
+                $result = $DB->get_field_sql($sql, array('tempmanagerjaid' => $this->tempmanagerjaid));
+                if ($result) {
+                    return $result;
+                }
             }
+            return null;
 
         } else if ($name === 'fullname') {
             if (empty($this->fullname)) {
@@ -498,6 +520,7 @@ class job_assignment {
         $getproperties[] = 'description';
         $getproperties[] = 'description_editor';
         $getproperties[] = 'managerid';
+        $getproperties[] = 'teamleaderid';
         $getproperties[] = 'tempmanagerid';
         $getproperties[] = 'fullname';
 
@@ -531,6 +554,7 @@ class job_assignment {
         $data->managerid              = $this->managerid;
         $data->managerjaid            = $this->managerjaid;
         $data->managerjapath          = $this->managerjapath;
+        $data->teamleaderid           = $this->teamleaderid;
         $data->tempmanagerid          = $this->tempmanagerid;
         $data->tempmanagerjaid        = $this->tempmanagerjaid;
         $data->tempmanagerexpirydate  = $this->tempmanagerexpirydate;

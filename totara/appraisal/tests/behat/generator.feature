@@ -102,7 +102,7 @@ Feature: Verify appraisal data generators.
     Then I should see "Immediate" in the "1" "table_row"
     Then I should see "Learner" in the "1" "table_row"
     Then I should see "Manager" in the "1" "table_row"
-    Then I should see "Team Leader" in the "1" "table_row"
+    Then I should see "Manager's Manager" in the "1" "table_row"
     Then I should see "Appraiser" in the "1" "table_row"
     # Message 2 and 3 are the same as 1 just with different recipients.
     And I should see "Message 2"
@@ -111,7 +111,7 @@ Feature: Verify appraisal data generators.
     And I should see "Message 4" in the "4" "table_row"
     And I should see "Learner" in the "4" "table_row"
     And I should see "Manager" in the "4" "table_row"
-    And I should not see "Team Leader" in the "4" "table_row"
+    And I should not see "Manager's Manager" in the "4" "table_row"
     And I should not see "Appraiser" in the "4" "table_row"
     # Message 5 is a stage based message.
     And I should see "Message 5" in the "5" "table_row"
@@ -119,7 +119,7 @@ Feature: Verify appraisal data generators.
     And I should see "2 weeks after event" in the "5" "table_row"
     And I should see "Learner" in the "5" "table_row"
     And I should see "Manager" in the "5" "table_row"
-    And I should not see "Team Leader" in the "5" "table_row"
+    And I should not see "Manager's Manager" in the "5" "table_row"
     And I should not see "Appraiser" in the "5" "table_row"
 
     # Add check to verify form fields are populated correctly.
@@ -131,7 +131,7 @@ Feature: Verify appraisal data generators.
     And the "deltaperiod" select box should contain "weeks"
     And the field "Learner" matches value "1"
     And the field "Manager" matches value "1"
-    And the field "Team Leader" does not match value "1"
+    And the field "Manager's Manager" does not match value "1"
     And the field "Appraiser" does not match value "1"
     And the "messagetoall" select box should contain "Send different message for each role"
     And the field "messagetitle[1]" matches value "Message 5 for Learner"
@@ -148,7 +148,7 @@ Feature: Verify appraisal data generators.
     And the "deltaperiod" select box should contain "days"
     And the field "Learner" matches value "1"
     And the field "Manager" matches value "1"
-    And the field "Team Leader" does not match value "1"
+    And the field "Manager's Manager" does not match value "1"
     And the field "Appraiser" matches value "1"
     And the "messagetoall" select box should contain "Send same message to all roles"
     And the field "messagetitle[0]" matches value "Message 6"

@@ -137,7 +137,7 @@ Feature: Link appraisal with an appraisee job assignment.
     Then I should see "Supposed Salesman, Universal Exports"
     And I should see "Spy, 007 Branch"
 
-    Given I trigger cron
+    Given I run the "\totara_appraisal\task\update_learner_assignments_task" task
     And I am on site homepage
     And I log out
     And I log in as "bond007"
@@ -191,7 +191,7 @@ Feature: Link appraisal with an appraisee job assignment.
     And I should see "Spy, 007 Branch"
     And I should not see "Unnamed job assignment (ID: 1)"
 
-    Given I trigger cron
+    Given I run the "\totara_appraisal\task\update_learner_assignments_task" task
     And I am on site homepage
     And I log out
     And I log in as "bond007"
@@ -238,7 +238,7 @@ Feature: Link appraisal with an appraisee job assignment.
     Then I should see "Supposed Salesman, Universal Exports"
     And I should not see "Unnamed job assignment (ID: 1)"
 
-    Given I trigger cron
+    Given I run the "\totara_appraisal\task\update_learner_assignments_task" task
     And I am on site homepage
     And I log out
     And I log in as "bond007"

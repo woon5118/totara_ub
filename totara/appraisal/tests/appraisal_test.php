@@ -532,12 +532,16 @@ class appraisal_test extends appraisal_testcase {
         $user2 = $this->getDataGenerator()->create_user();
 
         $teamleadja = \totara_job\job_assignment::create_default($teamlead->id);
-        $managerja = \totara_job\job_assignment::create_default($manager->id);
+        $managerja = \totara_job\job_assignment::create_default(
+            $manager->id,
+            [
+                'managerjaid' => $teamleadja->id
+            ]
+        );
+
         $jobassignmentmanagers = [
             'managerjaid' => $managerja->id,
-            'appraiserid' => $appraiser->id,
-            'tempmanagerjaid' => $teamleadja->id,
-            'tempmanagerexpirydate' => time() + YEARSECS * 2
+            'appraiserid' => $appraiser->id
         ];
 
         $user1ja = \totara_job\job_assignment::create_default($user1->id, $jobassignmentmanagers);
@@ -569,19 +573,31 @@ class appraisal_test extends appraisal_testcase {
         // Now Change user1s job assignment.
         $removedroles = [
             appraisal::ROLE_MANAGER => 'managerjaid',
-            appraisal::ROLE_TEAM_LEAD => 'tempmanagerjaid',
+            appraisal::ROLE_TEAM_LEAD => '',
             appraisal::ROLE_APPRAISER => 'appraiserid'
         ];
 
         $jobroleupdates = [];
         foreach ($removedroles as $role => $jobrolefield) {
-            $jobroleupdates[$jobrolefield] = null;
+            if (!empty($jobrolefield)) {
+                $jobroleupdates[$jobrolefield] = null;
+            }
         }
+
+        // To forestall unnecessary computation, the appraisal looks up the last
+        // modified time for a linked job assignment. If there was no change in
+        // the last modified time => the job assignment has no change => no role
+        // computation needs to be done. But timestamp precision is in seconds
+        // and occasionally, PHPUnit runs so fast that the timestamp is updated
+        // in the same second it was created. Thus, there is a sleep() here to
+        // stop the test from failing further down.
+        sleep(1);
         $user1ja->update($jobroleupdates);
 
-        // User1 should now be missing roles (except learner). Note the actual
-        // roles assigned to the appraisal has not changed yet; this is just a
-        // "prediction" of what will be missing when the cron task executes.
+        // User1 should now be missing roles except learner and team lead. Note
+        // the actual roles assigned to the appraisal has not changed yet; this
+        // is just a "prediction" of what will be missing when the cron task
+        // executes.
         $missing = $assign->missing_role_assignments()->roles;
         $this->assertTrue(array_key_exists($user1->id, $missing));
         $this->assertEquals(count($removedroles), count($missing[$user1->id]));
@@ -696,25 +712,33 @@ class appraisal_test extends appraisal_testcase {
 
         $teamlead1ja = \totara_job\job_assignment::create_default($teamlead1->id);
         $teamlead2ja = \totara_job\job_assignment::create_default($teamlead2->id);
-        $manager1ja = \totara_job\job_assignment::create_default($manager1->id);
-        $manager2ja = \totara_job\job_assignment::create_default($manager2->id);
+
+        $manager1ja = \totara_job\job_assignment::create_default(
+            $manager1->id,
+            [
+                'managerjaid' => $teamlead1ja->id
+            ]
+        );
+        $manager2ja = \totara_job\job_assignment::create_default(
+            $manager2->id,
+            [
+                'managerjaid' => $teamlead2ja->id
+            ]
+        );
+
         $user1ja = \totara_job\job_assignment::create_default(
             $user1->id,
             [
                 'managerjaid' => $manager1ja->id,
-                'tempmanagerjaid' => $teamlead1ja->id,
-                'appraiserid' => $appraiser->id,
-                'tempmanagerexpirydate' => time() + YEARSECS * 2
+                'appraiserid' => $appraiser->id
             ]
         );
 
         $user2ja = \totara_job\job_assignment::create_default(
             $user2->id,
             [
-                'managerjaid' => $manager1ja->id,
-                'tempmanagerjaid' => $teamlead2ja->id,
-                'appraiserid' => $appraiser->id,
-                'tempmanagerexpirydate' => time() + YEARSECS * 2
+                'managerjaid' => $manager2ja->id,
+                'appraiserid' => $appraiser->id
 
             ]
         );
@@ -743,6 +767,15 @@ class appraisal_test extends appraisal_testcase {
         }
 
         // Now Change user1s job assignment.
+        //
+        // To forestall unnecessary computation, the appraisal looks up the last
+        // modified time for a linked job assignment. If there was no change in
+        // the last modified time => the job assignment has no change => no role
+        // computation needs to be done. But timestamp precision is in seconds
+        // and occasionally, PHPUnit runs so fast that the timestamp is updated
+        // in the same second it was created. Thus, there is a sleep() here to
+        // stop the test from failing further down.
+        sleep(1);
         $user1ja->update(array('managerjaid' => $manager2ja->id, 'appraiserid' => $appraiser2->id));
 
         // There should be no missing roles.
@@ -757,7 +790,7 @@ class appraisal_test extends appraisal_testcase {
         $changed = $assign->changed_role_assignments();
         $this->assertEquals(1, count($changed));
         $this->assertTrue(array_key_exists($user1->id, $changed));
-        $this->assertEquals(2, count($changed[$user1->id]));
+        $this->assertEquals(3, count($changed[$user1->id]));
 
         $currentassignments = $appraisal->get_all_assignments($user1->id);
         $this->assertEquals(4, count($currentassignments));
@@ -775,7 +808,7 @@ class appraisal_test extends appraisal_testcase {
                     break;
 
                 case appraisal::ROLE_TEAM_LEAD:
-                    $user = $teamlead1;
+                    $user = $teamlead2;
                     break;
 
                 case appraisal::ROLE_APPRAISER:
@@ -840,23 +873,25 @@ class appraisal_test extends appraisal_testcase {
         $user2 = $this->getDataGenerator()->create_user();
 
         $teamleadja = \totara_job\job_assignment::create_default($teamlead->id);
-        $managerja = \totara_job\job_assignment::create_default($manager->id);
+        $managerja = \totara_job\job_assignment::create_default(
+            $manager->id,
+            [
+                'managerjaid' => $teamleadja->id
+            ]
+        );
+
         $user1ja = \totara_job\job_assignment::create_default(
             $user1->id,
             [
                 'managerjaid' => $managerja->id,
-                'tempmanagerjaid' => $teamleadja->id,
-                'appraiserid' => $appraiser->id,
-                'tempmanagerexpirydate' => time() + YEARSECS * 2
+                'appraiserid' => $appraiser->id
             ]
         );
         $user2ja = \totara_job\job_assignment::create_default(
             $user2->id,
             [
                 'managerjaid' => $user1ja->id,
-                'tempmanagerjaid' => $teamleadja->id,
-                'appraiserid' => $appraiser->id,
-                'tempmanagerexpirydate' => time() + YEARSECS * 2
+                'appraiserid' => $appraiser->id
             ]
         );
 
@@ -911,7 +946,7 @@ class appraisal_test extends appraisal_testcase {
                 appraisal::ROLE_MANAGER);
         $user2roles[] = $roleassignment->id;
         $this->answer_question($appraisal, $roleassignment, 0, 'completestage');
-        $roleassignment = appraisal_role_assignment::get_role($appraisal->id, $user2->id, $teamlead->id,
+        $roleassignment = appraisal_role_assignment::get_role($appraisal->id, $user2->id, $manager->id,
                 appraisal::ROLE_TEAM_LEAD);
         $user2roles[] = $roleassignment->id;
         $this->answer_question($appraisal, $roleassignment, 0, 'completestage');
