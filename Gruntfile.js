@@ -142,18 +142,6 @@ module.exports = function(grunt) {
         return path.join(path.dirname(path.dirname(srcPath)), 'styles.css');
     };
 
-    /**
-     * Filter expanded Less files glob.
-     *
-     * For some reason adding the negative match to the lessSrc
-     * glob does not remove the roots variables file.
-     *
-     * @param {String} srcPath
-     */
-    var less_filter = function(srcPath) {
-        return !(grunt.file.isMatch('**/*/variables.less', srcPath));
-    };
-
     var rtlSrc = 'theme/roots/style/*.css';
 
     if (inTheme) {
@@ -193,11 +181,11 @@ module.exports = function(grunt) {
         return !isRTLStylesheet(srcPath);
     };
 
-    // Roots less directory is added so that variables.less
-    // containing all bootstrap, Moodle & Totara variables
-    // can be imported in core without having to hard-code
-    // the theme path.
-    var lessImportPaths = ['theme', 'theme/roots/less'];
+    // Imports are tried in these locations:
+    //  1/ current directory
+    //  2/ theme and themedir directories
+    //  3/ dirroot directory
+    var lessImportPaths = ['theme'];
 
     // Facilitate working with custom $CFG->themedir.
     if (customThemeDir !== '') {
@@ -309,8 +297,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     src: lessSrc,
-                    rename: less_rename,
-                    filter: less_filter
+                    rename: less_rename
                 }]
             },
             bootstrapbase: {

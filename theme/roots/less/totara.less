@@ -21,70 +21,71 @@
 // @author    Joby Harding <joby.harding@totaralearning.com>
 // @package   theme_roots
 
-// All Totara plugins with less must go first,
-// because they are not allowed to override anything in theme or bootstrap.
-// These plugins must define all used variables with default values for legacy themes.
-@import "blocks/current_learning/less/styles";
-@import "totara/reportbuilder/less/styles";
-@import "totara/job/less/styles";
+// Plugins can either add theme specific sheet such as less/roots.less file.
+// Or they may use one less/styles.less for all themes, but then they
+// need to define defaults for all used variables, otherwise grunt will
+// fail building the legacy plugin styles.css file.
+// Do not forget to add plugin styles.css excludes into this theme config.php
+// for all plugins imported here.
+@import "mod/feedback/less/roots.less";
+@import "blocks/current_learning/less/styles.less";
+@import "totara/reportbuilder/less/styles.less";
+@import "totara/job/less/styles.less";
 
-//
-// Icons.
-//
-@import "base/less/flexible-icons";
+// Flexible icons.
+@import "base/less/flexible-icons.less";
 
 // Bootstrap 3.
-@import "bootstrap3/bootstrap";
-
-@import "variables.less";
+@import "bootstrap3/bootstrap.less";
 
 // Override Bootstrap defaults.
-@import "totara/bootstrapoverride";
+@import "totara/bootstrapoverride.less";
 
 // Roll back nameclashes.
-@import "totara/undo";
+@import "totara/undo.less";
 
-@import "totara/core";
-@import "totara/admin";
-@import "totara/calendar";
-@import "totara/course";
-@import "totara/filemanager";
-@import "totara/message";
-@import "totara/question";
-@import "totara/user";
-@import "totara/userprofile";
-@import "totara/login";
-@import "totara/tags";
-@import "totara/badges";
-@import "totara/new";
-@import "totara/blocks";
-@import "totara/forms";
-@import "totara/modules";
-@import "totara/chat";
-@import "totara/reports";
-@import "totara/backup-restore";
-@import "totara/tables";
-@import "totara/buttons";
-@import "totara/navs";
-@import "totara/enrolment";
-@import "totara/responsive";
-@import "totara/debug";
-@import "totara/dock";
-@import "totara/grade";
-@import "totara/editor";
-@import "totara/feedback";
+@import "totara/core.less";
+@import "totara/admin.less";
+@import "totara/calendar.less";
+@import "totara/course.less";
+@import "totara/filemanager.less";
+@import "totara/message.less";
+@import "totara/question.less";
+@import "totara/user.less";
+@import "totara/userprofile.less";
+@import "totara/login.less";
+@import "totara/tags.less";
+@import "totara/badges.less";
+@import "totara/new.less";
+@import "totara/blocks.less";
+@import "totara/forms.less";
+@import "totara/modules.less";
+@import "totara/chat.less";
+@import "totara/reports.less";
+@import "totara/backup-restore.less";
+@import "totara/tables.less";
+@import "totara/buttons.less";
+@import "totara/navs.less";
+@import "totara/enrolment.less";
+@import "totara/responsive.less";
+@import "totara/debug.less";
+@import "totara/dock.less";
+@import "totara/grade.less";
+@import "totara/editor.less";
 
 //
 // Modules
 //
-@import "totara/totara-menu";
-@import "totara/totara-dialog";
+@import "totara/totara-menu.less";
+@import "totara/totara-dialog.less";
 
 //
 // Legacy & Misc
 //
-@import "totara/fixes"; // TODO integrate and remove file.
+@import "totara/fixes.less"; // TODO integrate and remove file.
 
-@import "totara/totara_jquery/totara_jquery_datatables";
-@import "totara/totara_jquery/totara_jquery_treeview";
-@import "totara/totara_jquery/totara_jquery_ui_dialog";
+@import "totara/totara_jquery/totara_jquery_datatables.less";
+@import "totara/totara_jquery/totara_jquery_treeview.less";
+@import "totara/totara_jquery/totara_jquery_ui_dialog.less";
+
+@import "totara/variables.less";
