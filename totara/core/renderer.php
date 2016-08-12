@@ -257,7 +257,7 @@ class totara_core_renderer extends plugin_renderer_base {
         foreach ($reports as $report) {
             // Check url property is set.
             if (isset($report->url)) {
-                $report_data = array ('name' => $report->fullname, 'href' => $report->url);
+                $report_data = array ('name' => format_string($report->fullname), 'href' => $report->url);
 
                 if ($canedit) {
                     $report_data['edit_href'] = (string) new moodle_url('/totara/reportbuilder/general.php', array('id' => $report->id));
@@ -330,7 +330,7 @@ class totara_core_renderer extends plugin_renderer_base {
 
         foreach ($scheduledreports as $sched) {
             $cells = array();
-            $cells[] = new html_table_cell($sched->fullname);
+            $cells[] = new html_table_cell(format_string($sched->fullname));
             $cells[] = new html_table_cell($sched->data);
             $cells[] = new html_table_cell($sched->format);
             if (get_config('reportbuilder', 'exporttofilesystem') == 1) {

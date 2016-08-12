@@ -66,7 +66,7 @@ class scheduled_reports_new_form extends moodleform {
 
         $mform->addElement('header', 'general', get_string('scheduledreportsettings', 'totara_reportbuilder'));
 
-        $mform->addElement('static', 'report', get_string('report', 'totara_reportbuilder'), $report->fullname);
+        $mform->addElement('static', 'report', get_string('report', 'totara_reportbuilder'), format_string($report->fullname));
         if (empty($savedsearches)) {
             $mform->addElement('static', '', get_string('data', 'totara_reportbuilder'),
                     html_writer::div(get_string('scheduleneedssavedfilters', 'totara_reportbuilder', $report->report_url()),
@@ -251,7 +251,7 @@ class scheduled_reports_add_form extends moodleform {
                     if ($report->embedded) {
                         $reportobject = new reportbuilder($report->id);
                     }
-                    $reportselect[$report->id] = $report->fullname;
+                    $reportselect[$report->id] = format_string($report->fullname);
                 } catch (moodle_exception $e) {
                     if ($e->errorcode != "nopermission") {
                         // The embedded report creation failed, almost certainly due to a failed is_capable check.
