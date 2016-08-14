@@ -252,7 +252,11 @@ echo <<<EOF
 <p>Note: Brand icons should only be used to represent the company or product to which they refer.</p>
 EOF;
 
-echo html_writer::end_tag('dl');
+echo $OUTPUT->heading('List of all plugin flex icons');
+echo render_all_plugin_icons();
+echo <<<EOF
+<p>Note: Brand icons should only be used to represent the company or product to which they refer.</p>
+EOF;
 
 echo $OUTPUT->box_end();
 
@@ -316,6 +320,41 @@ function render_all_core_icons() {
         $output .= '<div style="padding-top: 5px">' . $OUTPUT->flex_icon($identifier) . $identifier . '</div>';
     }
     $output .= '</div>';
+
+    return $output;
+}
+
+/**
+ * Render list of all core icons.
+ */
+function render_all_plugin_icons() {
+    global $OUTPUT, $CFG;
+
+    $icons = flex_icon_helper::get_icons($CFG->theme);
+    $plugins = array();
+    foreach ($icons as $identifier => $icon) {
+        if (!empty($icon['deprecated'])) {
+            // No need to tell anybody about deprecated icons, they should not be used anywhere.
+            continue;
+        }
+        if (!preg_match('/([a-z0-9_]+)\|(.*)/', $identifier, $matches)) {
+            continue;
+        }
+        $plugins[$matches[1]][] = $identifier;
+    }
+    ksort($plugins);
+
+    $output = '';
+    foreach ($plugins as $component => $identifiers) {
+        $output .= $OUTPUT->heading($component, 3);
+        sort($identifiers);
+        // There is no point putting the CSS into the theme...
+        $output .= '<div style="-webkit-column-count: 3; -moz-column-count: 3; column-count: 3;">';
+        foreach ($identifiers as $identifier) {
+            $output .= '<div style="padding-top: 5px">' . $OUTPUT->flex_icon($identifier) . $identifier . '</div>';
+        }
+        $output .= '</div>';
+    }
 
     return $output;
 }
