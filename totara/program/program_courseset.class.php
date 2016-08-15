@@ -754,8 +754,9 @@ class multi_course_set extends course_set {
         $courses = $this->courses;
         $completiontype = $this->completiontype;
 
-        // Check if this is an 'optional' course set where the user doesn't have to complete any courses.
-        if ($completiontype == COMPLETIONTYPE_OPTIONAL) {
+        // Check if this is an 'optional' or 'some 0' course set where the user doesn't have to complete any courses.
+        if ($completiontype == COMPLETIONTYPE_OPTIONAL ||
+            $completiontype == COMPLETIONTYPE_SOME && $this->mincourses == 0) {
             $completionsettings = array(
                 'status'        => STATUS_COURSESET_COMPLETE,
                 'timecompleted' => time()
