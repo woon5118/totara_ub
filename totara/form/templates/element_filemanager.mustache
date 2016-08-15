@@ -89,21 +89,21 @@
                     <div class="fp-toolbar">
                         <div class="fp-btn-add">
                             <a role="button" title="{{#str}}addfile,repository{{/str}}" href="#">
-                                {{#pix}}a/add_file,core,{{#str}}addfiletext,repository{{/str}}{{/pix}}
+                                {{#flex_icon}}document-new,{"alt":"{{#str}}addfiletext,repository{{/str}}"}{{/flex_icon}}
                             </a>
                         </div>
                         <div class="fp-btn-mkdir">
                             <a role="button" title="{{#str}}makeafolder{{/str}}" href="#">
-                                {{#pix}}a/create_folder,core,{{#str}}createfolder,repository{{/str}}{{/pix}}
+                                {{#flex_icon}}folder-create,{"alt":"{{#str}}createfolder,repository{{/str}}"}{{/flex_icon}}
                             </a>
                         </div>
                         <div class="fp-btn-download">
                             <a role="button" title="{{#str}}downloadfolder,repository{{/str}}" href="#">
-                                {{#pix}}a/download_all,core,{{#str}}downloadallfiles,repository{{/str}}{{/pix}}
+                                {{#flex_icon}}download,{"alt":"{{#str}}downloadallfiles,repository{{/str}}"}{{/flex_icon}}
                             </a>
                         </div>
                         <span class="fp-img-downloading">
-                            {{#pix}}i/loading_small,core{{/pix}}
+                            {{#flex_icon}}loading{{/flex_icon}}
                         </span>
                     </div>
                     <div class="fp-viewbar">
@@ -122,7 +122,7 @@
                     <span class="fp-path-folder"><a class="fp-path-folder-name" href="#"></a></span>
                 </div>
             </div>
-            <div class="filemanager-loading mdl-align">{{#pix}}i/loading_small,core,{{#str}}loading,repository{{/str}}{{/pix}}</div>
+            <div class="filemanager-loading mdl-align">{{#flex_icon}}loading, {"alt":"{{#str}}loading,repository{{/str}}"}{{/flex_icon}}</div>
             <div class="filemanager-container" >
                 <div class="fm-content-wrapper">
                     <div class="fp-content"></div>
@@ -131,9 +131,9 @@
                     </div>
                     <div class="dndupload-target">{{#str}}droptoupload{{/str}}<br/><div class="dndupload-arrow"></div></div>
                     <div class="dndupload-progressbars"></div>
-                    <div class="dndupload-uploadinprogress">{{#pix}}i/loading_small,core,{{#str}}loading,repository{{/str}}{{/pix}}</div>
+                    <div class="dndupload-uploadinprogress">{{#flex_icon}}loading, {"alt":"{{#str}}loading,repository{{/str}}"}{{/flex_icon}}</div>
                 </div>
-                <div class="filemanager-updating">{{#pix}}i/loading_small,core,{{#str}}loading,repository{{/str}}{{/pix}}</div>
+                <div class="filemanager-updating">{{#flex_icon}}loading,{"alt":"{{#str}}loading,repository{{/str}}"}{{/flex_icon}}</div>
             </div>
         </div>
 
