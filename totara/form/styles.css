@@ -87,18 +87,6 @@
     text-decoration: none;
 }
 
-.totara_form .totara_form_group_section fieldset.collapsible legend a {
-    padding: 0 5px 0 20px;
-    margin-left: -20px;
-    background: url([[pix:t/expanded]]) 2px center no-repeat;
-}
-
-.totara_form .totara_form_group_section fieldset.collapsed legend a {
-    padding: 0 5px 0 20px;
-    margin-left: -20px;
-    background: url([[pix:t/collapsed]]) 2px center no-repeat;
-}
-
 .totara_form .totara_form_group_section fieldset.collapsed div.tf_section_items {
     display: none;
 }
