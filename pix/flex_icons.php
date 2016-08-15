@@ -1576,6 +1576,13 @@ $icons = array(
                     'classes' => 'fa-repeat',
                 ),
         ),
+    'required' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-asterisk ft-state-danger',
+                ),
+        ),
     'risk-config' =>
         array(
             'template' => 'core/flex_icon_stack',
@@ -2321,7 +2328,7 @@ $deprecated = array(
     'core|i/warning' => 'warning-warning',
     'core|i/withsubcat' => 'view-tree',
     'core|m/USD' => 'dollar',
-    'core|req' => 'asterisk',
+    'core|req' => 'required',
     'core|spacer' => 'spacer',
     'core|t/add' => 'plus',
     'core|t/addcontact' => 'contact-add',
