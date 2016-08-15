@@ -563,6 +563,7 @@ class totara_program_renderer extends plugin_renderer_base {
     protected function coursecat_category(programcat_helper $chelper, $coursecat, $depth, $type = 'program') {
         global $CFG;
         require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+        $has_children = false;
 
         $this->include_js();
 
@@ -580,6 +581,7 @@ class totara_program_renderer extends plugin_renderer_base {
              prog_get_programs_count($coursecat, $type))) {
                 $classes[] = 'with_children';
                 $classes[] = 'collapsed';
+                $has_children = true;
             }
         } else {
             // Load category content.
@@ -587,6 +589,7 @@ class totara_program_renderer extends plugin_renderer_base {
             $classes[] = 'loaded';
             if (!empty($categorycontent)) {
                 $classes[] = 'with_children';
+                $has_children = true;
             }
         }
         $content = html_writer::start_tag('div', array('class' => join(' ', $classes),
@@ -615,7 +618,14 @@ class totara_program_renderer extends plugin_renderer_base {
         $categoryname .= html_writer::tag('span', ' (' . $categorycount . ')',
                         array('title' => get_string('numberofprograms', 'totara_program')));
         $content .= html_writer::start_tag('div', array('class' => 'info'));
-        $content .= html_writer::tag(($depth > 1) ? 'h4' : 'h3', $categoryname, array('class' => 'categoryname'));
+
+        $icon = null;
+        if ($has_children) {
+            $icon = new \core\output\flex_icon('collapsed');
+        } else {
+            $icon = new \core\output\flex_icon('collapsed-empty');
+        }
+        $content .= html_writer::tag(($depth > 1) ? 'h4' : 'h3', $this->render($icon) . $categoryname, array('class' => 'categoryname'));
         $content .= html_writer::end_tag('div');
 
         // Add category content to the output.
@@ -780,7 +790,7 @@ class totara_program_renderer extends plugin_renderer_base {
 
             // Show the collapse/expand.
             $content .= html_writer::start_tag('div', array('class' => 'collapsible-actions'));
-            $content .= html_writer::link('#', get_string('expandall'),
+            $content .= html_writer::link('#', $this->render(new \core\output\flex_icon('collapsed')) . get_string('expandall'),
                 array('class' => implode(' ', $classes)));
             $content .= html_writer::end_tag('div');
             $this->page->requires->strings_for_js(array('collapseall', 'expandall'), 'moodle');

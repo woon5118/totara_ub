@@ -587,13 +587,6 @@ span.editinstructions {
       margin:3px 0;
       margin-bottom:3px;
       clear: both;
-      & > .categoryname {
-        background-image: url([[pix:t/collapsed_empty]]);
-        background-repeat: no-repeat;
-        padding: 2px 18px;
-        margin: 3px;
-        background-position: left;
-      }
     }
     & > .content {
       padding-left:16px;
@@ -614,16 +607,8 @@ span.editinstructions {
   .category.with_children {
     & > .info {
       & > .categoryname {
-        background-image: url([[pix:t/expanded]]);
         cursor: pointer;
         line-height: 30px;
-      }
-    }
-  }
-  .category.with_children.collapsed {
-    & > .info {
-      & > .categoryname {
-        background-image: url([[pix:t/collapsed]]);
       }
     }
   }
