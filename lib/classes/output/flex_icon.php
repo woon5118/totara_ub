@@ -153,13 +153,15 @@ class flex_icon extends \pix_icon {
 
         if (isset($customclasses)) {
             self::add_class_to_customdata($customdata, $customclasses);
+        }
 
-        } else {
-            // Try to guess if we should apply some known classes.
-            if (!empty($icon->attributes['class'])) {
-                if (strpos($icon->attributes['class'], 'activityicon') !== false) {
-                    self::add_class_to_customdata($customdata, 'activityicon');
-                }
+        if (!empty($icon->attributes['class'])) {
+            $blacklist = array('smallicon', 'iconsmall', 'iconlarge', 'icon-pre', 'icon-post', 'icon', 'iconhelp',
+                'navicon', 'spacer', 'actionmenu', 'msgicon', 'itemicon', '');
+
+            $newclasses = array_diff(explode(' ',$icon->attributes['class']), $blacklist);
+            if (count($newclasses) > 0) {
+                self::add_class_to_customdata($customdata, implode(' ', $newclasses));
             }
         }
 

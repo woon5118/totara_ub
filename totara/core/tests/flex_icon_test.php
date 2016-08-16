@@ -200,7 +200,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $flexicon = flex_icon::create_from_pix_icon($pixicon);
         $this->assertInstanceOf('core\output\flex_icon', $flexicon);
         $this->assertSame('mod_forum|icon', $flexicon->identifier);
-        $this->assertSame(array('classes' => 'activityicon', 'alt' => 'Alt text'), $flexicon->customdata);
+        $this->assertSame(array('classes' => 'activityicon otherclass', 'alt' => 'Alt text'), $flexicon->customdata);
 
         $pixicon = new pix_icon('grrrrgrgrg', 'Some Forum', 'forum');
         $flexicon = flex_icon::create_from_pix_icon($pixicon);
