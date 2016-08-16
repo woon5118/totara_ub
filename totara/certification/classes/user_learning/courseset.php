@@ -291,12 +291,12 @@ class courseset implements designation {
 
         // Next step operator.
         switch ($this->nextsetoperator) {
-            case COMPLETIONTYPE_ANY:
-            case COMPLETIONTYPE_SOME:
+            case NEXTSETOPERATOR_OR:
                 $setoperator = get_string('or', 'totara_program');
                 break;
-            case COMPLETIONTYPE_ALL:
+            case NEXTSETOPERATOR_AND:
                 $setoperator = get_string('and', 'totara_program');
+                $setdata->nextseticon = 'plus';
                 break;
             default:
                 $setoperator = '';

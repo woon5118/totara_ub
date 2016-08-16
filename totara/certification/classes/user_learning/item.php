@@ -165,7 +165,7 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
      * Ensure the program record has been loaded and
      * if not load it.
      */
-    protected function ensure_program_loaded() {
+    protected function ensure_certification_loaded() {
         if ($this->certification === null) {
             $this->certification = new \program($this->id);
         }
@@ -181,7 +181,7 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
         if ($this->coursesets !== null) {
             return;
         }
-        $this->ensure_program_loaded();
+        $this->ensure_certification_loaded();
         $this->coursesets = [];
         foreach ($this->certification->content->get_course_sets_path($this->certification_path) as $set) {
             /** @var \course_set $set */
