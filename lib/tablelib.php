@@ -1326,11 +1326,9 @@ class flexible_table {
         }
 
         if ($order == SORT_ASC) {
-            return html_writer::empty_tag('img',
-                    array('src' => $OUTPUT->pix_url('t/sort_asc'), 'alt' => get_string('asc'), 'class' => 'iconsort'));
+            return $OUTPUT->render(new \core\output\flex_icon('sort-asc', array('alt' => get_string('asc'), 'classes' => 'iconsort')));
         } else {
-            return html_writer::empty_tag('img',
-                    array('src' => $OUTPUT->pix_url('t/sort_desc'), 'alt' => get_string('desc'), 'class' => 'iconsort'));
+            return $OUTPUT->render(new \core\output\flex_icon('sort-desc', array('alt' => get_string('desc'), 'classes' => 'iconsort')));
         }
     }
 
