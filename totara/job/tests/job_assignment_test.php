@@ -431,6 +431,19 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
         } catch (Exception $e) {
             $this->assertEquals('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::update_internal', $e->getMessage());
         }
+
+        // Check that unsetting the managerjaid will reset the managerjapath.
+        $jobassignment->update(array('managerjaid' => null));
+        $this->assertNull($jobassignment->managerid);
+        $this->assertNull($jobassignment->managerjaid);
+        $this->assertEquals('/' . $jobassignment->id, $jobassignment->managerjapath);
+
+        // Check that updating the position to null causes the positionassignmentdate to be updated.
+        sleep(1);
+        $timebefore = time();
+        $jobassignment->update(array('positionid' => null));
+        $this->assertNull($jobassignment->positionid);
+        $this->assertGreaterThanOrEqual($timebefore, $jobassignment->positionassignmentdate);
     }
 
     /**

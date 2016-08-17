@@ -296,7 +296,7 @@ class job_assignment {
         }
 
         // Remove the description_editor and save it for later.
-        if (isset($record->description_editor)) {
+        if (property_exists($record, 'description_editor')) {
             $descriptioneditor = $record->description_editor;
             unset($record->description_editor);
         } else {
@@ -326,7 +326,7 @@ class job_assignment {
             $extrafields = new \stdClass();
             $extrafields->id = $record->id;
 
-            if (!isset($record->managerjaid)) {
+            if (empty($record->managerjaid)) {
                 $record->managerjaid = null;
             }
             $extrafields->managerjapath = self::calculate_managerjapath($record->id, $record->managerjaid);
@@ -621,7 +621,7 @@ class job_assignment {
         }
 
         // Process the description_editor.
-        if (isset($record->description_editor)) {
+        if (property_exists($record, 'description_editor')) {
             file_postupdate_standard_editor($record, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
                 'totara_job', 'job_assignment', $this->id);
         }
@@ -630,11 +630,11 @@ class job_assignment {
         $record->timemodified = $now;
         $record->usermodified = $USER->id;
 
-        if (isset($record->positionid) && $record->positionid != $this->positionid) {
+        if (property_exists($record, 'positionid') && $record->positionid != $this->positionid) {
             $record->positionassignmentdate = $now;
         }
 
-        if (isset($record->managerjaid)) {
+        if (property_exists($record, 'managerjaid')) {
             $record->managerjapath = self::calculate_managerjapath($record->id, $record->managerjaid);
         }
 
