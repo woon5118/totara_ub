@@ -785,4 +785,14 @@ function totara_core_upgrade_multiple_jobs() {
             unset($assigntype_manager, $assigntype_managerja, $sql, $params);
         }
     }
+
+    // Move signup setting from totara_core to totara_job.
+    $settingnames = array('allowsignupposition', 'allowsignuporganisation', 'allowsignupmanager');
+    foreach ($settingnames as $settingname) {
+        $existingsetting = get_config('totara_hierarchy', $settingname);
+        if ($existingsetting !== false) {
+            set_config($settingname, $existingsetting, 'totara_job');
+            unset_config($settingname, 'totara_hierarchy');
+        }
+    }
 }

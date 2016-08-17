@@ -780,4 +780,24 @@ class totara_job_install_testcase extends reportcache_advanced_testcase {
         $this->assertCount(0, $manager_assignments);
     }
 
+    /**
+     * Test that totara_hirarchy settings are moved to totara_job during upgrade.
+     */
+    public function test_upgrade_hierarchy_settings() {
+        $settingnames = array('allowsignupposition', 'allowsignuporganisation', 'allowsignupmanager');
+
+        // Make sure the database looks like the old version and contains some identifiable values.
+        foreach ($settingnames as $settingname) {
+            set_config($settingname, 12345, 'totara_hierarchy');
+        }
+
+        // Do the upgrade.
+        totara_core_upgrade_multiple_jobs();
+
+        // Check the results are what we expect.
+        foreach ($settingnames as $settingname) {
+            $this->assertEquals(12345, get_config('totara_job', $settingname));
+            $this->assertFalse(get_config('totara_hierarchy', $settingname));
+        }
+    }
 }
