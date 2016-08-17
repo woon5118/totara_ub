@@ -99,7 +99,7 @@ $string['groupother'] = 'Non-question element';
 $string['image'] = 'Image';
 $string['infotodisplay'] = 'Information to display';
 $string['notanswered'] = 'Not yet answered';
-$string['managername'] = 'Job assignments';
+$string['managernames'] = 'Managers';
 $string['moveup'] = 'Move up';
 $string['movedown'] = 'Move down';
 $string['multichoicecheck'] = 'Checkboxes';
@@ -127,7 +127,9 @@ $string['noselfobjfromplan'] = 'Your learning plan(s) don\'t contain any objecti
 $string['noselfprogfromplan'] = 'Your learning plan(s) don\'t contain any programs to review';
 $string['noselfrequiredlearning'] = 'You don\'t have any required learning to review';
 $string['nothingselected'] = 'No items selected';
+$string['organisations'] = 'Organisations';
 $string['pluginname'] = 'Question';
+$string['positions'] = 'Positions';
 $string['question'] = 'Question';
 $string['question_help'] = 'Here you specify what information you want the user to provide when they answer this element';
 $string['questionandstage'] = '{$a->name} ({$a->stage})';
@@ -204,3 +206,6 @@ $string['userselectednothing'] = 'User selected nothing';
 $string['valueoutsiderange'] = 'Please enter a value within the valid range';
 $string['visibleto'] = 'Visible to:';
 $string['youranswer'] = 'Your answer';
+
+// Deprecated.
+$string['managername'] = 'Manager';
