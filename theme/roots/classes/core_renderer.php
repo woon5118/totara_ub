@@ -90,7 +90,7 @@ class theme_roots_core_renderer extends core_renderer {
 
         $iconbar = html_writer::tag('span', '', array('class' => 'icon-bar'));
         $sronly = html_writer::tag('span', 'Toggle navigation', array('class' => 'sr-only')); // TODO: localise
-        $button = html_writer::tag('button', $iconbar . "\n" . $iconbar. "\n" . $iconbar, array(
+        $button = html_writer::tag('button', $iconbar . "\n" . $iconbar. "\n" . $iconbar . $sronly, array(
             'class'       => 'navbar-toggle',
             'type'        => 'button',
             'data-toggle' => 'collapse',
