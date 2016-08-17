@@ -42,6 +42,7 @@ class theme_roots_block_settings_renderer extends block_settings_renderer {
             )
         );
         $content .= html_writer::start_div('input-group');
+        $content .= html_writer::tag('label', s(get_string('searchinsettings', 'admin')), array('for'=>'adminsearchquery', 'class'=>'sr-only'));
         $content .= html_writer::empty_tag('input',
             array(
                 'id' => 'adminsearchquery',
