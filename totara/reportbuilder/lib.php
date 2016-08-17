@@ -3687,13 +3687,13 @@ class reportbuilder {
 
         $initiallyhidden = $this->is_initially_hidden();
 
-        if (!defined('DEFAULT_PAGE_SIZE')) {
-            define('DEFAULT_PAGE_SIZE', $this->recordsperpage);
-        }
         if (!defined('SHOW_ALL_PAGE_SIZE')) {
             define('SHOW_ALL_PAGE_SIZE', 9999);
         }
-        $perpage   = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT);
+        if (defined('DEFAULT_PAGE_SIZE')) {
+            $this->recordsperpage = DEFAULT_PAGE_SIZE;
+        }
+        $perpage   = optional_param('perpage', $this->recordsperpage, PARAM_INT);
 
         $columns = $this->columns;
         $shortname = $this->shortname;
