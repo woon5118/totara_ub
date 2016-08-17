@@ -800,4 +800,42 @@ class totara_job_install_testcase extends reportcache_advanced_testcase {
             $this->assertFalse(get_config('totara_hierarchy', $settingname));
         }
     }
+
+    /**
+     * Test that update_temporary_manager_task settings are moved from totara_core to totara_job.
+     */
+    public function test_upgrade_temp_manager_task() {
+        global $DB;
+
+        // Remove the new task if it already exists.
+        $criteria = array(
+            'component' => 'totara_job',
+            'classname' => '\totara_job\task\update_temporary_managers_task'
+        );
+        $DB->delete_records('task_scheduled', $criteria);
+
+        // Create the old record, and make it easily identifiable.
+        $data = new stdClass();
+        $data->component = 'totara_core';
+        $data->classname = '\totara_core\task\update_temporary_managers_task';
+        $data->lastruntime = 12345; // This is what we'll look for.
+        $DB->insert_record('task_scheduled', $data);
+
+        // Get all the data from the table before upgrade and make it look like what we expect afterwards.
+        $expectedrecords = $DB->get_records('task_scheduled', array(), 'id');
+        foreach ($expectedrecords as $record) {
+            if ($record->component == 'totara_core' && $record->classname == '\totara_core\task\update_temporary_managers_task') {
+                $record->component = 'totara_job';
+                $record->classname = '\totara_job\task\update_temporary_managers_task';
+                break;
+            }
+        }
+
+        // Do the upgrade.
+        totara_core_upgrade_multiple_jobs();
+
+        // Compare before and after.
+        $resultrecords = $DB->get_records('task_scheduled', array(), 'id');
+        $this->assertEquals($expectedrecords, $resultrecords);
+    }
 }

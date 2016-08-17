@@ -795,4 +795,16 @@ function totara_core_upgrade_multiple_jobs() {
             unset_config($settingname, 'totara_hierarchy');
         }
     }
+
+    // Move update temporary managers task setting from totara_core to totara_job.
+    $criteria = array(
+        'component' => 'totara_core',
+        'classname' => '\totara_core\task\update_temporary_managers_task'
+    );
+    $task = $DB->get_record('task_scheduled', $criteria, 'id');
+    if ($task) {
+        $task->component = 'totara_job';
+        $task->classname = '\totara_job\task\update_temporary_managers_task';
+        $DB->update_record('task_scheduled', $task);
+    }
 }
