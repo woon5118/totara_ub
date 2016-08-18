@@ -177,7 +177,7 @@ class profile_field_base {
         }
 
         // Check for uniqueness of data if required.
-        if ($this->is_unique() && (($value !== '') || $this->is_required())) {
+        if ($this->is_unique() && ($value !== '')) {
             $data = $DB->get_records_sql('
                     SELECT id, userid
                       FROM {user_info_data}
