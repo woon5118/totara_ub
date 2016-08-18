@@ -3902,7 +3902,7 @@ class action_menu implements renderable {
             $title = new lang_string('actions', 'moodle');
             $this->actionicon = new pix_icon(
                 't/edit_menu',
-                '',
+                $title,
                 'moodle',
                 array('class' => 'iconsmall actionmenu', 'title' => '')
             );
