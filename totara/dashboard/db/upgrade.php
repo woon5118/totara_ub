@@ -44,7 +44,7 @@ function xmldb_totara_dashboard_upgrade($oldversion) {
         foreach ($dashes as $dash) {
             if (!preg_match('/^[0-9]{1,10}$/', $dash->dashboardid)) {
                 // Delete the invalid record.
-                $DB->delete_record('totara_dashboard_user', array('id' => $dash->id));
+                $DB->delete_records('totara_dashboard_user', array('id' => $dash->id));
 
                 // Log what has happended.
                 $type = 'Invalid Dashboard Warning';
