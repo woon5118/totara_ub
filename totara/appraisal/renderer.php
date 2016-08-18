@@ -953,14 +953,14 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                     $redisplayed = '';
                 }
 
-                $dragdrop = $this->pix_icon('/i/dragdrop', '', 'moodle', array('class' => 'iconsmall js-show-inline move'));
-                $viewlink = $this->output->action_icon($editurl, new pix_icon('/t/preview', $strview, 'moodle'), null,
+                $dragdrop = $this->pix_icon('i/dragdrop', '', 'moodle', array('class' => 'iconsmall js-show-inline move'));
+                $viewlink = $this->output->action_icon($editurl, new pix_icon('t/preview', $strview, 'moodle'), null,
                     array('class' => 'action-icon view'));
-                $editlink = $this->output->action_icon($editurl, new pix_icon('/t/edit', $stredit, 'moodle'), null,
+                $editlink = $this->output->action_icon($editurl, new pix_icon('t/edit', $stredit, 'moodle'), null,
                         array('class' => 'action-icon edit'));
-                $duplicatelink = $this->output->action_icon($duplicateurl, new pix_icon('/t/copy', $strduplicate, 'moodle'), null,
+                $duplicatelink = $this->output->action_icon($duplicateurl, new pix_icon('t/copy', $strduplicate, 'moodle'), null,
                         array('class' => 'action-icon copy'));
-                $deletelink = $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'), null,
+                $deletelink = $this->output->action_icon($deleteurl, new pix_icon('t/delete', $strdelete, 'moodle'), null,
                         array('class' => 'action-icon delete'));
 
                 $questtext = html_writer::tag('strong', format_string($question->get_name())) .
