@@ -100,7 +100,7 @@
         ><span class="expanded-icon">{{#flex_icon}}caret-down{{/flex_icon}}</span
     ></span
 ><span data-toggle="tooltip" data-placement="top" data-container="body" title="{{title}}">{{#flex_icon}}{{icon}}{{/flex_icon}}</span
-    ><a href="{{url_view}}">{{fullname}}</a
+    ><a href="{{url_view}}">{{{fullname}}}</a
     ><span class="pull-right info">
         {{#dueinfo}}<span class="label {{state}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">{{#alert}}{{#flex_icon}}warning-warning{{/flex_icon}}{{/alert}} {{duetext}}</span>{{/dueinfo}}
         {{#progress}}<span class="label label-default">{{summary}}</span>{{/progress}}
@@ -115,10 +115,10 @@
         {{/completed_coursesets}}
         {{#coursesets}}
         <div class="current_learning-set">
-            <h5>{{name}}<span class="pull-right info">{{completion_text}}</span></h5>
+            <h5>{{{name}}}<span class="pull-right info">{{completion_text}}</span></h5>
             {{#courses}}
             <p class="current_learning-course status-{{status}}">
-            <a href="{{url_view}}">{{fullname}}</a>
+            <a href="{{url_view}}">{{{fullname}}}</a>
                 {{#points}}
                 <span class="points">{{points}}</span>
                 {{/points}}
