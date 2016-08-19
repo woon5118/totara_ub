@@ -896,7 +896,8 @@ class totara_program_renderer extends plugin_renderer_base {
                 $catdisplayoptions['viewmoretext'] = new lang_string('viewallsubcategories');
             } else {
                 // We have a category that has both subcategories and programs, display pagination separately.
-                $programdisplayoptions['viewmoreurl'] = new moodle_url($baseurl, array('browse' => $browse, 'viewtype' => $viewtype, 'page' => 1));
+                $programdisplayoptions['offset'] = $page * $perpage;
+                $programdisplayoptions['paginationurl'] = new moodle_url($baseurl, array('browse' => $browse, 'viewtype' => $viewtype));
                 $catdisplayoptions['viewmoreurl'] = new moodle_url($baseurl, array('browse' => 'categories', 'viewtype' => $viewtype, 'page' => 1));
             }
         }
