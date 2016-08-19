@@ -3662,7 +3662,7 @@ class reportbuilder {
         }
         $writerclass = $formats[$format];
 
-        $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
+        $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), format_string($this->fullname)));
         $filename = clean_filename($fullname . '_report');
 
         $source = new \totara_reportbuilder\tabexport_source($this);
