@@ -163,12 +163,6 @@ Feature: Add - Remove seminar attendees
     And I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
 
-    # Remove users (continue with just added users in Attendees tab)
-    #When I click on "All" "link" in the ".mod-facetoface-attendees" "css_element"
-    #And I click on "Confirm" "option" in the "#menuf2f-actions" "css_element"
-    #And I wait "1" seconds
-    #And I press "Yes"
-    #And I click on "Attendees" "link"
     When I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
@@ -176,6 +170,7 @@ Feature: Add - Remove seminar attendees
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam2 Student2"
+    And I should see "Bulk remove users success - Successfully removed 1 attendees."
     And I should not see "Sam1 Student1"
 
   Scenario: Use the allow scheduling conflicts checkbox

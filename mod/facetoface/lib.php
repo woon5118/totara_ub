@@ -4854,7 +4854,11 @@ function facetoface_set_bulk_result_notification($results, $type = 'bulkadd') {
         }
     } else if ($added) {
         $result_message .= get_string($type.'attendeessuccess', 'facetoface') . ' - ';
-        $result_message .= get_string('successfullyaddededitedxattendees', 'facetoface', count($added));
+        if ($type == 'bulkremove') {
+            $result_message .= get_string('successfullyremovedxattendees', 'facetoface', count($added));
+        } else {
+            $result_message .= get_string('successfullyaddededitedxattendees', 'facetoface', count($added));
+        }
         $result_message .= ' <a href="#" class="'.$dialogid.'">('.get_string('viewresults', 'facetoface').')</a>';
     }
 

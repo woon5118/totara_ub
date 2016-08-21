@@ -1844,6 +1844,7 @@ $string['status_declined'] = 'Declined';
 $string['status_session_cancelled'] = 'Event Cancelled';
 $string['submitcsvtext'] = 'Submit CSV text';
 $string['successfullyaddededitedxattendees'] = 'Successfully added/edited {$a} attendees.';
+$string['successfullyremovedxattendees'] = 'Successfully removed {$a} attendees.';
 $string['summary'] = 'Summary';
 $string['takeattendance'] = 'Take attendance';
 $string['template'] = 'Template';
