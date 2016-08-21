@@ -15,6 +15,13 @@
     <licenseversion></licenseversion>
   </library>
   <library>
+    <location>foonts</location>
+    <name>Bootstrap - GLYPHICONS Halflings</name>
+    <license>MIT</license>
+    <version>3.3.7</version>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
     <location>fonts/totara_font.json.zip</location>
     <name>Octicons</name>
     <license>MIT</license>
