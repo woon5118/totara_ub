@@ -55,34 +55,18 @@ function totara_gap_install_aspirational_pos() {
         // Nothing to do here.
         return;
     }
+
+    // Move the data from pos_assignment to gap_aspirational.
     // Magic 3 => POSITION_TYPE_ASPIRATIONAL (removed).
-    $positions = $DB->get_recordset ('pos_assignment', array(
-        'type' => 3
-    ));
-    if ($positions) {
-        foreach ($positions as $pos) {
-            $data = (object)array (
-                'userid' => $pos->userid,
-                'positionid' => $pos->positionid,
-                'usermodified' => $pos->usermodified,
-                'timecreated' => $pos->timecreated,
-                'timemodified' => $pos->timemodified 
-            );
-            $posexists = $DB->record_exists ('gap_aspirational', array (
-                'userid' => $pos->userid 
-            ));
-            if (!$posexists) {
-                $posexists = $DB->insert_record('gap_aspirational', $data);
-            }
-            if ($posexists) {
-                // Remove exactly aspirational position that we just added (and insured that it is exists).
-                $DB->delete_records ('pos_assignment', array(
-                    'id' => $pos->id,
-                    'type' => 3 
-                ));
-            }
-        }
-    }
+    $params = array('type' => 3);
+    $sql = "INSERT INTO {gap_aspirational} (userid, positionid, usermodified, timecreated, timemodified)
+                (SELECT pa.userid, pa.positionid, pa.usermodified, pa.timecreated, pa.timemodified
+                   FROM {pos_assignment} pa
+                  WHERE pa.type = :type AND pa.positionid IS NOT NULL)";
+    $DB->execute($sql, $params);
+    $sql = "DELETE FROM {pos_assignment}
+                  WHERE type = :type";
+    $DB->execute($sql, $params);
 
     // Now remove it from settings.
     $posstring = get_config('totara_hierarchy', 'positionsenabled');

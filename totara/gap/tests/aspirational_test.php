@@ -44,7 +44,7 @@ class totara_gap_aspirational_test extends advanced_testcase {
         $posassignmenttable->add_field('fullname', XMLDB_TYPE_CHAR, '255', null, null, null, null);
         $posassignmenttable->add_field('type', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '1');
         $posassignmenttable->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $posassignmenttable->add_field('positionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $posassignmenttable->add_field('positionid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $posassignmenttable->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $posassignmenttable->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $posassignmenttable->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
@@ -71,13 +71,16 @@ class totara_gap_aspirational_test extends advanced_testcase {
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
 
         $DB->insert_record('pos_assignment', (object)array('id' => 10, 'fullname' => 'a1', 'type' => 1, 'userid' => $user1->id, 
             'positionid' => $pos1->id, 'timecreated' => '1468468590', 'timemodified' => '1468468595', 'usermodified' => 2));
         $DB->insert_record('pos_assignment', (object)array('id' => 20, 'fullname' => 'a2', 'type' => 3, 'userid' => $user2->id, 
             'positionid' => $pos2->id, 'timecreated' => '1468468591', 'timemodified' => '1468468596', 'usermodified' => $user1->id));
-        $DB->insert_record('pos_assignment', (object)array('id' => 30, 'fullname' => 'a3', 'type' => 2, 'userid' => $user2->id, 
+        $DB->insert_record('pos_assignment', (object)array('id' => 30, 'fullname' => 'a3', 'type' => 2, 'userid' => $user2->id,
             'positionid' => $pos2->id, 'timecreated' => '1468468592', 'timemodified' => '1468468597', 'usermodified' => $user2->id));
+        $DB->insert_record('pos_assignment', (object)array('id' => 30, 'fullname' => 'a4', 'type' => 3, 'userid' => $user3->id,
+            'positionid' => null, 'timecreated' => '1468468592', 'timemodified' => '1468468598', 'usermodified' => $user3->id));
 
         totara_gap_install_aspirational_pos();
 
