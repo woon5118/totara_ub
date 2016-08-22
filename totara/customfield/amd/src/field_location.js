@@ -404,7 +404,7 @@ define(['jquery'], function ($) {
                 zoomControl: true,
                 mapTypeControl: false,
                 scaleControl: false,
-                streetViewControl: true,
+                streetViewControl: false,
                 rotateControl: false,
                 mapTypeId: this.view,
                 zoom: this.get_zoom_level()
