@@ -44,15 +44,15 @@ Feature: Test job assignments can be created, edited, and deleted
 
     When I follow "Add job assignment"
     And I set the following fields to these values:
-      | Full name   | Assignment 3 |
-      | Short name  | Assign 3     |
-      | ID Number   | A4           |
+      | Full name   | Health & Safety lead |
+      | Short name  | H&S lead             |
+      | ID Number   | A4                   |
     And I press "Add job assignment"
     Then I should see "Job assignments"
     And there should be "3" totara job assignments
     And job assignment at position "1" should be "Assignment 1"
     And job assignment at position "2" should be "Assignment 2"
-    And job assignment at position "3" should be "Assignment 3"
+    And job assignment at position "3" should be "Health & Safety lead"
     And I should be able to sort the "Assignment 2" totara job assignment
     And I should be able to delete the "Assignment 2" totara job assignment
 
@@ -66,9 +66,9 @@ Feature: Test job assignments can be created, edited, and deleted
     And there should be "3" totara job assignments
     And job assignment at position "1" should be "Assignment 1"
     And job assignment at position "2" should be "Developer 1"
-    And job assignment at position "3" should be "Assignment 3"
+    And job assignment at position "3" should be "Health & Safety lead"
 
-    When I follow "Assignment 3"
+    When I follow "Health & Safety lead"
     And I set the following fields to these values:
       | Full name   | Developer 2 |
       | Short name  | Dev 2       |
@@ -148,15 +148,13 @@ Feature: Test job assignments can be created, edited, and deleted
 
       When I follow "Add job assignment"
       And I set the following fields to these values:
-        | Full name   | Assignment 3 |
-        | Short name  | Assign 3     |
-        | ID Number   | A4           |
+        | ID Number   | H&SLEAD |
       And I press "Add job assignment"
       Then I should see "Job assignments"
       And there should be "3" totara job assignments
       And job assignment at position "1" should be "Assignment 1"
       And job assignment at position "2" should be "Assignment 2"
-      And job assignment at position "3" should be "Assignment 3"
+      And job assignment at position "3" should be "Unnamed job assignment (ID: H&SLEAD)"
 
       When I log out
       And I log in as "user1"

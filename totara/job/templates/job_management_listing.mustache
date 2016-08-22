@@ -57,7 +57,7 @@
     {{#hasjobs}}
     <ul class="joblist unlist">
     {{#jobs}}
-        <li><a class="editjoblink" href="{{editurl}}" title="{{#str}}editjobassignment,totara_job,{{fullname}}{{/str}}" data-id="{{id}}" data-sortorder="{{sortorder}}">{{fullname}}</a>
+        <li><a class="editjoblink" href="{{editurl}}" title="{{#str}}editjobassignment,totara_job{{/str}}" data-id="{{id}}" data-sortorder="{{sortorder}}">{{{fullname}}}</a>
             {{#canedit}}<span class="pull-right"><a href="#" data-action="down" title="{{#str}}movedown,core{{/str}}">{{#flex_icon}}arrow-down{{/flex_icon}}</a>
                 <a href="#" data-action="up" data-function="move" title="{{#str}}moveup,core{{/str}}">{{#flex_icon}}arrow-up{{/flex_icon}}</a>
                 <a href="#" data-action="delete" data-function="move" title="{{#str}}delete,core{{/str}}">{{#flex_icon}}times-danger{{/flex_icon}}</a></span>{{/canedit}}</li>
