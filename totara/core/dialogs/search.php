@@ -440,7 +440,7 @@ switch ($searchtype) {
     case 'dp_plan_evidence':
         // Generate search SQL
         $keywords = totara_search_parse_keywords($query);
-        $fields = array('e.name', 'e.description');
+        $fields = array('e.name', 'eid.data');
         list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields);
 
         $search_info->id = 'e.id';
@@ -448,6 +448,10 @@ switch ($searchtype) {
         $search_info->sql = "
             FROM
                 {dp_plan_evidence} e
+            JOIN {dp_plan_evidence_info_field} eif
+                ON eif.shortname = 'evidencedescription'
+            JOIN {dp_plan_evidence_info_data} eid
+                ON eid.fieldid = eif.id
             WHERE
                 {$searchsql}
                 AND e.userid = ?
