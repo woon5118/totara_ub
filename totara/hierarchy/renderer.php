@@ -100,7 +100,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                         'linktype' . $eitem->id, //$name
                         (isset($eitem->linktype) ? $eitem->linktype : PLAN_LINKTYPE_OPTIONAL), //$selected,
                         false, //$nothing,
-                        array('data-id' => $eitem->id)
+                        array('data-id' => $eitem->id, 'class' => 'linktype')
                     );
 
                     $cell = new html_table_cell($content);
@@ -416,7 +416,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                         'linktype' . $ritem->aid, //$name,
                         ($ritem->linktype ? $ritem->linktype : PLAN_LINKTYPE_OPTIONAL), //$selected,
                         false, //$nothing,
-                        array('data-id' => $ritem->aid)
+                        array('data-id' => $ritem->aid, 'class' => 'linktype')
                     );
                     $content[] = $this->output->action_icon(
                         new moodle_url('/totara/hierarchy/prefix/' . $prefix . '/assigncompetency/remove.php',

@@ -30,11 +30,11 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
          *
          * @param prefix string the hierarchy type to work with
          */
-        init: function (prefix) {
-            var selector = '.list-assignedcompetencies .menulinktype,'
-                    + ' #list-evidence .menulinktype, #list-coursecompetency .menulinktype';
+        init: function (linktype) {
+            var selector = '.list-assignedcompetencies .linktype,'
+                    + ' #list-evidence .linktype, #list-coursecompetency .linktype';
             $(document).on('change', selector, function () {
-                hierarchy._update_linktype(prefix, $(this).data('id'), $(this).val());
+                hierarchy._update_linktype(linktype, $(this).data('id'), $(this).val());
             });
         },
 
@@ -45,9 +45,9 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
          * @param id int The id of the hierarchy item to work with
          * @param val int the value to change it to
          */
-        _update_linktype: function (prefix, id, val) {
+        _update_linktype: function (linktype, id, val) {
             var params = {
-                type: prefix,
+                type: linktype,
                 c: id,
                 sesskey: mdlconfig.sesskey,
                 t: val
