@@ -39,6 +39,7 @@
 
     Context variables required for this template:
      * userid - The id of the user whose job assignments ids we are viewing.
+     * canadd - True if we can add a new job assignment.
      * canedit - True if we can edit this users job assignments.
      * jobcount - The number of job assignments the user has.
      * hasjobs - True if the user has one or more job assignments.
@@ -51,7 +52,7 @@
          * editurl - The URL that is used to edit the job assignment.
 
     Example context (json):
-      {"jobcount":3,"hasjobs":true,"jobs":[{"id":"41","idnumber":"Two","sortorder":"0","fullname":"Two","shortname":"Two"},{"id":"40","idnumber":"One","sortorder":"1","fullname":"One","shortname":"One"},{"id":"42","idnumber":"Three","sortorder":"2","fullname":"Three","shortname":"Three"}],"canedit":true,"userid":"2"}
+      {"jobcount":3,"hasjobs":true,"jobs":[{"id":"41","idnumber":"Two","sortorder":"0","fullname":"Two","shortname":"Two"},{"id":"40","idnumber":"One","sortorder":"1","fullname":"One","shortname":"One"},{"id":"42","idnumber":"Three","sortorder":"2","fullname":"Three","shortname":"Three"}],"canedit":true,"canadd":true,"userid":"2"}
 }}
 <div class="totara-job-management-listing" data-enhance="job-management-listing" data-enhanced="false" data-userid="{{userid}}" data-jobcount="{{jobcount}}" data-canedit="{{canedit}}" data-allowmultiple="{{allowmultiple}}">
     {{#hasjobs}}
@@ -65,7 +66,7 @@
     </ul>
     {{/hasjobs}}
     <div class="nojobassignments">{{#str}}nojobassignments,totara_job{{/str}}</div>
-    {{#canedit}}<div class="addjobassignment"><a class="addjoblink" href="{{addurl}}" title="{{#str}}jobassignmentadd,totara_job{{/str}}">{{#str}}jobassignmentadd,totara_job{{/str}}</a></div>{{/canedit}}
+    {{#canadd}}<div class="addjobassignment"><a class="addjoblink" href="{{addurl}}" title="{{#str}}jobassignmentadd,totara_job{{/str}}">{{#str}}jobassignmentadd,totara_job{{/str}}</a></div>{{/canadd}}
 </div>
 {{#js}}
 require(['totara_job/job_management_listing'], function(Listing){

@@ -127,6 +127,7 @@ function totara_job_myprofile_navigation(\core_user\output\myprofile\tree $tree,
 
     // Check if the current user can add, update and delte the specified user's job assignment details.
     $canedit = totara_job_can_edit_job_assignments($user->id);
+    $allowmultiple = !empty($CFG->totara_job_allowmultiplejobs);
 
     // A bit of a hack here.
     // We are going to display a list in a single node.
@@ -136,8 +137,9 @@ function totara_job_myprofile_navigation(\core_user\output\myprofile\tree $tree,
     $data->hasjobs = false;
     $data->jobs = [];
     $data->canedit = $canedit;
+    $data->canadd = false;
     $data->userid = $user->id;
-    $data->allowmultiple = !empty($CFG->totara_job_allowmultiplejobs);
+    $data->allowmultiple = $allowmultiple;
     $data->addurl = new moodle_url('/totara/job/jobassignment.php', array('userid' => $user->id));
     foreach (\totara_job\job_assignment::get_all($user->id) as $jobassignment) {
         $jobdata = $jobassignment->export_for_template($OUTPUT);
@@ -146,6 +148,7 @@ function totara_job_myprofile_navigation(\core_user\output\myprofile\tree $tree,
         $data->hasjobs = true;
         $data->jobcount ++;
     }
+    $data->canadd = $canedit && ($data->jobcount === 0 || $allowmultiple);
     $node = new core_user\output\myprofile\node(
         'jobassignment',
         'jobassignment_list' . $user->id,
