@@ -1065,6 +1065,19 @@ function facetoface_delete_session($session) {
         $DB->delete_records_select('facetoface_cancellation_info_data', "id {$sqlin}", $inparams);
     }
 
+    $sessioncancelparams = array('sessionid' => $session->id);
+    $sessioncancelids = $DB->get_fieldset_select(
+        'facetoface_sessioncancel_info_data',
+        'id',
+        "facetofacecancellationid = :sessionid",
+        $sessioncancelparams
+    );
+    if (!empty($sessioncancelids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($sessioncancelids);
+        $DB->delete_records_select('facetoface_sessioncancel_info_data_param', "dataid $sqlin", $inparams);
+        $DB->delete_records_select('facetoface_sessioncancel_info_data', "id {$sqlin}", $inparams);
+    }
+
     $DB->delete_records_select(
         'facetoface_signups_status',
         "signupid IN (SELECT id FROM {facetoface_signups} WHERE sessionid = {$session->id})");

@@ -1059,6 +1059,11 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $cfids = array_merge($cfids, $cfgenerator->create_datetime('facetoface_cancellation', array('cancellation_date' => array('shortname' => 'cancellationdate'))));
         $cfids = array_merge($cfids, $cfgenerator->create_multiselect('facetoface_cancellation', array('cancellation_multi' => array('opt1', 'opt2'))));
 
+        // Set up some facetoface Session Cancellation customfields.
+        $cfids = array_merge($cfids, $cfgenerator->create_text('facetoface_sessioncancel', array('sessioncancel_text')));
+        $cfids = array_merge($cfids, $cfgenerator->create_datetime('facetoface_sessioncancel', array('sessioncancel_date' => array('shortname' => 'sessioncanceldate'))));
+        $cfids = array_merge($cfids, $cfgenerator->create_multiselect('facetoface_sessioncancel', array('sessioncancel_multi' => array('opt1', 'opt2'))));
+
         $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
 
         $facetofacedata = array(
@@ -1157,6 +1162,15 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $cfgenerator->set_multiselect($signup32, $cfids['cancellation_multi'], array('opt1'), 'facetofacecancellation', 'facetoface_cancellation');
         $cfgenerator->set_datetime($signup32, $cfids['cancellation_date'], time(), 'facetofacecancellation', 'facetoface_cancellation');
 
+        // Add session cancellation data
+        $cfgenerator->set_text($session1, $cfids['sessioncancel_text'], 'value2', 'facetofacecancellation', 'facetoface_sessioncancel');
+        $cfgenerator->set_multiselect($session1, $cfids['sessioncancel_multi'], array('opt1'), 'facetofacecancellation', 'facetoface_sessioncancel');
+        $cfgenerator->set_datetime($session1, $cfids['sessioncancel_date'], time(), 'facetofacecancellation', 'facetoface_sessioncancel');
+
+        $cfgenerator->set_text($session2, $cfids['sessioncancel_text'], 'value2', 'facetofacecancellation', 'facetoface_sessioncancel');
+        $cfgenerator->set_multiselect($session2, $cfids['sessioncancel_multi'], array('opt1'), 'facetofacecancellation', 'facetoface_sessioncancel');
+        $cfgenerator->set_datetime($session2, $cfids['sessioncancel_date'], time(), 'facetofacecancellation', 'facetoface_sessioncancel');
+
         $sink->close();
 
         // Check we have data in before deleting session data.
@@ -1182,6 +1196,21 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $session2params = $DB->get_records_sql($sqlparams . $sqlin2, $paramin2);
         $this->assertCount(1, $session2params);
 
+        // Check customfield data for session1 and session2.
+        $cfsessioncancel1 = $DB->get_records('facetoface_sessioncancel_info_data', array('facetofacecancellationid' => $session1->id));
+        $this->assertCount(3, $cfsessioncancel1);
+
+        $cfsessioncancel2 = $DB->get_records('facetoface_sessioncancel_info_data', array('facetofacecancellationid' => $session2->id));
+        $this->assertCount(3, $cfsessioncancel2);
+
+        $sqlparamssessioncancel = 'SELECT id FROM {facetoface_sessioncancel_info_data_param} WHERE dataid ';
+
+        list($sqlinsessioncancel1, $paraminsessioncancel1) = $DB->get_in_or_equal(array_keys($cfsessioncancel1));
+        $this->assertCount(1, $DB->get_records_sql($sqlparamssessioncancel . $sqlinsessioncancel1, $paraminsessioncancel1));
+
+        list($sqlinsessioncancel2, $paraminsessioncancel2) = $DB->get_in_or_equal(array_keys($cfsessioncancel2));
+        $this->assertCount(1, $DB->get_records_sql($sqlparamssessioncancel . $sqlinsessioncancel2, $paraminsessioncancel2));
+
         // Call facetoface_delete_session function for session1.
         $sink = $this->redirectMessages();
         $this->assertTrue((bool)facetoface_delete_session($session1));
@@ -1197,6 +1226,12 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertFalse($DB->record_exists('facetoface_sessions_dates', array('sessionid' => $session1id)));
         $this->assertEquals(0, $DB->count_records('facetoface_session_info_data', array('facetofacesessionid' => $session1->id)));
         $this->assertEmpty($DB->get_records_sql($sqlparams . $sqlin, $paramin));
+
+        // Check session cancellation data
+        $this->assertEquals(0, $DB->count_records('facetoface_sessioncancel_info_data', array('facetofacecancellationid' => $session1->id)));
+        $this->assertEquals(3, $DB->count_records('facetoface_sessioncancel_info_data', array('facetofacecancellationid' => $session2->id)));
+        $this->assertCount(0, $DB->get_records_sql($sqlparamssessioncancel . $sqlinsessioncancel1, $paraminsessioncancel1));
+        $this->assertCount(1, $DB->get_records_sql($sqlparamssessioncancel . $sqlinsessioncancel2, $paraminsessioncancel2));
 
         // Check the customfield data after associated session deletion.
         $this->assertFalse($DB->record_exists('facetoface_signup_info_data', array('facetofacesignupid' => $signup11->id)));
