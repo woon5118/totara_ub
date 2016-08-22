@@ -168,7 +168,7 @@ Available Seminar placholders:
 
 There are also placeholders available for event custom fields and they follow the format [session:shortname]. Where "shortname" is the shortname of the Seminar custom field.
 
-To include the details of each session, a segment of the notification can be repeated to include the details of each individual sesison. To do this, add [#sessions] where you would like the loop to start, add [/sessions] where you would like it to end.
+To include the details of each session, a segment of the notification can be repeated to include the details of each individual session. To do this, add [#sessions] where you would like the loop to start, add [/sessions] where you would like it to end.
 
 You can then add the following placeholders for each session:
 
