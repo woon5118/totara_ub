@@ -27,12 +27,12 @@ $string['allowsignuporganisationsecurityrisk'] =  'Security risk: Please be awar
 $string['allowsignuporganisation_help'] = 'When this option is selected and Self-registration is enabled,
 the organisation field will be available for users in the sign-up';
 $string['allowsignupposition'] = 'Position';
-$string['allowsignuppositionfields'] = 'Allow primary position fields';
+$string['allowsignuppositionfields'] = 'Allow job assignment fields';
 $string['allowsignuppositionsecurityrisk'] =  'Security risk: Please be aware that while this option is enabled, information about positions will be public.';
 $string['allowsignupposition_help'] = 'When this option is selected and Self-registration is enabled,
 the position field will be available for users in the sign-up';
 $string['allowsignupmanager'] = 'Manager';
-$string['allowsignupmanagersecurityrisk'] =  'Security risk: Please be aware that while this option is enabled, information about users will be public.';
+$string['allowsignupmanagersecurityrisk'] =  'Security risk: Please be aware that while this option is enabled, information about users and their job assignments will be public.';
 $string['allowsignupmanager_help'] = 'When this option is selected and Self-registration is enabled,
 the manager field will be available for users in the sign-up';
 $string['appraiser'] = 'Appraiser';
@@ -100,6 +100,7 @@ $string['jobassignmentstartdate'] = 'Start date';
 $string['jobassignmentstartdate_help'] = 'Date that the user started in this job assignment. This date can be used in dynamic audience rules. However, this date is NOT used to determine if the job assignment is "active" in any other part of Totara.';
 $string['jobmanagement'] = 'Job Management';
 $string['manager'] = 'Manager';
+$string['managernomatchja'] = 'Make sure you are selecting a job assignment linked to your manager. If that is what you were doing, delete your manager selection and try selecting it again. Or have your manager assigned after sign-up.';
 $string['nopositionsassigned'] = 'No positions currently assigned to this user';
 $string['nojobassignments'] = 'This user has no job assignments';
 $string['organisation'] = 'Organisation';

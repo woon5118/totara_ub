@@ -698,7 +698,6 @@ if (strlen($query)) {
             $dialog = new totara_dialog_content();
             $dialog->items = array();
             $dialog->parent_items = array();
-            $dialog->disabled_items = $this->disabled_items;
             if (isset($search_info->datakeys)) {
                 $dialog->set_datakeys($search_info->datakeys);
             }
@@ -735,6 +734,7 @@ if (strlen($query)) {
                 }
             }
 
+            $dialog->disabled_items = $this->disabled_items;
             echo $dialog->generate_treeview();
 
         } else {

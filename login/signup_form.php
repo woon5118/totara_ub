@@ -213,6 +213,28 @@ class login_signup_form extends moodleform {
                 $errors['recaptcha'] = get_string('missingrecaptchachallengefield');
             }
         }
+
+        // TOTARA: We need to validate that managerid is correct for the managerjaid specified.
+        if (get_config('totara_job', 'allowsignupmanager')) {
+            if (!empty($data['managerjaid'])) {
+                if (empty($data['managerid'])) {
+                    // Something's wrong. Advise the user to try again or select a manager later.
+                    $errors['managerselector'] = get_string('managernomatchja', 'totara_job');
+                } else {
+                    $managerja = \totara_job\job_assignment::get_with_id($data['managerjaid']);
+                    if ($managerja->userid != $data['managerid']) {
+                        // Something's wrong. Advise the user to try again or select a manager later.
+                        $errors['managerselector'] = get_string('managernomatchja', 'totara_job');
+                    }
+                }
+            } else {
+                if (!empty($data['managerid'])) {
+                    // You can't currently add assign a manager without a manager's job assignment id.
+                    $errors['managerselector'] = get_string('managernomatchja', 'totara_job');
+                }
+            }
+        }
+
         // Validate customisable profile fields. (profile_validation expects an object as the parameter with userid set)
         $dataobject = (object)$data;
         $dataobject->id = 0;

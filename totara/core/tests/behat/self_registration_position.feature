@@ -7,6 +7,7 @@ Feature: Test the ability to set your own
     And the following "users" exist:
       | username | firstname    | lastname | email               |
       | manager  | Frederick    | Newman   | manager@example.com |
+      | user1    | John         | Smith    | user1@example.com   |
     And the following "organisation frameworks" exist in "totara_hierarchy" plugin:
       | fullname               | idnumber  |
       | Organisation Framework | oframe    |
@@ -55,7 +56,17 @@ Feature: Test the ability to set your own
     And I click on "Organisation One" "link" in the "organisation" "totaradialogue"
     And I click on "OK" "button" in the "organisation" "totaradialogue"
     And I click on "Choose manager" "button"
-    And I click on "Frederick Newman - General Manager" "link" in the "manager" "totaradialogue"
+    And I click on "John Smith - requires job assignment entry" "link" in the "manager" "totaradialogue"
+    Then I should not see "Selected:"
+    When I click on "Search" "link" in the "Choose manager" "totaradialogue"
+    And I set the following fields to these values:
+      | Search | John |
+    And I press "Search"
+    And I click on "John Smith - requires job assignment entry" "link" in the "#search-tab" "css_element"
+    Then I should not see "Selected:"
+    When I click on "Browse" "link" in the "Choose manager" "totaradialogue"
+    When I click on "Frederick Newman - General Manager" "link" in the "manager" "totaradialogue"
+    Then I should see "Selected:"
     And I click on "OK" "button" in the "manager" "totaradialogue"
     And I press "Create my new account"
     And I press "Continue"

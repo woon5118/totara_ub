@@ -339,6 +339,7 @@ class totara_job_dialog_assign_manager extends totara_dialog_content {
             } else {
                 $item->fullname = totara_job_display_user_job($result, null, $this->canviewemail);
                 $addcreateitem = null;
+                $this->disabled_items[$item->id] = $item;
             }
             $item->userid = $result->userid;
             $item->displaystring = $item->fullname;

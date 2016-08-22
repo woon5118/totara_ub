@@ -518,6 +518,21 @@ function profile_validation($usernew, $files) {
     return $err;
 }
 
+/**
+ * Totara: Saves job assignment data specified from a self-registration.
+ *
+ * It can only account for a single job assignment. If a position, organisation or
+ * manager job assignment are specified it will add the to the first job assignment (according
+ * to sortorder) if there is one, or create a new job assignment.
+ *
+ * The settings for each data type (e.g. for positions: 'allowsignupposition') must be
+ * enabled for this function to process that data.
+ *
+ * We would have checked that managerjaid is correct for the managerid in the signup_form validation.
+ * If this function is being used elsewhere, make sure there is similar validation taking place.
+ *
+ * @param stdClass $userprofile - this might be data received from a form.
+ */
 function position_save_data($userprofile) {
     global $CFG;
     require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
@@ -541,6 +556,11 @@ function position_save_data($userprofile) {
 
     if ($allowsignupposition) {
         $data->positionid = isset($userprofile->positionid) ? $userprofile->positionid : null;
+    }
+
+    if (empty($data->managerjaid) && empty($data->organisationid) && empty($data->positionid)) {
+        // If nothing that uses a job assignment is to be added, then don't create a new job assignment.
+        return;
     }
 
     $jobassignment = \totara_job\job_assignment::get_first($userprofile->id, false);
