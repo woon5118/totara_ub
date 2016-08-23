@@ -25,59 +25,85 @@
   border: 1px solid @table-border-color;
   vertical-align: baseline;
 }
-#page-footer .performanceinfo {
-  margin: 10px 20%;
-}
-#page-footer .performanceinfo span {
-  display: block;
-}
-#page-footer .validators {
-  margin-top: 40px;
-  padding-top: 5px;
-  border-top: 1px dotted gray;
-}
-#page-footer .validators ul {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-}
-#page-footer .validators ul li {
-  display: inline;
-  margin-right: 10px;
-  margin-left: 10px;
-}
-.performanceinfo .cachesused {
-  margin-top: 1em;
-}
-.performanceinfo .cachesused .cache-stats-heading,
-.performanceinfo .cachesused .cache-total-stats {
-  font-weight: bold;
-  font-size: 110%;
-  margin-top: 0.3em;
-}
-#page-footer .performanceinfo .cachesused .cache-definition-stats {
-  margin: .3em;
-  display: inline-block;
-  vertical-align: top;
-  background-color: @table-bg-accent;
-}
-.cache-store-stats {
-  padding: 0 1.3em;
-}
-.cache-store-stats.nohits {
-  background-color: @state-danger-bg;
-}
-.cache-store-stats.lowhits {
-  background-color: @state-warning-bg;
-}
-.cache-store-stats.hihits {
-  background-color: @state-success-bg;
-}
-#page-footer,
-#page-footer .validators,
-#page-footer .purgecaches,
-#page-footer .performanceinfo {
-  text-align: center;
-}
 
+#page-footer {
+  text-align: center;
+
+  .validators {
+    margin-top: 40px;
+    padding-top: 5px;
+    border-top: 1px dotted gray;
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+
+      > li {
+        display: inline;
+        margin-right: 10px;
+        margin-left: 10px;
+      }
+    }
+  }
+
+  .performanceinfo {
+    margin: 1em;
+
+    span {
+      display: block;
+    }
+
+    .cachesused {
+
+      // Variables, as basis at least is going to invert these.
+      @cache-stat-bg: lighten(@gray-base, 97%); // #f7f7f7;
+      @cache-stat-border: lighten(@gray-base, 93.5%); // #eee;
+      @cache-stat-heading-text: @text-color;
+
+      margin-top: 1em;
+
+      .cache-stats-heading,
+      .cache-total-stats {
+        font-weight: bold;
+        font-size: 110%;
+        margin-top: 0.3em;
+      }
+      .cache-definition-stats {
+        margin: .3em;
+        display: inline-block;
+        vertical-align: top;
+        background-color: @cache-stat-bg;
+        border: 1px solid @cache-stat-border; // #eee;
+        border-radius: @border-radius-small;
+      }
+      .cache-definition-stats-heading {
+        color: @cache-stat-heading-text;
+        span {
+          display: inline-block;
+        }
+      }
+      .cache-store-stats {
+        padding: 0 1.3em;
+
+        &.nohits {
+          color: @state-danger-text;
+          background-color: @state-danger-bg;
+        }
+        &.lowhits {
+          color: @state-warning-text;
+          background-color: @state-warning-bg;
+        }
+        &.hihits {
+          color: @state-success-text;
+          background-color: @state-success-bg;
+        }
+      }
+      .cache-store-stats:last-child {
+        border-bottom-left-radius: @border-radius-small;
+        border-bottom-right-radius: @border-radius-small;
+      }
+    }
+  }
+}
 // End of original bootstrap theme code.
