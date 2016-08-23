@@ -143,7 +143,7 @@ class totara_cohort_position_profile_field_checkbox_testcase extends advanced_te
 
         $this->cohort_generator->create_cohort_rule_params(
             $this->ruleset,
-            'primaryjobassign',
+            'alljobassign',
             'poscustomfield'.$this->fieldid,
             array('equal' => COHORT_RULES_OP_IN_EQUAL),
             array(0) // Checked.
@@ -170,7 +170,7 @@ class totara_cohort_position_profile_field_checkbox_testcase extends advanced_te
 
         $this->cohort_generator->create_cohort_rule_params(
             $this->ruleset,
-            'primaryjobassign',
+            'alljobassign',
             'poscustomfield'.$this->fieldid,
             array('equal' => COHORT_RULES_OP_IN_EQUAL),
             array(1) // Unchecked.

@@ -212,71 +212,47 @@ class cohort_rule_sqlhandler_date_usercustomfield_no_timezone extends cohort_rul
 }
 
 /**
- * SQL snippet for finding out when a user was assigned their current first position.
+ * @deprecated Since v9.0
+ *
+ * This class was deprecated as part of the multiple jobs patch and replaced with
+ * the cohort_rule_sqlhandler_date_alljobassignments class, please use that instead.
  */
-class cohort_rule_sqlhandler_date_position_assignment extends cohort_rule_sqlhandler_date {
-    public function __construct(){
-        // No arguments necessary, this is a single-purpose SQL handler to query only one field.
-    }
+class cohort_rule_sqlhandler_date_posstarted extends cohort_rule_sqlhandler_date_alljobassignments {
 
-    protected function construct_sql_snippet($field, $comparison) {
-        $sqlhandler = new stdClass();
-        $sqlhandler->sql =
-            "EXISTS(
-             SELECT 1
-               FROM {job_assignment} ja
-              WHERE ja.userid = u.id
-                AND ja.sortorder = 1
-                AND ja.positionassignmentdate {$comparison}
-                )";
-        $sqlhandler->params = array();
-        return $sqlhandler;
+    public function __construct(){
+        debugging('Class cohort_rule_sqlhandler_date_posstarted has been replaced and is now deprecated.
+            Please use the cohort_rule_sqlhandler_date_alljobassignments class instead', DEBUG_DEVELOPER);
+        parent::__construct('positionassignmentdate');
     }
 }
 
 /**
- * SQL snippet for finding out when a user started their job assignment.
+ * @deprecated Since v9.0
+ *
+ * This class was deprecated as part of the multiple jobs patch and replaced with
+ * the cohort_rule_sqlhandler_date_alljobassignments class, please use that instead.
  */
-class cohort_rule_sqlhandler_date_job_assignment_start extends cohort_rule_sqlhandler_date {
-    public function __construct(){
-        // No arguments necessary, this is a single-purpose SQL handler to query only one field.
-    }
+class cohort_rule_sqlhandler_date_postimevalidfrom extends cohort_rule_sqlhandler_date_alljobassignments {
 
-    protected function construct_sql_snippet($field, $comparison) {
-        $sqlhandler = new stdClass();
-        $sqlhandler->sql =
-            "EXISTS(
-             SELECT 1
-               FROM {job_assignment} ja
-              WHERE ja.userid = u.id
-                AND ja.sortorder = 1
-                AND ja.startdate {$comparison}
-                )";
-        $sqlhandler->params = array();
-        return $sqlhandler;
+    public function __construct(){
+        debugging('Class cohort_rule_sqlhandler_date_postimevalidfrom has been replaced and is now deprecated.
+            Please use the cohort_rule_sqlhandler_date_alljobassignments class instead', DEBUG_DEVELOPER);
+        parent::__construct('startdate');
     }
 }
 
 /**
- * SQL snippet for finding out when a user's job assignment expires.
+ * @deprecated Since v9.0
+ *
+ * This class was deprecated as part of the multiple jobs patch and replaced with
+ * the cohort_rule_sqlhandler_date_alljobassignments class, please use that instead.
  */
-class cohort_rule_sqlhandler_date_job_assignment_end extends cohort_rule_sqlhandler_date {
-    public function __construct(){
-        // No arguments necessary, this is a single-purpose SQL handler to query only one field.
-    }
+class cohort_rule_sqlhandler_date_postimevalidto extends cohort_rule_sqlhandler_date_alljobassignments {
 
-    protected function construct_sql_snippet($field, $comparison) {
-        $sqlhandler = new stdClass();
-        $sqlhandler->sql =
-            "EXISTS(
-             SELECT 1
-               FROM {job_assignment} ja
-              WHERE ja.userid = u.id
-                AND ja.sortorder = 1
-                AND ja.enddate {$comparison}
-                )";
-        $sqlhandler->params = array();
-        return $sqlhandler;
+    public function __construct(){
+        debugging('Class cohort_rule_sqlhandler_date_postimevalidto has been replaced and is now deprecated.
+            Please use the cohort_rule_sqlhandler_date_alljobassignments class instead', DEBUG_DEVELOPER);
+        parent::__construct('enddate');
     }
 }
 
@@ -311,7 +287,6 @@ class cohort_rule_sqlhandler_date_poscustomfield extends cohort_rule_sqlhandler_
                JOIN {pos_type_info_data} ptid
                  ON ja.positionid = ptid.positionid AND ptid.data != '' AND ptid.data IS NOT NULL
               WHERE ja.userid = u.id
-                AND ja.sortorder = 1
                 AND ptid.fieldid = :dpcf2{$this->ruleid}
                 AND ".$DB->sql_cast_char2int('ptid.data', true)." {$comparison}
                 )";
@@ -334,7 +309,6 @@ class cohort_rule_sqlhandler_date_orgcustomfield extends cohort_rule_sqlhandler_
                JOIN {org_type_info_data} otid
                  ON ja.organisationid = otid.organisationid AND otid.data != '' AND otid.data IS NOT NULL
               WHERE ja.userid = u.id
-                AND ja.sortorder = 1
                 AND otid.fieldid = :docf2{$this->ruleid}
                 AND ".$DB->sql_cast_char2int('otid.data', true)." {$comparison}
                 )";

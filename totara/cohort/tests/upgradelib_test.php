@@ -50,9 +50,11 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
     private $posfw = null;
     private $ptype1 = null;
     private $ptype2 = null;
+    private $pcust1 = null;
     private $orgfw = null;
     private $otype1 = null;
     private $otype2 = null;
+    private $ocust1 = null;
     private $cohort = null;
     private $ruleset = 0;
     private $userspos1 = array();
@@ -63,7 +65,7 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
     /** @var totara_hierarchy_generator $hierarchy_generator */
     private $hierarchy_generator = null;
     private $dateformat = '';
-    const TEST_POSITION_COUNT_MEMBERS = 23;
+    const TEST_JOB_COUNT_MEMBERS = 23;
 
     /**
      * Users per position/organisation:
@@ -100,15 +102,29 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
         $this->ptype1 = $this->hierarchy_generator->create_pos_type(array('idnumber' => 'ptype1', 'fullname' => 'ptype1'));
         $this->ptype2 = $this->hierarchy_generator->create_pos_type(array('idnumber' => 'ptype2', 'fullname' => 'ptype2'));
 
+        // Create checkbox customfield for position type.
+        $defaultdata = 0; // Unchecked.
+        $shortname   = 'checkbox' . $this->ptype1;
+        $data = array('hierarchy' => 'position', 'typeidnumber' => 'ptype1', 'value' => $defaultdata);
+        $this->hierarchy_generator->create_hierarchy_type_checkbox($data);
+        $this->pcust1 = $DB->get_record('pos_type_info_field', array('shortname' => $shortname));
+
         // Create organisation framework.
         $name = totara_hierarchy_generator::DEFAULT_NAME_FRAMEWORK_ORGANISATION;
         $name .= ' ' . totara_generator_util::get_next_record_number('org_framework', 'fullname', $name);
         $data = array('fullname' => $name);
         $this->orgfw = $this->hierarchy_generator->create_framework('organisation', $data);
 
-        // Create position types.
+        // Create organisation types.
         $this->otype1 = $this->hierarchy_generator->create_org_type(array('idnumber' => 'otype1', 'fullname' => 'otype1'));
         $this->otype2 = $this->hierarchy_generator->create_org_type(array('idnumber' => 'otype2', 'fullname' => 'otype2'));
+
+        // Create checkbox customfield for organisation type.
+        $defaultdata = 0; // Unchecked.
+        $shortname   = 'checkbox' . $this->otype1;
+        $data = array('hierarchy' => 'organisation', 'typeidnumber' => 'otype1', 'value' => $defaultdata);
+        $this->hierarchy_generator->create_hierarchy_type_checkbox($data);
+        $this->ocust1 = $DB->get_record('org_type_info_field', array('shortname' => $shortname));
 
         // Create positions and organisation hierarchies.
         $this->assertEquals(0, $DB->count_records('pos'));
@@ -130,6 +146,23 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
             array('idnumber' => 'org3', 'fullname' => 'orgname3', 'typeid' => $this->otype2));
         $this->assertEquals(3, $DB->count_records('org'));
 
+        // Set some custom field data.
+        $cfname = 'customfield_' . $this->ocust1->shortname;
+        $item = new \stdClass();
+        $item->id = $this->org2->id;
+        $item->typeid = $this->otype1;
+        $item->{$cfname} = 1; // Checked for org2.
+        customfield_save_data($item, 'organisation', 'org_type');
+
+        // Set the custom field data.
+        $cfname = 'customfield_' . $this->pcust1->shortname;
+        $item = new \stdClass();
+        $item->id = $this->pos2->id;
+        $item->typeid = $this->ptype1;
+        $item->{$cfname} = 1; // Checked for pos2.
+        customfield_save_data($item, 'position', 'pos_type');
+
+
         // Create some managers.
         $this->man1 = $this->getDataGenerator()->create_user();
         $man1ja = \totara_job\job_assignment::create_default($this->man1->id);
@@ -140,7 +173,7 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
         // Create some test users and assign them to a position.
         $this->assertEquals(4, $DB->count_records('user'));
         $now = time();
-        for ($i = 1; $i <= self::TEST_POSITION_COUNT_MEMBERS; $i++) {
+        for ($i = 1; $i <= self::TEST_JOB_COUNT_MEMBERS; $i++) {
             $this->{'user'.$i} = $this->getDataGenerator()->create_user();
             if ($i%3 === 0) {
                 $man = $man1ja->id;
@@ -179,7 +212,7 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
         $this->userspos3 = array_flip($this->userspos3);
 
         // Check the users were created. It should match $this->countmembers + 2 users(admin + guest) + 2 Managers.
-        $this->assertEquals(self::TEST_POSITION_COUNT_MEMBERS + 4, $DB->count_records('user'));
+        $this->assertEquals(self::TEST_JOB_COUNT_MEMBERS + 4, $DB->count_records('user'));
 
         // Check positions were assigned correctly.
         $this->assertEquals(7, $DB->count_records('job_assignment', array('positionid' => $this->pos1->id)));
@@ -187,7 +220,8 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
         $this->assertEquals(8, $DB->count_records('job_assignment', array('positionid' => $this->pos3->id)));
 
         // Creating dynamic cohort.
-        $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
+        $cohortdata = array('name' => 'test cohort', 'cohorttype' => cohort::TYPE_DYNAMIC);
+        $this->cohort = $this->cohort_generator->create_cohort($cohortdata);
         $this->assertTrue($DB->record_exists('cohort', array('id' => $this->cohort->id)));
         $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
 
@@ -446,7 +480,7 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         // Create an old style rule
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'pos', 'type',
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'pos', 'postype',
             array('equal' => COHORT_RULES_OP_IN_EQUAL), array($this->ptype1));
         cohort_rules_approve_changes($this->cohort);
 
@@ -465,6 +499,50 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
     }
 
     /**
+     * Test the migration of a position type custom field rule.
+     */
+    public function test_position_type_customfield_rule_migration() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Make an extra position in the same type to make sure they aren't included.
+        $pos4 = $this->hierarchy_generator->create_hierarchy($this->posfw->id, 'position',
+            array('idnumber' => 'pos4', 'fullname' => 'posname4', 'typeid' => $this->ptype1));
+
+        // Create some test users and assign them to a position.
+        $now = time();
+        $expected = array();
+        for ($i = 1; $i <= 5; $i++) {
+            $custuser = $this->getDataGenerator()->create_user();
+            $data = array('positionid' => $pos4->id);
+            \totara_job\job_assignment::create_default($custuser->id, $data);
+        }
+
+        // Create an old style rule.
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'pos', 'customfield' . $this->pcust1->id,
+            array('equal' => COHORT_RULES_OP_IN_EQUAL), array(0)); // 0 => Checked for some reason.
+        cohort_rules_approve_changes($this->cohort);
+
+        // Check the $members dont meet the expected amount.
+        $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($this->cohort->id));
+        $this->assertNotEquals(8, count($members));
+
+        // Run the upgradelib function.
+        totara_cohort_migrate_position_rules();
+        totara_cohort_update_dynamic_cohort_members($this->cohort->id, 0, true);
+
+        // Check the $members now meet the expected amount.
+        $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($this->cohort->id));
+        $this->assertEquals(8, count($members));
+
+        foreach (array_keys($this->userspos2) as $userid) {
+            $this->assertTrue(in_array($userid, $members));
+        }
+    }
+
+    /**
      * Test the migration of an organisation type rule.
      */
     public function test_organisation_type_rule_migration() {
@@ -474,7 +552,7 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         // Create an old style rule
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'org', 'type',
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'org', 'orgtype',
             array('equal' => COHORT_RULES_OP_IN_EQUAL), array($this->otype1));
         cohort_rules_approve_changes($this->cohort);
 
@@ -490,6 +568,56 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
         $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($this->cohort->id));
         $this->assertEquals(8, count($members));
         $this->assertEmpty(array_diff_key(array_flip($members), $this->userspos2));
+    }
+
+    /**
+     * Test the migration of an organisation type custom field rule.
+     */
+    public function test_organisation_type_customfield_rule_migration() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Todo: find a better way to deal with static variable in cohort_rules_list.
+        // The static $rules variable in cohort_rules_list may still be set from earlier tests.
+        // This function is used within functions that are run by this test and random failures can result.
+        // For now passing in true as an argument will reset it.
+        cohort_rules_list(true);
+
+        // Make an extra position in the same type to make sure they aren't included.
+        $org4 = $this->hierarchy_generator->create_hierarchy($this->orgfw->id, 'organisation',
+            array('idnumber' => 'org4', 'fullname' => 'orgname4', 'typeid' => $this->otype1));
+
+        // Create some test users and assign them to a position.
+        $now = time();
+        $expected = array();
+        for ($i = 1; $i <= 5; $i++) {
+            $custuser = $this->getDataGenerator()->create_user();
+            $data = array('organisationid' => $org4->id);
+            \totara_job\job_assignment::create_default($custuser->id, $data);
+        }
+
+        // Create an old style rule
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'org', 'customfield' . $this->ocust1->id,
+            array('equal' => COHORT_RULES_OP_IN_EQUAL), array(0)); // 0 => Checked for some reason.
+        cohort_rules_approve_changes($this->cohort);
+
+        // Check the $members dont meet the expected amount.
+        $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($this->cohort->id));
+        $this->assertNotEquals(8, count($members));
+
+        // Run the upgradelib function
+        totara_cohort_migrate_position_rules();
+        totara_cohort_update_dynamic_cohort_members($this->cohort->id, 0, true);
+
+        // Check the $members now meet the expected amount.
+        $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($this->cohort->id));
+        $this->assertEquals(8, count($members));
+
+        foreach (array_keys($this->userspos2) as $userid) {
+            $this->assertTrue(in_array($userid, $members));
+        }
     }
 
     /**

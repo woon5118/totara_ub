@@ -28,13 +28,13 @@
  * pos | name               => primaryjobassign | posname
  * pos | id                 => primaryjobassign | posid
  * pos | idnumber           => primaryjobassign | posidnumber
- * pos | type               => primaryjobassign | postype
+ * pos | postype            => primaryjobassign | postype
  * pos | startdate          => primaryjobassign | posassigndate
  *
  * ORGANISATION FIELD RULES
  * org | id                 => primaryjobassign | orgid
  * org | idnumber           => primaryjobassign | orgidnumber
- * org | type               => primaryjobassign | orgtype
+ * org | orgtype            => primaryjobassign | orgtype
  *
  * POS/JOB ASSIGNMENT FIELD RULES
  * pos | timevalidfrom      => primaryjobassign | startdate
@@ -49,17 +49,17 @@ function totara_cohort_migrate_position_rules() {
 
     // Update all of the cohort_rules.name fields first.
     $rulenames = array(
-        array('new' => 'posid', 'rtype' => 'pos', 'rname' => 'id'),
-        array('new' => 'posidnumber', 'rtype' => 'pos', 'rname' => 'idnumber'),
-        array('new' => 'posassigndate', 'rtype' => 'pos', 'rname' => 'startdate'),
-        array('new' => 'posname', 'rtype' => 'pos', 'rname' => 'name'),
-        array('new' => 'postype', 'rtype' => 'pos', 'rname' => 'type'),
-        array('new' => 'orgid', 'rtype' => 'org', 'rname' => 'id'),
-        array('new' => 'orgidnumber', 'rtype' => 'org', 'rname' => 'idnumber'),
-        array('new' => 'orgtype', 'rtype' => 'org', 'rname' => 'type'),
-        array('new' => 'startdate', 'rtype' => 'pos', 'rname' => 'timevalidfrom'),
-        array('new' => 'enddate', 'rtype' => 'pos', 'rname' => 'timevalidto'),
-        array('new' => 'manager', 'rtype' => 'pos', 'rname' => 'reportsto'),
+        array('new' => 'positions', 'rtype' => 'pos', 'rname' => 'id'),
+        array('new' => 'posidnumbers', 'rtype' => 'pos', 'rname' => 'idnumber'),
+        array('new' => 'posassigndates', 'rtype' => 'pos', 'rname' => 'startdate'),
+        array('new' => 'posnames', 'rtype' => 'pos', 'rname' => 'name'),
+        array('new' => 'postypes', 'rtype' => 'pos', 'rname' => 'postype'),
+        array('new' => 'organisations', 'rtype' => 'org', 'rname' => 'id'),
+        array('new' => 'orgidnumbers', 'rtype' => 'org', 'rname' => 'idnumber'),
+        array('new' => 'orgtypes', 'rtype' => 'org', 'rname' => 'orgtype'),
+        array('new' => 'startdates', 'rtype' => 'pos', 'rname' => 'timevalidfrom'),
+        array('new' => 'enddates', 'rtype' => 'pos', 'rname' => 'timevalidto'),
+        array('new' => 'managers', 'rtype' => 'pos', 'rname' => 'reportsto'),
     );
 
     foreach ($rulenames as $params) {
@@ -80,7 +80,7 @@ function totara_cohort_migrate_position_rules() {
 
     // Finally update the cohort_rules.ruletype field.
     $sqlruletype = "UPDATE {cohort_rules}
-                       SET ruletype = 'primaryjobassign'
+                       SET ruletype = 'alljobassign'
                      WHERE ruletype = 'pos'
                         OR ruletype = 'org'";
     $DB->execute($sqlruletype);

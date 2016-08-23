@@ -1939,8 +1939,8 @@ JS;
     }
 }
 
-require_once($CFG->dirroot . '/totara/core/dialogs/dialog_content_manager.class.php');
-class totara_dialog_content_manager_cohortreportsto extends totara_dialog_content_manager {
+require_once($CFG->dirroot . '/totara/core/dialogs/dialog_content_users.class.php');
+class totara_dialog_content_manager_cohort extends totara_dialog_content_users {
     /**
     * Returns markup to be used in the selected pane of a multi-select dialog
     *
@@ -1974,7 +1974,7 @@ class cohort_rule_ui_reportsto extends cohort_rule_ui {
         // Only return generated tree html
         $treeonly = optional_param('treeonly', false, PARAM_BOOL);
 
-        $dialog = new totara_dialog_content_manager_cohortreportsto();
+        $dialog = new totara_dialog_content_manager_cohort();
 
         // Toggle treeview only display
         $dialog->show_treeview_only = $treeonly;
@@ -2174,7 +2174,6 @@ class cohort_rule_ui_managersja extends cohort_rule_ui {
         return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
     }
 }
-
 
 require_once($CFG->dirroot . '/totara/core/dialogs/dialog_content_manager.class.php');
 class totara_dialog_content_manager_cohortmember extends totara_dialog_content_manager {

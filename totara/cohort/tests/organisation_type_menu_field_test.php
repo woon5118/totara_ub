@@ -163,7 +163,7 @@ extends advanced_testcase {
     public function test_equals() {
         $this->cohorts->create_cohort_rule_params(
             $this->rules->id,
-            'primaryjobassign',
+            'alljobassign',
             'orgcustomfield'.$this->custom_field->id,
             array('equal' => COHORT_RULES_OP_IN_EQUAL),
             array('IT') // 1st menu option.
@@ -180,7 +180,7 @@ extends advanced_testcase {
     public function test_not_equals() {
         $this->cohorts->create_cohort_rule_params(
             $this->rules->id,
-            'primaryjobassign',
+            'alljobassign',
             'orgcustomfield'.$this->custom_field->id,
             array('equal' => COHORT_RULES_OP_IN_NOTEQUAL),
             array('IT') // 1st menu option.

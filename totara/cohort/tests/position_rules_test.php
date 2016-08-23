@@ -154,7 +154,7 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         // Add a rule that matches users for the position posname1. It should match 7 users.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'primaryjobassign', 'posname', array('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array('posname1'));
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'posnames', array('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array('posname1'));
         cohort_rules_approve_changes($this->cohort);
         $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($this->cohort->id));
         $this->assertEquals(7, count($members));
@@ -170,7 +170,7 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         // Add a rule that matches users for the position pos1. It should match 7 users.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'primaryjobassign', 'posidnumber', array('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array('pos1'));
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'posidnumbers', array('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array('pos1'));
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(7, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
     }
@@ -185,11 +185,11 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         $params4 =  array('operator' => COHORT_RULE_DATE_OP_AFTER_FIXED_DATE, 'date' => 1);
         $params5 =  array('operator' => COHORT_RULE_DATE_OP_AFTER_FIXED_DATE, 'date' => 0);
         $data = array(
-            array('enddate', $params1, 15, array('pos1', 'pos2')),
-            array('enddate', $params2, 8, array('pos3')),
-            array('startdate', $params3, 15, array('pos1', 'pos2')),
-            array('startdate', $params4, 8, array('pos3')),
-            array('posassigndate', $params5, 23, array('pos1', 'pos2', 'pos3')),
+            array('enddates', $params1, 15, array('pos1', 'pos2')),
+            array('enddates', $params2, 8, array('pos3')),
+            array('startdates', $params3, 15, array('pos1', 'pos2')),
+            array('startdates', $params4, 8, array('pos3')),
+            array('posassigndates', $params5, 23, array('pos1', 'pos2', 'pos3')),
         );
         return $data;
     }
@@ -216,7 +216,7 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         }
 
         // Create a position rule.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'primaryjobassign', $rulename, $params, array());
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', $rulename, $params, array());
         cohort_rules_approve_changes($this->cohort);
 
         // It should match:
@@ -257,7 +257,7 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         $this->assertTrue($DB->set_field('pos', 'typeid', $postype1, array('id' => $this->pos1->id)));
 
         // Create a rule that matches users in the previous created type.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'primaryjobassign', 'postype', array('equal' => COHORT_RULES_OP_IN_EQUAL), array($postype1));
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'postypes', array('equal' => COHORT_RULES_OP_IN_EQUAL), array($postype1));
         cohort_rules_approve_changes($this->cohort);
 
         // It should match 7 users (pos1).
@@ -290,7 +290,7 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         \totara_job\job_assignment::create_default($my_users[3]->id, array('fullname' => 'Inside Sales Representative'));
 
         // Add a rule that matches users for the job assignment 'Inside Sales Representative'. It should match 2 users.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'primaryjobassign', 'jobtitle',
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'jobtitles',
                 array('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array('Inside Sales Representative'));
 
         // Where is the doc of the next method? I assume, it will check if the rule is correctly defined and executable.
@@ -345,7 +345,7 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'user', 'username', array('equal' => COHORT_RULES_OP_IN_NOTEQUALTO), array('admin'));
 
         // Create a rule.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'primaryjobassign', 'hasdirectreports', $params, $listofvalues);
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'hasdirectreports', $params, $listofvalues);
         cohort_rules_approve_changes($this->cohort);
 
         // It should match:
@@ -435,7 +435,7 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         $membersofmanagers = array_unique($membersofmanagers);
 
         // Create a rule to test "Reports to" option.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'primaryjobassign', 'manager', $params, $listofmanagers, 'managerid');
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'managers', $params, $listofmanagers, 'managerid');
         cohort_rules_approve_changes($this->cohort);
 
         // It should match:
@@ -522,7 +522,7 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'user', 'username', array('equal' => COHORT_RULES_OP_IN_NOTEQUALTO), array('admin'));
 
         // Create a rule for positions.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'primaryjobassign', 'posid', $params, $listofvalues);
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'positions', $params, $listofvalues);
         cohort_rules_approve_changes($this->cohort);
 
         // It should match:

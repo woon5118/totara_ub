@@ -90,7 +90,7 @@ class totara_cohort_delete_items_testcase extends advanced_testcase {
             'includechildren' => 0
         );
         $listofvalues = array($this->pos1->id, $this->pos2->id);
-        $this->cohort_generator->create_cohort_rule_params($ruleset, 'primaryjobassign', 'posid', $params, $listofvalues, 'listofvalues');
+        $this->cohort_generator->create_cohort_rule_params($ruleset, 'alljobassign', 'positions', $params, $listofvalues, 'listofvalues');
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(3, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
     }
@@ -102,7 +102,7 @@ class totara_cohort_delete_items_testcase extends advanced_testcase {
 
         // Get the rule param of cohort 1.
         $audience = $DB->get_record('cohort', array('id' => $this->cohort->id));
-        $ruleids = $this->cohort_generator->cohort_get_ruleids($audience->draftcollectionid, 'primaryjobassign', 'posid');
+        $ruleids = $this->cohort_generator->cohort_get_ruleids($audience->draftcollectionid, 'alljobassign', 'positions');
         $ruleid = reset($ruleids);
 
         // Get the pos1 rule param.

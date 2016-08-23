@@ -258,94 +258,89 @@ function cohort_rules_list($reset = false){
             }
         }
 
-        // Job assignment rules.
+        // Audience rules applied across all job assignments.
         $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'jobtitle',
+            'alljobassign',
+            'jobtitles',
             new cohort_rule_ui_text(
-                get_string('ruledesc-primaryjobassign-jobtitle', 'totara_cohort'),
+                get_string('ruledesc-alljobassign-titles', 'totara_cohort'),
                 get_string('rulehelp-job-title', 'totara_cohort')
             ),
-            new cohort_rule_sqlhandler_in_jobassignfield('fullname', true)
+            new cohort_rule_sqlhandler_in_alljobassignfield('fullname', true)
         );
-        // User's position's start date.
+        // User's job assignment startdate.
         $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'startdate',
+            'alljobassign',
+            'startdates',
             new cohort_rule_ui_date(
-                get_string('ruledesc-primaryjobassign-startdate', 'totara_cohort')
+                get_string('ruledesc-alljobassign-startdates', 'totara_cohort')
             ),
-            new cohort_rule_sqlhandler_date_job_assignment_start()
+            new cohort_rule_sqlhandler_date_alljobassignments('startdate')
         );
-        // User's position's end date.
+        // User's job assignment enddate.
         $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'enddate',
+            'alljobassign',
+            'enddates',
             new cohort_rule_ui_date(
-                get_string('ruledesc-primaryjobassign-enddate', 'totara_cohort')
+                get_string('ruledesc-alljobassign-enddates', 'totara_cohort')
             ),
-            new cohort_rule_sqlhandler_date_job_assignment_end()
+            new cohort_rule_sqlhandler_date_alljobassignments('enddate')
         );
-        // If the user is a manager
+
+        // Position Rules.
         $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'hasdirectreports',
-            new cohort_rule_ui_checkbox(
-                get_string('ruledesc-primaryjobassign-hasdirectreports', 'totara_cohort'),
-                array(
-                    1 => get_string('directreportsyes', 'totara_cohort'),
-                    0 => get_string('directreportsno', 'totara_cohort')
-                )
-            ),
-            new cohort_rule_sqlhandler_hasreports()
-        );
-        // The user's manager
-        $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'manager',
-            new cohort_rule_ui_reportsto(),
-            new cohort_rule_sqlhandler_reportsto()
-        );
-        // The user's position
-        $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'posid',
+            'alljobassign',
+            'positions',
             new cohort_rule_ui_picker_hierarchy(
-                get_string('ruledesc-pos-id', 'totara_cohort'),
+                get_string('ruledesc-alljobassign-posid', 'totara_cohort'),
                 'position'
             ),
-            new cohort_rule_sqlhandler_in_listofids_pos()
+            new cohort_rule_sqlhandler_in_listofids_allpos()
         );
-        // User's position's name
+        // User's position's name.
         $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'posname',
+            'alljobassign',
+            'posnames',
             new cohort_rule_ui_text(
-                get_string('ruledesc-pos-name', 'totara_cohort'),
+                get_string('ruledesc-alljobassign-posnames', 'totara_cohort'),
                 get_string('rulehelp-pos-name', 'totara_cohort')
             ),
             new cohort_rule_sqlhandler_in_posfield('fullname', true)
         );
-        // User's position's id number
+        // User's position's idnumber.
         $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'posidnumber',
+            'alljobassign',
+            'posidnumbers',
             new cohort_rule_ui_text(
-                get_string('ruledesc-pos-idnumber', 'totara_cohort'),
+                get_string('ruledesc-alljobassign-posidnumbers', 'totara_cohort'),
                 get_string('rulehelp-pos-idnumber', 'totara_cohort')
             ),
             new cohort_rule_sqlhandler_in_posfield('idnumber', true)
         );
-        // User's position's date assigned.
+        // User's position assignment date.
         $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'posassigndate',
+            'alljobassign',
+            'posassigndates',
             new cohort_rule_ui_date(
-                get_string('ruledesc-primaryjobassign-posassigndate', 'totara_cohort')
+                get_string('ruledesc-alljobassign-posassigndates', 'totara_cohort')
             ),
-            new cohort_rule_sqlhandler_date_position_assignment()
+            new cohort_rule_sqlhandler_date_alljobassignments('positionassignmentdate')
         );
-        // Custom fields for user's primary position
+        // User's position's type.
+        $pos = new position();
+        $postypes = $pos->get_types();
+        array_walk($postypes, function(&$item) { $item = $item->fullname; });
+        $postypes[0] = get_string('unclassified', 'totara_hierarchy');
+        $rules[] = new cohort_rule_option(
+            'alljobassign',
+            'postypes',
+            new cohort_rule_ui_menu(
+                get_string('ruledesc-alljobassign-postypes', 'totara_cohort'),
+                $postypes
+            ),
+            new cohort_rule_sqlhandler_in_posfield('typeid', false)
+        );
+        // Custom fields for user's position.
         $poscustomfields = $DB->get_records_sql(
             "SELECT potyinfi.id, potyinfi.fullname as name, potyinfi.datatype, potyinfi.param1
                FROM {pos_type_info_field} potyinfi
@@ -400,51 +395,59 @@ function cohort_rules_list($reset = false){
             }
 
             $rules[] = new cohort_rule_option(
-                'primaryjobassign',
+                'alljobassign',
                 "poscustomfield{$id}",
                 $dialog,
                 $sqlhandler,
                 s($field->name)
             );
         }
-        $pos = new position();
-        $postypes = $pos->get_types();
-        array_walk($postypes, function(&$item) { $item = $item->fullname; });
-        $postypes[0] = get_string('unclassified', 'totara_hierarchy');
+
+        // Organisation Rules.
         $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'postype',
-            new cohort_rule_ui_menu(
-                get_string('ruledesc-pos-postype', 'totara_cohort'),
-                $postypes
-            ),
-            new cohort_rule_sqlhandler_in_posfield('typeid', false)
-        );
-
-
-
-        // Organizations!
-        // Organization by direct selection
-        $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'orgid',
+            'alljobassign',
+            'organisations',
             new cohort_rule_ui_picker_hierarchy(
-                get_string('ruledesc-org-id', 'totara_cohort'),
+                get_string('ruledesc-alljobassign-orgid', 'totara_cohort'),
                 'organisation'
             ),
-            new cohort_rule_sqlhandler_in_listofids_org()
+            new cohort_rule_sqlhandler_in_listofids_allorg()
         );
-        // ID number from user's primary position's organization
+        // User's organisation's name
         $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'orgidnumber',
+            'alljobassign',
+            'orgnames',
             new cohort_rule_ui_text(
-                get_string('ruledesc-org-idnumber', 'totara_cohort'),
+                get_string('ruledesc-alljobassign-orgnames', 'totara_cohort'),
+                get_string('rulehelp-org-name', 'totara_cohort')
+            ),
+            new cohort_rule_sqlhandler_in_orgfield('fullname', true)
+        );
+        // User's organisation's idnumber
+        $rules[] = new cohort_rule_option(
+            'alljobassign',
+            'orgidnumbers',
+            new cohort_rule_ui_text(
+                get_string('ruledesc-alljobassign-orgidnumbers', 'totara_cohort'),
                 get_string('rulehelp-org-idnumber', 'totara_cohort')
             ),
-            new cohort_rule_sqlhandler_in_posorgfield('idnumber', true)
+            new cohort_rule_sqlhandler_in_orgfield('idnumber', true)
         );
-        // Custom fields for user's primary position's organization
+        // User's organisation's type.
+        $org = new organisation();
+        $orgtypes = $org->get_types();
+        array_walk($orgtypes, function(&$item) { $item = $item->fullname; });
+        $orgtypes[0] = get_string('unclassified', 'totara_hierarchy');
+        $rules[] = new cohort_rule_option(
+            'alljobassign',
+            'orgtypes',
+            new cohort_rule_ui_menu(
+                get_string('ruledesc-alljobassign-orgtypes', 'totara_cohort'),
+                $orgtypes
+            ),
+            new cohort_rule_sqlhandler_in_orgfield('typeid', false)
+        );
+        // Custom fields for user's organization.
         $orgcustomfields = $DB->get_records_sql(
             "SELECT ortyinfi.id, ortyinfi.fullname as name, ortyinfi.datatype, ortyinfi.param1
                FROM {org_type_info_field} ortyinfi
@@ -464,20 +467,20 @@ function cohort_rules_list($reset = false){
                         get_string('usersorgx', 'totara_cohort', $field->name),
                         array_combine($options, $options)
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_in_posorgcustomfield($id, $field->datatype);
+                    $sqlhandler = new cohort_rule_sqlhandler_in_orgcustomfield($id, $field->datatype);
                     break;
                 case 'text':
                     $dialog = new cohort_rule_ui_text(
                         get_string('usersorgx', 'totara_cohort', $field->name),
                         get_string('separatemultiplebycommas', 'totara_cohort')
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_in_posorgcustomfield($id, $field->datatype);
+                    $sqlhandler = new cohort_rule_sqlhandler_in_orgcustomfield($id, $field->datatype);
                     break;
                 case 'datetime':
                     $dialog = new cohort_rule_ui_date(
                         get_string('usersorgx', 'totara_cohort', $field->name)
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_date_orgcustomfield($id);
+                    $sqlhandler = new cohort_rule_sqlhandler_date_orgcustomfield($id, $field->datatype);
                     break;
                 case 'checkbox':
                     $dialog = new cohort_rule_ui_checkbox(
@@ -488,7 +491,7 @@ function cohort_rules_list($reset = false){
                             0 => get_string('checkboxyes','totara_cohort')
                         )
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_in_posorgcustomfield($id, $field->datatype);
+                    $sqlhandler = new cohort_rule_sqlhandler_in_orgcustomfield($id, $field->datatype);
                     break;
                 default:
                     // Skip field types we haven't defined a rule for yet.
@@ -498,123 +501,34 @@ function cohort_rules_list($reset = false){
             }
 
             $rules[] = new cohort_rule_option(
-                'primaryjobassign',
+                'alljobassign',
                 "orgcustomfield{$id}",
                 $dialog,
                 $sqlhandler,
                 s($field->name)
             );
         }
-        $org = new organisation();
-        $orgtypes = $org->get_types();
-        array_walk($orgtypes, function(&$item) { $item = $item->fullname; });
-        $orgtypes[0] = get_string('unclassified', 'totara_hierarchy');
-        $rules[] = new cohort_rule_option(
-            'primaryjobassign',
-            'orgtype',
-            new cohort_rule_ui_menu(
-                get_string('ruledesc-org-orgtype', 'totara_cohort'),
-                $orgtypes
-            ),
-            new cohort_rule_sqlhandler_in_posorgfield('typeid', false)
-        );
 
-        // Audience rules applied across all job assignments.
-        $rules[] = new cohort_rule_option(
-            'alljobassign',
-            'jobtitles',
-            new cohort_rule_ui_text(
-                get_string('ruledesc-alljobassign-titles', 'totara_cohort'),
-                get_string('rulehelp-job-title', 'totara_cohort')
-            ),
-            new cohort_rule_sqlhandler_in_alljobassignfield('fullname', true)
-        );
-        $rules[] = new cohort_rule_option(
-            'alljobassign',
-            'startdates',
-            new cohort_rule_ui_date(
-                get_string('ruledesc-alljobassign-startdates', 'totara_cohort')
-            ),
-            new cohort_rule_sqlhandler_date_alljobassignments('startdate')
-        );
-        $rules[] = new cohort_rule_option(
-            'alljobassign',
-            'enddates',
-            new cohort_rule_ui_date(
-                get_string('ruledesc-alljobassign-enddates', 'totara_cohort')
-            ),
-            new cohort_rule_sqlhandler_date_alljobassignments('enddate')
-        );
-        $rules[] = new cohort_rule_option(
-            'alljobassign',
-            'positions',
-            new cohort_rule_ui_picker_hierarchy(
-                get_string('ruledesc-alljobassign-posid', 'totara_cohort'),
-                'position'
-            ),
-            new cohort_rule_sqlhandler_in_listofids_allpos()
-        );
-        $rules[] = new cohort_rule_option(
-            'alljobassign',
-            'posnames',
-            new cohort_rule_ui_text(
-                get_string('ruledesc-alljobassign-posnames', 'totara_cohort'),
-                get_string('rulehelp-pos-name', 'totara_cohort')
-            ),
-            new cohort_rule_sqlhandler_in_alljobassign_posfield('fullname', true)
-        );
-        $rules[] = new cohort_rule_option(
-            'alljobassign',
-            'posidnumbers',
-            new cohort_rule_ui_text(
-                get_string('ruledesc-alljobassign-posidnumbers', 'totara_cohort'),
-                get_string('rulehelp-pos-idnumber', 'totara_cohort')
-            ),
-            new cohort_rule_sqlhandler_in_alljobassign_posfield('idnumber', true)
-        );
-        $rules[] = new cohort_rule_option(
-            'alljobassign',
-            'posassigndates',
-            new cohort_rule_ui_date(
-                get_string('ruledesc-alljobassign-posassigndates', 'totara_cohort')
-            ),
-            new cohort_rule_sqlhandler_date_alljobassignments('positionassignmentdate')
-        );
-        $rules[] = new cohort_rule_option(
-            'alljobassign',
-            'organisations',
-            new cohort_rule_ui_picker_hierarchy(
-                get_string('ruledesc-alljobassign-orgid', 'totara_cohort'),
-                'organisation'
-            ),
-            new cohort_rule_sqlhandler_in_listofids_allorg()
-        );
-        // User's organisation's name
-        $rules[] = new cohort_rule_option(
-            'alljobassign',
-            'orgnames',
-            new cohort_rule_ui_text(
-                get_string('ruledesc-alljobassign-orgnames', 'totara_cohort'),
-                get_string('rulehelp-org-name', 'totara_cohort')
-            ),
-            new cohort_rule_sqlhandler_in_alljobassign_orgfield('fullname', true)
-        );
-        // User's organisation's id number
-        $rules[] = new cohort_rule_option(
-            'alljobassign',
-            'orgidnumbers',
-            new cohort_rule_ui_text(
-                get_string('ruledesc-alljobassign-orgidnumbers', 'totara_cohort'),
-                get_string('rulehelp-org-idnumber', 'totara_cohort')
-            ),
-            new cohort_rule_sqlhandler_in_alljobassign_orgfield('idnumber', true)
-        );
-        // TODO - it would be good to let people select the managers job assignments here.
+        // Manager Rules.
+        // TODO - it would be good to let people select the managers job assignments here. (separate rule).
         $rules[] = new cohort_rule_option(
             'alljobassign',
             'managers',
             new cohort_rule_ui_reportsto(),
             new cohort_rule_sqlhandler_allstaff()
+        );
+        // If the user is a manager in any of their job assignments.
+        $rules[] = new cohort_rule_option(
+            'alljobassign',
+            'hasdirectreports',
+            new cohort_rule_ui_checkbox(
+                get_string('ruledesc-alljobassign-hasdirectreports', 'totara_cohort'),
+                array(
+                    1 => get_string('directreportsyes', 'totara_cohort'),
+                    0 => get_string('directreportsno', 'totara_cohort')
+                )
+            ),
+            new cohort_rule_sqlhandler_hasreports()
         );
 
         // Learning (i.e. course & program completion)

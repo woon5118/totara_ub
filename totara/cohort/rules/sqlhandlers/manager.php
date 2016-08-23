@@ -43,14 +43,12 @@ class cohort_rule_sqlhandler_hasreports extends cohort_rule_sqlhandler {
     public function get_sql_snippet() {
         $sqlhandler = new stdClass();
         $hasreports = array_pop($this->listofvalues);
-        $sqlhandler->sql = ($hasreports ? '' : 'NOT ') . "exists (
+        $sqlhandler->sql = ($hasreports ? '' : 'NOT ') . "EXISTS (
                 SELECT 1
                   FROM {job_assignment} staffja
                   JOIN {job_assignment} managerja
                     ON staffja.managerjaid = managerja.id
                  WHERE managerja.userid = u.id
-                   AND staffja.sortorder = 1
-                   AND managerja.sortorder = 1
             ) ";
         $sqlhandler->params = array();
         return $sqlhandler;
@@ -58,57 +56,17 @@ class cohort_rule_sqlhandler_hasreports extends cohort_rule_sqlhandler {
 }
 
 /**
- * A rule for determining whether or not a user reports to another user in their respective primary job assignments.
+ * @deprecated Since v9.0
+ *
+ * This class was deprecated as part of the multiple jobs patch and replaced with
+ * the cohort_rule_sqlhandler_allstaff class, please use that instead.
  */
-class cohort_rule_sqlhandler_reportsto extends cohort_rule_sqlhandler {
-    public $params = array(
-        'isdirectreport' => 0,
-        'managerid' => 1
-    );
+class cohort_rule_sqlhandler_reportsto extends cohort_rule_sqlhandler_allstaff {
 
-    public function get_sql_snippet() {
-        global $DB;
-
-        $sqlhandler = new stdClass();
-        $sqlhandler->sql = "EXISTS (
-                SELECT 1
-                  FROM {job_assignment} staffja
-                  LEFT JOIN {job_assignment} managerja
-                  ON staffja.managerjaid = managerja.id
-                     WHERE staffja.userid = u.id
-                     AND staffja.sortorder = 1
-                     AND managerja.sortorder = 1
-             ";
-
-        // Both branches of the if statement below need the results of get_in_or_equal.
-        list($sqlin, $params) = $DB->get_in_or_equal($this->managerid, SQL_PARAMS_NAMED, 'rt' . $this->ruleid);
-
-        if ($this->isdirectreport) {
-            $sqlhandler->sql .= 'AND managerja.userid '.$sqlin;
-
-        } else {
-            $sqlhandler->sql .= "AND (";
-            $needor = 0;
-            $index = 1;
-            // We need to get the actual managerpath for each manager for this to work properly. !!! This needs to be fixed!!!
-            $menusql = "SELECT userid, managerjapath FROM {job_assignment} WHERE userid {$sqlin}";
-            $jobassignpaths = $DB->get_records_sql_menu($menusql, $params);
-            foreach ($this->managerid as $mid) {
-                if (!empty($needor)) { //don't add on first iteration.
-                    $sqlhandler->sql .= ' OR ';
-                }
-                $jobassignpath = (!empty($jobassignpaths[$mid])) ? $jobassignpaths[$mid] : "/{$mid}"; // $mid is wrong - need $mid's job_ass.id
-                $sqlhandler->sql .= $DB->sql_like('staffja.managerjapath', ':rtm'.$this->ruleid.$index);
-                $params['rtm'.$this->ruleid.$index] = $jobassignpath . '/%';
-                $needor = true;
-                $index++;
-            }
-            $sqlhandler->sql .= ")";
-        }
-
-        $sqlhandler->sql .= ')';
-        $sqlhandler->params = $params;
-        return $sqlhandler;
+    public function __construct(){
+        debugging('Class cohort_rule_sqlhandler_reportsto has been replaced and is now deprecated.
+            Please use the cohort_rule_sqlhandler_allstaff class instead', DEBUG_DEVELOPER);
+        parent::__construct();
     }
 }
 
@@ -143,14 +101,14 @@ class cohort_rule_sqlhandler_allstaff extends cohort_rule_sqlhandler {
             $sqlhandler->sql .= "AND (";
             $needor = 0;
             $index = 1;
-            // We need to get the actual managerpath for each manager for this to work properly. !!! This needs to be fixed!!!
+            // We need to get the actual managerpath for each manager for this to work properly.
             $menusql = "SELECT userid, managerjapath FROM {job_assignment} WHERE userid {$sqlin}";
             $jobassignpaths = $DB->get_records_sql_menu($menusql, $params);
             foreach ($this->managerid as $mid) {
                 if (!empty($needor)) { //don't add on first iteration.
                     $sqlhandler->sql .= ' OR ';
                 }
-                $jobassignpath = (!empty($jobassignpaths[$mid])) ? $jobassignpaths[$mid] : "/{$mid}"; // $mid is wrong - need $mid's job_ass.id
+                $jobassignpath = (!empty($jobassignpaths[$mid])) ? $jobassignpaths[$mid] : "/{$mid}";
                 $sqlhandler->sql .= $DB->sql_like('staffja.managerjapath', ':rtm'.$this->ruleid.$index);
                 $params['rtm'.$this->ruleid.$index] = $jobassignpath . '/%';
                 $needor = true;

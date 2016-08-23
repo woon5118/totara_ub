@@ -138,7 +138,7 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         // Add a rule that matches users for the organisation org1. It should match 7 users.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'primaryjobassign', 'orgidnumber', array('equal' => COHORT_RULES_OP_IN_ISEQUALTO),  array('org1'));
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'orgidnumbers', array('equal' => COHORT_RULES_OP_IN_ISEQUALTO),  array('org1'));
         cohort_rules_approve_changes($this->cohort);
         $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($this->cohort->id));
         $this->assertEquals(7, count($members));
@@ -168,7 +168,7 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
         $this->assertTrue($DB->set_field('org', 'typeid', $orgtype1, array('id' => $this->org1->id)));
 
         // Create a rule that matches users in the previous created type.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'primaryjobassign', 'orgtype', array('equal' => COHORT_RULES_OP_IN_EQUAL), array($orgtype1));
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'orgtypes', array('equal' => COHORT_RULES_OP_IN_EQUAL), array($orgtype1));
         cohort_rules_approve_changes($this->cohort);
 
         // It should match 7 users (org1).
@@ -251,7 +251,7 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
         $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'user', 'username', array('equal' => COHORT_RULES_OP_IN_NOTEQUALTO), array('admin'));
 
         // Create organisation rule.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'primaryjobassign', 'orgid', $params, $listofvalues);
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'alljobassign', 'organisations', $params, $listofvalues);
         cohort_rules_approve_changes($this->cohort);
 
         // It should match:
