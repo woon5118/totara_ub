@@ -143,7 +143,7 @@ if ($session and $d) {
     print_error('error:couldnotdeletesession', 'facetoface', $returnurl);
 }
 
-if (!empty($session->cancelledstatus)) {
+if (!empty($session->cancelledstatus) && !$c) {
     print_error('error:cannoteditcancelledevent', 'facetoface', $returnurl);
 }
 
