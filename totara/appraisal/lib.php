@@ -319,12 +319,12 @@ class appraisal {
         $assignment = new totara_assign_appraisal('appraisal', $this);
         if ($assignment->get_current_users_count() < 1) {
             $key = 'learners';
-            $err = get_string('appraisalinvalid:learners', 'totara_appraisal');
+            $errdesc = get_string('appraisalinvalid:learners', 'totara_appraisal');
             if ($CFG->dynamicappraisals) {
-                $war[$key] = $err;
+                $war[$key] = $errdesc;
             }
             else {
-                $err[$key] = $err;
+                $err[$key] = $errdesc;
             }
         }
 
