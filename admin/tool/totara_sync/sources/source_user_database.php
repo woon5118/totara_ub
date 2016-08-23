@@ -70,6 +70,19 @@ class totara_sync_source_user_database extends totara_sync_source_user {
                 $dbstruct[] = !empty($fieldmappings[$f]) ? $fieldmappings[$f] : $f;;
             }
         }
+        if (empty($this->config->import_deleted)) {
+            $deletedwarning = '';
+        } else {
+            // If the deleted field is present, we need to warn that the deleted field only applies
+            // to user records, not job assignments.
+            if (isset($fieldmappings['deleted'])) {
+                // We'll use the mapped field for deleted if it's been defined.
+                $a = $fieldmappings['deleted'];
+            } else {
+                $a = 'deleted';
+            }
+            $deletedwarning = get_string('deletednotforjobassign', 'tool_totara_sync', $a);
+        }
 
         $db_table = isset($this->config->{'database_dbtable'}) ? $this->config->{'database_dbtable'} : false;
 
@@ -79,7 +92,8 @@ class totara_sync_source_user_database extends totara_sync_source_user {
             $db_table = $this->config->{'database_dbtable'};
             $dbstruct = implode(', ', $dbstruct);
             $description = get_string('tablemustincludexdb', 'tool_totara_sync', $db_table);
-            $description .= html_writer::empty_tag('br') . $dbstruct;
+            $description .= html_writer::empty_tag('br') . html_writer::tag('pre', $dbstruct);
+            $description .= $deletedwarning;
         }
 
         $mform->addElement('html', html_writer::tag('div', html_writer::tag('p', $description), array('class' => 'informationbox')));

@@ -93,8 +93,22 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         }
         unset($fcount);
 
+        if (empty($this->config->import_deleted)) {
+            $deletedwarning = '';
+        } else {
+            // If the deleted field is present, we need to warn that the deleted field only applies
+            // to user records, not job assignments.
+            if (isset($fieldmappings['deleted'])) {
+                // We'll use the mapped field for deleted if it's been defined.
+                $a = $fieldmappings['deleted'];
+            } else {
+                $a = 'deleted';
+            }
+            $deletedwarning = get_string('deletednotforjobassign', 'tool_totara_sync', $a);
+        }
+
         $delimiter = $this->config->delimiter;
-        $info = get_string('csvimportfilestructinfo', 'tool_totara_sync', implode($delimiter, $filestruct));
+        $info = get_string('csvimportfilestructinfo', 'tool_totara_sync', implode($delimiter, $filestruct)) . $deletedwarning;
         $mform->addElement('html', html_writer::tag('div', html_writer::tag('p', $info, array('class' => "informationbox"))));
 
         // Add some source file details

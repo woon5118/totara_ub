@@ -72,6 +72,7 @@ $string['removeitemsdesc'] = 'Specify what to do with internal items during HR I
 $string['displayname:user'] = 'User';
 $string['settings:user'] = 'User element settings';
 $string['deleted'] = 'Deleted';
+$string['deletednotforjobassign'] = '<strong>Warning:</strong> the "{$a}" field applies to deleting users. Do not set its value to 1 when you only intend to delete a job assignment.';
 $string['sourceallrecords'] = 'Source contains all records';
 $string['sourceallrecordsdesc'] = 'Does the source provide all HR Import records, everytime <strong>OR</strong> are only records that need to be updated/deleted provided? If "No" (only records to be updated/deleted), then the source must use the <strong>"delete" flag</strong>.';
 $string['allowduplicatedemails'] = 'Allow duplicate emails';
