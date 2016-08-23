@@ -105,12 +105,12 @@ class behat_facetoface extends behat_base {
             }
         }
 
-        if ($timestartzone !== '') {
-            date_default_timezone_set($timestartzone);
-        }
         $now = time();
         $newdate = strtotime("{$timestartmonth} {$timestartday} {$timestartyear} {$timestarthour} {$timestartmin}" , $now) ;
         $startdate = new DateTime(date('Y-m-d H:i' , $newdate));
+        if ($timestartzone !== '') {
+            new DateTime(date('Y-m-d H:i' , $newdate), new DateTimeZone($timestartzone));
+        }
 
         // Values for the minutes field should be multiple of 5 (from 00 to 55). So we need to fix these values.
         $startmin = $startdate->format("i");
@@ -123,11 +123,11 @@ class behat_facetoface extends behat_base {
 
         $startdate->setTime($startdate->format('H'), $minutes);
 
-        if ($timefinishzone !== '') {
-            date_default_timezone_set($timefinishzone);
-        }
-        $newdate = strtotime("{$timefinishmonth} {$timefinishday} {$timefinishyear} {$timefinishhour} {$timefinishmin}" , $now) ;
+        $newdate = strtotime("{$timefinishmonth} {$timefinishday} {$timefinishyear} {$timefinishhour} {$timefinishmin}" , $now);
         $finishdate = new DateTime(date('Y-m-d H:i' , $newdate));
+        if ($timefinishzone !== '') {
+            $finishdate = new DateTime(date('Y-m-d H:i' , $newdate), new DateTimeZone($timefinishzone));
+        }
 
         $finishmin = $finishdate->format('i');
         $minutes = (($finishmin % 5 ) !== 0) ? floor($finishmin / 5) * 5 + 5 : ($finishmin / 5) * 5;
