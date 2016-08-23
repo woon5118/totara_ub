@@ -234,8 +234,8 @@ function goal_scale_display_table($scales) {
     if ($can_add) {
         $buttonurl = new moodle_url('/totara/hierarchy/prefix/goal/scale/edit.php', array('prefix' => 'goal'));
 
-        $templatedata->add = $OUTPUT->single_button($buttonurl, get_string('scalesgoalcustomcreate', 'totara_hierarchy'), 'get');
-        $templatedata->add .= $OUTPUT->help_icon('goalscalesgeneral', 'totara_hierarchy');
+        $templatedata->addbuttons = $OUTPUT->single_button($buttonurl, get_string('scalesgoalcustomcreate', 'totara_hierarchy'), 'get');
+        $templatedata->addbuttons .= $OUTPUT->help_icon('goalscalesgeneral', 'totara_hierarchy');
     }
 
     echo $OUTPUT->render_from_template('totara_hierarchy/admin_scales', $templatedata);
