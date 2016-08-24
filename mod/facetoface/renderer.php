@@ -108,11 +108,17 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
             $isbookedsession = (!empty($session->bookedsession) && ($session->id == $session->bookedsession->sessionid));
             $sessionstarted = facetoface_has_session_started($session, time());
-            if (!empty($session->sessiondates)) {
-                $signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_BOOKED);
+
+            $comp = '>='; // SQL comparison operator.
+            if ($session->cancelledstatus) {
+                $status = MDL_F2F_STATUS_SESSION_CANCELLED;
+                $comp = '=';
+            } else if (!empty($session->sessiondates)) {
+                $status = MDL_F2F_STATUS_BOOKED;
             } else {
-                $signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_WAITLISTED);
+                $status = MDL_F2F_STATUS_WAITLISTED;
             }
+            $signupcount = facetoface_get_num_attendees($session->id, $status, $comp);
             $sessionfull = ($signupcount >= $session->capacity);
 
             $rooms = facetoface_get_session_rooms($session->id);
