@@ -825,7 +825,7 @@ abstract class prog_eventbased_message extends prog_message {
                 $managerdata->contexturl = $CFG->wwwroot.'/totara/program/view.php?id='.$this->programid.'&amp;userid='.$recipient->id;
                 $managerdata->icon = 'program-regular';
                 $managerdata->msgtype = TOTARA_MSG_TYPE_PROGRAM;
-                $result = $reult && tm_alert_send($managerdata);
+                $result = $result && tm_alert_send($managerdata);
             }
         }
 
