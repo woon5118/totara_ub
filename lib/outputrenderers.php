@@ -3223,6 +3223,7 @@ EOD;
      * @return string
      */
     public function custom_menu($custommenuitems = '') {
+        global $PAGE;
         debugging('This functionality has been deprecated - Please use the totara menu functionality instead', DEBUG_DEVELOPER);
         $menudata = totara_build_menu();
         $totara_core_renderer = $PAGE->get_renderer('totara_core');
@@ -3245,6 +3246,7 @@ EOD;
      * @return string
      */
     protected function render_custom_menu(custom_menu $menu) {
+        global $PAGE;
         debugging('This functionality has been deprecated - Please use the totara menu functionality instead', DEBUG_DEVELOPER);
         $menudata = totara_build_menu();
         $totara_core_renderer = $PAGE->get_renderer('totara_core');
