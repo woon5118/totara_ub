@@ -201,8 +201,10 @@ define(['jquery',
             templates.render(template, {});
         });
 
-        initPaginationHandlers();
-        initStyles(blockData);
+        if (blockData.pagination) {
+            initPaginationHandlers();
+            initStyles(blockData);
+        }
         if (bsjavascript) {
             initTooltips();
         }
