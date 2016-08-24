@@ -684,10 +684,10 @@ function customfield_get_fields_definition($tableprefix, $conditions = array()) 
  * @param string $tableprefix the table prefix of the customfield
  * @param string $prefix The prefix of the custom field
  * @param bool $indexfullname If true the index for each value will be the fullname of the field, otherwise the shortname
- * @param array $extradata customfield_file::display_item_data requires some additional extradata.
+ * @param array $itemextradata customfield_file::display_item_data requires some additional extradata.
  * @return array Array with the customfield and its associated value
  */
-function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = true, $extradata = array()) {
+function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = true, $itemextradata = array()) {
     global $DB, $CFG;
     $out = array();
 
@@ -741,7 +741,7 @@ function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = tru
             case 'location':
                 require_once($CFG->dirroot.'/totara/customfield/field/location/field.class.php');
                 // If require pass in 'extended' => true as a value in the $extradata array to get the full map layout.
-                $extradata = array_merge($extradata, array('prefix' => $prefix, 'itemid' => $field->dataid));
+                $extradata = array_merge($itemextradata, array('prefix' => $prefix, 'itemid' => $field->dataid));
                 $data = json_decode($data);
                 $data = \customfield_location::display_item_data($data, $extradata);
                 break;
