@@ -857,7 +857,7 @@ class organisations_category extends prog_assignment_category {
             $where .= " AND u.id=$userid";
         }
 
-        $select = $count ? 'COUNT(u.id)' : 'u.id';
+        $select = $count ? 'COUNT(DISTINCT u.id)' : 'DISTINCT u.id';
 
         $sql = "SELECT $select
                 FROM {job_assignment} AS ja
@@ -896,14 +896,17 @@ class organisations_category extends prog_assignment_category {
 
     }
 
+    /**
+     * @param stdClass $data
+     * @param stdClass $object
+     * @return int
+     */
     function get_includechildren($data, $object) {
-        if (!isset($data->includechildren)
-            || !isset($data->includechildren[$this->id])
-            || !isset($data->includechildren[$this->id][$object->assignmenttypeid])) {
-
+        if (empty($data->includechildren[$this->id][$object->assignmenttypeid])) {
             return 0;
+        } else {
+            return 1;
         }
-        return 1;
     }
 
     function get_js($programid) {
@@ -1012,13 +1015,12 @@ class positions_category extends prog_assignment_category {
             $where = "ja.positionid $usql";
         }
 
-        $select = $count ? 'COUNT(u.id)' : 'u.id';
+        $select = $count ? 'COUNT(DISTINCT u.id)' : 'DISTINCT u.id';
 
         $sql = "SELECT $select
                 FROM {job_assignment} ja
                 INNER JOIN {user} u ON ja.userid = u.id
                 WHERE $where
-                AND ja.sortorder = 1
                 AND u.deleted = 0";
         if ($userid) {
             $sql .= " AND u.id = ?";
@@ -1056,14 +1058,17 @@ class positions_category extends prog_assignment_category {
 
     }
 
+    /**
+     * @param stdClass $data
+     * @param stdClass $object
+     * @return int
+     */
     function get_includechildren($data, $object) {
-        if (!isset($data->includechildren)
-            || !isset($data->includechildren[$this->id])
-            || !isset($data->includechildren[$this->id][$object->assignmenttypeid])) {
-
+        if (empty($data->includechildren[$this->id][$object->assignmenttypeid])) {
             return 0;
+        } else {
+            return 1;
         }
-        return 1;
     }
 
     function get_js($programid) {
@@ -1315,7 +1320,7 @@ class managers_category extends prog_assignment_category {
             $params = array($item->id);
         }
 
-        $select = $count ? 'COUNT(ja.userid) AS id' : 'ja.userid AS id';
+        $select = $count ? 'COUNT(DISTINCT ja.userid) AS id' : 'DISTINCT ja.userid AS id';
 
         $sql = "SELECT $select
                 FROM {job_assignment} ja
