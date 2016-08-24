@@ -1437,7 +1437,7 @@ class hierarchy {
             $item_data = call_user_func(array($cf_type, 'display_item_data'), $record->$data,
                 array('prefix' => $this->prefix, 'itemid' => $record->$itemid, 'altprefix' => $altprefix));
             $item_name = html_writer::tag('strong', format_string($cf->fullname) . ': ');
-            $out .= $OUTPUT->container($item_name . format_text($item_data), 'customfield ' . $cssclass);
+            $out .= $OUTPUT->container($item_name . $item_data, 'customfield ' . $cssclass);
         }
 
         return $out;
