@@ -41,16 +41,16 @@ M.totara_appraisal_message = M.totara_appraisal_message || {
     }
 
     // Adding custom dependency checkers without changing form.js code.
-    M.form.dependencyManager.prototype._dependency_eqhide = function(elements, value) {
-        result = M.form.dependencyManager.prototype._dependency_eq(elements, value);
+    M.form.dependencyManager.prototype._dependencyEqhide = function(elements, value) {
+        result = M.form.dependencyManager.prototype._dependencyEq(elements, value);
         if (result.lock) {
             result.hide = true;
         }
         return result;
     }
 
-    M.form.dependencyManager.prototype._dependency_notcheckedhide = function(elements, value) {
-        result = M.form.dependencyManager.prototype._dependency_notchecked(elements, value);
+    M.form.dependencyManager.prototype._dependencyNotcheckedhide = function(elements, value) {
+        result = M.form.dependencyManager.prototype._dependencyNotchecked(elements, value);
         if (result.lock) {
             result.hide = true;
         }
