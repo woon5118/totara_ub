@@ -336,6 +336,7 @@ $string['error:unknownbuttonclicked'] = 'Unknown button clicked';
 $string['error:updatescheduledreport'] = 'Error updating Scheduled Report';
 $string['excludetags'] = 'Exclude records tagged with';
 $string['export'] = 'Export';
+$string['exportas'] = 'Export as';
 $string['exportcsv'] = 'Export in CSV format';
 $string['exportfilesystemoptions'] = 'Export options';
 $string['exportfilesystempath'] = 'File export path';
