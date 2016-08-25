@@ -329,19 +329,10 @@ function calendar_get_mini($courses, $groups, $users, $calmonth = false, $calyea
             $dayweek = $display->minwday;
         }
 
-        // Reset vars.
-        if ($weekend & (1 << ($dayweek % $numberofdaysinweek))) {
-            // Weekend. This is true no matter what the exact range is.
-            $class = 'weekend day';
-        } else {
-            // Normal working day.
-            $class = 'day';
-        }
-
         if (isset($eventsbyday[$day])) {
             // There is at least one event on this day.
 
-            $class .= ' hasevent';
+            $class = 'hasevent';
             $hrefparams['view'] = 'day';
             $dayhref = calendar_get_link_href(new moodle_url(CALENDAR_URL . 'view.php', $hrefparams), 0, 0, 0, $daytime);
 
@@ -402,6 +393,14 @@ function calendar_get_mini($courses, $groups, $users, $calmonth = false, $calyea
             }
             $cell = html_writer::link($dayhref, $day);
         } else {
+            // Reset vars.
+            if ($weekend & (1 << ($dayweek % $numberofdaysinweek))) {
+                // Weekend. This is true no matter what the exact range is.
+                $class = 'weekend day';
+            } else {
+                // Normal working day.
+                $class = 'day';
+            }
             $cell = $day;
         }
 
