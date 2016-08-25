@@ -701,8 +701,12 @@ class rb_source_dp_course extends rb_base_source {
 
     public function rb_display_course_completion_previous_completion($name, $row) {
         global $OUTPUT;
-        return $OUTPUT->action_link(new moodle_url('/totara/plan/record/courses.php',
-                array('courseid' => $row->courseid, 'userid' => $row->userid, 'history' => 1)), $name);
+        if ($name !== '') {
+            return $OUTPUT->action_link(new moodle_url('/totara/plan/record/courses.php',
+                    array('courseid' => $row->courseid, 'userid' => $row->userid, 'history' => 1)), $name);
+        } else {
+            return '';
+        }
     }
 
     function rb_filter_coursecompletion_status() {
