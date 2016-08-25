@@ -1023,10 +1023,263 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
     }
 
     /**
-     * Tests update_temporary_managers().
+     * Sets users up with job assignments and temporary managers.
+     * Used with the test_update_temporary_managers tests that follow.
+     *
+     * @param int|bool $past - timestamp for temp manager expiry dates or false to only use
+     * the $future timestamp value for expiry dates.
+     * @param int $future - timestamp for temp manager expiry dates.
+     * @param \totara_job\job_assignment $manager1ja - used for setting the users' managerjaid and tempmanagerjaid.
+     * @param \totara_job\job_assignment $manager2ja - used for setting the users' managerjaid and tempmanagerjaid.
+     * @return array of the users' job assignments.
      */
-    public function test_update_temporary_managers() {
-        // TODO Write me.
+    private function set_job_assignments_with_tempmanagers($past, $future, $manager1ja, $manager2ja) {
+        $jobassignments = array();
+
+        if ($past === false) {
+            // If we don't want a past date (because it's not relevant to the test), we'll
+            // set all dates to the $future date.
+            $past = $future;
+        }
+
+        // One job assignmnet and one temp manager.
+        $jobassignments['1a'] = \totara_job\job_assignment::create_default($this->users[1]->id,
+            array('tempmanagerjaid' => $manager1ja->id, 'tempmanagerexpirydate' => $past));
+
+        // Two job assignments and temp manager on the second.
+        $jobassignments['2a'] = \totara_job\job_assignment::create_default($this->users[2]->id);
+        $jobassignments['2b'] = \totara_job\job_assignment::create_default($this->users[2]->id,
+            array('tempmanagerjaid' => $manager1ja->id, 'tempmanagerexpirydate' => $past));
+
+        // Two job assignments and different temp managers on each. A usual manager on one.
+        $jobassignments['3a'] = \totara_job\job_assignment::create_default($this->users[3]->id,
+            array('tempmanagerjaid' => $manager2ja->id, 'tempmanagerexpirydate' => $past));
+        $jobassignments['3b'] = \totara_job\job_assignment::create_default($this->users[3]->id,
+            array('tempmanagerjaid' => $manager1ja->id, 'tempmanagerexpirydate' => $past));
+
+        // Two job assignments and the same temp manager on both.
+        $jobassignments['4a'] = \totara_job\job_assignment::create_default($this->users[4]->id,
+            array('tempmanagerjaid' => $manager2ja->id, 'tempmanagerexpirydate' => $past, 'managerjaid' => $manager1ja->id));
+        $jobassignments['4b'] = \totara_job\job_assignment::create_default($this->users[4]->id,
+            array('tempmanagerjaid' => $manager2ja->id, 'tempmanagerexpirydate' => $past));
+
+        // Past and future dates on the different temp managers in each job assignment.
+        $jobassignments['5a'] = \totara_job\job_assignment::create_default($this->users[5]->id,
+            array('tempmanagerjaid' => $manager2ja->id, 'tempmanagerexpirydate' => $past));
+        $jobassignments['5b'] = \totara_job\job_assignment::create_default($this->users[5]->id,
+            array('tempmanagerjaid' => $manager1ja->id, 'tempmanagerexpirydate' => $future));
+        $jobassignments['6a'] = \totara_job\job_assignment::create_default($this->users[6]->id,
+            array('tempmanagerjaid' => $manager2ja->id, 'tempmanagerexpirydate' => $future));
+        $jobassignments['6b'] = \totara_job\job_assignment::create_default($this->users[6]->id,
+            array('tempmanagerjaid' => $manager2ja->id, 'tempmanagerexpirydate' => $past));
+
+        // Repeat the cases for users 1 -4 but with future dates only.
+        // The following are also the only ones returned if we don't ask for past expiry dates.
+
+        // One job assignmnet and one temp manager.
+        $jobassignments['7a'] = \totara_job\job_assignment::create_default($this->users[7]->id,
+            array('tempmanagerjaid' => $manager1ja->id, 'tempmanagerexpirydate' => $future));
+        // Two job assignments and temp manager on the second.
+        $jobassignments['8a'] = \totara_job\job_assignment::create_default($this->users[8]->id);
+        $jobassignments['8b'] = \totara_job\job_assignment::create_default($this->users[8]->id,
+            array('tempmanagerjaid' => $manager1ja->id, 'tempmanagerexpirydate' => $future));
+        // Two job assignments and different temp managers on each. A usual manager on one.
+        $jobassignments['9a'] = \totara_job\job_assignment::create_default($this->users[9]->id,
+            array('tempmanagerjaid' => $manager2ja->id, 'tempmanagerexpirydate' => $future));
+        $jobassignments['9b'] = \totara_job\job_assignment::create_default($this->users[9]->id,
+            array('tempmanagerjaid' => $manager1ja->id, 'tempmanagerexpirydate' => $future));
+        // Two job assignments and the same temp manager on both.
+        $jobassignments['10a'] = \totara_job\job_assignment::create_default($this->users[10]->id,
+            array('tempmanagerjaid' => $manager2ja->id, 'tempmanagerexpirydate' => $future, 'managerjaid' => $manager1ja->id));
+        $jobassignments['10b'] = \totara_job\job_assignment::create_default($this->users[10]->id,
+            array('tempmanagerjaid' => $manager2ja->id, 'tempmanagerexpirydate' => $future));
+
+        return $jobassignments;
+    }
+
+    /**
+     * Tests update_temporary_managers() checking that expired temporary managers will be unset
+     * in job assignment records.
+     */
+    public function test_update_temporary_managers_expiry() {
+        global $DB;
+
+        $data_generator = $this->getDataGenerator();
+        $manager1 = $data_generator->create_user();
+        $manager1ja = \totara_job\job_assignment::create_default($manager1->id);
+        $manager2 = $data_generator->create_user();
+        $manager2ja = \totara_job\job_assignment::create_default($manager2->id);
+
+        // Timestamps
+        $past = time() - 5 * DAYSECS;
+        $future = time() + 5 * DAYSECS;
+
+        $jobassignments = $this->set_job_assignments_with_tempmanagers($past, $future, $manager1ja, $manager2ja);
+
+        // Do some basic pre-checks to ensure data is as it should be.
+
+        // Total job assignments is 1 each for 2 managers. 3 users with 1 each and 8 users with 2 each.
+        $this->assertEquals(20, $DB->count_records('job_assignment'));
+        // Count how many job assignments with a temp manager there are.
+        $this->assertEquals(16, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerjaid IS NOT NULL'));
+        $this->assertEquals(16, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerexpirydate IS NOT NULL'));
+        // Check there are the correct number of past and future expiry dates.
+        $this->assertEquals(8, $DB->count_records('job_assignment', array('tempmanagerexpirydate' => $past)));
+        $this->assertEquals(8, $DB->count_records('job_assignment', array('tempmanagerexpirydate' => $future)));
+
+        // Run the function.
+        ob_start();
+        \totara_job\job_assignment::update_temporary_managers();
+        ob_end_clean();
+
+        // No job assignments should have been deleted, only updated.
+        $this->assertEquals(20, $DB->count_records('job_assignment'));
+        // Only the future expiry temp managers should remain.
+        $this->assertEquals(8, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerjaid IS NOT NULL'));
+        $this->assertEquals(8, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerexpirydate IS NOT NULL'));
+        $this->assertEquals(0, $DB->count_records('job_assignment', array('tempmanagerexpirydate' => $past)));
+        $this->assertEquals(8, $DB->count_records('job_assignment', array('tempmanagerexpirydate' => $future)));
+
+        // Check the job assignment records specifically.
+        // We'll check the basic scenario and then a couple of the more complicated ones such a mix of past and future dates.
+        // The count checks above largely cover the rest.
+
+        $user1ja_check = \totara_job\job_assignment::get_with_id($jobassignments['1a']->id);
+        $this->assertNull($user1ja_check->tempmanagerjaid);
+        $this->assertNull($user1ja_check->tempmanagerid);
+        $this->assertNull($user1ja_check->tempmanagerexpirydate);
+
+        $user4ja1_check = \totara_job\job_assignment::get_with_id($jobassignments['4a']->id);
+        $this->assertNull($user4ja1_check->tempmanagerjaid);
+        $this->assertNull($user4ja1_check->tempmanagerid);
+        $this->assertNull($user4ja1_check->tempmanagerexpirydate);
+        // But the usual manager should still be there.
+        $this->assertEquals($manager1ja->id, $user4ja1_check->managerjaid);
+        $this->assertEquals($manager1->id, $user4ja1_check->managerid);
+
+        $user6ja1_check = \totara_job\job_assignment::get_with_id($jobassignments['6a']->id);
+        $this->assertEquals($manager2ja->id, $user6ja1_check->tempmanagerjaid);
+        $this->assertEquals($manager2->id, $user6ja1_check->tempmanagerid);
+        $this->assertEquals($future, $user6ja1_check->tempmanagerexpirydate);
+
+        $user6ja2_check = \totara_job\job_assignment::get_with_id($jobassignments['6b']->id);
+        $this->assertNull($user6ja2_check->tempmanagerjaid);
+        $this->assertNull($user6ja2_check->tempmanagerid);
+        $this->assertNull($user6ja2_check->tempmanagerexpirydate);
+    }
+
+    /**
+     * Tests update_temporary_managers() checking that if the 'tempmanagerrestrictselection' is
+     * turned on, then any assigned temp managers will be restricted to only those that
+     * are also (usual/non-temp) managers.
+     */
+    public function test_update_temporary_managers_restrict() {
+        global $DB;
+
+        $data_generator = $this->getDataGenerator();
+        $manager1 = $data_generator->create_user();
+        $manager1ja = \totara_job\job_assignment::create_default($manager1->id);
+        $manager2 = $data_generator->create_user();
+        $manager2ja = \totara_job\job_assignment::create_default($manager2->id);
+
+        // Timestamps
+        $future = time() + 5 * DAYSECS;
+        // We don't want past expiry dates. We're isolating the restrict behaviour in this test.
+        $jobassignments = $this->set_job_assignments_with_tempmanagers(false, $future, $manager1ja, $manager2ja);
+
+        // Total job assignments is 1 each for 2 managers. 3 users with 1 each and 8 users with 2 each.
+        $this->assertEquals(20, $DB->count_records('job_assignment'));
+        // Count how many job assignments with a temp manager there are.
+        $this->assertEquals(16, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerjaid IS NOT NULL'));
+        $this->assertEquals(16, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerexpirydate IS NOT NULL'));
+        // Check the expiry dates.
+        $this->assertEquals(16, $DB->count_records('job_assignment', array('tempmanagerexpirydate' => $future)));
+
+        // Set the config to restrict temp managers to those that are also usual managers for others.
+        set_config('tempmanagerrestrictselection', 1);
+
+        // Run the function.
+        ob_start();
+        \totara_job\job_assignment::update_temporary_managers();
+        ob_end_clean();
+
+        // No job assignments should have been deleted, only updated.
+        $this->assertEquals(20, $DB->count_records('job_assignment'));
+        // There should be just one tempmanager set up now.
+        $this->assertEquals(7, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerjaid IS NOT NULL'));
+        $this->assertEquals(7, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerexpirydate IS NOT NULL'));
+        $this->assertEquals(7, $DB->count_records('job_assignment', array('tempmanagerexpirydate' => $future)));
+
+        // Check that some records specifically.
+        $user7ja1_check = \totara_job\job_assignment::get_with_id($jobassignments['7a']->id);
+        $this->assertEquals($manager1ja->id, $user7ja1_check->tempmanagerjaid);
+        $this->assertEquals($manager1->id, $user7ja1_check->tempmanagerid);
+        $this->assertEquals($future, $user7ja1_check->tempmanagerexpirydate);
+
+        $user9ja1_check = \totara_job\job_assignment::get_with_id($jobassignments['9a']->id);
+        $this->assertNull($user9ja1_check->tempmanagerjaid);
+        $this->assertNull($user9ja1_check->tempmanagerid);
+        $this->assertNull($user9ja1_check->tempmanagerexpirydate);
+
+        // This user had the usual manager assigned. Their temp manager was not a usual manager though, so should have been removed.
+        $user10ja1_check = \totara_job\job_assignment::get_with_id($jobassignments['10a']->id);
+        $this->assertNull($user10ja1_check->tempmanagerjaid);
+        $this->assertNull($user10ja1_check->tempmanagerid);
+        $this->assertNull($user10ja1_check->tempmanagerexpirydate);
+        // But the usual manager should still be there.
+        $this->assertEquals($manager1ja->id, $user10ja1_check->managerjaid);
+        $this->assertEquals($manager1->id, $user10ja1_check->managerid);
+    }
+
+    /**
+     * Tests update_temporary_managers() checking that if temp managers are disabled, that all
+     * temporary managers are unset in job assignment records.
+     */
+    public function test_update_temporary_managers_disable() {
+        global $DB;
+
+        $data_generator = $this->getDataGenerator();
+        $manager1 = $data_generator->create_user();
+        $manager1ja = \totara_job\job_assignment::create_default($manager1->id);
+        $manager2 = $data_generator->create_user();
+        $manager2ja = \totara_job\job_assignment::create_default($manager2->id);
+
+        // Timestamps
+        $future = time() + 5 * DAYSECS;
+        // We don't want past expiry dates. We're isolating the restrict behaviour in this test.
+        $jobassignments = $this->set_job_assignments_with_tempmanagers(false, $future, $manager1ja, $manager2ja);
+
+        // Total job assignments is 1 each for 2 managers. 3 users with 1 each and 8 users with 2 each.
+        $this->assertEquals(20, $DB->count_records('job_assignment'));
+        // Count how many job assignments with a temp manager there are.
+        $this->assertEquals(16, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerjaid IS NOT NULL'));
+        $this->assertEquals(16, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerexpirydate IS NOT NULL'));
+        // Check the expiry dates.
+        $this->assertEquals(16, $DB->count_records('job_assignment', array('tempmanagerexpirydate' => $future)));
+
+        // Set the config such that temporary managers are disabled.
+        set_config('enabletempmanagers', 0);
+
+        // Run the function.
+        ob_start();
+        \totara_job\job_assignment::update_temporary_managers();
+        ob_end_clean();
+
+        // No job assignments should have been deleted, only updated.
+        $this->assertEquals(20, $DB->count_records('job_assignment'));
+        // There should be just no tempmanager set up now.
+        $this->assertEquals(0, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerjaid IS NOT NULL'));
+        $this->assertEquals(0, $DB->count_records_sql('SELECT COUNT(id) FROM {job_assignment} WHERE tempmanagerexpirydate IS NOT NULL'));
+        $this->assertEquals(0, $DB->count_records('job_assignment', array('tempmanagerexpirydate' => $future)));
+
+        // This user had the usual manager assigned. Only the temp manager should have been removed.
+        $user10ja1_check = \totara_job\job_assignment::get_with_id($jobassignments['10a']->id);
+        $this->assertNull($user10ja1_check->tempmanagerjaid);
+        $this->assertNull($user10ja1_check->tempmanagerid);
+        $this->assertNull($user10ja1_check->tempmanagerexpirydate);
+        // But the usual manager should still be there.
+        $this->assertEquals($manager1ja->id, $user10ja1_check->managerjaid);
+        $this->assertEquals($manager1->id, $user10ja1_check->managerid);
     }
 
     /**

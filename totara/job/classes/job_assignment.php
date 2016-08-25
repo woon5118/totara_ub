@@ -1477,13 +1477,13 @@ class job_assignment {
         if (empty($CFG->enabletempmanagers)) {
             // Unassign all current temporary managers.
 
-            $rs = $DB->get_recordset_select('job_assignment', 'tempmanagerid IS NOT NULL');
+            $rs = $DB->get_recordset_select('job_assignment', 'tempmanagerjaid IS NOT NULL');
 
             if ($rs) {
                 mtrace('Removing obsolete temporary managers...');
                 foreach ($rs as $record) {
                     $jobassignment = new job_assignment($record);
-                    $jobassignment->update_internal(array('tempmanagerid' => null, 'timemanagerexpirydate' => null));
+                    $jobassignment->update_internal(array('tempmanagerjaid' => null, 'tempmanagerexpirydate' => null));
                 }
                 mtrace('Done removing obsolete temporary managers.');
             }
@@ -1500,18 +1500,17 @@ class job_assignment {
 
             $sql = "SELECT staffja.*
                       FROM {job_assignment} staffja
-                 LEFT JOIN {job_assignment} tempmanagerja ON staffja.tempmanagerjaid = tempmanagerja.id
+                      JOIN {job_assignment} tempmanagerja ON staffja.tempmanagerjaid = tempmanagerja.id
                       JOIN {job_assignment} alltempmanagersjas ON tempmanagerja.userid = alltempmanagersjas.userid
-                      JOIN {job_assignment} allotherstaffja ON allotherstaffja.managerjaid = alltempmanagersjas.id
-                                                           AND allotherstaffja.id <> staffja.id
-                     WHERE staffja.tempmanagerjaid IS NOT NULL AND tempmanagerja.id IS NULL";
+                 LEFT JOIN {job_assignment} allotherstaffja ON allotherstaffja.managerjaid = alltempmanagersjas.id
+                     WHERE allotherstaffja.managerjaid IS NULL";
             $rs = $DB->get_recordset_sql($sql);
 
             if ($rs) {
                 mtrace('Removing non-manager temporary managers...');
                 foreach ($rs as $record) {
                     $jobassignment = new job_assignment($record);
-                    $jobassignment->update_internal(array('tempmanagerid' => null, 'timemanagerexpirydate' => null));
+                    $jobassignment->update_internal(array('tempmanagerjaid' => null, 'tempmanagerexpirydate' => null));
                 }
                 mtrace('Done removing non-manager temporary managers.');
             }
@@ -1526,7 +1525,7 @@ class job_assignment {
             mtrace('Removing expired temporary managers...');
             foreach ($rs as $record) {
                 $jobassignment = new job_assignment($record);
-                $jobassignment->update_internal(array('tempmanagerid' => null, 'timemanagerexpirydate' => null));
+                $jobassignment->update_internal(array('tempmanagerjaid' => null, 'tempmanagerexpirydate' => null));
             }
             mtrace('Done removing expired temporary managers.');
         }
