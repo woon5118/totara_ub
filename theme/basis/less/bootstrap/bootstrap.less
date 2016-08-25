@@ -48,3 +48,69 @@
 .breadcrumb {
   background: transparent;
 }
+
+//
+// Nav.
+//
+.nav {
+  > li {
+    > a {
+      font-weight: 400;
+    }
+  }
+}
+
+//
+// Tabs.
+//
+.nav-tabs {
+  text-transform: uppercase;
+  font-size: ceil(@font-size-base * 0.8);
+  > li {
+    // Actual tabs (as links)
+    > a {
+      margin-right: 0;
+      border-radius: 0;
+      color: @nav-tabs-link-color;
+      border-color: @nav-tabs-border-color;
+      border-right-color: transparent;
+      background-color: @nav-tabs-link-bg;
+      &:hover {
+        border-color: @nav-tabs-border-color transparent @nav-tabs-border-color @nav-tabs-border-color;
+      }
+    }
+
+    &:last-child > a {
+      border-right-color: @nav-tabs-border-color;
+    }
+
+    &.active {
+      + li > a {
+        box-shadow: inset 3px 0 rgba(0, 0, 0, 0.03);
+        border-left-width: 0;
+      }
+    }
+
+    // Active state, and its :hover to override normal :hover
+    &.active > a {
+      background-color: #fff;
+      &,
+      &:hover,
+      &:focus {
+        color: @nav-tabs-link-color;
+        background-color: @nav-tabs-active-link-hover-bg;
+        border-top-color: lighten(@brand-primary, 10%);
+        box-shadow: 0 -2px lighten(@brand-primary, 10%),
+        -3px 0 rgba(0, 0, 0, 0.03);
+      }
+    }
+    &.active:first-child > a {
+      &,
+      &:hover,
+      &:focus {
+        box-shadow: 0 -2px lighten(@brand-primary, 10%);
+      }
+    }
+
+  }
+}
