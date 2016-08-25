@@ -1088,8 +1088,8 @@ if ($show_table) {
                     $signupstatus = new stdClass();
                     $signupstatus->id = $attendee->submissionid;
                     $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
-
-                    $signupnotetext = empty($signupnote) ? '' : $signupnote['signupnote'];
+                    // Currently it is possible to delete signupnote custom field easly so we must check if cf is exists.
+                    $signupnotetext = isset($signupnote['signupnote']) ? $signupnote['signupnote'] : '';
                     if (!$download) {
                         $data[] = $icon . html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
                     } else {
@@ -1266,8 +1266,8 @@ if ($action == 'approvalrequired') {
             $signupstatus = new stdClass();
             $signupstatus->id = $attendee->signupid;
             $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
-
-            $signupnotetext = empty($signupnote) ? '' : $signupnote['signupnote'];
+            // Currently it is possible to delete signupnote custom field easly so we must check if cf is exists.
+            $signupnotetext = isset($signupnote['signupnote']) ? $signupnote['signupnote'] : '';
 
             $note = html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
             $data[] = $icon . $note;

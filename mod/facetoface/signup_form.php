@@ -160,7 +160,10 @@ class mod_facetoface_signup_form extends moodleform {
         $signup = new stdClass();
         $signup->id = 0;
         customfield_definition($mform, $signup, 'facetofacesignup', 0, 'facetoface_signup');
-        $mform->removeElement('customfields');
+        // To avoid crashing the form check if 'customfields' element exists, it may happened when all custom fields removed.
+        if ($mform->elementExists('customfields')) {
+            $mform->removeElement('customfields');
+        }
 
         if (empty($CFG->facetoface_notificationdisable)) {
             $options = array(MDL_F2F_BOTH => get_string('notificationboth', 'facetoface'),
