@@ -50,6 +50,17 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
     }
 
     function config_form(&$mform) {
+
+        // Empty CSV field setting.
+        $emptyfieldopt = array(
+            false => get_string('emptyfieldskeepdata', 'tool_totara_sync'),
+            true => get_string('emptyfieldsremovedata', 'tool_totara_sync')
+        );
+        $mform->addElement('select', 'csvsaveemptyfields', get_string('emptyfieldsbehaviourhierarchy', 'tool_totara_sync'), $emptyfieldopt);
+        $default = !empty($this->config->csvsaveemptyfields);
+        $mform->setDefault('csvsaveemptyfields', $default);
+        $mform->addHelpButton('csvsaveemptyfields', 'emptyfieldsbehaviourhierarchy', 'tool_totara_sync');
+
         $mform->addElement('header', 'crud', get_string('allowedactions', 'tool_totara_sync'));
         $mform->addElement('checkbox', 'allow_create', get_string('create', 'tool_totara_sync'));
         $mform->setDefault('allow_create', 1);
@@ -60,6 +71,7 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
     }
 
     function config_save($data) {
+        $this->set_config('csvsaveemptyfields', $data->csvsaveemptyfields);
         $this->set_config('allow_create', !empty($data->allow_create));
         $this->set_config('allow_update', !empty($data->allow_update));
         $this->set_config('allow_delete', !empty($data->allow_delete));
@@ -134,6 +146,7 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
      *
      * @param stdClass $newitem object with escaped values
      * @param string $synctable sync table name
+     * @return bool true because someone didn't like calling return without a value
      * @throws totara_sync_exception
      */
     function sync_item($newitem, $synctable) {
@@ -143,6 +156,11 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             // not allowed to create/update, so return early
             return true;
         }
+
+        $iscsvimport =
+            get_class($this->get_source()) === 'totara_sync_source_pos_csv' ||
+            get_class($this->get_source()) === 'totara_sync_source_org_csv';
+        $saveemptyfields = !$iscsvimport || !empty($this->config->csvsaveemptyfields);
 
         $elname = $this->get_name();
 
@@ -173,10 +191,12 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
         }
         $newitem->parentid = !empty($parentid) ? $parentid : 0;
 
-        if (isset($newitem->typeidnumber)) {
-            $newitem->typeid = !empty($newitem->typeidnumber) ? $DB->get_field($elname.'_type', 'id', array('idnumber' => $newitem->typeidnumber)) : 0;
-        } else {
+        if (!isset($newitem->typeidnumber) || (($newitem->typeidnumber === "") && !$saveemptyfields)) {
             unset($newitem->typeid);
+        } else if (empty($newitem->typeidnumber)) {
+            $newitem->typeid = 0;
+        } else {
+            $newitem->typeid = $DB->get_field($elname.'_type', 'id', array('idnumber' => $newitem->typeidnumber));
         }
 
         // Unset the *idnumbers, since we now have the ids ;)
@@ -201,6 +221,14 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             // Save custom field data
             if ($customfields = json_decode($newitem->customfields)) {
                 foreach ($customfields as $name=>$value) {
+                    if ($value === null) {
+                        continue; // Null means "don't update the existing data", so skip this field.
+                    }
+
+                    if ($value === "" && !$saveemptyfields) {
+                        continue; // CSV import and empty fields are not saved, so skip this field.
+                    }
+
                     $hitem->{$name} = $value;
                 }
                 customfield_save_data($hitem, $this->hierarchy->prefix, $this->hierarchy->shortprefix.'_type', true);
@@ -226,6 +254,17 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
         if (empty($this->config->allow_update)) {
             return true;
         }
+
+        foreach ($newitem as $field => $value) {
+            if ($value === null) {
+                unset($newitem->$field); // Null means "don't update the existing data", so skip this field.
+            }
+
+            if ($value === "" && !$saveemptyfields) {
+                unset($newitem->$field); // CSV import and empty fields are not saved, so skip this field.
+            }
+        }
+
         $newitem->usermodified = get_admin()->id;
         if (!$this->hierarchy->update_hierarchy_item($dbitem->id, $newitem, false, true, false)) {
             throw new totara_sync_exception($elname, 'syncitem', 'cannotupdatex',
@@ -241,6 +280,14 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             // Add/update custom field data
             if ($newcustomfields = json_decode($newitem->customfields)) {
                 foreach ($newcustomfields as $name=>$value) {
+                    if ($value === null) {
+                        continue; // Null means "don't update the existing data", so skip this field.
+                    }
+
+                    if ($value === "" && !$saveemptyfields) {
+                        continue; // CSV import and empty fields are not saved, so skip this field.
+                    }
+
                     $newitem->{$name} = $value;
                 }
                 customfield_save_data($newitem, $this->hierarchy->prefix, $this->hierarchy->shortprefix.'_type', true);

@@ -70,6 +70,18 @@ class totara_sync_element_user extends totara_sync_element {
         $mform->addElement('selectyesno', 'sourceallrecords', get_string('sourceallrecords', 'tool_totara_sync'));
         $mform->addElement('static', 'sourceallrecordsdesc', '', get_string('sourceallrecordsdesc', 'tool_totara_sync'));
 
+        // Empty CSV field setting.
+        $emptyfieldopt = array(
+            false => get_string('emptyfieldskeepdata', 'tool_totara_sync'),
+            true => get_string('emptyfieldsremovedata', 'tool_totara_sync')
+        );
+        $mform->addElement('select', 'csvsaveemptyfields', get_string('emptyfieldsbehaviouruser', 'tool_totara_sync'), $emptyfieldopt);
+        $mform->disabledIf('csvsaveemptyfields', 'source_user', 'eq', '');
+        $mform->disabledIf('csvsaveemptyfields', 'source_user', 'eq', 'totara_sync_source_user_database');
+        $default = !empty($this->config->csvsaveemptyfields);
+        $mform->setDefault('csvsaveemptyfields', $default);
+        $mform->addHelpButton('csvsaveemptyfields', 'emptyfieldsbehaviouruser', 'tool_totara_sync');
+
         // User email settings.
         $mform->addElement('selectyesno', 'allowduplicatedemails', get_string('allowduplicatedemails', 'tool_totara_sync'));
         $mform->addElement('text', 'defaultsyncemail', get_string('defaultemailaddress', 'tool_totara_sync'), array('size' => 50));
@@ -120,6 +132,7 @@ class totara_sync_element_user extends totara_sync_element {
     function config_save($data) {
         global $CFG;
         $this->set_config('sourceallrecords', $data->sourceallrecords);
+        $this->set_config('csvsaveemptyfields', $data->csvsaveemptyfields);
         $this->set_config('allowduplicatedemails', $data->allowduplicatedemails);
         if (!empty($data->allow_create)) {
             // When user creation is allowed, force change the first name and last name settings on.
@@ -613,9 +626,17 @@ class totara_sync_element_user extends totara_sync_element {
 
         if ($customfields) {
             require_once($CFG->dirroot.'/user/profile/lib.php');
+
+            $iscsvimport = get_class($this->get_source()) === 'totara_sync_source_user_csv';
+            $saveemptyfields = !$iscsvimport || !empty($this->config->csvsaveemptyfields);
+
             foreach ($customfields as $name => $value) {
                 if ($value === null) {
-                    continue; // Don't make empty records, it messes with defaults.
+                    continue; // Null means "don't update the existing data", so skip this field.
+                }
+
+                if ($value === "" && !$saveemptyfields) {
+                    continue; // CSV import and empty fields are not saved, so skip this field.
                 }
 
                 $profile = str_replace('customfield_', 'profile_field_', $name);
@@ -761,48 +782,64 @@ class totara_sync_element_user extends totara_sync_element {
 
         $requiredfields = array('username', 'firstname', 'lastname', 'email');
 
+        $iscsvimport = get_class($this->get_source()) === 'totara_sync_source_user_csv';
+        $saveemptyfields = !$iscsvimport || !empty($this->config->csvsaveemptyfields);
+
         foreach ($fields as $field) {
-            if (isset($suser->$field)) {
-                if (!in_array($field, $requiredfields) || trim($suser->$field) !== '') {
-                    // Not an empty required field - other fields are allowed to be empty.
-                    // Handle exceptions first.
-                    switch ($field) {
-                        case 'username':
-                            // Must be lower case.
-                            $user->$field = core_text::strtolower($suser->$field);
-                            break;
-                        case 'country':
-                            if (!empty($suser->$field)) {
-                                // Must be upper case.
-                                $user->$field = core_text::strtoupper($suser->$field);
-                            } else if (empty($user->$field) && isset($CFG->country) && !empty($CFG->country)) {
-                                // Sync and target are both empty - so use the default country.
-                                $user->$field = $CFG->country;
-                            }
-                            break;
-                        case 'city':
-                            if (!empty($suser->$field)) {
-                                $user->$field = $suser->$field;
-                            } else if (empty($user->$field) && isset($CFG->defaultcity) && !empty($CFG->defaultcity)) {
-                                // Sync and target are both empty - So use the default city.
-                                $user->$field = $CFG->defaultcity;
-                            }
-                            break;
-                        case 'timemodified':
-                            // Default to now.
-                            $user->$field = empty($suser->$field) ? time() : $suser->$field;
-                            break;
-                        case 'lang':
-                            // Sanity check will check for validity and add log but we will still
-                            // store invalid lang and it will default to $CFG->lang internally.
-                            if (!empty($suser->$field)) {
-                                $user->$field = $suser->$field;
-                            }
-                            break;
-                        default:
-                            $user->$field = $suser->$field;
+            if (!isset($suser->$field)) {
+                continue; // Null means "don't update the existing data", so skip this field.
+            }
+
+            if ($suser->$field === "" && !$saveemptyfields) {
+                continue; // CSV import and empty fields are not saved, so skip this field.
+            }
+
+            if (in_array($field, $requiredfields) && trim($suser->$field) === "") {
+                continue; // Required fields can't be empty, so skip this field.
+            }
+
+            // Handle exceptions first.
+            switch ($field) {
+                case 'username':
+                    // Must be lower case.
+                    $user->$field = core_text::strtolower($suser->$field);
+                    break;
+                case 'country':
+                    if (!empty($suser->$field)) {
+                        // Must be upper case.
+                        $user->$field = core_text::strtoupper($suser->$field);
+                    } else if (empty($user->$field) && isset($CFG->country) && !empty($CFG->country)) {
+                        // Sync and target are both empty - so use the default country if set.
+                        $user->$field = $CFG->country;
+                    } else {
+                        // No default set, replace the current data with an empty value.
+                        $user->$field = "";
                     }
-                }
+                    break;
+                case 'city':
+                    if (!empty($suser->$field)) {
+                        $user->$field = $suser->$field;
+                    } else if (empty($user->$field) && isset($CFG->defaultcity) && !empty($CFG->defaultcity)) {
+                        // Sync and target are both empty - So use the default city.
+                        $user->$field = $CFG->defaultcity;
+                    } else {
+                        // No default set, replace the current data with an empty value.
+                        $user->$field = "";
+                    }
+                    break;
+                case 'timemodified':
+                    // Default to now.
+                    $user->$field = empty($suser->$field) ? time() : $suser->$field;
+                    break;
+                case 'lang':
+                    // Sanity check will check for validity and add log but we will still
+                    // store invalid lang and it will default to $CFG->lang internally.
+                    if (!empty($suser->$field)) {
+                        $user->$field = $suser->$field;
+                    }
+                    break;
+                default:
+                    $user->$field = $suser->$field;
             }
         }
 

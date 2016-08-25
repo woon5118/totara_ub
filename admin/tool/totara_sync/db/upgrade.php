@@ -213,5 +213,17 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016012000, 'tool', 'totara_sync');
     }
 
+    if ($oldversion < 2016082500) {
+
+        // TL-8647 saw the introduction of a new setting to determine how empty values should be handled in CSV sources.
+        // For upgrade we want to maintain previous behaviour where an empty value removes data.
+
+        set_config('csvsaveemptyfields', true, 'totara_sync_element_user');
+        set_config('csvsaveemptyfields', true, 'totara_sync_element_pos');
+        set_config('csvsaveemptyfields', true, 'totara_sync_element_org');
+
+        upgrade_plugin_savepoint(true, 2016082500, 'tool', 'totara_sync');
+    }
+
     return true;
 }

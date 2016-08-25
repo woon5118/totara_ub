@@ -125,6 +125,10 @@ class profile_field_menu extends profile_field_base {
             return $itemnew;
         }
 
+        if ($itemnew->$fieldname === "") {
+            return $itemnew;
+        }
+
         // Now get the corresponding option for that value.
         $selected = null;
         foreach ($this->options as $key => $option) {

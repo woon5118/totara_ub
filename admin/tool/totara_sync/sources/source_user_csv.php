@@ -111,6 +111,11 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         $info = get_string('csvimportfilestructinfo', 'tool_totara_sync', implode($delimiter, $filestruct)) . $deletedwarning;
         $mform->addElement('html', html_writer::tag('div', html_writer::tag('p', $info, array('class' => "informationbox"))));
 
+        // Empty field info.
+        $langstring = !empty($this->element->config->csvsaveemptyfields) ? 'csvemptysettingdeleteinfo' : 'csvemptysettingkeepinfo';
+        $info = get_string($langstring, 'tool_totara_sync');
+        $mform->addElement('html', html_writer::tag('div', html_writer::tag('p', $info), array('class' => "alert alert-warning")));
+
         // Add some source file details
         $mform->addElement('header', 'fileheader', get_string('filedetails', 'tool_totara_sync'));
         $mform->setExpanded('fileheader');
@@ -390,6 +395,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 }
                 $dbrow['timezone'] = $timezone;
             }
+
             // Custom fields are special - needs to be json-encoded
             if (!empty($this->customfields)) {
                 $cfield_data = array();
@@ -440,6 +446,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 try {
                     totara_sync_bulk_insert($temptable, $datarows);
                 } catch (dml_exception $e) {
+                    error_log($e->getMessage()."\n".$e->debuginfo);
                     throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'couldnotimportallrecords', $e->getMessage());
                 }
 
@@ -456,6 +463,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         try {
             totara_sync_bulk_insert($temptable, $datarows);
         } catch (dml_exception $e) {
+            error_log($e->getMessage()."\n".$e->debuginfo);
             throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'couldnotimportallrecords', $e->getMessage());
         }
         unset($fieldmappings);

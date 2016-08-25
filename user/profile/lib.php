@@ -220,13 +220,6 @@ class profile_field_base {
      * @return stdClass             The same $itemnew record after processing the customfield.
      */
     public function totara_sync_data_preprocess($itemnew) {
-        $fieldname = $this->inputname;
-
-        // Consistently ignore empty strings for sync.
-        if (property_exists($itemnew, $fieldname) && $itemnew->$fieldname === '') {
-            unset($itemnew->$fieldname);
-        }
-
         return $itemnew;
     }
 

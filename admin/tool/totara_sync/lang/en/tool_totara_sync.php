@@ -138,6 +138,8 @@ $string['alternatename'] = 'Alternate name';
 $string['email'] = 'Email';
 $string['city'] = 'City';
 $string['country'] = 'Country';
+$string['csvemptysettingdeleteinfo'] = 'The use of empty fields in your CSV file will delete the field\'s value in your site.';
+$string['csvemptysettingkeepinfo'] = 'The use of empty fields in your CSV file will leave the field\'s current value in your site.';
 $string['timezone'] = 'Timezone';
 $string['lang'] = 'Language';
 $string['description'] = 'Description';
@@ -189,6 +191,8 @@ $string['dbtestconnectfail'] = 'Failed to connect to database';
 $string['dbconnectiondetails'] = 'Please enter database connection details.';
 $string['selectfieldsdb'] = 'Please select some fields to import by checking the boxes below.';
 $string['tablemustincludexdb'] = 'The table "{$a}" must contain the following fields:';
+
+$string['databaseemptynullinfo'] = 'The use of empty strings in your external database will delete the field\'s value in your site. Null values in your external database will leave the field\'s current value in your site.';
 
 ///
 /// Log messages
@@ -337,6 +341,20 @@ $string['notifysubject'] = '{$a} :: HR Import notification';
 $string['syncnotifications'] = 'HR Import notifications';
 $string['viewsyncloghere'] = 'For more information, view the HR Import Log at {$a}';
 $string['warnplural'] = 'Warnings';
+$string['emptyfieldsbehaviourhierarchy'] = 'Empty string behaviour in CSV';
+$string['emptyfieldsbehaviouruser'] = 'Empty string behaviour in CSV';
+$string['emptyfieldskeepdata'] = 'Empty strings are ignored';
+$string['emptyfieldsremovedata'] = 'Empty strings erase existing data';
+$string['emptyfieldsbehaviourhierarchy_help'] = 'When set to "Empty strings are ignored" empty strings within your CSV file will result in the current value being left.
+
+When set to "Empty strings erase existing data" empty strings within your CSV file will lead to the current value being deleted.';
+$string['emptyfieldsbehaviouruser_help'] = 'When set to "Empty strings are ignored" empty strings within your CSV file will result in the current value being left.
+
+When set to "Empty strings erase existing data" empty strings within your CSV file will lead to the current value being deleted.
+
+Please note that some fields are required, and some fields utilise a default value.
+If "Empty strings erase existing data" is selected and you attempt to delete the current value for a required field, the user in the CSV file will be skipped as a value must be provided.
+If "Empty strings erase existing data" is selected and you delete the current value of a field that utilises a default value, the default value will be used as the current value.';
 $string['enablescheduledsync'] = 'Enable scheduled HR Importing';
 $string['files'] = 'Files';
 $string['filesdir'] = 'Files directory';

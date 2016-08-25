@@ -130,6 +130,7 @@ class tool_totara_sync_user_csv_forcepasswordchange_testcase extends advanced_te
             'undeletepwreset' => '0',
             'ignoreexistingpass' => '0',
             'sourceallrecords' => '0',
+            'csvsaveemptyfields' => true,
         );
     }
 
