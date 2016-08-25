@@ -1264,6 +1264,20 @@ $icons = array(
                     'classes' => 'fa-mouse-pointer',
                 ),
         ),
+    'move-down' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-arrow-down'
+                ),
+        ),
+    'move-up' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-arrow-up'
+                ),
+        ),
     'navitem' =>
         array(
             'data' =>

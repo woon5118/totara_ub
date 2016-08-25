@@ -55,6 +55,7 @@ $string['confirmdeletejobassignment'] = 'Are you sure you want to delete the fol
 {$a}';
 $string['currentlyselected'] = 'Currently selected';
 $string['deletejobassignment'] = 'Delete job assignment';
+$string['deletexjobassignment'] = 'Delete {$a} job assignment';
 $string['dialogmanageraddemptyjob'] = '{$a->fullname} - create empty job assignment';
 $string['dialogmanagercreateemptyjob'] = 'Create empty job assignment';
 $string['dialogmanagerjob'] = '{$a->fullname} - {$a->job}';
@@ -101,6 +102,8 @@ $string['jobassignmentstartdate_help'] = 'Date that the user started in this job
 $string['jobmanagement'] = 'Job Management';
 $string['manager'] = 'Manager';
 $string['managernomatchja'] = 'Make sure you are selecting a job assignment linked to your manager. If that is what you were doing, delete your manager selection and try selecting it again. Or have your manager assigned after sign-up.';
+$string['movedownxjobassignment'] = 'Move down {$a} job assignment';
+$string['moveupxjobassignment'] = 'Move up {$a} job assignment';
 $string['nopositionsassigned'] = 'No positions currently assigned to this user';
 $string['nojobassignments'] = 'This user has no job assignments';
 $string['organisation'] = 'Organisation';
