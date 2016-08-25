@@ -279,6 +279,7 @@ $string['externalbadgesp'] = 'Badges from other web sites:';
 $string['externalbadges_help'] = 'This area displays badges from your external backpack.';
 $string['fixed'] = 'Fixed date';
 $string['hiddenbadge'] = 'Unfortunately, the badge owner has not made this information available.';
+$string['imageofbadgex'] = 'Image of badge {$a}';
 $string['issuedbadge'] = 'Issued badge information';
 $string['issuancedetails'] = 'Badge expiry';
 $string['issuerdetails'] = 'Issuer details';

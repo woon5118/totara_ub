@@ -47,7 +47,7 @@ class core_badges_renderer extends plugin_renderer_base {
 
             $name = html_writer::tag('span', $bname, array('class' => 'badge-name'));
 
-            $image = html_writer::empty_tag('img', array('src' => $imageurl, 'class' => 'badge-image'));
+            $image = html_writer::empty_tag('img', array('src' => $imageurl, 'class' => 'badge-image', 'alt' => get_string('imageofbadgex', 'badges', $bname)));
             if (!empty($badge->dateexpire) && $badge->dateexpire < time()) {
                 $image .= $this->output->pix_icon('i/expired',
                         get_string('expireddate', 'badges', userdate($badge->dateexpire)),
@@ -88,7 +88,10 @@ class core_badges_renderer extends plugin_renderer_base {
                 }
             }
             $actions = html_writer::tag('div', $push . $download . $status, array('class' => 'badge-actions'));
-            $items[] = html_writer::link($url, $image . $actions . $name, array('title' => $bname));
+            $item = html_writer::link($url, $image, array('title' => $bname));
+            $item .= $actions;
+            $item .= html_writer::link($url, $name);
+            $items[] = $item;
         }
 
         return html_writer::alist($items, array('class' => 'badges'));
