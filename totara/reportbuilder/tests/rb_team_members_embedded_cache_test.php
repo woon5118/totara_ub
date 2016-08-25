@@ -52,7 +52,7 @@ class totara_reportbuilder_rb_team_members_embedded_cache_testcase extends repor
 
     protected $report_builder_settings_data = array(
         array('id' => 5, 'reportid' => 17, 'type' => 'user_content', 'name' => 'enable', 'value' => '1'),
-        array('id' => 6, 'reportid' => 17, 'type' => 'user_content',  'name' => 'who', 'value' => rb_user_content::PRIMARY_DIRECT_REPORTS)
+        array('id' => 6, 'reportid' => 17, 'type' => 'user_content',  'name' => 'who', 'value' => rb_user_content::USER_DIRECT_REPORTS)
     );
 
     // Work data

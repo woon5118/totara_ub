@@ -84,8 +84,8 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         $rbcol3 = new stdClass();
         $rbcol3->reportid = $report->id;
-        $rbcol3->type = 'primary_job';
-        $rbcol3->value = 'organisation';
+        $rbcol3->type = 'job_assignment';
+        $rbcol3->value = 'allorganisationnames';
         $rbcol3->heading = 'Office';
         $rbcol3->sortorder = 3;
         $rbcol3->hidden = 0;
@@ -105,8 +105,8 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         $rbcol5 = new stdClass();
         $rbcol5->reportid = $report->id;
-        $rbcol5->type = 'primary_job';
-        $rbcol5->value = 'position';
+        $rbcol5->type = 'job_assignment';
+        $rbcol5->value = 'allpositionnames';
         $rbcol5->heading = 'Position';
         $rbcol5->sortorder = 5;
         $rbcol5->hidden = 0;
@@ -154,8 +154,8 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         $rbfilter2 = new stdClass();
         $rbfilter2->reportid = $report->id;
-        $rbfilter2->type = 'primary_job';
-        $rbfilter2->value = 'organisationid';
+        $rbfilter2->type = 'job_assignment';
+        $rbfilter2->value = 'allorganisations';
         $rbfilter2->advanced = 0;
         $rbfilter2->sortorder = 2;
         $rbfilter2->id = $DB->insert_record('report_builder_filters', $rbfilter2);
@@ -170,8 +170,8 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         $rbfilter4 = new stdClass();
         $rbfilter4->reportid = $report->id;
-        $rbfilter4->type = 'primary_job';
-        $rbfilter4->value = 'positionid';
+        $rbfilter4->type = 'job_assignment';
+        $rbfilter4->value = 'allpositions';
         $rbfilter4->advanced = 0;
         $rbfilter4->sortorder = 4;
         $rbfilter4->id = $DB->insert_record('report_builder_filters', $rbfilter4);
@@ -818,7 +818,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $obj1 = new stdClass();
         $obj1->joins = array('auser','competency');
         $obj2 = new stdClass();
-        $obj2->joins = 'primary_position';
+        $obj2->joins = 'completion_position';
         $joins = $rb->get_joins($obj1, 'test');
         // should return an array
         $this->assertTrue((bool)is_array($joins));
@@ -838,14 +838,13 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $joins2 = $rb->get_joins($obj2, 'test');
         $this->assertTrue((bool)is_array($joins2));
         // the array should contain the correct number of joins
-        $this->assertEquals(2, count($joins2));
+        $this->assertEquals(1, count($joins2));
         $posjoin = new rb_join(
-            'primary_position',
+            'completion_position',
             'LEFT',
             '{pos}',
-            'primary_position.id = primary_job_assignment.positionid',
-            1,
-            'primary_job_assignment'
+            'completion_position.id = base.positionid',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE
         );
         // the strings should have the correct format
         $this->assertEquals($posjoin, current($joins2));
@@ -870,7 +869,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // should return an array
         $this->assertTrue((bool)is_array($columns));
         // the array should contain the correct number of columns
-        $this->assertEquals(9, count($columns));
+        $this->assertEquals(7, count($columns));
         $userjoin = new rb_join(
             'auser',
             'LEFT',
@@ -889,7 +888,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         global $CFG,$SESSION;
         $rb = $this->rb;
         // set a filter session var
-        $SESSION->reportbuilder[$rb->get_uniqueid()] = array('user-fullname' => 'unused', 'primary_job-positionid' => 'unused');
+        $SESSION->reportbuilder[$rb->get_uniqueid()] = array('user-fullname' => 'unused', 'competency-fullname' => 'unused');
         $joins = $rb->get_filter_joins();
         // should return an array
         $this->assertTrue((bool)is_array($joins));
@@ -1060,22 +1059,22 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->assertSame(' ORDER BY base.id', $rb->get_report_sort(false));
 
         unset($SESSION->flextable);
-        $DB->set_field('report_builder', 'defaultsortcolumn', 'primary_job_position', array('id' => $this->rb->_id));
+        $DB->set_field('report_builder', 'defaultsortcolumn', 'competency_evidence_position', array('id' => $this->rb->_id));
         $DB->set_field('report_builder', 'defaultsortorder', SORT_DESC, array('id' => $this->rb->_id));
         $rb = new reportbuilder($this->rb->_id);
-        $this->assertSame(' ORDER BY primary_job_position DESC, base.id', $rb->get_report_sort());
-        $this->assertSame(' ORDER BY primary_job_position DESC, base.id', $rb->get_report_sort(false));
+        $this->assertSame(' ORDER BY competency_evidence_position DESC, base.id', $rb->get_report_sort());
+        $this->assertSame(' ORDER BY competency_evidence_position DESC, base.id', $rb->get_report_sort(false));
 
         $SESSION->flextable[$this->rb->get_uniqueid('rb')] = array(
             'collapse' => array(),
-            'sortby'   => array('primary_job_organisation' => SORT_ASC),
+            'sortby'   => array('competency_evidence_position' => SORT_ASC),
             'i_first'  => '',
             'i_last'   => '',
             'textsort' => array(),
         );
         $rb = new reportbuilder($this->rb->_id);
-        $this->assertSame(' ORDER BY primary_job_organisation ASC, base.id', $rb->get_report_sort());
-        $this->assertSame(' ORDER BY primary_job_position DESC, base.id', $rb->get_report_sort(false));
+        $this->assertSame(' ORDER BY competency_evidence_position ASC, base.id', $rb->get_report_sort());
+        $this->assertSame(' ORDER BY competency_evidence_position DESC, base.id', $rb->get_report_sort(false));
     }
 
     // skipping tests for the following as they just print HTML

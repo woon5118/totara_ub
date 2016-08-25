@@ -242,4 +242,3 @@ class rb_filter_select extends rb_filter_type {
         return get_string('selectlabel', 'filters', $a);
     }
 }
-

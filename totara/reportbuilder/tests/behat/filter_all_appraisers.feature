@@ -33,7 +33,7 @@ Feature: Use the multi-item appraiser filter
     And I set the field "Source" to "user"
     And I press "Create report"
     And I switch to "Filters" tab
-    And I select "All Assigned Appraiser(s)" from the "newstandardfilter" singleselect
+    And I select "User's Appraiser(s)" from the "newstandardfilter" singleselect
     And I press "Add"
     And I switch to "Access" tab
     # We'll get a standard user to use the filter, as there are some access checks that
@@ -50,7 +50,7 @@ Feature: Use the multi-item appraiser filter
     And I should see "user3" in the ".reportbuilder-table" "css_element"
     And I should see "user4" in the ".reportbuilder-table" "css_element"
     And I should see "user5" in the ".reportbuilder-table" "css_element"
-    When I select "Any of the Selected" from the "job_assignment-appraiser_op" singleselect
+    When I select "Any of the selected" from the "User's Appraiser(s) field limiter" singleselect
     When I click on "Choose Appraisers" "link" in the "Search by" "fieldset"
     And I click on "Appraiser1 One1" "link" in the "Choose Appraisers" "totaradialogue"
     And I click on "Save" "button" in the "Choose Appraisers" "totaradialogue"

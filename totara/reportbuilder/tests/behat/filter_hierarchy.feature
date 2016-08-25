@@ -43,7 +43,7 @@ Feature: Single hierarchy report filter
       | Source      | User        |
     And I click on "Create report" "button"
     And I switch to "Filters" tab
-    And I set the field "newstandardfilter" to "User's Organisation"
+    And I set the field "newstandardfilter" to "User's Organisation(s)"
     And I click on "Add" "button"
     And I click on "View This Report" "link"
     Then I should see "User One"
@@ -51,24 +51,15 @@ Feature: Single hierarchy report filter
     And I should see "User Three"
     And I should see "User Four"
     And I should see "User Five"
-    And the "Choose Organisation" "button" should be disabled
-
-  Scenario: Test the enable/disable choose orgainisation button
-    Given I set the field "primary_job-organisationpath_op" to "is equal to"
-    Then the "Choose Organisation" "button" should be enabled
-    When I set the field "primary_job-organisationpath_op" to "is any value"
-    Then the "Choose Organisation" "button" should be disabled
-    When I set the field "primary_job-organisationpath_op" to "isn't equal to"
-    Then the "Choose Organisation" "button" should be enabled
 
   Scenario Outline: Test organisation report builder filter
-    Given I set the field "primary_job-organisationpath_op" to "<type>"
-    And I click on "Choose Organisation" "button"
-    And I click on "Organisation 1z" "link" in the "Choose organisation" "totaradialogue"
-    And I click on "OK" "button" in the "Choose organisation" "totaradialogue"
+    Given I set the field "job_assignment-allorganisations_op" to "<type>"
+    And I click on "Choose Organisations" "link" in the "Search by" "fieldset"
+    And I click on "Organisation 1z" "link" in the "Choose Organisations" "totaradialogue"
+    And I click on "Save" "button" in the "Choose Organisations" "totaradialogue"
     And I wait "1" seconds
 
-    When I set the field "Include sub-categories?" to "<includesub>"
+    When I set the field "Include children" to "<includesub>"
     # This needs to be limited as otherwise it clicks the legend ...
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should <u1> "User One"
@@ -78,8 +69,8 @@ Feature: Single hierarchy report filter
     And I should <u5> "User Five"
 
   Examples:
-    | type           | includesub | u1      | u2      | u3      | u4      | u5      |
-    | is equal to    | 0          | see     | not see | not see | not see | not see |
-    | isn't equal to | 0          | not see | see     | see     | see     | see     |
-    | is equal to    | 1          | see     | see     | see     | not see | not see |
-    | isn't equal to | 1          | not see | not see | not see | see     | see     |
+    | type                 | includesub | u1      | u2      | u3      | u4      | u5      |
+    | Any of the selected  | 0          | see     | not see | not see | not see | not see |
+    | None of the selected | 0          | not see | see     | see     | see     | see     |
+    | Any of the selected  | 1          | see     | see     | see     | not see | not see |
+    | None of the selected | 1          | not see | not see | not see | see     | see     |

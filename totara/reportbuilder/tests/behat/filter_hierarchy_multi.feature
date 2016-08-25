@@ -42,9 +42,9 @@ Feature: Use the multi-item hierarchy filter
     And I set the field "Source" to "user"
     And I press "Create report"
     And I switch to "Filters" tab
-    And I select "User's Position (multi-item)" from the "newstandardfilter" singleselect
+    And I select "User's Position(s)" from the "newstandardfilter" singleselect
     And I press "Add"
-    And I select "User's Position Framework ID Number" from the "newstandardfilter" singleselect
+    And I select "User's Position Framework ID Number(s)" from the "newstandardfilter" singleselect
     And I press "Save changes"
     And I follow "View This Report"
     Then I should see "user1" in the ".reportbuilder-table" "css_element"
@@ -52,8 +52,8 @@ Feature: Use the multi-item hierarchy filter
     And I should see "user3" in the ".reportbuilder-table" "css_element"
     And I should see "user4" in the ".reportbuilder-table" "css_element"
     And I should see "user5" in the ".reportbuilder-table" "css_element"
-    When I select "is equal to" from the "User's Position Framework ID Number field limiter" singleselect
-    And I set the field "User's Position Framework ID Number value" to "posfw"
+    When I select "is equal to" from the "User's Position Framework ID Number(s) field limiter" singleselect
+    And I set the field "User's Position Framework ID Number(s) value" to "posfw"
     And I click on "Search" "button" in the "#fgroup_id_submitgroupstandard" "css_element"
     Then I should see "user1"
     And I should see "user2" in the ".reportbuilder-table" "css_element"
@@ -61,7 +61,8 @@ Feature: Use the multi-item hierarchy filter
     And I should see "user4" in the ".reportbuilder-table" "css_element"
     And I should not see "user5" in the ".reportbuilder-table" "css_element"
     And I click on "Clear" "button" in the "#fgroup_id_submitgroupstandard" "css_element"
-    When I click on "Choose Positions" "link" in the "Search by" "fieldset"
+    When I select "Any of the selected" from the "User's Position(s) field limiter" singleselect
+    And I click on "Choose Positions" "link" in the "Search by" "fieldset"
     And I click on "Position One" "link" in the "Choose Positions" "totaradialogue"
     And I click on "Save" "button" in the "Choose Positions" "totaradialogue"
     And I wait "1" seconds
@@ -71,7 +72,8 @@ Feature: Use the multi-item hierarchy filter
     And I should not see "user3" in the ".reportbuilder-table" "css_element"
     And I should not see "user4" in the ".reportbuilder-table" "css_element"
     And I should not see "user5" in the ".reportbuilder-table" "css_element"
-    When I click on "Choose Positions" "link" in the "Search by" "fieldset"
+    When I select "Any of the selected" from the "User's Position(s) field limiter" singleselect
+    And I click on "Choose Positions" "link" in the "Search by" "fieldset"
     And I click on "Position Two" "link" in the "Choose Positions" "totaradialogue"
     And I click on "Save" "button" in the "Choose Positions" "totaradialogue"
     And I wait "1" seconds
@@ -88,7 +90,7 @@ Feature: Use the multi-item hierarchy filter
     And I set the field "Source" to "User"
     And I press "Create report"
     And I switch to "Filters" tab
-    And I select "User's Organisation (multi-item)" from the "newstandardfilter" singleselect
+    And I select "User's Organisation(s)" from the "newstandardfilter" singleselect
     And I press "Save changes"
     And I follow "View This Report"
     Then I should see "user1" in the ".reportbuilder-table" "css_element"
@@ -96,7 +98,8 @@ Feature: Use the multi-item hierarchy filter
     And I should see "user3" in the ".reportbuilder-table" "css_element"
     And I should see "user4" in the ".reportbuilder-table" "css_element"
     And I should see "user5" in the ".reportbuilder-table" "css_element"
-    When I click on "Choose Organisations" "link" in the "Search by" "fieldset"
+    When I select "Any of the selected" from the "User's Organisation(s) field limiter" singleselect
+    And I click on "Choose Organisations" "link" in the "Search by" "fieldset"
     And I click on "Organisation One" "link" in the "Choose Organisations" "totaradialogue"
     And I click on "Save" "button" in the "Choose Organisations" "totaradialogue"
     And I wait "1" seconds
@@ -106,7 +109,8 @@ Feature: Use the multi-item hierarchy filter
     And I should see "user3" in the ".reportbuilder-table" "css_element"
     And I should not see "user4" in the ".reportbuilder-table" "css_element"
     And I should not see "user5" in the ".reportbuilder-table" "css_element"
-    When I click on "Choose Organisations" "link" in the "Search by" "fieldset"
+    When I select "Any of the selected" from the "User's Organisation(s) field limiter" singleselect
+    And I click on "Choose Organisations" "link" in the "Search by" "fieldset"
     And I click on "Organisation Two" "link" in the "Choose Organisations" "totaradialogue"
     And I click on "Save" "button" in the "Choose Organisations" "totaradialogue"
     And I wait "1" seconds

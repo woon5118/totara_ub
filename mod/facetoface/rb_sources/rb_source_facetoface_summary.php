@@ -102,8 +102,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->add_session_status_to_joinlist($joinlist);
         $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course');
         $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
-        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'allattendees', 'userid');
-        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'allattendees', 'userid');
+        $this->add_job_assignment_tables_to_joinlist($joinlist, 'allattendees', 'userid');
         $this->add_user_table_to_joinlist($joinlist, 'allattendees', 'userid');
         $this->add_facetoface_session_roles_to_joinlist($joinlist, 'sessions.id');
 

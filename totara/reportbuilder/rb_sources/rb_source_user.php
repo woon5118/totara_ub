@@ -153,8 +153,7 @@ class rb_source_user extends rb_base_source {
         );
 
         $this->add_user_table_to_joinlist($joinlist, 'base', 'id');
-        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'id');
-        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'id');
+        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'id');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'id');
 
         return $joinlist;
@@ -171,8 +170,7 @@ class rb_source_user extends rb_base_source {
 
         $columnoptions = array();
         $this->add_user_fields_to_columns($columnoptions, 'base');
-        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
-        $this->add_all_job_assignments_fields_to_columns($columnoptions);
+        $this->add_job_assignment_fields_to_columns($columnoptions);
 
         // A column to display a user's profile picture
         $columnoptions[] = new rb_column_option(
@@ -309,8 +307,7 @@ class rb_source_user extends rb_base_source {
         $filteroptions = array();
 
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
-        $this->add_all_job_assignments_fields_to_filters($filteroptions, 'base');
+        $this->add_job_assignment_fields_to_filters($filteroptions, 'base');
         $this->add_cohort_user_fields_to_filters($filteroptions);
 
         return $filteroptions;

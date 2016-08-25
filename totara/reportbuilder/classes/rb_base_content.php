@@ -63,12 +63,9 @@ abstract class rb_base_content {
 class rb_current_pos_content extends rb_base_content {
 
     // Define some constants for the selector options.
-    const CONTENT_PRIMARY_EQUAL = 0;
-    const CONTENT_PRIMARY_EQUALANDBELOW = 1;
-    const CONTENT_PRIMARY_BELOW = 2;
-    const CONTENT_ANY_EQUAL = 3;
-    const CONTENT_ANY_EQUALANDBELOW = 4;
-    const CONTENT_ANY_BELOW = 5;
+    const CONTENT_POS_EQUAL = 0;
+    const CONTENT_POS_EQUALANDBELOW = 1;
+    const CONTENT_POS_BELOW = 2;
 
     /**
      * Generate the SQL to apply this content restriction
@@ -84,55 +81,48 @@ class rb_current_pos_content extends rb_base_content {
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
         $settings = reportbuilder::get_all_settings($reportid, $type);
-        $userid = $this->reportfor;
-
         $restriction = $settings['recursive'];
-        $primaryoptions = array(self::CONTENT_PRIMARY_EQUALANDBELOW, self::CONTENT_PRIMARY_EQUAL, self::CONTENT_PRIMARY_BELOW);
-        $equaloptions = array(self::CONTENT_PRIMARY_EQUALANDBELOW, self::CONTENT_PRIMARY_EQUAL, self::CONTENT_ANY_EQUALANDBELOW, self::CONTENT_ANY_EQUAL);
-        $recursiveoptions = array(self::CONTENT_PRIMARY_EQUALANDBELOW, self::CONTENT_PRIMARY_BELOW, self::CONTENT_ANY_EQUALANDBELOW, self::CONTENT_ANY_BELOW);
+        $userid = $this->reportfor;
 
         $viewparam = $DB->get_unique_param('viewid');
         $params = array($viewparam => $userid);
 
         // Set up the base joins and where clause for the restrictions.
-        $prime = in_array($restriction, $primaryoptions) ? ' AND u1ja.sortorder = 1' : '';
         $joinsql = " SELECT 1
                        FROM {job_assignment} u1ja
                  INNER JOIN {pos} p1
-                         ON u1ja.positionid = p1.id{$prime}";
+                         ON u1ja.positionid = p1.id";
         $wheresql = " WHERE u1ja.userid = :{$viewparam}";
 
+        switch ($restriction) {
+            case self::CONTENT_POS_EQUAL:
+                $joinsql .= " LEFT JOIN {job_assignment} u2ja
+                                     ON u2ja.positionid = p1.id";
 
-        // Set up the joins and where clause for equals restrictions.
-        if (in_array($restriction, $equaloptions)) {
-            $eqprime = in_array($restriction, $primaryoptions) ? ' AND u2ja.sortorder = 1' : '';
-            $joinsql .= " LEFT JOIN {job_assignment} u2ja
-                            ON u2ja.positionid = p1.id{$eqprime}";
-            $wheresql .= " AND u2ja.userid = {$field}";
-        }
+                $wheresql .= " AND u2ja.userid = {$field}";
+                break;
+            case self::CONTENT_POS_BELOW:
+                $joinsql .= " LEFT JOIN {pos} p2
+                                     ON p2.path LIKE " . $DB->sql_concat('p1.path', "'/%'") . "
+                              LEFT JOIN {job_assignment} u3ja
+                                     ON u3ja.positionid = p2.id";
 
-        // Set up the joins and where clause for below restrictions.
-        if (in_array($restriction, $recursiveoptions)) {
-            $reprime = in_array($restriction, $primaryoptions) ? ' AND u3ja.sortorder = 1' : '';
-            $joinsql .= " LEFT JOIN {pos} p2
-                            ON p2.path LIKE " . $DB->sql_concat('p1.path', "'/%'") . "
-                     LEFT JOIN {job_assignment} u3ja
-                            ON u3ja.positionid = p2.id{$reprime}";
+                $wheresql .= " AND u3ja.userid = {$field} ";
+                break;
+            case self::CONTENT_POS_EQUALANDBELOW:
+                $joinsql .= " LEFT JOIN {job_assignment} u2ja
+                                     ON u2ja.positionid = p1.id
+                              LEFT JOIN {pos} p2
+                                     ON p2.path LIKE " . $DB->sql_concat('p1.path', "'/%'") . "
+                              LEFT JOIN {job_assignment} u3ja
+                                     ON u3ja.positionid = p2.id";
 
-            $wheresql .= " AND u3ja.userid = {$field} ";
-        }
-
-        // Override the wheresql when both are selected to get the OR working.
-        if (in_array($restriction, $equaloptions) && in_array($restriction, $recursiveoptions)) {
-            $viewparam = $DB->get_unique_param('viewid');
-            $params[$viewparam] = $userid;
-            $wheresql = " WHERE u1ja.userid = :{$viewparam}
-                            AND (u2ja.userid = {$field} OR u3ja.userid = {$field})";
+                $wheresql .= " AND (u2ja.userid = {$field} OR u3ja.userid = {$field})";
+                break;
         }
 
         $sql = "EXISTS({$joinsql}{$wheresql})";
         return array($sql, $params);
-
     }
 
     /**
@@ -152,22 +142,13 @@ class rb_current_pos_content extends rb_base_content {
         $type = substr(get_class($this), 3);
         $settings = reportbuilder::get_all_settings($reportid, $type);
 
-        $posid = $DB->get_field('job_assignment', 'positionid', array('userid' => $userid, 'sortorder' => 1));
-        $posname = $DB->get_field('pos', 'fullname', array('id' => $posid));
-
         switch ($settings['recursive']) {
-            case self::CONTENT_PRIMARY_EQUAL:
-                return get_string('contentdesc_posprimaryequal', 'totara_reportbuilder', $posname);
-            case self::CONTENT_PRIMARY_EQUALANDBELOW:
-                return get_string('contentdesc_posprimaryboth', 'totara_reportbuilder', $posname);
-            case self::CONTENT_PRIMARY_BELOW:
-                return get_string('contentdesc_posprimarybelow', 'totara_reportbuilder', $posname);
-            case self::CONTENT_PRIMARY_EQUAL:
-                return get_string('contentdesc_posallequal', 'totara_reportbuilder', $posname);
-            case self::CONTENT_PRIMARY_EQUALANDBELOW:
-                return get_string('contentdesc_posallboth', 'totara_reportbuilder', $posname);
-            case self::CONTENT_PRIMARY_BELOW:
-                return get_string('contentdesc_posallbelow', 'totara_reportbuilder', $posname);
+            case self::CONTENT_POS_EQUAL:
+                return get_string('contentdesc_posequal', 'totara_reportbuilder');
+            case self::CONTENT_POS_EQUALANDBELOW:
+                return get_string('contentdesc_posboth', 'totara_reportbuilder');
+            case self::CONTENT_POS_BELOW:
+                return get_string('contentdesc_posbelow', 'totara_reportbuilder');
             default:
                 return '';
         }
@@ -196,24 +177,16 @@ class rb_current_pos_content extends rb_base_content {
         $mform->disabledIf('current_pos_enable', 'contentenabled', 'eq', 0);
         $radiogroup = array();
         $radiogroup[] =& $mform->createElement('radio', 'current_pos_recursive',
-            '', get_string('showrecordsinposandbelow', 'totara_reportbuilder'), self::CONTENT_PRIMARY_EQUALANDBELOW);
+            '', get_string('showrecordsinposandbelow', 'totara_reportbuilder'), self::CONTENT_POS_EQUALANDBELOW);
         $radiogroup[] =& $mform->createElement('radio', 'current_pos_recursive',
-            '', get_string('showrecordsinpos', 'totara_reportbuilder'), self::CONTENT_PRIMARY_EQUAL);
+            '', get_string('showrecordsinpos', 'totara_reportbuilder'), self::CONTENT_POS_EQUAL);
         $radiogroup[] =& $mform->createElement('radio', 'current_pos_recursive',
-            '', get_string('showrecordsbelowposonly', 'totara_reportbuilder'), self::CONTENT_PRIMARY_BELOW);
-        $radiogroup[] =& $mform->createElement('radio', 'current_pos_recursive',
-            '', get_string('showrecordsinposandbelowall', 'totara_reportbuilder'), self::CONTENT_ANY_EQUALANDBELOW);
-        $radiogroup[] =& $mform->createElement('radio', 'current_pos_recursive',
-            '', get_string('showrecordsinposall', 'totara_reportbuilder'), self::CONTENT_ANY_EQUAL);
-        $radiogroup[] =& $mform->createElement('radio', 'current_pos_recursive',
-            '', get_string('showrecordsbelowposonlyall', 'totara_reportbuilder'), self::CONTENT_ANY_BELOW);
+            '', get_string('showrecordsbelowposonly', 'totara_reportbuilder'), self::CONTENT_POS_BELOW);
         $mform->addGroup($radiogroup, 'current_pos_recursive_group',
             get_string('includechildpos', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
         $mform->setDefault('current_pos_recursive', $recursive);
-        $mform->disabledIf('current_pos_recursive_group', 'contentenabled',
-            'eq', 0);
-        $mform->disabledIf('current_pos_recursive_group', 'current_pos_enable',
-            'notchecked');
+        $mform->disabledIf('current_pos_recursive_group', 'contentenabled', 'eq', 0);
+        $mform->disabledIf('current_pos_recursive_group', 'current_pos_enable', 'notchecked');
         $mform->addHelpButton('current_pos_header', 'reportbuildercurrentpos', 'totara_reportbuilder');
     }
 
@@ -256,12 +229,9 @@ class rb_current_pos_content extends rb_base_content {
 class rb_current_org_content extends rb_base_content {
 
     // Define some constants for the selector options.
-    const CONTENT_PRIMARY_EQUAL = 0;
-    const CONTENT_PRIMARY_EQUALANDBELOW = 1;
-    const CONTENT_PRIMARY_BELOW = 2;
-    const CONTENT_ANY_EQUAL = 3;
-    const CONTENT_ANY_EQUALANDBELOW = 4;
-    const CONTENT_ANY_BELOW = 5;
+    const CONTENT_ORG_EQUAL = 0;
+    const CONTENT_ORG_EQUALANDBELOW = 1;
+    const CONTENT_ORG_BELOW = 2;
 
     /**
      * Generate the SQL to apply this content restriction
@@ -277,49 +247,43 @@ class rb_current_org_content extends rb_base_content {
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
         $settings = reportbuilder::get_all_settings($reportid, $type);
-        $userid = $this->reportfor;
-
         $restriction = $settings['recursive'];
-        $primaryoptions = array(self::CONTENT_PRIMARY_EQUALANDBELOW, self::CONTENT_PRIMARY_EQUAL, self::CONTENT_PRIMARY_BELOW);
-        $equaloptions = array(self::CONTENT_PRIMARY_EQUALANDBELOW, self::CONTENT_PRIMARY_EQUAL, self::CONTENT_ANY_EQUALANDBELOW, self::CONTENT_ANY_EQUAL);
-        $recursiveoptions = array(self::CONTENT_PRIMARY_EQUALANDBELOW, self::CONTENT_PRIMARY_BELOW, self::CONTENT_ANY_EQUALANDBELOW, self::CONTENT_ANY_BELOW);
+        $userid = $this->reportfor;
 
         $viewparam = $DB->get_unique_param('viewid');
         $params = array($viewparam => $userid);
 
         // Set up the base joins and where clause for the restrictions.
-        $prime = in_array($restriction, $primaryoptions) ? ' AND u1ja.sortorder = 1' : '';
         $joinsql = " SELECT 1
                        FROM {job_assignment} u1ja
                  INNER JOIN {org} o1
-                         ON u1ja.organisationid = o1.id{$prime}";
+                         ON u1ja.organisationid = o1.id";
         $wheresql = " WHERE u1ja.userid = :{$viewparam}";
+        switch ($restriction) {
+            case self::CONTENT_ORG_EQUAL:
+                $joinsql .= " LEFT JOIN {job_assignment} u2ja
+                                ON u2ja.organisationid = o1.id";
 
-        // Set up the joins and where clause for equals restrictions.
-        if (in_array($restriction, $equaloptions)) {
-            $eqprime = in_array($restriction, $primaryoptions) ? ' AND u2ja.sortorder = 1' : '';
-            $joinsql .= " LEFT JOIN {job_assignment} u2ja
-                            ON u2ja.organisationid = o1.id{$eqprime}";
-            $wheresql .= " AND u2ja.userid = {$field}";
-        }
+                $wheresql .= " AND u2ja.userid = {$field}";
+                break;
+            case self::CONTENT_ORG_BELOW:
+                $joinsql .= " LEFT JOIN {org} o2
+                                ON o2.path LIKE " . $DB->sql_concat('o1.path', "'/%'") . "
+                         LEFT JOIN {job_assignment} u3ja
+                                ON u3ja.positionid = o2.id";
 
-        // Set up the joins and where clause for below restrictions.
-        if (in_array($restriction, $recursiveoptions)) {
-            $reprime = in_array($restriction, $primaryoptions) ? ' AND u3ja.sortorder = 1' : '';
-            $joinsql .= " LEFT JOIN {org} o2
-                            ON o2.path LIKE " . $DB->sql_concat('o1.path', "'/%'") . "
-                     LEFT JOIN {job_assignment} u3ja
-                            ON u3ja.positionid = o2.id{$reprime}";
+                $wheresql .= " AND u3ja.userid = {$field} ";
+                break;
+            case self::CONTENT_ORG_EQUALANDBELOW:
+                $joinsql .= " LEFT JOIN {job_assignment} u2ja
+                                ON u2ja.organisationid = o1.id
+                         LEFT JOIN {org} o2
+                                ON o2.path LIKE " . $DB->sql_concat('o1.path', "'/%'") . "
+                         LEFT JOIN {job_assignment} u3ja
+                                ON u3ja.positionid = o2.id";
 
-            $wheresql .= " AND u3ja.userid = {$field} ";
-        }
-
-        // Override the wheresql when both are selected to get the OR working.
-        if (in_array($restriction, $equaloptions) && in_array($restriction, $recursiveoptions)) {
-            $viewparam = $DB->get_unique_param('viewid');
-            $params[$viewparam] = $userid;
-            $wheresql = " WHERE u1ja.userid = :{$viewparam}
-                            AND (u2ja.userid = {$field} OR u3ja.userid = {$field})";
+                $wheresql .= " AND (u2ja.userid = {$field} OR u3ja.userid = {$field})";
+                break;
         }
 
         $sql = "EXISTS({$joinsql}{$wheresql})";
@@ -343,22 +307,13 @@ class rb_current_org_content extends rb_base_content {
         $type = substr(get_class($this), 3);
         $settings = reportbuilder::get_all_settings($reportid, $type);
 
-        $orgid = $DB->get_field('job_assignment', 'organisationid', array('userid' => $userid, 'sortorder' => 1));
-        $orgname = $DB->get_field('org', 'fullname', array('id' => $orgid));
-
         switch ($settings['recursive']) {
-            case self::CONTENT_PRIMARY_EQUAL:
-                return get_string('contentdesc_orgprimaryequal', 'totara_reportbuilder', $orgname);
-            case self::CONTENT_PRIMARY_EQUALANDBELOW:
-                return get_string('contentdesc_orgprimaryboth', 'totara_reportbuilder', $orgname);
-            case self::CONTENT_PRIMARY_BELOW:
-                return get_string('contentdesc_orgprimarybelow', 'totara_reportbuilder', $orgname);
-            case self::CONTENT_PRIMARY_EQUAL:
-                return get_string('contentdesc_orgallequal', 'totara_reportbuilder', $orgname);
-            case self::CONTENT_PRIMARY_EQUALANDBELOW:
-                return get_string('contentdesc_orgallboth', 'totara_reportbuilder', $orgname);
-            case self::CONTENT_PRIMARY_BELOW:
-                return get_string('contentdesc_orgallbelow', 'totara_reportbuilder', $orgname);
+            case self::CONTENT_ORG_EQUAL:
+                return get_string('contentdesc_orgequal', 'totara_reportbuilder');
+            case self::CONTENT_ORG_EQUALANDBELOW:
+                return get_string('contentdesc_orgboth', 'totara_reportbuilder');
+            case self::CONTENT_ORG_BELOW:
+                return get_string('contentdesc_orgbelow', 'totara_reportbuilder');
             default:
                 return '';
         }
@@ -388,17 +343,11 @@ class rb_current_org_content extends rb_base_content {
         $mform->disabledIf('current_org_enable', 'contentenabled', 'eq', 0);
         $radiogroup = array();
         $radiogroup[] =& $mform->createElement('radio', 'current_org_recursive',
-            '', get_string('showrecordsinorgandbelow', 'totara_reportbuilder'), self::CONTENT_PRIMARY_EQUALANDBELOW);
+            '', get_string('showrecordsinorgandbelow', 'totara_reportbuilder'), self::CONTENT_ORG_EQUALANDBELOW);
         $radiogroup[] =& $mform->createElement('radio', 'current_org_recursive',
-            '', get_string('showrecordsinorg', 'totara_reportbuilder'), self::CONTENT_PRIMARY_EQUAL);
+            '', get_string('showrecordsinorg', 'totara_reportbuilder'), self::CONTENT_ORG_EQUAL);
         $radiogroup[] =& $mform->createElement('radio', 'current_org_recursive',
-            '', get_string('showrecordsbeloworgonly', 'totara_reportbuilder'), self::CONTENT_PRIMARY_BELOW);
-        $radiogroup[] =& $mform->createElement('radio', 'current_org_recursive',
-            '', get_string('showrecordsinorgandbelowall', 'totara_reportbuilder'), self::CONTENT_ANY_EQUALANDBELOW);
-        $radiogroup[] =& $mform->createElement('radio', 'current_org_recursive',
-            '', get_string('showrecordsinorgall', 'totara_reportbuilder'), self::CONTENT_ANY_EQUAL);
-        $radiogroup[] =& $mform->createElement('radio', 'current_org_recursive',
-            '', get_string('showrecordsbeloworgonlyall', 'totara_reportbuilder'), self::CONTENT_ANY_BELOW);
+            '', get_string('showrecordsbeloworgonly', 'totara_reportbuilder'), self::CONTENT_ORG_BELOW);
         $mform->addGroup($radiogroup, 'current_org_recursive_group',
             get_string('includechildorgs', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
         $mform->setDefault('current_org_recursive', $recursive);
@@ -614,18 +563,12 @@ class rb_completed_org_content extends rb_base_content {
 class rb_user_content extends rb_base_content {
 
     const USER_OWN = 1;
-    const PRIMARY_DIRECT_REPORTS = 2;
-    const PRIMARY_INDIRECT_REPORTS = 4;
-    const PRIMARY_TEMP_REPORTS = 8;
-    const ALL_DIRECT_REPORTS = 16;
-    const ALL_INDIRECT_REPORTS = 32;
-    const ALL_TEMP_REPORTS = 64;
+    const USER_DIRECT_REPORTS = 2;
+    const USER_INDIRECT_REPORTS = 4;
+    const USER_TEMP_REPORTS = 8;
 
     /**
      * Generate the SQL to apply this content restriction.
-     *
-     * Note: If you select both 'primary_direct_reports' and 'all_direct_reports'
-     *       the 'all' records option will override the 'primary' one.
      *
      * @param array $field      SQL field to apply the restriction against
      * @param integer $reportid ID of the report
@@ -640,9 +583,9 @@ class rb_user_content extends rb_base_content {
         // remove rb_ from start of classname.
         $type = substr(get_class($this), 3);
         $settings = reportbuilder::get_all_settings($reportid, $type);
+        $restriction = isset($settings['who']) ? $settings['who'] : null;
         $userid = $this->reportfor;
 
-        $restriction = isset($settings['who']) ? $settings['who'] : null;
 
         if (empty($restriction)) {
             return array(' (1 = 1) ', array());
@@ -657,17 +600,13 @@ class rb_user_content extends rb_base_content {
             $params['self'] = $userid;
         }
 
-        $viewprimarydirect = ($restriction & self::PRIMARY_DIRECT_REPORTS) == self::PRIMARY_DIRECT_REPORTS;
-        $viewalldirect = ($restriction & self::ALL_DIRECT_REPORTS) == self::ALL_DIRECT_REPORTS;
-        if ($viewprimarydirect || $viewalldirect) {
-            $uprime = !$viewalldirect ? ' AND u1ja.sortorder = 1' : '';
-            $dprime = !$viewalldirect ? ' AND d1ja.sortorder = 1' : '';
+        if (($restriction & self::USER_DIRECT_REPORTS) == self::USER_DIRECT_REPORTS) {
             $conditions[] = "EXISTS (SELECT 1
                                        FROM {user} u1
                                  INNER JOIN {job_assignment} u1ja
-                                         ON u1ja.userid = u1.id{$uprime}
+                                         ON u1ja.userid = u1.id
                                  INNER JOIN {job_assignment} d1ja
-                                         ON d1ja.managerjaid = u1ja.id{$dprime}
+                                         ON d1ja.managerjaid = u1ja.id
                                       WHERE u1.id = :viewer1
                                         AND d1ja.userid = {$field}
                                         AND d1ja.userid != u1.id
@@ -675,18 +614,14 @@ class rb_user_content extends rb_base_content {
             $params['viewer1'] = $userid;
         }
 
-        $viewprimaryindirect = ($restriction & self::PRIMARY_INDIRECT_REPORTS) == self::PRIMARY_INDIRECT_REPORTS;
-        $viewallindirect = ($restriction & self::ALL_INDIRECT_REPORTS) == self::ALL_INDIRECT_REPORTS;
-        if ($viewprimaryindirect || $viewallindirect) {
+        if (($restriction & self::USER_INDIRECT_REPORTS) == self::USER_INDIRECT_REPORTS) {
             $ilikesql = $DB->sql_concat('u2ja.managerjapath', "'/%'");
-            $uprime = !$viewallindirect ? ' AND u2ja.sortorder = 1' : '';
-            $iprime = !$viewallindirect ? ' AND i2ja.sortorder = 1' : '';
             $conditions[] = "EXISTS (SELECT 1
                                        FROM {user} u2
                                  INNER JOIN {job_assignment} u2ja
-                                         ON u2ja.userid = u2.id{$uprime}
+                                         ON u2ja.userid = u2.id
                                  INNER JOIN {job_assignment} i2ja
-                                         ON i2ja.managerjapath LIKE {$ilikesql}{$iprime}
+                                         ON i2ja.managerjapath LIKE {$ilikesql}
                                       WHERE u2.id = :viewer2
                                         AND i2ja.userid = {$field}
                                         AND i2ja.userid != u2.id
@@ -695,17 +630,13 @@ class rb_user_content extends rb_base_content {
             $params['viewer2'] = $userid;
         }
 
-        $viewprimarytemp = ($restriction & self::PRIMARY_TEMP_REPORTS) == self::PRIMARY_TEMP_REPORTS;
-        $viewalltemp = ($restriction & self::ALL_TEMP_REPORTS) == self::ALL_TEMP_REPORTS;
-        if ($viewprimarytemp || $viewalltemp) {
-            $uprime = !$viewalltemp ? ' AND u3ja.sortorder = 1' : '';
-            $tprime = !$viewalltemp ? ' AND t3ja.sortorder = 1' : '';
+        if (($restriction & self::USER_TEMP_REPORTS) == self::USER_TEMP_REPORTS) {
             $conditions[] = "EXISTS (SELECT 1
                                        FROM {user} u3
                                  INNER JOIN {job_assignment} u3ja
-                                         ON u3ja.userid = u3.id{$uprime}
+                                         ON u3ja.userid = u3.id
                                  INNER JOIN {job_assignment} t3ja
-                                         ON t3ja.tempmanagerjaid = u3ja.id{$tprime}
+                                         ON t3ja.tempmanagerjaid = u3ja.id
                                       WHERE u3.id = :viewer3
                                         AND t3ja.userid = {$field}
                                         AND t3ja.userid != u3.id
@@ -744,22 +675,16 @@ class rb_user_content extends rb_base_content {
             $strings[] = get_string('contentdesc_userown', 'totara_reportbuilder', $strparams);
         }
 
-        if (($who & self::ALL_DIRECT_REPORTS) == self::ALL_DIRECT_REPORTS) {
-            $strings[] = get_string('contentdesc_useralldirect', 'totara_reportbuilder', $strparams);
-        } else if (($who & self::PRIMARY_DIRECT_REPORTS) == self::PRIMARY_DIRECT_REPORTS) {
-            $strings[] = get_string('contentdesc_userprimarydirect', 'totara_reportbuilder', $strparams);
+        if (($who & self::USER_DIRECT_REPORTS) == self::USER_DIRECT_REPORTS) {
+            $strings[] = get_string('contentdesc_userdirect', 'totara_reportbuilder', $strparams);
         }
 
-        if (($who & self::ALL_INDIRECT_REPORTS) == self::ALL_INDIRECT_REPORTS) {
-            $strings[] = get_string('contentdesc_userallindirect', 'totara_reportbuilder', $strparams);
-        } else if (($who & self::PRIMARY_INDIRECT_REPORTS) == self::PRIMARY_INDIRECT_REPORTS) {
-            $strings[] = get_string('contentdesc_userprimaryindirect', 'totara_reportbuilder', $strparams);
+        if (($who & self::USER_INDIRECT_REPORTS) == self::USER_INDIRECT_REPORTS) {
+            $strings[] = get_string('contentdesc_userindirect', 'totara_reportbuilder', $strparams);
         }
 
-        if (($who & self::PRIMARY_TEMP_REPORTS) == self::PRIMARY_TEMP_REPORTS) {
-            $strings[] = get_string('contentdesc_userprimarytemp', 'totara_reportbuilder', $strparams);
-        } else if (($who & self::ALL_TEMP_REPORTS) == self::ALL_TEMP_REPORTS) {
-            $strings[] = get_string('contentdesc_useralltemp', 'totara_reportbuilder', $strparams);
+        if (($who & self::USER_TEMP_REPORTS) == self::USER_TEMP_REPORTS) {
+            $strings[] = get_string('contentdesc_usertemp', 'totara_reportbuilder', $strparams);
         }
 
         if (empty($strings)) {
@@ -796,31 +721,19 @@ class rb_user_content extends rb_base_content {
         $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::USER_OWN.']', '',
             get_string('userownrecords', 'totara_reportbuilder'), null, array(0, 1));
         $mform->setType('user_who['.self::USER_OWN.']', PARAM_INT);
-        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::PRIMARY_DIRECT_REPORTS.']', '',
+        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::USER_DIRECT_REPORTS.']', '',
             get_string('userdirectreports', 'totara_reportbuilder'), null, array(0, 1));
-        $mform->setType('user_who['.self::PRIMARY_DIRECT_REPORTS.']', PARAM_INT);
-        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::PRIMARY_INDIRECT_REPORTS.']', '',
+        $mform->setType('user_who['.self::USER_DIRECT_REPORTS.']', PARAM_INT);
+        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::USER_INDIRECT_REPORTS.']', '',
             get_string('userindirectreports', 'totara_reportbuilder'), null, array(0, 1));
-        $mform->setType('user_who['.self::PRIMARY_INDIRECT_REPORTS.']', PARAM_INT);
-        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::PRIMARY_TEMP_REPORTS.']', '',
+        $mform->setType('user_who['.self::USER_INDIRECT_REPORTS.']', PARAM_INT);
+        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::USER_TEMP_REPORTS.']', '',
             get_string('usertempreports', 'totara_reportbuilder'), null, array(0, 1));
-        $mform->setType('user_who['.self::PRIMARY_TEMP_REPORTS.']', PARAM_INT);
-        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::ALL_DIRECT_REPORTS.']', '',
-            get_string('userdirectreportsall', 'totara_reportbuilder'), null, array(0, 1));
-        $mform->setType('user_who['.self::ALL_DIRECT_REPORTS.']', PARAM_INT);
-        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::ALL_INDIRECT_REPORTS.']', '',
-            get_string('userindirectreportsall', 'totara_reportbuilder'), null, array(0, 1));
-        $mform->setType('user_who['.self::ALL_INDIRECT_REPORTS.']', PARAM_INT);
-        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::ALL_TEMP_REPORTS.']', '',
-            get_string('usertempreportsall', 'totara_reportbuilder'), null, array(0, 1));
-        $mform->setType('user_who['.self::ALL_TEMP_REPORTS.']', PARAM_INT);
+        $mform->setType('user_who['.self::USER_TEMP_REPORTS.']', PARAM_INT);
 
         $mform->addGroup($checkgroup, 'user_who_group',
             get_string('includeuserrecords', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
-        $usergroups = array(self::USER_OWN,
-            self::PRIMARY_DIRECT_REPORTS, self::PRIMARY_INDIRECT_REPORTS, self::PRIMARY_TEMP_REPORTS,
-            self::ALL_DIRECT_REPORTS, self::ALL_INDIRECT_REPORTS, self::ALL_TEMP_REPORTS
-        );
+        $usergroups = array(self::USER_OWN, self::USER_DIRECT_REPORTS, self::USER_INDIRECT_REPORTS, self::USER_TEMP_REPORTS);
         foreach ($usergroups as $usergroup) {
             // Bitwise comparison.
             if (($who & $usergroup) == $usergroup) {

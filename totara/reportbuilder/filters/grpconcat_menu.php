@@ -17,20 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Oleg Demeshev <oleg.demeshev@totaralms.com>
- * @package totara
- * @subpackage reportbuilder
- */
-
-/**
- * Menu of choices select filter based on a signle value.
+ * @author David Curry <david.curry@totaralearning.com>
+ * @package totara_reportbuilder
  */
 
 global $CFG;
-
 require_once($CFG->dirroot . '/totara/reportbuilder/filters/select.php');
 
-class rb_filter_menuofchoices extends rb_filter_select {
+/**
+ * TODO - This filter used to be "Equals" but is now "Contains", it would be nice to add a selector with more options.
+ *
+ * NOTE: This filter assumes that simple mode is enabled, see the
+ *       add_job_custom_field_filters() function for an example.
+ */
+class rb_filter_grpconcat_menu extends rb_filter_select {
 
     /**
      * Returns the condition to be used with SQL where
@@ -38,30 +38,16 @@ class rb_filter_menuofchoices extends rb_filter_select {
      * @return array containing filtering condition SQL clause and params
      */
     function get_sql_filter($data) {
+        global $DB;
 
         $value = $data['value'];
-        $query = $this->get_field();
-        $simplemode = $this->options['simplemode'];
+        $field = $this->get_field();
+        $likeparam = array();
 
-        if ($simplemode) {
-            // Use "equal to" operator for simple select.
-            $operator = 1;
-        } else {
-            $operator = $data['operator'];
-        }
+        $uniqueparam = rb_unique_param('mnfilter');
+        $likesql = $DB->sql_like($field, ":{$uniqueparam}", true, true, false);
+        $likeparam["{$uniqueparam}"] = '%' . $DB->sql_like_escape($value) . '%';
 
-        if ($operator == 0) {
-            // Return 1=1 instead of TRUE for MSSQL support.
-            return array(' 1=1 ', array());
-        } else if ($operator == 1) {
-            // Equal to.
-            $param = rb_unique_param("fsequal_");
-            return array("{$query} = :{$param}", array($param => $value));
-        } else {
-            // Not equal to.
-            // Check for null case for is not operator.
-            $param = rb_unique_param("fsequal_");
-            return array("({$query} != :{$param} OR ({$query}) IS NULL)", array($param => $value));
-        }
+        return array($likesql, $likeparam);
     }
 }

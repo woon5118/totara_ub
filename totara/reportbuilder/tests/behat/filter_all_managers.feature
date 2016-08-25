@@ -33,7 +33,7 @@ Feature: Use the multi-item manager filter
     And I set the field "Source" to "user"
     And I press "Create report"
     And I switch to "Filters" tab
-    And I select "All Assigned Manager(s)" from the "newstandardfilter" singleselect
+    And I select "User's Manager(s)" from the "newstandardfilter" singleselect
     And I press "Add"
     And I switch to "Access" tab
     # We'll get a standard user to use the filter, as there are some access checks that
@@ -50,7 +50,7 @@ Feature: Use the multi-item manager filter
     And I should see "user3" in the ".reportbuilder-table" "css_element"
     And I should see "user4" in the ".reportbuilder-table" "css_element"
     And I should see "user5" in the ".reportbuilder-table" "css_element"
-    When I select "Any of the Selected" from the "job_assignment-manager_op" singleselect
+    When I select "Any of the selected" from the "User's Manager(s) field limiter" singleselect
     When I click on "Choose Managers" "link" in the "Search by" "fieldset"
     And I click on "Manager1 One1" "link" in the "Choose Managers" "totaradialogue"
     And I click on "Save" "button" in the "Choose Managers" "totaradialogue"

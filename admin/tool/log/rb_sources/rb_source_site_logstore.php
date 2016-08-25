@@ -71,8 +71,7 @@ class rb_source_site_logstore extends rb_base_source {
         // Requires the course join.
         $this->add_course_category_table_to_joinlist($joinlist,
             'course', 'category');
-        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_tag_tables_to_joinlist('course', $joinlist, 'base', 'courseid');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_cohort_course_tables_to_joinlist($joinlist, 'base', 'courseid');
@@ -247,8 +246,7 @@ class rb_source_site_logstore extends rb_base_source {
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_course_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions);
-        $this->add_all_job_assignments_fields_to_columns($columnoptions);
-        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
+        $this->add_job_assignment_fields_to_columns($columnoptions);
         $this->add_tag_fields_to_columns('course', $columnoptions);
         $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_course_fields_to_columns($columnoptions);
@@ -310,8 +308,7 @@ class rb_source_site_logstore extends rb_base_source {
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
-        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
-        $this->add_all_job_assignments_fields_to_filters($filteroptions);
+        $this->add_job_assignment_fields_to_filters($filteroptions);
         $this->add_tag_fields_to_filters('course', $filteroptions);
         $this->add_cohort_user_fields_to_filters($filteroptions);
         $this->add_cohort_course_fields_to_filters($filteroptions);
@@ -403,13 +400,13 @@ class rb_source_site_logstore extends rb_base_source {
                 'advanced' => 1,
             ),
             array(
-                'type' => 'primary_job',
-                'value' => 'positionpath',
+                'type' => 'job_assignment',
+                'value' => 'allpositions',
                 'advanced' => 1,
             ),
             array(
-                'type' => 'primary_job',
-                'value' => 'organisationpath',
+                'type' => 'job_assignment',
+                'value' => 'allorganisations',
                 'advanced' => 1,
             ),
         );

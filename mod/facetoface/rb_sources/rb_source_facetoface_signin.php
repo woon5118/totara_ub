@@ -156,8 +156,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course', 'INNER');
         $this->add_context_table_to_joinlist($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
         $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
-        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_tag_tables_to_joinlist('course', $joinlist, 'facetoface', 'course');
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
@@ -362,8 +361,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_course_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions);
-        $this->add_all_job_assignments_fields_to_columns($columnoptions);
-        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
+        $this->add_job_assignment_fields_to_columns($columnoptions);
         $this->add_tag_fields_to_columns('course', $columnoptions);
         $this->add_facetoface_session_roles_to_columns($columnoptions);
         $this->add_cohort_user_fields_to_columns($columnoptions);
@@ -475,8 +473,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
-        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
-        $this->add_all_job_assignments_fields_to_filters($filteroptions);
+        $this->add_job_assignment_fields_to_filters($filteroptions);
         $this->add_tag_fields_to_filters('course', $filteroptions);
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
         $this->add_cohort_user_fields_to_filters($filteroptions);

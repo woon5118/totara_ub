@@ -48,7 +48,7 @@ $PAGE->set_context(context_system::instance());
 // If not, then they are not permitted to view all users here.
 $reportid = required_param('reportid', PARAM_INT);
 $canviewreport = reportbuilder::is_capable($reportid, $USER->id);
-$reporthasfilter = reportbuilder::contains_filter($reportid, 'job_assignment', 'appraiser');
+$reporthasfilter = reportbuilder::contains_filter($reportid, 'job_assignment', 'allappraisers');
 if (!($canviewreport and $reporthasfilter)) {
     print_error('accessdenied', 'admin');
 }

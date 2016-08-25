@@ -102,8 +102,7 @@ class rb_source_program_overview extends rb_base_source {
 
         $this->add_program_table_to_joinlist($joinlist, 'base', 'programid');
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
 
         if ($this->instancetype == 'program') {
@@ -241,8 +240,7 @@ class rb_source_program_overview extends rb_base_source {
         // Include some standard columns.
         $this->add_program_fields_to_columns($columnoptions, 'program', "totara_{$this->instancetype}");
         $this->add_user_fields_to_columns($columnoptions);
-        $this->add_all_job_assignments_fields_to_columns($columnoptions);
-        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
+        $this->add_job_assignment_fields_to_columns($columnoptions);
 
         // Programe completion cols.
         $columnoptions[] = new rb_column_option(
@@ -661,8 +659,8 @@ class rb_source_program_overview extends rb_base_source {
     protected function define_defaultcolumns() {
         $defaultcolumns = array();
         $defaultcolumns[] = array('type' => 'prog', 'value' => 'shortname');
-        $defaultcolumns[] = array('type' => 'primary_job', 'value' => 'organisation');
-        $defaultcolumns[] = array('type' => 'primary_job', 'value' => 'position');
+        $defaultcolumns[] = array('type' => 'job_assignment', 'value' => 'allorganisationnames');
+        $defaultcolumns[] = array('type' => 'job_assignment', 'value' => 'allpositionnames');
         $defaultcolumns[] = array('type' => 'user', 'value' => 'namelink');
         $defaultcolumns[] = array('type' => 'program_completion', 'value' => 'timedue');
         if ($this->instancetype == 'program') {

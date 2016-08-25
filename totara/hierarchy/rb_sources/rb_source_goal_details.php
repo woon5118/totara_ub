@@ -103,8 +103,7 @@ class rb_source_goal_details extends rb_base_source {
         );
 
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_primary_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
@@ -169,8 +168,7 @@ class rb_source_goal_details extends rb_base_source {
         );
 
         $this->add_user_fields_to_columns($columnoptions);
-        $this->add_all_job_assignments_fields_to_columns($columnoptions);
-        $this->add_primary_job_assignment_fields_to_columns($columnoptions);
+        $this->add_job_assignment_fields_to_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -195,8 +193,7 @@ class rb_source_goal_details extends rb_base_source {
         );
 
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_primary_job_assignment_fields_to_filters($filteroptions);
-        $this->add_all_job_assignments_fields_to_filters($filteroptions);
+        $this->add_job_assignment_fields_to_filters($filteroptions);
 
         return $filteroptions;
     }
@@ -304,16 +301,16 @@ class rb_source_goal_details extends rb_base_source {
                 'value' => 'namelink'
             ),
             array(
-                'type' => 'primary_job',
-                'value' => 'position'
+                'type' => 'job_assignment',
+                'value' => 'allpositionnames'
             ),
             array(
-                'type' => 'primary_job',
-                'value' => 'organisation'
+                'type' => 'job_assignment',
+                'value' => 'allorganisationnames'
             ),
             array(
-                'type' => 'primary_job',
-                'value' => 'managername'
+                'type' => 'job_assignment',
+                'value' => 'allmanagernames'
             ),
             array(
                 'type' => 'goal',

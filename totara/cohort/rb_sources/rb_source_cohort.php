@@ -121,7 +121,7 @@ class rb_source_cohort extends rb_base_source {
         );
 
         $this->add_user_table_to_joinlist($joinlist, 'members', 'userid');
-        $this->add_all_job_assignments_tables_to_joinlist($joinlist, 'members', 'userid');
+        $this->add_job_assignment_tables_to_joinlist($joinlist, 'members', 'userid');
         $this->add_tag_tables_to_joinlist('cohort', $joinlist, 'base', 'id');
 
         return $joinlist;
@@ -257,7 +257,7 @@ class rb_source_cohort extends rb_base_source {
         );
 
         $this->add_user_fields_to_columns($columnoptions);
-        $this->add_all_job_assignments_fields_to_columns($columnoptions);
+        $this->add_job_assignment_fields_to_columns($columnoptions);
         $this->add_tag_fields_to_columns('cohort', $columnoptions);
 
         return $columnoptions;

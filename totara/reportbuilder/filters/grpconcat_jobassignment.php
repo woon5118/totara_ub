@@ -22,12 +22,13 @@
  * @subpackage reportbuilder
  */
 
+global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/filters/hierarchy_multi.php');
 
 /**
  * Generic filter based on selecting multiple items from a hierarchy.
  */
-class rb_filter_jobassignment_multi extends rb_filter_hierarchy_multi {
+class rb_filter_grpconcat_jobassignment extends rb_filter_hierarchy_multi {
     const JOB_OPERATOR_ANY = 0;
     const JOB_OPERATOR_CONTAINS = 1;
     const JOB_OPERATOR_NOTCONTAINS = 2;
@@ -112,6 +113,8 @@ class rb_filter_jobassignment_multi extends rb_filter_hierarchy_multi {
         // Container for currently selected items.
         $objs = array();
         $objs['operator'] = $mform->createElement('select', $this->name.'_op', null, $this->get_operators());
+        $objs['operator']->setLabel(get_string('limiterfor', 'filters', $label));
+
 
         $content = html_writer::tag('div', '', array('class' => 'list-' . $this->name));
         $content .= display_choose_items_link($this->name, $this->shortname);
@@ -227,7 +230,7 @@ class rb_filter_jobassignment_multi extends rb_filter_hierarchy_multi {
         }
 
         // Include child hierarchies if the
-        if ($children && $this->shortname = 'pos') {
+        if ($children && in_array($this->shortname, array('pos', 'org'))) {
             $childitems = array();
             $childsql = "SELECT id FROM {{$this->shortname}} WHERE (1=0)";
             foreach ($items as $item) {
@@ -267,12 +270,13 @@ class rb_filter_jobassignment_multi extends rb_filter_hierarchy_multi {
             foreach ($items as $item) {
                 $unique   = rb_unique_param('uja'.$this->shortname);
                 $subtable = $unique . 'tab' . $item;
-                $exttable = $unique . 'ext' . $item;
 
                 // Build the sql statement from the filter options.
                 if (!empty($this->options['extjoin']) && !empty($this->options['extfield'])) {
                     $extjoin = $this->options['extjoin'];
                     $extfield = $this->options['extfield'];
+                    $exttable = $unique . 'ext' . $item;
+
                     // Allow for one layer of abstraction for managerjaid etc.
                     $fromsql = " FROM {job_assignment} {$subtable} " .
                                " INNER JOIN {{$extjoin}} {$exttable} " .

@@ -22,10 +22,50 @@
  */
 
 /**
+ * Rename reportbuilder columns. Using the $type param to constrain the renaming to a single
+ * type is recommended to avoid renaming columns unintentionally.
+ *
+ * @param array $values     An array with data formatted like array($oldname => $newname)
+ * @param string $type      The type constraint, e.g. 'user'
+ */
+function totara_reportbuilder_migrate_column_names($values, $type = '') {
+    global $DB;
+
+    $typesql = '';
+    $params = array();
+    if (!empty($type)) {
+        $typesql = ' AND type = :type';
+        $params['type'] = $type;
+    }
+
+    foreach ($values as $oldname => $newname) {
+        $sql = "UPDATE {report_builder_columns}
+                   SET value = :newname
+                 WHERE value = :oldname
+                       {$typesql}";
+        $params['newname'] = $newname;
+        $params['oldname'] = $oldname;
+
+        $DB->execute($sql, $params);
+    }
+
+    return true;
+}
+
+/**
  * Map old position columns to the new job_assignment columns.
+ *
+ * @param array $values     An array of the values we are updating the type of
+ * @param string $oldtype   The oldtype
+ * @param string $newtype
  */
 function totara_reportbuilder_migrate_column_types($values, $oldtype, $newtype) {
     global $DB;
+
+    // If there is nothing to migrate just return.
+    if (empty($values)) {
+        return true;
+    }
 
     list($insql, $params) = $DB->get_in_or_equal($values, SQL_PARAMS_NAMED);
     $sql = "UPDATE {report_builder_columns}
@@ -39,10 +79,51 @@ function totara_reportbuilder_migrate_column_types($values, $oldtype, $newtype) 
 }
 
 /**
+ * Rename reportbuilder filters. Using the $type param to constrain the renaming to a single
+ * type is recommended to avoid renaming filters unintentionally.
+ *
+ * @param array $values     An array with data formatted like array($oldname => $newname)
+ * @param string $type      The type constraint, e.g. 'user'
+ */
+function totara_reportbuilder_migrate_filter_names($values, $type = '') {
+    global $DB;
+
+    // If there is nothing to migrate just return.
+    if (empty($values)) {
+        return true;
+    }
+
+    $typesql = '';
+    $params = array();
+    if (!empty($type)) {
+        $typesql = 'AND type = :type';
+        $params['type'] = $type;
+    }
+
+    foreach ($values as $oldname => $newname) {
+        $sql = "UPDATE {report_builder_filters}
+                   SET value = :newname
+                 WHERE value = :oldname
+                       {$typesql}";
+        $params['newname'] = $newname;
+        $params['oldname'] = $oldname;
+
+        $DB->execute($sql, $params);
+    }
+
+    return true;
+}
+
+/**
  * Map old position filters to the new job_assignment columns.
  */
 function totara_reportbuilder_migrate_filter_types($values, $oldtype, $newtype) {
     global $DB;
+
+    // If there is nothing to migrate just return.
+    if (empty($values)) {
+        return true;
+    }
 
     list($insql, $params) = $DB->get_in_or_equal($values, SQL_PARAMS_NAMED);
     $sql = "UPDATE {report_builder_filters}
@@ -60,6 +141,11 @@ function totara_reportbuilder_migrate_filter_types($values, $oldtype, $newtype) 
  */
 function totara_reportbuilder_migrate_saved_search_filters($values, $oldtype, $newtype) {
     global $DB;
+
+    // If there is nothing to migrate just return.
+    if (empty($values)) {
+        return true;
+    }
 
     // Get all saved searches.
     $savedsearches = $DB->get_records('report_builder_saved');
@@ -95,6 +181,11 @@ function totara_reportbuilder_migrate_saved_search_filters($values, $oldtype, $n
  */
 function totara_reportbuilder_migrate_default_sort_columns($values, $oldtype, $newtype) {
     global $DB;
+
+    // If there is nothing to migrate just return.
+    if (empty($values)) {
+        return true;
+    }
 
     foreach ($values as $sort) {
         $sql = "UPDATE {report_builder}
