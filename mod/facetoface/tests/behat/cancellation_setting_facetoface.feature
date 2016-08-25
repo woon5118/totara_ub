@@ -8,7 +8,8 @@ Feature: Cancellation for session
     Given I am on a totara site
     And the following "users" exist:
       | username     | firstname | lastname  | email                 |
-      | teacher1     | Terry3    | Teacher   | teacher@example.com   |
+      | teacher1     | Terry1    | Teacher   | teacher1@example.com  |
+      | teacher2     | Terry2    | Teacher   | teacher2@example.com  |
       | student1     | Sam1      | Student1  | student1@example.com  |
       | student2     | Sam2      | Student2  | student2@example.com  |
     And the following "courses" exist:
@@ -17,6 +18,7 @@ Feature: Cancellation for session
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
+      | teacher2 | C1     | teacher        |
       | student1 | C1     | student        |
       | student2 | C1     | student        |
     And I log in as "teacher1"
@@ -30,7 +32,7 @@ Feature: Cancellation for session
     And I log out
 
   @javascript
-  Scenario: User can cancel their booking at any time until session starts
+  Scenario: User can cancel their booking at any time until seminar session starts
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -67,6 +69,28 @@ Feature: Cancellation for session
     When I click on the link "Cancel booking" in row 1
     And I press "Yes"
     And I should not see "Cancel booking"
+    And I log out
+
+    # Check that editing teacher can manage cancellation notes
+    And I log in as "teacher1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "View all events"
+    And I click on the link "Attendees" in row 1
+    And I follow "Cancellations"
+    And I should see "Show cancellation reason"
+    And I click on "a.attendee-cancellation-note" "css_element"
+    And I should see "Sam1 Student1 - Cancellation note"
+    And I log out
+
+    # Check that teacher can not manage cancellation notes
+    And I log in as "teacher2"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "View all events"
+    And I click on the link "Attendees" in row 1
+    And I follow "Cancellations"
+    And I should not see "Show cancellation reason"
     And I log out
 
   @javascript

@@ -1029,10 +1029,14 @@ if ($show_table) {
                     debugging('Unexpected cancellation type encountered.', DEBUG_DEVELOPER);
                     $data[] = get_string('usercancelled', 'facetoface');
                 }
-                $showpix = new pix_icon('/t/preview', get_string('showcancelreason', 'facetoface'));
-                $url = new moodle_url('/mod/facetoface/cancellation_note.php',
-                    array('s' => $session->id, 'userid' => $attendee->id, 'sesskey' => sesskey()));
-                $icon = $OUTPUT->action_icon($url, $showpix, null, array('class' => 'action-icon attendee-cancellation-note pull-right'));
+
+                $icon = '';
+                if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
+                    $url = new moodle_url('/mod/facetoface/cancellation_note.php',
+                        array('s' => $session->id, 'userid' => $attendee->id, 'sesskey' => sesskey()));
+                    $showpix = new pix_icon('/t/preview', get_string('showcancelreason', 'facetoface'));
+                    $icon = $OUTPUT->action_icon($url, $showpix, null, array('class' => 'action-icon attendee-cancellation-note pull-right'));
+                }
 
                 $cancelstatus = new stdClass();
                 $cancelstatus->id = $attendee->submissionid;
