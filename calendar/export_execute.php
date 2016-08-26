@@ -177,7 +177,7 @@ $events = calendar_get_events($timestart, $timeend, $users, $groups, array_keys(
 $ical = new iCalendar;
 $ical->add_property('method', 'PUBLISH');
 foreach($events as $event) {
-   if (!empty($event->modulename)) {
+    if (!empty($event->modulename) && ($event->courseid !== SITEID)) {
         $cm = get_coursemodule_from_instance($event->modulename, $event->instance);
         if (!\core_availability\info_module::is_user_visible($cm, $userid, false)) {
             continue;

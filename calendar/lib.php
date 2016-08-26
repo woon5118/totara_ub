@@ -263,7 +263,7 @@ function calendar_get_mini($courses, $groups, $users, $calmonth = false, $calyea
     // Set event course class for course events
     if (!empty($events)) {
         foreach ($events as $eventid => $event) {
-            if (!empty($event->modulename)) {
+            if (!empty($event->modulename) && ($event->courseid !== SITEID)) {
                 $cm = get_coursemodule_from_instance($event->modulename, $event->instance);
                 if (!\core_availability\info_module::is_user_visible($cm, 0, false)) {
                     unset($events[$eventid]);
@@ -562,7 +562,7 @@ function calendar_get_upcoming($courses, $groups, $users, $daysinfuture, $maxeve
         foreach($events as $event) {
 
 
-            if (!empty($event->modulename)) {
+            if (!empty($event->modulename) && ($event->courseid !== SITEID)) {
                 if ($event->courseid == $COURSE->id) {
                     if (isset($modinfo->instances[$event->modulename][$event->instance])) {
                         $cm = $modinfo->instances[$event->modulename][$event->instance];
