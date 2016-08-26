@@ -37,6 +37,15 @@ Feature: Use location customfield in HR import position upload
       | Short name        | cflocation              |
     And I press "Save changes"
 
+    # URL
+    And I should see "Create a new custom field"
+    And I set the field "datatype" to "URL"
+    And I expand all fieldsets
+    And I set the following fields to these values:
+      | Full name         | Custom field URL        |
+      | Short name        | cfurl                   |
+    And I press "Save changes"
+
     # HR Import configuration
     And I navigate to "General settings" node in "Site administration > HR Import"
     And I set the following fields to these values:
@@ -53,6 +62,7 @@ Feature: Use location customfield in HR import position upload
      | Type                    | 1 |
      | Custom field text input | 1 |
      | Custom field location   | 1 |
+     | Custom field URL        | 1 |
     And I press "Save changes"
 
   Scenario: Upload position CSV with customfield using HR Import
@@ -75,8 +85,10 @@ Feature: Use location customfield in HR import position upload
     And I follow "Position 4"
     Then I should see "Her Majesty"
     And I should see "Buckingham Palace, London, England"
+    And I should see "http://www.buckinghampalace.co.uk"
     And I navigate to "Manage positions" node in "Site administration > Hierarchies > Positions"
     When I follow "Position Framework 2"
     And I follow "Position 6"
     Then I should see "Stonehenge"
     And I should see "Off A344 Road, Amesbury, Wiltshire, England"
+    And I should see "http://www.stonehenge.co.uk"
