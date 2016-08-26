@@ -54,6 +54,24 @@ class customfield_location extends customfield_base {
         customfield_define_location::prepare_form_location_data_for_db($itemnew, $this->inputname);
         parent::edit_save_data($itemnew, $prefix, $tableprefix);
     }
+
+    /**
+     * Changes the customfield value from a string to the key that matches
+     * the string in the array of options.
+     *
+     * @param  object $syncitem     The original syncitem to be processed.
+     * @return object               The syncitem with the customfield data processed.
+     *
+     */
+    public function sync_data_preprocess($syncitem) {
+        $fieldname = $this->inputname;
+        $address = $syncitem->$fieldname;
+        // Make data in format required by @see customfield_location::prepare_form_location_data_for_db()
+        $syncitem->{$fieldname . 'address'} = $address;
+        $syncitem->{$fieldname . 'display'} = GMAP_DISPLAY_ADDRESS_ONLY;
+        return $syncitem;
+    }
+
     public function edit_load_item_data(&$item) {
         $item->{$this->inputname} = customfield_define_location::prepare_db_location_data_for_form($this->data);
     }
