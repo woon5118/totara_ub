@@ -82,7 +82,7 @@ $pagetitle = format_string(get_string('report', 'totara_reportbuilder').': '.$fu
 
 $PAGE->set_title($pagetitle);
 $PAGE->set_button($report->edit_button());
-$PAGE->navbar->add(get_string('myreports', 'totara_reportbuilder'), new moodle_url('/my/reports.php'));
+$PAGE->navbar->add(get_string('reports', 'totara_core'), new moodle_url('/my/reports.php'));
 $PAGE->navbar->add($fullname);
 $PAGE->set_heading(format_string($SITE->fullname));
 

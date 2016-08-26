@@ -172,7 +172,7 @@ if ($id == 0) {
 
 $PAGE->set_title(get_string($pagename, 'totara_reportbuilder'));
 $PAGE->set_cacheable(true);
-$PAGE->navbar->add(get_string('myreports', 'totara_reportbuilder'), new moodle_url('/my/reports.php'));
+$PAGE->navbar->add(get_string('reports', 'totara_core'), new moodle_url('/my/reports.php'));
 $PAGE->navbar->add(get_string($pagename, 'totara_reportbuilder'));
 echo $output->header();
 
