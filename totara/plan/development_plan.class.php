@@ -1093,8 +1093,8 @@ class development_plan {
         if ($can_manage) {
             if ($canapproveplan) {
                 $out .= html_writer::start_div();
-                $out .= get_string('reasonfordecision', 'totara_message');
-                $out .= html_writer::empty_tag('input', array('type' => 'text', 'name' => 'reasonfordecision'));
+                $out .= html_writer::tag('label', get_string('reasonfordecision', 'totara_message'), array('for' => 'id_reasonfordecision'));
+                $out .= html_writer::empty_tag('input', array('type' => 'text', 'name' => 'reasonfordecision', 'id' => 'id_reasonfordecision'));
                 $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'approve',
                     'value' => get_string('approve', 'totara_plan')));
                 $out .= '&nbsp;' . html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'decline',
