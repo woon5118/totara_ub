@@ -77,6 +77,6 @@ $icons = array(
  */
 $deprecated = array(
     'mod_book|nav_next_dis' => 'caret-right-disabled',
-    'mod_book|nav_sep' => 'pipe',
+    'mod_book|nav_sep' => 'spacer',
     'mod_book|add' => 'plus',
 );

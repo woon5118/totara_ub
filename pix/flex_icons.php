@@ -64,7 +64,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-addressbook',
+                    'classes' => 'ft-address-book',
                 ),
         ),
     'alarm' =>
@@ -98,32 +98,18 @@ $icons = array(
                         ),
                 ),
         ),
-    'alfresco' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-alfresco',
-                ),
-        ),
     'archive' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-archive',
+                    'classes' => 'ft-archive',
                 ),
         ),
-    'archive-alt' =>
+    'archives' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-archive-alt',
-                ),
-        ),
-    'archives-alt' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-archives-alt',
+                    'classes' => 'ft-books',
                 ),
         ),
     'areafiles' =>
@@ -217,7 +203,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-backpack',
+                    'classes' => 'ft-bag',
                 ),
         ),
     'ban' =>
@@ -281,20 +267,6 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-bookmark-o',
-                ),
-        ),
-    'box-alt' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-box-alt',
-                ),
-        ),
-    'box-net' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-box-net',
                 ),
         ),
     'briefcase' =>
@@ -405,13 +377,6 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'ft-certificate',
-                ),
-        ),
-    'chart-bar' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-chart-bar',
                 ),
         ),
     'check' =>
@@ -634,7 +599,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-competency',
+                    'classes' => 'fa-graduation-cap',
                 ),
         ),
     'competency-achieved' =>
@@ -710,13 +675,6 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-cube',
-                ),
-        ),
-    'dash' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-dash',
                 ),
         ),
     'database' =>
@@ -809,7 +767,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-book-alt',
+                    'classes' => 'ft-book',
                 ),
         ),
     'edit' =>
@@ -1104,13 +1062,6 @@ $icons = array(
                     'classes' => 'fa-frown-o',
                 ),
         ),
-    'gdrive' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-gdrive',
-                ),
-        ),
     'globe' =>
         array(
             'data' =>
@@ -1242,7 +1193,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-hbars',
+                    'classes' => 'ft-log',
                 ),
         ),
     'mahara' =>
@@ -1297,13 +1248,6 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'ft-mnethost',
-                ),
-        ),
-    'moodle' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-moodle',
                 ),
         ),
     'moon-o' =>
@@ -1384,7 +1328,7 @@ $icons = array(
                 array(
                     'classes' =>
                         array(
-                            'ft-viewtreeactive ft-stack-main',
+                            'ft-view-tree ft-stack-main',
                             'ft-slash ft-stack-over ft-state-danger',
                         ),
                 ),
@@ -1493,13 +1437,6 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-pie-chart',
-                ),
-        ),
-    'pipe' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-pipe',
                 ),
         ),
     'plug' =>
@@ -1615,7 +1552,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-vbars',
+                    'classes' => 'ft-stats-bars',
                 ),
         ),
     'recycle' =>
@@ -1762,14 +1699,9 @@ $icons = array(
         ),
     'separate-groups' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-users ft-stack-prefix',
-                            'fa-users ft-stack-suffix',
-                        ),
+                    'classes' => 'ft-group-separate',
                 ),
         ),
     /* Settings or editing of stuff that changes how Totara works */
@@ -1951,20 +1883,6 @@ $icons = array(
                     'classes' => 'fa-tag',
                 ),
         ),
-    'th-large' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-th-large',
-                ),
-        ),
-    'th-list' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-th-list',
-                ),
-        ),
     'thumbs-down-danger' =>
         array(
             'data' =>
@@ -2026,6 +1944,13 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-toggle-on',
+                ),
+        ),
+    'totara' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-totara',
                 ),
         ),
     'trash' =>
@@ -2143,11 +2068,25 @@ $icons = array(
                     'classes' => 'fa-users',
                 ),
         ),
-    'viewtreeactive' =>
+    'view-large' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-viewtreeactive',
+                    'classes' => 'fa-th-large',
+                ),
+        ),
+    'view-list' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-th-list',
+                ),
+        ),
+    'view-tree' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-view-tree',
                 ),
         ),
     'volume-up' =>
@@ -2210,9 +2149,9 @@ $deprecated = array(
     'core|a/refresh' => 'refresh',
     'core|a/search' => 'search',
     'core|a/setting' => 'settings',
-    'core|a/view_icon_active' => 'th-large',
-    'core|a/view_list_active' => 'th-list',
-    'core|a/view_tree_active' => 'viewtreeactive',
+    'core|a/view_icon_active' => 'view-large',
+    'core|a/view_list_active' => 'view-list',
+    'core|a/view_tree_active' => 'view-tree',
     'core|b/bookmark-new' => 'bookmark-o',
     'core|b/document-edit' => 'document-edit',
     'core|b/document-new' => 'document-new',
@@ -2221,7 +2160,7 @@ $deprecated = array(
     'core|b/edit-delete' => 'delete',
     'core|c/event' => 'calendar',
     'core|docs' => 'info-circle',
-    'core|f/archive' => 'box-alt',
+    'core|f/archive' => 'file-archive-o',
     'core|f/audio' => 'volume-up',
     'core|f/avi' => 'film',
     'core|f/base' => 'database',
@@ -2331,7 +2270,7 @@ $deprecated = array(
     'core|i/mean' => 'mean',
     'core|i/menu' => 'bars',
     'core|i/mnethost' => 'mnet-host',
-    'core|i/moodle_host' => 'moodle',
+    'core|i/moodle_host' => 'totara', // Intentional change of branding for repositories on other Totara servers.
     'core|i/move_2d' => 'arrows',
     'core|i/navigationitem' => 'navitem',
     'core|i/new' => 'new',
@@ -2380,7 +2319,7 @@ $deprecated = array(
     'core|i/users' => 'users',
     'core|i/valid' => 'check-success',
     'core|i/warning' => 'warning-warning',
-    'core|i/withsubcat' => 'viewtreeactive',
+    'core|i/withsubcat' => 'view-tree',
     'core|m/USD' => 'dollar',
     'core|req' => 'asterisk',
     'core|spacer' => 'spacer',

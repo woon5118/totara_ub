@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'repository_googledocs|icon' => 'gdrive',
+$icons = array(
+    'repository_googledocs|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-google-drive',
+                ),
+        ),
 );

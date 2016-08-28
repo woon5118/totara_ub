@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'mod_survey|icon' => 'chart-bar',
+$icons = array(
+    'mod_survey|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-stats-bars',
+                ),
+        ),
 );

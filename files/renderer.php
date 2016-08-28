@@ -191,9 +191,9 @@ class core_files_renderer extends plugin_renderer_base {
             'create_folder' => $this->output->flex_icon('folder-create', ['alt' => get_string('createfolder', 'repository')]),
             'download_all' => $this->output->flex_icon('download', ['alt' => get_string('downloadallfiles', 'repository')]),
             'loading_small' => $this->output->flex_icon('loading', ['classes' => 'fp-img-downloading']),
-            'view_icon_active' => $this->output->flex_icon('th-large', ['alt' => get_string('displayasicons', 'repository')]),
-            'view_list_active' => $this->output->flex_icon('th-list', ['alt' => get_string('displayasdetails', 'repository')]),
-            'view_tree_active' => $this->output->flex_icon('viewtreeactive', ['alt' => get_string('displayastree', 'repository')]),
+            'view_icon_active' => $this->output->flex_icon('view-large', ['alt' => get_string('displayasicons', 'repository')]),
+            'view_list_active' => $this->output->flex_icon('view-list', ['alt' => get_string('displayasdetails', 'repository')]),
+            'view_tree_active' => $this->output->flex_icon('view-tree', ['alt' => get_string('displayastree', 'repository')]),
             'progress' => $this->output->flex_icon('loading', ['alt' => get_string('loading', 'repository')])
         );
 
@@ -595,13 +595,13 @@ class core_files_renderer extends plugin_renderer_base {
                 </div>
                 <div class="fp-viewbar">
                     <a role="button" title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons" href="#">
-                        '.$this->output->flex_icon('th-large').'
+                        '.$this->output->flex_icon('view-large').'
                     </a>
                     <a role="button" title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details" href="#">
-                        '.$this->output->flex_icon('th-list').'
+                        '.$this->output->flex_icon('view-list').'
                     </a>
                     <a role="button" title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree" href="#">
-                        '.$this->output->flex_icon('viewtreeactive').'
+                        '.$this->output->flex_icon('view-tree').'
                     </a>
                 </div>
                 <div class="fp-clear-left"></div>

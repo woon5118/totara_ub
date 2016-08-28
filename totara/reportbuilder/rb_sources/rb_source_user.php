@@ -386,7 +386,7 @@ class rb_source_user extends rb_base_source {
         // Learning Records icon
         if (totara_feature_visible('recordoflearning')) {
             $disp .= html_writer::start_tag('a', array('href' => $CFG->wwwroot . '/totara/plan/record/index.php?userid='.$itemid));
-            $disp .= $OUTPUT->flex_icon('archive-alt', ['classes' => 'ft-size-300']);
+            $disp .= $OUTPUT->flex_icon('archive', ['classes' => 'ft-size-300']);
             $disp .= html_writer::end_tag('a');
         }
 
