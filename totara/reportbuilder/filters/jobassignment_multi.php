@@ -266,13 +266,13 @@ class rb_filter_jobassignment_multi extends rb_filter_hierarchy_multi {
             $subquery = array();
             foreach ($items as $item) {
                 $unique   = rb_unique_param('uja'.$this->shortname);
-                $extjoin = $this->options['extjoin'];
-                $extfield = $this->options['extfield'];
                 $subtable = $unique . 'tab' . $item;
                 $exttable = $unique . 'ext' . $item;
 
                 // Build the sql statement from the filter options.
                 if (!empty($this->options['extjoin']) && !empty($this->options['extfield'])) {
+                    $extjoin = $this->options['extjoin'];
+                    $extfield = $this->options['extfield'];
                     // Allow for one layer of abstraction for managerjaid etc.
                     $fromsql = " FROM {job_assignment} {$subtable} " .
                                " INNER JOIN {{$extjoin}} {$exttable} " .
