@@ -127,6 +127,7 @@ $string['attendance'] = 'Attendance';
 $string['attendanceinstructions'] = 'Select users who attended the event:';
 $string['attendancerequestsupdated'] = 'Attendance requests updated';
 $string['attendedsession'] = 'Attended event';
+$string['attendeeactions'] = 'Attendee actions';
 $string['attendeenote'] = 'Attendee\'s note';
 $string['attendees'] = 'Attendees';
 $string['approvalnocapacity'] = 'There are {$a->waiting} learners awaiting approval but no spaces available, you cannot approve any more learners at this time.';
