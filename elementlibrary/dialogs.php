@@ -23,7 +23,7 @@ $PAGE->requires->strings_for_js(array('chooseposition', 'choosemanager', 'choose
 $PAGE->requires->strings_for_js(array('error:positionnotselected', 'error:organisationnotselected', 'error:managernotselected'), 'totara_job');
 $jsmodule = array(
         'name' => 'totara_jobassignment',
-        'fullpath' => '/totara/job/js/totara_jobassignment.js',
+        'fullpath' => '/totara/job/js/jobassignment.js',
         'requires' => array('json'));
 $selected_position = json_encode( dialog_display_currently_selected(get_string('selected', 'totara_job'), 'position') );
 $selected_organisation = json_encode( dialog_display_currently_selected(get_string("selected", "totara_job"), "organisation") );
