@@ -67,7 +67,8 @@ abstract class assignment_created extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The  goal: {$this->data['other']['goalid']} was assigned to {$this->type}: {$this->data['other']['instanceid']}";
+        $type = $this->get_type();
+        return "The  goal: {$this->data['other']['goalid']} was assigned to {$type}: {$this->data['other']['instanceid']}";
     }
 
     public function get_url() {
