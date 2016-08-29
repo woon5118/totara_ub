@@ -159,16 +159,14 @@ class writer extends tabexport_writer {
 
         if ($this->portrait) {
             $svgdata = $this->source->get_svg_graph(800, 400);
+            if ($svgdata) {
+                $pdf->WriteHTML('<img src="@' . base64_encode($svgdata) . '" width="800" height="400"/>', true, false, false, false, '');
+            }
         } else {
             $svgdata = $this->source->get_svg_graph(1200, 400);
-        }
-        if ($svgdata) {
-            if ($this->portrait) {
-                $pdf->ImageSVG('@' . $svgdata, 5, 30, 196, 100);
-            } else {
-                $pdf->ImageSVG('@' . $svgdata, 5, 30, 282, 100);
+            if ($svgdata) {
+                $pdf->WriteHTML('<img src="@' . base64_encode($svgdata) . '" width="1200" height="400"/>', true, false, false, false, '');
             }
-            $pdf->SetY(130);
         }
 
         // Closing the pdf.

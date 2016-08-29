@@ -6,4 +6,8 @@ Totara changes:
 * do not forget to update core thirdpartylibs.xml
 * fixed the test page http://127.0.0.1/lib/tests/other/pdflibtestpage.php to say Totara
 
+Extra patches:
+
+* support for inline SVG images in TCPDF::openHTMLTagHandler()
+
 Petr Skoda

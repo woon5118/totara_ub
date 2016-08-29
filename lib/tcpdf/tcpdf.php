@@ -18813,7 +18813,12 @@ Putting 1 is equivalent to putting 0 and calling Ln() just after. Default value:
 					if ($tag['attribute']['src'][0] === '@') {
 						// data stream
 						$tag['attribute']['src'] = '@'.base64_decode(substr($tag['attribute']['src'], 1));
-						$type = '';
+                        if (strpos($tag['attribute']['src'], '</svg>') !== false) {
+                            // Totara: TL-10313 add support for inline SVG images.
+                            $type = 'svg';
+                        } else {
+                            $type = '';
+                        }
 					} else {
 						// get image type
 						$type = TCPDF_IMAGES::getImageFileType($tag['attribute']['src']);
