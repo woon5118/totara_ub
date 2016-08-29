@@ -397,6 +397,7 @@ class graph {
             }
         }
 
+        // Set up legend defaults and shorten entries if requested.
         $settings = $this->shorten_legend($settings);
 
         return $this->apply_custom_colours($settings);
@@ -463,20 +464,52 @@ class graph {
     }
 
     /**
-     * Shorten the legend entries.
+     * Set up legend defaults and shorten entries if requested.
+     *
+     * By default if there are many entries the default settings are
+     * adjusted to fix as much as possible into 3 columns max.
      *
      * @param array $settings
      * @return array modified $settings
      */
     protected function shorten_legend(array $settings) {
-        $legendshorten = (int)$settings['legend_shorten'];
-
-        if ($legendshorten <= 0 or empty($settings['legend_entries'])) {
+        if (empty($settings['legend_entries'])) {
             return $settings;
         }
 
-        foreach ($settings['legend_entries'] as $k => $v) {
-            $settings['legend_entries'][$k] = shorten_text($v, $legendshorten);
+        // If there are many legend entries make everything smaller and use more columns by default.
+        if (!isset($settings['legend_entry_width']) and !isset($settings['legend_entry_height']) and !isset($settings['legend_columns'])) {
+            $legendcount = count($settings['legend_entries']);
+            if ($legendcount > 84) {
+                $settings['legend_columns'] = 3;
+                $settings['legend_entry_width'] = 6;
+                $settings['legend_entry_height'] = 6;
+                $settings['legend_font_size'] = 6;
+            } else if ($legendcount > 28) {
+                $settings['legend_columns'] = ceil($legendcount / 28);
+                $settings['legend_entry_width'] = 7;
+                $settings['legend_entry_height'] = 7;
+                $settings['legend_font_size'] = 7;
+            } else if ($legendcount > 21) {
+                $settings['legend_columns'] = 1;
+                $settings['legend_entry_width'] = 8;
+                $settings['legend_entry_height'] = 8;
+                $settings['legend_font_size'] = 8;
+            } else if ($legendcount > 14) {
+                $settings['legend_columns'] = 1;
+                $settings['legend_entry_width'] = 10;
+                $settings['legend_entry_height'] = 10;
+                $settings['legend_font_size'] = 10;
+            }
+        }
+
+        if (!empty($settings['legend_shorten'])) {
+            $legendshorten = (int)$settings['legend_shorten'];
+            if ($legendshorten > 0) {
+                foreach ($settings['legend_entries'] as $k => $v) {
+                    $settings['legend_entries'][$k] = shorten_text($v, $legendshorten);
+                }
+            }
         }
 
         return $settings;
