@@ -146,7 +146,7 @@ $string['body_help'] = 'This is the body of the notification to be sent.
 
 In the notification there are a number of placeholders that can be used, these placeholders will be replaced with the appropriate values when the message is sent.
 
-Available Seminar placholders:
+Available Seminar placeholders:
 
 * [coursename] - Name of course
 * [facetofacename] - Name of seminar activity
