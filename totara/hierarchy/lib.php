@@ -1362,29 +1362,29 @@ class hierarchy {
         $str_delete = get_string('delete');
         $str_spacer = $OUTPUT->spacer(array('height' => 11, 'width' => 11));
         $prefix = $this->prefix;
-        $params = array_merge(array('prefix' => $prefix, 'frameworkid' => $record->frameworkid, 'sesskey' => sesskey()), $extraparams);
+        $params = array_merge(array('prefix' => $prefix, 'frameworkid' => $record->frameworkid), $extraparams);
 
         if ($canedit) {
             $buttons[] = $OUTPUT->action_icon(new moodle_url('item/edit.php', array_merge($params, array('id' => $record->id))),
                     new pix_icon('t/edit', $str_edit));
 
             if ($record->visible) {
-                $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('hide' => $record->id))),
+                $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('hide' => $record->id, 'sesskey' => sesskey()))),
                     new pix_icon('t/hide', $str_hide));
             } else {
-                $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('show' => $record->id))),
+                $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('show' => $record->id, 'sesskey' => sesskey()))),
                     new pix_icon('t/show', $str_show));
             }
 
             if ($canmove) {
                 if ($this->get_hierarchy_item_adjacent_peer($record, HIERARCHY_ITEM_ABOVE)) {
-                    $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('moveup' => $record->id))),
+                    $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('moveup' => $record->id, 'sesskey' => sesskey()))),
                             new pix_icon('t/up', $str_moveup));
                 } else {
                     $buttons[] = $str_spacer;
                 }
                 if ($this->get_hierarchy_item_adjacent_peer($record, HIERARCHY_ITEM_BELOW)) {
-                    $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('movedown' => $record->id))),
+                    $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('movedown' => $record->id, 'sesskey' => sesskey()))),
                             new pix_icon('t/down', $str_movedown));
                 } else {
                     $buttons[] = $str_spacer;
