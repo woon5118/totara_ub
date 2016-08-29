@@ -284,6 +284,7 @@ $string['error:notenoughvisibility'] = 'You are not allowed to view this content
 $string['error:novisibleaudiencesselected'] = 'Audiences must be added when using the option "Visible to enrolled users and members of the selected audiences" is selected';
 $string['error:rulemissing'] = 'A required parameter (rule) was missing';
 $string['error:rulemissingparams'] = 'This rule is not defined.';
+$string['error:startafterfinish'] = 'Start date must not be later than finish date';
 $string['error:unknownbuttonclicked'] = 'Unknown button clicked';
 $string['error:visiblelearningdisabled'] = 'Visible learning is not enabled.';
 $string['eventcertificationitemadded'] = 'Certification item added';
