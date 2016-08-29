@@ -1605,7 +1605,7 @@ function totara_plan_comment_add($comment) {
         // Other commenter, so ensure learner and manager are added
         $subscribers[$learner->id] = $learner->id;
         foreach($managers as $manager) {
-            if ($comment->id != $manager->id) {
+            if ($comment->userid != $manager->id) {
                 $subscribers[$manager->id] = $manager->id;
             }
         }
