@@ -110,6 +110,7 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $this->assertCount(3, facetoface_get_users_by_status($sid, MDL_F2F_STATUS_REQUESTED));
         $this->assertCount(0, facetoface_get_users_by_status($sid, MDL_F2F_STATUS_WAITLISTED));
 
+        $this->setUser($manager1);
         // Approve user 1 and user 3's signup requests.
         facetoface_approve_requests((object)array(
             's' => $sid,
@@ -328,6 +329,7 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $this->assertCount(3, facetoface_get_users_by_status($sid, MDL_F2F_STATUS_REQUESTED));
         $this->assertCount(0, facetoface_get_users_by_status($sid, MDL_F2F_STATUS_WAITLISTED));
 
+        $this->setUser($manager1);
         facetoface_approve_requests((object)array(
             's' => $sid,
             'action' => 'approvalrequired',
@@ -531,6 +533,7 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $this->assertCount(3, facetoface_get_users_by_status($sid, MDL_F2F_STATUS_REQUESTED));
         $this->assertCount(0, facetoface_get_users_by_status($sid, MDL_F2F_STATUS_WAITLISTED));
 
+        $this->setUser($manager1);
         // Approve all three users.
         facetoface_approve_requests((object)array(
             's' => $sid,
@@ -771,6 +774,7 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $this->assertCount(3, facetoface_get_users_by_status($sid, MDL_F2F_STATUS_REQUESTED));
         $this->assertCount(0, facetoface_get_users_by_status($sid, MDL_F2F_STATUS_WAITLISTED));
 
+        $this->setUser($manager1);
         // Approve all three users.
         facetoface_approve_requests((object)array(
             's' => $sid,

@@ -2263,6 +2263,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
     function test_facetoface_approve_requests() {
         global $DB;
+
+        $this->setAdminUser();
         $this->init_sample_data();
 
         // Test variables.

@@ -2765,8 +2765,7 @@ function facetoface_approve_requests($data) {
 
         // Load user submission
         if (!$attendee = facetoface_get_attendee($sessionid, $key)) {
-            error_log('F2F: User '.$key.' not an attendee of this session');
-            $errors[$attendee->id] = 'notattendingsession';
+            $errors[$attendee->id] = 'approverinactive';
             continue;
         }
 
@@ -2779,11 +2778,11 @@ function facetoface_approve_requests($data) {
             if ($signupstatus->statuscode == MDL_F2F_STATUS_REQUESTED || $signupstatus->statuscode == MDL_F2F_STATUS_REQUESTEDADMIN) {
                 $currentstatus = $signupstatus->statuscode;
             } else {
-                $errors[$attendee->id] = 'norequest';
+                $errors[$attendee->id] = 'approvalinvalidstatus';
                 continue;
             }
         } else {
-            $errors[$attendee->id] = 'nostatus';
+            $errors[$attendee->id] = 'approvalinvalidstatus';
             continue;
         }
 

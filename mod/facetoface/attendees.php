@@ -481,10 +481,22 @@ if ($form = data_submitted()) {
 
     // Approve requests
     if ($action == 'approvalrequired' && !empty($form->requests)) {
-        facetoface_approve_requests($form);
-
-        $return->params(array('action' => 'approvalrequired', 'approved' => 1));
-
+        $return->params(array('action' => 'approvalrequired'));
+        // Site admin is allowing to approve user request.
+        if (!$canapproveanyrequest) {
+            // Leave the users which are required to approve and remove the rest.
+            $form->requests = array_intersect_key($form->requests, array_flip($staff));
+        }
+        if (($result = facetoface_approve_requests($form)) === true) {
+            $return->params(array('approved' => '1'));
+        } else {
+            $output = html_writer::start_tag('ul');
+            foreach ($result as $attendeeid => $errmsg) {
+                $output .= html_writer::tag('li', get_string('error:'.$errmsg, 'facetoface', $attendeeid));
+            }
+            $output .= html_writer::end_tag('ul');
+            totara_set_notification($output);
+        }
         redirect($return);
         die();
     }
@@ -1183,15 +1195,6 @@ if ($action == 'messageusers') {
     $mform->display();
 }
 
-// Go back.
-if ($backtoallsessions) {
-    $url = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
-} else {
-    $url = new moodle_url('/course/view.php', array('id' => $course->id));
-}
-echo html_writer::link($url, get_string('goback', 'facetoface')) . html_writer::end_tag('p');
-
-
 /**
  * Print unapproved requests (if user able to view)
  */
@@ -1329,6 +1332,14 @@ if ($action == 'approvalrequired') {
 
     echo html_writer::end_tag('form');
 }
+
+// Go back.
+if ($backtoallsessions) {
+    $url = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
+} else {
+    $url = new moodle_url('/course/view.php', array('id' => $course->id));
+}
+echo html_writer::link($url, get_string('goback', 'facetoface')) . html_writer::end_tag('p');
 
 /**
  * Print page footer
