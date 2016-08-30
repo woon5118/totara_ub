@@ -73,13 +73,14 @@ local_js(array(
 // Get extension dialog content
 if ($programid = $DB->get_field('dp_plan_program_assign', 'programid', array('id' => $progassid))) {
     $PAGE->requires->strings_for_js(array('pleaseentervaliddate', 'pleaseentervalidreason', 'extensionrequest', 'cancel', 'ok'), 'totara_program');
+    $PAGE->requires->strings_for_js(array('datepickerlongyeardisplayformat', 'datepickerlongyearplaceholder', 'datepickerlongyearregexjs'), 'totara_core');
     $notify_html = addslashes_js(trim($OUTPUT->notification(get_string("extensionrequestsent", "totara_program"), "notifysuccess")));
     $notify_html_fail = addslashes_js(trim($OUTPUT->notification(get_string("extensionrequestnotsent", "totara_program"), null)));
     $args = array('args'=>'{"id":'.$programid.', "userid":'.$USER->id.', "user_fullname":'.json_encode(fullname($USER)).', "notify_html_fail":"'.$notify_html_fail.'", "notify_html":"'.$notify_html.'"}');
     $jsmodule = array(
                  'name' => 'totara_programview',
                  'fullpath' => '/totara/program/view/program_view.js',
-                 'requires' => array('json')
+                 'requires' => array('json', 'totara_core')
               );
     $PAGE->requires->js_init_call('M.totara_programview.init',$args, false, $jsmodule);
 }
