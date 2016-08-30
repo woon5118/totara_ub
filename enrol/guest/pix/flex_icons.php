@@ -25,6 +25,6 @@
 /* Developer documentation is in /pix/flex_icons.php file. */
 
 $aliases = array(
-    'enrol_guest|withoutpassword' => 'no-key',
+    'enrol_guest|withoutpassword' => 'key-no',
     'enrol_guest|withpassword' => 'key',
 );

@@ -259,7 +259,7 @@ if ($do_show == 'edit') {
         $countreq = $DB->count_records('feedback_item', $params);
         if ($countreq > 0) {
             echo '<div class="fdescription required">';
-            echo get_string('somefieldsrequired', 'form', $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger', 'alt' => get_string('requiredelement', 'form'))));
+            echo get_string('somefieldsrequired', 'form', $OUTPUT->flex_icon('required', array('alt' => get_string('requiredelement', 'form'))));
             echo '</div>';
         }
 
@@ -375,7 +375,7 @@ if ($do_show == 'edit') {
                 $urlparams = array('switchitemrequired'=>$feedbackitem->id);
                 $requiredurl = new moodle_url($url, $urlparams);
                 $buttonlink = $requiredurl->out();
-                $icon = $OUTPUT->flex_icon('asterisk', array ('alt' => $buttontitle));
+                $icon = $OUTPUT->flex_icon('required', array ('alt' => $buttontitle));
                 echo '<a class="icon feedback_switchrequired" title="' . $buttontitle . '" href="' . $buttonlink . '">'. $icon . '</a>';
                 echo '</span>';
             }

@@ -26,8 +26,8 @@
 
 $aliases = array(
     'totara_plan|i/star' => 'star',
-    'totara_plan|i/star_grey' => 'star-o',
+    'totara_plan|i/star_grey' => 'star-off',
     'totara_plan|learning_plan_alert' => 'exclamation-circle',
     'totara_plan|t/star' => 'star',
-    'totara_plan|t/star_grey' => 'star-o',
+    'totara_plan|t/star_grey' => 'star-off',
 );

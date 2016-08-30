@@ -309,7 +309,7 @@ class feedback_item_multichoice extends feedback_item_base {
         $align = right_to_left() ? 'right' : 'left';
 
         $presentation = explode (FEEDBACK_MULTICHOICE_LINE_SEP, $info->presentation);
-        $strrequiredmark = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger', 'alt' => get_string('requiredelement', 'form')));
+        $strrequiredmark = $OUTPUT->flex_icon('required', array('alt' => get_string('requiredelement', 'form')));
 
         //test if required and no value is set so we have to mark this item
         //we have to differ check and the other subtypes
@@ -408,7 +408,7 @@ class feedback_item_multichoice extends feedback_item_base {
             $value = array();
         }
         $presentation = explode (FEEDBACK_MULTICHOICE_LINE_SEP, $info->presentation);
-        $strrequiredmark = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger', 'alt' => get_string('requiredelement', 'form')));
+        $strrequiredmark = $OUTPUT->flex_icon('required', array('alt' => get_string('requiredelement', 'form')));
 
         //test if required and no value is set so we have to mark this item
         //we have to differ check and the other subtypes
@@ -529,7 +529,7 @@ class feedback_item_multichoice extends feedback_item_base {
         }
         $requiredmark = '';
         if ($item->required == 1) {
-            $requiredmark = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger', 'alt' => get_string('requiredelement', 'form')));
+            $requiredmark = $OUTPUT->flex_icon('required', array('alt' => get_string('requiredelement', 'form')));
         }
 
         //print the question and label

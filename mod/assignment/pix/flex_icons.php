@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'mod_assignment|icon' => 'file-text-o',
+$icons = array(
+    'mod_assignment|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-text-o',
+                ),
+        ),
 );

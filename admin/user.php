@@ -366,12 +366,12 @@
 
                 } else {
                     if ($user->suspended) {
-                        $buttons[] = html_writer::link(new moodle_url($returnurl, array('unsuspend'=>$user->id, 'sesskey'=>sesskey())), $OUTPUT->flex_icon('eye-slash', array('alt' => $strunsuspend)), array('title'=>$strunsuspend));
+                        $buttons[] = html_writer::link(new moodle_url($returnurl, array('unsuspend'=>$user->id, 'sesskey'=>sesskey())), $OUTPUT->flex_icon('show', array('alt' => $strunsuspend)), array('title'=>$strunsuspend));
                     } else {
                         if ($user->id == $USER->id or is_siteadmin($user)) {
                             // no suspending of admins or self!
                         } else {
-                            $buttons[] = html_writer::link(new moodle_url($returnurl, array('suspend'=>$user->id, 'sesskey'=>sesskey())), $OUTPUT->flex_icon('eye', array('alt' => $strsuspend)), array('title'=>$strsuspend));
+                            $buttons[] = html_writer::link(new moodle_url($returnurl, array('suspend'=>$user->id, 'sesskey'=>sesskey())), $OUTPUT->flex_icon('hide', array('alt' => $strsuspend)), array('title'=>$strsuspend));
                         }
                     }
 

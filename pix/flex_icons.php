@@ -60,13 +60,6 @@ $icons = array(
                         ),
                 ),
         ),
-    'addressbook' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-address-book',
-                ),
-        ),
     'alarm' =>
         array(
             'data' =>
@@ -95,32 +88,6 @@ $icons = array(
                         array(
                             'ft-alarm ft-stack-main',
                             'fa-warning ft-stack-suffix ft-state-warning',
-                        ),
-                ),
-        ),
-    'archive' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-archive',
-                ),
-        ),
-    'archives' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-books',
-                ),
-        ),
-    'areafiles' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'fa-file-text-o ft-stack-main',
-                            'fa-paperclip ft-stack-suffix',
                         ),
                 ),
         ),
@@ -180,23 +147,11 @@ $icons = array(
                     'classes' => 'fa-arrows-v',
                 ),
         ),
-    'asterisk' =>
+    'attachment' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-asterisk',
-                ),
-        ),
-    'auto-completion-on' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'fa-check-circle-o ft-stack-main',
-                            'fa-play ft-stack-suffix',
-                        ),
+                    'classes' => 'fa-paperclip',
                 ),
         ),
     'backpack' =>
@@ -206,18 +161,18 @@ $icons = array(
                     'classes' => 'ft-bag',
                 ),
         ),
+    'badge' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-trophy',
+                ),
+        ),
     'ban' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-ban',
-                ),
-        ),
-    'bar-chart' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-bar-chart',
                 ),
         ),
     'bars' =>
@@ -262,25 +217,18 @@ $icons = array(
                     'classes' => 'fa-caret-square-o-right ft-flip-rtl',
                 ),
         ),
-    'bookmark-o' =>
+    'bookmark' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-bookmark-o',
                 ),
         ),
-    'briefcase' =>
+    'books' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-briefcase',
-                ),
-        ),
-    'bullhorn' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-bullhorn',
+                    'classes' => 'ft-books',
                 ),
         ),
     'cache' =>
@@ -372,7 +320,7 @@ $icons = array(
                     'classes' => 'fa-caret-up',
                 ),
         ),
-    'certificate' =>
+    'certification' =>
         array(
             'data' =>
                 array(
@@ -412,18 +360,6 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-check ft-state-disabled',
-                ),
-        ),
-    'check-permissions' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'fa-user ft-stack-main',
-                            'fa-warning ft-stack-suffix ft-state-warning',
-                        ),
                 ),
         ),
     'check-square-o' =>
@@ -482,6 +418,13 @@ $icons = array(
                     'classes' => 'fa-circle ft-state-success',
                 ),
         ),
+    'clock' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-clock-o',
+                ),
+        ),
     'clock-locked' =>
         array(
             'template' => 'core/flex_icon_stack',
@@ -494,13 +437,6 @@ $icons = array(
                         ),
                 ),
         ),
-    'clock-o' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-clock-o',
-                ),
-        ),
     'code' =>
         array(
             'data' =>
@@ -508,11 +444,11 @@ $icons = array(
                     'classes' => 'fa-code',
                 ),
         ),
-    'cog' =>
+    'cohort' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-cog',
+                    'classes' => 'fa-users',
                 ),
         ),
     'collapsed' =>
@@ -540,10 +476,10 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-comment',
+                    'classes' => 'fa-comment-o',
                 ),
         ),
-    'comment-add-o' =>
+    'comment-add' =>
         array(
             'template' => 'core/flex_icon_stack',
             'data' =>
@@ -553,13 +489,6 @@ $icons = array(
                             'fa-comment-o ft-stack-main',
                             'fa-plus ft-stack-suffix',
                         ),
-                ),
-        ),
-    'comment-o' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-comment-o',
                 ),
         ),
     'commenting-info' =>
@@ -573,13 +502,6 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-comments',
-                ),
-        ),
-    'comments-o' =>
-        array(
-            'data' =>
-                array(
                     'classes' => 'fa-comments-o',
                 ),
         ),
@@ -590,7 +512,7 @@ $icons = array(
                 array(
                     'classes' =>
                         array(
-                            'fa-comment ft-stack-main',
+                            'fa-comments-o ft-stack-main',
                             'fa-search ft-stack-suffix',
                         ),
                 ),
@@ -609,9 +531,75 @@ $icons = array(
                 array(
                     'classes' =>
                         array(
-                            'ft-competency ft-stack-main',
+                            'fa-graduation-cap ft-stack-main',
                             'fa-check ft-stack-suffix ft-state-success',
                         ),
+                ),
+        ),
+    'completion-auto-enabled' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'fa-check-circle-o ft-stack-main',
+                            'fa-play ft-stack-suffix',
+                        ),
+                ),
+        ),
+    'completion-auto-fail' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-times-circle-o ft-state-danger',
+                ),
+        ),
+    'completion-auto-n' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-circle-o',
+                ),
+        ),
+    'completion-auto-pass' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-check-circle-o ft-state-success',
+                ),
+        ),
+    'completion-auto-y' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-check-circle-o',
+                ),
+        ),
+    'completion-manual-enabled' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'fa-check-square-o ft-stack-main',
+                            'fa-play ft-stack-suffix',
+                        ),
+                ),
+        ),
+    'completion-manual-n' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-square-o',
+                ),
+        ),
+    'completion-manual-y' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-check-square-o',
                 ),
         ),
     'contact-add' =>
@@ -638,7 +626,6 @@ $icons = array(
                         ),
                 ),
         ),
-    /* Totara course */
     'course' =>
         array(
             'data' =>
@@ -670,13 +657,6 @@ $icons = array(
                         ),
                 ),
         ),
-    'cube' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-cube',
-                ),
-        ),
     'database' =>
         array(
             'data' =>
@@ -690,6 +670,13 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-times ft-state-danger',
+                ),
+        ),
+    'delete-disabled' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-times ft-state-disabled',
                 ),
         ),
     'document-edit' =>
@@ -735,25 +722,11 @@ $icons = array(
                     'classes' => 'fa-dollar',
                 ),
         ),
-    'dot-circle-o' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-dot-circle-o',
-                ),
-        ),
     'download' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-download',
-                ),
-        ),
-    'dropbox' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-dropbox',
                 ),
         ),
     'duplicate' =>
@@ -763,13 +736,6 @@ $icons = array(
                     'classes' => 'fa-copy',
                 ),
         ),
-    'ebook' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-book',
-                ),
-        ),
     'edit' =>
         array(
             'data' =>
@@ -777,23 +743,37 @@ $icons = array(
                     'classes' => 'fa-edit',
                 ),
         ),
-    'editmenu' =>
+    'email' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-envelope-o',
+                ),
+        ),
+    'email-no' =>
         array(
             'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
                     'classes' =>
                         array(
-                            'fa-cog ft-stack-main',
-                            'fa-caret-down ft-stack-suffix',
+                            'fa-envelope-o ft-stack-main',
+                            'ft-slash ft-stack-over ft-state-danger',
                         ),
                 ),
         ),
-    'ellipsis-h' =>
+    'emoticon-frown' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-ellipsis-h',
+                    'classes' => 'fa-frown-o',
+                ),
+        ),
+    'emoticon-smile' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-smile-o',
                 ),
         ),
     'enrolment-suspended' =>
@@ -806,13 +786,6 @@ $icons = array(
                             'fa-user ft-stack-main',
                             'fa-pause ft-stack-suffix',
                         ),
-                ),
-        ),
-    'envelope-o' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-envelope-o',
                 ),
         ),
     'event-course' =>
@@ -884,6 +857,13 @@ $icons = array(
                         ),
                 ),
         ),
+    'export' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-share-square-o',
+                ),
+        ),
     'external-link-square' =>
         array(
             'data' =>
@@ -891,114 +871,102 @@ $icons = array(
                     'classes' => 'fa-external-link-square',
                 ),
         ),
-    'eye' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-eye',
-                ),
-        ),
-    'eye-slash' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-eye-slash',
-                ),
-        ),
-    'file-archive-o' =>
+    'file-archive' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-file-archive-o',
                 ),
         ),
-    'file-code-o' =>
+    'file-audio' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-volume-up',
+                ),
+        ),
+    'file-chart' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-bar-chart',
+                ),
+        ),
+    'file-code' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-file-code-o',
                 ),
         ),
-    'file-excel-o' =>
+    'file-database' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-excel-o',
+                    'classes' => 'fa-database',
                 ),
         ),
-    'file-image-o' =>
+    'file-ebook' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-image-o',
+                    'classes' => 'ft-book',
                 ),
         ),
-    'file-o' =>
+    'file-general' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-file-o',
                 ),
         ),
-    'file-pdf-o' =>
+    'file-image' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-image-o',
+                ),
+        ),
+    'file-pdf' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-file-pdf-o',
                 ),
         ),
-    'file-powerpoint-o' =>
+    'file-powerpoint' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-file-powerpoint-o',
                 ),
         ),
-    'file-sound-o' =>
+    'file-sound' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-file-sound-o',
                 ),
         ),
-    'file-text' =>
+    'file-spreadsheet' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-text',
+                    'classes' => 'fa-file-excel-o',
                 ),
         ),
-    'file-text-o' =>
+    'file-text' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-file-text-o',
                 ),
         ),
-    'file-video-o' =>
+    'file-video' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-file-video-o',
-                ),
-        ),
-    'file-wrench' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'fa-file-o ft-stack-main',
-                            'fa-wrench ft-stack-suffix',
-                        ),
-                ),
-        ),
-    'film' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-film',
                 ),
         ),
     'filter' =>
@@ -1008,25 +976,18 @@ $icons = array(
                     'classes' => 'fa-filter',
                 ),
         ),
-    'flag' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-flag',
-                ),
-        ),
-    'flag-o' =>
+    'flag-off' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-flag-o',
                 ),
         ),
-    'flickr' =>
+    'flag-on' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-flickr',
+                    'classes' => 'fa-flag',
                 ),
         ),
     'folder-create' =>
@@ -1041,32 +1002,18 @@ $icons = array(
                         ),
                 ),
         ),
-    'folder-o' =>
+    'folder' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-folder-o',
                 ),
         ),
-    'folder-open-o' =>
+    'folder-open' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-folder-open-o',
-                ),
-        ),
-    'frown-o' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-frown-o',
-                ),
-        ),
-    'globe' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-globe',
                 ),
         ),
     'grades' =>
@@ -1074,6 +1021,32 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'ft-grades',
+                ),
+        ),
+    'groups-no' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'fa-users ft-stack-main',
+                            'ft-slash ft-stack-main ft-state-danger',
+                        ),
+                ),
+        ),
+    'groups-separate' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-group-separate',
+                ),
+        ),
+    'groups-visible' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-users',
                 ),
         ),
     /* For links to Totara help */
@@ -1084,11 +1057,12 @@ $icons = array(
                     'classes' => 'fa-question-circle',
                 ),
         ),
-    'highlight' =>
+    /* For action links that result in hiding of something */
+    'hide' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-highlight',
+                    'classes' => 'fa-eye-slash',
                 ),
         ),
     'image' =>
@@ -1119,11 +1093,30 @@ $icons = array(
                     'classes' => 'fa-key',
                 ),
         ),
+    'key-no' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'fa-key ft-stack-main',
+                            'ft-slash ft-stack-over ft-state-danger',
+                        ),
+                ),
+        ),
     'laptop' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-laptop',
+                ),
+        ),
+    'learningplan' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-briefcase',
                 ),
         ),
     'level-up' =>
@@ -1133,46 +1126,11 @@ $icons = array(
                     'classes' => 'fa-level-up',
                 ),
         ),
-    'lightbulb-o' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-lightbulb-o',
-                ),
-        ),
-    'lightbulb-o-disabled' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-lightbulb-o ft-state-disabled',
-                ),
-        ),
-    'line-chart' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-line-chart',
-                ),
-        ),
     'link' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-link',
-                ),
-        ),
-    'list-alt' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-list-alt',
-                ),
-        ),
-    'list-ol' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-list-ol',
                 ),
         ),
     'loading' =>
@@ -1203,16 +1161,18 @@ $icons = array(
                     'classes' => 'ft-mahara',
                 ),
         ),
-    'manual-completion-on' =>
+    'marker-on' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-check-square-o ft-stack-main',
-                            'fa-play ft-stack-suffix',
-                        ),
+                    'classes' => 'fa-lightbulb-o',
+                ),
+        ),
+    'marker-off' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-lightbulb-o ft-state-disabled',
                 ),
         ),
     'mean' =>
@@ -1220,6 +1180,20 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'ft-mean',
+                ),
+        ),
+    'message' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-comment',
+                ),
+        ),
+    'messages' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-comments',
                 ),
         ),
     'minus' =>
@@ -1248,13 +1222,6 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'ft-mnethost',
-                ),
-        ),
-    'moon-o' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-moon-o',
                 ),
         ),
     'mouse-pointer' =>
@@ -1292,59 +1259,11 @@ $icons = array(
                     'classes' => 'ft-new',
                 ),
         ),
-    'newspaper-o' =>
+    'news' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-newspaper-o',
-                ),
-        ),
-    'no-email' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'fa-envelope-o ft-stack-main',
-                            'ft-slash ft-stack-over ft-state-danger',
-                        ),
-                ),
-        ),
-    'no-groups' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'fa-users ft-stack-main',
-                            'ft-slash ft-stack-main ft-state-danger',
-                        ),
-                ),
-        ),
-    'no-key' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'fa-key ft-stack-main',
-                            'ft-slash ft-stack-over ft-state-danger',
-                        ),
-                ),
-        ),
-    'no-subcategory' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'ft-view-tree ft-stack-main',
-                            'ft-slash ft-stack-over ft-state-danger',
-                        ),
                 ),
         ),
     'objective' =>
@@ -1366,6 +1285,13 @@ $icons = array(
                         ),
                 ),
         ),
+    'outcomes' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-pie-chart',
+                ),
+        ),
     'outdent' =>
         array(
             'data' =>
@@ -1378,20 +1304,6 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'ft-package',
-                ),
-        ),
-    'paperclip' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-paperclip',
-                ),
-        ),
-    'paypal' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-paypal',
                 ),
         ),
     'pencil' =>
@@ -1439,25 +1351,16 @@ $icons = array(
                         ),
                 ),
         ),
-    'picasa' =>
+    'permissions-check' =>
         array(
+            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' => 'ft-picasa',
-                ),
-        ),
-    'pie-chart' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-pie-chart',
-                ),
-        ),
-    'plug' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-plug',
+                    'classes' =>
+                        array(
+                            'fa-user ft-stack-main',
+                            'fa-warning ft-stack-suffix ft-state-warning',
+                        ),
                 ),
         ),
     'plus' =>
@@ -1507,6 +1410,20 @@ $icons = array(
                         ),
                 ),
         ),
+    'preferences' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-sliders',
+                ),
+        ),
+    'preview' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-eye',
+                ),
+        ),
     'print' =>
         array(
             'data' =>
@@ -1532,13 +1449,6 @@ $icons = array(
                             'fa-globe ft-stack-main',
                             'fa-play ft-stack-suffix ft-state-info',
                         ),
-                ),
-        ),
-    'puzzle-piece' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-puzzle-piece',
                 ),
         ),
     'question' =>
@@ -1569,6 +1479,20 @@ $icons = array(
                     'classes' => 'ft-stats-bars',
                 ),
         ),
+    'rating-star' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-star-half-o',
+                ),
+        ),
+    'recordoflearning' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-archive',
+                ),
+        ),
     'recycle' =>
         array(
             'data' =>
@@ -1590,6 +1514,7 @@ $icons = array(
                     'classes' => 'fa-repeat',
                 ),
         ),
+    /* Forms element required to be filled */
     'required' =>
         array(
             'data' =>
@@ -1697,32 +1622,11 @@ $icons = array(
                     'classes' => 'ft-stats-bars',
                 ),
         ),
-    'scissors' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-scissors',
-                ),
-        ),
     'search' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-search',
-                ),
-        ),
-    'seminar' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-seminar',
-                ),
-        ),
-    'separate-groups' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-group-separate',
                 ),
         ),
     /* Settings or editing of stuff that changes how Totara works */
@@ -1745,11 +1649,24 @@ $icons = array(
                         ),
                 ),
         ),
-    'share-square-o' =>
+    'settings-menu' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'fa-cog ft-stack-main',
+                            'fa-caret-down ft-stack-suffix',
+                        ),
+                ),
+        ),
+    /* Use for action icons that unhide something */
+    'show' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-share-square-o',
+                    'classes' => 'fa-eye',
                 ),
         ),
     'sigma' =>
@@ -1790,32 +1707,11 @@ $icons = array(
                         ),
                 ),
         ),
-    'skyatlas' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-skyatlas',
-                ),
-        ),
     'slash' =>
         array(
             'data' =>
                 array(
                     'classes' => 'ft-slash',
-                ),
-        ),
-    'sliders' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-sliders',
-                ),
-        ),
-    'smile-o' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-smile-o',
                 ),
         ),
     'sort' =>
@@ -1850,13 +1746,6 @@ $icons = array(
                     'classes' => 'fa-square-o',
                 ),
         ),
-    'stamp' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'ft-stamp',
-                ),
-        ),
     'star' =>
         array(
             'data' =>
@@ -1864,29 +1753,29 @@ $icons = array(
                     'classes' => 'fa-star',
                 ),
         ),
-    'star-half-o' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-star-half-o',
-                ),
-        ),
-    'star-o' =>
+    'star-off' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-star-o',
                 ),
         ),
-    'subscribed' =>
+    'statistics' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-line-chart',
+                ),
+        ),
+    'subcategory-no' =>
         array(
             'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
                     'classes' =>
                         array(
-                            'fa-envelope-o ft-stack-main',
-                            'fa-check ft-stack-suffix ft-state-success',
+                            'ft-view-tree ft-stack-main',
+                            'ft-slash ft-stack-over ft-state-danger',
                         ),
                 ),
         ),
@@ -1895,13 +1784,6 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-table',
-                ),
-        ),
-    'tag' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-tag',
                 ),
         ),
     'thumbs-down-danger' =>
@@ -1946,13 +1828,6 @@ $icons = array(
                     'classes' => 'fa-times ft-state-danger',
                 ),
         ),
-    'times-disabled' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-times ft-state-disabled',
-                ),
-        ),
     'toggle-off' =>
         array(
             'data' =>
@@ -1981,13 +1856,6 @@ $icons = array(
                     'classes' => 'fa-trash',
                 ),
         ),
-    'trophy' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-trophy',
-                ),
-        ),
     'undo' =>
         array(
             'data' =>
@@ -2009,23 +1877,11 @@ $icons = array(
                     'classes' => 'fa-unlock',
                 ),
         ),
-    'unlock-alt' =>
+    'unlocked' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-unlock-alt',
-                ),
-        ),
-    'unsubscribed' =>
-        array(
-            'template' => 'core/flex_icon_stack',
-            'data' =>
-                array(
-                    'classes' =>
-                        array(
-                            'fa-envelope-o ft-stack-main',
-                            'fa-times ft-stack-suffix ft-state-danger',
-                        ),
                 ),
         ),
     'upload' =>
@@ -2042,18 +1898,25 @@ $icons = array(
                     'classes' => 'fa-user',
                 ),
         ),
+    'user-add' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-user-plus',
+                ),
+        ),
+    'user-delete' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-user-times',
+                ),
+        ),
     'user-disabled' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-user ft-state-disabled',
-                ),
-        ),
-    'user-plus' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-user-plus',
                 ),
         ),
     'user-refresh' =>
@@ -2073,13 +1936,6 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-user-secret',
-                ),
-        ),
-    'user-times' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-user-times',
                 ),
         ),
     'users' =>
@@ -2110,39 +1966,11 @@ $icons = array(
                     'classes' => 'ft-view-tree',
                 ),
         ),
-    'volume-up' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-volume-up',
-                ),
-        ),
-    'warning-warning' =>
+    'warning' =>
         array(
             'data' =>
                 array(
                     'classes' => 'fa-warning ft-state-warning',
-                ),
-        ),
-    'wheelchair' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-wheelchair',
-                ),
-        ),
-    'wikipedia-w' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-wikipedia-w',
-                ),
-        ),
-    'youtube-play' =>
-        array(
-            'data' =>
-                array(
-                    'classes' => 'fa-youtube-play',
                 ),
         ),
 );
@@ -2173,7 +2001,7 @@ $deprecated = array(
     'core|a/view_icon_active' => 'view-large',
     'core|a/view_list_active' => 'view-list',
     'core|a/view_tree_active' => 'view-tree',
-    'core|b/bookmark-new' => 'bookmark-o',
+    'core|b/bookmark-new' => 'bookmark',
     'core|b/document-edit' => 'document-edit',
     'core|b/document-new' => 'document-new',
     'core|b/document-properties' => 'document-properties',
@@ -2181,70 +2009,60 @@ $deprecated = array(
     'core|b/edit-delete' => 'delete',
     'core|c/event' => 'calendar',
     'core|docs' => 'info-circle',
-    'core|f/archive' => 'file-archive-o',
-    'core|f/audio' => 'volume-up',
-    'core|f/avi' => 'film',
-    'core|f/base' => 'database',
-    'core|f/bmp' => 'file-image-o',
-    'core|f/chart' => 'bar-chart',
-    'core|f/database' => 'database',
-    'core|f/dmg' => 'file-archive-o',
-    'core|f/document' => 'file-text-o',
+    'core|f/archive' => 'file-archive',
+    'core|f/audio' => 'file-audio',
+    'core|f/avi' => 'file-video',
+    'core|f/base' => 'file-database',
+    'core|f/bmp' => 'file-image',
+    'core|f/chart' => 'file-chart',
+    'core|f/database' => 'file-database',
+    'core|f/dmg' => 'file-archive',
+    'core|f/document' => 'file-text',
     'core|f/edit' => 'pencil-square-o',
-    'core|f/eps' => 'file-image-o',
-    'core|f/epub' => 'ebook',
+    'core|f/eps' => 'file-image',
+    'core|f/epub' => 'file-ebook',
     'core|f/explore' => 'explore',
-    'core|f/flash' => 'file-video-o',
-    'core|f/folder' => 'folder-o',
-    'core|f/folder-open' => 'folder-open-o',
-    'core|f/gif' => 'file-image-o',
+    'core|f/flash' => 'file-video',
+    'core|f/folder' => 'folder',
+    'core|f/folder-open' => 'folder-open',
+    'core|f/gif' => 'file-image',
     'core|f/help-32' => 'help',
-    'core|f/html' => 'file-code-o',
-    'core|f/image' => 'file-image-o',
-    'core|f/jpeg' => 'file-image-o',
-    'core|f/markup' => 'file-code-o',
-    'core|f/mov' => 'file-video-o',
+    'core|f/html' => 'file-code',
+    'core|f/image' => 'file-image',
+    'core|f/jpeg' => 'file-image',
+    'core|f/markup' => 'file-code',
+    'core|f/mov' => 'file-video',
     'core|f/move' => 'arrows',
-    'core|f/mp3' => 'file-sound-o',
-    'core|f/mpeg' => 'file-video-o',
+    'core|f/mp3' => 'file-sound',
+    'core|f/mpeg' => 'file-video',
     'core|f/parent-32' => 'level-up',
-    'core|f/pdf' => 'file-pdf-o',
-    'core|f/png' => 'file-image-o',
-    'core|f/powerpoint' => 'file-powerpoint-o',
-    'core|f/psd' => 'file-image-o',
-    'core|f/quicktime' => 'file-video-o',
-    'core|f/sourcecode' => 'file-code-o',
-    'core|f/spreadsheet' => 'file-excel-o',
-    'core|f/text' => 'file-text-o',
-    'core|f/tiff' => 'file-image-o',
-    'core|f/unknown' => 'file-o',
-    'core|f/video' => 'file-video-o',
-    'core|f/wav' => 'file-sound-o',
-    'core|f/wmv' => 'file-video-o',
-    'core|g/f1' => 'smile-o',
-    'core|g/f2' => 'smile-o',
+    'core|f/pdf' => 'file-pdf',
+    'core|f/png' => 'file-image',
+    'core|f/powerpoint' => 'file-powerpoint',
+    'core|f/psd' => 'file-image',
+    'core|f/quicktime' => 'file-video',
+    'core|f/sourcecode' => 'file-code',
+    'core|f/spreadsheet' => 'file-spreadsheet',
+    'core|f/text' => 'file-text',
+    'core|f/tiff' => 'file-image',
+    'core|f/unknown' => 'file-general',
+    'core|f/video' => 'file-video',
+    'core|f/wav' => 'file-sound',
+    'core|f/wmv' => 'file-video',
     'core|help' => 'help',
     'core|i/admin' => 'settings',
     'core|i/agg_mean' => 'mean',
     'core|i/agg_sum' => 'sigma',
     'core|i/ajaxloader' => 'loading',
-    'core|i/assignroles' => 'user-plus',
+    'core|i/assignroles' => 'user-add',
     'core|i/backup' => 'upload',
-    'core|i/badge' => 'trophy',
+    'core|i/badge' => 'badge',
     'core|i/calc' => 'calculator',
     'core|i/calendar' => 'calendar',
     'core|i/caution' => 'exclamation-circle',
-    'core|i/checkpermissions' => 'check-permissions',
-    'core|i/closed' => 'folder-o',
-    'core|i/cohort' => 'users',
-    'core|i/completion-auto-enabled' => 'auto-completion-on',
-    'core|i/completion-auto-fail' => 'times-circle-o-danger',
-    'core|i/completion-auto-n' => 'circle-o',
-    'core|i/completion-auto-pass' => 'check-circle-o-success',
-    'core|i/completion-auto-y' => 'check-circle-o',
-    'core|i/completion-manual-enabled' => 'manual-completion-on',
-    'core|i/completion-manual-n' => 'square-o',
-    'core|i/completion-manual-y' => 'check-square-o',
+    'core|i/checkpermissions' => 'permissions-check',
+    'core|i/closed' => 'folder',
+    'core|i/cohort' => 'cohort',
     'core|i/configlock' => 'settings-lock',
     'core|i/course' => 'course',
     'core|i/courseevent' => 'event-course',
@@ -2254,27 +2072,27 @@ $deprecated = array(
     'core|i/dragdrop' => 'arrows',
     'core|i/dropdown' => 'caret-down',
     'core|i/edit' => 'edit',
-    'core|i/email' => 'envelope-o',
+    'core|i/email' => 'email',
     'core|i/enrolmentsuspended' => 'enrolment-suspended',
-    'core|i/enrolusers' => 'user-plus',
+    'core|i/enrolusers' => 'user-add',
     'core|i/export' => 'upload',
-    'core|i/feedback' => 'comment-o',
-    'core|i/feedback_add' => 'comment-add-o',
-    'core|i/files' => 'file-o',
+    'core|i/feedback' => 'comment',
+    'core|i/feedback_add' => 'comment-add',
+    'core|i/files' => 'file-general',
     'core|i/filter' => 'filter',
-    'core|i/flagged' => 'flag',
-    'core|i/folder' => 'folder-o',
+    'core|i/flagged' => 'flag-on',
+    'core|i/folder' => 'folder',
     'core|i/grade_correct' => 'check-success',
     'core|i/grade_incorrect' => 'times-danger',
     'core|i/grade_partiallycorrect' => 'check-warning',
     'core|i/grades' => 'grades',
     'core|i/group' => 'users',
     'core|i/groupevent' => 'event-group',
-    'core|i/groupn' => 'no-groups',
-    'core|i/groups' => 'separate-groups',
-    'core|i/groupv' => 'users',
+    'core|i/groupn' => 'groups-no',
+    'core|i/groups' => 'groups-separate',
+    'core|i/groupv' => 'groups-visible',
     'core|i/guest' => 'user-secret',
-    'core|i/hide' => 'eye-slash',
+    'core|i/hide' => 'hide',
     'core|i/hierarchylock' => 'site-lock',
     'core|i/import' => 'download',
     'core|i/info' => 'info-circle',
@@ -2286,8 +2104,8 @@ $deprecated = array(
     'core|i/log' => 'log',
     'core|i/mahara_host' => 'mahara',
     'core|i/manual_item' => 'edit',
-    'core|i/marked' => 'lightbulb-o',
-    'core|i/marker' => 'lightbulb-o-disabled',
+    'core|i/marked' => 'marker-on',
+    'core|i/marker' => 'marker-off',
     'core|i/mean' => 'mean',
     'core|i/menu' => 'bars',
     'core|i/mnethost' => 'mnet-host',
@@ -2295,19 +2113,19 @@ $deprecated = array(
     'core|i/move_2d' => 'arrows',
     'core|i/navigationitem' => 'navitem',
     'core|i/new' => 'new',
-    'core|i/news' => 'newspaper-o',
-    'core|i/nosubcat' => 'no-subcategory',
-    'core|i/open' => 'folder-open-o',
-    'core|i/outcomes' => 'pie-chart',
+    'core|i/news' => 'news',
+    'core|i/nosubcat' => 'subcategory-no',
+    'core|i/open' => 'folder-open',
+    'core|i/outcomes' => 'outcomes',
     'core|i/payment' => 'dollar',
     'core|i/permissionlock' => 'permission-lock',
     'core|i/permissions' => 'permissions',
     'core|i/portfolio' => 'portfolio',
-    'core|i/preview' => 'eye',
+    'core|i/preview' => 'preview',
     'core|i/publish' => 'publish',
     'core|i/questions' => 'question',
     'core|i/reload' => 'refresh',
-    'core|i/report' => 'file-text-o',
+    'core|i/report' => 'file-text',
     'core|i/repository' => 'database',
     'core|i/restore' => 'download',
     'core|i/return' => 'undo',
@@ -2319,27 +2137,27 @@ $deprecated = array(
     'core|i/risk_xss' => 'risk-xss',
     'core|i/rss' => 'rss',
     'core|i/scales' => 'scales',
-    'core|i/scheduled' => 'clock-o',
+    'core|i/scheduled' => 'clock',
     'core|i/search' => 'search',
     'core|i/self' => 'user',
     'core|i/settings' => 'settings',
-    'core|i/show' => 'eye',
+    'core|i/show' => 'show',
     'core|i/siteevent' => 'calendar',
-    'core|i/star-rating' => 'star-half-o',
-    'core|i/stats' => 'line-chart',
+    'core|i/star-rating' => 'rating-star',
+    'core|i/stats' => 'statistics',
     'core|i/switch' => 'toggle-on',
     'core|i/switchrole' => 'user-refresh',
     'core|i/twoway' => 'arrows-h',
-    'core|i/unflagged' => 'flag-o',
+    'core|i/unflagged' => 'flag-off',
     'core|i/unlock' => 'unlock',
     'core|i/up' => 'arrow-up',
     'core|i/user' => 'user',
-    'core|i/useradd' => 'user-plus',
-    'core|i/userdel' => 'user-times',
+    'core|i/useradd' => 'user-add',
+    'core|i/userdel' => 'user-delete',
     'core|i/userevent' => 'event-user',
     'core|i/users' => 'users',
     'core|i/valid' => 'check-success',
-    'core|i/warning' => 'warning-warning',
+    'core|i/warning' => 'warning',
     'core|i/withsubcat' => 'view-tree',
     'core|m/USD' => 'dollar',
     'core|req' => 'required',
@@ -2349,8 +2167,8 @@ $deprecated = array(
     'core|t/adddir' => 'folder-create',
     'core|t/addfile' => 'document-new',
     'core|t/approve' => 'check',
-    'core|t/assignroles' => 'user-plus',
-    'core|t/award' => 'trophy',
+    'core|t/assignroles' => 'user-add',
+    'core|t/award' => 'badge',
     'core|t/backpack' => 'backpack',
     'core|t/backup' => 'upload',
     'core|t/block' => 'ban',
@@ -2361,7 +2179,7 @@ $deprecated = array(
     'core|t/calc_off' => 'calculator-off',
     'core|t/calendar' => 'calendar',
     'core|t/check' => 'check',
-    'core|t/cohort' => 'users',
+    'core|t/cohort' => 'cohort',
     'core|t/collapsed' => 'caret-right',
     'core|t/collapsed_empty' => 'caret-right-disabled',
     'core|t/collapsed_empty_rtl' => 'caret-left-disabled',
@@ -2379,21 +2197,21 @@ $deprecated = array(
     'core|t/dropdown' => 'caret-down',
     'core|t/edit' => 'settings',
     'core|t/edit_gray' => 'edit',
-    'core|t/edit_menu' => 'editmenu',
+    'core|t/edit_menu' => 'settings-menu',
     'core|t/editstring' => 'edit',
-    'core|t/email' => 'envelope-o',
-    'core|t/emailno' => 'no-email',
+    'core|t/email' => 'email',
+    'core|t/emailno' => 'email-no',
     'core|t/enroladd' => 'plus',
-    'core|t/enrolusers' => 'user-plus',
+    'core|t/enrolusers' => 'user-add',
     'core|t/expanded' => 'caret-down',
-    'core|t/feedback' => 'comment-o',
-    'core|t/feedback_add' => 'comment-add-o',
+    'core|t/feedback' => 'comment',
+    'core|t/feedback_add' => 'comment-add',
     'core|t/go' => 'circle-success',
     'core|t/grades' => 'grades',
-    'core|t/groupn' => 'no-groups',
-    'core|t/groups' => 'separate-groups',
-    'core|t/groupv' => 'users',
-    'core|t/hide' => 'eye-slash',
+    'core|t/groupn' => 'groups-no',
+    'core|t/groups' => 'groups-separate',
+    'core|t/groupv' => 'groups-visible',
+    'core|t/hide' => 'hide',
     'core|t/left' => 'arrow-left',
     'core|t/less' => 'minus',
     'core|t/lock' => 'lock',
@@ -2402,13 +2220,13 @@ $deprecated = array(
     'core|t/log' => 'log',
     'core|t/markasread' => 'check',
     'core|t/mean' => 'mean',
-    'core|t/message' => 'comment',
-    'core|t/messages' => 'comments',
+    'core|t/message' => 'message',
+    'core|t/messages' => 'messages',
     'core|t/more' => 'plus',
     'core|t/move' => 'arrows-v',
     'core|t/portfolioadd' => 'portfolio-add',
-    'core|t/preferences' => 'sliders',
-    'core|t/preview' => 'eye',
+    'core|t/preferences' => 'preferences',
+    'core|t/preview' => 'preview',
     'core|t/print' => 'print',
     'core|t/ranges' => 'ranges',
     'core|t/recycle' => 'recycle',
@@ -2418,7 +2236,7 @@ $deprecated = array(
     'core|t/restore' => 'download',
     'core|t/right' => 'arrow-right',
     'core|t/scales' => 'scales',
-    'core|t/show' => 'eye',
+    'core|t/show' => 'show',
     'core|t/sigma' => 'sigma',
     'core|t/sigmaplus' => 'sigma-plus',
     'core|t/sort' => 'sort',
@@ -2433,11 +2251,10 @@ $deprecated = array(
     'core|t/switch_whole' => 'external-link-square',
     'core|t/unblock' => 'check',
     'core|t/unlock' => 'unlock',
-    'core|t/unlocked' => 'unlock-alt',
+    'core|t/unlocked' => 'unlocked',
     'core|t/up' => 'arrow-up',
     'core|t/user' => 'user',
-    'core|t/usernot' => 'user-times',
-    'core|t/viewdetails' => 'eye',
+    'core|t/viewdetails' => 'preview',
     'core|u/f1' => 'user-disabled',
     'core|u/f2' => 'user-disabled',
     'core|u/f3' => 'user-disabled',
@@ -2557,4 +2374,7 @@ $pixonlyimages = array(
     'e/undo',
     'e/visual_aid',
     'e/visual_blocks',
+    /* Default user images */
+    'g/f1',
+    'g/f2',
 );

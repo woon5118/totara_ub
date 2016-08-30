@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'repository_skydrive|icon' => 'skyatlas',
+$icons = array(
+    'repository_skydrive|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-skyatlas',
+                ),
+        ),
 );

@@ -109,12 +109,12 @@ class format_demo_renderer extends format_section_renderer_base {
             if ($course->marker == $section->section) {  // Show the "light globe" on/off.
                 $url->param('marker', 0);
                 $controls[] = html_writer::link($url,
-                                    $this->flex_icon('lightbulb-o', array('alt' => get_string('markedthistopic'))),
+                                    $this->flex_icon('highlight-on', array('alt' => get_string('markedthistopic'))),
                                     array('title' => get_string('markedthistopic'), 'class' => 'editing_highlight'));
             } else {
                 $url->param('marker', $section->section);
                 $controls[] = html_writer::link($url,
-                                $this->flex_icon('lightbulb-o-disabled', array('alt' => get_string('markthistopic'))),
+                                $this->flex_icon('highlight-off', array('alt' => get_string('markthistopic'))),
                                 array('title' => get_string('markthistopic'), 'class' => 'editing_highlight'));
             }
         }

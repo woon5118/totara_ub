@@ -27,5 +27,5 @@
 $aliases = array(
     'block_gaccess|calendar' => 'calendar',
     'block_gaccess|gdocs' => 'file-text',
-    'block_gaccess|gmail' => 'envelope-o',
+    'block_gaccess|gmail' => 'email',
 );

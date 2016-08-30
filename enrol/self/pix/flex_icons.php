@@ -26,5 +26,5 @@
 
 $aliases = array(
     'enrol_self|withkey' => 'key',
-    'enrol_self|withoutkey' => 'no-key',
+    'enrol_self|withoutkey' => 'key-no',
 );

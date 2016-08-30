@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'mod_feedback|icon' => 'bullhorn',
+$icons = array(
+    'mod_feedback|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-bullhorn',
+                ),
+        ),
 );

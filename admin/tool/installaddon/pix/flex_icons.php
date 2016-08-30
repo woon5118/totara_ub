@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'tool_installaddon|icon' => 'download',
+$icons = array(
+    'tool_installaddon|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-download',
+                ),
+        ),
 );

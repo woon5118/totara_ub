@@ -164,7 +164,7 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         require(['core/templates'], function (templates) {
             nodes.each(function (node) {
                 // Font style icon
-                templates.renderIcon('lightbulb-o-disabled', old_string).done(function (html) {
+                templates.renderIcon('marker-off', old_string).done(function (html) {
                     templates.replaceNode(node.getDOMNode(), html, '');
                 });
             });
@@ -193,7 +193,7 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
             } else {
                 // Font style icon
                 require(['core/templates'], function (templates) {
-                    templates.renderIcon('lightbulb-o', new_string).done(function (html) {
+                    templates.renderIcon('marker-on', new_string).done(function (html) {
                         templates.replaceNode(highlighticon.getDOMNode(), html, '');
                     });
                 });

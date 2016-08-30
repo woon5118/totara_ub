@@ -73,11 +73,11 @@ class core_message_renderer extends plugin_renderer_base {
                 $enable->text = html_writer::nonempty_tag('span', get_string('outputnotconfigured', 'message'), array('class' => 'error'));
             } else if ($processor->enabled) {
                 $url = new moodle_url('/admin/message.php', array('disable' => $processor->id, 'sesskey' => sesskey()));
-                $enable->text = html_writer::link($url, $this->output->flex_icon('eye-slash', array('alt' => get_string('outputenabled', 'message'))));
+                $enable->text = html_writer::link($url, $this->output->flex_icon('hide', array('alt' => get_string('outputenabled', 'message'))));
             } else {
                 $row->attributes['class'] = 'dimmed_text';
                 $url = new moodle_url('/admin/message.php', array('enable' => $processor->id, 'sesskey' => sesskey()));
-                $enable->text = html_writer::link($url, $this->output->flex_icon('eye', array('alt' => get_string('outputdisabled', 'message'))));
+                $enable->text = html_writer::link($url, $this->output->flex_icon('show', array('alt' => get_string('outputdisabled', 'message'))));
             }
             // Settings
             $settings = new html_table_cell();

@@ -24,21 +24,36 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+$icons = array(
+    'assignfeedback_editpdf|stamp' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-stamp',
+                ),
+        ),
+    'assignfeedback_editpdf|highlight' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-highlight',
+                ),
+        ),
+);
+
 $aliases = array(
     'assignfeedback_editpdf|comment' => 'comment',
     'assignfeedback_editpdf|comment_search' => 'comments-search',
     'assignfeedback_editpdf|cross' => 'times-danger',
-    'assignfeedback_editpdf|highlight' => 'highlight',
     'assignfeedback_editpdf|line' => 'slash',
     'assignfeedback_editpdf|nav_next' => 'caret-right',
     'assignfeedback_editpdf|nav_prev' => 'caret-left',
     'assignfeedback_editpdf|oval' => 'circle-o',
     'assignfeedback_editpdf|pen' => 'pencil',
     'assignfeedback_editpdf|rectangle' => 'square-o',
-    'assignfeedback_editpdf|sad' => 'frown-o',
+    'assignfeedback_editpdf|sad' => 'emoticon-frown',
     'assignfeedback_editpdf|select' => 'mouse-pointer',
-    'assignfeedback_editpdf|smile' => 'smile-o',
-    'assignfeedback_editpdf|stamp' => 'stamp',
+    'assignfeedback_editpdf|smile' => 'emoticon-smile',
     'assignfeedback_editpdf|tick' => 'check-success',
     'assignfeedback_editpdf|trash' => 'trash',
 );

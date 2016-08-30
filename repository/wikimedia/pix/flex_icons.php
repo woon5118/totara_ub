@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'repository_wikimedia|icon' => 'wikipedia-w',
+$icons = array(
+    'repository_wikimedia|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-wikipedia-w',
+                ),
+        ),
 );

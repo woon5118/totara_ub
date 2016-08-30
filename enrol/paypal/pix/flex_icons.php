@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'enrol_paypal|icon' => 'paypal',
+$icons = array(
+    'enrol_paypal|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-paypal',
+                ),
+        ),
 );

@@ -239,7 +239,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertSame('<div class="text_to_html">Some summary</div>', $processed[0]);
 
         $theme = $PAGE->theme->name;
-        $fileicon = $OUTPUT->flex_icon('file-text-o', array('alt' => get_string('file')));
+        $fileicon = $OUTPUT->flex_icon('file-text', array('alt' => get_string('file')));
         $fileiconlink = html_writer::link($fileurl, $fileicon . 'readme.txt', array('class' => 'icon'));
         $this->assertSame($fileiconlink, $processed[1]);
 

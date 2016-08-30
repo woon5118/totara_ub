@@ -63,7 +63,7 @@ class data_field_url extends data_field_base {
 
         $label = '<label for="' . $fieldid . '"><span class="accesshide">' . $this->field->name . '</span>';
         if ($this->field->required) {
-            $image = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger', 'alt' => get_string('requiredelement', 'form')));
+            $image = $OUTPUT->flex_icon('required', array('alt' => get_string('requiredelement', 'form')));
             if ($autolinkable) {
                 $label .= html_writer::div(get_string('requiredelement', 'form'), 'accesshide');
             } else {

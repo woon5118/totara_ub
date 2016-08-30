@@ -441,7 +441,7 @@ class appraisal_quest_edit_form extends question_base_form {
         $info->pageid = $pageid;
         $element->add_settings_form_elements($mform, $readonly, $info);
         if ($element->requires_permissions()) {
-            $requiredstr = $OUTPUT->flex_icon('asterisk', ['classes' => 'ft-state-danger']);
+            $requiredstr = $OUTPUT->flex_icon('required');
             $mform->addElement('header', 'perms', get_string('permissions', 'totara_appraisal') . $requiredstr);
             $mform->setExpanded('perms');
             if ($element->is_answerable()) {
@@ -795,7 +795,7 @@ class appraisal_message_form extends moodleform {
         $mform->addElement('select', 'messagetoall', '', $messageall);
 
         // Required field icon. This is a bit of a hack.
-        $requiredstr = $OUTPUT->flex_icon('asterisk', ['classes' => 'ft-state-danger']);
+        $requiredstr = $OUTPUT->flex_icon('required');
 
         // Messages.
         $mform->addElement('text', 'messagetitle[0]',

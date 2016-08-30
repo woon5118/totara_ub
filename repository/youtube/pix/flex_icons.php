@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'repository_youtube|icon' => 'youtube-play',
+$icons = array(
+    'repository_youtube|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-youtube-play',
+                ),
+        ),
 );

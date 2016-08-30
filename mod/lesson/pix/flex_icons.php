@@ -24,6 +24,13 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'mod_lesson|icon' => 'list-alt',
+$icons = array(
+    'mod_lesson|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-list-alt',
+                ),
+        ),
+
 );

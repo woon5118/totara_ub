@@ -1491,9 +1491,9 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
         }else {
             $this->updateAttributes(array('class'=>'mform'));
         }
-        $this->_reqHTML = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger form-required', 'alt' => get_string('requiredelement', 'form'), 'title' => get_string('requiredelement', 'form')));
-        $this->_advancedHTML = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-info form-advanced', 'alt' => get_string('advancedelement', 'form'), 'title' => get_string('advancedelement', 'form')));
-        $this->setRequiredNote(get_string('somefieldsrequired', 'form', $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger'))));
+        $this->_reqHTML = $OUTPUT->flex_icon('required', array('classes' => 'ft-state-danger form-required', 'alt' => get_string('requiredelement', 'form'), 'title' => get_string('requiredelement', 'form')));
+        $this->_advancedHTML = $OUTPUT->flex_icon('required', array('classes' => 'ft-state-info form-advanced', 'alt' => get_string('advancedelement', 'form'), 'title' => get_string('advancedelement', 'form')));
+        $this->setRequiredNote(get_string('somefieldsrequired', 'form', $OUTPUT->flex_icon('required')));
     }
 
     /**

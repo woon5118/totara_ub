@@ -180,10 +180,10 @@
             $visible = '';
         } else if ($blocks[$blockid]->visible) {
             $visible = '<a href="blocks.php?hide='.$blockid.'&amp;sesskey='.sesskey().'" title="'.$strhide.'">'.
-                       $OUTPUT->flex_icon('eye', array('alt' => $strhide));
+                       $OUTPUT->flex_icon('hide', array('alt' => $strhide));
         } else {
             $visible = '<a href="blocks.php?show='.$blockid.'&amp;sesskey='.sesskey().'" title="'.$strshow.'">'.
-                        $OUTPUT->flex_icon('eye-slash', array('alt' => $strshow));
+                        $OUTPUT->flex_icon('show', array('alt' => $strshow));
             $class = 'dimmed_text';
         }
 

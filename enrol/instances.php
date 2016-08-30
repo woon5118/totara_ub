@@ -254,7 +254,7 @@ foreach ($instances as $instance) {
                 $edit[] = $OUTPUT->action_icon($aurl, new pix_icon('t/show', $strenable, 'core', array('class' => 'iconsmall')));
             } else {
                 // plugin specific state - do not mess with it!
-                $edit[] = $OUTPUT->flex_icon('eye-slash');
+                $edit[] = $OUTPUT->flex_icon('show');
             }
 
         }

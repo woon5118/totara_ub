@@ -24,8 +24,17 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+$icons = array(
+    'totara_program|progress_or' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-ellipsis-h',
+                ),
+        ),
+);
+
 $aliases = array(
     'totara_program|program_warning' => 'exclamation-circle',
-    'totara_program|progress_or' => 'ellipsis-h',
     'totara_program|progress_then' => 'arrow-down',
 );

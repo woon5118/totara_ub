@@ -24,12 +24,21 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+$icons = array(
+    'mod_glossary|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-address-book',
+                ),
+        ),
+);
+
 $aliases = array(
     'mod_glossary|asc' => 'sort-asc',
     'mod_glossary|comment' => 'comment',
     'mod_glossary|desc' => 'sort-desc',
-    'mod_glossary|export' => 'share-square-o',
-    'mod_glossary|icon' => 'addressbook',
+    'mod_glossary|export' => 'export',
     'mod_glossary|minus' => 'minus',
     'mod_glossary|print' => 'print',
 );

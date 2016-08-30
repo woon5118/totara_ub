@@ -25,5 +25,5 @@
 /* Developer documentation is in /pix/flex_icons.php file. */
 
 $aliases = array(
-    'mod_page|icon' => 'file-text-o',
+    'mod_page|icon' => 'file-text',
 );

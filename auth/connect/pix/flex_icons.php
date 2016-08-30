@@ -24,6 +24,13 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'auth_connect|icon' => 'plug',
+$icons = array(
+    'auth_connect|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-plug',
+                ),
+        ),
+
 );

@@ -5762,14 +5762,14 @@ class admin_setting_manageenrols extends admin_setting {
             if (isset($active_enrols[$enrol])) {
                 $aurl = new moodle_url($url, array('action'=>'disable', 'enrol'=>$enrol));
                 $hideshow = "<a href=\"$aurl\">";
-                $hideshow .= $OUTPUT->flex_icon('eye', array('alt' => $strdisable));
+                $hideshow .= $OUTPUT->flex_icon('hide', array('alt' => $strdisable));
                 $hideshow .= "</a>";
                 $enabled = true;
                 $displayname = $name;
             } else if (isset($enrols_available[$enrol])) {
                 $aurl = new moodle_url($url, array('action'=>'enable', 'enrol'=>$enrol));
                 $hideshow = "<a href=\"$aurl\">";
-                $hideshow .= $OUTPUT->flex_icon('eye-slash', array('alt' => $strenable));
+                $hideshow .= $OUTPUT->flex_icon('show', array('alt' => $strenable));
                 $hideshow .= "</a>";
                 $enabled = false;
                 $displayname = $name;
@@ -6327,14 +6327,14 @@ class admin_setting_manageauths extends admin_setting {
             // hide/show link
             if (in_array($auth, $authsenabled)) {
                 $hideshow = "<a href=\"$url&amp;action=disable&amp;auth=$auth\">";
-                $hideshow .= $OUTPUT->flex_icon('eye', array('alt' => get_string('disable')));
+                $hideshow .= $OUTPUT->flex_icon('hide', array('alt' => get_string('disable')));
                 $hideshow .= "</a>";
                 $enabled = true;
                 $displayname = $name;
             }
             else {
                 $hideshow = "<a href=\"$url&amp;action=enable&amp;auth=$auth\">";
-                $hideshow .= $OUTPUT->flex_icon('eye-slash', array('alt' => get_string('enable')));
+                $hideshow .= $OUTPUT->flex_icon('show', array('alt' => get_string('enable')));
                 $hideshow .= "</a>";
                 $enabled = false;
                 $displayname = $name;
@@ -6517,14 +6517,14 @@ class admin_setting_manageeditors extends admin_setting {
             $class = '';
             if (in_array($editor, $active_editors)) {
                 $hideshow = "<a href=\"$url&amp;action=disable&amp;editor=$editor\">";
-                $hideshow .= $OUTPUT->flex_icon('eye', array('alt' => get_string('disable')));
+                $hideshow .= $OUTPUT->flex_icon('hide', array('alt' => get_string('disable')));
                 $hideshow .= "</a>";
                 $enabled = true;
                 $displayname = $name;
             }
             else {
                 $hideshow = "<a href=\"$url&amp;action=enable&amp;editor=$editor\">";
-                $hideshow .= $OUTPUT->flex_icon('eye-slash', array('alt' => get_string('enable')));
+                $hideshow .= $OUTPUT->flex_icon('show', array('alt' => get_string('enable')));
                 $hideshow .= "</a>";
                 $enabled = false;
                 $displayname = $name;
@@ -6659,10 +6659,10 @@ class admin_setting_managelicenses extends admin_setting {
 
             if ($value->enabled == 1) {
                 $hideshow = html_writer::link($url.'&action=disable&license='.$value->shortname,
-                    $OUTPUT->flex_icon('eye', array('alt' => get_string('disable'))));
+                    $OUTPUT->flex_icon('hide', array('alt' => get_string('disable'))));
             } else {
                 $hideshow = html_writer::link($url.'&action=enable&license='.$value->shortname,
-                    $OUTPUT->flex_icon('eye-slash', array('alt' => get_string('enable'))));
+                    $OUTPUT->flex_icon('show', array('alt' => get_string('enable'))));
             }
 
             if ($value->shortname == $CFG->sitedefaultlicense) {
@@ -8528,12 +8528,12 @@ class admin_setting_managewebserviceprotocols extends admin_setting {
             // hide/show link
             if (in_array($protocol, $active_protocols)) {
                 $hideshow = "<a href=\"$url&amp;action=disable&amp;webservice=$protocol\">";
-                $hideshow .= $OUTPUT->flex_icon('eye', array('alt' => $strdisable));
+                $hideshow .= $OUTPUT->flex_icon('hide', array('alt' => $strdisable));
                 $hideshow .= "</a>";
                 $displayname = "<span>$name</span>";
             } else {
                 $hideshow = "<a href=\"$url&amp;action=enable&amp;webservice=$protocol\">";
-                $hideshow .= $OUTPUT->flex_icon('eye-slash', array('alt' => $strenable));
+                $hideshow .= $OUTPUT->flex_icon('show', array('alt' => $strenable));
                 $hideshow .= "</a>";
                 $displayname = "<span class=\"dimmed_text\">$name</span>";
             }

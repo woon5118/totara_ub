@@ -25,5 +25,5 @@
 /* Developer documentation is in /pix/flex_icons.php file. */
 
 $aliases = array(
-    'repository_local|icon' => 'folder-open-o',
+    'repository_local|icon' => 'folder-open',
 );

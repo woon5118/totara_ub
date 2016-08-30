@@ -319,7 +319,7 @@ abstract class review extends multichoice {
 
         // Add the header - starts a new frameset.
         if ($canasnweritems && $this->required) {
-            $requiredstr = $OUTPUT->flex_icon('asterisk', ['classes' => 'ft-state-danger']);
+            $requiredstr = $OUTPUT->flex_icon('required');
         } else {
             $requiredstr = '';
         }

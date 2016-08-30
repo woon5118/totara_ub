@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'repository_dropbox|icon' => 'dropbox',
+$icons = array(
+    'repository_dropbox|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-dropbox',
+                ),
+        ),
 );

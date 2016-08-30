@@ -290,7 +290,7 @@ class data_field_base {     // Base class for Database Field Types (see field/*/
         $str = '<div title="' . s($this->field->description) . '">';
         $str .= '<label for="field_'.$this->field->id.'"><span class="accesshide">'.$this->field->name.'</span>';
         if ($this->field->required) {
-            $image = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger', 'alt' => get_string('requiredelement', 'form')));
+            $image = $OUTPUT->flex_icon('required', array('alt' => get_string('requiredelement', 'form')));
             $str .= html_writer::div($image, 'inline-req');
         }
         $str .= '</label><input class="basefieldinput mod-data-input" type="text" name="field_'.$this->field->id.'"';
@@ -1262,7 +1262,7 @@ function data_print_template($template, $records, $data, $search='', $page=0, $r
         }
         $patterns[]='##more##';
 
-        $flexicon = $image = $OUTPUT->flex_icon('eye', array('alt' => get_string('more', 'data')));
+        $flexicon = $image = $OUTPUT->flex_icon('preview', array('alt' => get_string('more', 'data')));
         $replacement[] = '<a href="'.$moreurl.'">' . $flexicon . '</a>';
 
         $patterns[]='##moreurl##';

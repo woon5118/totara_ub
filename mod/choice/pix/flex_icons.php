@@ -24,8 +24,17 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+$icons = array(
+    'mod_choice|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-question-circle',
+                ),
+        ),
+);
+
 $aliases = array(
     'mod_choice|column' => 'columns',
-    'mod_choice|icon' => 'question-circle',
     'mod_choice|row' => 'rows',
 );

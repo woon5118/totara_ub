@@ -24,8 +24,14 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'mod_certificate|icon' => 'certificate',
+$icons = array(
+    'mod_certificate|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-certificate',
+                ),
+        ),
 );
 
 // NOTE: Images used to construct PDF certificates were moved to pdfresources directory.

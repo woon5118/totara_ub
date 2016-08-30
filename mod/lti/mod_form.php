@@ -216,7 +216,7 @@ class mod_lti_mod_form extends moodleform_mod {
                         'add_icon_html' => (string) $OUTPUT->flex_icon('plus', array ('alt' => get_string('add'))),
                         'delete_icon_html' => (string) $OUTPUT->flex_icon('delete', array ('alt' => get_string('delete'))),
                         'green_check_icon_html' => (string) $OUTPUT->flex_icon('check-success', array ('alt' => get_string('success'))),
-                        'warning_icon_html' => (string) $OUTPUT->flex_icon('warning-warning', array ('alt' => get_string('error'))),
+                        'warning_icon_html' => (string) $OUTPUT->flex_icon('warning', array ('alt' => get_string('error'))),
                         'instructor_tool_type_edit_url' => $editurl->out(false),
                         'ajax_url' => $ajaxurl->out(true),
                         'courseId' => $COURSE->id

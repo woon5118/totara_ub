@@ -113,8 +113,8 @@ if ($display) {
     $table->data = array();
 
     $editicon = $OUTPUT->flex_icon('settings', ['alt' => get_string('configure')]);
-    $showicon = $OUTPUT->flex_icon('eye', ['alt' => get_string('show')]);
-    $hideicon = $OUTPUT->flex_icon('eye-slash', ['alt' => get_string('hide')]);
+    $showicon = $OUTPUT->flex_icon('show', ['alt' => get_string('show')]);
+    $hideicon = $OUTPUT->flex_icon('hide', ['alt' => get_string('hide')]);
 
     foreach ($instances as $i) {
         $visible = $i->get_user_config('visible', $USER->id);

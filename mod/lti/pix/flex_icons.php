@@ -24,7 +24,16 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+$icons = array(
+    'mod_lti|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-puzzle-piece',
+                ),
+        ),
+);
+
 $aliases = array(
-    'mod_lti|icon' => 'puzzle-piece',
-    'mod_lti|warning' => 'warning-warning',
+    'mod_lti|warning' => 'warning',
 );

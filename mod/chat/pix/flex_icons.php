@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'mod_chat|icon' => 'comments',
+$icons = array(
+    'mod_chat|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-comments',
+                ),
+        ),
 );

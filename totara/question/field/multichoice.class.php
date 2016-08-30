@@ -272,7 +272,7 @@ abstract class multichoice extends question_base {
         global $DB, $OUTPUT;
 
         $type = $this->scaletype;
-        $requiredstr = $OUTPUT->flex_icon('asterisk', ['classes' => 'ft-state-danger']);
+        $requiredstr = $OUTPUT->flex_icon('required');
         $form->addElement('header', $jsid, get_string($headerstringkey, 'totara_question') . $requiredstr);
         $form->setExpanded($jsid);
 

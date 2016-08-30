@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'mod_folder|icon' => 'folder-o',
+$icons = array(
+    'mod_folder|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-folder-o',
+                ),
+        ),
 );

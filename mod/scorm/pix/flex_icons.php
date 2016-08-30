@@ -24,12 +24,27 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+$icons = array(
+    'mod_scorm|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-archive',
+                ),
+        ),
+    'mod_scorm|suspend' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-moon-o',
+                ),
+        ),
+);
+
 $aliases = array(
-    'mod_scorm|icon' => 'archive',
     'mod_scorm|minus' => 'minus-square-o',
     'mod_scorm|notattempted' => 'square-o',
     'mod_scorm|passed' => 'check-square-o',
     'mod_scorm|plus' => 'plus-square-o',
-    'mod_scorm|suspend' => 'moon-o',
     'mod_scorm|wait' => 'loading',
 );

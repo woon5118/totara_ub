@@ -24,13 +24,28 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+$icons = array(
+    'mod_data|field/latlong' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-globe',
+                ),
+        ),
+    'mod_data|field/radiobutton' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-dot-circle-o',
+                ),
+        ),
+);
+
 $aliases = array(
     'mod_data|field/checkbox' => 'check-square-o',
     'mod_data|field/date' => 'calendar',
-    'mod_data|field/file' => 'file-o',
-    'mod_data|field/latlong' => 'globe',
+    'mod_data|field/file' => 'file-general',
     'mod_data|field/picture' => 'image',
-    'mod_data|field/radiobutton' => 'dot-circle-o',
     'mod_data|field/url' => 'link',
     'mod_data|icon' => 'database',
 );

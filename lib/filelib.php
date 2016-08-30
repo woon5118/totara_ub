@@ -1672,7 +1672,7 @@ function file_mimetype_flex_icon($mimetype, $alt = '', $classes = '') {
     $iconname = 'core|f/' . mimeinfo_from_type('icon', $mimetype);
 
     if (!\core\output\flex_icon::exists($iconname)) {
-        $iconname = 'file-o';
+        $iconname = 'file-general';
 
     }
 

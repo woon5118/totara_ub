@@ -24,8 +24,36 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'mod_forum|icon' => 'comments-o',
-    'mod_forum|t/subscribed' => 'subscribed',
-    'mod_forum|t/unsubscribed' => 'unsubscribed',
+$icons = array(
+    'mod_forum|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-comments-o',
+                ),
+        ),
+    'mod_forum|t/subscribed' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'fa-envelope-o ft-stack-main',
+                            'fa-check ft-stack-suffix ft-state-success',
+                        ),
+                ),
+        ),
+    'mod_forum|t/unsubscribed' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'fa-envelope-o ft-stack-main',
+                            'fa-times ft-stack-suffix ft-state-danger',
+                        ),
+                ),
+        ),
 );

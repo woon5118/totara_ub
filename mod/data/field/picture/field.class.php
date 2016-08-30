@@ -76,7 +76,7 @@ class data_field_picture extends data_field_base {
 
         if ($this->field->required) {
             $str .= '&nbsp;' . get_string('requiredelement', 'form') . '</span></legend>';
-            $image = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger', 'alt' => get_string('requiredelement', 'form')));
+            $image = $OUTPUT->flex_icon('required', array('alt' => get_string('requiredelement', 'form')));
             $str .= html_writer::div($image, 'inline-req');
         } else {
             $str .= '</span></legend>';

@@ -709,13 +709,13 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                 var flexicon = "";
                 switch (groupmode) {
                     case that.GROUPS_NONE:
-                        flexicon = 'no-groups';
+                        flexicon = 'groups-no';
                         break;
                     case that.GROUPS_SEPARATE:
-                        flexicon = 'separate-groups';
+                        flexicon = 'groups-separate';
                         break;
                     case that.GROUPS_VISIBLE:
-                        flexicon = 'users';
+                        flexicon = 'groups-visible';
                         break;
                 }
                 templates.renderIcon(flexicon, newtitlestr, 'ft-size-200')
@@ -1136,7 +1136,7 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         require(['core/templates'], function (templates) {
             nodes.each(function (node) {
                 // Font style icon
-                templates.renderIcon('lightbulb-o-disabled', old_string).done(function (html) {
+                templates.renderIcon('marker-off', old_string).done(function (html) {
                     templates.replaceNode(node.getDOMNode(), html, '');
                 });
             });
@@ -1165,7 +1165,7 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
             } else {
                 // Font style icon
                 require(['core/templates'], function (templates) {
-                    templates.renderIcon('lightbulb-o', new_string).done(function (html) {
+                    templates.renderIcon('marker-on', new_string).done(function (html) {
                         templates.replaceNode(highlighticon.getDOMNode(), html, '');
                     });
                 });

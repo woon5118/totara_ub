@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'repository_flickr|icon' => 'flickr',
+$icons = array(
+    'repository_flickr|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-flickr',
+                ),
+        ),
 );

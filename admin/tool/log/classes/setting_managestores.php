@@ -169,14 +169,14 @@ class tool_log_setting_managestores extends admin_setting {
             if (isset($enabled[$store])) {
                 $aurl = new moodle_url($url, array('action' => 'disable', 'store' => $store));
                 $hideshow = "<a href=\"$aurl\">";
-                $hideshow .= $OUTPUT->flex_icon('eye', array('alt' => $strdisable));
+                $hideshow .= $OUTPUT->flex_icon('hide', array('alt' => $strdisable));
                 $isenabled = true;
                 $displayname = "<span>$name</span>";
             } else {
                 if (isset($available[$store])) {
                     $aurl = new moodle_url($url, array('action' => 'enable', 'store' => $store));
                     $hideshow = "<a href=\"$aurl\">";
-                    $hideshow .= $OUTPUT->flex_icon('eye-slash', array('alt' => $strenable));
+                    $hideshow .= $OUTPUT->flex_icon('show', array('alt' => $strenable));
                     $isenabled = false;
                     $displayname = "<span class=\"dimmed_text\">$name</span>";
                 } else {

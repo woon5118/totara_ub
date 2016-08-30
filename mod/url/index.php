@@ -94,7 +94,7 @@ foreach ($urls as $url) {
     $class = $url->visible ? '' : 'class="dimmed"'; // hidden modules are dimmed
     $table->data[] = array (
         $printsection,
-        "<a $class $extra href=\"view.php?id=$cm->id\">" . $OUTPUT->flex_icon('globe', array('alt' => get_string('modulename', $cm->modname))) . ' ' . format_string($url->name)."</a>",
+        "<a $class $extra href=\"view.php?id=$cm->id\">" . $OUTPUT->flex_icon('mod_url|icon', array('alt' => get_string('modulename', $cm->modname))) . ' ' . format_string($url->name)."</a>",
         format_module_intro('url', $url, $cm->id));
 }
 

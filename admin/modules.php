@@ -132,11 +132,11 @@
             $class   = '';
         } else if ($module->visible) {
             $visible = "<a href=\"modules.php?hide=$module->name&amp;sesskey=".sesskey()."\" title=\"$strhidemodule\">".
-                       $OUTPUT->flex_icon('eye', array('alt' => $strhidemodule)) . "</a>";
+                       $OUTPUT->flex_icon('hide', array('alt' => $strhidemodule)) . "</a>";
             $class   = '';
         } else {
             $visible = "<a href=\"modules.php?show=$module->name&amp;sesskey=".sesskey()."\" title=\"$strshowmodule\">".
-                       $OUTPUT->flex_icon('eye-slash', array('alt' => $strshowmodule)) . "</a>";
+                       $OUTPUT->flex_icon('show', array('alt' => $strshowmodule)) . "</a>";
             $class =   'dimmed_text';
         }
         if ($module->name == "forum") {

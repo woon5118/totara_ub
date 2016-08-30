@@ -153,7 +153,7 @@ function totara_message_dismiss_action($id) {
     // TODO SCANMSG: Check this still outputs required markup in no/script render
     // Construct HTML for dismiss button
     $str = get_string('dismiss', 'block_totara_alerts');
-    $deleteicon = $OUTPUT->flex_icon('times-disabled', ['alt' => $str, 'classes' => 'ft-size-300']);
+    $deleteicon = $OUTPUT->flex_icon('delete-disabled', ['alt' => $str, 'classes' => 'ft-size-300']);
     $out = html_writer::tag('a', $deleteicon, array('href' => '#', 'id' => 'dismissmsg'.$id.'-dialog', 'name' => 'tm_dismiss_msg'));
 
     $out .= html_writer::tag('noscript',

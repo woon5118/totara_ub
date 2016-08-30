@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
 class totara_core_flex_icon_testcase extends advanced_testcase {
     public function test_exists() {
         $this->assertTrue(flex_icon::exists('edit'));
-        $this->assertTrue(flex_icon::exists('unsubscribed'));
+        $this->assertTrue(flex_icon::exists('mod_forum|t/unsubscribed'));
         $this->assertTrue(flex_icon::exists('core|i/edit'));
         $this->assertTrue(flex_icon::exists('mod_book|icon'));
         $this->assertTrue(flex_icon::exists('mod_book|nav_exit'));
@@ -49,7 +49,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $this->assertSame(array(), $icon->customdata);
         $this->assertDebuggingNotCalled();
 
-        $identifier = 'unsubscribed';
+        $identifier = 'mod_forum|t/unsubscribed';
         $icon = new flex_icon($identifier);
         $this->assertSame($identifier, $icon->identifier);
         $this->assertSame(array(), $icon->customdata);
@@ -103,7 +103,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
     public function test_get_template() {
         // New icon names.
         $this->assertSame('core/flex_icon', (new flex_icon('edit'))->get_template());
-        $this->assertSame('core/flex_icon_stack', (new flex_icon('unsubscribed'))->get_template());
+        $this->assertSame('core/flex_icon_stack', (new flex_icon('mod_forum|t/unsubscribed'))->get_template());
 
         // Legacy icon name.
         $this->assertSame('core/flex_icon', (new flex_icon('core|i/edit'))->get_template());
@@ -131,7 +131,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
             'customdata' => array('classes' => 'normalstuff'),
         );
         $this->assertSame($expected, $icon->export_for_template($renderer));
-        $icon = new flex_icon('unsubscribed', array('classes' => 'compositestuff'));
+        $icon = new flex_icon('mod_forum|t/unsubscribed', array('classes' => 'compositestuff'));
         $expected = array(
             'classes' => array(
                 'fa-envelope-o ft-stack-main',
@@ -256,7 +256,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $deprecatedicon = new flex_icon('core|i/edit');
         $this->assertSame($expected, $renderer->render($deprecatedicon));
 
-        $stackdicon = new flex_icon('unsubscribed');
+        $stackdicon = new flex_icon('mod_forum|t/unsubscribed');
         $expected = $renderer->render_from_template($stackdicon->get_template(), $stackdicon->export_for_template($renderer));
         $this->assertSame($expected, $renderer->render($stackdicon));
 

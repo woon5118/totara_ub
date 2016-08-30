@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'repository_picasa|icon' => 'picasa',
+$icons = array(
+    'repository_picasa|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-picasa',
+                ),
+        ),
 );

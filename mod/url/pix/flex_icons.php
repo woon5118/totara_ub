@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'mod_url|icon' => 'globe',
+$icons = array(
+    'mod_url|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-globe',
+                ),
+        ),
 );

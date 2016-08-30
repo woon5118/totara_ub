@@ -74,7 +74,7 @@ class mustache_flex_icon_helper_testcase extends basic_testcase {
      */
     public function test_flex_icon_output_without_customdata() {
 
-        $identifier = 'check-permissions';
+        $identifier = 'permissions-check';
         $mustachehelper = new mustache_flex_icon_helper(self::$renderer);
 
         $expected = self::$renderer->render(new flex_icon($identifier));
@@ -91,7 +91,7 @@ class mustache_flex_icon_helper_testcase extends basic_testcase {
      */
     public function test_flex_icon_output_with_customdata() {
 
-        $identifier = 'check-permissions';
+        $identifier = 'permissions-check';
         $customdata = array(
             'classes' => 'ft-state-success ft-size-700'
         );

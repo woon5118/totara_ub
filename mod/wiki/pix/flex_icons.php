@@ -24,7 +24,16 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+$icons = array(
+    'mod_wiki|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-wikipedia-w',
+                ),
+        ),
+);
+
 $aliases = array(
-    'mod_wiki|attachment' => 'paperclip',
-    'mod_wiki|icon' => 'wikipedia-w',
+    'mod_wiki|attachment' => 'attachment',
 );

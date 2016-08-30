@@ -24,8 +24,17 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+$icons = array(
+    'totara_reportbuilder|report_icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-pie-chart',
+                ),
+        ),
+);
+
 $aliases = array(
-    'totara_reportbuilder|report_icon' => 'pie-chart',
     'totara_reportbuilder|wait' => 'loading',
     'totara_reportbuilder|waitbig' => 'loading',
 );

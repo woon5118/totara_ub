@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'mod_facetoface|icon' => 'seminar',
+$icons = array(
+    'mod_facetoface|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-seminar',
+                ),
+        ),
 );

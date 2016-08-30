@@ -408,7 +408,7 @@ class mod_lesson_renderer extends plugin_renderer_base {
 
         $url = new moodle_url('/mod/lesson/view.php', array('id' => $this->page->cm->id, 'pageid' => $page->id));
         $label = get_string('previewpagenamed', 'lesson', format_string($page->title));
-        $img = $this->output->flex_icon('eye', array('alt' => $label));
+        $img = $this->output->flex_icon('preview', array('alt' => $label));
         $actions[] = html_writer::link($url, $img, array('title' => $label));
 
         $url = new moodle_url('/mod/lesson/lesson.php',

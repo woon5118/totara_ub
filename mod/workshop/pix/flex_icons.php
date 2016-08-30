@@ -24,8 +24,17 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+$icons = array(
+    'mod_workshop|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'ft-seminar',
+                ),
+        ),
+);
+
 $aliases = array(
-    'mod_workshop|icon' => 'seminar',
     'mod_workshop|userplan/task-done' => 'check-success',
     'mod_workshop|userplan/task-fail' => 'times-danger',
     'mod_workshop|userplan/task-info' => 'info-circle',

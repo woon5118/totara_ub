@@ -24,6 +24,12 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
-$aliases = array(
-    'mod_label|icon' => 'tag',
+$icons = array(
+    'mod_label|icon' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-tag',
+                ),
+        ),
 );

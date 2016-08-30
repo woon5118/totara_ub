@@ -161,7 +161,7 @@ class block_current_learning extends block_base {
 
                 if ($item instanceof \totara_certification\user_learning\item) {
                     $itemdata->title = get_string('thisisacertification', 'block_current_learning');
-                    $itemdata->icon = 'certificate';
+                    $itemdata->icon = 'certification';
                 }
 
                 $itemdata->template = $template;

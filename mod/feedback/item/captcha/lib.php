@@ -134,7 +134,7 @@ class feedback_item_captcha extends feedback_item_base {
             }
         }
 
-        $requiredmark  = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger flex-icon-pre', 'alt' => get_string('requiredelement', 'form')));
+        $requiredmark  = $OUTPUT->flex_icon('required', array('classes' => 'flex-icon-pre', 'alt' => get_string('requiredelement', 'form')));
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
@@ -183,7 +183,7 @@ class feedback_item_captcha extends feedback_item_base {
             $highlight = '';
         }
 
-        $requiredmark  = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger flex-icon-pre', 'alt' => get_string('requiredelement', 'form')));
+        $requiredmark  = $OUTPUT->flex_icon('required', array('classes' => 'flex-icon-pre', 'alt' => get_string('requiredelement', 'form')));
 
         if (isset($SESSION->feedback->captchacheck) AND
                 $SESSION->feedback->captchacheck == $USER->sesskey AND
@@ -271,7 +271,7 @@ class feedback_item_captcha extends feedback_item_base {
             }
         }
 
-        $requiredmark  = $OUTPUT->flex_icon('asterisk', array('classes' => 'ft-state-danger flex-icon-pre', 'alt' => get_string('requiredelement', 'form')));
+        $requiredmark  = $OUTPUT->flex_icon('required', array('classes' => 'flex-icon-pre', 'alt' => get_string('requiredelement', 'form')));
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';

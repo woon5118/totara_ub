@@ -26,5 +26,5 @@
 
 $aliases = array(
     'enrol_totara_facetoface|withkey' => 'key',
-    'enrol_totara_facetoface|withoutkey' => 'no-key',
+    'enrol_totara_facetoface|withoutkey' => 'key-no',
 );

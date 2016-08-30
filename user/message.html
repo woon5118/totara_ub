@@ -45,7 +45,7 @@
                 $error = get_string('emailempty');
             }
             if (!empty($error)) {
-                echo $OUTPUT->flex_icon('no-email');
+                echo $OUTPUT->flex_icon('email-no');
                 unset($error);
             }
             echo '</td><td><input type="submit" onClick="this.form.deluser.value='.$user->id.';" value="' . get_string('remove') . '" /></td></tr>';

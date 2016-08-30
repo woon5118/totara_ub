@@ -505,13 +505,13 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                 var flexicon = "";
                 switch (groupmode) {
                     case that.GROUPS_NONE:
-                        flexicon = 'no-groups';
+                        flexicon = 'groups-no';
                         break;
                     case that.GROUPS_SEPARATE:
-                        flexicon = 'separate-groups';
+                        flexicon = 'groups-separate';
                         break;
                     case that.GROUPS_VISIBLE:
-                        flexicon = 'users';
+                        flexicon = 'groups-visible';
                         break;
                 }
                 templates.renderIcon(flexicon, newtitlestr, 'ft-size-200')

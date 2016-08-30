@@ -62,8 +62,8 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
         require(['core/templates'], function (templates) {
             var iconscache = [];
             iconscache.push(templates.renderIcon('loading', M.util.get_string('saving', 'totara_reportbuilder')));
-            iconscache.push(templates.renderIcon('eye', M.util.get_string('hide', 'totara_reportbuilder')));
-            iconscache.push(templates.renderIcon('eye-slash', M.util.get_string('show', 'totara_reportbuilder')));
+            iconscache.push(templates.renderIcon('hide', M.util.get_string('hide', 'totara_reportbuilder')));
+            iconscache.push(templates.renderIcon('show', M.util.get_string('show', 'totara_reportbuilder')));
             iconscache.push(templates.renderIcon('delete', M.util.get_string('delete', 'totara_reportbuilder')));
             iconscache.push(templates.renderIcon('arrow-up', M.util.get_string('moveup', 'totara_reportbuilder')));
             iconscache.push(templates.renderIcon('arrow-down', M.util.get_string('movedown', 'totara_reportbuilder')));
