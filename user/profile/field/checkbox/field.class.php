@@ -82,10 +82,19 @@ class profile_field_checkbox extends profile_field_base {
      * @return string HTML.
      */
     public function display_data() {
-        $options = new stdClass();
-        $options->para = false;
-        $checked = intval($this->data) === 1 ? 'checked="checked"' : '';
-        return '<input disabled="disabled" type="checkbox" name="'.$this->inputname.'" '.$checked.' />';
+        $attr = array(
+            'disabled' => 'disabled',
+            'type' => 'checkbox',
+            'id' => $this->inputname,
+            'name' => $this->inputname
+        );
+
+        if (intval($this->data) === 1) {
+            $attr['checked'] = 'checked';
+        }
+        $label = html_writer::label($this->field->name, $this->inputname, true, array('class' => 'sr-only'));
+        $checkbox = html_writer::empty_tag('input', $attr);
+        return $checkbox . $label;
     }
 
     /**
