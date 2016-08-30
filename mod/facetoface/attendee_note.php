@@ -55,6 +55,7 @@ if (!has_capability('mod/facetoface:manageattendeesnote', $context)) {
 
 /* @var mod_facetoface_renderer|core_renderer $renderer */
 $renderer = $PAGE->get_renderer('mod_facetoface');
+$renderer->setcontext($context);
 
 $attendee_note = facetoface_get_attendee($sessionid, $userid);
 $attendee_note->userid = $attendee_note->id;

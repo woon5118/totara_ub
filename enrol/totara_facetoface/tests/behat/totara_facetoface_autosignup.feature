@@ -79,6 +79,36 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I click on "Sign-up" "link_or_button"
     Then I should see "Your booking has been completed and you have been enrolled on 2 event(s)."
 
+  Scenario: Auto enrol to waiting list using seminar direct and managers enabled required
+    Given I log in as "teacher1"
+    And I follow "Course 1"
+    And I turn editing mode on
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                       | Test seminar name 1        |
+      | Description                | Test seminar description 1 |
+      | Manager Approval           | 0                          |
+      | Allow manager reservations | Yes                        |
+    And I follow "Test seminar name 1"
+    And I follow "Add a new event"
+    And I click on "Delete" "link" in the "Select room" "table_row"
+    And I press "Save changes"
+    And I follow "Course 1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    When I add "Seminar direct enrolment" enrolment method with:
+      | Custom instance name  | Test student enrolment |
+      | Default assigned role | Learner                |
+    And I log out
+
+    And I log in as "student1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "Course 1"
+    And I click on "Join waitlist" "link_or_button"
+    And I click on "Sign-up" "link_or_button"
+    Then I should see "Your booking has been completed."
+    And I should see "Wait-listed"
+
   Scenario: Auto enrol using seminar direct with manager approval required
     Given the following "position" frameworks exist:
       | fullname      | idnumber |

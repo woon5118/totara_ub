@@ -1711,16 +1711,14 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     // Legacy.
     $msg = str_replace(get_string('placeholder:registrationcutoff', 'facetoface'), $registrationcutoff, $msg);
 
-    if (!empty($data->sessiondates)) {
-        $rooms = facetoface_get_session_rooms($data->id);
-        // Get data for room custom fields.
-        $roomcustomfields = array();
-        foreach($rooms as $room) {
-            $roomcustomfields[$room->id] = customfield_get_data($room, 'facetoface_room', 'facetofaceroom', false);
-        }
-        $msg = facetoface_notification_loop_session_placeholders($msg, $data, $rooms, $roomcustomfields, $user);
-        $msg = facetoface_notification_substitute_deprecated_placeholders($msg, $data, $rooms, $roomcustomfields);
+    $rooms = facetoface_get_session_rooms($data->id);
+    // Get data for room custom fields.
+    $roomcustomfields = array();
+    foreach($rooms as $room) {
+        $roomcustomfields[$room->id] = customfield_get_data($room, 'facetoface_room', 'facetofaceroom', false);
     }
+    $msg = facetoface_notification_loop_session_placeholders($msg, $data, $rooms, $roomcustomfields, $user);
+    $msg = facetoface_notification_substitute_deprecated_placeholders($msg, $data, $rooms, $roomcustomfields);
 
     if (empty($data->details)) {
         // Replace.
@@ -1808,6 +1806,12 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
         $endposition = strpos($msg, $endtag, $startposition);
         if (!$endposition) {
             return $msg;
+        }
+
+        // Cut off sessions section.
+        if (empty($session->sessiondates)) {
+            $msg = substr($msg, 0, $startposition) . get_string('locationtimetbd', 'facetoface') . substr($msg, $endposition + strlen($endtag));
+            continue;
         }
 
         if (empty($rooms)) {

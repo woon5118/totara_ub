@@ -95,6 +95,7 @@ if (!$session->allowoverbook) {
 $reserveinfo = facetoface_limit_reserveinfo_by_session_date($reserveinfo, $session);
 
 $output = $PAGE->get_renderer('mod_facetoface');
+$output->setcontext($context);
 
 $preform = '';
 $form = '';

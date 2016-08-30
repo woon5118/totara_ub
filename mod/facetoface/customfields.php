@@ -50,7 +50,7 @@ $renderer = $PAGE->get_renderer('totara_customfield');
 
 /** @var mod_facetoface_renderer $renderer*/
 $facetofacerenderer = $PAGE->get_renderer('mod_facetoface');
-
+$facetofacerenderer->setcontext($contextsystem);
 // Check if any actions need to be performed.
 switch ($action) {
     case 'showlist':

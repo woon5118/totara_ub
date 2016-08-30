@@ -80,6 +80,8 @@ $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 $output = $PAGE->get_renderer('mod_facetoface');
+$output->setcontext($context);
+
 echo $output->header();
 echo $output->heading(format_string($facetoface->name));
 echo facetoface_print_session($session, false);

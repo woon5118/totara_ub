@@ -70,6 +70,8 @@ $PAGE->set_heading($title);
 echo $OUTPUT->header();
 /** @var mod_facetoface_renderer $renderer */
 $renderer = $PAGE->get_renderer('mod_facetoface');
+$renderer->setcontext($systemcontext);
+
 echo $renderer->heading($PAGE->title);
 
 echo $renderer->render_asset_details($asset);

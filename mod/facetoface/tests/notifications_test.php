@@ -514,6 +514,19 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         $expectedmsg .= "That is all.";
         $this->assertEquals($expectedmsg, $replacedmsg);
     }
+ public function test_facetoface_notification_loop_session_placeholders_no_session() {
+        $this->resetAfterTest(true);
+
+        $msg = "Testing with non-saved session. A[#sessions]Start time is [session:starttime]. Finish time is [session:finishtime].\n[/sessions]A";
+        $msg .= " I repeat: [#sessions]Start date is [session:startdate]. Finish date is [session:finishdate].\n[/sessions]";
+        $msg .= " That is all.";
+
+        $session = new stdClass();
+        $session->sessiondates = array();
+        $replacedmsg = facetoface_notification_loop_session_placeholders($msg, $session);
+        $expectedmsg = "Testing with non-saved session. ALocation and time to be announced later.A I repeat: Location and time to be announced later. That is all.";
+        $this->assertEquals($expectedmsg, $replacedmsg);
+    }
 
     /**
      * Tests facetoface_notification_loop_session_placeholders function with data returned by functions generally used

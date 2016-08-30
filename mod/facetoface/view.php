@@ -99,6 +99,7 @@ $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'facetoface'));
 $pagetitle = format_string($facetoface->name);
 
 $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
+$f2f_renderer->setcontext($context);
 
 $completion=new completion_info($course);
 $completion->set_module_viewed($cm);
@@ -193,14 +194,15 @@ echo $OUTPUT->footer($course);
 function print_session_list($courseid, $facetoface, $sessions) {
     global $CFG, $USER, $DB, $OUTPUT, $PAGE;
 
-    /** @var mod_facetoface_renderer $f2f_renderer */
-    $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
-
     $timenow = time();
 
     $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $courseid, false, MUST_EXIST);
     $context = context_module::instance($cm->id);
+
+    /** @var mod_facetoface_renderer $f2f_renderer */
+    $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
     $f2f_renderer->setcontext($context);
+
     $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
     $editevents = has_capability('mod/facetoface:editevents', $context);
 

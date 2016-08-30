@@ -649,6 +649,7 @@ $string['joinwaitlistcompleted'] = 'You have been placed on the waitlist for thi
 $string['lastreservation'] = 'Last reservations are {$a->reservedays} days before the event starts. Unallocated reservations will be deleted {$a->reservecanceldays} days before the event starts.';
 $string['late'] = '\{$a} late';
 $string['location'] = 'Location';
+$string['locationtimetbd'] = 'Location and time to be announced later.';
 $string['lookfor'] = 'Search';
 $string['manageassets'] = 'Manage assets';
 $string['manageevents'] = 'View and manage events';

@@ -144,6 +144,7 @@ echo facetoface_print_session($session, false, true, true);
 
 // Table.
 $f2frenderer = $PAGE->get_renderer('mod_facetoface');
+$f2frenderer->setcontext($context);
 
 $users = $mform->get_user_list($userlist, $page, USERS_PER_PAGE);
 $paging = new paging_bar(count($userlist), $page, USERS_PER_PAGE, $currenturl);

@@ -160,7 +160,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     }
 
     $managerselect = get_config(null, 'facetoface_managerselect');
-    if ($managerselect) {
+    if ($managerselect && !empty($fromform->managerid)) {
         $params['managerselect'] = $fromform->managerid;
     }
 
