@@ -1519,6 +1519,7 @@ function assign_archive_completion($userid, $courseid, $windowopens = NULL) {
             // Delete assignment files and assignment grade.
             $assignment = new assign($context, $cm, $course);
             $assignment->delete_user_submission($userid);
+            $assignment->unlock_submission($userid);
 
             // Reset grade.
             $assign = $DB->get_record('assign', array('id' => $submission->assignid));
