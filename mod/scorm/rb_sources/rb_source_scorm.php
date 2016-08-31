@@ -70,12 +70,12 @@ class rb_source_scorm extends rb_base_source {
         // time we want a field - horribly inefficient, but should be okay until
         // scorm gets redesigned
         $elements = array(
-            'starttime' => 'x.start.time',
-            'totaltime' => 'cmi.core.total_time',
-            'status' => 'cmi.core.lesson_status',
-            'scoreraw' => 'cmi.core.score.raw',
-            'scoremin' => 'cmi.core.score.min',
-            'scoremax' => 'cmi.core.score.max',
+            'starttime' => "'x.start.time'",
+            'totaltime' => "'cmi.core.total_time', 'cmi.total_time'",
+            'status' => "'cmi.core.lesson_status', 'cmi.completion_status'",
+            'scoreraw' => "'cmi.core.score.raw', 'cmi.score.raw'",
+            'scoremin' => "'cmi.core.score.min', 'cmi.score.min'",
+            'scoremax' => "'cmi.core.score.max', 'cmi.score.max'",
         );
         foreach ($elements as $name => $element) {
             $key = "sco_$name";
@@ -85,7 +85,7 @@ class rb_source_scorm extends rb_base_source {
                 '{scorm_scoes_track}',
                 "($key.userid = base.userid AND $key.scormid = base.scormid" .
                 " AND $key.scoid = base.scoid AND $key.attempt = " .
-                " base.attempt AND $key.element = '$element')",
+                " base.attempt AND $key.element IN ($element))",
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             );
         }
