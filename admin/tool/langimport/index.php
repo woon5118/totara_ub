@@ -163,7 +163,7 @@ echo $OUTPUT->box_start('admin_lang_available');
 
 // list of installed languages
 $url = new moodle_url('/admin/tool/langimport/index.php', array('mode' => DELETION_OF_SELECTED_LANG));
-echo html_writer::start_tag('div', array('class' => 'currentlangs'));
+echo html_writer::start_tag('div', array('class' => 'currentlangs col-md-6'));
 echo html_writer::start_tag('form', array('id' => 'uninstallform', 'action' => $url->out(), 'method' => 'post'));
 echo html_writer::start_tag('fieldset');
 echo html_writer::label(get_string('installedlangs', 'tool_langimport'), 'menuuninstalllang');
@@ -191,7 +191,7 @@ foreach ($availablelangs as $alang) {
     }
 }
 if (!empty($options)) {
-    echo html_writer::start_tag('div', array('class' => 'availablelangs'));
+    echo html_writer::start_tag('div', array('class' => 'availablelangs col-md-6'));
     $url = new moodle_url('/admin/tool/langimport/index.php', array('mode' => INSTALLATION_OF_SELECTED_LANG));
     echo html_writer::start_tag('form', array('id' => 'installform', 'action' => $url->out(), 'method' => 'post'));
     echo html_writer::start_tag('fieldset');
