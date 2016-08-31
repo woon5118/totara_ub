@@ -591,7 +591,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         // Check if the user is allowed to cancel his booking.
         $allowcancellation = facetoface_allow_user_cancellation($session);
         if ($isbookedsession) {
-            $signuplink .= html_writer::link($signupurl, get_string('moreinfo', 'facetoface'), array('title' => get_string('moreinfo', 'facetoface')));
+            if (!$sessionstarted) {
+                $signuplink .= html_writer::link($signupurl, get_string('moreinfo', 'facetoface'), array('title' => get_string('moreinfo', 'facetoface')));
+            }
             if ($allowcancellation) {
                 $signuplink .= html_writer::empty_tag('br');
                 $canceltext = facetoface_is_user_on_waitlist($session) ? 'cancelwaitlist' : 'cancelbooking';
