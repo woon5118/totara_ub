@@ -86,7 +86,6 @@ Feature: Seminar event cancellation calendar views
     Then I should see date "1 day" formatted "%d %B %Y"
     Then I should see "Course 1"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland"
-    And I should see "You are booked for this Seminar event"
     And I should see "Teacher One"
 
     Given I log out
@@ -110,8 +109,8 @@ Feature: Seminar event cancellation calendar views
     And I click on "Go to calendar" "link"
     Then I should not see "Course 1"
     And I should not see "10:00 AM - 4:00 PM Pacific/Auckland"
-    And I should not see "You are booked for this Seminar event"
     And I should not see "Editing Trainer Teacher One"
+    And I should see "There are no upcoming events"
 
 
   Scenario: mod_facetoface_cancel_801: cancelled events removed from session role calendar.
@@ -122,7 +121,6 @@ Feature: Seminar event cancellation calendar views
     Then I should see date "1 day" formatted "%d %B %Y"
     Then I should see "Course 1"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland"
-    And I should see "You have created this Seminar event"
     And I should see "Teacher One"
 
     Given I log out
@@ -146,5 +144,5 @@ Feature: Seminar event cancellation calendar views
     And I click on "Go to calendar" "link"
     Then I should not see "Course 1"
     And I should not see "10:00 AM - 4:00 PM Pacific/Auckland"
-    And I should not see "You are booked for this Seminar event"
     And I should not see "Editing Trainer Teacher One"
+    And I should see "There are no upcoming events"
