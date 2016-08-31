@@ -180,6 +180,9 @@ class core_renderer extends renderer_base {
      */
     protected $unique_main_content_token;
 
+    /** @var bool Totara helper for tab object rendering */
+    private $secondtabrow = false;
+
     /**
      * Constructor
      *
@@ -2506,7 +2509,7 @@ EOD;
             $message .= '<p class="errormessage">' . get_string('installproblem', 'error') . '</p>';
             //It is usually not possible to recover from errors triggered during installation, you may need to create a new database or use a different database prefix for new installation.
         }
-        $output .= $this->box($message, 'errorbox', null, array('data-rel' => 'fatalerror'));
+        $output .= $this->box($message, 'errorbox alert alert-danger', null, array('data-rel' => 'fatalerror'));
 
         if ($CFG->debugdeveloper) {
             if (!empty($debuginfo)) {
@@ -2548,6 +2551,7 @@ EOD;
 
         $classmappings = array(
             'notifyproblem' => \core\output\notification::NOTIFY_PROBLEM,
+            'notifywarning' => \core\output\notification::NOTIFY_MESSAGE, // Totara: use normal message for warnings, this is not an error.
             'notifytiny' => \core\output\notification::NOTIFY_PROBLEM,
             'notifysuccess' => \core\output\notification::NOTIFY_SUCCESS,
             'notifymessage' => \core\output\notification::NOTIFY_MESSAGE,
@@ -3079,38 +3083,44 @@ EOD;
      * @return string XHTML navbar
      */
     public function navbar() {
+        // Totara: code from bootstrap theme
         $items = $this->page->navbar->get_items();
-        $itemcount = count($items);
-        if ($itemcount === 0) {
+        if (empty($items)) { // MDL-46107.
+            return '';
+        }
+        $breadcrumbs = '';
+        foreach ($items as $item) {
+            $item->hideicon = true;
+            $breadcrumbs .= '<li>'.$this->render($item).'</li>';
+        }
+        return "<ol class=breadcrumb>$breadcrumbs</ol>";
+    }
+
+    /**
+     * This code renders the navbar button to control the display of the custom menu
+     * on smaller screens.
+     *
+     * Do not display the button if the menu is empty.
+     *
+     * @return string HTML fragment
+     */
+    protected function navbar_button() {
+        global $CFG;
+
+        if (empty($CFG->custommenuitems) && $this->lang_menu() == '') {
             return '';
         }
 
-        $htmlblocks = array();
-        // Iterate the navarray and display each node
-        $separator = get_separator();
-        for ($i=0;$i < $itemcount;$i++) {
-            $item = $items[$i];
-            $item->last = false;
-            $item->hideicon = true;
-            if ($i===0) {
-                $content = html_writer::tag('li', $this->render($item));
-            } else if ($i === $itemcount - 1) {
-                $item->last = true;
-                $content = html_writer::tag('li', $separator . $this->render($item));
-            } else {
-                $content = html_writer::tag('li', $separator.$this->render($item));
-            }
-            $htmlblocks[] = $content;
-        }
+        $iconbar = html_writer::tag('span', '', array('class' => 'icon-bar'));
+        $sronly = html_writer::tag('span', 'Toggle navigation', array('class' => 'sr-only')); // TODO: localise
+        $button = html_writer::tag('button', $iconbar . "\n" . $iconbar. "\n" . $iconbar . $sronly, array(
+            'class'       => 'navbar-toggle',
+            'type'        => 'button',
+            'data-toggle' => 'collapse',
+            'data-target' => '#totara-navbar'
+        ));
 
-        //accessibility: heading for navbar list  (MDL-20446)
-        $navbarcontent = html_writer::tag('span', get_string('pagepath'),
-                array('class' => 'accesshide', 'id' => 'navbar-label'));
-        $navbarcontent .= html_writer::tag('nav',
-                html_writer::tag('ul', join('', $htmlblocks)),
-                array('aria-labelledby' => 'navbar-label'));
-        // XHTML
-        return $navbarcontent;
+        return $button;
     }
 
     /**
@@ -3408,81 +3418,49 @@ EOD;
         if (empty($tabtree->subtree)) {
             return '';
         }
-        $str = '';
-        $str .= html_writer::start_tag('div', array('class' => 'tabtree'));
-        $str .= $this->render_tabobject($tabtree);
-        $str .= html_writer::end_tag('div').
-                html_writer::tag('div', ' ', array('class' => 'clearer'));
-        return $str;
+        $firstrow = $secondrow = '';
+        foreach ($tabtree->subtree as $tab) {
+            $firstrow .= $this->render($tab);
+            if (($tab->selected || $tab->activated) && !empty($tab->subtree) && $tab->subtree !== array()) {
+                $this->secondtabrow = true;
+                $secondrow = $this->tabtree($tab->subtree);
+                $this->secondtabrow = false;
+            }
+        }
+        // Note: the tabtree class is necessary to get existing behat tests pass both in new and old themes.
+        $output = html_writer::tag('ul', $firstrow, array('class' => 'nav nav-tabs')) . $secondrow;
+        if (!$this->secondtabrow) {
+            $output = html_writer::tag('div', $output, array('class' => 'tabtree'));
+        }
+        return $output;
     }
 
     /**
-     * Renders tabobject (part of tabtree)
+     * Renders tab object (part of tabtree)
      *
      * This function is called from {@link core_renderer::render_tabtree()}
-     * and also it calls itself when printing the $tabobject subtree recursively.
+     * and also it calls itself when printing the $tab object subtree recursively.
      *
-     * Property $tabobject->level indicates the number of row of tabs.
+     * Property $tab->level indicates the number of row of tabs.
      *
-     * @param tabobject $tabobject
+     * @param tabobject $tab
      * @return string HTML fragment
      */
-    protected function render_tabobject(tabobject $tabobject) {
-        $str = '';
-
-        // Print name of the current tab.
-        if ($tabobject instanceof tabtree) {
-            // No name for tabtree root.
-        } else if ($tabobject->inactive || $tabobject->activated || ($tabobject->selected && !$tabobject->linkedwhenselected)) {
-            // Tab name without a link. The <a> tag is used for styling.
-            $str .= html_writer::tag('a', html_writer::span($tabobject->text), array('class' => 'nolink moodle-has-zindex'));
+    protected function render_tabobject(tabobject $tab) {
+        // Totara: Bootstrap 3 code
+        if ($tab->selected or $tab->activated) {
+            return html_writer::tag('li', html_writer::tag('a', $tab->text), array('class' => 'active'));
+        } else if ($tab->inactive) {
+            return html_writer::tag('li', html_writer::tag('a', $tab->text), array('class' => 'disabled'));
         } else {
-            // Tab name with a link.
-            if (!($tabobject->link instanceof moodle_url)) {
-                // backward compartibility when link was passed as quoted string
-                $str .= "<a href=\"$tabobject->link\" title=\"$tabobject->title\"><span>$tabobject->text</span></a>";
+            if (!($tab->link instanceof moodle_url)) {
+                // Backward compatibility when link was passed as quoted string.
+                $link = "<a href=\"$tab->link\" title=\"$tab->title\">$tab->text</a>";
             } else {
-                $str .= html_writer::link($tabobject->link, html_writer::span($tabobject->text), array('title' => $tabobject->title));
+                $link = html_writer::link($tab->link, $tab->text, array('title' => $tab->title));
             }
+            return html_writer::tag('li', $link);
         }
-
-        if (empty($tabobject->subtree)) {
-            if ($tabobject->selected) {
-                $str .= html_writer::tag('div', '&nbsp;', array('class' => 'tabrow'. ($tabobject->level + 1). ' empty'));
-            }
-            return $str;
-        }
-
-        // Print subtree.
-        if ($tabobject->level == 0 || $tabobject->selected || $tabobject->activated) {
-            $str .= html_writer::start_tag('ul', array('class' => 'tabrow'. $tabobject->level));
-            $cnt = 0;
-            foreach ($tabobject->subtree as $tab) {
-                $liclass = '';
-                if (!$cnt) {
-                    $liclass .= ' first';
-                }
-                if ($cnt == count($tabobject->subtree) - 1) {
-                    $liclass .= ' last';
-                }
-                if ((empty($tab->subtree)) && (!empty($tab->selected))) {
-                    $liclass .= ' onerow';
-                }
-
-                if ($tab->selected) {
-                    $liclass .= ' here selected';
-                } else if ($tab->activated) {
-                    $liclass .= ' here active';
-                }
-
-                // This will recursively call function render_tabobject() for each item in subtree.
-                $str .= html_writer::tag('li', $this->render($tab), array('class' => trim($liclass)));
-                $cnt++;
-            }
-            $str .= html_writer::end_tag('ul');
-        }
-
-        return $str;
     }
 
     /**

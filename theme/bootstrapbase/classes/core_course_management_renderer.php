@@ -17,22 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @copyright 2016 onwards Totara Learning Solutions LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Joby Harding <joby.harding@totaralearning.com>
  * @author    Petr Skoda <petr.skoda@totaralms.com>
- * @package   theme_roots
- *
- * NOTE: this code is based on code from bootstrap theme by Bas Brands and other contributors.
+ * @package   theme_bootstrapbase
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . "/course/classes/management_renderer.php");
-
-class theme_roots_core_course_management_renderer extends core_course_management_renderer {
+class theme_bootstrapbase_core_course_management_renderer extends core_course_management_renderer {
     public function grid_start($id = null, $class = null) {
-        $gridclass = 'row';
+        $gridclass = 'grid-row-r row-fluid';
         if (is_null($class)) {
             $class = $gridclass;
         } else {
@@ -48,12 +42,33 @@ class theme_roots_core_course_management_renderer extends core_course_management
     public function grid_column_start($size, $id = null, $class = null) {
 
         // Calculate Bootstrap grid sizing.
-        $bootstrapclass = 'col-md-'.$size;
+        $bootstrapclass = 'span'.$size;
+
+        // Calculate YUI grid sizing.
+        if ($size === 12) {
+            $maxsize = 1;
+            $size = 1;
+        } else {
+            $maxsize = 12;
+            $divisors = array(8, 6, 5, 4, 3, 2);
+            foreach ($divisors as $divisor) {
+                if (($maxsize % $divisor === 0) && ($size % $divisor === 0)) {
+                    $maxsize = $maxsize / $divisor;
+                    $size = $size / $divisor;
+                    break;
+                }
+            }
+        }
+        if ($maxsize > 1) {
+            $yuigridclass =  "grid-col-{$size}-{$maxsize} grid-col";
+        } else {
+            $yuigridclass =  "grid-col-1 grid-col";
+        }
 
         if (is_null($class)) {
-            $class = $bootstrapclass;
+            $class = $yuigridclass . ' ' . $bootstrapclass;
         } else {
-            $class .= ' ' . $bootstrapclass;
+            $class .= ' ' . $yuigridclass . ' ' . $bootstrapclass;
         }
         $attributes = array();
         if (!is_null($id)) {
@@ -63,9 +78,9 @@ class theme_roots_core_course_management_renderer extends core_course_management
     }
 
     protected function detail_pair($key, $value, $class ='') {
-        $html = html_writer::start_div('detail-pair row '.preg_replace('#[^a-zA-Z0-9_\-]#', '-', $class));
-        $html .= html_writer::div(html_writer::span($key), 'pair-key col-sm-3');
-        $html .= html_writer::div(html_writer::span($value), 'pair-value col-sm-9');
+        $html = html_writer::start_div('detail-pair row yui3-g '.preg_replace('#[^a-zA-Z0-9_\-]#', '-', $class));
+        $html .= html_writer::div(html_writer::span($key), 'pair-key span3 yui3-u-1-4');
+        $html .= html_writer::div(html_writer::span($value), 'pair-value span9 yui3-u-3-4');
         $html .= html_writer::end_div();
         return $html;
     }

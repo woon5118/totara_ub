@@ -322,7 +322,7 @@ class core_files_renderer extends plugin_renderer_base {
         <input type="text" />
     </div>
     <button class="fp-dlg-butcreate btn-primary btn">'.get_string('makeafolder').'</button>
-    <button class="fp-dlg-butcancel btn-cancel btn">'.get_string('cancel').'</button>
+    <button class="fp-dlg-butcancel btn-default btn">'.get_string('cancel').'</button>
 </div>';
         return $rv;
     }
@@ -396,39 +396,39 @@ class core_files_renderer extends plugin_renderer_base {
         <div class="fp-hr"></div>
 
         <div class="fp-forminset">
-                <div class="fp-saveas control-group clearfix">
-                    <label class="control-label">'.get_string('name', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-saveas form-group">
+                    <label class="control-label col-md-4">'.get_string('name', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <input type="text"/>
                     </div>
                 </div>
-                <div class="fp-author control-group clearfix">
-                    <label class="control-label">'.get_string('author', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-author form-group">
+                    <label class="control-label col-md-4">'.get_string('author', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <input type="text"/>
                     </div>
                 </div>
-                <div class="fp-license control-group clearfix">
-                    <label class="control-label">'.get_string('chooselicense', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-license form-group">
+                    <label class="control-label col-md-4">'.get_string('chooselicense', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <select></select>
                     </div>
                 </div>
-                <div class="fp-path control-group clearfix">
-                    <label class="control-label">'.get_string('path', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-path form-group">
+                    <label class="control-label col-md-4">'.get_string('path', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <select></select>
                     </div>
                 </div>
-                <div class="fp-original control-group clearfix">
-                    <label class="control-label">'.get_string('original', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-original form-group">
+                    <label class="control-label col-md-4">'.get_string('original', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <span class="fp-originloading">'.$iconprogress.' '.$strloading.'</span><span class="fp-value"></span>
                     </div>
                 </div>
-                <div class="fp-reflist control-group clearfix">
-                    <label class="control-label">'.get_string('referenceslist', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-reflist form-group">
+                    <label class="control-label col-md-4">'.get_string('referenceslist', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <p class="fp-refcount"></p>
                         <span class="fp-reflistloading">'.$iconprogress.' '.$strloading.'</span>
                         <ul class="fp-value"></ul>
@@ -437,7 +437,7 @@ class core_files_renderer extends plugin_renderer_base {
         </div>
         <div class="fp-select-buttons">
             <button class="fp-file-update btn-primary btn">'.get_string('update', 'moodle').'</button>
-            <button class="fp-file-cancel btn-cancel btn">'.get_string('cancel').'</button>
+            <button class="fp-file-cancel btn-default btn">'.get_string('cancel').'</button>
         </div>
     </form>
     <div class="fp-info clearfix">
@@ -470,7 +470,7 @@ class core_files_renderer extends plugin_renderer_base {
 <div class="filemanager fp-dlg">
     <div class="fp-dlg-text"></div>
     <button class="fp-dlg-butconfirm btn-primary btn">'.get_string('ok').'</button>
-    <button class="fp-dlg-butcancel btn-cancel btn">'.get_string('cancel').'</button>
+    <button class="fp-dlg-butcancel btn-default btn">'.get_string('cancel').'</button>
 </div>';
         return $rv;
     }
@@ -484,8 +484,9 @@ class core_files_renderer extends plugin_renderer_base {
         $class_methods = get_class_methods($this);
         $templates = array();
         foreach ($class_methods as $method_name) {
-            if (preg_match('/^fm_js_template_(.*)$/', $method_name, $matches))
-            $templates[$matches[1]] = $this->$method_name();
+            if (preg_match('/^fm_js_template_(.*)$/', $method_name, $matches)) {
+                $templates[$matches[1]] = $this->$method_name();
+            }
         }
         return $templates;
     }
@@ -731,46 +732,46 @@ class core_files_renderer extends plugin_renderer_base {
     <div class="fp-select-loading">'.$this->output->flex_icon('loading').'</div>
     <form class="form-horizontal">
         <div class="fp-forminset">
-                <div class="fp-linktype-2 control-group control-radio clearfix">
-                    <label class="control-label control-radio">'.get_string('makefileinternal', 'repository').'</label>
-                    <div class="controls control-radio">
+                <div class="fp-linktype-2 form-group">
+                    <label class="control-label col-md-4">'.get_string('makefileinternal', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <input type="radio"/>
                     </div>
                 </div>
-                <div class="fp-linktype-1 control-group control-radio clearfix">
-                    <label class="control-label control-radio">'.get_string('makefilelink', 'repository').'</label>
-                    <div class="controls control-radio">
+                <div class="fp-linktype-1 form-group">
+                    <label class="control-label col-md-4">'.get_string('makefilelink', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <input type="radio"/>
                     </div>
                 </div>
-                <div class="fp-linktype-4 control-group control-radio clearfix">
-                    <label class="control-label control-radio">'.get_string('makefilereference', 'repository').'</label>
-                    <div class="controls control-radio">
+                <div class="fp-linktype-4 form-group">
+                    <label class="control-label col-md-4">'.get_string('makefilereference', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <input type="radio"/>
                     </div>
                 </div>
-                <div class="fp-saveas control-group clearfix">
-                    <label class="control-label">'.get_string('saveas', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-saveas form-group">
+                    <label class="control-label col-md-4">'.get_string('saveas', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <input type="text"/>
                     </div>
                 </div>
-                <div class="fp-setauthor control-group clearfix">
-                    <label class="control-label">'.get_string('author', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-setauthor form-group">
+                    <label class="control-label col-md-4">'.get_string('author', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <input type="text"/>
                     </div>
                 </div>
-                <div class="fp-setlicense control-group clearfix">
-                    <label class="control-label">'.get_string('chooselicense', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-setlicense form-group">
+                    <label class="control-label col-md-4">'.get_string('chooselicense', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <select></select>
                     </div>
                 </div>
         </div>
        <div class="fp-select-buttons">
             <button class="fp-select-confirm btn-primary btn">'.get_string('getfile', 'repository').'</button>
-            <button class="fp-select-cancel btn-cancel btn">'.get_string('cancel').'</button>
+            <button class="fp-select-cancel btn-default btn">'.get_string('cancel').'</button>
         </div>
     </form>
     <div class="fp-info clearfix">
@@ -813,33 +814,33 @@ class core_files_renderer extends plugin_renderer_base {
     <div class="fp-content-center">
         <form enctype="multipart/form-data" method="POST" class="form-horizontal">
             <div class="fp-formset">
-                <div class="fp-file control-group clearfix">
-                    <label class="control-label">'.get_string('attachment', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-file form-group">
+                    <label class="control-label col-md-4">'.get_string('attachment', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <input type="file"/>
                     </div>
                 </div>
-                <div class="fp-saveas control-group clearfix">
-                    <label class="control-label">'.get_string('saveas', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-saveas form-group">
+                    <label class="control-label col-md-4">'.get_string('saveas', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <input type="text"/>
                     </div>
                 </div>
-                <div class="fp-setauthor control-group clearfix">
-                    <label class="control-label">'.get_string('author', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-setauthor form-group">
+                    <label class="control-label col-md-4">'.get_string('author', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <input type="text"/>
                     </div>
                 </div>
-                <div class="fp-setlicense control-group clearfix">
-                    <label class="control-label">'.get_string('chooselicense', 'repository').'</label>
-                    <div class="controls">
+                <div class="fp-setlicense form-group">
+                    <label class="control-label col-md-4">'.get_string('chooselicense', 'repository').'</label>
+                    <div class="controls col-md-8">
                         <select ></select>
                     </div>
                 </div>
             </div>
         </form>
-        <div class="mdl-align">
+        <div class="col-md-8 col-md-offset-4">
             <button class="fp-upload-btn btn-primary btn">'.get_string('upload', 'repository').'</button>
         </div>
     </div>
@@ -918,7 +919,7 @@ class core_files_renderer extends plugin_renderer_base {
     <div class="fp-dlg-buttons">
         <button class="fp-dlg-butoverwrite btn">'.get_string('overwrite', 'repository').'</button>
         <button class="fp-dlg-butrename btn"></button>
-        <button class="fp-dlg-butcancel btn btn-cancel">'.get_string('cancel').'</button>
+        <button class="fp-dlg-butcancel btn btn-default">'.get_string('cancel').'</button>
     </div>
 </div>';
         return $rv;
@@ -980,32 +981,32 @@ class core_files_renderer extends plugin_renderer_base {
     <div class="fp-content-center">
         <form class="form-horizontal">
             <div class="fp-formset">
-                <div class="fp-login-popup control-group clearfix">
-                    <div class="controls fp-popup">
+                <div class="fp-login-popup form-group">
+                    <div class="controls col-md-8 fp-popup">
                         <button class="fp-login-popup-but btn-primary btn">'.get_string('login', 'repository').'</button>
                     </div>
                 </div>
-                <div class="fp-login-textarea control-group clearfix">
-                    <div class="controls"><textarea></textarea></div>
+                <div class="fp-login-textarea form-group">
+                    <div class="controls col-md-8"><textarea></textarea></div>
                 </div>
-                <div class="fp-login-select control-group clearfix">
-                    <label class="control-label"></label>
-
-                    <div class="controls"><select></select></div>
+                <div class="fp-login-select form-group">
+                    <label class="control-label col-md-4"></label>
+                    <div class="controls col-md-8"><select></select></div>
                 </div>';
         // HACK to prevent browsers from automatically inserting the user's password into the wrong fields.
         $rv .= prevent_form_autofill_password();
         $rv .= '
-                <div class="fp-login-input control-group clearfix">
-                    <label class="control-label"></label>
-                    <div class="controls"><input/></div>
+                <div class="fp-login-input form-group">
+                    <label class="control-label col-md-4"></label>
+                    <div class="controls col-md-8"><input/></div>
                 </div>
-                <div class="fp-login-radiogroup control-group clearfix">
-                    <label class="control-label"></label>
-                    <div class="controls fp-login-radio"><input /> <label></label></div>
+                <div class="fp-login-radiogroup form-group">
+                    <label class="control-label col-md-4"></label>
+                    <div class="controls col-md-8 fp-login-radio"><input /> <label></label></div>
                 </div>
             </div>
-            <p><button class="fp-login-submit btn-primary btn">'.get_string('submit', 'repository').'</button></p>
+            <div class="col-md-8 col-md-offset-4"><button class="fp-login-submit btn-primary btn">'.
+            get_string('submit', 'repository').'</button></div>
         </form>
     </div>
 </div>';
@@ -1021,8 +1022,9 @@ class core_files_renderer extends plugin_renderer_base {
         $class_methods = get_class_methods($this);
         $templates = array();
         foreach ($class_methods as $method_name) {
-            if (preg_match('/^fp_js_template_(.*)$/', $method_name, $matches))
-            $templates[$matches[1]] = $this->$method_name();
+            if (preg_match('/^fp_js_template_(.*)$/', $method_name, $matches)) {
+                $templates[$matches[1]] = $this->$method_name();
+            }
         }
         return $templates;
     }

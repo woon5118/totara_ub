@@ -155,7 +155,8 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
         if ($section->section != 0) {
             // Only in the non-general sections.
             if (course_get_format($course)->is_section_current($section)) {
-                $o = get_accesshide(get_string('currentsection', 'format_'.$course->format));
+                // Totara: use the same spacing in all sections.
+                $o .= get_accesshide(get_string('currentsection', 'format_'.$course->format));
             }
         }
 

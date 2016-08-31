@@ -520,7 +520,13 @@ class core_admin_renderer extends plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function warning($message, $type = 'warning') {
-        return $this->box($message, 'generalbox admin' . $type);
+        $notifytype = 'notifyproblem';
+        if ($type === 'warning') {
+            $notifytype = 'notifywarning';
+        } else if ($type === 'error') {
+            $notifytype = 'notifyproblem';
+        }
+        return $this->notification($message, $notifytype);
     }
 
     /**
@@ -832,10 +838,8 @@ class core_admin_renderer extends plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function release_notes_link() {
-        global $CFG;
         $releasenoteslink = get_string('releasenoteslink', 'admin', 'http://community.totaralms.com/mod/forum/view.php?id=1834');
-        $releasenoteslink = str_replace('target="_blank"', 'onclick="this.target=\'_blank\'"', $releasenoteslink); // extremely ugly validation hack
-        return $this->box($releasenoteslink, 'generalbox releasenoteslink');
+        return $this->notification($releasenoteslink, 'notifymessage');
     }
 
     /**
@@ -955,6 +959,18 @@ class core_admin_renderer extends plugin_renderer_base {
 
                 $statuscode = $plugin->get_status();
                 $row->attributes['class'] .= ' status-' . $statuscode;
+                // Totara: add Bootstrap 3 classes
+                if ($statuscode === 'missing') {
+                    $row->attributes['class'] .= ' danger';
+                } else if ($statuscode === 'downgrade') {
+                    $row->attributes['class'] .= ' danger';
+                } else if ($statuscode === 'upgrade') {
+                    $row->attributes['class'] .= ' info';
+                } else if ($statuscode === 'delete') {
+                    $row->attributes['class'] .= ' info';
+                } else if ($statuscode === 'new') {
+                    $row->attributes['class'] .= ' success';
+                }
                 $statusclass = 'statustext label label-default ';
                 switch ($statuscode) {
                     case core_plugin_manager::PLUGIN_STATUS_NEW:
@@ -1910,18 +1926,20 @@ class core_admin_renderer extends plugin_renderer_base {
                 // Format error or warning line
                 if ($errorline || $warningline) {
                     $messagetype = $errorline? 'error':'warn';
+                    $messageclass = $errorline? 'danger':'warning';
                 } else {
                     $messagetype = 'ok';
+                    $messageclass = 'success';
                 }
-                $status = '<span class="'.$messagetype.'">'.$status.'</span>';
+                $status = '<span class="label label-'.$messageclass.'">'.$status.'</span>';
                 // Here we'll store all the feedback found
                 $feedbacktext = '';
                 // Append the feedback if there is some
-                $feedbacktext .= $environment_result->strToReport($environment_result->getFeedbackStr(), $messagetype);
+                $feedbacktext .= $environment_result->strToReport($environment_result->getFeedbackStr(), 'text-' . $messageclass);
                 //Append the bypass if there is some
-                $feedbacktext .= $environment_result->strToReport($environment_result->getBypassStr(), 'warn');
+                $feedbacktext .= $environment_result->strToReport($environment_result->getBypassStr(), 'text-warning');
                 //Append the restrict if there is some
-                $feedbacktext .= $environment_result->strToReport($environment_result->getRestrictStr(), 'error');
+                $feedbacktext .= $environment_result->strToReport($environment_result->getRestrictStr(), 'text-danger');
 
                 $report .= $feedbacktext;
 

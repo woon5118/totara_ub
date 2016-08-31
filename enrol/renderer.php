@@ -42,6 +42,9 @@ class core_enrol_renderer extends plugin_renderer_base {
 
         $table->initialise_javascript();
 
+        // Totara: Added for the Bootstrap theme. Make this table responsive.
+        $table->attributes['class'] .= ' table table-responsive';
+
         $buttons = $table->get_manual_enrol_buttons();
         $buttonhtml = '';
         if (count($buttons) > 0) {
@@ -85,7 +88,10 @@ class core_enrol_renderer extends plugin_renderer_base {
 
             $content .= html_writer::end_tag('form');
         } else {
+            // Totara: Added for the Bootstrap theme, a no-overflow wrapper.
+            $content .= html_writer::start_tag('div', array('class' => 'no-overflow'));
             $content .= html_writer::table($table);
+            $content .= html_writer::end_tag('div');
         }
         $content .= $this->output->render($table->get_paging_bar());
         if (!empty($buttonhtml)) {

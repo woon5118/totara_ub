@@ -28,18 +28,5 @@ defined('MOODLE_INTERNAL') || die();
 require_once("{$CFG->dirroot}/totara/core/renderer.php");
 
 class theme_bootstrapbase_totara_core_renderer extends totara_core_renderer {
-
-    /**
-     * Outputs a block containing totara copyright information
-     *
-     * @param string $totara_release A totara release version, for inclusion in the block
-     *
-     * @return string HTML to output.
-     */
-    public function totara_print_copyright($totara_release) {
-        $output = parent::totara_print_copyright($totara_release);
-        $output = str_replace('class="totara-copyright"', 'class="box generalbox adminwarning totara-copyright"', $output);
-        return $output;
-    }
-
+    // Keep even if empty for backwards compatibility with 3rd party themes.
 }

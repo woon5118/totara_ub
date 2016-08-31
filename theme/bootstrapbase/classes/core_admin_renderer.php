@@ -69,4 +69,23 @@ class theme_bootstrapbase_core_admin_renderer extends core_admin_renderer {
         $output = str_replace('class="copyright-acknowledgements"', 'class="box generalbox adminwarning copyright-acknowledgements"', $output);
         return $output;
     }
+
+    public function environment_check_table($result, $environment) {
+        // Totara: original function from Moodle 3
+        $html = parent::environment_check_table($result, $environment);
+
+        $replacements = array(
+            '<span class="label label-success">' => '<span class="ok">',
+            '<span class="label label-warning">' => '<span class="warn">',
+            '<span class="label label-danger">' => '<span class="error">',
+            '<p class="text-success">' => '<p class="ok">',
+            '<p class="text-warning">' => '<p class="warn">',
+            '<p class="text-danger">' => '<p class="error">',
+        );
+
+        $find = array_keys($replacements);
+        $replace = array_values($replacements);
+
+        return str_replace($find, $replace, $html);
+    }
 }

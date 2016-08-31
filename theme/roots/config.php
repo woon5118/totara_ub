@@ -40,7 +40,6 @@ $THEME->parents_exclude_sheets = array(
     'base' => array('flexible-icons'),
 );
 
-$THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->plugins_exclude_sheets = array(
     'block' => array(
         'current_learning',

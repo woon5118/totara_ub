@@ -32,7 +32,6 @@ $THEME->yuicssmodules = array();
 $THEME->enable_dock = true;
 $THEME->sheets = array('totara');
 $THEME->supportscssoptimisation = false;
-$THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->enable_dock = true;
 
 // Use CSS preprocessing to facilitate style inheritance.

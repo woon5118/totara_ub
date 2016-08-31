@@ -37,4 +37,5 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class theme_bootstrapbase_core_renderer_maintenance extends core_renderer_maintenance {
+    // Keep even if empty for backwards compatibility with 3rd party themes.
 }
