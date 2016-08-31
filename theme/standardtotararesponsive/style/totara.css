@@ -541,3 +541,9 @@ fieldset .felement input[type='button'],
 fieldset .felement input[type='submit'] {
     margin-bottom: 0;
 }
+
+/* Fix for higher pix density screenshots in theme selector */
+#adminthemeselector td img {
+    max-width: 500px;
+    max-height: 342px;
+}
