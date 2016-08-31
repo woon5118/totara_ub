@@ -123,7 +123,7 @@ Feature: Seminar event cancellation notifications
     And I should see "10 February 2025, 9:00 AM - 3:00 PM Pacific/Auckland"
     And I press "Yes"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
-    And I should see "0 / 2" in the "10 February 2025" "table_row"
+    And I should see "3 / 2 (Overbooked)" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
     And "Cancel event" "link" should not exist in the "10 February 2025" "table_row"
 
@@ -229,7 +229,7 @@ Feature: Seminar event cancellation notifications
     And I press "Yes"
     Then I should see "9:00 AM - 3:00 PM Pacific/Auckland" in the "10 February 2025" "table_row"
     And I should see "10:00 AM - 4:00 PM Pacific/Auckland" in the "11 March 2026" "table_row"
-    And I should see "0 / 2" in the "10 February 2025" "table_row"
+    And I should see "3 / 2 (Overbooked)" in the "10 February 2025" "table_row"
     And I should see "Event cancelled" in the "10 February 2025" "table_row"
     And "Cancel event" "link" should not exist in the "10 February 2025" "table_row"
 
