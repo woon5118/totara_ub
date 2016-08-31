@@ -89,7 +89,7 @@
     color: #333333;
     background: #CCCCCC;
 }
-.block .minicalendar td.day.hasevent,.block .minicalendar td.hasevent a {
+.block .minicalendar td.day.hasevent,.block .minicalendar td.weekend.hasevent a {
     color: #333333;
 }
 .block .minicalendar td.today a {
@@ -98,6 +98,19 @@
 .block .minicalendar td.weekend {
     color: #999999;
     background: #f5f5f5;
+}
+
+.block .minicalendar td.calendar_event_course {
+    background-color: #ffd3bd;
+}
+.block .minicalendar td.calendar_event_global {
+    background-color: #d6f8cd;
+}
+.block .minicalendar td.calendar_event_group {
+    background-color: #fee7ae;
+}
+.block .minicalendar td.calendar_event_user {
+    background-color: #dce7ec;
 }
 .block .calendar_filters.filters {
     background-color: transparent;
