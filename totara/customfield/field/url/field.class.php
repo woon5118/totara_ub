@@ -285,6 +285,11 @@ class customfield_url extends customfield_base {
         $fieldname = $this->inputname;
         $url = $syncitem->$fieldname;
 
+        if (isset($url['url'])) {
+            // Has already been processed.
+            return $syncitem;
+        }
+
         $data = array();
         if (!empty($url)) {
             $url = core_text::strtolower($url);
