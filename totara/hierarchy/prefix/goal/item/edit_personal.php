@@ -175,7 +175,7 @@ if ($mform->is_cancelled()) {
         if ($USER->id == $todb->userid && $can_edit[GOAL_ASSIGNMENT_SELF]) {
             // They are assigning it to themselves.
             $todb->assigntype = GOAL_ASSIGNMENT_SELF;
-        } else if (totara_is_manager($todb->userid) && $can_edit[GOAL_ASSIGNMENT_MANAGER]) {
+        } else if (\totara_job\job_assignment::is_managing($USER->id, $todb->userid) && $can_edit[GOAL_ASSIGNMENT_MANAGER]) {
             // They are assigning it to their team.
             $todb->assigntype = GOAL_ASSIGNMENT_MANAGER;
         } else if ($can_edit[GOAL_ASSIGNMENT_ADMIN]) {

@@ -59,7 +59,7 @@ if ($USER->id == $userid) {
     $PAGE->navbar->add($strmyfeedback);
     $PAGE->set_title($strmyfeedback);
     $PAGE->set_heading($strmyfeedback);
-} else if (totara_is_manager($userid)) {
+} else if (\totara_job\job_assignment::is_managing($USER->id, $userid)) {
     // You are a manager view a staff members feedback.
     $viewrequestee = has_capability('totara/feedback360:viewstaffreceivedfeedback360', $usercontext);
     $viewrequested = has_capability('totara/feedback360:viewstaffrequestedfeedback360', $usercontext);

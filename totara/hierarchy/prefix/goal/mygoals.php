@@ -78,7 +78,7 @@ if ($format != '') {
 $report->include_js();
 /* End of defining the report */
 
-if (totara_is_manager($userid)) {
+if (\totara_job\job_assignment::is_managing($USER->id, $userid)) {
     $username = fullname($DB->get_record('user', array('id' => $userid)));
     $strmygoals = get_string('mygoalsteam', 'totara_hierarchy', $username);
     if (totara_feature_visible('myteam')) {

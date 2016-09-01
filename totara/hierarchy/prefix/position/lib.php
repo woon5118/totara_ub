@@ -32,6 +32,26 @@ require_once("{$CFG->dirroot}/totara/hierarchy/lib.php");
 require_once("{$CFG->dirroot}/totara/core/utils.php");
 require_once("{$CFG->dirroot}/completion/data_object.php");
 
+/** @deprecated since 9.0 */
+define('POSITION_TYPE_PRIMARY',         1);
+/** @deprecated since 9.0 */
+define('POSITION_TYPE_SECONDARY',       2);
+/** @deprecated since 9.0 */
+define('POSITION_TYPE_ASPIRATIONAL',    3);
+
+// List available position types
+/** @deprecated since 9.0 */
+global $POSITION_TYPES;
+$POSITION_TYPES = array(
+    POSITION_TYPE_PRIMARY       => 'primary',
+    POSITION_TYPE_SECONDARY     => 'secondary',
+    POSITION_TYPE_ASPIRATIONAL  => 'aspirational'
+);
+
+/** @deprecated since 9.0 */
+global $POSITION_CODES;
+$POSITION_CODES = array_flip($POSITION_TYPES);
+
 /**
  * Oject that holds methods and attributes for position operations.
  * @abstract

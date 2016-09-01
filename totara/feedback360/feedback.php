@@ -86,7 +86,7 @@ if ($isexternaluser) {
 
     if ($respassignment->subjectid != $USER->id) {
         // If you arent the owner of the feedback request.
-        if (totara_is_manager($respassignment->subjectid)) {
+        if (\totara_job\job_assignment::is_managing($USER->id, $respassignment->subjectid)) {
             // Or their manager.
             $capability_context = context_user::instance($respassignment->subjectid);
             require_capability('totara/feedback360:viewstaffreceivedfeedback360', $capability_context);
@@ -113,7 +113,7 @@ if ($isexternaluser) {
 
     // If you aren't the owner of the response.
     if ($viewas != $USER->id) {
-        if (totara_is_manager($viewas)) {
+        if (\totara_job\job_assignment::is_managing($USER->id, $viewas)) {
             // You are a manager viewing your team members responses to someone else, you need to view staff feedback capability.
             $usercontext = context_user::instance($viewas);
             require_capability('totara/feedback360:viewstaffrequestedfeedback360', $usercontext);

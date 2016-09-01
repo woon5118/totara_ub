@@ -62,7 +62,7 @@ function prog_can_view_users_required_learning($learnerid) {
     }
 
     // If this user is their manager
-    if (totara_is_manager($learnerid)) {
+    if (\totara_job\job_assignment::is_managing($USER->id, $learnerid)) {
         return true;
     }
 
@@ -1250,7 +1250,7 @@ function prog_process_extensions($extensionslist, $reasonfordecision = array()) 
                     }
 
                     // Ensure the message is actually coming from $user's manager, default to support.
-                    $userfrom = totara_is_manager($extension->userid, $USER->id) ? $USER : core_user::get_support_user();
+                    $userfrom = \totara_job\job_assignment::is_managing($USER->id, $extension->userid, $USER->id) ? $USER : core_user::get_support_user();
                     $stringmanager = get_string_manager();
                     $messagedata = new stdClass();
                     $messagedata->userto           = $userto;

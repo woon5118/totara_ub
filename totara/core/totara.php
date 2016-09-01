@@ -1049,40 +1049,91 @@ function totara_print_my_courses() {
  *
  * If managerid is not set, uses the current user
  *
+ * @deprecated since 9.0
  * @param int $userid       ID of user
  * @param int $managerid    ID of a potential manager to check (optional)
+ * @param int $postype      Type of the position to check (POSITION_TYPE_* constant). Defaults to all positions (optional)
  * @return boolean true if user $userid is managed by user $managerid
  **/
-function totara_is_manager($userid, $managerid = null) {
+function totara_is_manager($userid, $managerid = null, $postype = null) {
     global $USER;
 
-    // Deprecate!
+    debugging('The function totara_is_manager has been deprecated since 9.0. Please use \totara_job\job_assignment::is_managing instead.', DEBUG_DEVELOPER);
 
     if (empty($managerid)) {
         $managerid = $USER->id;
     }
 
-    return \totara_job\job_assignment::is_managing($managerid, $userid);
+    $staffjaid = null;
+
+    if (!empty($postype)) {
+        if (!in_array($postype, array(POSITION_TYPE_PRIMARY, POSITION_TYPE_SECONDARY))) {
+            // Position type not recognised. Or if it was for an aspiration position, manager assignments were not possible.
+            return false;
+        }
+        // If postype has been included then we'll look according to sortorder. We're only getting job assignments
+        // where there's a manager.
+        $jobassignments = \totara_job\job_assignment::get_all($userid, true);
+        foreach($jobassignments as $jobassignment) {
+            if ($jobassignment->sortorder == $postype) {
+                $staffjaid = $jobassignment->id;
+                break;
+            }
+        }
+
+        if (empty($staffjaid)) {
+            // None found with that $postype, meaning there is no manager at all for that postype.
+            return false;
+        }
+    }
+
+    return \totara_job\job_assignment::is_managing($managerid, $userid, $staffjaid);
 }
 
 /**
  * Returns the staff of the specified user
  *
+ * @deprecated since 9.0
  * @param int $managerid ID of a user to get the staff of, If $managerid is not set, returns staff of current user
- * @param int $jobassignid ID of the job assignment to check. Defaults to all job assignments belonging to the manager
+ * @param mixed $postype Type of the position to check (POSITION_TYPE_* constant). Defaults to primary position (optional)
  * @param bool $sort optional ordering by lastname, firstname
  * @return array|bool Array of userids of staff who are managed by user $userid , or false if none
  **/
-function totara_get_staff($managerid = null, $jobassignid = 0, $sort = false) {
+function totara_get_staff($managerid = null, $postype = null, $sort = false) {
     global $USER;
 
-    // Deprecate!
+    debugging('totara_get_staff has been deprecated since 9.0. Use \totara_job\job_assignment::get_staff_userids instead.', DEBUG_DEVELOPER);
+
+    if ($sort) {
+        debugging('Warning: The $sort argument in deprecated function totara_get_staff is no longer valid. Returned ids will not be sorted according to last name and first name.',
+            DEBUG_DEVELOPER);
+    }
+
+    if (!empty($postype)) {
+        if (!in_array($postype, array(POSITION_TYPE_PRIMARY, POSITION_TYPE_SECONDARY))) {
+            // Position type not recognised. Or if it was for an aspiration position, manager assignments were not possible.
+            return false;
+        }
+    } else {
+        $postype = POSITION_TYPE_PRIMARY;
+    }
 
     if (empty($managerid)) {
         $managerid = $USER->id;
     }
 
-    $result = \totara_job\job_assignment::get_staff_userids($managerid, $jobassignid, true);
+    $jobassignments = \totara_job\job_assignment::get_all($managerid);
+    $result = false;
+    foreach ($jobassignments as $jobassignment) {
+        if (!empty($postype) && $jobassignment->sortorder != $postype) {
+            // If $postype was specified, closest to backwards-compatibility we can achieve is to base it on sortorder.
+            continue;
+        }
+
+        $result = \totara_job\job_assignment::get_staff_userids($managerid, $jobassignment->id, true);
+        break;
+    }
+
     if (empty($result)) {
         return false;
     } else {
@@ -1093,20 +1144,35 @@ function totara_get_staff($managerid = null, $jobassignid = 0, $sort = false) {
 /**
  * Find out a user's manager.
  *
+ * @deprecated since 9.0
  * @param int $userid Id of the user whose manager we want
+ * @param int $postype Type of the position we want the manager for (POSITION_TYPE_* constant). Defaults to primary position (i.e. sortorder=1).
  * @param boolean $skiptemp Skip check and return of temporary manager
  * @param boolean $skipreal Skip check and return of real manager
  * @return mixed False if no manager. Manager user object from mdl_user if the user has a manager.
  */
-function totara_get_manager($userid, $skiptemp = false, $skipreal = false) {
+function totara_get_manager($userid, $postype = null, $skiptemp = false, $skipreal = false) {
     global $CFG, $DB;
 
-    // Deprecate!
+    debugging('totara_get_manager has been deprecated since 9.0. You will need to use methods from \totara_job\job_assignment instead.', DEBUG_DEVELOPER);
+
+    if (!empty($postype)) {
+        if (!in_array($postype, array(POSITION_TYPE_PRIMARY, POSITION_TYPE_SECONDARY))) {
+            // Position type not recognised. Or if it was for an aspiration position, manager assignments were not possible.
+            return false;
+        }
+    } else {
+        $postype = POSITION_TYPE_PRIMARY;
+    }
 
     $jobassignments = \totara_job\job_assignment::get_all($userid);
 
     $managerid = false;
     foreach ($jobassignments as $jobassignment) {
+        if (!empty($postype) && $jobassignment->sortorder != $postype) {
+            // If $postype was specified, closest to backwards-compatibility we can achieve is to base it on sortorder.
+            continue;
+        }
         if (!$skiptemp && $jobassignment->tempmanagerjaid && !empty($CFG->enabletempmanagers)) {
             $managerid = $jobassignment->tempmanagerid;
             break;
@@ -1127,9 +1193,6 @@ function totara_get_manager($userid, $skiptemp = false, $skipreal = false) {
 /**
  * Find the manager of the user's 'first' job.
  *
- * This function probably returns a result, but it's probably not the best result.
- * It might actually be better to rethink the places where this is used and deprecate this function.
- *
  * @deprecated since version 9.0
  * @param int|bool $userid Id of the user whose manager we want
  * @return mixed False if no manager. Manager user object from mdl_user if the user has a manager.
@@ -1137,7 +1200,7 @@ function totara_get_manager($userid, $skiptemp = false, $skipreal = false) {
 function totara_get_most_primary_manager($userid = false) {
     global $DB, $USER;
 
-    debugging("totara_get_most_primary_manager is deprecated. Use \\totara_job\\job_assignment methods instead.");
+    debugging("totara_get_most_primary_manager is deprecated. Use \\totara_job\\job_assignment methods instead.", DEBUG_DEVELOPER);
 
     if ($userid === false) {
         $userid = $USER->id;
@@ -1145,75 +1208,233 @@ function totara_get_most_primary_manager($userid = false) {
 
     $managers = \totara_job\job_assignment::get_all_manager_userids($userid);
     if (!empty($managers)) {
-        return $DB->get_record('user', array('id' => $managers[0]));
+        $managerid = reset($managers);
+        return $DB->get_record('user', array('id' => $managerid));
     }
     return false;
 }
 
+/**
+ * Update/set a temp manager for the specified user
+ *
+ * @deprecated since 9.0
+ * @param int $userid Id of user to set temp manager for
+ * @param int $managerid Id of temp manager to be assigned to user.
+ * @param int $expiry Temp manager expiry epoch timestamp
+ */
+function totara_update_temporary_manager($userid, $managerid, $expiry) {
+    global $CFG, $DB, $USER;
+
+    debugging('totara_update_temporary_manager is deprecated. Use \totara_job\job_assignment::update instead.', DEBUG_DEVELOPER);
+
+    if (!$user = $DB->get_record('user', array('id' => $userid))) {
+        return false;
+    }
+
+    // With multiple job assignments, we'll only consider the first job assignment for this function.
+    $jobassignment = \totara_job\job_assignment::get_first($userid, false);
+    if (empty($jobassignment)) {
+        return false;
+    }
+
+    if (empty($jobassignment->managerid)) {
+        $realmanager = false;
+    } else {
+        $realmanager = $DB->get_record('user', array('id' => $jobassignment->managerid));
+    }
+
+    if (empty($jobassignment->tempmanagerid)) {
+        $oldtempmanager = false;
+    } else {
+        $oldtempmanager = $DB->get_record('user', array('id' => $jobassignment->tempmanagerid));
+    }
+
+    if (!$newtempmanager = $DB->get_record('user', array('id' => $managerid))) {
+        return false;
+    }
+
+    // Set up messaging.
+    require_once($CFG->dirroot.'/totara/message/messagelib.php');
+    $msg = new stdClass();
+    $msg->userfrom = $USER;
+    $msg->msgstatus = TOTARA_MSG_STATUS_OK;
+    $msg->contexturl = $CFG->wwwroot.'/user/positions.php?user='.$userid.'&courseid='.SITEID;
+    $msg->contexturlname = get_string('xpositions', 'totara_core', fullname($user));
+    $msgparams = (object)array('staffmember' => fullname($user), 'tempmanager' => fullname($newtempmanager),
+        'expirytime' => userdate($expiry, get_string('datepickerlongyearphpuserdate', 'totara_core')), 'url' => $msg->contexturl);
+
+    if (!empty($oldtempmanager) && $newtempmanager->id == $oldtempmanager->tempmanagerid) {
+        if ($jobassignment->tempmanagerexpirydate == $expiry) {
+            // Nothing to do here.
+            return true;
+        } else {
+            // Update expiry time.
+            $jobassignment->update(array('tempmanagerexpirydate' => $expiry));
+
+            // Expiry change notifications.
+
+            // Notify staff member.
+            $msg->userto = $user;
+            $msg->subject = get_string('tempmanagerexpiryupdatemsgstaffsubject', 'totara_core', $msgparams);
+            $msg->fullmessage = get_string('tempmanagerexpiryupdatemsgstaff', 'totara_core', $msgparams);
+            $msg->fullmessagehtml = get_string('tempmanagerexpiryupdatemsgstaff', 'totara_core', $msgparams);
+            tm_alert_send($msg);
+
+            // Notify real manager.
+            if (!empty($realmanager)) {
+                $msg->userto = $realmanager;
+                $msg->subject = get_string('tempmanagerexpiryupdatemsgmgrsubject', 'totara_core', $msgparams);
+                $msg->fullmessage = get_string('tempmanagerexpiryupdatemsgmgr', 'totara_core', $msgparams);
+                $msg->fullmessagehtml = get_string('tempmanagerexpiryupdatemsgmgr', 'totara_core', $msgparams);
+                $msg->roleid = $CFG->managerroleid;
+                tm_alert_send($msg);
+            }
+
+            // Notify temp manager.
+            $msg->userto = $newtempmanager;
+            $msg->subject = get_string('tempmanagerexpiryupdatemsgtmpmgrsubject', 'totara_core', $msgparams);
+            $msg->fullmessage = get_string('tempmanagerexpiryupdatemsgtmpmgr', 'totara_core', $msgparams);
+            $msg->fullmessagehtml = get_string('tempmanagerexpiryupdatemsgtmpmgr', 'totara_core', $msgparams);
+            $msg->roleid = $CFG->managerroleid;
+            tm_alert_send($msg);
+
+            return true;
+        }
+    }
+
+    $newtempmanagerja = \totara_job\job_assignment::get_first($newtempmanager->id);
+    if (empty($newtempmanagerja)) {
+        $newtempmanagerja = \totara_job\job_assignment::create_default($newtempmanager->id);
+    }
+    // Assign/update temp manager role assignment.
+    $jobassignment->update(array('tempmanagerjaid' => $newtempmanagerja->id, 'tempmanagerexpirydate' => $expiry));
+
+    // Send assignment notifications.
+
+    // Notify staff member.
+    $msg->userto = $user;
+    $msg->subject = get_string('tempmanagerassignmsgstaffsubject', 'totara_core', $msgparams);
+    $msg->fullmessage = get_string('tempmanagerassignmsgstaff', 'totara_core', $msgparams);
+    $msg->fullmessagehtml = get_string('tempmanagerassignmsgstaff', 'totara_core', $msgparams);
+    tm_alert_send($msg);
+
+    // Notify real manager.
+    if (!empty($realmanager)) {
+        $msg->userto = $realmanager;
+        $msg->subject = get_string('tempmanagerassignmsgmgrsubject', 'totara_core', $msgparams);
+        $msg->fullmessage = get_string('tempmanagerassignmsgmgr', 'totara_core', $msgparams);
+        $msg->fullmessagehtml = get_string('tempmanagerassignmsgmgr', 'totara_core', $msgparams);
+        $msg->roleid = $CFG->managerroleid;
+        tm_alert_send($msg);
+    }
+
+    // Notify temp manager.
+    $msg->userto = $newtempmanager;
+    $msg->subject = get_string('tempmanagerassignmsgtmpmgrsubject', 'totara_core', $msgparams);
+    $msg->fullmessage = get_string('tempmanagerassignmsgtmpmgr', 'totara_core', $msgparams);
+    $msg->fullmessagehtml = get_string('tempmanagerassignmsgtmpmgr', 'totara_core', $msgparams);
+    $msg->roleid = $CFG->managerroleid;
+    tm_alert_send($msg);
+}
+
+/**
+ * Unassign the temporary manager of the specified user
+ *
+ * @deprecated since 9.0
+ * @param int $userid
+ * @return boolean true on success
+ * @throws Exception
+ */
+function totara_unassign_temporary_manager($userid) {
+    global $DB, $CFG;
+
+    debugging('totara_unassign_temporary_manager is deprecated. Use \totara_job\job_assignment::update instead.', DEBUG_DEVELOPER);
+
+    // We'll use first job assignment only.
+    $jobassignment = \totara_job\job_assignment::get_first($userid, false);
+    if (empty($jobassignment)) {
+        return false;
+    }
+
+    if (empty($jobassignment->tempmanagerid)) {
+        // Nothing to do.
+        return true;
+    }
+    $jobassignment->update(array('tempmanagerjaid' => null, 'tempmanagerexpirydate' => null));
+
+    return true;
+}
 
 /**
  * Find out a user's teamleader (manager's manager).
  *
+ * @deprecated since 9.0
  * @param int $userid Id of the user whose teamleader we want
- * @param int $jobassignid ID of the job assignment we want the teamleader for. Defaults to user's first job assignment (optional)
+ * @param int $postype Type of the position we want the teamleader for (POSITION_TYPE_* constant).  Defaults to primary position (i.e. sortorder=1).
  * @return mixed False if no teamleader. Teamleader user object from mdl_user if the user has a teamleader.
  */
-function totara_get_teamleader($userid, $jobassignid = null) {
-    global $DB;
+function totara_get_teamleader($userid, $postype = null) {
 
-    // Deprecate?
-    // If all calling code is redesigned to allow selection of job assignment then this function shouldn't be needed.
-    if ($jobassignid) {
-        $staffja = \totara_job\job_assignment::get_with_id($jobassignid, false);
-        if (!empty($staffja) && $staffja->userid != $userid) {
-            throw new exception('Userid does not match job assignment userid in totara_get_appraiser');
+    debugging('totara_get_teamleader is deprecated. Use \totara_job\job_assignment methods instead.', DEBUG_DEVELOPER);
+
+    if (!empty($postype)) {
+        if (!in_array($postype, array(POSITION_TYPE_PRIMARY, POSITION_TYPE_SECONDARY))) {
+            // Position type not recognised. Or if it was for an aspiration position, manager assignments were not possible.
+            return false;
         }
+    } else {
+        $postype = POSITION_TYPE_PRIMARY;
     }
 
-    if (empty($staffja)) {
-        $staffja = \totara_job\job_assignment::get_first($userid, false);
-    }
+    $manager = totara_get_manager($userid, $postype);
 
-    if (empty($staffja) || is_null($staffja->managerjaid)) {
+    if (empty($manager)) {
         return false;
+    } else {
+        return totara_get_manager($manager->id, $postype);
     }
-
-    $managerja = \totara_job\job_assignment::get_with_id($staffja->managerjaid);
-
-    // Note that all current calls to this function only use the user id, so this is a waste of effort.
-    return $DB->get_record('user', array('id' => $managerja->managerid));
 }
 
 
 /**
  * Find out a user's appraiser.
  *
+ * @deprecated since 9.0
  * @param int $userid Id of the user whose appraiser we want
- * @param int $jobassignid ID of the job assignment we want the appraiser for. Defaults to user's first job assignment (optional)
+ * @param int $postype Type of the position we want the appraiser for (POSITION_TYPE_* constant).
+ *                     Defaults to primary position(optional)
  * @return mixed False if no appraiser. Appraiser user object from mdl_user if the user has a appraiser.
  */
-function totara_get_appraiser($userid, $jobassignid = null) {
+function totara_get_appraiser($userid, $postype = null) {
     global $DB;
 
-    // Deprecate?
-    // If all calling code is redesigned to allow selection of job assignment then this function shouldn't be needed.
-    if ($jobassignid) {
-        $jobassignment = \totara_job\job_assignment::get_with_id($jobassignid, false);
-        if (!empty($jobassignment) && $jobassignment->userid != $userid) {
-            throw new exception('Userid does not match job assignment userid in totara_get_appraiser');
+    debugging('totara_get_appraiser is deprecated. Use \totara_job\job_assignment methods instead.', DEBUG_DEVELOPER);
+
+    if (!empty($postype)) {
+        if (!in_array($postype, array(POSITION_TYPE_PRIMARY, POSITION_TYPE_SECONDARY))) {
+            // Position type not recognised. Or if it was for an aspiration position, appraiser assignments were not possible.
+            return false;
         }
+    } else {
+        $postype = POSITION_TYPE_PRIMARY;
     }
 
-    if (empty($jobassignment)) {
-        $jobassignment = \totara_job\job_assignment::get_first($userid, false);
+    $jobassignments = \totara_job\job_assignment::get_all($userid);
+
+    $appraiserid = false;
+    foreach ($jobassignments as $jobassignment) {
+        if (!empty($postype) && $jobassignment->sortorder != $postype) {
+            // If $postype was specified, closest to backwards-compatibility we can achieve is to base it on sortorder.
+            continue;
+        }
+        $appraiserid = $jobassignment->appraiserid;
     }
 
-    if (empty($jobassignment) || is_null($jobassignment->appraiserid)) {
+    if ($appraiserid) {
+        return $DB->get_record('user', array('id' => $appraiserid));
+    } else {
         return false;
     }
-
-    // Note that all current calls to this function only use the user id, so this is a waste of effort.
-    return $DB->get_record('user', array('id' => $jobassignment->appraiserid));
 }
 
 
@@ -1533,11 +1754,12 @@ function mssql_get_collation($casesensitive = true, $accentsensitive = true) {
 /**
  * Assign a user a position assignment and create/delete role assignments as required
  *
+ * @deprecated since 9.0.
  * @param $assignment
  * @param bool $unittest set to true if using for unit tests (optional)
  */
 function assign_user_position($assignment, $unittest=false) {
-    // Deprecated!
+    throw new coding_exception('assign_user_position has been deprecated since 9.0. You will need to use \totara_job\job_assignment methods instead.');
 }
 
 /**

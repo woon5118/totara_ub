@@ -518,6 +518,22 @@ function build_nojs_jobassignmentpicker($url, $urlparams) {
     return $html;
 }
 
+/*
+ * Create a non-javascript position picker page, allowing the user to select which
+ * position to use to assign an item
+ *
+ * @deprecated since 9.0
+ * @param string $url URL to take the user to when they click a position link
+ * @params array $urlparams array of url parameters to pass along with URL
+ * @return string HTML to print the position picker list
+ */
+function build_nojs_positionpicker($url, $urlparams) {
+
+    debugging('build_nojs_positionpicker has been deprecated from 9.0. Use build_nojs_jobassignmentpicker instead.', DEBUG_DEVELOPER);
+
+    return build_nojs_jobassignmentpicker($url, $urlparams);
+}
+
 /**
  * Return markup for 'Currently selected' info in a dialog
  * @param string $label the label

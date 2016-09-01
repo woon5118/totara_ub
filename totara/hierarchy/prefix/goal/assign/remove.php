@@ -73,7 +73,7 @@ $self = false;
 
 if ($assigntype == GOAL_ASSIGNMENT_INDIVIDUAL) {
         $user_context = context_user::instance($modid);
-        $manager = totara_is_manager($modid) && has_capability('totara/hierarchy:managestaffcompanygoal', $user_context);
+        $manager = \totara_job\job_assignment::is_managing($USER->id, $modid) && has_capability('totara/hierarchy:managestaffcompanygoal', $user_context);
         $self = ($USER->id == $modid) && has_capability('totara/hierarchy:manageowncompanygoal', $user_context);
 }
 

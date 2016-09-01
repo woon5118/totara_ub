@@ -20,6 +20,7 @@
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
+ * @deprecated since 9.0
  */
 
 /**

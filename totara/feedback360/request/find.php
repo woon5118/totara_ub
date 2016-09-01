@@ -39,7 +39,7 @@ $usercontext = context_user::instance($userid);
 if ($USER->id == $userid) {
     // This is the user editing their own feedback.
     require_capability('totara/feedback360:manageownfeedback360', $systemcontext);
-} else if (totara_is_manager($userid)) {
+} else if (\totara_job\job_assignment::is_managing($USER->id, $userid)) {
     // This is the manager editing their staff memebers feedback.
     require_capability('totara/feedback360:managestafffeedback', $usercontext);
 } else {

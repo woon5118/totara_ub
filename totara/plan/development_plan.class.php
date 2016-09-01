@@ -1436,9 +1436,12 @@ class development_plan {
      * @return string
      */
     function get_manager() {
-        debugging('This function is deprecated since 9.0. Please use development_plan::get_all_managers instead.');
+        global $DB;
 
-        return totara_get_manager($this->userid);
+        debugging('This function is deprecated since 9.0. Please use development_plan::get_all_managers instead.', DEBUG_DEVELOPER);
+
+        $job_assignment = \totara_job\job_assignment::get_first($this->userid);
+        return $DB->get_record('user', array('id' => $job_assignment->managerid));
     }
 
     /**
@@ -1612,9 +1615,11 @@ class development_plan {
     public function send_alert($tolearner, $icon, $subjectstring, $fullmessagestring) {
         global $CFG, $DB, $USER;
 
-        debugging('development_plan::send_alert has been deprecated since 9.0. Please use development_plan::send_alert_to_learner or development_plan::send_alert_to_managers instead.');
+        debugging('development_plan::send_alert has been deprecated since 9.0. Please use development_plan::send_alert_to_learner or development_plan::send_alert_to_managers instead.',
+            DEBUG_DEVELOPER);
 
-        $manager = totara_get_manager($this->userid);
+        $job_assignment = \totara_job\job_assignment::get_first($this->userid);
+        $manager = $DB->get_record('user', array('id' => $job_assignment->managerid));
         $learner = $DB->get_record('user', array('id' => $this->userid));
         if ($learner && $manager) {
             require_once($CFG->dirroot . '/totara/message/eventdata.class.php');

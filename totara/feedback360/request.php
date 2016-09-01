@@ -55,7 +55,7 @@ if ($USER->id == $userid) {
     $PAGE->navbar->add($strmyfeedback);
     $PAGE->set_title($strrequestfeedback);
     $PAGE->set_heading($strrequestfeedback);
-} else if (totara_is_manager($userid)) {
+} else if (\totara_job\job_assignment::is_managing($USER->id, $userid)) {
     require_capability('totara/feedback360:managestafffeedback', $usercontext);
     $asmanager = true;
 

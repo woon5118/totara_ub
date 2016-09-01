@@ -42,7 +42,7 @@ if ($userid == $USER->id) {
     require_capability('totara/feedback360:viewownreceivedfeedback360', $context);
 } else if (!is_siteadmin()) {
     // Skip this check if you are a site admin.
-    if (!totara_is_manager($userid)) {
+    if (!\totara_job\job_assignment::is_managing($USER->id, $userid)) {
         print_error('error:accessdenied', 'totara_feedback360');
     }
 

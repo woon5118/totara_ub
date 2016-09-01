@@ -759,3 +759,14 @@ function totara_core_uncomplete_course_modules_completion($cm, $completion, $now
         $DB->delete_records_select('course_completions', "course = ? AND (rpl = '' OR rpl IS NULL)", array($cm->course));
     }
 }
+
+/**
+ * @deprecated since 9.0
+ */
+function totara_update_temporary_managers() {
+    global $CFG, $DB;
+
+    debugging('totara_update_temporary_managers has been deprecated since 9.0. Use \totara_job\job_assignment::update_temporary_managers instead.', DEBUG_DEVELOPER);
+
+    \totara_job\job_assignment::update_temporary_managers();
+}

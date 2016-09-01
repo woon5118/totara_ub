@@ -44,7 +44,7 @@ if (!$user = $DB->get_record('user', array('id' => $userid))) {
 }
 
 // Users can only view their own and their staff's pages.
-if ($USER->id != $userid && !totara_is_manager($userid) && !is_siteadmin()) {
+if ($USER->id != $userid && !\totara_job\job_assignment::is_managing($USER->id, $userid) && !is_siteadmin()) {
     print_error('error:cannotviewthispage', 'totara_core');
 }
 
