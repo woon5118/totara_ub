@@ -180,6 +180,13 @@ select.singleselect {
   margin: 0 0 5px 0;
 }
 
+// In some places, selects are incorrectly used outside of a form tag, resulting
+// in the form-control class not being applied to the element and affecting the
+// appearance of the element. This addresses the problem. The long term solution
+// is to correct the mark-up. TL-10346 raised to address this.
+select {
+  .form-control;
+}
 
 .path-admin .buttons,
 .form-buttons {
