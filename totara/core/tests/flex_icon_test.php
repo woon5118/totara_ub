@@ -128,6 +128,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $icon = new flex_icon('edit', array('classes' => 'normalstuff'));
         $expected = array(
             'classes' => 'fa-edit',
+            'identifier' => 'edit',
             'customdata' => array('classes' => 'normalstuff'),
         );
         $this->assertSame($expected, $icon->export_for_template($renderer));
@@ -137,6 +138,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
                 'fa-envelope-o ft-stack-main',
                 'fa-times ft-stack-suffix ft-state-danger',
             ),
+            'identifier' => 'mod_forum|t/unsubscribed',
             'customdata' => array('classes' => 'compositestuff'),
         );
         $this->assertSame($expected, $icon->export_for_template($renderer));
@@ -145,6 +147,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $icon = new flex_icon('core|i/edit');
         $expected = array(
             'classes' => 'fa-edit',
+            'identifier' => 'core|i/edit',
             'customdata' => array(),
         );
         $this->assertSame($expected, $icon->export_for_template($renderer));
@@ -153,6 +156,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $icon = new flex_icon('mod_book|nav_exit');
         $expected = array(
             'classes' => 'fa-caret-up',
+            'identifier' => 'mod_book|nav_exit',
             'customdata' => array(),
         );
         $this->assertSame($expected, $icon->export_for_template($renderer));
@@ -162,6 +166,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $this->assertDebuggingNotCalled();
         $icon = new flex_icon('fdfdsfdsfdsdfs');
         $this->assertDebuggingCalled();
+        $missingicondata['identifier'] = 'fdfdsfdsfdsdfs';
         $this->assertSame($missingicondata, $icon->export_for_template($renderer));
     }
 
@@ -254,7 +259,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $this->assertSame($expected, $renderer->render($icon));
 
         $deprecatedicon = new flex_icon('core|i/edit');
-        $this->assertSame($expected, $renderer->render($deprecatedicon));
+        $this->assertSame(str_replace('data-flex-icon="edit"', 'data-flex-icon="core|i/edit"', $expected), $renderer->render($deprecatedicon));
 
         $stackdicon = new flex_icon('mod_forum|t/unsubscribed');
         $expected = $renderer->render_from_template($stackdicon->get_template(), $stackdicon->export_for_template($renderer));
@@ -298,7 +303,10 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $flexicon = new flex_icon('edit');
         $pixicon = new pix_icon('i/edit', '');
 
-        $this->assertSame($renderer->action_icon($url, $pixicon), $renderer->action_icon($url, $flexicon));
+        $expected = $renderer->action_icon($url, $flexicon);
+        $expected = str_replace('data-flex-icon="edit"', 'data-flex-icon="core|i/edit"', $expected);
+
+        $this->assertSame($expected, $renderer->action_icon($url, $pixicon));
     }
 
     public function test_pix_icon_url() {

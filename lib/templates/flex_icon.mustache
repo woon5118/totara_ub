@@ -33,9 +33,11 @@
 
     Context variables required for this template:
     * classes
+    * identifier
 
     Example context (json):
     {
+        "identifier" : "edit",
         "customdata": {
             "classes": "custom-class another-custom-class",
             "alt": "Settings"
@@ -44,7 +46,7 @@
     }
 
 }}
-<span aria-hidden="true"
+<span aria-hidden="true" data-flex-icon="{{identifier}}"
       class="flex-icon ft-fw ft {{#classes}}{{.}}{{/classes}}{{#customdata.classes}} {{.}}{{/customdata.classes}}"
       {{#customdata.alt}} title="{{.}}"{{/customdata.alt}}></span>{{#customdata.alt}}<span class="sr-only">{{.}}</span>{{/customdata.alt}}
 

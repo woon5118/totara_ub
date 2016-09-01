@@ -33,9 +33,11 @@
 
     Context variables required for this template:
     * classes
+    * identifier
 
     Example context (json):
     {
+        "identifier" : "check-permissions",
         "customdata": {
             "classes": "custom-class another-custom-class",
             "alt": "Settings"
@@ -47,7 +49,8 @@
     }
 
 }}
-<span aria-hidden="true" class="flex-icon ft-fw ft-stack{{#customdata.classes}} {{.}}{{/customdata.classes}}"
+<span aria-hidden="true" data-flex-icon="{{identifier}}"
+      class="flex-icon ft-fw ft-stack{{#customdata.classes}} {{.}}{{/customdata.classes}}"
       {{#customdata.alt}} title="{{.}}"{{/customdata.alt}}>
 {{#classes}}      <span class="ft ft-fw {{.}}"></span>
 {{/classes}}
