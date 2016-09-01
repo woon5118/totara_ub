@@ -1075,7 +1075,6 @@ class program {
         }
 
         if ($completion = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $userid, 'coursesetid' => 0))) {
-
             foreach ($completionsettings as $key => $val) {
                 $completion->$key = $val;
             }
@@ -1124,8 +1123,14 @@ class program {
             $completion->timestarted = $now;
             if ($progcompleted_eventtrigger) {
                 // record the user's pos/org at time of completion
-                $completion->positionid = $posids['positionid'];
-                $completion->organisationid = $posids['organisationid'];
+                $jobassignment = \totara_job\job_assignment::get_first($userid, false);
+                if ($jobassignment) {
+                    $completion->positionid = $jobassignment->positionid;
+                    $completion->organisationid = $jobassignment->organisationid;
+                } else {
+                    $completion->positionid = 0;
+                    $completion->organisationid = 0;
+                }
             }
 
             foreach ($completionsettings as $key => $val) {
@@ -1141,7 +1146,7 @@ class program {
                         'context' => context_program::instance($this->id),
                         'userid' => $userid,
                         'other' => array(
-                            'certifid' => $this->certifid,
+                            'certifid' => isset($this->certifid) ? $this->certifid : 0,
                         )
                     )
                 );
