@@ -824,7 +824,7 @@ When **Show records by user** is selected the report will show different records
 *   When **Records for user\'s indirect reports** is checked the user can see the records belonging to any user who reports any user below them in the management hierarchy, excluding their direct reports.
 
 If multiple options are selected the user sees records that match any of the selected options.';
-$string['reportcachingdisabled'] = 'Report caching is disabled. You can enable it <a href="{$a}">here</a>';
+$string['reportcachingdisabled'] = 'Report caching is disabled. <a href="{$a}">Enable report caching here</a>';
 $string['reportcolumns'] = 'Report Columns';
 $string['reportconfirmdelete'] = 'Are you sure you want to delete this report?';
 $string['reportconfirmreload'] = 'This is an embedded report so you cannot delete it (that must be done by your site developer). You can choose to reset the report settings to their original values. Do you want to continue?';
