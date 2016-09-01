@@ -31,12 +31,10 @@ Feature: Toggle activities groups mode from the course page
     And ".ft-stack .ft-slash.ft-stack-main" "css_element" should exist
     And I click on "No groups (Click to change)" "link" in the "Test forum name" activity
     And "Separate groups (Click to change)" "link" should exist
-    And ".ft-stack .fa-users.ft-stack-prefix" "css_element" should exist
-    And ".ft-stack .fa-users.ft-stack-suffix" "css_element" should exist
+    And ".ft-group-separate" "css_element" should exist
     And I reload the page
     And "Separate groups (Click to change)" "link" should exist
-    And ".ft-stack .fa-users.ft-stack-prefix" "css_element" should exist
-    And ".ft-stack .fa-users.ft-stack-suffix" "css_element" should exist
+    And ".ft-group-separate" "css_element" should exist
     And I click on "Separate groups (Click to change)" "link" in the "Test forum name" activity
     And "Visible groups (Click to change)" "link" should exist
     And ".fa-users" "css_element" should exist
