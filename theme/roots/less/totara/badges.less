@@ -177,23 +177,43 @@ img#persona_signin {
 
 // End of original bootstrap theme code.
 
-#badge-overview dl dt,
-#badge-overview dl dd {
+#badge-image,
+#badge-details {
   display: inline-block;
-  margin-bottom: @line-height-computed;
+  width: auto;
 }
 
-#badge-overview dl dt {
+#badge-image {
+  padding: @line-height-computed @padding-large-horizontal * 2 0 0;
+  vertical-align: top;
+  text-align: center;
+}
+
+#badge-image img + .singlebutton{
+  margin-top: @padding-large-vertical;
+}
+
+#badge-overview dl dt,
+#badge-overview dl dd,
+#badge-details dl dt,
+#badge-details dl dd {
+  display: inline-block;
+  margin-bottom: @padding-small-vertical;
+}
+
+#badge-overview dl dt,
+#badge-details dl dt {
   width: 20%;
   min-width: 100px;
 }
 
-#badge-overview dl dd {
+#badge-overview dl dd,
+#badge-details dl dd {
   width: 80%;
 }
 
 .path-badges .statusbox > div,
-#badge-overview .activatebadge {
+#badge-details .activatebadge {
   display: inline-block;
   margin-left: @padding-small-horizontal;
 }
