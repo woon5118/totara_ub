@@ -480,10 +480,24 @@ span.editinstructions {
     clear: both;
     margin-bottom: 30px;
   }
-  .enrolmenticons {
+  .enrolmenticons,
+  .moreinfo {
     float: right;
     img {
       padding: 0 5px;
+    }
+  }
+  .name,
+  .coursename {
+    display:inline-block;
+    a {
+      background-position: left top;
+      background-repeat: no-repeat;
+      display: block;
+      line-height: (@line-height-computed * 2);
+      // These are for background image on old course catalog.
+      min-height: 32px;
+      text-indent: 40px;
     }
   }
 }
