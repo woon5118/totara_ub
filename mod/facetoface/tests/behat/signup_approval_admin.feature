@@ -10,6 +10,7 @@ Feature: Seminar Signup Admin Approval
       | username    | firstname | lastname | email              |
       | sysapprover | Terry     | Ter      | terry@example.com  |
       | actapprover | Larry     | Lar      | larry@example.com  |
+      | mickymau    | Micky     | Mau      | micky@example.com  |
       | teacher     | Freddy    | Fred     | freddy@example.com |
       | trainer     | Benny     | Ben      | benny@example.com  |
       | manager     | Cassy     | Cas      | cassy@example.com  |
@@ -53,6 +54,9 @@ Feature: Seminar Signup Admin Approval
     And I expand all fieldsets
     And I click on "addapprovaladmins" "button"
     And I click on "Larry Lar" "link" in the "Select activity level approvers" "totaradialogue"
+    And I click on "Search" "link" in the "Select activity level approvers" "totaradialogue"
+    And I search for "Mick" in the "Select activity level approvers" totara dialogue
+    And I click on "Micky Mau" from the search results in the "Select activity level approvers" totara dialogue
     And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
     And I press "Save and display"
     And I follow "Add a new event"
@@ -74,7 +78,7 @@ Feature: Seminar Signup Admin Approval
     And I press "Save changes"
     And I log out
 
-  Scenario: Student signs up with no manager assigned
+  Scenario: Student signs up with no manager assigned when admin approval is required
     When I log in as "sally"
     And I click on "Find Learning" in the totara menu
     And I follow "Classroom Connect Course"

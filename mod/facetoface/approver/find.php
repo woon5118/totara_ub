@@ -99,6 +99,7 @@ if (!$nojs) {
     $dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
     $dialog->searchtype = 'user';
     $dialog->items = $availableusers;
+    $dialog->urlparams = array('cid' => $cid);
 
     echo $dialog->generate_markup();
 }

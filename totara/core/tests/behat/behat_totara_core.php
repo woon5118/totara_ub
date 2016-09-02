@@ -424,7 +424,7 @@ class behat_totara_core extends behat_base {
         }
 
         throw new ExpectationException(
-            'No associated issue given for skipped scenario'
+            'No associated issue given for skipped scenario', $this->getSession()
         );
     }
 
@@ -442,5 +442,52 @@ class behat_totara_core extends behat_base {
             $xpath,
             new ExpectationException('Text "'.$text.'" was not found in page header', $this->getSession())
         );
+    }
+
+    /**
+     * Searches for a specific term in the totara dialog.
+     *
+     * @Given /^I search for "([^"]*)" in the "([^"]*)" totara dialogue$/
+     * @param string $term
+     * @throws ExpectationException
+     */
+    public function i_search_for_in_the_totara_dialogue($term, $dialog) {
+        $dialog = $this->get_selected_node('totaradialogue', $dialog);
+        if (!$dialog) {
+            throw new ExpectationException('Unable to find the "'.$dialog.'" Totara dialog', $this->getSession());
+        }
+        $node = $dialog->find('xpath', '//div[@id="search-tab"]//input[@name="query" and @type="text"]');
+        if (!$node) {
+            throw new ExpectationException('Unable to find the query input for searching within the "'.$dialog.'" Totara dialog', $this->getSession());
+        }
+        $node->setValue($term);
+
+        $node = $dialog->find('xpath', '//input[@type="submit" and @value="Search"]');
+        if (!$node) {
+            throw new ExpectationException('Unable to find the search button within the "'.$dialog.'" Totara dialog', $this->getSession());
+        }
+        $node->press();
+
+        // Its now loading some content via AJAX.
+        $this->wait_for_pending_js();
+    }
+
+    /**
+     * Clicks on a specific result in the totara dialog search results.
+     *
+     * @Given /^I click on "([^"]*)" from the search results in the "([^"]*)" totara dialogue$/
+     * @param string $term
+     * @throws ExpectationException
+     */
+    public function i_click_on_from_the_search_results_in_the_totara_dialogue($term, $dialog) {
+        $dialog = $this->get_selected_node('totaradialogue', $dialog);
+        if (!$dialog) {
+            throw new ExpectationException('Unable to find the "'.$dialog.'" Totara dialog', $this->getSession());
+        }
+        $results = $dialog->find('xpath', '//*[@id="search-tab"]');
+
+        $node = $results->findLink($term);
+        $this->ensure_node_is_visible($node);
+        $node->click();
     }
 }
