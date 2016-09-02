@@ -908,4 +908,3 @@ function profile_view($user, $context, $course = null) {
     $event->add_record_snapshot('user', $user);
     $event->trigger();
 }
-

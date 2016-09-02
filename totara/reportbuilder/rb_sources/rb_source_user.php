@@ -276,7 +276,8 @@ class rb_source_user extends rb_base_source {
                             'extrafields' => array_merge(array('id' => 'base.id',
                                                                'picture' => 'base.picture',
                                                                'imagealt' => 'base.imagealt',
-                                                               'email' => 'base.email'),
+                                                               'email' => 'base.email',
+                                                               'deleted' => 'base.deleted'),
                                                          $allnamefields),
                             'dbdatatype' => 'char',
                             'outputformat' => 'text'
@@ -446,6 +447,8 @@ class rb_source_user extends rb_base_source {
     function rb_display_user_with_links($user, $row, $isexport = false) {
         global $CFG, $OUTPUT, $USER;
 
+        require_once($CFG->dirroot . '/totara/feedback360/lib.php');
+
         // Process obsolete calls to this display function.
         if (isset($row->userpic_picture)) {
             $picuser = new stdClass();
@@ -468,7 +471,10 @@ class rb_source_user extends rb_base_source {
             return $this->rb_display_user($user, $row, true);
         }
 
-        $user_pic = $OUTPUT->user_picture($row, array('courseid' => 1));
+        $usercontext = context_user::instance($userid, MUST_EXIST);
+        $show_profile_link = user_can_view_profile($row, null, $usercontext);
+
+        $user_pic = $OUTPUT->user_picture($row, array('courseid' => 1, 'link' => $show_profile_link));
 
         $recordstr = get_string('records', 'rb_source_user');
         $requiredstr = get_string('required', 'rb_source_user');
@@ -488,11 +494,11 @@ class rb_source_user extends rb_base_source {
         $feedback_link = html_writer::link("{$CFG->wwwroot}/totara/feedback360/index.php?userid={$userid}", $feedback360str);
         $goal_link = html_writer::link("{$CFG->wwwroot}/totara/hierarchy/prefix/goal/mygoals.php?userid={$userid}", $goalstr);
 
-        require_once($CFG->dirroot . '/totara/plan/lib.php');
         $show_plan_link = totara_feature_visible('learningplans') && dp_can_view_users_plans($userid);
+
         $links = html_writer::start_tag('ul');
         $links .= $show_plan_link ? html_writer::tag('li', $plan_link) : '';
-        $links .= html_writer::tag('li', $profile_link);
+        $links .= $show_profile_link ? html_writer::tag('li', $profile_link) : '';
         $links .= html_writer::tag('li', $booking_link);
         $links .= html_writer::tag('li', $rol_link);
 
@@ -502,22 +508,30 @@ class rb_source_user extends rb_base_source {
             $links .= html_writer::tag('li', $appraisal_link);
         }
 
-        if (totara_feature_visible('feedback360')) {
+        if (totara_feature_visible('feedback360') && feedback360::can_view_other_feedback360s($userid)) {
             $links .= html_writer::tag('li', $feedback_link);
         }
 
         if (totara_feature_visible('goals')) {
-            $links .= html_writer::tag('li', $goal_link);
+            if (has_capability('totara/hierarchy:viewstaffcompanygoal', $usercontext, $USER->id) ||
+                has_capability('totara/hierarchy:viewstaffpersonalgoal', $usercontext, $USER->id)) {
+                $links .= html_writer::tag('li', $goal_link);
+            }
         }
 
-        if (totara_feature_visible('programs') || totara_feature_visible('certifications')) {
+        if ((totara_feature_visible('programs') || totara_feature_visible('certifications')) && prog_can_view_users_required_learning($userid)) {
             $links .= html_writer::tag('li', $required_link);
         }
 
         $links .= html_writer::end_tag('ul');
 
-        $user_tag = html_writer::link(new moodle_url("/user/profile.php", array('id' => $userid)),
-            fullname($row), array('class' => 'name'));
+        if ($show_profile_link) {
+            $user_tag = html_writer::link(new moodle_url("/user/profile.php", array('id' => $userid)),
+                fullname($row), array('class' => 'name'));
+        }
+        else {
+            $user_tag = html_writer::span(fullname($row), 'name');
+        }
 
         $return = $user_pic . $user_tag . $links;
 

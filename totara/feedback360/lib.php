@@ -816,6 +816,42 @@ class feedback360 {
             print_error('feedback360disabled', 'totara_feedback360');
         }
     }
+
+    /**
+     * Check to see if logged in user can view the specified user's 360 feedback
+     *
+     * @param int $userid id of the user for whom we are want to display data
+     * @return bool
+     * @since Totara 9.0
+     */
+    public static function can_view_other_feedback360s($userid) {
+        global $USER;
+
+        if (!isloggedin()) {
+            return false;
+        }
+
+        if (!$userid) {
+            $userid = $USER->id;
+        }
+
+        // Check user has permission to request feedback, and set up the page.
+        if ($USER->id == $userid) {
+            return feedback360::can_view_feedback360s($userid);
+        } else if (totara_is_manager($userid)) {
+            // You are a manager view a staff members feedback.
+            $usercontext = context_user::instance($userid, MUST_EXIST);
+            return has_capability('totara/feedback360:viewstaffreceivedfeedback360', $usercontext) ||
+                   has_capability('totara/feedback360:viewstaffrequestedfeedback360', $usercontext);
+        } else if (is_siteadmin()) {
+            // Site admin can see everything.
+            return true;
+        } else {
+            // You aren't the user, their manager or an admin
+            return false;
+        }
+    }
+
 }
 
 /**

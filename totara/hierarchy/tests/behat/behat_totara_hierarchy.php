@@ -180,6 +180,9 @@ class behat_totara_hierarchy extends behat_base {
             'appraiser', // Username.
             'organisation', // ID number.
             'position', // ID number.
+            'tempmanager', // Username.
+            'tempmanagerjaidnumber', // String.
+            'tempmanagerexpirydate', // Unix datetime
         );
 
         $data = $table->getHash();
@@ -236,6 +239,32 @@ class behat_totara_hierarchy extends behat_base {
             }
             unset($record['managerjaidnumber']);
             unset($record['manager']);
+
+            // Map Temp Manager and managershortname to a user.
+            if (!empty($record['tempmanagerjaidnumber'])) {
+                if (empty($record['tempmanager'])) {
+                    throw new Exception('Must provide tempmanager when specifying tempmanagerjaidnumber in job assignment definition');
+                }
+                if (!$tempmanagerid = $DB->get_field('user', 'id', array('username' => $record['tempmanager']))) {
+                    throw new Exception('Unknown tempmanager '.$record['tempmanager'].' in job assignment definition');
+                }
+                $tempmanagerja = \totara_job\job_assignment::get_with_idnumber($tempmanagerid, $record['tempmanagerjaidnumber']);
+                if (empty($tempmanagerja)) {
+                    throw new Exception('Unknown tempmanagerjaidnumber '.$record['tempmanagerjaidnumber'].' for tempmanager '.$record['tempmanager'].' in job assignment definition');
+                }
+                $record['tempmanagerjaid'] = $tempmanagerja->id;
+            } else if (!empty($record['tempmanager'])) {
+                if (!$tempmanagerid = $DB->get_field('user', 'id', array('username' => $record['tempmanager']))) {
+                    throw new Exception('Unknown tempmanager '.$record['tempmanager'].' in job assignment definition');
+                }
+                $tempmanagerja = \totara_job\job_assignment::get_first($tempmanagerid, false);
+                if (empty($tempmanagerja)) {
+                    $tempmanagerja = \totara_job\job_assignment::create_default($tempmanagerid);
+                }
+                $record['tempmanagerjaid'] = $tempmanagerja->id;
+            }
+            unset($record['tempmanagerjaidnumber']);
+            unset($record['tempmanager']);
 
             // Map Appraiser to a user.
             if (!empty($record['appraiser'])) {
