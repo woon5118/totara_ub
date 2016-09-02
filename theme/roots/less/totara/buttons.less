@@ -131,23 +131,21 @@ input[type="reset"] {
     margin: 0;
 }
 
-.singlebutton div {
-    margin: 0;
-}
-
-.singlebutton + .singlebutton div {
-    margin-left: ceil(@grid-gutter-width / 2);
-}
-
 .breadcrumb-button {
     margin-top: 0;
-}
 
-.breadcrumb-button .singlebutton {
-    margin: 0;
+    .singlebutton {
+        display: inline-block;
+        margin-right: @padding-xs-horizontal;
+        margin-bottom: @line-height-computed;
+    }
+
+    .singlebutton + .singlebutton:last-child {
+        margin-right: 0;
+    }
 }
 
 .buttons .singlebutton {
     display: inline-block;
-    margin-right: @padding-small-horizontal;
+    margin-right: @padding-xs-horizontal;
 }
