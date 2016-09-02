@@ -1453,3 +1453,34 @@ ul.dragdrop-keyboard-drag li {
 .navbar-header h1 {
   margin: 0;
 }
+
+// Undo styles applied earlier in this file affecting
+// links styled as Bootstrap buttons.
+a.btn.disabled:hover,
+a.btn.disabled {
+  font-style: normal;
+  &.btn-default {
+    color: @btn-default-color;
+  }
+  &.btn-primary {
+    color: @btn-primary-color;
+  }
+  &.btn-secondary {
+    color: @btn-secondary-color;
+  }
+  &.btn-tertiary {
+    color: @btn-tertiary-color;
+  }
+  &.btn-success {
+    color: @btn-success-color;
+  }
+  &.btn-info {
+    color: @btn-info-color;
+  }
+  &.btn-warning {
+    color: @btn-warning-color;
+  }
+  &.btn-danger {
+    color: @btn-danger-color;
+  }
+}

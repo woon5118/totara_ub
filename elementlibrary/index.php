@@ -42,6 +42,19 @@ echo html_writer::tag('li', html_writer::link(new moodle_url('/elementlibrary/to
 echo html_writer::tag('li', html_writer::link(new moodle_url('/elementlibrary/dialogs.php'), 'Dialogs'));
 echo html_writer::tag('li', html_writer::link(new moodle_url('/elementlibrary/verticaltabs.php'), 'Vertical tabs'));
 echo html_writer::tag('li', html_writer::link(new moodle_url('/elementlibrary/flex_icons.php'), 'Flexible icons'));
+
+// Only display the pattern library if Roots is a parent.
+// This is as new patterns will not be available in deprecated
+// themes by default (e.g. Standard Totara Responsive). Where
+// these patterns are used in core backwards compatiblity will
+// be provided for legacy themes.
+if ($PAGE->theme->name === 'roots' || in_array('roots', $PAGE->theme->parents)) {
+    echo html_writer::tag('li', html_writer::link(new moodle_url('/elementlibrary/pattern_library.php'), 'Pattern library'));
+} else {
+    // Display a sensible message to the user.
+    echo html_writer::tag('li', 'Pattern library (only available in Bootstrap 3 themes extending Roots or Basis)');
+}
+
 echo html_writer::end_tag('ul');
 echo $OUTPUT->container_end();
 

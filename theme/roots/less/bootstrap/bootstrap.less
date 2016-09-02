@@ -1,0 +1,88 @@
+//
+// This file is part of Totara LMS
+//
+// Copyright (C) 2016 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <ht    tp://www.gnu.org/licenses/>.
+//
+// @copyright 2016 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Joby Harding <joby.harding@totaralearning.com>
+// @package   theme_roots
+
+//
+// Typography.
+//
+// Extends Bootstrap headings to provide an alternative
+// styled header. Approach based on BS3 heading classes.
+.h1-alt, .h2-alt, .h3-alt, .h4-alt, .h5-alt, .h6-alt {
+    font-weight: 300;
+    small,
+    .small {
+        font-weight: 300;
+    }
+}
+
+//
+// Badges.
+//
+// Extends the Bootstrap 3 badges classes so that state
+// can be applied by class (rather than only inherited).
+.badge-primary {
+    background-color: @brand-primary;
+}
+
+.badge-success {
+    background-color: @brand-success;
+}
+
+.badge-info {
+    background-color: @brand-info;
+}
+
+.badge-warning {
+    background-color: @brand-warning;
+}
+
+.badge-danger {
+    background-color: @brand-danger;
+}
+
+// Custom button types for Basis.
+.btn-secondary {
+    .button-variant(@btn-secondary-color; @btn-secondary-bg; @btn-secondary-border);
+}
+
+// Due to tertiary button having a thicker border-width
+// we have to override the default .button-size() styles.
+.btn-tertiary {
+    border-width: 2px;
+    .button-size((@padding-base-vertical - 1); (@padding-base-horizontal - 1); @font-size-base; @line-height-base; @btn-border-radius-base);
+    .button-variant(@btn-tertiary-color; @btn-tertiary-bg; @btn-tertiary-border);
+    &:active,
+    &.active {
+        .box-shadow(inset 0 0 8px rgba(0,0,0,.15));
+    }
+    &.btn-lg {
+        // line-height: ensure even-numbered height of button next to large input
+        .button-size(@padding-large-vertical; @padding-large-horizontal; @font-size-large; @line-height-large; @btn-border-radius-large);
+    }
+    &.btn-sm {
+        // line-height: ensure proper height of button next to small input
+        .button-size(@padding-small-vertical; @padding-small-horizontal; @font-size-small; @line-height-small; @btn-border-radius-small);
+    }
+    &.btn-xs {
+        .button-size(@padding-xs-vertical; @padding-xs-horizontal; @font-size-small; @line-height-small; @btn-border-radius-small);
+    }
+}
