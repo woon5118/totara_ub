@@ -79,11 +79,8 @@ class theme_bootstrapbase_core_renderer extends core_renderer {
     protected function navbar_button() {
         global $CFG;
 
-        if (empty($CFG->custommenuitems) && $this->lang_menu() == '') {
-            return '';
-        }
-
         $iconbar = html_writer::tag('span', '', array('class' => 'icon-bar'));
+
         $button = html_writer::tag('a', $iconbar . "\n" . $iconbar. "\n" . $iconbar, array(
             'class'       => 'btn btn-navbar',
             'data-toggle' => 'collapse',

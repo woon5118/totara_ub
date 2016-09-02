@@ -68,7 +68,7 @@ if ($devicetype !== 'mobile' and $devicetype !== 'tablet') {
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
-                <span class="accesshide"><?php echo get_string('expand'); ?></span>
+                <span class="accesshide"><?php echo get_string('togglenavigation', 'core'); ?></span>
             </a>
             <div class="nav-collapse collapse">
                 <ul class="nav <?php echo $left ? "pull-right" : "pull-left" ?>">

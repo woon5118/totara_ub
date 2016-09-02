@@ -98,7 +98,7 @@ echo $OUTPUT->doctype() ?>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
-                <span class="accesshide"><?php echo get_string('expand'); ?></span>
+                <span class="accesshide"><?php echo get_string('togglenavigation', 'core'); ?></span>
             </a>
             <?php echo ($haslangmenu && (!isloggedin() || isguestuser()) ? $OUTPUT->lang_menu() : '') . $OUTPUT->user_menu() ?>
             <?php echo $OUTPUT->page_heading(); ?>

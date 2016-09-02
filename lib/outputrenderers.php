@@ -3107,12 +3107,8 @@ EOD;
     protected function navbar_button() {
         global $CFG;
 
-        if (empty($CFG->custommenuitems) && $this->lang_menu() == '') {
-            return '';
-        }
-
         $iconbar = html_writer::tag('span', '', array('class' => 'icon-bar'));
-        $sronly = html_writer::tag('span', 'Toggle navigation', array('class' => 'sr-only')); // TODO: localise
+        $sronly = html_writer::tag('span', get_string('togglenavigation', 'core'), array('class' => 'sr-only'));
         $button = html_writer::tag('button', $iconbar . "\n" . $iconbar. "\n" . $iconbar . $sronly, array(
             'class'       => 'navbar-toggle',
             'type'        => 'button',

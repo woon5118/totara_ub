@@ -1864,6 +1864,7 @@ $string['tocontent'] = 'To item "{$a}"';
 $string['today'] = 'Today';
 $string['todaylogs'] = 'Today\'s logs';
 $string['toeveryone'] = 'to everyone';
+$string['togglenavigation'] = 'Toggle navigation';
 $string['toomanybounces'] = 'That email address has had too many bounces. You <b>must</b> change it to continue.';
 $string['toomanytoshow'] = 'There are too many users to show.';
 $string['toomanyusersmatchsearch'] = 'Too many users ({$a->count}) match \'{$a->search}\'';
