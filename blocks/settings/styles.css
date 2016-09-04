@@ -13,11 +13,6 @@
 .block_settings .block_tree li.item_with_icon .leaf { padding: 0; }
 .dir-rtl .block_settings .block_tree li.item_with_icon .flex-icon { margin-left: 4px; }
 
-.block_settings .fa-square {
-    font-size: 0.5em;
-    margin: 0.65em;
-}
-
 .block_settings .block_tree .tree_item {margin:3px 0px;}
 .block_settings .block_tree .item_with_icon .tree_item {padding-left: 0;}
 

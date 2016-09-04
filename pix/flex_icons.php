@@ -158,7 +158,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-bag',
+                    'classes' => 'ft-backpack',
                 ),
         ),
     'badge' =>
@@ -1249,7 +1249,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-square',
+                    'classes' => 'ft-square-small',
                 ),
         ),
     'new' => // Something recently added.
