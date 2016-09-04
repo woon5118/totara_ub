@@ -30,34 +30,17 @@ defined('MOODLE_INTERNAL') || die();
 class site_logo implements \renderable, \templatable {
 
     /**
-     * @var string
-     */
-    public $siteshortname = '';
-
-    /***
-     * site_logo constructor.
-     *
-     * @param string $shortname Site shortname.
-     */
-    public function __construct($shortname) {
-
-        $this->siteshortname = $shortname;
-
-    }
-
-    /**
      * Implements export_for_template().
      * 
      * @param \renderer_base $output
      * @return array
      */
     public function export_for_template(\renderer_base $output) {
-
         global $PAGE, $SITE, $OUTPUT, $CFG;
 
         $templatecontext = array(
-            'siteurl' => $CFG->wwwroot,
-            'shortname' => $this->siteshortname,
+            'siteurl' => $CFG->wwwroot . '/',
+            'shortname' => $SITE->shortname,
         );
 
         $templatecontext['logourl'] = $PAGE->theme->setting_file_url('logo', 'logo');
@@ -82,7 +65,6 @@ class site_logo implements \renderable, \templatable {
         }
 
         return $templatecontext;
-
     }
 
 }

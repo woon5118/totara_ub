@@ -28,15 +28,15 @@ defined('MOODLE_INTERNAL') || die();
 class theme_roots_renderer extends plugin_renderer_base {
 
     /**
-     * Render from a template.
+     * Render site logo.
      *
-     * @param templatable $logodata
-     * @return bool|string
+     * @param \theme_roots\output\site_logo $sitelogo
+     * @return string
      */
-    public function render_site_logo(templatable $logodata) {
+    public function render_site_logo(\theme_roots\output\site_logo $sitelogo) {
         global $OUTPUT;
 
-        $context = $logodata->export_for_template($OUTPUT);
+        $context = $sitelogo->export_for_template($OUTPUT);
 
         return $this->render_from_template('theme_roots/site_logo', $context);
     }
