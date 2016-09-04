@@ -462,11 +462,13 @@ class program {
                     $timedue = $progcompletion ? $progcompletion->timedue : false;
                     $timedue = $this->make_timedue($user->id, $progassignment, $timedue);
 
-                    if ($progassignment->completionevent == COMPLETION_EVENT_FIRST_LOGIN && $timedue == COMPLETION_TIME_NOT_SET) {
+                    if ($progassignment->completionevent == COMPLETION_EVENT_FIRST_LOGIN && $timedue === false) {
                         // This is a future assignment.
                         // This means that the user hasn't logged in yet.
                         // Create or update the future assignment so we can assign them when they do login.
                         $futureassignusersbuffer[$user->id] = $user->id;
+                        // We want to create the completion record now, and it will be updated with the correct date later.
+                        $timedue = COMPLETION_TIME_NOT_SET;
                     }
 
                     if (isset($previoususerassignments[$user->id])) {
@@ -950,7 +952,7 @@ class program {
         $basetime = $event_object->get_timestamp($userid, $assignment_record);
 
         if ($basetime == false) {
-            return COMPLETION_TIME_NOT_SET;
+            return false;
         }
 
         $timedue = $basetime + $assignment_record->completiontime;
