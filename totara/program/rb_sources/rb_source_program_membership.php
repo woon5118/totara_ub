@@ -214,7 +214,7 @@ class rb_source_program_membership extends rb_base_source {
     public function rb_filter_status() {
         $out = array();
         $out[STATUS_PROGRAM_INCOMPLETE] = get_string('incomplete', 'totara_program');
-        $out[STATUS_PROGRAM_COMPLETE] = get_string('incomplete', 'totara_program');
+        $out[STATUS_PROGRAM_COMPLETE] = get_string('complete', 'totara_program');
 
         return $out;
     }
