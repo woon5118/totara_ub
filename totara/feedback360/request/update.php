@@ -40,6 +40,20 @@ $out .= html_writer::start_tag('div', array('id' => 'system_assignments', 'class
 $userform = $DB->get_record('feedback360_user_assignment', array('id' => $userformid), '*', MUST_EXIST);
 $feedback360 = $DB->get_record('feedback360', array('id' => $userform->feedback360id), '*', MUST_EXIST);
 
+$usercontext = context_user::instance($userform->userid);
+$systemcontext = context_system::instance();
+
+// Check user has permission to request feedback.
+if ($USER->id == $userform->userid) {
+    // This is the user editing their own feedback.
+    require_capability('totara/feedback360:manageownfeedback360', $systemcontext);
+} else if (totara_is_manager($userform->userid) || is_siteadmin()) {
+    // This is the manager editing their staff members feedback.
+    require_capability('totara/feedback360:managestafffeedback', $usercontext);
+} else {
+    print_error('error:accessdenied', 'totara_feedback');
+}
+
 foreach (explode(',', trim($users, ',')) as $userid) {
     $user = $DB->get_record('user', array('id' => $userid));
     $resp_params = array('userid' => $userid, 'feedback360userassignmentid' => $userformid);
