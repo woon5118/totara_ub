@@ -2485,7 +2485,7 @@ abstract class rb_base_source {
      * @param string $join              The name of the user table in the report
      * @return boolean
      */
-    protected function add_basic_user_content_options(&$contentoptions, $join = 'user') {
+    protected function add_basic_user_content_options(&$contentoptions, $join = 'auser') {
         // Add the manager/staff content options.
         $contentoptions[] = new rb_content_option(
                                     'user',

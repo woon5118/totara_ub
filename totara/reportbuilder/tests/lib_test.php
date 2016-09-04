@@ -739,12 +739,17 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $rb = new reportbuilder($reportid);
         $restrictions = $rb->get_content_restrictions();
         // should return the appropriate SQL snippet to OR the restrictions if content mode = 1
-        $this->assertRegExp('/\(\s\(user\.id\s+=\s+:[a-z0-9_]+\)\s+OR\s+\(base\.timemodified\s+>\s+[0-9]+\s+AND\s+base\.timemodified\s+!=\s+0\s+\)\)/', $restrictions[0]);
+        $this->assertRegExp('/\(\s\(auser\.id\s+=\s+:[a-z0-9_]+\)\s+OR\s+\(base\.timemodified\s+>\s+[0-9]+\s+AND\s+base\.timemodified\s+!=\s+0\s+\)\)/', $restrictions[0]);
         $DB->set_field('report_builder', 'contentmode', REPORT_BUILDER_CONTENT_MODE_ALL, array('id' => $reportid));
         $rb = new reportbuilder($reportid);
         $restrictions = $rb->get_content_restrictions();
         // should return the appropriate SQL snippet to AND the restrictions if content mode = 2
-        $this->assertRegExp('/\(\s\(user\.id\s+=\s+:[a-z0-9_]+\)\s+AND\s+\(base\.timemodified\s+>\s+[0-9]+\s+AND\s+base\.timemodified\s+!=\s+0\s+\)\)/', $restrictions[0]);
+        $this->assertRegExp('/\(\s\(auser\.id\s+=\s+:[a-z0-9_]+\)\s+AND\s+\(base\.timemodified\s+>\s+[0-9]+\s+AND\s+base\.timemodified\s+!=\s+0\s+\)\)/', $restrictions[0]);
+
+        // Test we can actually display this report with these restrictions.
+        ob_start();
+        $rb->display_table();
+        ob_end_clean();
 
         $this->resetAfterTest(true);
     }
