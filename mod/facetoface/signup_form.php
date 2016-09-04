@@ -38,7 +38,6 @@ class mod_facetoface_signup_form extends moodleform {
         $manager_title = '';
         if (!empty($this->_customdata['managerids'])) {
             $managerids = $this->_customdata['managerids'];
-            $manager_title = get_string('alljamanagers', 'mod_facetoface');
         }
         $managerid = 0;
         if (!empty($this->_customdata['managerid'])) {
@@ -86,8 +85,10 @@ class mod_facetoface_signup_form extends moodleform {
                     html_writer::tag('span', format_string($manager_title), array('class' => $manager_class, 'id' => 'managertitle'))
                     . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
                 );
-
                 $mform->addHelpButton('managerselector', 'choosemanager', 'totara_job');
+                if (!empty($managerids)) {
+                    $mform->addElement('static', 'managerjadesc', '', get_string('alljamanagersdesc', 'mod_facetoface'));
+                }
             } else {
                 // Display the average manager approval string.
                 $mform->addElement('static', 'managername', get_string('managername', 'mod_facetoface'), $manager_title);
@@ -115,6 +116,10 @@ class mod_facetoface_signup_form extends moodleform {
                 );
 
                 $mform->addHelpButton('managerselector', 'choosemanager', 'totara_job');
+
+                if (!empty($managerids)) {
+                    $mform->addElement('static', 'managerjadesc', '', get_string('alljamanagersdesc', 'mod_facetoface'));
+                }
             } else {
                 // Display the average manager&admin approval string.
                 $mform->addElement('static', 'managername', get_string('managername', 'mod_facetoface'), $manager_title);
@@ -243,7 +248,7 @@ class mod_facetoface_signup_form extends moodleform {
         if ($approvaltype == APPROVAL_MANAGER || $approvaltype == APPROVAL_ADMIN) {
             $manager = isset($data['managerid']) ? $data['managerid'] : null;
             $managers = isset($this->_customdata['managerids']) ? $this->_customdata['managerids'] : null;
-            if (empty($manager)) {
+            if (empty($manager) && empty($managers)) {
                 $select = get_config(null, 'facetoface_managerselect');
                 if ($select) {
                     $errors['managerselector'] = get_string('error:missingselectedmanager', 'mod_facetoface');

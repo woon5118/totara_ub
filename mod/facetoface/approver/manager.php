@@ -78,5 +78,6 @@ $dialog->searchtype = 'user';
 $dialog->items = $managers;
 $dialog->customdata['current_user'] = $userid;
 $dialog->urlparams['userid'] = $userid;
+$dialog->urlparams['fid'] = $fid;
 
 echo $dialog->generate_markup();

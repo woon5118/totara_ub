@@ -171,3 +171,26 @@ Feature: Seminar Signup Admin Approval
     And I follow "Classroom Connect Course"
     And I follow "View all events"
     Then I should see "Booked" in the "1 January 2020" "table_row"
+
+  Scenario: Student signs up with manager assigned with manager select enabled and admin approval required and does not select manager
+    When I log in as "admin"
+    And I navigate to "Global settings" node in "Site administration > Seminars"
+    And I click on "s__facetoface_managerselect" "checkbox"
+    And I press "Save changes"
+    And I log out
+
+    And I log in as "sammy"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Classroom Connect Course"
+    And I should see "Sign-up"
+    And I follow "Sign-up"
+    And I should see "Manager and Administrative approva"
+    And I should see "Managers from all job assignements will be chosen if left empty"
+    And I press "Request approval"
+    Then I should see "Your booking has been completed but requires approval from your manager"
+
+    When I log out
+    And I log in as "manager"
+    And I click on "Dashboard" in the totara menu
+    And I click on "View all tasks" "link"
+    And I click on "Attendees" "link"
