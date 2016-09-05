@@ -712,7 +712,11 @@ abstract class rb_base_source {
         }
 
         $url = new moodle_url('/user/view.php', array('id' => $row->id));
-        return html_writer::link($url, $fullname);
+        if ($fullname === '') {
+            return '';
+        } else {
+            return html_writer::link($url, $fullname);
+        }
     }
 
     /**
