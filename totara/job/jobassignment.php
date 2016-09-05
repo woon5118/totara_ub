@@ -175,7 +175,7 @@ if ($submitted = $form->get_data()) {
 
     $data->idnumber = $submitted->idnumber;
 
-    if (!empty($submitted->fullname)) {
+    if (isset($submitted->fullname) && $submitted->fullname !== "") {
         if ($jobassignment && $submitted->fullname == get_string('jobassignmentdefaultfullname', 'totara_job', $jobassignment->idnumber)) {
             $data->fullname = null;
         } else {
@@ -185,7 +185,7 @@ if ($submitted = $form->get_data()) {
         $data->fullname = null;
     }
 
-    if (!empty($submitted->shortname)) {
+    if (isset($submitted->shortname) && $submitted->shortname !== "") {
         $data->shortname = $submitted->shortname;
     } else {
         $data->shortname = null;

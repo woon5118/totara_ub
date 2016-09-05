@@ -388,7 +388,7 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             $jobassignment->update(array('idnumber' => $seconddata['idnumber'])); // Update first to match second.
             $this->assertEquals(0, 1, 'Exception was not triggered!');
         } catch (Exception $e) {
-            $this->assertEquals('Tried to update job assignment to a idnumber which is not unique for this user', $e->getMessage());
+            $this->assertEquals('Tried to update job assignment to an idnumber which is not unique for this user', $e->getMessage());
         }
 
         // Make sure that update of $jobassignment isn't messing with other job assignment records.

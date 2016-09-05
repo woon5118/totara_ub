@@ -217,13 +217,13 @@ class job_assignment {
         $this->sortorder = $record->sortorder;
         $this->positionassignmentdate = $record->positionassignmentdate;
 
-        if (!empty($record->fullname)) {
+        if (isset($record->fullname) && $record->fullname !== "") {
             $this->fullname = $record->fullname;
         }
-        if (!empty($record->shortname)) {
+        if (isset($record->shortname) && $record->shortname !== "") {
             $this->shortname = $record->shortname;
         }
-        if (!empty($this->idnumber)) {
+        if (isset($record->idnumber) && $record->idnumber !== "") {
             $this->idnumber = $record->idnumber;
         }
         if (!empty($record->description)) {
@@ -260,7 +260,7 @@ class job_assignment {
      *
      * Processes description_editor, so you don't have to.
      *
-     * @param array|\stdClass $data key/values for a new record (keys must include userid, fullname, shortname)
+     * @param array|\stdClass $data key/values for a new record (keys must include userid, idnumber)
      * @return job_assignment
      */
     public static function create($data) {
@@ -274,7 +274,7 @@ class job_assignment {
         if (empty($data['userid'])) {
             throw new exception('User id is required when creating new job assignment');
         }
-        if (empty($data['idnumber'])) {
+        if (!isset($data['idnumber']) || $data['idnumber'] === "") {
             throw new exception('ID Number is required when creating new job assignment');
         }
         foreach ($data as $key => $value) {
@@ -392,8 +392,11 @@ class job_assignment {
         if (empty($data['userid'])) {
             $data['userid'] = $userid;
         }
-        if (empty($data['idnumber'])) {
-            $data['idnumber'] = $DB->count_records('job_assignment', array('userid' => $data['userid'])) + 1;
+        if (!array_key_exists('idnumber', $data)) {
+            $data['idnumber'] = 1;
+            while ($DB->record_exists('job_assignment', array('userid' => $data['userid'], 'idnumber' => $data['idnumber']))) {
+                $data['idnumber']++;
+            }
         }
 
         return self::create($data);
@@ -488,7 +491,7 @@ class job_assignment {
             return null;
 
         } else if ($name === 'fullname') {
-            if (empty($this->fullname)) {
+            if (!isset($this->fullname) || $this->fullname === "") {
                 return get_string('jobassignmentdefaultfullname', 'totara_job', $this->idnumber);
             } else {
                 return $this->fullname;
@@ -601,10 +604,18 @@ class job_assignment {
     private function update_internal(array $data) {
         global $DB, $TEXTAREA_OPTIONS, $USER;
 
-        // If a new idnumber is supplied, check that it is unique for this user.
-        if (!empty($data['idnumber']) && $data['idnumber'] != $this->idnumber &&
-            $DB->record_exists('job_assignment', array('userid' => $this->userid, 'idnumber' => $data['idnumber']))) {
-            throw new Exception('Tried to update job assignment to a idnumber which is not unique for this user');
+        // If a new idnumber is supplied.
+        if (array_key_exists('idnumber', $data)) {
+            if (is_null($data['idnumber']) || $data['idnumber'] === "") {
+                // Null and empty string are not allow (but "0" is, so not checking "empty").
+                throw new Exception('Tried to update job assignment idnumber to an empty value which is not allowed');
+            }
+
+            // Check that it is unique for this user.
+            if ($data['idnumber'] != $this->idnumber &&
+                $DB->record_exists('job_assignment', array('userid' => $this->userid, 'idnumber' => $data['idnumber']))) {
+                throw new Exception('Tried to update job assignment to an idnumber which is not unique for this user');
+            }
         }
 
         if (!empty($data['tempmanagerjaid']) XOR !empty($data['tempmanagerexpirydate'])) {
