@@ -91,13 +91,17 @@ class rb_current_pos_content extends rb_base_content {
         $equaloptions = array(self::CONTENT_PRIMARY_EQUALANDBELOW, self::CONTENT_PRIMARY_EQUAL, self::CONTENT_ANY_EQUALANDBELOW, self::CONTENT_ANY_EQUAL);
         $recursiveoptions = array(self::CONTENT_PRIMARY_EQUALANDBELOW, self::CONTENT_PRIMARY_BELOW, self::CONTENT_ANY_EQUALANDBELOW, self::CONTENT_ANY_BELOW);
 
+        $viewparam = $DB->get_unique_param('viewid');
+        $params = array($viewparam => $userid);
+
         // Set up the base joins and where clause for the restrictions.
         $prime = in_array($restriction, $primaryoptions) ? ' AND u1ja.sortorder = 1' : '';
         $joinsql = " SELECT 1
                        FROM {job_assignment} u1ja
                  INNER JOIN {pos} p1
                          ON u1ja.positionid = p1.id{$prime}";
-        $wheresql = " WHERE u1ja.userid = :viewid";
+        $wheresql = " WHERE u1ja.userid = :{$viewparam}";
+
 
         // Set up the joins and where clause for equals restrictions.
         if (in_array($restriction, $equaloptions)) {
@@ -120,12 +124,13 @@ class rb_current_pos_content extends rb_base_content {
 
         // Override the wheresql when both are selected to get the OR working.
         if (in_array($restriction, $equaloptions) && in_array($restriction, $recursiveoptions)) {
-            $wheresql = " WHERE u1ja.userid = :viewid
+            $viewparam = $DB->get_unique_param('viewid');
+            $params[$viewparam] = $userid;
+            $wheresql = " WHERE u1ja.userid = :{$viewparam}
                             AND (u2ja.userid = {$field} OR u3ja.userid = {$field})";
         }
 
         $sql = "EXISTS({$joinsql}{$wheresql})";
-        $params = array('viewid' => $userid);
         return array($sql, $params);
 
     }
@@ -279,13 +284,16 @@ class rb_current_org_content extends rb_base_content {
         $equaloptions = array(self::CONTENT_PRIMARY_EQUALANDBELOW, self::CONTENT_PRIMARY_EQUAL, self::CONTENT_ANY_EQUALANDBELOW, self::CONTENT_ANY_EQUAL);
         $recursiveoptions = array(self::CONTENT_PRIMARY_EQUALANDBELOW, self::CONTENT_PRIMARY_BELOW, self::CONTENT_ANY_EQUALANDBELOW, self::CONTENT_ANY_BELOW);
 
+        $viewparam = $DB->get_unique_param('viewid');
+        $params = array($viewparam => $userid);
+
         // Set up the base joins and where clause for the restrictions.
         $prime = in_array($restriction, $primaryoptions) ? ' AND u1ja.sortorder = 1' : '';
         $joinsql = " SELECT 1
                        FROM {job_assignment} u1ja
                  INNER JOIN {org} o1
                          ON u1ja.organisationid = o1.id{$prime}";
-        $wheresql = " WHERE u1ja.userid = :viewid";
+        $wheresql = " WHERE u1ja.userid = :{$viewparam}";
 
         // Set up the joins and where clause for equals restrictions.
         if (in_array($restriction, $equaloptions)) {
@@ -308,12 +316,13 @@ class rb_current_org_content extends rb_base_content {
 
         // Override the wheresql when both are selected to get the OR working.
         if (in_array($restriction, $equaloptions) && in_array($restriction, $recursiveoptions)) {
-            $wheresql = " WHERE u1ja.userid = :viewid
+            $viewparam = $DB->get_unique_param('viewid');
+            $params[$viewparam] = $userid;
+            $wheresql = " WHERE u1ja.userid = :{$viewparam}
                             AND (u2ja.userid = {$field} OR u3ja.userid = {$field})";
         }
 
         $sql = "EXISTS({$joinsql}{$wheresql})";
-        $params = array('viewid' => $userid);
         return array($sql, $params);
     }
 
