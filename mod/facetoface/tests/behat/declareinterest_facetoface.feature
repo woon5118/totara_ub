@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara
+@javascript @mod @mod_facetoface @totara
 Feature: Manager approval and declare of interest
   In order to control seminar attendance
   As a manager
@@ -20,7 +20,6 @@ Feature: Manager approval and declare of interest
       | student1 | C1     | student        |
       | student2 | C1     | student        |
 
-  @javascript
   Scenario: Student cannot declare interest where not enabled
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
@@ -35,7 +34,6 @@ Feature: Manager approval and declare of interest
     And I follow "Course 1"
     And I should not see "Declare interest"
 
-  @javascript
   Scenario: Student can declare and withdraw interest where enabled
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
@@ -76,7 +74,6 @@ Feature: Manager approval and declare of interest
     And I press "Confirm"
     And I should see "Declare interest"
 
-  @javascript
   Scenario: Student cannot declare interest until all sessions are fully booked if setting enabled.
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
@@ -85,7 +82,7 @@ Feature: Manager approval and declare of interest
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                        | Test declareinterestfullybooked                     |
       | Description                 | Test seminar description                            |
-      | Users can declare interest  | When no upcoming sessions are available for booking |
+      | Users can declare interest  | When no upcoming events are available for booking |
     And I click on "View all events" "link" in the "declareinterestfullybooked" activity
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -118,7 +115,6 @@ Feature: Manager approval and declare of interest
     And I follow "Course 1"
     And I should see "Declare interest"
 
-  @javascript
   Scenario: Student cannot declare interest if overbooking is enabled.
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
@@ -127,7 +123,7 @@ Feature: Manager approval and declare of interest
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name                       | Test declareinterestfullybooked                     |
       | Description                | Test seminar description                            |
-      | Users can declare interest | When no upcoming sessions are available for booking |
+      | Users can declare interest | When no upcoming events are available for booking |
     And I click on "View all events" "link" in the "declareinterestfullybooked" activity
     And I follow "Add a new event"
     And I click on "Edit date" "link"
@@ -161,7 +157,6 @@ Feature: Manager approval and declare of interest
     And I follow "Course 1"
     And I should not see "Declare interest"
 
-  @javascript
   Scenario: Staff can view who has expressed interest
     When I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
@@ -243,3 +238,41 @@ Feature: Manager approval and declare of interest
     And I should not see "Test reason 1"
     And I should see "Test reason 2"
     And I should not see "Test reason 3"
+
+  Scenario: Student can declare interest when past sessions are not full and no upcoming sessions
+    When I log in as "teacher1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I turn editing mode on
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                       | Test declareinterestnotfullybookedpast              |
+      | Description                | Test seminar description                            |
+      | Manager Approval           | 1                                                   |
+      | Users can declare interest | When no upcoming events are available for booking |
+    And I click on "View all events" "link" in the "declareinterestnotfullybookedpast" activity
+    And I follow "Add a new event"
+    And I click on "Edit date" "link"
+    And I fill seminar session with relative date in form data:
+      | sessiontimezone    | Pacific/Auckland |
+      | timestart[day]     | -1               |
+      | timestart[month]   | 0                |
+      | timestart[year]    | 0                |
+      | timestart[hour]    | 0                |
+      | timestart[minute]  | 0                |
+      | timefinish[day]    | -1               |
+      | timefinish[month]  | 0                |
+      | timefinish[year]   | 0                |
+      | timefinish[hour]   | +1               |
+      | timefinish[minute] | 0                |
+    And I press "OK"
+    And I press "Save changes"
+    And I log out
+    And I log in as "student1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I should see "Declare interest"
+    And I follow "Declare interest"
+    And I set the following fields to these values:
+      | Reason for interest: | Test reason |
+    And I press "Confirm"
+    And I should see "Withdraw interest"

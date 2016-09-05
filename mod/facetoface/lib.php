@@ -3643,22 +3643,28 @@ function facetoface_delete_user_calendar_events($session, $eventtype) {
 }
 
 /**
- * Confirm that a user can be added to a session.
+ * Confirm that a session has free space for a user
  *
  * @param class  $session Record from the facetoface_sessions table
  * @param object $context (optional) A context object (record from context table)
+ * @param int    $userid (optional)
  * @return bool True if user can be added to session
  **/
-function facetoface_session_has_capacity($session, $context = false, $status = MDL_F2F_STATUS_BOOKED) {
-
+function facetoface_session_has_capacity($session, $context = false, $status = MDL_F2F_STATUS_BOOKED, $userid = 0) {
+    global $USER;
     if (empty($session)) {
         return false;
     }
 
+    if (!$userid) {
+        $userid = $USER->id;
+    }
+
     $signupcount = facetoface_get_num_attendees($session->id, $status);
+
     if ($signupcount >= $session->capacity) {
         // if session is full, check if overbooking is allowed for this user
-        if (!$context || !has_capability('mod/facetoface:signupwaitlist', $context)) {
+        if (!$context || !has_capability('mod/facetoface:signupwaitlist', $context, $userid)) {
             return false;
         }
     }
@@ -6169,49 +6175,87 @@ function facetoface_activity_can_declare_interest($facetoface, $userid = null) {
         return false;
     }
 
+    // Check that the user has no existing signup.
+    if (is_null($userid)) {
+        $userid = $USER->id;
+    }
+
     // If user already declared interest, cannot declare again.
     if (facetoface_user_declared_interest($facetoface, $userid)) {
         return false;
     }
 
-    // Check that the user has no existing signup.
-    if (is_null($userid)) {
-        $userid = $USER->id;
-    }
-    $sql = "
-    SELECT snp.id
-    FROM {facetoface_sessions} ssn
-    JOIN {facetoface_signups} snp ON (snp.sessionid = ssn.id)
-    JOIN {facetoface_signups_status} sst ON (sst.signupid = snp.id AND sst.superceded = :superceded)
-    WHERE ssn.facetoface = :f2fid
-    AND snp.userid = :userid
-    AND sst.statuscode >= :statusrequested
-    AND sst.statuscode <= :statusbooked
-    ";
-    $params = array(
-        'f2fid' => $facetoface->id,
-        'userid' => $userid,
-        'superceded' => 0,
-        'statusrequested' => MDL_F2F_STATUS_REQUESTED,
-        'statusbooked' => MDL_F2F_STATUS_BOOKED,
-    );
-    if ($DB->record_exists_sql($sql, $params)) {
-        return false;
-    }
-
     // If "only when full" is turned on, allow only when all sessions are fully booked.
     if ($facetoface->interestonlyiffull) {
-        $sessions = $DB->get_records('facetoface_sessions', array('facetoface' => $facetoface->id));
-        if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id)) {
-            print_error('error:incorrectcoursemodule', 'facetoface');
+        // If user signed - no declare interest.
+        $submission = facetoface_get_user_submissions($facetoface->id, $userid,
+                MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_FULLY_ATTENDED);
+        if (!empty($submission)) {
+            return false;
         }
-        $contextmodule = context_module::instance($cm->id);
-        foreach ($sessions as $session) {
-            if ($session->allowoverbook || facetoface_session_has_capacity($session, $contextmodule)) {
+
+        $now = time();
+        $sql = "
+            SELECT fs.id
+            FROM {facetoface_sessions} fs
+                INNER JOIN {facetoface_sessions_dates} fsd ON (fsd.sessionid = fs.id)
+            WHERE fsd.timestart > :now
+                AND fs.facetoface = :facetoface
+        ";
+
+        $sessions = $DB->get_records_sql($sql, array('now' => $now, 'facetoface' => $facetoface->id));
+        foreach ($sessions as $sessionrec) {
+            $session = facetoface_get_session($sessionrec->id);
+
+            if (facetoface_can_user_signup($session, $userid, $now)) {
                 return false;
             }
         }
     }
+    return true;
+}
+
+/**
+ * Check if user can signup to current event.
+ * @param stdClass $session object (must be prepared by see::facetoface_get_session())
+ * @param int $userid user id
+ * @param int $time time of check (by default now)
+ */
+function facetoface_can_user_signup($session, $userid, $time = 0) {
+    if (!$time) {
+        $time = time();
+    }
+    if (!empty($session->cancelledstatus)) {
+        return false;
+    }
+
+    if (facetoface_has_session_started($session, $time)) {
+        return false;
+    }
+
+    $submission = facetoface_get_user_submissions($session->facetoface, $userid,
+                        MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_FULLY_ATTENDED, $session->id);
+    if (!empty($submission)) {
+        return false;
+    }
+
+    if (!$cm = get_coursemodule_from_instance('facetoface', $session->facetoface)) {
+        print_error('error:incorrectcoursemodule', 'facetoface');
+    }
+    $contextmodule = context_module::instance($cm->id);
+
+    if (!$session->allowoverbook && !facetoface_session_has_capacity($session, $contextmodule, MDL_F2F_STATUS_BOOKED, $userid)) {
+        return false;
+    }
+
+    if (!empty($session->registrationtimestart) && $session->registrationtimestart > $time) {
+        return false;
+    }
+
+    if (!empty($session->registrationtimefinish) && $session->registrationtimefinish < $time) {
+        return false;
+    }
+
     return true;
 }
 

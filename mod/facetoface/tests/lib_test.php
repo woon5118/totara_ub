@@ -3440,4 +3440,154 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $sessiondate->roomid = (string)$roomid;
         return $sessiondate;
     }
+
+    /**
+     * Test facetoface_activity_can_declare_interest()
+     */
+    public function test_facetoface_activity_can_declare_interest() {
+        $now = time();
+        $course = $this->getDataGenerator()->create_course();
+        $room = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 1));
+
+        // Declare interest is enabled, and user is not submitted, and there no upcoming sessions.
+        $facetoface1 = $this->facetoface_generator->create_instance(array('course' => $course->id, 'declareinterest' => true));
+        $user1 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user1->id, $course->id);
+        $sessiondates1 = [$this->prepare_date($now - (DAYSECS * 4), $now - (DAYSECS * 3), $room->id)];
+        $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates1));
+        $this->assertTrue(facetoface_activity_can_declare_interest($facetoface1, $user1->id));
+
+        // Declare interest is disabled.
+        $facetoface2 = $this->facetoface_generator->create_instance(array('course' => $course->id, 'declareinterest' => false));
+        $user2 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user2->id, $course->id);
+        $this->facetoface_generator->add_session(array('facetoface' => $facetoface2->id, 'sessiondates' => $sessiondates1));
+        $this->assertFalse(facetoface_activity_can_declare_interest($facetoface2, $user2->id));
+
+        // User already declared interest.
+        $facetoface3 = $this->facetoface_generator->create_instance(array('course' => $course->id, 'declareinterest' => true));
+        $user3 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user3->id, $course->id);
+        $this->facetoface_generator->add_session(array('facetoface' => $facetoface3->id, 'sessiondates' => $sessiondates1));
+        $this->assertTrue(facetoface_activity_can_declare_interest($facetoface3, $user3->id));
+        facetoface_declare_interest($facetoface3, 'Reason', $user3->id);
+        $this->assertFalse(facetoface_activity_can_declare_interest($facetoface3, $user3->id));
+
+        // User already submitted.
+        $facetoface4 = $this->facetoface_generator->create_instance(array('course' => $course->id, 'declareinterest' => true, 'interestonlyiffull' => true));
+        $user4 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user4->id, $course->id);
+        $session4id = $this->facetoface_generator->add_session(array('facetoface' => $facetoface4->id, 'sessiondates' => $sessiondates1));
+        $session4 = facetoface_get_session($session4id);
+        $this->assertTrue(facetoface_activity_can_declare_interest($facetoface4, $user4->id));
+        facetoface_user_signup($session4, $facetoface4, $course, '', MDL_F2F_INVITE, MDL_F2F_STATUS_REQUESTED, $user4->id);
+        $this->assertDebuggingCalled(get_string('error:nomanagersemailset', 'facetoface'));
+        $this->assertFalse(facetoface_activity_can_declare_interest($facetoface4, $user4->id));
+    }
+
+    /**
+     * Test facetoface_can_user_signup()
+     */
+    public function test_facetoface_can_user_signup() {
+        $now = time();
+        $course = $this->getDataGenerator()->create_course();
+        $room = $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 1));
+
+        // Session in future, there free space, and registration time frame in.
+        $facetoface1 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+        $user1 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user1->id, $course->id);
+        $sessiondates1 = [$this->prepare_date($now + (DAYSECS * 3), $now + (DAYSECS * 4), $room->id)];
+        $session1id = $this->facetoface_generator->add_session(array(
+            'facetoface' => $facetoface1->id,
+            'sessiondates' => $sessiondates1,
+            'registrationtimestart' => $now - (DAYSECS * 1),
+            'registrationtimefinish' => $now + (DAYSECS * 1),
+        ));
+        $session1 = facetoface_get_session($session1id);
+        $this->assertTrue(facetoface_can_user_signup($session1, $user1->id, $now));
+
+        // Session in future, there no free space, but overbooking is alowed, and registration time frame in.
+        $facetoface2 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+        $user21 = $this->getDataGenerator()->create_user();
+        $user22 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user21->id, $course->id);
+        $this->getDataGenerator()->enrol_user($user22->id, $course->id);
+        $session2id = $this->facetoface_generator->add_session(array(
+            'facetoface' => $facetoface2->id,
+            'sessiondates' => $sessiondates1,
+            'capacity' => 1,
+            'allowoverbook' => true,
+        ));
+        $session2 = facetoface_get_session($session2id);
+        facetoface_user_signup($session2, $facetoface2, $course, '', MDL_F2F_INVITE, MDL_F2F_STATUS_REQUESTED, $user21->id);
+        $this->assertDebuggingCalled(get_string('error:nomanagersemailset', 'facetoface'));
+        $this->assertTrue(facetoface_can_user_signup($session2, $user22->id, $now));
+
+        // Session in the past.
+        $facetoface3 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+        $user3 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user3->id, $course->id);
+        $sessiondates3 = [$this->prepare_date($now - (DAYSECS * 4), $now - (DAYSECS * 3), $room->id)];
+        $session3id = $this->facetoface_generator->add_session(array(
+            'facetoface' => $facetoface3->id,
+            'sessiondates' => $sessiondates3,
+        ));
+        $session3 = facetoface_get_session($session3id);
+        $this->assertFalse(facetoface_can_user_signup($session3, $user3->id, $now));
+
+        // Session in the middle.
+        $facetoface4 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+        $user4 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user4->id, $course->id);
+        $sessiondates4 = [$this->prepare_date($now - (DAYSECS * 1), $now + (DAYSECS * 1), $room->id)];
+        $session4id = $this->facetoface_generator->add_session(array(
+            'facetoface' => $facetoface4->id,
+            'sessiondates' => $sessiondates4,
+        ));
+        $session4 = facetoface_get_session($session4id);
+        $this->assertFalse(facetoface_can_user_signup($session4, $user4->id, $now));
+
+        // Registration has not started yet.
+        $facetoface5 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+        $user5 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user5->id, $course->id);
+        $session5id = $this->facetoface_generator->add_session(array(
+            'facetoface' => $facetoface5->id,
+            'sessiondates' => $sessiondates1,
+            'registrationtimestart' => $now + (DAYSECS * 1),
+            'registrationtimefinish' => $now + (DAYSECS * 2),
+        ));
+        $session5 = facetoface_get_session($session5id);
+        $this->assertFalse(facetoface_can_user_signup($session5, $user5->id, $now));
+
+        // Registration is over.
+        $facetoface6 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+        $user6 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user6->id, $course->id);
+        $session6id = $this->facetoface_generator->add_session(array(
+            'facetoface' => $facetoface6->id,
+            'sessiondates' => $sessiondates1,
+            'registrationtimestart' => $now - (DAYSECS * 2),
+            'registrationtimefinish' => $now - (DAYSECS * 1),
+        ));
+        $session6 = facetoface_get_session($session6id);
+        $this->assertFalse(facetoface_can_user_signup($session6, $user6->id, $now));
+
+        // No free space.
+        $facetoface7 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+        $user71 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user71->id, $course->id);
+        $user72 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user72->id, $course->id);
+        $session7id = $this->facetoface_generator->add_session(array(
+            'facetoface' => $facetoface7->id,
+            'sessiondates' => $sessiondates1,
+            'capacity' => 1,
+        ));
+        $session7 = facetoface_get_session($session7id);
+        facetoface_user_signup($session7, $facetoface7, $course, '', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user71->id);
+        $this->assertDebuggingCalled();
+        $this->assertFalse(facetoface_can_user_signup($session7, $user72->id, $now));
+    }
 }
