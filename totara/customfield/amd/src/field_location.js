@@ -357,9 +357,9 @@ define(['jquery'], function ($) {
                     self.address = data.results[0].formatted_address;
                     self.location = data.results[0].geometry.location;
                     self.load_map();
-                    $('#fgroup_id_' + self.fieldprefix + 'mapelements .felement .alert-error').hide();
+                    $('#fgroup_id_' + self.fieldprefix + 'mapelements .felement .alert').hide();
                 } else {
-                    if ($('#fgroup_id_' + self.fieldprefix + 'mapelements .felement .alert-error').length === 0){
+                    if ($('#fgroup_id_' + self.fieldprefix + 'mapelements .felement .alert').length === 0){
                         require(['core/templates', 'core/str'], function (templates, mdlstrings) {
                             mdlstrings.get_string('locationnotfound', 'totara_customfield').done(function (notfound) {
                                 templates.render('core/notification_problem', {message: notfound}).done(function (html) {
@@ -368,7 +368,7 @@ define(['jquery'], function ($) {
                             });
                         });
                     } else {
-                        $('#fgroup_id_' + self.fieldprefix + 'mapelements .felement .alert-error').show();
+                        $('#fgroup_id_' + self.fieldprefix + 'mapelements .felement .alert').show();
                     }
                 }
             },
