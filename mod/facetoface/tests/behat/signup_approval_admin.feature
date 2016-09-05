@@ -10,7 +10,6 @@ Feature: Seminar Signup Admin Approval
       | username    | firstname | lastname | email              |
       | sysapprover | Terry     | Ter      | terry@example.com  |
       | actapprover | Larry     | Lar      | larry@example.com  |
-      | mickymau    | Micky     | Mau      | micky@example.com  |
       | teacher     | Freddy    | Fred     | freddy@example.com |
       | trainer     | Benny     | Ben      | benny@example.com  |
       | manager     | Cassy     | Cas      | cassy@example.com  |
@@ -18,6 +17,7 @@ Feature: Seminar Signup Admin Approval
       | timmy       | Timmy     | Tim      | timmy@example.com  |
       | sammy       | Sammy     | Sam      | sammy@example.com  |
       | sally       | Sally     | Sal      | sally@example.com  |
+      | mickymau    | Micky     | Mau      | micky@example.com  |
     And the following "courses" exist:
       | fullname                 | shortname | category |
       | Classroom Connect Course | CCC       | 0        |
