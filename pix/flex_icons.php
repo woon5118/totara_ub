@@ -2195,6 +2195,7 @@ $deprecated = array(
     'core|t/contextmenu' => 'bars',
     'core|t/copy' => 'duplicate',
     'core|t/delete' => 'delete',
+    'core|t/delete_gray' => 'delete-disabled',
     'core|t/disable_down' => 'arrow-down',
     'core|t/disable_up' => 'arrow-up',
     'core|t/dock_to_block' => 'block-undock',
