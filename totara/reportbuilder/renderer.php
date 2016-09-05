@@ -563,7 +563,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             }
         }
         require_once($CFG->dirroot . '/totara/reportbuilder/export_form.php');
-        $export = new report_builder_export_form($url, compact('id', 'sid'));
+        $export = new report_builder_export_form($url, compact('id', 'sid'), 'post', '', array('id' => 'rb_export_form'));
         $export->display();
     }
 

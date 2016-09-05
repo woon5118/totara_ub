@@ -1918,7 +1918,7 @@ class reportbuilder {
 
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
         $mformsidebar = new report_builder_sidebar_search_form($this->get_current_url(),
-                array('report' => $this, 'fields' => $sidebarfilters), 'post', '', array('class' => 'rb-sidebar'));
+                array('report' => $this, 'fields' => $sidebarfilters), 'post', '', array('class' => 'rb-sidebar col-md-3 col-sm-4 col-xs-12'));
         $mformsidebar->display();
 
         // If is_capable is not implemented on an embedded report then don't activate instant filters.
@@ -3727,8 +3727,15 @@ class reportbuilder {
         // Arrgh, the crazy table outputs each row immediately...
         ob_start();
 
+        $classes = '';
+
+        // If we're displaying the sidebar filters we need the content to be responsive.
+        if ($this->get_sidebar_filters()) {
+            $classes = ' col-md-9 col-sm-8 col-xs-12';
+        }
+
         // Prevent notifications boxes inside the table.
-        echo $OUTPUT->container_start('nobox rb-display-table-container no-overflow', $this->_id);
+        echo $OUTPUT->container_start('nobox rb-display-table-container no-overflow' . $classes, $this->_id);
 
         // Output cache information if needed.
         if ($cache) {
