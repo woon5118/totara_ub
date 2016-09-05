@@ -39,12 +39,14 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
          * @param string    The filter to apply (hierarchy, badge, hierarchy_multi, cohort, category, course_multi)
          * @param string    The current value (may be HTML) - only used by hierarchy and badge
          * @param string    The type of the hierarchy to load - only used by hierarchy type
+         * @param {string} name The name of the filter. Optional, may be undefined.
          */
-        init: function(filter, value, type) {
+        init: function(filter, value, type, name) {
             handler.waitingitems.push({
                 filter: filter,
                 value: value,
-                hierarchytype: type
+                hierarchytype: type,
+                name: name
             });
 
             if (window.dialogsInited) {
@@ -63,7 +65,13 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
         },
 
         rb_init_filter_dialogs: function() {
-            $.each(handler.waitingitems, function () {
+
+            // Copy the waiting items to a holding array, and empty the waiting items array.
+            // This was we know exactly what we need to initialise here.
+            var waitingitems = $.extend(true, [], handler.waitingitems);
+            handler.waitingitems = [];
+
+            $.each(waitingitems, function () {
                 switch (this.filter) {
                     case "hierarchy":
                         handler.rb_load_hierarchy_filters(this);
@@ -111,9 +119,18 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
         },
 
         rb_load_hierarchy_filters: function(filter) {
+            if (filter.name) {
+                // Totara dialog's use this as the selector as well, so we can rely on it here.
+                // If you change the input id everything will break, you will get here, and you will know
+                // to fix it there as well!
+                var inputselector = 'input#show-' + filter.name + '-dialog';
+            } else {
+                // Nothing more specific to use.
+                var inputselector = 'input';
+            }
             switch (filter.hierarchytype) {
                 case 'org':
-                    $('input.rb-filter-choose-org').each(function() {
+                    $(inputselector+'.rb-filter-choose-org').each(function() {
                         var id = $(this).attr('id');
                         // Remove 'show-' and '-dialog' from ID.
                         id = id.substr(5, id.length - 12);
@@ -143,7 +160,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                     break;
 
                 case 'pos':
-                    $('input.rb-filter-choose-pos').each(function() {
+                    $(inputselector+'.rb-filter-choose-pos').each(function() {
                         var id = $(this).attr('id');
                         // Remove 'show-' and '-dialog' from ID.
                         id = id.substr(5, id.length - 12);
@@ -173,7 +190,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                     break;
 
                 case 'comp':
-                    $('input.rb-filter-choose-comp').each(function() {
+                    $(inputselector+'.rb-filter-choose-comp').each(function() {
                         var id = $(this).attr('id');
                         // Remove 'show-' and '-dialog' from ID.
                         id = id.substr(5, id.length - 12);
