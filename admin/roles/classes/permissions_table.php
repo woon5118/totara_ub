@@ -92,9 +92,18 @@ class core_role_permissions_table extends core_role_capability_table_base {
 
         foreach ($roles as $id => $name) {
             if (isset($needed[$id])) {
-                $templatecontext = array("rolename" => $name, "roleid" => $id, "action" => "prevent", "spanclass" => "allowed",
-                                  "linkclass" => "preventlink", "adminurl" => $adminurl->out(), "imageurl" => "");
+                $templatecontext = array(
+                    "rolename" => $name,
+                    "roleid" => $id,
+                    "action" => "prevent",
+                    "spanclass" => "allowed",
+                    "linkclass" => "preventlink",
+                    "adminurl" => '#',
+                    "imageurl" => ""
+                );
                 if (isset($overridableroles[$id]) and ($allowoverrides or ($allowsafeoverrides and is_safe_capability($capability)))) {
+                    $adminurl = new moodle_url($PAGE->url, array('contextid'=>$contextid, 'roleid'=>$id, 'capability'=>$capability->name, 'prevent'=>1));
+                    $templatecontext['adminurl'] = $adminurl->out(false); // Cleaned in the template.
                     $templatecontext['imageurl'] = 'delete';
                 }
                 $neededroles[$id] = $renderer->render_from_template('core/permissionmanager_role', $templatecontext);
@@ -103,10 +112,18 @@ class core_role_permissions_table extends core_role_capability_table_base {
         $neededroles = implode(' ', $neededroles);
         foreach ($roles as $id => $name) {
             if (isset($forbidden[$id])  and ($allowoverrides or ($allowsafeoverrides and is_safe_capability($capability)))) {
-                $templatecontext = array("rolename" => $name, "roleid" => $id, "action" => "unprohibit",
-                                "spanclass" => "forbidden", "linkclass" => "unprohibitlink", "adminurl" => $adminurl->out(),
-                                "imageurl" => "");
+                $templatecontext = array(
+                    "rolename" => $name,
+                    "roleid" => $id,
+                    "action" => "unprohibit",
+                    "spanclass" => "forbidden",
+                    "linkclass" => "unprohibitlink",
+                    "adminurl" => '#',
+                    "imageurl" => ""
+                );
                 if (isset($overridableroles[$id]) and prohibit_is_removable($id, $context, $capability->name)) {
+                    $adminurl = new moodle_url($PAGE->url, array('contextid'=>$contextid, 'roleid'=>$id, 'capability'=>$capability->name, 'unprohibit'=>1));
+                    $templatecontext['adminurl'] = $adminurl->out(false); // Cleaned in the template.
                     $templatecontext['imageurl'] = 'delete';
                 }
                 $forbiddenroles[$id] = $renderer->render_from_template('core/permissionmanager_role', $templatecontext);
