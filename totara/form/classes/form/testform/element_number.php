@@ -64,7 +64,8 @@ class element_number extends form {
         $this->model->add(new number('number_basic', 'Basic number'));
         $number_required = $this->model->add(new number('number_required', 'Required basic number'));
         $number_required->set_attribute('required', true);
-        $this->model->add(new number('number_with_current_data', 'number with current data'));
+        $number_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new number('number_with_current_data', 'number with current data'))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new number('number_frozen_empty', 'Empty frozen number'))->set_frozen(true);
         $this->model->add(new number('number_frozen_with_current_data', 'Frozen number with current data'))->set_frozen(true);
 

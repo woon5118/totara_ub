@@ -64,7 +64,8 @@ class element_textarea extends form {
         $this->model->add(new textarea('textarea_basic', 'Basic textarea', PARAM_RAW));
         $textarea_required = $this->model->add(new textarea('textarea_required', 'Required basic textarea', PARAM_RAW));
         $textarea_required->set_attribute('required', true);
-        $this->model->add(new textarea('textarea_with_current_data', 'textarea with current data', PARAM_RAW));
+        $textarea_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new textarea('textarea_with_current_data', 'textarea with current data', PARAM_RAW))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new textarea('textarea_frozen_empty', 'Empty frozen textarea', PARAM_RAW))->set_frozen(true);
         $this->model->add(new textarea('textarea_frozen_with_current_data', 'Frozen textarea with current data', PARAM_RAW))->set_frozen(true);
 

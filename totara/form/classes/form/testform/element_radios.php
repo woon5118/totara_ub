@@ -66,7 +66,8 @@ class element_radios extends form {
         $this->model->add(new radios('radios_basic', 'Basic radios', $defaultoptions));
         $radios_required = $this->model->add(new radios('radios_required', 'Required basic radios', $defaultoptions));
         $radios_required->set_attribute('required', true);
-        $this->model->add(new radios('radios_with_current_data', 'radios with current data', $defaultoptions));
+        $radios_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new radios('radios_with_current_data', 'radios with current data', $defaultoptions))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new radios('radios_frozen_empty', 'Empty frozen radios', $defaultoptions))->set_frozen(true);
         $this->model->add(new radios('radios_frozen_with_current_data', 'Frozen radios with current data', $defaultoptions))->set_frozen(true);
 

@@ -64,7 +64,8 @@ class element_passwordunmask extends form {
         $this->model->add(new passwordunmask('passwordunmask_basic', 'Basic passwordunmask'));
         $passwordunmask_required = $this->model->add(new passwordunmask('passwordunmask_required', 'Required basic passwordunmask'));
         $passwordunmask_required->set_attribute('required', true);
-        $this->model->add(new passwordunmask('passwordunmask_with_current_data', 'passwordunmask with current data'));
+        $passwordunmask_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new passwordunmask('passwordunmask_with_current_data', 'passwordunmask with current data'))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new passwordunmask('passwordunmask_frozen_empty', 'Empty frozen passwordunmask'))->set_frozen(true);
         $this->model->add(new passwordunmask('passwordunmask_frozen_with_current_data', 'Frozen passwordunmask with current data'))->set_frozen(true);
 

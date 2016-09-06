@@ -64,7 +64,8 @@ class element_email extends form {
         $this->model->add(new email('email_basic', 'Basic email'));
         $email_required = $this->model->add(new email('email_required', 'Required basic email'));
         $email_required->set_attribute('required', true);
-        $this->model->add(new email('email_with_current_data', 'email with current data'));
+        $email_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new email('email_with_current_data', 'email with current data'))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new email('email_frozen_empty', 'Empty frozen email'))->set_frozen(true);
         $this->model->add(new email('email_frozen_with_current_data', 'Frozen email with current data'))->set_frozen(true);
 

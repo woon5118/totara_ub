@@ -21,6 +21,10 @@
  */
 
 define(['jquery'], function ($) {
+
+    var ERROR_CONTAINER_CLASS = 'totara_form-error-container',
+        ERROR_CONTAINER_SELECTOR = '.'+ERROR_CONTAINER_CLASS;
+
     return {
         init: function (id) {
             (function (id) {
@@ -43,7 +47,7 @@ define(['jquery'], function ($) {
                         }
                     } else if (element.val().trim() !== '') {
                         validate.added = false;
-                        element.closest('.tf_element').find('.error-container').remove();
+                        element.closest('.tf_element').find(ERROR_CONTAINER_SELECTOR).remove();
                     }
                 }
 

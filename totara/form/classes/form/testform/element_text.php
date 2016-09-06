@@ -64,7 +64,8 @@ class element_text extends form {
         $this->model->add(new text('text_basic', 'Basic text', PARAM_RAW));
         $text_required = $this->model->add(new text('text_required', 'Required basic text', PARAM_RAW));
         $text_required->set_attribute('required', true);
-        $this->model->add(new text('text_with_current_data', 'Text with current data', PARAM_RAW));
+        $text_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new text('text_with_current_data', 'Text with current data', PARAM_RAW))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new text('text_frozen_empty', 'Empty frozen text', PARAM_RAW))->set_frozen(true);
         $this->model->add(new text('text_frozen_with_current_data', 'Frozen text with current data', PARAM_RAW))->set_frozen(true);
 

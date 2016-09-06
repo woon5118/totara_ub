@@ -21,6 +21,13 @@
 // @author    Joby Harding <joby.harding@totaralearning.com>
 // @package   theme_roots
 
+// Mixin for form labels - will NOT be output.
+.form-label-display() {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: (@padding-base-vertical + 1); // Default padding plus a border
+}
+
 // Basic mforms layout, used in resources, user profile etc.
 .mform {
   .fitem {
@@ -30,9 +37,7 @@
       .make-md-column(4);
       .make-lg-column(3);
       label {
-        margin-top: 0;
-        margin-bottom: 0;
-        padding-top: (@padding-base-vertical + 1); // Default padding plus a border
+        .form-label-display;
       }
     }
     .felement {
@@ -131,7 +136,9 @@
 .mform .iconhelp {
   margin-left: 4px;
 }
-
+.mform legend .iconhelp {
+  font-size: @font-size-base; // The help icon should always be the same size as the font.
+}
 // Basic admin forms layout.
 
 .form-item {
@@ -140,9 +147,7 @@
   .form-label {
     .make-md-column(4);
     label {
-      margin-top: 0;
-      margin-bottom: 0;
-      padding-top: (@padding-base-vertical + 1); // Default padding plus a border
+      .form-label-display;
     }
   }
   .form-setting {
@@ -232,7 +237,6 @@ select {
 @media (min-width: @screen-md-min) {
   .mform .fitemtitle,
   .form-label {
-    text-align: right;
     .form-shortname {
       display: block;
     }

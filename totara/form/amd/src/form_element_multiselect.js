@@ -28,6 +28,9 @@
  */
 define(['jquery', 'totara_form/form'], function($, Form) {
 
+    var ERROR_CONTAINER_CLASS = 'totara_form-error-container',
+        ERROR_CONTAINER_SELECTOR = '.'+ERROR_CONTAINER_CLASS;
+
     /**
      * Multiselect element
      *
@@ -107,7 +110,7 @@ define(['jquery', 'totara_form/form'], function($, Form) {
         });
         if (valid) {
             this.validationerroradded = false;
-            input.closest('.tf_element').find('.error-container').remove();
+            input.closest('.tf_element').find(ERROR_CONTAINER_SELECTOR).remove();
         } else {
             e.preventDefault();
             if (!this.validationerroradded) {

@@ -160,6 +160,11 @@ $THEME->layouts = array(
         'regions' => array('side-pre', 'side-post'),
         'defaultregion' => 'side-pre'
     ),
+    'noblocks' => array(
+        'file' => 'columns1.php',
+        'regions' => array(),
+        'options' => array(),
+    ),
 );
 
 $THEME->javascripts = array(

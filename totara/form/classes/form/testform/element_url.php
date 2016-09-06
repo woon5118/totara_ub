@@ -64,7 +64,8 @@ class element_url extends form {
         $this->model->add(new url('url_basic', 'Basic url'));
         $url_required = $this->model->add(new url('url_required', 'Required basic url'));
         $url_required->set_attribute('required', true);
-        $this->model->add(new url('url_with_current_data', 'url with current data'));
+        $url_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new url('url_with_current_data', 'url with current data'))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new url('url_frozen_empty', 'Empty frozen url'))->set_frozen(true);
         $this->model->add(new url('url_frozen_with_current_data', 'Frozen url with current data'))->set_frozen(true);
 

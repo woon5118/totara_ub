@@ -66,7 +66,8 @@ class element_select extends form {
         $this->model->add(new select('select_basic', 'Basic select', $defaultoptions));
         $select_required = $this->model->add(new select('select_required', 'Required basic select', $defaultoptions));
         $select_required->set_attribute('required', true);
-        $this->model->add(new select('select_with_current_data', 'select with current data', ['whatever' => 'Yeah?', 'yes' => 'Oh yea!', 'nah' => 'Never!']));
+        $select_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new select('select_with_current_data', 'select with current data', ['whatever' => 'Yeah?', 'yes' => 'Oh yea!', 'nah' => 'Never!']))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new select('select_frozen_empty', 'Empty frozen select', $defaultoptions))->set_frozen(true);
         $this->model->add(new select('select_frozen_with_current_data', 'Frozen select with current data', ['true' => '1', 'false' => '0']))->set_frozen(true);
 

@@ -145,9 +145,9 @@ define(['jquery', 'totara_form/form'], function($, Form) {
      */
     PasswordUnmaskElement.prototype.unmask = function() {
         if (this.unmaskinput.is(":checked")) {
-            this.input.parents('.totara_form_element_passwordunmask').addClass('unmask');
+            this.input.parents('.totara_form_element_passwordunmask').addClass('unmask-password');
         } else {
-            this.input.parents('.totara_form_element_passwordunmask').removeClass('unmask');
+            this.input.parents('.totara_form_element_passwordunmask').removeClass('unmask-password');
         }
     };
 

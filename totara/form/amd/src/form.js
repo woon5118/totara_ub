@@ -1644,6 +1644,13 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
          */
         debug: function (message, obj, level) {
             if (debug) {
+                if (!window.console.log.apply) {
+                    // IE9 doesn't provide apply on developer tool methods.
+                    if (window.console.log) {
+                        window.console.log(message);
+                    }
+                    return;
+                }
                 if (!level) {
                     level = MODULE.LOGLEVEL.none;
                 }
@@ -1656,6 +1663,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                 } else {
                     message = '%cForm: %c' + message;
                 }
+
                 var light = '#cb8bbe',
                     dark = '#ae45a3';
                 switch (level) {

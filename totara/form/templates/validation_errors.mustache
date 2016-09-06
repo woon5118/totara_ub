@@ -26,8 +26,8 @@
     This template generates form validation errors.
 
     Classes required for JS:
-    * error-container Any HTML outside of this element will not be removed once validation has been cleared (eg. once something has
-                been placed in a required field)
+    * totara_form-error-container Any HTML outside of this element will not be removed once validation has been cleared
+        (eg. once something has been placed in a required field)
 
     Data attributes required for JS:
     * none
@@ -43,7 +43,7 @@
       {}
 }}
 {{#errors_has_items}}
-    <div class="error-container">
-        {{#errors}}<span class="error" tabindex="0">{{{message}}}</span><br />{{/errors}}
+    <div class="totara_form-error-container">
+        {{#errors}}<span class="validation-error" tabindex="0">{{{message}}}</span><br />{{/errors}}
     </div>
 {{/errors_has_items}}

@@ -149,7 +149,9 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     on: {
                         complete: function(id,o,p) {
                             if (!o) {
-                                window.console.log('IO FATAL');
+                                if (window.console.log) {
+                                    window.console.log('IO FATAL');
+                                }
                                 return;
                             }
                             var data = null;

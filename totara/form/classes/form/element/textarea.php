@@ -57,7 +57,7 @@ class textarea extends text {
         $this->attributes = array(
             'maxlength' => null,
             'size' => null,
-            'cols' => null,
+            'cols' => 50, // Different browsers do different things, we'll default to 50.
             'rows' => null,
             'wrap' => null,
             'required' => false,

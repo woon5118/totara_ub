@@ -28,6 +28,9 @@
  */
 define(['jquery', 'totara_form/form'], function($, Form) {
 
+    var ERROR_CONTAINER_CLASS = 'totara_form-error-container',
+        ERROR_CONTAINER_SELECTOR = '.'+ERROR_CONTAINER_CLASS;
+
     /**
      * Checkbox element
      *
@@ -110,7 +113,7 @@ define(['jquery', 'totara_form/form'], function($, Form) {
         var input = this.input;
         if (!input.prop('checked')) {
             e.preventDefault();
-            if (input.closest('.tf_element').find('.error-container').length === 0) {
+            if (input.closest('.tf_element').find(ERROR_CONTAINER_SELECTOR).length === 0) {
                 require(['core/templates', 'core/str', 'core/config'], function (templates, mdlstrings, mdlconfig) {
                     mdlstrings.get_string('required', 'core').done(function (requiredstring) {
                         var context = {
@@ -124,7 +127,7 @@ define(['jquery', 'totara_form/form'], function($, Form) {
                 });
             }
         } else if (input.val().trim() !== '') {
-            input.closest('.tf_element').find('.error-container').remove();
+            input.closest('.tf_element').find(ERROR_CONTAINER_SELECTOR).remove();
         }
     };
 

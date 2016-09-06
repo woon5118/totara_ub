@@ -64,7 +64,8 @@ class element_tel extends form {
         $this->model->add(new tel('tel_basic', 'Basic tel'));
         $tel_required = $this->model->add(new tel('tel_required', 'Required basic tel'));
         $tel_required->set_attribute('required', true);
-        $this->model->add(new tel('tel_with_current_data', 'tel with current data'));
+        $tel_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new tel('tel_with_current_data', 'tel with current data'))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new tel('tel_frozen_empty', 'Empty frozen tel'))->set_frozen(true);
         $this->model->add(new tel('tel_frozen_with_current_data', 'Frozen tel with current data'))->set_frozen(true);
 

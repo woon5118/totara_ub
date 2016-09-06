@@ -451,7 +451,7 @@ if ($feedback_can_submit) {
             $countreq = $DB->count_records('feedback_item', $params);
             if ($countreq > 0) {
                 echo '<span class="fdescription required">';
-                echo get_string('somefieldsrequired', 'form', $OUTPUT->flex_icon('required', array('alt' => get_string('requiredelement', 'form'))));
+                echo get_string('somefieldsrequired', 'form', $OUTPUT->flex_icon('required', array('classes' => 'form-required', 'alt' => get_string('requiredelement', 'form'))));
                 echo '</span>';
             }
             echo $OUTPUT->box_start('feedback_items');

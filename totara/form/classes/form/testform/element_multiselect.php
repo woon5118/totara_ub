@@ -66,7 +66,8 @@ class element_multiselect extends form {
         $this->model->add(new multiselect('multiselect_basic', 'Basic multiselect', $defaultoptions));
         $multiselect_required = $this->model->add(new multiselect('multiselect_required', 'Required basic multiselect', $defaultoptions));
         $multiselect_required->set_attribute('required', true);
-        $this->model->add(new multiselect('multiselect_with_current_data', 'multiselect with current data', ['whatever' => 'Yeah?', 'yes' => 'Oh yea!', 'nah' => 'Never!']));
+        $multiselect_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new multiselect('multiselect_with_current_data', 'multiselect with current data', ['whatever' => 'Yeah?', 'yes' => 'Oh yea!', 'nah' => 'Never!']))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new multiselect('multiselect_frozen_empty', 'Empty frozen multiselect', $defaultoptions))->set_frozen(true);
         $this->model->add(new multiselect('multiselect_frozen_with_current_data', 'Frozen multiselect with current data', ['true' => '1', 'false' => '0']))->set_frozen(true);
 

@@ -64,7 +64,8 @@ class element_yesno extends form {
         $this->model->add(new yesno('yesno_basic', 'Basic yesno'));
         $yesno_required = $this->model->add(new yesno('yesno_required', 'Required basic yesno'));
         $yesno_required->set_attribute('required', true);
-        $this->model->add(new yesno('yesno_with_current_data', 'yesno with current data'));
+        $yesno_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new yesno('yesno_with_current_data', 'yesno with current data'))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new yesno('yesno_frozen_empty', 'Empty frozen yesno'))->set_frozen(true);
         $this->model->add(new yesno('yesno_frozen_with_current_data', 'Frozen yesno with current data'))->set_frozen(true);
 

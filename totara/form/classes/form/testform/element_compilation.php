@@ -102,8 +102,8 @@ class element_compilation extends form {
             'persimmon' => 'Persimmon',
         ]));
         $this->model->add(new static_html('statichtml', 'Static HTML', '<div style="background-color:#002a80;color:#FFF;padding:6px;">Static HTML test</div>'));
-        $this->model->add(new tel('tel', 'Tel'));
-        $this->model->add(new text('text', 'Text', PARAM_RAW));
+        $this->model->add(new tel('tel', 'Tel'))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
+        $this->model->add(new text('text', 'Text', PARAM_RAW))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new textarea('textarea', 'Textarea', PARAM_RAW));
         $this->model->add(new url('url', 'URL'));
         $this->model->add(new yesno('yesno', 'Yes or No'));

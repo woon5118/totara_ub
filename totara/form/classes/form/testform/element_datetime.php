@@ -64,7 +64,8 @@ class element_datetime extends form {
         $this->model->add(new datetime('datetime_basic', 'Basic datetime'));
         $datetime_required = $this->model->add(new datetime('datetime_required', 'Required basic datetime'));
         $datetime_required->set_attribute('required', true);
-        $this->model->add(new datetime('datetime_with_current_data', 'datetime with current data'));
+        $datetime_required->add_help_button('cachejs', 'core_admin'); // Just a random help string.
+        $this->model->add(new datetime('datetime_with_current_data', 'datetime with current data'))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new datetime('datetime_frozen_empty', 'Empty frozen datetime'))->set_frozen(true);
         $this->model->add(new datetime('datetime_frozen_with_current_data', 'Frozen datetime with current data'))->set_frozen(true);
 
