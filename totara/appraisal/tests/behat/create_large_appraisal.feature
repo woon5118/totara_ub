@@ -67,7 +67,10 @@ Feature: Create a large appraisal
         And I click on "All Appraisals" in the totara menu
         And I should see "Appraisal 1"
         And I click on "Appraisal 1" "link"
+        # This step will take some time, and may time out when the web host is under load.
+        # The wait is to ensure it has the time it needs.
         And I click on "Save PDF Snapshot" "button"
+        And I wait "5" seconds
         And I should see "A snapshot of your appraisal has been saved."
         And I click on "Cancel" "button" in the "savepdf" "totaradialogue"
         And I click on "All Appraisals" in the totara menu
