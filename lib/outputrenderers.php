@@ -2978,7 +2978,7 @@ EOD;
                         'value'
                     )
                 ),
-                array('class' => 'meta viewingas')
+                array('class' => 'meta viewingas label label-info')
             );
         }
 
