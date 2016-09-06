@@ -839,7 +839,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             get_string('allsignupcustomfields', 'rb_source_facetoface_sessions'),
             'facetofacesignupid',
             array(
-                'columngenerator' => 'allcustomfields'
+                'columngenerator' => 'allcustomfieldssignupmanage'
             )
         );
         $this->add_custom_fields_for('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
@@ -868,15 +868,101 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
 
     //
     //
-    // Methods for adding commonly used data to source definitions
-    //
-    //
-
-    //
-    //
     // Face-to-face specific display functions
     //
     //
+    /**
+     * Display customfield with edit action icon
+     * This module requires JS already to be included
+     * @param string $note
+     * @param stdClass $row
+     * @param bool $isexport
+     */
+    public function rb_display_allcustomfieldssignupmanage($note, $row, $isexport = false) {
+        global $OUTPUT;
+
+        if ($isexport) {
+            return $note;
+        }
+
+        if (!$cm = get_coursemodule_from_instance('facetoface', $row->facetofaceid, $row->courseid)) {
+            print_error('error:incorrectcoursemodule', 'facetoface');
+        }
+        $context = context_module::instance($cm->id);
+
+        if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
+            $url = new moodle_url('/mod/facetoface/attendee_note.php', array(
+                's' => $row->sessionid,
+                'userid' => $row->userid,
+                'sesskey'=> sesskey()
+            ));
+            $pix = new pix_icon('t/edit', get_string('edit'));
+            $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
+            $notehtml = html_writer::span($note);
+            return $icon . $notehtml;
+        }
+        return $note;
+    }
+
+    /**
+     * Add control to manage signup customfields when user have rights to do so.
+     * @param rb_column_option $columnoption should have public string property "type" which value is the type of customfields to show
+     * @param bool $hidden should all these columns be hidden
+     * @return array of rb_column
+     */
+    public function rb_cols_generator_allcustomfieldssignupmanage(rb_column_option $columnoption, $hidden) {
+        $results = $this->rb_cols_generator_allcustomfields($columnoption, $hidden);
+        $found = false;
+
+        $extrafields = [
+            'courseid' => 'facetoface.course',
+            'sessionid' => 'sessions.id',
+            'facetofaceid' => 'facetoface.id',
+            'userid' => 'base.userid',
+        ];
+
+        if (empty($results)) {
+            // No money no honey.
+            return $results;
+        }
+        foreach ($results as $column) {
+            // First try to find simple column (displayfunc is not set) that we can use for our actions display.
+            if (empty($column->displayfunc)) {
+                $column->displayfunc = 'allcustomfieldssignupmanage';
+                if (!is_array($column->extrafields)) {
+                    if (empty($column->extrafields)) {
+                        $column->extrafields = [];
+                    } else {
+                        $column->extrafields = [$column->extrafields];
+                    }
+                }
+                $column->extrafields = array_merge($extrafields, $column->extrafields);
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            // If there were no simple columns, add extra.
+            $results[] = new rb_column(
+                'facetoface_signup_manage',
+                'custom_field_edit_all',
+                get_string('actions', 'facetoface'),
+                'NULL',
+                [
+                    'displayfunc' => 'allcustomfieldssignupmanage',
+                    'noexport' => true,
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text',
+                    'style' => null,
+                    'class' => null,
+                    'extrafields' => $extrafields,
+                ]
+            );
+        }
+        return $results;
+    }
+
     /**
      * Position name column with edit icon
      */

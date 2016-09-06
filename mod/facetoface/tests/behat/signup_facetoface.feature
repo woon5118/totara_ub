@@ -84,3 +84,22 @@ Feature: Sign up to a seminar
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I should not see "Sign-up"
+
+  Scenario: Sign up with note and manage it by Editing Teacher
+    When I log in as "student1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I should see "Sign-up"
+    And I follow "Sign-up"
+    And I set the following fields to these values:
+     | Requests for session organiser | My test |
+    And I press "Sign-up"
+    And I should see "Your booking has been completed."
+    And I log out
+
+    And I log in as "teacher1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "Attendees"
+    When I click on "Edit" "link" in the "Sam1" "table_row"
+    Then I should see "Sam1 Student1 - update note"
