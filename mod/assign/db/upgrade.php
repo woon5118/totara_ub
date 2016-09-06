@@ -560,7 +560,8 @@ function xmldb_assign_upgrade($oldversion) {
 
             // Look for grade records with no submission record.
             // This is when a teacher has marked a student before they submitted anything.
-            $records = $DB->get_records_sql('SELECT g.id, g.assignment, g.userid
+            // Totara: make sure we are not creating duplicates when multiple grades exist without submission.
+            $records = $DB->get_recordset_sql('SELECT DISTINCT g.assignment, g.userid
                                                FROM {assign_grades} g
                                           LEFT JOIN {assign_submission} s
                                                  ON s.assignment = g.assignment
@@ -578,8 +579,10 @@ function xmldb_assign_upgrade($oldversion) {
                 $submission->timemodified = time();
                 array_push($submissions, $submission);
             }
+            $records->close();
 
             $DB->insert_records('assign_submission', $submissions);
+            unset($submissions); // Totara: free memory
         }
 
         // Assign savepoint reached.
