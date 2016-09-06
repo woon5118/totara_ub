@@ -177,7 +177,7 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user, a
 
         // Get the location data from custom fields if they exist.
         $locationstring = '';
-
+        $delimiter = get_string('icallocationstringdelimiter', 'facetoface');
         if (!empty($date->roomid) && isset($rooms[$date->roomid])) {
             $room = $rooms[$date->roomid];
             if (!empty($room->name)) {
@@ -185,13 +185,13 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user, a
             }
             if (!empty($room->customfield_building)) {
                 if (!empty($locationstring)) {
-                    $locationstring .= "\n";
+                    $locationstring .= $delimiter."\n";
                 }
                 $locationstring .= $room->customfield_building;
             }
             if (!empty($room->customfield_location->address)) {
                 if (!empty($locationstring)) {
-                    $locationstring .= "\n";
+                    $locationstring .= $delimiter."\n";
                 }
                 $locationstring .= $room->customfield_location->address;
             }
@@ -200,7 +200,10 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user, a
         // '\n'. But evolution presents a single line text field for location,
         // and shows the newlines as [0x0A] junk. So we switch it for commas
         // here. Remember commas need to be escaped too.
-        $LOCATION    = str_replace('\n', '\, ', facetoface_ical_escape($locationstring));
+        $locationstring = str_replace('\n', $delimiter, facetoface_ical_escape($locationstring, true));
+        // Possibility of multiple commas, replaced with the single one.
+        $pattern = "/{$delimiter}+/";
+        $LOCATION = preg_replace($pattern, $delimiter, $locationstring);
 
         $ORGANISEREMAIL = $CFG->facetoface_fromaddress;
 

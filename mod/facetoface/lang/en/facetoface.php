@@ -698,6 +698,7 @@ $string['header:managername'] = 'Manager\'s Name';
 $string['icalendarheading'] = 'iCalendar Attachments';
 $string['id'] = 'Id';
 $string['icaldescription'] = 'This calendar event is for the "{$a->name}" seminar event you have been booked on to.';
+$string['icallocationstringdelimiter'] = ',';
 $string['ignoreapprovalwhenaddingattendees'] = 'Book users without requiring approval';
 $string['import'] = 'Import';
 $string['individuals'] = 'Individuals';

@@ -200,10 +200,15 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         );
         $facetoface = $facetofacegenerator->create_instance($facetofacedata);
 
+        $room = $facetofacegenerator->add_site_wide_room(array('name' => 'Site x 1'));
+        $room->customfield_locationaddress = "Address\nTest\nTest2";
+        customfield_save_data($room, 'facetofaceroom', 'facetoface_room');
+
         $date1 = new stdClass();
         $date1->sessiontimezone = 'Pacific/Auckland';
         $date1->timestart = time() + WEEKSECS;
         $date1->timefinish = time() + WEEKSECS + 3600;
+        $date1->roomid = $room->id;
 
         $date2 = new stdClass();
         $date2->sessiontimezone = 'Pacific/Auckland';
@@ -225,8 +230,10 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         $session = facetoface_get_session($facetofacegenerator->add_session($sessiondata));
 
         $init = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student1);
+        $initlocation = $this->get_ical_values($init->content, 'LOCATION');
         $inituids = $this->get_ical_values($init->content, 'UID');
         $initseqs = $this->get_ical_values($init->content, 'SEQUENCE');
+        $this->assertEquals('Site x 1\, Address, Test, Test2', $initlocation[0]);
         $this->assertNotEquals($inituids[0], $inituids[1]);
 
         $initother = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student2);
