@@ -32,7 +32,7 @@ Feature: Seminar event cancellation basic
     And I follow "View all events"
 
   # ----------------------------------------------------------------------------
-  Scenario: mod_facetoface_cancel_100: cancel event with single future date, with attendees.
+  Scenario: mod_facetoface_cancel_100: cancel event with single future date, with attendees and confirm booking status.
     Given I follow "Add a new event"
     And I set the following fields to these values:
       | Maximum bookings | 39 |
@@ -95,6 +95,10 @@ Feature: Seminar event cancellation basic
     And "Copy event" "link" should exist in the "10 February 2025" "table_row"
     And "Delete event" "link" should exist in the "10 February 2025" "table_row"
     And "Edit event" "link" should not exist in the "10 February 2025" "table_row"
+
+    And I navigate to "View and manage events" node in "Site administration > Seminars"
+    And I should see "N/A" in the ".session_bookingstatus div span" "css_element"
+    And I should see "N/A" in the "Test Seminar" "table_row"
 
     When I log out
     And I log in as "teacher1"

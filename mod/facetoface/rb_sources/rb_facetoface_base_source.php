@@ -353,9 +353,10 @@ abstract class rb_facetoface_base_source extends rb_base_source {
      * Search for that and you'll see what you need to do.
      *
      * @param array $columnoptions
-     * @param string $join Join name that provide {facetoface_sessions_dates}
+     * @param string $joindates Join name that provide {facetoface_sessions_dates}
+     * @param string $joinsessions Join name that provide {facetoface_sessions}
      */
-    public function add_session_status_to_columns(&$columnoptions, $join = 'base') {
+    public function add_session_status_to_columns(&$columnoptions, $joindates = 'base', $joinsessions = 'sessions') {
         $now = time();
             // TODO: TL-8187 Cancellation status ("Face-to-face cancellations" specification).
         $columnoptions[] = new rb_column_option(
@@ -370,12 +371,12 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                     ELSE NULL END
              )",
             array(
-                'joins' => array($join, 'sessions'),
+                'joins' => array($joindates, $joinsessions),
                 'displayfunc' => 'overall_status',
                 'extrafields' => array(
-                    'timestart' => "{$join}.timestart",
-                    'timefinish' => "{$join}.timefinish",
-                    'timezone' => "{$join}.sessiontimezone",
+                    'timestart' => "{$joindates}.timestart",
+                    'timefinish' => "{$joindates}.timefinish",
+                    'timezone' => "{$joindates}.sessiontimezone",
                 )
             )
         );
@@ -384,20 +385,20 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'session',
             'bookingstatus',
             get_string('bookingstatus', 'rb_source_facetoface_summary'),
-            "(CASE WHEN {$now} > {$join}.timefinish AND cntsignups < sessions.capacity THEN 'ended'
+            "(CASE WHEN {$now} > {$joindates}.timefinish AND cntsignups < {$joinsessions}.capacity THEN 'ended'
                    WHEN cancelledstatus <> 0 THEN 'cancelled'
-                   WHEN cntsignups < sessions.mincapacity THEN 'underbooked'
-                   WHEN cntsignups < sessions.capacity THEN 'available'
-                   WHEN cntsignups = sessions.capacity THEN 'fullybooked'
-                   WHEN cntsignups > sessions.capacity THEN 'overbooked'
+                   WHEN cntsignups < {$joinsessions}.mincapacity THEN 'underbooked'
+                   WHEN cntsignups < {$joinsessions}.capacity THEN 'available'
+                   WHEN cntsignups = {$joinsessions}.capacity THEN 'fullybooked'
+                   WHEN cntsignups > {$joinsessions}.capacity THEN 'overbooked'
                    ELSE NULL END)",
             array(
-                'joins' => array($join, 'cntbookings', 'sessions'),
+                'joins' => array($joindates, 'cntbookings', $joinsessions),
                 'displayfunc' => 'booking_status',
                 'dbdatatype' => 'char',
                 'extrafields' => array(
-                    'mincapacity' => 'sessions.mincapacity',
-                    'capacity' => 'sessions.capacity'
+                    'mincapacity' => "{$joinsessions}.mincapacity",
+                    'capacity' => "{$joinsessions}.capacity"
                 )
             )
         );

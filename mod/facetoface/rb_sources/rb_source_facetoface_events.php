@@ -99,6 +99,13 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             'allattendees.sessionid = base.id',
             REPORT_BUILDER_RELATION_ONE_TO_ONE
         );
+        $joinlist[] = new rb_join(
+            'sessiondate',
+            'LEFT',
+            '{facetoface_sessions_dates}',
+            'sessiondate.sessionid = base.id',
+            REPORT_BUILDER_RELATION_ONE_TO_MANY
+        );
 
         $this->add_session_status_to_joinlist($joinlist, 'base', 'id');
         $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course');
@@ -252,25 +259,6 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
         }
 
         $columnoptions[] = new rb_column_option(
-            'session',
-            'bookingstatus',
-            get_string('bookingstatus', 'rb_source_facetoface_summary'),
-            "(CASE WHEN cntsignups < base.mincapacity THEN 'underbooked'
-                   WHEN cntsignups < base.capacity THEN 'available'
-                   WHEN cntsignups = base.capacity THEN 'fullybooked'
-                   WHEN cntsignups > base.capacity THEN 'overbooked'
-                   ELSE NULL END)",
-            array(
-                'joins' => array('cntbookings'),
-                'displayfunc' => 'booking_status',
-                'dbdatatype' => 'char',
-                'extrafields' => array(
-                    'mincapacity' => 'base.mincapacity',
-                    'capacity' => 'base.capacity'
-                )
-            )
-        );
-        $columnoptions[] = new rb_column_option(
             'facetoface',
             'sessionid',
             get_string('sessionid', 'rb_source_facetoface_room_assignments'),
@@ -315,6 +303,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 )
             )
         );
+        $this->add_session_status_to_columns($columnoptions, 'sessiondate', 'base');
         $this->add_facetoface_common_to_columns($columnoptions, 'base');
         $this->add_facetoface_session_roles_to_columns($columnoptions);
 
