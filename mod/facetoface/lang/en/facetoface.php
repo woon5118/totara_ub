@@ -829,6 +829,7 @@ $string['reservegtcancel'] = 'The reservation deadline must be greater than the 
 $string['reserveintro'] = 'You can use this form to change the number of reservations you have for this event - to cancel existing reservations, just reduce the number below.';
 $string['reserveintroother'] = 'You can use this form to change the number of reservations {$a} has for this event - to cancel existing reservations, just reduce the number below.';
 $string['reservenocapacity'] = 'There are no spaces left on this course, so you will not be able to make any reservations unless one of the participants cancels';
+$string['reservenopermissionother'] = 'This manager does not have capabilities to reserve places in Seminar';
 $string['reserveother'] = 'Reserve for another manager';
 $string['reservepastdeadline'] = 'You cannot make any further reservations within {$a} days of the event starting';
 $string['restoremissingdefaultnotifications'] = 'Restore missing default notifications';

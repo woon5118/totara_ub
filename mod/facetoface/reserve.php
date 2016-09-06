@@ -141,8 +141,11 @@ if ($action == 'reserve') {
             $preform .= html_writer::empty_tag('br');
         }
 
+        if (empty($reserveinfo['reserve'])) {
+            $form = html_writer::tag('p', get_string('reservenopermissionother', 'mod_facetoface'));
+        }
         // Generate the reserve form.
-        if (empty($reserveinfo['maxreserve'][$session->id])) {
+        else if (empty($reserveinfo['maxreserve'][$session->id])) {
             // No spaces left that the manager can reserve.
             if ($manager->id == $USER->id && !$reserveinfo['reserve']) {
                 $form = ''; // Can only reserve for others, not for self - wait the user to select a manager.

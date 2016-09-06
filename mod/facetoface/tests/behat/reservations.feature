@@ -10,7 +10,9 @@ Feature: Add - Remove manager reservations in Seminar
       | username | firstname | lastname | email                |
       | student1 | Sam1      | Student1 | student1@example.com |
       | student2 | Sam2      | Student2 | student2@example.com |
+      | student3 | Sam3      | Student3 | student3@example.com |
       | manager  | Max       | Manager  | manager@example.com  |
+      | teamlead | Torry     | Teamlead | teamlead@example.com |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
@@ -29,9 +31,10 @@ Feature: Add - Remove manager reservations in Seminar
       | framework | idnumber | fullname   |
       | FW001     | POS001   | Position1  |
     And the following job assignments exist:
-      | user     | position | manager |
-      | student1 | POS001   | manager |
-      | student2 | POS001   | manager |
+      | user     | position | manager  |
+      | student1 | POS001   | manager  |
+      | student2 | POS001   | manager  |
+      | student3 | POS001   | teamlead |
 
     And I log in as "admin"
     And I click on "Find Learning" in the totara menu
@@ -81,3 +84,14 @@ Feature: Add - Remove manager reservations in Seminar
     And I click on "Test Seminar name" "link"
     And I should see "Allocate spaces for team (1/1)"
     And I should see "Reserve spaces for team (1/1)"
+
+  Scenario: Confirm correct message when other manager cannot have reservations
+    Given I log in as "admin"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I click on "Test Seminar name" "link"
+    And I should see "Reserve for another manager"
+    And I click on "Reserve for another manager" "link"
+    When I select "Torry Teamlead" from the "menumanagerid" singleselect
+    And I press "Select manager"
+    Then I should see "This manager does not have capabilities to reserve places in Seminar"
