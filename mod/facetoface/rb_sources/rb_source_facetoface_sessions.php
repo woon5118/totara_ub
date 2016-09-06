@@ -697,6 +697,20 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         return $filteroptions;
     }
 
+    /**
+     * @deprecated since 9.0
+     * @return mixed
+     */
+    public function rb_filter_position_types_list() {
+        global $CFG, $POSITION_TYPES;
+        include_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
+
+        debugging('rb_source_facetoface_sessions::rb_filter_position_types_list has been deprecated since 9.0. You will need to rewrite your code to use job assignments instead.',
+            DEBUG_DEVELOPER);
+
+        return $POSITION_TYPES;
+    }
+
     public function rb_filter_cancel_status() {
         $selectchoices = array(
             '1' => get_string('cancelled', 'rb_source_facetoface_sessions')
@@ -1036,9 +1050,24 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         return $result;
     }
 
-    public function rb_display_position_type($jobassignmentid, $row) {
-        // Deprecate - you should probably link to the job table and get the full name (unless we want default lang string names).
-        return 'fixme';
+    /**
+     * @deprecated since 9.0
+     * @param $position
+     * @param $row
+     * @return string
+     */
+    public function rb_display_position_type($position, $row) {
+        global $POSITION_TYPES;
+
+        debugging('rb_source_facetoface_sessions::rb_display_position_type has been deprecated since 9.0. You will need to rewrite your code to use job assignments instead.',
+            DEBUG_DEVELOPER);
+
+        // If position type does not exists just return the value.
+        if (!isset($POSITION_TYPES[$position])) {
+            return $position;
+        }
+        // Otherwise return the string.
+        return get_string('type' . $POSITION_TYPES[$position], 'totara_hierarchy');
     }
 
     // convert a f2f activity name into a link to that activity

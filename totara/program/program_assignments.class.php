@@ -31,9 +31,11 @@ if (!defined('MOODLE_INTERNAL')) {
 define('ASSIGNTYPE_ORGANISATION', 1);
 define('ASSIGNTYPE_POSITION', 2);
 define('ASSIGNTYPE_COHORT', 3);
-define('ASSIGNTYPE_MANAGER', 4);
 define('ASSIGNTYPE_INDIVIDUAL', 5);
 define('ASSIGNTYPE_MANAGERJA', 6);
+
+/** @deprecated since 9.0 */
+define('ASSIGNTYPE_MANAGER', 4);
 
 global $ASSIGNMENT_CATEGORY_CLASSNAMES;
 

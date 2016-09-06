@@ -909,13 +909,13 @@ class importcertification_testcase extends reportcache_advanced_testcase {
         $certcompletion->timewindowopens = get_timewindowopens($certcompletion->timeexpires, $certification->windowperiod);
         $certcompletion->timemodified = $timecompleted;
 
-        $posids = pos_get_current_position_data($userid);
+        $jobassignment = \totara_job\job_assignment::get_first($userid);
 
         $progcompletion->status = STATUS_PROGRAM_COMPLETE;
         $progcompletion->timecompleted = $timecompleted;
         $progcompletion->timedue = $certcompletion->timeexpires;
-        $progcompletion->positionid = $posids['positionid'];
-        $progcompletion->organisationid = $posids['organisationid'];
+        $progcompletion->positionid = $jobassignment->positionid;
+        $progcompletion->organisationid = $jobassignment->organisationid;
 
         // Save the change (performs data validation and logging).
         certif_write_completion($certcompletion, $progcompletion, $message);

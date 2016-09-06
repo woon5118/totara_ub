@@ -1355,13 +1355,20 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      *
      * @param appraisal $appraisal
      * @param object $userassignment
+     * @param null $unused (previously $roleassignments) - DEPRECATED since 9.0 but will not be removed.
+     *                   The list of role assignments is now populated within this method.
      * @param boolean $preview
      * @param array $urlparams existing query parameters to use when creating a
      *        job selection control.
      * @return array a (html string, updated appraisee assignment) tuple.
      */
-    public function display_appraisal_header($appraisal, $userassignment, $preview = false, array $urlparams = []) {
+    public function display_appraisal_header($appraisal, $userassignment, $unused = null, $preview = false, array $urlparams = []) {
         global $CFG, $DB;
+
+        if (isset($unused)) {
+            debugging('The $roleassignments parameter in totara_appraisal_renderer::display_appraisal_header has been deprecated. The list of role assignments is now populated within this method.',
+                DEBUG_DEVELOPER);
+        }
 
         $out = html_writer::tag('h3', format_string($appraisal->name));
 
@@ -1696,7 +1703,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $roleassignments = $appraisal->get_all_assignments($userassignment->userid);
 
         // Title and status.
-        list($headerhtml, $newuserassignment) = $this->display_appraisal_header($appraisal, $userassignment, $preview, $urlparams);
+        list($headerhtml, $newuserassignment) = $this->display_appraisal_header($appraisal, $userassignment, null, $preview, $urlparams);
         $out .= $this->display_appraisal_actions($appraisal, $newuserassignment, $showprint, $preview);
         $out .= $headerhtml;
 
