@@ -289,8 +289,9 @@ function calendar_get_mini($courses, $groups, $users, $calmonth = false, $calyea
 
     // Accessibility: added summary and <abbr> elements.
     $summary = get_string('calendarheading', 'calendar', userdate($display->tstart, get_string('strftimemonthyear')));
+    $widthclass = 'days-in-week-'.$numberofdaysinweek;
     // Begin table.
-    $content .= '<table class="minicalendar calendartable" summary="' . $summary . '">';
+    $content .= '<table class="minicalendar calendartable '.$widthclass.'" summary="' . $summary . '">';
     if (($placement !== false) && ($courseid !== false)) {
         $content .= '<caption>'. calendar_top_controls($placement, array('id' => $courseid, 'time' => $time)) .'</caption>';
     }
@@ -299,8 +300,12 @@ function calendar_get_mini($courses, $groups, $users, $calmonth = false, $calyea
     // Print out the names of the weekdays.
     for ($i = $display->minwday; $i <= $display->maxwday; ++$i) {
         $pos = $i % $numberofdaysinweek;
-        $content .= '<th scope="col"><abbr title="'. $daynames[$pos]['fullname'] .'">'.
-            $daynames[$pos]['shortname'] ."</abbr></th>\n";
+        if (isset($daynames[$pos]['abbreviated'])) {
+            $abbreviation = $daynames[$pos]['abbreviated'];
+        } else {
+            $abbreviation = $daynames[$pos]['shortname'];
+        }
+        $content .= '<th scope="col"><abbr title="'. $daynames[$pos]['fullname'] .'">'. $abbreviation ."</abbr></th>\n";
     }
 
     $content .= '</tr><tr>'; // End of day names; prepare for day numbers

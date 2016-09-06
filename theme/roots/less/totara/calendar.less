@@ -324,7 +324,7 @@
 }
 .block {
   .minicalendar {
-    max-width: 280px;
+    table-layout: fixed;
     margin: 0 auto;
     width: 100%;
     th, td {
@@ -332,10 +332,17 @@
       font-size: 0.8em;
       text-align: center;
     }
-    td {
-      &.weekend {
-        color: @text-muted;
-      }
+    td .weekend {
+      color: @text-muted;
+    }
+    th {
+      vertical-align: top;
+      word-wrap: normal;
+      overflow: hidden;
+    }
+    &.days-in-week-7 th {
+      max-width: percentage(1/7); // 14.2857%;
+
     }
   }
   .calendar-event-panel {
