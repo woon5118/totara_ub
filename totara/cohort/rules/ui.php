@@ -128,11 +128,19 @@ abstract class cohort_rule_ui {
     public function validateResponse() {
         return true;
     }
-
+    /**
+     * @global core_renderer $OUTPUT
+     * @param int $paramid
+     * @return string
+     */
     public function param_delete_action_icon($paramid) {
         global $OUTPUT;
 
-        return $OUTPUT->action_icon('#', new pix_icon('i/bullet_delete', get_string('deleteruleparam', 'totara_cohort'), 'totara_core', array('class' => 'ruleparam-delete', 'ruleparam-id' => $paramid)));
+        $icon = new \core\output\flex_icon('delete', array(
+            'alt' => get_string('deleteruleparam', 'totara_cohort'),
+            'classes' => 'ruleparam-delete'
+        ));
+        return $OUTPUT->action_icon('#', $icon, null, array('data-ruleparam-id' => $paramid));
     }
 }
 
