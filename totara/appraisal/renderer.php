@@ -37,6 +37,8 @@ use totara_job\job_assignment;
  */
 class totara_appraisal_renderer extends plugin_renderer_base {
     /**
+     * @deprecated Since Totara 9.0.
+     *
      * Page header that is aware of dompdf limitations.
      * @return string
      */
@@ -67,6 +69,8 @@ class totara_appraisal_renderer extends plugin_renderer_base {
     }
 
     /**
+     * @deprecated Since Totara 9.0.
+     *
      * Page footer that is aware of pdf renderer limitations.
      * @return string
      */
@@ -1693,10 +1697,8 @@ class totara_appraisal_renderer extends plugin_renderer_base {
 
         // Title and status.
         list($headerhtml, $newuserassignment) = $this->display_appraisal_header($appraisal, $userassignment, $preview, $urlparams);
-        $out .= $headerhtml;
-
-        // Buttons to the right of the title and status.
         $out .= $this->display_appraisal_actions($appraisal, $newuserassignment, $showprint, $preview);
+        $out .= $headerhtml;
 
         // Check to see if there are any stages to display.
         if (empty($stages)) {

@@ -182,6 +182,6 @@ if ($action !== 'generatepdf') {
     $PAGE->requires->js_init_code('window.print()', true);
 }
 
-echo $renderer->snapshot_header();
+echo $renderer->header();
 echo $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces, false, $stageschecked);
-echo $renderer->snapshot_footer();
+echo $renderer->footer();

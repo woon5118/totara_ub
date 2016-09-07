@@ -24,6 +24,9 @@
 
 @import "styles_legacy";
 
+@padding-small-horizontal: 10px;
+@state-info-bg: #d9edf7;
+
 div.appraisal-content {
     padding-left:1em;
 }
@@ -34,4 +37,26 @@ div.appraisal-content .fitem.fitem_fgroup select {
 
 div.appraisal-content .mform .fitem .felement {
     padding: 0;
+}
+
+
+.appraisal-title {
+    float: none;
+}
+
+.appraisal-headerbuttons input[type="button"] {
+    margin-left: @padding-small-horizontal;
+}
+
+.appraisal-stage {
+    clear: both;
+}
+
+#page-totara-appraisal-snapshot {
+    .collapsible-actions,
+    .visibleto,
+    .visibleto-review,
+    .skiplinks {
+        display: none;
+    }
 }
