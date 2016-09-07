@@ -2234,6 +2234,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $waitlist = new facetoface_notification($defaults, false);
         $waitlist->title = $template->title;
         $waitlist->body = $template->body;
+        $waitlist->managerprefix = $template->managerprefix;
         $waitlist->conditiontype = MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION;
         $waitlist->status = $template->status;
         $waitlist->templateid = $template->id;
@@ -2344,6 +2345,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $session_change = new facetoface_notification($defaults, false);
         $session_change->title = $template->title;
         $session_change->body = $template->body;
+        $session_change->managerprefix = $template->managerprefix;
         $session_change->conditiontype = MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE;
         $session_change->booked = 1;
         $session_change->waitlisted = 1;
@@ -2359,6 +2361,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $trainer_confirmation = new facetoface_notification($defaults, false);
         $trainer_confirmation->title = $template->title;
         $trainer_confirmation->body = $template->body;
+        $trainer_confirmation->managerprefix = $template->managerprefix;
         $trainer_confirmation->conditiontype = MDL_F2F_CONDITION_TRAINER_CONFIRMATION;
         $trainer_confirmation->status = $template->status;
         $trainer_confirmation->templateid = $template->id;
@@ -2372,6 +2375,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $trainer_cancellation = new facetoface_notification($defaults, false);
         $trainer_cancellation->title = $template->title;
         $trainer_cancellation->body = $template->body;
+        $trainer_cancellation->managerprefix = $template->managerprefix;
         $trainer_cancellation->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION;
         $trainer_cancellation->status = $template->status;
         $trainer_cancellation->templateid = $template->id;
@@ -2385,6 +2389,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $trainer_unassigned = new facetoface_notification($defaults, false);
         $trainer_unassigned->title = $template->title;
         $trainer_unassigned->body = $template->body;
+        $trainer_unassigned->managerprefix = $template->managerprefix;
         $trainer_unassigned->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT;
         $trainer_unassigned->status = $template->status;
         $trainer_unassigned->templateid = $template->id;
@@ -2398,6 +2403,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $cancelreservation = new facetoface_notification($defaults, false);
         $cancelreservation->title = $template->title;
         $cancelreservation->body = $template->body;
+        $cancelreservation->managerprefix = $template->managerprefix;
         $cancelreservation->conditiontype = MDL_F2F_CONDITION_RESERVATION_CANCELLED;
         $cancelreservation->cancelled = 1;
         $cancelreservation->status = $template->status;
@@ -2412,6 +2418,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $cancelallreservations = new facetoface_notification($defaults, false);
         $cancelallreservations->title = $template->title;
         $cancelallreservations->body = $template->body;
+        $cancelallreservations->managerprefix = $template->managerprefix;
         $cancelallreservations->conditiontype = MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED;
         $cancelallreservations->cancelled = 1;
         $cancelallreservations->status = $template->status;
@@ -2426,6 +2433,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $sessioncancellation = new facetoface_notification($defaults, false);
         $sessioncancellation->title = $template->title;
         $sessioncancellation->body = $template->body;
+        $sessioncancellation->managerprefix = $template->managerprefix;
         $sessioncancellation->conditiontype = MDL_F2F_CONDITION_SESSION_CANCELLATION;
         $sessioncancellation->cancelled = 1;
         $sessioncancellation->status = $template->status;
@@ -2440,6 +2448,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $registrationexpired = new facetoface_notification($defaults, false);
         $registrationexpired->title = $template->title;
         $registrationexpired->body = $template->body;
+        $registrationexpired->managerprefix = $template->managerprefix;
         $registrationexpired->conditiontype = MDL_F2F_CONDITION_REGISTRATION_DATE_EXPIRED;
         $registrationexpired->status = $template->status;
         $registrationexpired->templateid = $template->id;
@@ -2453,6 +2462,7 @@ function facetoface_get_default_notifications($facetofaceid) {
         $registrationclosure = new facetoface_notification($defaults, false);
         $registrationclosure->title = $template->title;
         $registrationclosure->body = $template->body;
+        $registrationclosure->managerprefix = $template->managerprefix;
         $registrationclosure->conditiontype = MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS;
         $registrationclosure->ccmanager = 1;
         $registrationclosure->requested = 1;

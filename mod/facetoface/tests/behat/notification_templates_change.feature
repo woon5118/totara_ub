@@ -105,6 +105,11 @@ Feature: Test notification templates update all activities
     Then I should see "TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
     And I should not see "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
 
+    And I click on "Edit" "link" in the "Waitlisting advice for [facetofacename]" "table_row"
+    And I set the following fields to these values:
+      | Manager copy prefix | *** [firstname] [lastname]'s session waitlisted is copied below **** |
+    And I click on "Save changes" "button"
+
     # Check F2F activity notification now.
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -119,3 +124,6 @@ Feature: Test notification templates update all activities
 
     And I should see "TL-9052 booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
     And I should not see "Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]"
+
+    When I click on "Edit" "link" in the "Waitlisting advice for [facetofacename]" "table_row"
+    Then I should see "*** [firstname] [lastname]'s session waitlisted is copied below ****"
