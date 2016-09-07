@@ -434,6 +434,7 @@ $string['headingformat'] = '{$a->column} ({$a->type})';;
 $string['help:columnsdesc'] = 'The choices below determine which columns appear in the report and how those columns are labelled.';
 $string['help:restrictionoptions'] = 'The checkboxes below determine who has access to this report, and which records they are able to view. If no options are checked no results are visible. Click the help icon for more information';
 $string['hidden'] = 'Hide in My Reports';
+$string['hiddencellvalue'] = '&lt;hidden&gt;';
 $string['hide'] = 'Hide';
 $string['hierarchyfiltermusthavetype'] = 'Hierarchy filter of type "{$a->type}" and value "{$a->value}" must have "hierarchytype" set in source "{$a->source}"';
 $string['includechildorgs'] = 'Include records from child organisations';

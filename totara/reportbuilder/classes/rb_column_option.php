@@ -312,6 +312,16 @@ class rb_column_option {
     public $aggregate;
 
     /**
+     * Additional contextual information to use when rendering the report. This
+     * is an associative array and it's values are completely upto the user and
+     * renderer to interpret.
+     *
+     * @access public
+     * @var array
+     */
+    public $extracontext;
+
+    /**
      * Generate a new column option instance
      *
      * Options provided by an associative array, e.g.:
@@ -349,7 +359,8 @@ class rb_column_option {
             'graphable' => null,
             'transform' => null,
             'aggregate' => null,
-            'addtypetoheading' => false
+            'addtypetoheading' => false,
+            'extracontext' => null
         );
         $options = array_merge($defaults, $options);
 

@@ -418,6 +418,7 @@ abstract class rb_base_source {
                     'customheading' => $customheading,
                     'transform' => $transform,
                     'aggregate' => $aggregate,
+                    'extracontext' => $coloption->extracontext
                 )
             );
         } else {
@@ -4394,7 +4395,7 @@ abstract class rb_base_source {
             $name = isset($record->fullname) ? $record->fullname : $record->name;
             $column_options = array('joins' => $joinname);
             // If profile field isn't available to everyone require a capability to display the column.
-            if ($cf_prefix == 'user' && $record->visible != PROFILE_VISIBLE_ALL) {
+            if ($cf_prefix == 'user' && $record->visible === PROFILE_VISIBLE_NONE) {
                 $column_options['capability'] = 'moodle/user:viewalldetails';
             }
             $filtertype = 'text'; // default filter type
@@ -4623,6 +4624,12 @@ abstract class rb_base_source {
                 default:
                     // Unsupported customfields.
                     continue 2;
+            }
+
+            if ($cf_prefix === 'user') {
+                $column_options['displayfunc'] = 'user_customfield';
+                $column_options['extracontext']['visible'] = $record->visible;
+                $column_options['extracontext']['datatype'] = $record->datatype;
             }
 
             $joinlist[] = new rb_join(

@@ -285,6 +285,16 @@ class rb_column {
     public $grouped;
 
     /**
+     * Additional contextual information to use when rendering the report. This
+     * is an associative array and it's values are completely upto the user and
+     * renderer to interpret.
+     *
+     * @access public
+     * @var array
+     */
+    public $extracontext;
+
+    /**
      * Generate a new column instance
      *
      * Options provided by an associative array, e.g.:
@@ -317,6 +327,7 @@ class rb_column {
             'customheading' => true,
             'transform' => null,
             'aggregate' => null,
+            'extracontext' => null
         );
         $options = array_merge($defaults, $options);
 
