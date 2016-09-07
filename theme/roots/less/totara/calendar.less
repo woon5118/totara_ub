@@ -37,6 +37,7 @@
 }
 
 // Calendar restyling.
+/*!rtl:begin:ignore*/
 .path-calendar {
   .calendartable {
     width: 100%;
@@ -168,6 +169,10 @@
     }
     .header {
       overflow: hidden;
+      margin-bottom: 2em;
+      > .cal_courses_flt {
+        display: inline-block;
+      }
       .buttons {
         float: right;
       }
@@ -221,6 +226,9 @@
           }
         }
         .commands {
+          position: absolute;
+          top: 19px;
+          right: 19px;
           a {
             margin: 0 3px;
           }
@@ -229,8 +237,10 @@
     }
   }
 }
+/*!rtl:end:ignore*/
 
 // RTL overrides for main calendar.
+/*!rtl:begin:ignore*/
 .dir-rtl.path-calendar {
   .cal_courses_flt {
     label {
@@ -293,6 +303,8 @@
     }
   }
 }
+/*!rtl:end:ignore*/
+
 // Calendar export.
 #page-calendar-export {
   .indent {
@@ -422,25 +434,3 @@
 }
 
 // End of original bootstrap theme code.
-
-.path-calendar .maincalendar .eventlist .event {
-  position: relative;
-}
-
-.path-calendar .maincalendar .eventlist .event .commands {
-  position: absolute;
-  top: 19px;
-  right: 19px;
-}
-
-.path-calendar .maincalendar .header {
-  margin-bottom: 2em;
-}
-
-.path-calendar .maincalendar .header > .cal_courses_flt {
-  float: left;
-}
-
-.path-calendar .maincalendar .header .buttons {
-  float: right;
-}
