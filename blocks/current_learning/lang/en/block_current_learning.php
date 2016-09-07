@@ -36,10 +36,16 @@ $string['itemduewarningperiod'] = 'Item due warning period';
 $string['itemduewarningperiod_help'] = 'When the time until an item\'s due date is less than the period given here, the item will be flagged with a warning indicating it is due soon.
 
 If the warning period is zero or the item has no due date, no warning will be shown.';
+$string['multiplecompletedandmultipleoptionalcoursesets'] = '{$a->completed} completed sets and {$a->optional} optional sets';
+$string['multiplecompletedandoneoptionalcoursesets'] = '{$a} completed sets and 1 optional set';
 $string['nameatoz'] = 'Name - A to Z';
 $string['next'] = 'Next';
 $string['notstarted'] = 'Not started';
 $string['nocurrentlearning'] = 'You do not have any current learning. For previously completed learning see your <a href={$a}>Record of Learning</a>.';
+$string['onecompletedandmultipleoptionalcoursesets'] = '1 completed set and {$a} optional sets';
+$string['onecompletedandoneoptionalcoursesets'] = '1 completed set and 1 optional set';
+$string['optionalcoursesets'] = '1 optional set';
+$string['optionalcoursesetsplural'] = '{$a} optional sets';
 $string['pluginname'] = 'Current Learning';
 $string['previous'] = 'Previous';
 $string['progressmostcompletefirst'] = 'Progress - most complete first';

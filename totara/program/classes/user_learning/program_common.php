@@ -38,6 +38,7 @@ trait program_common {
         $groups = \prog_content::group_coursesets($this->certification_path, $coursesets);
 
         $completed_set_count = 0;
+        $optional_set_count = 0;
         $unavailable_set_count = 0;
 
         $then = false;
@@ -62,6 +63,11 @@ trait program_common {
             }
 
             if (prog_courseset_group_complete($program_groups, $this->user->id, false)) {
+                foreach ($group as $set) {
+                    if (!$set->is_set_complete()) {
+                        $optional_set_count++;
+                    }
+                }
                 $group_complete = true;
             }
 
@@ -70,7 +76,12 @@ trait program_common {
 
             foreach ($group as $set) {
                 if ($set->is_set_complete()) {
-                    $completed_set_count++;
+                    if ($set->completiontype == COMPLETIONTYPE_OPTIONAL) {
+                        $optional_set_count++;
+                    } else {
+                        $completed_set_count++;
+                    }
+
                 } else if (!$group_complete) {
                     $finalsets[] = $set;
                 }
@@ -88,6 +99,7 @@ trait program_common {
         $data = new \stdClass();
         $data->sets = $finalsets;
         $data->completecount = $completed_set_count;
+        $data->optionalcount = $optional_set_count;
         $data->unavailablecount = $unavailable_set_count;
 
         return $data;
@@ -176,6 +188,51 @@ trait program_common {
         foreach ($this->get_coursesets() as $set) {
             $set->remove_completed_courses();
         }
+    }
+
+    /**
+     * Create string for completed and/or optional sets.
+     *
+     * @param $completecount int The count of completed coursesets
+     * @param $optionalcount int The count of optional coursesets
+     *
+     * @return string The courseset header text
+     */
+    public function get_coursesets_header_text($completecount, $optionalcount) {
+        $string = '';
+
+        if ($completecount >= 1 && $optionalcount < 1) {
+            // Only completed.
+            if ($completecount == 1) {
+                $string = get_string('completedcoursesets', 'block_current_learning', $optionalcount);
+            } else if ($completecount > 1) {
+                $string = get_string('completedcoursesetsplural', 'block_current_learning', $optionalcount);
+            }
+        } else if ($completecount < 1 && $optionalcount >= 1) {
+            // Only optional.
+            if ($optionalcount == 1) {
+                $string = get_string('optionalcoursesets', 'block_current_learning', $optionalcount);
+            } else if ($optionalcount > 1) {
+                $string = get_string('optionalcoursesetsplural', 'block_current_learning', $optionalcount);
+            }
+        } else if ($completecount >= 1 && $optionalcount >= 1) {
+            if ($completecount == 1 && $optionalcount == 1) {
+                // 1 completed and 1 optional set
+                $string = get_string('onecompletedandoneoptionalcoursesets', 'block_current_learning', $optionalcount);
+            } else if ($completecount == 1 && $optionalcount > 1) {
+                // 1 completed set and 2 optional sets
+                $string = get_string('onecompletedandmultipleoptionalcoursesets', 'block_current_learning', $optionalcount);
+            } else if ($completecount > 1 && $optionalcount == 1) {
+                // 2 completed sets and 1 optional set
+                $string = get_string('multiplecompletedandoneoptionalcoursesets', 'block_current_learning', $completecount);
+            } else if ($completecount > 1 && $optionalcount > 1) {
+                // 2 complete sets and 2 optional sets
+                $string = get_string('multiplecompletedandmultipleoptionalcoursesets', 'block_current_learning',
+                    array('completed' => $completecount, 'optional' => $optionalcount));
+            }
+        }
+
+        return $string;
     }
 
 }

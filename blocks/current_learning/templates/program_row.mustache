@@ -55,6 +55,7 @@
             "percentage": 0
         },
         "dueinfo": null,
+        "coursesets_header_text": "1 completed set and 1 optional set",
         "coursesets": [
             {
                 "name": " First aid & health & safety",
@@ -108,11 +109,11 @@
 </h4>
 <div class="collapse" id="block_current_learning-program-{{id}}-detail">
     <div class="current_learning-bundle">
-        {{#completed_coursesets}}
+        {{#coursesets_header_text}}
         <div class="current_learning-set-stamp">
-            <p class="status-complete">{{#flex_icon}}check{{/flex_icon}}{{completed_coursesets}}</p>
+            <p class="status-complete">{{#flex_icon}}check{{/flex_icon}}{{coursesets_header_text}}</p>
         </div>
-        {{/completed_coursesets}}
+        {{/coursesets_header_text}}
         {{#coursesets}}
         <div class="current_learning-set">
             <h5>{{{name}}}<span class="pull-right info">{{completion_text}}</span></h5>

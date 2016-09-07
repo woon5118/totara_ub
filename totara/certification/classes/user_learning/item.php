@@ -300,12 +300,8 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
 
         $coursesetinfo = $this->process_coursesets($this->coursesets);
 
-        // Set string for completed sets.
-        if ($coursesetinfo->completecount == 1) {
-            $record->completed_coursesets = get_string('completedcoursesets', 'block_current_learning', $coursesetinfo->completecount);
-        } else if ($coursesetinfo->completecount > 1) {
-            $record->completed_coursesets = get_string('completedcoursesetsplural', 'block_current_learning', $coursesetinfo->completecount);
-        }
+        // Set string for coursesets header for completed and optional sets.
+        $record->coursesets_header_text = $this->get_coursesets_header_text($coursesetinfo->completecount, $coursesetinfo->optionalcount);
 
         // Set string for unavailable sets.
         if ($coursesetinfo->unavailablecount == 1) {
