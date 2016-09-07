@@ -4369,5 +4369,15 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016080900, 'facetoface');
     }
 
+    if ($oldversion < 2016080901) {
+
+        // Upgrade the two broken timeconfig settings.
+        $sql = 'UPDATE {config_plugins} SET name=:new WHERE name=:old';
+        $DB->execute($sql, ['old' => 'facetoface/defaultstarttime_minutes', 'new' => 'defaultstarttime_minutes']);
+        $DB->execute($sql, ['old' => 'facetoface/defaultfinishtime_minutes', 'new' => 'defaultfinishtime_minutes']);
+
+        upgrade_mod_savepoint(true, 2016080901, 'facetoface');
+    }
+
     return $result;
 }

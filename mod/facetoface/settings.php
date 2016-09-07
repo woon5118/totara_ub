@@ -178,9 +178,9 @@ $ADMIN->add('modfacetofacefolder', $settings);
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('facetoface/defaultdaystosession', new lang_string('defaultdaystosession', 'facetoface'), new lang_string('defaultdaystosession_desc', 'facetoface'), '1', PARAM_INT));
     $settings->add(new admin_setting_configcheckbox('facetoface/defaultdaysskipweekends', new lang_string('defaultdaysskipweekends', 'facetoface'),new lang_string('defaultdaysskipweekends_desc', 'facetoface'), 1));
-    $settings->add(new admin_setting_configtime('facetoface/defaultstarttime_hours', 'facetoface/defaultstarttime_minutes', new lang_string('defaultstarttime', 'facetoface'), new lang_string('defaultstarttimehelp', 'facetoface'), array('h' => 9, 'm' => 0)));
+    $settings->add(new admin_setting_configtime('facetoface/defaultstarttime_hours', 'defaultstarttime_minutes', new lang_string('defaultstarttime', 'facetoface'), new lang_string('defaultstarttimehelp', 'facetoface'), array('h' => 9, 'm' => 0)));
     $settings->add(new admin_setting_configtext('facetoface/defaultdaysbetweenstartfinish', new lang_string('defaultdaysbetweenstartfinish', 'facetoface'), new lang_string('defaultdaysbetweenstartfinish_desc', 'facetoface'), '0', PARAM_INT));
-    $settings->add(new admin_setting_configtime('facetoface/defaultfinishtime_hours', 'facetoface/defaultfinishtime_minutes', new lang_string('defaultfinishtime', 'facetoface'), new lang_string('defaultfinishtimehelp', 'facetoface'), array('h' => 10, 'm' => 0)));
+    $settings->add(new admin_setting_configtime('facetoface/defaultfinishtime_hours', 'defaultfinishtime_minutes', new lang_string('defaultfinishtime', 'facetoface'), new lang_string('defaultfinishtimehelp', 'facetoface'), array('h' => 10, 'm' => 0)));
     $settings->add(new admin_setting_configtext('facetoface/defaultminbookings',
         new lang_string('setting:defaultminbookings', 'facetoface'),
         new lang_string('setting:defaultminbookings_help', 'facetoface'), 0, PARAM_INT));
