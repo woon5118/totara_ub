@@ -307,6 +307,12 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
             $record->coursesets[] = $set->export_for_template();
         }
 
+        // Remove the next operator for the last courseset.
+        if (isset($record->coursesets)) {
+            unset(end($record->coursesets)->nextseticon);
+            unset(end($record->coursesets)->nextsetoperator);
+        }
+
         return $record;
     }
 
