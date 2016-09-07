@@ -327,6 +327,7 @@ if ($forum->type != 'single'
             $select = new url_select($forummenu, '',
                     array('/mod/forum/discuss.php?d=' . $discussion->id => get_string("movethisdiscussionto", "forum")),
                     'forummenu', get_string('move'));
+            $select->set_label(get_string("movethisdiscussionto", "forum"), array('class' => 'sr-only'));
             echo $OUTPUT->render($select);
             echo "</div>";
         }
