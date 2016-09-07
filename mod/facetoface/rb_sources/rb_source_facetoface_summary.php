@@ -528,6 +528,8 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 get_string('actions', 'rb_source_facetoface_summary'),
                 'sessions.id',
                 [
+                    'noexport' => true,
+                    'nosort' => true,
                     'extrafields' => ['facetofaceid' => 'sessions.facetoface'],
                     'displayfunc' => 'actions'
                 ]

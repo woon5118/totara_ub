@@ -424,6 +424,8 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 get_string('actions', 'rb_source_facetoface_summary'),
                 'base.id',
                 array(
+                    'noexport' => true,
+                    'nosort' => true,
                     'extrafields' => array('facetofaceid' => 'base.facetoface'),
                     'displayfunc' => 'actions',
                 )
