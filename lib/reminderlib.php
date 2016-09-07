@@ -402,25 +402,25 @@ function reminder_email_substitutions($content, $user, $course, $message, $remin
     $subs = array();
 
     // User details
-    $place[] = get_string('placeholder:firstname', 'totara_coursecatalog');
+    $place[] = '[firstname]';
     $subs[] = $user->firstname;
-    $place[] = get_string('placeholder:lastname', 'totara_coursecatalog');
+    $place[] = '[lastname]';
     $subs[] = $user->lastname;
 
     // Course details
-    $place[] = get_string('placeholder:coursepageurl', 'totara_coursecatalog');
+    $place[] = '[coursepageurl]';
     $subs[] = "{$CFG->wwwroot}/course/view.php?id={$course->id}";
-    $place[] = get_string('placeholder:coursename', 'totara_coursecatalog');
+    $place[] = '[coursename]';
     $subs[] = $course->fullname;
 
     // Manager name
-    $place[] = get_string('placeholder:managername', 'totara_coursecatalog');
-    $subs[] = $user->manager ? fullname($user->manager) : get_string('nomanagermessage', 'totara_coursecatalog');
+    $place[] = '[managername]';
+    $subs[] = !empty($user->manager) ? fullname($user->manager) : get_string('nomanagermessage', 'totara_coursecatalog');
 
     // Day counts
-    $place[] = get_string('placeholder:dayssincecompletion', 'totara_coursecatalog');
+    $place[] = '[days counter up]';
     $subs[] = $message->period;
-    $place[] = get_string('placeholder:daysuntildeadline', 'totara_coursecatalog');
+    $place[] = '[days count down]';
     $subs[] = $message->deadline;
 
     // Make substitutions

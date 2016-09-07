@@ -122,13 +122,6 @@ $string['performsearchoncertifications'] = 'or perform this search on certificat
 $string['performsearchoncourses'] = 'or perform this search on courses';
 $string['performsearchonprograms'] = 'or perform this search on programs';
 $string['period'] = 'Period';
-$string['placeholder:coursename'] = '[coursename]';
-$string['placeholder:coursepageurl'] = '[coursepageurl]';
-$string['placeholder:dayssincecompletion'] = '[days counter up]';
-$string['placeholder:daysuntildeadline'] = '[days count down]';
-$string['placeholder:firstname'] = '[firstname]';
-$string['placeholder:lastname'] = '[lastname]';
-$string['placeholder:managername'] = '[managername]';
 $string['pluginname'] = 'Course Catalog';
 $string['programs'] = 'Programs';
 $string['reminder'] = 'Reminder';
@@ -212,3 +205,12 @@ $string['tracking_help'] = 'The reminder can be sent based on the completion of 
 $string['viewallcategories'] = 'View all categories';
 $string['viewallcertifications'] = 'View all certifications';
 $string['viewallcourses'] = 'View all courses';
+
+# Deprecated
+$string['placeholder:coursename'] = '[coursename]';
+$string['placeholder:coursepageurl'] = '[coursepageurl]';
+$string['placeholder:dayssincecompletion'] = '[days counter up]';
+$string['placeholder:daysuntildeadline'] = '[days count down]';
+$string['placeholder:firstname'] = '[firstname]';
+$string['placeholder:lastname'] = '[lastname]';
+$string['placeholder:managername'] = '[managername]';
