@@ -87,7 +87,7 @@ $totalcount = count(badges_get_badges($type, $courseid, '', '', '', '', $USER->i
 $records = badges_get_badges($type, $courseid, $sortby, $sorthow, $page, BADGE_PERPAGE, $USER->id);
 
 if ($totalcount) {
-    echo $output->heading(get_string('badgestoearn', 'badges', $totalcount), 4);
+    echo html_writer::tag('p', get_string('badgestoearn', 'badges', $totalcount));
 
     if ($course && $course->startdate > time()) {
         echo $OUTPUT->box(get_string('error:notifycoursedate', 'badges'), 'generalbox notifyproblem');

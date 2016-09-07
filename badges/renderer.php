@@ -479,7 +479,7 @@ class core_badges_renderer extends plugin_renderer_base {
         $heading = get_string('localbadges', 'badges', format_string($SITE->fullname, true, array('context' => context_system::instance())));
         $localhtml .= $this->output->heading_with_help($heading, 'localbadgesh', 'badges');
         if ($badges->badges) {
-            $downloadbutton = $this->output->heading(get_string('badgesearned', 'badges', $badges->totalcount), 4, 'activatebadge');
+            $downloadbutton = html_writer::tag('p', get_string('badgesearned', 'badges', $badges->totalcount), array('class' => 'activatebadge'));
             $downloadbutton .= $downloadall;
 
             $htmllist = $this->print_badges_list($badges->badges, $USER->id);
