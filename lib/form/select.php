@@ -85,7 +85,7 @@ class MoodleQuickForm_select extends HTML_QuickForm_select{
             // of the select options.
             $html .= '<input type="hidden" name="'.$this->getName().'" value="_qf__force_multiselect_submission">';
         }
-        if ($this->_hiddenLabel){
+        if ($this->_hiddenLabel && !$this->_flagFrozen) {
             $this->_generateId();
             $html .= '<label class="accesshide" for="'.$this->getAttribute('id').'" >'.$this->getLabel().'</label>';
         }
