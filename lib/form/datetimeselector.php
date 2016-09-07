@@ -264,6 +264,16 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
      * @return string
      */
     function toHtml() {
+        // Remove calendar icon if control is frozen.
+        $calendartype = \core_calendar\type_factory::get_calendar_instance();
+        if ($this->_flagFrozen && $calendartype->get_name() === 'gregorian') {
+            for ($i = 0; $i < count($this->_elements); $i++) {
+                if ($this->_elements[$i]->_type === 'link') {
+                    array_splice($this->_elements, $i, 1);
+                    break;
+                }
+            }
+        }
         include_once('HTML/QuickForm/Renderer/Default.php');
         $renderer = new HTML_QuickForm_Renderer_Default();
         $renderer->setElementTemplate('{element}');

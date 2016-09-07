@@ -165,6 +165,26 @@ class core_form_dateselector_testcase extends advanced_testcase {
             $this->assertSame($expectedvalues, $el->getValue());
         }
     }
+
+    /**
+     * Testcase to check if the icon is visible
+     */
+    public function test_calendaricon() {
+        $mform = $this->mform;
+
+        $elparams = array('optional' => false);
+        $el = new MoodleQuickform_date_selector('dateselector', null, $elparams);
+        $el->_createElements();
+        $output = $el->toHtml();
+
+        // Should be visible if not frozen.
+        $this->assertTrue(strpos($output, 'visibleifjs') !== false);
+
+        $el->freeze();
+        $output = $el->toHtml();
+        // Should not be visible if frozen.
+        $this->assertFalse(strpos($output, 'visibleifjs'));
+    }
 }
 
 /**
