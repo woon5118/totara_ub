@@ -925,7 +925,7 @@ class core_badges_renderer extends plugin_renderer_base {
         $mform->setDefault('search', $search);
         $el[] = $mform->createElement('submit', 'submitsearch', get_string('searchname', 'badges'));
         $el[] = $mform->createElement('submit', 'clearsearch', get_string('clear'));
-        $mform->addGroup($el, 'searchgroup', '', ' ', false);
+        $mform->addGroup($el, 'searchgroup', get_string('search'), ' ', false);
 
         ob_start();
         $mform->display();
