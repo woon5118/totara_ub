@@ -160,7 +160,7 @@ $item .= html_writer::tag('div', format_text($cohort->description, $cohort->desc
 $out .= $OUTPUT->container($item, 'fitem required alternate');
 
 $item = html_writer::tag('div', get_string('startdate', 'totara_cohort'), array('class' => 'fitemtitle'));
-$ud = ($cohort->enddate) ? userdate($cohort->startdate, get_string('strftimedate')) : '';
+$ud = ($cohort->startdate) ? userdate($cohort->startdate, get_string('strftimedate')) : '';
 $item .= html_writer::tag('div', $ud, array('class' => 'felement ftext'));
 $out .= $OUTPUT->container($item, 'fitem required ');
 
