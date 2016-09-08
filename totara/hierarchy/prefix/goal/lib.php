@@ -200,6 +200,7 @@ class goal extends hierarchy {
 
         // Display the assignments selector.
         if ($can_assign) {
+            echo html_writer::label(get_string('assigngroup', 'totara_hierarchy'), 'menugroupselector', true, array('class' => 'sr-only'));
             echo html_writer::select($options, 'groupselector', null, null,
                     array('class' => 'group_selector', 'itemid' => $item->id));
         }
