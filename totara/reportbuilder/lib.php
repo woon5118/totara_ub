@@ -1171,20 +1171,26 @@ class reportbuilder {
 
         if (!empty($SESSION->reportbuilder[$this->get_uniqueid()])) {
             foreach ($SESSION->reportbuilder[$this->get_uniqueid()] as $fname => $data) {
+                $params = array();
                 if ($fname == 'toolbarsearchtext') {
                     if ($this->toolbarsearch && $this->has_toolbar_filter() && $data) {
-                        list($where_sqls[], $params) = $this->get_toolbar_sql_filter($data);
-                        $filterparams = array_merge($filterparams, $params);
+                        list($sqlwhere, $params) = $this->get_toolbar_sql_filter($data);
+                        if (!empty($params)) {
+                            $where_sqls[] = $sqlwhere;
+                        }
                     }
                 } else if (array_key_exists($fname, $this->filters)) {
                     $filter = $this->filters[$fname];
                     if ($filter->grouping != 'none') {
                         list($having_sqls[], $params) = $filter->get_sql_filter($data);
                     } else {
-                        list($where_sqls[], $params) = $filter->get_sql_filter($data);
+                        list($sqlwhere, $params) = $filter->get_sql_filter($data);
+                        if (!empty($params)) {
+                            $where_sqls[] = $sqlwhere;
+                        }
                     }
-                    $filterparams = array_merge($filterparams, $params);
                 }
+                $filterparams = array_merge($filterparams, $params);
             }
         }
 

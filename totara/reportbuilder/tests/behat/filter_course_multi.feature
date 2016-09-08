@@ -1,4 +1,4 @@
-@totara @totara_reportbuilder
+@totara @totara_reportbuilder @oleg
 Feature: Use the multi-item course filter
   To filter the courses in a report
   by several courses at a time
@@ -72,6 +72,28 @@ Feature: Use the multi-item course filter
     And I should see "CourseTwo" in the "Course (multi-item)" "fieldset"
     And I should not see "CourseOne" in the ".reportbuilder-table" "css_element"
     And I should not see "CourseTwo" in the ".reportbuilder-table" "css_element"
+    And I should see "CourseThree" in the ".reportbuilder-table" "css_element"
+
+  @javascript
+  Scenario: Test filter with spaces
+    Given I set the field "Report Name" to "Courses"
+    And I set the field "Source" to "Courses"
+    And I press "Create report"
+    When I follow "View This Report"
+    Then I should see "CourseOne" in the ".reportbuilder-table" "css_element"
+    And I should see "CourseTwo" in the ".reportbuilder-table" "css_element"
+    And I should see "CourseThree" in the ".reportbuilder-table" "css_element"
+  # Use normal search
+    When I set the field "course-fullname" to "CourseOne"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
+    Then I should see "CourseOne" in the ".reportbuilder-table" "css_element"
+    And I should not see "CourseTwo" in the ".reportbuilder-table" "css_element"
+    And I should not see "CourseThree" in the ".reportbuilder-table" "css_element"
+  # Use search with spaces
+    When I set the field "course-fullname" to "    "
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
+    Then I should see "CourseOne" in the ".reportbuilder-table" "css_element"
+    And I should see "CourseTwo" in the ".reportbuilder-table" "css_element"
     And I should see "CourseThree" in the ".reportbuilder-table" "css_element"
 
   @javascript
