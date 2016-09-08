@@ -2063,6 +2063,9 @@ class core_renderer extends renderer_base {
 
         $title = get_string($helpicon->identifier, $helpicon->component);
 
+        // Decode any html entities in help strings.
+        $title = core_text::entities_to_utf8($title);
+
         if (empty($helpicon->linktext)) {
             $alt = get_string('helpprefix2', '', trim($title, ". \t"));
         } else {
