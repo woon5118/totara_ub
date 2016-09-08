@@ -1312,7 +1312,6 @@ class program {
         global $CFG, $DB, $USER, $OUTPUT, $PAGE;
 
         $iscertif = (isset($this->certifid) && $this->certifid > 0) ? true : false;
-        $userid = $userid ? $userid : $USER->id;
 
         // Div created to show notifications. Needed when requesting extensions.
         $out = html_writer::tag('div', '', array('id' => 'totara-header-notifications'));
@@ -1480,9 +1479,6 @@ class program {
         }
 
         // only show end note when a program is complete
-        $prog_owners_id = ($userid) ? $userid : $USER->id;
-        $prog_completion = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $prog_owners_id, 'coursesetid' => 0));
-
         if ($prog_completion && $prog_completion->status == STATUS_PROGRAM_COMPLETE) {
             $out .= html_writer::start_tag('div', array('class' => 'programendnote'));
             $out .= $OUTPUT->heading(get_string('programends', 'totara_program'), 2);
