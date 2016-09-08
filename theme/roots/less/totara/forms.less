@@ -615,3 +615,21 @@ div#dateselector-calendar-panel {
   vertical-align: middle;
   margin: 0 @padding-xs-horizontal 0 0;
 }
+
+// Admin settings pages have their own time select markup.
+// They use the .form-time class exclusively in the system
+// so use that to target them for tweaks without affecting
+// other form elements.
+.form-item .form-time {
+  select {
+    // The 300px max-width of select elements should be
+    // variable-based but is not (above in this file).
+    max-width: ((300 / 2) - @padding-xs-horizontal);
+    display: inline-block;
+    margin-left: @padding-xs-horizontal;
+    &:first-of-type {
+      margin-right: @padding-xs-horizontal;
+      margin-left: @padding-small-horizontal;
+    }
+  }
+}
