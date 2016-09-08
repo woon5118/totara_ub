@@ -5487,9 +5487,9 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions = -1, $
         echo '<th class="header lastpost" scope="col">'.get_string('lastpost', 'forum').'</th>';
         if ((!is_guest($context, $USER) && isloggedin()) && has_capability('mod/forum:viewdiscussion', $context)) {
             if (\mod_forum\subscriptions::is_subscribable($forum)) {
-                echo '<th class="header discussionsubscription" scope="col">';
+                echo '<td class="header discussionsubscription">';
                 echo forum_get_discussion_subscription_icon_preloaders();
-                echo '</th>';
+                echo '</td>';
             }
         }
         echo '</tr>';
