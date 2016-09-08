@@ -67,7 +67,7 @@ $competencyname = $DB->get_field('comp', 'fullname', array('id' => $competencyid
 $details = new stdClass();
 
 // Get user's current primary position and organisation (if any)
-$jobassignment = \totara_job\job_assignment::get_first($this->plan->userid, false);
+$jobassignment = \totara_job\job_assignment::get_first($plan->userid, false);
 if ($jobassignment) {
     $details->positionid = $jobassignment->positionid;
     $details->organisationid = $jobassignment->organisationid;

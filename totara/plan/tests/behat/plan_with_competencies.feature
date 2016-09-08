@@ -71,3 +71,12 @@ Background:
   And I press "Approve"
   Then I should see "You are viewing firstname1 lastname1's plan"
   And I should see "Plan \"learner1 Learning Plan\" has been approved"
+
+  # Make sure the ajax competency update request works
+  When I click on "Team" in the totara menu
+  And I click on "Records" "link" in the "firstname1 lastname1" "table_row"
+  And the field "competencyevidencestatus1" matches value "Not Set"
+  And I set the field "competencyevidencestatus1" to "Competent"
+  And I click on "Other Evidence" "link" in the ".tabtree" "css_element"
+  And I click on "Competencies" "link" in the ".tabtree" "css_element"
+  Then the field "competencyevidencestatus1" matches value "Competent"
