@@ -15,6 +15,7 @@ Feature: Verify certification completion data can be successfully uploaded.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "Choose certification file to upload" filemanager
+    And I set the field "Import action" to "Certify uncertified users"
     And I click on "Upload" "button" in the "#mform2" "css_element"
     Then I should see "CSV import completed"
     And I should see "Certification data imported successfully"
