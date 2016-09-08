@@ -208,4 +208,4 @@ $string['visibleto'] = 'Visible to:';
 $string['youranswer'] = 'Your answer';
 
 // Deprecated.
-$string['managername'] = 'Manager';
+$string['managername'] = 'Manager\'s name';
