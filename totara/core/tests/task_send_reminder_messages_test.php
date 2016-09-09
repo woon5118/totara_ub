@@ -227,6 +227,16 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
         $this->assertContains('1 "reminder" type messages sent', $output);
         $this->assertContains('2 "escalation" type messages sent', $output);
 
+        // Make sure that an escalation email did indeed go to the manager.
+        $messages = $sink->get_messages();
+        $managergotemail = false;
+        foreach($messages as $message) {
+            if (($message->subject === 'Subject for type escalation') and ($message->useridto == $this->manager->id)) {
+                $managergotemail = true;
+            }
+        }
+        $this->assertTrue($managergotemail);
+
         $sink->close();
     }
 
