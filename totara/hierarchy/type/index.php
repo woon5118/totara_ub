@@ -47,6 +47,7 @@ $can_add = has_capability('totara/hierarchy:create'.$prefix.'type', $sitecontext
 $can_edit = has_capability('totara/hierarchy:update'.$prefix.'type', $sitecontext);
 $can_delete = has_capability('totara/hierarchy:delete'.$prefix.'type', $sitecontext);
 $can_edit_custom_fields = has_capability('totara/hierarchy:'.$prefix.'managecustomfield', $sitecontext);
+$can_change_type = has_capability('totara/hierarchy:update'.$prefix, $sitecontext);
 
 // Setup page and check permissions.
 if ($prefix == 'goal' && $class) {
@@ -187,7 +188,7 @@ if ($unclassified) {
     $options[0] = get_string('unclassified', 'totara_hierarchy');
 }
 
-if ($showbulkform && $class != 'personal') {
+if ($showbulkform && $can_change_type && $class != 'personal') {
     $templatedata->bulkchange = $OUTPUT->single_select(new moodle_url("change.php", array('prefix' => $prefix, 'class' => $class)),
         'typeid', $options, 'changetype', array('' => 'choosedots'), null,
         array('label' => get_string('bulktypechangesdesc', 'totara_hierarchy')));

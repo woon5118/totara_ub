@@ -69,6 +69,8 @@ if ($itemid) {
 
 // Setup page and check permissions.
 admin_externalpage_setup($adminpage, null, array('prefix' => $prefix));
+$sitecontext = context_system::instance();
+require_capability('totara/hierarchy:update' . $prefix, $sitecontext);
 
 $typename = hierarchy_get_type_name($typeid, $shortprefix);
 $newtypename = hierarchy_get_type_name($newtypeid, $shortprefix);
