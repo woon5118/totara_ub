@@ -147,7 +147,23 @@ $string['body_help'] = 'This is the body of the notification to be sent.
 
 In the notification there are a number of placeholders that can be used, these placeholders will be replaced with the appropriate values when the message is sent.
 
-Available Seminar placeholders:
+All place holders are enclosed within square brackets.
+There are several types of place holders, the patterns for each are as follows:
+
+* Event details: [placeholder]
+* Event custom fields: [session:placeholder]
+* Event cancellation custom fields: [sessioncancel:placeholder]
+* Multiple session event details: [#sessions][session:placeholder][/sessions]
+* Room details for each session: [#sessions][session:room:placeholder][/sessions]
+* Room custom fields for each session: [#sessions][session:room:placeholder][/sessions]
+* User details: [placeholder]
+* User custom fields: [user:placeholder]
+
+You can find out which placeholder are available, and how custom field placeholders work for each type under the relevant heading below.
+
+### 1. Event details
+
+The details of the seminar can be added to the notification by using the desired placeholders from the following list.
 
 * [coursename] - Name of course
 * [facetofacename] - Name of seminar activity
@@ -167,11 +183,28 @@ Available Seminar placeholders:
 * [latestfinishdate] - Date at the end of the event. If there are multiple sessions it will use the last one.
 * [registrationcutoff] - The deadline for registrations, if not set this will default to [starttime].
 
-There are also placeholders available for event custom fields and they follow the format [session:shortname]. Where "shortname" is the shortname of the Seminar custom field.
+### 2. Event custom fields
 
-To include the details of each session, a segment of the notification can be repeated to include the details of each individual session. To do this, add [#sessions] where you would like the loop to start, add [/sessions] where you would like it to end.
+If you have created event custom fields, and wish to use these in your notification body you can do so using the following placeholder, replacing "placeholder" with the shortname for the custom field.
 
-You can then add the following placeholders for each session:
+    [session:placeholder]
+
+For example if you have an event custom field with the shortname "department", to use the value recorded in the custom field in the notification body you would use the placeholder [session:department].
+
+### 3. Event cancellation custom fields
+
+If you have created event cancellation custom fields, and wish to use these in your notification body you can do so using the following placeholder, replacing "placeholder" with the shortname for the custom field.
+
+    [sessioncancel:placeholder]
+
+For example if you have an event custom field with the shortname "cancellationreason", to use the value recorded in the custom field in the notification body you would use the placeholder [sessioncancel:cancellationreason].
+
+### 4. Multiple session event details
+
+It is possible to include details of each session if you have multiple sessions for an event.
+A segment of the notification can be repeated to include the details of each individual session. To do this, add [#sessions] where you would like the loop to start, add [/sessions] where you would like it to end.
+
+You can then add the following placeholders between these tags:
 
 * [session:starttime] - start time of the session.
 * [session:startdate] - start date of the session.
@@ -179,10 +212,23 @@ You can then add the following placeholders for each session:
 * [session:finishdate] - finish date of the session.
 * [session:timezone] - timezone of the session.
 * [session:duration] - session duration.
+
+### 4.1. Room details for each session
+
+The details of any rooms used for the session can also be added to the notification by using the desired placeholders from the following list.
+
 * [session:room:name] - name of room assigned to this session.
 * [session:room:link] - link to details page for this room.
 
-You can add room custom field values. If a room custom field has the shortname, \'shortname\', the placeholder would have the following format: [session:room:cf_shortname].
+### 4.2. Room custom fields for each session
+
+In addition to the above room custom field information for each session can be added to the notification by using the following placeholder, replacing "placeholder" with the shortname for the custom field.
+
+    [session:room:placeholder]
+
+For example if you have a room custom field with the shortname "building", to use the value recorded in the custom field in the notification body you would use the placeholder [session:room:building].
+
+### 5. User details
 
 Available user placeholders:
 
@@ -213,7 +259,14 @@ Available user placeholders:
 * [timezone] - User\'s timezone
 * [url] - User\'s URL
 
-There are also placeholders available for user custom profile fields and they follow the format [user:shortname]. Where "shortname" is the shortname of the User custom profile field.
+### 6. User custom fields
+
+There are also placeholders available for user custom profile fields that can be added to the notification by using the following placeholder, replacing the word placeholder with the user custom profile field shortname:
+
+    [user:placeholder]
+
+For example if you have a user custom profile field with the shortname "suburb" that you wish to use in the notification you would [user:suburb] as the placeholder.
+
 ';
 $string['booked'] = 'Booked';
 $string['bookingcancelled'] = 'Your booking has been cancelled.';
