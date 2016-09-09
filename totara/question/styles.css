@@ -49,18 +49,6 @@ table.generaltable.question-review-table .r0 {
     min-width: 180px;
 }
 
-.visibleto {
-    position: absolute;
-    top: 20px;
-    line-height: 1.2em;
-}
-
-.visibleto-review {
-    position: absolute;
-    top: 55px;
-    line-height: 1.2em;
-}
-
 #question-review-item {
     padding: 0 0 10px 0;
     margin-top: 0;

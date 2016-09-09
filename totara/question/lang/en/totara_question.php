@@ -204,7 +204,7 @@ $string['uploadmaxinvalid'] = 'Number of files must be at least one';
 $string['uploadmaxnum'] = 'Maximum number of files';
 $string['userselectednothing'] = 'User selected nothing';
 $string['valueoutsiderange'] = 'Please enter a value within the valid range';
-$string['visibleto'] = 'Visible to:';
+$string['visibleto'] = 'Visible to: {$a}';
 $string['youranswer'] = 'Your answer';
 
 // Deprecated.

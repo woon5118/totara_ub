@@ -462,22 +462,20 @@ abstract class question_base {
         $form->addElement('header', 'question', format_string($this->name));
 
         if ($this->cananswer) {
+            if (!empty($this->viewers)) {
+                $viewersstring = get_string('visibleto', 'totara_question', implode(', ', $this->viewers));
+                $form->addElement('html', html_writer::tag('p', $viewersstring, array('class'=>'visibleto')));
+            }
             if ($this->viewonly) {
                 $this->add_field_specific_view_elements($form);
             } else {
                 $this->add_field_specific_edit_elements($form);
             }
-            if (!empty($this->viewers)) {
-                $viewersstring = '<small class="visibleto">' . get_string('visibleto', 'totara_question') .
-                            '<br>' . implode(', ', $this->viewers) . '</small>';
-                $form->addElement('html', $viewersstring);
-            }
         }
 
         foreach ($this->roleinfo as $info) {
             $question = $info->create_element($this->storage, $this);
-            $question->label = $info->label;
-            $form->addElement('html', $info->userimage);
+            $question->label = $info->userimage . $info->label;
             if ($question->cananswer) {
                 $question->add_field_specific_view_elements($form);
             }

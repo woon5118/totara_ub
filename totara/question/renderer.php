@@ -108,6 +108,11 @@ class totara_question_renderer extends plugin_renderer_base {
         }
 
         if ($review->cananswer) {
+            if (!empty($review->viewers)) {
+                $viewersstring = get_string('visibleto', 'totara_question', implode(', ', $review->viewers));
+                $form->addElement('html', html_writer::tag('p', $viewersstring, array('class'=>'visibleto-review')));
+            }
+
             $currentuseritems = $itemgroup[$review->answerid];
             if ($review->viewonly) {
                 if ($multifield) {
@@ -143,11 +148,6 @@ class totara_question_renderer extends plugin_renderer_base {
                             new MoodleQuickForm_textarea($form_prefix . '_reviewitem_' . $currentuseritems[0]->id,
                             get_string('youranswer', 'totara_question'), $text_area_options));
                 }
-            }
-            if (!empty($review->viewers)) {
-                $viewersstring = '<small class="visibleto-review">' . get_string('visibleto', 'totara_question') .
-                        '<br>' . implode(', ', $review->viewers) . '</small>';
-                $form->addElement('html', $viewersstring);
             }
         }
 

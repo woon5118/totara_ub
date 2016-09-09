@@ -22,10 +22,10 @@
 // @author    Rob Tyler <rob.tyler@totaralearning.com>
 // @package   totara_appraisal
 
-@import "styles_legacy";
+@import "legacy";
 
 @padding-small-horizontal: 10px;
-@state-info-bg: #d9edf7;
+@padding-small-vertical: 5px;
 
 div.appraisal-content {
     padding-left:1em;
@@ -39,7 +39,6 @@ div.appraisal-content .mform .fitem .felement {
     padding: 0;
 }
 
-
 .appraisal-title {
     float: none;
 }
@@ -50,6 +49,18 @@ div.appraisal-content .mform .fitem .felement {
 
 .appraisal-stage {
     clear: both;
+}
+
+.path-totara-appraisal .fcontainer {
+    padding-left: @padding-small-horizontal * 3;
+
+    .fstaticlabel a {
+        margin-right: @padding-small-horizontal;
+    }
+
+    .felement.fstatic {
+        padding-top: @padding-small-vertical * 1.5;
+    }
 }
 
 #page-totara-appraisal-snapshot {
