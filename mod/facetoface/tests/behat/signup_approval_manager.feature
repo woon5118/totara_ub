@@ -112,10 +112,52 @@ Feature: Seminar Signup Manager Approval
     And I should see "Sign-up"
     And I follow "Sign-up"
     And I should see "Manager Approval"
+    And I should see "Cassy Cas"
     And I press "Request approval"
     And I log out
 
     And I log in as "manager"
+    And I click on "Dashboard" in the totara menu
+    Then I should see "Seminar booking request"
+    And I click on "View all tasks" "link"
+    And I click on "Attendees" "link" in the "1 January 2020" "table_row"
+    Then I should see "Jimmy Jim" in the ".lastrow" "css_element"
+
+    When I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
+    And I click on "Update requests" "button"
+    Then I should not see "Jimmy Jim"
+
+    When I log out
+    And I log in as "jimmy"
+    And I click on "Dashboard" in the totara menu
+    Then I should see "Seminar booking confirmation"
+
+    When I click on "Find Learning" in the totara menu
+    And I follow "Classroom Connect Course"
+    And I follow "View all events"
+    Then I should see "Booked" in the "1 January 2020" "table_row"
+
+  Scenario: Student remove the existing manager and assign a new manager itself.
+    When I navigate to "Global settings" node in "Site administration > Seminars"
+    And I click on "s__facetoface_managerselect" "checkbox"
+    And I press "Save changes"
+    And I log out
+    And I log in as "jimmy"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Classroom Connect Course"
+    And I should see "Sign-up"
+    And I follow "Sign-up"
+    And I should see "Manager Approval"
+    And I should see "Cassy Cas"
+
+    And I press "Choose manager"
+    And I click on "Timmy Tim" "link" in the "Select manager" "totaradialogue"
+    And I click on "OK" "button" in the "Select manager" "totaradialogue"
+
+    And I press "Request approval"
+    And I log out
+
+    And I log in as "timmy"
     And I click on "Dashboard" in the totara menu
     Then I should see "Seminar booking request"
     And I click on "View all tasks" "link"

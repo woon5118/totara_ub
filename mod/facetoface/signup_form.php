@@ -36,9 +36,17 @@ class mod_facetoface_signup_form extends moodleform {
 
         $managerids = array();
         $manager_title = '';
+        // Get default data, user's manager/s who was/were assigned through job assignment/s, if exists.
         if (!empty($this->_customdata['managerids'])) {
+            $managers = array();
             $managerids = $this->_customdata['managerids'];
+            foreach ($managerids as $managerid) {
+                $manager = core_user::get_user($managerid);
+                $managers[] = fullname($manager);
+            }
+            $manager_title = implode(', ', $managers);
         }
+        // Possibility of new data, learner might remove the existing manager/s and assign a new manager itself.
         $managerid = 0;
         if (!empty($this->_customdata['managerid'])) {
             $managerid = $this->_customdata['managerid'];
