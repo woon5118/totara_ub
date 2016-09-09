@@ -1320,7 +1320,7 @@ Category.prototype = {
         var icon = action.one('img');
         if (icon === null) {
             require(['core/templates'], function (templates) {
-                templates.renderIcon('caret-down', M.util.get_string('expand', 'moodle')).done(function(html) {
+                templates.renderIcon('expanded', M.util.get_string('expand', 'moodle'), 'tree-icon').done(function(html) {
                     action.setContent(html);
                 });
             });
@@ -1353,15 +1353,9 @@ Category.prototype = {
         var icon = action.one('img');
         if (icon === null) {
             require(['core/templates'], function (templates) {
-                if (window.right_to_left()) {
-                    templates.renderIcon('caret-left', M.util.get_string('expand', 'moodle')).done(function(html) {
-                        action.setContent(html);
-                    });
-                } else {
-                    templates.renderIcon('caret-right', M.util.get_string('expand', 'moodle')).done(function(html) {
-                        action.setContent(html);
-                    });
-                }
+                templates.renderIcon('collapsed', M.util.get_string('expand', 'moodle'), 'tree-icon').done(function(html) {
+                    action.setContent(html);
+                });
             });
         } else {
             action.one('img').setAttrs({
