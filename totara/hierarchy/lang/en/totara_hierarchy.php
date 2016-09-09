@@ -143,7 +143,9 @@ $string['chooseevidencetype'] = 'Choose an evidence type';
 $string['choosemanager'] = 'Choose manager';
 $string['chooseorganisation'] = 'Choose organisation';
 $string['chooseposition'] = 'Choose position';
-$string['choosewhattodowithdata'] = 'Choose what you would like to do with the custom field data:';
+$string['choosewhattodowithdata'] = 'Existing custom field data may be either deleted or migrated to other custom fields. Migrated data is not validated, you may need to verify and manually fix affected items.
+
+Choose what you would like to do with the custom field data:';
 $string['clearsearch'] = 'Clear search';
 $string['clearselection'] = 'Clear selection';
 $string['clickfornonjsform'] = 'Click here for a non-javascript version of this form';
