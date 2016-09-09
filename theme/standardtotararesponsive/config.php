@@ -27,6 +27,7 @@ $THEME->parents = array('bootstrapbase', 'base');
 $THEME->sheets = array(
     'core',     // Must come first.
     'navigation',
+    'appraisal',
     'admin',
     'blocks',
     'calendar',
