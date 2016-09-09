@@ -21,8 +21,25 @@
 // @author    Sam Hemelryk <sam.hemelryk@totaralearning.com>
 // @package   theme_basis
 
-#page-footer .performanceinfo .cachesused {
-    @cache-stat-bg: lighten(@gray-base, 3%); // #f7f7f7;
-    @cache-stat-border: lighten(@gray-base, 6.5%); // #eee;
-    @cache-stat-heading-text: lighten(@gray-base, 93.5%); // #eee;;
+#dockeditempanel {
+    .dockeditempanel_hd {
+        &:extend(.block .block-header);
+    }
+
+    .dockeditempanel_content {
+        &:extend(.block);
+        h2 {
+            &:extend(.block .block-header h2);
+            &:extend(.block .block-title);
+        }
+    }
+    .block .block-control-actions {
+        .moveto,
+        .hidepanelicon {
+            margin-left: 0;
+        }
+        .menubar li {
+            margin-top: 0;
+        }
+    }
 }
