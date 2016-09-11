@@ -107,6 +107,9 @@ Feature: Add a seminar with select position
     And I set the following fields to these values:
       | Select a job assignment | Unnamed job assignment (ID: 2) (Position2) |
     And I press "Sign-up"
+    When I click on "More info" "link"
+    Then I should see "Job assignment"
+    And I should see "Unnamed job assignment (ID: 2)"
     And I log out
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu

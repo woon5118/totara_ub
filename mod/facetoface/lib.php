@@ -3262,18 +3262,20 @@ function facetoface_get_user_submissions($facetofaceid, $userid, $minimumstatus=
     return $DB->get_records_sql("
         SELECT
             su.id,
+            su.userid,
+            su.notificationtype,
+            su.discountcode,
+            su.managerid,
+            su.jobassignmentid,
             s.facetoface,
             s.id as sessionid,
-            su.userid,
-            0 as mailedconfirmation,
             s.cancelledstatus,
-            su.discountcode,
+            s.timemodified,
             ss.timecreated,
             ss.timecreated as timegraded,
-            s.timemodified,
+            ss.statuscode,
             0 as timecancelled,
-            su.notificationtype,
-            ss.statuscode
+            0 as mailedconfirmation
         FROM
             {facetoface_sessions} s
         JOIN
@@ -3683,7 +3685,7 @@ function facetoface_session_has_capacity($session, $context = false, $status = M
  * @return string|null html markup when return is true
  */
 function facetoface_print_session($session, $showcapacity, $calendaroutput=false, $return=true, $hidesignup=false, $class='f2f') {
-    global $CFG, $DB, $PAGE;
+    global $DB, $PAGE;
 
     $output = html_writer::start_tag('dl', array('class' => $class));
 
@@ -3759,6 +3761,18 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     // Display requires approval notification
     $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
 
+    // Display job assignments.
+    if (get_config(null, 'facetoface_selectjobassignmentonsignupglobal') &&
+        ($facetoface->selectjobassignmentonsignup || $facetoface->forceselectjobassignment)) {
+        if (isset($session->bookedsession->jobassignmentid) && $session->bookedsession->jobassignmentid) {
+            $output .= html_writer::empty_tag('br');
+            $output .= html_writer::tag('dt', get_string('jobassignment', 'facetoface'));
+            $jobassignment = \totara_job\job_assignment::get_with_id($session->bookedsession->jobassignmentid);
+            $output .= html_writer::tag('dd', $jobassignment->fullname);
+            $output .= html_writer::empty_tag('br');
+        }
+    }
+
     // Display waitlist notification
     if (!$hidesignup && $session->allowoverbook && $placesleft < 1) {
         $output .= html_writer::tag('dd', get_string('userwillbewaitlisted', 'facetoface'));
@@ -3768,6 +3782,22 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
         $output .= html_writer::tag('dt', get_string('approvalrequiredby', 'facetoface'));
         $approver = facetoface_get_approvaltype_string($facetoface->approvaltype, $facetoface->approvalrole);
         $output .= html_writer::tag('dd', $approver);
+
+        if (isset($session->bookedsession->managerid) && $session->bookedsession->managerid) {
+            $output .= html_writer::tag('dt', get_string('managername', 'facetoface'));
+            $manager = core_user::get_user($session->bookedsession->managerid);
+            $output .= html_writer::tag('dd', fullname($manager));
+        } else {
+            if (isset($session->managerids)) {
+                $managers = array();
+                $output .= html_writer::tag('dt', get_string('managername', 'facetoface'));
+                foreach ($session->managerids as $managerid) {
+                    $manager = core_user::get_user($managerid);
+                    $managers[] = fullname($manager);
+                }
+                $output .= html_writer::tag('dd', implode(', ', $managers));
+            }
+        }
     }
 
     if (!get_config(null, 'facetoface_hidecost') && !empty($session->normalcost)) {

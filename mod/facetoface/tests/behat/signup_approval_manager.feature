@@ -137,6 +137,10 @@ Feature: Seminar Signup Manager Approval
     And I follow "View all events"
     Then I should see "Booked" in the "1 January 2020" "table_row"
 
+    When I click on "More info" "link"
+    Then I should see "Manager's name"
+    And I should see "Cassy Cas"
+
   Scenario: Student remove the existing manager and assign a new manager itself.
     When I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "s__facetoface_managerselect" "checkbox"

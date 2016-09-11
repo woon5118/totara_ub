@@ -100,7 +100,7 @@ $signupbywaitlist = facetoface_is_signup_by_waitlist($session);
 $f2fid = $session->facetoface;
 
 $managerids = \totara_job\job_assignment::get_all_manager_userids($USER->id);
-
+$session->managerids = $managerids;
 $params = compact('s', 'backtoallsessions', 'managerid', 'managerids', 'showdiscountcode', 'approvaltype',
     'approvalterms', 'approvaladmins', 'f2fid', 'waitlisteveryone', 'signupbywaitlist');
 $mform = new mod_facetoface_signup_form(null, $params);
