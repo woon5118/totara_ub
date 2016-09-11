@@ -150,7 +150,7 @@ if ($extensionid = $DB->insert_record('prog_extension', $extension)) {
         $managermessagedata->rejectbutton = $strmgr->get_string('extensionrejectbutton', 'totara_program', null, $manager->lang);
         $managermessagedata->rejecttext = $strmgr->get_string('extensionrejecttext', 'totara_program', null, $manager->lang);
 
-        $messagesent = $messagesent || $extension_message->send_message($manager, $user);
+        $messagesent = $extension_message->send_message($manager, $user) || $messagesent;
     }
 
     if ($messagesent) {

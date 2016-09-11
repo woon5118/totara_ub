@@ -1281,10 +1281,6 @@ class job_assignment {
     /**
      * Get all manager userids for a given staff memeber.
      *
-     * If includetemp is true then temporary managers will override
-     * regular managers when there is one set and the expirydate has
-     * not yet passed.
-     *
      * @param int $userid
      * @param int $userjaid if specified, only managers related to this job asssignment are checked
      * @param bool $includetemp
