@@ -89,12 +89,15 @@ class totara_connect_form_client_add extends moodleform {
     }
 
     public function validation($data, $files) {
-        global $DB;
+        global $DB, $CFG;
         $errors = parent::validation($data, $files);
 
         $clienturl = rtrim($data['clienturl'], '/');
         if ($DB->record_exists('totara_connect_clients', array('clienturl' => $clienturl, 'status' => util::CLIENT_STATUS_OK))) {
             $errors['clienturl'] = get_string('errorduplicateclient', 'totara_connect');
+        } else if ($clienturl === $CFG->wwwroot) {
+            // Prevent strange attempts to connect to self.
+            $errors['clienturl'] = get_string('errorclientadd', 'totara_connect');
         }
 
         return $errors;
