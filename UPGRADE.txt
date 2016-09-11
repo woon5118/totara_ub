@@ -6,7 +6,7 @@ point release version. For upgrading a Moodle site see MOODLEUPGRADE.txt.
 
 New requirements in Totara 9.0:
 
-* PHP version 5.5.9 now required (was 5.4.4 in Totara 2.9).
+* PHP version 5.5.9 now required, 7.1 and higher is not supported (was 5.4.4 in Totara 2.9).
 * PHP zlib and OPcache modules now recommended.
 * MSSQL only: Database user requires additional permissions: ALTER SETTINGS(SERVER).
 * MSSQL 2008 now required (was 2005 in Totara 2.6).

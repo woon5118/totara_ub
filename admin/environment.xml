@@ -16,6 +16,7 @@
       <VENDOR name="sqlite" version="2.0" />
     </DATABASE>
     <PHP version="5.3.2" level="required">
+      <RESTRICT function="restrict_php_version_7" message="unsupportedphpversion7" />
     </PHP>
     <PHP_EXTENSIONS>
       <PHP_EXTENSION name="iconv" level="required">
@@ -126,6 +127,7 @@
       <VENDOR name="sqlite" version="2.0" />
     </DATABASE>
     <PHP version="5.3.2" level="required">
+      <RESTRICT function="restrict_php_version_7" message="unsupportedphpversion7" />
     </PHP>
     <PCREUNICODE level="optional">
       <FEEDBACK>
@@ -245,6 +247,7 @@
       <VENDOR name="sqlite" version="2.0" />
     </DATABASE>
     <PHP version="5.3.3" level="required">
+      <RESTRICT function="restrict_php_version_7" message="unsupportedphpversion7" />
     </PHP>
     <PCREUNICODE level="optional">
       <FEEDBACK>
@@ -372,6 +375,7 @@
       <VENDOR name="oracle" version="10.2" />
     </DATABASE>
     <PHP version="5.3.3" level="required">
+      <RESTRICT function="restrict_php_version_7" message="unsupportedphpversion7" />
     </PHP>
     <PCREUNICODE level="optional">
       <FEEDBACK>
@@ -788,6 +792,7 @@
       <VENDOR name="oracle" version="10.2" />
     </DATABASE>
     <PHP version="5.5.9" level="required">
+      <RESTRICT function="restrict_php_version_71" message="unsupportedphpversion71" />
     </PHP>
     <PCREUNICODE level="optional">
       <FEEDBACK>
