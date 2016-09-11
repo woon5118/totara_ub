@@ -838,7 +838,7 @@ class feedback360 {
         // Check user has permission to request feedback, and set up the page.
         if ($USER->id == $userid) {
             return feedback360::can_view_feedback360s($userid);
-        } else if (totara_is_manager($userid)) {
+        } else if (\totara_job\job_assignment::is_managing($USER->id, $userid)) {
             // You are a manager view a staff members feedback.
             $usercontext = context_user::instance($userid, MUST_EXIST);
             return has_capability('totara/feedback360:viewstaffreceivedfeedback360', $usercontext) ||

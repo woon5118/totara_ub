@@ -79,11 +79,19 @@ Feature: Show only links to member information the manager has permission to see
     Then "User 1" "link" should exist in the "team_members" "table"
       And "Appraisals" "link" should not exist in the "User 1" "table_row"
 
-  Scenario: Appraisals link is not available to temporary managers
+  Scenario: Appraisals link is not available to temporary managers. Other links are
     Given I log in as "user2"
       And I click on "Team" in the totara menu
     Then "User 1" "link" should exist in the "team_members" "table"
       And "Appraisals" "link" should not exist in the "User 1" "table_row"
+      And I should see the "Picture of User 1" image in the "User 1" "table_row"
+      And "Plans" "link" should exist in the "User 1" "table_row"
+      And "Profile" "link" should exist in the "User 1" "table_row"
+      And "Bookings" "link" should exist in the "User 1" "table_row"
+      And "Records" "link" should exist in the "User 1" "table_row"
+      And "360° Feedback" "link" should exist in the "User 1" "table_row"
+      And "Goals" "link" should exist in the "User 1" "table_row"
+      And "Required" "link" should exist in the "User 1" "table_row"
 
   Scenario: 360 Feedback link is not available if feedback360 feature is not visible
     Given I log in as "admin"
