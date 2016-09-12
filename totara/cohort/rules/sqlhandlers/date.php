@@ -105,7 +105,7 @@ class cohort_rule_sqlhandler_date_userfield extends cohort_rule_sqlhandler_date 
     protected function construct_sql_snippet($field, $comparison) {
         global $DB;
         $sqlhandler = new stdClass();
-        $sqlhandler->sql = "u.{$field} {$comparison}";
+        $sqlhandler->sql = "u.{$field} > 0 AND u.{$field} {$comparison}";
         $sqlhandler->params = array();
         return $sqlhandler;
     }

@@ -5,13 +5,19 @@ Feature: Verify membership options work correctly.
     Given I am on a totara site
     # Create some users and set the last login to 1st April 2015.
     And the following "users" exist:
-      | username  | firstname   | lastname   | lastlogin  |
-      | learner10 | firstname10 | lastname10 | 1427842800 |
-      | learner11 | firstname11 | lastname11 | 1427842800 |
-      | learner20 | firstname20 | lastname20 | 1427842800 |
-      | learner21 | firstname21 | lastname21 | 1427842800 |
-      | learner30 | firstname30 | lastname30 | 1427842800 |
-      | learner31 | firstname31 | lastname31 | 1427842800 |
+      # VERY IMPORTANT NOTE:
+      # The original test assumed the code used lastlogin field but the code
+      # actually uses the *currentlogin* field - which is the totally wrong.
+      # The flaw was exposed via TL-8803 but since this bug will only be fixed
+      # in TL-10440 and only > Totara 9.0, the test data has been fixed to have
+      # a currentlogin field.
+      | username  | firstname   | lastname   | lastlogin     | currentlogin  |
+      | learner10 | firstname10 | lastname10 | 1427842800    | 1427842800    |
+      | learner11 | firstname11 | lastname11 | 1427842800    | 1427842800    |
+      | learner20 | firstname20 | lastname20 | 1427842800    | 1427842800    |
+      | learner21 | firstname21 | lastname21 | 1427842800    | 1427842800    |
+      | learner30 | firstname30 | lastname30 | 1427842800    | 1427842800    |
+      | learner31 | firstname31 | lastname31 | 1427842800    | 1427842800    |
     And the following "cohorts" exist:
       | name       | idnumber | cohorttype |
       | Audience 1 | A1       | 2          |

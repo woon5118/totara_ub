@@ -74,6 +74,12 @@ class totara_cohort_system_access_rules_testcase extends advanced_testcase {
         $this->userseven = array_flip($this->userseven);
         $this->usersodd = array_flip($this->usersodd);
 
+        // Create a set of users who never logged in before. These should not be
+        // picked up at all for any test.
+        for ($i = 1; $i <= 8; $i++) {
+            $this->getDataGenerator()->create_user();
+        }
+
         // Create a dynamic cohort.
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
         $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
