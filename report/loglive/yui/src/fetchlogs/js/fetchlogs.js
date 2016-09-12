@@ -74,7 +74,7 @@ Y.extend(FetchLogs, Y.Base, {
         this.spinner = Y.one(SELECTORS.SPINNER);
         this.pauseButton = Y.one(SELECTORS.PAUSEBUTTON);
         this.spinner.hide();
-        Y.delegate('click', this.toggleUpdate, 'button', SELECTORS.PAUSEBUTTON, this);
+        Y.on('click', this.toggleUpdate, SELECTORS.PAUSEBUTTON, this);
     },
 
     /**
