@@ -114,7 +114,7 @@ class totara_menu implements \renderable, \templatable {
      * Export data to be used as the context for a mustache template to the menu.
      *
      * @param \renderer_base $output
-     * @return array
+     * @return \stdClass
      */
     public function export_for_template(\renderer_base $output) {
 

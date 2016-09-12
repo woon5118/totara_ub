@@ -40,13 +40,5 @@ global $OUTPUT;
         </div>
 
     </div>
-    <?php
-    if ($hastotaramenu) {
-        echo '<div class="totara-navbar-container">';
-        echo '    <div class="container-fluid">';
-        echo '        <div id="totara-navbar" class="totara-navbar navbar-collapse collapse">' . $totaramenu . '</div>';
-        echo '    </div>';
-        echo '</div>';
-    }
-    ?>
+    <?php if ($hastotaramenu) { echo $totaramenu; } ?>
 </nav>

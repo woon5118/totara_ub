@@ -34,6 +34,8 @@ $THEME->sheets = array('totara');
 $THEME->supportscssoptimisation = false;
 $THEME->enable_dock = true;
 
+$THEME->rendererfactory = 'theme_overridden_renderer_factory';
+
 // Use CSS preprocessing to facilitate style inheritance.
 $THEME->parents_exclude_sheets = array(
     'roots' => array('totara', 'totara-rtl'),

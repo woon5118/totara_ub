@@ -27,3 +27,11 @@
 $pixonlyimages = array(
     'screenshot',
 );
+
+$icons = array(
+    'home' => array(
+        'data' => array(
+            'classes' => 'fa-home ft-size-200'
+        ),
+    ),
+);

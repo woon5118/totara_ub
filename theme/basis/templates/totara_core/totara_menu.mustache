@@ -32,6 +32,8 @@
 
     Context variables required for this template:
     * menuitems Array The menu items
+    * subnav Array Items to display in sub-navigation bar
+    * subnav_has_items Boolean True if subnav is not empty
 
     Example context (json):
     {
@@ -59,10 +61,24 @@
                     }
                 ]
             }
-        ]
+        ],
+        "subnav": [
+            {
+                "class_name": "mybookings",
+                "class_isfirst": true,
+                "class_islast": false,
+                "class_isselected": false,
+                "linktext": "My Learning",
+                "url": "http://example.com",
+                "target": "_self",
+                "haschildren": false,
+                "children": []
+            }
+        ],
+        "subnav_has_items": true
     }
 }}
-<div class="totara-navbar-container">
+<div class="totara-navbar-container{{#subnav_has_items}} totara-navbar-container-with-subnav{{/subnav_has_items}}">
     <div class="container-fluid">
         <div id="totara-navbar" class="totara-navbar navbar-collapse collapse">
             <div class="totara-menu">
@@ -72,7 +88,7 @@
                     <ul class="totara-menu-nav-list navbar navbar-nav">
                         {{#menuitems}}
                         <li class="totara-menu-nav-item menu-{{class_name}}{{#haschildren}} haschildren{{/haschildren}}{{#class_isfirst}} first{{/class_isfirst}}{{#class_islast}} last{{/class_islast}}{{#class_isselected}} selected{{/class_isselected}}">
-                            <a class="totara-menu-nav-item-link" target="{{target}}" href="{{url}}">{{{linktext}}}</a>
+                            <a class="totara-menu-nav-item-link" target="{{target}}" href="{{url}}">{{{linktext}}}{{#haschildren}}<div class="totara-menu-arrow-up"></div>{{/haschildren}}</a>
                             {{#haschildren}}
                             <ul class="totara-menu-nav-list navbar navbar-nav">
                                 {{#children}}
@@ -86,6 +102,20 @@
                         {{/menuitems}}
                     </ul>
                 </nav>
+
+                {{#subnav_has_items}}
+                {{! The subnav is hidden from screen-readers }}
+                <nav class="totara-menu-subnav" aria-hidden="true">
+                    <ul class="totara-menu-subnav-list">
+                    {{#subnav}}
+                        <li class="totara-menu-subnav-item{{#class_isselected}} selected{{/class_isselected}}">
+                            <a class="totara-menu-subnav-item-link" target="{{target}}" href="{{url}}">{{{linktext}}}</a>
+                        </li>
+                    {{/subnav}}
+                        <div class="clearfix"></div>
+                    </ul>
+                </nav>
+                {{/subnav_has_items}}
             </div>
         </div>
     </div>

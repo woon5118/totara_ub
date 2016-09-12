@@ -23,58 +23,203 @@
 
 .totara-navbar-container {
     background-color: @totara-menu-bg;
+    &.totara-navbar-container-with-subnav {
+        box-shadow: inset 0 -((@totara-menu-padding-vertical * 2) + @line-height-computed) 0 @totara-menu-dropdown-bg;
+    }
 }
 
 .totara-navbar {
     background-color: transparent;
+    .navbar {
+        // Hack to fix IE display bug specific to Basis Totara Menu.
+        min-height: 0;
+    }
+}
+
+.totara-menu-nav-item {
+    font-weight: normal;
+    &.selected {
+        .totara-menu-nav-item {
+            &.selected {
+                .totara-menu-nav-item-link {
+                    color: #fff;
+                    background-color: @totara-menu-link-active-bg;
+                    box-shadow: inset @basis-border-thick 0 @brand-primary;
+                }
+            }
+        }
+    }
 }
 
 .totara-menu-nav-item-link {
-    border: none;
+    position: relative;
+    border-color: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.6);
 }
 
 .totara-menu-nav-list .totara-menu-nav-item .totara-menu-nav-item-link:focus {
     background: transparent;
 }
 
-.totara-menu-nav-item.selected > .totara-menu-nav-item-link {
-    background-color: transparent;
-    box-shadow: inset 0 -@basis-border-thick @brand-primary;
-}
-
-// Specificity here required to override core styles.
-.totara-menu .totara-menu-nav-list .totara-menu-nav-item .totara-menu-nav-item-link {
-    color: #fff;
-}
-
-// Same here.
-.totara-menu .totara-menu-nav-item .totara-menu-nav-item .totara-menu-nav-item-link:link,
-.totara-menu .totara-menu-nav-item .totara-menu-nav-item .totara-menu-nav-item-link:visited,
-.totara-menu .totara-menu-nav-item .totara-menu-nav-item .totara-menu-nav-item-link:hover,
-.totara-menu .totara-menu-nav-item .totara-menu-nav-item .totara-menu-nav-item-link:active {
-    color: @text-color;
-}
-
-.totara-menu-nav-item.selected .totara-menu-nav-item.selected .totara-menu-nav-item-link {
-    box-shadow: inset 0 -@basis-border-thick darken(@gray, 5%);
-    background-color: @totara-menu-dropdown-bg;
-}
-
-
 .totara-menu-nav-item .totara-menu-nav-item .totara-menu-nav-item-link:focus {
     background-color: transparent;
 }
 
-.totara-menu .totara-menu-nav-item .totara-menu-nav-item-link:hover {
-    background-color: @gray-darker;
+// Subnav is an extension of the Totara Menu in Basis.
+.totara-menu-subnav {
+    clear: both;
+    display: none;  // Should not display on handheld devices.
+    background-color: @totara-menu-dropdown-bg;
+    margin: 0 (floor(@grid-gutter-width / 2) * -1);  // Boostrap core uses this type of minus margin approach.
 }
 
-.totara-menu-nav-item .totara-menu-nav-item .totara-menu-nav-item-link {
-    background-color: #f0f2f4;
-    color: initial;
+.totara-menu-subnav-list {
+    margin-bottom: 0;
+    margin-left: floor(@grid-gutter-width / 2);
 }
 
-.totara-menu-nav-item .totara-menu-nav-item .totara-menu-nav-item-link:hover,
-.totara-menu-nav-item.selected .totara-menu-nav-item.selected .totara-menu-nav-item-link:hover {
-    background-color: @gray-light;
+.totara-menu-subnav-item {
+    float: left;
+    list-style-type: none;
+    &.selected .totara-menu-subnav-item-link {
+        box-shadow: inset 0 -@basis-border-thick #b6bcc2;
+    }
+}
+
+.totara-menu-subnav-item-link {
+    display: block;
+    padding: @totara-menu-padding-vertical @totara-menu-padding-horizontal;
+    color: @text-color;     // Subnav is custom in Basis (no @totara-menu-subnav-color variable in roots).
+    text-decoration: none;
+    background-color: transparent;
+    &:link,
+    &:visited {
+        text-decoration: none;
+    }
+    &:hover,
+    &:active {
+        background-color: @totara-menu-dropdown-hover-bg;
+        text-decoration: none;
+    }
+}
+
+.totara-menu-arrow-up {
+    display: none; // Don't display at all for small devices.
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 200; // Display above any dropdown menus so box-shadow doesn't overlap.
+    &::after {
+        display: block;
+        width: 0;
+        height: 0;
+        margin: auto;
+        content: '';
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-bottom: 7px solid @totara-menu-dropdown-bg;
+    }
+}
+
+.totara-menu > .totara-menu-nav > .totara-menu-nav-list > .totara-menu-nav-item.selected > .totara-menu-nav-item-link {
+    box-shadow: inset @basis-border-thick 0 @brand-primary;
+    background-color: @totara-menu-link-active-bg;
+}
+
+@media (min-width: @grid-float-breakpoint) {
+
+    .totara-menu-nav-item {
+        &.selected .totara-menu-arrow-up,
+        &:hover .totara-menu-arrow-up {
+            display: block;
+        }
+    }
+
+    .totara-menu-nav-item-link {
+        border-bottom-width: 0;
+    }
+
+    .totara-menu-subnav {
+        display: block;
+    }
+
+    .totara-menu-nav-list {
+        .totara-menu-nav-list {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+        }
+    }
+
+    .totara-menu-nav {
+        > .totara-menu-nav-list {
+            > .totara-menu-nav-item {
+                &:first-child {
+                    .totara-menu-nav-item-link {
+                        border-top-width: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    .totara-menu-nav-item {
+        .totara-menu-nav-item {
+            .totara-menu-nav-item-link {
+                background-color: #f0f2f4;
+                color: initial;
+            }
+        }
+        &.selected {
+            .totara-menu-nav-item {
+                &.selected {
+                    .totara-menu-nav-item-link {
+                        box-shadow: inset 0 -@basis-border-thick darken(@gray, 5%);
+                        background-color: @totara-menu-dropdown-bg;
+                        &:hover {
+                            background-color: @totara-menu-dropdown-hover-bg;
+                        }
+                    }
+                }
+            }
+            > .totara-menu-nav-item-link {
+                box-shadow: inset 0 -@basis-border-thick @brand-primary;
+            }
+        }
+    }
+
+    .totara-menu {
+        > .totara-menu-nav {
+            > .totara-menu-nav-list {
+                > .totara-menu-nav-item {
+                    &.selected {
+                        > .totara-menu-nav-item-link {
+                            box-shadow: inset 0 -@basis-border-thick @brand-primary;
+                        }
+                        &.haschildren > .totara-menu-nav-item-link {
+                            box-shadow: none;
+                        }
+                        .totara-menu-nav-list {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+        .totara-menu-nav-item {
+            .totara-menu-nav-item {
+                .totara-menu-nav-item-link {
+                    &:hover {
+                        &:extend(.totara-menu-nav-item.selected .totara-menu-nav-item.selected .totara-menu-nav-item-link:hover);
+                    }
+                    &:link,
+                    &:visited,
+                    &:hover,
+                    &:active {
+                        color: @text-color;  // Default Roots Totara menu has same colour for all links so no specific variable.
+                    }
+                }
+            }
+        }
+    }
+
 }

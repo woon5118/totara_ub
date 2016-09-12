@@ -107,3 +107,14 @@
 .tabtree {
   margin: @line-height-computed 0;
 }
+
+// Totara menu.
+// This is a hack to trump specificity of legacy
+// code (the first two selectors are required for
+// this reason). We place in this file to keep it
+// with other similar workarounds. In future this
+// may be removed.
+.totara-menu-nav-list .totara-menu-nav-item .totara-menu-nav-item-link:hover,
+.totara-menu-nav-list .totara-menu-nav-item .totara-menu-nav-item-link:focus {
+    &:extend(.totara-menu-nav-item-link:hover);
+}
