@@ -109,7 +109,7 @@ define(['jquery','core/yui', 'core/str', 'totara_form/form'], function($, Y, cor
         Y.use(yuimodule.modules, function () {
             // Note: Eval is not pretty here, but it seems to be the most robust way to replicate the PHP JS stuff.
             var result = eval(yuimodule.functionstr);
-            if (result && self.getObjectClass(result) === 'Editor') {
+            if (result) {
                 self.setEditor(result);
             }
         });
@@ -230,7 +230,7 @@ define(['jquery','core/yui', 'core/str', 'totara_form/form'], function($, Y, cor
      * @returns {string}
      */
     AttoElement.prototype.stripValue = function(value) {
-        return value.trim().replace(/^<p[^>]*>(.*)<\/p>$/g, '$1').replace(/<br ?\/?>/g, '').trim();
+        return value.trim().replace(/^<p[^>]*>(.*)<\/p>$/g, '$1').replace(/<br ?\/?>/g, '').replace('&nbsp;', '').trim();
     };
 
     /**
