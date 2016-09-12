@@ -230,6 +230,16 @@ class totara_dialog_content {
      */
     protected $showfoldericons = true;
 
+    /*
+     * Used to set the context when certain permissions are checked for the current user.
+     *
+     * Many places in dialog code will not use this property and might, for example, only
+     * use system_context.
+     *
+     * @var null|context
+     */
+    protected $context = null;
+
     /**
      * Generate markup from configuration and return
      *
@@ -347,8 +357,13 @@ class totara_dialog_content {
         // before giving up and suggesting search instead
         $maxitems = TOTARA_DIALOG_MAXITEMS;
 
+        if (isset($this->context)) {
+            $context = $this->context;
+        } else {
+            $context = context_system::instance();
+        }
         // Check if user has capability to view emails.
-        $canviewemail = in_array('email', get_extra_user_fields(context_system::instance()));
+        $canviewemail = in_array('email', get_extra_user_fields($context));
 
         $html = '';
 
@@ -520,6 +535,18 @@ class totara_dialog_content {
 
     public function set_datakeys($datakeys) {
         $this->datakeys = $datakeys;
+    }
+
+    /**
+     * Set the context for this dialog.
+     *
+     * Be aware that much of the code may still determine context in its own way. e.g. may only use
+     * the system context.
+     *
+     * @param $context context to make permission checks against for current user.
+     */
+    public function set_context($context) {
+        $this->context = $context;
     }
 }
 

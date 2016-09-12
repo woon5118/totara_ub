@@ -171,6 +171,10 @@ class totara_program_generator extends component_generator_base {
         $this->programcount++;
         $now = time();
         $sortorder = $DB->get_field('prog', 'MAX(sortorder) + 1', array());
+        if (empty($data['category'])) {
+            // Empty category values may come through when the intention was just to use the default.
+            unset($data['category']);
+        }
         $default = array(
             'fullname' => 'Program Fullname',
             'availablefrom' => 0,

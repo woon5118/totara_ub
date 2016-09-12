@@ -29,7 +29,8 @@ require_login();
 
 // Get program id and check capabilities
 $programid = required_param('programid', PARAM_INT);
-require_capability('totara/program:configureassignments', program_get_context($programid));
+$program_context = context_program::instance($programid);
+require_capability('totara/program:configureassignments', $program_context);
 
 // Items selected but not yet saved.
 $selected = optional_param('selected', array(), PARAM_SEQUENCE);
@@ -80,6 +81,8 @@ $dialog->searchtype = 'user';
 
 // Addition url parameters
 $dialog->urlparams = array('programid' => $programid);
+
+$dialog->set_context($program_context);
 
 // Display
 echo $dialog->generate_markup();

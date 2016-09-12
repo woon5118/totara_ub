@@ -14,13 +14,13 @@ Feature: Find learning program category management
         | cat1     | cat1b    | Category 1b |
     Given the following "programs" exist in "totara_program" plugin:
         | shortname | fullname  | category | visible |
-        | t1        | top1      | 1        | 0       |
-        | t2        | top2      | 1        | 1       |
-        | c1p1      | c1p1      | 2        | 0       |
-        | c1p2      | c1p2      | 2        | 1       |
-        | c1ap1     | c1ap1     | 3        | 1       |
-        | c1bp1     | c1bp1     | 4        | 0       |
-        | c1bp2     | c1bp2     | 4        | 1       |
+        | t1        | top1      | 0        | 0       |
+        | t2        | top2      | 0        | 1       |
+        | c1p1      | c1p1      | cat1     | 0       |
+        | c1p2      | c1p2      | cat1     | 1       |
+        | c1ap1     | c1ap1     | cat1a    | 1       |
+        | c1bp1     | c1bp1     | cat1b    | 0       |
+        | c1bp2     | c1bp2     | cat1b    | 1       |
     And I log in as "admin"
     And I set the following administration settings values:
         | Enhanced catalog | 0 |

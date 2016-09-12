@@ -65,7 +65,15 @@ $search_info->sql = null;
 $search_info->params = null;
 
 // Check if user has capability to view emails.
-$canviewemail = in_array('email', get_extra_user_fields(context_system::instance()));
+if (isset($this->context)) {
+    $context = $this->context;
+} else {
+    $context = context_system::instance();
+}
+$canviewemail = in_array('email', get_extra_user_fields($context));
+// Maybe we'll use context again later, but with there being different requirements for each $searchtype,
+// we're unsetting it and leaving each search type to get the context in their own way.
+unset($context);
 
 /**
  * Use whitelist for table to prevent people messing with the query

@@ -13,6 +13,13 @@ Feature: Users assignments to a program
       | user003  | fn_003    | ln_003   | user003@example.com |
       | user004  | fn_004    | ln_004   | user004@example.com |
       | user005  | fn_005    | ln_005   | user005@example.com |
+      | catmgr   | Category  | Manager  | catmgr@example.com  |
+    And the following "categories" exist:
+      | name      | category | idnumber |
+      | Category1 | 0        | cat1     |
+    And the following "role assigns" exist:
+      | user   | role          | contextlevel | reference |
+      | catmgr | manager       | Category     | cat1      |
     And the following "cohorts" exist:
       | name      | idnumber | contextlevel | reference |
       | Audience1 | aud1     | System       |           |
@@ -43,8 +50,9 @@ Feature: Users assignments to a program
       | user004 | user003 | 1                 | pos2     | org2         | 1        | ja4      |
       | user005 | user001 | 2                 |          |              | 1        | ja5      |
     And the following "programs" exist in "totara_program" plugin:
-      | fullname                 | shortname    |
-      | Assignment Program Tests | assigntest   |
+      | fullname                 | shortname    | category   |
+      | Assignment Program Tests | assigntest   |            |
+      | Category Permission Test | cattest      | cat1       |
     # Get back the removed dashboard item for now.
     And I log in as "admin"
     And I navigate to "Main menu" node in "Site administration > Appearance"
@@ -402,3 +410,24 @@ Feature: Users assignments to a program
     And I click on "Completion" "link" in the ".tabtree" "css_element"
     And I click on "Edit completion records" "link" in the "fn_003 ln_003" "table_row"
     Then I should see "Part of 'fn_001 ln_001' team"
+
+  @javascript
+  Scenario: Site manager at category context can see emails when assigning individuals
+    Given I log in as "catmgr"
+    And I click on "Programs" in the totara menu
+    And I click on "Category Permission Test" "link"
+    And I click on "Edit program details" "button"
+    And I click on "Assignments" "link"
+    And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
+    And I click on "Add" "button" in the "#category_select" "css_element"
+    And I click on "Add individuals to program" "button"
+    Then I should see "fn_001 ln_001 (user001@example.com)" in the "add-assignment-dialog-5" "totaradialogue"
+    And I should see "fn_002 ln_002 (user002@example.com)" in the "add-assignment-dialog-5" "totaradialogue"
+    When I click on "Search" "link" in the "add-assignment-dialog-5" "totaradialogue"
+    And I set the following fields to these values:
+      | Search | fn_00 |
+    And I press "Search"
+    Then I should see "fn_001 ln_001 (user001@example.com)" in the "#search-tab" "css_element"
+    And I should see "fn_002 ln_002 (user002@example.com)" in the "#search-tab" "css_element"
+    And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
+    And I wait "1" seconds

@@ -32,15 +32,15 @@ Feature: Check that granting view hidden capabilities allows users to see hidden
     # Create programs (set both types of visibility to ensure normal doesn't interfere).
     And the following "programs" exist in "totara_program" plugin:
       | fullname      | shortname     | category | visible | audiencevisible |
-      | cat0_program1 | cat0_program1 | 1        | 0       | 2               |
-      | cat0_program2 | cat0_program2 | 1        | 1       | 0               |
-      | cat0_program3 | cat0_program3 | 1        | 0       | 3               |
-      | cat1_program1 | cat1_program1 | 2        | 0       | 2               |
-      | cat1_program2 | cat1_program2 | 2        | 1       | 0               |
-      | cat1_program3 | cat1_program3 | 2        | 0       | 3               |
-      | cat2_program1 | cat2_program1 | 3        | 0       | 2               |
-      | cat2_program2 | cat2_program2 | 3        | 1       | 0               |
-      | cat2_program3 | cat2_program3 | 3        | 0       | 3               |
+      | cat0_program1 | cat0_program1 | 0        | 0       | 2               |
+      | cat0_program2 | cat0_program2 | 0        | 1       | 0               |
+      | cat0_program3 | cat0_program3 | 0        | 0       | 3               |
+      | cat1_program1 | cat1_program1 | cat1     | 0       | 2               |
+      | cat1_program2 | cat1_program2 | cat1     | 1       | 0               |
+      | cat1_program3 | cat1_program3 | cat1     | 0       | 3               |
+      | cat2_program1 | cat2_program1 | cat2     | 0       | 2               |
+      | cat2_program2 | cat2_program2 | cat2     | 1       | 0               |
+      | cat2_program3 | cat2_program3 | cat2     | 0       | 3               |
 
     # Create certs (set both types of visibility to ensure normal doesn't interfere).
     And the following "certifications" exist in "totara_program" plugin:

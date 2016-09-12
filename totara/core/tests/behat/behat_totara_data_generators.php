@@ -94,6 +94,9 @@ class behat_totara_data_generators extends behat_base {
             'programs' => array(
                 'datagenerator' => 'program',
                 'required' => array('shortname'),
+                'switchids' => array(
+                    'category' => 'category'
+                ),
             ),
             'program assignments' => array(
                 'datagenerator' => 'prog_assign',
@@ -423,6 +426,27 @@ class behat_totara_data_generators extends behat_base {
 
         if (!$id = $DB->get_field('role', 'id', array('shortname' => $roleshortname))) {
             throw new Exception('The specified role with shortname "' . $roleshortname . '" does not exist');
+        }
+
+        return $id;
+    }
+
+    /**
+     * Gets the category is from its idnumber
+     * @throws Exception
+     * @param string $categoryidnumber
+     * @return int
+     */
+    protected function get_category_id($categoryidnumber) {
+        global $DB;
+
+        if (empty($categoryidnumber)) {
+            // If empty, the data generator will provide a default value.
+            return $categoryidnumber;
+        }
+
+        if (!$id = $DB->get_field('course_categories', 'id', array('idnumber' => $categoryidnumber))) {
+            throw new Exception('The specified category with idnumber "' . $categoryidnumber . '" does not exist');
         }
 
         return $id;
