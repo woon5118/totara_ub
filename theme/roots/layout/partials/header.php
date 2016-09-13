@@ -31,7 +31,7 @@ global $OUTPUT;
     <div class="container-fluid">
 
         <div class="navbar-header pull-left">
-            <h1><?php echo $themerenderer->render(new theme_roots\output\site_logo()); ?></h1>
+            <?php echo $themerenderer->render(new theme_roots\output\site_logo()); ?>
         </div>
 
         <div class="navbar-header pull-right">
