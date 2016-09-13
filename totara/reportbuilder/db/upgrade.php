@@ -370,7 +370,7 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
     // For upgrade (not fresh install) version we leave default course/programs catalog.
     // For fresh installs - new course/programs catalog
     if ($oldversion < 2014030500) {
-        set_config('upgradetofaceted', 1);
+        set_config('enhancedcatalog', 0);
         // Reportbuilder savepoint reached.
         upgrade_plugin_savepoint(true, 2014030500, 'totara', 'reportbuilder');
     }

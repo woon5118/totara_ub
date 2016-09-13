@@ -96,7 +96,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     // Enchanced catalog.
     // Was upgrade - old catalog by default, otherwise - new catalog.
-    $defaultenhanced = (isset($CFG->upgradetofaceted) && $CFG->upgradetofaceted == 1) ? 0 : 1;
+    $defaultenhanced = 1;
     $setting = new admin_setting_configcheckbox('enhancedcatalog',
             new lang_string('enhancedcatalog', 'totara_core'),
             new lang_string('configenhancedcatalog', 'totara_core'), $defaultenhanced);
