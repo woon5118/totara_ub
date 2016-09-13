@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript
+@mod @mod_facetoface @totara @totara_reportbuilder @javascript
 Feature: Sign up to a seminar
   In order to attend a seminar
   As a student
@@ -103,3 +103,29 @@ Feature: Sign up to a seminar
     And I follow "Attendees"
     When I click on "Edit" "link" in the "Sam1" "table_row"
     Then I should see "Sam1 Student1 - update note"
+
+  Scenario: Sign up with note and ensure that other reports do not have manage button
+    When I log in as "student1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I should see "Sign-up"
+    And I follow "Sign-up"
+    And I set the following fields to these values:
+     | Requests for session organiser | My test |
+    And I press "Sign-up"
+    And I should see "Your booking has been completed."
+    And I log out
+
+    And I log in as "admin"
+    And I navigate to "Manage reports" node in "Site administration > Reports > Report builder"
+    And I set the following fields to these values:
+      | Report Name | Other sign-ups   |
+      | Source      | Seminar Sign-ups |
+    And I press "Create report"
+    And I click on "Columns" "link"
+    And I set the field "newcolumns" to "All sign up custom fields"
+    And I press "Add"
+    And I press "Save changes"
+    And I click on "Reports" in the totara menu
+    When I click on "Other sign-ups" "link"
+    Then I should not see "edit" in the "Sam1 Student1" "table_row"

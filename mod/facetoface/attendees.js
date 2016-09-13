@@ -215,7 +215,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
         *  Attaches mouse events to the loaded content.
         */
         this.attachCustomClickEvents = function() {
-            // Add new page button.
+            // Add attendee note button.
+            $('a.attendee-add-note').show();
             $('a.attendee-add-note').on('click', function() {
                 $.get($(this).attr('href'), function(data) {
                     modalForm(data);

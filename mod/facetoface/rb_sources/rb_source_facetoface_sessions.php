@@ -897,7 +897,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'sesskey'=> sesskey()
             ));
             $pix = new pix_icon('t/edit', get_string('edit'));
-            $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
+            $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'js-hide action-icon attendee-add-note pull-right'));
             $notehtml = html_writer::span($note);
             return $icon . $notehtml;
         }
