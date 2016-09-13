@@ -3787,23 +3787,22 @@ function archive_course_activities($userid, $courseid, $windowopens = NULL) {
                     } else {
                         $modfunction($userid, $courseid, $windowopens);
                     }
-                } else {
-                    // Reset manually.
-                    // Reset grades.
-                    $updateitemfunc = $mod->name . '_grade_item_update';
-                    if (function_exists($updateitemfunc)) {
-                        $sql = "SELECT a.*,
-                                        cm.idnumber as cmidnumber,
-                                        m.name as modname
-                                FROM {" . $mod->name . "} a
-                                JOIN {course_modules} cm ON cm.instance = a.id AND cm.course = :courseid
-                                JOIN {modules} m ON m.id = cm.module AND m.name = :modname";
-                        $params = array('modname' => $mod->name, 'courseid' => $courseid);
+                }
 
-                        if ($modinstances = $DB->get_records_sql($sql, $params)) {
-                            foreach ($modinstances as $modinstance) {
-                                $updateitemfunc($modinstance, $grade);
-                            }
+                // Reset grades.
+                $updateitemfunc = $mod->name . '_grade_item_update';
+                if (function_exists($updateitemfunc)) {
+                    $sql = "SELECT a.*,
+                                    cm.idnumber as cmidnumber,
+                                    m.name as modname
+                            FROM {" . $mod->name . "} a
+                            JOIN {course_modules} cm ON cm.instance = a.id AND cm.course = :courseid
+                            JOIN {modules} m ON m.id = cm.module AND m.name = :modname";
+                    $params = array('modname' => $mod->name, 'courseid' => $courseid);
+
+                    if ($modinstances = $DB->get_records_sql($sql, $params)) {
+                        foreach ($modinstances as $modinstance) {
+                            $updateitemfunc($modinstance, $grade);
                         }
                     }
                 }
