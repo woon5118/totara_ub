@@ -88,7 +88,8 @@ class bulk_list {
      */
     public function set_user_ids(array $userids) {
         global $SESSION;
-        $SESSION->mod_facetoface_attendeeslist[$this->listid]['userdata'] = array_flip($userids);
+        $emptyvalues = array_fill(0, count($userids), null);
+        $SESSION->mod_facetoface_attendeeslist[$this->listid]['userdata'] = array_combine($userids, $emptyvalues);
         $SESSION->mod_facetoface_attendeeslist[$this->listid]['hasdata'] = false;
     }
 
@@ -102,12 +103,23 @@ class bulk_list {
     }
 
     /**
-     * Store user list with additional data
+     * Store all users with additional data
      * @param array $userdata
      */
-    public function set_user_data(array $userdata) {
+    public function set_all_user_data(array $userdata) {
         global $SESSION;
         $SESSION->mod_facetoface_attendeeslist[$this->listid]['userdata'] = $userdata;
+        $SESSION->mod_facetoface_attendeeslist[$this->listid]['hasdata'] = true;
+    }
+
+    /**
+     * Store one user with additional data
+     * @param array $userdata
+     * @param int $userid
+     */
+    public function set_user_data(array $userdata, $userid) {
+        global $SESSION;
+        $SESSION->mod_facetoface_attendeeslist[$this->listid]['userdata'][$userid] = $userdata;
         $SESSION->mod_facetoface_attendeeslist[$this->listid]['hasdata'] = true;
     }
 
@@ -117,7 +129,11 @@ class bulk_list {
      */
     public function get_user_data($userid) {
         global $SESSION;
-        return $SESSION->mod_facetoface_attendeeslist[$this->listid]['userdata'][$userid];
+        $userdata =  $SESSION->mod_facetoface_attendeeslist[$this->listid]['userdata'][$userid];
+        if (empty($userdata)) {
+            return [];
+        }
+        return $userdata;
     }
 
     /**
@@ -160,5 +176,13 @@ class bulk_list {
             return $SESSION->mod_facetoface_attendeeslist[$this->listid]['validation'];
         }
         return array();
+    }
+
+    /**
+     * Get current list id
+     * @return int
+     */
+    public function get_list_id() {
+        return $this->listid;
     }
 }

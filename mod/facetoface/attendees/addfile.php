@@ -60,10 +60,16 @@ foreach($customfields as $customfield) {
     $customfieldnames[] = $customfield->shortname;
 }
 
+$extrafields = [];
+if (!empty($facetoface->selectjobassignmentonsignup)) {
+    $extrafields[] = 'jobassignmentidnumber';
+}
+
 $mform = new facetoface_bulkadd_file_form(null, array(
     's' => $s,
     'listid' => $listid,
     'customfields' => $customfieldnames,
+    'extrafields' => $extrafields,
     'requiredcustomfields' => $requiredcfnames
     ));
 
@@ -185,6 +191,21 @@ if ($formdata = $mform->get_data()) {
                 }
             }
 
+            // Add job assignments info.
+            if ($facetoface->selectjobassignmentonsignup) {
+                if (!empty($data['jobassignmentidnumber'])) {
+                    try {
+                        $jobassignment = \totara_job\job_assignment::get_with_idnumber($user->id, $data['jobassignmentidnumber'], true);
+                        $data['jobassignmentid'] = $jobassignment->id;
+                    } catch(dml_missing_record_exception $e) {
+                        $a = new stdClass();
+                        $a->user = fullname($user);
+                        $a->idnumber = $data['jobassignmentidnumber'];
+                        $errors[] = get_string('error:xinvalidjaidnumber', 'facetoface', $a);
+                    }
+                }
+            }
+
             $addusers[$user->id] = $data;
         }
         if (!empty($inconsistentlines)) {
@@ -208,7 +229,7 @@ if ($formdata = $mform->get_data()) {
             totara_set_notification($error, null, array('class' => 'notifyproblem'));
         }
     } else {
-        $list->set_user_data($addusers);
+        $list->set_all_user_data($addusers);
         redirect(new moodle_url('/mod/facetoface/attendees/addconfirm.php', array('s' => $s, 'listid' => $listid, 'ignoreconflicts' => $formdata->ignoreconflicts)));
     }
 }

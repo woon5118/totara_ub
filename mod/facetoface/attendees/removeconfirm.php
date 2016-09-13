@@ -150,7 +150,7 @@ $users = $mform->get_user_list($userlist, $page, USERS_PER_PAGE);
 $paging = new paging_bar(count($userlist), $page, USERS_PER_PAGE, $currenturl);
 
 echo $f2frenderer->render($paging);
-echo $f2frenderer->print_user_table($users);
+echo $f2frenderer->print_userlist_table($users);
 echo $f2frenderer->render($paging);
 
 echo html_writer::empty_tag('br');

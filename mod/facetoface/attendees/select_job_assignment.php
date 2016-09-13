@@ -23,38 +23,56 @@
  */
 
 define('AJAX_SCRIPT', true);
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/attendee_job_assignment_form.php');
 require_once($CFG->dirroot . '/mod/facetoface/signup_form.php');
 
-$userid    = required_param('id', PARAM_INT); // Facetoface signup user ID.
-$sessionid = required_param('s', PARAM_INT); // Facetoface session ID.
+$userid = required_param('id', PARAM_INT); // User ID.
+$listid = required_param('listid', PARAM_ALPHANUM); // Session key to list of users to add.
+$s = required_param('s', PARAM_INT); // Facetoface session ID.
 
-list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($sessionid);
+list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 
 // Check essential permissions.
 require_course_login($course, true, $cm);
-require_capability('mod/facetoface:changesignedupjobassignment', $context);
+// Person that want to set job assignment, must be able to add attendees to session.
+require_capability('mod/facetoface:addattendees', $context);
+
+if (empty($facetoface->selectjobassignmentonsignup)) {
+    echo json_encode(array('result' => 'error', 'error' => get_string('error:jobassignementsonsignupdisabled', 'facetoface')));
+    die();
+}
 
 $jobassignments = \totara_job\job_assignment::get_all($userid);
 
 $usernamefields = get_all_user_name_fields(true, 'u');
 
 $params = array('userid' => $userid);
-$sql = "SELECT u.id, fs.id as signupid, fs.jobassignmentid, $usernamefields
-        FROM {user} u
-        LEFT JOIN {facetoface_signups} fs ON u.id = fs.userid AND fs.sessionid = $sessionid
-        WHERE u.id = :userid";
-$user = $DB->get_record_sql($sql, $params);
+$user = $DB->get_record('user', array('id' => $userid));
+
+$list = new \mod_facetoface\bulk_list($listid);
+$userlist = $list->get_user_ids();
+if (empty($userlist) || !  in_array($userid, $userlist)) {
+    echo json_encode(array('result' => 'error', 'error' => get_string('updateattendeesunsuccessful', 'facetoface')));
+    die();
+}
+
+// Selected job assignment.
+$jobassignmentid = 0;
+$userdata = $list->get_user_data($userid);
+if (!empty($userdata['jobassignmentid'])) {
+    $jobassignmentid = $userdata['jobassignmentid'];
+}
 
 $formparams = array(
     'jobassignments' => $jobassignments,
-    'selectedjaid' => $user->jobassignmentid,
+    'selectedjaid' => $jobassignmentid,
     'fullname' => fullname($user),
     'userid' => $userid,
-    'sessionid' => $sessionid
+    'sessionid' => $session->id,
+    'listid' => $listid
 );
 
 $mform = new attendee_job_assignment_form(null, $formparams);
@@ -74,26 +92,13 @@ if ($fromform = $mform->get_data()) {
         $jobassignmentid = $fromform->selectjobassign;
         $jobassignment = \totara_job\job_assignment::get_with_id($jobassignmentid);
 
-        $todb = new stdClass();
-        $todb->id = $user->signupid;
-        $todb->jobassignmentid = $jobassignment->id;
-        $DB->update_record('facetoface_signups', $todb);
+        // Store jobassignmentid in user list.
+        $userdata = $list->get_user_data($userid);
+        $list->set_user_data(array_merge($userdata, ['jobassignmentid' => $jobassignment->id]), $userid);
     } catch (Exception $e) {
         echo json_encode(array('result' => 'error', 'error' => $e->getMessage()));
         die();
     }
-
-    $event = \mod_facetoface\event\attendee_job_assignment_updated::create(
-        array(
-            'objectid' => $user->signupid,
-            'context' => $context,
-            'other' => array(
-                'sessionid'  => $session->id,
-                'attendeeid' => $user->id,
-            )
-        )
-    );
-    $event->trigger();
 
     $label = position::job_position_label($jobassignment);
 

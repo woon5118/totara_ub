@@ -994,14 +994,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $canchangesignedupjobassignment = has_capability('mod/facetoface:changesignedupjobassignment', $context);
 
         $jobassignment = \totara_job\job_assignment::get_with_id($row->jobassignmentid, false);
-        if (empty($jobassignment)) {
-            return '';
+        if (!empty($jobassignment)) {
+            if ($jobassignment->userid != $row->userid) {
+                // TODO: Errror!!!!
+            }
+            $label = position::job_position_label($jobassignment);
+        } else {
+            $label = '';
         }
-        if ($jobassignment->userid != $row->userid) {
-            // TODO: Errror!!!!
-        }
-        $label = position::job_position_label($jobassignment);
-
         $url = new moodle_url('/mod/facetoface/attendee_job_assignment.php', array('s' => $row->sessionid, 'id' => $row->userid));
         $pix = new pix_icon('t/edit', get_string('edit'));
         $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-job-assignment pull-right'));

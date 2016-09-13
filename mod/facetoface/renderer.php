@@ -975,13 +975,15 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     /**
      * Render table of users used in add attendees list
      * @param array $users
+     * @param \mod_facetoface\bulk_list $list User list Needed only with job assignments
+     * @param int $sessionid Needed only with job assignments
+     * @param int $jaselector Job assignements selection: 0 - no, 1 - optional, 2 - required
      * @return string
      */
-    public function print_user_table($users) {
+    public function print_userlist_table($users, \mod_facetoface\bulk_list $list = null, $sessionid = 0, $jaselector = 0) {
         global $OUTPUT;
         $out = '';
         $showcfdatawarning = false;
-
         if (count($users) > 0) {
             $table = new html_table();
             $table->head = array(
@@ -989,6 +991,18 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 get_string('email'),
                 get_string('username'),
                 get_string('idnumber'));
+            if ($jaselector) {
+                $jacolumnheader = get_string('jobassignment', 'facetoface');
+                if ($jaselector == 2) {
+                    // Taken from lib/formslib.php.
+                    $jacolumnheader .= $OUTPUT->flex_icon('required', array(
+                        'classes' => 'form-required',
+                        'alt' => get_string('requiredelement', 'form'),
+                        'title' => get_string('requiredelement', 'form')
+                    ));
+                }
+                $table->head[] = $jacolumnheader;
+            }
 
             if (isset(current($users)->cntcfdata)) {
                 $table->head[] = get_string('signupdata', 'facetoface');
@@ -999,6 +1013,23 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             foreach ($users as $user) {
                 $fullname = fullname($user);
                 $row = array($fullname, $user->email, $user->username, $user->idnumber);
+
+                if ($jaselector) {
+                    $janame = '';
+                    // Get previously stored jobassignmentid from user list. @see attendess/select_job_assignment.php.
+                    $userdata = $list->get_user_data($user->id);
+                    if (!empty($userdata['jobassignmentid'])) {
+                        $jobassignment = \totara_job\job_assignment::get_with_id($userdata['jobassignmentid']);
+                        $janame = $jobassignment->fullname;
+                    }
+                    $url = new moodle_url('/mod/facetoface/attendees/select_job_assignment.php',
+                            array('id' => $user->id, 's' => $sessionid, 'listid' => $list->get_list_id()));
+                    $icon = $OUTPUT->action_icon($url, new pix_icon('t/edit', get_string('edit')), null,
+                            array('class' => 'action-icon attendee-edit-job-assignment pull-right'));
+                    $jobassign = html_writer::span($janame, 'jobassign'.$user->id, array('id' => 'jobassign'.$user->id));
+                    $row[] = $icon . $jobassign;
+                }
+
                 if (isset($user->cntcfdata)) {
                     if ($user->cntcfdata) {
                         $showcfdatawarning = true;

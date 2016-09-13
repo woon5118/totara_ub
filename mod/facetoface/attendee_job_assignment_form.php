@@ -46,6 +46,12 @@ class attendee_job_assignment_form extends moodleform {
             $mform->addElement('hidden', 's', $sessionid);
             $mform->setType('s', PARAM_INT);
 
+            // Support for add attendees lists.
+            if (!empty($this->_customdata['listid'])) {
+                $mform->addElement('hidden', 'listid', $this->_customdata['listid']);
+                $mform->setType('listid', PARAM_INT);
+            }
+
             $mform->addElement('html', html_writer::tag('p', '&nbsp;', array('id' => 'attendee_note_err', 'class' => 'error')));
 
             $jobassignselectelement = $mform->addElement('select', 'selectjobassign', get_string('selectjobassignment', 'mod_facetoface'));

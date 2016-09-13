@@ -10,13 +10,25 @@ Feature: Add - Remove seminar attendees
       | username | firstname | lastname | email                |
       | student1 | Sam1      | Student1 | student1@example.com |
       | student2 | Sam2      | Student2 | student2@example.com |
+      | student3 | Sam3      | Student3 | student3@example.com |
+      | teacher1 | Terry1    | Teacher1 | teacher1@example.com |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
     And the following "activities" exist:
       | activity   | name              | course | idnumber |
       | facetoface | Test seminar name | C1     | seminar  |
-
+    And the following "course enrolments" exist:
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
+      | student1 | C1     | student        |
+      | student2 | C1     | student        |
+      | student3 | C1     | student        |
+    And the following job assignments exist:
+      | user     | fullname | idnumber |
+      | student1 | job1     | ja1      |
+      | student2 | job1     | ja1      |
+      | student2 | job2     | ja2      |
 
   Scenario: Add users to a seminar session with dates
     Given I log in as "admin"
@@ -281,3 +293,68 @@ Feature: Add - Remove seminar attendees
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_invalid_columns.csv" file to "Text file" filemanager
     And I press "Continue"
     And I should see "Invalid CSV file format - number of columns is not constant!"
+
+  Scenario: Add users with Job Assignments via select
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | facetoface_selectjobassignmentonsignupglobal | 1 |
+    And I log out
+
+    And I log in as "teacher1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "Test seminar name"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | Select job assignment on signup | 1 |
+    And I press "Save and display"
+    And I follow "Add a new event"
+    And I press "Save changes"
+
+    And I click on "Attendees" "link"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I click on "Sam3 Student3, student3@example.com" "option"
+    And I click on "Sam2 Student2, student2@example.com" "option"
+    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I press "Add"
+    And I press "Continue"
+    And I click on ".attendee-edit-job-assignment" "css_element" in the "Sam3 Student3" "table_row"
+    And I should see "User has no active job assignments"
+    And I press "Close"
+    And I click on ".attendee-edit-job-assignment" "css_element" in the "Sam2 Student2" "table_row"
+    And I set the following fields to these values:
+      | Select a job assignment | job2 |
+    And I press "Update job assignment"
+    And I click on ".attendee-edit-job-assignment" "css_element" in the "Sam1 Student1" "table_row"
+    And I set the following fields to these values:
+      | Select a job assignment | job1 |
+    And I press "Update job assignment"
+    When I press "Confirm"
+    Then I should see "job1" in the "Sam1 Student1" "table_row"
+    And I should see "job2" in the "Sam2 Student2" "table_row"
+
+  @_file_upload
+  Scenario: Add users with Job Assignments via CSV
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | facetoface_selectjobassignmentonsignupglobal | 1 |
+    And I log out
+
+    And I log in as "teacher1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "Test seminar name"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | Select job assignment on signup | 1 |
+    And I press "Save and display"
+    And I follow "Add a new event"
+    And I press "Save changes"
+
+    And I click on "Attendees" "link"
+    And I click on "Add users via file upload" "option" in the "#menuf2f-actions" "css_element"
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_with_ja.csv" file to "Text file" filemanager
+    And I press "Continue"
+    When I press "Confirm"
+    Then I should see "job1" in the "Sam1 Student1" "table_row"
+    And I should see "job2" in the "Sam2 Student2" "table_row"

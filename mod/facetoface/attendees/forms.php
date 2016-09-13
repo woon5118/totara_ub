@@ -192,6 +192,13 @@ class facetoface_bulkadd_file_form extends moodleform {
             }, $requiredcustomfields));
         }
 
+        $extrafields = $this->_customdata['extrafields'];
+        if (!empty($extrafields)) {
+            $customfieldinfo->customfields .= implode('', array_map(function($item) {
+                return " * {$item} \n";
+            }, $extrafields));
+        }
+
         $mform->addElement('hidden', 's', $this->_customdata['s']);
         $mform->setType('s', PARAM_INT);
 

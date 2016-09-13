@@ -43,6 +43,7 @@ $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
+$PAGE->requires->js_call_amd('mod_facetoface/attendees_addconfirm', 'init', array(array('s' => $s, 'listid' => $listid)));
 
 $list = new \mod_facetoface\bulk_list($listid);
 
@@ -99,6 +100,17 @@ if ($fromform = $mform->get_data()) {
     // Check if we need to add anyone.
     $users = $mform->get_user_list($userlist);
     $attendeestoadd = array_diff_key($users, $original);
+
+    // Confirm that new attendess have job assignments when required.
+    if (!empty($facetoface->forceselectjobassignment)) {
+        foreach ($attendeestoadd as $attendeetoadd) {
+            $userdata = $list->get_user_data($attendeetoadd->id);
+            if (empty($userdata['jobassignmentid'])) {
+                totara_set_notification(get_string('error:nojobassignmentselectedlist', 'facetoface'), $currenturl);
+            }
+        }
+    }
+
     if (!empty($attendeestoadd)) {
         // Prepare params
         $params = array();
@@ -115,6 +127,15 @@ if ($fromform = $mform->get_data()) {
 
         $clonefromform = serialize($fromform);
         foreach ($attendeestoadd as $attendee) {
+            // Add job assignments if they are enabled.
+            $params['jobassignmentid'] = null;
+            if ($facetoface->selectjobassignmentonsignup) {
+                $userdata = $list->get_user_data($attendee->id);
+                if (!empty($userdata['jobassignmentid'])) {
+                    $params['jobassignmentid'] = $userdata['jobassignmentid'];
+                }
+            }
+
             $result = facetoface_user_import($course, $facetoface, $session, $attendee->id, $params);
             if ($result['result'] !== true) {
                 $errors[] = $result;
@@ -166,8 +187,15 @@ $f2frenderer->setcontext($context);
 $users = $mform->get_user_list($userlist, $page, USERS_PER_PAGE);
 $paging = new paging_bar(count($userlist), $page, USERS_PER_PAGE, $currenturl);
 
+$jaselector = 0;
+if (!empty($facetoface->forceselectjobassignment)) {
+    $jaselector = 2;
+} else if (!empty($facetoface->selectjobassignmentonsignup)) {
+    $jaselector = 1;
+}
+
 echo $f2frenderer->render($paging);
-echo $f2frenderer->print_user_table($users);
+echo $f2frenderer->print_userlist_table($users, $list, $session->id, $jaselector);
 echo $f2frenderer->render($paging);
 
 echo html_writer::empty_tag('br');
