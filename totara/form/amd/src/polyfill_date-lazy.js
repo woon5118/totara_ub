@@ -2240,7 +2240,14 @@ define(['jquery', 'jqueryui'], function($){
      */
     $.timepicker.log = function () {
         if (window.console) {
-            window.console.log.apply(window.console, Array.prototype.slice.call(arguments));
+            // Totara: converted window.console.log.apply call as IE9 doesn't support it
+            if (window.console.log.apply) {
+                window.console.log.apply(window.console, Array.prototype.slice.call(arguments));
+            } else {
+                $.each(arguments, function (index, argument) {
+                    console.log(argument);
+                });
+            }
         }
     };
 
