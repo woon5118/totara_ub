@@ -626,9 +626,7 @@ div#dateselector-calendar-panel {
 // other form elements.
 .form-item .form-time {
   select {
-    // The 300px max-width of select elements should be
-    // variable-based but is not (above in this file).
-    max-width: ((300 / 2) - @padding-xs-horizontal);
+    width: auto;
     display: inline-block;
     margin-left: @padding-xs-horizontal;
     &:first-of-type {
