@@ -20,6 +20,7 @@
  * @package totara_form
  */
 
+/* jshint ignore:start */
 define(['jquery', 'jqueryui'], function($){
     /*! jQuery Timepicker Addon - v1.6.1 - 2015-11-14
      * http://trentrichardson.com/examples/timepicker
@@ -2324,3 +2325,4 @@ define(['jquery', 'jqueryui'], function($){
 
     return datepoly;
 });
+/* jshint ignore:end */

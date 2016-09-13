@@ -20,6 +20,7 @@
  * @package totara_form
  */
 
+/* jshint ignore:start */
 define(['jquery'], function ($) {
     var number = {
         init: function (id) {
@@ -464,3 +465,4 @@ define(['jquery'], function ($) {
     };
     return number;
 });
+/* jshint ignore:end */
