@@ -90,7 +90,6 @@ echo '<p><a href="http://getbootstrap.com/components/#badges">' . $bootstrapdocs
 echo '<div class="row">';
 echo '<div class="col-lg-6">';
 echo '<h3>Headings</h3>';
-echo '<p>Standard headings.</p>';
 $html = '<h1>h1. Header text</h1>';
 echo $html;
 echo "<pre><code>" . htmlentities($html) . "</code></pre>";
@@ -109,36 +108,9 @@ echo "<pre><code>" . htmlentities($html) . "</code></pre>";
 $html = '<h6>h6. Header text</h6>';
 echo $html;
 echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-echo '</div>';
-
-// Alternative headings.
-echo '<div class="col-lg-6">';
-echo "<h3>Alternative headings <small>{$extendsbootstrap}</small></h3>";
-echo '<p>Headings with an alternative style.</p>';
-$html = '<h1 class="h1-alt">h1. Header text</h1>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-$html = '<h2 class="h2-alt">h2. Header text</h2>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-$html = '<h3 class="h3-alt">h3. Header text</h3>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-$html = '<h4 class="h4-alt">h4. Header text</h4>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-$html = '<h5 class="h5-alt">h5. Header text</h5>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-$html = '<h6 class="h6-alt">h6. Header text</h6>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-echo '</div>';
-
-echo '</div>';
+echo '</div>'; // .col-lg-6
 
 // Small heading segments.
-echo '<div class="row">';
 echo '<div class="col-lg-6">';
 echo '<h3>Small heading segments <small>Standard heading</small></h3>';
 $html = '<h1>h1. Header <small>with a small segment</small></h1>';
@@ -160,29 +132,6 @@ $html = '<h6>h6. Header <small>with a small segment</small></h6>';
 echo $html;
 echo "<pre><code>" . htmlentities($html) . "</code></pre>";
 echo '</div>'; // .col-lg-6
-
-echo '<div class="col-lg-6">';
-echo "<h3>Small heading segments <small>Alternative heading {$extendsbootstrap}</small></h3>";
-$html = '<h1 class="h1-alt">h1. Header <small>with a small segment</small></h1>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-$html = '<h2 class="h2-alt">h2. Header <small>with a small segment</small></h2>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-$html = '<h3 class="h3-alt">h3. Header <small>with a small segment</small></h3>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-$html = '<h4 class="h4-alt">h4. Header <small>with a small segment</small></h4>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-$html = '<h5 class="h5-alt">h5. Header <small>with a small segment</small></h5>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-$html = '<h6 class="h6-alt">h6. Header <small>with a small segment</small></h6>';
-echo $html;
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-echo '</div>'; // .col-lg-6
-
 echo '</div>'; // .row
 
 echo '<hr />';
