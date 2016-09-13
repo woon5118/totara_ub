@@ -606,8 +606,8 @@ class rb_source_competency_evidence extends rb_base_source {
         $values = $DB->get_records_menu('comp_scale_values', null, 'scaleid, sortorder', 'id, name');
 
         $scales = array();
-        foreach ($values as $value) {
-            $scales[] = format_string($value);
+        foreach ($values as $index => $value) {
+            $scales[$index] = format_string($value);
         }
 
         // include all possible scale values (from every scale)
