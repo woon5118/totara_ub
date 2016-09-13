@@ -471,33 +471,6 @@ echo "<pre><code>" . htmlentities($html) . "</code></pre>";
 echo '</div>'; // .col-lg-6
 
 echo'<div class="col-lg-6">';
-echo "<h3>Tertiary <small>with size variants {$extendsbootstrap}</small></h3>";
-$html =<<<EOF
-<button type="button" class="btn btn-tertiary btn-xs">Tertiary tiny</button>
-<button type="button" class="btn btn-tertiary btn-sm">Tertiary small</button>
-<button type="button" class="btn btn-tertiary">Tertiary</button>
-<button type="button" class="btn btn-tertiary btn-lg">Tertiary large</button>
-EOF;
-echo "<p>{$html}</p>";
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-echo '</div>'; // .col-lg-6
-
-echo '</div>'; // .row
-echo '<div class="row">';
-
-echo'<div class="col-lg-6">';
-echo '<h3>Info <small>with size variants</small></h3>';
-$html =<<<EOF
-<button type="button" class="btn btn-info btn-xs">Info tiny</button>
-<button type="button" class="btn btn-info btn-sm">Info small</button>
-<button type="button" class="btn btn-info">Info</button>
-<button type="button" class="btn btn-info btn-lg">Info large</button>
-EOF;
-echo "<p>{$html}</p>";
-echo "<pre><code>" . htmlentities($html) . "</code></pre>";
-echo '</div>'; // .col-lg-6
-
-echo'<div class="col-lg-6">';
 echo '<h3>Success <small>with size variants</small></h3>';
 $html =<<<EOF
 <button type="button" class="btn btn-success btn-xs">Success tiny</button>
