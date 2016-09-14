@@ -30,4 +30,9 @@ $observers = array (
         'callback' => 'hierarchy_event_handler::user_deleted',
         'includefile' => '/totara/hierarchy/lib.php',
     ),
+    array(
+        'eventname' => '\core\event\course_deleted',
+        'callback'  => 'hierarchy_event_handler::course_deleted',
+        'includefile' => '/totara/hierarchy/lib.php',
+    ),
 );

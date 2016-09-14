@@ -126,6 +126,38 @@ class hierarchy_event_handler {
     public static function user_deleted(\core\event\user_deleted $event) {
         // Nothing to do.
     }
+
+
+    /**
+     * Handler function called when a course_deleted event is triggered
+     * Placed here so we can use this function for all hierarchy types.
+     *
+     * @param \core\event\user_deleted $event    The user object for the deleted user.
+     */
+    public static function course_deleted(\core\event\course_deleted $event) {
+        global $DB;
+
+        $eventdata = $event->get_data();
+        if (isset($eventdata['courseid']) || isset($eventdata['objectid'])) {
+            $references = $DB->get_records('comp_criteria', array('itemtype' => 'coursecompletion',
+                'iteminstance' => isset($eventdata['courseid']) ? $eventdata['courseid'] : $eventdata['objectid']));
+            $references = !empty($references) ? $references : array();
+
+            foreach ($references as $ritem) {
+                $data = new stdClass();
+                $data->id = $ritem->id;
+                $data->itemtype = $ritem->itemtype;
+
+                // Not fetching comp from the db as we only require the id which we have from the comp_criteria row
+                $competency = new stdClass();
+                $competency->id = $ritem->competencyid;
+
+                $evidence = competency_evidence_type::factory((array)$data);
+                $evidence->iteminstance = $ritem->iteminstance;
+                $evidence->delete($competency);
+            }
+        }
+    }
 }
 
 /**
