@@ -97,19 +97,16 @@ switch ($action) {
         $id       = optional_param('id', 0, PARAM_INT);
         $datatype = optional_param('datatype', '', PARAM_ALPHA);
 
-        $heading = $datatype;
         $capability = $customfieldtype->get_capability_managefield();
-        $tableprefix = $customfieldtype->get_table_prefix();
-        if ($id === 0) {
-            $datatypes = customfield_list_datatypes();
-            $heading = $datatypes[$datatype];
-        }
-
-        $tabs = $facetofacerenderer->customfield_management_tabs($prefix);
-        $heading = $OUTPUT->heading(get_string('customfieldsheadingaction', 'facetoface', $heading));
         require_capability($capability, $contextsystem);
 
+        $tableprefix = $customfieldtype->get_table_prefix();
         $field = customfield_get_record_by_id($tableprefix, $id, $datatype);
+        $datatype = $field->datatype;
+        $datatypes = customfield_list_datatypes();
+
+        $tabs = $facetofacerenderer->customfield_management_tabs($prefix);
+        $heading = $OUTPUT->heading(get_string('customfieldsheadingaction', 'facetoface', $datatypes[$datatype]));
 
         $appendedfields = array();
         if ($prefix == 'facetofacesession') {

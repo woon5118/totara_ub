@@ -116,19 +116,17 @@ switch ($action) {
         $id       = optional_param('id', 0, PARAM_INT);
         $datatype = optional_param('datatype', '', PARAM_ALPHA);
 
-        $heading = $datatype;
         $capability = $customfieldtype->get_capability_managefield();
-        $tableprefix = $customfieldtype->get_table_prefix();
-        if ($id === 0) {
-            $datatypes = customfield_list_datatypes();
-            $heading = $datatypes[$datatype];
-        }
-
-        $tabs = $renderer->customfield_tabs_link($prefix, $redirectoptions);
-        $heading = $renderer->get_heading($prefix, $action, $heading);
         require_capability($capability, $sitecontext);
 
+        $tableprefix = $customfieldtype->get_table_prefix();
         $field = customfield_get_record_by_id($tableprefix, $id, $datatype);
+        $datatype = $field->datatype;
+        $datatypes = customfield_list_datatypes();
+
+        $tabs = $renderer->customfield_tabs_link($prefix, $redirectoptions);
+        $heading = $renderer->get_heading($prefix, $action, $datatypes[$datatype]);
+
         $renderer->customfield_manage_edit_form($prefix, $typeid, $tableprefix, $field, $redirect, $heading, $tabs, array(), $class);
         break;
     default:

@@ -77,7 +77,18 @@ function customfield_list_datatypes() {
 function customfield_get_record_by_id($tableprefix, $id, $datatype) {
     global $DB;
 
-    if (!$field = $DB->get_record($tableprefix.'_info_field', array('id' => $id))) {
+    if ($id) {
+        if ($datatype !== '') {
+            $field = $DB->get_record($tableprefix.'_info_field', array('id' => $id, 'datatype' => $datatype), '*', MUST_EXIST);
+        } else {
+            $field = $DB->get_record($tableprefix.'_info_field', array('id' => $id), '*', MUST_EXIST);
+        }
+    } else {
+        $datatypes = customfield_list_datatypes();
+        if (!isset($datatypes[$datatype])) {
+            throw new invalid_parameter_exception('Unkwnown datatype');
+        }
+
         $field = new stdClass();
         $field->id = 0;
         $field->datatype = $datatype;

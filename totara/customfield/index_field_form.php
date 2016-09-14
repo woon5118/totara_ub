@@ -49,17 +49,17 @@ class field_form extends moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'action', 'editfield');
-        $mform->setType('action', PARAM_TEXT);
+        $mform->setType('action', PARAM_ALPHA);
         $mform->addElement('hidden', 'datatype', $datasent['datatype']);
-        $mform->setType('datatype', PARAM_TEXT);
+        $mform->setType('datatype', PARAM_ALPHA);
         $mform->addElement('hidden', 'prefix', $datasent['prefix']);
-        $mform->setType('prefix', PARAM_TEXT);
+        $mform->setType('prefix', PARAM_ALPHA);
         $mform->addElement('hidden', 'class', $datasent['class']);
         $mform->setType('class', PARAM_ALPHA);
         $mform->addElement('hidden', 'typeid', $datasent['typeid']);
         $mform->setType('typeid', PARAM_INT);
         $mform->addElement('hidden', 'tableprefix', $datasent['tableprefix']);
-        $mform->setType('tableprefix', PARAM_TEXT);
+        $mform->setType('tableprefix', PARAM_ALPHANUMEXT);
 
         $this->field->define_form($mform, $typeid, $tableprefix);
 
