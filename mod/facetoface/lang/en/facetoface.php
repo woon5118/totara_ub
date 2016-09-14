@@ -95,11 +95,11 @@ $string['approveremail'] = 'Approver Email';
 $string['approvaloptions'] = 'Require approval by';
 $string['approvaloptions_help'] = 'Available options are defined by the approvaloptions setting on the seminar administration settings page:
 <ul>
-<li> When <strong>No approval</strong> is selected, a user will be immediately booked into a session when signing up.</li>
+<li> When <strong>No approval</strong> is selected, a user will be immediately booked into an event when signing up.</li>
 <li> When <strong>Learner accepts terms and conditions</strong> is selected, a user will be presented the text defined in the text area below, and required to accept the terms and conditions.</li>
-<li> When a session role is selected, all user\'s assigned to the role in the session will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the session</li>
-<li> When <strong>Manager approval</strong> is selected, the Learner\'s Manager will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the session</li>
-<li>When <strong>Manager and Administrative approval</strong> is selected, all users selected on the site level and activity level will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the session after the Learner\'s Manager has initially approved the request. The administrative approver can also provide final approval before the Manager responds</li>
+<li> When an event role is selected, all user\'s assigned to the role in the event will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the event</li>
+<li> When <strong>Manager approval</strong> is selected, the Learner\'s Manager will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the event</li>
+<li>When <strong>Manager and Administrative approval</strong> is selected, all users selected on the site level and activity level will be immediately sent a notification with instructions to approve the user\'s request to sign-up for the event after the Learner\'s Manager has initially approved the request. The administrative approver can also provide final approval before the Manager responds</li>
 </ul>';
 $string['approvaloptionsheader'] = 'Approval Options';
 $string['approvalrequiredby'] = 'Approval required by: ';
