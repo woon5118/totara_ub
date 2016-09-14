@@ -160,9 +160,6 @@ if ($deleteyes) {
 
         $data = file_postupdate_standard_editor($data, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_plan', 'dp_plan_objective', $data->itemid);
         $DB->set_field('dp_plan_objective', 'description', $data->description, array('id' => $data->itemid));
-
-        \totara_plan\event\component_created::create_from_component($plan, 'objective', $data->itemid, $data->fullname)->trigger();
-
     } else {
         $data = file_postupdate_standard_editor($data, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_plan', 'dp_plan_objective', $data->itemid);
 
