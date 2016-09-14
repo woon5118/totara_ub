@@ -108,9 +108,10 @@ class block_course_overview_renderer extends plugin_renderer_base {
             // No need to pass title through s() here as it will be done automatically by html_writer.
             $attributes = array('title' => $course->fullname);
             if ($course->id > 0) {
-                if (empty($course->visible)) {
-                    $attributes['class'] = 'dimmed';
-                }
+                // TOTARA: We need may need to check audience visibility before adding the dimmed class.
+                global $CFG;
+                require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+                $attributes['class'] = totara_get_style_visibility($course);
                 $courseurl = new moodle_url('/course/view.php', array('id' => $course->id));
                 $coursefullname = format_string(get_course_display_name_for_list($course), true, $course->id);
                 $link = html_writer::link($courseurl, $coursefullname, $attributes);
