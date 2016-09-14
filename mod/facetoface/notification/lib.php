@@ -1760,7 +1760,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $msg = str_replace($placeholder, $cfvalue, $msg);
     }
 
-    $sessioncancellationcustomfields = customfield_get_data($session, 'facetoface_sessioncancel', 'facetofacecancellation', false);
+    $sessioncancellationcustomfields = customfield_get_data($session, 'facetoface_sessioncancel', 'facetofacesessioncancel', false);
     foreach ($sessioncancellationcustomfields as $cftitle => $cfvalue) {
         $placeholder = "[sessioncancel:{$cftitle}]";
         $msg = str_replace($placeholder, $cfvalue, $msg);

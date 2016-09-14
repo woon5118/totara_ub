@@ -4379,5 +4379,43 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016080901, 'facetoface');
     }
 
+    if ($oldversion < 2016092000) {
+
+        // Alter facetoface_sessioncancel_info_data table to ensure customfield id field is unique.
+        // Rename the facetofacecancellationid field to facetofacesessioncancelid if the facetoface_sessioncancel_info_data
+        // table exists and create new key.
+
+        // Define table facetoface_sessioncancel_info_data to be adjusted.
+        $table = new xmldb_table('facetoface_sessioncancel_info_data');
+        $field = new xmldb_field('facetofacecancellationid');
+
+        // Conditionally launch if the table and field exists.
+        if ($dbman->table_exists($table) && $dbman->field_exists($table, $field)) {
+
+            // Define key cancellationinfodata_cancellationid_fk (foreign) to be dropped form facetoface_sessioncancel_info_data.
+            $key = new xmldb_key('cancellationinfodata_cancellationid_fk', XMLDB_KEY_FOREIGN, array('facetofacecancellationid'), 'facetoface_sessions', array('id'));
+
+            // Launch drop key cancellationinfodata_sessioncancelid_fk.
+            $dbman->drop_key($table, $key);
+
+            // Rename field facetofacecancellationid on table facetoface_sessioncancel_info_data to facetofacesessioncancelid.
+            $field = new xmldb_field('facetofacecancellationid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'fieldid');
+
+            // Launch rename field facetofacecancellationid.
+            $dbman->rename_field($table, $field, 'facetofacesessioncancelid');
+
+            // Define key cancellationinfodata_sessioncancelid_fk (foreign) to be added to facetoface_sessioncancel_info_data.
+            $key = new xmldb_key('cancellationinfodata_sessioncancelid_fk', XMLDB_KEY_FOREIGN, array('facetofacesessioncancelid'), 'facetoface_sessions', array('id'));
+
+            // Launch add key cancellationinfodata_sessioncancelid_fk.
+            $dbman->add_key($table, $key);
+
+            // Take care of files.
+            mod_facetoface_fix_cancellationid_files();
+        }
+
+        upgrade_mod_savepoint(true, 2016092000, 'facetoface');
+    }
+
     return $result;
 }

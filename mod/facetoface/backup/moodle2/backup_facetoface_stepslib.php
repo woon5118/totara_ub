@@ -195,7 +195,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
 
         $this->add_customfield_set_source($customfield, 'facetoface_session', 'facetofacesessionid');
 
-        $this->add_customfield_set_source($sessioncancelfield, 'facetoface_sessioncancel', 'facetofacecancellationid');
+        $this->add_customfield_set_source($sessioncancelfield, 'facetoface_sessioncancel', 'facetofacesessioncancelid');
 
         if ($userinfo) {
             $signup->set_source_table('facetoface_signups', array('sessionid' => backup::VAR_PARENTID));

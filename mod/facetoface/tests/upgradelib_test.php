@@ -1151,4 +1151,110 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $this->assertNotEmpty($DB->get_records('facetoface_cancellation_info_data', array('facetofacecancellationid' => $signup_u1s2->submissionid)));
         $this->assertEmpty($DB->get_records('facetoface_cancellation_info_data', array('facetofacecancellationid' => $signup_u2s2->submissionid)));
     }
+
+    /**
+     * Test that filearea correctly replaced/copied after field rename
+     */
+    public function test_mod_facetoface_fix_cancellationid_files() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot.'/lib/upgradelib.php');
+        require_once($CFG->dirroot.'/mod/facetoface/db/upgradelib.php');
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+        // Data
+        $fixtures = [
+            'facetoface_sessioncancel_info_field' =>
+            [
+                ['id' =>"1", 'shortname' => "evtcncl", 'datatype' => "text", 'sortorder' => 1, 'param1' => "30", 'param2' => "2048", 'fullname' =>"Event cancellation note", 'hidden'=> 0, 'locked' => 0, 'required' => 0, 'forceunique' => 0],
+                ['id' =>"2", 'shortname' => "ecf", 'datatype' => "file", 'sortorder' => 2, 'fullname' =>"Event cancel file", 'hidden'=> 0, 'locked' => 0, 'required' => 0, 'forceunique' => 0],
+                ['id' =>"3", 'shortname' => "ecta", 'datatype' => "textarea", 'sortorder' => 3, 'param1' => "30", 'param2' => "10", 'fullname' =>"Event cancel text area", 'hidden'=> 0, 'locked' => 0, 'required' => 0, 'forceunique' => 0],
+
+            ],
+            'facetoface_sessioncancel_info_data' =>
+            [
+                ['id' => "7", 'data' => "Event cancel C1", 'fieldid' => 1, 'facetofacesessioncancelid' => 5],
+                ['id' => "8", 'data' => "8", 'fieldid' => 2, 'facetofacesessioncancelid' => 5],
+                ['id' => "9", 'data' => '<p>Event cancel textarea with image </p><p><img src="@@PLUGINFILE@@/bug.jpg" alt="" width="235" height="215" style="vertical-align:text-bottom;margin:0 .5em;" class="img-responsive" /><br /></p>', 'fieldid' => 3, 'facetofacesessioncancelid' => 5],
+                ['id' => "10", 'data' => "Cancel seminar C5", 'fieldid' => 1, 'facetofacesessioncancelid' => 7],
+                ['id' => "11", 'data' => "11", 'fieldid' => 2, 'facetofacesessioncancelid' => 7],
+                ['id' => "12", 'data' => '<p>Cancel seminar C5</p><p><img src="@@PLUGINFILE@@/badger.jpg" alt="" width="480" height="360" style="vertical-align:text-bottom;margin:0 .5em;" class="img-responsive" /><br /></p>', 'fieldid' => 3, 'facetofacesessioncancelid' => 7]
+            ],
+            'facetoface_cancellation_info_field' =>
+            [
+                // Cancellation note is already created.
+                ['id' =>"2", 'shortname' => "ucf", 'datatype' => "file", 'sortorder' => 2, 'fullname' =>"User cancel file", 'hidden'=> 0, 'locked' => 0, 'required' => 0, 'forceunique' => 0],
+                ['id' =>"3", 'shortname' => "ucta", 'datatype' => "textarea", 'sortorder' => 3, 'param1' => "30", 'param2' => "10", 'fullname' =>"User cancel text area", 'hidden'=> 0, 'locked' => 0, 'required' => 0, 'forceunique' => 0]
+            ],
+            'facetoface_cancellation_info_data' =>
+            [
+                ['id' => "7", 'data' => "User cancellation", 'fieldid' => 1, 'facetofacecancellationid' => 24],
+                ['id' => "8", 'data' => "8", 'fieldid' => 2, 'facetofacecancellationid' => 24],
+                ['id' => "9", 'data' => '<p>User cancellation</p><p><img src="@@PLUGINFILE@@/anzac_bw2.JPG" alt="" width="321" height="269" style="vertical-align:text-bottom;margin:0 .5em;" class="img-responsive" /><br /></p>', 'fieldid' => 3, 'facetofacecancellationid' => 24],
+                ['id' => "13", 'data' => "Cancel learner11", 'fieldid' => 1, 'facetofacecancellationid' => 20],
+                ['id' => "14", 'data' => "14", 'fieldid' => 2, 'facetofacecancellationid' => 20],
+                ['id' => "15", 'data' => '<p>Cancel learner11</p><p><img src="@@PLUGINFILE@@/the_tiger__s_anger_by_mvlaniel.jpg" alt="" width="320" height="322" style="vertical-align:text-bottom;margin:0 .5em;" class="img-responsive" /><br /></p>', 'fieldid' => 3, 'facetofacecancellationid' => 20],
+            ],
+            'files' =>
+            [
+                ['id' => "97", 'contenthash' => "da39a3ee5e6b4b0d3255bfef95601890afd80709", 'pathnamehash' =>"80e846495322259771d21cb9de12592eae65cf6c",
+                 'contextid' => 5, 'component' => "user", 'filearea' =>"draft", 'itemid' => 606962697, 'filepath' => "/",
+                 'filename' => ".", 'userid' => 2, 'filesize' => 0, 'mimetype' => "", 'source' => "",
+                 'timecreated' => 1474414106, 'timemodified' => 1474414106],
+                ['id' => "108", 'contenthash' => "da39a3ee5e6b4b0d3255bfef95601890afd80709", 'pathnamehash' =>"884555719c50529b9df662a38619d04b5b11e25c",
+                 'contextid' => 1, 'component' => "core", 'filearea' =>"preview", 'itemid' => 0, 'filepath' => "/",
+                 'filename' => ".", 'userid' => 2, 'filesize' => 0, 'mimetype' => "document/unknown", 'source' => "",
+                 'timecreated' => 1474415277, 'timemodified' => 1474415277],
+                ['id' => "111", 'contenthash' => "da3e9ddd0df9b8fe4c36dad2ca1cbcbf359030a1", 'pathnamehash' =>"e55985d0cd6ce803d6a209d0199594b96cec0aa9",
+                 'contextid' => 1, 'component' => "totara_customfield", 'filearea' =>"facetofacecancellation_filemgr", 'itemid' => 8, 'filepath' => "/",
+                 'filename' => "anzac_bw.JPG", 'userid' => 2, 'filesize' => 20254, 'mimetype' => "image/jpeg", 'source' => "anzac_bw.JPG",
+                 'timecreated' => 1474415277, 'timemodified' => 1474415301],
+                ['id' => "112", 'contenthash' => "3fcb05b2dddb6f1af2c3791718dfb221f78977bb", 'pathnamehash' =>"754443025c90eca5c96db9c2b8b39c6087ea18d0",
+                 'contextid' => 1, 'component' => "totara_customfield", 'filearea' =>"facetofacecancellation", 'itemid' => 9, 'filepath' => "/",
+                 'filename' => "anzac_bw2.JPG", 'userid' => 2, 'filesize' => 88430, 'mimetype' => "image/jpeg", 'source' => "anzac_bw2.JPG",
+                 'timecreated' => 1474415290, 'timemodified' => 1474415301],
+                ['id' => "126", 'contenthash' => "18f08f5d87af85260a7fc0dec0c7f27c4876827d", 'pathnamehash' =>"9866ceeefa52b870563f571a3ccf9cabcea56807",
+                 'contextid' => 1, 'component' => "totara_customfield", 'filearea' =>"facetofacecancellation_filemgr", 'itemid' => 14, 'filepath' => "/",
+                 'filename' => "f2f_attendees_by_idnumber.csv", 'userid' => 2, 'filesize' => 58, 'mimetype' => "text/csv", 'source' => "f2f_attendees_by_idnumber.csv",
+                 'timecreated' => 1474422576, 'timemodified' => 1474422616],
+                ['id' => "128", 'contenthash' => "5d78ceb3a32bac12275c42e698a8801cd611afea", 'pathnamehash' =>"85d0d82e65ac6cc55b8b0f0488f81c2c708f70c6",
+                 'contextid' => 1, 'component' => "totara_customfield", 'filearea' =>"facetofacecancellation", 'itemid' => 15, 'filepath' => "/",
+                 'filename' => "the_tiger.jpg", 'userid' => 2, 'filesize' => 1212759, 'mimetype' => "image/jpeg", 'source' => "the_tiger.jpg",
+                 'timecreated' => 1474422606, 'timemodified' => 1474422616],
+                ['id' => "134", 'contenthash' => "482a521ced502f4924f95d63af41956a41c3c05c", 'pathnamehash' =>"13a7e6b3fb24428c56a23550e80b96b740ab5742",
+                 'contextid' => 1, 'component' => "totara_customfield", 'filearea' =>"facetofacecancellation_filemgr", 'itemid' => 11, 'filepath' => "/",
+                 'filename' => "f2f_attendees_with_ja.csv", 'userid' => 2, 'filesize' => 89, 'mimetype' => "text/csv", 'source' => "f2f_attendees_with_ja.csv",
+                 'timecreated' => 1474422986, 'timemodified' => 1474423018],
+                ['id' => "136", 'contenthash' => "8cf652f8f7e4757654ea9d190e802a98bacafaec", 'pathnamehash' =>"bab770c76a1d842ee97a6d4faa938d2d2b92aad8",
+                 'contextid' => 1, 'component' => "totara_customfield", 'filearea' =>"facetofacecancellation", 'itemid' => 12, 'filepath' => "/",
+                 'filename' => "badger.jpg", 'userid' => 2, 'filesize' => 14418, 'mimetype' => "image/jpeg", 'source' => "badger.jpg",
+                 'timecreated' => 1474423014, 'timemodified' => 1474423018],
+            ]
+        ];
+
+        $DB->delete_records('files');
+        // Prepare data.
+        foreach ($fixtures as $table => $rows) {
+            foreach ($rows as $row) {
+                $DB->insert_record_raw($table, $row, true, false, true);
+            }
+        }
+
+        // Perform upgrade.
+        mod_facetoface_fix_cancellationid_files();
+
+        // Check.
+        $files = $DB->get_records('files');
+        // 14 = 8 initial + 4 copied (facetoface_sessioncancel_info_data.id IN (8,9,11,12)) + 4 root (".") created for each copy - 2 removed from user cancel (other 2 are conflicting, so should stay).
+        $this->assertCount(14, $files);
+
+        $this->assertArrayHasKey(97, $files);
+        $this->assertArrayHasKey(108, $files);
+        $this->assertArrayHasKey(111, $files);
+        $this->assertArrayHasKey(112, $files);
+        $this->assertArrayHasKey(126, $files);
+        $this->assertArrayHasKey(128, $files);
+        $this->assertArrayNotHasKey(134, $files);
+        $this->assertArrayNotHasKey(136, $files);
+    }
 }

@@ -844,7 +844,7 @@ function facetoface_cancel_session($session, $fromform) {
     // Save the custom fields.
     if ($fromform) {
         $fromform->id = $session->id;
-        customfield_save_data($fromform, 'facetofacecancellation', 'facetoface_sessioncancel');
+        customfield_save_data($fromform, 'facetofacesessioncancel', 'facetoface_sessioncancel');
     }
 
     // Update field cancelledstatus.
@@ -1069,7 +1069,7 @@ function facetoface_delete_session($session) {
     $sessioncancelids = $DB->get_fieldset_select(
         'facetoface_sessioncancel_info_data',
         'id',
-        "facetofacecancellationid = :sessionid",
+        "facetofacesessioncancelid = :sessionid",
         $sessioncancelparams
     );
     if (!empty($sessioncancelids)) {

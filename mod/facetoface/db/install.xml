@@ -290,12 +290,12 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="fieldid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="facetofacecancellationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="WARNING - this points to session id"/>
+        <FIELD NAME="facetofacesessioncancelid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="WARNING - this points to session id"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="cancellationinfodata_fieldid_fk" TYPE="foreign" FIELDS="fieldid" REFTABLE="facetoface_sessioncancel_info_field" REFFIELDS="id"/>
-        <KEY NAME="cancellationinfodata_cancellationid_fk" TYPE="foreign" FIELDS="facetofacecancellationid" REFTABLE="facetoface_sessions" REFFIELDS="id"/>
+        <KEY NAME="cancellationinfodata_sessioncancelid_fk" TYPE="foreign" FIELDS="facetofacesessioncancelid" REFTABLE="facetoface_sessions" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="facetoface_sessioncancel_info_data_param" COMMENT="Whole event cancellation custom fields data parameters">

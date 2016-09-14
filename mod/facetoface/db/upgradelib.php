@@ -168,3 +168,65 @@ function mod_facetoface_delete_orphaned_customfield_data($type) {
     }
     $transaction->allow_commit();
 }
+
+/**
+ * Copy files from facetofacecancellation* to facetofacesessioncancel* file area to make them available after field rename
+ */
+function mod_facetoface_fix_cancellationid_files() {
+    global $DB;
+
+    // Get itemid's for user cancelation.
+    $usersql = "
+    SELECT fcid.id
+    FROM {facetoface_cancellation_info_data} fcid
+    INNER JOIN {facetoface_cancellation_info_field} fcif ON (fcif.id = fcid.fieldid)
+    WHERE fcif.datatype IN ('file', 'textarea')
+    ";
+    $usercancelrecords = $DB->get_records_sql($usersql, []);
+    $usercancelids = empty($usercancelrecords) ? [] : array_keys($usercancelrecords);
+
+    // Get itemid's for session cancelation.
+    $sessionsql = "
+    SELECT fscid.id
+    FROM {facetoface_sessioncancel_info_data} fscid
+    INNER JOIN {facetoface_sessioncancel_info_field} fscif ON (fscif.id = fscid.fieldid)
+    WHERE fscif.datatype IN ('file', 'textarea')
+    ";
+    $sessioncancelrecords = $DB->get_records_sql($sessionsql, []);
+
+    if (!empty($sessioncancelrecords)) {
+        $sessioncancelids = array_keys($sessioncancelrecords);
+
+        // Fix filearea.
+        $fs = get_file_storage();
+        $confcontext = context_system::instance();
+        $component = 'totara_customfield';
+        $areas = [
+            'facetofacecancellation_filemgr' => 'facetofacesessioncancel_filemgr',
+            'facetofacecancellation' => 'facetofacesessioncancel'
+        ];
+
+        foreach($areas as $oldarea => $newarea) {
+            $files = $fs->get_area_files($confcontext->id, $component, $oldarea);
+            if (is_array($files)) {
+                $itemidstodel = [];
+                foreach ($files as $file) {
+                    if (in_array($file->get_itemid(), $sessioncancelids)) {
+                        $fs->create_file_from_storedfile(array('filearea' => $newarea), $file);
+
+                        $itemid = $file->get_itemid();
+                        if (!in_array($itemid, $usercancelids) && !empty($itemid)) {
+                            // This file is not used in user cancellation. Remove it.
+                            $itemidstodel[$itemid] = 1;
+                        }
+                    }
+                }
+                if (!empty($itemidstodel)) {
+                    foreach ($itemidstodel as $itemid => $unused) {
+                        $fs->delete_area_files($confcontext->id, $component, $oldarea, $itemid);
+                    }
+                }
+            }
+        }
+    }
+}

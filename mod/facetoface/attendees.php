@@ -699,7 +699,7 @@ if (!$onlycontent && !$download) {
         echo facetoface_print_session($session, true);
 
         // Print customfields.
-        $customfields = customfield_get_data($session, 'facetoface_sessioncancel', 'facetofacecancellation');
+        $customfields = customfield_get_data($session, 'facetoface_sessioncancel', 'facetofacesessioncancel');
 
         if (!empty($customfields)) {
 

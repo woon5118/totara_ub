@@ -38,8 +38,8 @@ class mod_facetoface_cancelsession_form extends moodleform {
         $mform->addElement('hidden', 'backtoallsessions', $this->_customdata['backtoallsessions']);
         $mform->setType('backtoallsessions', PARAM_BOOL);
 
-        customfield_load_data($session, 'facetofacecancellation', 'facetoface_sessioncancel');
-        customfield_definition($mform, $session, 'facetofacecancellation', 0, 'facetoface_sessioncancel');
+        customfield_load_data($session, 'facetofacesessioncancel', 'facetoface_sessioncancel');
+        customfield_definition($mform, $session, 'facetofacesessioncancel', 0, 'facetoface_sessioncancel');
 
         $mform->addElement('html', get_string('cancelsessionconfirm', 'facetoface')); // Instructions.
 

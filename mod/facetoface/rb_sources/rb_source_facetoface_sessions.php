@@ -856,7 +856,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_custom_fields_for('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
         $this->add_custom_fields_for('facetoface_signup', 'base', 'facetofacesignupid', $this->joinlist, $this->columnoptions, $this->filteroptions);
         $this->add_custom_fields_for('facetoface_cancellation', 'base', 'facetofacecancellationid', $this->joinlist, $this->columnoptions, $this->filteroptions);
-        $this->add_custom_fields_for('facetoface_sessioncancel', 'sessions', 'facetofacecancellationid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+        $this->add_custom_fields_for('facetoface_sessioncancel', 'sessions', 'facetofacesessioncancelid', $this->joinlist, $this->columnoptions, $this->filteroptions);
 
         $this->add_custom_fields_for(
             'facetoface_room',
