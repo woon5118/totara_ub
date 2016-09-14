@@ -1087,7 +1087,23 @@ class reportbuilder {
         return true;
     }
 
-
+    /**
+     * Returns true if a report has filter of given type and value. Returns false if not.
+     *
+     * @param $reportid
+     * @param $type
+     * @param $value
+     * @return bool
+     */
+    public static function contains_filter($reportid, $type, $value) {
+        global $DB;
+        $filterexists = $DB->record_exists('report_builder_filters',
+            array(
+                'reportid' => $reportid,
+                'type' => $type,
+                'value' => $value));
+        return $filterexists;
+    }
 
     /**
      * Gets any filters set for the current report from the database

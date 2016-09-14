@@ -25,6 +25,7 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php'
 require_once($CFG->dirroot.'/totara/core/utils.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/filters/lib.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/filters/jobassignment_multi.php');
+require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
 $ids = required_param('ids', PARAM_SEQUENCE);
 $ids = array_filter(explode(',', $ids));
@@ -32,6 +33,15 @@ $filtername = required_param('filtername', PARAM_TEXT);
 require_login();
 
 $PAGE->set_context(context_system::instance());
+
+// Check that the user can view the report specified and that the report contains the filter which uses this page.
+// If not, then they are not permitted to view all users here.
+$reportid = required_param('reportid', PARAM_INT);
+$canviewreport = reportbuilder::is_capable($reportid, $USER->id);
+$reporthasfilter = reportbuilder::contains_filter($reportid, 'job_assignment', 'manager');
+if (!($canviewreport and $reporthasfilter)) {
+    print_error('accessdenied', 'admin');
+}
 
 echo $OUTPUT->container_start('list-' . $filtername);
 if (!empty($ids)) {

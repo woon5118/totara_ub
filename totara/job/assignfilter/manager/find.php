@@ -25,6 +25,7 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php'
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_users.class.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
+require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
 // Page title
 $pagetitle = 'selectmanagers';
@@ -42,6 +43,15 @@ $treeonly = optional_param('treeonly', false, PARAM_BOOL);
 
 require_login();
 $PAGE->set_context(context_system::instance());
+
+// Check that the user can view the report specified and that the report contains the filter which uses this page.
+// If not, then they are not permitted to view all users here.
+$reportid = required_param('reportid', PARAM_INT);
+$canviewreport = reportbuilder::is_capable($reportid, $USER->id);
+$reporthasfilter = reportbuilder::contains_filter($reportid, 'job_assignment', 'manager');
+if (!($canviewreport and $reporthasfilter)) {
+    print_error('accessdenied', 'admin');
+}
 
 ///
 /// Display page

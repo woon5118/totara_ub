@@ -32,6 +32,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
         // Holds items that need to be initialised.
         waitingitems: [],
+        reportid: 0,
 
         /**
          * Module initialisation method called by php js_init_call().
@@ -41,13 +42,14 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
          * @param string    The type of the hierarchy to load - only used by hierarchy type
          * @param {string} name The name of the filter. Optional, may be undefined.
          */
-        init: function(filter, value, type, name) {
+        init: function(filter, value, type, name, reportid) {
             handler.waitingitems.push({
                 filter: filter,
                 value: value,
                 hierarchytype: type,
                 name: name
             });
+            handler.reportid = reportid;
 
             if (window.dialogsInited) {
                 this.rb_init_filter_dialogs();
@@ -223,6 +225,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
         },
 
         rb_load_jobassign_multi_filters: function() {
+            var self = this;
             // Bind multi-managers report filter.
             $('div.rb-man-add-link a').each(function() {
                 var id = $(this).attr('id');
@@ -235,8 +238,8 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                     totaraMultiSelectDialogRbFilter(
                         id,
                         choosemanplural,
-                        url + 'find.php?',
-                        url + 'save.php?filtername=' + id + '&ids='
+                        url + 'find.php?reportid=' + self.reportid,
+                        url + 'save.php?reportid=' + self.reportid + '&filtername=' + id + '&ids='
                     );
                 });
             });
@@ -253,8 +256,8 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                     totaraMultiSelectDialogRbFilter(
                         id,
                         choosemanplural,
-                        url + 'find.php?',
-                        url + 'save.php?filtername=' + id + '&ids='
+                        url + 'find.php?reportid=' + self.reportid,
+                        url + 'save.php?reportid=' + self.reportid + '&filtername=' + id + '&ids='
                     );
                 });
             });
