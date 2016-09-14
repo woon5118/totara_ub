@@ -1199,9 +1199,8 @@ class flexible_table {
             $linkattributes = array('title' => get_string('show') . ' ' . strip_tags($this->headers[$index]),
                                     'aria-expanded' => 'false',
                                     'aria-controls' => $ariacontrols);
-            $iconurl = right_to_left() ? $OUTPUT->pix_url('t/switch_plus_rtl') : $OUTPUT->pix_url('t/switch_plus');
             return html_writer::link($this->baseurl->out(false, array($this->request[TABLE_VAR_SHOW] => $column)),
-                    html_writer::empty_tag('img', array('src' => $iconurl, 'alt' => get_string('show'))),
+                    $OUTPUT->flex_icon('column-show', array('alt' => get_string('show'))),
                     $linkattributes);
 
         } else if ($this->headers[$index] !== NULL) {
@@ -1209,7 +1208,7 @@ class flexible_table {
                                     'aria-expanded' => 'true',
                                     'aria-controls' => $ariacontrols);
             return html_writer::link($this->baseurl->out(false, array($this->request[TABLE_VAR_HIDE] => $column)),
-                    html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/switch_minus'), 'alt' => get_string('hide'))),
+                    $OUTPUT->flex_icon('column-hide', array('alt' => get_string('hide'))),
                     $linkattributes);
         }
     }

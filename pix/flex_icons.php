@@ -472,6 +472,20 @@ $icons = array(
                     'classes' => 'ft-columns',
                 ),
         ),
+    'column-hide' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-minus-square'
+                ),
+        ),
+    'column-show' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-plus-square'
+                ),
+        ),
     'comment' =>
         array(
             'data' =>
