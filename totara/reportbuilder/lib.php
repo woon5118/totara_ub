@@ -3758,6 +3758,11 @@ class reportbuilder {
             $classes = ' col-md-9 col-sm-8 col-xs-12';
         }
 
+        // If it's an embedded report, put the shortname in the class. Can be used in css/js to select the specific report.
+        if ($this->embedded) {
+            $classes .= ' embeddedshortname_' . $shortname;
+        }
+
         // Prevent notifications boxes inside the table.
         echo $OUTPUT->container_start('nobox rb-display-table-container no-overflow' . $classes, $this->_id);
 

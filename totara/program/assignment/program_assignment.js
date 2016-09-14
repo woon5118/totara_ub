@@ -415,8 +415,8 @@ M.totara_programassignment = M.totara_programassignment || {
 
         // On click events for column sorting and paging inside "View dates" popup.
         $('#page-totara-program-edit_assignments').on('click',
-            '.moodle-dialogue-content #program_assignment_duedates a, ' +
-            '.moodle-dialogue-content #cert_assignment_duedates a', function(event) {
+            '.moodle-dialogue-content .embeddedshortname_program_assignment_duedates a, ' +
+            '.moodle-dialogue-content .embeddedshortname_cert_assignment_duedates a', function(event) {
             if (!event.target.closest('td') || !$(event.target.closest('td')).hasClass('cell')) {
                 $.get($(event.target).attr('href'), function(result) {
                     M.totara_programassignment.datesDialogue.bodyNode.setHTML(result);
