@@ -41,6 +41,8 @@ class feedback360_responder_test extends feedback360_testcase {
         $userassignment = $DB->get_record('feedback360_user_assignment', array('feedback360id' => $fdbck->id,
             'userid' => $user->id));
         $respuser = $this->getDataGenerator()->create_user();
+        // Get current time to test timedue against.
+        $this->setCurrentTimeStart();
         $response = $this->assign_resp($fdbck, $user->id, $respuser->id);
         $response->viewed = true;
         $response->timeassigned = $time;
@@ -58,7 +60,7 @@ class feedback360_responder_test extends feedback360_testcase {
         $this->assertEquals($respuser->id, $resptest->userid);
         $this->assertEquals(feedback360_responder::TYPE_USER, $resptest->type);
         $this->assertEquals($user->id, $resptest->subjectid);
-        $this->assertLessThan(5, abs($resptest->timedue - time()));
+        $this->assertTimeCurrent($resptest->timedue);
     }
 
     public function test_by_preview() {
