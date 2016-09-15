@@ -2453,7 +2453,7 @@ class global_navigation extends navigation_node {
         $coursenode->hidden = (empty($dimmed)) ? false : true;
         // We need to decode &amp;'s here as they will have been added by format_string above and attributes will be encoded again
         // later.
-        $coursenode->title(str_replace('&amp;', '&', $fullname));
+        $coursenode->title(format_string($course->fullname, true, array('context' => $coursecontext, 'escape' => false)));
         if ($canexpandcourse) {
             // This course can be expanded by the user, make it a branch to make the system aware that its expandable by ajax.
             $coursenode->nodetype = self::NODETYPE_BRANCH;
