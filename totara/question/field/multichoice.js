@@ -71,38 +71,36 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
     }
 
     // Hide from numVisible (default is 3) to last
-    $allOptions.slice(numVisible, max).addClass('js-hide');
+    $allOptions.slice(numVisible, max).hide();
 
     $allOptions.each(function(){
         var $this = $(this);
         if ($($this.find('span')).length > 0) {
-            $this.find('span').addClass('js-hide');
+            $this.find('span').hide();
             var $makeDefault = $('<span class="makedefaultlink">');
             var $makeDefaultLink = $('<a href="#">' + M.util.get_string('defaultmake', 'totara_question') + '</a>');
+            var $unselect = $('<span class="unselectlink">' + M.util.get_string('defaultselected', 'totara_question') + ' </span>').hide();
+            var $unselectLink = $('<a href="#">' + M.util.get_string('defaultunselect', 'totara_question') + '</a>');
+
             $makeDefault.append($makeDefaultLink);
             $makeDefaultLink.on('click', function(){
                 if (M.totara_question_multichoice.config.oneAnswer == 1) {
-                    $allOptions.find('.unselectlink').each(function(){
-                        if (!$(this).hasClass('js-hide')) {
-                            $(this).find('a').click();
-                        }
-                    });
+                    $allOptions.find('.unselectlink').hide();
+                    $allOptions.find('.makedefaultlink').show();
                 }
 
                 $this.find('input.makedefault').prop('checked', true);
 
-                $makeDefault.addClass('js-hide');
-                $unselect.removeClass('js-hide');
+                $makeDefault.hide();
+                $unselect.show();
                 return false;
             });
 
-            var $unselect = $('<span class="unselectlink js-hide">' + M.util.get_string('defaultselected', 'totara_question') + ' </span>');
-            var $unselectLink = $('<a href="#">' + M.util.get_string('defaultunselect', 'totara_question') + '</a>');
             $unselect.append($unselectLink);
             $unselectLink.on('click', function(){
                 $this.find('input.makedefault').prop('checked', false);
-                $makeDefault.removeClass('js-hide');
-                $unselect.addClass('js-hide');
+                $makeDefault.show();
+                $unselect.hide();
                 return false;
             });
 
@@ -122,22 +120,22 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
     }
 
     // Make visible #addoptionlink_$jsid
-    $container.find('a.addoptionlink').addClass('js-show');
+    $container.find('a.addoptionlink').show();
     $container.find('a.addoptionlink').on('click', function(){
         if ($(this).hasClass('disabled')) {
             return false;
         }
-        var $group = $container.find('.fcontainer .fitem_fgroup.js-hide').eq(0);
+        var $group = $container.find('.fcontainer .fitem_fgroup:hidden').eq(0);
 
         if ($group.length) {
-            $group.removeClass('js-hide');
+            $group.show();
             numVisible++;
         } else {
-            $(this).removeClass('js-show');
+            $(this).hide();
         }
 
         if (numVisible == max) {
-            $(this).removeClass('js-show');
+            $(this).hide();
         }
 
         return false;
@@ -155,11 +153,7 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
 
     function clearChoices() {
         $allOptions.find("input[type='text']").val('');
-        $allOptions.find('.unselectlink').each(function(){
-            if (!$(this).hasClass('js-hide')) {
-                $(this).find('a').click();
-            }
-        });
+        $allOptions.find('.unselectlink').show();
     }
 
     // Disable "Save options as" fields.
@@ -190,8 +184,8 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
             // Enable "Add another option link".
             $container.find(".addoptionlink").removeClass('disabled');
         }
-        $container.find('.fcontainer .fitem_fgroup').removeClass('js-hide');
-        $allOptions.slice(numVisible, max).addClass('js-hide');
+        $container.find('.fcontainer .fitem_fgroup').show();
+        $allOptions.slice(numVisible, max).hide();
     });
     }
 }
