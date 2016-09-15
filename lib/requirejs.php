@@ -141,5 +141,4 @@ foreach ($jsfiles as $modulename => $jsfile) {
     $js = implode($replace, explode($search, $js, 2));
     $content .= $js;
 }
-// Totara: fix parameters!
 js_send_uncached($content, 'requirejs.php');
