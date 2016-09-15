@@ -56,7 +56,10 @@ class core_user_editadvanced_form {
      * @param editadvanced_form_definition_complete $hook
      */
     public static function extend_form(editadvanced_form_definition_complete $hook) {
-        global $CFG;
+        global $CFG, $USER;
+        if (!empty($USER->newadminuser)) {
+            return;
+        }
         $userid = isset($hook->customdata['user']->id) ? $hook->customdata['user']->id : null;
         if (totara_gap_can_edit_aspirational_position($userid)) {
             self::add_aspirational_position_controls_to_form($hook);
@@ -74,6 +77,10 @@ class core_user_editadvanced_form {
      * @param editadvanced_form_display $hook
      */
     public static function display_form(editadvanced_form_display $hook) {
+        global $USER;
+        if (!empty($USER->newadminuser)) {
+            return;
+        }
         $userid = isset($hook->customdata['user']->id) ? $hook->customdata['user']->id : null;
         if (totara_gap_can_edit_aspirational_position($userid)) {
             // Set up JS.
@@ -94,6 +101,10 @@ class core_user_editadvanced_form {
      * @param editadvanced_form_save_changes $hook
      */
     public static function save_form(editadvanced_form_save_changes $hook) {
+        global $USER;
+        if (!empty($USER->newadminuser)) {
+            return;
+        }
         if (totara_gap_can_edit_aspirational_position($hook->userid)) {
             self::save_aspirational_position_changes($hook);
         }
