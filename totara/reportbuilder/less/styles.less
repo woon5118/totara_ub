@@ -21,9 +21,11 @@
 // @author    Rob Tyler <rob.tyler@totaralearning.com>
 // @package   totara_reportbuilder
 
-@padding-small-horizontal:  10px;
-
 @import "styles_legacy";
+
+@padding-small-horizontal:  10px;
+@line-height-computed: 20px;
+@padding-small-horizontal: 5px;
 
 .rb-search .mform {
   .mform .fitem .felement label {
@@ -69,11 +71,24 @@
   text-align: center;
 
   fieldset {
+    width: auto;
     display: inline-block;
 
-    legend,
     .felement {
       width: auto;
+      float: left;
+      margin: 0;
+    }
+
+    legend {
+      float: left;
+      width: auto;
+      line-height: @line-height-computed * 1.5;
+      margin-right: @padding-small-horizontal;
+
+      span {
+        width: auto;
+      }
     }
   }
 }
