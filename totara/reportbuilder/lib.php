@@ -1187,26 +1187,27 @@ class reportbuilder {
 
         if (!empty($SESSION->reportbuilder[$this->get_uniqueid()])) {
             foreach ($SESSION->reportbuilder[$this->get_uniqueid()] as $fname => $data) {
-                $params = array();
+                if (isset($data['value'])) {
+                    if (is_array($data['value']) || is_object($data['value'])) {
+                        $data['value'] = clean_param_array((array)$data['value'], PARAM_RAW_TRIMMED);
+                    } else {
+                        $data['value'] = clean_param($data['value'], PARAM_RAW_TRIMMED);
+                    }
+                }
                 if ($fname == 'toolbarsearchtext') {
                     if ($this->toolbarsearch && $this->has_toolbar_filter() && $data) {
-                        list($sqlwhere, $params) = $this->get_toolbar_sql_filter($data);
-                        if (!empty($params)) {
-                            $where_sqls[] = $sqlwhere;
-                        }
+                        list($where_sqls[], $params) = $this->get_toolbar_sql_filter($data);
+                        $filterparams = array_merge($filterparams, $params);
                     }
                 } else if (array_key_exists($fname, $this->filters)) {
                     $filter = $this->filters[$fname];
                     if ($filter->grouping != 'none') {
                         list($having_sqls[], $params) = $filter->get_sql_filter($data);
                     } else {
-                        list($sqlwhere, $params) = $filter->get_sql_filter($data);
-                        if (!empty($params)) {
-                            $where_sqls[] = $sqlwhere;
-                        }
+                        list($where_sqls[], $params) = $filter->get_sql_filter($data);
                     }
+                    $filterparams = array_merge($filterparams, $params);
                 }
-                $filterparams = array_merge($filterparams, $params);
             }
         }
 
@@ -3264,6 +3265,7 @@ class reportbuilder {
                 return $cached;
             }
         }
+
         $mode = rb_column::REGULAR;
         if ($this->grouped) {
             $mode = rb_column::REGULARGROUPED;

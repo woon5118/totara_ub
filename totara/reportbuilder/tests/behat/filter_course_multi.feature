@@ -1,4 +1,4 @@
-@totara @totara_reportbuilder @oleg
+@totara @totara_reportbuilder
 Feature: Use the multi-item course filter
   To filter the courses in a report
   by several courses at a time
