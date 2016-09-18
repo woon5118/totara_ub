@@ -210,11 +210,12 @@ class rb_source_user extends rb_base_source {
         );
 
         // A column to display the number of achieved competencies for a user
+        // We need a COALESCE on the field for 0 to replace nulls, which ensures correct sorting order.
         $columnoptions[] = new rb_column_option(
                         'statistics',
                         'competenciesachieved',
                         get_string('usersachievedcompcount', 'rb_source_user'),
-                        'totara_stats_comp_achieved.number',
+                        'COALESCE(totara_stats_comp_achieved.number,0)',
                         array(
                             'displayfunc' => 'count',
                             'joins' => 'totara_stats_comp_achieved',
@@ -223,11 +224,12 @@ class rb_source_user extends rb_base_source {
         );
 
         // A column to display the number of started courses for a user
+        // We need a COALESCE on the field for 0 to replace nulls, which ensures correct sorting order.
         $columnoptions[] = new rb_column_option(
                         'statistics',
                         'coursesstarted',
                         get_string('userscoursestartedcount', 'rb_source_user'),
-                        'course_completions_courses_started.number',
+                        'COALESCE(course_completions_courses_started.number,0)',
                         array(
                             'displayfunc' => 'count',
                             'joins' => 'course_completions_courses_started',
@@ -236,11 +238,12 @@ class rb_source_user extends rb_base_source {
         );
 
         // A column to display the number of completed courses for a user
+        // We need a COALESCE on the field for 0 to replace nulls, which ensures correct sorting order.
         $columnoptions[] = new rb_column_option(
                         'statistics',
                         'coursescompleted',
                         get_string('userscoursescompletedcount', 'rb_source_user'),
-                        'totara_stats_courses_completed.number',
+                        'COALESCE(totara_stats_courses_completed.number,0)',
                         array(
                             'displayfunc' => 'count',
                             'joins' => 'totara_stats_courses_completed',
@@ -249,11 +252,12 @@ class rb_source_user extends rb_base_source {
         );
 
         // A column to display the number of course completions as evidence for a user.
+        // We need a COALESCE on the field for 0 to replace nulls, which ensures correct sorting order.
         $columnoptions[] = new rb_column_option(
             'statistics',
             'coursecompletionsasevidence',
             get_string('coursecompletionsasevidence', 'rb_source_user'),
-            'totara_stats_course_completion_imports.number',
+            'COALESCE(totara_stats_course_completion_imports.number,0)',
             array(
                 'displayfunc' => 'count',
                 'joins' => 'totara_stats_course_completion_imports',
