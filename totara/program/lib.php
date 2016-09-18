@@ -247,7 +247,7 @@ function prog_display_required_programs($userid) {
     $count = prog_get_required_programs($userid, '', '', '', true, true);
 
     // Set up table
-    $tablename = 'progs-list';
+    $tablename = 'progs-list-programs';
     $tableheaders = array(get_string('programname', 'totara_program'));
     $tablecols = array('progname');
 
@@ -322,7 +322,7 @@ function prog_display_certification_programs($userid) {
     $count = prog_get_certification_programs($userid, '', '', '', true, true, true);
 
     // Set up table
-    $tablename = 'progs-list';
+    $tablename = 'progs-list-cert';
     $tableheaders = array(get_string('certificationname', 'totara_program'));
     $tablecols = array('progname');
 
