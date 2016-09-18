@@ -32,7 +32,7 @@ Feature: Test dynamic audience with job assignment fullnames.
     And I navigate to "Audiences" node in "Site administration > Users > Accounts"
     And I follow "TestAudience"
     And I switch to "Rule sets" tab
-    And I set the field "addrulesetmenu" to "Job Title"
+    And I set the field "addrulesetmenu" to "Titles"
 
 
   @javascript

@@ -22,7 +22,7 @@ Feature: Delete a position audience requirement
       | Type | Dynamic       |
     And I click on "Save changes" "button"
 
-    When I set the field "addrulesetmenu" to "Position"
+    When I set the field "addrulesetmenu" to "Positions"
     And I click on "Pos 1" "link" in the "Add rule" "totaradialogue"
     And I click on "Pos 2" "link" in the "Add rule" "totaradialogue"
     And I click on "Pos 3" "link" in the "Add rule" "totaradialogue"
