@@ -92,7 +92,7 @@ class behat_totara_core extends behat_base {
      */
     protected function find_totara_menu_item($text) {
         $text = $this->getSession()->getSelectorsHandler()->xpathLiteral($text);
-        $xpath = "//*[@id = 'totaramenu']//a[contains(text(),{$text})]";
+        $xpath = "//*[@id = 'totaramenu']//a[contains(normalize-space(.),{$text})]";
         $node = $this->find(
             'xpath',
             $xpath,
