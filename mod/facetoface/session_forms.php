@@ -172,6 +172,7 @@ class mod_facetoface_session_form extends moodleform {
                 // Show header (if haven't already)
                 if ($choices && !$header_shown) {
                     $mform->addElement('header', 'trainerroles', get_string('sessionroles', 'facetoface'));
+                    $mform->addElement('static', 'roleapprovalerror');
                     $header_shown = true;
                 }
 
@@ -372,6 +373,8 @@ class mod_facetoface_session_form extends moodleform {
     }
 
     function validation($data, $files) {
+        global $DB;
+
         $errors = parent::validation($data, $files);
         $facetofaceid = $this->_customdata['f'];
         $dates = array();
@@ -468,12 +471,15 @@ class mod_facetoface_session_form extends moodleform {
                 $whereparams[] = $this->_customdata['s'];
             }
 
-            // Loop through roles
+            // Seminar approval by role is set, required at least one role selected.
             $hasconflicts = 0;
+            $selectedroleids = array();
+            $usernamefields = get_all_user_name_fields(true, 'u');
+            // Loop through roles.
             foreach ($trainerdata as $roleid => $trainers) {
                 // Attempt to load users with this role in this context.
-                $usernamefields = get_all_user_name_fields(true, 'u');
                 $trainerlist = get_role_users($roleid, $this->context, true, "u.id, {$usernamefields}", 'u.id ASC');
+
                 // Initialize error variable.
                 $trainererrors = '';
                 // Loop through trainers in this role.
@@ -481,6 +487,8 @@ class mod_facetoface_session_form extends moodleform {
 
                     if (!$trainer) {
                         continue;
+                    } else {
+                        $selectedroleids[] = $roleid;
                     }
 
                     // Check their availability.
@@ -500,7 +508,12 @@ class mod_facetoface_session_form extends moodleform {
                     $errors["trainerrole[{$roleid}]"] = $trainererrors;
                 }
             }
-
+            $facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid));
+            // Check if default role approval is selected.
+            if ($facetoface->approvaltype == APPROVAL_ROLE && !in_array($facetoface->approvalrole, $selectedroleids)) {
+                $rolenames = role_get_names($this->context);
+                $errors['roleapprovalerror'] = get_string('error:rolerequired', 'facetoface', $rolenames[$facetoface->approvalrole]->localname);
+            }
             // If there are conflicts, add a help message to checkbox
             if ($hasconflicts) {
                 if ($hasconflicts > 1) {

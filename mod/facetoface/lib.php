@@ -3768,9 +3768,9 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     if (get_config(null, 'facetoface_selectjobassignmentonsignupglobal') &&
         ($facetoface->selectjobassignmentonsignup || $facetoface->forceselectjobassignment)) {
         if (isset($session->bookedsession->jobassignmentid) && $session->bookedsession->jobassignmentid) {
+            $jobassignment = \totara_job\job_assignment::get_with_id($session->bookedsession->jobassignmentid);
             $output .= html_writer::empty_tag('br');
             $output .= html_writer::tag('dt', get_string('jobassignment', 'facetoface'));
-            $jobassignment = \totara_job\job_assignment::get_with_id($session->bookedsession->jobassignmentid);
             $output .= html_writer::tag('dd', $jobassignment->fullname);
             $output .= html_writer::empty_tag('br');
         }
@@ -3781,25 +3781,46 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
         $output .= html_writer::tag('dd', get_string('userwillbewaitlisted', 'facetoface'));
     }
 
+    // Display managers.
     if ($facetoface->approvaltype != APPROVAL_NONE && $facetoface->approvaltype != APPROVAL_SELF) {
-        $output .= html_writer::tag('dt', get_string('approvalrequiredby', 'facetoface'));
         $approver = facetoface_get_approvaltype_string($facetoface->approvaltype, $facetoface->approvalrole);
+        $output .= html_writer::tag('dt', get_string('approvalrequiredby', 'facetoface'));
         $output .= html_writer::tag('dd', $approver);
 
-        if (isset($session->bookedsession->managerid) && $session->bookedsession->managerid) {
-            $output .= html_writer::tag('dt', get_string('managername', 'facetoface'));
+        if ($facetoface->approvaltype == APPROVAL_MANAGER && isset($session->bookedsession->managerid) && $session->bookedsession->managerid) {
             $manager = core_user::get_user($session->bookedsession->managerid);
-            $output .= html_writer::tag('dd', fullname($manager));
+            $manager_url = new moodle_url('/user/view.php', array('id' => $manager->id));
+            $output .= html_writer::tag('dt', get_string('managername', 'facetoface'));
+            $output .= html_writer::tag('dd', html_writer::link($manager_url, fullname($manager)));
         } else {
-            if (isset($session->managerids)) {
+            if (isset($session->managerids) && !empty($session->managerids)) {
                 $managers = array();
-                $output .= html_writer::tag('dt', get_string('managername', 'facetoface'));
                 foreach ($session->managerids as $managerid) {
                     $manager = core_user::get_user($managerid);
-                    $managers[] = fullname($manager);
+                    $manager_url = new moodle_url('/user/view.php', array('id' => $manager->id));
+                    $managers[] = html_writer::link($manager_url, fullname($manager));
                 }
+                $output .= html_writer::tag('dt', get_string('managername', 'facetoface'));
                 $output .= html_writer::tag('dd', implode(', ', $managers));
             }
+        }
+    }
+    // Display trainers.
+    if ($facetoface->approvaltype == APPROVAL_ROLE && isset($session->trainerroles)) {
+        foreach ((array)$session->trainerroles as $role => $rolename) {
+
+            if (empty($session->trainers[$role])) {
+                continue;
+            }
+
+            $trainer_names = array();
+            $rolename = $rolename->localname;
+            foreach ($session->trainers[$role] as $trainer) {
+                $trainer_url = new moodle_url('/user/view.php', array('id' => $trainer->id));
+                $trainer_names[] = html_writer::link($trainer_url, fullname($trainer));
+            }
+            $output .= html_writer::tag('dt', $rolename);
+            $output .= html_writer::tag('dd', implode(', ', $trainer_names));
         }
     }
 
@@ -3813,12 +3834,8 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
         }
     }
 
-    // Display trainers.
-    $courseid = $DB->get_field('facetoface', 'course', array('id' => $session->facetoface));
-    $coursecontext = context_course::instance($courseid);
-
     if (!empty($session->details)) {
-        if ($cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $courseid)) {
+        if ($cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course)) {
             $context = context_module::instance($cm->id);
             $session->details = file_rewrite_pluginfile_urls($session->details, 'pluginfile.php', $context->id, 'mod_facetoface', 'session', $session->id);
             $session->details = format_text($session->details, FORMAT_HTML);
@@ -3828,28 +3845,6 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
         $output .= html_writer::tag('dd', $details);
     }
 
-    $trainerroles = facetoface_get_trainer_roles($coursecontext);
-
-    if ($trainerroles) {
-        // Get trainers.
-        $trainers = facetoface_get_trainers($session->id);
-
-        foreach ($trainerroles as $role => $rolename) {
-            $rolename = $rolename->localname;
-
-            if (empty($trainers[$role])) {
-                continue;
-            }
-
-            $trainer_names = array();
-            foreach ($trainers[$role] as $trainer) {
-                $trainer_url = new moodle_url('/user/view.php', array('id' => $trainer->id));
-                $trainer_names[] = html_writer::link($trainer_url, fullname($trainer));
-            }
-            $output .= html_writer::tag('dt', $rolename);
-            $output .= html_writer::tag('dd', implode(', ', $trainer_names));
-        }
-    }
     $output .= html_writer::end_tag('dl');
 
     if ($return) {

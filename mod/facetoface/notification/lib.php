@@ -957,10 +957,12 @@ class facetoface_notification extends data_object {
 
         // Send the booking request to all users with the approvalrole set in the session.
         $sessionroles = facetoface_get_trainers($session->id, $facetoface->approvalrole);
-        foreach ($sessionroles as $recipient) {
-            if (!empty($recipient)) {
-                $event->userto = core_user::get_user($recipient->id);
-                message_send($event);
+        if (!empty($sessionroles)) {
+            foreach ($sessionroles as $recipient) {
+                if (!empty($recipient)) {
+                    $event->userto = core_user::get_user($recipient->id);
+                    message_send($event);
+                }
             }
         }
 

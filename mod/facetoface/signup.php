@@ -97,13 +97,18 @@ $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlistev
 $waitlisteveryone = !empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone;
 $signupbywaitlist = facetoface_is_signup_by_waitlist($session);
 
-$f2fid = $session->facetoface;
+$session->managerids   = \totara_job\job_assignment::get_all_manager_userids($USER->id);
+$session->trainerroles = facetoface_get_trainer_roles(context_course::instance($course->id));
+$session->trainers     = facetoface_get_trainers($session->id);
 
-$managerids = \totara_job\job_assignment::get_all_manager_userids($USER->id);
-$session->managerids = $managerids;
-$params = compact('s', 'backtoallsessions', 'managerid', 'managerids', 'showdiscountcode', 'approvaltype',
-    'approvalterms', 'approvaladmins', 'f2fid', 'waitlisteveryone', 'signupbywaitlist');
-$mform = new mod_facetoface_signup_form(null, $params);
+if ($facetoface->approvaltype == APPROVAL_ROLE) {
+    if (!$session->trainerroles || !$session->trainers) {
+        print_error('error:missingrequiredrole', 'facetoface', $returnurl);
+    }
+}
+
+$params = compact('session', 'facetoface', 'backtoallsessions', 'managerid', 'showdiscountcode', 'waitlisteveryone', 'signupbywaitlist');
+$mform = new mod_facetoface_signup_form(null, $params, 'post', '', array('name' => 'signupform'));
 
 // Setup custom javascript
 local_js(array(
@@ -160,7 +165,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     }
 
     $managerselect = get_config(null, 'facetoface_managerselect');
-    if ($managerselect && !empty($fromform->managerid)) {
+    if ($managerselect && isset($fromform->managerid)) {
         $params['managerselect'] = $fromform->managerid;
     }
 
@@ -327,7 +332,7 @@ if ($signedup) {
     echo html_writer::tag('p', html_writer::tag('strong', $conflict));
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
 // If manager approval is required and no manager is defined, warn the user.
-} else if (empty($managerids) && !get_config(null, 'facetoface_managerselect') && ($approvaltype == APPROVAL_MANAGER || $approvaltype == APPROVAL_ADMIN)) {
+} else if (empty($session->managerids) && !get_config(null, 'facetoface_managerselect') && ($approvaltype == APPROVAL_MANAGER || $approvaltype == APPROVAL_ADMIN)) {
     echo $OUTPUT->notification(get_string('error:missingrequiredmanager', 'mod_facetoface'), 'notifyproblem');
 } else {
     // Signup form.

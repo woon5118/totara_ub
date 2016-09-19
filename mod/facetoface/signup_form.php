@@ -30,16 +30,18 @@ class mod_facetoface_signup_form extends moodleform {
         global $CFG;
 
         $mform =& $this->_form;
+        $session = $this->_customdata['session'];
+        $facetoface = $this->_customdata['facetoface'];
         $showdiscountcode = $this->_customdata['showdiscountcode'];
-        $approvaltype = $this->_customdata['approvaltype'];
-        $approvaladmins = $this->_customdata['approvaladmins'];
+        $approvaltype = $facetoface->approvaltype;
+        $approvaladmins = $facetoface->approvaladmins;
 
         $managerids = array();
         $manager_title = '';
         // Get default data, user's manager/s who was/were assigned through job assignment/s, if exists.
-        if (!empty($this->_customdata['managerids'])) {
+        if (!empty($session->managerids)) {
             $managers = array();
-            $managerids = $this->_customdata['managerids'];
+            $managerids = $session->managerids;
             foreach ($managerids as $managerid) {
                 $manager = core_user::get_user($managerid);
                 $managers[] = fullname($manager);
@@ -54,16 +56,17 @@ class mod_facetoface_signup_form extends moodleform {
             $manager_title = fullname($manager);
         }
 
-        $mform->addElement('hidden', 's', $this->_customdata['s']);
+        $mform->addElement('hidden', 's', $session->id);
         $mform->setType('s', PARAM_INT);
         $mform->addElement('hidden', 'backtoallsessions', $this->_customdata['backtoallsessions']);
         $mform->setType('backtoallsessions', PARAM_BOOL);
 
+        $mform->addElement('static', 'approvalerrors');
         // Do nothing if approval is set to none or role.
         if ($approvaltype == APPROVAL_SELF) {
             global $PAGE;
 
-            $url = new moodle_url('/mod/facetoface/signup_tsandcs.php', array('s' => $this->_customdata['s']));
+            $url = new moodle_url('/mod/facetoface/signup_tsandcs.php', array('s' => $session->id));
             $tandcurl = html_writer::link($url, get_string('approvalterms', 'mod_facetoface'), array("class"=>"tsandcs ajax-action"));
 
             $PAGE->requires->strings_for_js(array('approvalterms', 'close'), 'mod_facetoface');
@@ -192,7 +195,7 @@ class mod_facetoface_signup_form extends moodleform {
         }
         $mform->setType('notificationtype', PARAM_INT);
 
-        self::add_jobassignment_selection_formelem($mform, $this->_customdata['f2fid'], $this->_customdata['s']);
+        self::add_jobassignment_selection_formelem($mform, $facetoface->id, $session->id);
 
         if ($this->_customdata['waitlisteveryone']) {
             $mform->addElement(
@@ -250,12 +253,13 @@ class mod_facetoface_signup_form extends moodleform {
         global $USER;
 
         $errors = parent::validation($data, $files);
-        $approvaltype = $this->_customdata['approvaltype'];
+        $session = $this->_customdata['session'];
+        $approvaltype = $this->_customdata['facetoface']->approvaltype;
 
         // Manager validation if approval type requires it.
         if ($approvaltype == APPROVAL_MANAGER || $approvaltype == APPROVAL_ADMIN) {
             $manager = isset($data['managerid']) ? $data['managerid'] : null;
-            $managers = isset($this->_customdata['managerids']) ? $this->_customdata['managerids'] : null;
+            $managers = isset($session->managerids) ? $session->managerids : null;
             if (empty($manager) && empty($managers)) {
                 $select = get_config(null, 'facetoface_managerselect');
                 if ($select) {
@@ -263,6 +267,10 @@ class mod_facetoface_signup_form extends moodleform {
                 } else if (empty($managers)) {
                     $errors['managername'] = get_string('error:missingrequiredmanager', 'mod_facetoface');
                 }
+            }
+        } else if ($approvaltype == APPROVAL_ROLE) {
+            if (!$session->trainerroles || !$session->trainers) {
+                $errors['approvalerrors'] = get_string('error:missingrequiredrole', 'facetoface');
             }
         }
 
