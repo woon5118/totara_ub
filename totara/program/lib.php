@@ -2133,53 +2133,8 @@ function prog_display_progress($programid, $userid, $certifpath = CERTIFPATH_CER
     } else if ($prog_completion->status == STATUS_PROGRAM_COMPLETE) {
         $overall_progress = 100;
     } else {
-        $content = new prog_content($programid);
-        $csgroups = $content->get_courseset_groups($certifpath);
-        $csgroup_count = count($csgroups);
-        $csgroup_complete_count = 0;
-
-        $subgroup = array();
-        foreach ($csgroups as $csgroup) {
-
-            foreach ($csgroup as $courseset) {
-                if ($courseset->nextsetoperator == NEXTSETOPERATOR_AND) {
-                    // Loop to the end of a subgroup to get them all together.
-                    $subgroup[] = $courseset;
-                    continue;
-                }
-
-                if (!empty($subgroup)) {
-                    // Add this courseset to the group to check.
-                    $subgroup[] = $courseset;
-
-                    // Check the whole group is complete.
-                    $subgrpcomplete = true;
-                    foreach ($subgroup as $cs) {
-                        if (!$cs->is_courseset_complete($userid)) {
-                            $subgrpcomplete = false;
-                            break;
-                        }
-                    }
-
-                    // Clear the subgroup for the next group.
-                    $subgroup = array();
-
-                    // Update the count of completed groups.
-                    if ($subgrpcomplete === true) {
-                        $csgroup_complete_count++;
-                        continue(2);
-                    }
-                } else if ($courseset->is_courseset_complete($userid)) {
-                        $csgroup_complete_count++;
-                        continue(2);
-                }
-            }
-        }
-
-        $overall_progress = 0;
-        if ($csgroup_count > 0) {
-            $overall_progress = (float)($csgroup_complete_count / $csgroup_count) * 100;
-        }
+        $program = new program($programid);
+        $overall_progress = $program->get_progress($userid);
     }
 
     if ($export) {

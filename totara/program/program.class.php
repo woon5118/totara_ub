@@ -1201,7 +1201,7 @@ class program {
         }
 
         $certifpath = get_certification_path_user($this->certifid, $userid);
-        $courseset_groups = $this->content->get_courseset_groups($certifpath);
+        $courseset_groups = $this->content->get_courseset_groups($certifpath, true);
         $courseset_group_count = count($courseset_groups);
         $courseset_group_complete_count = 0;
 

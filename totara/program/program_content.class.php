@@ -38,6 +38,9 @@ class prog_content {
     public $formdataobject;
 
     protected $programid;
+    /**
+     * @var multi_course_set[]|competency_course_set[]|recurring_course_set[]
+     */
     protected $coursesets;
     protected $coursesets_deleted_ids;
 
@@ -693,11 +696,47 @@ class prog_content {
      * particular set and/or group of sets (which is necessary for working out
      * when to provide 'access tokens' to a user to let them into any of the
      * courses in a subsequent course set or group of course sets.
+     *
+     * @param string $certifpath
+     * @param bool $trimoptional If true then optional coursesets will be trimmed.
      */
-    public function get_courseset_groups($certifpath) {
+    public function get_courseset_groups($certifpath, $trimoptional = false) {
 
         $courseset_groups = prog_content::group_coursesets($certifpath, $this->coursesets);
+        if ($trimoptional === true) {
+            // 'Optional' coursesets should not be counted towards progress.
+            // 'Some courses' with minimum set to 0 should not be counted towards progress.
+            // The logic between course set groups (GROUPS) can be complex and the logic is mathematical.
+            // To solve this we build a true && false || true && false style evaluation and create
+            // a lambda function to evaluate it.
+            foreach ($courseset_groups as $key => $courseset_group) {
 
+                $completionoptional = null;
+                $previousoperator = null;
+
+                foreach ($courseset_group as $courseset) {
+                    $set_completionoptional = $courseset->is_considered_optional() ? 'true' : 'false';
+                    if ($completionoptional === null) {
+                        $completionoptional = $set_completionoptional;
+                    } else {
+                        if ($previousoperator == NEXTSETOPERATOR_AND) {
+                            $operator = ' && ';
+                        } else {
+                            $operator = ' || ';
+                        }
+                        $completionoptional = "{$completionoptional}{$operator}{$set_completionoptional}";
+                    }
+                    $previousoperator = $courseset->nextsetoperator;
+                }
+                // This is so annoying, we should never use the likes of create_function.
+                // However we can be sure it is safe, absolutely no content at all comes from the user.
+                // It is entirely generated from hard coded strings in the foreach above.
+                $completionoptional = create_function('', "return {$completionoptional};");
+                if ($completionoptional()) {
+                    unset($courseset_groups[$key]);
+                }
+            }
+        }
         return $courseset_groups;
     }
 

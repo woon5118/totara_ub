@@ -370,6 +370,14 @@ abstract class course_set {
     }
 
     /**
+     * Returns true if ths courseset is optional.
+     * @return bool
+     */
+    public function is_considered_optional() {
+        return false;
+    }
+
+    /**
      * Returns the HTML suitable for displaying a course set to a learner.
      *
      * @param int $userid
@@ -1581,6 +1589,22 @@ class multi_course_set extends course_set {
 
     public function get_courses() {
         return $this->courses;
+    }
+
+    /**
+     * Returns true if ths courseset is optional.
+     * @return bool
+     */
+    public function is_considered_optional() {
+        if ($this->completiontype == COMPLETIONTYPE_OPTIONAL) {
+            // Clearly so.
+            return true;
+        }
+        if ($this->completiontype == COMPLETIONTYPE_SOME && $this->mincourses == 0) {
+            // Some courses are required, but that is set to 0, so its optional.
+            return true;
+        }
+        return parent::is_considered_optional();
     }
 }
 

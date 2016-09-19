@@ -297,7 +297,35 @@ Feature: Users completion of programs and coursesets
     And I should see "Course 2"
     And I should see "Course 3"
 
-    # Check program completion when the only non-optional course is completed.
+    # Check progress is 0% because optional cousresets should not count towards progress.
+    When I click on "Record of Learning" in the totara menu
+    And I click on "Completion Program Tests" "link"
+    Then I should see "0%" program progress
+
+    # Check optional courseset courses are not marked as completed.
+    When I click on "Record of Learning" in the totara menu
+    Then I should not see "Course 2"
+    And I should not see "Course 1"
+
+    # Complete optional courses, the progress should still be 0%.
+    When I click on "Required Learning" in the totara menu
+    And I click on "Course 1" "link"
+    And I click on "Complete course" "link"
+    And I click on "Yes" "button"
+    And I click on "Required Learning" in the totara menu
+    Then I should see "Complete" in the "Course 1" "table_row"
+
+    When I click on "Course 2" "link"
+    And I click on "Complete course" "link"
+    And I click on "Yes" "button"
+    And I click on "Required Learning" in the totara menu
+    Then I should see "Complete" in the "Course 2" "table_row"
+
+    When I click on "Record of Learning" in the totara menu
+    And I click on "Completion Program Tests" "link"
+    Then I should see "0%" program progress
+
+    # Now check program completion when the only non-optional course is completed.
     When I click on "Course 3" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
@@ -305,8 +333,8 @@ Feature: Users completion of programs and coursesets
 
     When I click on "Record of Learning" in the totara menu
     Then I should see "Course 3"
-    And I should not see "Course 2"
-    And I should not see "Course 1"
+    And I should see "Course 2"
+    And I should see "Course 1"
 
     When I click on "Programs" "link" in the "#dp-plan-content" "css_element"
     And I click on "Completion Program Tests" "link"
@@ -420,6 +448,9 @@ Feature: Users completion of programs and coursesets
     And I should see "Course 1"
     And I should see "Course 2"
     And I should see "Course 3"
+
+    # Check progress.
+    And I should see "0%" program progress
 
     When I log out
     And I run the "\totara_program\task\completions_task" task

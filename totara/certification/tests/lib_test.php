@@ -388,4 +388,1846 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
         $this->assertEquals(2000, $certcompletion->timecompleted);
         $this->assertEquals(2000, $progcompletion->timecompleted);
     }
+
+    /**
+     * Test getting the progress of a certification with a single course set.
+     */
+    public function test_prog_display_progress_single_then_courseset() {
+        $this->resetAfterTest(true);
+        $now = time();
+
+        $certification = $this->getDataGenerator()->create_certification();
+        $user = $this->getDataGenerator()->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 5; $i++) {
+            $courses[$i] = $this->getDataGenerator()->create_course();
+        }
+
+        // Set up some courses in the certifications.
+        $this->getDataGenerator()->add_courseset_program($certification->id,
+            array($courses[1]->id, $courses[2]->id, $courses[5]->id), CERTIFPATH_CERT);
+        $this->getDataGenerator()->add_courseset_program($certification->id,
+            array($courses[4]->id, $courses[1]->id), CERTIFPATH_RECERT);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $courses[1]->id));
+        $completion->mark_complete($now);
+
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $courses[2]->id));
+        $completion->mark_complete($now);
+
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $courses[5]->id));
+        $completion->mark_complete($now);
+
+        // This is stupid - now its not a float!
+        $this->assertSame(100, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+    }
+
+    /**
+     * Test getting the progress of a certification with two course sets.
+     */
+    public function test_prog_display_progress_two_then_coursesets() {
+        $this->resetAfterTest(true);
+        $now = time();
+
+        $certification = $this->getDataGenerator()->create_certification();
+        $user = $this->getDataGenerator()->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 7; $i++) {
+            $courses[$i] = $this->getDataGenerator()->create_course();
+        }
+
+        // Set up some courses in the certifications.
+        $this->getDataGenerator()->add_courseset_program($certification->id,
+            array($courses[1]->id, $courses[2]->id, $courses[5]->id), CERTIFPATH_CERT);
+        $this->getDataGenerator()->add_courseset_program($certification->id,
+            array($courses[4]->id, $courses[3]->id), CERTIFPATH_CERT);
+        $this->getDataGenerator()->add_courseset_program($certification->id,
+            array($courses[6]->id, $courses[7]->id), CERTIFPATH_RECERT);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $courses[1]->id));
+        $completion->mark_complete($now);
+
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $courses[2]->id));
+        $completion->mark_complete($now);
+
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $courses[5]->id));
+        $completion->mark_complete($now);
+
+        $this->assertSame(50.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $courses[4]->id));
+        $completion->mark_complete($now);
+
+        $this->assertSame(50.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $courses[3]->id));
+        $completion->mark_complete($now);
+
+        // This is stupid - now its not a float!
+        $this->assertSame(100, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+    }
+
+    /**
+     * Completes the given course and then asserts that cert progress is as expected.
+     *
+     * @param float|int $expectedprogress
+     * @param program $program
+     * @param stdClass $user
+     * @param stdClass $course
+     * @param int $path
+     */
+    protected function assert_program_progress_after_course_completion($expectedprogress, program $program, stdClass $user, stdClass $course, $path = CERTIFPATH_CERT) {
+        $completion = new completion_completion(['userid' => $user->id, 'course' => $course->id]);
+        $completion->mark_complete(time());
+
+        $this->assertTrue($completion->is_complete());
+
+        $actualprogress = prog_display_progress($program->id, $user->id, $path, true);
+
+        $this->assertSame($expectedprogress, $actualprogress, "Progress found to be $actualprogress but expected $expectedprogress");
+    }
+
+    /**
+     * Assert that the parsed courseset groups are as you would expect.
+     *
+     * @param program $certification
+     * @param array $expectednames An array of expected course set groups, each of which is an array containing the set names.
+     */
+    protected function assert_courseset_groups_contain_expected_names(program $certification, array $expectednames) {
+
+        $certification = new program($certification->id);
+        $courseset_groups = $certification->get_content()->get_courseset_groups(CERTIFPATH_CERT, true);
+
+        $this->assertCount(count($expectednames), $courseset_groups);
+
+        $courseset_group_names = [];
+        foreach ($courseset_groups as $group) {
+            $coursesetnames = [];
+            foreach ($group as $courseset) {
+                $coursesetnames[] = $courseset->label;
+            }
+            $courseset_group_names[] = $coursesetnames;
+        }
+        $this->assertSame($courseset_group_names, $expectednames);
+    }
+
+    /**
+     * Test getting the progress of a certification with three course sets.
+     *
+     *  - Course set 1 (A, B, C)
+     *      THEN
+     *  - Course set 2 (D, E)
+     *      THEN
+     *  - Course set 3 (F)
+     */
+    public function test_prog_display_progress_three_then_coursesets() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 6; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1],
+                    $courses[2],
+                    $courses[3],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[4],
+                    $courses[5],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[6]
+                ]
+            ]
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+            ],
+            [
+                'Course set 2',
+            ],
+            [
+                'Course set 3',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[3]);
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[4]);
+        $this->assert_program_progress_after_course_completion((2/3)*100, $certification, $user, $courses[5]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[6]);
+    }
+
+    /**
+     * Test getting the progress of a certification with two coursesets using the OR operator.
+     */
+    public function test_prog_display_progress_two_or_coursesets() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 4; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_OR,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1],
+                    $courses[2],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_OR,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3],
+                    $courses[4],
+                ]
+            ]
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[3]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[4]);
+    }
+
+    /**
+     * Test getting the progress of a certification with two course sets using the AND operator.
+     */
+    public function test_prog_display_progress_two_and_coursesets() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 4; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1],
+                    $courses[2],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3],
+                    $courses[4],
+                ]
+            ]
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[3]);
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[4]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+    }
+
+    /**
+     * Test getting the progress of a certification with AND plus OR operators.
+     *
+     * This uses:
+     *   Course set 1
+     *      AND
+     *   Course set 2
+     *     THEN
+     *   Course set 3
+     *      OR
+     *   Course set 4
+     *     THEN
+     *   Course set 5
+     */
+    public function test_prog_display_progress_and_plus_or_coursesets() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 10; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1],
+                    $courses[2],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3],
+                    $courses[4],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_OR,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[5],
+                    $courses[6],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[7],
+                    $courses[8],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[9],
+                    $courses[10],
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+            ],
+            [
+                'Course set 3',
+                'Course set 4',
+            ],
+            [
+                'Course set 5',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[3]);
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[4]);
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[5]);
+        $this->assert_program_progress_after_course_completion((2/3)*100, $certification, $user, $courses[6]);
+        $this->assert_program_progress_after_course_completion((2/3)*100, $certification, $user, $courses[7]);
+        $this->assert_program_progress_after_course_completion((2/3)*100, $certification, $user, $courses[8]);
+        $this->assert_program_progress_after_course_completion((2/3)*100, $certification, $user, $courses[9]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[10]);
+    }
+
+    /**
+     * Test getting the progress of a certification with OR plus AND operators.
+     *
+     * This uses:
+     *   Course set 1
+     *      OR
+     *   Course set 2
+     *     THEN
+     *   Course set 3
+     *      AND
+     *   Course set 4
+     *     THEN
+     *   Course set 5
+     */
+    public function test_prog_display_progress_or_plus_and_coursesets() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 10; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_OR,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1],
+                    $courses[2],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3],
+                    $courses[4],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[5],
+                    $courses[6],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[7],
+                    $courses[8],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[9],
+                    $courses[10],
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+            ],
+            [
+                'Course set 3',
+                'Course set 4',
+            ],
+            [
+                'Course set 5',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[3]);
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[4]);
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[5]);
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[6]);
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[7]);
+        $this->assert_program_progress_after_course_completion((2/3)*100, $certification, $user, $courses[8]);
+        $this->assert_program_progress_after_course_completion((2/3)*100, $certification, $user, $courses[9]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[10]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1
+     *     THEN
+     *   Course set 2 (Optional)
+     *     THEN
+     *   Course set 3
+     *
+     * Here we are testing three course sets of which one is optional.
+     */
+    public function test_prog_display_progress_simple_optional_coursesets() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();
+        for ($i = 1; $i <= 6; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1],
+                    $courses[2],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3],
+                    $courses[4],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[5],
+                    $courses[6],
+                ]
+            ]
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1'
+            ],
+            [
+                'Course set 3'
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[3]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[4]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[5]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[6]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1 (Optional)
+     *
+     * Here we are testing that a single optional course set is fine.
+     */
+    public function test_prog_display_progress_single_optional_courseset() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $course = $generator->create_course(['summary' => 'A short summary']);
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $course
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, []);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $course);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1 (Optional)
+     *      OR
+     *   Course set 2 (Optional)
+     *
+     * Here we are testing optional or optional.
+     */
+    public function test_prog_display_progress_OoO() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 2; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_OR,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, []);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        // This is a little skrewy, but is correct.
+        $this->assertSame(0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1 (Optional)
+     *      AND
+     *   Course set 2 (Optional)
+     *
+     * Here we are testing optional and optional.
+     */
+    public function test_prog_display_progress_OaO() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 2; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, []);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1
+     *      AND
+     *   Course set 2 (Optional)
+     *
+     * Here we are testing required and optional.
+     */
+    public function test_prog_display_progress_RaO() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 2; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2'
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1 (Optional)
+     *      AND
+     *   Course set 2
+     *
+     * Here we are testing optional and required.
+     */
+    public function test_prog_display_progress_OaR() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 2; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1 (Optional)
+     *      OR
+     *   Course set 2
+     *
+     * Here we are testing optional or required.
+     */
+    public function test_prog_display_progress_OoR() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 2; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_OR,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, []);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1
+     *      AND
+     *   Course set 2  (Optional)
+     *      AND
+     *   Course set 3  (Optional)
+     *
+     * Here we are testing required and optional and optional.
+     */
+    public function test_prog_display_progress_RaOaO() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 3; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+                'Course set 3',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[3]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1  (Optional)
+     *      AND
+     *   Course set 2  (Optional)
+     *      AND
+     *   Course set 3
+     *
+     * Here we are testing optional and optional and required.
+     */
+    public function test_prog_display_progress_OaOaR() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 3; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+                'Course set 3',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[3]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1  (Optional)
+     *      AND
+     *   Course set 2
+     *      AND
+     *   Course set 3  (Optional)
+     *
+     * Here we are testing optional and required and optional.
+     */
+    public function test_prog_display_progress_OaRaO() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 3; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+                'Course set 3',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[3]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1
+     *      AND
+     *   Course set 2  (Optional)
+     *      AND
+     *   Course set 3
+     *
+     * Here we are testing required and optional and required.
+     */
+    public function test_prog_display_progress_RaOaR() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 3; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+                'Course set 3',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[3]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1
+     *      AND
+     *   Course set 2 (Optional)
+     *     THEN
+     *   Course set 3 (Optional)
+     *      AND
+     *   Course set 4
+     *     THEN
+     *   Course set 5 (Optional)
+     *
+     * Here we are testing three course sets groups each with an optional courseset.
+     */
+    public function test_prog_display_progress_RaOtOaRto() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 10; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1],
+                    $courses[2],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3],
+                    $courses[4],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[5],
+                    $courses[6],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[7],
+                    $courses[8],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[9],
+                    $courses[10],
+                ]
+            ],
+        ]);
+
+        $certification = new program($certification->id);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+            ],
+            [
+                'Course set 3',
+                'Course set 4',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[2]); // Complete set 1. Set 2 + 3 skipped as optional.
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[3]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[4]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[5]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[6]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[7]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[8]); // Completed set 4. Set 5 skipped as optional.
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[9]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[10]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1
+     *      AND
+     *   Course set 2 (Some - 0)
+     *     THEN
+     *   Course set 3 (Some - 0)
+     *      AND
+     *   Course set 4
+     *     THEN
+     *   Course set 5 (Some - 0)
+     *
+     * Here we are testing three course set groups each with a some courses = 0 courseset.
+     */
+    public function test_prog_display_progress_RaStSaRtS_mincourses_0() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 10; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1],
+                    $courses[2],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_SOME,
+                'certifpath' => CERTIFPATH_STD,
+                'mincourses' => 0,
+                'courses' => [
+                    $courses[3],
+                    $courses[4],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_SOME,
+                'mincourses' => 0,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[5],
+                    $courses[6],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[7],
+                    $courses[8],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_SOME,
+                'mincourses' => 0,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[9],
+                    $courses[10],
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+            ],
+            [
+                'Course set 3',
+                'Course set 4',
+            ]
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[3]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[4]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[5]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[6]);
+        $this->assert_program_progress_after_course_completion(50.0, $certification, $user, $courses[7]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[8]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[9]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[10]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1
+     *      AND
+     *   Course set 2 (Some - 1)
+     *     THEN
+     *   Course set 3 (Some - 1)
+     *      AND
+     *   Course set 4
+     *     THEN
+     *   Course set 5 (Some - 1)
+     *
+     * Here we are testing three course sets groups each with a some courses = 1 courseset.
+     */
+    public function test_prog_display_progress_RaStSaRtS_mincourses_1() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 10; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1],
+                    $courses[2],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_SOME,
+                'certifpath' => CERTIFPATH_STD,
+                'mincourses' => 1,
+                'courses' => [
+                    $courses[3],
+                    $courses[4],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_SOME,
+                'mincourses' => 1,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[5],
+                    $courses[6],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[7],
+                    $courses[8],
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_SOME,
+                'mincourses' => 1,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[9],
+                    $courses[10],
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+            ],
+            [
+                'Course set 3',
+                'Course set 4',
+            ],
+            [
+                'Course set 5',
+            ],
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(0.0, $certification, $user, $courses[2]); // Course set 1 complete now.
+
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[3]); // Course set 2 complete now.
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[4]);
+
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[5]); // Course set 3 complete now.
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[6]);
+
+        $this->assert_program_progress_after_course_completion((1/3)*100, $certification, $user, $courses[7]);
+        $this->assert_program_progress_after_course_completion((2/3)*100, $certification, $user, $courses[8]); // Course set 4 complete now.
+
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[9]); // Course set 5 complete now.
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[10]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1
+     *      AND
+     *   Course set 2  (Optional)
+     *      OR
+     *   Course set 3  (Optional)
+     *
+     * Here we are testing required and optional or optional.
+     */
+    public function test_prog_display_progress_RaOoO() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 3; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_OR,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, []);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[3]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1  (Optional)
+     *      AND
+     *   Course set 2  (Optional)
+     *      OR
+     *   Course set 3
+     *
+     * Here we are testing optional and optional or required.
+     */
+    public function test_prog_display_progress_OaOoR() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 3; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_OR,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, []);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[3]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1  (Optional)
+     *      AND
+     *   Course set 2
+     *      OR
+     *   Course set 3  (Optional)
+     *
+     * Here we are testing optional and required or optional.
+     */
+    public function test_prog_display_progress_OaRoO() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 3; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_OR,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3]
+                ]
+            ],
+        ]);
+
+        $this->assert_courseset_groups_contain_expected_names($certification, []);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[3]);
+    }
+
+    /**
+     * Test getting the progress of a certification with the following structure.
+     *
+     * This uses:
+     *   Course set 1
+     *      AND
+     *   Course set 2  (Optional)
+     *      OR
+     *   Course set 3
+     *
+     * Here we are testing required and optional or required.
+     */
+    public function test_prog_display_progress_RaOoR() {
+        $this->resetAfterTest(true);
+        $generator = $this->getDataGenerator();
+
+        $user = $generator->create_user();
+        $courses = array();;
+        for ($i = 1; $i <= 3; $i++) {
+            $courses[$i] = $generator->create_course(['summary' => 'A short summary']);
+        }
+
+        $certification = $generator->create_certification([], [
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_AND,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[1]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_OR,
+                'completiontype' => COMPLETIONTYPE_OPTIONAL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[2]
+                ]
+            ],
+            [
+                'type' => CONTENTTYPE_MULTICOURSE,
+                'nextsetoperator' => NEXTSETOPERATOR_THEN,
+                'completiontype' => COMPLETIONTYPE_ALL,
+                'certifpath' => CERTIFPATH_STD,
+                'courses' => [
+                    $courses[3]
+                ]
+            ],
+        ]);
+
+        // This is stupid, but done. We want to know if anyone changes it.
+        $this->assertSame(get_string('notassigned', 'totara_program'), prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+
+        $this->assert_courseset_groups_contain_expected_names($certification, [
+            [
+                'Course set 1',
+                'Course set 2',
+                'Course set 3'
+            ]
+        ]);
+
+        // Assign the user to the cert as an individual.
+        $this->getDataGenerator()->assign_to_program($certification->id, ASSIGNTYPE_INDIVIDUAL, $user->id);
+        $this->assertSame(0.0, prog_display_progress($certification->id, $user->id, CERTIFPATH_CERT, true));
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[1]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[2]);
+        $this->assert_program_progress_after_course_completion(100, $certification, $user, $courses[3]);
+    }
 }

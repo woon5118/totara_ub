@@ -261,9 +261,10 @@ class totara_reportbuilder_cache_generator extends testing_data_generator {
      * Create program certification for testing.
      *
      * @param array $data Override default properties - use 'cert_' or 'prog_' prefix for each parameter name
+     * @param array $coursesetdata Course set data which gets given to create_coursesets_in_program. Check that function for details.
      * @return program Program object
      */
-    public function create_certification($data = array()) {
+    public function create_certification($data = array(), array $coursesetdata = null) {
         global $DB;
 
         // Keep a record of how many test certifications are being created.
@@ -308,7 +309,88 @@ class totara_reportbuilder_cache_generator extends testing_data_generator {
 
         // Create and return the program.
         $certifprogram = $this->create_program($programmerged);
+
+        if ($coursesetdata !== null) {
+            $this->create_coursesets_in_program($certifprogram, $coursesetdata);
+        }
+
         return $certifprogram;
+    }
+
+    /**
+     * Creates course sets and adds content given on the data passed through details.
+     *
+     * Details should be an array of course set data, each item can have the following keys:
+     *
+     *   - type int The type, one of CONTENTTYPE_MULTICOURSE, CONTENTTYPE_COMPETENCY, CONTENTTYPE_RECURRING
+     *   - nextsetoperator int The next set operator, one of NEXTSETOPERATOR_THEN, NEXTSETOPERATOR_AND, NEXTSETOPERATOR_OR
+     *   - completiontype The type, one of COMPLETIONTYPE_ALL, COMPLETIONTYPE_SOME, COMPLETIONTYPE_OPTIONAL
+     *   - certifpath The certification path for this set, one of CERTIFPATH_STD, CERTIFPATH_RECERT
+     *   - mincourses int The minimum number of courses the user is required to complete (only relevant with COMPLETIONTYPE_SOME)
+     *   - courses array An array of courses created by create_course.
+     *
+     * @param program $program
+     * @param array $details
+     * @throws coding_exception
+     */
+    public function create_coursesets_in_program(program $program, array $details) {
+        $expected_coursesets = count($details);
+
+        $certifcontent = $program->get_content();
+
+        foreach ($details as $detail) {
+            /** @var course_set $courseset */
+            $type = (isset($detail['type'])) ? $detail['type'] : CONTENTTYPE_MULTICOURSE;
+            if (!$certifcontent->add_set($type)) {
+                // We really need to know about this when it happens, and as its testing coding exception is going to be best.
+                throw new coding_exception('Error adding set to course.');
+            }
+        }
+        $certifcontent->fix_set_sortorder();
+
+        if ($expected_coursesets !== count($certifcontent->get_course_sets())) {
+            // We really need to know about this when it happens, and as its testing coding exception is going to be best.
+            throw new coding_exception('Mis-match in the number of course sets created.');
+        }
+
+        $coursecounts = array();
+        foreach ($certifcontent->get_course_sets() as $courseset) {
+            /** @var course_set $courseset */
+
+            $detail = array_shift($details);
+
+            $nextsetoperator = (isset($detail['nextsetoperator'])) ? $detail['nextsetoperator'] : NEXTSETOPERATOR_THEN;
+            $completiontype = (isset($detail['completiontype'])) ? $detail['completiontype'] : COMPLETIONTYPE_ALL;
+            $certifpath = (isset($detail['certifpath'])) ? $detail['certifpath'] : CERTIFPATH_STD;
+            $mincourses = (isset($detail['mincourses'])) ? (int)$detail['mincourses'] : 0;
+            $courses = (isset($detail['courses']) && is_array($detail['courses'])) ? $detail['courses'] : false;
+
+            $coursecount = 0;
+            if ($courses) {
+                /** @var multi_course_set $courseset */
+                if ($courseset->contenttype != CONTENTTYPE_MULTICOURSE) {
+                    throw new coding_exception('Courses can only be added to multi course sets.');
+                }
+                foreach ($courses as $course) {
+                    $coursecount++;
+                    $key = $courseset->get_set_prefix() . 'courseid';
+                    $coursedata = new stdClass();
+                    $coursedata->{$key} = $course->id;
+                    if (!$courseset->add_course($coursedata)) {
+                        // We really need to know about this when it happens, and as its testing coding exception is going to be best.
+                        throw new coding_exception('Mis-match in the number of course sets created.');
+                    }
+                }
+            }
+            $coursecounts[] = $coursecount;
+
+            $courseset->nextsetoperator = $nextsetoperator;
+            $courseset->completiontype = $completiontype;
+            $courseset->certifpath = $certifpath;
+            $courseset->mincourses = $mincourses;
+        }
+
+        $certifcontent->save_content();
     }
 
     /**
