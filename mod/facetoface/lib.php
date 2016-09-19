@@ -2400,6 +2400,7 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
             MDL_F2F_STATUS_REQUESTED, // They are currently waiting for approval already.
             MDL_F2F_STATUS_USER_CANCELLED, // They cancelled and are coming back again - seek approval once more.
             MDL_F2F_STATUS_SESSION_CANCELLED, // They session was cancelled but we are back? seek approval to be sure.
+            MDL_F2F_STATUS_DECLINED, // Persistent learner, won't take no for an answer
         );
         if (in_array($currentstatus, $alreadyapproved)) {
             // The user is an already approved state - no need to seek there approval again.
