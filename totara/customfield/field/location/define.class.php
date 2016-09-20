@@ -211,12 +211,16 @@ class customfield_define_location extends customfield_define_base {
                 'class' => 'btn_search'
             )
         );
+        // Google Map element
+        $mapelements[] = $form->createElement(
+            'static',
+            $formprefix . 'googlemap',
+            null,
+            html_writer::tag('div', null, array('id' => "{$formprefix}location_map", 'class' => 'location_map'))
+        );
 
         $form->addGroup($mapelements, $formprefix . 'mapelements', get_string('customfieldtypelocation_setmap', 'totara_customfield'), ' ', false);
         $form->addHelpButton($formprefix . 'mapelements', 'customfieldtypelocation_setmap', 'totara_customfield');
-
-        // Google Map element
-        $form->addElement('html', '<div id="' . $formprefix . 'location_map" class="location_map" ></div>');
 
         $usertz = core_date::get_user_timezone();
         $tz = new DateTimeZone($usertz);
