@@ -15,6 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$plugin->version = 2009080102;
-$plugin->requires  = 2015111000;        // Requires this Moodle version
+$plugin->version = 2016092000;
+$plugin->requires  = 2015111606;        // Requires this Moodle version
 $plugin->component = 'auth_gauth';         // Full name of the plugin (used for diagnostics)
