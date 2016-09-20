@@ -13,6 +13,6 @@
         "autoprefixer": "^6.3.7",
         "grunt-postcss": "^0.8.0",
         "rtlcss": "^2.0.5",
-        "promise": "~7.1.1"
+        "promise": "~6.1.0"
     }
 }

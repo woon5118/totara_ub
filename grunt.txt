@@ -11,7 +11,7 @@ or perform an upgrade triggered by a version bump.
 Installation
 ============
 
-1. Install nodejs and npm in your OS
+1. Install Node.js and npm in your OS - minimum recommended version of npm is v2.15
 2. run 'npm install' in the root directory to install all required npm modules in expected versions
 3. either install grunt-cli globally using 'npm install grunt-cli -g' (you may be required to use sudo)
 4. or install grunt locally via 'npm install grunt-cli' (you will have to use './node_modules/.bin/grunt' later)
@@ -36,12 +36,18 @@ to minimise problems when switching branches in one checkout.
 
 Totara employees should use the following procedure:
 
-1. run 'grunt' and make sure everything is up-to-date before you start
-2. delete node_modules/ directory
-3. delete npm-shrinkwrap.json file
-4. run 'npm install'
-5. run 'npm shrinkwrap --dev'
-6. run 'grunt'
-7. verify the changes in minified JavaScript and CSS are ok
-9. commit the changed files and submit for review
-10. add a changelog note that developers need to 'npm install' to upgrade their dev machines
+1. make sure you have latest Node.js v4 with latest npm@2 installed
+2. run 'grunt' and make sure everything is up-to-date before you start
+3. delete node_modules/ directory
+4. delete npm-shrinkwrap.json file
+5. run 'npm install'
+6. run 'npm shrinkwrap --dev'
+7. run 'grunt'
+8. verify the changes in minified JavaScript and CSS are ok
+9. commit the changed files
+10. switch to Node.js v6 with npm@3
+11. delete node_modules/ directory
+12. run 'npm install'
+13. verify there are no changed files
+14. submit patch for review
+15. remind developers in changelog they need to 'npm install' when switching branches or updating
