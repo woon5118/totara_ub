@@ -816,6 +816,11 @@ class behat_data_generators extends behat_base {
                 $instanceid = $DB->get_field('course_modules', 'id', array('idnumber' => $contextref));
                 break;
 
+            // TOTARA: Allow selecting program context as well.
+            case CONTEXT_PROGRAM:
+                $instanceid = $DB->get_field('prog', 'id', array('idnumber' => $contextref));
+                break;
+
             default:
                 break;
         }

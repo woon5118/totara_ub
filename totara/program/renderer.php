@@ -64,7 +64,7 @@ class totara_program_renderer extends plugin_renderer_base {
     * @param string $name
     * @return string
     */
-    public function completion_events_dropdown($name="eventtype") {
+    public function completion_events_dropdown($name="eventtype", $programid = null) {
         global $COMPLETION_EVENTS_CLASSNAMES;
         // The javascript part of this element was initially factored out
         // and added using jQuery when the page was loaded but this didn't work
@@ -75,7 +75,7 @@ class totara_program_renderer extends plugin_renderer_base {
             $dropdown_options[$event->get_id()] = $event->get_name();
         }
         $out = html_writer::select($dropdown_options, $name, null, null, array('id' => $name, 'class' => $name, 'onchange' => 'handle_completion_selection()'));
-        $out .= html_writer::script(prog_assignments::get_completion_events_script($name));
+        $out .= html_writer::script(prog_assignments::get_completion_events_script($name, $programid));
         return $out;
     }
 
@@ -414,7 +414,7 @@ class totara_program_renderer extends plugin_renderer_base {
     *
     * @return string HTML Fragment
     */
-    public function display_set_completion() {
+    public function display_set_completion($programid = null) {
         $out = '';
         $out .= html_writer::start_tag('fieldset');
         $out .= html_writer::start_tag('span', array('class' => 'legend')) . get_string('completeby', 'totara_program') . html_writer::end_tag('span');
@@ -464,7 +464,7 @@ class totara_program_renderer extends plugin_renderer_base {
         $out .= html_writer::tag('span', get_string('completewithin', 'totara_program'));
         $out .= program_utilities::print_duration_selector($prefix = '', $periodelementname = 'timeperiod', $periodvalue = '', $numberelementname = 'timeamount', $numbervalue = '1', $includehours = false);
         $out .= ' ' . get_string('of', 'totara_program') . ' ';
-        $out .= $this->completion_events_dropdown();
+        $out .= $this->completion_events_dropdown("eventtype", $programid);
         $out .= html_writer::empty_tag('input', array('id' => 'instance', 'type' => 'hidden', 'name' => "instance", 'value' => ''));
         $out .= html_writer::link('#', '', array('id' => 'instancetitle', 'onclick' => 'handle_completion_selection()'));
         $out .= html_writer::start_tag('button', array('class' => 'relativeeventtime')) . get_string('settimerelativetoevent', 'totara_program') . html_writer::end_tag('button');

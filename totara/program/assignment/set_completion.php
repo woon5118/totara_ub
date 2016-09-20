@@ -28,5 +28,6 @@ require_once($CFG->dirroot.'/totara/program/lib.php');
 require_login();
 $PAGE->set_context(context_system::instance());
 
+$programid = required_param('programid', PARAM_INT);
 
-echo $PAGE->get_renderer('totara_program')->display_set_completion();
+echo $PAGE->get_renderer('totara_program')->display_set_completion($programid);

@@ -43,11 +43,9 @@ require_login();
 $program = new program($id);
 $programcontext = $program->get_context();
 
-if (!has_capability('totara/program:editcompletion', $programcontext)) {
-    print_error('error:nopermissions', 'totara_program');
-}
+require_capability('totara/program:editcompletion', $programcontext);
 
-if (!empty($program->certifid)) {
+if ($program->is_certif()) {
     print_error('error:notaprogram', 'totara_program');
 }
 

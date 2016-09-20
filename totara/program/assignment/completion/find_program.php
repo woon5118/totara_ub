@@ -27,9 +27,17 @@
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_programs.class.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
+require_once($CFG->dirroot.'/totara/program/program.class.php');
 
 require_login();
 $PAGE->set_context(context_system::instance());
+
+// Check permissions.
+$programid = required_param('programid', PARAM_INT);
+$program = new program($programid);
+require_capability('totara/program:configureassignments', $program->get_context());
+$program->check_enabled();
+
 ///
 /// Setup / loading data
 ///

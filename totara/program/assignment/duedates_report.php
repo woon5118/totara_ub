@@ -33,16 +33,10 @@ $programid = required_param('programid', PARAM_INT);
 // Check capabilities.
 ajax_require_login();
 
-require_capability('totara/program:configureassignments', program_get_context($programid));
-
 $program = new program($programid);
-$iscertif = $program->certifid ? true : false;
-
-if ($iscertif) {
-    check_certification_enabled();
-} else {
-    check_program_enabled();
-}
+require_capability('totara/program:configureassignments', $program->get_context());
+$program->check_enabled();
+$iscertif = $program->is_certif();
 
 $PAGE->set_url('/totara/program/assignment/duedates_report.php');
 $PAGE->set_context(context_system::instance());

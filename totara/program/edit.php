@@ -42,26 +42,18 @@ $nojs = optional_param('nojs', 0, PARAM_INT);
 require_login();
 
 $program = new program($id);
-$iscertif = $program->certifid ? true : false;
+$iscertif = $program->is_certif();
+$program->check_enabled();
 $programcontext = $program->get_context();
+require_capability('totara/program:configuredetails', $programcontext);
+
 $PAGE->set_context($programcontext);
 
 customfield_load_data($program, 'program', 'prog');
 
-// Check if programs or certifications are enabled.
-if ($iscertif) {
-    check_certification_enabled();
-} else {
-    check_program_enabled();
-}
-
 // Redirect to delete page if deleting.
 if ($action == 'delete') {
     redirect(new moodle_url('/totara/program/delete.php', array('id' => $id, 'category' => $category)));
-}
-
-if (!has_capability('totara/program:configuredetails', $programcontext)) {
-    print_error('error:nopermissions', 'totara_program');
 }
 
 // Set type.

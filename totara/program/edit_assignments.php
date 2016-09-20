@@ -36,21 +36,12 @@ require_login();
 
 $id = required_param('id', PARAM_INT);
 
-$systemcontext = context_system::instance();
 $program = new program($id);
-$iscertif = $program->certifid ? true : false;
+$iscertif = $program->is_certif();
 $programcontext = $program->get_context();
 
-// Check if programs or certifications are enabled.
-if ($iscertif) {
-    check_certification_enabled();
-} else {
-    check_program_enabled();
-}
-
-if (!has_capability('totara/program:configureassignments', $programcontext)) {
-    print_error('error:nopermissions', 'totara_program');
-}
+require_capability('totara/program:configureassignments', $programcontext);
+$program->check_enabled();
 
 $PAGE->set_url(new moodle_url('/totara/program/edit_assignments.php', array('id' => $id)));
 $PAGE->set_context($programcontext);

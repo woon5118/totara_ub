@@ -467,7 +467,7 @@ M.totara_programassignment = M.totara_programassignment || {
      * Called by AJAX callback data inserted into DOM
      */
     add_category: function(id, name, find_url, title){
-        program_assignment.add_category(new category(id, name, find_url, title));
+        program_assignment.add_category(new category(id, name, find_url, title, this.config.id));
     },
 
     /**
@@ -648,8 +648,9 @@ program_assignment = new function() {
 /***
  *** Define the category object for re-use, but don't actually instantiate any!
  ***/
-function category(id, name, find_url, title) {
+function category(id, name, find_url, title, programid) {
     this.id = id;
+    this.programid = programid;
     this.name = name;
     this.items = [];
     this.unsaveditems = [];
@@ -842,15 +843,19 @@ function category(id, name, find_url, title) {
 
         if (newids.length > 0) {
             this.dialog_additem.showLoading();
+            var postdata = {"cat":self.name,"itemid":newids,"programid":self.programid};
+            $.ajax({
+                type: 'POST',
+                url: self.url + 'get_item.php',
+                data: postdata,
+                dataType: 'json',
+                success: function(data) {
+                    $.each(data['rows'], function(index, html) {
+                        self.create_item(html);
+                    });
 
-            $.getJSON(this.ajax_url + '&itemid=' + newids.join(','), function(data) {
-
-                $.each(data['rows'], function(index, html) {
-                    self.create_item(html);
-                });
-
-                self.dialog_additem.hide();
-            });
+                    self.dialog_additem.hide();
+            }});
         } else {
             this.dialog_additem.hide();
         }
@@ -895,8 +900,6 @@ function item(category, element, isexistingitem) {
         this.users = parseInt(this.usersElement.html());
     }
     this.initial_users = this.users;
-
-    this.removeurl = this.category.url + 'remove_item.php?cat=' + this.category.name + '&itemid=' + this.itemid;
 
     // Hidden values
     this.completiontime = this.element.find('input[name^="completiontime"]');
@@ -1077,15 +1080,20 @@ function item(category, element, isexistingitem) {
     // includechildren is true or false
     this.get_user_count = function(includechildren) {
 
-        var url = this.category.url + 'get_item_count.php?cat=' + this.category.name + '&itemid=' + this.itemid + '&include=' + includechildren;
+        var item_count_url = this.category.url + 'get_item_count.php';
+        var postdata = {"cat":this.category.name,"itemid":this.itemid,"include":includechildren,"programid":this.category.programid};
         this.usersElement.data('complete', false);
 
         this.set_loading();
-
-        $.getJSON(url, function(data) {
-            var count = parseInt(data['count']);
-            self.update_user_count(count);
-        });
+        $.ajax({
+            type: 'POST',
+            url: item_count_url,
+            data: postdata,
+            dataType: 'json',
+            success: function(data) {
+                var count = parseInt(data['count']);
+                self.update_user_count(count);
+        }});
     };
 
     this.set_loading = function() {
@@ -1132,7 +1140,7 @@ function item(category, element, isexistingitem) {
         self.get_completioneventname(completioneventname);
         event.preventDefault();
         totaraDialogs['completion'].item = self;
-        totaraDialogs['completion'].default_url = self.category.url + 'set_completion.php';
+        totaraDialogs['completion'].default_url = self.category.url + 'set_completion.php?programid=' + self.category.programid;
         totaraDialogs['completion'].open();
     });
 

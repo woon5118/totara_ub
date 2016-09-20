@@ -26,6 +26,9 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
 require_once($CFG->dirroot . '/totara/program/edit_completion_history_form.php');
 
+// Check if programs are enabled.
+check_program_enabled();
+
 if (empty($CFG->enableprogramcompletioneditor)) {
     print_error('error:completioneditornotenabled', 'totara_program');
 }
@@ -39,11 +42,7 @@ require_login();
 $program = new program($id);
 $programcontext = $program->get_context();
 
-check_program_enabled();
-
-if (!has_capability('totara/program:editcompletion', $programcontext)) {
-    print_error('error:nopermissions', 'totara_program');
-}
+require_capability('totara/program:editcompletion', $programcontext);
 
 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 

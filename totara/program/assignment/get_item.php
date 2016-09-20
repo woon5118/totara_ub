@@ -28,65 +28,67 @@ require_once($CFG->dirroot.'/totara/program/lib.php');
 $PAGE->set_context(context_system::instance());
 require_login();
 
+$cat = required_param('cat', PARAM_ALPHA); // The category name, such as positions, organisations
+$itemids = required_param_array('itemid', PARAM_INT);
+$programid = required_param('programid', PARAM_INT);
 
-$cat = required_param('cat', PARAM_TEXT); // The category name, such as positions, organisations
-$itemids = required_param('itemid', PARAM_SEQUENCE);
-$itemids = explode(',', $itemids);
+$program = new program($programid);
+require_capability('totara/program:configureassignments', $program->get_context());
+$program->check_enabled();
 
 $classname = "{$cat}_category";
 
-if (class_exists($classname)) {
-    $category = new $classname();
+if (!class_exists($classname) || !is_subclass_of($classname, 'prog_assignment_category')) {
+    throw new moodle_exception('error', '', '', null, 'invalid classname');
+}
 
-    $items = array();
-    $rows = array();
-    $users = 0;
-    foreach ($itemids as $itemid) {
+/** @var prog_assignment_category $category */
+$category = new $classname();
+
+$items = array();
+$rows = array();
+$users = 0;
+foreach ($itemids as $itemid) {
     $item = $category->get_item(intval($itemid));
     $users += $category->user_affected_count($item);
-
     $items[] = $item;
+
     $row = $category->build_row($item);
-
-        $rowhtml = '<tr>';
-        $colcount = 0;
-        foreach ($row as $cell) {
-            $rowhtml .= '<td class="col'.$colcount.'">'.$cell.'</td>';
-            $colcount++;
-        }
-        $rowhtml .= '</tr>';
-
+    $rowhtml = '<tr>';
+    $colcount = 0;
+    foreach ($row as $cell) {
+        $rowhtml .= '<td class="col'.$colcount.'">'.$cell.'</td>';
+        $colcount++;
+    }
+    $rowhtml .= '</tr>';
     $rows[] = $rowhtml;
-    }
+}
 
-    // Build the html to display in the confirmation dialog
-    $num = count($items);
-    $itemnames = '';
-    if ($num == 1) {
+// Build the html to display in the confirmation dialog
+$num = count($items);
+$itemnames = '';
+if ($num == 1) {
     $itemnames .= '"'.$items[0]->fullname.'"';
-    }
-    else {
+} else {
     for ($i = 0; $i < $num; $i++) {
         // If not last item
         if ($i == 0) {
             $itemnames .= ' "'.$items[$i]->fullname.'"';
-        }
-        else if ($i != $num-1) {
+        } else if ($i != $num-1) {
             $itemnames .= ', "'.$items[$i]->fullname.'"';
-        }
-        else {
+        } else {
             $itemnames .= ' and "'.$items[$i]->fullname.'"';
         }
     }
-    }
-    $a = new stdClass();
-    $a->itemnames = $itemnames;
-    $a->affectedusers = $users;
-    $html = get_string('youhaveadded', 'totara_program', $a);
+}
 
-    $data = array(
+$a = new stdClass();
+$a->itemnames = $itemnames;
+$a->affectedusers = $users;
+$html = get_string('youhaveadded', 'totara_program', $a);
+
+$data = array(
     'html'      => $html,
     'rows'      => $rows
-    );
-    echo json_encode($data);
-}
+);
+echo json_encode($data);

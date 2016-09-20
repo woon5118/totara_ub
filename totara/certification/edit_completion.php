@@ -42,12 +42,10 @@ require_login();
 
 $program = new program($id);
 $programcontext = $program->get_context();
+
+require_capability('totara/program:editcompletion', $programcontext);
+
 $certification = $DB->get_record('certif', array('id' => $program->certifid));
-
-if (!has_capability('totara/program:editcompletion', $programcontext)) {
-    print_error('error:nopermissions', 'totara_program');
-}
-
 if (!$certification) {
     print_error(get_string('nocertifdetailsfound', 'totara_certification'));
 }

@@ -25,24 +25,34 @@ require_once($CFG->dirroot.'/totara/program/lib.php');
 
 require_login();
 
-$cat = required_param('cat', PARAM_TEXT); // The category name, such as positions, organisations
+$cat = required_param('cat', PARAM_ALPHA); // The category name, such as positions, organisations
 $itemid = required_param('itemid', PARAM_INT);
 $includechildren = required_param('include', PARAM_INT);
+$programid = required_param('programid', PARAM_INT);
+
+$program = new program($programid);
+// Information such as user's fullnames, manager positions can be exposed via this script,
+// so check that the user has permission to do this.
+require_capability('totara/program:configureassignments', $program->get_context());
+$program->check_enabled();
 
 $classname = "{$cat}_category";
 
-if (class_exists($classname)) {
-    $category = new $classname();
-
-    $item = $category->get_item(intval($itemid));
-
-    $item->includechildren = $includechildren;
-
-    $users = $category->user_affected_count($item, true);
-
-    $data = array(
-        'name'  => $item->fullname,
-        'count' => $users,
-    );
-    echo json_encode($data);
+if (!class_exists($classname) || !is_subclass_of($classname, 'prog_assignment_category')) {
+    throw new moodle_exception('error', '', '', null, 'invalid classname');
 }
+
+/** @var prog_assignment_category $category */
+$category = new $classname();
+
+$item = $category->get_item(intval($itemid));
+
+$item->includechildren = $includechildren;
+
+$users = $category->user_affected_count($item, true);
+
+$data = array(
+    'name'  => $item->fullname,
+    'count' => $users,
+);
+echo json_encode($data);

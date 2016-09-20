@@ -217,6 +217,9 @@ class program {
         return $this->content;
     }
 
+    /**
+     * @return context_program
+     */
     public function get_context() {
         return $this->context;
     }
@@ -2070,6 +2073,30 @@ class program {
         }
 
         return $message;
+    }
+
+    /**
+     * Checks if certifications/programs are enabled depending on what type
+     * this is. Throws an exception if they're not.
+     *
+     * @throws moodle_exception
+     */
+    public function check_enabled() {
+        // Check if programs or certifications are enabled.
+        if ($this->is_certif()) {
+            check_certification_enabled();
+        } else {
+            check_program_enabled();
+        }
+    }
+
+    /**
+     * Returns true if this is a certification, or false if not.
+     *
+     * @return bool
+     */
+    public function is_certif() {
+        return !empty($this->certifid);
     }
 }
 

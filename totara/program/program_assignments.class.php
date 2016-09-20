@@ -285,7 +285,7 @@ class prog_assignments {
      * @param string $name
      * @return string
      */
-    public static function get_completion_events_script($name="eventtype") {
+    public static function get_completion_events_script($name="eventtype", $programid = null) {
         global $COMPLETION_EVENTS_CLASSNAMES;
 
         $out = '';
@@ -298,7 +298,7 @@ class prog_assignments {
 
         // Get the script that should be run if we select a specific event
         foreach ($COMPLETION_EVENTS_CLASSNAMES as $class) {
-            $event = new $class();
+            $event = new $class($programid);
             $out .= "if (eventid == ". $event->get_id() .") { " . $event->get_script() . " }";
         }
 
@@ -1551,6 +1551,14 @@ class user_assignment {
 }
 
 abstract class prog_assignment_completion_type {
+    protected $programid;
+
+    public function __construct($programid = null) {
+        if (isset($programid)) {
+            $this->programid = $programid;
+        }
+    }
+
     abstract public function get_id();
     abstract public function get_name();
     abstract public function get_script();
@@ -1599,8 +1607,13 @@ class prog_assigment_completion_position_assigned_date extends prog_assignment_c
     public function get_script() {
         global $CFG;
 
+        if (empty($this->programid)) {
+            throw new coding_exception('Program id must be defined for js that will call the completion ajax scripts.');
+        }
+
         return "
-            totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_position.php?';
+            totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_position.php?programid="
+            . $this->programid . "';
             totaraDialogs['completionevent'].open();
 
             $('#instancetitle').unbind('click').click(function() {
@@ -1664,8 +1677,13 @@ class prog_assigment_completion_position_start_date extends prog_assignment_comp
     public function get_script() {
         global $CFG;
 
+        if (empty($this->programid)) {
+            throw new coding_exception('Program id must be defined for js that will call the completion ajax scripts.');
+        }
+
         return "
-            totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_position.php?';
+            totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_position.php?programid="
+            . $this->programid . "';
             totaraDialogs['completionevent'].open();
 
             $('#instancetitle').unbind('click').click(function() {
@@ -1729,8 +1747,13 @@ class prog_assigment_completion_program_completion extends prog_assignment_compl
     public function get_script() {
         global $CFG;
 
+        if (empty($this->programid)) {
+            throw new coding_exception('Program id must be defined for js that will call the completion ajax scripts.');
+        }
+
         return "
-            totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_program.php?';
+            totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_program.php?programid="
+            . $this->programid . "';
             totaraDialogs['completionevent'].open();
 
             $('#instancetitle').unbind('click').click(function() {
@@ -1792,8 +1815,13 @@ class prog_assigment_completion_course_completion extends prog_assignment_comple
     public function get_script() {
         global $CFG;
 
+        if (empty($this->programid)) {
+            throw new coding_exception('Program id must be defined for js that will call the completion ajax scripts.');
+        }
+
         return "
-            totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_course.php?';
+            totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_course.php?programid="
+            . $this->programid . "';
             totaraDialogs['completionevent'].open();
 
             $('#instancetitle').unbind('click').click(function() {
@@ -1855,8 +1883,13 @@ class prog_assigment_completion_profile_field_date extends prog_assignment_compl
     public function get_script() {
         global $CFG;
 
+        if (empty($this->programid)) {
+            throw new coding_exception('Program id must be defined for js that will call the completion ajax scripts.');
+        }
+
         return "
-            totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_profile_field.php?';
+            totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_profile_field.php?programid="
+            . $this->programid . "';
             totaraDialogs['completionevent'].open();
 
             $('#instancetitle').unbind('click').click(function() {

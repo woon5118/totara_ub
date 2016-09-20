@@ -39,20 +39,12 @@ require_login();
 
 $systemcontext = context_system::instance();
 $program = new program($id);
-$iscertif = $program->certifid ? true : false;
-
-// Check if programs or certifications are enabled.
-if ($iscertif) {
-    check_certification_enabled();
-} else {
-    check_program_enabled();
-}
+$iscertif = $program->is_certif();
 
 $programcontext = $program->get_context();
 
-if (!has_capability('totara/program:configuremessages', $programcontext)) {
-    print_error('error:nopermissions', 'totara_program');
-}
+require_capability('totara/program:configuremessages', $programcontext);
+$program->check_enabled();
 
 $PAGE->set_url(new moodle_url('/totara/program/edit_messages.php', array('id' => $id)));
 $PAGE->set_context($programcontext);

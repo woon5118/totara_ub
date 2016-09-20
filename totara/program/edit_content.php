@@ -43,19 +43,11 @@ $systemcontext = context_system::instance();
 // Constructors called in turn are: program, prog_content, prog_courseset, (multi_course_set).
 // So all existing data loaded.
 $program = new program($id);
-$iscertif = $program->certifid ? true : false;
+$iscertif = $program->is_certif();
 $programcontext = $program->get_context();
 
-// Check if programs or certifications are enabled.
-if ($iscertif) {
-    check_certification_enabled();
-} else {
-    check_program_enabled();
-}
-
-if (!has_capability('totara/program:configurecontent', $programcontext)) {
-    print_error('error:nopermissions', 'totara_program');
-}
+require_capability('totara/program:configurecontent', $programcontext);
+$program->check_enabled();
 
 $PAGE->set_url(new moodle_url('/totara/program/edit_content.php', array('id' => $id)));
 $PAGE->set_context($programcontext);

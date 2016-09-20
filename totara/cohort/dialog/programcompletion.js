@@ -297,7 +297,7 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
             dialog.completioninstance = $('input[name^="completioninstance"]', div);
             dialog.completionlink = div;
 
-            dialog.default_url = M.cfg.wwwroot + '/totara/program/assignment/set_completion.php';
+            dialog.default_url = M.cfg.wwwroot + '/totara/program/assignment/set_completion.php?programid=' + dialog.programid;
             totaraDialogs['completion'].open();
         });
         // Add handler to remove completion dates.

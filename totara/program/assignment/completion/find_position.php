@@ -25,9 +25,19 @@
 
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_hierarchy.class.php');
+require_once($CFG->dirroot.'/totara/program/program.class.php');
 
 require_login();
-$PAGE->set_context(context_system::instance());
+$systemcontext = context_system::instance();
+$PAGE->set_context($systemcontext);
+
+// Check permissions.
+$programid = required_param('programid', PARAM_INT);
+$program = new program($programid);
+require_capability('totara/program:configureassignments', $program->get_context());
+require_capability('totara/hierarchy:viewposition', $systemcontext);
+$program->check_enabled();
+
 ///
 /// Setup / loading data
 ///
