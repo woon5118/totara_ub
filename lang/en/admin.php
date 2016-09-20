@@ -170,7 +170,8 @@ $string['configcronremotepassword'] = 'This means that the cron.php script canno
     http://site.example.com/admin/cron.php?password=opensesame
 </pre>If this is left empty, no password is required.';
 $string['configcurlcache'] = 'Time-to-live for cURL cache, in seconds.';
-$string['configcustommenuitems'] = 'You can configure a custom menu here to be shown by themes. Each line consists of some menu text, a link URL (optional), a tooltip title (optional) and a language code or comma-separated list of codes (optional, for displaying the line to users of the specified language only), separated by pipe characters. You can specify a structure using hyphens, and dividers can be used by adding a line of one or more # characters where desired. For example:
+$string['configcustommenuitems'] = 'This is deprecated functionality and will not display in core themes (will be deleted in Totara 10.0). Please customise the main menu instead (Site adminsitration > Appearance > Main menu).<br/>
+You can configure a custom menu here to be shown by themes. Each line consists of some menu text, a link URL (optional), a tooltip title (optional) and a language code or comma-separated list of codes (optional, for displaying the line to users of the specified language only), separated by pipe characters. You can specify a structure using hyphens, and dividers can be used by adding a line of one or more # characters where desired. For example:
 <pre>
 Totara community|http://community.totaralms.com
 Totara support|http://support.totaralms.com
@@ -396,7 +397,7 @@ $string['curltimeoutkbitrate_help'] = 'This setting is used to calculate an appr
 $string['currenttheme'] = 'Current theme';
 $string['customcheck'] = 'Other checks';
 $string['custommenu'] = 'Custom menu';
-$string['custommenuitems'] = 'Custom menu items';
+$string['custommenuitems'] = 'Custom menu items (Deprecated)';
 $string['customusermenuitems'] = 'User menu items';
 $string['datarootsecurityerror'] = '<p><strong>SECURITY WARNING!</strong></p><p>Your dataroot directory is in the wrong location and is exposed to the web. This means that all your private files are available to anyone in the world, and some of them could be used by a cracker to obtain unauthorised administrative access to your site!</p>
 <p>You <em>must</em> move dataroot directory ({$a}) to a new location that is not within your public web directory, and update the <code>$CFG->dataroot</code> setting in your config.php accordingly.</p>';
