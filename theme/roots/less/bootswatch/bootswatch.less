@@ -63,3 +63,17 @@
 .dl-horizontal dd {
     margin-bottom: @padding-small-vertical;
 }
+
+//
+// Labels.
+//
+// Links inside labels should inherit the label text colour.
+// This is used for action (font) icons.
+.label a {
+    color: inherit;
+
+    &:hover,
+    &:focus {
+        color: inherit;
+    }
+}

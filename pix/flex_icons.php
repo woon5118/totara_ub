@@ -686,6 +686,14 @@ $icons = array(
                     'classes' => 'fa-times ft-state-danger',
                 ),
         ),
+    // Non-standard / no state delete. For use with dark background colours.
+    'delete-ns' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-times',
+                ),
+        ),
     'delete-disabled' =>
         array(
             'data' =>
