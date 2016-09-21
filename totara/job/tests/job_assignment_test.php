@@ -289,10 +289,9 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
 
         $createtimebefore = time();
         $jobassignment = \totara_job\job_assignment::create_default($this->users[4]->id);
-        $createtimeafter = time();
-
         $managerja = \totara_job\job_assignment::create_default($this->users[2]->id);
         $tempmanagerja = \totara_job\job_assignment::create_default($this->users[3]->id);
+        $createtimeafter = time();
 
         $updatedata = array(
             'fullname' => 'fullname1',
