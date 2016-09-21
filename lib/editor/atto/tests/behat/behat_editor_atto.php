@@ -25,6 +25,8 @@
 
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
 
+use Behat\Mink\Exception\ExpectationException as ExpectationException;
+
 /**
  * Steps definitions to deal with the atto text editor
  *
@@ -62,31 +64,42 @@ class behat_editor_atto extends behat_base {
      *
      * Checks, that page contains specified text. It also checks if the text is visible when running Javascript tests.
      *
-     * @Then /^I should see "(?P<text_string>(?:[^"]|\\")*)" list from Atto$/
+     * @Then /^I should see "(?P<text_string>(?:[^"]|\\")*)" list in the "([^"]*)" Atto editor$/
      * @throws Behat\Mink\Exception\ExpectationException
      * @param string $text
      * @return array
      */
-    public function assert_page_contains_list_from_atto($text) {
+    public function assert_page_contains_list_from_atto($text, $fieldlocator) {
         global $CFG;
 
-        $driver = $this->getSession()->getDriver();
-        if (method_exists($driver, 'getBrowser')) {
-            $browser = $driver->getBrowser();
-            if ($browser === 'chrome' or $browser === 'safari') {
-                if ($CFG->theme === 'standardtotararesponsive') {
-                    $text = str_replace('<ol><li>', '<ol><li><span style=\\"color:rgb(51,51,51);\\">', $text);
-                    $text = str_replace('<ul><li>', '<ul><li><span style=\\"color:rgb(51,51,51);\\">', $text);
-                } else {
-                    $text = str_replace('<ol><li>', '<ol><li><span style=\\"line-height:1.42857;\\">', $text);
-                    $text = str_replace('<ul><li>', '<ul><li><span style=\\"line-height:1.42857;\\">', $text);
-                }
+        if (!$this->running_javascript()) {
+            throw new coding_exception('Selecting text requires javascript.');
+        }
+        // We delegate to behat_form_field class, it will
+        // guess the type properly.
+        $field = behat_field_manager::get_form_field_from_label($fieldlocator, $this);
+        if (!method_exists($field, 'get_value')) {
+            throw new coding_exception('Field does not support the get_value function.');
+        }
+        $fieldText = $field->get_value();
+
+        // Some chrome browsers add a <span> tag around the text.
+        // For now NOT expecting the closing tags in the test text
+        $elements = preg_split('/(<[ou]l><li>)/', $text, null, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $searchre = '/';
+        if (count($elements) > 1) {
+            for ($i = 1; $i < count($elements); $i += 2) {
+                $searchre .= $elements[$i - 1] . '.*' . $elements[$i];
             }
         }
+        else {
+            $searchre .= $elements[0];
+        }
+        $searchre .= '/';
 
-        return array(
-            new Behat\Behat\Context\Step\Given('I should see "' . $text . '"')
-        );
+        if (!preg_match($searchre, $fieldText)) {
+            throw new ExpectationException('"' . $text . '" text was not found in the Atto editor', $this->getSession());
+        }
     }
 }
 
