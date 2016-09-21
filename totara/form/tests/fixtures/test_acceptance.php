@@ -115,10 +115,18 @@ if (isset($form)) {
         $table = new html_table();
         $table->id = 'form_results';
         $table->caption = 'The following form values were submit';
-        $table->head = ['Name', 'Value'];
+        $table->head = ['Name', 'Value', 'Post data'];
         $table->data = [];
         foreach ($data as $name => $value) {
-            $table->data[] = [$name, $formclass::format_for_display($name, $value)];
+            $postdata = 'No post data';
+            if (array_key_exists($name, $_POST)) {
+                if (empty($_POST[$name])) {
+                    $postdata = 'Provided but empty';
+                } else {
+                    $postdata = 'Data present, type '.gettype($_POST[$name]);
+                }
+            }
+            $table->data[] = [$name, $formclass::format_for_display($name, $value), $postdata];
         }
         echo $OUTPUT->render($table);
         echo $OUTPUT->single_button(new moodle_url($PAGE->url, ['form_select' => $formclass]), 'Reset');
