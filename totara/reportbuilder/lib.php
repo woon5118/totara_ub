@@ -5579,12 +5579,14 @@ function reportbuilder_get_export_filename($report, $userid, $scheduleid) {
     // Validate directory.
     $path = get_config('reportbuilder', 'exporttofilesystempath');
     if (!empty($path)) {
+
         // Check path format.
         if (DIRECTORY_SEPARATOR == '\\') {
-            $pattern = '/[^a-zA-Z0-9\/_\\\\\\:-]/i';
+            $pattern = '/[^a-zA-Z0-9\/_\\\\\\:\-\.]/i';
         } else {
-            $pattern = '/[^a-zA-Z0-9\/_-]/i';
+            $pattern = '/[^a-zA-Z0-9\/_\-\.]/i';
         }
+
         if (preg_match($pattern, $path)) {
             mtrace(get_string('error:notapathexportfilesystempath', 'totara_reportbuilder'));
         } else if (!is_dir($path)) {
