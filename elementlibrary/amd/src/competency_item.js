@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Alastair Munro <alastair.munro@totaralms.com>
- * @package elementlibrary
+ * @package core_elementlibrary
  */
 define(['core/config', 'core/str'], function (mdlcfg, mdlstrings) {
     var multiselect = {

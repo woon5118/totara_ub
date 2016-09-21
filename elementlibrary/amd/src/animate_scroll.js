@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Joby Harding <joby.harding@totaralearning.com>
- * @package elementlibrary
+ * @package core_elementlibrary
  */
 define(['jquery', 'core/log'], function($, logging) {
 

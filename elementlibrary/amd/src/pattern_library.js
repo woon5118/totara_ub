@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Joby Harding <joby.harding@totaralearning.com>
- * @package elementlibrary
+ * @package core_elementlibrary
  */
-define(['jquery', 'elementlibrary/animate_scroll'], function($) {
+define(['jquery', 'core_elementlibrary/animate_scroll'], function($) {
     return {
         init: function() {
             // Page fragment links animation.

@@ -82,7 +82,7 @@ if (!$item) {
     $PAGE->requires->strings_for_js(array('assignrelatedcompetencies',
         'assignnewevidenceitem','assigncoursecompletions'), 'totara_hierarchy');
 
-    $PAGE->requires->js_call_amd('elementlibrary/competency_item', 'init', array('args' => $item->id));
+    $PAGE->requires->js_call_amd('core_elementlibrary/competency_item', 'init', array('args' => $item->id));
 
     $out = html_writer::start_tag('div', array('class' => 'buttons'));
     $out .= html_writer::start_tag('div', array('class' => 'singlebutton'));

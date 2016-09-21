@@ -36,7 +36,7 @@ $PAGE->set_url($url);
 $PAGE->set_title($strheading);
 $PAGE->set_heading($strheading);
 
-$PAGE->requires->js_call_amd('elementlibrary/pattern_library', 'init');
+$PAGE->requires->js_call_amd('core_elementlibrary/pattern_library', 'init');
 
 admin_externalpage_setup('elementlibrary');
 
