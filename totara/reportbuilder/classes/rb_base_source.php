@@ -1048,10 +1048,17 @@ abstract class rb_base_source {
      */
     function rb_display_certif_renewalstatus($renewalstatus, $row) {
         global $CERTIFRENEWALSTATUS;
-        if ($renewalstatus && isset($CERTIFRENEWALSTATUS[$renewalstatus])) {
-            return get_string($CERTIFRENEWALSTATUS[$renewalstatus], 'totara_certification');
+
+        if (!empty($row->unassigned)) {
+            return '';
+        } else if (!empty($row->status) && $row->status == CERTIFSTATUS_ASSIGNED) {
+            // Just assigned.
+            return '';
+        } else if (!empty($row->status) && $row->status == CERTIFSTATUS_INPROGRESS && $renewalstatus == CERTIFRENEWALSTATUS_NOTDUE) {
+            // First assignment and have made some progress.
+            return '';
         } else {
-            return get_string($CERTIFRENEWALSTATUS[CERTIFRENEWALSTATUS_NOTDUE], 'totara_certification');
+            return get_string($CERTIFRENEWALSTATUS[$renewalstatus], 'totara_certification');
         }
     }
 

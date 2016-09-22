@@ -274,6 +274,7 @@ class rb_source_dp_certification extends rb_base_source {
                         'certifpath' => 'certif_completion.certifpath',
                         'certifstatus' => 'certif_completion.status',
                         'userid' => 'prog_completion.userid',
+                        'unassigned' => 'certif_completion.unassigned',
                     )
                 )
         );
@@ -312,6 +313,7 @@ class rb_source_dp_certification extends rb_base_source {
                     'joins' => 'certif_completion',
                     'displayfunc' => 'certif_renewalstatus',
                     'extrafields' => array(
+                        'status' => 'certif_completion.status',
                         'unassigned' => 'certif_completion.unassigned'
                     )
                 )

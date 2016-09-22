@@ -38,6 +38,10 @@ class programduedate extends \totara_reportbuilder\rb\display\base {
             return '';
         }
 
+        if (!empty($extrafields->unassigned)) {
+            return '';
+        }
+
         if ($format === 'excel') {
             $dateformat = new \MoodleExcelFormat();
             $dateformat->set_num_format(14);
