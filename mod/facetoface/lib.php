@@ -412,7 +412,6 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
                 facetoface_update_calendar_entries($session, $facetoface);
                 // If manager changed from approval required to not
                 if ($facetoface->approvaltype != $previousapproval) {
-                    // TODO - the spec says "clean slate" it, so we might just approve everyone. Pending question on the jira.
                     switch ($facetoface->approvaltype) {
                         case APPROVAL_NONE:
                         case APPROVAL_SELF:
@@ -467,6 +466,9 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
                                     }
                                 }
                             }
+
+                            // Now that we have approved any requests that already have manager approval, we want to resend request notifications.
+                            // Note: There is no break here on purpose, we can just re-use the role approval case to resend the notifications.
                         case APPROVAL_ROLE:
                             // Resend notifications for any pending requests.
                             $status = array(MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_REQUESTEDADMIN);
