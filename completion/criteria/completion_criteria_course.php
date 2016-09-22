@@ -215,4 +215,71 @@ class completion_criteria_course extends completion_criteria {
 
         return $details;
     }
+
+    /**
+     * Mark users complete who have completed the required course.
+     */
+    public function cron() {
+        global $DB;
+
+        // Check to see if this criteria is in use.
+        if (!$this->is_in_use()) {
+            if (debugging()) {
+                mtrace('... skipping as criteria not used');
+            }
+            return;
+        }
+
+        // Get all users who meet this criteria.
+        $sql = '
+            SELECT DISTINCT
+                c.id AS course,
+                cr.id AS criteriaid,
+                cc.timecompleted,
+                ue.userid AS userid
+            FROM
+                {user_enrolments} ue
+            INNER JOIN
+                {enrol} e
+             ON e.id = ue.enrolid
+            INNER JOIN
+                {course} c
+             ON e.courseid = c.id
+            AND c.enablecompletion = 1
+            INNER JOIN
+                {course_completion_criteria} cr
+             ON cr.course = c.id
+            AND cr.criteriatype = '.COMPLETION_CRITERIA_TYPE_COURSE.'
+            INNER JOIN
+                {course_completions} cc
+             ON cc.userid = ue.userid
+            AND cc.course = cr.courseinstance
+            AND cc.timecompleted > 0
+            LEFT JOIN
+                {course_completion_crit_compl} cccc
+             ON cccc.criteriaid = cr.id
+            AND cccc.userid = ue.userid
+            WHERE
+                cccc.id IS NULL
+            AND ue.status = :userenrolstatus
+            AND e.status = :instanceenrolstatus
+            AND (ue.timeend > :timeendafter OR ue.timeend = 0)
+        ';
+        // Hint: ue, e, c and cr determine the users, courses they are in, and applicable completion criteria,
+        //       cccc.id IS NULL checks if the user is already marked complete,
+        //       cc.timecompleted > 0 is the condition requried for completion of the criteria.
+
+        // Loop through completions, and mark as complete.
+        $params = array(
+            'userenrolstatus' => ENROL_USER_ACTIVE,
+            'instanceenrolstatus' => ENROL_INSTANCE_ENABLED,
+            'timeendafter' => time() // Excludes user enrolments that have ended already.
+        );
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $record) {
+            $completion = new completion_criteria_completion((array) $record, DATA_OBJECT_FETCH_BY_KEY);
+            $completion->mark_complete($record->timecompleted);
+        }
+        $rs->close();
+    }
 }
