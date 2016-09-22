@@ -166,33 +166,31 @@ class question_goals extends reviewrating {
      */
     public function add_field_specific_edit_elements(MoodleQuickForm $form) {
         // Process auto-add of goal items.
-        if ($this->can_answer_items()) {
-            if ($this->param5 & (self::SELECT_COMPANY_ADDALL | self::SELECT_PERSONAL_ADDALL)) {
-                $currentgoals = $this->get_review_items();
-                if ($this->param5 & self::SELECT_COMPANY_ADDALL) {
-                    $availablecompanygoals = goal::get_goal_items(array('userid' => $this->subjectid), goal::SCOPE_COMPANY);
-                    foreach ($availablecompanygoals as $goalrecord) {
-                        $needle = new stdClass();
-                        $needle->itemid = $goalrecord->id;
-                        $needle->scope = goal::SCOPE_COMPANY;
-                        $needle->uniquekey = $goalrecord->id . '_' . goal::SCOPE_COMPANY;
-                        if (!array_search($needle, $currentgoals)) {
-                            // Add a new review data record.
-                            $this->prepare_stub($needle);
-                        }
+        if ($this->param5 & (self::SELECT_COMPANY_ADDALL | self::SELECT_PERSONAL_ADDALL)) {
+            $currentgoals = $this->get_review_items();
+            if ($this->param5 & self::SELECT_COMPANY_ADDALL) {
+                $availablecompanygoals = goal::get_goal_items(array('userid' => $this->subjectid), goal::SCOPE_COMPANY);
+                foreach ($availablecompanygoals as $goalrecord) {
+                    $needle = new stdClass();
+                    $needle->itemid = $goalrecord->id;
+                    $needle->scope = goal::SCOPE_COMPANY;
+                    $needle->uniquekey = $goalrecord->id . '_' . goal::SCOPE_COMPANY;
+                    if (!array_search($needle, $currentgoals)) {
+                        // Add a new review data record.
+                        $this->prepare_stub($needle);
                     }
                 }
-                if ($this->param5 & self::SELECT_PERSONAL_ADDALL) {
-                    $availablepersonalgoals = goal::get_goal_items(array('userid' => $this->subjectid), goal::SCOPE_PERSONAL);
-                    foreach ($availablepersonalgoals as $goalpersonal) {
-                        $needle = new stdClass();
-                        $needle->itemid = $goalpersonal->id;
-                        $needle->scope = goal::SCOPE_PERSONAL;
-                        $needle->uniquekey = $goalpersonal->id . '_' . goal::SCOPE_PERSONAL;
-                        if (!array_search($needle, $currentgoals)) {
-                            // Add a new review data record.
-                            $this->prepare_stub($needle);
-                        }
+            }
+            if ($this->param5 & self::SELECT_PERSONAL_ADDALL) {
+                $availablepersonalgoals = goal::get_goal_items(array('userid' => $this->subjectid), goal::SCOPE_PERSONAL);
+                foreach ($availablepersonalgoals as $goalpersonal) {
+                    $needle = new stdClass();
+                    $needle->itemid = $goalpersonal->id;
+                    $needle->scope = goal::SCOPE_PERSONAL;
+                    $needle->uniquekey = $goalpersonal->id . '_' . goal::SCOPE_PERSONAL;
+                    if (!array_search($needle, $currentgoals)) {
+                        // Add a new review data record.
+                        $this->prepare_stub($needle);
                     }
                 }
             }
