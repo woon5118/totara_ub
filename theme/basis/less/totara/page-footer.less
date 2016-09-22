@@ -24,8 +24,8 @@
 // We prefer not to use IDs for styles but necessary
 // due to existing implementation.
 #page-footer {
-    margin-top: 0;
-    padding: ceil(@line-height-computed * 1.5) 0 0;
+    margin-top: @line-height-computed;
+    padding: 0;
     border-top: @basis-border-thick solid @brand-primary;
     background-color: @totara-menu-bg;
     color: #fff;
@@ -36,10 +36,14 @@
     a:active {
         color: #fff;
         text-decoration: none;
+        border-bottom: none;
     }
-    a:hover,
-    a:active {
-        border-bottom: 1px dotted #fff;
+}
+
+.page-footer {
+    // We can't easily add a .page-footer-purge-caches class currently.
+    .purgecaches {
+        margin-bottom: @line-height-computed;
     }
 }
 
@@ -49,16 +53,26 @@
 
 .page-footer-poweredby {
     display: block;
-    margin-top: ceil(@line-height-computed * 1.5);
     padding: @padding-base-vertical 0;
     background-color: @brand-primary;
 }
 
-.page-footer-main-content div {
-    padding: 0 0 ceil(@line-height-computed / 2) 0;
+.page-footer-loggedin-info {
+    margin-bottom: @line-height-computed;
 }
 
-.page-footer-main-content div:last-child {
-    padding-bottom: 0;
+.page-footer-nav {
+    text-align: left;
 }
 
+.page-footer-nav-list {
+    margin-bottom: @line-height-computed;
+}
+
+.page-footer-nav-item {
+    list-style-type: none;
+    white-space: nowrap;
+    .page-footer-nav-item {
+        &:extend(small);
+    }
+}
