@@ -1031,8 +1031,30 @@ function setup_get_remote_url() {
         //obscure name found on some servers - this is definitely not supported
         $rurl['fullpath'] = $_SERVER['REQUEST_URI']; // TODO: verify this is always properly encoded
 
-    } else if (strpos($_SERVER['SERVER_SOFTWARE'], 'PHP') === 0) {
-        // built-in PHP Development Server
+    } else if (preg_match('/^PHP .* Development Server$/', $_SERVER['SERVER_SOFTWARE'])) {
+        global $CFG;
+        // Totara: built-in PHP Development Server is not intended for production use!
+        if (substr($_SERVER["SCRIPT_NAME"], -10) === '/index.php') {
+            if (strpos($_SERVER['REQUEST_URI'], '?') === false) {
+                $uri = $_SERVER['REQUEST_URI'];
+                $query = null;
+            } else {
+                list($uri, $query) = explode('?', $_SERVER['REQUEST_URI'], 2);
+            }
+            if (strpos($_SERVER["SCRIPT_NAME"], $uri) === 0) {
+                if (substr($uri, -10) !== '/index.php' and substr($uri, -1) !== '/') {
+                    // PHP has a known bug that it does not redirect when / is missing at the end of dir,
+                    // see https://bugs.php.net/bug.php?id=66191
+                    $uri .= '/';
+                    if ($query !== null) {
+                        $uri .= '?' . $query;
+                    }
+                    header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
+                    header('Location: ' . preg_replace('|^(.*?[^:/])/.*$|', '$1', $CFG->wwwroot) . $uri);
+                    die;
+                }
+            }
+        }
         $rurl['fullpath'] = $_SERVER['REQUEST_URI'];
 
     } else {
