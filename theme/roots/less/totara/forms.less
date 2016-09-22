@@ -530,14 +530,15 @@ input[type="checkbox"] {
   clear: both;
 }
 
-.mform input[type="password"] + div.unmask {
-  display: inline-block;
-  margin-left: @padding-small-horizontal;
-}
+.mform .fitem_fpassword .felement.fpassword {
+  > input {
+    display: inline-block;
+  }
 
-.mform input[type="password"] + div.unmask > label {
-  padding: 0;
-  margin: 0;
+  .unmask {
+    display: inline-block;
+    margin-left: @padding-small-horizontal;
+  }
 }
 
 //
