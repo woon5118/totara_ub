@@ -2278,11 +2278,6 @@ $deprecated = array(
     'core|t/up' => 'arrow-up',
     'core|t/user' => 'user',
     'core|t/viewdetails' => 'preview',
-    'core|u/f1' => 'user-disabled',
-    'core|u/f2' => 'user-disabled',
-    'core|u/f3' => 'user-disabled',
-    'core|u/user100' => 'user-disabled',
-    'core|u/user35' => 'user-disabled',
     'core|y/lm' => 'caret-down',
     'core|y/loading' => 'loading',
     'core|y/lp' => 'caret-right',
@@ -2400,4 +2395,9 @@ $pixonlyimages = array(
     /* Default user images */
     'g/f1',
     'g/f2',
+    'u/f1',
+    'u/f2',
+    'u/f3',
+    'u/user35',
+    'u/user100',
 );
