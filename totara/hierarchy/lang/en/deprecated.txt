@@ -25,3 +25,4 @@ positionsettings,totara_hierarchy
 userpositiondetails,totara_hierarchy
 typeaspirational,totara_hierarchy
 mygoals,totara_hierarchy
+goalnotescalevalueentry,totara_hierarchy

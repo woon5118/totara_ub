@@ -667,7 +667,6 @@ $string['goalmissingnametype'] = 'Missing goal type name';
 $string['goalmissingshortname'] = 'Missing goal short name';
 $string['goalnoframeworks'] = 'No goal frameworks defined';
 $string['goalnoframeworkssetup'] = 'There are no goal frameworks setup for this site.';
-$string['goalnotescalevalueentry'] = 'One value per line - from most completed to least';
 $string['goalnotypes'] = 'No goal types';
 $string['goalparent'] = 'Parent';
 $string['goalparent_help'] = '**Parent goal** allows you to manage parent/child relationships between goals.
@@ -1285,7 +1284,9 @@ $string['xandychildren'] = '{$a->item} (and {$a->num} children)';
 $string['xitemsdeleted'] = '{$a->num} {$a->items} and all children have been deleted';
 $string['xitemsmoved'] = '{$a->num} {$a->items} and all children have been moved';
 
-// Deprecated.
+/**
+ * @deprecated Since Totara 9.0.
+ */
 $string['allowsignuporganisation'] = 'Organisation';
 $string['allowsignuporganisationsecurityrisk'] =  'Security risk: Please be aware that while this option is enabled, information about organisations will be public.';
 $string['allowsignuporganisation_help'] = 'When this option is selected and Self-registration is enabled,
@@ -1319,3 +1320,4 @@ $string['positionsettings'] = 'Position settings';
 $string['userpositiondetails'] = 'User position details';
 $string['typeaspirational'] = 'Aspirational position';
 $string['mygoals'] = 'My Goals';
+$string['goalnotescalevalueentry'] = 'One value per line - from most completed to least';
