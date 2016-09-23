@@ -283,6 +283,11 @@ class customfield_url extends customfield_base {
     public function sync_data_preprocess($syncitem) {
 
         $fieldname = $this->inputname;
+
+        if (!isset($syncitem->$fieldname)) {
+            return $syncitem;
+        }
+
         $url = $syncitem->$fieldname;
 
         if (isset($url['url'])) {

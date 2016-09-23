@@ -79,6 +79,10 @@ class customfield_textarea extends customfield_base {
         // Get short form name by removing trailing '_editor' from $this->inputname;
         $shortinputname = substr($this->inputname, 0, -7);
 
+        if (!isset($itemnew->$shortinputname)) {
+            return $itemnew;
+        }
+
         $systemcontext = context_system::instance();
 
         // Create textarea options array taken from global $TEXTAREA_OPTIONS

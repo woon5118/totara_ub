@@ -65,6 +65,11 @@ class customfield_location extends customfield_base {
      */
     public function sync_data_preprocess($syncitem) {
         $fieldname = $this->inputname;
+
+        if (!isset($syncitem->$fieldname)) {
+            return $syncitem;
+        }
+
         $address = $syncitem->$fieldname;
         // Make data in format required by @see customfield_location::prepare_form_location_data_for_db()
         $syncitem->{$fieldname . 'address'} = $address;

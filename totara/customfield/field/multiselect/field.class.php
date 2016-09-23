@@ -144,6 +144,11 @@ class customfield_multiselect extends customfield_base {
     public function sync_data_preprocess($syncitem) {
         // Get the sync value out of the item.
         $fieldname = $this->inputname;
+
+        if (!isset($syncitem->$fieldname)) {
+            return $syncitem;
+        }
+
         $value = $syncitem->$fieldname;
 
         // Now get the corresponding option for that value.
