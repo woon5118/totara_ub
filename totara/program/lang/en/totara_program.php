@@ -542,6 +542,7 @@ $string['label:competencyname'] = 'Competency name';
 $string['label:coursecreation'] = 'When to create new course';
 $string['label:coursescorefield'] = 'Course score field';
 $string['label:learnermustcomplete'] = 'Learner must complete';
+$string['label:managersubject'] = 'Manager Subject';
 $string['label:message'] = 'Message';
 $string['label:minimumscore'] = 'Minimum score';
 $string['label:minimumtimerequired'] = 'Minimum time required';
@@ -648,6 +649,8 @@ In program messages, certain variables can be inserted into the subject and/or b
 :   This will be replaced by the course set label (it will only be replaced if the message relates to a course set';
 $string['managername'] = 'Manager name';
 $string['managers_category'] = 'management team(s)';
+$string['managersubject'] = 'Manager Subject';
+$string['managersubject_help'] = 'This is the subject line that the message for the manager will use.';
 $string['mandatory'] = 'Mandatory';
 $string['markcompletheading'] = 'Mark complete';
 $string['meesagetypenotfound'] = 'Program messagetype class not found';

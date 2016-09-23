@@ -35,5 +35,16 @@ function xmldb_totara_program_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
+    if ($oldversion < 2016110900) {
+        $table = new xmldb_table('prog_message');
+        $field = new xmldb_field('managersubject', XMLDB_TYPE_CHAR, '255', null, false, null, "");
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2016110900, 'totara_program');
+    }
+
     return true;
 }

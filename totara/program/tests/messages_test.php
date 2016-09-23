@@ -54,6 +54,7 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
     private $program_generator = null;
     private $program1, $program2;
     private $user1, $user2, $user3, $user4, $user5, $user6;
+    private $manager, $managerja;
     private $sink;
 
     public function setUp() {
@@ -77,10 +78,11 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
 
         // Create users.
         $this->assertEquals(2, $DB->count_records('user'));
+        $this->manager = $this->getDataGenerator()->create_user();
         for ($i = 1; $i <= 6; $i++) {
-            $this->{'user'.$i} = $this->getDataGenerator()->create_user();
+            $this->{'user'.$i} = $this->getDataGenerator()->create_user(array('managerid' => $this->manager->id));
         }
-        $this->assertEquals(6 + 2, $DB->count_records('user'));
+        $this->assertEquals(6 + 3, $DB->count_records('user'));
 
         // Create two programs.
         $this->assertEquals(0, $DB->count_records('prog'));
@@ -104,10 +106,16 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
         $programmessagemanager->add_message(MESSAGETYPE_UNENROLMENT);
         $programmessagemanager->save_messages();
         prog_messages_manager::get_program_messages_manager($this->program1->id, true); // Causes static cache to be reset.
-        $enrolmentmessageid = $DB->get_field('prog_message', 'id',
-            array('programid' => $this->program1->id, 'messagetype' => MESSAGETYPE_ENROLMENT));
-        $unenrolmentmessageid = $DB->get_field('prog_message', 'id',
-            array('programid' => $this->program1->id, 'messagetype' => MESSAGETYPE_UNENROLMENT));
+
+        $enrolmentmessage = $DB->get_record('prog_message', array('programid' => $this->program1->id, 'messagetype' => MESSAGETYPE_ENROLMENT));
+        $unenrolmentmessage = $DB->get_record('prog_message', array('programid' => $this->program1->id, 'messagetype' => MESSAGETYPE_UNENROLMENT));
+
+        // Some quick edits to the enrolment message content.
+        $enrolmentmessage->managersubject = '';
+        $enrolmentmessage->managermessage = 'Staff Program Assignment';
+        $enrolmentmessage->notifymanager = 1;
+        $DB->update_record('prog_message', $enrolmentmessage);
+        prog_messages_manager::get_program_messages_manager($this->program1->id, true); // Causes static cache to be reset.
 
         // Assign users to program1.
         $usersprogram1 = array($this->user1->id, $this->user2->id, $this->user3->id);
@@ -122,17 +130,45 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
 
         // Check the right amount of messages were caught.
         $emails = $this->sink->get_messages();
-        $this->assertCount(3, $emails);
+        $this->assertCount(6, $emails);
         $this->sink->clear();
+
+        // Check the emails content.
+        $managercount = 0;
+        $learnercount = 0;
+        foreach ($emails as $email) {
+            if (in_array($email->useridto, $usersprogram1)) {
+                $learnercount++;
+                $this->assertEquals($email->subject, 'You have been enrolled on program Program Fullname', 'unexpected default learner enrolment subject');
+                $this->assertEquals($email->fullmessage, 'You are now enrolled on program Program Fullname.', 'unexpected default learner enrolment message');
+            } else {
+                $managercount++;
+                $this->assertEquals($email->useridto, $this->manager->id, 'unexpected user recieving message');
+                $this->assertEquals($email->subject, 'Learner enrolled', 'unexpected default manager enrolment subject');
+                $this->assertEquals($email->fullmessage, 'Staff Program Assignment', 'unexpected custom manager enrolment message');
+            }
+
+            $this->assertEquals($email->fromemail, 'admin@example.com', 'unexpected default userfrom email address');
+        }
+        $this->assertEquals(3, $managercount);
+        $this->assertEquals(3, $learnercount);
 
         // Check that they all had logs created.
         $this->assertEquals(3, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $enrolmentmessageid)));
+            array('userid' => $this->user1->id, 'messageid' => $enrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $enrolmentmessageid)));
+            array('userid' => $this->user2->id, 'messageid' => $enrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user3->id, 'messageid' => $enrolmentmessageid)));
+            array('userid' => $this->user3->id, 'messageid' => $enrolmentmessage->id)));
+
+        // Now edit the subject lines to make sure they've changed.
+        $enrolmentmessage->messagesubject = 'Learner Program Assignment';
+        $enrolmentmessage->mainmessage = 'You have been assigned to the program';
+        $enrolmentmessage->managersubject = 'Staff Program Assignment';
+        $enrolmentmessage->managermessage = 'Your staffmember has been assigned to the program';
+        $DB->update_record('prog_message', $enrolmentmessage);
+        prog_messages_manager::get_program_messages_manager($this->program1->id, true); // Causes static cache to be reset.
 
         // Assign users to program1 and make sure only the new users get the message.
         $usersprogram1 = array($this->user1->id, $this->user2->id, $this->user3->id, $this->user4->id, $this->user5->id);
@@ -147,15 +183,34 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
 
         // Check the right amount of messages were caught.
         $emails = $this->sink->get_messages();
-        $this->assertCount(2, $emails);
+        $this->assertCount(4, $emails);
         $this->sink->clear();
+
+        // Check the emails content.
+        $managercount = $learnercount = 0;
+        foreach ($emails as $email) {
+            if (in_array($email->useridto, $usersprogram1)) {
+                $learnercount++;
+                $this->assertEquals($email->subject, 'Learner Program Assignment', 'unexpected custom learner enrolment subject');
+                $this->assertEquals($email->fullmessage, 'You have been assigned to the program', 'unexpected custom learner enrolment message');
+            } else {
+                $managercount++;
+                $this->assertEquals($email->useridto, $this->manager->id, 'unexpected user recieving message');
+                $this->assertEquals($email->subject, 'Staff Program Assignment', 'unexpected custom manager enrolment subject');
+                $this->assertEquals($email->fullmessage, 'Your staffmember has been assigned to the program', 'unexpected custom manager enrolment message');
+            }
+
+            $this->assertEquals($email->fromemail, 'admin@example.com', 'unexpected default userfrom email address');
+        }
+        $this->assertEquals(2, $learnercount);
+        $this->assertEquals(2, $managercount);
 
         // Check that they all had logs created.
         $this->assertEquals(5, $DB->count_records('prog_messagelog'));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user4->id, 'messageid' => $enrolmentmessageid)));
+            array('userid' => $this->user4->id, 'messageid' => $enrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user5->id, 'messageid' => $enrolmentmessageid)));
+            array('userid' => $this->user5->id, 'messageid' => $enrolmentmessage->id)));
 
         // Remove users from the program.
         $usersprogram1 = array();
@@ -176,15 +231,15 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
         // Check that they all had logs created.
         $this->assertEquals(5, $DB->count_records('prog_messagelog')); // 5 enrolment messages were deleted.
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $unenrolmentmessageid)));
+            array('userid' => $this->user1->id, 'messageid' => $unenrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $unenrolmentmessageid)));
+            array('userid' => $this->user2->id, 'messageid' => $unenrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user3->id, 'messageid' => $unenrolmentmessageid)));
+            array('userid' => $this->user3->id, 'messageid' => $unenrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user4->id, 'messageid' => $unenrolmentmessageid)));
+            array('userid' => $this->user4->id, 'messageid' => $unenrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user5->id, 'messageid' => $unenrolmentmessageid)));
+            array('userid' => $this->user5->id, 'messageid' => $unenrolmentmessage->id)));
 
         // Assign users to program1 (second assignment).
         $usersprogram1 = array($this->user1->id, $this->user2->id, $this->user3->id, $this->user4->id);
@@ -199,21 +254,21 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
 
         // Check the right amount of messages were caught.
         $emails = $this->sink->get_messages();
-        $this->assertCount(4, $emails);
+        $this->assertCount(8, $emails);
         $this->sink->clear();
 
         // Check that they all had logs created.
         $this->assertEquals(5, $DB->count_records('prog_messagelog')); // 4 unenrolment messages were deleted.
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $enrolmentmessageid)));
+            array('userid' => $this->user1->id, 'messageid' => $enrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $enrolmentmessageid)));
+            array('userid' => $this->user2->id, 'messageid' => $enrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user3->id, 'messageid' => $enrolmentmessageid)));
+            array('userid' => $this->user3->id, 'messageid' => $enrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user4->id, 'messageid' => $enrolmentmessageid)));
+            array('userid' => $this->user4->id, 'messageid' => $enrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user5->id, 'messageid' => $unenrolmentmessageid)));
+            array('userid' => $this->user5->id, 'messageid' => $unenrolmentmessage->id)));
 
         // Remove users from the program (second unassignment).
         $usersprogram1 = array($this->user1->id);
@@ -234,15 +289,15 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
         // Check that they all had logs created.
         $this->assertEquals(5, $DB->count_records('prog_messagelog')); // 3 enrolment messages were deleted.
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user1->id, 'messageid' => $enrolmentmessageid)));
+            array('userid' => $this->user1->id, 'messageid' => $enrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user2->id, 'messageid' => $unenrolmentmessageid)));
+            array('userid' => $this->user2->id, 'messageid' => $unenrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user3->id, 'messageid' => $unenrolmentmessageid)));
+            array('userid' => $this->user3->id, 'messageid' => $unenrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user4->id, 'messageid' => $unenrolmentmessageid)));
+            array('userid' => $this->user4->id, 'messageid' => $unenrolmentmessage->id)));
         $this->assertEquals(1, $DB->count_records('prog_messagelog',
-            array('userid' => $this->user5->id, 'messageid' => $unenrolmentmessageid)));
+            array('userid' => $this->user5->id, 'messageid' => $unenrolmentmessage->id)));
     }
 
     /**
@@ -355,11 +410,22 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
         $programmessagemanager->delete();
         $programmessagemanager->add_message(MESSAGETYPE_PROGRAM_DUE);
         $programmessagemanager->save_messages();
+        // Update the message record to be triggered 100 days before due.
+        $duemessage = $DB->get_record('prog_message', array('programid' => $this->program1->id, 'messagetype' => MESSAGETYPE_PROGRAM_DUE));
+        // Some quick edits to the enrolment message content.
+        $duemessage->messagesubject = 'Learner ProgDue Message';
+        $duemessage->mainmessage = 'Hey dude, do your program';
+        $duemessage->managersubject = 'Manager ProgDue Message';
+        $duemessage->managermessage = 'Go tell your staff member to finish their program';
+        $duemessage->notifymanager = 1;
+        $DB->update_record('prog_message', $duemessage);
+
+        $messageid = $duemessage->id;
         prog_messages_manager::get_program_messages_manager($this->program1->id, true); // Causes static cache to be reset.
-        $messageid = $DB->get_field('prog_message', 'id',
-            array('programid' => $this->program1->id, 'messagetype' => MESSAGETYPE_PROGRAM_DUE));
-        // Hack the message record to be triggered 100 days before due.
+
         $DB->set_field('prog_message', 'triggertime', DAYSECS * 100, array('id' => $messageid));
+        $DB->set_field('prog_message', 'notifymanager', "1", array('id' => $messageid));
+        prog_messages_manager::get_program_messages_manager($this->program1->id, true); // Causes static cache to be reset.
 
         // Create two courses.
         $course1 = $this->getDataGenerator()->create_course();
@@ -438,8 +504,28 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
 
         // Check the right amount of messages were caught.
         $emails = $this->sink->get_messages();
-        $this->assertCount(3, $emails);
+        $this->assertCount(6, $emails);
         $this->sink->clear();
+
+        // Check the emails content.
+        $managercount = 0;
+        $learnercount = 0;
+        foreach ($emails as $email) {
+            if (in_array($email->useridto, $usersprogram)) {
+                $learnercount++;
+                $this->assertEquals($email->subject, 'Learner ProgDue Message', 'unexpected default learner enrolment subject');
+                $this->assertEquals($email->fullmessage, 'Hey dude, do your program', 'unexpected default learner enrolment message');
+            } else {
+                $managercount++;
+                $this->assertEquals($email->useridto, $this->manager->id, 'unexpected user recieving message');
+                $this->assertEquals($email->subject, 'Manager ProgDue Message', 'unexpected default manager enrolment subject');
+                $this->assertEquals($email->fullmessage, 'Go tell your staff member to finish their program', 'unexpected custom manager enrolment message');
+            }
+
+            $this->assertEquals($email->fromemail, 'admin@example.com', 'unexpected default userfrom email address');
+        }
+        $this->assertEquals(3, $managercount);
+        $this->assertEquals(3, $learnercount);
 
         // Check that they all had logs created.
         $this->assertEquals(3, $DB->count_records('prog_messagelog'));

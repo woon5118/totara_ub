@@ -61,7 +61,7 @@ abstract class prog_message {
 
     public $id, $programid, $messagetype, $sortorder;
     public $messagesubject, $mainmessage;
-    public $notifymanager, $managermessage;
+    public $notifymanager, $managersubject, $managermessage;
     public $triggertime, $triggerperiod, $triggernum;
     public $isfirstmessage, $islastmessage;
     public $studentrole, $managerrole;
@@ -86,6 +86,7 @@ abstract class prog_message {
             $this->messagesubject = $messageob->messagesubject;
             $this->mainmessage = $messageob->mainmessage;
             $this->notifymanager = $messageob->notifymanager;
+            $this->managersubject = $messageob->managersubject;
             $this->managermessage = $messageob->managermessage;
             $this->triggertime = $messageob->triggertime;
         } else {
@@ -95,6 +96,7 @@ abstract class prog_message {
             $this->messagesubject = '';
             $this->mainmessage = '';
             $this->notifymanager = false;
+            $this->managersubject = '';
             $this->managermessage = '';
             $this->triggertime = 0;
         }
@@ -132,6 +134,7 @@ abstract class prog_message {
         $this->mainmessage = $formdata->{$formnameprefix.'mainmessage'};
 
         $this->notifymanager = isset($formdata->{$formnameprefix.'notifymanager'}) ? $formdata->{$formnameprefix.'notifymanager'} : false;;
+        $this->managersubject = isset($formdata->{$formnameprefix.'managersubject'}) ? $formdata->{$formnameprefix.'managersubject'} : '';
         $this->managermessage = isset($formdata->{$formnameprefix.'managermessage'}) ? $formdata->{$formnameprefix.'managermessage'} : '';
         $this->triggerperiod = isset($formdata->{$formnameprefix.'triggerperiod'}) ? $formdata->{$formnameprefix.'triggerperiod'} : 0;
         $this->triggernum = isset($formdata->{$formnameprefix.'triggernum'}) ? $formdata->{$formnameprefix.'triggernum'} : 0;
@@ -168,12 +171,14 @@ abstract class prog_message {
             $message_todb->id = $this->id;
             $message_todb->messagesubject = $this->messagesubject;
             $message_todb->mainmessage = $this->mainmessage;
+            $message_todb->managersubject = $this->managersubject;
             $message_todb->managermessage = $this->managermessage;
             $DB->update_record('prog_message', $message_todb);
             return true;
         } else {
             $message_todb->messagesubject = $this->messagesubject;
             $message_todb->mainmessage = $this->mainmessage;
+            $message_todb->managersubject = $this->managersubject;
             $message_todb->managermessage = $this->managermessage;
             $id = $DB->insert_record('prog_message', $message_todb);
             $this->id = $id;
@@ -492,6 +497,20 @@ abstract class prog_message {
         $templatehtml .= html_writer::end_tag('div');
         $formdataobject->{$prefix.'notifymanager'} = (bool)$this->notifymanager;
 
+        // Add the manager subject
+        $safe_managersubject = !empty($this->managersubject) ? format_string($this->managersubject) : '';
+        if ($updateform) {
+            $mform->addElement('text', $prefix.'managersubject', '', array('size'=>'50', 'maxlength'=>'255', 'id'=>$prefix.'managersubject'));
+            $mform->setType($prefix.'managersubject', PARAM_TEXT);
+            $template_values['%'.$prefix.'managersubject%'] = array('name'=>$prefix.'managersubject', 'value'=>null);
+        }
+        $helpbutton = $OUTPUT->help_icon('managersubject', 'totara_program');
+        $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
+        $templatehtml .= html_writer::tag('div', html_writer::tag('label', get_string('label:managersubject', 'totara_program') . ' ' . $helpbutton, array('for' => $prefix.'managersubject')), array('class' => 'fitemtitle'));
+        $templatehtml .= html_writer::tag('div', '%'.$prefix.'managersubject%', array('class' => 'felement'));
+        $templatehtml .= html_writer::end_tag('div');
+        $formdataobject->{$prefix.'managersubject'} = $safe_managersubject;
+
         // Add the manager message
         $safe_managermessage = format_string($this->managermessage);
         if ($updateform) {
@@ -682,12 +701,13 @@ abstract class prog_noneventbased_message extends prog_message {
         if ($result && $this->notifymanager && !empty($managers)) {
             foreach ($managers as $managerid) {
                 $manager = core_user::get_user($managerid, '*', MUST_EXIST);
+                $managersubject = empty($this->managersubject) ? $this->managermessagedata->subject : $this->managersubject;
 
                 $managerdata = new stdClass();
                 $managerdata->userto = $manager;
                 //ensure the message is actually coming from $user, default to support
                 $managerdata->userfrom = ($USER->id == $recipient->id) ? $recipient : core_user::get_support_user();
-                $managerdata->subject = $this->replacevars($this->managermessagedata->subject);
+                $managerdata->subject = $this->replacevars($managersubject);
                 $managerdata->fullmessage = $this->replacevars($this->managermessagedata->fullmessage);
                 $managerdata->contexturl = $CFG->wwwroot.'/totara/program/view.php?id='.$this->programid.'&amp;userid='.$recipient->id;
                 $managerdata->icon = 'program-regular';
@@ -818,12 +838,13 @@ abstract class prog_eventbased_message extends prog_message {
         if ($result && $this->notifymanager && !empty($managers)) {
             foreach ($managers as $managerid) {
                 $manager = core_user::get_user($managerid, '*', MUST_EXIST);
+                $managersubject = empty($this->managersubject) ? $this->managermessagedata->subject : $this->managersubject;
 
                 $managerdata = new stdClass();
                 $managerdata->userto = $manager;
                 //ensure the message is actually coming from $user, default to support
                 $managerdata->userfrom = ($USER->id == $recipient->id) ? $recipient : core_user::get_support_user();
-                $managerdata->subject = $this->replacevars($this->managermessagedata->subject);
+                $managerdata->subject = $this->replacevars($managersubject);
                 $managerdata->fullmessage = $this->replacevars($this->managermessagedata->fullmessage);
                 $managerdata->contexturl = $CFG->wwwroot.'/totara/program/view.php?id='.$this->programid.'&amp;userid='.$recipient->id;
                 $managerdata->icon = 'program-regular';
