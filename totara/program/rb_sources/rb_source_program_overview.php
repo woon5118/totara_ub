@@ -415,6 +415,7 @@ class rb_source_program_overview extends rb_base_source {
                         'csorder'  => 'prog_courseset.sortorder',
                         'cscid'    => 'prog_courseset_course.id'
                     ),
+                    'nosort' => true, // You can't sort concatenated columns.
                     'displayfunc' => 'coursename_list',
                     'style' => array('white-space' => 'pre'),
                 )
@@ -432,6 +433,7 @@ class rb_source_program_overview extends rb_base_source {
                         'csorder'  => 'prog_courseset.sortorder',
                         'cscid'    => 'prog_courseset_course.id'
                     ),
+                    'nosort' => true, // You can't sort concatenated columns.
                     'displayfunc' => 'course_status_list',
                     'style' => array('white-space' => 'pre'),
                 )
@@ -450,6 +452,7 @@ class rb_source_program_overview extends rb_base_source {
                     'csorder'  => 'prog_courseset.sortorder',
                     'cscid'    => 'prog_courseset_course.id'
                 ),
+                'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'orderedlist_to_newline_date',
                 'style' => array('white-space' => 'pre'),
             )
@@ -467,6 +470,7 @@ class rb_source_program_overview extends rb_base_source {
                     'csorder'  => 'prog_courseset.sortorder',
                     'cscid'    => 'prog_courseset_course.id'
                 ),
+                'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'orderedlist_to_newline_date',
                 'style' => array('white-space' => 'pre'),
             )
@@ -484,6 +488,7 @@ class rb_source_program_overview extends rb_base_source {
                     'csorder'  => 'prog_courseset.sortorder',
                     'cscid'    => 'prog_courseset_course.id'
                 ),
+                'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'orderedlist_to_newline_date',
                 'style' => array('white-space' => 'pre'),
             )
@@ -505,6 +510,7 @@ class rb_source_program_overview extends rb_base_source {
                 'groupinginfo' => array(
                     'orderby' => array('prog_courseset.sortorder', 'prog_courseset_course.id'),
                 ),
+                'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'orderedlist_to_newline',
                 'style' => array('white-space' => 'pre'),
             )
@@ -522,6 +528,7 @@ class rb_source_program_overview extends rb_base_source {
                     'csorder'  => 'prog_courseset.sortorder',
                     'cscid'    => 'prog_courseset_course.id'
                 ),
+                'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'orderedlist_to_newline',
                 'style' => array('white-space' => 'pre'),
             )
@@ -541,6 +548,7 @@ class rb_source_program_overview extends rb_base_source {
                     'csorder'  => 'prog_courseset.sortorder',
                     'cscid'    => 'prog_courseset_course.id'
                 ),
+                'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'orderedlist_to_newline',
                 'style' => array('white-space' => 'pre'),
                 'dbdatatype' => 'char',
@@ -562,6 +570,7 @@ class rb_source_program_overview extends rb_base_source {
                     'cscid'    => 'prog_courseset_course.id'
                 ),
                 'defaultheading' => get_string('category', 'totara_reportbuilder'),
+                'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'category_link_list',
                 'style' => array('white-space' => 'pre'),
             )
@@ -574,6 +583,7 @@ class rb_source_program_overview extends rb_base_source {
             'COALESCE(course_category.idnumber, \'-\')',
             array(
                 'joins' => array('course', 'course_category'),
+                'nosort' => true, // You can't sort concatenated columns.
                 'displayfunc' => 'orderedlist_to_newline',
                 'grouping' => 'sql_aggregate',
                 'grouporder' => array(
