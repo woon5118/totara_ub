@@ -1454,7 +1454,7 @@ class program {
         if ($iscertif) {
             // Before window opens, ideally we'd show the last path that they completed, but assuming the recert path because
             // of an existing history record is inaccurate, due to expiry and import. So instead we'll show both paths.
-            if (is_siteadmin() || $certifcompletion && $certifstate == CERTIFCOMPLETIONSTATE_CERTIFIED) {
+            if (is_siteadmin() || !$certifcompletion || $certifstate == CERTIFCOMPLETIONSTATE_CERTIFIED) {
                 $out .= $OUTPUT->heading(get_string('oricertpath', 'totara_certification'), 2);
                 $out .= $this->display_courseset(CERTIFPATH_CERT, $userid, $viewinganothersprogram);
 
@@ -1463,7 +1463,7 @@ class program {
                 $out .= html_writer::end_tag('div');
 
                 $out .= $this->display_courseset(CERTIFPATH_RECERT, $userid, $viewinganothersprogram);
-            } else if ($certifcompletion) {
+            } else { // Has a certification completion record.
                 if ($certifcompletion->certifpath == CERTIFPATH_CERT) {
                     $out .= $OUTPUT->heading(get_string('oricertpath', 'totara_certification'), 2);
                     $out .= $this->display_courseset(CERTIFPATH_CERT, $userid, $viewinganothersprogram);
@@ -1473,9 +1473,6 @@ class program {
                     $out .= html_writer::end_tag('div');
                     $out .= $this->display_courseset(CERTIFPATH_RECERT, $userid, $viewinganothersprogram);
                 }
-            } else {
-                $out .= $OUTPUT->heading(get_string('oricertpath', 'totara_certification'), 2);
-                $out .= $this->display_courseset(CERTIFPATH_CERT, $userid, $viewinganothersprogram);
             }
         } else {
             $out .= $this->display_courseset(CERTIFPATH_STD, $userid, $viewinganothersprogram);
