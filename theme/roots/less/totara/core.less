@@ -141,6 +141,14 @@
 
 /** Page layout CSS ends **/
 
+// In the main content the first header should be an h2.
+// To make it line up with the top of the block columns
+// we need to remove the margin, but only on the first h2.
+#region-main div[role='main'] > h2:first-of-type,
+#region-main div[role='main'] > div > h2:first-of-type {
+  margin-top: 0;
+}
+
 .mdl-left {
   text-align: left;
 }
