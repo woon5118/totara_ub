@@ -1,0 +1,9 @@
+This files describes API changes in Totara Connect Server,
+information provided here is intended especially for developers.
+
+=== 10 ===
+
+* Added new service protocol version 2 with following APIs:
+  - new 'get_positions'
+  - new 'get_organisations'
+  - updated 'get_users' to include job assignments and custom user profile fields

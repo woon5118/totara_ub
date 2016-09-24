@@ -51,7 +51,8 @@ $settingspage->add(new admin_setting_configselect('auth_connect/migratemap',
     new lang_string('migratemap', 'auth_connect'), new lang_string('migratemap_desc', 'auth_connect'),
     'username', $options));
 
-// NOTE TL-7410: add settings for user preference and custom profile fields sync here.
+$settingspage->add(new admin_setting_configcheckbox('auth_connect/syncprofilefields',
+    new lang_string('syncprofilefields', 'auth_connect'), new lang_string('syncprofilefields_desc', 'auth_connect'), 0));
 
 $options = array(
     AUTH_REMOVEUSER_KEEP       => get_string('auth_remove_keep', 'auth'),
@@ -61,6 +62,17 @@ $options = array(
 $settingspage->add(new admin_setting_configselect('auth_connect/removeuser',
     new lang_string('removeuser', 'auth_connect'), new lang_string('removeuser_desc', 'auth_connect'),
     AUTH_REMOVEUSER_SUSPEND, $options));
+
+$settingspage->add(new admin_setting_configcheckbox('auth_connect/syncjobs',
+    new lang_string('syncjobs', 'auth_connect'), new lang_string('syncjobs_desc', 'auth_connect'), 0));
+
+if (!totara_feature_disabled('positions')) {
+    $settingspage->add(new admin_setting_configcheckbox('auth_connect/syncpositions',
+        new lang_string('syncpositions', 'auth_connect'), new lang_string('syncpositions_desc', 'auth_connect'), 0));
+}
+
+$settingspage->add(new admin_setting_configcheckbox('auth_connect/syncorganisations',
+    new lang_string('syncorganisations', 'auth_connect'), new lang_string('syncorganisations_desc', 'auth_connect'), 0));
 
 $ADMIN->add('authconnectfolder', $settingspage);
 

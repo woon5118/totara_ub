@@ -55,6 +55,40 @@ class totara_connect_form_client_add extends moodleform {
         $mform->setDefault('cohortid', 0);
         $mform->addHelpButton('cohortid', 'restricttocohort', 'totara_connect');
 
+        $mform->addElement('advcheckbox', 'syncprofilefields', get_string('syncprofilefields', 'totara_connect'));
+        $mform->addHelpButton('syncprofilefields', 'syncprofilefields', 'totara_connect');
+
+        $mform->addElement('advcheckbox', 'syncjobs', get_string('syncjobs', 'totara_connect'));
+        $mform->addHelpButton('syncjobs', 'syncjobs', 'totara_connect');
+
+        if (!totara_feature_disabled('positions')) {
+            $options = array();
+            $frameworks = $DB->get_records('pos_framework', array(), 'sortorder ASC');
+            foreach ($frameworks as $framework) {
+                $options[$framework->id] = $framework->fullname;
+                if ($framework->idnumber !== '') {
+                    $options[$framework->id] .= ' [' . $framework->idnumber . ']';
+                }
+            }
+            if ($options) {
+                $mform->addElement('select', 'positionframeworks', get_string('positionframeworks', 'totara_connect'), $options, array('multiple' => true));
+                $mform->addHelpButton('positionframeworks', 'positionframeworks', 'totara_connect');
+            }
+        }
+
+        $options = array();
+        $frameworks = $DB->get_records('org_framework', array('visible' => 1), 'sortorder ASC');
+        foreach ($frameworks as $framework) {
+            $options[$framework->id] = $framework->fullname;
+            if ($framework->idnumber !== '') {
+                $options[$framework->id] .= ' [' . $framework->idnumber . ']';
+            }
+        }
+        if ($options) {
+            $mform->addElement('select', 'organisationframeworks', get_string('organisationframeworks', 'totara_connect'), $options, array('multiple' => true));
+            $mform->addHelpButton('organisationframeworks', 'organisationframeworks', 'totara_connect');
+        }
+
         $mform->addElement('advcheckbox', 'addnewcourses', get_string('addnewcourses', 'totara_connect'));
         $mform->addHelpButton('addnewcourses', 'addnewcourses', 'totara_connect');
         $mform->addElement('advcheckbox', 'addnewcohorts', get_string('addnewcohorts', 'totara_connect'));

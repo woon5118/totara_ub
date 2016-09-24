@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2015 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2016 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Petr Skoda <petr.skoda@totaralms.com>
+ * @author Petr Skoda <petr.skoda@totaralearning.com>
  * @package auth_connect
  */
 
 
 namespace auth_connect\task;
 
+use auth_connect\util;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * General cleanup task.
+ * Positions sync task.
  */
-class cleanup_task extends \core\task\scheduled_task {
+class position_task extends \core\task\scheduled_task {
 
     /**
      * Get a descriptive name for this task (shown to admins).
@@ -37,7 +39,7 @@ class cleanup_task extends \core\task\scheduled_task {
      * @return string
      */
     public function get_name() {
-        return get_string('taskcleanup', 'auth_connect');
+        return get_string('taskposition', 'auth_connect');
     }
 
     /**
@@ -47,13 +49,12 @@ class cleanup_task extends \core\task\scheduled_task {
         global $DB;
 
         if (!is_enabled_auth('connect')) {
-            $DB->delete_records('auth_connect_sso_sessions');
-            $DB->delete_records('auth_connect_sso_requests');
             return;
         }
 
-        $select = "timecreated < ?";
-        $params = array(time() - 60 * 60);
-        $DB->delete_records_select('auth_connect_sso_requests', $select, $params);
+        $servers = $DB->get_records('auth_connect_servers', array('status' => util::SERVER_STATUS_OK));
+        foreach ($servers as $server) {
+            util::sync_positions($server);
+        }
     }
 }

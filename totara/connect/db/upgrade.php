@@ -36,5 +36,94 @@ function xmldb_totara_connect_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
+
+    // Totara 10 ugprade line.
+
+    if ($oldversion < 2016110200) {
+
+        // Define field syncjobs to be added to totara_connect_clients.
+        $table = new xmldb_table('totara_connect_clients');
+        $field = new xmldb_field('syncjobs', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'addnewcourses');
+
+        // Conditionally launch add field syncjobs.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2016110200, 'totara', 'connect');
+    }
+
+    if ($oldversion < 2016110201) {
+
+        // Define table totara_connect_pos_frameworks to be created.
+        $table = new xmldb_table('totara_connect_client_pos_frameworks');
+
+        // Adding fields to table totara_connect_pos_frameworks.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('clientid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('fid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table totara_connect_pos_frameworks.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('clientid', XMLDB_KEY_FOREIGN, array('clientid'), 'totara_connect_clients', array('id'));
+        $table->add_key('fid', XMLDB_KEY_FOREIGN, array('fid'), 'pos_framework', array('id'));
+
+        // Adding indexes to table totara_connect_pos_frameworks.
+        $table->add_index('clientid-fid', XMLDB_INDEX_UNIQUE, array('clientid', 'fid'));
+
+        // Conditionally launch create table for totara_connect_pos_frameworks.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2016110201, 'totara', 'connect');
+    }
+
+    if ($oldversion < 2016110202) {
+
+        // Define table totara_connect_org_frameworks to be created.
+        $table = new xmldb_table('totara_connect_client_org_frameworks');
+
+        // Adding fields to table totara_connect_org_frameworks.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('clientid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('fid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table totara_connect_org_frameworks.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('clientid', XMLDB_KEY_FOREIGN, array('clientid'), 'totara_connect_clients', array('id'));
+        $table->add_key('fid', XMLDB_KEY_FOREIGN, array('fid'), 'org_framework', array('id'));
+
+        // Adding indexes to table totara_connect_org_frameworks.
+        $table->add_index('clientid-fid', XMLDB_INDEX_UNIQUE, array('clientid', 'fid'));
+
+        // Conditionally launch create table for totara_connect_org_frameworks.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2016110202, 'totara', 'connect');
+    }
+
+    if ($oldversion < 2016110203) {
+
+        // Define field syncprofilefields to be added to totara_connect_clients.
+        $table = new xmldb_table('totara_connect_clients');
+        $field = new xmldb_field('syncprofilefields', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'cohortid');
+
+        // Conditionally launch add field syncjobs.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2016110203, 'totara', 'connect');
+    }
+
     return true;
 }
