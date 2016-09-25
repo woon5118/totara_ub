@@ -64,6 +64,9 @@ Feature: Add - Remove seminar attendees
     And I press "Continue"
     And I press "Confirm"
     Then I should see "Sam1 Student1"
+    # View existing attendees in "Users to add" select box
+    When I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    Then I should see "Sam1 Student1, student1@example.com"
 
   Scenario: Add and remove users to a Seminar session without dates (waitlist)
     Given I log in as "admin"

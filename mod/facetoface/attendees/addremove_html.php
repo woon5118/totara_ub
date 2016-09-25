@@ -19,6 +19,12 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
         <label for="removeselect"><?php echo $strusertochange ?></label>
         <select name="removeselect[]" size="20" id="removeselect" multiple="multiple">
         <?php
+            if (!empty($attendees) && $action === 'add') {
+                foreach ($attendees as $attendee) {
+                    $fullname = fullname($attendee, true);
+                    echo "<option disabled value=\"$attendee->id\">".$fullname.", ".$attendee->email."</option>\n";
+                }
+            }
             if (!empty($userstoadd)) {
                 foreach ($userstoadd as $newuser) {
                     $fullname = fullname($newuser, true);
