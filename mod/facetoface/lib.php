@@ -1525,10 +1525,16 @@ function facetoface_get_session($sessionid) {
  * Get all records from facetoface_sessions for a given facetoface activity and location
  *
  * @param integer $facetofaceid ID of the activity
- * @param string $location location filter (optional)
+ * @param string $location location filter (optional). @deprecated 9.0 No longer used by internal code.
+ * @param integer $roomid Room id filter (optional).
  */
 function facetoface_get_sessions($facetofaceid, $location = '', $roomid = 0) {
     global $DB;
+
+    if (!empty($location)) {
+        debugging('The $location parameter in facetoface_get_sessions has been deprecated. Use Room location custom field.',
+            DEBUG_DEVELOPER);
+    }
 
     $locationjoin = '';
     $locationwhere = '';
@@ -1778,9 +1784,21 @@ function facetoface_get_userfields() {
 /**
  * Download the list of users attending at least one of the sessions
  * for a given facetoface activity
+ *
+ * @param string $facetofacename Seminar name
+ * @param integer $facetofaceid Seminar ID
+ * @param string $location Location to filter by, @deprecated 9.0 No longer used by internal code.
+ * @param string $format Download format
+ *
+ * @return null
  */
 function facetoface_download_attendance($facetofacename, $facetofaceid, $location, $format) {
     global $CFG, $DB;
+
+    if (!empty($location)) {
+        debugging('The $location parameter in facetoface_download_attendance has been deprecated. Use Room location custom field.',
+            DEBUG_DEVELOPER);
+    }
 
     $timenow = time();
     $timeformat = str_replace(' ', '_', get_string('strftimedate', 'langconfig'));
@@ -1867,7 +1885,7 @@ function facetoface_write_worksheet_header(&$worksheet, $context) {
  * @param object  $coursecontext context of the course containing this f2f activity
  * @param integer $startingrow  Index of the starting row (usually 1)
  * @param integer $facetofaceid ID of the facetoface activity
- * @param string  $location     Location to filter by
+ * @param string  $location     Location to filter by, @deprecated 9.0 No longer used by internal code.
  * @param string  $coursename   Name of the course (optional)
  * @param string  $activityname Name of the facetoface activity (optional)
  * @param object  $dateformat   Use to write out dates in the spreadsheet
@@ -1876,6 +1894,11 @@ function facetoface_write_worksheet_header(&$worksheet, $context) {
 function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $startingrow, $facetofaceid, $location,
                                               $coursename, $activityname, $dateformat) {
     global $CFG, $DB;
+
+    if (!empty($location)) {
+        debugging('The $location parameter in facetoface_write_activity_attendance has been deprecated. Use Room location custom field.',
+            DEBUG_DEVELOPER);
+    }
 
     $trainerroles = facetoface_get_trainer_roles($coursecontext);
     $userfields = facetoface_get_userfields();
@@ -3674,6 +3697,118 @@ function facetoface_session_has_capacity($session, $context = false, $status = M
     }
 
     return true;
+}
+
+/**
+ * Print the list of a sessions
+ *
+ * @param integer $courseid
+ * @param object $facetoface
+ * @param object $sessions
+ *
+ * @return string html sting
+ */
+function facetoface_print_session_list($courseid, $facetoface, $sessions) {
+    global $USER, $OUTPUT, $PAGE;
+
+    $timenow = time();
+
+    $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $courseid, false, MUST_EXIST);
+    $context = context_module::instance($cm->id);
+
+    /** @var mod_facetoface_renderer $f2f_renderer */
+    $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
+    $f2f_renderer->setcontext($context);
+
+    $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
+    $editevents = has_capability('mod/facetoface:editevents', $context);
+
+    $bookedsession = null;
+    $submissions = facetoface_get_user_submissions($facetoface->id, $USER->id);
+    if (!$facetoface->multiplesessions) {
+        $submission = array_shift($submissions);
+        $bookedsession = $submission;
+    }
+
+    $upcomingarray = array();
+    $previousarray = array();
+    $upcomingtbdarray = array();
+
+    if ($sessions) {
+        foreach ($sessions as $session) {
+
+            $sessionstarted = false;
+            $sessionwaitlisted = false;
+
+            $sessiondata = $session;
+            if ($facetoface->multiplesessions) {
+                $submission = facetoface_get_user_submissions($facetoface->id, $USER->id,
+                    MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_FULLY_ATTENDED, $session->id);
+                $bookedsession = array_shift($submission);
+            }
+            $sessiondata->bookedsession = $bookedsession;
+
+            // Is session waitlisted
+            if (!$session->cntdates ) {
+                $sessionwaitlisted = true;
+            }
+
+            // Check if session is started
+            if ($session->cntdates  && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
+                $sessionstarted = true;
+            } else if ($session->cntdates  && facetoface_has_session_started($session, $timenow)) {
+                $sessionstarted = true;
+            }
+
+            // Put the row in the right table
+            if ($sessionstarted) {
+                $previousarray[] = $sessiondata;
+            } else if ($sessionwaitlisted) {
+                $upcomingtbdarray[] = $sessiondata;
+            } else { // Normal scheduled session
+                $upcomingarray[] = $sessiondata;
+            }
+        }
+    }
+
+    $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+
+    // Upcoming sessions
+    $output = $OUTPUT->heading(get_string('upcomingsessions', 'facetoface'));
+    if (empty($upcomingarray) && empty($upcomingtbdarray)) {
+        print_string('noupcoming', 'facetoface');
+    } else {
+        $upcomingarray = array_merge($upcomingarray, $upcomingtbdarray);
+        $reserveinfo = array();
+        if (!empty($facetoface->managerreserve)) {
+            // Include information about reservations when drawing the list of sessions.
+            $reserveinfo = facetoface_can_reserve_or_allocate($facetoface, $sessions, $context);
+            $output .= html_writer::tag('p', get_string('lastreservation', 'mod_facetoface', $facetoface));
+        }
+
+        $output .= $f2f_renderer->print_session_list_table(
+            $upcomingarray, $viewattendees, $editevents, $displaytimezones, $reserveinfo, $PAGE->url
+        );
+    }
+
+    if ($editevents) {
+        $output .= html_writer::tag(
+            'p',
+            html_writer::link(
+                new moodle_url('sessions.php', array('f' => $facetoface->id, 'backtoallsessions' => 1)), get_string('addsession', 'facetoface')
+            )
+        );
+    }
+
+    // Previous sessions
+    if (!empty($previousarray)) {
+        $output .= $OUTPUT->heading(get_string('previoussessions', 'facetoface'));
+        $output .= $f2f_renderer->print_session_list_table(
+            $previousarray, $viewattendees, $editevents, $displaytimezones, [], $PAGE->url
+        );
+    }
+
+    return $output;
 }
 
 /**
