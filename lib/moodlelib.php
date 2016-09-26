@@ -9456,6 +9456,16 @@ function setup_lang_from_browser() {
             $langs[substr($parts[1], $pos+1)] = $parts[0];
         }
     }
+
+    // Totara: Safari sends only one full lang name - add the basic form without dash.
+    if (count($langs) === 1) {
+        $lang = reset($langs);
+        $upos = strpos($lang, '_');
+        if ($upos !== false) {
+            $langs[0] = substr($lang, 0, $upos);
+        }
+    }
+
     krsort($langs, SORT_NUMERIC);
 
     // Look for such langs under standard locations.

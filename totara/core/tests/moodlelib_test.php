@@ -28,6 +28,63 @@ defined('MOODLE_INTERNAL') || die();
  */
 class totara_core_moodlelib_testcase extends advanced_testcase {
 
+    /**
+     * Test fix for Safari lang detection.
+     *
+     */
+    public function test_setup_lang_from_browser() {
+        global $SESSION, $USER, $CFG;
+        $this->resetAfterTest();
+
+        $this->assertNotEmpty($CFG->autolang);
+        $USER->lang = '';
+
+        $SESSION->lang = '';
+        unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+        setup_lang_from_browser();
+        $this->assertSame('', $SESSION->lang);
+
+        $SESSION->lang = '';
+        $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en';
+        setup_lang_from_browser();
+        $this->assertSame('en', $SESSION->lang);
+
+        $SESSION->lang = '';
+        $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en-us';
+        setup_lang_from_browser();
+        $this->assertSame('en', $SESSION->lang);
+
+        $SESSION->lang = '';
+        $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en-GB,en-US;q=0.8,en;q=0.6';
+        setup_lang_from_browser();
+        $this->assertSame('en', $SESSION->lang);
+
+        $SESSION->lang = '';
+        $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'xx-zz';
+        setup_lang_from_browser();
+        $this->assertSame('', $SESSION->lang);
+
+        $CFG->autolang = 0;
+        $SESSION->lang = '';
+        $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en';
+        setup_lang_from_browser();
+        $this->assertSame('', $SESSION->lang);
+
+        $CFG->autolang = 1;
+        $USER->lang = 'cs';
+        $SESSION->lang = '';
+        $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en';
+        setup_lang_from_browser();
+        $this->assertSame('', $SESSION->lang);
+
+        $CFG->autolang = 1;
+        $USER->lang = '';
+        $SESSION->lang = 'cs';
+        $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en';
+        setup_lang_from_browser();
+        $this->assertSame('cs', $SESSION->lang);
+    }
+
     public function test_delete_user() {
         global $DB, $CFG;
 
