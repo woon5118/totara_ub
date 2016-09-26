@@ -635,3 +635,50 @@ div#dateselector-calendar-panel {
     }
   }
 }
+
+//
+// Date selector.
+//
+// Fieldsets which group elements to form a single input
+// component e.g. Date selector (3 X <select>).
+.fitem > fieldset {
+  > legend {
+    font-size: @font-size-base;
+    border-bottom: none;
+    margin-top: 0;
+
+    // Negative margin coming in from grid.less
+    margin-right: 0;
+    margin-left: 0;
+
+    padding-top: 0;
+    &:extend(.fitemtitle);
+    &:extend(.mform .fitemtitle);
+
+    &:extend(.form-horizontal .form-group);
+    .make-md-column(4);
+    .make-lg-column(3);
+
+    .legend {
+      &:extend(label);
+      &:extend(.mform .fitem .fitemtitle label);
+      padding-top: (@padding-base-vertical + 1); // Default padding plus a border
+    }
+  }
+}
+
+.fdate_selector legend {
+  &:extend(.mform .fitem .fitemtitle label);
+}
+
+.mform .fdate_selector .felement select{
+  &:extend(.mform .fitem .felement.fdate_selector select);
+}
+
+//
+// .form-multicheckbox
+// e.g. Seminar global settings.
+//
+.form-setting .form-multicheckbox ul {
+  margin-left: 0;
+}

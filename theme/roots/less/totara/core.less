@@ -424,6 +424,14 @@ div.hide {
 a.skip-block,
 a.skip {
   &:extend(.sr-only); // screen-reader-only
+
+  // Display skip to content link when focused for keyboard navigators.
+  &:focus {
+    position: static;
+    display: block;
+    width: auto;
+    height: auto;
+  }
 }
 a.skip-block:focus,
 a.skip-block:active,
@@ -1515,4 +1523,25 @@ h5 [data-flex-icon='help'],
 h6 [data-flex-icon='help'] {
   font-size: @font-size-base;
   vertical-align: text-top;
+}
+
+.navbar-site {
+  .navbar-brand {
+    padding: 0;
+    height: (@font-size-base * 5);
+    > img {
+      height: 100%;
+      padding: (@grid-gutter-width / 2);
+      width: auto;
+    }
+  }
+}
+
+// Behat sees the new sr-only stuff as visible,
+// but it must not see the old accesshide class for backwards compatibility.
+// This may be removed only after we drop support for old themes and fix all behat tests.
+body.behat-site {
+  .accesshide {
+    display:none
+  }
 }
