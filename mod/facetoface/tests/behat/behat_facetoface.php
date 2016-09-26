@@ -213,4 +213,60 @@ class behat_facetoface extends behat_base {
             $DB->insert_record('facetoface_notification', $note);
         }
     }
+
+    /**
+     * Checks if a custom room of the given name exists in the database.
+     *
+     * @Given /^a seminar custom room called "([^"]*)" (should not|should) exist$/
+     *
+     * @throws \Behat\Mink\Exception\ExpectationException
+     * @param string $roomname
+     * @param string $should
+     */
+    public function a_seminar_custom_room_called_should_exist($roomname, $should) {
+        global $DB;
+
+        $params = array(
+            'custom' => 1,
+            'name' => $roomname
+        );
+        $exists = $DB->record_exists('facetoface_room', $params);
+        if ($should === 'should') {
+            if (!$exists) {
+                throw new \Behat\Mink\Exception\ExpectationException('Seminar custom room by the name of "' . $roomname . '" does not exist', $this->getSession());
+            }
+        } else {
+            if ($exists) {
+                throw new \Behat\Mink\Exception\ExpectationException('Seminar custom room by the name of "' . $roomname . '" still exists', $this->getSession());
+            }
+        }
+    }
+
+    /**
+     * Checks if a custom asset of the given name exists in the database.
+     *
+     * @Given /^a seminar custom asset called "([^"]*)" (should not|should) exist$/
+     *
+     * @throws \Behat\Mink\Exception\ExpectationException
+     * @param string $assetname
+     * @param string $should
+     */
+    public function a_seminar_custom_asset_called_should_exist($assetname, $should) {
+        global $DB;
+
+        $params = array(
+            'custom' => 1,
+            'name' => $assetname
+        );
+        $exists = $DB->record_exists('facetoface_asset', $params);
+        if ($should === 'should') {
+            if (!$exists) {
+                throw new \Behat\Mink\Exception\ExpectationException('Seminar custom asset by the name of "' . $assetname . '" does not exist', $this->getSession());
+            }
+        } else {
+            if ($exists) {
+                throw new \Behat\Mink\Exception\ExpectationException('Seminar custom asset by the name of "' . $assetname . '" still exists', $this->getSession());
+            }
+        }
+    }
 }

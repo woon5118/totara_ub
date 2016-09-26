@@ -995,7 +995,7 @@ function facetoface_delete_session($session) {
         $customassetids = $DB->get_fieldset_sql($sql, array('sessionsdateid' => $dateid));
         $DB->delete_records('facetoface_asset_dates', array('sessionsdateid' => $dateid));
         foreach ($customassetids as $assetid) {
-            if (!$DB->record_exists('facetoface_asset_dates', array('assetid', $assetid))) {
+            if (!$DB->record_exists('facetoface_asset_dates', array('assetid' => $assetid))) {
                 facetoface_delete_asset($assetid);
             }
         }
@@ -1009,7 +1009,7 @@ function facetoface_delete_session($session) {
     $customroomids = $DB->get_fieldset_sql($sql, array('sessionid' => $session->id));
     $DB->set_field('facetoface_sessions_dates', 'roomid', 0, array('sessionid' => $session->id));
     foreach ($customroomids as $roomid) {
-        if (!$DB->record_exists('facetoface_sessions_dates', array('roomid', $roomid))) {
+        if (!$DB->record_exists('facetoface_sessions_dates', array('roomid' => $roomid))) {
             facetoface_delete_room($roomid);
         }
     }
