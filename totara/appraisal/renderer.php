@@ -1803,10 +1803,10 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         }
         $tabs[] = $rows;
         if ($includewrapper) {
-            $out .= $this->container_start('verticaltabtree-wrapper');
+            $out .= $this->container_start('verticaltabtree-wrapper row');
         }
         $out .= html_writer::tag('div', print_tabs($tabs, $page->id, $inactiverows, null, true),
-                array('class' => 'verticaltabtree'));
+                array('class' => 'verticaltabtree col-sm-4 col-md-3 col-lg-2'));
 
         return $out;
     }

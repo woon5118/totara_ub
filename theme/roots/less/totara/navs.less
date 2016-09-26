@@ -118,3 +118,49 @@
 .totara-menu-nav-list .totara-menu-nav-item .totara-menu-nav-item-link:focus {
     &:extend(.totara-menu-nav-item-link:hover);
 }
+
+/**
+ * Vertical tabs.
+ *
+ * This is an modification on top of the Bootstrap standard tabs.
+ * Please use the Bootstrap grid classes to set the proportions
+ * of the tab and content widths.
+ */
+.verticaltabtree-wrapper {
+  margin-top: @padding-large-vertical * 3;
+
+  .verticaltabtree  {
+    float: left;
+
+    .tabtree {
+      margin: 0;
+    }
+
+    .nav.nav-tabs {
+      border-right: 1px solid @nav-tabs-border-color;
+      border-bottom: 0;
+
+      > li {
+      float: none;
+
+        a {
+        border-radius: @border-radius-base 0 0 @border-radius-base;
+        margin-right: -1px;
+        }
+      }
+
+      > li.active a {
+        border: 1px solid @nav-tabs-active-link-hover-border-color;
+        border-right-color: #fff;
+      }
+    }
+  }
+
+  .verticaltabtree-content {
+    float: left;
+  }
+}
+
+#page-admin-elementlibrary-verticaltabs .tabtree {
+  margin-right: @padding-large-horizontal;
+}

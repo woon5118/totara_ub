@@ -340,7 +340,7 @@ if ($action == 'stages') {
 else {
     if (isset($form)) {
         echo $renderer->display_pages($visiblepages, $page, $roleassignment, $preview, true);
-        echo $renderer->container_start('verticaltabtree-content');
+        echo $renderer->container_start('verticaltabtree-content col-sm-8 col-md-9 col-lg-10');
         $form->display();
         echo $renderer->container_end();
         echo $renderer->container_end(); // This is supposed to be here twice.
