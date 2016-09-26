@@ -977,7 +977,7 @@ class behat_course extends behat_base {
         // Checking the show button alt text and show icon.
         $showtext = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('showfromothers', $courseformat));
         $linkxpath = $xpath . "/descendant::a[@title=$showtext]";
-        $imgxpath = $linkxpath . "/descendant::*[contains(@class, 'fa-eye')]";
+        $imgxpath = $linkxpath . "/descendant::*[contains(@data-flex-icon, 'show')]";
 
         $exception = new ElementNotFoundException($this->getSession(), 'Show section icon ');
         $this->find('xpath', $imgxpath, $exception);
@@ -1004,7 +1004,7 @@ class behat_course extends behat_base {
         // Checking the hide button alt text and hide icon.
         $hidetext = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('hidefromothers', $courseformat));
         $linkxpath = $xpath . "/descendant::a[@title=$hidetext]";
-        $imgxpath = $linkxpath . "/descendant::*[contains(@class, 'fa-eye-slash')]";
+        $imgxpath = $linkxpath . "/descendant::*[contains(@data-flex-icon, 'hide')]";
 
         $exception = new ElementNotFoundException($this->getSession(), 'Hide section icon ');
         $this->find('xpath', $imgxpath, $exception);

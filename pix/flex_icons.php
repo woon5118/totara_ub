@@ -1076,7 +1076,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-eye-slash',
+                    'classes' => 'fa-eye',
                 ),
         ),
     'image' =>
@@ -1680,7 +1680,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-eye',
+                    'classes' => 'fa-eye-slash',
                 ),
         ),
     'sigma' =>

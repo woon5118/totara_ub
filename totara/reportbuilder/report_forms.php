@@ -582,7 +582,7 @@ class report_builder_edit_columns_form extends moodleform {
 
                             $mform->addElement('html', html_writer::link(
                                 $hideurl,
-                                $OUTPUT->pix_icon('t/show', $strhide, null, array('class' => 'iconsmall')),
+                                $OUTPUT->pix_icon('t/hide', $strhide, null, array('class' => 'iconsmall')),
                                 array('class' => 'hidecolbtn action-icon', 'title' => $strhide)
                             ));
                         } else {
@@ -591,7 +591,7 @@ class report_builder_edit_columns_form extends moodleform {
 
                             $mform->addElement('html', html_writer::link(
                                 $showurl,
-                                $OUTPUT->pix_icon('t/hide', $strshow, null, array('class' => 'iconsmall')),
+                                $OUTPUT->pix_icon('t/show', $strshow, null, array('class' => 'iconsmall')),
                                 array('class' => 'showcolbtn action-icon', 'title' => $strshow)
                             ));
                         }
