@@ -514,7 +514,8 @@ Feature: Generation of program assignment exceptions
     Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
 
     Then I click on "Assignments" "link"
-    And I should not see "No" in the "fn_001" "table_row"
+    And I should not see "No due date" in the "fn_001" "table_row"
+    And I should not see "Not yet known" in the "fn_001" "table_row"
     And I click on "Set due date" "link" in the ".completionlink_3" "css_element"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
@@ -526,7 +527,8 @@ Feature: Generation of program assignment exceptions
     And I click on "Save changes" "button"
     Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
 
-    Then I should not see "No" in the "fn_001" "table_row"
+    Then I should not see "No due date" in the "fn_001" "table_row"
+    And I should not see "Not yet known" in the "fn_001" "table_row"
     And I click on "Set due date" "link" in the ".completionlink_3" "css_element"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
@@ -534,7 +536,8 @@ Feature: Generation of program assignment exceptions
       | timeamount | 2 |
     And I click on "Set time relative to event" "button" in the "completion-dialog" "totaradialogue"
 
-    Then I should not see "No" in the "fn_002" "table_row"
+    Then I should not see "No due date" in the "fn_002" "table_row"
+    And I should not see "Not yet known" in the "fn_002" "table_row"
     And I click on "Set due date" "link" in the ".completionlink_4" "css_element"
     And I click on "Week(s)" "option" in the "#timeperiod" "css_element"
     And I click on "Program enrollment date" "option" in the "#eventtype" "css_element"
