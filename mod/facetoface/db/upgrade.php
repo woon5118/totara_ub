@@ -4416,6 +4416,11 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
         upgrade_mod_savepoint(true, 2016092000, 'facetoface');
     }
-
+    if ($oldversion < 2016092800) {
+        mod_facetoface_upgrade_notification_titles();
+        mod_facetoface_fix_trainercancel_body();
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2016092800, 'facetoface');
+    }
     return $result;
 }

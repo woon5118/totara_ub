@@ -1146,8 +1146,10 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaultcancellationsubject'] = 'Default subject line for cancellation emails.';
 $string['setting:defaultcancellationsubject_caption'] = 'Cancellation subject';
-$string['setting:defaultcancellationsubjectdefault'] = 'Seminar booking cancellation';
+$string['setting:defaultcancellationsubjectdefault'] = 'Face-to-face booking cancellation';
+$string['setting:defaultcancellationsubjectdefault_v9'] = 'Seminar booking cancellation';
 $string['setting:defaultcancelallreservationssubjectdefault'] = 'All reservations cancelled';
+$string['setting:defaultcancelallreservationssubjectdefault_v9'] = 'All reservations cancelled';
 $string['setting:defaultcancelallreservationsmessagedefault'] = 'This is to advise you that all unallocated reservations for the following course have been automatically cancelled, as the course will be starting soon:
 
 ***ALL RESERVATIONS CANCELLED***
@@ -1179,6 +1181,7 @@ Location: [session:room:cf_location]
 [/sessions]
 ';
 $string['setting:defaultcancelreservationsubjectdefault'] = 'Reservation cancellation';
+$string['setting:defaultcancelreservationsubjectdefault_v9'] = 'Reservation cancellation';
 $string['setting:defaultcancelreservationmessagedefault'] = 'This is to advise you that your reservation for the following course has been cancelled:
 
 ***RESERVATION CANCELLED***
@@ -1254,7 +1257,8 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaultdeclinesubject'] = 'Default subject line for decline emails.';
 $string['setting:defaultdeclinesubject_caption'] = 'Decline subject';
-$string['setting:defaultdeclinesubjectdefault'] = 'Seminar booking decline';
+$string['setting:defaultdeclinesubjectdefault'] = 'Face-to-face booking decline';
+$string['setting:defaultdeclinesubjectdefault_v9'] = 'Seminar booking decline';
 $string['setting:defaultconfirmationinstrmngr'] = 'Default confirmation message sent to managers.';
 $string['setting:defaultconfirmationinstrmngr_caption'] = 'Confirmation message (managers)';
 $string['setting:defaultconfirmationinstrmngrdefault'] = '*** Advice only ****
@@ -1315,7 +1319,8 @@ To re-schedule your booking you need to cancel this booking and then re-book a n
 ';
 $string['setting:defaultconfirmationsubject'] = 'Default subject line for confirmation emails.';
 $string['setting:defaultconfirmationsubject_caption'] = 'Confirmation subject';
-$string['setting:defaultconfirmationsubjectdefault'] = 'Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultconfirmationsubjectdefault'] = 'Face-to-face booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultconfirmationsubjectdefault_v9'] = 'Seminar booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultdatetimechangemessagedefault'] = 'Your session date/time has changed:
 
 Participant:   [firstname] [lastname]
@@ -1417,7 +1422,8 @@ Location: [session:room:cf_location]
 [session:room:link]
 [/sessions]
 ';
-$string['setting:defaultdatetimechangesubjectdefault'] = 'Seminar booking date/time changed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultdatetimechangesubjectdefault'] = 'Face-to-face booking date/time changed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultdatetimechangesubjectdefault_v9'] = 'Seminar booking date/time changed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultminbookings'] = 'Default minimum bookings';
 $string['setting:defaultminbookings_help'] = 'Default value for all seminar sessions. All sessions can still have a custom minimum bookings when setting up a new seminar session.';
 $string['setting:defaultreminderinstrmngr'] = 'Default reminder message sent to managers.';
@@ -1480,7 +1486,8 @@ To re-schedule your booking you need to cancel this booking and then re-book a n
 ';
 $string['setting:defaultremindersubject'] = 'Default subject line for reminder emails.';
 $string['setting:defaultremindersubject_caption'] = 'Reminder subject';
-$string['setting:defaultremindersubjectdefault'] = 'Seminar booking reminder: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultremindersubjectdefault'] = 'Face-to-face booking reminder: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultremindersubjectdefault_v9'] = 'Seminar booking reminder: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultrequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as their Team Leader / Manager.
 
 Please review this request before registration closes on [registrationcutoff]
@@ -1523,7 +1530,8 @@ Location: [session:room:cf_location]
 
 This request will expire on [registrationcutoff]
 ';
-$string['setting:defaultrequestsubjectdefault'] = 'Seminar booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultrequestsubjectdefault'] = 'Face-to-face booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultrequestsubjectdefault_v9'] = 'Seminar booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultrolerequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as a [sessionrole] for the session.
 
 Please review this request before registration closes on [registrationcutoff]
@@ -1652,13 +1660,14 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaulttrainerconfirmationsubject'] = 'Default subject line for trainer confirmation emails.';
 $string['setting:defaulttrainerconfirmationsubject_caption'] = 'Trainer confirmation subject';
-$string['setting:defaulttrainerconfirmationsubjectdefault'] = 'Seminar trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaulttrainerconfirmationsubjectdefault'] = 'Face-to-face trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaulttrainerconfirmationsubjectdefault_v9'] = 'Seminar trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 
 $string['setting:defaulttrainersessioncancellationmessage'] = 'Default event cancellation message sent to the trainer.';
 $string['setting:defaulttrainersessioncancellationmessage_caption'] = 'Trainer event cancellation message';
 $string['setting:defaulttrainersessioncancellationmessagedefault'] = 'This is to advise that your assigned training session the following course has been cancelled:
 
-***EVENT CANCELLED***
+***SESSION CANCELLED***
 
 Participant:   [firstname] [lastname]
 Course:   [coursename]
@@ -1692,7 +1701,8 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaulttrainersessioncancellationsubject'] = 'Default subject line for trainer event cancellation emails.';
 $string['setting:defaulttrainersessioncancellationsubject_caption'] = 'Trainer event cancellation subject';
-$string['setting:defaulttrainersessioncancellationsubjectdefault'] = 'Seminar event trainer cancellation';
+$string['setting:defaulttrainersessioncancellationsubjectdefault'] = 'Face-to-face session trainer cancellation';
+$string['setting:defaulttrainersessioncancellationsubjectdefault_v9'] = 'Seminar event trainer cancellation';
 
 $string['setting:defaulttrainersessionunassignedmessage'] = 'Default event unassigned message sent to the trainer.';
 $string['setting:defaulttrainersessionunassignedmessage_caption'] = 'Trainer event unassigned message';
@@ -1732,7 +1742,8 @@ Location: [session:room:cf_location]
 ';
 $string['setting:defaulttrainersessionunassignedsubject'] = 'Default subject line for trainer event unassigned emails.';
 $string['setting:defaulttrainersessionunassignedsubject_caption'] = 'Trainer event unassigned subject';
-$string['setting:defaulttrainersessionunassignedsubjectdefault'] = 'Seminar event trainer unassigned';
+$string['setting:defaulttrainersessionunassignedsubjectdefault'] = 'Face-to-face session trainer unassigned';
+$string['setting:defaulttrainersessionunassignedsubjectdefault_v9'] = 'Seminar event trainer unassigned';
 $string['setting:defaultvalue'] = 'Default value';
 $string['setting:defaultwaitlistedmessage'] = 'Default wait-listed message sent to users.';
 $string['setting:defaultwaitlistedmessage_caption'] = 'Wait-listed message';
@@ -1810,6 +1821,7 @@ $string['setting:defaultsessioncancellationsubjectdefault'] = 'Seminar event can
 $string['setting:defaultwaitlistedsubject'] = 'Default subject line for wait-listed emails.';
 $string['setting:defaultwaitlistedsubject_caption'] = 'Wait-listed subject';
 $string['setting:defaultwaitlistedsubjectdefault'] = 'Waitlisting advice for [facetofacename]';
+$string['setting:defaultwaitlistedsubjectdefault_v9'] = 'Waitlisting advice for [facetofacename]';
 $string['setting:displaysessiontimezones'] = 'When enabled the timezone of the Seminar event will be shown otherwise it will be hidden (selecting a timezone for an event will also be enabled/disabled).';
 $string['setting:displaysessiontimezones_caption'] = 'Display event timezones';
 $string['setting:disableicalcancel'] = 'Disable cancellation emails with an iCalendar attachment.';

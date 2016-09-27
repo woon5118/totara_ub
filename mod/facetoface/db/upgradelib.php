@@ -230,3 +230,115 @@ function mod_facetoface_fix_cancellationid_files() {
         }
     }
 }
+
+/**
+ * Upgrade notifications titles from facetoface to seminar.
+ */
+function mod_facetoface_upgrade_notification_titles() {
+    global $DB;
+    // Upgrade notification titles.
+    // Strings for previous template defaults just prior to 9.0. Uses their reference as keys.
+    $oldtemplatedefaults = array();
+    $oldtemplatedefaults['confirmation'] = get_string('setting:defaultconfirmationsubjectdefault', 'facetoface');
+    $oldtemplatedefaults['cancellation'] = get_string('setting:defaultcancellationsubjectdefault', 'facetoface');
+    $oldtemplatedefaults['waitlist'] = get_string('setting:defaultwaitlistedsubjectdefault', 'facetoface');
+    $oldtemplatedefaults['reminder'] = get_string('setting:defaultremindersubjectdefault', 'facetoface');
+    $oldtemplatedefaults['request'] = get_string('setting:defaultrequestsubjectdefault', 'facetoface');
+    $oldtemplatedefaults['decline'] = get_string('setting:defaultdeclinesubjectdefault', 'facetoface');
+    $oldtemplatedefaults['timechange'] = get_string('setting:defaultdatetimechangesubjectdefault', 'facetoface');
+    $oldtemplatedefaults['trainercancel'] = get_string('setting:defaulttrainersessioncancellationsubjectdefault', 'facetoface');
+    $oldtemplatedefaults['trainerunassign'] = get_string('setting:defaulttrainersessionunassignedsubjectdefault', 'facetoface');
+    $oldtemplatedefaults['trainerconfirm'] = get_string('setting:defaulttrainerconfirmationsubjectdefault', 'facetoface');
+    $oldtemplatedefaults['allreservationcancel'] = get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface');
+    $oldtemplatedefaults['reservationcancel'] = get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface');
+
+    // Strings for new template defaults with new placeholder variables introduced in 9.0. Uses their reference as keys.
+    $newtemplatedefaults = array();
+    $newtemplatedefaults['confirmation'] = get_string('setting:defaultconfirmationsubjectdefault_v9', 'facetoface');
+    $newtemplatedefaults['cancellation'] = get_string('setting:defaultcancellationsubjectdefault_v9', 'facetoface');
+    $newtemplatedefaults['waitlist'] = get_string('setting:defaultwaitlistedsubjectdefault_v9', 'facetoface');
+    $newtemplatedefaults['reminder'] = get_string('setting:defaultremindersubjectdefault_v9', 'facetoface');
+    $newtemplatedefaults['request'] = get_string('setting:defaultrequestsubjectdefault_v9', 'facetoface');
+    $newtemplatedefaults['decline'] = get_string('setting:defaultdeclinesubjectdefault_v9', 'facetoface');
+    $newtemplatedefaults['timechange'] = get_string('setting:defaultdatetimechangesubjectdefault_v9', 'facetoface');
+    $newtemplatedefaults['trainercancel'] = get_string('setting:defaulttrainersessioncancellationsubjectdefault_v9', 'facetoface');
+    $newtemplatedefaults['trainerunassign'] = get_string('setting:defaulttrainersessionunassignedsubjectdefault_v9', 'facetoface');
+    $newtemplatedefaults['trainerconfirm'] = get_string('setting:defaulttrainerconfirmationsubjectdefault_v9', 'facetoface');
+    $newtemplatedefaults['allreservationcancel'] = get_string('setting:defaultcancelallreservationssubjectdefault_v9', 'facetoface');
+    $newtemplatedefaults['reservationcancel'] = get_string('setting:defaultcancelreservationsubjectdefault_v9', 'facetoface');
+
+    // This will hold templates that were found to match the pre-9.0 defaults. With format array(id => reference).
+    $templateswithdefaults = array();
+
+    // Update notification templates.
+    $templates = $DB->get_records('facetoface_notification_tpl');
+    foreach ($templates as $template) {
+        if (isset($template->title) && isset($template->reference) && isset($oldtemplatedefaults[$template->reference])
+                && (strcmp($template->title, $oldtemplatedefaults[$template->reference]) === 0)) {
+            $template->title = $newtemplatedefaults[$template->reference];
+            $templateswithdefaults[$template->id] = $template->reference;
+            $DB->update_record('facetoface_notification_tpl', $template);
+        }
+    }
+
+    // Update notifications.
+    $f2f_notifications = $DB->get_records('facetoface_notification');
+    foreach ($f2f_notifications as $f2f_notification) {
+        if (isset($f2f_notification->title) && isset($templateswithdefaults[$f2f_notification->templateid])) {
+            // This notification uses a template that matched the default lang string.
+            $reference = $templateswithdefaults[$f2f_notification->templateid];
+            if (strcmp($f2f_notification->title, $oldtemplatedefaults[$reference]) === 0) {
+                // This notification also matched the same default lang string. So we'll update it
+                // to the new default.
+                $f2f_notification->title = $newtemplatedefaults[$reference];
+                $DB->update_record('facetoface_notification', $f2f_notification);
+            }
+        }
+    }
+}
+
+/**
+ * During upgrade from 2.9 and prior to 9.0rc1 notification message for trainercancel had wrong string in lang file
+ * (different from original) as result it was not updated, but dates format was changed anyway (as fallback scenario).
+ * String is fixed now, but we still need to cover upgrades from 9.0rc1 to 9+ by refixing this particualr string.
+ * It make sense only for English version.
+ */
+function mod_facetoface_fix_trainercancel_body() {
+    global $DB;
+    // This is resulting template
+    $wrongtemplate = '<div class="text_to_html">This is to advise that your assigned training session the following course has been cancelled:<br />
+<br />
+***SESSION CANCELLED***<br />
+<br />
+Participant:   [firstname] [lastname]<br />
+Course:   [coursename]<br />
+Face-to-face:   [facetofacename]<br />
+<br />
+Duration:   [duration]<br />
+Date(s):<br />
+[#sessions][session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]<br>[/sessions]<br />
+<br />
+Location:   [session:location]<br />
+Venue:   [session:venue]<br />
+Room:   [session:room]<br />
+</div>';
+
+    $newtemplate = text_to_html(get_string('setting:defaulttrainersessioncancellationmessagedefault_v9', 'facetoface'));
+    // Update notification templates.
+    $template = $DB->get_record('facetoface_notification_tpl', ['reference' => 'trainercancel']);
+    if (!empty($template) && strcmp($template->body, $wrongtemplate) === 0) {
+        $template->body = $newtemplate;
+        $DB->update_record('facetoface_notification_tpl', $template);
+
+        // Upgrade acitivities template.
+        $f2f_notifications = $DB->get_records('facetoface_notification', ['templateid' => $template->id]);
+        if (!empty($f2f_notifications)) {
+            foreach ($f2f_notifications as $notification) {
+                if (strcmp($notification->body, $wrongtemplate) === 0) {
+                    $notification->body = $newtemplate;
+                    $DB->update_record('facetoface_notification', $notification);
+                }
+            }
+        }
+    }
+}

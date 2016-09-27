@@ -1257,4 +1257,94 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $this->assertArrayNotHasKey(134, $files);
         $this->assertArrayNotHasKey(136, $files);
     }
+
+    /**
+     * Test fixes of notification titles.
+     */
+    public function test_mod_facetoface_upgrade_notification_titles() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot.'/lib/upgradelib.php');
+        require_once($CFG->dirroot.'/mod/facetoface/db/upgradelib.php');
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+
+        // Old title.
+        $toupgrade = $DB->get_record('facetoface_notification_tpl', ['reference' => 'trainerconfirm']);
+        $toupgrade->title = 'Face-to-face trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+        $DB->update_record('facetoface_notification_tpl', $toupgrade);
+
+        $toskip = $DB->get_record('facetoface_notification_tpl', ['reference' => 'reminder']);
+        $toskip->title = 'Should be skipped';
+        $DB->update_record('facetoface_notification_tpl', $toskip);
+
+        // Create course and f2f activity.
+        $facetoface_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface_generator->create_instance(array('course' => $course->id));
+
+        mod_facetoface_upgrade_notification_titles();
+
+        // Confirm upgraded.
+        $isupgraded = $DB->get_record('facetoface_notification_tpl', ['reference' => 'trainerconfirm']);
+        $this->assertEquals('Seminar trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]', $isupgraded->title);
+
+        $isupgradedactivity = $DB->get_records('facetoface_notification', ['templateid' => $isupgraded->id]);
+        foreach ($isupgradedactivity as $notification) {
+            $this->assertEquals('Seminar trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]', $notification->title);
+        }
+
+        // Confirm skipped.
+        $isskipped = $DB->get_record('facetoface_notification_tpl', ['reference' => 'reminder']);
+        $this->assertEquals('Should be skipped', $isskipped->title);
+
+        $isskippedactivity = $DB->get_records('facetoface_notification', ['templateid' => $isskipped->id]);
+        foreach ($isskippedactivity as $notification) {
+            $this->assertEquals('Should be skipped', $notification->title);
+        }
+    }
+
+    /**
+     * Test of fix trainercancel body incorrect upgrade by 9.0rc1
+     */
+    public function test_mod_facetoface_fix_trainercancel_body() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot.'/lib/upgradelib.php');
+        require_once($CFG->dirroot.'/mod/facetoface/db/upgradelib.php');
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        $wrongtrainercancel = $DB->get_record('facetoface_notification_tpl', ['reference' => 'trainercancel']);
+        $wrongtrainercancel->body = '<div class="text_to_html">This is to advise that your assigned training session the following course has been cancelled:<br />
+<br />
+***SESSION CANCELLED***<br />
+<br />
+Participant:   [firstname] [lastname]<br />
+Course:   [coursename]<br />
+Face-to-face:   [facetofacename]<br />
+<br />
+Duration:   [duration]<br />
+Date(s):<br />
+[#sessions][session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]<br>[/sessions]<br />
+<br />
+Location:   [session:location]<br />
+Venue:   [session:venue]<br />
+Room:   [session:room]<br />
+</div>';
+        $DB->update_record('facetoface_notification_tpl', $wrongtrainercancel);
+
+        mod_facetoface_fix_trainercancel_body();
+
+        $correctmessage = text_to_html(get_string('setting:defaulttrainersessioncancellationmessagedefault_v9', 'facetoface'));
+        $trainercancel = $DB->get_record('facetoface_notification_tpl', ['reference' => 'trainercancel']);
+        $this->assertEquals($correctmessage, $trainercancel->body);
+
+        // Idempotence for pre-9 upgrades.
+        mod_facetoface_fix_trainercancel_body();
+
+        $trainercancel2 = $DB->get_record('facetoface_notification_tpl', ['reference' => 'trainercancel']);
+        $this->assertEquals($correctmessage, $trainercancel2->body);
+    }
 }
