@@ -452,6 +452,10 @@ Feature: Use user source to import job assignments data in HR sync
     And I navigate to "HR Import Log" node in "Site administration > HR Import"
     And I should see "HR Import finished" in the "#totarasynclog" "css_element"
 
+    # User 10 and 11 => fail due to empty job assignment id number.
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id10"
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id11"
+
     # User 15 and 16 => fail because of missing jaid.
     And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id15"
     And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id16"
@@ -474,13 +478,13 @@ Feature: Use user source to import job assignments data in HR sync
     # User 27 => failed because it tried to update the first job assignment record to same id as the second.
     And I should see "Cannot create job assignment (user: id27): Tried to update job assignment to an idnumber which is not unique for this user"
 
-    # User 10 - no import, no existing => no job assignments.
+    # User 10 - no import, no existing => fail to create job assignment due to empty job assignment id number.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first10 last10" "link"
     Then I should see "Add job assignment"
     And I should see "This user has no job assignments"
 
-    # User 11 - no import, has existing => don't change existing.
+    # User 11 - no import, has existing => fail to update job assignment due to empty job assignment id number.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first11 last11" "link"
     Then I should not see "Add job assignment"
@@ -1099,6 +1103,10 @@ Feature: Use user source to import job assignments data in HR sync
       | totara_sync_log-logtype    | info |
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
 
+    # User 10 and 11 => fail due to empty job assignment id number.
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id10"
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id11"
+
     # Users 13 and 17 => can't create another ja.
     And I should see "Tried to create a job assignment but multiple job assignments site setting is disabled and a job assignment already exists. Skipped job assignment for user id13"
     And I should see "Tried to create a job assignment but multiple job assignments site setting is disabled and a job assignment already exists. Skipped job assignment for user id17"
@@ -1122,13 +1130,13 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "Duplicate users with username username26. Skipped user id26"
     And I should see "Duplicate users with email e26@example.com. Skipped user id26"
 
-    # User 10 - no import, no existing => no job assignments.
+    # User 10 - no import, no existing => fail to create job assignment due to empty job assignment id number.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first10 last10" "link"
     Then I should see "Add job assignment"
     And I should see "This user has no job assignments"
 
-    # User 11 - no import, has existing => don't change existing.
+    # User 11 - no import, has existing => fail to update job assignment due to empty job assignment id number.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first11 last11" "link"
     Then I should not see "Add job assignment"
@@ -1748,6 +1756,10 @@ Feature: Use user source to import job assignments data in HR sync
     And I navigate to "HR Import Log" node in "Site administration > HR Import"
     And I should see "HR Import finished" in the "#totarasynclog" "css_element"
 
+    # User 10 and 11 => fail due to empty job assignment id number.
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id10"
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id11"
+
     # User 15 and 16 => fail because of missing jaid.
     And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id15"
     And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id16"
@@ -1770,13 +1782,13 @@ Feature: Use user source to import job assignments data in HR sync
     # User 27 => failed because it tried to update the first job assignment record to same id as the second.
     And I should see "Cannot create job assignment (user: id27): Tried to update job assignment to an idnumber which is not unique for this user"
 
-    # User 10 - no import, no existing => no job assignments.
+    # User 10 - no import, no existing => fail to create job assignment due to empty job assignment id number.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first10 last10" "link"
     Then I should see "Add job assignment"
     And I should see "This user has no job assignments"
 
-    # User 11 - no import, has existing => don't change existing.
+    # User 11 - no import, has existing => fail to create job assignment due to empty job assignment id number.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first11 last11" "link"
     Then I should see "Add job assignment"
@@ -2437,6 +2449,10 @@ Feature: Use user source to import job assignments data in HR sync
     And I navigate to "HR Import Log" node in "Site administration > HR Import"
     And I should see "HR Import finished" in the "#totarasynclog" "css_element"
 
+    # User 10 and 11 => fail due to empty job assignment id number.
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id10"
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id11"
+
     # User 15 and 16 => fail because of missing jaid.
     And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id15"
     And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id16"
@@ -2451,13 +2467,13 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "Appraiser appraiseridx does not exist. Skipped user id19"
     And I should see "Appraiser appraiseridx does not exist. Skipped user id20"
 
-    # User 10 - no import, no existing => no job assignments.
+    # User 10 - no import, no existing => fail to create job assignment due to empty job assignment id number.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first10 last10" "link"
     Then I should see "Add job assignment"
     And I should see "This user has no job assignments"
 
-    # User 11 - no import, has existing => don't change existing.
+    # User 11 - no import, has existing => fail to update job assignment due to empty job assignment id number.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first11 last11" "link"
     Then I should see "Add job assignment"

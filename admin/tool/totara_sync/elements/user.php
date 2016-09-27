@@ -543,10 +543,10 @@ class totara_sync_element_user extends totara_sync_element {
                 } else if ($suser->$jafield === "" && !$saveemptyfields) {
                     // It contains an empty string, but these should be ignored.
                     unset($suser->$jafield);
-                } else if ($suser->$jafield !== "") {
-                    // There is real, non-empty data to save.
+                } else {
+                    // There is data to save (which might be empty string, but only if empty string isn't ignored).
                     $hasdatatoimport = true;
-                } // Else empty string, and empty strings erase existing data, but only import if some other non-empty data exists.
+                }
             }
             if (!$hasdatatoimport) {
                 unset($assign_sync_users[$id]);
