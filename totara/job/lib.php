@@ -32,9 +32,8 @@ function totara_job_can_view_job_assignments(stdClass $user, stdClass $course = 
     global $USER;
 
     $systemcontext = context_system::instance();
-    $usercontext = context_user::instance($user->id);
 
-    if (!isset($user->id)) {
+    if (empty($user->id)) {
         // Not a real boy... I mean user.
         return false;
     }
@@ -46,6 +45,14 @@ function totara_job_can_view_job_assignments(stdClass $user, stdClass $course = 
         // Guests don't have job assignments.
         return false;
     }
+
+    try {
+        $usercontext = context_user::instance($user->id);
+    } catch(Exception $e) {
+        // user deleted
+        return false;
+    }
+
     if (!empty($USER->id) && ($user->id == $USER->id) && has_capability('totara/hierarchy:viewposition', $systemcontext)) {
         // Can view own profile.
         return true;
@@ -67,7 +74,7 @@ function totara_job_can_view_job_assignments(stdClass $user, stdClass $course = 
 function totara_job_can_edit_job_assignments($userid) {
     global $USER;
 
-    if (!isset($userid)) {
+    if (empty($userid)) {
         // Not a real boy... I mean user.
         return false;
     }
@@ -80,13 +87,15 @@ function totara_job_can_edit_job_assignments($userid) {
         return false;
     }
 
-    // Can assign any user's job assignments.
-    if (has_capability('totara/hierarchy:assignuserposition', context_system::instance())) {
-        return true;
+    try {
+        $usercontext = context_user::instance($userid);
+    } catch(Exception $e) {
+        // user deleted
+        return false;
     }
 
     // Can assign this particular user's job assignments.
-    if (has_capability('totara/hierarchy:assignuserposition', context_user::instance($userid))) {
+    if (has_capability('totara/hierarchy:assignuserposition', $usercontext)) {
         return true;
     }
 

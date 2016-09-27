@@ -33,7 +33,7 @@ $functions = array(
         'loginrequired'     => true,
         'ajax'              => true,
         'capabilities'      => 'totara/hierarchy:viewposition, moodle/user:viewdetails, totara/hierarchy:assignuserposition, '
-                             . 'totara/hierarchy:assignuserposition, totara/hierarchy:assignselfposition'
+                             . 'totara/hierarchy:assignselfposition'
     ),
 
     // Deletes a job assignment for a given user.
@@ -46,7 +46,7 @@ $functions = array(
         'loginrequired'     => true,
         'ajax'              => true,
         'capabilities'      => 'totara/hierarchy:viewposition, moodle/user:viewdetails, totara/hierarchy:assignuserposition, '
-            . 'totara/hierarchy:assignuserposition, totara/hierarchy:assignselfposition'
+            . 'totara/hierarchy:assignselfposition'
     ),
 
 );

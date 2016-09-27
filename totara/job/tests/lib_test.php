@@ -138,4 +138,115 @@ class totara_job_lib_testcase extends advanced_testcase {
         $returnedstring2 = totara_job_display_user_job($user2, null, true);
         $this->assertEquals(fullname($user2) . ' (' .$user2->email . ') - requires job assignment entry', $returnedstring2);
     }
+
+    public function test_totara_job_can_edit_job_assignments() {
+        global $USER, $DB;
+
+        $this->resetAfterTest();
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        // Null and empty userid
+        $this->setUser($user1);
+        $this->assertFalse(totara_job_can_edit_job_assignments(null));
+        $this->assertFalse(totara_job_can_edit_job_assignments(0));
+
+        // Not logged in
+        $this->setUser();
+        $this->assertFalse(totara_job_can_edit_job_assignments($user2->id));
+
+        // Guest user
+        $guest = get_guest_role();
+        $this->setUser($guest);
+        $this->assertFalse(totara_job_can_edit_job_assignments($user2->id));
+
+        $systemcontext = context_system::instance();
+        $user2context = context_user::instance($user2->id);
+        $user3context = context_user::instance($user3->id);
+
+        // Editing own job assignments
+        $this->setUser($user1);
+        $this->assertFalse(totara_job_can_edit_job_assignments($user1->id));
+        $user_role = $DB->get_record('role', array('shortname'=>'user'), '*', MUST_EXIST);
+        assign_capability('totara/hierarchy:assignselfposition', CAP_ALLOW, $user_role->id, $systemcontext->id, true);
+        $systemcontext->mark_dirty();
+        $this->assertTrue(totara_job_can_edit_job_assignments($user1->id));
+
+        // totara/hierarchy:assignuserposition capability
+        $sm_role = $DB->get_record('role', array('shortname'=>'staffmanager'), '*', MUST_EXIST);
+        role_assign($sm_role->id, $user1->id, $systemcontext->id);
+        role_assign($sm_role->id, $user1->id, $user2context->id);
+        role_assign($sm_role->id, $user1->id, $user3context->id);
+
+        // systemcontext not taken into consideration anymore (TL-10680)
+        assign_capability('totara/hierarchy:assignuserposition', CAP_ALLOW, $sm_role->id, $systemcontext->id, true);
+        assign_capability('totara/hierarchy:assignuserposition', CAP_ALLOW, $sm_role->id, $user2context->id, true);
+        assign_capability('totara/hierarchy:assignuserposition', CAP_PROHIBIT, $sm_role->id, $user3context->id, true);
+        $systemcontext->mark_dirty();
+
+        $this->setUser($user1);
+        $this->assertTrue(totara_job_can_edit_job_assignments($user2->id));
+        $this->assertFalse(totara_job_can_edit_job_assignments($user3->id));
+
+        // Deleted user
+        $user2->deleted = 1;
+        $user2 = $this->getDataGenerator()->create_user($user2);
+        $this->assertFalse(totara_job_can_edit_job_assignments($user2->id));
+    }
+
+    public function test_totara_job_can_view_job_assignments() {
+        global $USER, $DB;
+
+        $this->resetAfterTest();
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $invuser = new stdClass();
+        $deluser = $this->getDataGenerator()->create_user(array('deleted'=>1));
+        $course = $this->getDataGenerator()->create_course();
+
+        // Null and empty userid
+        $this->setUser($user1);
+        $this->assertFalse(totara_job_can_view_job_assignments($invuser));
+        $invuser->id = '';
+        $this->assertFalse(totara_job_can_view_job_assignments($invuser));
+
+        // Not logged in
+        $this->setUser();
+        $this->assertFalse(totara_job_can_view_job_assignments($user2));
+
+        // Guest user
+        $guest = get_guest_role();
+        $this->setUser($guest);
+        $this->assertFalse(totara_job_can_view_job_assignments($user2));
+
+        // Deleted user
+        $this->setUser($user1);
+        $this->assertFalse(totara_job_can_view_job_assignments($deluser));
+
+        $systemcontext = context_system::instance();
+        $user2context = context_user::instance($user2->id);
+        $user_role = $DB->get_record('role', array('shortname'=>'user'), '*', MUST_EXIST);
+        $coursecontext = context_course::instance($course->id);
+
+        // Own profile access
+        $this->assertTrue(totara_job_can_view_job_assignments($user1));
+        assign_capability('totara/hierarchy:viewposition', CAP_PROHIBIT, $user_role->id, $systemcontext->id, true);
+        $systemcontext->mark_dirty();
+        $this->assertFalse(totara_job_can_view_job_assignments($user1));
+
+        // Course access
+        assign_capability('totara/hierarchy:viewposition', CAP_ALLOW, $user_role->id, $systemcontext->id, true); // reset
+        $systemcontext->mark_dirty();
+        $this->assertFalse(totara_job_can_view_job_assignments($user2, $course));
+        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $user_role->id, $coursecontext->id, true);
+        $systemcontext->mark_dirty();
+        $this->assertTrue(totara_job_can_view_job_assignments($user2, $course));
+
+        // User details
+        $this->assertFalse(totara_job_can_view_job_assignments($user2));
+        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $user_role->id, $user2context->id, true);
+        $systemcontext->mark_dirty();
+        $this->assertTrue(totara_job_can_view_job_assignments($user2));
+    }
 }
