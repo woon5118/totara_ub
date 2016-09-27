@@ -1458,8 +1458,25 @@ ul.dragdrop-keyboard-drag li {
   color: @link-color;
 }
 
-.navbar-header h1 {
-  margin: 0;
+.navbar-header {
+  h1 {
+    margin: 0;
+  }
+
+  .langmenu,
+  .usermenu {
+    display: inline-block;
+    padding: 0;
+  }
+
+  .usermenu {
+    margin-left: @padding-large-horizontal;
+    padding: 0;
+  }
+
+  .usermenu > .login {
+    line-height: @line-height-computed * 2;
+  }
 }
 
 // Undo styles applied earlier in this file affecting
