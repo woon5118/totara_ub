@@ -94,19 +94,19 @@
         "template": "block_current_learning/program_row"
     }
 }}
-<li id="block_current_learning-program-{{id}}" class="block_current_learning-program">
-<h4>
+<li id="block_current_learning-program-{{id}}" class="block_current_learning-item block_current_learning-program">
+    <div class="block_current_learning-row-item">
     <span class="expand-collapse-icon-wrap collapsed" data-toggle="collapse" data-target="#block_current_learning-program-{{id}}-detail" aria-expanded="false" aria-controls="block_current_learning-program-{{id}}-detail"
-        ><span class="collapsed-icon">{{#flex_icon}}caret-right{{/flex_icon}}</span
+        ><span class="collapsed-icon">{{#flex_icon}}collapsed{{/flex_icon}}</span
         ><span class="expanded-icon">{{#flex_icon}}caret-down{{/flex_icon}}</span
     ></span
 ><span data-toggle="tooltip" data-placement="top" data-container="body" title="{{title}}">{{#flex_icon}}{{icon}}{{/flex_icon}}</span
-    ><a href="{{url_view}}">{{{fullname}}}</a
+><a href="{{url_view}}"><h3>{{{fullname}}}</h3></a
     ><span class="pull-right info">
         {{#dueinfo}}<span class="label {{state}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">{{#alert}}{{#flex_icon}}warning{{/flex_icon}}{{/alert}} {{duetext}}</span>{{/dueinfo}}
         {{#progress}}<span class="label label-default">{{summary}}</span>{{/progress}}
     </span>
-</h4>
+</div>
 <div class="collapse" id="block_current_learning-program-{{id}}-detail">
     <div class="current_learning-bundle">
         {{#coursesets_header_text}}
@@ -116,7 +116,7 @@
         {{/coursesets_header_text}}
         {{#coursesets}}
         <div class="current_learning-set">
-            <h5>{{{name}}}<span class="pull-right info">{{completion_text}}</span></h5>
+            <h4>{{{name}}}<span class="pull-right info">{{completion_text}}</span></h4>
             {{#courses}}
             <p class="current_learning-course status-{{status}}">
             <a href="{{url_view}}">{{{fullname}}}</a>
