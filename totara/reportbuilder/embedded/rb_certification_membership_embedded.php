@@ -65,6 +65,19 @@ class rb_certification_membership_embedded extends rb_base_embedded {
     }
 
     /**
+     * Is this embedded report usable?
+     *
+     * If true returned the report is not displayed in the list of all embedded reports.
+     * If source is ignored then this method is irrelevant.
+     *
+     * @return bool
+     */
+    public function is_ignored() {
+        global $CFG;
+        return empty($CFG->enableprogramcompletioneditor);
+    }
+
+    /**
      * Check if the user is capable of accessing this report.
      * We use $reportfor instead of $USER->id and $report->get_param_value() instead of getting report params
      * some other way so that the embedded report will be compatible with the scheduler (in the future).
