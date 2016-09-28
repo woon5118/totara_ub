@@ -88,7 +88,7 @@ Note that the first time an import is performed \'using the user\'s job assignme
 $string['ignoreexistingpass'] = 'Only import new users\' passwords';
 $string['ignoreexistingpassdesc'] = 'If "Yes" passwords are only updated for new users, if "No" all users\' passwords are updated';
 $string['forcepwchange'] = 'Force password change for new users';
-$string['forcepwchangedesc'] = 'If "yes" new users have their password set but are forced to change it on first login';
+$string['forcepwchangedesc'] = 'If "yes" new users have their password set but are forced to change it on first login. <br /><strong>Note:</strong> Users with generated passwords will be forced to change them on first login regardless of this configuration option.';
 $string['undeletepwreset'] = 'Reset passwords for undeleted users';
 $string['undeletepwresetdesc'] = 'If "yes" and if a password is not specified in the import then undeleted users will have their passwords reset, will receive an email with the new password and will be forced to reset their password when first logging in';
 $string['checkuserconfig'] = 'These settings change the expected <a href=\'{$a}\'>source configuration</a>. You should check the format of your data source matches the new source configuration';
