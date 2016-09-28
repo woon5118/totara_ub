@@ -28,6 +28,7 @@ Feature: Manage custom rooms by non-admin user
     And I follow "Add a new event"
     And I click on "Select room" "link"
     And I click on "Create new room" "link"
+    And I should see "Create new room" in the "Create new room" "totaradialogue"
     And I set the following fields to these values:
       | Name         | Room 1          |
       | Building     | That house      |
@@ -42,9 +43,10 @@ Feature: Manage custom rooms by non-admin user
 
     # Edit
     And I click on ".roomname a.dialog-singleselect-editable" "css_element"
+    And I should see "Edit room" in the "Edit room" "totaradialogue"
     And I set the following fields to these values:
       | Name         | Room edited |
       | roomcapacity | 10          |
     And I should not see "Publish for reuse"
-    When I click on "OK" "button" in the "Create new room" "totaradialogue"
+    When I click on "OK" "button" in the "Edit room" "totaradialogue"
     Then I should see "Room edited (10)"

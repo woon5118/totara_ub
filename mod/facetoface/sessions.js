@@ -291,6 +291,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                                 $editbutton.click(function(e) {
                                     e.preventDefault();
                                     M.totara_f2f_room.config.editroom = elem.id;
+                                    totaraDialogs['editcustomroom' + offset].config.title = '<h2>' + M.util.get_string('editroom', 'facetoface') + '</h2>';
                                     totaraDialogs['editcustomroom' + offset].open();
                                 });
                                 $roomitem.append($editbutton);
@@ -405,6 +406,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                 $editbutton.click(function(e) {
                     e.preventDefault();
                     M.totara_f2f_room.config.editasset = data.id;
+                    totaraDialogs['editcustomasset' + offset].config.title = '<h2>' + M.util.get_string('editasset', 'facetoface') + '</h2>';
                     totaraDialogs['editcustomasset' + offset].open();
                 });
                 $elem.append($editbutton);
@@ -438,7 +440,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
 
             // Init assets.
             function load_assets() {
-                var inititems = $('input[name="assetids[' + offset + ']"]').val();
+                var inititems = $input.val();
                 if (inititems.length) {
                     $assetlist.append($('<li>' + M.util.get_string('loadinghelp', 'moodle') + '</li>'));
                     $.post(

@@ -616,9 +616,9 @@ Feature: Seminar room availability
     And I set the following fields to these values:
       | Allow room booking conflicts | 0 |
     # TODO TL-9503 fix dialog name to be 'Edit room'
-    And I click on "OK" "button" in the "Create new room" "totaradialogue"
-    Then I should see "Room has conflicting usage" in the "Create new room" "totaradialogue"
-    And I click on "Cancel" "button" in the "Create new room" "totaradialogue"
+    And I click on "OK" "button" in the "Edit room" "totaradialogue"
+    Then I should see "Room has conflicting usage" in the "Edit room" "totaradialogue"
+    And I click on "Cancel" "button" in the "Edit room" "totaradialogue"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -638,7 +638,7 @@ Feature: Seminar room availability
     And I set the following fields to these values:
       | Allow room booking conflicts | 0 |
     # TODO TL-9503 fix dialog name to be 'Edit room'
-    And I click on "OK" "button" in the "Create new room" "totaradialogue"
+    And I click on "OK" "button" in the "Edit room" "totaradialogue"
     Then I should not see "Room has conflicting usage"
     And I press "Save changes"
 

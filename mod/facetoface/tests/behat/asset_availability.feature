@@ -622,10 +622,9 @@ Feature: Seminar asset availability
     And I click on "Edit asset" "link" in the "Etwas 1" "table_row"
     And I set the following fields to these values:
       | Allow asset booking conflicts | 0 |
-    # TODO TL-9503 fix dialog name to be 'Edit asset'
-    And I click on "OK" "button" in the "Create new asset" "totaradialogue"
-    Then I should see "Asset has conflicting usage" in the "Create new asset" "totaradialogue"
-    And I click on "Cancel" "button" in the "Create new asset" "totaradialogue"
+    And I click on "OK" "button" in the "Edit asset" "totaradialogue"
+    Then I should see "Asset has conflicting usage" in the "Edit asset" "totaradialogue"
+    And I click on "Cancel" "button" in the "Edit asset" "totaradialogue"
     And I click on "Edit date" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -644,8 +643,7 @@ Feature: Seminar asset availability
     And I click on "Edit asset" "link" in the "Etwas 1" "table_row"
     And I set the following fields to these values:
       | Allow asset booking conflicts | 0 |
-    # TODO TL-9503 fix dialog name to be 'Edit asset'
-    And I click on "OK" "button" in the "Create new asset" "totaradialogue"
+    And I click on "OK" "button" in the "Edit asset" "totaradialogue"
     Then I should not see "Asset has conflicting usage"
     And I press "Save changes"
 
