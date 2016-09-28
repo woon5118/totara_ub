@@ -71,3 +71,9 @@
         {{/haschildren}}
     </li>{{/menuitems}}
 </ul>
+{{#js}}
+    require(['totara_core/totaramenu', 'core/log'], function(totaraMenu, logging) {
+    totaraMenu.setFocus('#totaramenu');
+    logging.debug('Totara menu initialised');
+    });
+{{/js}}

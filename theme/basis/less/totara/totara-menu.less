@@ -173,7 +173,7 @@
             .totara-menu-nav-item {
                 &.selected {
                     .totara-menu-nav-item-link {
-                        box-shadow: inset 0 -@basis-border-thick darken(@gray, 5%);
+                        box-shadow: none;
                         background-color: @totara-menu-dropdown-bg;
                         &:hover {
                             background-color: @totara-menu-dropdown-hover-bg;
@@ -208,12 +208,14 @@
         .totara-menu-nav-item {
             .totara-menu-nav-item {
                 .totara-menu-nav-item-link {
-                    &:hover {
+                    &:hover,
+                    &:focus {
                         &:extend(.totara-menu-nav-item.selected .totara-menu-nav-item.selected .totara-menu-nav-item-link:hover);
                     }
                     &:link,
                     &:visited,
                     &:hover,
+                    &:focus,
                     &:active {
                         color: @text-color;  // Default Roots Totara menu has same colour for all links so no specific variable.
                     }

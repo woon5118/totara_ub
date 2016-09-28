@@ -84,3 +84,9 @@
         </ul>
     </nav>
 </div>
+{{#js}}
+require(['totara_core/totaramenu', 'core/log'], function(totaraMenu, logging) {
+    totaraMenu.setFocus('#totaramenu-legacy');
+    logging.debug('Totara menu initialised');
+});
+{{/js}}
