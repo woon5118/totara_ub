@@ -161,8 +161,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
             }
         }
 
-        $linkjobassignmentidnumber = $this->element->config->linkjobassignmentidnumber;
-        if (!empty($linkjobassignmentidnumber)) {
+        if (!empty($this->element->config->linkjobassignmentidnumber)) {
             $jobassignmentrelatedfields = array(
                 'jobassignmentfullname',
                 'jobassignmentstartdate',
@@ -209,7 +208,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
     }
 
     function config_save($data) {
-        if ($this->element->config->linkjobassignmentidnumber && !empty($data->import_manageridnumber)) {
+        if (!empty($this->element->config->linkjobassignmentidnumber) && !empty($data->import_manageridnumber)) {
             $data->import_managerjobassignmentidnumber = 1;
         } else {
             $data->import_managerjobassignmentidnumber = 0;

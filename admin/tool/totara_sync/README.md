@@ -16,4 +16,4 @@ The following snippet illustrates the addition needed to you your sites config.p
     define('TEST_SYNC_DB_PORT', '');
     define('TEST_SYNC_DB_TABLE', '');
 
-All tests that require an external database will be skipped if the above configuration is not defined.
+If these settings are not provided then temporary tables will be created in the php unit test database to perform the tests.

@@ -753,7 +753,7 @@ class totara_sync_element_user extends totara_sync_element {
 
         $newjobdata = array();
         if (isset($suser->jobassignmentfullname)) {
-            if ($suser->jobassignmentfullname === "") {
+            if ($suser->jobassignmentfullname === "") { // Don't check empty because "0" is a valid string.
                 $newjobdata['fullname'] = null;
             } else {
                 $newjobdata['fullname'] = $suser->jobassignmentfullname;
@@ -761,7 +761,7 @@ class totara_sync_element_user extends totara_sync_element {
         }
 
         if (isset($suser->jobassignmentstartdate)) {
-            if ($suser->jobassignmentstartdate === "") {
+            if (empty($suser->jobassignmentstartdate)) { // Empty string and 0.
                 $newjobdata['startdate'] = null;
             } else {
                 $newjobdata['startdate'] = $suser->jobassignmentstartdate;
@@ -769,7 +769,7 @@ class totara_sync_element_user extends totara_sync_element {
         }
 
         if (isset($suser->jobassignmentenddate)) {
-            if ($suser->jobassignmentenddate === "") {
+            if (empty($suser->jobassignmentenddate)) { // Empty string or 0.
                 $newjobdata['enddate'] = null;
             } else {
                 $newjobdata['enddate'] = $suser->jobassignmentenddate;
@@ -777,7 +777,7 @@ class totara_sync_element_user extends totara_sync_element {
         }
 
         if (isset($suser->orgidnumber)) {
-            if ($suser->orgidnumber === "") {
+            if ($suser->orgidnumber === "") { // Don't check empty because "0" is a valid idnumber.
                 $newjobdata['organisationid'] = null;
             } else {
                 $newjobdata['organisationid'] = $DB->get_field('org', 'id', array('idnumber' => $suser->orgidnumber));
@@ -785,7 +785,7 @@ class totara_sync_element_user extends totara_sync_element {
         }
 
         if (isset($suser->posidnumber)) {
-            if ($suser->posidnumber === "") {
+            if ($suser->posidnumber === "") { // Don't check empty because "0" is a valid idnumber.
                 $newjobdata['positionid'] = null;
             } else {
                 $newjobdata['positionid'] = $DB->get_field('pos', 'id', array('idnumber' => $suser->posidnumber));
@@ -793,7 +793,7 @@ class totara_sync_element_user extends totara_sync_element {
         }
 
         if (isset($suser->appraiseridnumber)) {
-            if ($suser->appraiseridnumber === "") {
+            if ($suser->appraiseridnumber === "") { // Don't check empty because "0" is a valid idnumber.
                 $newjobdata['appraiserid'] = null;
             } else {
                 $newjobdata['appraiserid'] = $DB->get_field('user', 'id', array('idnumber' => $suser->appraiseridnumber, 'deleted' => 0));
@@ -802,7 +802,7 @@ class totara_sync_element_user extends totara_sync_element {
 
         // At this point, $newjobdata only contains job assignment data that we want to write to the database (except idnumber).
 
-        if ($this->config->linkjobassignmentidnumber) {
+        if (!empty($this->config->linkjobassignmentidnumber)) {
             // Update or create job assignment with matching job assignment id number.
 
             if (!isset($suser->jobassignmentidnumber)) {
@@ -885,7 +885,7 @@ class totara_sync_element_user extends totara_sync_element {
      * @return boolean false if there was a problem and the data could not be imported
      */
     public function sync_user_dependant_job_assignment_fields($userid, $suser) {
-        global $CFG, $DB;
+        global $DB;
 
         // If we have no job assignment info at all we do not need to set a job assignment.
         // Note that job assignment idnumber is not included here, because it has been processed already.
@@ -904,7 +904,7 @@ class totara_sync_element_user extends totara_sync_element {
             // job assignment idnumber. Whereas manager's job assignment idnumber is optional.
 
             // Pre-calculate the managerid - if it is provided then it is used.
-            if (!empty($suser->manageridnumber)) {
+            if ($suser->manageridnumber !== "") { // Don't use empty check because "0" is a valid idnumber.
                 $managerid = $DB->get_field('user', 'id', array('idnumber' => $suser->manageridnumber, 'deleted' => 0));
                 // Shouldn't be possible, but lets check anyway.
                 if (empty($managerid)) {
@@ -913,29 +913,36 @@ class totara_sync_element_user extends totara_sync_element {
                 }
             }
 
-            // Manager jaid can only be provided if linking by idnumber (invalid config).
-            if (!empty($suser->managerjobassignmentidnumber) && empty($this->config->linkjobassignmentidnumber)) {
-                $this->addlog(get_string('managerassigncanthavejaid', 'tool_totara_sync', $suser), 'warn', 'updateusers');
-                return false;
+            if (empty($this->config->linkjobassignmentidnumber)) {
+                // Manager jaid can only be provided if linking by idnumber (invalid config).
+                if (isset($suser->managerjobassignmentidnumber)) {
+                    $this->addlog(get_string('managerassigncanthavejaid', 'tool_totara_sync', $suser), 'warn', 'updateusers');
+                    return false;
+                }
+            } else {
+                // Manager is provided, but could be empty.
+
+                // Manager jaid must be provided if linking by idnumber and manager is provided.
+                if (!isset($suser->managerjobassignmentidnumber)) {
+                    $this->addlog(get_string('managerassignwojaidx', 'tool_totara_sync', $suser), 'warn', 'updateusers');
+                    return false;
+                }
+
+                // Can't provide manager jaid without providing a valid manager.
+                if (empty($managerid) && !empty($suser->managerjobassignmentidnumber)) {
+                    $this->addlog(get_string('managerassignwoidnumberx', 'tool_totara_sync', $suser), 'warn', 'updateusers');
+                    return false;
+                }
+
+                // Managerjaid is provided, but could be empty, but only when manager is also empty.
+                $managerjaid = $suser->managerjobassignmentidnumber;
             }
 
-            // Can't provide manager jaid without knowing manager.
-            if (!empty($suser->managerjobassignmentidnumber) && empty($suser->manageridnumber)) {
-                $this->addlog(get_string('managerassignwoidnumberx', 'tool_totara_sync', $suser), 'warn', 'updateusers');
-                return false;
-            }
+            // By now, we know we've got valid manager data (although we're not yet sure what that is, and could be empty).
 
-            // Manager jaid must be provided if linking by idnumber and manager is provided.
-            if (empty($suser->managerjobassignmentidnumber) && !empty($this->config->linkjobassignmentidnumber) && !empty($suser->manageridnumber)) {
-                $this->addlog(get_string('managerassignwojaidx', 'tool_totara_sync', $suser), 'warn', 'updateusers');
-                return false;
-            }
-
-            // By now, we know we've got valid manager data (although we're not yet sure what that is).
-
-            if (!empty($suser->manageridnumber) && !empty($suser->managerjobassignmentidnumber)) {
-                // Both are provided and managerid must be known.
-                $managerja = \totara_job\job_assignment::get_with_idnumber($managerid, $suser->managerjobassignmentidnumber, false);
+            if (!empty($managerid) && !empty($managerjaid)) {
+                // Both are provided.
+                $managerja = \totara_job\job_assignment::get_with_idnumber($managerid, $managerjaid, false);
                 if (empty($managerja)) {
                     // Manager's job assignment needs to already exist, either before import or created during previous step.
                     $this->addlog(get_string('managerassignmissingmanagerjobx', 'tool_totara_sync', $suser), 'warn', 'updateusers');
@@ -944,7 +951,7 @@ class totara_sync_element_user extends totara_sync_element {
                     $newjobdata['managerjaid'] = $managerja->id;
                 }
 
-            } else if (!empty($suser->manageridnumber)) {
+            } else if (!empty($managerid)) {
                 // Only the manageridnumber field was provided. We know we're linking to first job assignment (due to previous tests).
                 $managerja = \totara_job\job_assignment::get_first($managerid, false);
                 if (empty($managerja)) {
@@ -965,7 +972,7 @@ class totara_sync_element_user extends totara_sync_element {
             return true;
         }
 
-        if ($this->config->linkjobassignmentidnumber) {
+        if (!empty($this->config->linkjobassignmentidnumber)) {
             // Update or create job assignment with matching job assignment id number.
 
             // Check that we've got a valid job assignment id. Should already have been logged if there's a problem, so just return.
@@ -1255,7 +1262,7 @@ class totara_sync_element_user extends totara_sync_element {
             $extracondition = "WHERE deleted = ?";
             $params[0] = 0;
         }
-        if ($CFG->totara_job_allowmultiplejobs && !empty($this->config->linkjobassignmentidnumber)) {
+        if (!empty($CFG->totara_job_allowmultiplejobs) && !empty($this->config->linkjobassignmentidnumber)) {
             // These three fields must be unique. By doing a DISTINCT on these columns, we can find any records
             // that are genuinely not unique, rather than duplicates caused by multiple job assignments.
             $duplicatessubquery =

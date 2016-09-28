@@ -142,15 +142,31 @@ class tool_totara_sync_user_external_database_testcase extends advanced_testcase
     );
 
     public function setUp() {
-        global $CFG, $DB;
+        global $CFG;
 
-        $this->dbtype = defined('TEST_SYNC_DB_TYPE') ? TEST_SYNC_DB_TYPE : '';
-        $this->dbhost = defined('TEST_SYNC_DB_HOST') ? TEST_SYNC_DB_HOST : '';
-        $this->dbport = defined('TEST_SYNC_DB_PORT') ? TEST_SYNC_DB_PORT : '';
-        $this->dbname = defined('TEST_SYNC_DB_NAME') ? TEST_SYNC_DB_NAME : '';
-        $this->dbuser = defined('TEST_SYNC_DB_USER') ? TEST_SYNC_DB_USER : '';
-        $this->dbpass = defined('TEST_SYNC_DB_PASS') ? TEST_SYNC_DB_PASS : '';
-        $this->dbtable = defined('TEST_SYNC_DB_TABLE') ? TEST_SYNC_DB_TABLE : '';
+        if (defined('TEST_SYNC_DB_TYPE') ||
+            defined('TEST_SYNC_DB_HOST') ||
+            defined('TEST_SYNC_DB_PORT') ||
+            defined('TEST_SYNC_DB_NAME') ||
+            defined('TEST_SYNC_DB_USER') ||
+            defined('TEST_SYNC_DB_PASS') ||
+            defined('TEST_SYNC_DB_TABLE')) {
+            $this->dbtype = defined('TEST_SYNC_DB_TYPE') ? TEST_SYNC_DB_TYPE : '';
+            $this->dbhost = defined('TEST_SYNC_DB_HOST') ? TEST_SYNC_DB_HOST : '';
+            $this->dbport = defined('TEST_SYNC_DB_PORT') ? TEST_SYNC_DB_PORT : '';
+            $this->dbname = defined('TEST_SYNC_DB_NAME') ? TEST_SYNC_DB_NAME : '';
+            $this->dbuser = defined('TEST_SYNC_DB_USER') ? TEST_SYNC_DB_USER : '';
+            $this->dbpass = defined('TEST_SYNC_DB_PASS') ? TEST_SYNC_DB_PASS : '';
+            $this->dbtable = defined('TEST_SYNC_DB_TABLE') ? TEST_SYNC_DB_TABLE : '';
+        } else {
+            $this->dbtype = $CFG->dbtype;
+            $this->dbhost = $CFG->dbhost;
+            $this->dbport = !empty($CFG->dbport) ? $CFG->dbport : '';
+            $this->dbname = $CFG->dbname;
+            $this->dbuser = $CFG->dbuser;
+            $this->dbpass = !empty($CFG->dbpass) ? $CFG->dbpass : '';
+            $this->dbtable = $CFG->phpunit_prefix . 'totara_sync_user_source';
+        }
 
         if (!empty($this->dbtype) &&
             !empty($this->dbhost) &&
@@ -160,6 +176,8 @@ class tool_totara_sync_user_external_database_testcase extends advanced_testcase
             // All necessary config variables are set.
             $this->configexists = true;
             $this->ext_dbconnection = setup_sync_DB($this->dbtype, $this->dbhost, $this->dbname, $this->dbuser, $this->dbpass, array('dbport' => $this->dbport));
+        } else {
+            $this->assertTrue(false, 'HR Import database test configuration was only partially provided');
         }
 
         parent::setup();
