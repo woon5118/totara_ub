@@ -32,6 +32,8 @@ Feature: Use user source to import job assignments data in HR sync
       | managery   | managery   | many      | many     | managery@example.com   | 0          |
       | managerz   | managerz   | manz      | manz     | managerz@example.com   | 0          |
       | manager3   | manager3   | man3      | man3     | manager3@example.com   | 0          |
+      | manager4   | manager4   | man4      | man4     | manager4@example.com   | 0          |
+      | manager5   | manager5   | man5      | man5     | manager5@example.com   | 1          |
       | appraiserx | appraiserx | appx      | appx     | appraiserx@example.com | 0          |
       | appraisery | appraisery | appy      | appy     | appraisery@example.com | 0          |
       | appraiserz | appraiserz | appz      | appz     | appraiserz@example.com | 0          |
@@ -50,6 +52,8 @@ Feature: Use user source to import job assignments data in HR sync
       | managery   | managerjaidy  | fully    |           |            |            |              |          |          |                   |            |
       | managerz   | managerjaidz  | fullz    |           |            |            |              |          |          |                   |            |
       | manager3   | manager3jaid1 | full3    |           |            |            |              |          |          |                   |            |
+      | manager5   | manager5jaid1 | full5a   |           |            |            |              |          |          |                   |            |
+      | manager5   | manager5jaid2 | full5b   |           |            |            |              |          |          |                   |            |
       | username11 | jaidx         | fullx    | short11   | 1426820400 | 1434772800 | orgx         | posx     | managerx | managerjaidx      | appraiserx |
       | username13 | jaidx         | fullx    | short13   | 1426820400 | 1434772800 | orgx         | posx     | managerx | managerjaidx      | appraiserx |
       | username14 | matchingjaid  | fullx    | short14   | 1426820400 | 1434772800 | orgx         | posx     | managerx | managerjaidx      | appraiserx |
@@ -117,7 +121,15 @@ Feature: Use user source to import job assignments data in HR sync
     And I press "Run HR Import"
     And I should see "Running HR Import cron...Done! However, there have been some problems"
     And I navigate to "HR Import Log" node in "Site administration > HR Import"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 1    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I should see "HR Import finished" in the "#totarasynclog" "css_element"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 2    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
 
     # User 19 and 20 => check that the data failed.
     And I should see "Position pos2 does not exist. Skipped user id19"
@@ -371,6 +383,58 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "manx manx (managerx@example.com) - fullx"
     And I should see "appx appx"
 
+    # User 21 - manager id only manager has no assignment => create default manager job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first21 last21" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager id only manager has no assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has no assignment |
+      | Short name         |                                           |
+      | ID Number          | jaid                                      |
+      | startdate[enabled] | 0                                         |
+      | enddate[enabled]   | 0                                         |
+    And I should see "manager1 manager1 (manager1@example.com) - Unnamed job assignment (ID: 1)"
+
+    # User 22 - manager id only manager has existing assignment => link to manager's existing job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first22 last22" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager id only manager has existing assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has existing assignment |
+      | Short name         |                                                 |
+      | ID Number          | jaid                                            |
+      | startdate[enabled] | 0                                               |
+      | enddate[enabled]   | 0                                               |
+    And I should see "manager2 manager2 (manager2@example.com) - full2"
+
+    # User 23 - manager id only manager has no assignment => create default manager job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first23 last23" "link"
+    Then I should not see "Add job assignment"
+    And I click on "Unnamed job assignment (ID: 1)" "link"
+    Then the following fields match these values:
+      | Full name          | Unnamed job assignment (ID: 1) |
+      | Short name         |                                |
+      | ID Number          | 1                              |
+      | startdate[enabled] | 0                              |
+      | enddate[enabled]   | 0                              |
+    And I should see "manager1 manager1 (manager1@example.com) - Unnamed job assignment (ID: 1)"
+
+    # User 24 - manager id only manager has existing assignment => link to manager's existing job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first24 last24" "link"
+    Then I should not see "Add job assignment"
+    And I click on "Unnamed job assignment (ID: 1)" "link"
+    Then the following fields match these values:
+      | Full name          | Unnamed job assignment (ID: 1) |
+      | Short name         |                                |
+      | ID Number          | 1                              |
+      | startdate[enabled] | 0                              |
+      | enddate[enabled]   | 0                              |
+    And I should see "manager2 manager2 (manager2@example.com) - full2"
+
     # User 27 - jaid matches second ja => failed because it tried to update the first jaid.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first27 last27" "link"
@@ -450,7 +514,15 @@ Feature: Use user source to import job assignments data in HR sync
     And I press "Run HR Import"
     And I should see "Running HR Import cron...Done! However, there have been some problems"
     And I navigate to "HR Import Log" node in "Site administration > HR Import"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 1    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I should see "HR Import finished" in the "#totarasynclog" "css_element"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 2    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
 
     # User 10 and 11 => fail due to empty job assignment id number.
     And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id10"
@@ -474,6 +546,10 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "Duplicate users with idnumber id26. Skipped user id26"
     And I should see "Duplicate users with username username26. Skipped user id26"
     And I should see "Duplicate users with email e26@example.com. Skipped user id26"
+
+    # User 23 and 24 => fail because of missing jaid.
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id23"
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id24"
 
     # User 27 => failed because it tried to update the first job assignment record to same id as the second.
     And I should see "Cannot create job assignment (user: id27): Tried to update job assignment to an idnumber which is not unique for this user"
@@ -684,6 +760,44 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "manx manx (managerx@example.com) - fullx"
     And I should see "appx appx"
 
+    # User 21 - manager id only manager has no assignment => create default manager job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first21 last21" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager id only manager has no assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has no assignment |
+      | Short name         |                                           |
+      | ID Number          | jaid                                      |
+      | startdate[enabled] | 0                                         |
+      | enddate[enabled]   | 0                                         |
+    And I should see "manager1 manager1 (manager1@example.com) - Unnamed job assignment (ID: 1)"
+
+    # User 22 - manager id only manager has existing assignment => link to manager's existing job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first22 last22" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager id only manager has existing assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has existing assignment |
+      | Short name         |                                                 |
+      | ID Number          | jaid                                            |
+      | startdate[enabled] | 0                                               |
+      | enddate[enabled]   | 0                                               |
+    And I should see "manager2 manager2 (manager2@example.com) - full2"
+
+    # User 23 - manager id only manager has no assignment => fail due to missing job assignment id number.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first23 last23" "link"
+    Then I should see "Add job assignment"
+    And I should see "This user has no job assignments"
+
+    # User 24 - manager id only manager has existing assignment => fail due to missing job assignment id number.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first24 last24" "link"
+    Then I should see "Add job assignment"
+    And I should see "This user has no job assignments"
+
     # User 27 - jaid matches second ja => failed because it tried to update the first jaid.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first27 last27" "link"
@@ -790,6 +904,13 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "Manager managerxyz does not exist. Skipped user id20"
     And I should see "Appraiser appraiseridx does not exist. Skipped user id19"
     And I should see "Appraiser appraiseridx does not exist. Skipped user id20"
+
+    # Users 21 and 22 => manager is missing jaid.
+    And I should see "Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user id21"
+    And I should see "Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user id22"
+
+    # User 23 => manager's job assignment must exist or be in the import.
+    And I should see "Manager's job assignment must already exist in database or be in the import. Skipped manager assignment for user id23"
 
     # User 26 => failed to import due to duplicates.
     And I should see "Duplicate users with idnumber id26. Skipped user id26"
@@ -1014,6 +1135,58 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "manx manx (managerx@example.com) - fullx"
     And I should see "appx appx"
 
+    # User 21 - manager id only manager has no assignment => job assignment is created but manager is not set.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first21 last21" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager id only manager has no assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has no assignment |
+      | Short name         |                                           |
+      | ID Number          | jaid                                      |
+      | startdate[enabled] | 0                                         |
+      | enddate[enabled]   | 0                                         |
+    And I should not see "manager1 manager1 (manager1@example.com)"
+
+    # User 22 - manager id only manager has existing assignment => job assignment is created but manager is not set.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first22 last22" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager id only manager has existing assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has existing assignment |
+      | Short name         |                                                 |
+      | ID Number          | jaid                                            |
+      | startdate[enabled] | 0                                               |
+      | enddate[enabled]   | 0                                               |
+    And I should not see "manager2 manager2 (manager2@example.com)"
+
+    # User 23 - manager with job assignment id manager new second => no manager - manager's job assignment must already exist.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first23 last23" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager with job assignment id manager new second" "link"
+    Then the following fields match these values:
+      | Full name          | manager with job assignment id manager new second |
+      | Short name         |                                                   |
+      | ID Number          | jaid                                              |
+      | startdate[enabled] | 0                                                 |
+      | enddate[enabled]   | 0                                                 |
+    And I should not see "man4"
+
+    # User 24 - manager id only manager has existing assignment => link to manager's existing job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first24 last24" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager with job assignment id manager match second" "link"
+    Then the following fields match these values:
+      | Full name          | manager with job assignment id manager match second |
+      | Short name         |                                                     |
+      | ID Number          | jaid                                                |
+      | startdate[enabled] | 0                                                   |
+      | enddate[enabled]   | 0                                                   |
+    And I should see "man5 man5 (manager5@example.com) - full5b"
+
     # User 27 - jaid matches second ja => update matching ja.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first27 last27" "link"
@@ -1124,6 +1297,13 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "Manager managerxyz does not exist. Skipped user id20"
     And I should see "Appraiser appraiseridx does not exist. Skipped user id19"
     And I should see "Appraiser appraiseridx does not exist. Skipped user id20"
+
+    # Users 21 and 22 => manager is missing jaid.
+    And I should see "Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user id21"
+    And I should see "Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user id22"
+
+    # User 23 => manager's job assignment must exist or be in the import.
+    And I should see "Manager's job assignment must already exist in database or be in the import. Skipped manager assignment for user id23"
 
     # User 26 => failed to import due to duplicates.
     And I should see "Duplicate users with idnumber id26. Skipped user id26"
@@ -1342,6 +1522,58 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "manx manx (managerx@example.com) - fullx"
     And I should see "appx appx"
 
+    # User 21 - manager id only manager has no assignment => job assignment is created but manager is not set.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first21 last21" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager id only manager has no assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has no assignment |
+      | Short name         |                                           |
+      | ID Number          | jaid                                      |
+      | startdate[enabled] | 0                                         |
+      | enddate[enabled]   | 0                                         |
+    And I should not see "manager1 manager1 (manager1@example.com)"
+
+    # User 22 - manager id only manager has existing assignment => job assignment is created but manager is not set.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first22 last22" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager id only manager has existing assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has existing assignment |
+      | Short name         |                                                 |
+      | ID Number          | jaid                                            |
+      | startdate[enabled] | 0                                               |
+      | enddate[enabled]   | 0                                               |
+    And I should not see "manager2 manager2 (manager2@example.com)"
+
+    # User 23 - manager with job assignment id manager new second => no manager - manager's job assignment must already exist.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first23 last23" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager with job assignment id manager new second" "link"
+    Then the following fields match these values:
+      | Full name          | manager with job assignment id manager new second |
+      | Short name         |                                                   |
+      | ID Number          | jaid                                              |
+      | startdate[enabled] | 0                                                 |
+      | enddate[enabled]   | 0                                                 |
+    And I should not see "man4"
+
+    # User 24 - manager id only manager has existing assignment => link to manager's existing job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first24 last24" "link"
+    Then I should not see "Add job assignment"
+    And I click on "manager with job assignment id manager match second" "link"
+    Then the following fields match these values:
+      | Full name          | manager with job assignment id manager match second |
+      | Short name         |                                                     |
+      | ID Number          | jaid                                                |
+      | startdate[enabled] | 0                                                   |
+      | enddate[enabled]   | 0                                                   |
+    And I should see "man5 man5 (manager5@example.com) - full5b"
+
     # User 27 - jaid matches second ja => update matching ja.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first27 last27" "link"
@@ -1421,7 +1653,15 @@ Feature: Use user source to import job assignments data in HR sync
     And I press "Run HR Import"
     And I should see "Running HR Import cron...Done! However, there have been some problems"
     And I navigate to "HR Import Log" node in "Site administration > HR Import"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 1    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I should see "HR Import finished" in the "#totarasynclog" "css_element"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 2    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
 
     # User 19 and 20 => check that the data failed.
     And I should see "Position pos2 does not exist. Skipped user id19"
@@ -1675,6 +1915,71 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "manx manx (managerx@example.com) - fullx"
     And I should see "appx appx"
 
+    # User 21 - manager id only manager has no assignment => create default manager job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first21 last21" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager id only manager has no assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has no assignment |
+      | Short name         |                                           |
+      | ID Number          | jaid                                      |
+      | startdate[enabled] | 0                                         |
+      | enddate[enabled]   | 0                                         |
+    And I should see "manager1 manager1 (manager1@example.com) - Unnamed job assignment (ID: 1)"
+
+    # User 22 - manager id only manager has existing assignment => link to manager's existing job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first22 last22" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager id only manager has existing assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has existing assignment |
+      | Short name         |                                                 |
+      | ID Number          | jaid                                            |
+      | startdate[enabled] | 0                                               |
+      | enddate[enabled]   | 0                                               |
+    And I should see "manager2 manager2 (manager2@example.com) - full2"
+
+    # User 23 - manager with job assignment id manager new first => link to manager's existing job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first22 last22" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager id only manager has existing assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has existing assignment |
+      | Short name         |                                                 |
+      | ID Number          | jaid                                            |
+      | startdate[enabled] | 0                                               |
+      | enddate[enabled]   | 0                                               |
+    And I should see "manager2 manager2 (manager2@example.com) - full2"
+
+    # User 23 - manager id only manager has no assignment => create default manager job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first23 last23" "link"
+    Then I should see "Add job assignment"
+    And I click on "Unnamed job assignment (ID: 1)" "link"
+    Then the following fields match these values:
+      | Full name          | Unnamed job assignment (ID: 1) |
+      | Short name         |                                |
+      | ID Number          | 1                              |
+      | startdate[enabled] | 0                              |
+      | enddate[enabled]   | 0                              |
+    And I should see "manager1 manager1 (manager1@example.com) - Unnamed job assignment (ID: 1)"
+
+    # User 24 - manager id only manager has existing assignment => link to manager's existing job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first24 last24" "link"
+    Then I should see "Add job assignment"
+    And I click on "Unnamed job assignment (ID: 1)" "link"
+    Then the following fields match these values:
+      | Full name          | Unnamed job assignment (ID: 1) |
+      | Short name         |                                |
+      | ID Number          | 1                              |
+      | startdate[enabled] | 0                              |
+      | enddate[enabled]   | 0                              |
+    And I should see "manager2 manager2 (manager2@example.com) - full2"
+
     # User 27 - jaid matches second ja => failed because it tried to update the first jaid.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first27 last27" "link"
@@ -1754,7 +2059,15 @@ Feature: Use user source to import job assignments data in HR sync
     And I press "Run HR Import"
     And I should see "Running HR Import cron...Done! However, there have been some problems"
     And I navigate to "HR Import Log" node in "Site administration > HR Import"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 1    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I should see "HR Import finished" in the "#totarasynclog" "css_element"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 2    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
 
     # User 10 and 11 => fail due to empty job assignment id number.
     And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id10"
@@ -1773,6 +2086,10 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "Manager managerxyz does not exist. Skipped user id20"
     And I should see "Appraiser appraiseridx does not exist. Skipped user id19"
     And I should see "Appraiser appraiseridx does not exist. Skipped user id20"
+
+    # User 23 and 24 => fail because of missing jaid.
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id23"
+    And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id24"
 
     # User 26 => failed to import due to duplicates.
     And I should see "Duplicate users with idnumber id26. Skipped user id26"
@@ -1988,6 +2305,44 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "manx manx (managerx@example.com) - fullx"
     And I should see "appx appx"
 
+    # User 21 - manager id only manager has no assignment => create default manager job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first21 last21" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager id only manager has no assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has no assignment |
+      | Short name         |                                           |
+      | ID Number          | jaid                                      |
+      | startdate[enabled] | 0                                         |
+      | enddate[enabled]   | 0                                         |
+    And I should see "manager1 manager1 (manager1@example.com) - Unnamed job assignment (ID: 1)"
+
+    # User 22 - manager id only manager has existing assignment => link to manager's existing job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first22 last22" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager id only manager has existing assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has existing assignment |
+      | Short name         |                                                 |
+      | ID Number          | jaid                                            |
+      | startdate[enabled] | 0                                               |
+      | enddate[enabled]   | 0                                               |
+    And I should see "manager2 manager2 (manager2@example.com) - full2"
+
+    # User 23 - manager id only manager has no assignment => fail due to missing job assignment id number.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first23 last23" "link"
+    Then I should see "Add job assignment"
+    And I should see "This user has no job assignments"
+
+    # User 24 - manager id only manager has existing assignment => fail due to missing job assignment id number.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first24 last24" "link"
+    Then I should see "Add job assignment"
+    And I should see "This user has no job assignments"
+
     # User 27 - jaid matches second ja => failed because it tried to update the first jaid.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first27 last27" "link"
@@ -2067,7 +2422,15 @@ Feature: Use user source to import job assignments data in HR sync
     And I press "Run HR Import"
     And I should see "Running HR Import cron...Done! However, there have been some problems"
     And I navigate to "HR Import Log" node in "Site administration > HR Import"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 1    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I should see "HR Import finished" in the "#totarasynclog" "css_element"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 2    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
 
     # User 15 and 16 => fail because of missing jaid.
     And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id15"
@@ -2082,6 +2445,13 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "Manager managerxyz does not exist. Skipped user id20"
     And I should see "Appraiser appraiseridx does not exist. Skipped user id19"
     And I should see "Appraiser appraiseridx does not exist. Skipped user id20"
+
+    # Users 21 and 22 => manager is missing jaid.
+    And I should see "Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user id21"
+    And I should see "Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user id22"
+
+    # User 23 => manager's job assignment must exist or be in the import.
+    And I should see "Manager's job assignment must already exist in database or be in the import. Skipped manager assignment for user id23"
 
     # User 10 - no import, no existing => no job assignments.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
@@ -2328,6 +2698,58 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "manx manx (managerx@example.com) - fullx"
     And I should see "appx appx"
 
+    # User 21 - manager id only manager has no assignment => job assignment is created but manager is not set.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first21 last21" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager id only manager has no assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has no assignment |
+      | Short name         |                                           |
+      | ID Number          | jaid                                      |
+      | startdate[enabled] | 0                                         |
+      | enddate[enabled]   | 0                                         |
+    And I should not see "manager1 manager1 (manager1@example.com)"
+
+    # User 22 - manager id only manager has existing assignment => job assignment is created but manager is not set.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first22 last22" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager id only manager has existing assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has existing assignment |
+      | Short name         |                                                 |
+      | ID Number          | jaid                                            |
+      | startdate[enabled] | 0                                               |
+      | enddate[enabled]   | 0                                               |
+    And I should not see "manager2 manager2 (manager2@example.com)"
+
+    # User 23 - manager with job assignment id manager new second => no manager - manager's job assignment must already exist.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first23 last23" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager with job assignment id manager new second" "link"
+    Then the following fields match these values:
+      | Full name          | manager with job assignment id manager new second |
+      | Short name         |                                                   |
+      | ID Number          | jaid                                              |
+      | startdate[enabled] | 0                                                 |
+      | enddate[enabled]   | 0                                                 |
+    And I should not see "man4"
+
+    # User 24 - manager id only manager has existing assignment => link to manager's existing job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first24 last24" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager with job assignment id manager match second" "link"
+    Then the following fields match these values:
+      | Full name          | manager with job assignment id manager match second |
+      | Short name         |                                                     |
+      | ID Number          | jaid                                                |
+      | startdate[enabled] | 0                                                   |
+      | enddate[enabled]   | 0                                                   |
+    And I should see "man5 man5 (manager5@example.com) - full5b"
+
     # User 26 - two jas => both imported
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "first26 last26" "link"
@@ -2447,7 +2869,15 @@ Feature: Use user source to import job assignments data in HR sync
     And I press "Run HR Import"
     And I should see "Running HR Import cron...Done! However, there have been some problems"
     And I navigate to "HR Import Log" node in "Site administration > HR Import"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 1    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I should see "HR Import finished" in the "#totarasynclog" "css_element"
+    And I set the following fields to these values:
+      | totara_sync_log-logtype_op | 2    |
+      | totara_sync_log-logtype    | info |
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
 
     # User 10 and 11 => fail due to empty job assignment id number.
     And I should see "Job assignment id number cannot be empty. Skipped job assignment for user id10"
@@ -2466,6 +2896,65 @@ Feature: Use user source to import job assignments data in HR sync
     And I should see "Manager managerxyz does not exist. Skipped user id20"
     And I should see "Appraiser appraiseridx does not exist. Skipped user id19"
     And I should see "Appraiser appraiseridx does not exist. Skipped user id20"
+
+    # Users 21 and 22 => manager is missing jaid.
+    And I should see "Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user id21"
+    And I should see "Manager job assignment idnumber is required when manager job assignment is provided. Skipped manager assignment for user id22"
+
+    # User 23 => manager's job assignment must exist or be in the import.
+    And I should see "Manager's job assignment must already exist in database or be in the import. Skipped manager assignment for user id23"
+
+    # User 21 - manager id only manager has no assignment => job assignment is created but manager is not set.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first21 last21" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager id only manager has no assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has no assignment |
+      | Short name         |                                           |
+      | ID Number          | jaid                                      |
+      | startdate[enabled] | 0                                         |
+      | enddate[enabled]   | 0                                         |
+    And I should not see "manager1 manager1 (manager1@example.com)"
+
+    # User 22 - manager id only manager has existing assignment => job assignment is created but manager is not set.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first22 last22" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager id only manager has existing assignment" "link"
+    Then the following fields match these values:
+      | Full name          | manager id only manager has existing assignment |
+      | Short name         |                                                 |
+      | ID Number          | jaid                                            |
+      | startdate[enabled] | 0                                               |
+      | enddate[enabled]   | 0                                               |
+    And I should not see "manager2 manager2 (manager2@example.com)"
+
+    # User 23 - manager with job assignment id manager new second => no manager - manager's job assignment must already exist.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first23 last23" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager with job assignment id manager new second" "link"
+    Then the following fields match these values:
+      | Full name          | manager with job assignment id manager new second |
+      | Short name         |                                                   |
+      | ID Number          | jaid                                              |
+      | startdate[enabled] | 0                                                 |
+      | enddate[enabled]   | 0                                                 |
+    And I should not see "man4"
+
+    # User 24 - manager id only manager has existing assignment => link to manager's existing job assignment.
+    When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "first24 last24" "link"
+    Then I should see "Add job assignment"
+    And I click on "manager with job assignment id manager match second" "link"
+    Then the following fields match these values:
+      | Full name          | manager with job assignment id manager match second |
+      | Short name         |                                                     |
+      | ID Number          | jaid                                                |
+      | startdate[enabled] | 0                                                   |
+      | enddate[enabled]   | 0                                                   |
+    And I should see "man5 man5 (manager5@example.com) - full5b"
 
     # User 10 - no import, no existing => fail to create job assignment due to empty job assignment id number.
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"

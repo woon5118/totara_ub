@@ -13,8 +13,10 @@ id17,username17,e17@example.com,first17,last17,x,0,0,newjaid,good data,146069280
 id18,username18,e18@example.com,first18,last18,x,0,0,matchingjaid,good data,1460692800,1463284800,org1,pos1,manager2id,appraiser1id
 id19,username19,e19@example.com,first19,last19,x,0,0,newjaid,bad data,1460692800,1463284800,org2,pos2,managerxyz,appraiseridx
 id20,username20,e20@example.com,first20,last20,x,0,0,matchingjaid,bad data,1460692800,1463284800,org2,pos2,managerxyz,appraiseridx
-id21,username21,e21@example.com,first21,last21,x,0,0,jaid,manager id only manager has no assignment,1460692800,1463284800,,,manager1id,
-id22,username22,e22@example.com,first22,last22,x,0,0,jaid,manager id only manager has existing assignment,1460692800,1463284800,,,manager2id,
+id21,username21,e21@example.com,first21,last21,x,0,0,jaid,manager id only manager has no assignment,,,,,manager1id,
+id22,username22,e22@example.com,first22,last22,x,0,0,jaid,manager id only manager has existing assignment,,,,,manager2id,
+id23,username23,e23@example.com,first23,last23,x,0,0,,,,,,,manager1id,
+id24,username24,e24@example.com,first24,last24,x,0,0,,,,,,,manager2id,
 id26,username26,e26@example.com,first26,last26,x,0,0,jaid1,multiple import #1 for one user,1460692800,1463284800,org1,pos1,manager3,appraiser1id
 id26,username26,e26@example.com,first26,last26,x,0,0,jaid2,multiple import #2 for one user,1460692800,1463284800,orgx,posx,managerx,appraiserx
 id27,username27,e27@example.com,first27,last27,x,0,0,jaidy,match second jaid,1460692800,1463284800,org1,pos1,manager3,appraiser1id
