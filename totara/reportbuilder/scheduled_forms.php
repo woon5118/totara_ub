@@ -65,7 +65,6 @@ class scheduled_reports_new_form extends moodleform {
         }
 
         $mform->addElement('header', 'general', get_string('scheduledreportsettings', 'totara_reportbuilder'));
-
         $mform->addElement('static', 'report', get_string('report', 'totara_reportbuilder'), format_string($report->fullname));
         if (empty($savedsearches)) {
             $mform->addElement('static', '', get_string('data', 'totara_reportbuilder'),
@@ -108,6 +107,7 @@ class scheduled_reports_new_form extends moodleform {
 
         // Email to, setting for the schedule reports.
         $mform->addElement('header', 'emailto', get_string('scheduledemailtosettings', 'totara_reportbuilder'));
+        $mform->addElement('html', html_writer::tag('p', get_string('warngrrvisibility', 'totara_reportbuilder')));
         $mform->addElement('static', 'emailrequired', '', '');
 
         // Input hidden fields for system_users and audiences.

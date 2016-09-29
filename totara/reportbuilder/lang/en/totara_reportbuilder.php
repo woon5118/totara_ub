@@ -867,6 +867,9 @@ $string['scheduledaily'] = 'Daily';
 $string['scheduledemailtosettings'] = 'Email Settings';
 $string['scheduledreportmessage'] = 'Attached is a copy of the \'{$a->reportname}\' report in {$a->exporttype}. {$a->savedtext}
 
+You have been sent this report by {$a->sender}.
+The report shows the data {$a->sender} has access to; YOU may see different results when viewing the report online.
+
 You can also view this report online at:
 
 {$a->reporturl}
@@ -1133,6 +1136,7 @@ $string['value'] = 'Value';
 $string['viewreport'] = 'View This Report';
 $string['viewsavedsearch'] = 'View a saved search...';
 $string['warngroupaggregation'] = 'This report is using data aggregation internally, custom aggregation of columns may produce unexpected results.';
+$string['warngrrvisibility'] = 'Recipients of this report will be sent the report as YOU see it. If you have access to different data, ensure you are happy for recipients to see what you see.';
 $string['warnrequiredcolumns'] = 'This report uses some columns internally in order to obtain the data. Custom aggregation of columns may produce unexpected results.';
 $string['weekly'] = 'Weekly';
 $string['withcontentrestrictionall'] = 'Show records matching <strong>all</strong> of the checked criteria below';

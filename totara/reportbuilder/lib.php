@@ -5440,6 +5440,7 @@ function reportbuilder_send_scheduled_report($sched) {
     $messagedetails->exporttype = $writerclassname::get_export_option_name();
     $messagedetails->reporturl = $reporturl;
     $messagedetails->scheduledreportsindex = $CFG->wwwroot . '/my/reports.php#scheduled';
+    $messagedetails->sender = \fullname($user);
 
     $schedule = new scheduler($sched, array('nextevent' => 'nextreport'));
     $messagedetails->schedule = $schedule->get_formatted($user);
