@@ -1,3 +1,9 @@
+@padding-large-horizontal: 16px;
+@padding-large-vertical: 10px;
+@border-radius-base: 4px;
+@nav-tabs-border-color: #dddddd;
+@nav-tabs-active-link-hover-border-color: #dddddd;
+
 #page {
     margin-top: 2em;
 }
@@ -147,4 +153,47 @@
     #totaramenu ul li li.last a {
         border-bottom: none;
     }
+}
+
+/**
+ * Vertical tabs.
+ *
+ * This is an modification on top of the Bootstrap standard tabs.
+ */
+.verticaltabtree-wrapper {
+    margin-top: @padding-large-vertical * 3;
+
+    .verticaltabtree  {
+        float: left;
+        max-width: 20%;
+        margin: 0 @padding-large-horizontal * 2;
+
+        .tabtree {
+            margin: 0;
+        }
+
+        .nav.nav-tabs {
+            border-right: 1px solid @nav-tabs-border-color;
+            border-bottom: 0;
+
+            > li {
+                float: none;
+
+                a {
+                    border-radius: @border-radius-base 0 0 @border-radius-base;
+                    margin-right: -1px;
+                    word-wrap: break-word;
+                }
+            }
+
+            > li.active a {
+                border: 1px solid @nav-tabs-active-link-hover-border-color;
+                border-right-color: #fff;
+            }
+        }
+    }
+}
+
+#page-admin-elementlibrary-verticaltabs .tabtree {
+    margin-right: @padding-large-horizontal;
 }
