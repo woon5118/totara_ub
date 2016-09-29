@@ -132,6 +132,11 @@ class flexible_table {
     private $prefs = array();
 
     /**
+     * List of column indexes that constitute the "comparison" key for each row.
+     */
+    private $comparison_columns = array();
+
+    /**
      * Constructor
      * @param string $uniqueid all tables have to have a unique id, this is used
      *      as a key when storing table properties like sort order in the session.
@@ -439,6 +444,20 @@ class flexible_table {
      */
     public function define_help_for_headers($helpicons) {
         $this->helpforheaders = $helpicons;
+    }
+
+    /**
+     * This defines table columns which when taken together, constitute a basic
+     * "comparison key" for each table row. This key can then be used in further
+     * processing eg suppressing or showing identical, consecutive column values
+     * depending on whether the comparison keys for each row match or not.
+     *
+     * @param array $column list of column indexes to be used in the comparison.
+     */
+    function define_comparison_columns($columns) {
+        if (is_array($columns) && !empty($columns)) {
+            $this->comparison_columns = $columns;
+        }
     }
 
     /**
@@ -1115,7 +1134,20 @@ class flexible_table {
 
                 if (empty($this->prefs['collapse'][$column])) {
                     if ($this->column_suppress[$column] && $suppress_lastrow !== NULL && $suppress_lastrow[$index] === $data) {
-                        $content = '&nbsp;';
+                        if (empty($this->comparison_columns)) {
+                            $content = '&nbsp;';
+                        }
+                        else {
+                            $suppress = true;
+                            foreach ($this->comparison_columns as $i) {
+                                if ($suppress_lastrow[$i] !== $row[$i]) {
+                                    $suppress = false;
+                                    break;
+                                }
+                            }
+
+                            $content = $suppress ? '&nbsp;' : $data;
+                        }
                     } else {
                         $content = $data;
                     }
