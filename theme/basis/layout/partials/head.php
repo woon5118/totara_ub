@@ -19,26 +19,21 @@
  *
  * @copyright 2016 onwards Totara Learning Solutions LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Joby Harding <joby.harding@totaralearning.com>
  * @package   theme_basis
  */
 
-defined('MOODLE_INTERNAL' || die());
+defined('MOODLE_INTERNAL') || die();
 
-$THEME->doctype = 'html5';
-$THEME->name = 'basis';
-$THEME->parents = array('roots', 'base');
-$THEME->yuicssmodules = array();
-$THEME->enable_dock = true;
-$THEME->sheets = array('totara', 'settings-noprocess');
-$THEME->supportscssoptimisation = false;
-$THEME->enable_dock = true;
+if (!empty($PAGE->theme->settings->favicon)) {
+    $faviconurl = $PAGE->theme->setting_file_url('favicon', 'favicon');
+} else {
+    $faviconurl = $OUTPUT->favicon();
+}
 
-$THEME->rendererfactory = 'theme_overridden_renderer_factory';
-$THEME->csspostprocess = 'theme_basis_process_css';
-
-// Use CSS preprocessing to facilitate style inheritance.
-$THEME->parents_exclude_sheets = array(
-    'roots' => array('totara', 'totara-rtl'),
-    'base' => array('flexible-icons'),
-);
+?>
+<head>
+    <title><?php echo $OUTPUT->page_title(); ?></title>
+    <link rel="shortcut icon" href="<?php echo $faviconurl; ?>" />
+    <?php echo $OUTPUT->standard_head_html(); ?>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
+</head>

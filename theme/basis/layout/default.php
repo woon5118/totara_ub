@@ -45,7 +45,6 @@ $PAGE->set_popup_notification_allowed(false);
 
 $themerenderer = $PAGE->get_renderer('theme_basis');
 
-// TODO improve on this legacy approach.
 $hastotaramenu = false;
 $totaramenu = '';
 if (empty($PAGE->layout_options['nocustommenu'])) {
@@ -54,16 +53,11 @@ if (empty($PAGE->layout_options['nocustommenu'])) {
     $totaramenu = $totara_core_renderer->totara_menu($menudata);
     $hastotaramenu = !empty($totaramenu);
 }
-// END
+
 
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
-<head>
-    <title><?php echo $OUTPUT->page_title(); ?></title>
-    <link rel="shortcut icon" href="<?php echo $OUTPUT->favicon(); ?>" />
-    <?php echo $OUTPUT->standard_head_html(); ?>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
-</head>
+<?php require("{$CFG->dirroot}/theme/basis/layout/partials/head.php"); ?>
 
 <body <?php echo $OUTPUT->body_attributes(); ?>>
 <?php echo $OUTPUT->standard_top_of_body_html() ?>

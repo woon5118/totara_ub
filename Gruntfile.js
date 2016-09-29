@@ -145,13 +145,15 @@ module.exports = function(grunt) {
     var rtlSrc = 'theme/roots/style/*.css';
 
     if (inTheme) {
-        // Single theme only.
-        rtlSrc = cwd + '/style/*.css';
+        // Single theme only. Ignore files with noprocess suffix.
+        // These are intended to contain non-standard CSS placeholders
+        // which cause a fatal error.
+        rtlSrc = [cwd + '/style/*.css', '!' + cwd + '/style/*-noprocess.css'];
     } else if (localLess) {
         rtlSrc = [];
     } else {
-        // All theme style files.
-        rtlSrc = 'theme/*/style/*.css';
+        // All theme style files. Ignore *-noprocess.css files as above.
+        rtlSrc = ['theme/*/style/*.css', '!theme/*/style/*-noprocess.css'];
     }
 
     /**

@@ -24,8 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $OUTPUT;
-
 ?>
 <footer id="page-footer" class="page-footer">
     <div class="container-fluid page-footer-main-content">
@@ -37,6 +35,13 @@ global $OUTPUT;
         <div class="row">
             <div id="course-footer"><?php echo $OUTPUT->course_footer(); ?></div>
         </div>
+
+        <?php
+        if (!empty($PAGE->theme->settings->footnote)) {
+            echo '<div class="footnote">'.format_text($PAGE->theme->settings->footnote).'</div>';
+        }
+        ?>
+
         <div class="row">
             <div class="page-footer-loggedin-info">
                 <?php echo $OUTPUT->login_info(); ?>
