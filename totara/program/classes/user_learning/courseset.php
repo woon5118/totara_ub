@@ -133,6 +133,17 @@ class courseset implements designation {
     }
 
     /**
+     * Check if the courseset is optional.
+     *
+     * @return bool True if this courseset is optional.
+     */
+    public function is_set_optional() {
+        $optional = $this->set->is_considered_optional();
+
+        return $optional;
+    }
+
+    /**
      * Remove a course from the courses array
      */
     public function remove_course($id) {

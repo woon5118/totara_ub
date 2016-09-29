@@ -76,7 +76,7 @@ trait program_common {
 
             foreach ($group as $set) {
                 if ($set->is_set_complete()) {
-                    if ($set->completiontype == COMPLETIONTYPE_OPTIONAL) {
+                    if ($set->is_set_optional()) {
                         $optional_set_count++;
                     } else {
                         $completed_set_count++;
@@ -218,7 +218,7 @@ trait program_common {
         } else if ($completecount >= 1 && $optionalcount >= 1) {
             if ($completecount == 1 && $optionalcount == 1) {
                 // 1 completed and 1 optional set
-                $string = get_string('onecompletedandoneoptionalcoursesets', 'block_current_learning', $optionalcount);
+                $string = get_string('onecompletedandoneoptionalcoursesets', 'block_current_learning');
             } else if ($completecount == 1 && $optionalcount > 1) {
                 // 1 completed set and 2 optional sets
                 $string = get_string('onecompletedandmultipleoptionalcoursesets', 'block_current_learning', $optionalcount);
