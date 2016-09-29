@@ -86,11 +86,14 @@ class question_fixedtext extends question_base{
      */
     protected function add_field_specific_settings_elements(MoodleQuickForm $form, $readonly, $moduleinfo) {
         global $TEXTAREA_OPTIONS;
+
+        $options = $TEXTAREA_OPTIONS;
+        $options['autosave'] = false;
+
         if ($readonly) {
             $this->add_field_specific_view_elements($form);
         } else {
-            $form->addElement('editor', 'fixedtext_editor', get_string('questiontypefixedtext', 'totara_question'), null,
-                    $TEXTAREA_OPTIONS);
+            $form->addElement('editor', 'fixedtext_editor', get_string('questiontypefixedtext', 'totara_question'), null, $options);
             $form->setType('fixedtext_editor', PARAM_CLEANHTML);
             $form->addRule('fixedtext_editor', get_string('required'), 'required', null, 'client');
         }
