@@ -195,7 +195,7 @@ class job_assignment {
     private $appraiserid = null;
 
     /**
-     * Sort order - starts at 1
+     * Sort order - starts at 0
      *
      * @var int
      */
@@ -312,9 +312,10 @@ class job_assignment {
         // Put the job_assignment at the end of the list.
         $maxsortorder = $DB->get_field('job_assignment', 'MAX(sortorder)', array('userid' => $record->userid), IGNORE_MISSING);
         if ($maxsortorder === false) {
-            $maxsortorder = 0;
+            $record->sortorder = 0;
+        } else {
+            $record->sortorder = $maxsortorder + 1;
         }
-        $record->sortorder = $maxsortorder + 1;
 
         $transaction = $DB->start_delegated_transaction();
         try {
@@ -1143,14 +1144,18 @@ class job_assignment {
     public static function get_first($userid, $mustexist = true) {
         global $DB;
 
-        $strictness = $mustexist ? MUST_EXIST : IGNORE_MISSING;
+        $params = array('userid' => $userid);
+        $records = $DB->get_records('job_assignment', $params, 'sortorder ASC', '*', 0, 1);
 
-        $record = $DB->get_record('job_assignment', array('userid' => $userid, 'sortorder' => 1), '*', $strictness);
-
-        if ($record) {
-            return new job_assignment($record);
+        if (empty($records)) {
+            if ($mustexist) {
+                throw new \dml_missing_record_exception('job_assignment', '', $params);
+            } else {
+                return null;
+            }
         } else {
-            return null;
+            $record = reset($records);
+            return new job_assignment($record);
         }
     }
 
@@ -1602,12 +1607,12 @@ class job_assignment {
 
         $targetja = self::get_with_id($jobassignmentid);
 
-        if ($targetja->sortorder == 1) {
+        $otherjarecord = $DB->get_record('job_assignment',
+            array('userid' => $targetja->userid, 'sortorder' => $targetja->sortorder - 1), '*', IGNORE_MISSING);
+
+        if (empty($otherjarecord)) {
             throw new exception('Tried to move the first job assignment up.');
         }
-
-        $otherjarecord = $DB->get_record('job_assignment',
-            array('userid' => $targetja->userid, 'sortorder' => $targetja->sortorder - 1), '*', MUST_EXIST);
 
         $otherja = new job_assignment($otherjarecord);
 
