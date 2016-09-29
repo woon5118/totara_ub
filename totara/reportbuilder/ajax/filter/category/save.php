@@ -47,7 +47,11 @@ if (!empty($ids)) {
     list($in_sql, $in_params) = $DB->get_in_or_equal($ids);
     $items = $DB->get_records_select('course_categories', "id {$in_sql}", $in_params);
     $names = coursecat::make_categories_list();
+    $viewhidden = has_capability('moodle/category:viewhiddencategories', context_system::instance());
     foreach ($items as $item) {
+        if (empty($item->visible) and !$viewhidden) {
+            continue;
+        }
         echo display_selected_category_item($names, $item, $filtername);
     }
 }

@@ -124,7 +124,13 @@ class totara_dialog_content_category extends totara_dialog_content {
     public function get_all_root_items() {
         global $DB;
 
-        return $DB->get_records('course_categories', array('parent' => 0), '', 'id, name, path');
+        if (has_capability('moodle/category:viewhiddencategories', context_system::instance())) {
+            $conditions = array('parent' => 0);
+        } else {
+            $conditions = array('parent' => 0, 'visible' => 1);
+        }
+
+        return $DB->get_records('course_categories', $conditions, '', 'id, name, path');
     }
 
     /**
@@ -135,7 +141,13 @@ class totara_dialog_content_category extends totara_dialog_content {
     public function get_subcategories_item($itemid) {
         global $DB;
 
-        return $DB->get_records('course_categories', array('parent' => $itemid), 'id', 'id, name, path');
+        if (has_capability('moodle/category:viewhiddencategories', context_system::instance())) {
+            $conditions = array('parent' => $itemid);
+        } else {
+            $conditions = array('parent' => $itemid, 'visible' => 1);
+        }
+
+        return $DB->get_records('course_categories', $conditions, 'id', 'id, name, path');
     }
 
     /**

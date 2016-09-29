@@ -58,11 +58,29 @@ $nojs = optional_param('nojs', false, PARAM_BOOL);
 $returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 
 require_login();
+$context = context_system::instance();
+
+$manager = false;
+$self = false;
+
+if ($assigntype == GOAL_ASSIGNMENT_INDIVIDUAL) {
+    $user_context = context_user::instance($assignto);
+    $manager = \totara_job\job_assignment::is_managing($USER->id, $assignto) && has_capability('totara/hierarchy:managestaffcompanygoal', $user_context);
+    $self = $USER->id == $assignto && has_capability('totara/hierarchy:manageowncompanygoal', $user_context);
+    $admin = has_capability('totara/hierarchy:managegoalassignments', $user_context);
+} else {
+    // You must have some form of managegoals permission to see this page.
+    $admin = has_capability('totara/hierarchy:managegoalassignments', $context);
+}
+
+if (!($admin || $manager || $self)) {
+    print_error('error:findgoals', 'totara_hierarchy');
+}
 
 // Check if Goals are enabled.
 goal::check_feature_enabled();
 
-$context = context_system::instance();
+
 $strfindgoals = get_string('findgoals', 'totara_hierarchy');
 
 // String of params needed in non-js url strings.
@@ -157,21 +175,6 @@ if (!$nojs) {
 
 } else {
     // Non JS version of page.
-
-    // You must have some form of managegoals permission to see this page.
-    $admin = has_capability('totara/hierarchy:managegoalassignments', $context);
-    $manager = false;
-    $self = false;
-
-    if ($assigntype == GOAL_ASSIGNMENT_INDIVIDUAL) {
-        $user_context = context_user::instance($assignto);
-        $manager = \totara_job\job_assignment::is_managing($USER->id, $assignto) && has_capability('totara/hierarchy:managestaffcompanygoal', $user_context);
-        $self = $USER->id == $assignto && has_capability('totara/hierarchy:manageowncompanygoal', $user_context);
-    }
-
-    if (!($admin || $manager || $self)) {
-        print_error('error:findgoals', 'totara_hierarchy');
-    }
 
     // Setup hierarchy objects.
     $hierarchy = new goal();
