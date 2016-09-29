@@ -59,7 +59,7 @@ Feature: User reassignment to a certification
       And I log out
       And I log in as "jimmy"
       And I click on "Record of Learning" in the totara menu
-      Then I should not see "Certifications"
+      Then I should not see "Certifications" in the ".tabtree" "css_element"
       And I log out
       And I log in as "admin"
 
@@ -80,7 +80,14 @@ Feature: User reassignment to a certification
       Then I should see "Jimmy Jim"
       And I should see "Not certified" in the "Jimmy Jim" "table_row"
 
-    Scenario: Reassign someone with no history records
+      # We should also check reassignment via the Record of Learning to make sure
+      # the way we confirmed unassignment earlier was valid.
+      And I log out
+      And I log in as "jimmy"
+      And I click on "Record of Learning" in the totara menu
+      Then I should see "Certifications" in the ".tabtree" "css_element"
+
+    Scenario: Reassign someone where history records all have unassigned set to No
       # And I create some history records.
       And I switch to "Completion" tab
       And I click on "Edit completion records" "link" in the "Jimmy Jim" "table_row"
@@ -134,7 +141,7 @@ Feature: User reassignment to a certification
       And I log out
       And I log in as "jimmy"
       And I click on "Record of Learning" in the totara menu
-      Then I should not see "Certifications"
+      Then I should not see "Certifications" in the ".tabtree" "css_element"
 
       # And I reassign jimmy.
       And I log out
@@ -154,6 +161,13 @@ Feature: User reassignment to a certification
       And I switch to "Completion" tab
       Then I should see "Jimmy Jim"
       And I should see "Not certified" in the "Jimmy Jim" "table_row"
+
+      # We should also check reassignment via the Record of Learning to make sure
+      # the way we confirmed unassignment earlier was valid.
+      And I log out
+      And I log in as "jimmy"
+      And I click on "Record of Learning" in the totara menu
+      Then I should see "Certifications" in the ".tabtree" "css_element"
 
     Scenario: Check the validation on the unassigned field in the editor
       # And I create some history records.
@@ -290,7 +304,7 @@ Feature: User reassignment to a certification
       And I log out
       And I log in as "jimmy"
       And I click on "Record of Learning" in the totara menu
-      Then I should not see "Certifications"
+      Then I should not see "Certifications" in the ".tabtree" "css_element"
 
       # And I reassign jimmy.
       And I log out
@@ -314,6 +328,7 @@ Feature: User reassignment to a certification
       When I log out
       And I log in as "jimmy"
       And I click on "Record of Learning" in the totara menu
+      Then I should see "Certifications" in the ".tabtree" "css_element"
       And I switch to "Certifications" tab
       Then I should see "Not certified"
       And I should see "Due"
