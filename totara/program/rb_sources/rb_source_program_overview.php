@@ -728,7 +728,7 @@ class rb_source_program_overview extends rb_base_source {
         global $COMPLETION_STATUS;
 
         $output = array();
-        $items = explode(',', $data);
+        $items = explode($this->uniquedelimiter, $data);
         foreach ($items as $status) {
             if (in_array($status, array_keys($COMPLETION_STATUS))) {
                 $output[] = get_string('coursecompletion_'.$COMPLETION_STATUS[$status], 'rb_source_program_overview');
@@ -741,7 +741,7 @@ class rb_source_program_overview extends rb_base_source {
 
     function rb_display_category_link_list($data, $row) {
         $output = array();
-        $items = explode(',', $data);
+        $items = explode($this->uniquedelimiter, $data);
         foreach ($items as $item) {
             list($catid, $visible, $catname) = explode('|', $item);
             if ($visible) {
@@ -757,7 +757,7 @@ class rb_source_program_overview extends rb_base_source {
 
     function rb_display_coursename_list($data, $row) {
 
-         $items = explode(',', $data);
+         $items = explode($this->uniquedelimiter, $data);
          foreach ($items as $key => $item) {
              list($id, $coursename) = explode('|', $item);
              $url = new moodle_url('/course/view.php', array('id' => $id));

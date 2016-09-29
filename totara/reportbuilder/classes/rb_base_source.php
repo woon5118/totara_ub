@@ -635,11 +635,11 @@ abstract class rb_base_source {
         return implode($items, "\n");
     }
 
-    // Displays a comma separated list of strings as one string per line.
-    // Assumes you used "'grouping' => 'prog_aggregate'", which concatenates with ',' to construct a pre-ordered the string.
+    // Displays a delimited list of strings as one string per line.
+    // Assumes you used "'grouping' => 'sql_aggregate'", which concatenates with $uniquedelimiter to construct a pre-ordered string.
     function rb_display_orderedlist_to_newline($list, $row) {
         $output = array();
-        $items = explode(',', $list);
+        $items = explode($this->uniquedelimiter, $list);
         foreach ($items as $item) {
             $item = trim($item);
             if (empty($item) || $item === '-') {
@@ -767,11 +767,11 @@ abstract class rb_base_source {
         return implode($items, "\n");
     }
 
-    // Displays a comma separated list of ints as one nice_date per line, base off nice_date_list.
-    // Assumes you used "'grouping' => 'prog_aggregate'", which concatenates with ',' to construct a pre-ordered the string.
+    // Displays a delimited list of ints as one nice_date per line, based off nice_date_list.
+    // Assumes you used "'grouping' => 'sql_aggregate'", which concatenates with $uniquedelimiter to construct a pre-ordered string.
     function rb_display_orderedlist_to_newline_date($datelist, $row) {
         $output = array();
-        $items = explode(',', $datelist);
+        $items = explode($this->uniquedelimiter, $datelist);
         foreach ($items as $item) {
             if (empty($item) || $item === '-') {
                 $output[] = '-';
@@ -2115,7 +2115,7 @@ abstract class rb_base_source {
     function rb_group_sql_aggregate($field, $orderby) {
         global $DB;
 
-        return $DB->sql_group_concat($field, ',', $orderby);
+        return $DB->sql_group_concat($field, $this->uniquedelimiter, $orderby);
     }
 
     // return list as single field, separated by commas
