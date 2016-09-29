@@ -3812,6 +3812,40 @@ function facetoface_print_session_list($courseid, $facetoface, $sessions) {
 }
 
 /**
+ * Print the details of a session for calendar
+ *
+ * @param object $event         Record from calendar event
+ * @return string|null html markup when return is true
+ */
+function facetoface_print_calendar_session($event) {
+    global $DB, $CFG, $USER;
+
+    $session = facetoface_get_session($event->uuid);
+    $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
+
+    if (empty($facetoface->showoncalendar) && empty($facetoface->usercalentry)) {
+        return '';
+    }
+
+    $output = facetoface_print_session($session, false, true);
+    $users = facetoface_get_attendees($session->id);
+
+    if ($facetoface->usercalentry && array_key_exists($USER->id, $users)) {
+        // Better way is to get an user status and display it.
+        $linkurl = $CFG->wwwroot . "/mod/facetoface/signup.php?s=$session->id";
+        $output .= get_string("calendareventdescriptionbooking", 'facetoface', $linkurl);
+    } else  if ($facetoface->showoncalendar == F2F_CAL_SITE || $facetoface->showoncalendar == F2F_CAL_COURSE) {
+        $linkurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
+        $linktext = get_string('signupforthissession', 'facetoface');
+        $output .= html_writer::link($linkurl, $linktext);
+    } else {
+        $output = '';
+    }
+
+    return $output;
+}
+
+/**
  * Print the details of a session
  *
  * @param object $session         Record from facetoface_sessions
@@ -3823,7 +3857,7 @@ function facetoface_print_session_list($courseid, $facetoface, $sessions) {
  * @return string|null html markup when return is true
  */
 function facetoface_print_session($session, $showcapacity, $calendaroutput=false, $return=true, $hidesignup=false, $class='f2f') {
-    global $DB, $PAGE;
+    global $DB, $PAGE, $USER;
 
     $output = html_writer::start_tag('dl', array('class' => $class));
 
@@ -3922,13 +3956,16 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
         $output .= html_writer::tag('dt', get_string('approvalrequiredby', 'facetoface'));
         $output .= html_writer::tag('dd', $approver);
 
-        if ($facetoface->approvaltype == APPROVAL_MANAGER && isset($session->bookedsession->managerid) && $session->bookedsession->managerid) {
+        if (isset($session->bookedsession->managerid) && $session->bookedsession->managerid) {
             $manager = core_user::get_user($session->bookedsession->managerid);
             $manager_url = new moodle_url('/user/view.php', array('id' => $manager->id));
             $output .= html_writer::tag('dt', get_string('managername', 'facetoface'));
             $output .= html_writer::tag('dd', html_writer::link($manager_url, fullname($manager)));
         } else {
-            if (isset($session->managerids) && !empty($session->managerids)) {
+            if (!isset($session->managerids)) {
+                $session->managerids   = \totara_job\job_assignment::get_all_manager_userids($USER->id);
+            }
+            if (!empty($session->managerids)) {
                 $managers = array();
                 foreach ($session->managerids as $managerid) {
                     $manager = core_user::get_user($managerid);
@@ -3941,22 +3978,26 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
         }
     }
     // Display trainers.
-    if ($facetoface->approvaltype == APPROVAL_ROLE && isset($session->trainerroles)) {
-        foreach ((array)$session->trainerroles as $role => $rolename) {
+    if (!isset($session->trainerroles)) {
+        $session->trainerroles = facetoface_get_trainer_roles(context_course::instance($facetoface->course));
+    }
+    if (!isset($session->trainers)) {
+        $session->trainers = facetoface_get_trainers($session->id);
+    }
+    foreach ((array)$session->trainerroles as $role => $rolename) {
 
-            if (empty($session->trainers[$role])) {
-                continue;
-            }
-
-            $trainer_names = array();
-            $rolename = $rolename->localname;
-            foreach ($session->trainers[$role] as $trainer) {
-                $trainer_url = new moodle_url('/user/view.php', array('id' => $trainer->id));
-                $trainer_names[] = html_writer::link($trainer_url, fullname($trainer));
-            }
-            $output .= html_writer::tag('dt', $rolename);
-            $output .= html_writer::tag('dd', implode(', ', $trainer_names));
+        if (empty($session->trainers[$role])) {
+            continue;
         }
+
+        $trainer_names = array();
+        $rolename = $rolename->localname;
+        foreach ($session->trainers[$role] as $trainer) {
+            $trainer_url = new moodle_url('/user/view.php', array('id' => $trainer->id));
+            $trainer_names[] = html_writer::link($trainer_url, fullname($trainer));
+        }
+        $output .= html_writer::tag('dt', $rolename);
+        $output .= html_writer::tag('dd', implode(', ', $trainer_names));
     }
 
     if (!get_config(null, 'facetoface_hidecost') && !empty($session->normalcost)) {

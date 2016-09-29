@@ -260,8 +260,8 @@ class core_calendar_renderer extends plugin_renderer_base {
         $eventdetailsclasses = '';
 
         if ($event->modulename == 'facetoface') {
-            $session = facetoface_get_session($event->uuid);
-            $eventdetailshtml .= facetoface_print_session($session, false, true);
+            // This fixed the Google Map for any location custom fields.
+            $eventdetailshtml .= facetoface_print_calendar_session($event);
         } else {
             $eventdetailshtml .= format_text($event->description, $event->format, array('context' => $context));
         }
