@@ -1545,3 +1545,18 @@ div.criteria-description {
     font-size: 0.5em;
     vertical-align: text-top;
 }
+
+/** Taken from bootstrap for compatibility */
+.pull-right {
+    float: right;
+}
+.pull-left {
+    float: left;
+}
+/** This gets flipped automatically in less themes **/
+.dir-rtl .pull-right {
+    float: left;
+}
+.dir-rtl .pull-left {
+    float: right;
+}
