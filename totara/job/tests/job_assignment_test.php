@@ -1511,5 +1511,128 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
         $this->assertNull($mgrdata->teamleaderid);
     }
 
-    // TODO Write tests for the functions added after move_down (resort_user_job_assignments is being renamed, export_for_template).
+    /**
+     * Test resort all actually does what it says it will.
+     */
+    public function test_resort_all() {
+        global $DB;
+
+        $limit = 5;
+        $teamleadja = \totara_job\job_assignment::create_default($this->users[1]->id);
+
+        for ($i = 1; $i <= $limit; $i++) {
+            $result = \totara_job\job_assignment::create([
+                'userid' => $this->users[2]->id,
+                'fullname' => 'manager'.$i,
+                'shortname' => 'manager'.$i,
+                'idnumber' => 'id'.$i,
+                'managerjaid' => $teamleadja->id, // User 1.
+            ]);
+            $this->assertInstanceOf('\totara_job\job_assignment', $result);
+        }
+
+        $assignments = \totara_job\job_assignment::get_all($this->users[2]->id);
+        $this->assertCount($limit, $assignments);
+
+        $i = 1;
+        $ids = array();
+        foreach ($assignments as $assignment) {
+            $this->assertEquals($i, $assignment->sortorder);
+            $this->assertSame('manager'.$i, $assignment->fullname);
+            $i++;
+            $ids[] = $assignment->id;
+        }
+
+        // Check nothing changes if we call resort all with the current order.
+        \totara_job\job_assignment::resort_all($this->users[2]->id, $ids);
+        $assignments = \totara_job\job_assignment::get_all($this->users[2]->id);
+        $count = 1;
+        reset($ids);
+        foreach ($assignments as $assignment) {
+            $this->assertEquals(current($ids), $assignment->id);
+            $this->assertEquals($count, $assignment->sortorder);
+            $this->assertSame('manager'.$count, $assignment->fullname);
+            $count++;
+            next($ids);
+        }
+
+        // Reverse the job assignments sort order.
+        $ids = array_reverse($ids);
+        \totara_job\job_assignment::resort_all($this->users[2]->id, $ids);
+
+        $assignments = \totara_job\job_assignment::get_all($this->users[2]->id);
+        $i = $limit;
+        $count = 1;
+        reset($ids);
+        foreach ($assignments as $assignment) {
+            $this->assertEquals(current($ids), $assignment->id);
+            $this->assertEquals($count, $assignment->sortorder);
+            $this->assertSame('manager'.$i, $assignment->fullname);
+            $i--;
+            $count++;
+            next($ids);
+        }
+
+        // Test we can't resort all assignments without giving all assignments.
+        $original = array_pop($ids);
+        try {
+            \totara_job\job_assignment::resort_all($this->users[2]->id, $ids);
+            $this->fail('Expected an exception as not all job assignments are present.');
+        } catch (moodle_exception $e) {
+            $this->assertEquals('Incomplete job list in submit data.', $e->debuginfo);
+        }
+
+        // And nothing should have changed.
+        $assignments = \totara_job\job_assignment::get_all($this->users[2]->id);
+        $i = $limit;
+        $count = 1;
+        $ids[] = $original;
+        reset($ids);
+        foreach ($assignments as $assignment) {
+            $this->assertEquals(current($ids), $assignment->id);
+            $this->assertEquals($count, $assignment->sortorder);
+            $this->assertSame('manager'.$i, $assignment->fullname);
+            $i--;
+            $count++;
+            next($ids);
+        }
+
+        // Check we can't pass in another users job assignment.
+        $result = \totara_job\job_assignment::create([
+            'userid' => $this->users[3]->id,
+            'fullname' => 'user3',
+            'shortname' => 'user3',
+            'idnumber' => 'u3',
+            'managerjaid' => $teamleadja->id, // User 1.
+        ]);
+        $original = array_pop($ids);
+        $ids[] = $result->id;
+
+        try {
+            \totara_job\job_assignment::resort_all($this->users[2]->id, $ids);
+            $this->fail('Expected an exception as not all job assignments are present.');
+        } catch (moodle_exception $e) {
+            $this->assertEquals('Incorrect job list in submit data.', $e->debuginfo);
+        }
+        // And nothing should have changed.
+        $assignments = \totara_job\job_assignment::get_all($this->users[2]->id);
+        $i = $limit;
+        $count = 1;
+        array_pop($ids);
+        $ids[] = $original;
+        reset($ids);
+        foreach ($assignments as $assignment) {
+            $this->assertEquals(current($ids), $assignment->id);
+            $this->assertEquals($count, $assignment->sortorder);
+            $this->assertSame('manager'.$i, $assignment->fullname);
+            $i--;
+            $count++;
+            next($ids);
+        }
+
+        $assignment = $DB->get_record('job_assignment', array('id' => $result->id), '*', MUST_EXIST);
+        foreach ($assignment as $key => $value) {
+            $this->assertEquals($value, $result->{$key});
+        }
+    }
 }

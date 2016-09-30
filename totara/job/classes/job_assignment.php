@@ -195,7 +195,7 @@ class job_assignment {
     private $appraiserid = null;
 
     /**
-     * Sort order - starts at 0
+     * Sort order - starts at 1
      *
      * @var int
      */
@@ -312,7 +312,7 @@ class job_assignment {
         // Put the job_assignment at the end of the list.
         $maxsortorder = $DB->get_field('job_assignment', 'MAX(sortorder)', array('userid' => $record->userid), IGNORE_MISSING);
         if ($maxsortorder === false) {
-            $record->sortorder = 0;
+            $record->sortorder = 1;
         } else {
             $record->sortorder = $maxsortorder + 1;
         }
@@ -1653,19 +1653,31 @@ class job_assignment {
     public static function resort_all($userid, $jobassignmentids) {
         global $DB;
 
-        // This will give us an array with the jobassignid as the key, and the position in the array as the value.
-        // Perfect for a sort!
-        $map = array_flip(array_values($jobassignmentids));
+        // Create an array of job assignments, where the key is the jaid, and the value is the sort order.
+        $map = array();
+        $i = 1;
+        foreach ($jobassignmentids as $jobassignment) {
+            $map[$jobassignment] = $i;
+            $i++;
+        }
         $currentassignments = self::get_all($userid);
 
-        // We do this in a transaction - its all or nothing.
-        $transaction = $DB->start_delegated_transaction();
-        // First up make sure the sortorder is unique.
-        // To do this we set it to its negative self. Easy! but inefficient!
+        if (count($map) !== count($currentassignments)) {
+            throw new \moodle_exception('error', 'error', '', null, 'Incomplete job list in submit data.');
+        }
+
+        // First up check we have all of the users job assignments here.
         foreach ($currentassignments as $jobassignment) {
             if (!array_key_exists($jobassignment->id, $map)) {
-                $transaction->rollback(new \moodle_exception('error', 'error', '', null, 'Incomplete job list in submit data.'));
+                throw new \moodle_exception('error', 'error', '', null, 'Incorrect job list in submit data.');
             }
+        }
+
+        // We do this in a transaction - its all or nothing.
+        // Make sure the sortorder is unique.
+        // To do this we set it to its negative self. Easy! but inefficient!
+        $transaction = $DB->start_delegated_transaction();
+        foreach ($currentassignments as $jobassignment) {
             if ($jobassignment->sortorder != $map[$jobassignment->id]) {
                 // It is going to change, we need to isolate its sortorder number.
                 // We update the database directly as update_internal does heaps of stuff, including events.
