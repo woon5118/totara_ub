@@ -84,7 +84,10 @@ echo $OUTPUT->doctype() ?>
         <div id="region-main-box" class="<?php echo $regionmainbox; ?>">
             <div class="row-fluid">
                 <section id="region-main" class="<?php echo $regionmain; ?>">
-                    <?php echo $OUTPUT->blocks('main'); ?>
+                    <?php
+                    echo $OUTPUT->blocks('main');
+                    echo $OUTPUT->main_content();
+                    ?>
                 </section>
                 <?php echo $OUTPUT->blocks('side-pre', $sidepre); ?>
             </div>
