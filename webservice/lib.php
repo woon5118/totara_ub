@@ -1431,7 +1431,7 @@ class '.$classname.' {
                         return null;
                     }
 
-                    $event = \core\event\webservice_function_called::create_from_data('.$function->methodname.');
+                    $event = \core\event\webservice_function_called::create_from_data('.var_export($function->methodname, true).');
                     $event->set_legacy_logdata('.$legacylogdata.');
                     $event->trigger();
 

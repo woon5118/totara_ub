@@ -185,7 +185,6 @@ class core_webservice_renderer extends plugin_renderer_base {
                 get_string('description'), get_string('requiredcaps', 'webservice'));
             $table->align = array('left', 'left', 'left');
             $table->size = array('15%', '40%', '40%');
-            $table->width = '100%';
             $table->align[] = 'left';
 
             //display remove function operation (except for build-in service)

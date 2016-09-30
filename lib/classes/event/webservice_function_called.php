@@ -47,6 +47,24 @@ class webservice_function_called extends base {
     protected $legacylogdata;
 
     /**
+     * Totara shortcut.
+     *
+     * @param string $function
+     * @return \core\event\webservice_function_called
+     */
+    public static function create_from_data($function) {
+        $data = array(
+            'other' => array(
+                'function' => $function,
+            ),
+        );
+
+        $event = self::create($data);
+
+        return $event;
+    }
+
+    /**
      * Returns description of what happened.
      *
      * @return string
