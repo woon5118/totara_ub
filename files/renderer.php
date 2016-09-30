@@ -218,9 +218,9 @@ class core_files_renderer extends plugin_renderer_base {
                 '.$icons['loading_small'].'
             </div>
             <div class="fp-viewbar">
-                <a title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons" href="#">'.$icons['view_icon_active'].'</a>
-                <a title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details" href="#">'.$icons['view_list_active'].'</a>
-                <a title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree" href="#">'.$icons['view_tree_active'].'</a>
+                <a title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons ft-size-300" href="#">'.$icons['view_icon_active'].'</a>
+                <a title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details ft-size-300" href="#">'.$icons['view_list_active'].'</a>
+                <a title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree ft-size-300" href="#">'.$icons['view_tree_active'].'</a>
             </div>
         </div>
         <div class="fp-pathbar">
@@ -595,13 +595,13 @@ class core_files_renderer extends plugin_renderer_base {
                     <div class="fp-tb-message"></div>
                 </div>
                 <div class="fp-viewbar">
-                    <a role="button" title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons" href="#">
+                    <a role="button" title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons ft-size-300" href="#">
                         '.$this->output->flex_icon('view-large').'
                     </a>
-                    <a role="button" title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details" href="#">
+                    <a role="button" title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details ft-size-300" href="#">
                         '.$this->output->flex_icon('view-list').'
                     </a>
-                    <a role="button" title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree" href="#">
+                    <a role="button" title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree ft-size-300" href="#">
                         '.$this->output->flex_icon('view-tree').'
                     </a>
                 </div>
