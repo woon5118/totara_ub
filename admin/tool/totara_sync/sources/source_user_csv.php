@@ -407,8 +407,8 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                                 $parsed_date = totara_date_parse_from_format($csvdateformat, $value, true);
                                 if ($parsed_date) {
                                     $value = $parsed_date;
-                                } else {
-                                    // Don't try to put a value if the field has been left empty.
+                                } elseif (empty($value) || !is_numeric($value)) {
+                                    // Don't try to put a value if the field has been left empty, is 0 or not numeric.
                                     continue 2;
                                 }
                                 break;
@@ -417,8 +417,8 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                                 $parsed_date = totara_date_parse_from_format($csvdateformat, $value, true, 'UTC');
                                 if ($parsed_date) {
                                     $value = $parsed_date;
-                                } else {
-                                    // Don't try to put a value if the field has been left empty.
+                                } elseif (empty($value) || !is_numeric($value)) {
+                                    // Don't try to put a value if the field has been left empty, is 0 or not numeric.
                                     continue 2;
                                 }
                                 break;
