@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author  Petr Skoda <petr.skoda@totaralms.com>
  * @package theme_roots
  */

@@ -318,6 +318,9 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $this->moodle_copyright();
         //////////////////////////////////////////////////////////////////////////////////////////////////
 
+        // Totara: Additional acknowledgement.
+        $output .= $totara_renderer->acknowledgements();
+
         // Totara: Remove generalbox markup.
         $output .= html_writer::end_div();
 

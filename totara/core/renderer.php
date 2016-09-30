@@ -871,4 +871,17 @@ class totara_core_renderer extends plugin_renderer_base {
 
         return $this->render_from_template('totara_core/myreports', $template_data);
     }
+
+    /**
+     * Generate text for additional copyrighted material acknowledgements on notifications page.
+     *
+     * @return string
+     */
+    public function acknowledgements() {
+        return <<<EOF
+The work of Open Source community themers distributed as part of <a href="https://github.com/bmbrands/theme_bootstrap">Theme Bootstrap</a><br />
+Copyright &copy; 2015 Bas Brands, David Scotson and other contributors.<br />
+<a href="http://www.gnu.org/licenses/gpl-3.0.en.html">GNU General Public License</a>
+EOF;
+    }
 }

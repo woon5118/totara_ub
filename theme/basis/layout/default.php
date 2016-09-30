@@ -2,8 +2,6 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2016 onwards Totara Learning Solutions LTD
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
@@ -17,14 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @copyright 2016 onwards Totara Learning Solutions LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @package   theme_roots
+ * @copyright 2015 Bas Brands <www.sonsbeekmedia.nl>
+ * @author    Bas Brands
+ * @author    David Scotson
  * @author    Joby Harding <joby.harding@totaralearning.com>
  * @author    Petr Skoda <petr.skoda@totaralms.com>
- * @package   theme_roots
- *
- * NOTE: this code is based on code from bootstrap theme by Bas Brands and other contributors.
+ * @package   theme_basis
  */
 
 defined('MOODLE_INTERNAL') || die();
