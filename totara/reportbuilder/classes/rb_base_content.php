@@ -270,7 +270,7 @@ class rb_current_org_content extends rb_base_content {
                 $joinsql .= " LEFT JOIN {org} o2
                                 ON o2.path LIKE " . $DB->sql_concat('o1.path', "'/%'") . "
                          LEFT JOIN {job_assignment} u3ja
-                                ON u3ja.positionid = o2.id";
+                                ON u3ja.organisationid = o2.id";
 
                 $wheresql .= " AND u3ja.userid = {$field} ";
                 break;
@@ -280,7 +280,7 @@ class rb_current_org_content extends rb_base_content {
                          LEFT JOIN {org} o2
                                 ON o2.path LIKE " . $DB->sql_concat('o1.path', "'/%'") . "
                          LEFT JOIN {job_assignment} u3ja
-                                ON u3ja.positionid = o2.id";
+                                ON u3ja.organisationid = o2.id";
 
                 $wheresql .= " AND (u2ja.userid = {$field} OR u3ja.userid = {$field})";
                 break;
@@ -395,6 +395,10 @@ class rb_current_org_content extends rb_base_content {
  * Pass in an integer that represents an organisation ID
  */
 class rb_completed_org_content extends rb_base_content {
+    const CONTENT_ORGCOMP_EQUAL = 0;
+    const CONTENT_ORGCOMP_EQUALANDBELOW = 1;
+    const CONTENT_ORGCOMP_BELOW = 2;
+
     /**
      * Generate the SQL to apply this content restriction
      *
@@ -411,40 +415,53 @@ class rb_completed_org_content extends rb_base_content {
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
         $settings = reportbuilder::get_all_settings($reportid, $type);
-
+        $restriction = $settings['recursive'];
         $userid = $this->reportfor;
 
         // get the user's primary organisation path
-        $orgpath = $DB->get_field_sql(
+        $orgpaths = $DB->get_fieldset_sql(
             "SELECT o.path
                FROM {job_assignment} ja
                JOIN {org} o ON ja.organisationid = o.id
-              WHERE ja.userid = ? AND ja.sortorder = 1",
-            array($userid));
+              WHERE ja.userid = ?",
+              array($userid));
 
         // we need the user to have a valid organisation path
-        if (!$orgpath) {
+        if (empty($orgpaths)) {
             // using 1=0 instead of FALSE for MSSQL support
             return array('1=0', array());
         }
 
-        if ($settings['recursive']) {
-            // match all organisations below the user's one
-            $paramname = rb_unique_param('ccor');
-            $sql = $DB->sql_like($field, ":$paramname");
-            $params = array($paramname => $DB->sql_like_escape($orgpath) . '/%');
-            if ($settings['recursive'] == 1) {
-                // also include the current organisation
-                $paramname2 = rb_unique_param('ccor');
-                $sql .= " OR $field = :{$paramname2}";
-                $params[$paramname2] = $orgpath;
-            }
-        } else {
-            // the user's organisation only
-            $paramname = rb_unique_param('ccor');
-            $sql = "{$field} = :{$paramname}";
-            $params = array($paramname => $orgpath);
+        $constraints = array();
+        $params = array();
+        switch ($restriction) {
+            case self::CONTENT_ORGCOMP_EQUAL:
+                foreach ($orgpaths as $orgpath) {
+                    $paramname = rb_unique_param('ccor');
+                    $constraints[] = "$field = :$paramname";
+                    $params[$paramname] = $orgpath;
+                }
+                break;
+            case self::CONTENT_ORGCOMP_BELOW:
+                foreach ($orgpaths as $orgpath) {
+                    $paramname = rb_unique_param('ccor');
+                    $constraints[] = $DB->sql_like($field, ":{$paramname}");
+                    $params[$paramname] = $DB->sql_like_escape($orgpath) . '/%';
+                }
+                break;
+            case self::CONTENT_ORGCOMP_EQUALANDBELOW:
+                foreach ($orgpaths as $orgpath) {
+                    $paramname = rb_unique_param('ccor1');
+                    $constraints[] = "$field = :{$paramname}";
+                    $params[$paramname] = $orgpath;
+
+                    $paramname = rb_unique_param('ccors');
+                    $constraints[] = $DB->sql_like($field, ":$paramname");
+                    $params[$paramname] = $DB->sql_like_escape($orgpath) . '/%';
+                }
+                break;
         }
+        $sql = implode(' OR ', $constraints);
 
         return array("({$sql})", $params);
     }
@@ -473,17 +490,17 @@ class rb_completed_org_content extends rb_base_content {
         $orgname = $DB->get_field('org', 'fullname', array('id' => $orgid));
 
         switch ($settings['recursive']) {
-        case 0:
-            return $title . ' ' . get_string('is', 'totara_reportbuilder') .
-                ': "' . $orgname . '"';
-        case 1:
-            return $title . ' ' . get_string('is', 'totara_reportbuilder') .
-                ': "' . $orgname . '" ' . get_string('orsuborg', 'totara_reportbuilder');
-        case 2:
-            return $title . ' ' . get_string('isbelow', 'totara_reportbuilder') .
-                ': "' . $orgname . '"';
-        default:
-            return '';
+            case self::CONTENT_ORGCOMP_EQUAL:
+                return $title . ' ' . get_string('is', 'totara_reportbuilder') .
+                    ': "' . $orgname . '"';
+            case self::CONTENT_ORGCOMP_EQUALANDBELOW:
+                return $title . ' ' . get_string('is', 'totara_reportbuilder') .
+                    ': "' . $orgname . '" ' . get_string('orsuborg', 'totara_reportbuilder');
+            case self::CONTENT_ORGCOMP_BELOW:
+                return $title . ' ' . get_string('isbelow', 'totara_reportbuilder') .
+                    ': "' . $orgname . '"';
+            default:
+                return '';
         }
     }
 
@@ -511,11 +528,11 @@ class rb_completed_org_content extends rb_base_content {
         $mform->disabledIf('completed_org_enable', 'contentenabled', 'eq', 0);
         $radiogroup = array();
         $radiogroup[] =& $mform->createElement('radio', 'completed_org_recursive',
-            '', get_string('showrecordsinorgandbelow', 'totara_reportbuilder'), 1);
+            '', get_string('showrecordsinorgandbelow', 'totara_reportbuilder'), self::CONTENT_ORGCOMP_EQUALANDBELOW);
         $radiogroup[] =& $mform->createElement('radio', 'completed_org_recursive',
-            '', get_string('showrecordsinorg', 'totara_reportbuilder'), 0);
+            '', get_string('showrecordsinorg', 'totara_reportbuilder'), self::CONTENT_ORGCOMP_EQUAL);
         $radiogroup[] =& $mform->createElement('radio', 'completed_org_recursive',
-            '', get_string('showrecordsbeloworgonly', 'totara_reportbuilder'), 2);
+            '', get_string('showrecordsbeloworgonly', 'totara_reportbuilder'), self::CONTENT_ORGCOMP_BELOW);
         $mform->addGroup($radiogroup, 'completed_org_recursive_group',
             get_string('includechildorgs', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
         $mform->setDefault('completed_org_recursive', $recursive);
