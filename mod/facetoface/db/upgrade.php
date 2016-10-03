@@ -1844,7 +1844,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
             if ($lang == 'en' || $strmgr->get_string('facetoface', 'facetoface', null, $lang) !== $strmgr->get_string('facetoface', 'facetoface', null, 'en')) {
 
-                $f2flabel = $strmgr->get_string('facetoface', 'facetoface', null, $lang);
+                $f2flabel = 'Face-to-face';
                 $courselabel = $strmgr->get_string('course', 'moodle', null, $lang);
 
                 $body_key = "/{$courselabel}:\s*\[facetofacename\]/";
@@ -3889,7 +3889,10 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         $oldtemplatedefaults = array();
         $oldtemplatedefaults['confirmation'] = text_to_html(get_string('setting:defaultconfirmationmessagedefault', 'facetoface'));
         $oldtemplatedefaults['cancellation'] = text_to_html(get_string('setting:defaultcancellationmessagedefault', 'facetoface'));
-        $oldtemplatedefaults['waitlist'] = text_to_html(get_string('setting:defaultwaitlistedmessagedefault', 'facetoface'));
+        $oldtemplatedefaults['waitlist'] = [
+            text_to_html(get_string('setting:defaultwaitlistedmessagedefault_v27', 'facetoface')),
+            text_to_html(get_string('setting:defaultwaitlistedmessagedefault', 'facetoface'))
+        ];
         $oldtemplatedefaults['reminder'] = text_to_html(get_string('setting:defaultremindermessagedefault', 'facetoface'));
         $oldtemplatedefaults['request'] = text_to_html(get_string('setting:defaultrequestmessagedefault', 'facetoface'));
         $oldtemplatedefaults['rolerequest'] = text_to_html(get_string('setting:defaultrolerequestmessagedefault', 'facetoface'));
@@ -3933,6 +3936,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
         // This will hold templates that were found to match the pre-9.0 defaults. With format array(id => reference).
         $templateswithdefaults = array();
+        $oldtemplatedefaultbodies = array();
 
         // Only make actual changes if all the strings exist.
         if ($stringsexist) {
@@ -3955,14 +3959,29 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                     $savethisrecord = true;
                 }
                 if (isset($template->body)) {
-                    if (isset($template->reference) && isset($oldtemplatedefaults[$template->reference])
-                        && (strcmp($template->body, $oldtemplatedefaults[$template->reference]) === 0)) {
-                        // The template's body is an exact match with the string in the lang file.
-                        // We'll update it with the new string in the lang file.
-                        $template->body = $newtemplatedefaults[$template->reference];
-                        $templateswithdefaults[$template->id] = $template->reference;
-                        $savethisrecord = true;
-                    } else if (strpos($template->body, $alldates) !== false) {
+                    $wasdefault = false;
+                    if (isset($oldtemplatedefaults[$template->reference])) {
+                        // Make same structure for every template upgrade.
+                        if (!is_array($oldtemplatedefaults[$template->reference])) {
+                            $oldtemplatedefaults[$template->reference] = [$oldtemplatedefaults[$template->reference]];
+                        }
+
+                        foreach ($oldtemplatedefaults[$template->reference] as $oldtemplate) {
+                            if (isset($template->reference) && (strcmp($template->body, $oldtemplate) === 0)) {
+                                // The template's body is an exact match with the string in the lang file.
+                                // We'll update it with the new string in the lang file.
+                                $template->body = $newtemplatedefaults[$template->reference];
+                                $templateswithdefaults[$template->id] = $template->reference;
+                                $oldtemplatedefaultbodies[$template->id] = $oldtemplate;
+                                $savethisrecord = true;
+                                $wasdefault = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // If not found.
+                    if (!$wasdefault && strpos($template->body, $alldates) !== false) {
                         // If the template didn't match the default in the lang file, we'll still
                         // replace the [alldates] placeholders, but can't really replace [session:location]
                         // and similar placeholders as the way these work has changed.
@@ -3970,9 +3989,15 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                         $savethisrecord = true;
                     }
                 }
-                if (isset($template->managerprefix) && (strpos($template->managerprefix, $alldates) !== false)) {
-                    $template->managerprefix = str_replace($alldates, $replacement, $template->managerprefix);
-                    $savethisrecord = true;
+                if (isset($template->managerprefix)) {
+                    // Special case for manager prefix during upgrade from 2.4.x
+                    if (strcmp($template->managerprefix, text_to_html(get_string('setting:defaultrequestinstrmngrdefault_v24', 'facetoface'))) === 0) {
+                        $template->managerprefix = text_to_html(get_string('setting:defaultrequestinstrmngrdefault', 'facetoface'));
+                        $savethisrecord = true;
+                    } else if (strpos($template->managerprefix, $alldates) !== false) {
+                        $template->managerprefix = str_replace($alldates, $replacement, $template->managerprefix);
+                        $savethisrecord = true;
+                    }
                 }
                 if ($savethisrecord) {
                     $DB->update_record('facetoface_notification_tpl', $template);
@@ -3991,7 +4016,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                     if (isset($templateswithdefaults[$f2f_notification->templateid])) {
                         // This notification uses a template that matched the default lang string.
                         $reference = $templateswithdefaults[$f2f_notification->templateid];
-                        if (strcmp($f2f_notification->body, $oldtemplatedefaults[$reference]) === 0) {
+                        if (strcmp($f2f_notification->body, $oldtemplatedefaultbodies[$f2f_notification->templateid]) === 0) {
                             // This notification also matched the same default lang string. So we'll update it
                             // to the new default.
                             $f2f_notification->body = $newtemplatedefaults[$reference];
@@ -4005,9 +4030,15 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                         $savethisrecord = true;
                     }
                 }
-                if (isset($f2f_notification->managerprefix) && (strpos($f2f_notification->managerprefix, $alldates) !== false)) {
-                    $f2f_notification->managerprefix = str_replace($alldates, $replacement, $f2f_notification->managerprefix);
-                    $savethisrecord = true;
+                if (isset($f2f_notification->managerprefix)) {
+                    // Special case for manager prefix during upgrade from 2.4.x
+                    if (strcmp($f2f_notification->managerprefix, text_to_html(get_string('setting:defaultrequestinstrmngrdefault_v24', 'facetoface'))) === 0) {
+                        $f2f_notification->managerprefix = text_to_html(get_string('setting:defaultrequestinstrmngrdefault', 'facetoface'));
+                        $savethisrecord = true;
+                    } else if (strpos($f2f_notification->managerprefix, $alldates) !== false) {
+                        $f2f_notification->managerprefix = str_replace($alldates, $replacement, $f2f_notification->managerprefix);
+                        $savethisrecord = true;
+                    }
                 }
                 if ($savethisrecord) {
                     $DB->update_record('facetoface_notification', $f2f_notification);
@@ -4419,6 +4450,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
     if ($oldversion < 2016092800) {
         mod_facetoface_upgrade_notification_titles();
         mod_facetoface_fix_trainercancel_body();
+        mod_facetoface_fix_defaultrequestinstrmngrdefault();
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2016092800, 'facetoface');
     }

@@ -1488,6 +1488,23 @@ $string['setting:defaultremindersubject'] = 'Default subject line for reminder e
 $string['setting:defaultremindersubject_caption'] = 'Reminder subject';
 $string['setting:defaultremindersubjectdefault'] = 'Face-to-face booking reminder: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultremindersubjectdefault_v9'] = 'Seminar booking reminder: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultrequestinstrmngrdefault_v24'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as their Team Leader / Manager.
+
+Course:   [facetofacename]
+Cost:   [cost]
+
+Duration:   [duration]
+Date(s):
+[alldates]
+
+Location:   [session:location]
+Venue:   [session:venue]
+Room:   [session:room]
+
+Please follow the link below to approve the request:
+[attendeeslink]
+
+';
 $string['setting:defaultrequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as their Team Leader / Manager.
 
 Please review this request before registration closes on [registrationcutoff]
@@ -1759,6 +1776,19 @@ Participant:   [firstname] [lastname]
 By waitlisting you have registered your interest in this course and will be contacted directly when sessions become available.
 
 To remove yourself from this waitlist please return to this course and click Cancel waitlist. Please note there is no waitlist removal confirmation email.
+';
+$string['setting:defaultwaitlistedmessagedefault_v27'] = 'This is to advise that you have been added to the waitlist for:
+
+Course:   [coursename]
+Face-to-face:   [facetofacename]
+Location:  [session:location]
+Participant:   [firstname] [lastname]
+
+***Please note this is not a course booking confirmation***
+
+By waitlisting you have registered your interest in this course and will be contacted directly when sessions become available.
+
+To remove yourself from this waitlist please return to this course and click Cancel Booking. Please note there is no waitlist removal confirmation email.
 ';
 $string['setting:defaultwaitlistedmessagedefault_v9'] = 'This is to advise that you have been added to the waitlist for:
 

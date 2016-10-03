@@ -342,3 +342,51 @@ Room:   [session:room]<br />
         }
     }
 }
+
+/**
+ * During upgrade from 2.4 and prior to 9.0rc1 notification message for defaultrequestinstrmngrdefault had different from original
+ * string in lang file as result it was not updated, but dates format was changed anyway (as fallback scenario).
+ * String is fixed now, but we still need to cover upgrades from 9.0rc1 to 9+ by refixing this particualr string.
+ * It make sense only for English version.
+ */
+function mod_facetoface_fix_defaultrequestinstrmngrdefault() {
+    global $DB;
+    // This is resulting template
+    $wrongtemplate = '<div class="text_to_html">This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as their Team Leader / Manager.<br />
+<br />
+Course:   [coursename]<br />
+Face-to-face:   [facetofacename]<br />
+Cost:   [cost]<br />
+<br />
+Duration:   [duration]<br />
+Date(s):<br />
+[#sessions][session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]<br>[/sessions]<br />
+<br />
+Location:   [session:location]<br />
+Venue:   [session:venue]<br />
+Room:   [session:room]<br />
+<br />
+Please follow the link below to approve the request:<br />
+[attendeeslink]<br />
+<br />
+</div>';
+
+    $newtemplate = text_to_html(get_string('setting:defaultrequestinstrmngrdefault', 'facetoface'));
+    // Update notification templates.
+    $template = $DB->get_record('facetoface_notification_tpl', ['reference' => 'request']);
+    if (!empty($template) && strcmp($template->managerprefix, $wrongtemplate) === 0) {
+        $template->managerprefix = $newtemplate;
+        $DB->update_record('facetoface_notification_tpl', $template);
+
+        // Upgrade acitivities template.
+        $f2f_notifications = $DB->get_records('facetoface_notification', ['templateid' => $template->id]);
+        if (!empty($f2f_notifications)) {
+            foreach ($f2f_notifications as $notification) {
+                if (strcmp($notification->managerprefix, $wrongtemplate) === 0) {
+                    $notification->managerprefix = $newtemplate;
+                    $DB->update_record('facetoface_notification', $notification);
+                }
+            }
+        }
+    }
+}
