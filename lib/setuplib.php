@@ -1383,7 +1383,7 @@ function disable_output_buffering() {
  */
 function redirect_if_major_upgrade_required() {
     global $CFG;
-    $lastmajordbchanges = 2014093001.00;
+    $lastmajordbchanges = 2015111606.00; // Anything before Totara 9.0rc1
     if (empty($CFG->version) or (float)$CFG->version < $lastmajordbchanges or
             during_initial_install() or !empty($CFG->adminsetuppending) or !isset($CFG->totara_version)) {
         try {
