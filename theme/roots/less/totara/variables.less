@@ -32,9 +32,13 @@
 
 // Dock.
 @dock-width: 36px;
-@dock-title-margin: 3px;
-@dock-panel-width: (768px / 2);
-@dock-title-font-size: 11px;
+@dock-title-margin: 0;
+@dock-panel-width: (@grid-float-breakpoint / 2);
+@dock-title-font-size: 12px;
+@dock-border-style: solid;
+@dock-border-color: @panel-default-border;
+@dock-border-width: 1px;
+@dock-border: @dock-border-width @dock-border-style @dock-border-color;
 
 // Totara Menu
 @totara-menu-border-color: #ddd;
