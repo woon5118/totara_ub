@@ -88,12 +88,12 @@
     <div class="tf_element_input">{{> totara_form/validation_errors}}
 
         <div>
-        <textarea id="{{id}}" name="{{name}}[text]" rows="{{rows}}" cols="{{cols}}" spellcheck="true"
-                  data-fptemplates="{{fptemplates}}" data-requiredstrings="{{requiredstrings}}" data-jsmodules="{{jsmodules}}" data-yuimodules="{{yuimodules}}"
-            {{#frozen}}readonly{{/frozen}} {{#required}}required{{/required}}>{{text}}</textarea>
+        <textarea id="{{id}}" {{#frozen}}disabled data-{{/frozen}}name="{{name}}[text]" rows="{{rows}}" cols="{{cols}}" spellcheck="true"
+            data-fptemplates="{{fptemplates}}" data-requiredstrings="{{requiredstrings}}" data-jsmodules="{{jsmodules}}" data-yuimodules="{{yuimodules}}"
+            {{#required}}required{{/required}}>{{text}}</textarea>
         </div>
-        <input type="hidden" name="{{name}}[format]" value="{{format}}" />
-        <input type="hidden" name="{{name}}[itemid]" value="{{itemid}}" />
+        <input type="hidden" {{#frozen}}data-{{/frozen}}name="{{name}}[format]" value="{{format}}" />
+        <input type="hidden" {{#frozen}}data-{{/frozen}}name="{{name}}[itemid]" value="{{itemid}}" />
 
     </div>
 </div>

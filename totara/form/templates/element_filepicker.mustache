@@ -78,11 +78,14 @@
         }
 }}
 <div class="tf_element totara_form_element_filepicker">
-    <input type="hidden" id="{{id}}" name="{{name}}" value="{{value}}" data-fpoptions="{{fpoptions}}" />
+    <input type="hidden" id="{{id}}" {{#frozen}}data-{{/frozen}}name="{{name}}" value="{{value}}" data-fpoptions="{{fpoptions}}" />
     <div class="tf_element_title"><span class="legend">{{label}}{{#required}}{{> totara_form/required_suffix}}{{/required}}</span>{{> totara_form/help_button}}</div>
     <div class="tf_element_input">{{> totara_form/validation_errors}}
         {{#frozen}}
             {{! TODO TL-9421: somehow list current files}}
+            <div id="filepicker-wrapper-{{client_id}}" class="mdl-left">
+                <input type="button" disabled class="fp-btn-choose" id="filepicker-button-{{client_id}}" value="{{#str}}openpicker,repository{{/str}}"/>
+            </div>
         {{/frozen}}{{^frozen}}
 
         <div class="filemanager-loading mdl-align" id='filepicker-loading-{{client_id}}'>

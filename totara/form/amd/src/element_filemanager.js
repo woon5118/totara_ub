@@ -258,24 +258,37 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
             is_disabled: function() {
                 return this.filemanager.ancestor('.fitem.disabled') !== null;
             },
+            is_frozen: function() {
+                return this.options.frozen || this.filemanager.ancestor('[data-element-frozen="1"]') !== null
+            },
             setup_buttons: function() {
                 var button_download = this.filemanager.one('.fp-btn-download');
                 var button_create   = this.filemanager.one('.fp-btn-mkdir');
                 var button_addfile  = this.filemanager.one('.fp-btn-add');
 
                 // Setup 'add file' button.
-                button_addfile.on('click', this.show_filepicker, this);
+                if (!this.is_frozen()) {
+                    button_addfile.on('click', this.show_filepicker, this);
+                } else if (button_addfile) {
+                    // Its frozen and the button is there, hide the button.
+                    button_addfile.hide();
+                }
 
                 var dndarrow = this.filemanager.one('.dndupload-arrow');
                 if (dndarrow) {
-                    dndarrow.on('click', this.show_filepicker, this);
+                    if (!this.is_frozen()) {
+                        dndarrow.on('click', this.show_filepicker, this);
+                    } else {
+                        // Its frozen and the button is there, hide the button.
+                        dndarrow.hide();
+                    }
                 }
 
                 // Setup 'make a folder' button.
-                if (this.options.subdirs) {
+                if (this.options.subdirs && !this.is_frozen()) {
                     button_create.on('click',function(e) {
                         e.preventDefault();
-                        if (this.is_disabled()) {
+                        if (this.is_disabled() || this.is_frozen()) {
                             return;
                         }
                         var scope = this;
@@ -355,6 +368,10 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     }, this);
                 } else {
                     this.filemanager.addClass('fm-nomkdir');
+                    if (button_create) {
+                        // Its frozen and the button is there, hide the button.
+                        button_create.hide();
+                    }
                 }
 
                 // Setup 'download this folder' button.
@@ -418,7 +435,8 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
 
             show_filepicker: function (e) {
                 e.preventDefault();
-                if (this.is_disabled()) {
+                if (this.is_disabled() || this.is_frozen()) {
+                    // Don't show the file picker if this is disabled or frozen.
                     return;
                 }
                 var options = this.filepicker_options;
@@ -663,6 +681,12 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 }
             },
             update_file: function(confirmed) {
+                if (this.is_disabled() || this.frozen()) {
+                    // You cannot update a disabled or frozen element.
+                    this.selectui.hide();
+                    return;
+                }
+
                 var selectnode = this.selectnode;
                 var fileinfo = this.selectui.fileinfo;
 
@@ -785,17 +809,150 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 });
                 this.populate_licenses_select(selectnode.one('.fp-license select'));
                 // Register event on clicking buttons.
-                selectnode.one('.fp-file-update').on('click', function(e) {
-                    e.preventDefault();
-                    this.update_file();
-                }, this);
-                selectnode.all('form').on('keydown', function(e) {
-                    if (e.keyCode == 13) {
+                var btn_update = selectnode.one('.fp-file-update'),
+                    btn_download = selectnode.one('.fp-file-download'),
+                    btn_delete = selectnode.one('.fp-file-delete'),
+                    btn_zip = selectnode.one('.fp-file-zip'),
+                    btn_unzip = selectnode.one('.fp-file-unzip'),
+                    btn_setmain = selectnode.one('.fp-file-setmain'),
+                    btn_cancel = selectnode.all('.fp-file-cancel');
+                if (this.is_frozen()) {
+                    if (btn_update) {
+                        btn_update.hide();
+                    }
+                    if (btn_delete) {
+                        btn_delete.hide();
+                    }
+                    if (btn_zip) {
+                        btn_zip.hide();
+                    }
+                    if (btn_unzip) {
+                        btn_unzip.hide();
+                    }
+                    if (btn_setmain) {
+                        btn_setmain.hide();
+                    }
+                    selectnode.all('form input').each(function(){
+                        this.setAttribute('readonly', 'readonly');
+                    });
+                    selectnode.all('form select').each(function(){
+                        this.setAttribute('disabled', 'disabled')
+                    });
+                } else {
+                    btn_update.on('click', function(e) {
                         e.preventDefault();
                         this.update_file();
-                    }
-                }, this);
-                selectnode.one('.fp-file-download').on('click', function(e) {
+                    }, this);
+                    selectnode.all('form').on('keydown', function(e) {
+                        if (e.keyCode == 13) {
+                            e.preventDefault();
+                            this.update_file();
+                        }
+                    }, this);
+
+                    btn_delete.on('click', function(e) {
+                        e.preventDefault();
+                        var dialog_options = {};
+                        var params = {};
+                        var fileinfo = this.selectui.fileinfo;
+                        dialog_options.scope = this;
+                        params.filepath = fileinfo.filepath;
+                        if (fileinfo.type == 'folder') {
+                            params.filename = '.';
+                            dialog_options.message = M.util.get_string('confirmdeletefolder', 'repository');
+                        } else {
+                            params.filename = fileinfo.fullname;
+                            if (fileinfo.refcount) {
+                                dialog_options.message = M.util.get_string('confirmdeletefilewithhref', 'repository',fileinfo.refcount);
+                            } else {
+                                dialog_options.message = M.util.get_string('confirmdeletefile', 'repository');
+                            }
+                        }
+                        dialog_options.callbackargs = [params];
+                        dialog_options.callback = function(params) {
+                            this.request({
+                                action: 'delete',
+                                scope: this,
+                                params: params,
+                                callback: function(id, obj, args) {
+                                    args.scope.filecount--;
+                                    args.scope.refresh(obj.filepath);
+                                    if (typeof M.core_formchangechecker != 'undefined') {
+                                        M.core_formchangechecker.set_form_changed();
+                                    }
+                                }
+                            });
+                        };
+                        this.selectui.hide();
+                        this.show_confirm_dialog(dialog_options);
+                    }, this);
+
+                    btn_zip.on('click', function(e) {
+                        e.preventDefault();
+                        var params = {};
+                        var fileinfo = this.selectui.fileinfo;
+                        if (fileinfo.type != 'folder') {
+                            // This button should not even be shown.
+                            return;
+                        }
+                        params.filepath = fileinfo.filepath;
+                        params.filename = '.';
+                        selectnode.addClass('loading');
+                        this.request({
+                            action: 'zip',
+                            scope: this,
+                            params: params,
+                            callback: function(id, obj, args) {
+                                args.scope.selectui.hide();
+                                args.scope.refresh(obj.filepath);
+                            }
+                        });
+                    }, this);
+                    btn_unzip.on('click', function(e) {
+                        e.preventDefault();
+                        var params = {};
+                        var fileinfo = this.selectui.fileinfo;
+                        if (fileinfo.type != 'zip') {
+                            // This button should not even be shown.
+                            return;
+                        }
+                        params.filepath = fileinfo.filepath;
+                        params.filename = fileinfo.fullname;
+                        selectnode.addClass('loading');
+                        this.request({
+                            action: 'unzip',
+                            scope: this,
+                            params: params,
+                            callback: function(id, obj, args) {
+                                args.scope.selectui.hide();
+                                args.scope.refresh(obj.filepath);
+                            }
+                        });
+                    }, this);
+                    btn_setmain.on('click', function(e) {
+                        e.preventDefault();
+                        var params = {};
+                        var fileinfo = this.selectui.fileinfo;
+                        if (!this.enablemainfile || fileinfo.type == 'folder') {
+                            // This button should not even be shown for folders or when mainfile is disabled.
+                            return;
+                        }
+                        params.filepath = fileinfo.filepath;
+                        params.filename = fileinfo.fullname;
+                        selectnode.addClass('loading');
+                        this.request({
+                            action: 'setmainfile',
+                            scope: this,
+                            params: params,
+                            callback: function(id, obj, args) {
+                                args.scope.selectui.hide();
+                                args.scope.refresh(fileinfo.filepath);
+                            }
+                        });
+                    }, this);
+                }
+
+                btn_download.on('click', function(e) {
                     e.preventDefault();
                     if (this.selectui.fileinfo.type != 'folder') {
                         var node = Y.Node.create('<iframe></iframe>').setStyles({
@@ -807,106 +964,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                         Y.one('body').appendChild(node);
                     }
                 }, this);
-                selectnode.one('.fp-file-delete').on('click', function(e) {
-                    e.preventDefault();
-                    var dialog_options = {};
-                    var params = {};
-                    var fileinfo = this.selectui.fileinfo;
-                    dialog_options.scope = this;
-                    params.filepath = fileinfo.filepath;
-                    if (fileinfo.type == 'folder') {
-                        params.filename = '.';
-                        dialog_options.message = M.util.get_string('confirmdeletefolder', 'repository');
-                    } else {
-                        params.filename = fileinfo.fullname;
-                        if (fileinfo.refcount) {
-                            dialog_options.message = M.util.get_string('confirmdeletefilewithhref', 'repository',fileinfo.refcount);
-                        } else {
-                            dialog_options.message = M.util.get_string('confirmdeletefile', 'repository');
-                        }
-                    }
-                    dialog_options.callbackargs = [params];
-                    dialog_options.callback = function(params) {
-                        this.request({
-                            action: 'delete',
-                            scope: this,
-                            params: params,
-                            callback: function(id, obj, args) {
-                                args.scope.filecount--;
-                                args.scope.refresh(obj.filepath);
-                                if (typeof M.core_formchangechecker != 'undefined') {
-                                    M.core_formchangechecker.set_form_changed();
-                                }
-                            }
-                        });
-                    };
-                    this.selectui.hide();
-                    this.show_confirm_dialog(dialog_options);
-                }, this);
-                selectnode.one('.fp-file-zip').on('click', function(e) {
-                    e.preventDefault();
-                    var params = {};
-                    var fileinfo = this.selectui.fileinfo;
-                    if (fileinfo.type != 'folder') {
-                        // This button should not even be shown.
-                        return;
-                    }
-                    params.filepath = fileinfo.filepath;
-                    params.filename = '.';
-                    selectnode.addClass('loading');
-                    this.request({
-                        action: 'zip',
-                        scope: this,
-                        params: params,
-                        callback: function(id, obj, args) {
-                            args.scope.selectui.hide();
-                            args.scope.refresh(obj.filepath);
-                        }
-                    });
-                }, this);
-                selectnode.one('.fp-file-unzip').on('click', function(e) {
-                    e.preventDefault();
-                    var params = {};
-                    var fileinfo = this.selectui.fileinfo;
-                    if (fileinfo.type != 'zip') {
-                        // This button should not even be shown.
-                        return;
-                    }
-                    params.filepath = fileinfo.filepath;
-                    params.filename = fileinfo.fullname;
-                    selectnode.addClass('loading');
-                    this.request({
-                        action: 'unzip',
-                        scope: this,
-                        params: params,
-                        callback: function(id, obj, args) {
-                            args.scope.selectui.hide();
-                            args.scope.refresh(obj.filepath);
-                        }
-                    });
-                }, this);
-                selectnode.one('.fp-file-setmain').on('click', function(e) {
-                    e.preventDefault();
-                    var params = {};
-                    var fileinfo = this.selectui.fileinfo;
-                    if (!this.enablemainfile || fileinfo.type == 'folder') {
-                        // This button should not even be shown for folders or when mainfile is disabled.
-                        return;
-                    }
-                    params.filepath = fileinfo.filepath;
-                    params.filename = fileinfo.fullname;
-                    selectnode.addClass('loading');
-                    this.request({
-                        action: 'setmainfile',
-                        scope: this,
-                        params: params,
-                        callback: function(id, obj, args) {
-                            args.scope.selectui.hide();
-                            args.scope.refresh(fileinfo.filepath);
-                        }
-                    });
-                }, this);
-                selectnode.all('.fp-file-cancel').on('click', function(e) {
+                btn_cancel.on('click', function(e) {
                     e.preventDefault();
                     this.selectui.hide();
                 }, this);
@@ -949,7 +1007,13 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                         el.set('selected', true);
                     }
                 });
-                selectnode.all('.fp-author input, .fp-license select').set('disabled',(node.type == 'folder') ? 'disabled' : '');
+                if (this.is_frozen()) {
+                    selectnode.all('.fp-author input').setAttribute('readonly', 'readonly');
+                    selectnode.all('.fp-license select').setAttribute('disabled', 'disabled');
+                } else {
+                    selectnode.all('.fp-author input').setAttribute('readonly',(node.type == 'folder') ? 'readonly' : '');
+                    selectnode.all('.fp-license select').setAttribute('disabled',(node.type == 'folder') ? 'disabled' : '');
+                }
                 // Display static information about a file (when known).
                 var attrs = ['datemodified','datecreated','size','dimensions','original','reflist'];
                 for (var i in attrs) {
@@ -1038,7 +1102,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
             },
             render: function() {
                 this.print_path();
-                this.view_files();
+                this.view_files(null);
             },
             has_folder: function(foldername) {
                 var element;
@@ -1058,20 +1122,22 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
         filemanager.removeClass('fm-loading').addClass('fm-loaded');
 
         var manager = new FileManagerHelper(options);
-        var dndoptions = {
-            filemanager: manager,
-            acceptedtypes: options.filepicker.accepted_types,
-            clientid: options.client_id,
-            author: options.author,
-            maxfiles: options.maxfiles,
-            maxbytes: options.maxbytes,
-            areamaxbytes: options.areamaxbytes,
-            itemid: options.itemid,
-            repositories: manager.filepicker_options.repositories,
-            containerid: manager.dndcontainer.get('id'),
-            contextid: options.context.id
-        };
-        M.form_dndupload.init(Y, dndoptions);
+        if (!options.frozen) {
+            var dndoptions = {
+                filemanager: manager,
+                acceptedtypes: options.filepicker.accepted_types,
+                clientid: options.client_id,
+                author: options.author,
+                maxfiles: options.maxfiles,
+                maxbytes: options.maxbytes,
+                areamaxbytes: options.areamaxbytes,
+                itemid: options.itemid,
+                repositories: manager.filepicker_options.repositories,
+                containerid: manager.dndcontainer.get('id'),
+                contextid: options.context.id
+            };
+            M.form_dndupload.init(Y, dndoptions);
+        }
     };
 
     return {

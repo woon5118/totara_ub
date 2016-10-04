@@ -2,6 +2,9 @@
 @import "number_polyfill.less";
 @import "passwordunmask.less";
 
+@totara_form-text-color: rgba(85, 85, 85, 1);
+@totara_form-disabled-bg: #dde1e5;
+
 .totara_form {
 
     @totara_form-bottom-space-element: 30px;
@@ -95,6 +98,7 @@
         .tf_element_input label {
             padding-right: .6em;
             padding-left: .6em;
+            color: @totara_form-text-color;
         }
     }
 
@@ -136,7 +140,8 @@
         padding: 6px 12px;
         font-size: 14px;
         line-height: 1.42857143;
-        color: #555;
+        -webkit-text-fill-color: @totara_form-text-color;
+        color: @totara_form-text-color;
         background-color: #fff;
         background-image: none;
         border: 1px solid #ccc;
@@ -147,14 +152,27 @@
         -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
         transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
         margin: 0 0 5px 0;
+
+        &[disabled],
+        &[readonly] {
+            background-color: @totara_form-disabled-bg;
+            opacity: 1; // iOS fix for unreadable disabled content; see https://github.com/twbs/bootstrap/issues/11655
+        }
     }
-    input[type=email],
-    input[type=tel],
-    input[type=url],
-    input[type=number],
-    input[type=datetime-local],
-    input[type=datetime],
-    input[type=date] {
+    input[type="text"],
+    input[type="password"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="date"],
+    input[type="month"],
+    input[type="time"],
+    input[type="week"],
+    input[type="number"],
+    input[type="email"],
+    input[type="url"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="color"] {
         .totara_form-input-default;
         height: 34px;
         width: auto;
@@ -162,6 +180,19 @@
     }
     textarea {
         .totara_form-input-default;
+    }
+
+    [data-element-frozen="1"] {
+        .filemanager-container,
+        .filepicker-filelist {
+            background-color: #f6f6f6;
+        }
+        .fp-iconview .fp-thumbnail {
+            border-width: 0;
+        }
+        .fp-iconview .fp-filename-field .fp-filename {
+            background-color: transparent;
+        }
     }
 }
 

@@ -68,9 +68,24 @@ define(['jquery', 'core/yui', 'totara_form/form'], function($, Y, Form) {
      */
     FileManagerElement.prototype.init = function(done) {
         this.input = $('#' + this.id);
-        var fmoptions = this.input.data('fmoptions');
+        var options = {};
+
+        try {
+            options = this.input.data('fmoptions');
+        } catch (ex) {
+            Form.debug('Failed to pick up FileManager options from data attribute.', this, Form.LOGLEVEL.error);
+            throw ex;
+        }
+
+        if (options === '') {
+            // The data attribute was empty, this only happens when the file manager was frozen.
+            Form.debug('FileManager could not initialise, no options present.', this, Form.LOGLEVEL.error);
+            done();
+            return;
+        }
+
         require(['totara_form/element_filemanager'], function(fp) {
-            fp.init_filemanager(fmoptions);
+            fp.init_filemanager(options);
             done();
         });
     };

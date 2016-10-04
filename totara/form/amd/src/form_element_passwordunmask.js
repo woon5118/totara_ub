@@ -124,7 +124,12 @@ define(['jquery', 'totara_form/form'], function($, Form) {
         this.unmaskinput = $('#' + id + 'unmask');
         this.wrap = this.input.parent('.wrap');
 
-        $('<input type="text" value="" class="inputmask" />').insertBefore('#' + id);
+        var mask = $('<input type="text" value="" class="inputmask" />');
+        if (this.input.attr('readonly')) {
+            mask.attr('readonly', 'readonly');
+        }
+        mask.insertBefore('#' + id);
+
         this.mask = this.wrap.find('.inputmask');
         this.updateMask();
 

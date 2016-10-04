@@ -286,19 +286,17 @@ class filemanager extends element {
         unset($attributes['return_types']);
         unset($attributes['disable_types']);
 
-        if (!$frozen) {
-            $draftitemid = $this->get_field_value();
-            if ($draftitemid === null) {
-                $draftitemid = file_get_unused_draft_itemid();
-            }
-            $fmoptions = $this->get_fm_options($draftitemid, true);
-
-            $attributes['value'] = (string)$draftitemid;
-            $attributes['maxbytes'] = $maxbytes;
-            $attributes['fmoptions'] = json_encode($fmoptions);
-            $attributes['client_id'] = $fmoptions->client_id;
-            $attributes['restrictions'] = $fmoptions->restrictions;
+        $draftitemid = $this->get_field_value();
+        if ($draftitemid === null) {
+            $draftitemid = file_get_unused_draft_itemid();
         }
+        $fmoptions = $this->get_fm_options($draftitemid, true);
+
+        $attributes['value'] = (string)$draftitemid;
+        $attributes['maxbytes'] = $maxbytes;
+        $attributes['fmoptions'] = json_encode($fmoptions);
+        $attributes['client_id'] = $fmoptions->client_id;
+        $attributes['restrictions'] = $fmoptions->restrictions;
 
         $this->set_attribute_template_data($result, $attributes);
 
@@ -352,6 +350,7 @@ class filemanager extends element {
         $fs = get_file_storage();
         $options = file_get_drafarea_files($draftitemid, '/');
 
+        $options->frozen = $this->is_frozen();
         $options->maxbytes = $this->get_maxbytes();
         $options->areamaxbytes = $attributes['areamaxbytes'];
         $options->maxfiles = $attributes['maxfiles'];

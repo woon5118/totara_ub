@@ -115,7 +115,7 @@ class element_datetime extends form {
         );
         foreach ($fields as $field) {
             if (!empty($data->$field)) {
-                $data->$field = date($format, $data->$field);
+                $data->$field .= ' (' . date($format, $data->$field) . ' ' . \core_date::get_user_timezone() . ')';
             }
         }
 

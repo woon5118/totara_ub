@@ -79,6 +79,7 @@ class element_compilation extends form {
         $this->model->add(new checkbox('checkbox', 'Checkbox', 'checked', 'empty'));
         $this->model->add(new checkboxes('checkboxes', 'Checkboxes', ['1' => 'Yes', '0' => 'No', '-1', 'Maybe']));
         $this->model->add(new datetime('datetime', 'Date and time'));
+        $this->model->add(new datetime('datetime_tz', 'Date and time with TZ', 'Indian/Reunion'));
         $this->model->add(new editor('editor', 'Editor'));
         $this->model->add(new email('email', 'Email'));
         $this->model->add(new filemanager('filemanager', 'File manager'));
@@ -118,7 +119,10 @@ class element_compilation extends form {
      */
     public static function process_after_submit(\stdClass $data) {
         if (!empty($data->datetime)) {
-            $data->datetime = date('Y/m/d H:i', $data->datetime);
+            $data->datetime .= ' (' . date('Y/m/d H:i', $data->datetime) . ' ' . \core_date::get_user_timezone() . ')';
+        }
+        if (!empty($data->datetime_tz)) {
+            $data->datetime_tz .= ' (' .date('Y/m/d H:i', $data->datetime_tz) . ' ' . \core_date::get_user_timezone() . ')';
         }
         return parent::process_after_submit($data);
     }

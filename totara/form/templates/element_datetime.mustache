@@ -83,17 +83,17 @@
 }}
 <div class="tf_element totara_form_element_datetime">
     <div class="tf_element_title"><label class="legend" for="{{id}}">{{label}}{{#required}}{{> totara_form/required_suffix}}{{/required}}</label>{{> totara_form/help_button}}</div>
-    <div class="tf_element_input">{{> totara_form/validation_errors}}<input type="datetime-local" id="{{id}}" name="{{name}}[isodate]" value="{{isodate}}"
-        {{#frozen}}readonly{{/frozen}} {{#required}}required{{/required}} {{#placeholder}}placeholder="{{.}}"{{/placeholder}} />
+    <div class="tf_element_input">{{> totara_form/validation_errors}}<input type="datetime-local" id="{{id}}" {{#frozen}}disabled data-{{/frozen}}name="{{name}}[isodate]" value="{{isodate}}"
+                                                                            {{#required}}required{{/required}} {{#placeholder}}placeholder="{{.}}"{{/placeholder}} />
     {{#showtz}}
         <label for="{{id}}___tz" class="accesshide">{{#str}}timezone{{/str}}</label>
-        <select name="{{name}}[tz]" id="{{id}}___tz" {{#frozen}}readonly{{/frozen}}>
+        <select {{#frozen}}disabled data-{{/frozen}}name="{{name}}[tz]" id="{{id}}___tz" >
             {{#timezones}}
             <option value="{{value}}" {{#selected}}selected{{/selected}}>{{text}}</option>
             {{/timezones}}
         </select>
     {{/showtz}}
     {{^showtz}}
-        <input type="hidden" name="{{name}}[tz]" value="{{tz}}"/>
+        {{^frozen}}<input type="hidden" name="{{name}}[tz]" value="{{tz}}"/>{{/frozen}}
     {{/showtz}}</div>
 </div>

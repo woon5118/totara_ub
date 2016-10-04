@@ -86,15 +86,15 @@
     <div class="tf_element_input">{{> totara_form/validation_errors}}
 
         <div>
-        <textarea id="{{id}}" name="{{name}}[text]" rows="{{rows}}" cols="{{cols}}" spellcheck="true"
-                {{#frozen}}readonly{{/frozen}} {{#required}}required{{/required}}>{{text}}</textarea>
+        <textarea id="{{id}}" {{#frozen}}disabled data-{{/frozen}}name="{{name}}[text]" rows="{{rows}}" cols="{{cols}}" spellcheck="true"
+            {{#required}}required{{/required}}>{{text}}</textarea>
         </div>
         <label for="{{id}}___format" class="accesshide">{{#str}}timezone{{/str}}</label>
-        <select name="{{name}}[format]" id="{{id}}___format" {{#frozen}}readonly{{/frozen}} {{#required}}required{{/required}}>
+        <select {{#frozen}}disabled data-{{/frozen}}name="{{name}}[format]" id="{{id}}___format" {{#required}}required{{/required}}>
             {{#formats}}<option value="{{value}}" {{#selected}}selected{{/selected}}>{{text}}</option>{{/formats}}
         </select>
 
-        <input type="hidden" name="{{name}}[itemid]" value="{{itemid}}" />
+        <input type="hidden" {{#frozen}}data-{{/frozen}}name="{{name}}[itemid]" value="{{itemid}}" />
 
     </div>
 </div>

@@ -78,6 +78,13 @@ define(['jquery', 'core/yui', 'totara_form/form'], function($, Y, Form) {
             throw ex;
         }
 
+        if (options === '') {
+            // The data attribute was empty, this only happens when the file picker was frozen.
+            Form.debug('FilePicker initialisation skipped as it was frozen.', this, Form.LOGLEVEL.error);
+            done();
+            return;
+        }
+
         require(['totara_form/element_filepicker'], function(fm) {
             fm.init_filepicker(options);
             done();

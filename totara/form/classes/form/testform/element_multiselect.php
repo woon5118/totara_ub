@@ -61,7 +61,7 @@ class element_multiselect extends form {
      */
     public function definition() {
 
-        $defaultoptions = array('' => 'Choose...', '1' => 'Yes', '3' => 'No');
+        $defaultoptions = array('1' => 'Yes', '3' => 'No');
 
         $this->model->add(new multiselect('multiselect_basic', 'Basic multiselect', $defaultoptions));
         $multiselect_required = $this->model->add(new multiselect('multiselect_required', 'Required basic multiselect', $defaultoptions));

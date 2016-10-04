@@ -98,14 +98,16 @@ if (isset($form)) {
         // Add to the data array any files that were used.
         foreach ($form->get_files() as $elname => $list) {
             $files = array();
-            foreach ($list as $file) {
-                /** @var \stored_file $file */
-                if ($file->is_directory()) {
-                    $path = $file->get_filepath();
-                } else {
-                    $path = $file->get_filepath() . $file->get_filename();
+            if ($list !== null) {
+                foreach ($list as $file) {
+                    /** @var \stored_file $file */
+                    if ($file->is_directory()) {
+                        $path = $file->get_filepath();
+                    } else {
+                        $path = $file->get_filepath() . $file->get_filename();
+                    }
+                    $files[] = $path;
                 }
-                $files[] = $path;
             }
             $data->$elname = join(', ', $files);
         }

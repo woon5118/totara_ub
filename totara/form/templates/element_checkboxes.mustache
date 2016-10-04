@@ -23,7 +23,7 @@
 
     @template totara_form/element_checkboxes
 
-    This template generates Totara form multi select input element.
+    This template generates Totara form checkboxes element.
 
     Classes required for JS:
     * none
@@ -78,8 +78,7 @@
     <div id="{{id}}" class="tf_element_input" {{#required}}required{{/required}}>{{> totara_form/validation_errors}}
         {{^frozen}}<input type="hidden" name="{{name}}[-1]" value="" />{{/frozen}}
         {{#options}}
-            <input type="checkbox" id="{{oid}}" name="{{name}}[]" value="{{value}}" {{#checked}}checked{{/checked}}
-                {{#frozen}}disabled{{/frozen}} /><label for="{{oid}}">{{{text}}}</label>
+            <input type="checkbox" id="{{oid}}" {{#frozen}}disabled data-{{/frozen}}name="{{name}}[]" value="{{value}}" {{#checked}}checked{{/checked}} /><label for="{{oid}}">{{{text}}}</label>
         {{/options}}
     </div>
 </div>
