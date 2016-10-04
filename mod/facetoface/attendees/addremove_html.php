@@ -21,8 +21,10 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
         <?php
             if (!empty($attendees) && $action === 'add') {
                 foreach ($attendees as $attendee) {
-                    $fullname = fullname($attendee, true);
-                    echo "<option disabled value=\"$attendee->id\">".$fullname.", ".$attendee->email."</option>\n";
+                    if (!array_key_exists($attendee->id, $userstoadd)) {
+                        $fullname = fullname($attendee, true);
+                        echo "<option disabled value=\"$attendee->id\">".$fullname.", ".$attendee->email."</option>\n";
+                    }
                 }
             }
             if (!empty($userstoadd)) {

@@ -40,6 +40,7 @@ $currenturl     = new moodle_url('/mod/facetoface/attendees/add.php', array('s' 
 $action = 'add';
 $attendees = array();
 $notification = '';
+$userstoadd = array();
 
 list($session, $facetoface, $course, $cm, $context) = facetoface_get_env_session($s);
 
@@ -56,7 +57,6 @@ $list = new \mod_facetoface\bulk_list($listid, $currenturl, $action);
 
 if ($frm = data_submitted()) {
     require_sesskey();
-    $userstoadd = array();
     // Process selected user list.
     if (!empty($frm->removeselect)) {
         foreach ($frm->removeselect as $adduser) {
@@ -235,6 +235,6 @@ echo facetoface_print_session($session, false, true, true);
 // Configure selector form.
 $strusertochange = get_string('userstoadd', 'facetoface');
 $stravailableusers = get_string('potentialusers', 'role', $usercount);
-require('addremove_html.php');
+require_once('addremove_html.php');
 
 echo $OUTPUT->footer();
