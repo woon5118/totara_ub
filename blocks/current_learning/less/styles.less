@@ -4,6 +4,8 @@
 @bg-light: #f5f5f5;
 @bg: #e8e8e8;
 
+@padding-small-vertical: 5px;
+
 // Program set complete.
 @bg-set-complete: #83CC36;
 @border-color-complete: #5cb85c;
@@ -163,10 +165,11 @@
         padding: 10px 40px;
     }
     .current_learning-set {
-        padding: 2px @padding-horizontal;
+        padding: @padding-small-vertical @padding-horizontal;
         background-color: @bg;
         border-radius: @border-radius-large;
         h4 {
+            padding-top: @padding-small-vertical;
             span {
                 color: #888;
                 font-size: @font-size-small;
