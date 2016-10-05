@@ -295,7 +295,7 @@ if ($hassiteconfig || $hasmodconfig) {
     if (!during_initial_install()) {
         $enablemobiledocurl = new moodle_url(get_docs_url('Enable_mobile_web_services'));
         $enablemobiledoclink = html_writer::link($enablemobiledocurl, new lang_string('documentation'));
-        $default = is_https() ? 1 : 0;
+        $default = 0; // Totara: no mobile!
         $temp->add(new admin_setting_enablemobileservice('enablemobilewebservice',
                 new lang_string('enablemobilewebservice', 'admin'),
                 new lang_string('configenablemobilewebservice', 'admin', $enablemobiledoclink), $default));
