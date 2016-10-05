@@ -852,6 +852,7 @@ $string['planhasunapproveditems'] = 'This plan has draft items:';
 $string['planidnotfound'] = 'Plan ID of \'{$a}\' not found';
 $string['planinstructions'] = 'Your current and completed learning plans are shown below. ';
 $string['planinstructions_add'] = 'You can create a new learning plan by clicking "Create a new learning plan" to the right of the screen. ';
+$string['planinstructions_noadd'] = 'You do not currently have permission to create a Learning Plan. ';
 $string['planinstructionsuser'] = '{$a}\'s current and completed learning plans are shown below. ';
 $string['planmarkedcomplete'] = 'Plan marked as complete';
 $string['planname'] = 'Plan name';

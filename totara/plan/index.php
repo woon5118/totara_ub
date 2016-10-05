@@ -37,6 +37,7 @@ $role = ($planuser == $USER->id) ? 'learner' : 'manager';
 $can_access = dp_can_view_users_plans($planuser);
 $can_manage = dp_can_manage_users_plans($planuser);
 $can_view = dp_role_is_allowed_action($role, 'view');
+$can_create = dp_role_is_allowed_action($role, 'create');
 
 if (!$can_access || !$can_view) {
     print_error('error:nopermissions', 'totara_plan');
@@ -83,15 +84,17 @@ if ($planuser == $USER->id) {
     $userfullname = fullname($user);
     $planinstructions = get_string('planinstructionsuser', 'totara_plan', $userfullname) . ' ';
 }
-if ($can_manage) {
+if ($can_manage && $can_create) {
     $planinstructions .= get_string('planinstructions_add', 'totara_plan');
+} else {
+    $planinstructions .= get_string('planinstructions_noadd', 'totara_plan');
 }
 
 \totara_plan\event\plan_list_viewed::create_from_userid($planuser)->trigger();
 
 echo html_writer::tag('p', $planinstructions, array('class' => 'instructional_text'));
 
-if ($can_manage) {
+if ($can_manage && $can_create) {
     $renderer = $PAGE->get_renderer('totara_plan');
     echo $renderer->print_add_plan_button($planuser);
 }
