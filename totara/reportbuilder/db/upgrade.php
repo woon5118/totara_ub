@@ -1037,7 +1037,7 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
                   FROM {report_builder_schedule} rbs
                   JOIN {user} u ON u.id = rbs.userid
                  WHERE u.deleted = 1";
-        $reports = $DB->get_fieldset_sql($sql);
+        $reports = $DB->get_records_sql($sql);
         // Delete all scheduled reports created by deleted user/s.
         foreach ($reports as $report) {
             $DB->delete_records('report_builder_schedule_email_audience',   array('scheduleid' => $report->id));
