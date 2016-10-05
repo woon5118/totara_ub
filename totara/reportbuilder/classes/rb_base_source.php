@@ -1771,7 +1771,7 @@ abstract class rb_base_source {
 
     public function rb_display_orderedlist_to_newline_email($list, $row, $isexport = false) {
         $output = array();
-        $emails = explode(',', $list);
+        $emails = explode($this->uniquedelimiter, $list);
         foreach ($emails as $email) {
             if ($isexport) {
                 $output[] = $email;
@@ -3600,9 +3600,9 @@ abstract class rb_base_source {
         // All job fields listed by sortorder.
         $jobfieldlistsubsql = "
             (SELECT u.id AS jfid,
-            " . $DB->sql_group_concat('COALESCE(uja.fullname, \'-\')', ',', 'uja.sortorder') . " AS titlenamelist,
-            " . $DB->sql_group_concat('COALESCE(uja.startdate, \'0\')', ',', 'uja.sortorder') . " AS jobstartdatelist,
-            " . $DB->sql_group_concat('COALESCE(uja.enddate, \'0\')', ',', 'uja.sortorder') . " AS jobenddatelist
+            " . $DB->sql_group_concat('COALESCE(uja.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS titlenamelist,
+            " . $DB->sql_group_concat('COALESCE(uja.startdate, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS jobstartdatelist,
+            " . $DB->sql_group_concat('COALESCE(uja.enddate, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS jobenddatelist
                FROM {user} u
           LEFT JOIN {job_assignment} uja
                  ON uja.userid = u.id
@@ -3621,13 +3621,13 @@ abstract class rb_base_source {
         $usednamefields = totara_get_all_user_name_fields_join('manager', null, true);
         $manlistsubsql = "
             (SELECT u.id AS manlistid,
-            " . $DB->sql_group_concat($DB->sql_concat_join("' '", $usednamefields), ',', 'uja.sortorder') . " AS manfullnamelist,
-            " . $DB->sql_group_concat('COALESCE(manager.firstname, \'-\')', ',', 'uja.sortorder') . " AS manfirstnamelist,
-            " . $DB->sql_group_concat('COALESCE(manager.lastname, \'-\')', ',', 'uja.sortorder') . " AS manlastnamelist,
-            " . $DB->sql_group_concat('COALESCE(manager.idnumber, \'-\')', ',', 'uja.sortorder') . " AS manidnumberlist,
-            " . $DB->sql_group_concat('COALESCE(manager.id, \'0\')', ',', 'uja.sortorder') . " AS manidlist,
-            " . $DB->sql_group_concat('COALESCE(CASE WHEN manager.maildisplay <> 1 THEN \'!private!\' ELSE manager.email END, \'-\')', ',', 'uja.sortorder') . " AS manemailobslist,
-            " . $DB->sql_group_concat('COALESCE(manager.email, \'-\')', ',', 'uja.sortorder') . " AS manemailunobslist
+            " . $DB->sql_group_concat($DB->sql_concat_join("' '", $usednamefields), $this->uniquedelimiter, 'uja.sortorder') . " AS manfullnamelist,
+            " . $DB->sql_group_concat('COALESCE(manager.firstname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manfirstnamelist,
+            " . $DB->sql_group_concat('COALESCE(manager.lastname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manlastnamelist,
+            " . $DB->sql_group_concat('COALESCE(manager.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manidnumberlist,
+            " . $DB->sql_group_concat('COALESCE(manager.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manidlist,
+            " . $DB->sql_group_concat('COALESCE(CASE WHEN manager.maildisplay <> 1 THEN \'!private!\' ELSE manager.email END, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manemailobslist,
+            " . $DB->sql_group_concat('COALESCE(manager.email, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS manemailunobslist
 
                 FROM {user} u
            LEFT JOIN {job_assignment} uja
@@ -3650,13 +3650,13 @@ abstract class rb_base_source {
         // All position fields listed by job sortorder.
         $poslistsubsql = "
             (SELECT u.id AS poslistid,
-            " . $DB->sql_group_concat('COALESCE(position.id, \'0\')', ',', 'uja.sortorder') . " AS posidlist,
-            " . $DB->sql_group_concat('COALESCE(position.idnumber, \'-\')', ',', 'uja.sortorder') . " AS posidnumberlist,
-            " . $DB->sql_group_concat('COALESCE(position.fullname, \'-\')', ',', 'uja.sortorder') . " AS posnamelist,
-            " . $DB->sql_group_concat('COALESCE(ptype.fullname, \'-\')', ',', 'uja.sortorder') . " AS ptypenamelist,
-            " . $DB->sql_group_concat('COALESCE(pframe.id, \'0\')', ',', 'uja.sortorder') . " AS pframeidlist,
-            " . $DB->sql_group_concat('COALESCE(pframe.idnumber, \'-\')', ',', 'uja.sortorder') . " AS pframeidnumberlist,
-            " . $DB->sql_group_concat('COALESCE(pframe.fullname, \'-\')', ',', 'uja.sortorder') . " AS pframenamelist
+            " . $DB->sql_group_concat('COALESCE(position.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS posidlist,
+            " . $DB->sql_group_concat('COALESCE(position.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS posidnumberlist,
+            " . $DB->sql_group_concat('COALESCE(position.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS posnamelist,
+            " . $DB->sql_group_concat('COALESCE(ptype.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS ptypenamelist,
+            " . $DB->sql_group_concat('COALESCE(pframe.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS pframeidlist,
+            " . $DB->sql_group_concat('COALESCE(pframe.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS pframeidnumberlist,
+            " . $DB->sql_group_concat('COALESCE(pframe.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS pframenamelist
                 FROM {user} u
            LEFT JOIN {job_assignment} uja
                   ON uja.userid = u.id
@@ -3680,13 +3680,13 @@ abstract class rb_base_source {
         // List of all assigned organisation names.
         $orglistsubsql = "
             (SELECT u.id AS orglistid,
-            " . $DB->sql_group_concat('COALESCE(organisation.id, \'0\')', ',', 'uja.sortorder') . " AS orgidlist,
-            " . $DB->sql_group_concat('COALESCE(organisation.idnumber, \'-\')', ',', 'uja.sortorder') . " AS orgidnumberlist,
-            " . $DB->sql_group_concat('COALESCE(organisation.fullname, \'-\')', ',', 'uja.sortorder') . " AS orgnamelist,
-            " . $DB->sql_group_concat('COALESCE(otype.fullname, \'-\')', ',', 'uja.sortorder') . " AS otypenamelist,
-            " . $DB->sql_group_concat('COALESCE(oframe.id, \'0\')', ',', 'uja.sortorder') . " AS oframeidlist,
-            " . $DB->sql_group_concat('COALESCE(oframe.idnumber, \'-\')', ',', 'uja.sortorder') . " AS oframeidnumberlist,
-            " . $DB->sql_group_concat('COALESCE(oframe.fullname, \'-\')', ',', 'uja.sortorder') . " AS oframenamelist
+            " . $DB->sql_group_concat('COALESCE(organisation.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS orgidlist,
+            " . $DB->sql_group_concat('COALESCE(organisation.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS orgidnumberlist,
+            " . $DB->sql_group_concat('COALESCE(organisation.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS orgnamelist,
+            " . $DB->sql_group_concat('COALESCE(otype.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS otypenamelist,
+            " . $DB->sql_group_concat('COALESCE(oframe.id, \'0\')', $this->uniquedelimiter, 'uja.sortorder') . " AS oframeidlist,
+            " . $DB->sql_group_concat('COALESCE(oframe.idnumber, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS oframeidnumberlist,
+            " . $DB->sql_group_concat('COALESCE(oframe.fullname, \'-\')', $this->uniquedelimiter, 'uja.sortorder') . " AS oframenamelist
                 FROM {user} u
            LEFT JOIN {job_assignment} uja
                   ON uja.userid = u.id
@@ -3711,7 +3711,7 @@ abstract class rb_base_source {
         $usednamefields = totara_get_all_user_name_fields_join('appraiser', null, true);
         $applistsubsql = "
             (SELECT u.id AS applistid,
-            " . $DB->sql_group_concat($DB->sql_concat_join("' '", $usednamefields), ',', 'uja.sortorder') . " AS appfullnamelist
+            " . $DB->sql_group_concat($DB->sql_concat_join("' '", $usednamefields), $this->uniquedelimiter, 'uja.sortorder') . " AS appfullnamelist
                 FROM {user} u
            LEFT JOIN {job_assignment} uja
                   ON uja.userid = u.id
