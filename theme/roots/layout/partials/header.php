@@ -37,7 +37,9 @@ global $OUTPUT;
 
         <div class="navbar-header pull-right">
             <?php
-                echo $OUTPUT->navbar_button();
+                if ($hastotaramenu) {
+                    echo $OUTPUT->navbar_button();
+                }
 
                 // Add profile menu (for logged in) or language menu (not logged in).
                 $haslangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );
