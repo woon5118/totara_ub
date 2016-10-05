@@ -35,6 +35,11 @@
 
 class webdav_client {
 
+    /**
+     * Regex to match the expected content type for requests and responses.
+     */
+    const EXPECTED_CONTENT_TYPE_REGEX = '#^\s*(application|text)/xml(;\s?charset=([\'"]?)utf-8\3)?\s*$#i';
+
     /**#@+
      * @access private
      * @var string
@@ -574,6 +579,20 @@ class webdav_client {
     }
 
     /**
+     * Checks if the given content type string is of the expected type.
+     *
+     * @param string $contenttype
+     * @return bool
+     */
+    protected function check_expected_contenttype($contenttype) {
+        if (preg_match(self::EXPECTED_CONTENT_TYPE_REGEX, $contenttype)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Public method lock
      *
      * Locks a file or collection.
@@ -619,7 +638,7 @@ class webdav_client {
                 switch($response['status']['status-code']) {
                 case 200:
                     // collection was successfully locked... see xml response to get lock token...
-                    if (strcmp($response['header']['Content-Type'], 'text/xml; charset="utf-8"') == 0) {
+                    if ($this->check_expected_contenttype($response['header']['Content-Type'])) {
                         // ok let's get the content of the xml stuff
                         $this->_parser = xml_parser_create_ns();
                         $this->_parserid = (int) $this->_parser;
@@ -717,7 +736,7 @@ class webdav_client {
                 case 207:
                     // collection was NOT deleted... see xml response for reason...
                     // next there should be a Content-Type: text/xml; charset="utf-8" header line
-                    if (strcmp($response['header']['Content-Type'], 'text/xml; charset="utf-8"') == 0) {
+                    if ($this->check_expected_contenttype($response['header']['Content-Type'])) {
                         // ok let's get the content of the xml stuff
                         $this->_parser = xml_parser_create_ns();
                         $this->_parserid = (int) $this->_parser;
@@ -809,7 +828,7 @@ EOD;
                 if (strcmp($response['status']['status-code'],'207') == 0 ) {
                     // ok so far
                     // next there should be a Content-Type: text/xml; charset="utf-8" header line
-                    if (preg_match('#(application|text)/xml;\s?charset=[\'\"]?utf-8[\'\"]?#i', $response['header']['Content-Type'])) {
+                    if ($this->check_expected_contenttype($response['header']['Content-Type'])) {
                         // ok let's get the content of the xml stuff
                         $this->_parser = xml_parser_create_ns('UTF-8');
                         $this->_parserid = (int) $this->_parser;
