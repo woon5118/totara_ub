@@ -87,7 +87,7 @@
                 <nav id="totaramenu" class="totara-menu-nav">
                     <ul class="totara-menu-nav-list navbar navbar-nav">
                         {{#menuitems}}
-                        <li class="totara-menu-nav-item menu-{{class_name}}{{#haschildren}} haschildren{{/haschildren}}{{#class_isfirst}} first{{/class_isfirst}}{{#class_islast}} last{{/class_islast}}{{#class_isselected}} selected{{/class_isselected}}">
+                        <li class="totara-menu-nav-item menu-{{class_name}}{{#haschildren}} haschildren{{/haschildren}}{{#class_isfirst}} first{{/class_isfirst}}{{#class_islast}} last{{/class_islast}}{{#class_isselected}} selected{{/class_isselected}}{{#class_child_isselected}} child-selected{{/class_child_isselected}}">
                             <a class="totara-menu-nav-item-link" target="{{target}}" href="{{url}}">{{{linktext}}}{{#haschildren}}<div class="totara-menu-arrow-up"></div>{{/haschildren}}</a>
                             {{#haschildren}}
                             <ul class="totara-menu-nav-list navbar navbar-nav">
@@ -109,7 +109,7 @@
                     <ul class="totara-menu-subnav-list">
                     {{#subnav}}
                         <li class="totara-menu-subnav-item{{#class_isselected}} selected{{/class_isselected}}">
-                            <a class="totara-menu-subnav-item-link" target="{{target}}" href="{{url}}">{{{linktext}}}</a>
+                            <a tabindex="-1" class="totara-menu-subnav-item-link" target="{{target}}" href="{{url}}">{{{linktext}}}</a>
                         </li>
                     {{/subnav}}
                         <div class="clearfix"></div>

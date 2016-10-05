@@ -44,6 +44,7 @@ class theme_basis_totara_core_renderer extends totara_core_renderer {
 
         $currentitem = null;
         $itemindex = -1;
+        $childselected = false;
 
         foreach (array_values($contextdata->menuitems) as $i => $navitem) {
 
@@ -62,6 +63,7 @@ class theme_basis_totara_core_renderer extends totara_core_renderer {
                 if ($childitem['class_isselected']) {
                     $currentitem = $navitem;
                     $itemindex = $i;
+                    $childselected = true;
                 }
             }
         }
@@ -69,6 +71,10 @@ class theme_basis_totara_core_renderer extends totara_core_renderer {
         if ($currentitem !== null) {
             // the .selected class is not consistently added so normalize TL-10596
             $contextdata->menuitems[$itemindex]['class_isselected'] = true;
+            // Add a class so we know it is the child item which is active.
+            if ($childselected) {
+                $contextdata->menuitems[$itemindex]['class_child_isselected'] = true;
+            }
         }
 
         return $currentitem;

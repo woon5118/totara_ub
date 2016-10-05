@@ -130,7 +130,7 @@
 @media (min-width: @grid-float-breakpoint) {
 
     .totara-menu-nav-item {
-        &.selected .totara-menu-arrow-up,
+        &.child-selected .totara-menu-arrow-up,
         &:hover .totara-menu-arrow-up {
             display: block;
         }
@@ -195,12 +195,20 @@
                         > .totara-menu-nav-item-link {
                             box-shadow: inset 0 -@basis-border-thick @brand-primary;
                         }
-                        &.haschildren > .totara-menu-nav-item-link {
-                            box-shadow: none;
-                        }
                         .totara-menu-nav-list {
                             display: none;
                         }
+                    }
+                    &.child-selected {
+                        > .totara-menu-nav-item-link {
+                            box-shadow: none;
+                        }
+                        &:hover .totara-menu-nav-list {
+                            display: none;
+                        }
+                    }
+                    &:hover .totara-menu-nav-list {
+                        display: block;
                     }
                 }
             }
