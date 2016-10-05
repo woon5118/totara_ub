@@ -82,7 +82,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
         $joinlist = array(
             new rb_join(
                 'prog', // table alias
-                'LEFT', // type of join
+                'INNER', // type of join
                 '{prog}',
                 '(base.programid = prog.id AND prog.certifid IS NULL)', // how it is joined
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
