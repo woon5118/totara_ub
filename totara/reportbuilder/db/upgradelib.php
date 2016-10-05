@@ -152,7 +152,15 @@ function totara_reportbuilder_migrate_saved_search_filters($values, $oldtype, $n
 
     // Loop through them all and json_decode
     foreach ($savedsearches as $saved) {
+        if (empty($saved)) {
+            continue;
+        }
+
         $search = unserialize($saved->search);
+
+        if (!is_array($search)) {
+            continue;
+        }
 
         // Check for any filters that will need to be updated.
         foreach ($search as $key => $info) {
