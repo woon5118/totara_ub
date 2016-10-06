@@ -131,6 +131,26 @@ a.dimmed_text:visited,
 .dimmed_category a {
     .muted
 }
+
+// Actionable icons should retain link colour
+// even if they are inside muted text.
+a.dimmed,
+.dimmed_text a {
+    &:link,
+    &:visited {
+        .ft {
+            color: @linkColor;
+        }
+    }
+    &:hover,
+    &:active,
+    &:focus {
+        .ft {
+            color: @linkColorHover;
+        }
+    }
+}
+
 .activity.label .dimmed_text {
     .opacity(50)
 }

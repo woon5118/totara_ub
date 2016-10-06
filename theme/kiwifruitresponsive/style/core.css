@@ -1922,3 +1922,23 @@ div.totara-dialog td.select #search-tab #fgroup_id_searchgroup {
 .page-context-header h2 {
     margin-left: 110px;
 }
+
+/* Actionable icons should retain link colour
+   even if they are inside muted text. */
+a.dimmed .ft,
+a:link.dimmed .ft,
+a:visited.dimmed .ft,
+.dimmed_text a .ft,
+.dimmed_text a:link .ft,
+.dimmed_text a:visited .ft {
+    color: #00ACA8;
+}
+
+a:hover.dimmed .ft,
+a:active.dimmed .ft,
+a:focus.dimmed .ft,
+.dimmed_text a:hover .ft,
+.dimmed_text a:active .ft,
+.dimmed_text a:focus .ft {
+    color: #00ACA8;
+}
