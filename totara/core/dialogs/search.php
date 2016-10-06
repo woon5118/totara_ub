@@ -670,7 +670,7 @@ if (strlen($query)) {
     $strqueryerror = get_string('queryerror', 'totara_core');
     $start = $page * DIALOG_SEARCH_NUM_PER_PAGE;
 
-    $select = "SELECT {$search_info->id} AS id ";
+    $select = "SELECT DISTINCT {$search_info->id} AS id ";
     if (isset($search_info->fullnamefields)) {
         $select .= ", {$search_info->fullnamefields} ";
     } else if (isset($search_info->fullname)) {
@@ -679,7 +679,7 @@ if (strlen($query)) {
     if (isset($search_info->email)) {
         $select .= ", {$search_info->email} AS email ";
     }
-    $count  = "SELECT COUNT({$search_info->id}) ";
+    $count  = "SELECT COUNT(DISTINCT {$search_info->id}) ";
 
     $total = $DB->count_records_sql($count.$search_info->sql, $search_info->params);
     if ($total) {
