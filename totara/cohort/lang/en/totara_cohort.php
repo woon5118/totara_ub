@@ -126,6 +126,8 @@ $string['cohortalertoptions_help'] = '
 When multiple options are selected the user can choose their preferred options from the alert dropdown menu.
 
 When no options are selected, the alert function is disabled.';
+$string['cohortapplyinbackground'] = 'Apply dynamic audience membership changes in background';
+$string['cohortapplyinbackground_help'] = 'Dynamic audience membership needs to be updated after audience rule changes are approved, which can take some time to complete. When checked, updates will be scheduled to occur as a background task. If unchecked, updates will occur immediately which will require the user who is approving the changes to wait for the update to complete.';
 $string['cohortbrokenrule'] = '{$a->type} - {$a->name} => This rule is broken';
 $string['cohortbrokenrulesmessage'] = 'Some broken rules have been found.
 While there are broken rules the audience membership will not be updated.
@@ -164,6 +166,8 @@ $string['cohortoperatorlabel_help'] = 'This setting determines how the audience 
 Note that each ruleset has its own, separate, logical operator to indicate the relationship between the rules within that ruleset.';
 $string['cohortoperatororlabel'] = 'OR (members are in any rule set)';
 $string['cohortruleschanged'] = 'Audience rules changed';
+$string['cohortruleschangednote'] = 'Audience membership will be updated immediately after approval, this may take a while.';
+$string['cohortruleschangedadhocnote'] = 'Audience membership update will be scheduled for later.';
 $string['cohorts'] = 'Audiences';
 $string['cohortsaddenrolled'] = 'Add enrolled audiences';
 $string['cohortsaddvisible'] = 'Add visible audiences';
@@ -496,6 +500,7 @@ $string['rulename-user-username'] = 'Username';
 $string['ruleneedsnoconfiguration'] = 'This rule needs no configuration.';
 $string['rules'] = 'Rules';
 $string['rulesapprovesuccess'] = 'Rule changes approved';
+$string['rulesapproveadhocsuccess'] = 'Rule changes approved, the audience membership is scheduled to be updated later';
 $string['rulescancelsuccess'] = 'Rule changes cancelled';
 $string['rulesetname'] = 'Ruleset #{$a}';
 $string['rulesetoperatorlabel'] = 'Membership setting between each rule in this rule set';

@@ -22,58 +22,7 @@
  * @subpackage cohort
  */
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once($CFG->libdir . '/adminlib.php');
-require_once($CFG->dirroot . '/totara/cohort/lib.php');
-require_once($CFG->dirroot . '/totara/cohort/cohort_forms.php');
 
-admin_externalpage_setup('cohortglobalsettings');
+debugging('/totara/cohort/globalsettings.php was deprecated, use admin block to access new audience settings page', DEBUG_DEVELOPER);
 
-$returnurl = $CFG->wwwroot . "/totara/cohort/globalsettings.php";
-
-// form definition
-$mform = new cohort_global_settings_form();
-
-// form results check
-if ($mform->is_cancelled()) {
-    redirect($returnurl);
-}
-if ($fromform = $mform->get_data()) {
-
-    if (empty($fromform->submitbutton)) {
-        totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_cohort'), $returnurl);
-    }
-
-    update_global_settings($fromform);
-
-    totara_set_notification(get_string('globalsettingsupdated', 'totara_cohort'), $returnurl, array('class' => 'notifysuccess'));
-}
-
-echo $OUTPUT->header();
-
-echo $OUTPUT->heading(get_string('cohortglobalsettings', 'totara_cohort'));
-
-// display the form
-$mform->display();
-
-echo $OUTPUT->footer();
-
-/**
- * Update global report builder settings
- *
- * @param object $fromform Moodle form object containing global setting changes to apply
- *
- * @return True if settings could be successfully updated
- */
-function update_global_settings($fromform) {
-    global $COHORT_ALERT;
-
-    $alertoptions = array();
-    foreach ($COHORT_ALERT as $code => $option) {
-        $checkboxname = 'alert' . $code;
-        if (isset($fromform->$checkboxname) && $fromform->$checkboxname == 1) {
-            $alertoptions[] = $code;
-        }
-    }
-    set_config('alertoptions', implode(',', $alertoptions), 'cohort');
-    return true;
-}
+redirect(new moodle_url('/admin/settings.php', array('section' => 'cohortglobalsettings')));

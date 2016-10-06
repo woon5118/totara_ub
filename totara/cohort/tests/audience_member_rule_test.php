@@ -139,4 +139,51 @@ class totara_cohort_audience_member_rule_testcase extends advanced_testcase {
         $this->assertEquals($usercount, count($members));
         $this->assertEmpty(array_diff_key(array_flip($members), $membersincohort));
     }
+
+    /**
+     * Test audience member rule with separate job sync.
+     *
+     * @dataProvider member_rule_params
+     */
+    public function test_audience_member_sync_job($incohortparam, $cohortidsparam, $usercount, $membersmatched) {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $cohort3 = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
+        $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $cohort3->id)));
+
+        // Create ruleset 1.
+        $ruleset = cohort_rule_create_ruleset($cohort3->draftcollectionid);
+
+        // Process cohortidsparam.
+        $cohortids = array();
+        foreach ($cohortidsparam as $cohort) {
+            $cohortids[] = $this->{$cohort}->id;
+        }
+
+        // Process members in cohort.
+        $membersincohort = array();
+        foreach ($membersmatched as $member) {
+            $membersincohort = $membersincohort + $this->{$member};
+        }
+
+        // Create rule1.
+        $this->cohort_generator->create_cohort_rule_params($ruleset, 'cohort', 'cohortmember', $incohortparam, $cohortids, 'cohortids');
+        cohort_rules_approve_changes($cohort3, false);
+
+        // No members yet expected.
+        $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($cohort3->id));
+        $this->assertEquals(0, count($members));
+
+        // Run the scheduled job.
+        \totara_cohort\task\sync_dynamic_cohort_task::sync_cohort($cohort3, null);
+
+        // It should match $usercount users.
+        $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($cohort3->id));
+        $this->assertEquals($usercount, count($members));
+        $this->assertEmpty(array_diff_key(array_flip($members), $membersincohort));
+
+        $this->assertEmpty(get_config('totara_cohort', 'lasthourlycron'));
+    }
 }

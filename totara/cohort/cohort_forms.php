@@ -135,38 +135,6 @@ class cohort_rules_form extends moodleform {
 }
 
 /**
- * Formslib template for the global settings form
- */
-class cohort_global_settings_form extends moodleform {
-    function definition() {
-        global $COHORT_ALERT;
-        $mform =& $this->_form;
-
-        $mform->addElement('header', 'settings', get_string('globalsettings', 'totara_cohort'));
-
-        $alertoptions = get_config('cohort', 'alertoptions');
-        $alertoptions = $alertoptions !== '' ? explode(',', $alertoptions) : array();
-
-        $group = array();
-        foreach ($COHORT_ALERT as $code => $option) {
-            $group[] =& $mform->createElement('checkbox', 'alert' . $code, '', $option);
-            if (in_array($code, $alertoptions)) {
-                $mform->setDefault('alert' . $code, 1);
-            } else {
-                $mform->setDefault('alert' . $code, 0);
-            }
-        }
-        $mform->addGroup($group, 'alertoptions', get_string('cohortalertoptions', 'totara_cohort'),
-            html_writer::empty_tag('br'), false);
-        $mform->addHelpButton('alertoptions', 'cohortalertoptions', 'totara_cohort');
-
-        $this->add_action_buttons();
-    }
-
-}
-
-
-/**
  * Formslib template for cohort learning plan settings from
  */
 class cohort_learning_plan_settings_form extends moodleform {

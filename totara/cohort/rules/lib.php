@@ -316,7 +316,14 @@ function cohort_collection_get_rulesetoperator($cohortid, $collectionstatus='dra
     return $DB->get_field_sql($sql, array($cohortid));
 }
 
-function cohort_rules_approve_changes($cohort) {
+/**
+ * Approve dynamic cohort rules and optionally sync the membership.
+ *
+ * @param stdClass $cohort
+ * @param bool $syncmembers
+ * @return bool success, always true
+ */
+function cohort_rules_approve_changes($cohort, $syncmembers = true) {
     global $DB, $USER;
 
     $now = time();
@@ -358,7 +365,9 @@ function cohort_rules_approve_changes($cohort) {
     // Trigger draft saved event.
     \totara_cohort\event\draftcollection_saved::create_from_instance($cohort)->trigger();
 
-    totara_cohort_update_dynamic_cohort_members($cohort->id, 0, true);
+    if ($syncmembers) {
+        totara_cohort_update_dynamic_cohort_members($cohort->id, 0, true);
+    }
 
     return true;
 }

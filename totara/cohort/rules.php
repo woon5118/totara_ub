@@ -34,6 +34,7 @@ require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 $id = required_param('id', PARAM_INT);
 $debug = optional_param('debug', false, PARAM_BOOL);
+$approved = optional_param('approved', false, PARAM_BOOL);
 
 $url = new moodle_url('/totara/cohort/rules.php', array('id' => $id));
 if ($debug) {
@@ -97,6 +98,10 @@ if (!$cohort->cohorttype == cohort::TYPE_DYNAMIC) {
     print_error('error:notdynamiccohort', 'totara_cohort');
 }
 
+if ($approved and confirm_sesskey()) {
+    totara_set_notification(get_string('rulesapprovesuccess', 'totara_cohort'), $url->out(), array('class' => 'notifysuccess'));
+}
+
 $rulesets = $DB->get_records('cohort_rulesets', array('rulecollectionid' => $cohort->draftcollectionid), 'sortorder');
 $collections = $DB->get_record('cohort_rule_collections', array('id' => $cohort->draftcollectionid));
 
@@ -128,19 +133,27 @@ if (($data = data_submitted()) && confirm_sesskey()) {
     if ($canapproverules && !empty($data->approverulechanges)) {
         // This may take a long time, we do want to finish this even if user goes to different page.
         ignore_user_abort(true);
-        core_php_time_limit::raise(60 * 30);
-        \core\session\manager::write_close();
 
-        if (!cohort_rules_approve_changes($cohort)) {
+        if (!cohort_rules_approve_changes($cohort, false)) {
             print_error('error:couldnotapprovechanges', 'totara_cohort');
         }
 
-        // The changes in cohort enrolments are not triggered automatically via events, let's hardcode it here for now.
-        require_once("$CFG->dirroot/enrol/cohort/locallib.php");
-        enrol_cohort_sync(new null_progress_trace(), null, $cohort->id);
+        if (get_config('cohort', 'applyinbackground')) {
+            // Do not wait for the membership updates, let cron do the thing asap.
+            $adhoctask = new \totara_cohort\task\sync_dynamic_cohort_task();
+            $adhoctask->set_custom_data($cohort->id);
+            $adhoctask->set_component('totara_cohort');
+            \core\task\manager::queue_adhoc_task($adhoctask);
 
-        // Set notification.
-        totara_set_notification(get_string('rulesapprovesuccess', 'totara_cohort'), $url->out(), array('class' => 'notifysuccess'));
+            // Redirect and notify.
+            totara_set_notification(get_string('rulesapproveadhocsuccess', 'totara_cohort'), $url->out(), array('class' => 'notifysuccess'));
+
+        } else {
+            \core\session\manager::write_close();
+            \totara_cohort\task\sync_dynamic_cohort_task::sync_cohort($cohort, null);
+            // NOTE: totara_set_notification() does not work after session is closed!
+            redirect(new moodle_url($url, array('approved' => 1, 'sesskey' => sesskey())));
+        }
     }
     if ($canapproverules && isset($data->cancelrulechanges)) {
         if (!cohort_rules_cancel_changes($cohort)) {
@@ -243,6 +256,7 @@ print '</div>';
 echo $OUTPUT->footer();
 
 function display_approval_action_box($cohortid, $debug=false, $style='display:block') {
+    global $CFG;
     $attrs = array('class' => 'alert alert-warning notifynotice clearfix', 'role' => 'alert', 'id' => 'cohort_rules_action_box', 'style' => $style);
     echo html_writer::start_tag('div', $attrs);
     $attrs = array('action' => new moodle_url("/totara/cohort/rules.php"), 'method' => 'POST', 'class' => 'approvalform');
@@ -252,14 +266,23 @@ function display_approval_action_box($cohortid, $debug=false, $style='display:bl
     if ($debug) {
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'debug', 'value' => 1));
     }
-    echo html_writer::start_tag('span');
+    echo html_writer::start_tag('p');
 
     echo get_string('cohortruleschanged', 'totara_cohort');
     $attrs = array('type' => 'submit', 'name' => 'approverulechanges', 'value' => get_string('approvechanges', 'totara_cohort'));
     echo html_writer::empty_tag('input', $attrs);
     $attrs = array('type' => 'submit', 'name' => 'cancelrulechanges', 'value' => get_string('cancelchanges', 'totara_cohort'));
     echo html_writer::empty_tag('input', $attrs);
-    echo html_writer::end_tag('span');
+    echo html_writer::end_tag('p');
+    if (get_config('cohort', 'applyinbackground')) {
+        echo html_writer::start_tag('p');
+        echo get_string('cohortruleschangedadhocnote', 'totara_cohort');
+        echo html_writer::end_tag('p');
+    } else {
+        echo html_writer::start_tag('p');
+        echo get_string('cohortruleschangednote', 'totara_cohort');
+        echo html_writer::end_tag('p');
+    }
     echo html_writer::end_tag('form');
     echo html_writer::end_tag('div'); // cohort_rules_action_box
 }
