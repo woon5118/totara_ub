@@ -32,7 +32,7 @@
 
 
 $string['pluginname'] = 'Check User Timezones';
-$string['infomessage'] = 'This tool checks the timezones specified in the profiles of your users. In order for timezones to work correctly a location-based timezone should be specified, e.g. America/New_York, Europe/London, Asia/Singapore. Some timezone abbreviations (e.g. CET, EST) and UTC offsets (e.g +/-4.5) will not calculate Daylight Savings changes correctly.<br><br>This tool will allow you to change unsuported timezones to an approved format.';
+$string['infomessage'] = 'This tool checks the timezones specified in the profiles of your users. In order for timezones to work correctly a location-based timezone should be specified, e.g. America/New_York, Europe/London, Asia/Singapore. Some timezone abbreviations (e.g. CET, EST) and UTC offsets (e.g +/-4.5) will not calculate Daylight Savings changes correctly.<br><br>This tool will allow you to change unsupported timezones to an approved format.';
 $string['badusertimezonemessage'] = 'Some users have timezones specified in their profiles which are no longer supported. Timezones should be set to a location-based string, e.g. America/New_York, Europe/London, Asia/Singapore. Use the Check User Timezones tool found in Site Administration -> Location to fix timezones for all users.';
 $string['nobadusertimezones'] = 'All user profile timezones are correct';
 $string['numbadusertimezones'] = 'Timezones need to be adjusted for {$a} users';
