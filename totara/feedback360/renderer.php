@@ -314,7 +314,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
         }
 
         $out = html_writer::tag('div', '', array('class' => "empty", 'id' => 'feedbackhead-anchor'));
-        $out .= html_writer::tag('div', $save.html_writer::table($t), array('class' => "plan_box notifymessage",
+        $out .= html_writer::tag('div', $save.html_writer::table($t), array('class' => "plan_box notifymessage alert alert-info",
             'id' => 'feedbackhead'));
 
         return $out;
