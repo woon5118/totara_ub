@@ -4191,6 +4191,7 @@ function facetoface_get_customfield_data($item, $tableprefix, $prefix, $options 
         $newfield = 'customfield_'.$field->datatype;
         $formfield = new $newfield($field->id, $item, $prefix, $tableprefix);
         if (!$formfield->is_hidden() and !$formfield->is_empty()) {
+            $options['itemid'] = $field->id;
             $output[s($formfield->field->fullname)] = $formfield::display_item_data($formfield->data, $options);
         }
     }
