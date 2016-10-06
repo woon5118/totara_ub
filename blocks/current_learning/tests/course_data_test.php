@@ -100,7 +100,7 @@ class block_current_learning_course_data_testcase extends block_current_learning
     }
 
     public function test_course_gradedrolesonly() {
-        global $CFG;
+        global $CFG, $DB;
 
         // First, check the course is included as it should be.
         $this->generator->enrol_user($this->user1->id, $this->course1->id);
@@ -114,6 +114,18 @@ class block_current_learning_course_data_testcase extends block_current_learning
         $this->generator->enrol_user($this->user1->id, $this->course1->id);
         $learning_data = $this->get_learning_data($this->user1->id);
         $this->assertNotTrue($this->course_in_learning_data($this->course1->id, $learning_data));
+
+        $CFG->gradebookroles = '5'; // Set graded roles to be only the Learner.
+
+        // Ensure that if a user is enrolled in a non-graded role they do no see the course.
+        $this->generator->enrol_user($this->user2->id, $this->course1->id, 3); // Enrol as Editing Trainer.
+        $learning_data = $this->get_learning_data($this->user2->id);
+        $this->assertNotTrue($this->course_in_learning_data($this->course1->id, $learning_data));
+
+        // Ensure the course shows for a user who is in a graded role.
+        $this->generator->enrol_user($this->user3->id, $this->course1->id, 5); // Enrol as Editing Trainer.
+        $learning_data = $this->get_learning_data($this->user3->id);
+        $this->assertTrue($this->course_in_learning_data($this->course1->id, $learning_data));
     }
 
     public function test_completed_courses() {

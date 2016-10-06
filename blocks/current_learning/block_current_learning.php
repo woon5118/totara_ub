@@ -270,16 +270,17 @@ class block_current_learning extends block_base {
             $gradebookroles = explode(",", $CFG->gradebookroles);
             $userscourses = enrol_get_all_users_courses($this->userid, true);
             if (!empty($userscourses)) {
-                list($gradebookrolessql, $gradebookrolesparams) = $DB->get_in_or_equal($gradebookroles, SQL_PARAMS_NAMED);
-                list($coursesql, $courseparams) = $DB->get_in_or_equal(array_keys($userscourses), SQL_PARAMS_NAMED);
-                $sql = "SELECT e.courseid, COUNT(e.id) AS gradeablecount
-                      FROM {enrol} e
-                      JOIN {user_enrolments} ue ON ue.enrolid = e.id
-                     WHERE e.courseid {$coursesql}
-                       AND ue.userid = :userid
-                       AND e.roleid {$gradebookrolessql}
-                  GROUP BY e.courseid";
-                $params = array_merge($gradebookrolesparams, $courseparams, ['userid' => $this->userid]);
+                list($gradebookrolesinsql, $gradebookrolesinparams) = $DB->get_in_or_equal($gradebookroles, SQL_PARAMS_NAMED);
+                list($courseinsql, $courseinparams) = $DB->get_in_or_equal(array_keys($userscourses), SQL_PARAMS_NAMED);
+                $sql = "SELECT c.instanceid AS courseid, COUNT(ra.id) AS gradeablecount
+                        FROM {role_assignments} ra
+                        JOIN {context} c ON c.id = ra.contextid
+                        WHERE c.instanceid {$courseinsql}
+                        AND c.contextlevel = :coursecontext
+                        AND ra.roleid {$gradebookrolesinsql}
+                        AND ra.userid = :userid
+                    GROUP BY c.instanceid";
+                $params = array_merge($gradebookrolesinparams, $courseinparams, ['userid' => $this->userid, 'coursecontext' => CONTEXT_COURSE]);
                 $counts = $DB->get_records_sql_menu($sql, $params);
             }
         }
