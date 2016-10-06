@@ -4050,8 +4050,8 @@ class reportbuilder {
      */
     function check_sort_keys() {
         global $SESSION;
-        $sortarray = isset($SESSION->flextable[$this->get_uniqueid('rb')]->sortby) ?
-                $SESSION->flextable[$this->get_uniqueid('rb')]->sortby : null;
+        $sortarray = isset($SESSION->flextable[$this->get_uniqueid('rb')]['sortby']) ?
+                $SESSION->flextable[$this->get_uniqueid('rb')]['sortby'] : null;
         if (is_array($sortarray)) {
             foreach ($sortarray as $sortelement => $unused) {
                 // see if sort element is in columns array
@@ -4063,7 +4063,7 @@ class reportbuilder {
                 }
                 // if it's not remove it from sort SESSION var
                 if ($set === false) {
-                    unset($SESSION->flextable[$this->get_uniqueid('rb')]->sortby[$sortelement]);
+                    unset($SESSION->flextable[$this->get_uniqueid('rb')]['sortby'][$sortelement]);
                 }
             }
         }

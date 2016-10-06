@@ -1037,12 +1037,12 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     function test_reportbuilder_check_sort_keys() {
         global $SESSION;
         // set a bad sortorder key
-        $SESSION->flextable[$this->rb->get_uniqueid('rb')]->sortby['bad_key'] = 4;
-        $before = count($SESSION->flextable[$this->rb->get_uniqueid('rb')]->sortby);
+        $SESSION->flextable[$this->rb->get_uniqueid('rb')]['sortby']['bad_key'] = 4;
+        $before = count($SESSION->flextable[$this->rb->get_uniqueid('rb')]['sortby']);
         $rb = $this->rb;
         // run the function
         $rb->check_sort_keys();
-        $after = count($SESSION->flextable[$this->rb->get_uniqueid('rb')]->sortby);
+        $after = count($SESSION->flextable[$this->rb->get_uniqueid('rb')]['sortby']);
         // the bad sort key should have been deleted
         $this->assertEquals(1, $before - $after);
 
