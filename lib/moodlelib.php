@@ -3640,7 +3640,8 @@ function order_in_string($values, $stringformat) {
 /**
  * Checks if current user is shown any extra fields when listing users.
  *
- * @param object $context Context
+ * @param content|true $context Context. If set to true then the capability check is ignored and all user identity fields will be included.
+ *      This is useful in situations where you are fetching the fields from the database, and intend to check the capability later.
  * @param array $already Array of fields that we're going to show anyway
  *   so don't bother listing them
  * @return array Array of field names from user table, not including anything
@@ -3650,8 +3651,13 @@ function get_extra_user_fields($context, $already = array()) {
     global $CFG;
 
     // Only users with permission get the extra fields.
-    if (!has_capability('moodle/site:viewuseridentity', $context)) {
-        return array();
+    if ($context !== true) {
+        if (!$context instanceof context) {
+            throw new coding_exception('get_extra_user_fields $context must be either a context or (bool)true');
+        }
+        if (!has_capability('moodle/site:viewuseridentity', $context)) {
+            return array();
+        }
     }
 
     // Split showuseridentity on comma.

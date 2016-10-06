@@ -1205,6 +1205,19 @@ class core_moodlelib_testcase extends advanced_testcase {
         // Two fields.
         $CFG->showuseridentity = 'frog,zombie';
         $this->assertEquals(array('zombie'), get_extra_user_fields($context, array('frog')));
+
+        // Test if we pass true as a context that we get back all configured fields.
+        $this->assertEquals(array('frog', 'zombie'), get_extra_user_fields(true));
+        $this->assertEquals(array('zombie'), get_extra_user_fields(true, array('frog')));
+        $this->assertEquals(array(), get_extra_user_fields(true, array('frog', 'zombie')));
+
+        // Check we can't provide false as context.
+        $this->setExpectedException('coding_exception');
+        get_extra_user_fields(false);
+
+        // Check we can't provide null as context.
+        $this->setExpectedException('coding_exception');
+        get_extra_user_fields(null);
     }
 
     public function test_get_extra_user_fields_sql() {
@@ -1240,6 +1253,19 @@ class core_moodlelib_testcase extends advanced_testcase {
         $CFG->showuseridentity = 'frog,zombie';
         $this->assertEquals(', u1.zombie AS u_zombie',
             get_extra_user_fields_sql($context, 'u1', 'u_', array('frog')));
+
+        // Test if we pass true as a context that we get back all configured fields.
+        $this->assertEquals(', u1.frog, u1.zombie', get_extra_user_fields_sql(true, 'u1'));
+        $this->assertEquals(', u1.zombie', get_extra_user_fields_sql(true, 'u1', '', array('frog')));
+        $this->assertEquals('', get_extra_user_fields_sql(true, 'u1', '', array('frog', 'zombie')));
+
+        // Check we can't provide false as context.
+        $this->setExpectedException('coding_exception');
+        get_extra_user_fields_sql(false, 'u1');
+
+        // Check we can't provide null as context.
+        $this->setExpectedException('coding_exception');
+        get_extra_user_fields_sql(null, 'u1');
     }
 
     /**

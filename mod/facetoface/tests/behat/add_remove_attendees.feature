@@ -7,11 +7,11 @@ Feature: Add - Remove seminar attendees
   Background:
     Given I am on a totara site
     And the following "users" exist:
-      | username | firstname | lastname | email                |
-      | student1 | Sam1      | Student1 | student1@example.com |
-      | student2 | Sam2      | Student2 | student2@example.com |
-      | student3 | Sam3      | Student3 | student3@example.com |
-      | teacher1 | Terry1    | Teacher1 | teacher1@example.com |
+      | username | firstname | lastname | idnumber | email                |
+      | student1 | Sam1      | Student1 | sid#1    | student1@example.com |
+      | student2 | Sam2      | Student2 | sid#2    | student2@example.com |
+      | student3 | Sam3      | Student3 | sid#3    | student3@example.com |
+      | teacher1 | Terry1    | Teacher1 | tid#1    | teacher1@example.com |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
@@ -361,3 +361,133 @@ Feature: Add - Remove seminar attendees
     When I press "Confirm"
     Then I should see "job1" in the "Sam1 Student1" "table_row"
     And I should see "job2" in the "Sam2 Student2" "table_row"
+
+  Scenario: User identity information is shown to editing trainer when adding and removing attendees
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | Show user identity | ID number |
+    And I log out
+    And I log in as "teacher1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "Test seminar name"
+    And I follow "Add a new event"
+    And I click on "Edit date" "link"
+    And I set the following fields to these values:
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity           | 1    |
+    And I press "Save changes"
+
+    When I click on "Attendees" "link"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the following fields to these values:
+      | searchtext | Sam |
+    And I press "Search"
+    And I click on "Sam1 Student1, sid#1, student1@example.com" "option"
+    And I press "Add"
+    And I wait "1" seconds
+    And I press "Continue"
+    And I should see "Sam1 Student1"
+    And I should see "student1@example.com"
+    And I should see "sid#1"
+    And I press "Confirm"
+    Then I should see "Sam1 Student1"
+
+    # View existing attendees in "Users to add" select box
+    When I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    Then I should see "Sam1 Student1, sid#1, student1@example.com"
+
+    When I press "Continue"
+    Then I should see "Please select users before continuing."
+
+    When I press "Cancel"
+    And I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the following fields to these values:
+      | searchtext | Sam |
+    And I press "Search"
+    And I click on "Sam1 Student1, sid#1, student1@example.com" "option"
+    And I press "Add"
+    And I wait "1" seconds
+    And I press "Continue"
+    And I should see "Sam1 Student1"
+    And I should see "student1@example.com"
+    And I should see "sid#1"
+    And I press "Confirm"
+    Then I should not see "Sam1 Student1"
+
+  Scenario: User identity information is not shown to editing trainer when the capability is prohibited
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | Show user identity | ID number |
+    And I set the following system permissions of "Editing Trainer" role:
+      | moodle/site:viewuseridentity | Prohibit |
+    And I log out
+    And I log in as "teacher1"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I follow "Test seminar name"
+    And I follow "Add a new event"
+    And I click on "Edit date" "link"
+    And I set the following fields to these values:
+      | timestart[day]     | 1    |
+      | timestart[month]   | 1    |
+      | timestart[year]    | 2020 |
+      | timestart[hour]    | 11   |
+      | timestart[minute]  | 00   |
+      | timefinish[day]    | 1    |
+      | timefinish[month]  | 1    |
+      | timefinish[year]   | 2020 |
+      | timefinish[hour]   | 12   |
+      | timefinish[minute] | 00   |
+    And I press "OK"
+    And I set the following fields to these values:
+      | capacity           | 1    |
+    And I press "Save changes"
+
+    When I click on "Attendees" "link"
+    And I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the following fields to these values:
+      | searchtext | Sam |
+    And I press "Search"
+    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I press "Add"
+    And I wait "1" seconds
+    And I press "Continue"
+    And I should see "Sam1 Student1"
+    And I should see "student1@example.com"
+    And I should see "sid#1"
+    And I press "Confirm"
+    Then I should see "Sam1 Student1"
+
+  # View existing attendees in "Users to add" select box
+    When I click on "Add users" "option" in the "#menuf2f-actions" "css_element"
+    Then I should see "Sam1 Student1, student1@example.com"
+
+    When I press "Continue"
+    Then I should see "Please select users before continuing."
+
+    When I press "Cancel"
+    And I click on "Remove users" "option" in the "#menuf2f-actions" "css_element"
+    And I set the following fields to these values:
+      | searchtext | Sam |
+    And I press "Search"
+    And I click on "Sam1 Student1, student1@example.com" "option"
+    And I press "Add"
+    And I wait "1" seconds
+    And I press "Continue"
+    And I should see "Sam1 Student1"
+    And I should see "student1@example.com"
+    And I should see "sid#1"
+    And I press "Confirm"
+    Then I should not see "Sam1 Student1"

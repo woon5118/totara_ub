@@ -1632,7 +1632,8 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
                      LEFT JOIN';
     }
 
-    $usernamefields = get_all_user_name_fields(true, 'u');
+    // Get all name fields, and user identity fields.
+    $usernamefields = get_all_user_name_fields(true, 'u').get_extra_user_fields_sql(true, 'u', '', get_all_user_name_fields());
 
     $sql = "
         SELECT
@@ -6762,4 +6763,41 @@ function facetoface_validate_user_import($user, $context, $facetoface, $session,
 
     // No errors, so just return an empty array.
     return array();
+}
+
+/**
+ * Returns a users name for selection in a seminar.
+ *
+ * This function allows for viewing user identity information as configured for the site.
+ *
+ * Taken from \user_selector_base::output_user
+ * At some point this needs to be converted to a proper user selector.
+ *
+ * @param stdClass $user
+ * @param array|null $extrafields Extra fields to display next to the users name, if null the user identity fields are used.
+ * @param bool $fullnameoverride Passed through to the fullname function as the override arg.
+ * @return string
+ */
+function facetoface_output_user_for_selection(stdClass $user, array $extrafields = null, $fullnameoverride = false) {
+    global $CFG, $PAGE;
+
+    $out = fullname($user, $fullnameoverride);
+    if ($extrafields === null) {
+        $extrafields = [];
+        if (!empty($CFG->showuseridentity) && has_capability('moodle/site:viewuseridentity', $PAGE->context)) {
+            $extrafields = explode(',', $CFG->showuseridentity);
+        }
+    }
+    if ($extrafields) {
+        $displayfields = array();
+        foreach ($extrafields as $field) {
+            if (!empty($user->{$field})) {
+                $displayfields[] = $user->{$field};
+            }
+        }
+        // This little bit of hardcoding is pretty bad, but its consistent with how Seminar was working and as this
+        // change was made right before release we wanted to keep it consistent.
+        $out .= ', ' . implode(', ', $displayfields);
+    }
+    return $out;
 }

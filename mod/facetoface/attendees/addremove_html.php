@@ -1,9 +1,43 @@
 <?php
+/*
+ * This file is part of Totara LMS
+ *
+ * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package mod_facetoface
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ */
+
 defined('MOODLE_INTERNAL') || die();
+
+// Must be declared global as this file is included from other files.
+global $CFG, $PAGE;
 
 $strsearch = get_string('search');
 $strshowall = get_string('showall', 'moodle', '');
 $strsearchresults = get_string('searchresults');
+
+// For backwards compatibility email is always shown here.
+// Otherwise those users without viewuseridentity would suddenly lose this information.
+// In 9.0 this is fixed, and only users with viewuseridentity will see the users email address.
+$extrafields = ['email'];
+if (!empty($CFG->showuseridentity) && has_capability('moodle/site:viewuseridentity', $PAGE->context)) {
+    $extrafields = explode(',', $CFG->showuseridentity);
+}
+
 ?>
 <form id="assignform" method="post" action="<?php echo $PAGE->url; ?>">
 <div>
@@ -22,20 +56,19 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
             if (!empty($attendees) && $action === 'add') {
                 foreach ($attendees as $attendee) {
                     if (!array_key_exists($attendee->id, $userstoadd)) {
-                        $fullname = fullname($attendee, true);
-                        echo "<option disabled value=\"$attendee->id\">".$fullname.", ".$attendee->email."</option>\n";
+                        echo "<option disabled value=\"$attendee->id\">".facetoface_output_user_for_selection($attendee, $extrafields, true)."</option>\n";
                     }
                 }
             }
             if (!empty($userstoadd)) {
                 foreach ($userstoadd as $newuser) {
-                    $fullname = fullname($newuser, true);
+                    $fullname = facetoface_output_user_for_selection($newuser, $extrafields, true);
 
                     if ($session->cntdates && ($newuser->statuscode > MDL_F2F_STATUS_BOOKED)) {
-                        echo "<option value=\"$newuser->id\">".$fullname." (".
-                            get_string('status_'.$MDL_F2F_STATUS[$newuser->statuscode], 'facetoface')."), ".$newuser->email."</option>\n";
+                        $status = get_string('status_'.$MDL_F2F_STATUS[$newuser->statuscode], 'facetoface');
+                        echo "<option value=\"$newuser->id\">".$fullname." - ". $status."</option>\n";
                     } else {
-                        echo "<option value=\"$newuser->id\">".$fullname.", ".$newuser->email."</option>\n";
+                        echo "<option value=\"$newuser->id\">".$fullname."</option>\n";
                     }
                 }
             }
@@ -65,12 +98,12 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
                         echo "<optgroup label=\"$strsearchresults (" . $usercount . ")\">\n";
                         foreach ($availableusers as $user) {
                             $idx++;
-                            $fullname = fullname($user, true);
+                            $fullname = facetoface_output_user_for_selection($user, $extrafields, true);
                             if ($session->cntdates && ($user->statuscode == MDL_F2F_STATUS_WAITLISTED)) {
-                                echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname." (".
-                                    get_string('status_'.$MDL_F2F_STATUS[$user->statuscode], 'facetoface')."), ".$user->email."</option>\n";
+                                $status = get_string('status_'.$MDL_F2F_STATUS[$user->statuscode], 'facetoface');
+                                echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname." - ". $status."</option>\n";
                             } else {
-                                echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname.", ".$user->email."</option>\n";
+                                echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname."</option>\n";
                             }
                         }
                     } else {
@@ -90,12 +123,12 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
                     if (is_array($availableusers) || $availableusers->valid()) {
                         foreach ($availableusers as $user) {
                             $idx++;
-                            $fullname = fullname($user, true);
+                            $fullname = facetoface_output_user_for_selection($user, $extrafields, true);
                             if ($session->cntdates && ($user->statuscode == MDL_F2F_STATUS_WAITLISTED)) {
-                                echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname." (".
-                                get_string('status_'.$MDL_F2F_STATUS[$user->statuscode], 'facetoface')."), ".$user->email."</option>\n";
+                                $status = get_string('status_'.$MDL_F2F_STATUS[$user->statuscode], 'facetoface');
+                                echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname." - ". $status."</option>\n";
                             } else {
-                                echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname.", ".$user->email."</option>\n";
+                                echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname."</option>\n";
                             }
                         }
                     } else {
