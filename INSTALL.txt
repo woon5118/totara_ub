@@ -11,7 +11,6 @@ Before installing Totara you should have a server with:
 * Recommended PHP modules: openssl, tokenizer, xmlrpc, soap, opcache
 * PHP Memory limit of at least 256MB
 * Access to a supported database (PostgreSQL 9.2 or greater, Mysql 5.5.31 or greater, MariaDB 5.5.31, MSSQL 2008 or greater).
-  * If your database is PostgreSQL you must set standard_conforming_strings to off and escape_string_warning to off in your postgresql.conf file
   * If your database is MSSQL, your database user must have the permissions: ALTER SETTINGS(SERVER).
 * A domain name that resolves to your server
 * Recommended minimum browser: Recent Google Chrome, Recent Firefox, Safari 9, Internet Explorer 9 (IE 10 required for drag and drop of files from outside the browser into Totara)
