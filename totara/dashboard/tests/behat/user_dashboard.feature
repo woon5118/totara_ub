@@ -26,12 +26,12 @@ Feature: Perform basic dashboard user changes
   And I log in as "admin"
   And I set the following administration settings values:
     | defaulthomepage | Totara dashboard |
+  And the following "cohort members" exist:
+      | user     | cohort |
+      | learner2 | CH1    |
   And I log out
 
   Scenario: Add block to personal version of second dashboard and then reset
-    And the following "cohort members" exist:
-      | user     | cohort |
-      | learner2 | CH1    |
     And I log in as "learner1"
     And I follow "Dashboard unlocked published"
 
@@ -57,6 +57,34 @@ Feature: Perform basic dashboard user changes
     And I press "Customise this page"
     And I press "Reset dashboard to default"
     Then "Latest news" "block" should not exist
+
+  Scenario: Confirm that dashboard blocks positions maintained when customised by users
+    Given I log in as "admin"
+    And I follow "Dashboard"
+    And I press "Manage dashboards"
+    And I click on "Dashboard unlocked published" "link"
+    And I press "Blocks editing on"
+    And I add the "Latest news" block
+
+    # Move blocks around
+    And I click on "span.moodle-core-dragdrop-draghandle" "css_element" in the "Latest news" "block"
+    And I click on "//a[contains(., 'To item \"Navigation\"')]" "xpath_element"
+    And I click on "span.moodle-core-dragdrop-draghandle" "css_element" in the "Navigation" "block"
+    And I click on "//a[contains(., 'To item \"Dashboards\"')]" "xpath_element"
+    And I log out
+
+    And I log in as "learner1"
+    And I follow "Dashboard unlocked published"
+    And I should see "Navigation" in the "#region-main" "css_element"
+    And I should not see "Navigation" in the "#block-region-side-pre" "css_element"
+    And I should see "Latest news" in the "#block-region-side-pre" "css_element"
+    And I should not see "Latest news" in the "#region-main" "css_element"
+
+    When I press "Customise this page"
+    Then I should see "Navigation" in the "#region-main" "css_element"
+    And I should not see "Navigation" in the "#block-region-side-pre" "css_element"
+    And I should see "Latest news" in the "#block-region-side-pre" "css_element"
+    And I should not see "Latest news" in the "#region-main" "css_element"
 
   Scenario: Cannot change locked dashboard
     When I log in as "learner1"

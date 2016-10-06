@@ -508,9 +508,11 @@ class totara_dashboard {
         $systemcontext = context_system::instance();
         $usercontext = context_user::instance($userid);
 
+        // Copy instances.
         $blockinstances = $DB->get_records('block_instances', array('parentcontextid' => $systemcontext->id,
                                                                     'pagetypepattern' => 'my-totara-dashboard-' . $this->id,
                                                                     'subpagepattern' => 'default'));
+        $clonedids = array();
         foreach ($blockinstances as $instance) {
             $originalid = $instance->id;
             unset($instance->id);
@@ -520,6 +522,26 @@ class totara_dashboard {
             context_block::instance($instance->id);  // Just creates the context record.
             $block = block_instance($instance->blockname, $instance);
             $block->instance_copy($originalid);
+            $clonedids[$originalid] = $instance->id;
+        }
+
+        // Copy positions of system blocks.
+        $blockpositions = $DB->get_records('block_positions', array(
+            'contextid' => $systemcontext->id,
+            'pagetype' => 'my-totara-dashboard-' . $this->id,
+            'subpage' => 'default'
+        ));
+        if (!empty($blockpositions)) {
+            foreach ($blockpositions as $position) {
+                unset($position->id);
+                $position->contextid = $usercontext->id;
+                $position->subpage = $userpageid;
+                // If new block was created, we need to change its id as well.
+                if (!empty($clonedids[$position->blockinstanceid])) {
+                    $position->blockinstanceid = $clonedids[$position->blockinstanceid];
+                }
+                $position->id = $DB->insert_record('block_positions', $position);
+            }
         }
 
         return $userpageid;
@@ -545,6 +567,11 @@ class totara_dashboard {
                     }
                 }
             }
+            $DB->delete_records('block_positions', array(
+                'contextid' => $context->id,
+                'pagetype' => 'my-totara-dashboard-' . $this->id,
+                'subpage' => $pageid
+            ));
             $DB->delete_records('totara_dashboard_user', array('id' => $pageid));
         }
     }
@@ -591,6 +618,11 @@ class totara_dashboard {
                 blocks_delete_instance($block);
             }
         }
+
+        $DB->delete_records('block_positions', array(
+            'contextid' => $context->id,
+            'pagetype' => 'my-totara-dashboard-' . $this->id
+        ));
     }
 
     /**
