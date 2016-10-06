@@ -28,6 +28,9 @@ use totara_form\form\validator\element_url;
 /**
  * Url input element.
  *
+ * Only http, https and ftp protocols are accepted.
+ * If no protocol specified then 'http://' prefix is added.
+ *
  * @package   totara_form
  * @copyright 2016 Totara Learning Solutions Ltd {@link http://www.totaralms.com/}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -64,5 +67,30 @@ class url extends text {
         $result['form_item_template'] = 'totara_form/element_url';
         $result['amdmodule'] = 'totara_form/form_element_url';
         return $result;
+    }
+
+    /**
+     * Get submitted data without validation.
+     *
+     * NOTE: automatically adds 'http://' prefix if no protocol specified
+     *
+     * @return array
+     */
+    public function get_data() {
+        $data = parent::get_data();
+        $name = $this->get_name();
+
+        if ($this->is_frozen()) {
+            return $data;
+        }
+
+        if (!isset($data[$name]) or $data[$name] === '') {
+            return $data;
+        }
+
+        if (!preg_match('/^[a-z]+:/i', $data[$name])) {
+            $data[$name] = 'http://' . $data[$name];
+        }
+        return $data;
     }
 }

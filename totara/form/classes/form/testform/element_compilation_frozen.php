@@ -151,7 +151,7 @@ class element_compilation_frozen extends form {
         $this->model->add(new tel('tel', 'Tel'))->set_frozen(true); // Just a random help string.
         $this->model->add(new text('text', 'Text', PARAM_RAW))->set_frozen(true); // Just a random help string.
         $this->model->add(new textarea('textarea', 'Textarea', PARAM_RAW))->set_frozen(true);
-        $this->model->add(new url('url', 'URL'))->set_frozen(true);
+        $this->model->add(new url('url', 'Web URL'))->set_frozen(true);
         $this->model->add(new yesno('yesno', 'Yes or No'))->set_frozen(true);
 
         $this->model->add(new section('value', 'Frozen elements without values'));
@@ -186,7 +186,7 @@ class element_compilation_frozen extends form {
         $this->model->add(new tel('tel_novalue', 'Tel'))->set_frozen(true); // Just a random help string.
         $this->model->add(new text('text_novalue', 'Text', PARAM_RAW))->set_frozen(true); // Just a random help string.
         $this->model->add(new textarea('textarea_novalue', 'Textarea', PARAM_RAW))->set_frozen(true);
-        $this->model->add(new url('url_novalue', 'URL'))->set_frozen(true);
+        $this->model->add(new url('url_novalue', 'Web URL'))->set_frozen(true);
         $this->model->add(new yesno('yesno_novalue', 'Yes or No'))->set_frozen(true);
 
         $this->add_required_elements();

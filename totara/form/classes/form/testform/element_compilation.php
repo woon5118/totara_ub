@@ -106,7 +106,7 @@ class element_compilation extends form {
         $this->model->add(new tel('tel', 'Tel'))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new text('text', 'Text', PARAM_RAW))->add_help_button('cachejs', 'core_admin'); // Just a random help string.;
         $this->model->add(new textarea('textarea', 'Textarea', PARAM_RAW));
-        $this->model->add(new url('url', 'URL'));
+        $this->model->add(new url('url', 'Web URL'));
         $this->model->add(new yesno('yesno', 'Yes or No'));
 
         $this->add_required_elements();

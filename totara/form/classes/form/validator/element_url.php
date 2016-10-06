@@ -30,6 +30,8 @@ use totara_form\item,
 /**
  * Totara form url validator.
  *
+ * Only http, https and ftp protocols are accepted.
+ *
  * @package   totara_form
  * @copyright 2016 Totara Learning Solutions Ltd {@link http://www.totaralms.com/}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -65,6 +67,9 @@ class element_url extends element_validator {
      * @return void adds errors to element
      */
     public function validate() {
+        global $CFG;
+        require_once($CFG->dirroot . '/lib/validateurlsyntax.php');
+
         $name = $this->element->get_name();
         $data = $this->element->get_data();
 
@@ -84,8 +89,8 @@ class element_url extends element_validator {
             return;
         }
 
-        if ((string)$value === clean_param($value, PARAM_URL)) {
-            // Url is in correct format.
+        if (validateUrlSyntax($value, 's+H?S?F?E-u-P-a+I?p?f?q?r?')) {
+            // Url is in correct format - must be a subset of PARAM_URL.
             return;
         }
 

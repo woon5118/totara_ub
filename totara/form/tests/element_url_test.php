@@ -112,36 +112,77 @@ class totara_form_element_url_testcase extends advanced_testcase {
         $this->assertSame($expected, $data);
     }
 
+    public function test_submission_protocols() {
+        $definition = new test_definition($this,
+            function (model $model, advanced_testcase $testcase) {
+                /** @var url $url1 */
+                $url1 = $model->add(new url('someurl1', 'Some url 1'));
+                /** @var url $url2 */
+                $url2 = $model->add(new url('someurl2', 'Some url 3'));
+                /** @var url $url3 */
+                $url3 = $model->add(new url('someurl3', 'Some url 3'));
+                /** @var url $url4 */
+                $url4 = $model->add(new url('someurl4', 'Some url 4'));
+
+                // Test the form field values.
+                $testcase->assertSame('https://example.com/11', $url1->get_field_value());
+                $testcase->assertSame('ftp://example.com/22', $url2->get_field_value());
+                $testcase->assertSame('http://example.com', $url3->get_field_value());
+                $testcase->assertSame('http://example.com/44', $url4->get_field_value());
+            });
+        test_form::phpunit_set_definition($definition);
+
+        $postdata = array(
+            'someurl1' => 'https://example.com/11',
+            'someurl2' => 'ftp://example.com/22',
+            'someurl3' => 'http://example.com',
+            'someurl4' => 'example.com/44',
+        );
+        test_form::phpunit_set_post_data($postdata);
+        $form = new test_form(array());
+        $data = (array)$form->get_data();
+        $expected = array(
+            'someurl1' => 'https://example.com/11',
+            'someurl2' => 'ftp://example.com/22',
+            'someurl3' => 'http://example.com',
+            'someurl4' => 'http://example.com/44',
+        );
+        $this->assertSame($expected, $data);
+    }
+
     public function test_validation() {
         $definition = new test_definition($this,
             function (model $model, advanced_testcase $testcase) {
-                /** @var url $url1 */
-                $url1 = $model->add(new url('someurl1', 'Some url 1'));
+                $model->add(new url('someurl1', 'Some url 1'));
             });
         test_form::phpunit_set_definition($definition);
 
-        $postdata = array(
-            'someurl1' => 'https://example.com/',
-        );
-        test_form::phpunit_set_post_data($postdata);
+        test_form::phpunit_set_post_data(array('someurl1' => 'https://example.com/'));
         $form = new test_form(null);
         $data = (array)$form->get_data();
-        $expected = array(
-            'someurl1' => 'https://example.com/',
-        );
-        $this->assertSame($expected, $data);
+        $this->assertSame(array('someurl1' => 'https://example.com/'), $data);
 
-        $definition = new test_definition($this,
-            function (model $model, advanced_testcase $testcase) {
-                /** @var url $url1 */
-                $url1 = $model->add(new url('someurl1', 'Some url 1'));
-            });
-        test_form::phpunit_set_definition($definition);
+        test_form::phpunit_set_post_data(array('someurl1' => 'example.com/'));
+        $form = new test_form(null);
+        $data = (array)$form->get_data();
+        $this->assertSame(array('someurl1' => 'http://example.com/'), $data);
 
-        $postdata = array(
-            'someurl1' => 'https: //example.com/',
-        );
-        test_form::phpunit_set_post_data($postdata);
+        test_form::phpunit_set_post_data(array('someurl1' => 'ftp://example.com/'));
+        $form = new test_form(null);
+        $data = (array)$form->get_data();
+        $this->assertSame(array('someurl1' => 'ftp://example.com/'), $data);
+
+        test_form::phpunit_set_post_data(array('someurl1' => ''));
+        $form = new test_form(null);
+        $data = (array)$form->get_data();
+        $this->assertSame(array('someurl1' => ''), $data);
+
+        test_form::phpunit_set_post_data(array('someurl1' => 'file://example.com/'));
+        $form = new test_form(null);
+        $data = $form->get_data();
+        $this->assertNull($data);
+
+        test_form::phpunit_set_post_data(array('someurl1' => 'mailto:info@example.com'));
         $form = new test_form(null);
         $data = $form->get_data();
         $this->assertNull($data);
