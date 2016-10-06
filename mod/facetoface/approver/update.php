@@ -34,18 +34,22 @@ if (!in_array('approval_admin', $approvaloptions)) {
     print_error('error:approvaladminnotactive', 'facetoface');
 }
 
-$users = required_param('users', PARAM_SEQUENCE);
 $cid = required_param('cid', PARAM_INT);
+// Users is optional as the no users may have been selected.
+$users = optional_param('users', '', PARAM_SEQUENCE);
 
 $context = context_course::instance($cid);
 $PAGE->set_context($context);
 require_capability('moodle/course:manageactivities', $context);
 
+// The JS code relies on this div, so even if no users are selected we must print it.
 $out = html_writer::start_tag('div', array('id' => 'activityapproverbox', 'class' => 'activity_approvers'));
 
-foreach (explode(',', trim($users, ',')) as $userid) {
-    $user = core_user::get_user($userid);
-    $out .= facetoface_display_approver($user, true);
+if (!empty($users)) {
+    foreach (explode(',', trim($users, ',')) as $userid) {
+        $user = core_user::get_user($userid);
+        $out .= facetoface_display_approver($user, true);
+    }
 }
 
 $out .= html_writer::end_tag('div');

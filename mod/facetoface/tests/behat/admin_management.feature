@@ -27,7 +27,16 @@ Feature: Add and remove seminar Administrators
     And I set the following fields to these values:
       | Name                                | test seminar |
       | Manager and Administrative approval | 1            |
-    And I click on "Add approver" "button"
+
+    # Test I can open the dialog and close it without selecting anyone
+    When I click on "Add approver" "button"
+    And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
+    Then I should not see "Admin One (activity level approver)" in the "Approval Options" "fieldset"
+    And I should not see "Admin Two (activity level approver)" in the "Approval Options" "fieldset"
+    And I should not see "Admin Three (activity level approver)" in the "Approval Options" "fieldset"
+
+    # Select admin one as our starting point now.
+    When I click on "Add approver" "button"
     And I click on "Admin One (admin1@example.com)" "link" in the "Select activity level approvers" "totaradialogue"
     And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
     And I click on "Save and display" "button"
