@@ -189,7 +189,7 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
             return 0;
         }
         list($insql, $inparams) = $DB->get_in_or_equal($groupids);
-        $sql = "SELECT COUNT(u.id)
+        $sql = "SELECT COUNT(DISTINCT u.id)
                   FROM {user} u
             INNER JOIN {job_assignment} ja ON ja.userid = u.id AND ja.{$this->prefix}id $insql";
         $count = $DB->count_records_sql($sql, $inparams);
@@ -229,7 +229,7 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
         $sourceid = $assignedgroup->sourceid;
         $includechildren = $assignedgroup->includechildren;
 
-        $sql = "SELECT ja.userid AS userid FROM {job_assignment} ja
+        $sql = "SELECT DISTINCT ja.userid AS userid FROM {job_assignment} ja
             JOIN {{$this->grouptype}} hierarchy
                 ON ja.{$this->prefix}id = hierarchy.id
             WHERE ja.{$this->prefix}id = ?";
