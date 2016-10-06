@@ -352,6 +352,7 @@ class rb_source_goal_custom extends rb_base_source {
         $displayfunc = '';
         $multi = '';
         $extrafields = '';
+        $outputformat = '';
 
         switch($customgoal->datatype) {
             case 'checkbox':
@@ -386,6 +387,10 @@ class rb_source_goal_custom extends rb_base_source {
             case 'url':
                 $displayfunc = 'customfield_url';
                 break;
+            case 'location':
+                $displayfunc = 'location';
+                $outputformat = 'text';
+                break;
         }
 
         return new rb_column(
@@ -397,7 +402,8 @@ class rb_source_goal_custom extends rb_base_source {
                 'joins' => array($type . "_goalrecord" . $customgoal->id),
                 'hidden' => $hidden,
                 'displayfunc' => $displayfunc,
-                'extrafields' => $extrafields
+                'extrafields' => $extrafields,
+                'outputformat' => $outputformat
             )
         );
     }
