@@ -151,6 +151,9 @@ class customfield_textarea extends customfield_base {
         if (empty($data)) {
             return $data;
         }
+        if (isset($extradata['altprefix']) && $extradata['altprefix']) {
+            $extradata['prefix'] = $extradata['altprefix'];
+        }
         if (!isset($extradata['prefix']) || empty($extradata['prefix']) || !isset($extradata['itemid']) || empty($extradata['itemid'])) {
             return $data;
         }

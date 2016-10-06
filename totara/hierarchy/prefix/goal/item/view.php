@@ -151,6 +151,12 @@ $tabledata[$title] = format_string($targetdate);
 
 // Description.
 $title = get_string('description', 'totara_hierarchy');
+
+if ($goalpersonal->description) {
+    $goalpersonal->description = file_rewrite_pluginfile_urls($goalpersonal->description, 'pluginfile.php',
+        $context->id, 'totara_hierarchy', 'goal', $goalpersonal->id);
+}
+
 $tabledata[$title] = format_text($goalpersonal->description, FORMAT_HTML, $TEXTAREA_OPTIONS);
 
 echo html_writer::start_tag('dl', array('class' => 'dl-horizontal'));

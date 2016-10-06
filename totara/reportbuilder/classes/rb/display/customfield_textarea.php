@@ -41,9 +41,12 @@ class customfield_textarea extends base {
         $field = "{$column->type}_{$column->value}";
         $extrafields = self::get_extrafields_row($row, $column);
 
+        // Columns generated with "rb_cols_generator_allcustomfields" extradata will be prefixed with type_value_* remove it.
+        self::prepare_type_value_prefixed_extrafields($extrafields, $row, $column);
+
         // Hierarchy custom fields are stored in the FileAPI fileareas using the longform of the prefix
         // extract prefix from field name.
-        $pattern = '/(?P<prefix>(.*?))_custom_field_(\d+)[a-zA-Z]{0,5}$/';
+        $pattern = '/(?P<prefix>(.*?))(_all)?_custom_field_(\d+)[a-zA-Z]{0,5}$/';
         $matches = array();
         preg_match($pattern, $field, $matches);
         if (!empty($matches)) {

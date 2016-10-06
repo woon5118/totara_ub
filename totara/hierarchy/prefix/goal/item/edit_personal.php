@@ -86,7 +86,6 @@ $PAGE->set_title($strmygoals);
 $PAGE->set_heading($strmygoals);
 
 $prefix = 'goal_user';
-$context = context_system::instance();
 
 if ($id === 0) {
     $item = new stdClass();
@@ -115,7 +114,10 @@ $options = array(
     'context' => $context,
     'collapsed' => true
 );
-$item = file_prepare_standard_editor($item, 'description', $options, $context, 'totara_hierarchy', $item->id);
+
+$item->descriptionformat = FORMAT_HTML;
+$item = file_prepare_standard_editor($item, 'description', $options, $options['context'], 'totara_hierarchy','goal', $item->id);
+
 $datatosend = array('item' => $item, 'id' => $id, 'userid' => $userid);
 $mform = new goal_edit_personal_form(null, $datatosend);
 $mform->set_data($item);
