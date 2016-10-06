@@ -4451,6 +4451,14 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         mod_facetoface_upgrade_notification_titles();
         mod_facetoface_fix_trainercancel_body();
         mod_facetoface_fix_defaultrequestinstrmngrdefault();
+
+        // Copy settings for "Select job assignment on sign up".
+        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+        if (!empty($selectpositiononsignupglobal)) {
+            set_config('facetoface_selectjobassignmentonsignupglobal', true);
+            unset_config('facetoface_selectpositiononsignupglobal');
+        }
+
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2016092800, 'facetoface');
     }
