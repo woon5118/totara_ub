@@ -609,6 +609,23 @@ echo "<pre><code>" . htmlentities($html) . "</code></pre>";
 echo '</div>'; // .col-xs-12
 echo '</div>'; // .row
 
+echo '<div class="row">';
+echo '<div class="col-xs-12">';
+echo '<h3 id="tabs">Disabled <small>state variant</small></h3>';
+$html =<<<EOF
+<ul class="nav nav-tabs">
+    <li role="presentation" class="disabled"><a href="#">All audiences</a></li>
+    <li role="presentation" class="disabled"><a href="#">System audiences</a></li>
+    <li role="presentation" class="active"><a href="#">System audiences</a></li>
+    <li role="presentation" class="disabled"><a href="#">Add a new audience</a></li>
+    <li role="presentation" class="disabled"><a href="#">Upload audiences</a></li>
+</ul>
+EOF;
+echo "<p>{$html}</p>";
+echo "<pre><code>" . htmlentities($html) . "</code></pre>";
+echo '</div>'; // .col-xs-12
+echo '</div>'; // .row
+
 echo '<br />';
 echo $toplink;
 

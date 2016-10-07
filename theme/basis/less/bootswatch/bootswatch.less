@@ -101,6 +101,8 @@
     // Active state, and its :hover to override normal :hover
     &.active > a {
       background-color: #fff;
+      border-right-color: @nav-tabs-border-color;
+      border-left-color: @nav-tabs-border-color;
       &,
       &:hover,
       &:focus {
@@ -118,7 +120,31 @@
         box-shadow: 0 -2px lighten(@brand-primary, 10%);
       }
     }
-
+    &.disabled {
+      > a {
+        &,
+        &:hover,
+        &:focus {
+          // Colours used here are a one-off treatment
+          // specifically for Basis nav-tabs with .disabled
+          // therefore we do not add variables for them.
+          color: #949494; // AA compliant on white background.
+          background-color: #fff;
+          border-top-color: #e5e9ec;
+        }
+      }
+      & + .disabled,
+      &:first-child {
+        > a {
+          border-left-color: #e5e9ec;
+        }
+      }
+      &:last-child {
+        > a {
+          border-right-color: #e5e9ec;
+        }
+      }
+    }
   }
 }
 
