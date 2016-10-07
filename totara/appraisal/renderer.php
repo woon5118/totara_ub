@@ -1835,12 +1835,15 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $a->rolename = get_string($roles[$role], 'totara_appraisal');
         }
 
-        $r = new html_table_row(array($this->output->user_picture($subject),
-            get_string($langtext, 'totara_appraisal', $a)));
+        $rowdata = array();
+        if (!empty($subject->picture)) {
+            $rowdata[] = $this->output->user_picture($subject, array('link' => false));
+        }
+        $rowdata[] = get_string($langtext, 'totara_appraisal', $a);
 
         $t = new html_table();
         $t->attributes['class'] = 'invisiblepadded viewing-xs-appraisal';
-        $t->data[] = $r;
+        $t->data[] = new html_table_row($rowdata);
         return html_writer::tag('div', html_writer::table($t), array('class' => "plan_box notifymessage"));
     }
 
