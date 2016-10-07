@@ -204,14 +204,14 @@ trait program_common {
         if ($completecount >= 1 && $optionalcount < 1) {
             // Only completed.
             if ($completecount == 1) {
-                $string = get_string('completedcoursesets', 'block_current_learning', $optionalcount);
+                $string = get_string('completedcoursesets', 'block_current_learning');
             } else if ($completecount > 1) {
-                $string = get_string('completedcoursesetsplural', 'block_current_learning', $optionalcount);
+                $string = get_string('completedcoursesetsplural', 'block_current_learning', $completecount);
             }
         } else if ($completecount < 1 && $optionalcount >= 1) {
             // Only optional.
             if ($optionalcount == 1) {
-                $string = get_string('optionalcoursesets', 'block_current_learning', $optionalcount);
+                $string = get_string('optionalcoursesets', 'block_current_learning');
             } else if ($optionalcount > 1) {
                 $string = get_string('optionalcoursesetsplural', 'block_current_learning', $optionalcount);
             }
