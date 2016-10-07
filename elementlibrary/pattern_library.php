@@ -533,26 +533,22 @@ $html[] =<<<EOF
 <button type="button" class="btn btn-secondary" disabled="disabled">Button</button>
 <a role="button" class="btn btn-secondary disabled">Link</a>
 
-<!-- tertiary -->
-<button type="button" class="btn btn-tertiary" disabled="disabled">Button</button>
-<a role="button" class="btn btn-tertiary disabled">Link</a>
-EOF;
-
-$html[] =<<<EOF
 <!-- success -->
 <button type="button" class="btn btn-success" disabled="disabled">Button</button>
 <a role="button" class="btn btn-success disabled">Link</a>
-
-<!-- info -->
-<button type="button" class="btn btn-info" disabled="disabled">Button</button>
-<a role="button" class="btn btn-info disabled">Link</a>
 EOF;
 
 $html[] =<<<EOF
+<!-- info -->
+<button type="button" class="btn btn-info" disabled="disabled">Button</button>
+<a role="button" class="btn btn-info disabled">Link</a>
+
 <!-- warning -->
 <button type="button" class="btn btn-warning" disabled="disabled">Button</button>
 <a role="button" class="btn btn-warning disabled">Link</a>
+EOF;
 
+$html[] =<<<EOF
 <!-- danger -->
 <button type="button" class="btn btn-danger" disabled="disabled">Button</button>
 <a role="button" class="btn btn-danger disabled">Link</a>
@@ -560,11 +556,11 @@ EOF;
 
 echo "<p>";
 echo '<div class="row">';
+echo '<div class="col-xs-12">';
 foreach ($html as $examples) {
-    echo '<div class="col-md-3">';
     echo $examples;
-    echo '</div>';
 }
+echo '</div>';
 echo '</div>'; // .row
 echo "</p>";
 echo "<pre><code>";
