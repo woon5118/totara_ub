@@ -446,16 +446,18 @@ switch ($searchtype) {
         $search_info->id = 'e.id';
         $search_info->fullname = 'e.name';
         $search_info->sql = "
-            FROM
-                {dp_plan_evidence} e
-            JOIN {dp_plan_evidence_info_field} eif
+              FROM {dp_plan_evidence} e
+         LEFT JOIN {dp_plan_evidence_info_field} eif
                 ON eif.shortname = 'evidencedescription'
-            JOIN {dp_plan_evidence_info_data} eid
-                ON eid.fieldid = eif.id
-            WHERE
-                {$searchsql}
-                AND e.userid = ?
+         LEFT JOIN {dp_plan_evidence_info_data} eid
+                ON eid.fieldid = eif.id AND eid.evidenceid = e.id
+             WHERE {$searchsql}
+               AND e.userid = ?
         ";
+        // This query is weird. It first joins the main table to every field record which is a description (if it exists),
+        // then the second join joins on both the main record's id and the field's id.
+        // TODO TL-10834 "evidencedescription" is a custom field, so can be removed or renamed, and some other field could
+        // even be renamed to this name. Might make more sense to be searching all text/textarea custom fields instead?
 
         $search_info->order = " ORDER BY e.name";
         if (!empty($this->customdata['userid'])) {
@@ -670,7 +672,7 @@ if (strlen($query)) {
     $strqueryerror = get_string('queryerror', 'totara_core');
     $start = $page * DIALOG_SEARCH_NUM_PER_PAGE;
 
-    $select = "SELECT DISTINCT {$search_info->id} AS id ";
+    $select = "SELECT {$search_info->id} AS id ";
     if (isset($search_info->fullnamefields)) {
         $select .= ", {$search_info->fullnamefields} ";
     } else if (isset($search_info->fullname)) {
@@ -679,7 +681,7 @@ if (strlen($query)) {
     if (isset($search_info->email)) {
         $select .= ", {$search_info->email} AS email ";
     }
-    $count  = "SELECT COUNT(DISTINCT {$search_info->id}) ";
+    $count  = "SELECT COUNT({$search_info->id}) ";
 
     $total = $DB->count_records_sql($count.$search_info->sql, $search_info->params);
     if ($total) {
