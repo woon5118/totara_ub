@@ -616,6 +616,20 @@ $icons = array(
                     'classes' => 'fa-check-square-o',
                 ),
         ),
+    'completion-rpl-n' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-square-o',
+                ),
+        ),
+    'completion-rpl-y' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-check-square-o',
+                ),
+        ),
     'contact-add' =>
         array(
             'template' => 'core/flex_icon_stack',

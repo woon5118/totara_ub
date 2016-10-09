@@ -89,8 +89,8 @@ function show_rpl($type, $user, $rpl, $describe, $fulldescribe, $cmid = null) {
     } else {
         // Show RPL status icon
         $rplicon = strlen($rpl) ?
-            $OUTPUT->flex_icon('check-square-o', ['classes' => 'ft-size-300', 'alt' => $describe]) :
-            $OUTPUT->flex_icon('square-o', ['classes' => 'ft-size-300', 'alt' => $describe]);
+            $OUTPUT->flex_icon('completion-rpl-y', ['classes' => 'ft-size-300', 'alt' => $describe]) :
+            $OUTPUT->flex_icon('completion-rpl-n', ['classes' => 'ft-size-300', 'alt' => $describe]);
         print '<a href="index.php?course='.$course->id.'&sort='.$sort.'&page='.$page.'&edituser='.$user->id.'#user-'.$user->id.'" class="rpledit">' . $rplicon .
             '</a>';
 
@@ -221,8 +221,8 @@ if ($csv) {
     $args = array(
         'args' => json_encode(array(
             'course'      => $course->id,
-            'pix_rply'    => $OUTPUT->flex_icon('check-square-o', ['classes' => 'ft-size-300']),
-            'pix_rpln'    => $OUTPUT->flex_icon('square-o', ['classes' => 'ft-size-300']),
+            'pix_rply'    => $OUTPUT->flex_icon('completion-rpl-y', ['classes' => 'ft-size-300']),
+            'pix_rpln'    => $OUTPUT->flex_icon('completion-rpl-n', ['classes' => 'ft-size-300']),
             'pix_cross'   => $OUTPUT->flex_icon('times-danger', ['classes' => 'ft-size-300']),
             'pix_loading' => $OUTPUT->flex_icon('loading', ['classes' => 'ft-size-300']),
         ))
@@ -684,29 +684,15 @@ foreach ($progress as $user) {
                 $date = '';
             }
 
-            $auto = $activity->completion == COMPLETION_TRACKING_AUTOMATIC;
-
             // Work out how it corresponds to an icon
             switch($state) {
-                case COMPLETION_INCOMPLETE:
-                    $completiontype = 'n';
-                    $iconname = $auto ? 'circle-o' : 'square-o';
-                    break;
-                case COMPLETION_COMPLETE:
-                    $completiontype = 'y';
-                    $iconname = $auto ? 'check-circle-o' : 'check-square-o';
-                    break;
-                case COMPLETION_COMPLETE_PASS:
-                    $completiontype = 'pass';
-                    $iconname = $auto ? 'check-circle-o-success' : '';
-                    break;
-                case COMPLETION_COMPLETE_FAIL:
-                    $completiontype = 'fail';
-                    $iconname = $auto ? 'check-circle-o-danger' : '';
-                    break;
+                case COMPLETION_INCOMPLETE    : $completiontype = 'n';    break;
+                case COMPLETION_COMPLETE      : $completiontype = 'y';    break;
+                case COMPLETION_COMPLETE_PASS : $completiontype = 'pass'; break;
+                case COMPLETION_COMPLETE_FAIL : $completiontype = 'fail'; break;
             }
 
-
+            $auto = $activity->completion == COMPLETION_TRACKING_AUTOMATIC;
             $completionicon = 'completion-'.($auto ? 'auto' : 'manual').'-'.$completiontype;
 
             $describe = get_string('completion-'.$completiontype, 'completion');
@@ -717,15 +703,13 @@ foreach ($progress as $user) {
             $a->activity  = $activity->get_formatted_name();
             $fulldescribe = get_string('progress-title', 'completion', $a);
 
-            $icon = $OUTPUT->flex_icon($iconname, ['alt' => s($describe), 'classes' => 'ft-size-300']);
-
             if ($csv) {
                 $row[] = $describe;
                 $row[] = $date;
             } else {
                 print '<td class="completion-progresscell rpl-'.$criterion->id.' cmid-'.$criterion->moduleinstance.'">';
 
-                print $icon;
+                print $OUTPUT->flex_icon($completionicon, ['alt' => s($describe), 'classes' => 'ft-size-300']);
 
                 // Decide if we need to display an RPL
                 if (in_array($criterion->id, $criteria_with_rpl)) {
@@ -777,19 +761,14 @@ foreach ($progress as $user) {
                 );
 
                 if ($is_complete) {
-                    $manualicon = $OUTPUT->flex_icon('check-square-o', ['alt' => s($describe), 'classes' => 'ft-size-300']);
+                    $manualicon = $OUTPUT->flex_icon('completion-manual-y', ['alt' => s($describe), 'classes' => 'ft-size-300']);
                 } else {
-                    $manualicon = $OUTPUT->flex_icon('square-o', ['alt' => s($describe), 'classes' => 'ft-size-300']);
+                    $manualicon = $OUTPUT->flex_icon('completion-manual-n', ['alt' => s($describe), 'classes' => 'ft-size-300']);
                 }
                 print '<a href="'.$toggleurl->out().'" title="'.s(get_string('clicktomarkusercomplete', 'report_completion')).'">' .
                     $manualicon . '</a></td>';
             } else {
-                if ($is_complete) {
-                    $autoicon = $OUTPUT->flex_icon('check-circle-o', ['alt' => s($describe), 'classes' => 'ft-size-300']);
-                } else {
-                    $autoicon = $OUTPUT->flex_icon('circle-o', ['alt' => s($describe), 'classes' => 'ft-size-300']);
-                }
-                print $autoicon . '</td>';
+                print $OUTPUT->flex_icon($completionicon, ['alt' => s($describe), 'classes' => 'ft-size-300']) . '</td>';
             }
 
             print '</td>';
@@ -828,14 +807,8 @@ foreach ($progress as $user) {
 
         print '<td class="completion-progresscell rpl-course">';
 
-        if ($ccompletion->is_complete()) {
-            $icon = $OUTPUT->flex_icon('check-circle-o', ['alt' => s($describe), 'classes' => 'ft-size-300']);
-        } else {
-            $icon = $OUTPUT->flex_icon('circle-o', ['alt' => s($describe), 'classes' => 'ft-size-300']);
-        }
-
         // Display course completion status icon
-        print $icon;
+        print $OUTPUT->flex_icon('completion-auto-' . $completiontype, ['alt' => s($describe), 'classes' => 'ft-size-300']);
 
         if ($CFG->enablecourserpl) {
             show_rpl('course', $user, $ccompletion->rpl, $describe, $fulldescribe);
