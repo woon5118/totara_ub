@@ -40,6 +40,26 @@ $backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 
 $session = null;
 
+// This file requires the following:
+//
+// * A session id ($s) in which case editing is the default.
+//   * AND If $c is also not empty then we are copying the event as a new event.
+//   * OR If $d is also not empty then we are deleting the event.
+// * A course module id ($id) in which case we are adding a new event to the given instance.
+// * OR a facetoface instance id ($f) in which case we are adding a new event to the given instance.
+//
+// All of these variables are normalised after the related objects have been retrieved.
+// Because of this we will work out the proper heading for the page now.
+$actionheading = 'addingsession';
+if ($s) {
+    $actionheading = 'editingsession';
+    if ($d) {
+        $actionheading = 'deletingsession';
+    } else if ($c) {
+        $actionheading = 'copyingsession';
+    }
+}
+
 // Offer one date for new sessions by default.
 if (!$s && $cntdates < 1) {
     $cntdates = 1;
@@ -117,7 +137,7 @@ if ($session and $d) {
     if (!$confirm) {
         echo $OUTPUT->header();
 
-        echo $OUTPUT->heading(get_string('deletingsession', 'facetoface', format_string($facetoface->name)));
+        echo $OUTPUT->heading(get_string($actionheading, 'facetoface', format_string($facetoface->name)));
 
         $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
 
@@ -377,20 +397,10 @@ if ($fromform = $mform->get_data()) { // Form submitted
     redirect($returnurl);
 }
 
-if ($c) {
-    $heading = get_string('copyingsession', 'facetoface', $facetoface->name);
-}
-else if ($id or $f) {
-    $heading = get_string('addingsession', 'facetoface', $facetoface->name);
-}
-else {
-    $heading = get_string('editingsession', 'facetoface', $facetoface->name);
-}
-
 echo $OUTPUT->header();
 
 echo $OUTPUT->box_start();
-echo $OUTPUT->heading($heading);
+echo $OUTPUT->heading(get_string($actionheading, 'facetoface', format_string($facetoface->name)));
 
 if (!empty($errorstr)) {
     echo $OUTPUT->container(html_writer::tag('span', $errorstr, array('class' => 'errorstring')), array('class' => 'notifyproblem'));
