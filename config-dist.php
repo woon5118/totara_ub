@@ -527,6 +527,13 @@ $CFG->admin = 'admin';
 // any icon inside the pix/f folder. You can also set the customdescription field
 // (shown above) and (for advanced use) the groups, string, and defaulticon fields.
 //
+// Course completion logic changed in Totara 2.9 - failed activity completion
+// now triggers course completion. If you need the previous behaviour where failed
+// activities were ignored by course completion then add the following setting
+// to your config.php BEFORE upgrading to Totara 2.9
+//
+//      $CFG->completionexcludefailures = 1;
+//
 // Upgrade key
 //
 // If the upgrade key is defined here, then the value must be provided every time

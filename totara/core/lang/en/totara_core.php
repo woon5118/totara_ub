@@ -68,6 +68,8 @@ $string['completed'] = 'Completed';
 $string['completedwarningtext'] = 'Modifying activity completion criteria after some users have already completed the activity is not recommended as it can lead to different users being marked as completed for different reasons.<br />
 At this point you can choose to delete all completion records for users who have achieved completion in either this activity or this course. Their completion status for both this activity and this course will be recalculated next time cron runs and they may be marked as complete again.<br />
 Alternatively you can choose to keep all existing completion records and accept that different users may have received their status for different accomplishments.';
+$string['completionexcludefailuresoff'] = 'Users may complete activities in any way, failures are acceptable.';
+$string['completionexcludefailureson'] = 'Users have to complete activities without failures.';
 $string['configdynamicappraisals'] = 'This setting allows you to specify whether appraisals lock on activation and no longer update assignments and roles or continue to update after activation';
 $string['configenhancedcatalog'] = 'This setting allows you to specify if the enhanced catalog appears when clicking on \'Find Learning\' or any of the menu options under \'Find Learning\'.
     The enhanced catalog supports faceted search by multiple criteria using custom fields instead of relying on a single category.

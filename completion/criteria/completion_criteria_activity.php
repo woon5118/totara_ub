@@ -171,8 +171,16 @@ class completion_criteria_activity extends completion_criteria {
         $cm->id = $this->moduleinstance;
         $data = $info->get_data($cm, false, $completion->userid);
 
+        // Totara: let admin decide how to deal with activity completion failures in course completion
+        global $CFG;
+        if (!empty($CFG->completionexcludefailures)) {
+            $completedstates = array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS);
+        } else {
+            $completedstates = array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL);
+        }
+
         // If the activity is complete
-        if (in_array($data->completionstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL))) {
+        if (in_array($data->completionstate, $completedstates)) {
             if ($mark) {
                 if (isset($data->timecompleted)) {
                     // If course module indicated it's completion time, this time will be used.

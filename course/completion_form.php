@@ -111,7 +111,13 @@ class course_completion_form extends moodleform {
                 $criteria = new completion_criteria_activity(array_merge($params, $params_a));
                 $criteria->config_form_display($mform, $activity);
             }
-            $mform->addElement('static', 'criteria_role_note', '', get_string('activitiescompletednote', 'core_completion'));
+            // Totara: tell users how we deal with failed activity completions in course completions.
+            if (!empty($CFG->completionexcludefailures)) {
+                $note2 = get_string('completionexcludefailureson','totara_core');
+            } else {
+                $note2 = get_string('completionexcludefailuresoff','totara_core');
+            }
+            $mform->addElement('static', 'criteria_role_note', '', get_string('activitiescompletednote', 'core_completion') . ' ' . $note2);
 
             if (count($activities) > 1) {
                 // Map aggregation methods to context-sensitive human readable dropdown menu.
