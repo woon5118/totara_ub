@@ -40,7 +40,7 @@ function theme_basis_process_css($css, $theme) {
     $processor   = new css_processor($theme);
     $settingscss = $processor->get_settings_css($css);
 
-    if (!(bool)$theme->settings->enablestyleoverrides) {
+    if (empty($theme->settings->enablestyleoverrides)) {
         // Replace all instances ($settingscss is an array).
         return str_replace($settingscss, '', $css);
     }
