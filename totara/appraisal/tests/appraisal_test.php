@@ -613,23 +613,13 @@ class appraisal_test extends appraisal_testcase {
         $this->assertTrue(array_key_exists($user1->id, $changed));
         $this->assertEquals(count($removedroles), count($changed[$user1->id]));
 
-        // And the role assignments for the removed roles will be physically
-        // gone from the appraisal assignments.
-        $retainedroles = array_filter(
-            array_keys($roles),
-
-            function ($role) use ($removedroles) {
-                return !array_key_exists($role, $removedroles);
-            }
-        );
-
-        $currentassignments = $appraisal->get_all_assignments($user1->id);
-        $this->assertEquals(count($retainedroles), count($currentassignments));
-        foreach ($currentassignments as $assigned) {
-            $role = $assigned->appraisalrole;
-            $this->assertTrue(in_array($role, $retainedroles));
-
+        // The role assignments for the removed roles will be not be physically
+        // gone from the appraisal assignments; instead they will have a 0 user
+        // id.
+        $newRoles = [];
+        foreach (array_keys($roles) as $role) {
             $user = null;
+
             switch ($role) {
                 case appraisal::ROLE_LEARNER:
                     $user = $user1;
@@ -648,7 +638,17 @@ class appraisal_test extends appraisal_testcase {
                     $user = $appraiser;
             }
 
-            $this->assertEquals($user->id, $assigned->userid);
+            $newRoles[$role] = array_key_exists($role, $removedroles)
+                               ? 0
+                               : $user->id;
+        }
+
+        $currentassignments = $appraisal->get_all_assignments($user1->id);
+        $this->assertEquals(count($roles), count($currentassignments));
+        foreach ($currentassignments as $assigned) {
+            $role = $assigned->appraisalrole;
+            $this->assertTrue(key_exists($role, $newRoles));
+            $this->assertEquals($newRoles[$role], $assigned->userid);
         }
 
         // There should still be 2 user assignments.
@@ -819,7 +819,7 @@ class appraisal_test extends appraisal_testcase {
             $this->assertEquals($user->id, $assigned->userid);
         }
 
-        // There should still be 2 user assignments.
+        // There should still be 2 user assignments
         $userassignments = $DB->get_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
         $this->assertEquals(2, count($userassignments));
 
@@ -1019,8 +1019,10 @@ class appraisal_test extends appraisal_testcase {
         }
 
         // Check we have the users assigned to the appraisal and the users has records in the appraisal_role_assignment.
+        // Note appraisees now always 4 records for the role assignment; some may be for user id 0 - which indicates the
+        // assignment was deleted or doesn't exist.
         $this->assertEquals(count($users), count($userassignments));
-        $this->assertEquals(count($users), count($DB->get_records_sql($sql, array($appraisal->id))));
+        $this->assertEquals(count($users) * 4, count($DB->get_records_sql($sql, array($appraisal->id))));
 
         // Call the clean up task.
         $task = new \totara_appraisal\task\cleanup_task();
@@ -1029,7 +1031,7 @@ class appraisal_test extends appraisal_testcase {
         // Check the clean up task has done its work and deleted users have been removed from the assignments table.
         $currentusers = count($users) - count($deletedusers);
         $this->assertEquals($currentusers, $DB->count_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id)));
-        $this->assertEquals($currentusers, count($DB->get_records_sql($sql, array($appraisal->id))));
+        $this->assertEquals($currentusers * 4, count($DB->get_records_sql($sql, array($appraisal->id))));
 
         foreach ($deletedusers as $userid => $value) {
             $params = array('userid' => $userid, 'appraisalid' => $appraisal->id);

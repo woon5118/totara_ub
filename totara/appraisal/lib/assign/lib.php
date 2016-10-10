@@ -130,8 +130,8 @@ class totara_assign_appraisal extends totara_assign_core {
         $assignment = appraisal_user_assignment::get_user(
             $appraisal->id, $appraiseeid
         );
-        $roleassignments = (
-            new \appraisal_assignments($assignment->id)
+        $roleassignments = appraisal_assignments::from(
+            $assignment->id
         )->with_user(
             appraisal::ROLE_LEARNER, $appraiseeid
         );
@@ -206,14 +206,64 @@ class totara_assign_appraisal extends totara_assign_core {
             []
         );
 
-        $todelete = appraisal_assignments::assignment_ids($allassignments);
-        $toinsert = appraisal_assignments::storage_dtos($allassignments);
+        $toupdate = [];
+        $toinsert = [];
+        foreach ($allassignments as $assignments) {
+            $assignid = $assignments->id();
+            $current = \appraisal_assignments::from_db($assignid);
+            list($ins, $upd) = $this->update_roles($assignments, $current);
+
+            $toinsert = array_merge($toinsert, $ins);
+            $toupdate = array_merge($toupdate, $upd);
+        }
 
         $table = 'appraisal_role_assignment';
-        $field = 'appraisaluserassignmentid';
-        $DB->delete_records_list($table, $field, $todelete);
+        foreach ($toupdate as $obj) {
+            $DB->update_record($table, $obj, true);
+        }
+
         $DB->insert_records_via_batch($table, $toinsert);
         $DB->insert_records_via_batch('appraisal_role_changes', $auditlogs);
+    }
+
+    /**
+     * Creates/updates role assignments for an appraisee.
+     *
+     * @param \appraisal_assignments $newassignments new assignments.
+     * @param \appraisal_assignments $existingassignments current assignments.
+     */
+    private function update_roles(
+        \appraisal_assignments $newassignments,
+        \appraisal_assignments $existingassignments
+    ) {
+        $toinsert = [];
+        $toupdate = [];
+        $appraisalroles = [
+            appraisal::ROLE_LEARNER,
+            appraisal::ROLE_MANAGER,
+            appraisal::ROLE_TEAM_LEAD,
+            appraisal::ROLE_APPRAISER
+        ];
+
+        foreach ($appraisalroles as $role) {
+            $newuser = $newassignments->user_with_role($role);
+            $existinguser = $existingassignments->user_with_role($role);
+
+            if (empty($existinguser->id)) {
+                // This means there is no record in the database but one needs
+                // to inserted even if the userid is 0 (ie a userid for the role
+                // had been removed).
+                $toinsert[] = $newuser;
+            }
+            else {
+                // This means there is an existing database record, but it has
+                // to be updated with the new details.
+                $newuser->id = $existinguser->id;
+                $toupdate[] = $newuser;
+            }
+        }
+
+        return [$toinsert, $toupdate];
     }
 
     /**
@@ -255,9 +305,9 @@ class totara_assign_appraisal extends totara_assign_core {
 
         $users = $assignments->users();
         $params = ['appraiseeassignmentid' => $assignments->id()];
-        foreach ($assignments->users() as $role => $user) {
+        foreach ($users as $role => $user) {
             $placeholder = $placeholders[$role];
-            $params[$placeholder] = empty($user) ? 0 : $user;
+            $params[$placeholder] = $user->userid;
             $params[$placeholder . 'role'] = $role;
         }
 
@@ -268,7 +318,7 @@ class totara_assign_appraisal extends totara_assign_core {
                 $audit = new \stdClass();
                 $audit->userassignmentid = $existing->assignid;
                 $audit->originaluserid = $existing->originaluser;
-                $audit->newuserid = $users[$role];
+                $audit->newuserid = $users[$role]->userid;
                 $audit->role = $role;
                 $audit->timecreated = time();
 
@@ -525,48 +575,7 @@ class appraisal_assignments {
     /**
      * @var array current user/role assignments.
      */
-    private $assignments = [
-        appraisal::ROLE_LEARNER => null,
-        appraisal::ROLE_MANAGER => null,
-        appraisal::ROLE_TEAM_LEAD => null,
-        appraisal::ROLE_APPRAISER => null
-    ];
-
-    /**
-     * Extracts appraisee assignment ids from \appraisal_assignments instances.
-     *
-     * @param array $allassignments instances to process.
-     *
-     * @return array list of assignment ids.
-     */
-    public static function assignment_ids(array $allassignments) {
-        return array_map(
-            function (\appraisal_assignments $assignments) {
-                return $assignments->appraiseeassignmentid;
-            },
-
-            $allassignments
-        );
-    }
-
-    /**
-     * Extracts a set of DTOs to use to store role assignments in the database.
-     *
-     * @param array $allassignments instances to process.
-     *
-     * @return array list of \stdClass objects to use for storage.
-     */
-    public static function storage_dtos(array $allassignments) {
-        return array_reduce(
-            $allassignments,
-
-            function (array $accumulated, \appraisal_assignments $assignments) {
-                return array_merge($accumulated, $assignments->for_storage());
-            },
-
-            []
-        );
-    }
+    private $assignments = [];
 
     /**
      * Indicates appraisal roles that are missing from the given job assignment.
@@ -595,12 +604,73 @@ class appraisal_assignments {
     }
 
     /**
+     * Loads in the role assignments for the given user assignment id.
+     *
+     * @param int $userassignmentid user assignment id.
+     *
+     * @return array list of \appraisal_assignments objects
+     */
+    public static function from_db($userassignmentid) {
+        global $DB;
+
+        $records = $DB->get_records(
+            'appraisal_role_assignment',
+            array('appraisaluserassignmentid' => $userassignmentid)
+        );
+
+        return new \appraisal_assignments($userassignmentid, $records);
+    }
+
+    /**
+     * Creates a new blank assignment object,
+     *
+     * @param int $appraiseeassignmentid appraisee assignment id.
+     *
+     * @return \appraisal_assignments the new instance.
+     */
+    public static function from($userassignmentid) {
+        return new \appraisal_assignments($userassignmentid, []);
+    }
+
+    /**
      * Constructor.
      *
      * @param int $appraiseeassignmentid appraisee assignment id.
+     * @param array $roleassigments initial role assigmentes
      */
-    public function __construct($appraiseeassignmentid) {
+    private function __construct(
+        $appraiseeassignmentid,
+        array $roleassignments
+    ) {
         $this->appraiseeassignmentid = $appraiseeassignmentid;
+
+        foreach (array_keys(self::$job_assignment_roles) as $role) {
+            $user = new stdClass();
+
+            $user->id = null;
+            $user->appraisaluserassignmentid = $appraiseeassignmentid;
+            $user->userid = 0;
+            $user->appraisalrole = $role;
+            $user->activepageid = null;
+            $user->timecreated = time();
+
+            $this->assignments[$role] = $user;
+        }
+
+        if (empty($roleassignments)) {
+            return;
+        }
+
+        foreach ($roleassignments as $user) {
+            if (!empty($user)) {
+                $existing = $this->assignments[$user->appraisalrole];
+
+                $existing->id = $user->id;
+                $existing->userid = $user->userid;
+                $existing->activepageid = $user->activepageid;
+                $existing->timecreated = $user->timecreated;
+            }
+        }
     }
 
     /**
@@ -634,8 +704,20 @@ class appraisal_assignments {
      * @return \appraisal_assignments the updated role assignment.
      */
     public function with_user($role, $user) {
-        $this->assignments[$role] = $user;
+        $this->assignments[$role]->userid = empty($user) ? 0 : $user;
         return $this;
+    }
+
+    /**
+     * Returns the assigned user for the given role.
+     *
+     * @param int $role one of the appraisal::ROLE_XYZ constants.
+     *
+     * @return \stdClass object with fields corresponding to the columns in
+     *         the appraisal_role_assignment table.
+     */
+    public function user_with_role($role) {
+        return $this->assignments[$role];
     }
 
     /**
@@ -646,35 +728,5 @@ class appraisal_assignments {
      */
     public function users() {
         return $this->assignments;
-    }
-
-    /**
-     * Returns a DTOs to use when storing role assignments in the database. Note
-     * only non empty assignments are considered.
-     *
-     * @return array list of \stdClass whose field names mirror column names in
-     *         the appraisal_role_assignment table.
-     */
-    public function for_storage() {
-        return array_reduce(
-            array_keys(self::$job_assignment_roles),
-
-            function (array $accumulated, $role) {
-                $user = $this->assignments[$role];
-                if (empty($user)) {
-                    return $accumulated;
-                }
-
-                $dto = new stdClass();
-                $dto->appraisaluserassignmentid = $this->appraiseeassignmentid;
-                $dto->userid = $user;
-                $dto->appraisalrole = $role;
-                $dto->timecreated = time();
-
-                return array_merge($accumulated, [$dto]);
-            },
-
-            []
-        );
     }
 }
