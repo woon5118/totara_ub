@@ -105,6 +105,7 @@
     }
 }
 
+/** Mod facetoface fixes */
 @media screen and (min-width: 500px) {
     .f2f dt {
         clear: left;
@@ -128,4 +129,14 @@
         margin-right: 23%;
         padding-right: 5px;
     }
+}
+
+#assignform button.search,
+#assignform input[type="submit"].search {
+    margin: 2px auto;
+}
+
+#assignform input[type="text"] {
+    margin: 5px 0 0 0;
+    vertical-align: top;
 }
