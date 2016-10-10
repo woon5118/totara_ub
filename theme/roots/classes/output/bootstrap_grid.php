@@ -67,27 +67,29 @@ class bootstrap_grid {
      */
     public function get_regions_classes() {
 
+        // NOTE: when making changes here make sure you apply them also to theme/roots/less/totara/core.less
+
         if ($this->side_pre && $this->side_post) {
             return array(
-                'content' => 'col-sm-6 col-sm-push-3 col-lg-8 col-lg-push-2',
-                'pre' => 'col-sm-3 col-sm-pull-6 col-lg-2 col-lg-pull-8',
-                'post' => 'col-sm-3 col-lg-2',
+                'content' => 'col-sm-12 col-md-6 col-md-push-3',
+                'pre' => 'col-sm-6 col-md-3 col-md-pull-6',
+                'post' => 'col-sm-6 col-md-3',
             );
         }
 
         if ($this->side_pre && !$this->side_post) {
             return array(
-                'content' => 'col-sm-9 col-sm-push-3 col-lg-10 col-lg-push-2',
-                'pre' => 'col-sm-3 col-sm-pull-9 col-lg-2 col-lg-pull-10',
+                'content' => 'col-sm-12 col-md-9 col-md-push-3',
+                'pre' => 'col-sm-6 col-md-3 col-md-pull-9',
                 'post' => 'empty',
             );
         }
 
         if (!$this->side_pre && $this->side_post) {
             return array(
-                'content' => 'col-sm-9 col-lg-10',
+                'content' => 'col-sm-12 col-md-9',
                 'pre' => 'empty',
-                'post' => 'col-sm-3 col-lg-2',
+                'post' => 'col-sm-6 col-sm-offset-6 col-md-3 col-md-offset-0',
             );
         }
 

@@ -44,9 +44,9 @@ class theme_roots_bootstrap_grid_testcase extends basic_testcase {
         // Side-pre and side-post.
         //
         $expected =  array(
-            'content' => 'col-sm-6 col-sm-push-3 col-lg-8 col-lg-push-2',
-            'pre' => 'col-sm-3 col-sm-pull-6 col-lg-2 col-lg-pull-8',
-            'post' => 'col-sm-3 col-lg-2',
+            'content' => 'col-sm-12 col-md-6 col-md-push-3',
+            'pre' => 'col-sm-6 col-md-3 col-md-pull-6',
+            'post' => 'col-sm-6 col-md-3',
         );
         $actual = (new bootstrap_grid())
             ->has_side_pre()
@@ -59,8 +59,8 @@ class theme_roots_bootstrap_grid_testcase extends basic_testcase {
         // Side-pre only.
         //
         $expected = array(
-            'content' => 'col-sm-9 col-sm-push-3 col-lg-10 col-lg-push-2',
-            'pre' => 'col-sm-3 col-sm-pull-9 col-lg-2 col-lg-pull-10',
+            'content' => 'col-sm-12 col-md-9 col-md-push-3',
+            'pre' => 'col-sm-6 col-md-3 col-md-pull-9',
             'post' => 'empty',
         );
         $actual = (new bootstrap_grid())
@@ -73,9 +73,9 @@ class theme_roots_bootstrap_grid_testcase extends basic_testcase {
         // Side-post only.
         //
         $expected = array(
-            'content' => 'col-sm-9 col-lg-10',
+            'content' => 'col-sm-12 col-md-9',
             'pre' => 'empty',
-            'post' => 'col-sm-3 col-lg-2',
+            'post' => 'col-sm-6 col-sm-offset-6 col-md-3 col-md-offset-0',
         );
         $actual = (new bootstrap_grid())
             ->has_side_post()
