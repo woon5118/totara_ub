@@ -378,6 +378,7 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         $after1 = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student1, $sessionolddates, 1);
 
         $emails = $emailsink->get_messages();
+        $emailsink->close();
         $this->assertContains("Your session has changed", $emails[0]->body);
         $this->assertContains("BOOKING CANCELLED", $emails[1]->body);
 
@@ -403,6 +404,23 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         $this->assertEquals($before1ids[0], $after1ids[0]);
         $this->assertGreaterThanOrEqual($before0seqs[0], $after0seqs[0]);
         $this->assertGreaterThanOrEqual($before0seqs[0], $after1seqs[0]);
+
+        // Now test cancelling the session.
+        $emailsink = $this->redirectEmails();
+        $result = facetoface_cancel_session(facetoface_get_session($session->id), null);
+        $this->assertTrue($result);
+
+        $messages = $emailsink->get_messages();
+        $this->assertCount(1, $messages);
+        $message = reset($messages);
+        $this->assertContains('Seminar event cancellation', $message->subject);
+        $this->assertContains('This is to advise that the following session has been cancelled', $message->body);
+        $this->assertContains('Course: Test course 1', $message->body);
+        $this->assertContains('Seminar: facetoface', $message->body);
+        $this->assertContains('Date(s) and location(s):', $message->body);
+
+        $session = facetoface_get_session($session->id);
+        $this->assertEquals(1, $session->cancelledstatus);
     }
 
     /**

@@ -1258,6 +1258,14 @@ function facetoface_send_oneperday_notice($facetoface, $session, $userid, $param
         $session->notifyuser = true;
     }
 
+    if (!isset($session->sessiondates)) {
+        // Annoying, inconsistently implemented API.
+        // We add the session dates to the session object as quite possibly other session lib funcs will need them also, and we don't want
+        // to continuously load them.
+        // This is sadly consistently inconsistent behaviour.
+        $session->sessiondates = facetoface_get_session_dates($session->id);
+    }
+
     // Keep track of all sessiondates.
     $sessiondates = $session->sessiondates;
     // We need to consider old dates (cancel them if no new date exist for their dates).
