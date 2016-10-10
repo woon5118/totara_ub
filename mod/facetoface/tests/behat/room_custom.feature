@@ -42,7 +42,7 @@ Feature: Manage custom rooms by non-admin user
     Then I should see "Room 1 (5)"
 
     # Edit
-    And I click on ".roomname a.dialog-singleselect-editable" "css_element"
+    And I click on "Edit room" "link"
     And I should see "Edit room" in the "Edit room" "totaradialogue"
     And I set the following fields to these values:
       | Name         | Room edited |

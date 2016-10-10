@@ -287,7 +287,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                             $roomitem.addClass('nonempty');
                             // Edit button.
                             if (Number(elem.custom) > 0) {
-                                var $editbutton = $('<a href="#" class="dialog-singleselect-editable">'+M.util.get_string('editroom', 'facetoface')+'</a>');
+                                var $editbutton = $('<a href="#"></a>');
                                 $editbutton.click(function(e) {
                                     e.preventDefault();
                                     M.totara_f2f_room.config.editroom = elem.id;
@@ -295,6 +295,11 @@ M.totara_f2f_room = M.totara_f2f_room || {
                                     totaraDialogs['editcustomroom' + offset].open();
                                 });
                                 $roomitem.append($editbutton);
+                                require(['core/templates'], function (templates) {
+                                    templates.renderIcon('edit', M.util.get_string('editroom', 'facetoface')).done(function (html) {
+                                        $editbutton.html(html);
+                                    });
+                                });
                             }
                             handler.setup_delete();
                             $('input[name="roomcapacity[' + offset + ']"]').val(elem.capacity);
@@ -401,30 +406,39 @@ M.totara_f2f_room = M.totara_f2f_room || {
          */
         var render_asset_item = function(data, $input, offset) {
             var $elem = $('<li class="assetname" id="assetname' + offset + '_' + data.id + '" data-assetid="' + data.id + '" data-custom="' + data.custom + '">' + data.name + '</li>');
-            if (Number(data.custom) > 0) {
-                var $editbutton = $('<a href="#" class="dialog-singleselect-editable">'+M.util.get_string('editasset', 'facetoface')+'</a>');
-                $editbutton.click(function(e) {
-                    e.preventDefault();
-                    M.totara_f2f_room.config.editasset = data.id;
-                    totaraDialogs['editcustomasset' + offset].config.title = '<h2>' + M.util.get_string('editasset', 'facetoface') + '</h2>';
-                    totaraDialogs['editcustomasset' + offset].open();
-                });
-                $elem.append($editbutton);
-            }
-            var $deletebutton = $('<a href="#" class="dialog-singleselect-deletable">'+M.util.get_string('delete', 'totara_core')+'</a>');
-            $deletebutton.click(function(e) {
-                e.preventDefault();
-                var $li = $deletebutton.closest('li');
-                var delid = $li.data('assetid') + "";
-                 var ids = $input.val().split(',');
-                 var index = ids.indexOf(delid);
-                 if (index > -1) {
-                    ids.splice(index, 1);
-                    $input.val(ids.join());
+            require(['core/templates'], function (templates) {
+                if (Number(data.custom) > 0) {
+                    var $editbutton = $('<a href="#"></a>');
+                    $editbutton.click(function(e) {
+                        e.preventDefault();
+                        M.totara_f2f_room.config.editasset = data.id;
+                        totaraDialogs['editcustomasset' + offset].config.title = '<h2>' + M.util.get_string('editasset', 'facetoface') + '</h2>';
+                        totaraDialogs['editcustomasset' + offset].open();
+                    });
+                    $elem.append($editbutton);
+                    templates.renderIcon('edit', M.util.get_string('editasset', 'facetoface')).done(function (html) {
+                        $editbutton.html(html);
+                    });
                 }
-                $li.remove();
+
+                var $deletebutton = $('<a href="#"></a>');
+                $deletebutton.click(function(e) {
+                    e.preventDefault();
+                    var $li = $deletebutton.closest('li');
+                    var delid = $li.data('assetid') + "";
+                    var ids = $input.val().split(',');
+                    var index = ids.indexOf(delid);
+                    if (index > -1) {
+                        ids.splice(index, 1);
+                        $input.val(ids.join());
+                    }
+                    $li.remove();
+                });
+                $elem.append($deletebutton);
+                templates.renderIcon('delete', M.util.get_string('delete', 'totara_core')).done(function (html) {
+                    $deletebutton.html(html);
+                });
             });
-            $elem.append($deletebutton);
             return $elem;
         };
 

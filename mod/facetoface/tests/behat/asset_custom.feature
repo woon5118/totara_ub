@@ -16,7 +16,7 @@ Feature: Manage custom assets by non-admin user
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
 
-  Scenario: Add edit seminar custom room as editing teacher
+  Scenario: Add edit seminar custom asset as editing teacher
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -38,7 +38,7 @@ Feature: Manage custom assets by non-admin user
     Then I should see "Asset 1"
 
     # Edit
-    And I click on ".assetname a.dialog-singleselect-editable" "css_element"
+    And I click on "Edit asset" "link"
     And I should see "Edit asset" in the "Edit asset" "totaradialogue"
     And I set the following fields to these values:
       | Asset name | Asset updated |
