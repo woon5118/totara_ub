@@ -102,6 +102,30 @@ echo $OUTPUT->heading(get_string('transferdbtoserver', 'tool_dbtransfer'));
 $info = format_text(get_string('transferdbintro', 'tool_dbtransfer'), FORMAT_MARKDOWN);
 echo $OUTPUT->box($info);
 
+// This disclaimer is hard coded, its technical in nature, should only be seen by the admin on super rare occasions, failures are hard coded anyway.
+// Really you should not run this tool presently. In 10.0 we'll look to do something about this.
+
+$disclaimer = <<<DISCLAIMER
+<p>Please be aware that the use of this tool is not supported. It is an experimental tool and should be used with extreme caution.</p>
+<p>If you are using this tool please be aware that it will not run database specific installation steps which may be required by code.<br />
+You will need to review the install.php files within each component and plugin, and manually run any installation steps required for the database you are migrating to.<br />
+Known installation steps which must be manually run include, but may not be limited to:</p>
+<ul>
+<li><em>totara/reportbuilder/db/install.php</em> when migrating to PostgreSQL, installation of the GROUP_CONCAT function.</li>
+<li><em>totara/mssql/install.php</em> when migrating to MSSQL, installation of the GROUP_CONCAT function.</li>
+<li><em>totara/mssql/install.php</em> when migrating to MSSQL, permission checks.</li>
+</ul>
+<p>Please be aware that database structures created dynamically to facilitate functionality will not be copied over, this includes:</p>
+<ul>
+<li>Appraisals, tables created by the creation of appraisals will not be copied over.</li>
+<li>Feedback 360, tables created by the creation of feedback instances will not be copied over.</li>
+<li>Report builder caches, tables created to cache report data will not be copied over.</li>
+</ul>
+<p>Finally the case sensitivity on the new database must be identical on that of the original, otherwise the migration of data may not be possible.</p>
+DISCLAIMER;
+
+echo $OUTPUT->notification($disclaimer, 'notifymessage');
+
 $form->display();
 if ($problem !== '') {
     echo $OUTPUT->box($problem, 'generalbox error');
