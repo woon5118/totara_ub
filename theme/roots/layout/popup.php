@@ -24,6 +24,8 @@
  * @author      Petr Skoda <petr.skoda@totaralms.com>
  */
 
+$hasfooter = (!isset($PAGE->layout_options['nofooter']) || !$PAGE->layout_options['nofooter']);
+
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
@@ -40,7 +42,9 @@ echo $OUTPUT->doctype() ?>
     <?php
     echo $OUTPUT->standard_top_of_body_html();
     echo $OUTPUT->main_content();
-    echo $OUTPUT->standard_footer_html();
+    if ($hasfooter) {
+        echo $OUTPUT->standard_footer_html();
+    }
     echo $OUTPUT->standard_end_of_body_html();
     ?>
     </section>
