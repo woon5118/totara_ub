@@ -1283,6 +1283,41 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         $this->assertCount(1, $emails, 'Wrong booking cancellation for Test Manager copy is enable and suppressccmanager is enabled.');
     }
 
+    public function test_booking_cancellation_only_ccmanager() {
+
+        // Test Manager copy is disabled and suppressccmanager is disbaled.
+        list($session, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+
+        $emailsink = $this->redirectEmails();
+        facetoface_user_import($course, $facetoface, $session, $student1->id);
+        $emailsink->close();
+
+        $attendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED));
+
+        $params = array(
+            'facetofaceid'  => $facetoface->id,
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
+        );
+        $this->update_f2f_notification($params, 1);
+
+        $emailsink = $this->redirectEmails();
+        foreach ($attendees as $attendee) {
+            if (facetoface_user_cancel($session, $attendee->id)) {
+                $facetoface->ccmanager = 1;
+                $session->notifyuser = 0;
+                facetoface_send_cancellation_notice($facetoface, $session, $attendee->id);
+            }
+        }
+        $emailsink->close();
+
+        $emails = $emailsink->get_messages();
+        $this->assertCount(1, $emails, 'Only one message is expected');
+        $this->assertEquals($manager->email, $emails[0]->to);
+        $joinedbody = str_replace("=\n", "", $emails[0]->body);
+        $this->assertContains('you as their Team Leader', $joinedbody);
+    }
+
     public function test_booking_cancellation_no_ccmanager() {
 
         // Test Manager copy is disabled and suppressccmanager is disbaled.

@@ -103,8 +103,9 @@ if ($fromform = $mform->get_data()) {
             if (facetoface_user_cancel($session, $attendee->id, true, $cancelerr)) {
                 // Notify the user of the cancellation if the session hasn't started yet
                 $timenow = time();
-                if ($fromform->notifyuser and !facetoface_has_session_started($session, $timenow)) {
+                if (($fromform->notifymanager || $fromform->notifyuser) and !facetoface_has_session_started($session, $timenow)) {
                     $facetoface->ccmanager = $fromform->notifymanager;
+                    $session->notifyuser = $fromform->notifyuser;
                     facetoface_send_cancellation_notice($facetoface, $session, $attendee->id);
                 }
 
