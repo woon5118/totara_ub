@@ -1308,7 +1308,7 @@ class program {
      *
      * @global object $CFG
      * @global object $USER
-     * @param int $userid
+     * @param int $userid If specified then it indicates the user is assigned to the program.
      * @return string
      */
     public function display($userid=null) {
@@ -1489,6 +1489,14 @@ class program {
         return $out;
     }
 
+    /**
+     * Display the course set groups of a given program or certification path.
+     *
+     * @param $certifpath
+     * @param $userid If specified then it indicates the user is assigned to the program.
+     * @param $viewinganothersprogram
+     * @return string
+     */
     function display_courseset($certifpath, $userid, $viewinganothersprogram) {
         $out = '';
         $courseset_groups = $this->content->get_courseset_groups($certifpath);
