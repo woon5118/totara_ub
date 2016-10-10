@@ -61,15 +61,13 @@ echo $OUTPUT->doctype() ?>
             <?php echo $OUTPUT->main_content(); ?>
         </section>
     </div>
-
-    <footer id="page-footer">
-        <?php
-        echo $OUTPUT->standard_footer_html();
-        ?>
-    </footer>
-
-    <?php echo $OUTPUT->standard_end_of_body_html() ?>
-
 </div>
+
+<footer id="page-footer" class="page-footer">
+    <div class="container-fluid page-footer-main-content">
+        <?php echo $OUTPUT->standard_footer_html(); ?>
+    </div>
+</footer>
+<?php echo $OUTPUT->standard_end_of_body_html() ?>
 </body>
 </html>
