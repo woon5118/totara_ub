@@ -31,14 +31,16 @@ require_once($CFG->dirroot . '/totara/job/jobassignment_form.php');
 $courseid = optional_param('course', SITEID, PARAM_INT);
 $jobassignmentid = optional_param('jobassignmentid', 0, PARAM_INT);
 
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+
+// Check logged in user can view this profile.
+require_login($course);
+
 if (empty($jobassignmentid)) {
     // If no job assignment id is provided then we must be adding a new job assignment for the specified user.
     $jobassignment = null;
     $userid = optional_param('userid', $USER->id, PARAM_INT);
     $currenturl = new moodle_url('/totara/job/jobassignment.php', array('userid' => $userid));
-    if (empty($CFG->totara_job_allowmultiplejobs) && \totara_job\job_assignment::get_all($userid)) {
-        print_error('error:onlyonejobassignmentallowed', 'totara_job');
-    }
 } else {
     // Load the job assignment.
     $jobassignment = \totara_job\job_assignment::get_with_id($jobassignmentid);
@@ -46,16 +48,9 @@ if (empty($jobassignmentid)) {
     $currenturl = new moodle_url('/totara/job/jobassignment.php', array('jobassignmentid' => $jobassignmentid));
 }
 
-// Load some basic data.
-if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error('error:courseidincorrect', 'totara_core');
-}
 if (!$user = $DB->get_record('user', array('id' => $userid))) {
     print_error('error:useridincorrect', 'totara_core');
 }
-
-// Check logged in user can view this profile.
-require_login($course);
 
 // Check permissions.
 $coursecontext = context_course::instance($course->id);
@@ -76,6 +71,12 @@ if (!$canview) {
 // Is user deleted?
 if ($user->deleted) {
     print_error('userdeleted', 'moodle');
+}
+
+if (empty($jobassignmentid) && empty($CFG->totara_job_allowmultiplejobs) && \totara_job\job_assignment::get_all($userid)) {
+    // We're adding a new job assignment (as no jobassignment id provided), but multiple jobs is off
+    // and the user already has one.
+    print_error('error:onlyonejobassignmentallowed', 'totara_job');
 }
 
 // Can user edit this user's job assignments?
