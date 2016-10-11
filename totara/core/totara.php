@@ -1258,7 +1258,7 @@ function totara_update_temporary_manager($userid, $managerid, $expiry) {
     $msg = new stdClass();
     $msg->userfrom = $USER;
     $msg->msgstatus = TOTARA_MSG_STATUS_OK;
-    $msg->contexturl = $CFG->wwwroot.'/user/positions.php?user='.$userid.'&courseid='.SITEID;
+    $msg->contexturl = $CFG->wwwroot.'/totara/job/jobassignment.php?jobassignmentid='.$this->id;
     $msg->contexturlname = get_string('xpositions', 'totara_core', fullname($user));
     $msgparams = (object)array('staffmember' => fullname($user), 'tempmanager' => fullname($newtempmanager),
         'expirytime' => userdate($expiry, get_string('datepickerlongyearphpuserdate', 'totara_core')), 'url' => $msg->contexturl);

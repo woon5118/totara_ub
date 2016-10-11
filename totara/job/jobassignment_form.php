@@ -28,6 +28,8 @@ class job_assignment_form extends moodleform {
     function definition () {
         global $CFG, $DB;
 
+        require_once($CFG->dirroot . '/user/lib.php');
+
         $mform = $this->_form;
         $jobassignment = $this->_customdata['jobassignment'];
         $submitted = $this->_customdata['submitted'];
@@ -188,13 +190,32 @@ class job_assignment_form extends moodleform {
                         'value' => get_string('chooseappraiser', 'totara_job'), 'id' => 'show-appraiser-dialog'))
                 );
             } else {
-                $mform->addElement(
-                    'static',
-                    'appraiserselector',
-                    get_string('appraiser', 'totara_job'),
-                    html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
-                        array('id' => $appraiserid)), format_string($appraisertitle)), array('id' => 'appraisertitle'))
-                );
+                if (!empty($appraiserid)) {
+                    $usercontext = context_user::instance($appraiserid, MUST_EXIST);
+                    $testuser = new stdClass();
+                    $testuser->id = $appraiserid;
+                    $testuser->deleted = false;
+                    $showlink = user_can_view_profile($testuser, null, $usercontext);
+                } else {
+                    $showlink = false;
+                }
+
+                if ($showlink) {
+                    $mform->addElement(
+                        'static',
+                        'appraiserselector',
+                        get_string('appraiser', 'totara_job'),
+                        html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
+                            array('id' => $appraiserid)), format_string($appraisertitle)), array('id' => 'appraisertitle'))
+                    );
+                } else {
+                    $mform->addElement(
+                        'static',
+                        'appraiserselector',
+                        get_string('appraiser', 'totara_job'),
+                        html_writer::tag('span', format_string($appraisertitle), array('id' => 'appraisertitle'))
+                    );
+                }
             }
 
             $mform->addElement('hidden', 'appraiserid');
@@ -212,18 +233,39 @@ class job_assignment_form extends moodleform {
                 'managerselector',
                 get_string('manager', 'totara_job'),
                 html_writer::tag('span', format_string($managertitle), array('class' => $manager_class, 'id' => 'managertitle'))
-                . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
+                . html_writer::empty_tag('input',
+                    array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
             );
             $mform->addElement('hidden', 'manageridjaid');
             $mform->setType('manageridjaid', PARAM_ALPHANUMEXT);
             $mform->setDefault('manageridjaid', $managerid . '-' .$managerjaid);
         } else {
-            $mform->addElement(
-                'static',
-                'managerselector',
-                get_string('manager', 'totara_job'),
-                html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php', array('id' => $managerid)), format_string($managertitle)), array('id' => 'managertitle'))
-            );
+            if (!empty($managerid)) {
+                $usercontext = context_user::instance($managerid, MUST_EXIST);
+                $testuser = new stdClass();
+                $testuser->id = $managerid;
+                $testuser->deleted = false;
+                $showlink = user_can_view_profile($testuser, null, $usercontext);
+            } else {
+                $showlink = false;
+            }
+
+            if ($showlink) {
+                $mform->addElement(
+                    'static',
+                    'managerselector',
+                    get_string('manager', 'totara_job'),
+                    html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
+                        array('id' => $managerid)), format_string($managertitle)), array('id' => 'managertitle'))
+                );
+            } else {
+                $mform->addElement(
+                    'static',
+                    'managerselector',
+                    get_string('manager', 'totara_job'),
+                    html_writer::tag('span', format_string($managertitle), array('id' => 'managertitle'))
+                );
+            }
         }
 
         $mform->addElement('hidden', 'managerid');
@@ -285,14 +327,34 @@ class job_assignment_form extends moodleform {
                 $mform->setType('tempmanageridjaid', PARAM_ALPHANUMEXT);
                 $mform->setDefault('tempmanageridjaid', $tempmanagerid . '-' .$tempmanagerjaid);
             } else {
-                $mform->addElement(
-                    'static',
-                    'tempmanagerselector',
-                    get_string('tempmanager', 'totara_job'),
-                    html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
-                            array('id' => $tempmanagerid)), format_string($tempmanagertitle)),
-                            array('id' => 'tempmanagertitle'))
-                );
+                if (!empty($tempmanagerid)) {
+                    $usercontext = context_user::instance($tempmanagerid, MUST_EXIST);
+                    $testuser = new stdClass();
+                    $testuser->id = $tempmanagerid;
+                    $testuser->deleted = false;
+                    $showlink = user_can_view_profile($testuser, null, $usercontext);
+                } else {
+                    $showlink = false;
+                }
+
+                if ($showlink) {
+                    $mform->addElement(
+                        'static',
+                        'tempmanagerselector',
+                        get_string('tempmanager', 'totara_job'),
+                        html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
+                                array('id' => $tempmanagerid)), format_string($tempmanagertitle)),
+                                array('id' => 'tempmanagertitle'))
+                    );
+                } else {
+                    $mform->addElement(
+                            'static',
+                            'tempmanagerselector',
+                            get_string('tempmanager', 'totara_job'),
+                            html_writer::tag('span', format_string($tempmanagertitle),
+                                    array('id' => 'tempmanagertitle'))
+                        );
+                }
             }
 
             $mform->addElement('hidden', 'tempmanagerid');

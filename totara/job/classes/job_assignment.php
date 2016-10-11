@@ -836,7 +836,7 @@ class job_assignment {
         $msg = new \stdClass();
         $msg->userfrom = $USER;
         $msg->msgstatus = TOTARA_MSG_STATUS_OK;
-        $msg->contexturl = $CFG->wwwroot.'/user/positions.php?user='.$this->userid.'&courseid='.SITEID;
+        $msg->contexturl = $CFG->wwwroot.'/totara/job/jobassignment.php?jobassignmentid='.$this->id;
         $msg->contexturlname = get_string('xpositions', 'totara_job', fullname($user));
         $msgparams = (object)array(
             'staffmember' => fullname($user),
