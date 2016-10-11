@@ -1073,7 +1073,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         $output = array();
 
-        $output[] = html_writer::start_tag('dl', array('class' => 'f2f roomdetails'));
+        $output[] = html_writer::start_tag('dl', array('class' => 'f2f roomdetails dl-horizontal'));
 
         // Room name.
         $output[] = html_writer::tag('dt', get_string('roomname', 'facetoface'));
