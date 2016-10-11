@@ -119,13 +119,6 @@ class totara_completionimport_lib_testcase extends advanced_testcase {
                     // If the format of the $completiondate is exactly the same
                     // as $csvdateformat, the result should return true.
                     $thisexpectedresults[$key] = true;
-                } else if ((strpos($key, 'Y') === false) && (stripos($key, $csvdateformat) !== false)) {
-                    // So the $completiondate format does not match $csvdateformat. But if the
-                    // $completiondate format uses a 2 digit year, it could still be valid for
-                    // $csvdateformat that processes a 4 digit year, but not the other way around.
-                    // E.g. $completiondate = 30/08/98 is allowed for $csvdateformat = d/m/Y,
-                    // but $completiondate = 30/08/1998 is not allowed for $csvdateformat = d/m/y.
-                    $thisexpectedresults[$key] = true;
                 }
             }
 

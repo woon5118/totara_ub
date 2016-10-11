@@ -1897,10 +1897,17 @@ function update_errors_import($records, $errormessage, $tablename) {
  */
 function totara_completionimport_validate_date($csvdateformat, $completiondate) {
     $dateArray = date_parse_from_format($csvdateformat, $completiondate);
+
     if (!is_array($dateArray) or !empty($dateArray['error_count'])) {
         return false;
     }
+
     if ($dateArray['is_localtime']) {
+        return false;
+    }
+
+    // A four digit year has been specified but not provided.
+    if (preg_match('/Y/', $csvdateformat) && $dateArray['year'] < 1000) {
         return false;
     }
 
