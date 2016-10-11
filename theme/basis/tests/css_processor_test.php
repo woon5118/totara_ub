@@ -41,33 +41,34 @@ class css_processor_testcase extends basic_testcase {
      * It should return the settings delimited CSS if it exists or an empty string if not.
      */
     public function test_it_finds_settings_css() {
+        $starttoken = css_processor::TOKEN_ENABLEOVERRIDES_START;
+        $endtoken = css_processor::TOKEN_ENABLEOVERRIDES_END;
         $css = <<<EOF
 body {
     background: lime;
 }
-[[settings:start]]
+{$starttoken}
 SETTINGS HERE 1
-[[settings:end]]
-
+{$endtoken}
 .foo .bar {
     display: inline-block;
     color: #123123;
 }
 
-[[settings:start]]
+{$starttoken}
 SETTINGS HERE 2
-[[settings:end]]
+{$endtoken}
 EOF;
         $expected = array();
         $expected[] = <<<EOF
-[[settings:start]]
+{$starttoken}
 SETTINGS HERE 1
-[[settings:end]]
+{$endtoken}
 EOF;
         $expected[] = <<<EOF
-[[settings:start]]
+{$starttoken}
 SETTINGS HERE 2
-[[settings:end]]
+{$endtoken}
 EOF;
         $actual = (new css_processor())->get_settings_css($css);
 
@@ -264,11 +265,13 @@ EOF;
      * It should remove settings CSS delimiters.
      */
     public function test_it_removes_delimiters() {
+        $starttoken = css_processor::TOKEN_ENABLEOVERRIDES_START;
+        $endtoken = css_processor::TOKEN_ENABLEOVERRIDES_END;
 
         $css = <<<EOF
-[[settings:start]]SETTINGSCSS[[settings:end]]
+{$starttoken}SETTINGSCSS{$endtoken}
 CSS
-[[settings:start]]SETTINGSCSS[[settings:end]]
+{$starttoken}SETTINGSCSS{$endtoken}
 EOF;
 
         $expected = <<<EOF

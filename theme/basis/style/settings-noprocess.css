@@ -4,7 +4,7 @@
  * do not rely on autoprefixing or rtl flipping.
  */
 
-[[settings:start]]
+[[enablestyleoverrides:start]]
 
 a, a:link {
     color: [[setting:linkcolor]];
@@ -204,8 +204,8 @@ body, h1, h2, h3, h4, h5, h6, p, ul, ol, dl, input, textarea {
     }
 }
 
+[[enablestyleoverrides:end]]
+
 /** Custom CSS defined via theme settings **/
 [[setting:customcss]]
 /** END Custom CSS **/
-
-[[settings:end]]

@@ -42,7 +42,9 @@ function theme_basis_process_css($css, $theme) {
 
     if (empty($theme->settings->enablestyleoverrides)) {
         // Replace all instances ($settingscss is an array).
-        return str_replace($settingscss, '', $css);
+        $css = str_replace($settingscss, '', $css);
+        // Always insert settings-based custom CSS.
+        return $processor->replace_tokens(array('customcss' => css_processor::$DEFAULT_CUSTOMCSS), $css);
     }
 
     $replacements = $settingscss;
@@ -62,7 +64,6 @@ function theme_basis_process_css($css, $theme) {
         'contentbackground' => css_processor::$DEFAULT_CONTENTBACKGROUND,
         'bodybackground'    => css_processor::$DEFAULT_BODYBACKGROUND,
         'textcolor'         => css_processor::$DEFAULT_TEXTCOLOR,
-        'customcss'         => css_processor::$DEFAULT_CUSTOMCSS,
     );
 
     foreach (array_values($replacements) as $i => $replacement) {
@@ -74,6 +75,9 @@ function theme_basis_process_css($css, $theme) {
     if (!empty($settingscss)) {
         $css = str_replace($settingscss, $replacements, $css);
     }
+
+    // Settings based CSS is not applied conditionally.
+    $css = $processor->replace_tokens(array('customcss' => css_processor::$DEFAULT_CUSTOMCSS), $css);
 
     return $css;
 }

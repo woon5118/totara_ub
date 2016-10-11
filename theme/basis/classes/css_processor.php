@@ -29,6 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 
 class css_processor {
 
+    const TOKEN_ENABLEOVERRIDES_START = '[[enablestyleoverrides:start]]';
+    const TOKEN_ENABLEOVERRIDES_END = '[[enablestyleoverrides:end]]';
+
     // We use static properties rather than class constants
     // so that the class may be reused / overridden in other
     // themes. Otherwise all inheriting classes would be stuck
@@ -101,7 +104,9 @@ class css_processor {
      */
     public function get_settings_css($css) {
         $matches = array();
-        if (preg_match_all('/\[\[settings:start\]\].*?\[\[settings:end\]\]/s', $css, $matches) > 0) {
+        $start = preg_quote(self::TOKEN_ENABLEOVERRIDES_START);
+        $end = preg_quote(self::TOKEN_ENABLEOVERRIDES_END);
+        if (preg_match_all("/{$start}.*?{$end}/s", $css, $matches) > 0) {
             return $matches[0];
         }
         return array();
@@ -142,7 +147,10 @@ class css_processor {
      * @return string
      */
     public function remove_delimiters($css) {
-        $replacements = array('[[settings:start]]' => '', '[[settings:end]]' => '');
+        $replacements = array(
+            self::TOKEN_ENABLEOVERRIDES_START => '',
+            self::TOKEN_ENABLEOVERRIDES_END => ''
+        );
         return str_replace(array_keys($replacements), array_values($replacements), $css);
     }
 
