@@ -12,6 +12,7 @@ Feature: Test course visibility
       | Chemistry | C2        | 1       |
       | Physics   | C3        | 0       |
       | Calculus  | C4        | 0       |
+      | Mandatory | C0        | 1       |
     And the following "users" exist:
       | username | firstname | lastname | email                |
       | trainer1 | Trainer   | 1        | trainer1@example.com |
@@ -28,6 +29,10 @@ Feature: Test course visibility
       | learner1 | C2     | student        |
       | learner1 | C3     | student        |
       | learner1 | C4     | student        |
+      | trainer1 | C0     | editingteacher |
+      | learner1 | C0     | student        |
+      | learner2 | C0     | student        |
+      | learner3 | C0     | student        |
     And the following "cohorts" exist:
       | name     | idnumber | contextlevel | reference |
       | Cohort 1 | AUD1     | System       | 0         |
@@ -41,6 +46,10 @@ Feature: Test course visibility
     And I log in as "admin"
     And I set the following administration settings values:
       | Front page items when logged in | Combo list |
+    And I navigate to "Dashboards" node in "Site administration > Appearance"
+    And I click on "My Learning" "link"
+    And I press "Blocks editing on"
+    And I add the "Courses" block
     And I log out
 
   Scenario: Traditional course visibility works as expected
