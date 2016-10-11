@@ -44,6 +44,7 @@ $THEME->plugins_exclude_sheets = array(
     'block' => array(
         'current_learning',
         'search_forums',
+        'totara_alerts',
     ),
     'mod' => array(
         'feedback'
