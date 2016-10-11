@@ -1150,7 +1150,7 @@ totaraDialog_handler_treeview_singleselect.prototype.setup_delete = function() {
 
     var textel = $('#'+this.text_element_id);
     var idel = $('input[name="'+this.value_element_name+'"]');
-    var deletebutton = $('<a href="#" class="dialog-singleselect-deletable">'+M.util.get_string('delete', 'totara_core')+'</a>');
+    var deletebutton = $('<a href="#" class="dialog-singleselect-deletable"></a>');
     var handler = this;
 
     // Setup handler
@@ -1160,6 +1160,12 @@ totaraDialog_handler_treeview_singleselect.prototype.setup_delete = function() {
         textel.removeClass('nonempty');
         textel.empty();
         handler.setup_delete();
+    });
+
+    require(['core/templates'], function (templates) {
+        templates.renderIcon('delete', M.util.get_string('delete', 'totara_core')).done(function (html) {
+            deletebutton.html(html);
+        });
     });
 
     if (textel.hasClass('nonempty') && textel.text().length > 0) {

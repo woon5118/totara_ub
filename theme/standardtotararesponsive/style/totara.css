@@ -181,33 +181,6 @@ a.noscript-button {
     text-align: center;
 }
 
-/* button for removing and edit items once added by dialog */
-.dialog-singleselect-deletable {
-    vertical-align: middle;
-    cursor: pointer;
-    display: inline-block;
-    margin: 0 0 0 2px;
-    overflow: hidden;
-    text-indent: 100%;
-    white-space: nowrap;
-    padding: 2px 0px;
-    width: 20px;
-    background: transparent url([[pix:moodle|t/delete]]) 2px 3px no-repeat;
-}
-
-.dialog-singleselect-editable {
-    vertical-align: middle;
-    cursor: pointer;
-    display: inline-block;
-    margin: 0 0 0 2px;
-    overflow: hidden;
-    text-indent: 100%;
-    white-space: nowrap;
-    padding: 2px 0px;
-    width: 20px;
-    background: transparent url([[pix:moodle|t/edit]]) 2px 3px no-repeat;
-}
-
 /* fix for add competency display width */
 #hierarchy-type-competency-evidence-add #mform1 {
     width: 95%;
