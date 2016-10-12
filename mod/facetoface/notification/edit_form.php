@@ -138,12 +138,9 @@ class mod_facetoface_notification_form extends moodleform {
         $mform->setType('body', PARAM_RAW);
 
         if (!$isfrozen) {
-            $mform->addElement('html', '<br /><br />');
+            $mform->addElement('html', html_writer::empty_tag('br'));
 
-            $group = array();
-            $group[] = $mform->createElement('checkbox', 'ccmanager');
-            $group[] = $mform->createElement('static', '', '', get_string('ccmanager_note', 'facetoface'));
-            $mform->addGroup($group, 'ccmanager_group', get_string('ccmanager', 'facetoface'), ' ', false);
+            $mform->addElement('checkbox', 'ccmanager', get_string('ccmanager', 'facetoface'), get_string('ccmanager_note', 'facetoface'));
             $mform->setType('ccmanager', PARAM_INT);
 
             $mform->addElement('editor', 'managerprefix_editor', get_string('managerprefix', 'facetoface'));

@@ -47,6 +47,9 @@ class mod_facetoface_notification_template_form extends moodleform {
         $mform->addHelpButton('body_editor', 'body', 'facetoface');
         $mform->setType('body_editor', PARAM_RAW);
 
+        $mform->addElement('checkbox', 'ccmanager', get_string('ccmanager', 'facetoface'), get_string('ccmanager_note', 'facetoface'));
+        $mform->setType('ccmanager', PARAM_INT);
+
         $mform->addElement('editor', 'managerprefix_editor', get_string('managerprefix', 'facetoface'), null, $this->_customdata['editoroptions']);
         $mform->setType('managerprefix', PARAM_RAW);
 
