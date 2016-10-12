@@ -45,15 +45,24 @@ $THEME->plugins_exclude_sheets = array(
         'current_learning',
         'search_forums',
     ),
-    'tool' => array(
-        'customlang'
-    ),
     'mod' => array(
         'feedback'
     ),
+    'report' => array(
+        'participation',
+        'progress'
+    ),
+    'tool' => array(
+        'customlang',
+    ),
     'totara' => array(
-        'reportbuilder',
+        'appraisal',
+        'feedback360',
+        'form',
         'job',
+        'plan',
+        'program',
+        'reportbuilder',
     ),
 );
 
