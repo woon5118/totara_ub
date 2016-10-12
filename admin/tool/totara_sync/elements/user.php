@@ -920,7 +920,7 @@ class totara_sync_element_user extends totara_sync_element {
                     return false;
                 }
             } else {
-                // Manager is provided, but could be empty.
+                // Manager field is provided, we should be linking by jaid, but could be empty.
 
                 // Manager jaid must be provided if linking by idnumber and manager is provided.
                 if (!isset($suser->managerjobassignmentidnumber)) {
@@ -928,9 +928,13 @@ class totara_sync_element_user extends totara_sync_element {
                     return false;
                 }
 
-                // Can't provide manager jaid without providing a valid manager.
-                if (empty($managerid) && !empty($suser->managerjobassignmentidnumber)) {
+                // Manager and manager jaid must both be either "" or not "".
+                if ($suser->manageridnumber === "" && $suser->managerjobassignmentidnumber !== "") {
                     $this->addlog(get_string('managerassignwoidnumberx', 'tool_totara_sync', $suser), 'warn', 'updateusers');
+                    return false;
+                }
+                if ($suser->manageridnumber !== "" && $suser->managerjobassignmentidnumber === "") {
+                    $this->addlog(get_string('managerassignwojaidx', 'tool_totara_sync', $suser), 'warn', 'updateusers');
                     return false;
                 }
 
@@ -965,6 +969,9 @@ class totara_sync_element_user extends totara_sync_element {
                 // Doesn't matter if manager jaid is provided or not, we know it must be empty.
                 $newjobdata['managerjaid'] = null;
             }
+        } else if (isset($suser->managerjaidnumber)) {
+            $this->addlog(get_string('managerassignwoidnumberx', 'tool_totara_sync', $suser), 'warn', 'updateusers');
+            return false;
         }
 
         // Only need to continue if there is data to import.
