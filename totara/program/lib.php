@@ -1069,8 +1069,12 @@ function prog_get_programs_search($searchterms, $sort='fullname ASC', $page=0, $
     return $programs;
 }
 
+/**
+ * @deprecated since 9.0.
+ * @param $assignment
+ */
 function prog_store_position_assignment($assignment) {
-    // Deprecated - done inside $job_assignment->update();
+    throw new coding_exception('prog_store_position_assignment has been deprecated since 9.0. Use \totara_job\job_assignment::update() instead.');
 }
 
 /**
