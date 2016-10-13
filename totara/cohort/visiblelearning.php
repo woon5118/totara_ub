@@ -128,7 +128,7 @@ echo $OUTPUT->heading(format_string($cohort->name));
 echo cohort_print_tabs('visiblelearning', $cohort->id, $cohort->cohorttype, $cohort);
 
 if ($canedit) {
-    echo html_writer::start_tag('div', array('class' => 'buttons'));
+    echo html_writer::start_tag('div', array('class' => 'buttons visible-learning-buttons'));
 
     if (has_capability('moodle/course:update', context_system::instance())) {
         // Add courses.

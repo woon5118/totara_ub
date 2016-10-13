@@ -155,7 +155,7 @@ $report->display_restrictions();
 echo $OUTPUT->heading(format_string($cohort->name));
 echo cohort_print_tabs('enrolledlearning', $cohort->id, $cohort->cohorttype, $cohort);
 
-echo html_writer::start_tag('div', array('class' => 'buttons'));
+echo html_writer::start_tag('div', array('class' => 'buttons enrolled-learning-buttons'));
 
 // Add courses.
 if ($canedit && has_capability('moodle/course:update', $context)) {
