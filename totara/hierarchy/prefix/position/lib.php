@@ -268,7 +268,7 @@ class position extends hierarchy {
 
         $sql = "SELECT ja.id AS jobassignmentid, p.*
                   FROM {pos} p
-                  JOIN {jos_assignment} ja ON p.id = ja.positionid
+                  JOIN {job_assignment} ja ON p.id = ja.positionid
                  WHERE ja.userid = ?
                  ORDER BY ja.sortorder ASC";
         return $DB->get_records_sql($sql, array($user->id));
