@@ -1165,3 +1165,67 @@ span.editinstructions {
 }
 
 // End of original bootstrap theme code.
+
+/**
+ * Tidy-up course management page, standardising
+ * layout and appearance.
+ */
+#page-course-management {
+  #course-category-listings {
+    margin-bottom: @padding-large-vertical * 2;
+  }
+
+  h3 {
+    padding: @padding-large-vertical @padding-large-horizontal;
+  }
+
+  input[name='bulksort'] {
+    margin: 0;
+  }
+
+  input[type='checkbox'] {
+    vertical-align: middle;
+  }
+
+  .detail-pair {
+    border: 0;
+    margin-bottom: @padding-large-vertical;
+
+    > div {
+      padding: 0;
+    }
+  }
+
+  #course-listing {
+    // Give the pagination a standard look.
+    .listing-pagination a {
+      border: 0;
+      box-shadow: none;
+      margin: 0;
+
+      &.active-page {
+        color: inherit;
+        background-color: @body-bg;
+        font-weight: bold;
+      }
+    }
+  }
+
+  #coursesearch {
+    margin-top: @padding-large-vertical;
+
+    label {
+      margin-right: @padding-small-horizontal;
+    }
+  }
+
+  .buttons {
+    .singlebutton:first-child div {
+      margin-left: 0;
+
+      input[type='submit'] {
+        margin-left: 0;
+      }
+    }
+  }
+}
