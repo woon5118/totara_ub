@@ -27,6 +27,7 @@ require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot.'/totara/job/classes/job_assignment.php');
 require_once($CFG->dirroot.'/totara/appraisal/lib/assign/lib.php');
 require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot.'/totara/message/messagelib.php');
 
 use totara_job\job_assignment;
 
@@ -4530,51 +4531,61 @@ class appraisal_message {
      * This is an appraisal-wide message.
      * Send it to all users in the appraisal, and flag that it is sent in the appraisal_event triggered field.
      *
+     * @param  bool $managers_only true if the messages should only be sent to non-learner roles
      * @return bool true if there were no problems
      */
-    public function send_appraisal_wide_message() {
+    public function send_appraisal_wide_message($managers_only=false) {
         global $DB;
 
         // Don't send this message if it has already been sent.
-        if ($this->triggered) {
+        // Managers only messages are sent multiple times whenever assignment is done
+        if (!$managers_only && $this->triggered) {
             return;
         }
 
         // Get all user assignments currently in the appraisal.
         $userassignments = $DB->get_records('appraisal_user_assignment', array('appraisalid' => $this->appraisalid));
 
-        $this->send($userassignments);
+        $this->send($userassignments, $managers_only);
 
         // Update the database, so that we don't send this message again.
-        $this->triggered = 1;
-        $this->save();
+        // TODO: Need better handling for managers only
+        if (!$managers_only) {
+            $this->triggered = 1;
+            $this->save();
+        }
     }
 
 
     /**
      * Send this message to all roles associated with the given user.
      *
+     * @param  bool $managers_only true if the messages should only be sent to non-learner roles
      * @param int $userid the user id of the learner that this event relates to.
      */
-    public function send_user_specific_message($userid) {
+    public function send_user_specific_message($userid, $managers_only=false) {
         global $DB;
 
         $userassignment = $DB->get_record('appraisal_user_assignment',
             array('userid' => $userid, 'appraisalid' => $this->appraisalid));
 
-        $this->send(array($userassignment));
+        $this->send(array($userassignment), $managers_only);
 
-        // Remove the user event record (assuming there is one), so that it's not sent again.
-        $DB->delete_records('appraisal_user_event', array('userid' => $userid, 'eventid' => $this->id));
+        // TODO: Need better handling for managers_only messages
+        if (!$managers_only) {
+            // Remove the user event record (assuming there is one), so that it's not sent again.
+            $DB->delete_records('appraisal_user_event', array('userid' => $userid, 'eventid' => $this->id));
+        }
     }
 
 
     /**
      * Send this message to all roles related to the given user_assignments.
      *
-     * $param array $userassignments The user_assignment records to send the message to.
+     * @param array $userassignments The user_assignment records to send the message to.
+     * @param bool $managers_only true if the messages should only be sent to non-learner roles
      */
-    public function send($userassignments) {
+    public function send($userassignments, $managers_only=false) {
         global $DB;
 
         $sentaddress = array();
@@ -4590,50 +4601,57 @@ class appraisal_message {
 
             // Send a message to each role assignment user.
             foreach ($roleassignments as $roleassignment) {
-                $rcptuserid = $roleassignment->userid;
-                $rcpt = $DB->get_record('user', array('id' => $rcptuserid));
+                // TODO: add triggered value to appraisal_role_assignment table and use that
+                //       to determine if message has been sent or not.
+                //       For now - simply removing learners from the list
                 $role = $roleassignment->appraisalrole;
+                if (!$managers_only || $role != appraisal::ROLE_LEARNER) {
+                    $rcptuserid = $roleassignment->userid;
+                    $rcpt = $DB->get_record('user', array('id' => $rcptuserid));
+                    if (!empty($rcpt)) {
 
-                // Send only if complete/incomplete.
-                if ($this->type == self::EVENT_STAGE_DUE && $this->stageiscompleted != self::MESSAGE_SEND_ANY_STATE) {
-                    // Get stage completion.
-                    $stage = new appraisal_stage($this->stageid);
-                    $roleassignment = appraisal_role_assignment::get_role($this->appraisalid, $userassignment->userid,
-                        $rcptuserid, $role);
-                    $complete = $stage->is_completed($roleassignment);
-                    // Skip completed if set "only to incompleted" and contra versa.
-                    if ($this->stageiscompleted == self::MESSAGE_SEND_ONLY_COMPLETE && !$complete ||
-                        $this->stageiscompleted == self::MESSAGE_SEND_ONLY_INCOMPLETE && $complete) {
-                        continue;
+                        // Send only if complete/incomplete.
+                        if ($this->type == self::EVENT_STAGE_DUE && $this->stageiscompleted != self::MESSAGE_SEND_ANY_STATE) {
+                            // Get stage completion.
+                            $stage = new appraisal_stage($this->stageid);
+                            $roleassignment = appraisal_role_assignment::get_role($this->appraisalid, $userassignment->userid,
+                                $rcptuserid, $role);
+                            $complete = $stage->is_completed($roleassignment);
+                            // Skip completed if set "only to incompleted" and contra versa.
+                            if ($this->stageiscompleted == self::MESSAGE_SEND_ONLY_COMPLETE && !$complete ||
+                                $this->stageiscompleted == self::MESSAGE_SEND_ONLY_INCOMPLETE && $complete) {
+                                continue;
+                            }
+                        }
+
+                        // Get the message content, which may be different depending on the role.
+                        $message = $this->get_message($role);
+
+                        // Create a message.
+                        $eventdata = new stdClass();
+                        $eventdata->component         = 'moodle';
+                        $eventdata->name              = 'instantmessage';
+                        $eventdata->userfrom          = core_user::get_noreply_user();
+                        $eventdata->userto            = $rcpt;
+                        $eventdata->subject           = $message->name;
+                        $eventdata->fullmessage       = $message->content;
+                        $eventdata->fullmessageformat = FORMAT_PLAIN;
+                        // The content is plain text so make sure we convert linebreaks for the HTML content.
+                        $eventdata->fullmessagehtml   = html_writer::tag('pre', $message->content);
+                        $eventdata->smallmessage      = $message->content;
+
+                        // Send the message, preventing duplicates. E.g. If someone is a manager and appraiser and there are two
+                        // different messages set up then they will receive one of each type. If someone has multiple roles with
+                        // all roles set to the same message then they will only receive one message.
+                        if (!isset($sentaddress[$rcpt->email]) || !in_array($message->id, $sentaddress[$rcpt->email])) {
+                            tm_alert_send($eventdata);
+
+                            if (!isset($sentaddress[$rcpt->email])) {
+                                $sentaddress[$rcpt->email] = array();
+                            }
+                            $sentaddress[$rcpt->email][] = $message->id;
+                        }
                     }
-                }
-
-                // Get the message content, which may be different depending on the role.
-                $message = $this->get_message($role);
-
-                // Create a message.
-                $eventdata = new stdClass();
-                $eventdata->component         = 'moodle';
-                $eventdata->name              = 'instantmessage';
-                $eventdata->userfrom          = core_user::get_noreply_user();
-                $eventdata->userto            = $rcpt;
-                $eventdata->subject           = $message->name;
-                $eventdata->fullmessage       = $message->content;
-                $eventdata->fullmessageformat = FORMAT_PLAIN;
-                // The content is plain text so make sure we convert linebreaks for the HTML content.
-                $eventdata->fullmessagehtml   = html_writer::tag('pre', $message->content);
-                $eventdata->smallmessage      = $message->content;
-
-                // Send the message, preventing duplicates. E.g. If someone is a manager and appraiser and there are two
-                // different messages set up then they will receive one of each type. If someone has multiple roles with
-                // all roles set to the same message then they will only receive one message.
-                if (!isset($sentaddress[$rcpt->email]) || !in_array($message->id, $sentaddress[$rcpt->email])) {
-                    tm_alert_send($eventdata);
-
-                    if (!isset($sentaddress[$rcpt->email])) {
-                        $sentaddress[$rcpt->email] = array();
-                    }
-                    $sentaddress[$rcpt->email][] = $message->id;
                 }
             }
         }
@@ -5401,6 +5419,12 @@ class appraisal_user_assignment {
         $appraisal = new appraisal($this->appraisalid);
         $appraisal->assignment_changed_for_appraisee($this->userid);
 
+        // Sending manager messages here - may need to move this to
+        // totara_job\job_assignment::totara_assign_appraisal
+        // if we need to send manager messages again when any job
+        // assignment is updated
+        $this->send_manager_messages();
+
         return $this;
     }
 
@@ -5523,4 +5547,23 @@ class appraisal_user_assignment {
 
         $DB->update_record('appraisal_user_assignment', $dto);
     }
+
+    /**
+     * Send messages to managers, team leads and appraisers once assignment is made
+     */
+    private function send_manager_messages() {
+        global $DB;
+
+        $appraisalid = $this->appraisalid;
+
+        // For now only do Activation messages that needs to be sent to managers
+        $sql = "SELECT id FROM {appraisal_event} WHERE event = ? AND appraisalid = ?";
+        $params = array(appraisal_message::EVENT_APPRAISAL_ACTIVATION, $appraisalid);
+        $events = $DB->get_records_sql($sql, $params);
+        foreach ($events as $id => $eventdata) {
+            $eventmessage = new appraisal_message($id);
+            $eventmessage->send_user_specific_message($this->userid, true);
+        }
+    }
+
 }
