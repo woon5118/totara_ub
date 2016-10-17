@@ -204,9 +204,18 @@ class job_assignment {
     /**
      * Create instance of a job_assignment.
      *
-     * @param object $record as returned by get_record('job_assignment', ...)
+     * @param \stdClass $record as returned by get_record('job_assignment', ...)
      */
     private function __construct($record) {
+        $this->apply_record_data($record);
+    }
+
+    /**
+     * Set database data.
+     *
+     * @param \stdClass $record
+     */
+    private function apply_record_data($record) {
         $this->id = $record->id;
         $this->userid = $record->userid;
         $this->idnumber = $record->idnumber;
@@ -219,39 +228,63 @@ class job_assignment {
 
         if (isset($record->fullname) && $record->fullname !== "") {
             $this->fullname = $record->fullname;
+        } else {
+            $this->fullname = null;
         }
         if (isset($record->shortname) && $record->shortname !== "") {
             $this->shortname = $record->shortname;
+        } else {
+            $this->shortname = null;
         }
         if (isset($record->idnumber) && $record->idnumber !== "") {
             $this->idnumber = $record->idnumber;
+        } else {
+            $this->idnumber = null;
         }
         if (!empty($record->description)) {
             $this->description = $record->description;
+        } else {
+            $this->description = '';
         }
         if (!empty($record->positionid)) {
             $this->positionid = $record->positionid;
+        } else {
+            $this->positionid = null;
         }
         if (!empty($record->organisationid)) {
             $this->organisationid = $record->organisationid;
+        } else {
+            $this->organisationid = null;
         }
         if (!empty($record->startdate)) {
             $this->startdate = $record->startdate;
+        } else {
+            $this->startdate = null;
         }
         if (!empty($record->enddate)) {
             $this->enddate = $record->enddate;
+        } else {
+            $this->enddate = null;
         }
         if (!empty($record->managerjaid)) {
             $this->managerjaid = $record->managerjaid;
+        } else {
+            $this->managerjaid = null;
         }
         if (!empty($record->tempmanagerjaid)) {
             $this->tempmanagerjaid = $record->tempmanagerjaid;
+        } else {
+            $this->tempmanagerjaid = null;
         }
         if (!empty($record->tempmanagerexpirydate)) {
             $this->tempmanagerexpirydate = $record->tempmanagerexpirydate;
+        } else {
+            $this->tempmanagerexpirydate = null;
         }
         if (!empty($record->appraiserid)) {
             $this->appraiserid = $record->appraiserid;
+        } else {
+            $this->appraiserid = null;
         }
     }
 
@@ -341,6 +374,9 @@ class job_assignment {
             }
 
             $DB->update_record('job_assignment', $extrafields);
+
+            // Fetch from database to get correct data types and defaults.
+            $record = $DB->get_record('job_assignment', array('id' => $record->id), '*', MUST_EXIST);
 
             // Record is identical to the data in the database, so we can create the object from it.
             $jobassignment = new job_assignment($record);
@@ -536,7 +572,7 @@ class job_assignment {
      *
      * Processes description_editor, so you don't have to.
      *
-     * @return object with all public properties
+     * @return \stdClass with all public properties
      */
     public function get_data() {
         $data = new \stdClass();
@@ -657,17 +693,15 @@ class job_assignment {
         $oldpositionid = $this->positionid;
         $oldorganisationid = $this->organisationid;
 
+        $currentdata = (object)(array)($this);
         $transaction = $DB->start_delegated_transaction();
         try {
             // Update the database.
             $DB->update_record('job_assignment', $record);
 
-            // Update this object.
-            unset ($record->id);
-            $saveddata = (array)$record;
-            foreach ($saveddata as $key => $value) {
-                $this->$key = $value;
-            }
+            // Fetch from database to get correct data types and the most recent data.
+            $record = $DB->get_record('job_assignment', array('id' => $record->id), '*', MUST_EXIST);
+            $this->apply_record_data($record);
 
             // Update related users.
             $this->updated_manager($oldmanagerjaid);
@@ -675,8 +709,10 @@ class job_assignment {
 
             $transaction->allow_commit();
         } catch (Exception $e) {
+            $this->apply_record_data($currentdata);
             $transaction->rollback($e);
         }
+        unset($currentdata);
 
         $event = job_assignment_updated::create(
             array(
