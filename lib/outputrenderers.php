@@ -2322,10 +2322,10 @@ class core_renderer extends renderer_base {
         $client_id = $options->client_id;
         $strsaved = get_string('filesaved', 'repository');
         $straddfile = get_string('openpicker', 'repository');
-        $strloading  = get_string('loading', 'repository');
         $strdndenabled = get_string('dndenabled_inbox', 'moodle');
         $strdroptoupload = get_string('droptoupload', 'moodle');
-        $icon_progress = $OUTPUT->pix_icon('i/loading_small', $strloading).'';
+        $icon_progress = $OUTPUT->flex_icon('loading', ['alt' => get_string('loading', 'repository')]);
+        $icon_upload = $OUTPUT->flex_icon('upload', ['classes' => "ft-size-700"]);
 
         $currentfile = $options->currentfile;
         if (empty($currentfile)) {
@@ -2362,10 +2362,10 @@ EOD;
             $html .= <<<EOD
     <div id="file_info_{$client_id}" class="mdl-left filepicker-filelist" style="position: relative">
     <div class="filepicker-filename">
-        <div class="filepicker-container">$currentfile<div class="dndupload-message">$strdndenabled <br/><div class="dndupload-arrow"></div></div></div>
+        <div class="filepicker-container">$currentfile<div class="dndupload-message">$strdndenabled <br/><div class="dndupload-arrow">{$icon_upload}</div></div></div>
         <div class="dndupload-progressbars"></div>
     </div>
-    <div><div class="dndupload-target">{$strdroptoupload}<br/><div class="dndupload-arrow"></div></div></div>
+    <div><div class="dndupload-target">{$strdroptoupload}<br/><div class="dndupload-arrow">{$icon_upload}</div></div></div>
     </div>
 EOD;
         }

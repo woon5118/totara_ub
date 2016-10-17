@@ -196,7 +196,8 @@ class core_files_renderer extends plugin_renderer_base {
             'view_icon_active' => $this->output->flex_icon('view-large', ['alt' => get_string('displayasicons', 'repository')]),
             'view_list_active' => $this->output->flex_icon('view-list', ['alt' => get_string('displayasdetails', 'repository')]),
             'view_tree_active' => $this->output->flex_icon('view-tree', ['alt' => get_string('displayastree', 'repository')]),
-            'progress' => $this->output->flex_icon('loading', ['alt' => get_string('loading', 'repository')])
+            'progress' => $this->output->flex_icon('loading', ['alt' => get_string('loading', 'repository')]),
+            'upload' => $this->output->flex_icon('upload', ['classes' => "ft-size-700"])
         );
 
         $html = '
@@ -234,9 +235,9 @@ class core_files_renderer extends plugin_renderer_base {
         <div class="fm-content-wrapper">
             <div class="fp-content"></div>
             <div class="fm-empty-container">
-                <div class="dndupload-message">'.$strdndenabledinbox.'<br/><div class="dndupload-arrow"></div></div>
+                <div class="dndupload-message">'.$strdndenabledinbox.'<br/><div class="dndupload-arrow">'. $icons['upload'] .'</div></div>
             </div>
-            <div class="dndupload-target">'.$strdroptoupload.'<br/><div class="dndupload-arrow"></div></div>
+            <div class="dndupload-target">'.$strdroptoupload.'<br/><div class="dndupload-arrow">'. $icons['upload'] .'</div></div>
             <div class="dndupload-progressbars"></div>
             <div class="dndupload-uploadinprogress">'.$icons['progress'].'</div>
         </div>

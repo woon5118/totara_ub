@@ -106,11 +106,11 @@
             {{/currentfile}}
             {{^currentfile}}
                 <div class="filepicker-filename">
-                    <div class="filepicker-container"><div class="dndupload-message">{{#str}}dndenabled_inbox{{/str}} <br/><div class="dndupload-arrow"></div></div></div>
+                    <div class="filepicker-container"><div class="dndupload-message">{{#str}}dndenabled_inbox{{/str}} <br/><div class="dndupload-arrow">{{#flex_icon}}upload,{"classes":"ft-size-700"}{{/flex_icon}}</div></div></div>
                     <div class="dndupload-progressbars"></div>
                 </div>
             {{/currentfile}}
-            <div><div class="dndupload-target">{{#str}}droptoupload{{/str}}<br/><div class="dndupload-arrow"></div></div></div>
+            <div><div class="dndupload-target">{{#str}}droptoupload{{/str}}<br/><div class="dndupload-arrow">{{#flex_icon}}upload,{"classes":"ft-size-700"}{{/flex_icon}}</div></div></div>
         </div>
 
         {{/frozen}}
