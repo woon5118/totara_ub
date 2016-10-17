@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Overriding core ajax rendering functions for totara.
+ *
+ * @deprecated   since Totara 9
  */
 class theme_standardtotararesponsive_core_renderer_ajax extends core_renderer_ajax {
     /**

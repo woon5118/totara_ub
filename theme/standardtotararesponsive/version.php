@@ -17,6 +17,12 @@
 /**
  * Theme version info
  *
+ * This theme has been deprecated.
+ * We strongly recommend basing all new themes on roots and basis.
+ * This theme will be removed from core in a future release at which point
+ * it will no longer receive updates from Totara.
+ *
+ * @deprecated since Totara 9
  * @package    theme
  * @subpackage standard
  * @copyright  2011 Petr Skoda  {@link http://skodak.org}

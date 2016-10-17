@@ -17,12 +17,18 @@
 /**
  * Configuration for Moodle's bootstrap theme.
  *
+ * This theme has been deprecated.
+ * We strongly recommend basing all new themes on roots and basis.
+ * This theme will be removed from core in a future release at which point
+ * it will no longer receive updates from Totara.
+ *
  * DO NOT MODIFY THIS THEME!
  * COPY IT FIRST, THEN RENAME THE COPY AND MODIFY IT INSTEAD.
  *
  * For full information about creating Moodle themes, see:
  * http://docs.moodle.org/dev/Themes_2.0
  *
+ * @deprecated since Totara 9
  * @package   theme_bootstrapbase
  * @copyright 2013 Bas Brands. www.sonsbeekmedia.nl
  * @author    Bas Brands

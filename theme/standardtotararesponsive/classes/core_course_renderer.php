@@ -24,6 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class theme_standardtotararesponsive_core_course_renderer
+ *
+ * @deprecated   since Totara 9
+ */
 class theme_standardtotararesponsive_core_course_renderer extends theme_bootstrapbase_core_course_renderer {
     /**
      * Displays one course in the list of courses.

@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Overriding core rendering functions for totara.
+ *
+ * @deprecated   since Totara 9
  */
 class theme_standardtotararesponsive_core_renderer extends theme_bootstrapbase_core_renderer {
     /**
