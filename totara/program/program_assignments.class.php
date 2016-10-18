@@ -904,7 +904,7 @@ class organisations_category extends prog_assignment_category {
      * @return int
      */
     function get_includechildren($data, $object) {
-        if (empty($data->includechildren[$this->id][$object->assignmenttypeid])) {
+        if (!isset($data->includechildren[$this->id][$object->assignmenttypeid])) {
             return 0;
         } else {
             return 1;
@@ -1066,7 +1066,7 @@ class positions_category extends prog_assignment_category {
      * @return int
      */
     function get_includechildren($data, $object) {
-        if (empty($data->includechildren[$this->id][$object->assignmenttypeid])) {
+        if (!isset($data->includechildren[$this->id][$object->assignmenttypeid])) {
             return 0;
         } else {
             return 1;

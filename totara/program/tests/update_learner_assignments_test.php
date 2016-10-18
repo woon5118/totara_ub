@@ -2012,7 +2012,7 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         $generator->assign_to_program($this->program->id, ASSIGNTYPE_POSITION, $position1->id,
             array('includechildren' => 1));
         $generator->assign_to_program($this->program->id, ASSIGNTYPE_POSITION, $position3->id,
-            array('includechildren' => 0));
+            array('includechildren' => null));
 
         $timeafter = time();
 
@@ -2145,7 +2145,7 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         $generator->assign_to_program($this->program->id, ASSIGNTYPE_POSITION, $position1->id,
             array('includechildren' => 1));
         $generator->assign_to_program($this->program->id, ASSIGNTYPE_POSITION, $position3->id,
-            array('includechildren' => 0));
+            array('includechildren' => null));
 
         // Check that records exist.
         $this->assertEquals(2, $DB->count_records('prog_assignment',
@@ -2296,7 +2296,7 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         $generator->assign_to_program($this->program->id, ASSIGNTYPE_ORGANISATION, $organisation1->id,
             array('includechildren' => 1));
         $generator->assign_to_program($this->program->id, ASSIGNTYPE_ORGANISATION, $organisation3->id,
-            array('includechildren' => 0));
+            array('includechildren' => null));
 
         $timeafter = time();
 
@@ -2429,7 +2429,7 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         $generator->assign_to_program($this->program->id, ASSIGNTYPE_ORGANISATION, $organisation1->id,
             array('includechildren' => 1));
         $generator->assign_to_program($this->program->id, ASSIGNTYPE_ORGANISATION, $organisation3->id,
-            array('includechildren' => 0));
+            array('includechildren' => null));
 
         // Check that records exist.
         $this->assertEquals(2, $DB->count_records('prog_assignment',

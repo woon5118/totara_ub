@@ -454,7 +454,7 @@ class totara_reportbuilder_cache_generator extends testing_data_generator {
         $completiontime = (isset($record['completiontime'])) ? $record['completiontime'] : -1;
         $completionevent = (isset($record['completionevent'])) ? $record['completionevent'] : 0;
         $completioninstance = (isset($record['completioninstance'])) ? $record['completioninstance'] : 0;
-        $includechildren = (isset($record['includechildren'])) ? $record['includechildren'] : 0;
+        $includechildren = (isset($record['includechildren'])) ? $record['includechildren'] : null;
 
         // Create data.
         $data = new stdClass();
