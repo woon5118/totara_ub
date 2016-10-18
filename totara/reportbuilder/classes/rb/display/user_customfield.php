@@ -31,6 +31,7 @@ final class user_customfield extends base {
      * Actual value formatters to call after visibility check is done.
      */
     private static $formatters = [
+        'parent'   => '\totara_reportbuilder\rb\display\base',
         'checkbox' => '\totara_reportbuilder\rb\display\yes_or_no',
         'date'     => '\totara_reportbuilder\rb\display\nice_date_no_timezone',
         'datetime' => '\totara_reportbuilder\rb\display\nice_datetime',
@@ -84,7 +85,7 @@ final class user_customfield extends base {
     ) {
         $formatter = self::formatter($column);
         return call_user_func_array(
-            ["$formatter::is_graphable"],
+            "$formatter::is_graphable",
             [$column, $option, $report]
         );
     }
@@ -103,6 +104,6 @@ final class user_customfield extends base {
 
         return array_key_exists($type, self::$formatters)
                ? self::$formatters[$type]
-               : 'parent';
+               : self::$formatters['parent'];
     }
 }
