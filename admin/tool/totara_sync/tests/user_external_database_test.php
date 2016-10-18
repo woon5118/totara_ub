@@ -161,7 +161,7 @@ class tool_totara_sync_user_external_database_testcase extends advanced_testcase
         } else {
             $this->dbtype = $CFG->dbtype;
             $this->dbhost = $CFG->dbhost;
-            $this->dbport = !empty($CFG->dbport) ? $CFG->dbport : '';
+            $this->dbport = !empty($CFG->dboptions['dbport']) ? $CFG->dboptions['dbport'] : '';
             $this->dbname = $CFG->dbname;
             $this->dbuser = $CFG->dbuser;
             $this->dbpass = !empty($CFG->dbpass) ? $CFG->dbpass : '';
