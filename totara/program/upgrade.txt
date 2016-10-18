@@ -5,7 +5,7 @@ information provided here is intended especially for developers.
 
 API Changes:
 
-* prog_update_completion() added a third argument to provide the users completion state if already calculated.
+* prog_update_completion() added a fourth argument to provide the users completion state if already calculated.
 * program::__construct() now accepts either an ID or a record from the database during construction.
 * program::is_program_complete() now returns a boolean, true when successful false otherwise.
 * program::is_program_inprogress() now returns a boolean, true when successful false otherwise.

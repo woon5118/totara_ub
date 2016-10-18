@@ -61,7 +61,7 @@ class completions_task extends \core\task\scheduled_task {
             }
 
             foreach ($program_users as $userid) {
-                prog_update_completion($userid, $program, false);
+                prog_update_completion($userid, $program, null, false);
             }
         }
 
