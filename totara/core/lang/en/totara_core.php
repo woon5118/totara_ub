@@ -639,4 +639,3 @@ $string['tempmanagerselectionallusers'] = 'All users';
 $string['tempmanagerselectiononlymanagers'] = 'Only staff managers';
 $string['tempmanagersupporttext'] = ' Note, only current team managers can be selected.';
 $string['updatetemporarymanagerstask'] = 'Update temporary managers';
-$string['viewmyteam'] = 'View My Team';
