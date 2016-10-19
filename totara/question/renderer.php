@@ -66,21 +66,8 @@ class totara_question_renderer extends plugin_renderer_base {
         $form_prefix = $review->get_prefix_form();
         $prefix = $review->storage->prefix;
 
-        // Start a new fieldset so that we can identify it for deletion.
-        $form->addElement('header', 'question-review-item');
-        $form->setExpanded('question-review-item');
-
         if ($review->cananswer) {
             $currentuseritems = $itemgroup[$review->answerid];
-        }
-
-        // Delete button.
-        $deleteicon = '';
-        if ($review->can_select_items() && $review->can_delete_item($itemgroup)) {
-            $deleteurl = new moodle_url("/totara/$prefix/ajax/removeitem.php",
-                    array('id' => reset($currentuseritems)->id, 'sesskey' => sesskey()));
-            $deleteicon = $this->output->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')),
-                     null, array('class' => 'action-icon delete', 'data-reviewitemid' => reset($currentuseritems)->id));
         }
 
         // Item title.
@@ -94,7 +81,20 @@ class totara_question_renderer extends plugin_renderer_base {
         } else {
             $title = format_string($anyitem->fullname);
         }
-        $form->addElement('html', html_writer::tag('h3', $title . $deleteicon,
+
+        // Delete button.
+        $deleteicon = '';
+        if ($review->can_select_items() && $review->can_delete_item($itemgroup)) {
+            $deleteurl = new moodle_url("/totara/$prefix/ajax/removeitem.php",
+                array('id' => reset($currentuseritems)->id, 'sesskey' => sesskey()));
+            $deleteicon = $this->output->action_icon($deleteurl, new pix_icon('t/delete', get_string('deletethis', 'totara_question', $title)),
+                null, array('class' => 'action-icon delete', 'data-reviewitemid' => reset($currentuseritems)->id), true);
+        }
+
+        // Start a new fieldset so that we can identify it for deletion.
+        $form->addElement('header', 'question-review-item', $title);
+        $form->setExpanded('question-review-item');
+        $form->addElement('html', html_writer::tag('p', $deleteicon,
                 array('class' => $form_prefix . '_' . $prefix . '_review')));
 
         $review->add_item_specific_edit_elements($form, $anyitem);

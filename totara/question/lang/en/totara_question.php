@@ -62,6 +62,7 @@ $string['defaultselected'] = 'Selected by default';
 $string['defaultunselect'] = 'unselect';
 $string['defaultvalueoutrange'] = 'Default value out of range';
 $string['delete'] = 'Delete';
+$string['deletethis'] = 'Delete {$a}';
 $string['deletedquestion'] = 'Question deleted';
 $string['displaysettings'] = 'Display settings';
 $string['error:aggregatedisplayselect'] = 'You must select one (or both) of the average / median display options';

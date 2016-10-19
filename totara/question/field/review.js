@@ -146,7 +146,7 @@ M.totara_review = M.totara_review || {
     totara_question_update: function(response) {
         var responseobj = $($.parseHTML(response));
 
-        var longid = responseobj.find('h3').attr('class');
+        var longid = responseobj.find('p').attr('class');
 
         if(typeof longid !== "undefined") {
             var thirdunderline = longid.indexOf('_', longid.indexOf('_', longid.indexOf('_') + 1) + 1);
