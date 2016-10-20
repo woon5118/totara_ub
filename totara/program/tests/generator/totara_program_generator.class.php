@@ -155,10 +155,10 @@ class totara_program_generator extends component_generator_base {
     }
 
     /**
-     * Create mock program
+     * Create test program
      *
      * @param array $data Override default properties
-     * @return program Program record
+     * @return program
      */
     public function create_program($data = array()) {
         global $DB, $CFG;
