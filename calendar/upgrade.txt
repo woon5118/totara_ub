@@ -1,2 +1,7 @@
 This files describes API changes in /calendar/* ,
 information provided here is intended especially for developers.
+
+=== 10 ===
+
+API Changes:
+* function calendar_get_default_courses() has been deprecated. Use the new method calendar_information::get_default_courses() instead.
