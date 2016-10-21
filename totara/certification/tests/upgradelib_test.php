@@ -92,7 +92,8 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
 
         $where = "coursesetid <> 0 AND status = " . STATUS_COURSESET_INCOMPLETE;
         $this->assertEquals(7, $DB->count_records_select('prog_completion', $where));
-        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timestarted = 0"));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timestarted = 7"));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timecreated = 0"));
         $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timedue = 0"));
         $this->assertEquals(7, $DB->count_records_select('prog_completion', $where . " AND timecompleted = 0"));
 
@@ -201,7 +202,8 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
         $where = "userid = :userid AND coursesetid <> 0 AND programid = :programid";
         $params = array('userid' => $user1->id, 'programid' => $cert1->id);
         $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, $params));
-        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timestarted = 0", $params));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where . " AND timestarted = 0", $params));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timecreated = 0", $params));
         $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timedue = 0", $params));
         $this->assertEquals(1, $DB->count_records_select('prog_completion', $where . " AND timecompleted = 0", $params));
 
@@ -227,7 +229,8 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
         $where = "userid = :userid AND coursesetid <> 0 AND programid = :programid";
         $params = array('userid' => $user5->id, 'programid' => $cert2->id);
         $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, $params));
-        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timestarted = 0", $params));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where . " AND timestarted = 0", $params));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timecreated = 0", $params));
         $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timedue = 0", $params));
         $this->assertEquals(1, $DB->count_records_select('prog_completion', $where . " AND timecompleted = 0", $params));
 
@@ -235,7 +238,8 @@ class totara_certification_upgradelib_testcase extends reportcache_advanced_test
         $where = "userid = :userid AND coursesetid <> 0 AND programid = :programid";
         $params = array('userid' => $user6->id, 'programid' => $cert1->id);
         $this->assertEquals(1, $DB->count_records_select('prog_completion', $where, $params));
-        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timestarted = 0", $params));
+        $this->assertEquals(1, $DB->count_records_select('prog_completion', $where . " AND timestarted = 0", $params));
+        $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timecreated = 0", $params));
         $this->assertEquals(0, $DB->count_records_select('prog_completion', $where . " AND timedue = 0", $params));
         $this->assertEquals(1, $DB->count_records_select('prog_completion', $where . " AND timecompleted = 0", $params));
     }

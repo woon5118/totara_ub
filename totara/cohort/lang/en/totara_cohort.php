@@ -429,7 +429,8 @@ $string['ruledesc-learning-coursecompletiondate'] = 'User\'s course completion d
 $string['ruledesc-learning-coursecompletionduration'] = 'User\'s course completion duration';
 $string['ruledesc-learning-coursecompletionlist'] = 'User\'s course completion(s)';
 $string['ruledesc-learning-programcompletiondate'] = 'User\'s program completion date';
-$string['ruledesc-learning-programcompletionduration'] = 'User\'s program completion duration';
+$string['ruledesc-learning-programcompletiondurationassigned'] = 'User\'s program completion duration since assignment';
+$string['ruledesc-learning-programcompletiondurationstarted'] = 'User\'s program completion duration since started';
 $string['ruledesc-learning-programcompletionlist'] = 'User\'s program completion(s)';
 $string['ruledesc-systemaccess-firstlogin'] = 'User\'s first login date';
 $string['ruledesc-systemaccess-lastlogin'] = 'User\'s last login date';
@@ -484,7 +485,8 @@ $string['rulename-learning-coursecompletiondate'] = 'Course completion date';
 $string['rulename-learning-coursecompletionduration'] = 'Course completion duration';
 $string['rulename-learning-coursecompletionlist'] = 'Course completion';
 $string['rulename-learning-programcompletiondate'] = 'Program completion date';
-$string['rulename-learning-programcompletionduration'] = 'Program completion duration';
+$string['rulename-learning-programcompletiondurationassigned'] = 'Program completion duration since assignment';
+$string['rulename-learning-programcompletiondurationstarted'] = 'Program completion duration since started';
 $string['rulename-learning-programcompletionlist'] = 'Program completion';
 $string['rulename-systemaccess-firstlogin'] = 'First login date';
 $string['rulename-systemaccess-lastlogin'] = 'Last login date';
@@ -584,6 +586,7 @@ $string['youhaveremoved'] = 'You have removed {$a->itemname} from this program<b
 This change will be applied once the \'Save all changes\' button is clicked on the main Program assignments screen';
 
 // Deprecated.
+$string['ruledesc-learning-programcompletionduration'] = 'User\'s program completion duration';
 $string['ruledesc-org-id'] = 'User\'s organisation';
 $string['ruledesc-org-idnumber'] = 'User\'s organisation ID number';
 $string['ruledesc-org-orgtype'] = 'User\'s organisation type';
@@ -596,6 +599,7 @@ $string['ruledesc-pos-postype'] = 'User\'s position type';
 $string['ruledesc-pos-startdate'] = 'User\'s position date assigned';
 $string['ruledesc-pos-timevalidfrom'] = 'User\'s position start date';
 $string['ruledesc-pos-timevalidto'] = 'User\'s position end date';
+$string['rulename-learning-programcompletionduration'] = 'Program completion duration';
 $string['rulename-org-id'] = 'Organisation';
 $string['rulename-org-idnumber'] = 'Organisation ID number';
 $string['rulename-org-orgtype'] = 'Organisation type';

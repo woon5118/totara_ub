@@ -246,6 +246,7 @@ $string['eventbulkroleassignmentsstarted'] = 'Bulk role assignments started';
 $string['eventcoursearchived'] = 'Course was archived';
 $string['eventcoursecompletionreset'] = 'Course completion was reset';
 $string['eventcoursecompletionunlocked'] = 'Course completion was unlocked without reset';
+$string['eventcourseinprogress'] = 'User was marked in progress for course';
 $string['eventmenuadminviewed'] = 'Main menu viewed';
 $string['eventmenuitemcreated'] = 'Menu item created';
 $string['eventmenuitemdeleted'] = 'Menu item deleted';

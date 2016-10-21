@@ -1397,7 +1397,7 @@ function prog_update_completion($userid, program $program = null, $courseid = nu
             $completionsettings = array(
                 'status'        => STATUS_PROGRAM_COMPLETE,
                 'timecompleted' => $coursesetcompletion->timecompleted
-                );
+            );
             $program->update_program_complete($userid, $completionsettings);
         }
     }

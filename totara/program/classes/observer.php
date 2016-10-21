@@ -438,4 +438,57 @@ class totara_program_observer {
 
         return true;
     }
+
+    /**
+     * Handler function called when a course_in_progress event is triggered
+     * This marks any relevant programs as started for the user.
+     *
+     * @param \core\event\course_in_progress $event
+     * @return bool Success status
+     */
+    public static function course_in_progress(\core\event\course_in_progress $event) {
+        global $DB;
+
+        $userid = $event->relateduserid;
+        $courseid = $event->courseid;
+
+        $sql = "SELECT pc.*
+                  FROM {prog_user_assignment} pua
+            INNER JOIN {prog_courseset} pc
+                    ON pc.programid = pua.programid
+            INNER JOIN {prog_courseset_course} pcc
+                    ON pcc.coursesetid = pc.id
+            INNER JOIN {prog_completion} comp
+                    ON comp.userid = pua.userid
+                   AND comp.programid = pua.programid
+                   AND comp.coursesetid = 0
+                   AND comp.timecompleted = 0
+                 WHERE pua.userid = :uid
+                   AND pcc.courseid = :cid";
+        $params = array('uid' => $userid, 'cid' => $courseid);
+
+        $coursesets = $DB->get_records_sql($sql, $params);
+        foreach ($coursesets as $courseset) {
+            $params = array();
+            $params['coursesetid'] = $courseset->id;
+            $params['userid'] = $userid;
+            $params['programid'] = $courseset->programid;
+            $params['timestarted'] = 0;
+
+            // Check the program courseset is available, by getting the program completion.
+            if ($cscomp = $DB->get_record('prog_completion', $params)) {
+                $cscomp->timestarted = time();
+                $DB->update_record('prog_completion', $cscomp);
+
+                // Check the program completion (courseset 0) record.
+                $params['coursesetid'] = 0;
+                if ($progcomp = $DB->get_record('prog_completion', $params)) {
+                    $progcomp->timestarted = time();
+                    $DB->update_record('prog_completion', $progcomp);
+                }
+            }
+        }
+
+        return true;
+    }
 }

@@ -1537,9 +1537,15 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
             'timecompleted' => time()
         ]);
 
+        // Mark the other user as started.
+        $program->update_program_complete($user_incomplete->id, [
+            'status' => STATUS_PROGRAM_INCOMPLETE,
+            'timestarted' => time()
+        ]);
+
         $completedebugging = '$program->is_program_complete() is deprecated, use the lib function prog_is_complete() instead';
         $incompletedebugging = '$program->is_program_inprogress() is deprecated, use the lib function prog_is_inprogress() instead';
-        
+
         $this->assertTrue($program->is_program_complete($user_complete->id));
         $this->assertDebuggingCalled($completedebugging);
         $this->assertFalse($program->is_program_inprogress($user_complete->id));
@@ -1580,6 +1586,12 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $program->update_program_complete($user_complete->id, [
             'status' => STATUS_PROGRAM_COMPLETE,
             'timecompleted' => time()
+        ]);
+
+        // Mark the other user as started.
+        $program->update_program_complete($user_incomplete->id, [
+            'status' => STATUS_PROGRAM_INCOMPLETE,
+            'timestarted' => time()
         ]);
 
         // Now we want to mark the incomplete user complete in courses in the first courseset.
@@ -1864,6 +1876,9 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $certification = new program($certification->id);
         $certificationcontext = $certification->get_context();
 
+        prog_update_completion($user_complete->id, $certification);
+        prog_update_completion($user_incomplete->id, $certification);
+
         // At this point the complete user is 100% complete and the incomplete user is 50% complete.
         $this->assertTrue(prog_is_complete($certification->id, $user_complete->id));
         $this->assertEquals(100, $certification->get_progress($user_complete->id));
@@ -1951,6 +1966,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
     private function mark_user_complete_in_course($user, $course) {
         $params = array('userid' => $user->id, 'course' => $course->id);
         $completion = new completion_completion($params);
+        $completion->mark_inprogress();
         $this->assertNotEmpty($completion->mark_complete());
         $this->assertTrue($completion->is_complete());
     }

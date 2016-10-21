@@ -121,15 +121,16 @@ class prog_content {
      * Used by usort to sort the sets in the $coursesets array
      * by their sortorder properties
      *
-     * @param <type> $a
-     * @param <type> $b
-     * @return <type>
+     * @param object $a - courseset record
+     * @param object $b - courseset record
+     * @return integer  - 1 or -1
      */
     static function cmp_set_sortorder( $a, $b ) {
         // sort by sortorder within certifpath
         if ($a->certifpath ==  $b->certifpath) {
             if ($a->sortorder ==  $b->sortorder) {
-                return 0;
+                // Fall back to the coursesetid for consistent ordering.
+                return ($a->id < $b->id) ? -1 : 1;
             } else {
                 return ($a->sortorder < $b->sortorder) ? -1 : 1;
             }
@@ -919,7 +920,7 @@ class prog_content {
                 $cc->userid = $userid;
                 $cc->coursesetid = $courseset_selected->id;
                 $cc->status = STATUS_COURSESET_INCOMPLETE;
-                $cc->timestarted = $now;
+                $cc->timecreated = $now;
                 $cc->timedue = $now + $timeallowance;
                 $DB->insert_record('prog_completion', $cc);
             }
@@ -975,7 +976,7 @@ class prog_content {
                 $cc->userid = $userid;
                 $cc->coursesetid = $courseset_selected->id;
                 $cc->status = STATUS_COURSESET_INCOMPLETE;
-                $cc->timestarted = $now;
+                $cc->timecreated = $now;
                 $cc->timedue = $now + $timeallowance;
 
                 $prog_completions[] = $cc;

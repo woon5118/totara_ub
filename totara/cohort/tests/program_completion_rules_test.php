@@ -49,27 +49,27 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
 
     /*
      * Program completion data:
-     *-----------------*---------------------*--------------*-----------------*-----------------*
-     |      users      |       programs      | time started | time completed  | time completion |
-     |-----------------*---------------------*--------------*-----------------*-----------------*
-     |      user1      | program1            |  -5 days     |    -1 day       |     4 days      |
-     |-----------------*---------------------*--------------*-----------------*-----------------*
-     |      user2      | program1            |  -5 days     |    -2 days      |     3 days      |
-     |-----------------*---------------------*--------------*-----------------*-----------------*
-     |      user3      | program1 - program2 |  -3 days     |    -1 day       |     2 days      |
-     |-----------------*---------------------*--------------*-----------------*-----------------*
-     |      user4      | program2            |  -2 days     |    -1 day       |     1 days      |
-     |-----------------*---------------------*--------------*----------------*-----------------*
-     |      user5      | program2            |  -4 days     |    -2 days      |     2 days      |
-     |-----------------*---------------------*--------------*-----------------*-----------------*
-     |      user6      | program2            |  -3 days     | +1 day(future)  |     4 days      |
-     |-----------------*---------------------*--------------*-----------------*-----------------*
-     |      user7      | program2            |  -7 days     |    -1 day       |     6 days      |
-     |-----------------*---------------------*--------------*-----------------*-----------------*
-     |      user8      |  - - - - - - - -    |   - - - - -  |   - - - - - - - |   - - - - -     |
-     *-----------------*---------------------*--------------*-----------------*-----------------*
-     |  user1 - user7  | program3 - program4 |     now      |   - - - - - - - |   - - - - -     |
-     *-----------------*---------------------*--------------*-----------------*-----------------*
+     *-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
+     |      users      |       programs      | time assigned | time started | time completed | DurationAssigned | DurationStarted |
+     |-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
+     |      user1      | program1            |  -5 days      |  -3 days     |    -1 day      |     4 days       |     2 days      |
+     |-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
+     |      user2      | program1            |  -5 days      |  -5 days     |    -2 days     |     3 days       |     3 days      |
+     |-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
+     |      user3      | program1 - program2 |  -3 days      |  -2 days     |    -1 day      |     2 days       |     1 days      |
+     |-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
+     |      user4      | program2            |  -2 days      |  -4 days     |    -1 day      |     1 days       |     3 days      |
+     |-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
+     |      user5      | program2            |  -4 days      |  -3 days     |    -2 days     |     2 days       |     1 days      |
+     |-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
+     |      user6      | program2            |  -3 days      |  -5 days     | +1 day(future) |     4 days       |     6 days      |
+     |-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
+     |      user7      | program2            |  -7 days      |  -5 days     |    -1 day      |     6 days       |     4 days      |
+     |-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
+     |      user8      |  -----------------  |  -----------  |  ----------  |  ------------  |  --------------  |  -------------  |
+     *-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
+     |  user1 - user7  | program3 - program4 |     now       |     now      |  ------------  |  --------------  |  -------------  |
+     *-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
     */
     public function setUp() {
         global $DB, $CFG;
@@ -127,16 +127,26 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
         $this->getDataGenerator()->assign_program($this->program3->id, $usersprogram3);
         $this->getDataGenerator()->assign_program($this->program4->id, $usersprogram3);
 
-        // Create timestarted for each user.
+        // Create timecreated for each user.
         $now = time();
+        $timecreated = array();
+        $timecreated[$this->user1->id] = $now - (5 * DAYSECS);
+        $timecreated[$this->user2->id] = $now - (5 * DAYSECS);
+        $timecreated[$this->user3->id] = $now - (3 * DAYSECS);
+        $timecreated[$this->user4->id] = $now - (2 * DAYSECS);
+        $timecreated[$this->user5->id] = $now - (4 * DAYSECS);
+        $timecreated[$this->user6->id] = $now - (3 * DAYSECS);
+        $timecreated[$this->user7->id] = $now - (7 * DAYSECS);
+
+        // Create timestarted for each user.
         $timestarted = array();
-        $timestarted[$this->user1->id] = $now - (5 * DAYSECS);
+        $timestarted[$this->user1->id] = $now - (3 * DAYSECS);
         $timestarted[$this->user2->id] = $now - (5 * DAYSECS);
-        $timestarted[$this->user3->id] = $now - (3 * DAYSECS);
-        $timestarted[$this->user4->id] = $now - (2 * DAYSECS);
-        $timestarted[$this->user5->id] = $now - (4 * DAYSECS);
-        $timestarted[$this->user6->id] = $now - (3 * DAYSECS);
-        $timestarted[$this->user7->id] = $now - (7 * DAYSECS);
+        $timestarted[$this->user3->id] = $now - (2 * DAYSECS);
+        $timestarted[$this->user4->id] = $now - (4 * DAYSECS);
+        $timestarted[$this->user5->id] = $now - (3 * DAYSECS);
+        $timestarted[$this->user6->id] = $now - (5 * DAYSECS);
+        $timestarted[$this->user7->id] = $now - (5 * DAYSECS);
 
         // Create timecompleted for each user.
         $timecompleted = array();
@@ -154,6 +164,7 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
             foreach ($users as $userid) {
                 $completionsettings = array(
                     'status'        => STATUS_PROGRAM_COMPLETE,
+                    'timecreated'   => $timecreated[$userid],
                     'timestarted'   => $timestarted[$userid],
                     'timecompleted' => $timecompleted[$userid],
                 );
@@ -167,13 +178,15 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
             if ($j <= 4) {
                 $completionsettings = array(
                     'status' => STATUS_PROGRAM_COMPLETE,
-                    'timestarted' => $timestarted[$userid],
+                    'timecreated' => $timecreated[$userid],
+                    'timestarted'   => $timestarted[$userid],
                     'timecompleted' => $timecompleted[$userid],
                 );
             } else {
                 $completionsettings = array(
                     'status' => STATUS_PROGRAM_INCOMPLETE,
-                    'timestarted' => $timestarted[$userid],
+                    'timecreated' => $timecreated[$userid],
+                    'timestarted'   => $timestarted[$userid],
                     'timecompleted' => 0,
                 );
             }
@@ -186,13 +199,15 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
             if ($j <= 2) {
                 $completionsettings = array(
                     'status' => STATUS_PROGRAM_COMPLETE,
-                    'timestarted' => $timestarted[$userid],
+                    'timecreated' => $timecreated[$userid],
+                    'timestarted'   => $timestarted[$userid],
                     'timecompleted' => $timecompleted[$userid],
                 );
             } else {
                 $completionsettings = array(
                     'status' => STATUS_PROGRAM_INCOMPLETE,
-                    'timestarted' => $timestarted[$userid],
+                    'timecreated' => $timecreated[$userid],
+                    'timestarted'   => $timestarted[$userid],
                     'timecompleted' => 0,
                 );
             }
@@ -254,12 +269,12 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
             $days = 1;
             $users = $this->userprograms[$this->program2->id];
             foreach ($users as $user) {
-                $timestarted = $now - ($days * DAYSECS);
+                $timecreated = $now - ($days * DAYSECS);
                 $timecompleted = $now + ($days * DAYSECS);
                 $program = new program($this->program2->id);
                 $completionsettings = array(
                     'status'        => STATUS_PROGRAM_COMPLETE,
-                    'timestarted'   => $timestarted,
+                    'timecreated'   => $timecreated,
                     'timecompleted' => $timecompleted
                 );
                 $program->update_program_complete($user, $completionsettings);
@@ -284,7 +299,7 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
     /**
      * Data provider for program completion duration rule.
      */
-    public function data_program_completion_duration() {
+    public function data_program_completion_assigned_duration() {
         $data = array(
             array(array('operator' => COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN, 'date' => 2),  array('program1'), 1),
             array(array('operator' => COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN, 'date' => 3), array('program1'), 2),
@@ -296,9 +311,9 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
 
     /**
      * Test program completion duration rule.
-     * @dataProvider data_program_completion_duration
+     * @dataProvider data_program_completion_assigned_duration
      */
-    public function test_programcompletion_duration($params, $programs, $usercount) {
+    public function test_programcompletion_assigned_duration($params, $programs, $usercount) {
         global $DB;
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -310,7 +325,48 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
         }
 
         // Create a completion duration rule.
-        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'learning', 'programcompletionduration', $params, $listofids, 'listofids');
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'learning', 'programcompletiondurationassigned', $params, $listofids, 'listofids');
+        cohort_rules_approve_changes($this->cohort);
+
+        // It should match:
+        // 1. data1: 1 (users who have completed program1 in a period less than 2 days).
+        // 2. data2: 2 (users who have completed program1 in a period less than 3 days).
+        // 3. data3: 1 (users that had completed program1 and program2 within duration of more than 2 days).
+        // 4. data4: 2 (users that had completed program2 in a period grater than 3 days).
+        $this->assertEquals($usercount, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+    }
+
+    /**
+     * Data provider for program completion uration rule.
+     * Program completion data:
+     */
+    public function data_program_completion_started_duration() {
+        $data = array(
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN, 'date' => 2),  array('program1'), 2),
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN, 'date' => 3), array('program1'), 3),
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN, 'date' => 1),  array('program1', 'program2'), 1),
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN, 'date' => 3), array('program2'), 3),
+        );
+        return $data;
+    }
+
+    /**
+     * Test program completion duration rule.
+     * @dataProvider data_program_completion_started_duration
+     */
+    public function test_programcompletion_started_duration($params, $programs, $usercount) {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Process listofids.
+        $listofids = array();
+        foreach ($programs as $program) {
+            $listofids[] = $this->{$program}->id;
+        }
+
+        // Create a completion duration rule.
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'learning', 'programcompletiondurationstarted', $params, $listofids, 'listofids');
         cohort_rules_approve_changes($this->cohort);
 
         // It should match:

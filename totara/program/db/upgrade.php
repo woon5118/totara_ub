@@ -23,6 +23,14 @@
  */
 
 /**
+ * Local db upgrades for Totara Core
+ */
+
+require_once($CFG->dirroot.'/totara/core/db/utils.php');
+require_once($CFG->dirroot.'/totara/program/db/upgradelib.php');
+
+
+/**
  * Local database upgrade script
  *
  * @param   integer $oldversion Current (pre-upgrade) local db version timestamp

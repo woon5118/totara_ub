@@ -229,15 +229,16 @@ class totara_program_completions_task_testcase extends advanced_testcase {
         $this->verify_users_assigned($program_one, $users, ['u3', 'u4', 'u5', 'u6', 'u7', 'u8']);
         $this->verify_users_assigned($program_two, $users, ['u9', 'u10', 'u11', 'u12', 'u13', 'u14']);
 
-        $this->verify_program_completion_state($program_one, $users, ['u8'], ['u3', 'u4', 'u5', 'u6', 'u7']);
-        $this->verify_program_completion_state($program_two, $users, ['u14'], ['u9', 'u10', 'u11', 'u12', 'u13']);
+        // Note: You aren't in progress until you do something anymore.
+        $this->verify_program_completion_state($program_one, $users, ['u8'], ['u6', 'u7']);
+        $this->verify_program_completion_state($program_two, $users, ['u14'], ['u12', 'u13']);
 
         // Run for the first time and check that we are where we expect to be.
         $task = new \totara_program\task\completions_task();
         $this->assertTrue($task->execute());
 
-        $this->verify_program_completion_state($program_one, $users, ['u8'], ['u3', 'u4', 'u5', 'u6', 'u7']);
-        $this->verify_program_completion_state($program_two, $users, ['u14'], ['u9', 'u10', 'u11', 'u12', 'u13']);
+        $this->verify_program_completion_state($program_one, $users, ['u8'], ['u6', 'u7']);
+        $this->verify_program_completion_state($program_two, $users, ['u14'], ['u12', 'u13']);
 
         // START PROGRESSING USERS.
 
@@ -275,30 +276,30 @@ class totara_program_completions_task_testcase extends advanced_testcase {
         $this->access_and_complete_course($users['u12'], $courses['c4'], $modules['c4']);
         $this->check_courseset_complete_for_user($program_two, 2, $users['u12']);
 
-        $this->verify_program_completion_state($program_one, $users, ['u4', 'u6', 'u8'], ['u1', 'u3', 'u5', 'u7']);
-        $this->verify_program_completion_state($program_two, $users, ['u10', 'u12', 'u14'], ['u2', 'u9', 'u11', 'u13']);
+        $this->verify_program_completion_state($program_one, $users, ['u4', 'u6', 'u8'], ['u3', 'u7']);
+        $this->verify_program_completion_state($program_two, $users, ['u10', 'u12', 'u14'], ['u9', 'u13']);
 
         // VERIFY FINAL POSITION.
         // Run for the second time and check that we are where we expect to be.
         $task = new \totara_program\task\completions_task();
         $this->assertTrue($task->execute());
 
-        $this->verify_program_completion_state($program_one, $users, ['u4', 'u6', 'u8'], ['u1', 'u3', 'u5', 'u7']);
-        $this->verify_program_completion_state($program_two, $users, ['u10', 'u12', 'u14'], ['u2', 'u9', 'u11', 'u13']);
+        $this->verify_program_completion_state($program_one, $users, ['u4', 'u6', 'u8'], ['u3', 'u7']);
+        $this->verify_program_completion_state($program_two, $users, ['u10', 'u12', 'u14'], ['u9', 'u13']);
 
         // Force the position back to incomplete for all assigned users.
-        $DB->execute('UPDATE {prog_completion} SET status = :status', ['status' => STATUS_PROGRAM_INCOMPLETE]);
+        $DB->execute('UPDATE {prog_completion} SET status = :status, timestarted = 0', ['status' => STATUS_PROGRAM_INCOMPLETE]);
 
-        $this->verify_program_completion_state($program_one, $users, [], ['u4', 'u6', 'u8', 'u1', 'u3', 'u5', 'u7']);
-        $this->verify_program_completion_state($program_two, $users, [], ['u10', 'u12', 'u14', 'u2', 'u9', 'u11', 'u13']);
+        $this->verify_program_completion_state($program_one, $users, [], []);
+        $this->verify_program_completion_state($program_two, $users, [], []);
 
         // VERIFY FORCED POSITION FIXED.
         // Run for the second time and check that we are where we expect to be.
         $task = new \totara_program\task\completions_task();
         $this->assertTrue($task->execute());
 
-        $this->verify_program_completion_state($program_one, $users, ['u4', 'u6', 'u8'], ['u1', 'u3', 'u5', 'u7']);
-        $this->verify_program_completion_state($program_two, $users, ['u10', 'u12', 'u14'], ['u2', 'u9', 'u11', 'u13']);
+        $this->verify_program_completion_state($program_one, $users, ['u4', 'u6', 'u8'], ['u3', 'u7']);
+        $this->verify_program_completion_state($program_two, $users, ['u10', 'u12', 'u14'], ['u9', 'u13']);
     }
 
     /**
@@ -416,8 +417,9 @@ class totara_program_completions_task_testcase extends advanced_testcase {
         $this->verify_users_assigned($certification_one, $users, ['u3', 'u4', 'u5', 'u6', 'u7', 'u8']);
         $this->verify_users_assigned($certification_two, $users, ['u9', 'u10', 'u11', 'u12', 'u13', 'u14']);
 
-        $this->verify_program_completion_state($certification_one, $users, ['u8'], ['u3', 'u4', 'u5', 'u6', 'u7']);
-        $this->verify_program_completion_state($certification_two, $users, ['u14'], ['u9', 'u10', 'u11', 'u12', 'u13']);
+        // Note: You aren't in progress until you do something anymore.
+        $this->verify_program_completion_state($certification_one, $users, ['u8'], ['u6', 'u7']);
+        $this->verify_program_completion_state($certification_two, $users, ['u14'], ['u12', 'u13']);
 
         $this->verify_certification_completion_state($certification_one, $users, ['u3', 'u4', 'u5'], ['u6', 'u7'], ['u8'], [], []);
         $this->verify_certification_completion_state($certification_two, $users, ['u9', 'u10', 'u11'], ['u12', 'u13'], ['u14'], [], []);
@@ -426,8 +428,8 @@ class totara_program_completions_task_testcase extends advanced_testcase {
         $task = new \totara_program\task\completions_task();
         $this->assertTrue($task->execute());
 
-        $this->verify_program_completion_state($certification_one, $users, ['u8'], ['u3', 'u4', 'u5', 'u6', 'u7']);
-        $this->verify_program_completion_state($certification_two, $users, ['u14'], ['u9', 'u10', 'u11', 'u12', 'u13']);
+        $this->verify_program_completion_state($certification_one, $users, ['u8'], ['u6', 'u7']);
+        $this->verify_program_completion_state($certification_two, $users, ['u14'], ['u12', 'u13']);
 
         $this->verify_certification_completion_state($certification_one, $users, ['u3', 'u4', 'u5'], ['u6', 'u7'], ['u8'], [], []);
         $this->verify_certification_completion_state($certification_two, $users, ['u9', 'u10', 'u11'], ['u12', 'u13'], ['u14'], [], []);
@@ -468,8 +470,8 @@ class totara_program_completions_task_testcase extends advanced_testcase {
         $this->access_and_complete_course($users['u12'], $courses['c4'], $modules['c4']);
         $this->check_courseset_complete_for_user($certification_two, 2, $users['u12']);
 
-        $this->verify_program_completion_state($certification_one, $users, ['u4', 'u6', 'u8'], ['u1', 'u3', 'u5', 'u7']);
-        $this->verify_program_completion_state($certification_two, $users, ['u10', 'u12', 'u14'], ['u2', 'u9', 'u11', 'u13']);
+        $this->verify_program_completion_state($certification_one, $users, ['u4', 'u6', 'u8'], ['u3', 'u7']);
+        $this->verify_program_completion_state($certification_two, $users, ['u10', 'u12', 'u14'], ['u9', 'u13']);
 
         $this->verify_certification_completion_state($certification_one, $users, ['u1', 'u5'], ['u3', 'u7'], ['u4', 'u6', 'u8'], [], []);
         $this->verify_certification_completion_state($certification_two, $users, ['u2', 'u11'], ['u9', 'u13'], ['u10', 'u12', 'u14'], [], []);
@@ -621,6 +623,10 @@ class totara_program_completions_task_testcase extends advanced_testcase {
         // Check it isn't complete.
         $completionstate = $DB->get_field('course_modules_completion', 'completionstate', $params);
         $this->assertEmpty($completionstate);
+
+        $compparams = array('userid' => $user->id, 'course' => $course->id);
+        $completion = new completion_completion($compparams);
+        $completion->mark_inprogress();
 
         // Complete the certificate.
         $completion = new completion_info($course);

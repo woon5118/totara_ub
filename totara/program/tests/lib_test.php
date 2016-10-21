@@ -70,16 +70,27 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
 
         // Mark all the courses complete, with traceable time completed.
         $completion = new completion_completion(array('userid' => $user->id, 'course' => $course1->id));
+        $completion->mark_inprogress(800);
         $completion->mark_complete(1000);
+
         $completion = new completion_completion(array('userid' => $user->id, 'course' => $course2->id));
+        $completion->mark_inprogress(1800);
         $completion->mark_complete(2000);
+
         $completion = new completion_completion(array('userid' => $user->id, 'course' => $course3->id));
+        $completion->mark_inprogress(2800);
         $completion->mark_complete(3000);
+
         $completion = new completion_completion(array('userid' => $user->id, 'course' => $course4->id));
+        $completion->mark_inprogress(3800);
         $completion->mark_complete(4000);
+
         $completion = new completion_completion(array('userid' => $user->id, 'course' => $course5->id));
+        $completion->mark_inprogress(5800);
         $completion->mark_complete(6000);
+
         $completion = new completion_completion(array('userid' => $user->id, 'course' => $course6->id));
+        $completion->mark_inprogress(4800);
         $completion->mark_complete(5000);
 
         // Check the existing data.
@@ -439,9 +450,10 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
 
         foreach ($progcompletionnonzeropre as $pcnonzero) {
             $this->assertEquals(STATUS_COURSESET_COMPLETE, $pcnonzero->status);
-            $this->assertGreaterThanOrEqual($startassigntime, $pcnonzero->timestarted);
-            $this->assertLessThanOrEqual($endassigntime, $pcnonzero->timestarted);
+            $this->assertGreaterThanOrEqual($startassigntime, $pcnonzero->timecreated);
+            $this->assertLessThanOrEqual($endassigntime, $pcnonzero->timecreated);
             $this->assertEquals(12345, $pcnonzero->timedue);
+            $this->assertEquals(1000, $pcnonzero->timestarted);
             $this->assertEquals(1000, $pcnonzero->timecompleted);
 
             if ($pcnonzero->programid == $prog1->id && $pcnonzero->userid == $user1->id ||

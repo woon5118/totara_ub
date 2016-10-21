@@ -255,8 +255,14 @@ class completion_completion extends data_object {
             }
         }
 
-        // Mark as in progress for the certification
-        inprogress_certification_stage($this->course, $this->userid);
+        // Trigger event to indicate that a user has been marked as in progress in a course.
+        $context = context_course::instance($this->course);
+        $data = array(
+            'relateduserid' => $this->userid,
+            'objectid' => $this->course,
+            'context' => $context,
+        );
+        \core\event\course_in_progress::create($data)->trigger();
     }
 
     /**
@@ -416,6 +422,11 @@ class completion_completion extends data_object {
     public function aggregate() {
         global $DB;
         static $courses = array();
+
+        // Don't use the cache when running tests.
+        if (PHPUNIT_TEST) {
+            $courses = array();
+        }
 
         // Check if already complete.
         if ($this->timecompleted) {

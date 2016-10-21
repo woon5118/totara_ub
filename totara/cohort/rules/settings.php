@@ -583,15 +583,25 @@ function cohort_rules_list($reset = false){
                 ),
                 new cohort_rule_sqlhandler_completion_date_program()
             );
+            // Completion of all programs in a list within a given duration since assignment.
+            $rules[] = new cohort_rule_option(
+                'learning',
+                'programcompletiondurationassigned',
+                new cohort_rule_ui_picker_program_duration(
+                    get_string('ruledesc-learning-programcompletiondurationassigned', 'totara_cohort'),
+                    COHORT_PICKER_PROGRAM_COMPLETION
+                ),
+                new cohort_rule_sqlhandler_completion_duration_assigned_program()
+            );
             // Completion of all programs in a list within a given duration
             $rules[] = new cohort_rule_option(
                 'learning',
-                'programcompletionduration',
+                'programcompletiondurationstarted',
                 new cohort_rule_ui_picker_program_duration(
-                    get_string('ruledesc-learning-programcompletionduration', 'totara_cohort'),
+                    get_string('ruledesc-learning-programcompletiondurationstarted', 'totara_cohort'),
                     COHORT_PICKER_PROGRAM_COMPLETION
                 ),
-                new cohort_rule_sqlhandler_completion_duration_program()
+                new cohort_rule_sqlhandler_completion_duration_started_program()
             );
         }
 

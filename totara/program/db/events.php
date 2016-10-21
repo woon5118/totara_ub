@@ -71,4 +71,8 @@ $observers = array(
         'eventname' => '\totara_job\event\job_assignment_updated',
         'callback'  => 'totara_program_observer::job_assignment_updated',
     ),
+    array(
+        'eventname' => '\core\event\course_in_progress',
+        'callback'  => 'totara_program_observer::course_in_progress',
+    ),
 );

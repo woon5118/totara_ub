@@ -17,29 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Eugene Venter <eugene@catalyst.net.nz>
+ * @author David Curry <david.curry@totaralms.com>
  * @package totara
- * @subpackage cohort
+ * @subpackage certification
  */
 
-require_once($CFG->dirroot . '/totara/cohort/db/upgradelib.php');
+defined('MOODLE_INTERNAL') || die();
 
-/**
- * DB upgrades for Totara dynamic cohorts
- */
-function xmldb_totara_cohort_upgrade($oldversion) {
-    global $CFG, $DB;
+require_once($CFG->dirroot . '/totara/certification/lib.php');
 
-    $dbman = $DB->get_manager();
+class totara_certification_observer {
 
-    // Totara 10 branching line.
+    /**
+     * Handler function called when a course_started event is triggered
+     *
+     * @param \core\event\course_in_progress $event
+     * @return bool Success status
+     */
+    public static function course_in_progress(\core\event\course_in_progress $event) {
+        // Mark as in progress for the certification.
+        inprogress_certification_stage($event->courseid, $event->relateduserid);
 
-    if ($oldversion < 2017030300) {
-        totara_cohort_migrate_rules('learning', 'programcompletionduration', 'learning', 'programcompletiondurationassigned');
-
-        // Main savepoint reached.
-        totara_upgrade_mod_savepoint(true, 2017030300, 'totara_cohort');
+        return true;
     }
-
-    return true;
 }

@@ -279,19 +279,22 @@ function assign_certification_stage($certificationid, $userid) {
  */
 function inprogress_certification_stage($courseid, $userid) {
     global $DB;
-    $certificationids = find_certif_from_course($courseid);
 
-    if (!count($certificationids)) {
-        return false;
-    }
-
-    // Could be multiple certification records so find the one this user is doing.
-    list($usql, $params) = $DB->get_in_or_equal(array_keys($certificationids));
-    $sql = "SELECT id, status, renewalstatus, certifid
-            FROM {certif_completion} cfc
-            WHERE cfc.certifid $usql AND cfc.userid = ?";
-
-    $params[] = $userid;
+    $sql = "SELECT DISTINCT cfc.id, cfc.status, cfc.renewalstatus, cfc.certifid
+              FROM {certif_completion} cfc
+        INNER JOIN {prog} p
+                ON p.certifid = cfc.certifid
+        INNER JOIN {prog_user_assignment} pua
+                ON pua.programid = p.id
+               AND pua.userid = cfc.userid
+        INNER JOIN {prog_courseset} pcs
+                ON pcs.programid = p.id
+               AND pcs.certifpath = cfc.certifpath
+        INNER JOIN {prog_courseset_course} pcsc
+                ON pcsc.coursesetid = pcs.id
+             WHERE cfc.userid = :uid
+               AND pcsc.courseid = :cid";
+    $params = array('uid' => $userid, 'cid' => $courseid);
 
     $completion_records = $DB->get_records_sql($sql, $params);
 
@@ -299,27 +302,23 @@ function inprogress_certification_stage($courseid, $userid) {
     if ($count == 0) {
         // If 0 then this course & user is not in an assigned certification.
         return false;
-    } else if ($count > 1) {
-        // A problem TODO - eg user is doing 2 certifs which both have this course in them.
-        return false;
     }
 
-    $completion_record = reset($completion_records);
+    foreach ($completion_records as $comprec) {
+        // Change only from specific states as function can be called at any time (whenever course is viewed)
+        // from unset, assigned, expired - any time
+        // from completed when renewal status is dueforrenewal.
+        if ($comprec->status < CERTIFSTATUS_INPROGRESS
+            || $comprec->status == CERTIFSTATUS_EXPIRED
+            || ($comprec->status == CERTIFSTATUS_COMPLETED && $comprec->renewalstatus == CERTIFRENEWALSTATUS_DUE)) {
+            $todb = new StdClass();
+            $todb->id = $comprec->id;
+            $todb->status = CERTIFSTATUS_INPROGRESS;
+            $todb->timemodified = time();
 
-    // Change only from specific states as function can be called at any time (whenever course is viewed)
-    // from unset, assigned, expired - any time
-    // from completed when renewal status is dueforrenewal.
-    if ($completion_record->status < CERTIFSTATUS_INPROGRESS
-        || $completion_record->status == CERTIFSTATUS_EXPIRED
-        || $completion_record->status == CERTIFSTATUS_COMPLETED && $completion_record->renewalstatus == CERTIFRENEWALSTATUS_DUE) {
-        $todb = new StdClass();
-        $todb->id = $completion_record->id;
-        $todb->status = CERTIFSTATUS_INPROGRESS;
-        $todb->timemodified = time();
-
-        $DB->update_record('certif_completion', $todb);
+            $DB->update_record('certif_completion', $todb);
+        }
     }
-
     return true;
 }
 
@@ -2924,7 +2923,7 @@ function certif_load_completion($programid, $userid, $mustexist = true) {
     global $DB;
 
     $sql = "SELECT cc.*, pc.id AS pcid, pc.programid, pc.coursesetid, pc.status AS progstatus, pc.timestarted AS progtimestarted,
-                   pc.timedue, pc.timecompleted AS progtimecompleted, pc.organisationid, pc.positionid
+                   pc.timedue, pc.timecreated AS progtimecreated, pc.timecompleted AS progtimecompleted, pc.organisationid, pc.positionid
               FROM {certif_completion} cc
               JOIN {prog} prog
                 ON cc.certifid = prog.certifid
@@ -2962,6 +2961,7 @@ function certif_load_completion($programid, $userid, $mustexist = true) {
     $progcompletion->userid = $record->userid;
     $progcompletion->status = $record->progstatus;
     $progcompletion->timestarted = $record->progtimestarted;
+    $progcompletion->timecreated = $record->progtimecreated;
     $progcompletion->timedue = $record->timedue;
     $progcompletion->timecompleted = $record->progtimecompleted;
     $progcompletion->organisationid = $record->organisationid;

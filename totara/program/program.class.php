@@ -856,7 +856,7 @@ class program {
             $pc->userid = $userid;
             $pc->coursesetid = 0;
             $pc->status = STATUS_PROGRAM_INCOMPLETE;
-            $pc->timestarted = $now;
+            $pc->timecreated = $now;
             $pc->timedue = $assigndata['timedue'];
             $prog_completions[] = $pc;
         }
@@ -1206,7 +1206,18 @@ class program {
             }
         }
 
+        $startsql = "SELECT MIN(timestarted)
+                       FROM {prog_completion}
+                      WHERE timestarted > 0
+                        AND userid = :uid
+                        AND programid = :pid
+                   GROUP BY programid";
+        $minstarted = $DB->get_field_sql($startsql, array('uid' => $userid, 'pid' => $this->id));
         if ($completion = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $userid, 'coursesetid' => 0))) {
+            if (empty($completion->timestarted)) {
+                $completion->timestarted = !empty($minstarted) ? $minstarted : 0;
+            }
+
             foreach ($completionsettings as $key => $val) {
                 $completion->$key = $val;
             }
@@ -1251,8 +1262,9 @@ class program {
             $completion->coursesetid = 0;
             $completion->status = STATUS_PROGRAM_INCOMPLETE;
             $completion->timecompleted = 0;
+            $completion->timestarted = !empty($minstarted) ? $minstarted : 0;
             $completion->timedue = 0;
-            $completion->timestarted = $now;
+            $completion->timecreated = $now;
             if ($progcompleted_eventtrigger) {
                 // record the user's pos/org at time of completion
                 $jobassignment = \totara_job\job_assignment::get_first($userid, false);

@@ -67,7 +67,7 @@ abstract class cohort_rule_sqlhandler_completion_list extends cohort_rule_sqlhan
 
     public function get_sql_snippet() {
 
-        if (count($this->listofids) == 0){
+        if (count($this->listofids) == 0) {
             // TODO TL-7094 This needs to use sql snippet stdClass instead, for now this string means all users.
             return '1=0';
         }
@@ -274,15 +274,34 @@ class cohort_rule_sqlhandler_completion_duration_course extends cohort_rule_sqlh
 }
 
 /**
+ * @deprecated Since 9.0
+ * This class has been replaced by the cohort_rule_sqlhandler_completion_duration_started_program
+ * and cohort_rule_sqlhandler_completion_duration_assigned_program classes.
+ */
+class cohort_rule_sqlhandler_completion_duration_program extends cohort_rule_sqlhandler_completion_duration_assigned_program {
+    protected function construct_sql_snippet($goalnum, $comparison, $lov) {
+
+        $message = 'The completion_duration_program has been deprecated and split into 2 new functions.
+    * Completion_duration_started_program now does what the deprecated function should have been doing
+    * Completion_duration_assigned_program now does what the deprecated function was actually doing
+    Please update your code to use one of the new functions.';
+
+        debugging($message, DEBUG_DEVELOPER);
+
+        return parent::construct_sql_snippet($goalnum, $comparison, $lov);
+    }
+}
+
+/**
  * Rule for checking whether user took longer than a specified duration to complete all
  * the programs in a list
  */
-class cohort_rule_sqlhandler_completion_duration_program extends cohort_rule_sqlhandler_completion_date {
+class cohort_rule_sqlhandler_completion_duration_started_program extends cohort_rule_sqlhandler_completion_date {
     protected function construct_sql_snippet($goalnum, $comparison, $lov){
         global $DB;
         $sqlhandler = new stdClass();
-        list($sqlin1, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'cdp1'.$this->ruleid);
-        list($sqlin2, $params2) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'cdp2'.$this->ruleid);
+        list($sqlin1, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'cdps1'.$this->ruleid);
+        list($sqlin2, $params2) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'cdps2'.$this->ruleid);
         $params = array_merge($params, $params2);
         $sqlhandler->sql = "( {$goalnum} =
                   (
@@ -295,6 +314,40 @@ class cohort_rule_sqlhandler_completion_duration_program extends cohort_rule_sql
                      AND pc.timecompleted > 0
                   ) AND (
                      SELECT ((MAX(pc.timecompleted) - MIN(pc.timestarted)) / ". DAYSECS .")
+                       FROM {prog_completion} pc
+                      WHERE pc.userid = u.id
+                        AND pc.programid {$sqlin2}
+                        AND pc.coursesetid = 0
+                        AND pc.status = " . STATUS_PROGRAM_COMPLETE . "
+                        AND pc.timecompleted > 0
+                  ) {$comparison})";
+        $sqlhandler->params = $params;
+        return $sqlhandler;
+    }
+}
+
+/**
+ * Rule for checking whether user took longer than a specified duration to complete all
+ * the programs in a list
+ */
+class cohort_rule_sqlhandler_completion_duration_assigned_program extends cohort_rule_sqlhandler_completion_date {
+    protected function construct_sql_snippet($goalnum, $comparison, $lov){
+        global $DB;
+        $sqlhandler = new stdClass();
+        list($sqlin1, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'cdpa1'.$this->ruleid);
+        list($sqlin2, $params2) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'cdpa2'.$this->ruleid);
+        $params = array_merge($params, $params2);
+        $sqlhandler->sql = "( {$goalnum} =
+                  (
+                  SELECT count(*)
+                    FROM {prog_completion} pc
+                   WHERE pc.userid = u.id
+                     AND pc.programid {$sqlin1}
+                     AND pc.coursesetid = 0
+                     AND pc.status = " . STATUS_PROGRAM_COMPLETE . "
+                     AND pc.timecompleted > 0
+                  ) AND (
+                     SELECT ((MAX(pc.timecompleted) - MIN(pc.timecreated)) / ". DAYSECS .")
                        FROM {prog_completion} pc
                       WHERE pc.userid = u.id
                         AND pc.programid {$sqlin2}

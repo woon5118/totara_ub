@@ -50,4 +50,8 @@ $observers = array(
         'callback' => 'certification_event_handler::certification_updated',
         'includefile' => 'totara/certification/lib.php',
     ),
+    array(
+        'eventname' => '\core\event\course_in_progress',
+        'callback'  => 'totara_certification_observer::course_in_progress',
+    ),
 );

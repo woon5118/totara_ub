@@ -287,6 +287,27 @@ abstract class course_set {
                 $completion->$key = $val;
             }
 
+            if (empty($completion->timestarted)) {
+                $completion->timestarted = !empty($completion->timecompleted) ? $completion->timecompleted : time();
+
+                $certid = $DB->get_field('prog', 'certifid', array('id' => $this->programid));
+                if (empty($certid)) {
+                    $progcomp = prog_load_completion($this->programid, $userid, true);
+                } else {
+                    list($certcomp, $progcomp) = certif_load_completion($this->programid, $userid, true);
+                }
+
+                if (empty($progcomp->timestarted)) {
+                    $progcomp->timestarted = $completion->timestarted;
+                    if (empty($certid)) {
+                        prog_write_completion($progcomp, 'Marked program as started');
+                    } else {
+                        certif_write_completion($certcomp, $progcomp, 'Marked program as started');
+                    }
+                }
+
+            }
+
             if ($update_success = $DB->update_record('prog_completion', $completion)) {
                 if ($eventtrigger) {
                     // trigger an event to notify any listeners that this course
@@ -317,11 +338,15 @@ abstract class course_set {
             $completion->userid = $userid;
             $completion->coursesetid = $this->id;
             $completion->status = STATUS_COURSESET_INCOMPLETE;
-            $completion->timestarted = $now;
+            $completion->timecreated = $now;
             $completion->timedue = 0;
 
             foreach ($completionsettings as $key => $val) {
                 $completion->$key = $val;
+            }
+
+            if (empty($completion->timestarted)) {
+                $completion->timestarted = !empty($completion->timecompleted) ? $completion->timecompleted : $now;
             }
 
             if ($insert_success = $DB->insert_record('prog_completion', $completion)) {
@@ -345,7 +370,6 @@ abstract class course_set {
 
             return $insert_success;
         }
-
     }
 
     /**
@@ -775,9 +799,14 @@ class multi_course_set extends course_set {
             return false;
         }
 
+        $incomplete = false;
+        $timestarted = 0;
         $completedcourses = 0;
         $coursefieldvalsum = 0;
         foreach ($courses as $course) {
+            // create a new completion object for this course
+            $completion_info = new completion_info($course);
+
             $params = array('userid' => $userid, 'course' => $course->id);
             $completion_completion = new completion_completion($params);
 
@@ -786,6 +815,7 @@ class multi_course_set extends course_set {
                 if ($completiontype == COMPLETIONTYPE_ANY) {
                     $completionsettings = array(
                         'status'        => STATUS_COURSESET_COMPLETE,
+                        'timestarted' => $completion_completion->timestarted,
                         'timecompleted' => $completion_completion->timecompleted
                     );
                     return $this->update_courseset_complete($userid, $completionsettings);
@@ -809,11 +839,26 @@ class multi_course_set extends course_set {
                         return $this->complete_courseset_latest_completion($userid, $courses);
                     }
                 }
-            } else {
-                // If all courses must be completed for this course set to be complete.
-                if ($completiontype == COMPLETIONTYPE_ALL) {
-                    return false;
+
+                if (!empty($completion_completion->timestarted) && $completion_completion->timestarted < $timestarted) {
+                    $timestarted = $completion_completion->timestarted;
                 }
+            } else {
+                $incomplete = true;
+                if (!empty($completion_completion->timestarted) && $completion_completion->timestarted < $timestarted) {
+                    $timestarted = $completion_completion->timestarted;
+                }
+
+            }
+
+            // Now we have the earliest time started, mark the courseset as started.
+            if (!empty($timestarted)) {
+                $this->mark_started($userid, $timestarted);
+            }
+
+            // If there is an incomplete course in a complete all courseset return false.
+            if ($completiontype == COMPLETIONTYPE_ALL && $incomplete) {
+                return false;
             }
         }
 
@@ -824,6 +869,53 @@ class multi_course_set extends course_set {
         }
 
         return false;
+    }
+
+    private function mark_started($userid, $timestarted) {
+        global $DB;
+
+        $now = time();
+        $defaultdata = new stdClass();
+        $defaultdata->programid = $this->programid;
+        $defaultdata->userid = $userid;
+        $defaultdata->coursesetid = $this->id;
+        $defaultdata->status = STATUS_COURSESET_INCOMPLETE;
+        $defaultdata->timecreated = $now;
+        $defaultdata->timestarted = $now;
+        $defaultdata->timedue = 0;
+
+        $csetparams = array('pid' => $this->programid, 'uid' => $userid, 'csid' => $this->id);
+        if ($csetcomp = $DB->get_fieldset_select('prog_completion', 'id, timestarted, timecreated', 'programid = :pid AND userid = :uid AND coursesetid = :csid', $csetparams)) {
+            if (empty($csetcomp->timestarted)) {
+                // Don't let the timestarted be set before the timecreated.
+                if ($timestarted < $csetcomp->timecreated) {
+                    $timestarted = $csetcomp->timecreated;
+                }
+
+                $csetcomp->timestarted = $timestarted;
+                prog_write_completion($csetcomp, "User({$userid}) marked as started for courseset({$this->id}) in Program({$this->programid})");
+            } else {
+                return true; // No need to do anything.
+            }
+        } else {
+            prog_write_completion($defaultdata, "User({$userid}) marked as started for courseset({$this->id}) in Program({$this->programid})");
+            $timestarted = $defaultdata->timestarted;
+        }
+
+        // Check if the courseset 0 record needs updating/creating.
+        $progparams = array('pid' => $this->programid, 'uid' => $userid, 'csid' => 0);
+        if ($csetcomp = $DB->get_fieldset_select('prog_completion', 'id, timestarted, timecreated', 'programid = :pid AND userid = :uid AND coursesetid = :csid', $csetparams)) {
+            if (empty($progcomp->timestarted)) {
+                $progcomp->timestarted = $timestarted;
+                prog_write_completion($csetcomp, "User({$userid}) marked as started for courseset({$this->id}) in Program({$this->programid})");
+            } else {
+                return true; // No need to do anything.
+            }
+        } else {
+            $defaultdata->coursesetid = 0;
+            $defaultdata->status = STATUS_PROGRAM_INCOMPLETE;
+            prog_write_completion($defaultdata, "User({$userid}) marked as started for courseset({$this->id}) in Program({$this->programid})");
+        }
     }
 
     /**

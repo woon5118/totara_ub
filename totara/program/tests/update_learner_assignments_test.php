@@ -292,10 +292,12 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         $this->assertEquals(0, $progcompletion1->coursesetid);
         $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion0->status);
         $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion1->status);
-        $this->assertGreaterThanOrEqual($timebefore, $progcompletion0->timestarted);
-        $this->assertGreaterThanOrEqual($timebefore, $progcompletion1->timestarted);
-        $this->assertLessThanOrEqual($timeafter, $progcompletion0->timestarted);
-        $this->assertLessThanOrEqual($timeafter, $progcompletion1->timestarted);
+        $this->assertGreaterThanOrEqual($timebefore, $progcompletion0->timecreated);
+        $this->assertGreaterThanOrEqual($timebefore, $progcompletion1->timecreated);
+        $this->assertLessThanOrEqual($timeafter, $progcompletion0->timecreated);
+        $this->assertLessThanOrEqual($timeafter, $progcompletion1->timecreated);
+        $this->assertEquals(0, $progcompletion0->timestarted);
+        $this->assertEquals(0, $progcompletion1->timestarted);
         $this->assertEquals(-1, $progcompletion0->timedue);
         $this->assertEquals(-1, $progcompletion1->timedue);
         $this->assertEquals(0, $progcompletion0->timecompleted);
@@ -413,10 +415,12 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         $this->assertEquals(0, $progcompletion1->coursesetid);
         $this->assertEquals(0, $progcompletion0->status);
         $this->assertEquals(0, $progcompletion1->status);
-        $this->assertGreaterThanOrEqual($timebefore, $progcompletion0->timestarted);
-        $this->assertGreaterThanOrEqual($timebefore, $progcompletion1->timestarted);
-        $this->assertLessThanOrEqual($timeafter, $progcompletion0->timestarted);
-        $this->assertLessThanOrEqual($timeafter, $progcompletion1->timestarted);
+        $this->assertGreaterThanOrEqual($timebefore, $progcompletion0->timecreated);
+        $this->assertGreaterThanOrEqual($timebefore, $progcompletion1->timecreated);
+        $this->assertLessThanOrEqual($timeafter, $progcompletion0->timecreated);
+        $this->assertLessThanOrEqual($timeafter, $progcompletion1->timecreated);
+        $this->assertEquals(0, $progcompletion0->timestarted);
+        $this->assertEquals(0, $progcompletion1->timestarted);
         $this->assertEquals(-1, $progcompletion0->timedue);
         $this->assertEquals(-1, $progcompletion1->timedue);
         $this->assertEquals(0, $progcompletion0->timecompleted);
@@ -488,8 +492,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(-1, $progcompletion->timedue);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -575,8 +580,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(-1, $progcompletion->timedue);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -664,8 +670,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(-1, $progcompletion->timedue);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -742,8 +749,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(-1, $progcompletion->timedue);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -834,8 +842,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(-1, $progcompletion->timedue);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -909,8 +918,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals($duedate, $progcompletion->timedue); // Due date!
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -985,8 +995,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals($originalduedate, $progcompletion->timedue); // Original.
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -1034,8 +1045,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals($newduedate, $progcompletion->timedue); // New!
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -1110,8 +1122,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals($originalduedate, $progcompletion->timedue); // Original.
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -1159,8 +1172,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals($originalduedate, $progcompletion->timedue); // Still original!!!
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -1235,11 +1249,12 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             // When timedue for event "Enrollment date" is calculated, the prog_user_assignment record doesn't yet exist,
-            // so it uses time() instead of timestarted. Some short time later, prog_user_assignment is created, and
-            // timestarted may have a slightly different value. We know the calculated time must be between when the test
+            // so it uses time() instead of timecreated. Some short time later, prog_user_assignment is created, and
+            // timecreated may have a slightly different value. We know the calculated time must be between when the test
             // code was started and finished, and should have added the duration.
             $this->assertGreaterThanOrEqual($timebefore + $originalduration, $progcompletion->timedue); // Original.
             $this->assertLessThanOrEqual($timeafter + $originalduration, $progcompletion->timedue); // Original.
@@ -1289,9 +1304,10 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
-            // The timedue shouldn't have been changed, so it is still not based on the actual timestarted.
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
+            // The timedue shouldn't have been changed, so it is still not based on the actual timecreated.
             $this->assertGreaterThanOrEqual($timebefore + $originalduration, $progcompletion->timedue); // Still original!!!
             $this->assertLessThanOrEqual($timeafter + $originalduration, $progcompletion->timedue); // Still original!!!
             $this->assertEquals(0, $progcompletion->timecompleted);
@@ -1367,8 +1383,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals($originalduedate, $progcompletion->timedue); // Original.
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -1424,8 +1441,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(STATUS_PROGRAM_COMPLETE, $progcompletion->status); // Hacked to complete.
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals($originalduedate, $progcompletion->timedue); // Still original!!!
             $this->assertEquals($timebefore, $progcompletion->timecompleted);
         }
@@ -1502,8 +1520,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals($audienceduedate, $progcompletion->timedue); // Audience due date!
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -1565,10 +1584,11 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
             $this->assertEquals($originalduedate, $progcompletion->timedue, // Original due date.
-                'Not relative date: ' . ($newduration + $progcompletion->timestarted));
+                'Not relative date: ' . ($newduration + $progcompletion->timecreated));
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
 
@@ -1628,10 +1648,11 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(STATUS_PROGRAM_COMPLETE, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
             $this->assertEquals($originalduedate, $progcompletion->timedue, // Still original due date!
-                'Not relative date: ' . ($newduration + $progcompletion->timestarted));
+                'Not relative date: ' . ($newduration + $progcompletion->timecreated));
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals($timebefore, $progcompletion->timecompleted);
         }
     }
@@ -1823,8 +1844,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(-1, $progcompletion->timedue);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -1954,8 +1976,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(-1, $progcompletion->timedue);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -2083,8 +2106,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(-1, $progcompletion->timedue);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -2238,8 +2262,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(-1, $progcompletion->timedue);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -2367,8 +2392,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(-1, $progcompletion->timedue);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
@@ -2522,8 +2548,9 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
 
             $this->assertEquals(0, $progcompletion->coursesetid);
             $this->assertEquals(0, $progcompletion->status);
-            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
-            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timecreated);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timecreated);
+            $this->assertEquals(0, $progcompletion->timestarted);
             $this->assertEquals(-1, $progcompletion->timedue);
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
