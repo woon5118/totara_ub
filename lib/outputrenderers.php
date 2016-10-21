@@ -2990,7 +2990,7 @@ EOD;
             $role = core_text::strtolower(preg_replace('#[ ]+#', '-', trim($opts->metadata['rolename'])));
             $usertextcontents .= html_writer::span(
                 $opts->metadata['rolename'],
-                'meta role role-' . $role
+                'meta role role-' . $role . ' label label-info'
             );
         }
 
@@ -2998,7 +2998,7 @@ EOD;
         if (!empty($opts->metadata['userloginfail'])) {
             $usertextcontents .= html_writer::span(
                 $opts->metadata['userloginfail'],
-                'meta loginfailures'
+                'meta loginfailures label label-info'
             );
         }
 
@@ -3007,7 +3007,7 @@ EOD;
             $mnet = strtolower(preg_replace('#[ ]+#', '-', trim($opts->metadata['mnetidprovidername'])));
             $usertextcontents .= html_writer::span(
                 $opts->metadata['mnetidprovidername'],
-                'meta mnet mnet-' . $mnet
+                'meta mnet mnet-' . $mnet . ' label label-info'
             );
         }
 
