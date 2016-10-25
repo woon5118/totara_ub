@@ -2487,9 +2487,14 @@ EOD;
             if (empty($_SERVER['HTTP_RANGE'])) {
                 @header($protocol . ' 404 Not Found');
             } else {
-                // Must stop byteserving attempts somehow,
-                // this is weird but Chrome PDF viewer can be stopped only with 407!
-                @header($protocol . ' 407 Proxy Authentication Required');
+                if (core_useragent::is_safari_ios()) {
+                    // TL-10837: iOS 10 does not send the session cookie the first time it opens the video, we need to use this hack to make it retry with real session cookie.
+                    @header($protocol . ' 403 Forbidden');
+                } else {
+                    // Must stop byteserving attempts somehow,
+                    // this is weird but Chrome PDF viewer can be stopped only with 407!
+                    @header($protocol . ' 407 Proxy Authentication Required');
+                }
             }
 
             $this->page->set_context(null); // ugly hack - make sure page context is set to something, we do not want bogus warnings here
