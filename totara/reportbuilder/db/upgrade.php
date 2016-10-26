@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+require_once($CFG->dirroot . '/totara/reportbuilder/db/upgradelib.php');
+
 /**
  * Local database upgrade script
  *
@@ -31,9 +33,18 @@
 function xmldb_totara_reportbuilder_upgrade($oldversion) {
     global $CFG, $DB;
 
+
     $dbman = $DB->get_manager();
 
-    // Totara 10 branching line.
+    $result = true;
 
-    return true;
+    if ($oldversion < 2016110200) {
+
+        $result = $result && totara_reportbuilder_delete_scheduled_reports();
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2016110200, 'totara', 'reportbuilder');
+    }
+
+    return $result;
 }
