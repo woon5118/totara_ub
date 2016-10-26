@@ -699,16 +699,15 @@ if (function_exists('gc_enable')) {
     gc_enable();
 }
 
-// Detect unsupported upgrade jump as soon as possible - do not change anything, do not use system functions.
-if (!empty($CFG->version) and $CFG->version < 2011120507) {
+// Totara: do not localise these messages, they are intended for admins only!
+if (!empty($CFG->version) and $CFG->version < 2015111606) {
     if (empty($CFG->totara_release)) {
         // We cannot upgrade from Moodle older than v2.2.7.
         print_error('error:cannotupgradefrommoodle', 'totara_core');
     } else {
-        // We cannot upgrade from Totara older than v2.2.13.
-        print_error('error:cannotupgradefromtotara', 'totara_core');
+        // We cannot upgrade from Totara older than v9.0.
+        throw new Exception('You cannot upgrade to this Totara version from a Totara version prior to 9.0, please upgrade to latest Totara 9.0 first.');
     }
-    die;
 }
 
 // Calculate and set $CFG->ostype to be used everywhere. Possible values are:
