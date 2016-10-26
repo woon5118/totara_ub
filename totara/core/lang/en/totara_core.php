@@ -196,7 +196,6 @@ $string['error:autoupdatedisabled'] = 'Automatic checking for updates is current
 $string['error:cannotmanagereminders'] = 'You do not have permission to manage reminders';
 $string['error:cannotupgradefromnewermoodle'] = 'You cannot upgrade to Totara {$a->newtotaraversion} from this version of Moodle. Please use a newer version of Totara which is based on Moodle core {$a->oldversion} or above.';
 $string['error:cannotupgradefromnewertotara'] = 'You cannot downgrade from {$a->oldversion} to {$a->newversion}.';
-$string['error:cannotupgradefrommoodle'] = 'You cannot upgrade to this Totara version from a Moodle version prior to 2.2.7. Please upgrade to Totara 2.2.13+ or Moodle 2.2.7+ first.';
 $string['error:categoryidincorrect'] = 'Category ID was incorrect';
 $string['error:columntypenotfound'] = 'The column type \'{$a}\' was defined but is not a valid option. This can happen if you have deleted a custom field or hierarchy depth level. The best course of action is to delete this column by pressing the red cross to the right.';
 $string['error:columntypenotfound11'] = 'The column type \'{$a}\' was defined but is not a valid option. This can happen if you have deleted a custom field or hierarchy type. The best course of action is to delete this column by pressing the red cross to the right.';

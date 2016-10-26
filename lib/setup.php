@@ -391,6 +391,12 @@ if (!defined('MOODLE_INTERNAL')) { // Necessary because cli installer has to def
     define('MOODLE_INTERNAL', true);
 }
 
+// Totara: we support migration from this particular Moodle release only.
+if (!defined('MOODLE_MIGRATION_VERSION')) {
+    define('MOODLE_MIGRATION_VERSION', '2015111606.00'); // Keep as string to simplify comparison with DB data.
+    define('MOODLE_MIGRATION_RELEASE', '3.0.6 (Build: 20160912)');
+}
+
 // core_component can be used in any scripts, it does not need anything else.
 require_once($CFG->libdir .'/classes/component.php');
 
@@ -699,14 +705,20 @@ if (function_exists('gc_enable')) {
     gc_enable();
 }
 
-// Totara: do not localise these messages, they are intended for admins only!
-if (!empty($CFG->version) and $CFG->version < 2015111606) {
+// Totara: do not localise these messages, they will change often and they are intended for admins only!
+if (!empty($CFG->version)) {
     if (empty($CFG->totara_release)) {
-        // We cannot upgrade from Moodle older than v2.2.7.
-        print_error('error:cannotupgradefrommoodle', 'totara_core');
+        // Migration is now allowed from one specific Moodle release only!
+        if ($CFG->version < MOODLE_MIGRATION_VERSION) {
+            throw new Exception('You cannot migrate to this Totara version from Moodle ' . $CFG->release . '. Please upgrade to Moodle ' . MOODLE_MIGRATION_RELEASE . ' first.');
+        } else if ($CFG->version > MOODLE_MIGRATION_VERSION) {
+            throw new Exception('Migration to this version of Totara is possible only from Moodle ' . MOODLE_MIGRATION_RELEASE . '.');
+        }
     } else {
-        // We cannot upgrade from Totara older than v9.0.
-        throw new Exception('You cannot upgrade to this Totara version from a Totara version prior to 9.0, please upgrade to latest Totara 9.0 first.');
+        if ($CFG->version < 2015111606) {
+            // We cannot upgrade from Totara older than v9.0.
+            throw new Exception('You cannot upgrade to this Totara version from a Totara version prior to 9.0, please upgrade to latest Totara 9.0 first.');
+        }
     }
 }
 

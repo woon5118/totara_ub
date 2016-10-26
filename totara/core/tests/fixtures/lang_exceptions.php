@@ -42,7 +42,7 @@ $exceptions = array(
     'core_webservice' => array('testauserwithtestclientdescription'), // Caps.
     'tool_xmldb' => array('confirmcheckoraclesemantics'),
     'totara_core' => array(
-        'error:cannotupgradefrommoodle', 'error:cannotupgradefromnewermoodle', 'moodlecore', 'totaracopyright',
+        'error:cannotupgradefromnewermoodle', 'moodlecore', 'totaracopyright',
     ),
     'tool_behat' => array('fieldvalueargument_help'), // Docs link.
     'tool_installaddon' => true, // Mentions "Moodle plugin repo"
