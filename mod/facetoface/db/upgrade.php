@@ -42,7 +42,19 @@ function xmldb_facetoface_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // Totara 10 branching line.
+    $result = true;
 
-    return true;
+    if ($oldversion < 2016110200) {
+
+        // Remove seminar notifications for removed seminars.
+        // Regression T-14050.
+        $sql = "DELETE FROM {facetoface_notification} WHERE facetofaceid NOT IN (SELECT id FROM {facetoface})";
+        $result = $result && $DB->execute($sql);
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2016110200, 'facetoface');
+    }
+
+    return $result;
+
 }
