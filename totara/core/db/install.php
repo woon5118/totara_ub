@@ -22,10 +22,9 @@
  * @subpackage totara_core
  */
 
-require_once(dirname(__FILE__) . '/upgradelib.php');
-
 function xmldb_totara_core_install() {
     global $CFG, $DB, $SITE;
+    require_once(__DIR__ . '/upgradelib.php');
 
     // switch to new default theme in totara 9.0
     set_config('theme', 'basis');
@@ -203,260 +202,19 @@ function xmldb_totara_core_install() {
     set_config('pathconvert', '/usr/bin/convert', 'filter_tex');
     set_config('pathmimetex', '', 'filter_tex');
 
-    // Adding some totara upgrade code from lib/db/upgrade.php to
-    // avoid conflicts every time we upgrade moodle.
-    // This can be removed once we reach the verion of Moodle that
-    // includes this functionality. E.g. 2.5 for badges, 2.6? for
-    // course completion.
+    // Alter Moodle tables during migration to Totara.
 
-    // Add openbadges tables.
-
-    // Define table 'badge' to be created
-    $table = new xmldb_table('badge');
-
-    // Adding fields to table 'badge'
-    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
-    $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
-    $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null, 'name');
-    $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'description');
-    $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecreated');
-    $table->add_field('usercreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'timemodified');
-    $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'usercreated');
-    $table->add_field('issuername', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'usermodified');
-    $table->add_field('issuerurl', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'issuername');
-    $table->add_field('issuercontact', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'issuerurl');
-    $table->add_field('expiredate', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'issuercontact');
-    $table->add_field('expireperiod', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'expiredate');
-    $table->add_field('type', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'expireperiod');
-    $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'type');
-    $table->add_field('message', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, 'courseid');
-    $table->add_field('messagesubject', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, 'message');
-    $table->add_field('attachment', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'messagesubject');
-    $table->add_field('notification', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'attachment');
-    $table->add_field('status', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'notification');
-    $table->add_field('nextcron', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'status');
-
-    // Adding keys to table 'badge'
-    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-    $table->add_key('fk_courseid', XMLDB_KEY_FOREIGN, array('courseid'), 'course', array('id'));
-    $table->add_key('fk_usermodified', XMLDB_KEY_FOREIGN, array('usermodified'), 'user', array('id'));
-    $table->add_key('fk_usercreated', XMLDB_KEY_FOREIGN, array('usercreated'), 'user', array('id'));
-
-    // Adding indexes to table 'badge'
-    $table->add_index('type', XMLDB_INDEX_NOTUNIQUE, array('type'));
-
-    // Set the comment for the table 'badge'.
-    $table->setComment('Defines badge');
-
-    // Conditionally launch create table for 'badge'
-    if (!$dbman->table_exists($table)) {
-        $dbman->create_table($table);
+    // Add extra 'user' table fields for totara sync.
+    $table = new xmldb_table('user');
+    $field = new xmldb_field('totarasync');
+    $field->set_attributes(XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', null);
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
     }
-
-    // Define table 'badge_criteria' to be created
-    $table = new xmldb_table('badge_criteria');
-
-    // Adding fields to table 'badge_criteria'
-    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
-    $table->add_field('badgeid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
-    $table->add_field('criteriatype', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'badgeid');
-    $table->add_field('method', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'criteriatype');
-
-    // Adding keys to table 'badge_criteria'
-    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-    $table->add_key('fk_badgeid', XMLDB_KEY_FOREIGN, array('badgeid'), 'badge', array('id'));
-
-    // Adding indexes to table 'badge_criteria'
-    $table->add_index('criteriatype', XMLDB_INDEX_NOTUNIQUE, array('criteriatype'));
-    $table->add_index('badgecriteriatype', XMLDB_INDEX_UNIQUE, array('badgeid', 'criteriatype'));
-
-    // Set the comment for the table 'badge_criteria'.
-    $table->setComment('Defines criteria for issuing badges');
-
-    // Conditionally launch create table for 'badge_criteria'
-    if (!$dbman->table_exists($table)) {
-        $dbman->create_table($table);
-    }
-
-    // Define table 'badge_criteria_param' to be created
-    $table = new xmldb_table('badge_criteria_param');
-
-    // Adding fields to table 'badge_criteria_param'
-    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
-    $table->add_field('critid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
-    $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'critid');
-    $table->add_field('value', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'name');
-
-    // Adding keys to table 'badge_criteria_param'
-    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-    $table->add_key('fk_critid', XMLDB_KEY_FOREIGN, array('critid'), 'badge_criteria', array('id'));
-
-    // Set the comment for the table 'badge_criteria_param'.
-    $table->setComment('Defines parameters for badges criteria');
-
-    // Conditionally launch create table for 'badge_criteria_param'
-    if (!$dbman->table_exists($table)) {
-        $dbman->create_table($table);
-    }
-
-    // Define table 'badge_issued' to be created
-    $table = new xmldb_table('badge_issued');
-
-    // Adding fields to table 'badge_issued'
-    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
-    $table->add_field('badgeid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
-    $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'badgeid');
-    $table->add_field('uniquehash', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, 'userid');
-    $table->add_field('dateissued', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'uniquehash');
-    $table->add_field('dateexpire', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'dateissued');
-    $table->add_field('visible', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'dateexpire');
-    $table->add_field('issuernotified', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'visible');
-
-    // Adding keys to table 'badge_issued'
-    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-    $table->add_key('fk_badgeid', XMLDB_KEY_FOREIGN, array('badgeid'), 'badge', array('id'));
-    $table->add_key('fk_userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
-
-    // Adding indexes to table 'badge_issued'
-    $table->add_index('badgeuser', XMLDB_INDEX_UNIQUE, array('badgeid', 'userid'));
-
-    // Set the comment for the table 'badge_issued'.
-    $table->setComment('Defines issued badges');
-
-    // Conditionally launch create table for 'badge_issued'
-    if (!$dbman->table_exists($table)) {
-        $dbman->create_table($table);
-    }
-
-    // Define table 'badge_criteria_met' to be created
-    $table = new xmldb_table('badge_criteria_met');
-
-    // Adding fields to table 'badge_criteria_met'
-    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
-    $table->add_field('issuedid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'id');
-    $table->add_field('critid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'issuedid');
-    $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'critid');
-    $table->add_field('datemet', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'userid');
-
-    // Adding keys to table 'badge_criteria_met'
-    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-    $table->add_key('fk_critid', XMLDB_KEY_FOREIGN, array('critid'), 'badge_criteria', array('id'));
-    $table->add_key('fk_userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
-    $table->add_key('fk_issuedid', XMLDB_KEY_FOREIGN, array('issuedid'), 'badge_issued', array('id'));
-
-    // Set the comment for the table 'badge_criteria_met'.
-    $table->setComment('Defines criteria that were met for an issued badge');
-
-    // Conditionally launch create table for 'badge_criteria_met'
-    if (!$dbman->table_exists($table)) {
-        $dbman->create_table($table);
-    }
-
-    // Define table 'badge_manual_award' to be created
-    $table = new xmldb_table('badge_manual_award');
-
-    // Adding fields to table 'badge_manual_award'
-    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
-    $table->add_field('badgeid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
-    $table->add_field('recipientid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'badgeid');
-    $table->add_field('issuerid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'recipientid');
-    $table->add_field('issuerrole', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'issuerid');
-    $table->add_field('datemet', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'issuerrole');
-
-    // Adding keys to table 'badge_manual_award'
-    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-    $table->add_key('fk_badgeid', XMLDB_KEY_FOREIGN, array('badgeid'), 'badge', array('id'));
-    $table->add_key('fk_recipientid', XMLDB_KEY_FOREIGN, array('recipientid'), 'user', array('id'));
-    $table->add_key('fk_issuerid', XMLDB_KEY_FOREIGN, array('issuerid'), 'user', array('id'));
-    $table->add_key('fk_issuerrole', XMLDB_KEY_FOREIGN, array('issuerrole'), 'role', array('id'));
-
-    // Set the comment for the table 'badge_manual_award'.
-    $table->setComment('Track manual award criteria for badges');
-
-    // Conditionally launch create table for 'badge_manual_award'
-    if (!$dbman->table_exists($table)) {
-        $dbman->create_table($table);
-    }
-
-    // Define table 'badge_backpack' to be created
-    $table = new xmldb_table('badge_backpack');
-
-    // Adding fields to table 'badge_backpack'
-    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
-    $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
-    $table->add_field('email', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null, 'userid');
-    $table->add_field('backpackurl', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'email');
-    $table->add_field('backpackuid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'backpackurl');
-    $table->add_field('backpackgid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'backpackuid');
-    $table->add_field('autosync', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'backpackgid');
-    $table->add_field('password', XMLDB_TYPE_CHAR, '50', null, null, null, null, 'autosync');
-
-    // Adding keys to table 'badge_backpack'
-    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-    $table->add_key('fk_userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
-
-    // Set the comment for the table 'badge_backpack'.
-    $table->setComment('Defines settings for connecting external backpack');
-
-    // Conditionally launch create table for 'badge_backpack'
-    if (!$dbman->table_exists($table)) {
-        $dbman->create_table($table);
-    }
-
-    // Create a new 'badge_external' table first.
-    // Define table 'badge_external' to be created.
-    $table = new xmldb_table('badge_external');
-
-    // Adding fields to table 'badge_external'.
-    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
-    $table->add_field('backpackid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
-    $table->add_field('collectionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'backpackid');
-
-    // Adding keys to table 'badge_external'.
-    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-    $table->add_key('fk_backpackid', XMLDB_KEY_FOREIGN, array('backpackid'), 'badge_backpack', array('id'));
-
-    // Set the comment for the table 'badge_external'.
-    $table->setComment('Setting for external badges display');
-
-    // Conditionally launch create table for 'badge_external'.
-    if (!$dbman->table_exists($table)) {
-        $dbman->create_table($table);
-    }
-
-    // Define field backpackgid to be dropped from 'badge_backpack'.
-    $table = new xmldb_table('badge_backpack');
-    $field = new xmldb_field('backpackgid');
-
-    if ($dbman->field_exists($table, $field)) {
-        // Perform user data migration.
-        $usercollections = $DB->get_records('badge_backpack');
-        foreach ($usercollections as $usercollection) {
-            $collection = new stdClass();
-            $collection->backpackid = $usercollection->id;
-            $collection->collectionid = $usercollection->backpackgid;
-            $DB->insert_record('badge_external', $collection);
-        }
-
-        // Launch drop field backpackgid.
-        $dbman->drop_field($table, $field);
-    }
-
-    // Create missing badgeid foreign key on badge_manual_award.
-    $table = new xmldb_table('badge_manual_award');
-    $key = new xmldb_key('fk_badgeid', XMLDB_KEY_FOREIGN, array('id'), 'badge', array('id'));
-
-    $dbman->drop_key($table, $key);
-    $key->set_attributes(XMLDB_KEY_FOREIGN, array('badgeid'), 'badge', array('id'));
-    $dbman->add_key($table, $key);
-
-    // Drop unused badge image field.
-    $table = new xmldb_table('badge');
-    $field = new xmldb_field('image', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'description');
-
-    // Conditionally launch drop field eventtype.
-    if ($dbman->field_exists($table, $field)) {
-        $dbman->drop_field($table, $field);
+    $index = new xmldb_index('totarasync');
+    $index->set_attributes(XMLDB_INDEX_NOTUNIQUE, array('totarasync'));
+    if (!$dbman->index_exists($table, $index)) {
+        $dbman->add_index($table, $index);
     }
 
     // Define field completionprogressonview to be added to course.
@@ -484,30 +242,6 @@ function xmldb_totara_core_install() {
         $dbman->add_field($table, $field);
     }
 
-    // Backporting MDL-41914 to add new webservice core_user_add_user_device.
-    $table = new xmldb_table('user_devices');
-
-    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
-    $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
-    $table->add_field('appid', XMLDB_TYPE_CHAR, '128', null, XMLDB_NOTNULL, null, null, 'userid');
-    $table->add_field('name', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null, 'appid');
-    $table->add_field('model', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null, 'name');
-    $table->add_field('platform', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null, 'model');
-    $table->add_field('version', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null, 'platform');
-    $table->add_field('pushid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'version');
-    $table->add_field('uuid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'pushid');
-    $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'uuid');
-    $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'timecreated');
-
-    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-    $table->add_key('pushid-userid', XMLDB_KEY_UNIQUE, array('pushid', 'userid'));
-    $table->add_key('pushid-platform', XMLDB_KEY_UNIQUE, array('pushid', 'platform'));
-    $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
-
-    if (!$dbman->table_exists($table)) {
-        $dbman->create_table($table);
-    }
-
     // Add timecompleted for module completion.
     $table = new xmldb_table('course_modules_completion');
     $field = new xmldb_field('timecompleted', XMLDB_TYPE_INTEGER, '10');
@@ -521,35 +255,6 @@ function xmldb_totara_core_install() {
     $field = new xmldb_field('reaggregate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecompleted');
 
     // Conditionally launch add field reaggregate.
-    if (!$dbman->field_exists($table, $field)) {
-        $dbman->add_field($table, $field);
-    }
-
-    // Backport MDL-47830 from Moodle 2.9dev.
-    // Define table user_password_history to be created.
-    $table = new xmldb_table('user_password_history');
-    // Adding fields to table user_password_history.
-    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-    $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-    $table->add_field('hash', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-    $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-    // Adding keys to table user_password_history.
-    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-    $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
-    // Conditionally launch create table for user_password_history.
-    if (!$dbman->table_exists($table)) {
-        $dbman->create_table($table);
-    }
-
-    // Backport MDL-49543 from Moodle 2.9dev.
-    $table = new xmldb_table('badge_criteria');
-    $field = new xmldb_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
-    // Conditionally add description field to the badge_criteria table.
-    if (!$dbman->field_exists($table, $field)) {
-        $dbman->add_field($table, $field);
-    }
-    $field = new xmldb_field('descriptionformat', XMLDB_TYPE_INTEGER, 2, null, XMLDB_NOTNULL, null, 0);
-    // Conditionally add description format field to the badge_criteria table.
     if (!$dbman->field_exists($table, $field)) {
         $dbman->add_field($table, $field);
     }

@@ -34,37 +34,7 @@ function xmldb_totara_connect_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2015100201) {
-        // Fix incorrect password sync setting.
-        $sync = get_config('totaraconnect_connect', 'syncpasswords');
-        if ($sync !== false) {
-            unset_config('syncpasswords', 'totaraconnect_connect');
-            set_config('syncpasswords', $sync, 'totara_connect');
-        }
-
-        upgrade_plugin_savepoint(true, 2015100201, 'totara', 'connect');
-    }
-
-    if ($oldversion < 2015100202) {
-        // Cleanup after wrong upgrade step.
-        unset_config('version', 'connect_totara');
-        upgrade_plugin_savepoint(true, 2015100202, 'totara', 'connect');
-    }
-
-    if ($oldversion < 2015100203) {
-
-        // Define field active to be added to totara_connect_sso_sessions.
-        $table = new xmldb_table('totara_connect_sso_sessions');
-        $field = new xmldb_field('active', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'ssotoken');
-
-        // Conditionally launch add field active.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2015100203, 'totara', 'connect');
-    }
+    // Totara 10 branching line.
 
     return true;
 }

@@ -37,61 +37,11 @@
  */
 
 function xmldb_wiki_upgrade($oldversion) {
-    global $CFG, $DB, $OUTPUT;
+    global $CFG, $DB;
 
     $dbman = $DB->get_manager();
 
-
-    // Moodle v2.2.0 release upgrade line
-    // Put any upgrade step following this
-
-    // Moodle v2.3.0 release upgrade line
-    // Put any upgrade step following this
-
-    if ($oldversion < 2012061701) {
-        // Drop all legacy upgrade tables, not used anymore.
-
-        $table = new xmldb_table('wiki_entries_old');
-        if ($dbman->table_exists('wiki_entries_old')) {
-            $dbman->drop_table($table);
-        }
-
-        $table = new xmldb_table('wiki_locks_old');
-        if ($dbman->table_exists('wiki_locks_old')) {
-            $dbman->drop_table($table);
-        }
-
-        $table = new xmldb_table('wiki_pages_old');
-        if ($dbman->table_exists('wiki_pages_old')) {
-            $dbman->drop_table($table);
-        }
-
-        upgrade_plugin_savepoint(true, 2012061701, 'mod', 'wiki');
-    }
-
-
-    // Moodle v2.4.0 release upgrade line
-    // Put any upgrade step following this
-
-
-    // Moodle v2.5.0 release upgrade line.
-    // Put any upgrade step following this.
-
-
-    // Moodle v2.6.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.7.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.9.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v3.0.0 release upgrade line.
-    // Put any upgrade step following this.
+    // Totara 10 branching line.
 
     return true;
 }

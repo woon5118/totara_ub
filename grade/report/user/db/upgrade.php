@@ -27,23 +27,11 @@
  * @return bool result
  */
 function xmldb_gradereport_user_upgrade($oldversion) {
+    global $CFG, $DB;
 
-    if ($oldversion < 2014101500) {
-        // Need to always show weight and contribution to course total.
-        set_config('grade_report_user_showweight', 1);
+    $dbman = $DB->get_manager();
 
-        // User savepoint reached.
-        upgrade_plugin_savepoint(true, 2014101500, 'gradereport', 'user');
-    }
-
-    // Moodle v2.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.9.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v3.0.0 release upgrade line.
-    // Put any upgrade step following this.
+    // Totara 10 branching line.
 
     return true;
 }

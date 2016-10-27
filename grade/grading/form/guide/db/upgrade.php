@@ -35,16 +35,11 @@ defined('MOODLE_INTERNAL') || die();
  * @throws upgrade_exception
  */
 function xmldb_gradingform_guide_upgrade($oldversion) {
-    global $DB;
+    global $CFG, $DB;
 
-    if ($oldversion < 2015111601) {
-        // Clean up empty string or null marking guide comments.
-        $sql = $DB->sql_isempty('gradingform_guide_comments', 'description', true, true);
-        $sql .= " OR description IS NULL ";
-        $DB->delete_records_select('gradingform_guide_comments', $sql);
-        // Main savepoint reached.
-        upgrade_plugin_savepoint(true, 2015111601, 'gradingform', 'guide');
-    }
+    $dbman = $DB->get_manager();
+
+    // Totara 10 branching line.
 
     return true;
 }

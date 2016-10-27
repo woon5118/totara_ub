@@ -35,44 +35,7 @@ function xmldb_tool_monitor_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2014102000) {
-
-        // Define field lastnotificationsent to be added to tool_monitor_subscriptions.
-        $table = new xmldb_table('tool_monitor_subscriptions');
-        $field = new xmldb_field('lastnotificationsent', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecreated');
-
-        // Conditionally launch add field lastnotificationsent.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Monitor savepoint reached.
-        upgrade_plugin_savepoint(true, 2014102000, 'tool', 'monitor');
-    }
-
-    // Moodle v2.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.9.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v3.0.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    if ($oldversion < 2015111601) {
-
-        // Define field inactivedate to be added to tool_monitor_subscriptions.
-        $table = new xmldb_table('tool_monitor_subscriptions');
-        $field = new xmldb_field('inactivedate', XMLDB_TYPE_INTEGER, '10', null, true, null, 0, 'lastnotificationsent');
-
-        // Conditionally launch add field inactivedate.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Monitor savepoint reached.
-        upgrade_plugin_savepoint(true, 2015111601, 'tool', 'monitor');
-    }
+    // Totara 10 branching line.
 
     return true;
 }

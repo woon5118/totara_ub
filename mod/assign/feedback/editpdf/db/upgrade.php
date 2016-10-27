@@ -30,54 +30,11 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool
  */
 function xmldb_assignfeedback_editpdf_upgrade($oldversion) {
-    global $CFG;
+    global $CFG, $DB;
 
-    if ($oldversion < 2013110800) {
+    $dbman = $DB->get_manager();
 
-        // Check that no stamps where uploaded.
-        $fs = get_file_storage();
-        $stamps = $fs->get_area_files(context_system::instance()->id, 'assignfeedback_editpdf',
-            'stamps', 0, "filename", false);
-
-        // Add default stamps.
-        if (empty($stamps)) {
-            // List of default stamps.
-            $defaultstamps = array('smile.png', 'sad.png', 'tick.png', 'cross.png');
-
-            // Stamp file object.
-            $filerecord = new stdClass;
-            $filerecord->component = 'assignfeedback_editpdf';
-            $filerecord->contextid = context_system::instance()->id;
-            $filerecord->userid    = get_admin()->id;
-            $filerecord->filearea  = 'stamps';
-            $filerecord->filepath  = '/';
-            $filerecord->itemid    = 0;
-
-            // Add all default stamps.
-            foreach ($defaultstamps as $stamp) {
-                $filerecord->filename = $stamp;
-                $fs->create_file_from_pathname($filerecord,
-                    $CFG->dirroot . '/mod/assign/feedback/editpdf/pix/' . $filerecord->filename);
-            }
-        }
-
-        upgrade_plugin_savepoint(true, 2013110800, 'assignfeedback', 'editpdf');
-    }
-
-    // Moodle v2.6.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.7.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.9.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v3.0.0 release upgrade line.
-    // Put any upgrade step following this.
+    // Totara 10 branching line.
 
     return true;
 }
