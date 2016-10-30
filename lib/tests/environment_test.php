@@ -30,6 +30,23 @@ defined('MOODLE_INTERNAL') || die();
  * Do standard environment.xml tests.
  */
 class core_environment_testcase extends advanced_testcase {
+    /**
+     * Test fixed normalize_version() in Totara.
+     */
+    public function test_normalize_version() {
+        $this->assertSame('1', normalize_version(1));
+        $this->assertSame('1', normalize_version('1'));
+        $this->assertSame('1', normalize_version('a1'));
+        $this->assertSame('1', normalize_version('1 1'));
+        $this->assertSame('1.1', normalize_version('1a1'));
+        $this->assertSame('1.1', normalize_version('1.1dev'));
+        $this->assertSame('1.1', normalize_version('1.1alpha'));
+        $this->assertSame('1.1', normalize_version('1.1beta'));
+        $this->assertSame('1.1', normalize_version('1.1rc'));
+        $this->assertSame('1.1', normalize_version('1.1alpha1'));
+        $this->assertSame('1.1', normalize_version('1.1beta1'));
+        $this->assertSame('1.1', normalize_version('1.1rc1'));
+    }
 
     /**
      * Test the environment.
@@ -38,7 +55,7 @@ class core_environment_testcase extends advanced_testcase {
         global $CFG;
 
         require_once($CFG->libdir.'/environmentlib.php');
-        list($envstatus, $environment_results) = check_moodle_environment(normalize_version($CFG->release), ENV_SELECT_RELEASE);
+        list($envstatus, $environment_results) = check_totara_environment();
 
         $this->assertNotEmpty($envstatus);
         foreach ($environment_results as $environment_result) {
@@ -63,26 +80,26 @@ class core_environment_testcase extends advanced_testcase {
         // Build a sample xmlised environment.xml.
         $xml = <<<END
 <COMPATIBILITY_MATRIX>
-    <MOODLE version="1.9">
+    <TOTARA version="9">
         <PHP_EXTENSIONS>
             <PHP_EXTENSION name="xsl" level="required" />
         </PHP_EXTENSIONS>
-    </MOODLE>
-    <MOODLE version="2.5">
+    </TOTARA>
+    <TOTARA version="10">
         <PHP_EXTENSIONS>
             <PHP_EXTENSION name="xsl" level="required" />
         </PHP_EXTENSIONS>
-    </MOODLE>
-    <MOODLE version="2.6">
+    </TOTARA>
+    <TOTARA version="11">
         <PHP_EXTENSIONS>
             <PHP_EXTENSION name="xsl" level="required" />
         </PHP_EXTENSIONS>
-    </MOODLE>
-    <MOODLE version="2.7">
+    </TOTARA>
+    <TOTARA version="12">
         <PHP_EXTENSIONS>
             <PHP_EXTENSION name="xsl" level="required" />
         </PHP_EXTENSIONS>
-    </MOODLE>
+    </TOTARA>
     <PLUGIN name="block_test">
         <PHP_EXTENSIONS>
             <PHP_EXTENSION name="xsl" level="required" />
@@ -93,10 +110,10 @@ END;
         $environemt = xmlize($xml);
         $versions = get_list_of_environment_versions($environemt);
         $this->assertCount(5, $versions);
-        $this->assertContains('1.9', $versions);
-        $this->assertContains('2.5', $versions);
-        $this->assertContains('2.6', $versions);
-        $this->assertContains('2.7', $versions);
+        $this->assertContains('9', $versions);
+        $this->assertContains('10', $versions);
+        $this->assertContains('11', $versions);
+        $this->assertContains('12', $versions);
         $this->assertContains('all', $versions);
     }
 

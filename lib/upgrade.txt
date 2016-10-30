@@ -1,2 +1,8 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
+
+=== 10.0 ===
+
+* environment.xml file format was changed to use Totara major version numbers,
+  use new TOTARA tag, for example: <TOTARA version="10" requires="9">
+* environmentlib.php was partially refactored, do not use this internal API in custom code

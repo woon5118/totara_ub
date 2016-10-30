@@ -6,7 +6,7 @@ point release version. For upgrading a Moodle site see MOODLEUPGRADE.txt.
 
 New requirements:
 
-* none
+* PHP 5.6.5 or later, always use the latest release on Windows
 
 NOTE: To upgrade you must be on Totara 9.0 or later.
 

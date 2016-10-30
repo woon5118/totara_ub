@@ -486,17 +486,7 @@ class core_admin_renderer extends plugin_renderer_base {
         $output = '';
         $output .= $this->header();
 
-        // Totara: hack the version list to display our version numbers 9.0 and above.
-        if (isset($versions['3.0'])) {
-            $versions['3.0'] = str_replace('3.0', '9.0', $versions['3.0']);
-        }
-
-        // Print the component download link
-        /* No env updates in Totara yet
-        $output .= html_writer::tag('div', html_writer::link(
-                    new moodle_url('/admin/environment.php', array('action' => 'updatecomponent', 'sesskey' => sesskey())),
-                    get_string('updatecomponent', 'admin')),
-                array('class' => 'reportlink'));*/
+        // Totara: no download link!
 
         // Heading.
         $output .= $this->heading(get_string('environment', 'admin'));

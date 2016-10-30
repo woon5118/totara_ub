@@ -108,7 +108,7 @@ if (!moodle_needs_upgrading()) {
 }
 
 // Test environment first.
-list($envstatus, $environment_results) = check_moodle_environment(normalize_version($release), ENV_SELECT_RELEASE);
+list($envstatus, $environment_results) = check_totara_environment();
 if (!$envstatus) {
     $errors = environment_get_errors($environment_results);
     cli_heading(get_string('environment', 'admin'));

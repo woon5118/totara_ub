@@ -237,7 +237,7 @@ if (!core_tables_exist()) {
     }
     if (empty($confirmrelease)) {
         require_once($CFG->libdir.'/environmentlib.php');
-        list($envstatus, $environment_results) = check_moodle_environment(normalize_version($release), ENV_SELECT_RELEASE);
+        list($envstatus, $environment_results) = check_totara_environment();
         $strcurrentrelease = get_string('currentrelease');
 
         $PAGE->navbar->add($strcurrentrelease);
@@ -361,7 +361,7 @@ if (!$cache and $totarainfo->upgradecore) {
 
     } else if (empty($confirmrelease)){
         require_once($CFG->libdir.'/environmentlib.php');
-        list($envstatus, $environment_results) = check_moodle_environment($release, ENV_SELECT_RELEASE);
+        list($envstatus, $environment_results) = check_totara_environment();
         $strcurrentrelease = get_string('currentrelease');
 
         $PAGE->navbar->add($strcurrentrelease);
