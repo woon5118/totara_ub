@@ -1,7 +1,2 @@
-This file descripts API changes in reportbuilder.
-
-
-=== 2.6 ===
-
-* add 'dbdatatype' option to timestamp and numeric rb source column options
-
+This file describes API changes in reportbuilder,
+information provided here is intended especially for developers.
