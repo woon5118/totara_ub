@@ -9,6 +9,7 @@ information provided here is intended especially for developers.
 * all incompatible Moodle plugin installation and update code and APIs were removed
 * theme_config::get_all_block_regions() added argument $pagelayout
 * core_renderer::render_file_picker flex-icon used for upload rather than CSS loaded image.
+* CSS class 'link-as-button' has been removed. Please use "btn" instead
 
 === 9.2 ===
 

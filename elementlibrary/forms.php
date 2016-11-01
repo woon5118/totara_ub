@@ -141,11 +141,11 @@ echo html_writer::tag('p', 'A "continue" button. You can specify the URL to go t
 echo $OUTPUT->continue_button($url);
 
 echo $OUTPUT->container_start();
-echo html_writer::tag('p', 'Links can be styled as buttons using class="link-as-button". They should look and act the same as form buttons:');
-echo html_writer::tag('p', '<a href="#" class="link-as-button">Link styled to look like a button</a>');
+echo html_writer::tag('p', 'Links can be styled as buttons using class="btn btn-default". They should look and act the same as form buttons');
+echo html_writer::tag('p', '<a href="#" class="btn btn-default">Link styled to look like a button</a>');
 echo html_writer::tag('p', 'If the text is smaller or larger, the button should scale accordingly:');
-echo html_writer::tag('small', html_writer::tag('small', '<a href="#" class="link-as-button">Small link</a> '));
-echo html_writer::tag('big', html_writer::tag('big', '&nbsp; <a href="#" class="link-as-button">Large link</a>'));
+echo html_writer::tag('p', '<a href="#" class="btn btn-default btn-sm">Small link</a> ');
+echo html_writer::tag('p', '&nbsp; <a href="#" class="btn btn-default btn-lg">Large link</a>');
 echo $OUTPUT->container_end();
 
 echo html_writer::tag('p', '');

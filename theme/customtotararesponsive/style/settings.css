@@ -16,7 +16,8 @@ input[type="submit"],
 input[type="reset"],
 input[type="button"],
 #id_buttonfield,
-a.link-as-button {
+a.link-as-button,
+a.btn {
     color: [[setting:buttoncolor-readable-text]];
     text-shadow:0 1px 1px [[setting:buttoncolor-readable-text-shadow]];
     background-color: [[setting:buttoncolor]];
@@ -42,7 +43,8 @@ input[type="reset"]:hover,
 input[type="button"]:hover,
 #id_buttonfield:hover,
 button:hover,
-a.link-as-button:hover {
+a.link-as-button:hover,
+a.btn:hover {
     color:[[setting:buttoncolor-readable-text]];
     background-color:[[setting:buttoncolor-lighter-perc]];
     background-image:-ms-linear-gradient(top, [[setting:buttoncolor]], [[setting:buttoncolor-light]]);
@@ -61,7 +63,8 @@ button[disabled],
 input.form-submit[disabled],
 input[type="button"][disabled],
 input[type="submit"][disabled],
-input[type="reset"][disabled] {
+input[type="reset"][disabled],
+a.btn.disabled {
     color:#888888;
     background-color:[[setting:buttoncolor-lighter-perc]];
     background-image:-ms-linear-gradient(top, [[setting:buttoncolor-light-perc]], [[setting:buttoncolor-lighter-perc]]);
@@ -135,6 +138,10 @@ body {
 
 body, h1, h2, h3, h4, h5, h6, p, ul, ol, dl, input, textarea {
     color: [[setting:textcolor]];
+}
+
+a.btn:visited {
+    color: [[setting:buttoncolor-readable-text]]
 }
 
 /** Custom CSS defined via theme settings **/

@@ -683,7 +683,13 @@ input[type="submit"],
 input[type="button"],
 input[type="reset"],
 #id_buttonfield,
-a.link-as-button {
+a.link-as-button,
+a.btn-primary,
+a.btn-info,
+a.btn-success,
+a.btn-warning,
+a.btn-danger
+a.btn-inverse {
     color: #FFF;
     padding: 0.3em 0.6em;
     border:1px solid #ccc;
