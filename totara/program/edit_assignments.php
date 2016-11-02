@@ -93,8 +93,7 @@ if ($data = data_submitted()) {
     }
 
     // reset the assignments property to ensure it only contains the current assignments.
-    $assignments = $program->get_assignments();
-    $assignments->init_assignments($program->id);
+    $program->reset_assignments();
 
     // Update the user assignments
     $program->update_learner_assignments();
@@ -106,7 +105,7 @@ if ($data = data_submitted()) {
     $DB->update_record('prog', $prog_update);
 
     $eventdata = array();
-    foreach ($assignments as $assignment) {
+    foreach ($program->get_assignments()->get_assignments() as $assignment) {
         $eventdata[] = (array) $assignment;
     }
 

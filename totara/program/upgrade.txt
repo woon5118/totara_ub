@@ -1,0 +1,19 @@
+This files describes API changes in Totara Connect Server,
+information provided here is intended especially for developers.
+
+=== 10 ===
+
+API Changes:
+
+* prog_update_completion() added a third argument to provide the users completion state if already calculated.
+* program::__construct() now accepts either an ID or a record from the database during construction.
+* program::is_program_complete() now returns a boolean, true when successful false otherwise.
+* program::is_program_inprogress() now returns a boolean, true when successful false otherwise.
+* program::is_accessible() now returns a boolean, true when successful false otherwise.
+
+Deprecations:
+
+* program::is_accessible() has been deprecated, please call prog_is_accessible() instead.
+* prog_assignments::init_assignments() public access has been deprecated, please call prog_assignments::get_assignments() instead.
+* prog_assignments::$assignments public access has been deprecated, please call prog_assignments::get_assignments() instead.
+* prog_content::$coursesets public access has been deprecated, please call prog_content::get_course_sets() instead.

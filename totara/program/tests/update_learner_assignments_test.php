@@ -148,7 +148,7 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
     /**
      * Set individual assignments in a program.
      */
-    private function set_individual_assignments($program, $users, $completiontime = -1, $completionevent = 0) {
+    private function set_individual_assignments(program $program, $users, $completiontime = -1, $completionevent = 0) {
         $data = new stdClass();
         $data->id = $program->id;
         $data->item = array(ASSIGNTYPE_INDIVIDUAL => array());
@@ -166,14 +166,14 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         $category = new individuals_category();
         $category->update_assignments($data);
 
-        $assignments = $program->get_assignments();
-        $assignments->init_assignments($program->id);
+        // Reset the assignments. We use get_assignments()->reset() because we don't want to load the assignments yet.
+        $program->get_assignments()->reset();
     }
 
     /**
      * Set audience assignment to a program.
      */
-    private function set_audience_assignment($program, $audience, $completiontime = -1, $completionevent = 0) {
+    private function set_audience_assignment(program $program, $audience, $completiontime = -1, $completionevent = 0) {
         $data = new stdClass();
         $data->id = $program->id;
         $data->item = array(ASSIGNTYPE_COHORT => array());
@@ -189,8 +189,8 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
         $category = new cohorts_category();
         $category->update_assignments($data);
 
-        $assignments = $program->get_assignments();
-        $assignments->init_assignments($program->id);
+        // Reset the assignments. We use get_assignments()->reset() because we don't want to load the assignments yet.
+        $program->get_assignments()->reset();
     }
 
     /**

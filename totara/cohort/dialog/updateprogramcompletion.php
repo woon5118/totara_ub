@@ -85,7 +85,6 @@ $cat->update_assignments($data, false);
 
 // Update the assignment of learners to the program
 $prog = new program($programid);
-$prog->get_assignments()->init_assignments($programid);
 $prog->update_learner_assignments();
 
 echo totara_cohort_program_completion_link($cohortid, $programid);

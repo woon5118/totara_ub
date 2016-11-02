@@ -102,9 +102,6 @@ class totara_program_generator extends component_generator_base {
             }
             // Finalise the assignments.
             $program = new program($prog->id);
-            // reset the assignments property to ensure it only contains the current assignments.
-            $assignments = $program->get_assignments();
-            $assignments->init_assignments($prog->id);
             // Update the user assignments
             $program->update_learner_assignments(true);
             // Randomly resolve some exceptions and assign program anyway.
@@ -161,7 +158,7 @@ class totara_program_generator extends component_generator_base {
      * Create mock program
      *
      * @param array $data Override default properties
-     * @return stdClass Program record
+     * @return program Program record
      */
     public function create_program($data = array()) {
         global $DB, $CFG;
@@ -336,6 +333,81 @@ class totara_program_generator extends component_generator_base {
         $programcontent->save_content();
     }
 
+    /**
+     * Add courseset to program
+     *
+     * @param program $program
+     * @param int $coursesetnum  number of courseset
+     * @param stdClass[] $coursesetarray Array of courses to add to this course set.
+     */
+    public function add_courses_and_courseset_to_program(program $program, array $coursesetarray = array(), $certifpath = CERTIFPATH_CERT) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/program/lib.php');
+        require_once($CFG->dirroot . '/totara/certification/lib.php');
+
+        $prefix = 1000;
+        $coursesetnum = 0;
+        $sortorder = 1;
+
+        $rawdata = new stdClass();
+        $rawdata->id = $program->id;
+        $rawdata->contentchanged = 1;
+        $rawdata->contenttype = 1;
+        $rawdata->setprefixes = [];
+        $rawdata->setprefixes_rc = [];
+
+        foreach ($coursesetarray as $courses) {
+
+            $coursesetnum ++;
+            $prefix --;
+            $sortorder ++;
+
+
+            $rawdata->setprefixes[] = $prefix;
+            $rawdata->setprefixes_rc[] = $prefix;
+
+            $courseids = array();
+            $coursesassigned = 0;
+            foreach ($courses as $course) {
+                $courseids[] = $course->id;
+                $coursesassigned++;
+            }
+
+            $rawdata->{$prefix.'courses'} = implode(',', $courseids);
+            $rawdata->{$prefix.'contenttype'} = 1;
+            $rawdata->{$prefix.'id'} = 0;
+            $rawdata->{$prefix.'label'} = "Course Set {$coursesetnum}";
+            $rawdata->{$prefix.'sortorder'} = $sortorder;
+            $rawdata->{$prefix.'contenttype'} = 1;
+            $rawdata->{$prefix.'nextsetoperator'} = '';
+            $rawdata->{$prefix.'completiontype'} = 1;
+            $rawdata->{$prefix.'timeallowedperiod'} = 2;
+            $rawdata->{$prefix.'timeallowednum'} = 1;
+
+            if ($certifpath === CERTIFPATH_RECERT) { // Re-certification path.
+                $rawdata->certifpath_rc = CERTIFPATH_RECERT;
+                $rawdata->iscertif = 1;
+                $rawdata->contenttype_rc = 1;
+                $rawdata->{$prefix.'certifpath'} = 2;
+                $rawdata->contenttype_rc = 1;
+            } else {
+                // Certification path.
+                $rawdata->certifpath_rc = CERTIFPATH_CERT;
+                $rawdata->iscertif = 0;
+                $rawdata->contenttype_rc = 1;
+                $rawdata->{$prefix.'certifpath'} = 1;
+                $rawdata->contenttype_rc = 1;
+            }
+        }
+
+        $rawdata->setprefixes = join(',', $rawdata->setprefixes);
+        $rawdata->setprefixes_rc = join(',', $rawdata->setprefixes_rc);
+
+        $programcontent = $program->get_content();
+        $programcontent->setup_content($rawdata);
+        $programcontent->save_content();
+    }
+
     private function complete_course($courseid, $userid) {
         $comp_man = new stdClass();
         $comp_man->id = $DB->get_field('course_completions', 'id',
@@ -423,8 +495,6 @@ class totara_program_generator extends component_generator_base {
         $category->update_assignments($data);
 
         $program = new program($programid);
-        $assignments = $program->get_assignments();
-        $assignments->init_assignments($programid);
         $program->update_learner_assignments(true);
     }
 

@@ -37,7 +37,9 @@ require_once($CFG->dirroot . '/totara/program/lib.php');
  */
 class totara_program_events_testcase extends advanced_testcase {
 
+    /** @var totara_program_generator */
     private $program_generator = null;
+    /** @var program */
     private $program = null;
     private $user = null;
 
@@ -299,6 +301,11 @@ class totara_program_events_testcase extends advanced_testcase {
         $this->assertSame('u', $event->crud);
         $this->assertSame($event::LEVEL_OTHER, $event->edulevel);
         $this->assertSame($other, $event->other);
+
+        // Final test is with an empty array of users to ensure that nothing has changed.
+        $initialcount = $DB->count_records('prog_user_assignment');
+        $this->assertNull($this->program->assign_learners_bulk([], $assign));
+        $this->assertSame($initialcount, $DB->count_records('prog_user_assignment'));
     }
 
     public function test_bulk_future_assignments() {

@@ -38,7 +38,8 @@ class completions_task extends \core\task\scheduled_task {
      * Determine whether or not any users have completed any programs
      */
     public function execute() {
-        global $DB, $CFG;
+        global $CFG;
+
         require_once($CFG->dirroot . '/totara/program/lib.php');
         require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
         require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
@@ -49,26 +50,22 @@ class completions_task extends \core\task\scheduled_task {
             return false;
         }
 
-        // Get all programs.
-        $program_records = $DB->get_records('prog');
-
-        foreach ($program_records as $program_record) {
-
-            $program = new \program($program_record->id);
-
-            // Get all the users enrolled on this program.
-            $program_users = $program->get_program_learners();
-
-            if (count($program_users) == 0) {
+        // OK we want to find all programs that have at least one user assigned who has not completed the program already.
+        // Once a user has completed the program we no longer need to check that user. Complete is complete.
+        $programs = \program::get_all_programs_with_incomplete_users();
+        foreach ($programs as $program) {
+            // Get all the users enrolled on this program who have not already completed it.
+            $program_users = $program->get_program_learners(STATUS_PROGRAM_INCOMPLETE);
+            if (empty($program_users)) {
                 continue;
             }
 
-            if (!empty($program_users)) {
-                foreach ($program_users as $userid) {
-                    prog_update_completion($userid, $program);
-                }
+            foreach ($program_users as $userid) {
+                prog_update_completion($userid, $program, false);
             }
         }
+
+        return true;
     }
 }
 

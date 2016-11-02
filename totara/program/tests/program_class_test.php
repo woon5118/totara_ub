@@ -568,4 +568,1521 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $returnedreason = $certprogram1->display_completion_record_reason($user28);
         $this->assertEquals($expected, $returnedreason);
     }
+
+    /**
+     * Compares to programs, checking they are both programs, and that their public properties as the same.
+     *
+     * This function does not type hint, but does check internally, to give a unit test failure precedence.
+     *
+     * @param program $prog_a
+     * @param program $prog_b
+     */
+    private function compare_programs($prog_a, $prog_b) {
+        // Check they are both programs.
+        $this->assertInstanceOf('program', $prog_a);
+        $this->assertInstanceOf('program', $prog_b);
+
+        // Get a list of public properties from the class. We fetch it off the class so that we don't
+        // have to update this method when the properties come and go.
+        // This will help us ensure any new properties are dealt with consistently.
+        $class = new ReflectionClass('program');
+        $properties = $class->getProperties(ReflectionProperty::IS_PUBLIC);
+        foreach ($properties as $property) {
+            $this->assertEquals(
+                $property->getValue($prog_a),
+                $property->getValue($prog_b),
+                'Differing property value for "'.$property->getName().'"" when comparing programs'
+            );
+        }
+    }
+
+    /**
+     * Tests construction of a program object using just the program id.
+     */
+    public function test_construction_from_id() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $detail = [
+            'fullname' => 'Testing program construction from ID',
+            'shortname' => 'Test prog',
+        ];
+        $program_created = $this->program_generator->create_program($detail);
+        $program_id = $DB->get_field('prog', 'id', $detail, MUST_EXIST);
+
+        $this->assertEquals($program_id, $program_created->id);
+
+        $program_loaded = new program($program_id);
+        $this->compare_programs($program_created, $program_loaded);
+
+        foreach ($detail as $property => $value) {
+            $this->assertTrue(property_exists($program_created, $property));
+            $this->assertTrue(property_exists($program_loaded, $property));
+            $this->assertSame($value, $program_created->$property);
+            $this->assertSame($value, $program_loaded->$property);
+        }
+    }
+
+    /**
+     * Tests construction of a program object using a row from the prog table.
+     */
+    public function test_construction_from_object() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog',
+        ];
+        $program_created = $this->program_generator->create_program($detail);
+        $program_record = $DB->get_record('prog', $detail, '*', MUST_EXIST);
+
+        $this->assertEquals($program_record->id, $program_created->id);
+
+        $program_loaded = new program($program_record);
+        $this->compare_programs($program_created, $program_loaded);
+
+        foreach ($detail as $property => $value) {
+            $this->assertTrue(property_exists($program_created, $property));
+            $this->assertTrue(property_exists($program_loaded, $property));
+            $this->assertTrue(property_exists($program_record, $property));
+            $this->assertSame($value, $program_created->{$property});
+            $this->assertSame($value, $program_loaded->{$property});
+            $this->assertSame($value, $program_record->{$property});
+        }
+    }
+
+    /**
+     * Tests construction of a program object is not possible using an incomplete program object.
+     */
+    public function test_construction_from_incomplete_object() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog',
+        ];
+        $program_created = $this->program_generator->create_program($detail);
+        $program_record = $DB->get_record('prog', $detail, 'id, category, sortorder, fullname, shortname, idnumber, summary, endnote', MUST_EXIST);
+
+        $this->assertEquals($program_record->id, $program_created->id);
+
+        $this->setExpectedException('coding_exception', 'Program created with incomplete program record');
+        new program($program_record);
+    }
+
+    /**
+     * Tests construction of a program object is not possible using a record from the wrong table.
+     */
+    public function test_construction_from_incorrect_object() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog',
+        ];
+        $program_created = $this->program_generator->create_program($detail);
+        $program_record = $DB->get_record('prog', $detail, '*', MUST_EXIST);
+
+        $course_created = $this->data_generator->create_course($detail);
+        $course_record = $DB->get_record('course', $detail, '*', MUST_EXIST);
+
+        $this->assertEquals($program_record->id, $program_created->id);
+        $this->assertEquals($course_record->id, $course_created->id);
+
+        $this->setExpectedException('coding_exception', 'Program created with incomplete program record');
+        new program($course_record);
+
+        $program_loaded = new program($program_record);
+        $this->compare_programs($program_created, $program_loaded);
+    }
+
+    /**
+     * Tests the construction of a program from an invalid id.
+     */
+    public function test_construction_from_invalid_id() {
+
+        // This can't possibly exist, as we've not created it.
+        $this->setExpectedException('ProgramException', 'Program does not exist for ID : 7');
+        new program(7);
+
+    }
+
+    /**
+     * Tests construction of a program object when no student role has been identified.
+     */
+    public function test_construction_without_student_role_id() {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $detail = [
+            'fullname' => 'Testing program construction from ID',
+            'shortname' => 'Test prog',
+        ];
+        $program = $this->program_generator->create_program($detail);
+
+        $CFG->learnerroleid = 0;
+        $this->setExpectedException('moodle_exception', 'Could not find role with shortname student');
+        new program($program->id);
+
+        $CFG->learnerroleid = null;
+        $this->setExpectedException('moodle_exception', 'Could not find role with shortname student');
+        new program($program->id);
+
+        $CFG->learnerroleid = false;
+        $this->setExpectedException('moodle_exception', 'Could not find role with shortname student');
+        new program($program->id);
+    }
+
+    /**
+     * Tests getting the context of the program.
+     */
+    public function test_get_context() {
+
+        $this->resetAfterTest();
+
+        $category = $this->data_generator->create_category();
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog',
+            'category' => $category->id
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $context = $program->get_context();
+
+        $this->assertInstanceOf('context_program', $context);
+        $this->assertEquals(CONTEXT_PROGRAM, $context->contextlevel);
+        $this->assertEquals($program->id, $context->instanceid);
+        $this->assertEquals(3, $context->depth);
+
+        $systemcontext =context_system::instance();
+        $categorycontext = context_coursecat::instance($category->id);
+        $this->assertEquals('/'.$systemcontext->id.'/'.$categorycontext->id.'/'.$context->id, $context->path);
+    }
+
+    /**
+     * Tests the program_get_context() function.
+     */
+    public function test_program_get_context() {
+        $this->resetAfterTest();
+
+        $category = $this->data_generator->create_category();
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog',
+            'category' => $category->id
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $context = program_get_context($program->id);
+
+        $this->assertInstanceOf('context_program', $context);
+        $this->assertEquals(CONTEXT_PROGRAM, $context->contextlevel);
+        $this->assertEquals($program->id, $context->instanceid);
+        $this->assertEquals(3, $context->depth);
+
+        $systemcontext =context_system::instance();
+        $categorycontext = context_coursecat::instance($category->id);
+        $this->assertEquals('/'.$systemcontext->id.'/'.$categorycontext->id.'/'.$context->id, $context->path);
+    }
+
+    /**
+     * Tests fetching the content of the course.
+     *
+     * Please note this does not test the generation of the program content, just the it returns the content we expect.
+     */
+    public function test_get_content() {
+
+        $this->resetAfterTest();
+
+        $courses = [];
+        for ($i = 0; $i < 10; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(10, $courses);
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        // Each course set has only a single course because internally when adding content like this
+        // it calls rand(1, $numcourses)! how lame is that.
+        // The only predictable number is 1. Because rand(1,1) is always 1.
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+
+        $program = new program($program->id);
+        $content = $program->get_content();
+        $this->assertInstanceOf('prog_content', $content);
+        $coursesets = $content->get_course_sets();
+        $this->assertCount(3, $coursesets);
+        foreach ($coursesets as $courseset) {
+            $this->assertInstanceOf('multi_course_set', $courseset);
+            $this->assertCount(1, $courseset->get_courses());
+        }
+    }
+
+    /**
+     * Tests a program cannot be created with available data.
+     */
+    public function test_creation_with_availabile_property_is_not_allowed() {
+        // This is easy to test - just set availability to true, it is not allowed in any form at this point.
+        $this->setExpectedException('coding_exception', 'Property \'available\' is automatically calculated based on the given from and until dates and should not be manually specified');
+        program::create(['available' => true]);
+    }
+
+    /**
+     * Tests the resetting of assignments from the program.
+     */
+    public function test_reset_assignments() {
+
+        $this->resetAfterTest();
+
+        $courses = [];
+        $users = [];
+        for ($i = 0; $i < 10; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+            $user = $this->data_generator->create_user(['email' => 'user'.$i.'@example.com', 'username' => 'user'.$i, 'idnumber' => 'u'.$i]);
+            $users[$user->id] = $user;
+        }
+        $this->assertCount(10, $courses);
+        $this->assertCount(10, $users);
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+
+        // Initialise the assignments now, prior to adding any.
+        $assignments_preassign = $program->get_assignments();
+        $this->assertCount(0, $assignments_preassign->get_assignments());
+
+        $this->assertCount(0, $program->get_program_learners());
+        $this->program_generator->assign_program($program->id, array_keys($users));
+        $this->assertCount(10, $program->get_program_learners());
+
+        // Check we still have 0. Because its not been reset yet.
+        $assignments_preassign = $program->get_assignments();
+        $this->assertCount(0, $assignments_preassign->get_assignments());
+
+        // Reset and count the result from the reset.
+        $program->reset_assignments();
+        $this->assertCount(10, $program->get_assignments()->get_assignments());
+
+        $assignments_postassign = $program->get_assignments();
+
+        // Check that the pre and post assign are both the same object - exactly the same.
+        $this->assertSame($assignments_preassign, $assignments_postassign);
+        $this->assertCount(10, $assignments_postassign->get_assignments());
+
+    }
+
+    /**
+     * Test fetching the exceptions manager.
+     *
+     * Please note this does not actually test exceptions, just that we get back the expected object.
+     */
+    public function test_get_exceptionsmanager() {
+
+        $this->resetAfterTest();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog',
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $manager = $program->get_exceptionsmanager();
+        // Check it is what we expect it to be.
+        $this->assertInstanceOf('prog_exceptions_manager', $manager);
+        // Check there are no exceptions (no assignments so it has to be the case).
+        $this->assertSame(0, $manager->count_exceptions());
+    }
+
+    /**
+     * Test that assigned users can access and gain enrolment in courses.
+     */
+    public function test_assigned_learners_are_enrollable_in_courses() {
+
+        $this->resetAfterTest();
+
+        $courses = [];
+        $users = [];
+        for ($i = 0; $i < 5; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+            $user = $this->data_generator->create_user(['email' => 'user'.$i.'@example.com', 'username' => 'user'.$i, 'idnumber' => 'u'.$i]);
+            $users[$user->id] = $user;
+        }
+        $this->assertCount(5, $courses);
+        $this->assertCount(5, $users);
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        $this->assertCount(0, $program->get_program_learners());
+        $this->program_generator->assign_program($program->id, array_keys($users));
+        $this->assertCount(5, $program->get_program_learners());
+
+        // Now we need to assign the users to the program and ensure they are enrolled in the course.
+        $program = new program($program->id);
+        $coursesets = $program->get_content()->get_course_sets();
+        /** @var multi_course_set $courseset */
+        $courseset = reset($coursesets);
+        $this->assertInstanceOf('multi_course_set', $courseset);
+        $coursesetcourses = $courseset->get_courses();
+        $course = reset($coursesetcourses);
+        foreach ($users as $user) {
+            // They should not be enrolled yet, not until they first access the course.
+            $enrolledcourses = enrol_get_all_users_courses($user->id);
+            $this->assertCount(0, $enrolledcourses);
+
+            /// Now check if they can enter - this adds the enrolment record.
+            $result = prog_can_enter_course($user, $course);
+            $this->assertObjectHasAttribute('enroled', $result);
+            $this->assertTrue($result->enroled);
+
+            // They should now be enrolled.
+            $enrolledcourses = enrol_get_all_users_courses($user->id);
+            $this->assertCount(1, $enrolledcourses);
+            $enrolledcourse = reset($enrolledcourses);
+            $this->assertSame($course->fullname, $enrolledcourse->fullname);
+        }
+    }
+
+    /**
+     * Test unassigning users.
+     */
+    public function test_unassign_learners() {
+
+        $this->resetAfterTest();
+
+        $courses = [];
+        $users = [];
+        $oddusers = [];
+        for ($i = 0; $i < 6; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+            $user = $this->data_generator->create_user(['email' => 'user'.$i.'@example.com', 'username' => 'user'.$i, 'idnumber' => 'u'.$i]);
+            $users[$user->id] = $user;
+            if ($i % 2 !== 0) {
+                $oddusers[$user->id] = $user;
+            }
+        }
+        $this->assertCount(6, $courses);
+        $this->assertCount(6, $users);
+        $this->assertCount(3, $oddusers);
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        // Make sure there are no users assigned.
+        $this->assertCount(0, $program->get_program_learners());
+        $this->program_generator->assign_program($program->id, array_keys($users));
+        // Now make sure we have 6.
+        $this->assertCount(6, $program->get_program_learners());
+
+        // Now we need to assign the users to the program and ensure they are enrolled in the course.
+        $program = new program($program->id);
+        $coursesets = $program->get_content()->get_course_sets();
+        /** @var multi_course_set $courseset */
+        $courseset = reset($coursesets);
+        $this->assertInstanceOf('multi_course_set', $courseset);
+        $coursesetcourses = $courseset->get_courses();
+        $course = reset($coursesetcourses);
+        foreach ($users as $user) {
+            // They should not be enrolled yet, not until they first access the course.
+            $enrolledcourses = enrol_get_all_users_courses($user->id);
+            $this->assertCount(0, $enrolledcourses);
+
+            /// Now check if they can enter - this adds the enrolment record.
+            $result = prog_can_enter_course($user, $course);
+            $this->assertObjectHasAttribute('enroled', $result);
+            $this->assertTrue($result->enroled);
+
+            // They should now be enrolled.
+            $enrolledcourses = enrol_get_all_users_courses($user->id);
+            $this->assertCount(1, $enrolledcourses);
+            $enrolledcourse = reset($enrolledcourses);
+            $this->assertSame($course->fullname, $enrolledcourse->fullname);
+        }
+
+        $page = new moodle_page();
+
+        // Get an active enrolment manager to make this easier.
+        $enrolmentmanager = new course_enrolment_manager($page, $course, null, 0, '', 0, ENROL_USER_ACTIVE);
+
+        // Just to be safe.
+        $program->reset_assignments();
+        $this->assertCount(6, $program->get_assignments()->get_assignments());
+        $this->assertSame(6, $enrolmentmanager->get_total_users());
+
+        $program->unassign_learners(array_keys($oddusers));
+
+        $assignedusers = $program->get_program_learners();
+        $this->assertCount(3, $assignedusers);
+
+        // We need to get this again as it is statically cached internally :(
+        $enrolmentmanager = new course_enrolment_manager($page, $course, null, 0, '', 0, ENROL_USER_ACTIVE);
+        $this->assertSame(3, $enrolmentmanager->get_total_users());
+
+        foreach ($users as $user) {
+            $enrolledcourses = enrol_get_all_users_courses($user->id, true);
+            if (isset($oddusers[$user->id])) {
+                // The user should have been unassigned.
+                $this->assertCount(0, $enrolledcourses);
+                $this->assertFalse(in_array($user->id, $assignedusers));
+            } else {
+                // The user is still enrolled.
+                $this->assertCount(1, $enrolledcourses);
+                $this->assertTrue(in_array($user->id, $assignedusers));
+            }
+        }
+    }
+
+    /**
+     * Test that assigned users can access and gain enrolment in courses.
+     */
+    public function test_user_is_assigned() {
+
+        $this->resetAfterTest();
+
+        $courses = [];
+        $users = [];
+        for ($i = 0; $i < 2; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+            $user = $this->data_generator->create_user(['email' => 'user'.$i.'@example.com', 'username' => 'user'.$i, 'idnumber' => 'u'.$i]);
+            $users[$user->id] = $user;
+        }
+        $this->assertCount(2, $courses);
+        $this->assertCount(2, $users);
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        $this->program_generator->assign_program($program->id, array_keys($users));
+
+        $unassigneduser = $this->data_generator->create_user();
+
+        foreach ($users as $user) {
+            $this->assertTrue($program->user_is_assigned($user->id));
+        }
+        $this->assertFalse($program->user_is_assigned($unassigneduser->id));
+
+        $this->assertFalse($program->user_is_assigned(0));
+        $this->assertFalse($program->user_is_assigned(-1));
+    }
+
+    /**
+     * Test user_is_assigned with users who have been assigned through a plan.
+     */
+    public function test_user_is_assigned_through_plan() {
+        $this->resetAfterTest();
+
+        $courses = [];
+        for ($i = 0; $i < 2; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(2, $courses);
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+
+        $planuser = $this->data_generator->create_user();
+        // Not assigned through a plan yet.
+        $this->assertFalse($program->user_is_assigned($planuser->id));
+
+        // We need a capable user for this next bit.
+        $this->setAdminUser();
+
+        /** @var totara_plan_generator $plangenerator */
+        $plangenerator = $this->data_generator->get_plugin_generator('totara_plan');
+        $plan = $plangenerator->create_learning_plan(['userid' => $planuser->id]);
+        $plangenerator->add_learning_plan_program($plan->id, $program->id);
+        $plan = new development_plan($plan->id);
+        $plan->set_status(DP_APPROVAL_APPROVED);
+        plan_activate_plan($plan);
+
+        $program->update_learner_assignments(true);
+
+        $this->assertTrue($program->assigned_through_plan($planuser->id));
+
+        // Is now assigned through a plan.
+        $this->assertTrue($program->user_is_assigned($planuser->id));
+    }
+
+    /**
+     * Test get_all_programs_with_incomplete_users
+     */
+    public function test_get_all_programs_with_incomplete_users() {
+
+        $this->resetAfterTest();
+
+        $programs = [];
+        $courses = [];
+        $users = [];
+        for ($i = 0; $i < 5; $i++) {
+
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+            $user = $this->data_generator->create_user(['email' => 'user'.$i.'@example.com', 'username' => 'user'.$i, 'idnumber' => 'u'.$i]);
+            $users[$user->id] = $user;
+        }
+
+        $detail = [
+            'fullname' => 'Testing program 1',
+            'shortname' => 'Test prog 1'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        $this->program_generator->assign_program($program->id, array_keys($users));
+        $programs[] = $program;
+
+        $detail = [
+            'fullname' => 'Testing program 2',
+            'shortname' => 'Test prog 2'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        $programs[] = $program;
+
+        $this->assertCount(2, $programs);
+        $this->assertCount(5, $courses);
+        $this->assertCount(5, $users);
+
+        $fullnames = [
+            'Testing program 1',
+        ];
+        $programs = program::get_all_programs_with_incomplete_users();
+        $this->assertCount(1, $programs);
+        foreach ($programs as $program) {
+            $this->assertInstanceOf('program', $program);
+            $key = array_search($program->fullname, $fullnames);
+            $this->assertNotFalse($key);
+            // Remove it so it can only be found once.
+            unset($fullnames[$key]);
+        }
+    }
+
+    /**
+     * Test the assigned_to_users_required_learning method.
+     */
+    public function test_assigned_to_users_required_learning() {
+        $this->resetAfterTest();
+
+        $courses = [];
+        for ($i = 0; $i < 2; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(2, $courses);
+
+        $user = $this->data_generator->create_user();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+
+        // Check its not in their required learning.
+        $this->assertFalse($program->assigned_to_users_required_learning($user->id));
+
+        // Assign the user.
+        $this->program_generator->assign_program($program->id, [$user->id]);
+
+        // Check it is not in their required learning.
+        $this->assertTrue($program->assigned_to_users_required_learning($user->id));
+    }
+
+    /**
+     * Test the deprecated is_required_learning method.
+     */
+    public function test_deprecated_is_required_learning() {
+
+        $this->resetAfterTest();
+
+        $courses = [];
+        for ($i = 0; $i < 2; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(2, $courses);
+
+        $user = $this->data_generator->create_user();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+
+        $debugmessage = '$program->is_required_learning() is deprecated, use the lib function prog_required_for_user() instead';
+
+        // Check the program is not required, the user is not assigned.
+        $this->assertFalse($program->is_required_learning($user->id));
+        $this->assertDebuggingCalled($debugmessage);
+
+        // Assign the user and check the program is now required.
+        $this->program_generator->assign_program($program->id, [$user->id]);
+        $this->assertTrue($program->is_required_learning($user->id));
+        $this->assertDebuggingCalled($debugmessage);
+
+        // Mark the program complete for the user, and check it is no longer required.
+        $program->update_program_complete($user->id, [
+            'status' => STATUS_PROGRAM_COMPLETE,
+            'timecompleted' => time()
+        ]);
+        $this->assertFalse($program->is_required_learning($user->id));
+        $this->assertDebuggingCalled($debugmessage);
+    }
+
+    /**
+     * Test the deprecated is_accessible method.
+     */
+    public function test_deprecated_is_accessible() {
+
+        $this->resetAfterTest();
+
+        $courses = [];
+        for ($i = 0; $i < 2; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(2, $courses);
+
+        $user = $this->data_generator->create_user();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        
+        $debugmessage = '$program->is_accessible() is deprecated, use the lib function prog_is_accessible() instead';
+
+        // Check the program is accessible before the user is not assigned.
+        $this->assertTrue($program->is_accessible($user));
+        $this->assertDebuggingCalled($debugmessage);
+
+        // Assign the user and check the program still accessible.
+        $this->program_generator->assign_program($program->id, [$user->id]);
+        $this->assertTrue($program->is_accessible($user));
+        $this->assertDebuggingCalled($debugmessage);
+
+        // Create a new program that is not visible.
+        $now = time();
+        $day = 86400;
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog',
+            'availablefrom' => $now - ($day * 7),
+            'availableuntil' => $now - ($day * 5),
+        ];
+        $unavailableprogram = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($unavailableprogram->id, 1, 1);
+        $this->program_generator->assign_program($program->id, [$user->id]);
+        $this->assertEquals(0, $unavailableprogram->available);
+        // Check the user cannot access it.
+        $this->assertFalse($unavailableprogram->is_accessible($user));
+        $this->assertDebuggingCalled($debugmessage);
+        // Check the admin can still access it.
+        $admin = get_admin();
+        $this->assertTrue($unavailableprogram->is_accessible($admin));
+        $this->assertDebuggingCalled($debugmessage);
+    }
+
+    /**
+     * Test the user cannot enter a course through the program if the program is not available.
+     */
+    public function test_can_enter_course_with_unavailable_program() {
+        $this->resetAfterTest();
+
+        $courses = [];
+        for ($i = 0; $i < 2; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(2, $courses);
+
+        $user = $this->data_generator->create_user();
+
+        // Create a new program that is not visible.
+        $now = time();
+        $day = 86400;
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog',
+            'availablefrom' => $now - ($day * 7),
+            'availableuntil' => $now - ($day * 5),
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        $this->program_generator->assign_program($program->id, [$user->id]);
+        $this->assertEquals(0, $program->available);
+
+        foreach ($courses as $course) {
+            $this->assertFalse($program->can_enter_course($user->id, $course->id));
+        }
+    }
+
+    /**
+     * Test the get_progress method.
+     */
+    public function test_get_progress() {
+
+        $this->resetAfterTest();
+
+        $courses = [];
+        for ($i = 0; $i < 10; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(10, $courses);
+
+        $user = $this->data_generator->create_user();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 10);
+
+        // Check the program progress is 0, the user is not assigned.
+        $this->assertEquals(0, $program->get_progress($user->id));
+
+        // Assign the user and check the program progress is still 0.
+        $this->program_generator->assign_program($program->id, [$user->id]);
+        $this->assertEquals(0, $program->get_progress($user->id));
+
+        // Mark the program complete for the user, and check it is now 100% complete.
+        $program->update_program_complete($user->id, [
+            'status' => STATUS_PROGRAM_COMPLETE,
+            'timecompleted' => time()
+        ]);
+        $this->assertEquals(100, $program->get_progress($user->id));
+
+        // Now undo the above.
+        $program->delete_completion_record($user->id, true);
+        $this->assertEquals(0, $program->get_progress($user->id));
+
+        // Lets test completing the first course set.
+        // Now we want to mark the incomplete user complete in courses in the first courseset.
+        $coursesets = $program->get_content()->get_course_sets();
+        /** @var multi_course_set $courseset */
+        $courseset = reset($coursesets);
+        $this->assertInstanceOf('multi_course_set', $courseset);
+        $courses = $courseset->get_courses();
+        if (count($courses) === 1) {
+            // Stupid bloody random generator.
+            // If you get here you are here because we tried to add more than one course to a courseset in the program
+            // using the generator and it failed, it randomly selected to add 1. YAY!
+            // Look for mt_rand within totara_program_generator::add_courseset_to_program.
+            $this->markTestSkipped('Skipped due to bad luck - fix the program add_courseset_to_program method');
+        }
+        $course = reset($courses);
+        // Mark the user as complete in this one course, this should put them into progress.
+        $this->mark_user_complete_in_course($user, $course);
+        $this->assertFalse($courseset->check_courseset_complete($user->id));
+
+        // Check they are complete, this will mark the user as complete for the first course set.
+        $this->assertEquals(0, $program->get_progress($user->id));
+    }
+
+    /**
+     * Test the get_program_learners method.
+     */
+    public function test_get_program_learners() {
+
+        $this->resetAfterTest();
+
+        $courses = [];
+        for ($i = 0; $i < 2; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(2, $courses);
+
+        $user_complete = $this->data_generator->create_user();
+        $user_incomplete = $this->data_generator->create_user();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        $this->program_generator->assign_program($program->id, [$user_complete->id, $user_incomplete->id]);
+
+        // Mark one user as complete.
+        $program->update_program_complete($user_complete->id, [
+            'status' => STATUS_PROGRAM_COMPLETE,
+            'timecompleted' => time()
+        ]);
+
+        // Test fetching just the all users.
+        $learners = $program->get_program_learners();
+        $this->assertCount(2, $learners);
+
+        // Test fetching just the incomplete users.
+        $learners = $program->get_program_learners(STATUS_PROGRAM_INCOMPLETE);
+        $this->assertCount(1, $learners);
+        $learner = reset($learners);
+        $this->assertEquals($user_incomplete->id, $learner);
+
+        // Test fetching just the complete users.
+        $learners = $program->get_program_learners(STATUS_PROGRAM_COMPLETE);
+        $this->assertCount(1, $learners);
+        $learner = reset($learners);
+        $this->assertEquals($user_complete->id, $learner);
+    }
+
+    /**
+     * Test the is_program_complete method and the is_program_incomplete method.
+     */
+    public function test_deprecated_is_program_methods() {
+
+        $this->resetAfterTest();
+
+        $courses = [];
+        for ($i = 0; $i < 2; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(2, $courses);
+
+        $user_complete = $this->data_generator->create_user();
+        $user_incomplete = $this->data_generator->create_user();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        $this->program_generator->assign_program($program->id, [$user_complete->id, $user_incomplete->id]);
+
+        // Mark one user as complete.
+        $program->update_program_complete($user_complete->id, [
+            'status' => STATUS_PROGRAM_COMPLETE,
+            'timecompleted' => time()
+        ]);
+
+        $completedebugging = '$program->is_program_complete() is deprecated, use the lib function prog_is_complete() instead';
+        $incompletedebugging = '$program->is_program_inprogress() is deprecated, use the lib function prog_is_inprogress() instead';
+        
+        $this->assertTrue($program->is_program_complete($user_complete->id));
+        $this->assertDebuggingCalled($completedebugging);
+        $this->assertFalse($program->is_program_inprogress($user_complete->id));
+        $this->assertDebuggingCalled($incompletedebugging);
+
+        $this->assertFalse($program->is_program_complete($user_incomplete->id));
+        $this->assertDebuggingCalled($completedebugging);
+        $this->assertTrue($program->is_program_inprogress($user_incomplete->id));
+        $this->assertDebuggingCalled($incompletedebugging);
+    }
+
+    /**
+     * Test the delete_completion_record method.
+     */
+    public function test_delete_completion_record() {
+
+        $this->resetAfterTest();
+
+        $courses = [];
+        for ($i = 0; $i < 5; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(5, $courses);
+
+        $user_complete = $this->data_generator->create_user();
+        $user_incomplete = $this->data_generator->create_user();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        $this->program_generator->add_courseset_to_program($program->id, 2, 1);
+        $this->program_generator->assign_program($program->id, [$user_complete->id, $user_incomplete->id]);
+
+        // Mark one user as complete.
+        $program->update_program_complete($user_complete->id, [
+            'status' => STATUS_PROGRAM_COMPLETE,
+            'timecompleted' => time()
+        ]);
+
+        // Now we want to mark the incomplete user complete in courses in the first courseset.
+        $coursesets = $program->get_content()->get_course_sets();
+        $this->assertCount(2, $coursesets);
+        /** @var multi_course_set $courseset */
+        $courseset = reset($coursesets);
+        $this->assertInstanceOf('multi_course_set', $courseset);
+        $courses = $courseset->get_courses();
+        $this->assertCount(1, $courses);
+        foreach ($courses as $course) {
+            $this->mark_user_complete_in_course($user_incomplete, $course);
+        }
+        // Check they are complete, this will mark the user as complete for the first course set.
+        $this->assertTrue($courseset->check_courseset_complete($user_incomplete->id));
+
+        // At this point the complete user is 100% complete and the incomplete user is 50% complete.
+        $this->assertTrue(prog_is_complete($program->id, $user_complete->id));
+        $this->assertEquals(100, $program->get_progress($user_complete->id));
+        $this->assertTrue(prog_is_inprogress($program->id, $user_incomplete->id));
+        $this->assertEquals(50, $program->get_progress($user_incomplete->id));
+
+        // Delete completions but don't force.
+        $this->assertTrue($program->delete_completion_record($user_complete->id));
+        $this->assertTrue($program->delete_completion_record($user_incomplete->id));
+        // This should reset the incomplete user and have no effect on the complete user.
+        $this->assertTrue(prog_is_complete($program->id, $user_complete->id));
+        $this->assertEquals(100, $program->get_progress($user_complete->id));
+        $this->assertFalse(prog_is_inprogress($program->id, $user_incomplete->id));
+        $this->assertEquals(0, $program->get_progress($user_incomplete->id));
+
+        // Now force the deletion for both users.
+        $this->assertTrue($program->delete_completion_record($user_complete->id, true));
+        $this->assertTrue($program->delete_completion_record($user_incomplete->id, true));
+        // Both users should not be back to square one, 0% complete, and not even in progress.
+        $this->assertFalse(prog_is_complete($program->id, $user_complete->id));
+        $this->assertFalse(prog_is_complete($program->id, $user_incomplete->id));
+        $this->assertFalse(prog_is_inprogress($program->id, $user_complete->id));
+        $this->assertFalse(prog_is_inprogress($program->id, $user_incomplete->id));
+        $this->assertEquals(0, $program->get_progress($user_complete->id));
+        $this->assertEquals(0, $program->get_progress($user_incomplete->id));
+
+        // Finally, sneak in one final test, now that the user is not even in progress mark them complete.
+        // Mark one user as complete.
+        $program->update_program_complete($user_complete->id, [
+            'status' => STATUS_PROGRAM_COMPLETE,
+            'timecompleted' => time()
+        ]);
+        $this->assertTrue(prog_is_complete($program->id, $user_complete->id));
+        $this->assertEquals(100, $program->get_progress($user_complete->id));
+        // And finally forcefully delete it once more.
+        $this->assertTrue($program->delete_completion_record($user_complete->id, true));
+        $this->assertFalse(prog_is_complete($program->id, $user_complete->id));
+        $this->assertFalse(prog_is_inprogress($program->id, $user_complete->id));
+        $this->assertEquals(0, $program->get_progress($user_complete->id));
+    }
+
+    /**
+     * Test deletion of a program.
+     */
+    public function test_delete() {
+        global $USER, $DB;
+
+        $this->resetAfterTest();
+        // We need the admin user for this test, as we need to work with learning plans.
+        $this->setAdminUser();
+
+        $courses = [];
+        for ($i = 0; $i < 5; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(5, $courses);
+
+        $user_complete = $this->data_generator->create_user();
+        $user_incomplete = $this->data_generator->create_user();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $program = $this->program_generator->create_program($detail);
+        $this->program_generator->add_courseset_to_program($program->id, 1, 1);
+        $this->program_generator->add_courseset_to_program($program->id, 2, 1);
+        $this->program_generator->assign_program($program->id, [$user_complete->id, $user_incomplete->id]);
+
+        $program = new program($program->id);
+
+        // Mark one user as complete.
+        $program->update_program_complete($user_complete->id, [
+            'status' => STATUS_PROGRAM_COMPLETE,
+            'timecompleted' => time()
+        ]);
+
+        // Now we want to mark the incomplete user complete in courses in the first courseset.
+        $coursesets = $program->get_content()->get_course_sets();
+        $this->assertCount(2, $coursesets);
+        /** @var multi_course_set $courseset */
+        $courseset = reset($coursesets);
+        $this->assertInstanceOf('multi_course_set', $courseset);
+        $courses_one = $courseset->get_courses();
+        $this->assertCount(1, $courses_one);
+        foreach ($courses_one as $course) {
+            $this->mark_user_complete_in_course($user_incomplete, $course);
+            $this->mark_user_complete_in_course($user_complete, $course);
+        }
+        // Check they are complete, this will mark the user as complete for the first course set.
+        $this->assertTrue($courseset->check_courseset_complete($user_incomplete->id));
+
+        // Now do the same for the last courseset for the complete user.
+        $courseset = next($coursesets);
+        $this->assertInstanceOf('multi_course_set', $courseset);
+        $courses_two = $courseset->get_courses();
+        $this->assertCount(1, $courses_two);
+        foreach ($courses_two as $course) {
+            $this->mark_user_complete_in_course($user_complete, $course);
+        }
+        $this->assertNotFalse($courseset->check_courseset_complete($user_complete->id));
+
+        // Now add the program to an incomplete users plan.
+        /** @var totara_plan_generator $plangenerator */
+        $plangenerator = $this->data_generator->get_plugin_generator('totara_plan');
+        $plan = $plangenerator->create_learning_plan(['userid' => $user_incomplete->id]);
+        $plangenerator->add_learning_plan_program($plan->id, $program->id);
+        $plan = new development_plan($plan->id);
+        $plan->set_status(DP_APPROVAL_APPROVED);
+        plan_activate_plan($plan);
+
+        // Refresh the object just to make sure it is 100% up to date.
+        $program = new program($program->id);
+        $programcontext = $program->get_context();
+
+        // At this point the complete user is 100% complete and the incomplete user is 50% complete.
+        $this->assertTrue(prog_is_complete($program->id, $user_complete->id));
+        $this->assertEquals(100, $program->get_progress($user_complete->id));
+        $this->assertTrue(prog_is_inprogress($program->id, $user_incomplete->id));
+        $this->assertEquals(50, $program->get_progress($user_incomplete->id));
+        // Double check both users are in the state we expect.
+        foreach ($courses_one as $course) {
+            $this->verify_user_complete_in_course($user_complete, $course);
+            $this->verify_user_complete_in_course($user_incomplete, $course);
+        }
+        foreach ($courses_two as $course) {
+            $this->verify_user_complete_in_course($user_complete, $course);
+            $this->verify_user_complete_in_course($user_incomplete, $course, false);
+        }
+
+        // OK now run the event.
+        $eventsink = $this->redirectEvents();
+        $this->assertTrue($program->delete());
+
+        // First up verify the event.
+        $events = $eventsink->get_events();
+        $expectedevents = [
+            'totara_core\event\bulk_role_assignments_started',
+            'core\event\role_unassigned',
+            'core\event\role_unassigned',
+            'totara_core\event\bulk_role_assignments_ended',
+            'totara_program\event\program_unassigned',
+            'totara_program\event\program_unassigned',
+            'totara_program\event\program_deleted',
+        ];
+        /** @var \totara_program\event\program_deleted $deletionevent */
+        $deletionevent = null;
+        foreach ($events as $event) {
+            $class = get_class($event);
+            $key = array_search($class, $expectedevents);
+            $this->assertNotFalse($key);
+            // Remove it from the array, to reduce it to 0 hopefully.
+            unset($expectedevents[$key]);
+            if ($class === 'totara_program\event\program_deleted') {
+                $deletionevent = $event;
+            }
+        }
+        // Check we got all of the expected events.
+        $this->assertCount(0, $expectedevents, 'The following events were not expected when deleting a program: '.join(', ', $expectedevents));
+        // Verify the deletion event now.
+        $this->assertNotNull($deletionevent);
+        $this->assertInstanceOf('\totara_program\event\program_deleted', $event);
+        $this->assertSame($program->id, $event->objectid);
+        $this->assertSame($USER->id, $event->userid);
+        $this->assertSame($programcontext->id, $event->get_context()->id);
+
+        // Now verify the database.
+        $this->assertSame(0, $DB->count_records('prog', ['id' => $program->id]));
+        $this->assertSame(0, $DB->count_records('dp_plan_program_assign', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_assignment', ['programid' => $program->id]));
+        // $this->assertSame(0, $DB->count_records('prog_completion', ['programid' => $program->id]));
+        // $this->assertSame(0, $DB->count_records('prog_completion_history', ['programid' => $program->id]));
+        // $this->assertSame(0, $DB->count_records('prog_completion_log', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_courseset', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_exception', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_extension', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_future_user_assignment', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_info_data', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_message', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_recurrence', ['programid' => $program->id]));
+        $this->assertSame(0, $DB->count_records('prog_user_assignment', ['programid' => $program->id]));
+
+        // Finally verify the users are still complete in their courses.
+        foreach ($courses_one as $course) {
+            $this->verify_user_complete_in_course($user_complete, $course);
+            $this->verify_user_complete_in_course($user_incomplete, $course);
+        }
+        foreach ($courses_two as $course) {
+            $this->verify_user_complete_in_course($user_complete, $course);
+            $this->verify_user_complete_in_course($user_incomplete, $course, false);
+        }
+    }
+
+    /**
+     * Test deletion of a certification.
+     */
+    public function test_delete_certification() {
+        global $USER, $DB;
+
+        $this->resetAfterTest();
+        // We need the admin user for this test, as we need to work with learning plans.
+        $this->setAdminUser();
+
+        $courses = [];
+        for ($i = 0; $i < 5; $i++) {
+            $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
+        }
+        $this->assertCount(5, $courses);
+
+        $user_complete = $this->data_generator->create_user();
+        $user_incomplete = $this->data_generator->create_user();
+
+        $detail = [
+            'fullname' => 'Testing program fullname',
+            'shortname' => 'Test prog'
+        ];
+        $certificationid = $this->program_generator->create_certification($detail);
+        $certification = new program($certificationid);
+        $this->program_generator->add_courseset_to_program($certification->id, 1, 1);
+        $this->program_generator->add_courseset_to_program($certification->id, 2, 1);
+        $this->program_generator->assign_program($certification->id, [$user_complete->id, $user_incomplete->id]);
+
+        $certification = new program($certificationid);
+
+        // Mark one user as complete.
+        $certification->update_program_complete($user_complete->id, [
+            'status' => STATUS_PROGRAM_COMPLETE,
+            'timecompleted' => time()
+        ]);
+
+        // Now we want to mark the incomplete user complete in courses in the first courseset.
+        $coursesets = $certification->get_content()->get_course_sets();
+        $this->assertCount(2, $coursesets);
+        /** @var multi_course_set $courseset */
+        $courseset = reset($coursesets);
+        $this->assertInstanceOf('multi_course_set', $courseset);
+        $courses_one = $courseset->get_courses();
+        $this->assertCount(1, $courses_one);
+        foreach ($courses_one as $course) {
+            $this->mark_user_complete_in_course($user_incomplete, $course);
+            $this->mark_user_complete_in_course($user_complete, $course);
+        }
+        // Check they are complete, this will mark the user as complete for the first course set.
+        $this->assertTrue($courseset->check_courseset_complete($user_incomplete->id));
+
+        // Now do the same for the last courseset for the complete user.
+        $courseset = next($coursesets);
+        $this->assertInstanceOf('multi_course_set', $courseset);
+        $courses_two = $courseset->get_courses();
+        $this->assertCount(1, $courses_two);
+        foreach ($courses_two as $course) {
+            $this->mark_user_complete_in_course($user_complete, $course);
+        }
+        $this->assertNotFalse($courseset->check_courseset_complete($user_complete->id));
+
+        // Now add the program to an incomplete users plan.
+        /** @var totara_plan_generator $plangenerator */
+        $plangenerator = $this->data_generator->get_plugin_generator('totara_plan');
+        $plan = $plangenerator->create_learning_plan(['userid' => $user_incomplete->id]);
+        $plangenerator->add_learning_plan_program($plan->id, $certification->id);
+        $plan = new development_plan($plan->id);
+        $plan->set_status(DP_APPROVAL_APPROVED);
+        plan_activate_plan($plan);
+
+        // Refresh the object just to make sure it is 100% up to date.
+        $certification = new program($certification->id);
+        $certificationcontext = $certification->get_context();
+
+        // At this point the complete user is 100% complete and the incomplete user is 50% complete.
+        $this->assertTrue(prog_is_complete($certification->id, $user_complete->id));
+        $this->assertEquals(100, $certification->get_progress($user_complete->id));
+        $this->assertTrue(prog_is_inprogress($certification->id, $user_incomplete->id));
+        $this->assertEquals(50, $certification->get_progress($user_incomplete->id));
+        // Double check both users are in the state we expect.
+        foreach ($courses_one as $course) {
+            $this->verify_user_complete_in_course($user_complete, $course);
+            $this->verify_user_complete_in_course($user_incomplete, $course);
+        }
+        foreach ($courses_two as $course) {
+            $this->verify_user_complete_in_course($user_complete, $course);
+            $this->verify_user_complete_in_course($user_incomplete, $course, false);
+        }
+
+        // OK now run the event.
+        $eventsink = $this->redirectEvents();
+        $this->assertTrue($certification->delete());
+
+        // First up verify the event.
+        $events = $eventsink->get_events();
+        $expectedevents = [
+            'totara_core\event\bulk_role_assignments_started',
+            'core\event\role_unassigned',
+            'core\event\role_unassigned',
+            'totara_core\event\bulk_role_assignments_ended',
+            'totara_program\event\program_unassigned',
+            'totara_program\event\program_unassigned',
+            'totara_program\event\program_deleted',
+        ];
+        /** @var \totara_program\event\program_deleted $deletionevent */
+        $deletionevent = null;
+        foreach ($events as $event) {
+            $class = get_class($event);
+            $key = array_search($class, $expectedevents);
+            $this->assertNotFalse($key);
+            // Remove it from the array, to reduce it to 0 hopefully.
+            unset($expectedevents[$key]);
+            if ($class === 'totara_program\event\program_deleted') {
+                $deletionevent = $event;
+            }
+        }
+        // Check we got all of the expected events.
+        $this->assertCount(0, $expectedevents, 'The following events were not expected when deleting a program: '.join(', ', $expectedevents));
+        // Verify the deletion event now.
+        $this->assertNotNull($deletionevent);
+        $this->assertInstanceOf('\totara_program\event\program_deleted', $deletionevent);
+        $this->assertSame($certification->id, $deletionevent->objectid);
+        $this->assertSame($USER->id, $deletionevent->userid);
+        $this->assertSame($certificationcontext->id, $deletionevent->get_context()->id);
+
+        // Now verify the database.
+        $this->assertSame(0, $DB->count_records('prog', ['id' => $certification->id]));
+        $this->assertSame(0, $DB->count_records('dp_plan_program_assign', ['programid' => $certification->id]));
+        $this->assertSame(0, $DB->count_records('prog_assignment', ['programid' => $certification->id]));
+        // $this->assertSame(0, $DB->count_records('prog_completion', ['programid' => $certification->id]));
+        // $this->assertSame(0, $DB->count_records('prog_completion_history', ['programid' => $certification->id]));
+        // $this->assertSame(0, $DB->count_records('prog_completion_log', ['programid' => $certification->id]));
+        $this->assertSame(0, $DB->count_records('prog_courseset', ['programid' => $certification->id]));
+        $this->assertSame(0, $DB->count_records('prog_exception', ['programid' => $certification->id]));
+        $this->assertSame(0, $DB->count_records('prog_extension', ['programid' => $certification->id]));
+        $this->assertSame(0, $DB->count_records('prog_future_user_assignment', ['programid' => $certification->id]));
+        $this->assertSame(0, $DB->count_records('prog_info_data', ['programid' => $certification->id]));
+        $this->assertSame(0, $DB->count_records('prog_message', ['programid' => $certification->id]));
+        $this->assertSame(0, $DB->count_records('prog_recurrence', ['programid' => $certification->id]));
+        $this->assertSame(0, $DB->count_records('prog_user_assignment', ['programid' => $certification->id]));
+
+        // Finally verify the users are still complete in their courses.
+        foreach ($courses_one as $course) {
+            $this->verify_user_complete_in_course($user_complete, $course);
+            $this->verify_user_complete_in_course($user_incomplete, $course);
+        }
+        foreach ($courses_two as $course) {
+            $this->verify_user_complete_in_course($user_complete, $course);
+            $this->verify_user_complete_in_course($user_incomplete, $course, false);
+        }
+    }
+
+    /**
+     * Marks the user as complete in the course and assert it was done successfully.
+     *
+     * @param stdClass $user
+     * @param stdClass $course
+     */
+    private function mark_user_complete_in_course($user, $course) {
+        $params = array('userid' => $user->id, 'course' => $course->id);
+        $completion = new completion_completion($params);
+        $this->assertNotEmpty($completion->mark_complete());
+        $this->assertTrue($completion->is_complete());
+    }
+
+    /**
+     * Asserts the user is complete in the course.
+     *
+     * @param stdClass $user
+     * @param stdClass $course
+     * @param bool $expect_complete
+     */
+    private function verify_user_complete_in_course($user, $course, $expect_complete = true) {
+        $params = array('userid' => $user->id, 'course' => $course->id);
+        $completion = new completion_completion($params);
+        if ($expect_complete) {
+            $this->assertTrue($completion->is_complete());
+        } else {
+            $this->assertFalse($completion->is_complete());
+        }
+    }
+
+    /**
+     * Tests the static duration implode method.
+     */
+    public function test_duration_implode() {
+
+        $hour = 60 * 60;
+        $day = $hour * 24;
+        $week = $day * 7;
+        $month = $day * 30;
+        $year = $day * 365;
+
+        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_HOURS));
+        $this->assertSame(1 * $hour, program_utilities::duration_implode(1, TIME_SELECTOR_HOURS));
+        $this->assertSame(17 * $hour, program_utilities::duration_implode(17, TIME_SELECTOR_HOURS));
+
+        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_DAYS));
+        $this->assertSame(1 * $day, program_utilities::duration_implode(1, TIME_SELECTOR_DAYS));
+        $this->assertSame(23 * $day, program_utilities::duration_implode(23, TIME_SELECTOR_DAYS));
+
+        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_WEEKS));
+        $this->assertSame(1 * $week, program_utilities::duration_implode(1, TIME_SELECTOR_WEEKS));
+        $this->assertSame(5 * $week, program_utilities::duration_implode(5, TIME_SELECTOR_WEEKS));
+
+        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_MONTHS));
+        $this->assertSame(1 * $month, program_utilities::duration_implode(1, TIME_SELECTOR_MONTHS));
+        $this->assertSame(51 * $month, program_utilities::duration_implode(51, TIME_SELECTOR_MONTHS));
+
+        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_YEARS));
+        $this->assertSame(1 * $year, program_utilities::duration_implode(1, TIME_SELECTOR_YEARS));
+        $this->assertSame(42 * $year, program_utilities::duration_implode(42, TIME_SELECTOR_YEARS));
+
+        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_NOMINIMUM));
+        $this->assertSame(0, program_utilities::duration_implode(1, TIME_SELECTOR_NOMINIMUM));
+        $this->assertSame(0, program_utilities::duration_implode(18, TIME_SELECTOR_NOMINIMUM));
+
+        $this->assertSame(0, program_utilities::duration_implode(0, TIME_SELECTOR_INFINITY));
+        $this->assertSame(0, program_utilities::duration_implode(1, TIME_SELECTOR_INFINITY));
+        $this->assertSame(0, program_utilities::duration_implode(34, TIME_SELECTOR_INFINITY));
+    }
+
+    /**
+     * Tests the static duration explode method.
+     */
+    public function test_duration_explode() {
+
+        $hour = 60 * 60;
+        $day = $hour * 24;
+        $week = $day * 7;
+        $month = $day * 30;
+        $year = $day * 365;
+
+        $result = program_utilities::duration_explode(0);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(TIME_SELECTOR_INFINITY, $result->period);
+        $this->assertEquals(0, $result->num);
+        $this->assertEquals('no minimum time', $result->periodstr);
+
+        $result = program_utilities::duration_explode(1);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(0, $result->period);
+        $this->assertEquals(0, $result->num);
+        $this->assertEquals('', $result->periodstr);
+
+        $result = program_utilities::duration_explode($hour * 7);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(TIME_SELECTOR_HOURS, $result->period);
+        $this->assertEquals(7, $result->num);
+        $this->assertEquals('hour(s)', $result->periodstr);
+
+        $result = program_utilities::duration_explode($day * 3);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(TIME_SELECTOR_DAYS, $result->period);
+        $this->assertEquals(3, $result->num);
+        $this->assertEquals('day(s)', $result->periodstr);
+
+        $result = program_utilities::duration_explode($day * 7);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(TIME_SELECTOR_WEEKS, $result->period);
+        $this->assertEquals(1, $result->num);
+        $this->assertEquals('week(s)', $result->periodstr);
+
+        $result = program_utilities::duration_explode($day * 21);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(TIME_SELECTOR_WEEKS, $result->period);
+        $this->assertEquals(3, $result->num);
+        $this->assertEquals('week(s)', $result->periodstr);
+
+        $result = program_utilities::duration_explode($week * 3);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(TIME_SELECTOR_WEEKS, $result->period);
+        $this->assertEquals(3, $result->num);
+        $this->assertEquals('week(s)', $result->periodstr);
+
+        $result = program_utilities::duration_explode($week * 7);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(TIME_SELECTOR_WEEKS, $result->period);
+        $this->assertEquals(7, $result->num);
+        $this->assertEquals('week(s)', $result->periodstr);
+
+        $result = program_utilities::duration_explode($month * 7);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(TIME_SELECTOR_MONTHS, $result->period);
+        $this->assertEquals(7, $result->num);
+        $this->assertEquals('month(s)', $result->periodstr);
+
+        $result = program_utilities::duration_explode($month * 18);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(TIME_SELECTOR_MONTHS, $result->period);
+        $this->assertEquals(18, $result->num);
+        $this->assertEquals('month(s)', $result->periodstr);
+
+        $result = program_utilities::duration_explode($month * 24);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(TIME_SELECTOR_MONTHS, $result->period);
+        $this->assertEquals(24, $result->num);
+        $this->assertEquals('month(s)', $result->periodstr);
+
+        $result = program_utilities::duration_explode($year * 7);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(TIME_SELECTOR_YEARS, $result->period);
+        $this->assertEquals(7, $result->num);
+        $this->assertEquals('year(s)', $result->periodstr);
+
+    }
+
+    /**
+     * Test the get_standard_time_allowance_options static method.
+     */
+    public function test_get_standard_time_allowance_options() {
+
+        $options_limited = program_utilities::get_standard_time_allowance_options();
+        $options_all = program_utilities::get_standard_time_allowance_options(true);
+
+        $this->assertInternalType('array', $options_limited);
+        $this->assertInternalType('array', $options_all);
+
+        $this->assertCount(4, $options_limited);
+        $this->assertCount(5, $options_all);
+
+        $expected_limited = array(
+            TIME_SELECTOR_DAYS => 'Day(s)',
+            TIME_SELECTOR_WEEKS => 'Week(s)',
+            TIME_SELECTOR_MONTHS => 'Month(s)',
+            TIME_SELECTOR_YEARS => 'Year(s)',
+        );
+        $expected_all = $expected_limited + [TIME_SELECTOR_NOMINIMUM => 'No minimum time'];
+
+        $this->assertSame($expected_limited, $options_limited);
+        $this->assertSame($expected_all, $options_all);
+
+    }
+
+    /**
+     * Tests the print duration selector.
+     *
+     * This function doesn't test what is output, its just testing the code is executable and that it returns a string.
+     */
+    public function test_print_duration_selector() {
+
+        $html = program_utilities::print_duration_selector('t_', 'name_test', TIME_SELECTOR_WEEKS, 'number_test', 7);
+        $this->assertInternalType('string', $html);
+        $this->assertSame(1, preg_match('/name=([\'"])t_name_test\1/', $html));
+        $this->assertSame(1, preg_match('/name=([\'"])t_number_test\1/', $html));
+        $this->assertSame(1, preg_match('/value=([\'"])7\1/', $html));
+
+    }
 }

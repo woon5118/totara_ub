@@ -72,14 +72,81 @@ $COMPLETION_EVENTS_CLASSNAMES = array(
 
 /**
  * Class representing the program assignments
+ *
+ * @property-read stdClass[] assignments Previously a protected property, this is now a virtual property
+ *      loaded only when requested. It is DEPRECATED. It will be removed in Totara 11.
+ *      You should convert your code to call get_assignments() instead.
  */
 class prog_assignments {
 
-    protected $assignments;
+    /**
+     * The assignment records from the database.
+     *
+     * Prior to Totara 10 there was a protected assignments property.
+     * This property was always populated during construction but not always used.
+     * Do not change the scope from private, call $this->get_assignments() instead.
+     *
+     * @internal Never use this directly always use $this->get_assignments()
+     * @var stdClass[]
+     */
+    private $assignmentrecords = null;
 
-    function __construct($programid) {
+    /**
+     * Class prog_assignments constructor.
+     *
+     * @param int $programid
+     */
+    public function __construct($programid) {
         $this->programid = $programid;
-        $this->init_assignments($programid);
+    }
+
+    /**
+     * Returns the requested property.
+     *
+     * @deprecated since Totara 10, this will be removed in Totara 11.
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name) {
+        if ($name === 'assignments') {
+            // If they are requesting assignments
+            $this->ensure_assignments_init();
+            debugging('The assignments property no longer exists, please call get_assignments instead.', DEBUG_DEVELOPER);
+            return $this->get_assignments();
+        }
+        // We don't check if the property exists, this class existed before this magic method did and code may be abusing
+        // it by setting virtual properties. To ensure any such horrid hacks continue to work we will just assume the requested
+        // property exists and if not you will get the standard system response.
+        return $this->$name;
+    }
+
+    /**
+     * Magic __call method.
+     *
+     * @deprecated since Totara 10, this will be removed in Totara 11
+     * @param string $method The method being called.
+     * @param array $arguments
+     * @return mixed
+     * @throws coding_exception if the requested method does not exist.
+     */
+    public function __call($method, array $arguments = array()) {
+        if ($method === 'init_assignments') {
+            // init_assignments has been deprecated, it is now a private method.
+            // To reset the assignments please call prog_assignments->reset()
+            // To get the assignments please call prog_assignments->get_assignments()
+            debugging(__METHOD__.' has been deprecated, please update your code.', DEBUG_DEVELOPER);
+            return call_user_func([$this, $method], $arguments);
+        }
+        throw new coding_exception('Invalid method call "'.__METHOD__.'"');
+    }
+
+    /**
+     * Ensures that assignments are loaded.
+     */
+    public function ensure_assignments_init() {
+        if ($this->assignmentrecords === null) {
+            $this->init_assignments();
+        }
     }
 
     /**
@@ -87,31 +154,57 @@ class prog_assignments {
      * that are currently stored in the database. This is necessary after
      * assignments are updated
      *
-     * @param int $programid
+     * @param int $programid Deprecated, do not use. Will be removed in Totara 11.
      */
-    public function init_assignments($programid) {
+    private function init_assignments($programid = null) {
         global $DB;
-        $this->assignments = array();
-        $assignments = $DB->get_records('prog_assignment', array('programid' => $programid));
-        $this->assignments = $assignments;
+        if ($programid === null) {
+            $programid = $this->programid;
+        } else {
+            // Deprecated in Totara 10.
+            debugging('The programid argument of init_assignments has been deprecated.', DEBUG_DEVELOPER);
+        }
+        if ($this->programid !== $programid) {
+            // Deprecated in Totara 10.
+            debugging('A prog_assignments id mismatch detected, fix your code!', DEBUG_DEVELOPER);
+        }
+        $this->assignmentrecords = $DB->get_records('prog_assignment', array('programid' => $programid));;
     }
 
+    /**
+     * Returns the assignments for this program.
+     *
+     * @return stdClass[]
+     */
     public function get_assignments() {
-        return $this->assignments;
+        $this->ensure_assignments_init();
+        return $this->assignmentrecords;
     }
 
+    /**
+     * Resets the program assignment records to ensure they are accurate.
+     */
+    public function reset() {
+        $this->assignmentrecords = null;
+    }
+
+    /**
+     * @param int $assignmenttype One of ASSIGNTYPE_*
+     * @return organisations_category|positions_category|cohorts_category|managers_category|individuals_category
+     * @throws Exception
+     */
     public static function factory($assignmenttype) {
         global $ASSIGNMENT_CATEGORY_CLASSNAMES;
 
         if (!array_key_exists($assignmenttype, $ASSIGNMENT_CATEGORY_CLASSNAMES)) {
-            throw new Exception('Assignment category type not found');
+            throw new coding_exception('Assignment category type not found');
         }
 
         if (class_exists($ASSIGNMENT_CATEGORY_CLASSNAMES[$assignmenttype])) {
             $classname = $ASSIGNMENT_CATEGORY_CLASSNAMES[$assignmenttype];
             return new $classname();
         } else {
-            throw new Exception('Assignment category class not found');
+            throw new coding_exception('Assignment category class not found');
         }
     }
 
@@ -223,11 +316,12 @@ class prog_assignments {
 
         $out = '';
 
-        if (count($this->assignments)) {
+        $assignmentrecords = $this->get_assignments();
+        if (count($assignmentrecords)) {
 
             $usertotal = 0;
 
-            foreach ($this->assignments as $assignment) {
+            foreach ($assignmentrecords as $assignment) {
                 $assignmentob = prog_assignments::factory($assignment->assignmenttype);
 
                 $assignmentdata[$assignment->assignmenttype]['typecount']++;

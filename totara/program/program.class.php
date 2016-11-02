@@ -110,14 +110,44 @@ class program {
     protected $assignments, $messagesmanager;
     protected $exceptionsmanager, $context, $studentroleid;
 
-    function __construct($id) {
+    /**
+     * Constructs a new program.
+     *
+     * @throws coding_exception if the given record does not contain all of the expected fields.
+     * @throws ProgramException if the program does not exist.
+     * @param int|stdClass $idorrecord Either a program id OR a program record with all fields from the database.
+     *     The ability to pass in a record was added in Totara 10.0.
+     *     It is expected if a record is passed that it is a complete row from the prog table.
+     */
+    public function __construct($idorrecord) {
         global $CFG, $DB;
 
         // get program db record
-        $program = $DB->get_record('prog', array('id' => $id));
+        if (is_object($idorrecord) && isset($idorrecord->id)) {
+            $id = $idorrecord->id;
+            $program = $idorrecord;
+            if (debugging() || (defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
+                // Debugging is turned on OR this is a PHPUNIT test, lets validate the object contains at least the properties
+                // we expect and use.
+                $columns = [
+                    'id', 'category', 'sortorder', 'fullname', 'shortname', 'idnumber', 'summary', 'endnote',
+                    'visible', 'availablefrom', 'availableuntil', 'available', 'timecreated', 'timemodified',
+                    'usermodified', 'icon', 'allowextensionrequests'
+                ];
+                $missing = array_filter($columns, function($column) use ($program) {
+                    return !property_exists($program, $column);
+                });
+                if (count($missing)) {
+                    throw new coding_exception('Program created with incomplete program record', "Missing: ".join(',', $missing));
+                }
 
-        if (!$program) {
-            throw new ProgramException(get_string('programidnotfound', 'totara_program', $id));
+            }
+        } else {
+            $id =(int)$idorrecord;
+            $program = $DB->get_record('prog', array('id' => $id));
+            if (!$program) {
+                throw new ProgramException(get_string('programidnotfound', 'totara_program', $id));
+            }
         }
 
         // set details about this program
@@ -213,19 +243,38 @@ class program {
         return $program;
     }
 
+    /**
+     * Returns the program content.
+     *
+     * @return prog_content
+     */
     public function get_content() {
         return $this->content;
     }
 
     /**
+     * Returns the program context.
+     *
      * @return context_program
      */
     public function get_context() {
         return $this->context;
     }
 
+    /**
+     * Returns the program assignments object.
+     *
+     * @return prog_assignments
+     */
     public function get_assignments() {
         return $this->assignments;
+    }
+
+    /**
+     * Resets the program assignments to ensure they are accurate.
+     */
+    public function reset_assignments() {
+        $this->assignments->reset();
     }
 
     public function get_messagesmanager() {
@@ -673,6 +722,9 @@ class program {
                                           WHERE pa.id = {prog_future_user_assignment}.assignmentid)",
             array('programid' => $this->id));
 
+        // Ensure the assignments object has been reset so that it will force a load next time someone tries to use it.
+        $this->get_assignments()->reset();
+
         return PROG_UPDATE_ASSIGNMENTS_COMPLETE;
     }
 
@@ -868,6 +920,11 @@ class program {
             }
             unset($completionstodelete);
 
+            // Reset the program assignments object at this point, just in case for any reason it has been initialised.
+            // This function should never reference it, however the event may act upon it, so we need to ensure it is accurate
+            // prior to this.
+            $this->get_assignments()->reset();
+
             foreach ($userids as $userid) {
                 // Trigger this event for any listening handlers to catch.
                 $event = \totara_program\event\program_unassigned::create(
@@ -1049,7 +1106,7 @@ class program {
      */
     public function is_program_complete($userid) {
         debugging('$program->is_program_complete() is deprecated, use the lib function prog_is_complete() instead', DEBUG_DEVELOPER);
-        prog_is_complete($this->id, $userid);
+        return prog_is_complete($this->id, $userid);
     }
 
     /**
@@ -1061,7 +1118,7 @@ class program {
      */
     public function is_program_inprogress($userid) {
         debugging('$program->is_program_inprogress() is deprecated, use the lib function prog_is_inprogress() instead', DEBUG_DEVELOPER);
-        prog_is_inprogress($this->id, $userid);
+        return prog_is_inprogress($this->id, $userid);
     }
 
     /**
@@ -1174,15 +1231,16 @@ class program {
      * on the program. Optionally, will only return a subset of users with a
      * specific completion status
      *
-     * @param int $status
+     * @param int $status One of STATUS_PROGRAM_INCOMPLETE or STATUS_PROGRAM_COMPLETE
      * @return array of userids for users in the program
      */
     public function get_program_learners($status=false) {
         global $DB;
 
-        if ($status) {
+        // If status is not false then add a check for it.
+        if ($status !== false) {
             $statussql = 'AND status = ?';
-            $statusparams = array($status);
+            $statusparams = array((int)$status);
         } else {
             $statussql = '';
             $statusparams = array();
@@ -1809,16 +1867,17 @@ class program {
     }
 
     /**
-     * Checks accessiblity of the program for user if the user parameter is
+     * Checks accessibility of the program for user if the user parameter is
      * passed to the function otherwise checks if the program is generally
      * accessible.
      *
-     * @param object $user If this parameter is included check availibilty to this user
+     * @deprecated since Totara 10
+     * @param object $user If this parameter is included check availability to this user
      * @return boolean
      */
     public function is_accessible($user = null) {
         debugging('$program->is_accessible() is deprecated, use the lib function prog_is_accessible() instead', DEBUG_DEVELOPER);
-        prog_is_accessible($this);
+        return prog_is_accessible($this, $user);
     }
 
     /**
@@ -2109,6 +2168,39 @@ class program {
      */
     public function is_certif() {
         return !empty($this->certifid);
+    }
+
+    /**
+     * Returns all programs that have one or more users assigned who have not yet completed the program.
+     * @return program[]
+     */
+    public static function get_all_programs_with_incomplete_users() {
+        global $DB;
+        // OK we want to find all programs that have at least one user assigned who has not completed the program already.
+        // Once a user has completed the program we no longer need to check that user. Complete is complete.
+        // Preloading the program contexts is going to save us 1 query per program.
+        $contextsql = context_helper::get_preload_record_columns_sql('ctx');
+        $sql = "SELECT p.*, {$contextsql}
+                  FROM {prog} p
+             LEFT JOIN {context} ctx ON ctx.instanceid = p.id AND ctx.contextlevel = :progctxlevel
+                  JOIN (
+                    SELECT DISTINCT programid
+                      FROM {prog_completion}
+                     WHERE coursesetid = 0 AND status = :statusincomplete
+                       ) pc ON pc.programid = p.id";
+        $params = [
+            'progctxlevel' => CONTEXT_PROGRAM,
+            'statusincomplete' => STATUS_PROGRAM_INCOMPLETE
+        ];
+        $rs = $DB->get_recordset_sql($sql, $params);
+        $programs = array();
+        foreach ($rs as $program_record) {
+            context_helper::preload_from_record($program_record);
+            $program = new self($program_record);
+            $programs[$program->id] = $program;
+        }
+        $rs->close();
+        return $programs;
     }
 }
 

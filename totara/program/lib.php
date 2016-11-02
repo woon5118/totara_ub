@@ -1301,11 +1301,16 @@ function prog_process_extensions($extensionslist, $reasonfordecision = array()) 
  *
  * @param int $userid
  * @param program $program if not set - all programs will be updated
+ * @param bool $useriscomplete if the users current completion status has already been fetched from the database
+ *     providing it here will shortcut the completion check in this function and save you a query.
+ *     This argument is ignored if no program was provided.
  */
-function prog_update_completion($userid, program $program = null) {
+function prog_update_completion($userid, program $program = null, $useriscomplete = null) {
     global $DB;
 
     if (!$program) {
+        // Well they can't possibly have completed it.
+        $useriscomplete = null; // As noted this is ignored.
         $proglist = prog_get_all_programs($userid, '', '', '', false, true);
         $programs = array();
         foreach ($proglist as $progrow) {
@@ -1315,7 +1320,22 @@ function prog_update_completion($userid, program $program = null) {
         $programs = array($program);
     }
 
+    /** @var program[] $programs */
     foreach ($programs as $program) {
+
+        // First check if the program is already marked as complete for this user and do nothing if it is.
+        if ($useriscomplete !== null) {
+            if ($useriscomplete === true) {
+                // We already know that they are complete.
+                continue;
+            }
+        } else if (prog_is_complete($program->id, $userid)) {
+            // He is already marked complete in the database, no need to proceed.
+            continue;
+        }
+
+        // OK the user has not completed the program yet - lets see if they are complete.
+
         // Get the program content.
         $program_content = $program->get_content();
 
@@ -1327,11 +1347,6 @@ function prog_update_completion($userid, program $program = null) {
             $path = CERTIFPATH_STD;
         }
         $courseset_groups = $program_content->get_courseset_groups($path);
-
-        // First check if the program is already marked as complete for this user and do nothing if it is.
-        if (prog_is_complete($program->id, $userid)) {
-            continue;
-        }
 
         $courseset_group_completed = false;
 
@@ -1372,7 +1387,7 @@ function prog_update_completion($userid, program $program = null) {
  * Check if a courseset group is completed and optionally update courseset completion.
  *
  * @throws ProgramException
- * @param array $courseset_group a group of coursesets, as returned by get_courseset_groups
+ * @param course_set[] $courseset_group a group of coursesets, as returned by get_courseset_groups
  * @param int $userid of the user for which completion should be checked/updated
  * @param boolean $updatecomplete also update courseset completion
  *

@@ -499,8 +499,6 @@ class totara_reportbuilder_cache_generator extends testing_data_generator {
         $category->update_assignments($data);
 
         $program = new program($programid);
-        $assignments = $program->get_assignments();
-        $assignments->init_assignments($programid);
         $program->update_learner_assignments(true);
     }
 
