@@ -46,12 +46,9 @@
                 "value": "inst4"
             }
         ],
-        "accessible_skip_from": {
-            "href": "#sb-2",
+        "accessible_skip": {
+            "id": "2",
             "title": "Navigation"
-        },
-        "accessible_skip_to": {
-            "id": "#sb-2"
         },
         "header":{
             "title":{
@@ -69,7 +66,7 @@
         "annotation":false
     }
 }}
-{{#accessible_skip_from}} <a class="skip-block" href="{{href}}">{{#str}} skipa, access, {{title}} {{/str}}</a> {{/accessible_skip_from}}
+{{#accessible_skip}} <a class="skip-block" href="#sb-{{id}}">{{#str}} skipa, access, {{title}} {{/str}}</a> {{/accessible_skip}}
 
 <div{{#attributes}} {{name}}="{{value}}"{{/attributes}}>
 
@@ -106,4 +103,4 @@
     <div class="blockannotation">{{{annotation_content}}}</div>
 {{/annotation}}
 
-{{#accessible_skip_to}}<span id="{{id}}" class="skip-block-to"></span>{{/accessible_skip_to}}
+{{#accessible_skip}}<span id="sb-{{id}}" class="skip-block-to"></span>{{/accessible_skip}}

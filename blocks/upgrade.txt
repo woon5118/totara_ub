@@ -1,2 +1,8 @@
 This files describes API changes in /blocks/* - activity modules,
 information provided here is intended especially for developers.
+
+=== 10 ===
+
+lib/templates/block.mustache context object has changed, the property ->accessible_skip_from has been deprecated and will be removed in a future release.
+lib/templates/block.mustache context object has changed, the property ->accessible_skip_to has been deprecated and will be removed in a future release.
+lib/templates/block.mustache context object has changed, the property ->accessible_skip has been added and has the attributes ->id and ->title
