@@ -1,0 +1,10 @@
+allcompletiontimeunknownissues,totara_program
+allcurrentlyassignedissues,totara_program
+allduplicatecourseissues,totara_program
+alltimeallowanceissues,totara_program
+chosedismissexception,totara_program
+currentlyassigned,totara_program
+dismissandtakenoaction,totara_program
+duplicatecourse,totara_program
+overrideandaddprogram,totara_program
+setrealistictimeallowance,totara_program
