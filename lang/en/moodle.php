@@ -1026,6 +1026,7 @@ $string['language'] = 'Language';
 $string['languagegood'] = 'This language pack is up-to-date! :-)';
 $string['last'] = 'Last';
 $string['lastaccess'] = 'Last access';
+$string['lastaction'] = 'Last action';
 $string['lastcourseaccess'] = 'Last access to course';
 $string['lastedited'] = 'Last edited';
 $string['lastip'] = 'Last IP address';
