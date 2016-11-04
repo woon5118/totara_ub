@@ -25,6 +25,8 @@
 //  This fragment is called by /admin/index.php
 ////////////////////////////////////////////////////////////////////////////////
 
+defined('MOODLE_INTERNAL') || die();
+
 $plugin->version  = 2016110200;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2015111606;       // Requires this Moodle version.
 $plugin->release   = '2.4.0 (2012112900)'; // User-friendly version number
