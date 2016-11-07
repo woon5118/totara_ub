@@ -22,29 +22,27 @@
  * @subpackage reportbuilder
  */
 
-require_once($CFG->dirroot . '/totara/reportbuilder/db/upgradelib.php');
-
 /**
  * Local database upgrade script
  *
- * @param   integer $oldversion Current (pre-upgrade) local db version timestamp
- * @return  boolean $result
+ * @param   int $oldversion Current (pre-upgrade) local db version timestamp
+ * @return  boolean always true
  */
 function xmldb_totara_reportbuilder_upgrade($oldversion) {
     global $CFG, $DB;
-
+    require_once(__DIR__ .'/upgradelib.php');
 
     $dbman = $DB->get_manager();
 
-    $result = true;
+    // Totara 10 branching line.
 
     if ($oldversion < 2016110200) {
 
-        $result = $result && totara_reportbuilder_delete_scheduled_reports();
+        totara_reportbuilder_delete_scheduled_reports();
 
         // Reportbuilder savepoint reached.
         upgrade_plugin_savepoint(true, 2016110200, 'totara', 'reportbuilder');
     }
 
-    return $result;
+    return true;
 }
