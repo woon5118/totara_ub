@@ -120,6 +120,11 @@
           <ON_CHECK message="maxinputvars" />
         </FEEDBACK>
       </PHP_SETTING>
+      <PHP_SETTING name="mbstring.func_overload" value="0" level="required">
+        <FEEDBACK>
+          <ON_ERROR message="mbstringoverloadunsupported" />
+        </FEEDBACK>
+      </PHP_SETTING>
     </PHP_SETTINGS>
     <CUSTOM_CHECKS>
       <CUSTOM_CHECK file="lib/upgradelib.php" function="check_database_storage_engine" level="required">
