@@ -46,6 +46,45 @@ class behat_totara_reportbuilder extends behat_base {
     }
 
     /**
+     * Deletes the given column from the report.
+     *
+     * This definition requires the user to already be editing a report and to be on the Columns tab.
+     *
+     * @Given /^I delete the "([^"]*)" column from the report$/
+     */
+    public function i_delete_the_column_from_the_report($columnname) {
+        $columnname_xpath = $this->getSession()->getSelectorsHandler()->xpathLiteral($columnname);
+        $delstring = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('delete'));
+        $xpath = '//option[contains(., '.$columnname_xpath.') and @selected]/ancestor::tr//a[@title='.$delstring.']';
+        $node = $this->find(
+            'xpath',
+            $xpath,
+            new ExpectationException('The given column could not be deleted from within the report builder report. '.$xpath, $this->getSession())
+        );
+        $node->click();
+        $this->getSession()->getDriver()->getWebDriverSession()->accept_alert();
+    }
+
+    /**
+     * Sets the aggregation for the given column in the report.
+     *
+     * This definition requires the user to already be editing a report and to be on the Columns tab.
+     *
+     * @Given /^I set aggregation for the "([^"]*)" column to "([^"]*)" in the report$/
+     */
+    public function i_set_aggregation_for_the_column_to_in_the_report($columnname, $aggregation) {
+        $columnname_xpath = $this->getSession()->getSelectorsHandler()->xpathLiteral($columnname);
+        $aggregation_xpath = $this->getSession()->getSelectorsHandler()->xpathLiteral($aggregation);
+        $xpath = '//option[contains(., '.$columnname_xpath.') and @selected]/ancestor::tr//select//option[contains(., '.$aggregation_xpath.')]//ancestor::select';
+        $select = $this->find(
+            'xpath',
+            $xpath,
+            new ExpectationException('Aggreation could not be set for the given column within the report builder report. ', $this->getSession())
+        );
+        $select->selectOption($aggregation);
+    }
+
+    /**
      * Navigates to a given report that the user has created.
      *
      * @Given /^I navigate to my "([^"]*)" report$/

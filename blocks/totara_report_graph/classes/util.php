@@ -227,4 +227,32 @@ class util {
         echo $pdfdata;
         die;
     }
+
+    /**
+     * Cleans user input of max width and max height.
+     *
+     * @param string $input
+     * @return null|string
+     */
+    public static function normalise_size_and_user_input($input) {
+        if (trim($input) === '') {
+            // Its empty, that is fine.
+            return '';
+        }
+        $regex = '#^ *(?<size>\-?\d+(\.\d+)?|\-?\.\d+) *(?<unit>%|px|cm|em|em|in|mm|pc|pe|pt|px)? *$#i';
+        if (preg_match($regex, $input, $matches)) {
+            $size = (float)$matches['size'];
+            if (empty($size)) {
+                return '';
+            }
+            $unit = 'px';
+            if (!empty($matches['unit'])) {
+                $unit = \core_text::strtolower($matches['unit']);
+            }
+            return $size.$unit;
+        }
+
+        // Its not valid.
+        return null;
+    }
 }
