@@ -37,5 +37,21 @@ function xmldb_totara_core_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
+    if ($oldversion < 2016111100) {
+        // Delete all removed update and install settings.
+        unset_config('disableupdatenotifications');
+        unset_config('disableupdateautodeploy');
+        unset_config('updateautodeploy');
+        unset_config('updateautocheck');
+        unset_config('updatenotifybuilds');
+        unset_config('updateminmaturity');
+        unset_config('updatenotifybuilds');
+
+        // Uninstall deleted plugin.
+        uninstall_plugin('tool', 'installaddon');
+
+        upgrade_plugin_savepoint(true, 2016111100, 'totara', 'core');
+    }
+
     return true;
 }

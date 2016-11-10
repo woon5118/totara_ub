@@ -1056,7 +1056,6 @@ $string['taskblogcron'] = 'Sync external blogs';
 $string['taskcachecleanup'] = 'Remove expired cache entries';
 $string['taskcachecron'] = 'Background processing for caches';
 $string['taskcalendarcron'] = 'Send calendar notifications';
-$string['taskcheckforupdates'] = 'Check for updates';
 $string['taskcompletionregular'] = 'Calculate regular completion data';
 $string['taskcompletiondaily'] = 'Completion mark as started';
 $string['taskcontextcleanup'] = 'Cleanup contexts';
