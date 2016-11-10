@@ -1199,6 +1199,11 @@ class feedback360_responder {
     public $tokenaccess = false;
 
     /**
+     * @var string used for when a user who has requested feedback is viewing responses
+     */
+    protected $requestertoken;
+
+    /**
      * Constructor
      * @param int $id feedback360_resp_assignment.id
      */
@@ -1241,6 +1246,26 @@ class feedback360_responder {
         if (!$resp) {
             return false;
         }
+        return new feedback360_responder($resp->id);
+    }
+
+    /**
+     * Get a feedback_responder object based on the 'requestertoken' associated with a response.
+     *
+     * This should only be used when the response is being viewed by the user who requested feedback.
+     * It should NOT be used by the user giving the feedback.
+     *
+     * @param $token
+     * @return bool|feedback360_responder
+     */
+    public static function get_by_requester_token($requestertoken) {
+        global $DB;
+
+        $resp = $DB->get_record('feedback360_resp_assignment', array('requestertoken' => $requestertoken));
+        if (!$resp) {
+            return false;
+        }
+
         return new feedback360_responder($resp->id);
     }
 
@@ -1314,6 +1339,7 @@ class feedback360_responder {
         $this->timeassigned = $respdata->timeassigned;
         $this->timecompleted = $respdata->timecompleted;
         $this->timedue = $respdata->timedue;
+        $this->requestertoken = $respdata->requestertoken;
 
         if ($respdata->feedback360emailassignmentid > 0) {
             if (empty($respdata->email) || empty($respdata->token)) {
@@ -1340,6 +1366,7 @@ class feedback360_responder {
         $data->timeassigned = $this->timeassigned;
         $data->viewed = $this->viewed;
         $data->timecompleted = $this->timecompleted;
+        $data->requestertoken = $this->get_requestertoken();
         if ($this->type == self::TYPE_USER) {
             $data->userid = $this->userid;
         } else {
@@ -1514,6 +1541,7 @@ class feedback360_responder {
         // Loop through the users to add and assign them where appropriate.
         foreach ($new as $userid) {
             $resp_assignment->userid = $userid;
+            $resp_assignment->requestertoken = self::create_requestertoken();
             $resp_assignment->id = $DB->insert_record('feedback360_resp_assignment', $resp_assignment);
 
             $userto = $DB->get_record('user', array('id' => $userid));
@@ -1559,6 +1587,34 @@ class feedback360_responder {
                 feedback360::cancel_resp_assignment($resp_assignment, $asmanager);
             }
         }
+    }
+
+    /**
+     * Get the 'requestertoken' associated with a feedback response. This will create a token if
+     * no token is found. This does not check the database. Ensure you use this classes load method
+     * to pull any data from the database if necessary.
+     *
+     * The requestertoken is used for accessing of responses by the user who requested feedback.
+     * This should NOT be used for users who will be giving responses.
+     *
+     * @return string the requester token (a 40 character sha1 hash).
+     */
+    protected function get_requestertoken() {
+        if (empty($this->requestertoken)) {
+            $this->requestertoken = self::create_requestertoken();
+        }
+
+        return $this->requestertoken;
+    }
+
+    /**
+     * Creates a random, unique 40 character sha1 hash to be used as the 'requestertoken'.
+     *
+     * @return string the requester token (a 40 character sha1 hash).
+     */
+    private static function create_requestertoken() {
+        $stringtohash = 'requester' . time() . random_string() . get_site_identifier();
+        return sha1($stringtohash);
     }
 
     /**
@@ -1643,12 +1699,18 @@ class feedback360_responder {
             // Create the feedback360_email_assignment.
             $email_assignment = new stdClass();
             $email_assignment->email = $email;
-            $email_assignment->token = sha1($email . ',' . 'feedback360_user_assignment:' . $userformid . ',' . time());
+
+            // Create a string that would be very difficult to replicate.
+            // The token generated here is for use by the user giving feedback (opposite to 'requestertoken').
+            $responderstringtohash = $email . 'responder' . $userformid . time() . get_site_identifier();
+            $email_assignment->token = sha1($responderstringtohash);
+
             $emailid = $DB->insert_record('feedback360_email_assignment', $email_assignment);
 
             // Create and link the feedback360_resp_assignment.
             $resp_assignment->userid = $CFG->siteguest; // They aren't a user so we'll put them down as guests.
             $resp_assignment->feedback360emailassignmentid = $emailid;
+            $resp_assignment->requestertoken = self::create_requestertoken();
             $resp_assignment->id = $DB->insert_record('feedback360_resp_assignment', $resp_assignment);
 
             // Set up some variables for the email.

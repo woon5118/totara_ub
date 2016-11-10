@@ -821,7 +821,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
                     $view_str = get_string('viewresponse', 'totara_feedback360');
                 }
 
-                $responseparam = array('myfeedback' => 1, 'responseid' => $resp_assignment->id);
+                $responseparam = array('myfeedback' => 1, 'requestertoken' => $resp_assignment->requestertoken);
                 $responseurl = new moodle_url('/totara/feedback360/feedback.php', $responseparam);
                 $responselink = html_writer::link($responseurl, $view_str);
             } else {

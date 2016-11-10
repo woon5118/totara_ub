@@ -1,0 +1,12 @@
+This file describes API changes in Totara Feedback360,
+information provided here is intended especially for developers.
+
+
+=== 10 ===
+
+* New database field requestertoken added to the feedback360_resp_assignment table.
+This is will hold sha1 hashes unique to each response. If the user who requested feedback is viewing responses,
+the response should be queried via this value, particularly if anonymous feedback is used.
+When a user that has requested feedback views a response, a 'responseid' in the url can no longer
+be used to fetch feedback, they must use the 'requestertoken'. This does not apply to users who are
+submitting feedback.

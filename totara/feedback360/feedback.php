@@ -81,8 +81,10 @@ if ($isexternaluser) {
 
     $respassignment = feedback360_responder::by_preview($feedback360id);
 } else if ($viewanswer) {
-    $responseid = required_param('responseid', PARAM_INT);
-    $respassignment = new feedback360_responder($responseid);
+    // Retrieve responses via their associated requester token rather than by id as this guards anonymity
+    // for anonymous feedback.
+    $requestertoken = required_param('requestertoken', PARAM_ALPHANUM);
+    $respassignment = feedback360_responder::get_by_requester_token($requestertoken);
 
     if ($respassignment->subjectid != $USER->id) {
         // If you arent the owner of the feedback request.

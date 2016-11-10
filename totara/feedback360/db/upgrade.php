@@ -35,5 +35,31 @@ function xmldb_totara_feedback360_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
+    if ($oldversion < 2016123000) {
+
+        // Define field requestertoken to be added to feedback360_resp_assignment.
+        $table = new xmldb_table('feedback360_resp_assignment');
+        $field = new xmldb_field('requestertoken', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null, 'feedback360emailassignmentid');
+
+        // Conditionally launch add field requestertoken.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // We now need to add tokens to each record in feedback360_resp_assignment.
+        $time = time();
+        $respassignments = $DB->get_records('feedback360_resp_assignment');
+        foreach ($respassignments as $respassignment) {
+            $stringtohash = 'requester' . $time . random_string() . get_site_identifier();
+            $hash = sha1($stringtohash);
+
+            $respassignment->requestertoken = $hash;
+            $DB->update_record('feedback360_resp_assignment', $respassignment);
+        }
+
+        // Feedback360 savepoint reached.
+        upgrade_plugin_savepoint(true, 2016123000, 'totara', 'feedback360');
+    }
+
     return true;
 }

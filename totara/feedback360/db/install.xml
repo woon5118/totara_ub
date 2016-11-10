@@ -109,6 +109,7 @@
         <FIELD NAME="timecompleted" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="viewed" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="feedback360emailassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Email assignments"/>
+        <FIELD NAME="requestertoken" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
