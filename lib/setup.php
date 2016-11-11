@@ -55,6 +55,10 @@ if (!isset($CFG)) {
     }
 }
 
+// Totara: Make sure we have the very basic to load our libraries and do a full environment test,
+// at the same time this detects use of different mis-configured PHP in CLI.
+require(__DIR__ . '/../lib/environmentmincheck.php');
+
 // We can detect real dirroot path reliably since PHP 4.0.2,
 // it can not be anything else, there is no point in having this in config.php
 $CFG->dirroot = dirname(dirname(__FILE__));
@@ -332,17 +336,6 @@ if (file_exists("$CFG->dataroot/climaintenance.html")) {
 } else {
     if (!defined('CLI_MAINTENANCE')) {
         define('CLI_MAINTENANCE', false);
-    }
-}
-
-if (CLI_SCRIPT) {
-    // sometimes people use different PHP binary for web and CLI, make 100% sure they have the supported PHP version
-    if (version_compare(phpversion(), '5.5.9') < 0) {
-        $phpversion = phpversion();
-        // do NOT localise - lang strings would not work here and we CAN NOT move it to later place
-        echo "Totara 9.0 or later requires at least PHP 5.5.9 (currently using version $phpversion).\n";
-        echo "Some servers may have multiple PHP versions installed, are you using the correct executable?\n";
-        exit(1);
     }
 }
 

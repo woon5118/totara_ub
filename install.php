@@ -43,6 +43,9 @@ if (file_exists($configfile)) {
     die;
 }
 
+// Make sure we have everything necessary for standard libraries.
+require(__DIR__ . '/lib/environmentmincheck.php');
+
 define('CLI_SCRIPT', false); // prevents some warnings later
 define('AJAX_SCRIPT', false); // prevents some warnings later
 define('CACHE_DISABLE_ALL', true); // Disables caching.. just in case.
@@ -51,31 +54,11 @@ define('IGNORE_COMPONENT_CACHE', true);
 define('MDL_PERF_TEST', false);
 
 // Servers should define a default timezone in php.ini, but if they don't then make sure something is defined.
-if (!function_exists('date_default_timezone_set') or !function_exists('date_default_timezone_get')) {
-    echo("Timezone functions are not available.");
-    die;
-}
 date_default_timezone_set(@date_default_timezone_get());
 
 // make sure PHP errors are displayed - helps with diagnosing of problems
 @error_reporting(E_ALL);
 @ini_set('display_errors', '1');
-
-// Check that PHP is of a sufficient version.
-if (version_compare(phpversion(), '5.5.9') < 0) {
-    $phpversion = phpversion();
-    // do NOT localise - lang strings would not work here and we CAN not move it after installib
-    echo "Totara 9.0 or later requires at least PHP 5.5.9 (currently using version $phpversion).<br />";
-    echo "Please upgrade your server software or install older Totara version.";
-    die;
-}
-
-// make sure iconv is available and actually works
-if (!function_exists('iconv')) {
-    // this should not happen, this must be very borked install
-    echo 'Totara requires the iconv PHP extension. Please install or enable the iconv extension.';
-    die();
-}
 
 if (PHP_INT_SIZE > 4) {
     // most probably 64bit PHP - we need a lot more memory

@@ -42,6 +42,9 @@ if (function_exists('opcache_reset')) {
     opcache_reset();
 }
 
+// Make sure we have everything necessary for standard libraries.
+require(__DIR__ . '/../../lib/environmentmincheck.php');
+
 $help =
 "Command line Totara installer, creates config.php and initializes database.
 Please note you must execute this script with the same uid as apache
@@ -124,10 +127,6 @@ $olddir = getcwd();
 chdir(dirname($_SERVER['argv'][0]));
 
 // Servers should define a default timezone in php.ini, but if they don't then make sure something is defined.
-if (!function_exists('date_default_timezone_set') or !function_exists('date_default_timezone_get')) {
-    fwrite(STDERR, "Timezone functions are not available.\n");
-    exit(1);
-}
 date_default_timezone_set(@date_default_timezone_get());
 
 // make sure PHP errors are displayed - helps with diagnosing of problems
@@ -145,15 +144,6 @@ define('CACHE_DISABLE_ALL', true);
 define('PHPUNIT_TEST', false);
 
 define('IGNORE_COMPONENT_CACHE', true);
-
-// Check that PHP is of a sufficient version
-if (version_compare(phpversion(), "5.5.9") < 0) {
-    $phpversion = phpversion();
-    // do NOT localise - lang strings would not work here and we CAN NOT move it after installib
-    fwrite(STDERR, "Totara 9.0 or later requires at least PHP 5.5.9 (currently using version $phpversion).\n");
-    fwrite(STDERR, "Please upgrade your server software or install older Totara version.\n");
-    exit(1);
-}
 
 // set up configuration
 global $CFG;

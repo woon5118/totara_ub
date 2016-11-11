@@ -29,34 +29,8 @@ if (!file_exists('../config.php')) {
     die();
 }
 
-// Check that PHP is of a sufficient version as soon as possible
-if (version_compare(phpversion(), '5.5.9') < 0) {
-    $phpversion = phpversion();
-    // do NOT localise - lang strings would not work here and we CAN NOT move it to later place
-    echo "Totara 9.0 or later requires at least PHP 5.5.9 (currently using version $phpversion).<br />";
-    echo "Please upgrade your server software or install older Totara version.";
-    die();
-}
-
-// make sure iconv is available and actually works
-if (!function_exists('iconv')) {
-    // this should not happen, this must be very borked install
-    echo 'Totara requires the iconv PHP extension. Please install or enable the iconv extension.';
-    die();
-}
-
-// Make sure php5-json is available.
-if (!function_exists('json_encode') || !function_exists('json_decode')) {
-    // This also shouldn't happen.
-    echo 'Totara requires the json PHP extension. Please install or enable the json extension.';
-    die();
-}
-
-// Make sure xml extension is available.
-if (!extension_loaded('xml')) {
-    echo 'Moodle requires the xml PHP extension. Please install or enable the xml extension.';
-    die();
-}
+// Make sure we have everything necessary for standard libraries.
+require(__DIR__ . '/../lib/environmentmincheck.php');
 
 define('NO_OUTPUT_BUFFERING', true);
 
