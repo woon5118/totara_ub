@@ -7,3 +7,4 @@ information provided here is intended especially for developers.
   use new TOTARA tag, for example: <TOTARA version="10" requires="9">
 * environmentlib.php was partially refactored, do not use this internal API in custom code
 * all incompatible Moodle plugin installation and update code and APIs were removed
+* theme_config::get_all_block_regions() added argument $pagelayout
