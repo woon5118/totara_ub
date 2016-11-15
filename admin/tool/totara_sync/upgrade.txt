@@ -1,0 +1,7 @@
+This files describes API changes in HR Import,
+information provided here is intended especially for developers.
+
+=== 10 ===
+
+* totara_sync_element_user::get_invalid_emails() is now publicly accessible.
+* totara_sync_element_user::get_invalid_lang() is now publicly accessible.
