@@ -68,8 +68,7 @@ module.exports = function(grunt) {
      */
     var preprocessTheme = function(path) {
         var dontProcess = [
-            'base', 'bootstrapbase', 'standardtotararesponsive',
-            'customtotararesponsive', 'kiwifruitresponsive'
+            'base', 'bootstrapbase', 'standardtotararesponsive', 'customtotararesponsive'
         ];
 
         for (var i = 0; i < dontProcess.length; i++) {

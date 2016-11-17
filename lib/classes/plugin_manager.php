@@ -1160,7 +1160,7 @@ class core_plugin_manager {
                 'formfactor', 'fusion', 'leatherbound', 'magazine', 'nimble', 'nonzero', 'overlay', 'serenity', 'sky_high',
                 'splash', 'standard', 'standardold'
                 // Totara uninstalled themes.
-                , 'canvas', 'clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara',
+                , 'canvas', 'clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara', 'kiwifruitresponsive'
             ),
             // Other Totara leftovers and mistakes.
             'connect' => array('totara'),
@@ -1419,7 +1419,7 @@ class core_plugin_manager {
             'theme' => array(
                 'base', 'bootstrapbase'
                 // Totara:
-                , 'kiwifruitresponsive', 'standardtotararesponsive', 'customtotararesponsive', 'roots', 'basis',
+                , 'standardtotararesponsive', 'customtotararesponsive', 'roots', 'basis',
             ),
 
             'tool' => array(

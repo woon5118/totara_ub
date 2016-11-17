@@ -36,7 +36,6 @@ function xmldb_totara_core_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
-
     if ($oldversion < 2016111100) {
         // Delete all removed update and install settings.
         unset_config('disableupdatenotifications');
@@ -51,6 +50,15 @@ function xmldb_totara_core_upgrade($oldversion) {
         uninstall_plugin('tool', 'installaddon');
 
         upgrade_plugin_savepoint(true, 2016111100, 'totara', 'core');
+    }
+
+    if ($oldversion < 2016112201) {
+        // Kiwifruit responsive was removed in Totara 10.
+        // Clean up configuration if it has not been re-introduced.
+        if (!file_exists("{$CFG->dirroot}/theme/kiwifruitresponsive/config.php")) {
+            unset_all_config_for_plugin('theme_kiwifruitresponsive');
+        }
+        totara_upgrade_mod_savepoint(true, 2016112201, 'totara_core');
     }
 
     return true;
