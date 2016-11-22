@@ -1,2 +1,7 @@
 This files describes API changes in /mod/feedback/*,
 information provided here is intended especially for developers.
+
+=== 10.0 ===
+
+* Abstract function feedback_item_base::get_analysed added argument $donl2br. Argument also added to all implementations of this function
+
