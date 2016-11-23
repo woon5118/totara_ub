@@ -912,15 +912,20 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
      * Test that assigned users can access and gain enrolment in courses.
      */
     public function test_assigned_learners_are_enrollable_in_courses() {
+        global $DB;
 
         $this->resetAfterTest();
 
         $courses = [];
         $users = [];
+        $reassignuserids = [];
         for ($i = 0; $i < 5; $i++) {
             $courses[] = $this->data_generator->create_course(['fullname' => 'Test course '.$i, 'shortname' => 'Test '.$i, 'idnumber' => 'TC'.$i]);
             $user = $this->data_generator->create_user(['email' => 'user'.$i.'@example.com', 'username' => 'user'.$i, 'idnumber' => 'u'.$i]);
             $users[$user->id] = $user;
+            if ($i < 3) {
+                $reassignuserids[] = $user->id;
+            }
         }
         $this->assertCount(5, $courses);
         $this->assertCount(5, $users);
@@ -959,6 +964,54 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
             $enrolledcourse = reset($enrolledcourses);
             $this->assertSame($course->fullname, $enrolledcourse->fullname);
         }
+
+        // Make sure that assign_learners_bulk calls process_program_reassignments for all users.
+
+        /* @var enrol_totara_program_plugin $programenrolmentplugin */
+        $programenrolmentplugin = enrol_get_plugin('totara_program');
+        $course1instance = $programenrolmentplugin->get_instance_for_course($course->id);
+        $courseenrolid = $course1instance->id;
+
+        // Check the data before we being.
+        $this->assertCount(5, $program->get_program_learners());
+        $this->assertEquals(5, $DB->count_records('user_enrolments', array('enrolid' => $courseenrolid)));
+        $this->assertEquals(5, $DB->count_records('user_enrolments', array('enrolid' => $courseenrolid, 'status' => ENROL_USER_ACTIVE)));
+
+        // Unassign users from the program and check that the enrolments are suspended.
+        $this->program_generator->assign_program($program->id, array());
+        $this->assertCount(0, $program->get_program_learners());
+        $this->assertEquals(5, $DB->count_records('user_enrolments', array('enrolid' => $courseenrolid)));
+        $this->assertEquals(5, $DB->count_records('user_enrolments', array('enrolid' => $courseenrolid, 'status' => ENROL_USER_SUSPENDED)));
+
+        // Reassign SOME users from the program and check that the enrolments are no longer suspended and events were triggered.
+        array_pop($users);
+        array_pop($users);
+        $eventsink = $this->redirectEvents();
+        $this->program_generator->assign_program($program->id, $reassignuserids);
+        $events = $eventsink->get_events();
+        $this->assertCount(3, $program->get_program_learners());
+        $this->assertEquals(5, $DB->count_records('user_enrolments', array('enrolid' => $courseenrolid)));
+        $this->assertEquals(3, $DB->count_records('user_enrolments', array('enrolid' => $courseenrolid, 'status' => ENROL_USER_ACTIVE)));
+        $this->assertEquals(2, $DB->count_records('user_enrolments', array('enrolid' => $courseenrolid, 'status' => ENROL_USER_SUSPENDED)));
+
+        // Check that the correct events were triggered.
+        $reassigneventcount = 0;
+        $actualreassignuserids = array();
+        foreach ($events as $event) {
+            $eventdata = $event->get_data();
+            if ($eventdata['eventname'] == '\core\event\user_enrolment_updated') {
+                $this->assertEquals('updated', $eventdata['action']);
+                $this->assertEquals($course->id, $eventdata['courseid']);
+                $this->assertEquals('totara_program', $eventdata['other']['enrol']);
+                $actualreassignuserids[$eventdata['relateduserid']] = $eventdata['relateduserid'];
+                $reassigneventcount++;
+
+            }
+        }
+        $this->assertEquals(3, $reassigneventcount);
+        sort($actualreassignuserids);
+        sort($reassignuserids);
+        $this->assertEquals($reassignuserids, $actualreassignuserids);
     }
 
     /**
