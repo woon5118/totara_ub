@@ -104,7 +104,7 @@ Feature: Verify badge issue based on program completion criterion.
     Given I log in as "learner1"
     When I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I press "Mark as complete"
+    And I click on "Not completed: Click to complete course. Select to mark as complete." "link"
     And I follow "Profile" in the user menu
     Then I should see "Program Badge"
     And I log out
@@ -138,7 +138,7 @@ Feature: Verify badge issue based on program completion criterion.
     When I log in as "learner1"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
-    And I press "Mark as complete"
+    And I click on "Not completed: Click to complete course. Select to mark as complete." "link"
     And I follow "Profile" in the user menu
     # The bagde has been issued
     Then I should see "Program Badge"
