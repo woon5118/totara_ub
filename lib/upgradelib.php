@@ -2311,14 +2311,15 @@ function check_upgrade_key($upgradekeyhash) {
  */
 function check_libcurl_version(environment_results $result) {
 
+    if (!function_exists('curl_version')) {
+        $result->setInfo('cURL PHP extension is not installed');
+        $result->setStatus(false);
+        return $result;
+    }
+
     // Supported version and version number.
     $supportedversion = 0x071304;
     $supportedversionstring = "7.19.4";
-
-    // Totara: make sure we do not get fatal errors when curl is not installed.
-    if (!function_exists('curl_version')) {
-        return null;
-    }
 
     // Installed version.
     $curlinfo = curl_version();
