@@ -39,6 +39,7 @@ $string['numspaces'] = 'Places available';
 $string['overallstatus'] = 'Overall status';
 $string['overbookingallowed'] = 'Overbooking allowed';
 $string['partiallyattended'] = 'Number partially attended';
+$string['sessionroles'] = 'Event roles';
 $string['signupenddate'] = 'Sign-up End Date';
 $string['signupstartdate'] = 'Sign-up Start Date';
 $string['totalnumattendees'] = 'Number of Attendees (inc Waiting Approval, Approved and Wait-listed)';

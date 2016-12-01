@@ -48,6 +48,7 @@ $string['pluginname'] = 'Seminar Sessions Report';
 $string['sessdatetime'] = 'Session Start Date/Time';
 $string['sessdatetimelink'] = 'Session Start Date/Time (linked to attendees page)';
 $string['sessionid'] = 'Session ID';
+$string['sessionroles'] = 'Event roles';
 $string['signupperiod'] = 'Sign-up Period';
 $string['signupenddate'] = 'Sign-up End Date';
 $string['signupstartdate'] = 'Sign-up Start Date';

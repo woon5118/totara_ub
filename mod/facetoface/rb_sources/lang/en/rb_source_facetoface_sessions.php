@@ -70,6 +70,7 @@ $string['usernote'] = 'User\'s note';
 // content
 $string['currentorg'] = 'The user\'s current organisation';
 $string['currentpos'] = 'The user\'s current position';
+$string['sessionroles'] = 'Event roles';
 $string['user'] = 'The user';
 $string['reserved'] = 'Reserved';
 $string['thedate'] = 'The session';

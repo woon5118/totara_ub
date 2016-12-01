@@ -1,2 +1,8 @@
 This file describes API changes in reportbuilder,
 information provided here is intended especially for developers.
+
+=== 10.0 ===
+
+Added rb_session_roles_content class in totara/reportbuilder/classes/rb_base_content.php
+to allow Seminar report content to be restricted by an event role in
+facetoface_events, facetoface_sessions and facetoface_summary reports

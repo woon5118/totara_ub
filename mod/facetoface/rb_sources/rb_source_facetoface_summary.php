@@ -414,6 +414,11 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             get_string('thedate', 'rb_source_facetoface_sessions'),
             'base.timestart'
         );
+        $contentoptions[] = new rb_content_option(
+            'session_roles',
+            get_string('sessionroles', 'rb_source_facetoface_summary'),
+            'base.sessionid'
+        );
 
         return $contentoptions;
     }

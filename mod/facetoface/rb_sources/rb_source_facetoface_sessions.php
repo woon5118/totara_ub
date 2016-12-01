@@ -728,6 +728,11 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             'sessiondate.timestart',
             'sessiondate'
         );
+        $contentoptions[] = new rb_content_option(
+            'session_roles',
+            get_string('sessionroles', 'rb_source_facetoface_sessions'),
+            'base.sessionid'
+        );
 
         return $contentoptions;
     }

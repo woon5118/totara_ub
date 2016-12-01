@@ -1431,3 +1431,5 @@ class rb_prog_availability_content extends rb_base_content {
 
 // Include trainer content restriction
 include_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_trainer_content.php');
+// Include session roles content restriction.
+include_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_session_roles_content.php');

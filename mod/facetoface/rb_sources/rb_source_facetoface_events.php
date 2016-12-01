@@ -347,6 +347,12 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
         // Add the manager/position/organisation content options.
         $this->add_basic_user_content_options($contentoptions);
 
+        $contentoptions[] = new rb_content_option(
+            'session_roles',
+            get_string('sessionroles', 'rb_source_facetoface_events'),
+            'base.id'
+        );
+
         return $contentoptions;
     }
 
