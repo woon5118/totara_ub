@@ -1782,8 +1782,8 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertSame($positions[1]['visible'], $resultpositions[1]->visible);
         $this->assertSame($positions[1]['timevalidfrom'], $resultpositions[1]->timevalidfrom);
         $this->assertSame($positions[1]['timevalidto'], $resultpositions[1]->timevalidto);
-        $this->assertTimeCurrent($resultpositions[0]->timecreated);
-        $this->assertTimeCurrent($resultpositions[0]->timemodified);
+        $this->assertTimeCurrent($resultpositions[1]->timecreated);
+        $this->assertTimeCurrent($resultpositions[1]->timemodified);
         $this->assertSame($user->id, $resultpositions[1]->usermodified);
         $this->assertSame($positions[1]['fullname'], $resultpositions[1]->fullname);
         $this->assertSame('0', $resultpositions[1]->parentid);
@@ -1800,8 +1800,8 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertSame($positions[2]['visible'], $resultpositions[2]->visible);
         $this->assertSame($positions[2]['timevalidfrom'], $resultpositions[2]->timevalidfrom);
         $this->assertSame($positions[2]['timevalidto'], $resultpositions[2]->timevalidto);
-        $this->assertTimeCurrent($resultpositions[0]->timecreated);
-        $this->assertTimeCurrent($resultpositions[0]->timemodified);
+        $this->assertTimeCurrent($resultpositions[2]->timecreated);
+        $this->assertTimeCurrent($resultpositions[2]->timemodified);
         $this->assertSame($user->id, $resultpositions[2]->usermodified);
         $this->assertSame($positions[2]['fullname'], $resultpositions[2]->fullname);
         $this->assertSame('0', $resultpositions[2]->parentid);
@@ -1818,8 +1818,8 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertSame($positions[3]['visible'], $resultpositions[3]->visible);
         $this->assertSame($positions[3]['timevalidfrom'], $resultpositions[3]->timevalidfrom);
         $this->assertSame($positions[3]['timevalidto'], $resultpositions[3]->timevalidto);
-        $this->assertTimeCurrent($resultpositions[0]->timecreated);
-        $this->assertTimeCurrent($resultpositions[0]->timemodified);
+        $this->assertTimeCurrent($resultpositions[3]->timecreated);
+        $this->assertTimeCurrent($resultpositions[3]->timemodified);
         $this->assertSame($user->id, $resultpositions[3]->usermodified);
         $this->assertSame($positions[3]['fullname'], $resultpositions[3]->fullname);
         $this->assertSame('0', $resultpositions[3]->parentid);
@@ -1836,8 +1836,8 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertSame($positions[4]['visible'], $resultpositions[4]->visible);
         $this->assertSame($positions[4]['timevalidfrom'], $resultpositions[4]->timevalidfrom);
         $this->assertSame($positions[4]['timevalidto'], $resultpositions[4]->timevalidto);
-        $this->assertTimeCurrent($resultpositions[0]->timecreated);
-        $this->assertTimeCurrent($resultpositions[0]->timemodified);
+        $this->assertTimeCurrent($resultpositions[4]->timecreated);
+        $this->assertTimeCurrent($resultpositions[4]->timemodified);
         $this->assertSame($user->id, $resultpositions[4]->usermodified);
         $this->assertSame($positions[4]['fullname'], $resultpositions[4]->fullname);
         $this->assertSame($resultpositions[3]->id, $resultpositions[4]->parentid);
@@ -2451,8 +2451,8 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertSame($resultframeworks[1]->id, $resultorganisations[1]->frameworkid);
         $this->assertSame('/' . $resultorganisations[1]->id, $resultorganisations[1]->path);
         $this->assertSame($organisations[1]['visible'], $resultorganisations[1]->visible);
-        $this->assertTimeCurrent($resultorganisations[0]->timecreated);
-        $this->assertTimeCurrent($resultorganisations[0]->timemodified);
+        $this->assertTimeCurrent($resultorganisations[1]->timecreated);
+        $this->assertTimeCurrent($resultorganisations[1]->timemodified);
         $this->assertSame($user->id, $resultorganisations[1]->usermodified);
         $this->assertSame($organisations[1]['fullname'], $resultorganisations[1]->fullname);
         $this->assertSame('0', $resultorganisations[1]->parentid);
@@ -2467,8 +2467,8 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertSame($resultframeworks[2]->id, $resultorganisations[2]->frameworkid);
         $this->assertSame('/' . $resultorganisations[2]->id, $resultorganisations[2]->path);
         $this->assertSame($organisations[2]['visible'], $resultorganisations[2]->visible);
-        $this->assertTimeCurrent($resultorganisations[0]->timecreated);
-        $this->assertTimeCurrent($resultorganisations[0]->timemodified);
+        $this->assertTimeCurrent($resultorganisations[2]->timecreated);
+        $this->assertTimeCurrent($resultorganisations[2]->timemodified);
         $this->assertSame($user->id, $resultorganisations[2]->usermodified);
         $this->assertSame($organisations[2]['fullname'], $resultorganisations[2]->fullname);
         $this->assertSame('0', $resultorganisations[2]->parentid);
@@ -2483,8 +2483,8 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertSame($resultframeworks[2]->id, $resultorganisations[3]->frameworkid);
         $this->assertSame('/' . $resultorganisations[3]->id, $resultorganisations[3]->path);
         $this->assertSame($organisations[3]['visible'], $resultorganisations[3]->visible);
-        $this->assertTimeCurrent($resultorganisations[0]->timecreated);
-        $this->assertTimeCurrent($resultorganisations[0]->timemodified);
+        $this->assertTimeCurrent($resultorganisations[3]->timecreated);
+        $this->assertTimeCurrent($resultorganisations[3]->timemodified);
         $this->assertSame($user->id, $resultorganisations[3]->usermodified);
         $this->assertSame($organisations[3]['fullname'], $resultorganisations[3]->fullname);
         $this->assertSame('0', $resultorganisations[3]->parentid);
@@ -2499,8 +2499,8 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertSame($resultframeworks[2]->id, $resultorganisations[4]->frameworkid);
         $this->assertSame('/' . $resultorganisations[3]->id . '/' . $resultorganisations[4]->id, $resultorganisations[4]->path);
         $this->assertSame($organisations[4]['visible'], $resultorganisations[4]->visible);
-        $this->assertTimeCurrent($resultorganisations[0]->timecreated);
-        $this->assertTimeCurrent($resultorganisations[0]->timemodified);
+        $this->assertTimeCurrent($resultorganisations[4]->timecreated);
+        $this->assertTimeCurrent($resultorganisations[4]->timemodified);
         $this->assertSame($user->id, $resultorganisations[4]->usermodified);
         $this->assertSame($organisations[4]['fullname'], $resultorganisations[4]->fullname);
         $this->assertSame($resultorganisations[3]->id, $resultorganisations[4]->parentid);
