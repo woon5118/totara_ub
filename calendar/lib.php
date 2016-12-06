@@ -1307,7 +1307,14 @@ function calendar_get_block_upcoming($events, $linkhref = NULL, $showcourselink 
         if ($showcourselink && !empty($events[$i]->courselink)) {
             $content .= html_writer::div($events[$i]->courselink, 'course');
         }
-        $content .= '<div class="date">'.$events[$i]->time.'</div></div>';
+
+        $content .= '<div class="date">'.$events[$i]->time.'</div>';
+
+        $hook = new \totara_core\hook\calendar_upcoming_event($events[$i], $content);
+        $hook->execute();
+
+        $content .= '</div>';
+
         if ($i < $lines - 1) $content .= '<hr />';
     }
 
