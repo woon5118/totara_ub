@@ -48,4 +48,9 @@ $TOTARA = new stdClass();
 
 $TOTARA->version    = '10dev';         // Please keep as string.
 $TOTARA->build      = '20161122.00';  // Please keep as string.
-$TOTARA->release    = "{$TOTARA->version} (Build: {$TOTARA->build})";
+
+if ($maturity == MATURITY_EVERGREEN) {
+    $TOTARA->release = "Evergreen (Build: {$TOTARA->build})";
+} else {
+    $TOTARA->release = "{$TOTARA->version} (Build: {$TOTARA->build})";
+}

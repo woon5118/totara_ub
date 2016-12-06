@@ -32,5 +32,3 @@ $plugin->requires  = 2015111000;
 $plugin->dependencies = array(
     'qbehaviour_adaptive' => 2015111000
 );
-
-$plugin->maturity  = MATURITY_STABLE;

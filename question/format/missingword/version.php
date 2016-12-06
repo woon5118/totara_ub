@@ -28,5 +28,3 @@ $plugin->component = 'qformat_missingword';
 $plugin->version   = 2015111600;
 
 $plugin->requires  = 2015111000;
-
-$plugin->maturity  = MATURITY_STABLE;

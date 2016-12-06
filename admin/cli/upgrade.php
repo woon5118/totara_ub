@@ -132,7 +132,7 @@ if ($interactive) {
 
 // make sure we are upgrading to a stable release or display a warning
 if (isset($maturity)) {
-    if (($maturity < MATURITY_STABLE) and !$options['allow-unstable']) {
+    if (($maturity < MATURITY_EVERGREEN) and !$options['allow-unstable']) {
         $maturitylevel = get_string('maturity'.$maturity, 'admin');
 
         if ($interactive) {

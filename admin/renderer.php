@@ -597,7 +597,7 @@ class core_admin_renderer extends plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function maturity_warning($maturity) {
-        if ($maturity == MATURITY_STABLE) {
+        if ($maturity >= MATURITY_EVERGREEN) {
             return ''; // No worries.
         }
 
@@ -649,13 +649,13 @@ class core_admin_renderer extends plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function maturity_info($maturity) {
-        if ($maturity == MATURITY_STABLE) {
+        if ($maturity >= MATURITY_EVERGREEN) {
             return ''; // No worries.
         }
 
         $level = 'warning';
 
-        if ($maturity == MATURITY_ALPHA) {
+        if ($maturity <= MATURITY_ALPHA) {
             $level = 'error';
         }
 

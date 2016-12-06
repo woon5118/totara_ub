@@ -34,5 +34,3 @@ $plugin->dependencies = array(
     'qtype_calculated'  => 2015111000,
     'qtype_multichoice' => 2015111000,
 );
-
-$plugin->maturity  = MATURITY_STABLE;

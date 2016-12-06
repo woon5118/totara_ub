@@ -468,7 +468,7 @@ get_string_manager(true);
 
 // make sure we are installing stable release or require a confirmation
 if (isset($maturity)) {
-    if (($maturity < MATURITY_STABLE) and !$options['allow-unstable']) {
+    if (($maturity < MATURITY_EVERGREEN) and !$options['allow-unstable']) {
         $maturitylevel = get_string('maturity'.$maturity, 'admin');
 
         if ($interactive) {

@@ -27,4 +27,3 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component  = 'gradingform_guide';
 $plugin->version    = 2015111601;
 $plugin->requires   = 2015111000;
-$plugin->maturity   = MATURITY_STABLE;

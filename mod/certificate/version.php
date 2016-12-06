@@ -30,5 +30,4 @@ $plugin->requires  = 2015111606; // Requires this Moodle version
 $plugin->cron      = 0; // Period for cron to check this module (secs)
 $plugin->component = 'mod_certificate';
 
-$plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = "Stable"; // User-friendly version number

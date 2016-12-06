@@ -32,5 +32,3 @@ $plugin->requires  = 2015111000;
 $plugin->dependencies = array(
     'qtype_numerical' => 2015111000,
 );
-
-$plugin->maturity  = MATURITY_STABLE;

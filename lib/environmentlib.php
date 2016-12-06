@@ -96,7 +96,7 @@ function check_totara_environment($version = null) {
     if (!$version) {
         $TOTARA = new stdClass();
         require($CFG->dirroot . '/version.php');
-        $version = (int)$TOTARA->release;
+        $version = (int)$TOTARA->version;
     }
 
 /// Get the more recent version before the requested
