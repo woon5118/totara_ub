@@ -500,23 +500,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         button.replaceClass('editing_' + oldAction, 'editing_' + newtitle);
 
         if (buttonimg === null) {
-            var that = this;
-            require(['core/templates'], function (templates) {
-                var flexicon = "";
-                switch (groupmode) {
-                    case that.GROUPS_NONE:
-                        flexicon = 'groups-no';
-                        break;
-                    case that.GROUPS_SEPARATE:
-                        flexicon = 'groups-separate';
-                        break;
-                    case that.GROUPS_VISIBLE:
-                        flexicon = 'groups-visible';
-                        break;
-                }
-                templates.renderIcon(flexicon, newtitlestr, 'ft-size-200')
-                    .done(function (html) {button.setContent(html);});
-            });
+            M.course.resource_toolbox._set_group_title(button.ancestor('.activity'));
         } else {
             if (groupmode === this.GROUPS_NONE) {
                 buttonimg.setAttrs({'src': M.util.image_url('i/groupn', 'moodle')});
@@ -656,7 +640,18 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             };
             this.send_request(data, spinner, function(response) {
                 if (response.instancename) {
-                    activity.one(SELECTOR.INSTANCENAME).setContent(response.instancename);
+                    var title = activity.one(SELECTOR.INSTANCENAME);
+                    title.setContent(response.instancename);
+                    require(['core/str', 'core/templates'], function (stringlib, templatelib) {
+                        // update the edit button string
+                        stringlib.get_string('editactivitytitle', 'core', response.instancename).then(function (string) {
+                            return templatelib.renderIcon('core|t/editstring', string);
+                        }).then (function (icon) {
+                            title.ancestor().siblings('span').pop().one('a').setContent(icon)
+                        });
+
+                        M.course.resource_toolbox._set_group_title(title.ancestor('.activity'));
+                    });
                 }
             });
         }
@@ -754,6 +749,51 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
 
             this.handle_resource_dim(buttonnode, element, action);
         }
+    },
+
+    _set_group_title: function(activitynode) {
+        var title = activitynode.one('.instancename').get('innerHTML');
+        var groupnode = activitynode.one('a[data-action="groupsvisible"], a[data-action="groupsnone"], a[data-action="groupsseparate"]');
+
+        require(['core/templates', 'core/str'], function (templates, stringslib) {
+            var flexicon = "";
+            var stringcurrent = '';
+            var stringnext = '';
+            switch (groupnode.getData('action')) {
+                case 'groupsnone':
+                    flexicon = 'groups-no';
+                    stringcurrent = 'groupsnone';
+                    stringnext = 'groupsseparate';
+                    break;
+                case 'groupsseparate':
+                    flexicon = 'groups-separate';
+                    stringcurrent = 'groupsseparate';
+                    stringnext = 'groupsvisible';
+                    break;
+                case 'groupsvisible':
+                    flexicon = 'groups-visible';
+                    stringcurrent = 'groupsvisible';
+                    stringnext = 'groupsnone';
+                    break;
+            }
+
+            var reqstrings = [
+                {key: stringcurrent, component: 'core'},
+                {key: stringnext, component: 'core'}
+            ]
+            stringslib.get_strings(reqstrings).then(function (strings) {
+                var stringparam = {
+                    activityname: title,
+                    now: strings[0],
+                    next:strings[1]
+                }
+                return stringslib.get_string('changegroupingmode', 'moodle', stringparam);
+            }).then(function (string) {
+                return templates.renderIcon(flexicon, string);
+            }).then(function (html) {
+                groupnode.setContent(html);
+            });
+        });
     }
 }, {
     NAME: 'course-resource-toolbox',

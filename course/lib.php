@@ -2170,21 +2170,24 @@ function course_get_cm_edit_actions(cm_info $mod, $indent = -1, $sr = null) {
                 $grouptitle = $str->groupsseparate;
                 $actionname = 'groupsseparate';
                 $groupimage = 'i/groups';
+                $groupalt = get_string('changegroupingmode', 'moodle', array('activityname' => format_string($mod->name), 'now' => get_string("groupsseparate"), 'next' => get_string("groupsvisible")));
             } else if ($mod->effectivegroupmode == VISIBLEGROUPS) {
                 $nextgroupmode = NOGROUPS;
                 $grouptitle = $str->groupsvisible;
                 $actionname = 'groupsvisible';
                 $groupimage = 'i/groupv';
+                $groupalt = get_string('changegroupingmode', 'moodle', array('activityname' => format_string($mod->name), 'now' => get_string("groupsvisible"), 'next' => get_string("groupsnone")));
             } else {
                 $nextgroupmode = SEPARATEGROUPS;
                 $grouptitle = $str->groupsnone;
                 $actionname = 'groupsnone';
                 $groupimage = 'i/groupn';
+                $groupalt = get_string('changegroupingmode', 'moodle', array('activityname' => format_string($mod->name), 'now' => get_string("groupsnone"), 'next' => get_string("groupsseparate")));
             }
 
             $actions[$actionname] = new action_menu_link_primary(
                 new moodle_url($baseurl, array('id' => $mod->id, 'groupmode' => $nextgroupmode)),
-                new pix_icon($groupimage, null, 'moodle', array('class' => 'iconsmall')),
+                new pix_icon($groupimage, $groupalt, 'moodle', array('class' => 'iconsmall')),
                 $grouptitle,
                 array('class' => 'editing_'. $actionname, 'data-action' => $actionname, 'data-nextgroupmode' => $nextgroupmode, 'aria-live' => 'assertive')
             );
@@ -2251,7 +2254,7 @@ function course_get_cm_rename_action(cm_info $mod, $sr = null) {
         return html_writer::span(
             html_writer::link(
                 new moodle_url($baseurl, array('update' => $mod->id)),
-                $OUTPUT->pix_icon('t/editstring', '', 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
+                $OUTPUT->pix_icon('t/editstring', get_string('editactivitytitle', 'core', format_string($mod->name)), 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
                 array(
                     'class' => 'editing_title',
                     'data-action' => 'edittitle',
