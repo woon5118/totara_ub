@@ -81,7 +81,12 @@ if ($id == -1) {
     admin_externalpage_setup('addnewuser', '', array('id' => -1));
 } else {
     // Editing existing user.
-    require_capability('moodle/user:update', $systemcontext);
+    if (!has_capability('moodle/user:update', $systemcontext)) {
+        totara_set_notification(get_string('error:userprofilecapability', 'totara_core'));
+        $redirecturl = new moodle_url('/user/profile.php', ['id' => $id]);
+        redirect($redirecturl);
+    }
+
     $user = $DB->get_record('user', array('id' => $id), '*', MUST_EXIST);
     $PAGE->set_context(context_user::instance($user->id));
     $PAGE->navbar->includesettingsbase = true;

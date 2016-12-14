@@ -72,6 +72,9 @@ class profile_field_base {
     /** @var string */
     public $dataformat;
 
+    /**  @var bool Do not enforce field as required */
+    protected $skiprequired = false;
+
     /**
      * Constructor method.
      * @param int $fieldid id of the profile from the user_info_field table
@@ -238,6 +241,9 @@ class profile_field_base {
      */
     public function edit_field_set_required($mform) {
         global $USER;
+        if ($this->skiprequired) {
+            return;
+        }
         if ($this->is_required() && ($this->userid == $USER->id || isguestuser())) {
             $mform->addRule($this->inputname, get_string('required'), 'required', null, 'client');
         }
@@ -417,6 +423,14 @@ class profile_field_base {
     public function is_signup_field() {
         return (boolean)$this->field->signup;
     }
+
+    /**
+     * Do not enforce field as required even if it is defined as required
+     * @param bool $skip
+     */
+    public function skip_required($skip = false) {
+        $this->skiprequired = $skip;
+    }
 }
 
 /**
@@ -471,6 +485,11 @@ function profile_definition($mform, $userid = 0) {
                         require_once($CFG->dirroot.'/user/profile/field/'.$field->datatype.'/field.class.php');
                         $newfield = 'profile_field_'.$field->datatype;
                         $formfield = new $newfield($field->id, $userid);
+                        // Do not force entry of required fields when admin login in as a user
+                        // and if the user is login in, the fields are required.
+                        if (\core\session\manager::is_loggedinas()) {
+                            $formfield->skip_required(true);
+                        }
                         $formfield->edit_field($mform);
                     }
                 }
@@ -921,8 +940,6 @@ function profile_view($user, $context, $course = null) {
  * So this is actually checking if we should redirect the user to edit their
  * profile, rather than whether there is a value in the database.
  *
- * Totara: we do not use this function!
- *
  * @param int $userid
  * @return bool
  */
@@ -932,7 +949,7 @@ function profile_has_required_custom_fields_set($userid) {
     $sql = "SELECT f.id
               FROM {user_info_field} f
          LEFT JOIN {user_info_data} d ON (d.fieldid = f.id AND d.userid = ?)
-             WHERE f.required = 1 AND f.visible > 0 AND f.locked = 0 AND d.id IS NULL";
+             WHERE f.required = 1 AND f.visible > 0 AND f.locked = 0 AND (d.id IS NULL OR d.data = '')";
 
     if ($DB->record_exists_sql($sql, [$userid])) {
         return false;

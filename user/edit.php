@@ -214,7 +214,7 @@ if ($usernew = $userform->get_data()) {
             $a->oldemail = $usernew->email = $user->email;
 
             $emailchangedhtml = $OUTPUT->box(get_string('auth_changingemailaddress', 'auth', $a), 'generalbox', 'notice');
-            $emailchangedhtml .= $OUTPUT->continue_button($returnurl);
+            $emailchangedhtml .= $OUTPUT->continue_button(useredit_get_return_url($user, $returnto, $course, $customreturn));
         }
     }
 

@@ -237,6 +237,7 @@ $string['error:staffmanagerroleexists'] = 'A role "staffmanager" already exists.
 $string['error:unknownbuttonclicked'] = 'Unknown button clicked';
 $string['error:useridincorrect'] = 'User id is incorrect.';
 $string['error:usernotfound'] = 'User not found';
+$string['error:userprofilecapability'] = 'You do not have permission to edit the user profile. Please contact the site administrator.';
 $string['errorfindingcategory'] = 'Error finding the category';
 $string['errorfindingprogram'] = 'Error finding the program';
 $string['eventbulkenrolmentsfinished'] = 'Bulk enrolments finished';
