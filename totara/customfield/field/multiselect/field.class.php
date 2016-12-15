@@ -95,29 +95,23 @@ class customfield_multiselect extends customfield_base {
      */
     public function edit_field_add(&$mform) {
         $ind = 0;
-        $grpcnt = 0;
         $title = format_string($this->field->fullname);
+        $chkgrp = array();
         while ($ind < count($this->options)) {
-            $chkgrp = array();
-            $grp = 0;
-            while ($grp < $this->groupsize) {
-                if (isset($this->options[$ind])) {
-                    $iconhtml = totara_icon_picker_preview('course', $this->options[$ind]['icon']);
-                    $chkgrp[] = $mform->createElement('advcheckbox', $this->inputname . '[' . $ind . ']', '',
-                            $iconhtml . format_string($this->options[$ind]['option']));
-                }
-                $grp++;
-                $ind++;
+            if (isset($this->options[$ind])) {
+                $iconhtml = totara_icon_picker_preview('course', $this->options[$ind]['icon']);
+                $chkgrp[] = $mform->createElement('advcheckbox', $this->inputname . '[' . $ind . ']', '',
+                        $iconhtml . format_string($this->options[$ind]['option']));
             }
-            if (count($chkgrp)) {
-                $grpname = 'grp_' . $this->fieldid . '_' . $grpcnt;
-                $groupelement = $mform->addGroup($chkgrp, $grpname, $title, null, false);
-                $groupelement->updateAttributes(array('class' => 'multiselect'));
-                // Show title only first time.
-                $title = '';
-            }
-            $grpcnt++;
+            $ind++;
         }
+
+        $separators = array_fill(0, $this->groupsize - 1, '');
+        $separators[] = '<br/>';
+
+        $grpname = 'grp_' . $this->fieldid;
+        $groupelement = $mform->addGroup($chkgrp, $grpname, $title, $separators, false);
+        $groupelement->updateAttributes(array('class' => 'multiselect'));
     }
 
     /**
