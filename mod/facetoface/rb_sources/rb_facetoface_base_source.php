@@ -97,12 +97,6 @@ abstract class rb_facetoface_base_source extends rb_base_source {
      * @param string $sessiondatejoin Join that provides {facetoface_sessions_dates}
      */
     public function add_session_common_to_columns(&$columnoptions, $sessiondatejoin = 'base') {
-        global $CFG;
-
-        $intimezone = '';
-        if (!empty($CFG->facetoface_displaysessiontimezones)) {
-            $intimezone = '_in_timezone';
-        }
 
         $columnoptions[] = new rb_column_option(
             'facetoface',
@@ -133,7 +127,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             array(
                 'joins' => array($sessiondatejoin),
                 'extrafields' => array('timezone' => "{$sessiondatejoin}.sessiontimezone"),
-                'displayfunc' => 'nice_datetime' . $intimezone,
+                'displayfunc' => 'event_date',
                 'dbdatatype' => 'timestamp'
             )
         );
@@ -146,7 +140,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             array(
                 'joins' => array($sessiondatejoin),
                 'extrafields' => array('timezone' => "{$sessiondatejoin}.sessiontimezone"),
-                'displayfunc' => 'nice_datetime' . $intimezone,
+                'displayfunc' => 'event_date',
                 'dbdatatype' => 'timestamp'
             )
         );
@@ -432,9 +426,22 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         $joinlist[] = new rb_join(
             'eventdateinfo',
             'LEFT',
-            '( SELECT sessionid, MIN(timestart) AS eventstart, MAX(timefinish) AS eventfinish
-               FROM {facetoface_sessions_dates}
-               GROUP BY sessionid)',
+            '(  SELECT  sd.sessionid,
+                        sd.eventstart,
+                        sd.eventfinish,
+                        tzstart.sessiontimezone AS tzstart,
+                        tzfinish.sessiontimezone AS tzfinish
+                FROM (
+                        SELECT   sessionid,
+                                 MIN(timestart) AS eventstart,
+                                 MAX(timefinish) AS eventfinish
+                        FROM     {facetoface_sessions_dates}
+                        GROUP BY sessionid
+                     ) sd
+                INNER JOIN {facetoface_sessions_dates} tzstart
+                    ON sd.eventstart = tzstart.timestart AND sd.sessionid = tzstart.sessionid
+                INNER JOIN {facetoface_sessions_dates} tzfinish
+                    ON sd.eventfinish = tzfinish.timefinish AND sd.sessionid = tzfinish.sessionid )',
             'eventdateinfo.sessionid = base.id',
             REPORT_BUILDER_RELATION_ONE_TO_MANY
         );

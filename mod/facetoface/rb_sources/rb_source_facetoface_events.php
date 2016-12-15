@@ -302,6 +302,33 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 )
             )
         );
+
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'eventstartdate',
+            get_string('eventstartdatetime', 'rb_source_facetoface_summary'),
+            "eventdateinfo.eventstart",
+            array(
+                'joins' => array('eventdateinfo'),
+                'displayfunc' => 'event_date',
+                'extrafields' => array('timezone' => 'eventdateinfo.tzstart'),
+                'dbdatatype' => 'timestamp',
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'eventfinishdate',
+            get_string('eventfinishdatetime', 'rb_source_facetoface_summary'),
+            "eventdateinfo.eventfinish",
+            array(
+                'joins' => array('eventdateinfo'),
+                'displayfunc' => 'event_date',
+                'extrafields' => array('timezone' => 'eventdateinfo.tzfinish'),
+                'dbdatatype' => 'timestamp',
+            )
+        );
+
         $this->add_session_status_to_columns($columnoptions, 'sessiondate', 'base');
         $this->add_facetoface_common_to_columns($columnoptions, 'base');
         $this->add_facetoface_session_roles_to_columns($columnoptions);
