@@ -25,5 +25,10 @@ function xmldb_repository_dropbox_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
+    if ($oldversion < 2015111601) {
+        set_config('legacyapi', 1, 'dropbox');
+        upgrade_plugin_savepoint(true, 2015111601, 'repository', 'dropbox');
+    }
+
     return true;
 }
