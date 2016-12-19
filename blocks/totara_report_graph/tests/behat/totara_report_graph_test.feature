@@ -45,7 +45,7 @@ Feature: Test the basic functionality of the Totara report graph block
     And I should see "New Zealand"
     And I should see "United States"
     And I should see "Australia"
-    And I should see "Czech Republic"
+    And I should see "Czechia"
     And I should see "33.33%"
     And I should see "22.22%"
     And I should see "11.11%"
