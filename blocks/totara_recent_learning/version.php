@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2016110100;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2015111606;       // Requires this Moodle version.
+$plugin->version  = 2016122100;       // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2015111607;       // Requires this Moodle version.
 $plugin->cron = 0;                    // Period for cron to check this module (secs)
 $plugin->component = 'block_totara_recent_learning'; // To check on upgrade, that module sits in correct place
