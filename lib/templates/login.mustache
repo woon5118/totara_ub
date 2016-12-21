@@ -162,18 +162,16 @@
 </div>
 
 {{#js}}
-    require(['jquery', 'core/yui'], function($, Y) {
     {{#error}}
-        $(function() {
-            M.util.focus_login_error(Y);
-        });
+        document.getElementById('loginerrormessage').focus();
     {{/error}}
     {{^error}}
         {{#autofocusform}}
-            $(function() {
-                M.util.focus_login_form(Y);
-            });
+            if (document.getElementById('username').value !== "") {
+                document.getElementById('password').focus();
+            } else {
+                document.getElementById('username').focus();
+            }
         {{/autofocusform}}
     {{/error}}
-    });
 {{/js}}
