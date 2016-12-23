@@ -390,4 +390,3 @@ Feature: Award badges
     When I press "Revoke badge"
     And I follow "Course Badge"
     Then I should see "Recipients (0)"
-

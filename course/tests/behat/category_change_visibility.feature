@@ -257,16 +257,16 @@ Feature: We can change the visibility of categories in the management interface.
     And course in management listing should be dimmed "C2"
     And course in management listing should be visible "C3"
 
-    @javascript @_cross_browser
-    Scenario: Test courses are hidden when selected category parent is hidden.
-      Given the following "categories" exist:
-        | name | category | idnumber |
-        | Cat 1 | 0 | CAT1 |
-        | Cat 2 | CAT1 | CAT2 |
-        | Cat 3 | CAT2 | CAT3 |
-      And the following "courses" exist:
-        | category | fullname | shortname | idnumber |
-        | CAT3 | Course 1 | Course 1 | C1 |
+  @javascript @_cross_browser
+  Scenario: Test courses are hidden when selected category parent is hidden.
+    Given the following "categories" exist:
+      | name | category | idnumber |
+      | Cat 1 | 0 | CAT1 |
+      | Cat 2 | CAT1 | CAT2 |
+      | Cat 3 | CAT2 | CAT3 |
+    And the following "courses" exist:
+      | category | fullname | shortname | idnumber |
+      | CAT3 | Course 1 | Course 1 | C1 |
 
       And I log in as "admin"
       And I go to the courses management page

@@ -83,4 +83,3 @@ Feature: In a report, admin can see loglive data
     # So the refresh ajax script doesn't run during the log out process (causing an error in PHP logs)
     And I press "Pause live updates"
     And I log out
-
