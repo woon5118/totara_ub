@@ -34,5 +34,41 @@ function xmldb_totara_dashboard_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
+    if ($oldversion < 2017010400) {
+
+        $sqlike = $DB->sql_like('pagetypepattern', ':pagetypepattern');
+        $param = array('pagetypepattern' => 'my-totara-dashboard-%');
+
+        $sql = "SELECT DISTINCT pagetypepattern
+                       FROM {block_instances}
+                      WHERE $sqlike";
+
+        $blockinsts = $DB->get_records_sql($sql, $param);
+
+        foreach ($blockinsts as $blockinst) {
+
+            list($my, $totara, $dashboard, $id) = explode('-', $blockinst->pagetypepattern);
+
+            if (!$DB->record_exists('totara_dashboard', array('id' => $id))) {
+                if ($blocks = $DB->get_records('block_instances', array('pagetypepattern' => 'my-totara-dashboard-' . $id))) {
+                    foreach ($blocks as $instance) {
+
+                        if ($block = block_instance($instance->blockname, $instance)) {
+                            $block->instance_delete();
+                        }
+
+                        context_helper::delete_instance(CONTEXT_BLOCK, $instance->id);
+
+                        $DB->delete_records('block_positions', array('blockinstanceid' => $instance->id));
+                        $DB->delete_records('block_instances', array('id' => $instance->id));
+                        $DB->delete_records_list('user_preferences', 'name', array('block'.$instance->id.'hidden','docked_block_instance_'.$instance->id));
+                    }
+                }
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2017010400, 'totara', 'dashboard');
+    }
+
     return true;
 }
