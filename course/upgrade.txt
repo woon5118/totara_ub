@@ -1,10 +1,13 @@
 This files describes API changes in /course/*,
 information provided here is intended especially for developers.
 
+=== 12 ===
+
+ * External function core_course_external::get_courses_by_field now returns the course filters list and status.
+
 === 11 ===
 
-* Publishing course on a hub (Hub functionality) has been deprecated and will be removed entirely in the next major version.
-
+ * Publishing course on a hub (Hub functionality) has been deprecated and will be removed entirely in the next major version.
 
 === 10 ===
 
