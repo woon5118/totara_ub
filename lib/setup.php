@@ -385,8 +385,8 @@ if (!defined('MOODLE_INTERNAL')) { // Necessary because cli installer has to def
 
 // Totara: we support migration from this particular Moodle release only.
 if (!defined('MOODLE_MIGRATION_VERSION')) {
-    define('MOODLE_MIGRATION_VERSION', '2015111606.00'); // Keep as string to simplify comparison with DB data.
-    define('MOODLE_MIGRATION_RELEASE', '3.0.6 (Build: 20160912)');
+    define('MOODLE_MIGRATION_VERSION', '2015111607.00'); // Keep as string to simplify comparison with DB data.
+    define('MOODLE_MIGRATION_RELEASE', '3.0.7 (Build: 20161114)');
 }
 
 // core_component can be used in any scripts, it does not need anything else.
