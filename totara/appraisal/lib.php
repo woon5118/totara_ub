@@ -480,8 +480,22 @@ class appraisal {
         }
 
         // Find old user assignments that need to be reactivated.
-        list($assignjoinsql, $assignparams, $assignalias) = $assign->get_users_from_assignments_sql('u', 'id');
         list($groupjoinsql, $groupparams, $groupalias) = $assign->get_users_from_groups_sql('u', 'id');
+
+        // If old user previously completed the appraisal, timecompleted will be not null.
+        // Restore these to status COMPLETED.
+        $sql = "UPDATE {appraisal_user_assignment}
+                   SET status = ?
+                 WHERE status = ?
+                   AND appraisalid = ?
+                   AND timecompleted IS NOT NULL
+                   AND userid IN (
+                       SELECT u.id
+                         FROM {user} u
+                       " . $groupjoinsql . "
+                   )";
+        $params = array_merge(array(self::STATUS_COMPLETED, self::STATUS_CLOSED, $this->id), $groupparams);
+        $DB->execute($sql, $params);
 
         $sql = "UPDATE {appraisal_user_assignment}
                    SET status = ?
@@ -1725,7 +1739,7 @@ class appraisal {
 
 
     /**
-     * Get array of appraisals with their start dates and number of learners
+     * Get array of appraisals with their start dates, number of assigned and completed learners
      *
      * @return array
      */
@@ -1738,12 +1752,23 @@ class appraisal {
             if ($appraisal->status == self::STATUS_DRAFT) {
                 $assign = new totara_assign_appraisal('appraisal', new appraisal($appraisal->id));
                 $appraisal->lnum = $assign->get_current_users_count();
-            } else if ($appraisal->status == self::STATUS_ACTIVE) {
-                $params = array('appraisalid' => $appraisal->id, 'status' => self::STATUS_ACTIVE);
-                $appraisal->lnum = $DB->count_records('appraisal_user_assignment', $params);
+                // Not yet activated, so no completed appraisals.
+                $appraisal->cnum = 0;
             } else {
-                $params = array('appraisalid' => $appraisal->id);
-                $appraisal->lnum = $DB->count_records('appraisal_user_assignment', $params);
+                // Restricting the counts to consider only non-closed assignments.
+                // This ensures the numbers are consistent with what is shown in the 'Assignments' tab.
+                $params = array('appraisalid' => $appraisal->id, 'status' => self::STATUS_CLOSED);
+                $sql = "SELECT count(completed) AS total, coalesce(sum(completed), 0) AS completed
+                          FROM (SELECT CASE
+                                        WHEN timecompleted IS NOT NULL THEN 1
+                                        ELSE 0
+                                       END AS completed
+                                  FROM {appraisal_user_assignment} ua
+                                 WHERE ua.appraisalid = :appraisalid
+                                   AND ua.status <> :status) AS assignments";
+                $row = $DB->get_record_sql($sql, $params);
+                $appraisal->lnum = $row->total;
+                $appraisal->cnum = $row->completed;
             }
         }
         return $appraisals;
@@ -1930,15 +1955,26 @@ class appraisal {
     public static function get_inactive_with_stats() {
         global $DB;
 
+        // We should not count completed appraisal_user_assignment rows with status CLOSED as completed
+        // These indicate that although the user has completed the appraisal, he was later removed from the
+        // assigned user group(s) and will be shown to have status 'Assignment Cancelled' in the reports.
         $sql = 'SELECT app.id, app.name, app.status, app.timefinished,
-                       COUNT(aua.timecompleted) AS userscomplete, COUNT(aua.id) AS userstotal
+                       COUNT(aua.timecompleted) - COUNT(aca.timecompleted) AS userscomplete,
+                       COUNT(aua.id) - COUNT(aca.timecompleted) AS userstotal
                   FROM {appraisal} app
                   JOIN {appraisal_user_assignment} aua
                     ON app.id = aua.appraisalid
-                 WHERE app.status IN (?, ?)
+                  LEFT JOIN {appraisal_user_assignment} aca
+                    ON aua.id = aca.id
+                   AND aca.status = :statusclosed1
+                   AND aca.timecompleted IS NOT NULL
+                 WHERE app.status IN (:statusclosed2, :statuscompleted)
                  GROUP BY app.id, app.name, app.status, app.timefinished';
+        $params = array('statusclosed1' => self::STATUS_CLOSED,
+                        'statusclosed2' => self::STATUS_CLOSED,
+                        'statuscompleted' => self::STATUS_COMPLETED);
 
-        return $DB->get_records_sql($sql, array(self::STATUS_CLOSED, self::STATUS_COMPLETED));
+        return $DB->get_records_sql($sql, $params);
     }
 
     /**

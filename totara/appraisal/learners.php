@@ -119,7 +119,9 @@ if (!empty($CFG->dynamicappraisals) && $appraisal->status == appraisal::STATUS_A
 }
 
 echo $output->appraisal_management_tabs($appraisal->id, 'learners');
-echo $output->heading(get_string('assigncurrentgroups', 'totara_appraisal'), 3);
+if (!appraisal::is_closed($appraisalid)) {
+    echo $output->heading(get_string('assigncurrentgroups', 'totara_appraisal'), 3);
+}
 
 if ($canassign) {
     if ($appraisal->status == appraisal::STATUS_CLOSED) {
@@ -139,26 +141,29 @@ if ($canassign) {
     }
 }
 
-$currentassignments = $assign->get_current_assigned_groups();
+if (!appraisal::is_closed($appraisalid)) {
+    $currentassignments = $assign->get_current_assigned_groups();
+    echo $output->display_assigned_groups($currentassignments, $appraisalid);
 
-echo $output->display_assigned_groups($currentassignments, $appraisalid);
+    echo $output->heading(get_string('assigncurrentusers', 'totara_appraisal'), 3);
 
-echo $output->heading(get_string('assigncurrentusers', 'totara_appraisal'), 3);
-
-// If the appraisal is active notify the user that changes are not live.
-if ($appraisal->status == appraisal::STATUS_ACTIVE) {
-    $userassignments = $assign->get_current_users();
-    $groupassignments = $assign->get_current_users(null, null, null, true);
-    $differences = $appraisal->compare_assignments($userassignments, $groupassignments);
-    echo html_writer::start_tag('div', array('id' => 'notlivenotice'));
-    if (!empty($CFG->dynamicappraisals) && $differences) {
-        echo $notlivenotice;
+    // If the appraisal is active notify the user that changes are not live.
+    if ($appraisal->status == appraisal::STATUS_ACTIVE) {
+        $userassignments = $assign->get_current_users();
+        $groupassignments = $assign->get_current_users(null, null, null, true);
+        $differences = $appraisal->compare_assignments($userassignments, $groupassignments);
+        echo html_writer::start_tag('div', array('id' => 'notlivenotice'));
+        if (!empty($CFG->dynamicappraisals) && $differences) {
+            echo $notlivenotice;
+        }
+        echo html_writer::end_tag('div');
     }
-    echo html_writer::end_tag('div');
+} else {
+    echo $output->heading(get_string('assigncompletedusers', 'totara_appraisal'), 3);
 }
 
 if ($canviewusers) {
-    echo $output->display_user_datatable();
+    echo $output->display_user_datatable(!appraisal::is_closed($appraisalid));
 }
 
 

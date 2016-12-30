@@ -105,7 +105,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
 
         $tableheader = array(get_string('name', 'totara_appraisal'),
                              get_string('start', 'totara_appraisal'),
-                             get_string('learners', 'totara_appraisal'),
+                             get_string('assigned', 'totara_appraisal'),
                              get_string('status', 'totara_appraisal'),
                              get_string('options', 'totara_appraisal'));
 
@@ -152,7 +152,12 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             } else {
                 $row[] = get_string('none', 'totara_appraisal');
             }
-            $row[] = $appraisal->lnum;
+
+            $a = new stdClass();
+            $a->total = $appraisal->lnum;
+            $a->completed = $appraisal->cnum;
+            $row[] = get_string('assignnumcompleted', 'totara_appraisal', $a);
+
             $row[] = appraisal::display_status($appraisal->status);
 
             $options = '';
@@ -1225,10 +1230,13 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      * @return string HTML
      */
     public function display_assigned_groups($assignments, $itemid) {
+        global $OUTPUT;
+
         $tableheader = array(get_string('assigngrouptypename', 'totara_appraisal'),
                              get_string('assignsourcename', 'totara_appraisal'),
                              get_string('assignincludechildren', 'totara_appraisal'),
-                             get_string('assignnumusers', 'totara_appraisal'),
+                             get_string('assignnumusers', 'totara_appraisal') . ' ' .
+                                        $OUTPUT->help_icon('assignnumusers', 'totara_appraisal'),
                              get_string('actions'));
 
         $appraisal = new appraisal($itemid);
@@ -1274,15 +1282,17 @@ class totara_appraisal_renderer extends plugin_renderer_base {
     /**
      * Returns the base markup for a paginated user table widget
      *
-     * @return string HTML
+     * @param  boolean $show_assignedvia    Show the "Assigned Via" column?
+     * @return string                       HTML
      */
-    public function display_user_datatable() {
+    public function display_user_datatable($show_assignedvia=true) {
         $table = new html_table();
         $table->id = 'datatable';
         $table->attributes['class'] = 'generaltable clearfix';
-        $table->head = array(get_string('learner'),
-                             get_string('assignedvia', 'totara_core'),
-                             );
+        $table->head = array(get_string('learner'));
+        if ($show_assignedvia) {
+            $table->head[] = get_string('assignedvia', 'totara_core');
+        }
         $out = $this->output->container(html_writer::table($table), 'clearfix', 'assignedusers');
         return $out;
     }
