@@ -281,6 +281,8 @@ information provided here is intended especially for developers.
   and converted to Bootstrap equivalents. Other custom classes passed to totara_set_notification are preserved.
 * completion_info::wipe_session_cache has been deprecated, tests automatically purge MUC
 * progress_bar.mustache has changed
+* ldap_get_entries_moodle() now always returns lower-cased attribute names in the returned entries.
+  It was supposed to do so before, but it actually didn't.
 
 === 9.2 ===
 
