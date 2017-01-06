@@ -1663,19 +1663,15 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $data->duration = '';
     }
 
+    $rolename = '';
     if (!empty($approvalrole)) {
         $rolenames = role_fix_names(get_all_roles());
         $rolename = $rolenames[$approvalrole]->localname;
-        // Replace.
-        $msg = str_replace('[sessionrole]', $rolename, $msg);
-        // Legacy.
-        $msg = str_replace(get_string('placeholder:sessionrole', 'facetoface'), $rolename, $msg);
-    } else {
-        // Replace.
-        $msg = str_replace('[sessionrole]', '', $msg);
-        // Legacy.
-        $msg = str_replace(get_string('placeholder:sessionrole', 'facetoface'), '', $msg);
     }
+    // Replace.
+    $msg = str_replace('[sessionrole]', $rolename, $msg);
+    // Legacy.
+    $msg = str_replace(get_string('placeholder:sessionrole', 'facetoface'), $rolename, $msg);
 
     // Replace placeholders with values
     $msg = str_replace('[coursename]', $coursename, $msg);
@@ -1732,17 +1728,14 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = facetoface_notification_loop_session_placeholders($msg, $data, $rooms, $roomcustomfields, $user);
     $msg = facetoface_notification_substitute_deprecated_placeholders($msg, $data, $rooms, $roomcustomfields);
 
-    if (empty($data->details)) {
-        // Replace.
-        $msg = str_replace('[details]', '', $msg);
-        // Legacy.
-        $msg = str_replace(get_string('placeholder:details', 'facetoface'), '', $msg);
-    } else {
-        // Replace.
-        $msg = str_replace('[details]', html_to_text($data->details), $msg);
-        // Legacy.
-        $msg = str_replace(get_string('placeholder:details', 'facetoface'), html_to_text($data->details), $msg);
+    $details = '';
+    if (!empty($data->details)) {
+        $details = format_text($data->details);
     }
+    // Replace.
+    $msg = str_replace('[details]', $details, $msg);
+    // Legacy.
+    $msg = str_replace(get_string('placeholder:details', 'facetoface'), $details, $msg);
 
     // Replace more meta data
     $attendees_url = new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessionid, 'action' => 'approvalrequired'));
