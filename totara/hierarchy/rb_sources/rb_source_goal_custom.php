@@ -39,12 +39,13 @@ class rb_source_goal_custom extends rb_base_source {
         // Apply global user restrictions.
         $this->add_global_report_restriction_join('base', 'userid');
 
-        $this->base = "(SELECT g.id, g.fullname AS name, gua.userid,
-            'company' AS personalcompany, COALESCE(t.fullname, 'notype') AS typename
+        $this->base = "(SELECT g.id, g.fullname AS name, g.description, gua.userid,
+                    'company' AS personalcompany, '' as context, COALESCE(t.fullname, 'notype') AS typename
                 FROM {goal} g JOIN {goal_user_assignment} gua ON g.id = gua.goalid
                 LEFT JOIN {goal_type} t ON t.id = g.typeid
                 UNION
-                SELECT gp.id, gp.name, gp.userid, 'personal' AS personalcompany, COALESCE(ut.fullname, 'notype') AS typename
+                SELECT gp.id, gp.name, gp.description, gp.userid,
+                    'personal' AS personalcompany, 'context_user' AS context, COALESCE(ut.fullname, 'notype') AS typename
                 FROM {goal_personal} gp
                 LEFT JOIN {goal_user_type} ut ON ut.id = gp.typeid
                 WHERE deleted = 0)";
@@ -164,6 +165,23 @@ class rb_source_goal_custom extends rb_base_source {
             ),
             new rb_column_option(
                 'goal',
+                'goaldescription',
+                get_string('goaldescription', 'rb_source_goal_custom'),
+                'base.description',
+                array('displayfunc' => 'tinymce_textarea',
+                    'extrafields' => array(
+                        'component' => '\'totara_hierarchy\'',
+                        'filearea' => '\'goal\'',
+                        'context' => 'base.context',
+                        'fileid' => 'base.id',
+                        'recordid' => 'base.userid'
+                    ),
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text'
+                )
+            ),
+            new rb_column_option(
+                'goal',
                 'personalcompany',
                 get_string('personalcompany', 'rb_source_goal_custom'),
                 'base.personalcompany',
@@ -211,6 +229,12 @@ class rb_source_goal_custom extends rb_base_source {
                 'goal',
                 'goalname',
                 get_string('goalname', 'rb_source_goal_custom'),
+                'text'
+            ),
+            new rb_filter_option(
+                'goal',
+                'goaldescription',
+                get_string('goaldescription', 'rb_source_goal_custom'),
                 'text'
             ),
             new rb_filter_option(

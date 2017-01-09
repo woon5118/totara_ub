@@ -414,7 +414,7 @@ class totara_hierarchy_generator extends component_generator_base {
         $record = (object) $record;
         $hierarchy = hierarchy::load_hierarchy($prefix);
         $itemnew = $hierarchy->process_additional_item_form_fields($record);
-        $item = $hierarchy->add_hierarchy_item($itemnew, $itemnew->parentid, $itemnew->frameworkid, false);
+        $item = $hierarchy->add_hierarchy_item($itemnew, $itemnew->parentid, $itemnew->frameworkid, false, true, false);
 
         return $item;
     }
