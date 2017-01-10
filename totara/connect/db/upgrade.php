@@ -125,5 +125,20 @@ function xmldb_totara_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016110203, 'totara', 'connect');
     }
 
+    if ($oldversion < 2017021700) {
+
+        // Define field allowpluginsepservices to be added to totara_connect_clients.
+        $table = new xmldb_table('totara_connect_clients');
+        $field = new xmldb_field('allowpluginsepservices', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'syncjobs');
+
+        // Conditionally launch add field allowpluginsepservices.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2017021700, 'totara', 'connect');
+    }
+
     return true;
 }

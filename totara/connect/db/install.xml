@@ -20,6 +20,7 @@
         <FIELD NAME="addnewcohorts" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Automatically add all new cohorts"/>
         <FIELD NAME="addnewcourses" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Automatically add all new courses"/>
         <FIELD NAME="syncjobs" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Send job assignments data to clients"/>
+        <FIELD NAME="allowpluginsepservices" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Allow clients to access any plugin services"/>
         <FIELD NAME="apiversion" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The API version used for communication with this client"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>

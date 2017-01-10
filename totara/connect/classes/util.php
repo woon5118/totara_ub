@@ -118,6 +118,7 @@ class util {
         $client->addnewcohorts  = $data->addnewcohorts;
         $client->addnewcourses  = $data->addnewcourses;
         $client->syncjobs       = $data->syncjobs;
+        $client->allowpluginsepservices = isset($data->allowpluginsepservices) ? $data->allowpluginsepservices : 0;
         $client->timecreated    = time();
         $client->timemodified   = $client->timecreated;
 
@@ -194,6 +195,7 @@ class util {
         $client->addnewcohorts = $data->addnewcohorts;
         $client->addnewcourses = $data->addnewcourses;
         $client->syncjobs      = $data->syncjobs;
+        $client->allowpluginsepservices = isset($data->allowpluginsepservices) ? $data->allowpluginsepservices : 0;
         $client->timemodified  = time();
 
         $DB->update_record('totara_connect_clients', $client);

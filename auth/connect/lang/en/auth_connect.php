@@ -21,6 +21,8 @@
  * @package auth_connect
  */
 
+$string['allowpluginsepservices'] = 'Allow requests to plugin services';
+$string['allowpluginsepservices_desc'] = 'Allow requests from Totara Connect servers to access services defined in any plugins';
 $string['autossoserver'] = 'Automatic single sign-on via server';
 $string['autossoserver_desc'] = 'Select Totara Connect server for automatic single sign-on.';
 $string['comment'] = 'Comment';

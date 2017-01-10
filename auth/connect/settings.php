@@ -74,6 +74,9 @@ if (!totara_feature_disabled('positions')) {
 $settingspage->add(new admin_setting_configcheckbox('auth_connect/syncorganisations',
     new lang_string('syncorganisations', 'auth_connect'), new lang_string('syncorganisations_desc', 'auth_connect'), 0));
 
+$settingspage->add(new admin_setting_configcheckbox('auth_connect/allowpluginsepservices',
+    new lang_string('allowpluginsepservices', 'auth_connect'), new lang_string('allowpluginsepservices_desc', 'auth_connect'), 0));
+
 $ADMIN->add('authconnectfolder', $settingspage);
 
 $ADMIN->add('authconnectfolder', new admin_externalpage('authconnectservers', new lang_string('serverspage', 'auth_connect'),

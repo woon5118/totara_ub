@@ -51,6 +51,9 @@ class totara_connect_form_client_edit extends moodleform {
         $mform->addElement('static', 'clienturl', get_string('url'));
         $mform->addHelpButton('clienturl', 'clienturl', 'totara_connect');
 
+        $mform->addElement('advcheckbox', 'allowpluginsepservices', get_string('allowpluginsepservices', 'totara_connect'));
+        $mform->addHelpButton('allowpluginsepservices', 'allowpluginsepservices', 'totara_connect');
+
         $cohorts = $DB->get_records_menu('cohort', array('contextid' => context_system::instance()->id), 'name ASC', 'id, name');
         $cohorts[0] = get_string('no');
         $mform->addElement('select', 'cohortid', get_string('restricttocohort', 'totara_connect'), $cohorts);
