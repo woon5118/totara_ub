@@ -231,6 +231,7 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
                 if (response.startTour) {
                     usertours.fetchTour(response.startTour);
                 }
+                return;
             }).fail(notification.exception);
         }
     };
