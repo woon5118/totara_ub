@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+require_once($CFG->dirroot . '/mod/forum/lib.php');
 
 class mod_forum_external_testcase extends externallib_advanced_testcase {
 
@@ -60,7 +61,7 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         $this->resetAfterTest(true);
 
         // Create a user.
-        $user = self::getDataGenerator()->create_user();
+        $user = self::getDataGenerator()->create_user(array('trackforums' => 1));
 
         // Set to the user.
         self::setUser($user);
@@ -73,12 +74,14 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         $record = new stdClass();
         $record->introformat = FORMAT_HTML;
         $record->course = $course1->id;
+        $record->trackingtype = FORUM_TRACKING_FORCED;
         $forum1 = self::getDataGenerator()->create_module('forum', $record);
 
         // Second forum.
         $record = new stdClass();
         $record->introformat = FORMAT_HTML;
         $record->course = $course2->id;
+        $record->trackingtype = FORUM_TRACKING_OFF;
         $forum2 = self::getDataGenerator()->create_module('forum', $record);
         $forum2->introfiles = [];
 
@@ -91,6 +94,7 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         // Expect one discussion.
         $forum1->numdiscussions = 1;
         $forum1->cancreatediscussions = true;
+        $forum1->istracked = true;
         $forum1->introfiles = [];
 
         $record = new stdClass();
@@ -103,6 +107,7 @@ class mod_forum_external_testcase extends externallib_advanced_testcase {
         $forum2->numdiscussions = 2;
         // Default limited role, no create discussion capability enabled.
         $forum2->cancreatediscussions = false;
+        $forum2->istracked = false;
 
         // Check the forum was correctly created.
         $this->assertEquals(2, $DB->count_records_select('forum', 'id = :forum1 OR id = :forum2',

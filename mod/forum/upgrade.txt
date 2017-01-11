@@ -3,12 +3,14 @@ information provided here is intended especially for developers.
 
 === 12 ===
 
-* String helpers are no longer used in the following templates, string data is passed via context data:
-** mod/forum/templates/forum_post_email_htmlemail_body.mustache
-** mod/forum/templates/forum_post_email_textemail.mustache
-** mod/forum/templates/forum_post_emaildigestbasic_htmlemail.mustache
-** mod/forum/templates/forum_post_emaildigestbasic_textemail.mustache
-** mod/forum/templates/forum_post_emaildigestfull_textemail.mustache
+ * String helpers are no longer used in the following templates, string data is passed via context data:
+  ** mod/forum/templates/forum_post_email_htmlemail_body.mustache
+  ** mod/forum/templates/forum_post_email_textemail.mustache
+  ** mod/forum/templates/forum_post_emaildigestbasic_htmlemail.mustache
+  ** mod/forum/templates/forum_post_emaildigestbasic_textemail.mustache
+  ** mod/forum/templates/forum_post_emaildigestfull_textemail.mustache
+ * External function get_forums_by_courses now returns and additional field "istracked" that indicates if the user
+   is tracking the related forum.
 
 === 10 ===
 
