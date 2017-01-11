@@ -604,6 +604,7 @@ class rb_source_program_overview extends rb_base_source {
 
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_program_fields_to_filters($filteroptions, "totara_{$this->instancetype}");
+        $this->add_job_assignment_fields_to_filters($filteroptions);
 
         $filteroptions[] = new rb_filter_option(
             'prog',
@@ -625,6 +626,20 @@ class rb_source_program_overview extends rb_base_source {
             'date'
         );
 
+        if ($this->instancetype == 'program') {
+            $filteroptions[] = new rb_filter_option(
+                'program_completion',
+                'status',
+                get_string('programcompletionstatus', 'rb_source_program_overview'),
+                'select',
+                array(
+                    'selectfunc' => 'program_status',
+                    'attributes' => rb_filter_option::select_width_limiter(),
+                    'simplemode' => true,
+                    'noanychoice' => true,
+                )
+            );
+        }
 
         return $filteroptions;
     }
@@ -815,6 +830,19 @@ class rb_source_program_overview extends rb_base_source {
             }
         }
         return ($list);
+    }
+
+    public function rb_filter_program_status() {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/totara/program/program.class.php');
+
+        $list = array();
+
+        $list[STATUS_PROGRAM_INCOMPLETE] = get_string('incomplete', 'rb_source_program_overview');
+        $list[STATUS_PROGRAM_COMPLETE] = get_string('complete', 'rb_source_program_overview');;
+
+        return $list;
     }
 
 }
