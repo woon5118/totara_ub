@@ -1,2 +1,6 @@
 List of upgrade and API changes in Totara core,
 information provided here is intended especially for developers.
+
+=== 10 ===
+
+* totara_dialog_content_manager has been deprecated, please use totara_job_dialog_assign_manager instead.
