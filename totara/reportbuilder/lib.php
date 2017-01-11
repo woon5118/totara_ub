@@ -3729,10 +3729,8 @@ class reportbuilder {
             return;
         }
 
-        $graphrecord = $DB->get_record('report_builder_graph', array('reportid' => $this->_id));
-        if (!empty($graphrecord->type) && !totara_feature_disabled('reportgraphs')) {
-            $graph = new \totara_reportbuilder\local\graph($graphrecord, $this, false);
-        } else {
+        $graph = new \totara_reportbuilder\local\graph($this);
+        if (!$graph->is_valid() && !totara_feature_disabled('reportgraphs')) {
             $graph = null;
         }
 
@@ -4441,6 +4439,17 @@ class reportbuilder {
             return false;
         }
         $transaction = $DB->start_delegated_transaction();
+
+        $graphseries = $DB->get_field('report_builder_graph', 'series', array('reportid' => $id));
+        if ($graphseries) {
+            $column = $DB->get_record('report_builder_columns', array('id' => $cid), 'type, value');
+            $source = implode('-', array($column->type, $column->value));
+            $datasources = json_decode($graphseries, true);
+            if (in_array($source, $datasources)) {
+                totara_set_notification(get_string('error:graphdeleteseries', 'totara_reportbuilder'));
+                return false;
+            }
+        }
 
         $DB->delete_records('report_builder_columns', array('id' => $cid));
         $allcolumns = $DB->get_records('report_builder_columns', array('reportid' => $id));

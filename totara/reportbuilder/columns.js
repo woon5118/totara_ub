@@ -404,7 +404,9 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
 
                         module.rb_init_col_rows();
                     } else {
-                        alert(M.util.get_string('error', 'moodle'));
+                        if (typeof o.noalert === 'undefined') {
+                            alert(M.util.get_string('error', 'moodle'));
+                        }
                         location.reload();
                     }
                 },

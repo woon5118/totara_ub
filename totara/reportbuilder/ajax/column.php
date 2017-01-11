@@ -130,6 +130,18 @@ switch ($action) {
 
         $column = $DB->get_record_sql($sql, $params);
 
+        $graphseries = $DB->get_field('report_builder_graph', 'series', array('reportid' => $reportid));
+        if ($graphseries) {
+            $source = implode('-', array($column->type, $column->value));
+            $datasources = json_decode($graphseries, true);
+            if (in_array($source, $datasources)) {
+                $result->success = false;
+                $result->noalert = true;
+                totara_set_notification(get_string('error:graphdeleteseries', 'totara_reportbuilder'));
+                break;
+            }
+        }
+
         $DB->delete_records('report_builder_columns', array('id' => $colid, 'reportid' => $reportid));
         reportbuilder_set_status($reportid);
 

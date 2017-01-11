@@ -6,3 +6,5 @@ information provided here is intended especially for developers.
 Added rb_session_roles_content class in totara/reportbuilder/classes/rb_base_content.php
 to allow Seminar report content to be restricted by an event role in
 facetoface_events, facetoface_sessions and facetoface_summary reports
+
+Removed unused $graphrecord and $isexport parameters from totara/reportbuilder/classes/local/graph::__construct()

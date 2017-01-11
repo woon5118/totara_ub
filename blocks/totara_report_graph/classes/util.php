@@ -39,12 +39,10 @@ class util {
     protected static function get_svg(\reportbuilder $report) {
         global $DB;
 
-        $graphrecord = $DB->get_record('report_builder_graph', array('reportid' => $report->_id));
-        if (empty($graphrecord->type)) {
+        $graph = new \totara_reportbuilder\local\graph($report);
+        if (!$graph->is_valid()) {
             return null;
         }
-
-        $graph = new \totara_reportbuilder\local\graph($graphrecord, $report, false);
         list($sql, $params, $cache) = $report->build_query(false, true);
         $order = $report->get_report_sort(false);
 

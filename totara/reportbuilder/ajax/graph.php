@@ -50,13 +50,12 @@ if (!$report->is_capable($id)) {
 // and we want to mess with session data and improve perf.
 \core\session\manager::write_close();
 
-$graphrecord = $DB->get_record('report_builder_graph', array('reportid' => $report->_id));
-if (empty($graphrecord->type)) {
+$graph = new \totara_reportbuilder\local\graph($report);
+if (!$graph->is_valid()) {
     // This should not happen.
     die;
 }
 
-$graph = new \totara_reportbuilder\local\graph($graphrecord, $report, false);
 list($sql, $params, $cache) = $report->build_query(false, true, true);
 
 $records = $DB->get_recordset_sql($sql.$order, $params, 0, $graph->get_max_records());

@@ -48,12 +48,20 @@ class graph {
     /** @var string SVGGraph colours */
     protected $svggraphcolours;
 
-    public function __construct(\stdClass $graphrecord, \reportbuilder $report, $isexport) {
-        if ($graphrecord->reportid != $report->_id) {
-            throw new \coding_exception('$record parameter is not matching $report parameter');
+    public function __construct(\reportbuilder $report) {
+
+        $this->load($report);
+
+        if (!empty($this->graphrecord->type)) {
+            $this->report = $report;
+            $this->init();
         }
-        $this->graphrecord = $graphrecord;
-        $this->report = $report;
+    }
+
+    /**
+     * Object initialisation.
+     */
+    private function init() {
 
         $this->svggraphsettings = array(
             'preserve_aspect_ratio' => 'xMidYMid meet',
@@ -77,7 +85,7 @@ class graph {
             // Custom Totara hacks.
             'label_shorten' => 40,
             'legend_shorten' => 80,
-    );
+        );
 
         $this->processedcount = 0;
         $this->values = array();
@@ -138,6 +146,21 @@ class graph {
                 $legend[] = $this->report->format_column_heading($this->report->columns[$colkey], true);
             }
             $this->svggraphsettings['legend_entries'] = $legend;
+        }
+    }
+
+    /**
+     * Load graph record.
+
+     * @param \reportbuilder $report eportbuilder the relevant reportbuilder instance
+     */
+    private function load($report) {
+        global $DB;
+
+        $this->graphrecord = $DB->get_record('report_builder_graph', array('reportid' => $report->_id));
+        if (!$this->graphrecord) {
+            $this->graphrecord = new \stdClass();
+            $this->graphrecord->type = '';
         }
     }
 
@@ -588,5 +611,14 @@ class graph {
         $data = $svggraph->Fetch($this->svggraphtype, false, false);
         $data = self::fix_svg_rtl($data, null, false);
         return $data;
+    }
+
+    public function is_valid() {
+
+        if (empty($this->graphrecord->type)) {
+            return false;
+        }
+
+        return (bool)$this->series;
     }
 }

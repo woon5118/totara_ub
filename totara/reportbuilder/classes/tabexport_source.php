@@ -124,15 +124,14 @@ class tabexport_source extends \totara_core\tabexport_source {
     public function get_svg_graph($w, $h) {
         global $DB;
 
-        $graphrecord = $DB->get_record('report_builder_graph', array('reportid' => $this->report->_id));
-        if (empty($graphrecord->type)) {
+        $graph = new \totara_reportbuilder\local\graph($this->report);
+        if (!$graph->is_valid()) {
             return null;
         }
-        $graph = new \totara_reportbuilder\local\graph($graphrecord, $this->report, false);
 
         list($sql, $params) = $this->report->build_query(false, true, true);
 
-        $rs = $DB->get_recordset_sql($sql, $params, 0, $graphrecord->maxrecords);
+        $rs = $DB->get_recordset_sql($sql, $params, 0, $graph->get_max_records());
         foreach($rs as $record) {
             $graph->add_record($record);
         }
