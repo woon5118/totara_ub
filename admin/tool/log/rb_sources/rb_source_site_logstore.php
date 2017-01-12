@@ -306,6 +306,7 @@ class rb_source_site_logstore extends rb_base_source {
 
         // Include some standard filters.
         $this->add_user_fields_to_filters($filteroptions);
+        $this->add_user_fields_to_filters($filteroptions, 'relateduser');
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
         $this->add_job_assignment_fields_to_filters($filteroptions);
