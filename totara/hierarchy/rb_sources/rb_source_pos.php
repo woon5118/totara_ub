@@ -69,6 +69,10 @@ class rb_source_pos extends rb_base_source {
     //
 
     protected function define_joinlist() {
+        global $DB;
+
+        $pathconcatsql = $DB->sql_concat('p.path', "'/'", "'%'");
+        $global_restriction_join_ja = $this->get_global_report_restriction_join('ja', 'userid');
 
         $joinlist = array(
             new rb_join(
@@ -107,6 +111,40 @@ class rb_source_pos extends rb_base_source {
                 'INNER',
                 '{pos}',
                 'base.id = position.id',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
+
+            // A count of all members of this position.
+            new rb_join(
+                'member',
+                'LEFT',
+                "(SELECT positionid, COUNT(DISTINCT ja.userid) membercount
+                    FROM {job_assignment} ja
+              INNER JOIN {user} u ON u.id = ja.userid
+                         {$global_restriction_join_ja}
+                   WHERE u.deleted = 0
+                GROUP BY ja.positionid)",
+                'base.id = member.positionid',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
+
+            // A count of all members of this position and its child positions.
+            new rb_join(
+                'membercumulative',
+                'LEFT',
+                "(SELECT p.id, SUM(pc.membercount) membercountcumulative
+                    FROM {pos} p
+              INNER JOIN (
+                        SELECT p.id, p.path, p.depthlevel, COUNT(DISTINCT ja.userid) membercount
+                          FROM {pos} p
+                    INNER JOIN {job_assignment} ja ON ja.positionid = p.id
+                    INNER JOIN {user} u ON u.id = ja.userid
+                               {$global_restriction_join_ja}
+                         WHERE u.deleted = 0
+                      GROUP BY p.id, p.path, p.depthlevel
+                         ) pc ON (pc.path LIKE {$pathconcatsql} OR pc.path = p.path) AND pc.depthlevel >= p.depthlevel
+                GROUP BY p.id)",
+                'base.id = membercumulative.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
         );
@@ -251,6 +289,22 @@ class rb_source_pos extends rb_base_source {
                 get_string('timemodified', 'rb_source_pos'),
                 'base.timemodified',
                 array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
+            ),
+            // A count of all members of this position.
+            new rb_column_option(
+                'pos',
+                'membercount',
+                get_string('membercount', 'rb_source_pos'),
+                'COALESCE(member.membercount, 0)',
+                array('joins' => 'member')
+            ),
+            // A count of all members of this position and its child positions.
+            new rb_column_option(
+                'pos',
+                'membercountcumulative',
+                get_string('membercountcumulative', 'rb_source_pos'),
+                'COALESCE(membercumulative.membercountcumulative, 0)',
+                array('joins' => 'membercumulative')
             ),
         );
 
