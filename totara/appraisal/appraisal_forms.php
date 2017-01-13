@@ -813,10 +813,12 @@ class appraisal_message_form extends moodleform {
                 get_string('eventmessagetitle', 'totara_appraisal') . $requiredstr,
                 array('class' => 'appraisal-event-title hide-disabled'));
         $mform->setType('messagetitle[0]', PARAM_CLEANHTML);
+        $mform->addHelpButton("messagetitle[0]", "messageplaceholders", "totara_appraisal");
         $mform->addElement('textarea', 'messagebody[0]',
                 get_string('eventmessagebody', 'totara_appraisal') . $requiredstr,
                 array('class' => 'appraisal-event-body hide-disabled'));
         $mform->setType('messagebody[0]', PARAM_CLEANHTML);
+        $mform->addHelpButton("messagebody[0]", "messageplaceholders", "totara_appraisal");
         $mform->disabledIf('messagetitle[0]', 'messagetoall', 'eq', 'each');
         $mform->disabledIf('messagetitle[0]', 'messagetoall', 'eqhide', 'each');
         $mform->disabledIf('messagebody[0]', 'messagetoall', 'eq', 'each');
@@ -828,10 +830,12 @@ class appraisal_message_form extends moodleform {
                     get_string('eventmessageroletitle', 'totara_appraisal', $name) . $requiredstr,
                     array('class' => 'appraisal-event-title hide-disabled'));
             $mform->setType("messagetitle[$role]", PARAM_CLEANHTML);
+            $mform->addHelpButton("messagetitle[$role]", "messageplaceholders", "totara_appraisal");
             $mform->addElement('textarea', "messagebody[$role]",
                     get_string('eventmessagerolebody', 'totara_appraisal', $name) . $requiredstr,
                     array('class' => 'appraisal-event-body hide-disabled'));
             $mform->setType("messagebody[$role]", PARAM_CLEANHTML);
+            $mform->addHelpButton("messagebody[$role]", "messageplaceholders", "totara_appraisal");
             $mform->disabledIf("messagetitle[$role]", 'messagetoall', 'eq', 'all');
             $mform->disabledIf("messagetitle[$role]", 'messagetoall', 'eqhide', 'all');
             $mform->disabledIf("messagebody[$role]", 'messagetoall', 'eq', 'all');

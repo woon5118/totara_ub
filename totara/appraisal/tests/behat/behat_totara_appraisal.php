@@ -25,6 +25,8 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
+use Behat\Gherkin\Node\PyStringNode as PyStringNode;
+
 class behat_totara_appraisal extends behat_base {
 
     /**
@@ -50,5 +52,19 @@ class behat_totara_appraisal extends behat_base {
         }
     }
 
+    /**
+     * Add all appraisal message placholders to the given field.
+     *
+     * @Given /^I add all appraisal message placeholders in the "([^"]*)" field$/
+     *
+     * @param string    $fieldname the field name
+     */
+    public function i_add_all_appraisal_message_placeholders_to_fieldname($fieldname) {
+        $placholdertext = '';
+        foreach (appraisal_message::$placeholders as $placeholder) {
+            $placholdertext .=  $placeholder . ': ['. $placeholder . ']' . PHP_EOL;
+        }
+        $this->execute("behat_forms::i_set_the_field_to_multiline", array($fieldname, new PyStringNode([$placholdertext], 0)));
+    }
 
 }

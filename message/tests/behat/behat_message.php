@@ -27,6 +27,10 @@
 
 require_once(__DIR__ . '/../../../lib/behat/behat_base.php');
 
+use Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException;
+use Behat\Gherkin\Node\PyStringNode as PyStringNode;
+use \Behat\Mink\Exception\ExpectationException;
+
 /**
  * Messaging system steps definitions.
  *
@@ -129,4 +133,118 @@ class behat_message extends behat_base {
 
         $this->execute("behat_forms::press_button", get_string('send', 'message'));
     }
+
+    /**
+     * Checks to see if a message exists by message subject for a given user
+     *
+     * @Given /^the message "([^"]*)" exists for "([^"]*)" user$/
+     * @param string $messagesubject
+     * @param string $username
+     */
+    public function the_message_exists_for_user($messagesubject, $username) {
+        global $DB;
+
+        $sql = "SELECT m.id
+                  FROM {message} m
+                  JOIN {user} u ON u.id = m.useridto
+                 WHERE m.subject = :subject
+                   AND u.username = :username";
+
+        $params = array(
+            'subject' => $messagesubject,
+            'username' => $username
+        );
+
+        if (!$DB->record_exists_sql($sql, $params)) {
+            throw new ExpectationException('The message with subject ' . $messagesubject . ' was not found for user ' . $username, $this->getSession());
+        }
+    }
+
+    /**
+     * Checks to see if a message does not contain text for a given user
+     *
+     * @Given /^the message "([^"]*)" does not contain "([^"]*)" for "([^"]*)" user$/
+     * @param string $messagesubject
+     * @param string $messagecontains
+     * @param string $username
+     */
+    public function the_message_does_not_contain_for_user($messagesubject, $messagecontains, $username) {
+        global $DB;
+
+        $sql = "SELECT m.id
+                  FROM {message} m
+                  JOIN {user} u ON u.id = m.useridto
+                 WHERE m.subject = :subject
+                   AND " . $DB->sql_like('m.fullmessage', ':contains', false, true, true) . "
+                   AND u.username = :username";
+
+        $params = array(
+            'subject' => $messagesubject,
+            'contains' => '%' . $DB->sql_like_escape($messagecontains) . '%',
+            'username' => $username
+        );
+
+        if (!$DB->record_exists_sql($sql, $params)) {
+            throw new ExpectationException($DB->sql_like('m.fullmessage', ':contains', false) . 'The message with subject ' . $messagesubject . ' should not contain ' . $messagecontains . ' for user ' . $username, $this->getSession());
+        }
+    }
+
+    /**
+     * Checks to see if a message contains text for a given user
+     *
+     * @Given /^the message "([^"]*)" contains "([^"]*)" for "([^"]*)" user$/
+     * @param string $messagesubject
+     * @param string $messagecontains
+     * @param string $username
+     */
+    public function the_message_contains_for_user($messagesubject, $messagecontains, $username) {
+        global $DB;
+
+        $sql = "SELECT m.id
+                  FROM {message} m
+                  JOIN {user} u ON u.id = m.useridto
+                 WHERE m.subject = :subject
+                   AND " . $DB->sql_like('m.fullmessage', ':contains', false) . "
+                   AND u.username = :username";
+
+        $params = array(
+            'subject' => $messagesubject,
+            'contains' => '%' . $DB->sql_like_escape($messagecontains) . '%',
+            'username' => $username
+        );
+
+        if (!$DB->record_exists_sql($sql, $params)) {
+            throw new ExpectationException($DB->sql_like('m.fullmessage', ':contains') . 'The message with subject ' . $messagesubject . ' does not contain ' . $messagecontains . ' for user ' . $username, $this->getSession());
+        }
+    }
+
+    /**
+     * Checks to see if a message contains multiline text for a given user
+     *
+     * @Given /^the message "([^"]*)" for "([^"]*)" user contains multiline:?$/
+     * @param string $messagesubject
+     * @param string $messagecontains
+     * @param string $username
+     */
+    public function the_message_contains_multiline_for_user($messagesubject, $username, PyStringNode $messagecontains) {
+        global $DB;
+
+        $sql = "SELECT m.id
+                  FROM {message} m
+                  JOIN {user} u ON u.id = m.useridto
+                 WHERE m.subject = :subject
+                   AND " . $DB->sql_like('m.fullmessage', ':contains') . "
+                   AND u.username = :username";
+
+        $params = array(
+            'subject' => $messagesubject,
+            'contains' => '%' . $DB->sql_like_escape($messagecontains) . '%',
+            'username' => $username
+        );
+
+        if (!$DB->record_exists_sql($sql, $params)) {
+            throw new ExpectationException($DB->sql_like('m.fullmessage', ':contains') . 'The message with subject ' . $messagesubject . ' does not contain ' . $messagecontains . ' for user ' . $username, $this->getSession());
+        }
+    }
+
 }

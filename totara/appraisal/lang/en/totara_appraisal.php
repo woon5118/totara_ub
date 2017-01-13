@@ -304,6 +304,67 @@ $string['messageevent'] = 'Event';
 $string['messagetiming'] = 'Timing';
 $string['messagerecipients'] = 'Recipients';
 $string['messagesaved'] = 'Message saved';
+$string['messageplaceholders'] = 'Message placeholders';
+$string['messageplaceholders_help'] = 'The following placeholders are available:
+
+* [sitename]
+  <br />The site name.
+* [siteurl]
+  <br /> The site URL.
+
+* [appraisalname]
+  <br /> The appraisal name.
+* [appraisaldescription]
+  <br /> The appraisal description.
+* [expectedappraisalcompletiondate]
+  <br /> The expected appraisal completion date.
+
+* [listofstagenames]
+  <br />List of all stage names.
+* [currentstagename]
+  <br />The users current stage name.
+* [expectedstagecompletiondate]
+  <br />The expected completion date for the users current stage name.
+* [previousstagename]
+  <br />The users previous stage name (defaults to \'No previous stage\').
+
+* [userusername]
+  <br />The appraisee\'s username.
+* [userfirstname]
+  <br />The appraisee\'s first name.
+* [userlastname]
+  <br />The appraisee\'s last name.
+* [userfullname]
+  <br />The appraisee\'s full name.
+
+* [managerusername]
+  <br /> The appraisee\'s managers username.
+* [managerfirstname]
+  <br />The appraisee\'s managers first name.
+* [managerlastname]
+  <br />The appraisee\'s managers last name.
+* [managerfullname]
+  <br />The appraisee\'s managers full name (defaults to \'Manager not known\').
+
+* [managersmanagerusername]
+  <br />The manager\'s manager username.
+* [managersmanagerfirstname]
+  <br />The manager\'s manager first name.
+* [managersmanagerlastname]
+  <br />The manager\'s manager last name.
+* [managersmanagerfullname]
+  <br />The manager\'s manager full name (defaults to \'Managers manager not known\').
+
+* [appraiserusername]
+  <br /> The appraiser\'s username.
+* [appraiserfirstname]
+  <br />The appraiser\'s first name.
+* [appraiserlastname]
+  <br />The appraiser\'s last name.
+* [appraiserfullname]
+  <br />The appraiser\'s full name (defaults to \'Appraiser not known\').
+
+';
 $string['missingroles'] = 'Some assigned users are missing important role assignments.';
 $string['missingrolesbelow'] = ' Users may not be able to complete the appraisal without these roles, they are listed below:';
 $string['missingrolesinfo'] = 'Some assigned users are missing important role assignments. {$a}';
@@ -343,6 +404,10 @@ $string['periodmonths'] = 'months';
 $string['periodweeks'] = 'weeks';
 $string['permissions'] = 'Permissions';
 $string['preview'] = 'Preview';
+$string['placeholders:default_previousstagename'] = 'No previous stage';
+$string['placeholders:default_managerfullname'] = 'Manager not known';
+$string['placeholders:default_teamleadfullname'] = 'Manager\'s manager not known';
+$string['placeholders:default_appraiserfullname'] = 'Appraiser not known';
 $string['previewdeprecated'] = 'Preview {$a->appraisal}:{$a->stage}:{$a->page} as {$a->role}';
 $string['previewingappraisal'] = 'Previewing "{$a->appraisalname}" as {$a->rolename}';
 $string['previewinfo'] = 'This window displays how the appraisal will appear to a user with the "{$a}" role, including which stages, pages and questions will be visible.';

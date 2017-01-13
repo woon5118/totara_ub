@@ -616,6 +616,23 @@ class appraisal {
     }
 
     /**
+     * Get the appraisal expected completed date, (the due date of the last stage).
+     *
+     * @return int timestamp
+     */
+    public function get_expected_completion_date() {
+        global $DB;
+
+        $sql = "SELECT MAX(timedue) AS due_date
+                  FROM {appraisal_stage}
+                 WHERE appraisalid = :appraisalid";
+        $params = array('appraisalid' => $this->id);
+        $record = $DB->get_record_sql($sql, $params);
+
+        return $record->due_date;
+    }
+
+    /**
      * Close the appraisal.
      * Will send alerts to affected users if required.
      *
@@ -2917,6 +2934,32 @@ class appraisal_stage {
         return $stages;
     }
 
+    /**
+     * Get the previous stage
+     *
+     * @return object appraisal_stage
+     */
+    public function get_previous() {
+        global $DB;
+
+        if (empty($this->id)) {
+            return false;
+        }
+
+        $sql = "appraisalid = :appraisalid AND timedue <= :timedue AND id <> :id";
+        $params = array(
+            'appraisalid' => $this->appraisalid,
+            'timedue' => $this->timedue,
+            'id' => $this->id,
+        );
+        $record = $DB->get_records_select('appraisal_stage', $sql, $params, 'timedue DESC, id DESC', 'id', 0, 1);
+
+        if ($record) {
+            return new self(current($record)->id);
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Remove stage if possible
@@ -4406,6 +4449,51 @@ class appraisal_message {
     protected $timescheduled = 0;
 
     /**
+     * Array of available placeholders.
+     * @var array
+     */
+    public static $placeholders = [
+        // Site.
+        'sitename',
+        'siteurl',
+
+        // Appraisal.
+        'appraisalname',
+        'appraisaldescription',
+        'expectedappraisalcompletiondate',
+
+        // Stage.
+        'listofstagenames',
+        'currentstagename',
+        'expectedstagecompletiondate',
+        'previousstagename',
+
+        // The appraisee.
+        'userusername',
+        'userfirstname',
+        'userlastname',
+        'userfullname',
+
+        // Manager.
+        'managerusername',
+        'managerfirstname',
+        'managerlastname',
+        'managerfullname',
+
+        // Team lead.
+        'managersmanagerusername',
+        'managersmanagerfirstname',
+        'managersmanagerlastname',
+        'managersmanagerfullname',
+
+        // Appraiser.
+        'appraiserusername',
+        'appraiserfirstname',
+        'appraiserlastname',
+        'appraiserfullname',
+    ];
+
+    /**
      * Create instance appraisal notification
      */
     public function __construct($id = 0) {
@@ -4736,6 +4824,8 @@ class appraisal_message {
     public function send($userassignments, $managers_only=false) {
         global $DB;
 
+        $appraisal = new appraisal($this->appraisalid);
+
         $sentaddress = array();
         foreach ($userassignments as $userassignment) {
             // Skip it if the user's assignment is closed.
@@ -4780,18 +4870,22 @@ class appraisal_message {
                         // Get the message content, which may be different depending on the role.
                         $message = $this->get_message($role);
 
+                        // Do the placeholders substitutions.
+                        list($messagesubject, $messagecontent) = $this->message_substitutions(
+                            $appraisal, array($message->name, $message->content), $userassignment, $rcpt);
+
                         // Create a message.
                         $eventdata = new stdClass();
                         $eventdata->component         = 'moodle';
                         $eventdata->name              = 'instantmessage';
                         $eventdata->userfrom          = core_user::get_noreply_user();
                         $eventdata->userto            = $rcpt;
-                        $eventdata->subject           = $message->name;
-                        $eventdata->fullmessage       = $message->content;
+                        $eventdata->subject           = $messagesubject;
+                        $eventdata->fullmessage       = $messagecontent;
                         $eventdata->fullmessageformat = FORMAT_PLAIN;
                         // The content is plain text so make sure we convert linebreaks for the HTML content.
-                        $eventdata->fullmessagehtml   = html_writer::tag('pre', $message->content);
-                        $eventdata->smallmessage      = $message->content;
+                        $eventdata->fullmessagehtml   = html_writer::tag('pre', $messagecontent);
+                        $eventdata->smallmessage      = $messagecontent;
 
                         // Send the message, preventing duplicates. E.g. If someone is a manager and appraiser and there are two
                         // different messages set up then they will receive one of each type. If someone has multiple roles with
@@ -4808,6 +4902,138 @@ class appraisal_message {
                 }
             }
         }
+    }
+
+
+    /**
+     * Subsitute the placeholders in message templates for the actual data
+     *
+     * @param object $appraisal The appraisal object
+     * @param array $messages An array containing the messages
+     * @param object $userassignments The user_assignment records to send the message to.
+     * @param object $rcpt The recipient user object
+     * @return  string
+     */
+    public function message_substitutions($appraisal, $messages, $userassignment, $rcpt) {
+        global $DB, $CFG;
+
+        if (empty($messages)) {
+            return array();
+        }
+
+        if (!empty($userassignment->jobassignmentid)) {
+            $jobassignment = job_assignment::get_with_id($userassignment->jobassignmentid);
+        }
+
+        // Create the data array, placeholder => value. (All empty values to start).
+        $data = array();
+        foreach (self::$placeholders as $placeholder) {
+            $data['[' . $placeholder . ']'] = '';
+        }
+
+        // Site.
+        $data['[sitename]'] = format_string(get_site()->fullname);
+        $data['[siteurl]'] = $CFG->wwwroot;
+
+        // Appraisal.
+        $data['[appraisalname]'] = format_string($appraisal->name);
+        $data['[appraisaldescription]'] = format_string($appraisal->description);
+        $data['[expectedappraisalcompletiondate]'] = userdate($appraisal->get_expected_completion_date(), get_string('strfdateshortmonth', 'langconfig'));
+
+        // Get the stage object.
+        $stage = new appraisal_stage($this->stageid);
+
+        // Current stage.
+        if ($this->stageid) {
+            $data['[currentstagename]'] = format_string($stage->name);
+            $data['[expectedstagecompletiondate]'] = userdate($stage->timedue, get_string('strfdateshortmonth', 'langconfig'));
+        }
+
+        // All stages.
+        $allstagenames = '';
+        foreach ($stage->fetch_appraisal($appraisal->id) as $stagerecord) {
+            $allstagenames .= "* {$stagerecord->name}\n";
+        }
+        if (!empty($allstagenames)) {
+            $data['[listofstagenames]'] = format_string($allstagenames);
+        }
+
+        // Previous stage.
+        $previousstage = $stage->get_previous();
+        if ($previousstage) {
+            $data['[previousstagename]'] = format_string($previousstage->name);
+        } else {
+            $data['[previousstagename]'] = get_string('placeholders:default_previousstagename', 'totara_appraisal');
+        }
+
+        // Appraisee.
+        $appraisee = ($rcpt->id != $userassignment->userid) ?
+            $DB->get_record('user', array('id' => $userassignment->userid)) : $rcpt;
+
+        $data['[userusername]'] = $appraisee->username;
+        $data['[userfirstname]'] = $appraisee->firstname;
+        $data['[userlastname]'] = $appraisee->lastname;
+        $data['[userfullname]'] = fullname($appraisee);
+
+        // Manager.
+        if (!empty($jobassignment->managerjaid)) {
+
+            $managerid = $jobassignment->managerid;
+            $manager = ($rcpt->id != $managerid) ? $DB->get_record('user', array('id' => $managerid)) : $rcpt;
+
+            if ($manager) {
+                $data['[managerusername]'] = $manager->username;
+                $data['[managerfirstname]'] = $manager->firstname;
+                $data['[managerlastname]'] = $manager->lastname;
+                $data['[managerfullname]'] = fullname($manager);
+            }
+        } else {
+            // The default.
+            $data['[managerfullname]'] = get_string('placeholders:default_managerfullname', 'totara_appraisal');
+        }
+
+        // Team Lead.
+        if (!empty($jobassignment->teamleaderid)) {
+
+            $teamleadid = $jobassignment->teamleaderid;
+            $teamlead = ($rcpt->id != $teamleadid) ? $DB->get_record('user', array('id' => $teamleadid)) : $rcpt;
+
+            if ($teamlead) {
+                $data['[managersmanagerusername]'] = $teamlead->username;
+                $data['[managersmanagerfirstname]'] = $teamlead->firstname;
+                $data['[managersmanagerlastname]'] = $teamlead->lastname;
+                $data['[managersmanagerfullname]'] = fullname($teamlead);
+            }
+        } else {
+            // The default.
+            $data['[managersmanagerfullname]'] = get_string('placeholders:default_teamleadfullname', 'totara_appraisal');
+        }
+
+        // Appraiser.
+        if (!empty($jobassignment->appraiserid)) {
+            $appraiser = ($rcpt->id != $jobassignment->appraiserid) ?
+                $DB->get_record('user', array('id' => $jobassignment->appraiserid)) : $rcpt;
+
+            if ($appraiser) {
+                $data['[appraiserusername]'] = $appraiser->username;
+                $data['[appraiserfirstname]'] = $appraiser->firstname;
+                $data['[appraiserlastname]'] = $appraiser->lastname;
+                $data['[appraiserfullname]'] = fullname($appraiser);
+            }
+        } else {
+            // The default.
+            $data['[appraiserfullname]'] = get_string('placeholders:default_appraiserfullname', 'totara_appraisal');
+        }
+
+        // Replace placeholders with values.
+        foreach ($messages as $key => $msg) {
+            foreach ($data as $placeholder => $value) {
+                $msg = str_replace($placeholder, $value, $msg);
+            }
+            $messages[$key] = $msg;
+        }
+
+        return $messages;
     }
 
 
