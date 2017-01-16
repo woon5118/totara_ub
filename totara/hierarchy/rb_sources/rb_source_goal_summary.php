@@ -101,6 +101,14 @@ class rb_source_goal_summary extends rb_base_source {
                 'base.id = goal.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
+            new rb_join(
+                'goaltype',
+                'LEFT',
+                '{goal_type}',
+                'goal.typeid = goaltype.id',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'goal'
+            )
         );
 
         return $joinlist;
@@ -151,6 +159,25 @@ class rb_source_goal_summary extends rb_base_source {
                 'scalevalues_',
                 array('columngenerator' => 'scalevalues',
                       'defaultheading' => get_string('goalscalevaluesheading', 'rb_source_goal_summary'))
+            ),
+            new rb_column_option(
+                'goal_type',
+                'name',
+                get_string('goaltypename', 'rb_source_goal_summary'),
+                'goaltype.fullname',
+                array(
+                    'joins' => 'goaltype'
+                )
+            ),
+            new rb_column_option(
+                'goal_type',
+                'typeid',
+                get_string('goaltypename', 'rb_source_goal_summary'),
+                'goaltype.id',
+                array(
+                    'joins' => 'goaltype',
+                    'selectable' => false
+                )
             )
         );
 
@@ -226,8 +253,7 @@ class rb_source_goal_summary extends rb_base_source {
                         'nosort' => $columnoption->nosort,
                         'style' => $columnoption->style,
                         'class' => $columnoption->class,
-                        'hidden' => $hidden,
-                        'customheading' => null
+                        'hidden' => $hidden
                     )
                 );
         }
@@ -250,6 +276,15 @@ class rb_source_goal_summary extends rb_base_source {
                 'numberofusersassigned',
                 get_string('goalnumberofusersassignedcolumn', 'rb_source_goal_summary'),
                 'number'
+            ),
+            new rb_filter_option(
+                'goal_type',
+                'typeid',
+                get_string('goaltypename', 'rb_source_goal_summary'),
+                'select',
+                array(
+                    'selectfunc' => 'goal_type'
+                )
             )
         );
 
@@ -277,6 +312,23 @@ class rb_source_goal_summary extends rb_base_source {
         return $goals;
     }
 
+    /**
+     * Filter goal type
+     *
+     * @return array
+     */
+    public function rb_filter_goal_type() {
+        global $DB;
+
+        $goaltypes = array();
+
+        $typelist = $DB->get_records('goal_type');
+        foreach ($typelist as $type) {
+            $goaltypes[$type->id] = $type->fullname;
+        }
+
+        return $goaltypes;
+    }
 
     protected function define_paramoptions() {
         $paramoptions = array(
