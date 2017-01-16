@@ -180,6 +180,64 @@ abstract class rb_facetoface_base_source extends rb_base_source {
     }
 
     /**
+     * Provides 'currentuserstatus' join required for the current signed in users status
+     * @param array $joinlist
+     */
+    public function add_facetoface_currentuserstatus_to_joinlist(&$joinlist) {
+        global $USER;
+
+        $joinlist[] = new rb_join(
+            'currentuserstatus',
+            'LEFT',
+            "(SELECT su.sessionid, su.userid, ss.id AS ssid, ss.statuscode AS statuscode
+                FROM {facetoface_signups} su
+                JOIN {facetoface_signups_status} ss
+                    ON su.id = ss.signupid
+                WHERE ss.superceded = 0
+                AND su.userid = {$USER->id})",
+            'currentuserstatus.sessionid = base.id',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE
+        );
+    }
+
+    /**
+     * Add the current signed in users status column
+     *
+     * @param array $columnoptions
+     */
+    public function add_facetoface_currentuserstatus_to_columns(&$columnoptions) {
+        $columnoptions[] =
+            new rb_column_option(
+                'session',
+                'currentuserstatus',
+                get_string('userstatus', 'rb_source_facetoface_events'),
+                "CASE WHEN currentuserstatus.statuscode > 0 THEN currentuserstatus.statuscode ELSE '" . MDL_F2F_STATUS_NOT_SET . "' END",
+                array(
+                    'joins' => array('currentuserstatus'),
+                    'displayfunc' => 'signup_status',
+                    'defaultheading' => get_string('userstatusdefault', 'rb_source_facetoface_events')
+                )
+            );
+    }
+
+    /**
+     * Add the current signed-in users status filter options
+     * @param array $filteroptions
+     */
+    protected function add_facetoface_currentuserstatus_to_filters(array &$filteroptions) {
+        $filteroptions[] =
+            new rb_filter_option(
+                'session',
+                'currentuserstatus',
+                get_string('userstatus', 'rb_source_facetoface_events'),
+                'select',
+                array(
+                    'selectchoices' => self::get_currentuserstatus_options(),
+                )
+            );
+    }
+
+    /**
      * Provides 'sessions', 'attendess', 'facetoface', 'room' joins to join list
      * Requires join that provides relevant "sessionid" field (by default used 'base')
      * @param array $joinlist
@@ -635,6 +693,21 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'fullybooked' => get_string('status:fullybooked', 'rb_source_facetoface_summary'),
             'overbooked' => get_string('status:overbooked', 'rb_source_facetoface_summary'),
         );
+        return $statusopts;
+    }
+
+    /**
+     * Get currently supported user booking status filter options
+     * @return array
+     */
+    protected static function get_currentuserstatus_options() {
+        global $MDL_F2F_STATUS;
+
+        $statusopts = array();
+        foreach($MDL_F2F_STATUS as $status => $name) {
+            $statusopts[$status] =  get_string('userstatus:' . $name, 'rb_source_facetoface_events');
+        }
+
         return $statusopts;
     }
 

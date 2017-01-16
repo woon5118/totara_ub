@@ -113,6 +113,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
         $this->add_job_assignment_tables_to_joinlist($joinlist, 'allattendees', 'userid');
         $this->add_user_table_to_joinlist($joinlist, 'allattendees', 'userid');
         $this->add_facetoface_session_roles_to_joinlist($joinlist, 'base.id');
+        $this->add_facetoface_currentuserstatus_to_joinlist($joinlist);
 
         return $joinlist;
     }
@@ -305,6 +306,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
         $this->add_grouped_session_status_to_columns($columnoptions, 'base');
         $this->add_facetoface_common_to_columns($columnoptions, 'base');
         $this->add_facetoface_session_roles_to_columns($columnoptions);
+        $this->add_facetoface_currentuserstatus_to_columns($columnoptions);
 
         // Include some standard columns.
         $this->add_course_category_fields_to_columns($columnoptions);
@@ -432,6 +434,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
         );
 
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
+        $this->add_facetoface_currentuserstatus_to_filters($filteroptions);
 
         // Add session custom fields to filters.
         $this->add_course_category_fields_to_filters($filteroptions);
