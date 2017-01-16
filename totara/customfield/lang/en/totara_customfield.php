@@ -178,6 +178,7 @@ $string['multiselectoptions'] = 'Menu options (and icons)';
 $string['nocustomfieldsdefined'] = 'No fields have been defined';
 $string['notset'] = 'Not set';
 $string['nofileselected'] = 'No file selected';
+$string['optionxtext'] = 'Option {$a} text';
 $string['pluginname'] = 'Customfields';
 $string['programcertcustomfields'] = 'Program and Certification custom fields';
 $string['regexpattern'] = 'Regular expression validation';

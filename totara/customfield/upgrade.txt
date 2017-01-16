@@ -4,3 +4,7 @@ information provided here is intended especially for developers.
 === 10.0 ===
 
 * changed HTML when viewing multiselect feild
+* changed HTML when editing multiselect feild
+* removed js-delete CSS
+* converted M.totara_customfield_multiselect to an AMD module (totara_customfield/field_multiselect-lazy)
+* moved CSS to less format
