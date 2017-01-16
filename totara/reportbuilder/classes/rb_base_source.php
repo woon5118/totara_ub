@@ -2500,6 +2500,19 @@ abstract class rb_base_source {
             )
         );
 
+        // add auth option
+        $columnoptions[] = new rb_column_option(
+            $groupname,
+            'auth',
+            get_string('userauth', 'totara_reportbuilder'),
+            "$join.auth",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'user_auth_method',
+                'addtypetohead' => $addtypetoheading
+            )
+        );
+
         // add deleted option
         $columnoptions[] = new rb_column_option(
             $groupname,
@@ -2616,6 +2629,19 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading
             )
         );
+
+        $filteroptions[] = new rb_filter_option(
+            $groupname,
+            'auth',
+            get_string('userauth', 'totara_reportbuilder'),
+            "select",
+            array(
+                'selectchoices' => $this->rb_filter_auth_options(),
+                'attributes' => $select_width_options,
+                'addtypetoheading' => $addtypetoheading
+            )
+        );
+
         $filteroptions[] = new rb_filter_option(
             $groupname,
             'deleted',
@@ -2688,6 +2714,20 @@ abstract class rb_base_source {
         );
 
         return true;
+    }
+
+    public function rb_filter_auth_options() {
+        $authoptions = array();
+
+        $auths = core_component::get_plugin_list('auth');
+
+        foreach ($auths as $auth => $something) {
+            $authinst = get_auth_plugin($auth);
+
+            $authoptions[$auth] = get_string('pluginname', "auth_{$auth}");
+        }
+
+        return $authoptions;
     }
 
     /**

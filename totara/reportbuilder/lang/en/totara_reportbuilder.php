@@ -1048,6 +1048,7 @@ $string['uninstalledlanguage'] = 'Uninstalled Language {$a->name} ({$a->code})';
 $string['updatescheduledreport'] = 'Successfully updated Scheduled Report';
 $string['useralternatename'] = 'User Alternate Name';
 $string['useraddress'] = 'User\'s Address';
+$string['userauth'] = 'User\'s Authentication Method';
 $string['usercity'] = 'User\'s City';
 $string['usercohortids'] = 'User audience IDs';
 $string['usercountry'] = 'User\'s Country';
