@@ -378,12 +378,17 @@ class rb_source_dp_program extends rb_base_source {
             )
         );
         $filteroptions[] = new rb_filter_option(
-                'program_completion_history',
-                'program_completion_history_count',
-                get_string('program_completion_history_count', 'rb_source_dp_program'),
-                'number'
+            'program_completion_history',
+            'program_completion_history_count',
+            get_string('program_completion_history_count', 'rb_source_dp_program'),
+            'number'
         );
-
+        $filteroptions[] = new rb_filter_option(
+            'program_completion',
+            'completeddate',
+            get_string('completeddate', 'rb_source_program_completion'),
+            'date'
+        );
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_job_assignment_fields_to_filters($filteroptions);
         $this->add_cohort_user_fields_to_filters($filteroptions);
