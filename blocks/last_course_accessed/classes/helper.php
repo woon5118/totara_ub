@@ -27,40 +27,32 @@ namespace block_last_course_accessed;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Helper.
+ *
+ * @deprecated Since Totara 10.0.
+ * @deprecated As the class currently only contains a single method, if no
+ * @deprecated further methods are added to the class it will be deprecated
+ * @deprecated and removed in a later version, otherwise only the deprecated
+ * @deprecated method will be removed.
+ */
 class helper {
 
     /**
      * Using a timestamp return a natural language string describing the
      * timestamp relative to the current time provided by the web server.
      *
+     * @deprecated since Totara 10.0.
+     *
      * @param integer $timestamp Describes the last access time in a timestamp.
      * @param integer $compare_to Describes what time the comparison should be made against.
      * @return string Natural language string describing the time difference.
      */
-    public static function get_last_access_text ($timestamp, $compare_to = null) {
+    public static function get_last_access_text($timestamp, $compare_to = null) {
 
-        if (!$compare_to) {
-            $compare_to = time();
-        }
+        debugging('This function has been deprecated and replaced by totara_core_get_relative_time_text().', DEBUG_DEVELOPER);
 
-        // Get a nice natural language string that says when the course was last accessed.
-        if ($timestamp >= strtotime('-5 minutes', $compare_to)) {
-            $last_accessed = get_string('last_access_five_minutes', 'block_last_course_accessed');
-        } else if ($timestamp >= strtotime('-30 minutes', $compare_to)) {
-            $last_accessed = get_string('last_access_half_hour', 'block_last_course_accessed');
-        } else if ($timestamp >= strtotime('-1 hour', $compare_to)) {
-            $last_accessed = get_string('last_access_hour', 'block_last_course_accessed');
-        } else if ($timestamp >= strtotime('today', $compare_to)) {
-            $last_accessed = date_format_string($timestamp, get_string('strftimetodayattime', 'core_langconfig'));
-        } else if ($timestamp >= strtotime('yesterday', $compare_to)) {
-            $last_accessed = date_format_string($timestamp, get_string('strftimeyesterdayattime', 'core_langconfig'));
-        } else if ($timestamp >= strtotime('-1 week', $compare_to)) {
-            $last_accessed = date_format_string($timestamp, get_string('strftimedayattime', 'core_langconfig'));
-        } else {
-            $last_accessed = date_format_string($timestamp, get_string('strftimedaydateattime', 'core_langconfig'));
-        }
-
-        return $last_accessed;
+        return totara_core_get_relative_time_text($timestamp, $compare_to, true);
     }
 
 }

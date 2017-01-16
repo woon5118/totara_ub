@@ -95,7 +95,7 @@ class block_last_course_accessed extends block_base {
         }
 
         // Get the text that describes when the course was last accessed.
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, null, true);
 
         // As we have the instance from the database we can use it to set the context for format_string below.
         context_helper::preload_from_record($course);

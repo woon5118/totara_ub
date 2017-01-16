@@ -2442,11 +2442,24 @@ abstract class rb_base_source {
             $groupname,
             'lastlogin',
             get_string('userlastlogin', 'totara_reportbuilder'),
-            // See MDL-22481 for why currentlogin is used instead of lastlogin
+            // See MDL-22481 for why currentlogin is used instead of lastlogin.
             "$join.currentlogin",
             array(
                 'joins' => $join,
                 'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp',
+                'addtypetoheading' => $addtypetoheading
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            $groupname,
+            'lastloginrelative',
+            get_string('userlastloginrelative', 'totara_reportbuilder'),
+            // See MDL-22481 for why currentlogin is used instead of lastlogin.
+            "$join.currentlogin",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'relative_time_text',
                 'dbdatatype' => 'timestamp',
                 'addtypetoheading' => $addtypetoheading
             )
@@ -2459,6 +2472,18 @@ abstract class rb_base_source {
             array(
                 'joins' => $join,
                 'displayfunc' => 'nice_datetime',
+                'dbdatatype' => 'timestamp',
+                'addtypetoheading' => $addtypetoheading
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            $groupname,
+            'firstaccessrelative',
+            get_string('userfirstaccessrelative', 'totara_reportbuilder'),
+            "$join.firstaccess",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'relative_time_text',
                 'dbdatatype' => 'timestamp',
                 'addtypetoheading' => $addtypetoheading
             )
@@ -2689,6 +2714,16 @@ abstract class rb_base_source {
             get_string('userlastlogin', 'totara_reportbuilder'),
             'date',
             array(
+                'addtypetoheading' => $addtypetoheading
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            $groupname,
+            'lastloginrelative',
+            get_string('userlastloginrelative', 'totara_reportbuilder'),
+            'date',
+            array(
                 'includetime' => true,
                 'addtypetoheading' => $addtypetoheading
             )
@@ -2698,6 +2733,17 @@ abstract class rb_base_source {
             $groupname,
             'firstaccess',
             get_string('userfirstaccess', 'totara_reportbuilder'),
+            'date',
+            array(
+                'includetime' => true,
+                'addtypetoheading' => $addtypetoheading
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            $groupname,
+            'firstaccessrelative',
+            get_string('userfirstaccessrelative', 'totara_reportbuilder'),
             'date',
             array(
                 'includetime' => true,

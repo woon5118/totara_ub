@@ -25,6 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
+require_once($CFG->dirroot.'/totara/core/utils.php');
+
 class test_block_last_course_accessed extends advanced_testcase {
 
     private $compare_to;
@@ -46,9 +50,9 @@ class test_block_last_course_accessed extends advanced_testcase {
      */
     public function test_five_minutes() {
 
-        $timestamp = $this->compare_to - (5 * 60);
+        $timestamp = $this->compare_to - (5 * MINSECS);
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
         $this->assertEquals('Within the last five minutes', $last_accessed);
     }
@@ -58,9 +62,9 @@ class test_block_last_course_accessed extends advanced_testcase {
      */
     public function test_half_hour() {
 
-        $timestamp = $this->compare_to - (30 * 60);
+        $timestamp = $this->compare_to - (30 * MINSECS);
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
         $this->assertEquals('Within the last half-hour', $last_accessed);
     }
@@ -70,9 +74,9 @@ class test_block_last_course_accessed extends advanced_testcase {
      */
     public function test_hour() {
 
-        $timestamp = $this->compare_to - (60 * 60);
+        $timestamp = $this->compare_to - HOURSECS;
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
         $this->assertEquals('Within the last hour', $last_accessed);
     }
@@ -82,9 +86,9 @@ class test_block_last_course_accessed extends advanced_testcase {
      */
     public function test_today() {
 
-        $timestamp = $this->compare_to - (61 * 60);
+        $timestamp = $this->compare_to - (HOURSECS + 60);
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
         $this->assertEquals('Today at 02:44 PM', $last_accessed);
     }
@@ -94,9 +98,9 @@ class test_block_last_course_accessed extends advanced_testcase {
      */
     public function test_yesterday() {
 
-        $timestamp = $this->compare_to - (60 * 60 * 24);
+        $timestamp = $this->compare_to - DAYSECS;
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
         $this->assertEquals('Yesterday at 03:45 PM', $last_accessed);
     }
@@ -106,23 +110,59 @@ class test_block_last_course_accessed extends advanced_testcase {
      */
     public function test_day() {
 
-        $timestamp = $this->compare_to - (60 * 60 * 24 * 7);
+        $timestamp = $this->compare_to - (DAYSECS * 6);
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
-        $this->assertEquals('Tuesday at 03:45 PM', $last_accessed);
+        $this->assertEquals('Wednesday at 03:45 PM', $last_accessed);
     }
 
     /**
-     * Test the correct text is created for visiting a course longer than a week ago.
+     * Test the correct text is created for visiting a course within the month but more than a week ago.
+     */
+    public function test_days() {
+
+        $timestamp = $this->compare_to - (DAYSECS * 10);
+
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
+
+        $this->assertEquals('10 days ago', $last_accessed);
+    }
+
+    /**
+     * Test the correct text is created for visiting a course within the last 12 months ago but at least a month ago.
+     */
+    public function test_months() {
+
+        $timestamp = $this->compare_to - YEARSECS;
+
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
+
+        $this->assertEquals('11 months ago', $last_accessed);
+    }
+
+    /**
+     * Test the correct text is created for visiting a course over three years aho.
+     */
+    public function test_years() {
+
+        $timestamp = $this->compare_to - (YEARSECS * 3);
+
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
+
+        $this->assertEquals('3 years ago', $last_accessed);
+    }
+
+    /**
+     * Test the correct text is created for visiting a course longer than a two years ago ago.
      */
     public function test_date() {
 
-        $timestamp = $this->compare_to - (60 * 60) * 24 * 8;
+        $timestamp = $this->compare_to - (YEARSECS * 3);
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to, true);
 
-        $this->assertEquals('Monday, 09 May 2016 at 03:45 PM', $last_accessed);
+        $this->assertEquals('Saturday, 18 May 2013 at 03:45 PM', $last_accessed);
     }
 
     /**
@@ -133,7 +173,7 @@ class test_block_last_course_accessed extends advanced_testcase {
         global $CFG, $DB, $USER;
         $this->setAdminUser();
 
-        $yesterday_time = $this->compare_to - (60 * 60 * 24);
+        $yesterday_time = $this->compare_to - DAYSECS;
 
         // Create a last access record using the system timezone.
         $last_access = new stdClass();
@@ -156,7 +196,7 @@ class test_block_last_course_accessed extends advanced_testcase {
         $USER->timezone = 'Europe/Paris';
 
         // Check the time has been created correctly. The time should be an hour ahead of our default time in $this->compare_to.
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($last_access->timeaccess, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($last_access->timeaccess, $this->compare_to);
         $this->assertEquals('Yesterday at 04:45 PM', $last_accessed);
 
         // Check there's not been an update to the timestamp.
@@ -169,7 +209,7 @@ class test_block_last_course_accessed extends advanced_testcase {
         $USER->timezone = 'Europe/Athens';
 
         // Check the time has been created correctly. The time should be an hour ahead of our default time in $this->compare_to.
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($last_access->timeaccess, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($last_access->timeaccess, $this->compare_to);
         $this->assertEquals('Yesterday at 05:45 PM', $last_accessed);
     }
 
@@ -179,12 +219,12 @@ class test_block_last_course_accessed extends advanced_testcase {
     public function test_timezone_five_minutes() {
         global $USER;
 
-        $timestamp = $this->compare_to - (5 * 60);
+        $timestamp = $this->compare_to - (5 * MINSECS);
 
         // A change in the timezone should not affect the output as it's relative to the system time.
         $USER->timezone = 'Europe/Berlin';
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
         $this->assertEquals('Within the last five minutes', $last_accessed);
     }
@@ -195,12 +235,12 @@ class test_block_last_course_accessed extends advanced_testcase {
     public function test_timezone_half_hour() {
         global $USER;
 
-        $timestamp = $this->compare_to - (30 * 60);
+        $timestamp = $this->compare_to - (30 * MINSECS);
 
         // A change in the timezone should not affect the output as it's relative to the system time.
         $USER->timezone = 'Europe/Warsaw';
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
         $this->assertEquals('Within the last half-hour', $last_accessed);
     }
@@ -211,12 +251,12 @@ class test_block_last_course_accessed extends advanced_testcase {
     public function test_timezone_hour() {
         global $USER;
 
-        $timestamp = $this->compare_to - (60 * 60);
+        $timestamp = $this->compare_to - HOURSECS;
 
         // A change in the timezone should not affect the output as it's relative to the system time.
         $USER->timezone = 'Europe/Stockholm';
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
         $this->assertEquals('Within the last hour', $last_accessed);
     }
@@ -227,12 +267,12 @@ class test_block_last_course_accessed extends advanced_testcase {
     public function test_timezone_today() {
         global $USER;
 
-        $timestamp = $this->compare_to - (61 * 60);
+        $timestamp = $this->compare_to - (HOURSECS + 60);
 
         // A change in the timezone should not affect the output as it's relative to the system time.
         $USER->timezone = 'Europe/Dublin';
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
         $this->assertEquals('Today at 02:44 PM', $last_accessed);
     }
@@ -243,12 +283,12 @@ class test_block_last_course_accessed extends advanced_testcase {
     public function test_timezone_yesterday() {
         global $USER;
 
-        $timestamp = $this->compare_to - (60 * 60 * 24);
+        $timestamp = $this->compare_to - DAYSECS;
 
         // A change in the timezone should not affect the output as it's relative to the system time.
         $USER->timezone = 'Europe/Malta';
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
         $this->assertEquals('Yesterday at 04:45 PM', $last_accessed);
     }
@@ -259,14 +299,63 @@ class test_block_last_course_accessed extends advanced_testcase {
     public function test_timezone_day() {
         global $USER;
 
-        $timestamp = $this->compare_to - (60 * 60 * 24 * 7);
+        $timestamp = $this->compare_to - (DAYSECS * 2);
 
         // A change in the timezone should not affect the output as it's relative to the system time.
         $USER->timezone = 'Europe/Malta';
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
-        $this->assertEquals('Tuesday at 04:45 PM', $last_accessed);
+        $this->assertEquals('Sunday at 04:45 PM', $last_accessed);
+    }
+
+
+    /**
+     * Test the correct text is created for visiting a course within ]the month but more than a week ago.
+     */
+    public function test_timezone_days() {
+        global $USER;
+
+        $timestamp = $this->compare_to - (DAYSECS * 15);
+
+        // A change in the timezone should not affect the output as it's relative to the system time.
+        $USER->timezone = 'Europe/Dublin';
+
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
+
+        $this->assertEquals('15 days ago', $last_accessed);
+    }
+
+    /**
+     * Test the correct text is created for visiting a course within the last 12 months ago but within a year.
+     */
+    public function test_timezone_months() {
+        global $USER;
+
+        $timestamp = $this->compare_to - (DAYSECS * 300);
+
+        // A change in the timezone should not affect the output as it's relative to the system time.
+        $USER->timezone = 'Europe/Stockholm';
+
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
+
+        $this->assertEquals('9 months ago', $last_accessed);
+    }
+
+    /**
+     * Test the correct text is created for visiting a course within the last 12 months ago but within a year.
+     */
+    public function test_timezone_years() {
+        global $USER;
+
+        $timestamp = $this->compare_to - (YEARSECS * 2.5);
+
+        // A change in the timezone should not affect the output as it's relative to the system time.
+        $USER->timezone = 'Europe/Dublin';
+
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
+
+        $this->assertEquals('2 years ago', $last_accessed);
     }
 
     /**
@@ -275,14 +364,14 @@ class test_block_last_course_accessed extends advanced_testcase {
     public function test_timezone_date() {
         global $USER;
 
-        $timestamp = $this->compare_to - (60 * 60) * 24 * 8;
+        $timestamp = $this->compare_to - (YEARSECS * 4.5);
 
         // A change in the timezone should not affect the output as it's relative to the system time.
         $USER->timezone = 'Europe/Prague';
 
-        $last_accessed = \block_last_course_accessed\helper::get_last_access_text($timestamp, $this->compare_to);
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to, true);
 
-        $this->assertEquals('Monday, 09 May 2016 at 04:45 PM', $last_accessed);
+        $this->assertEquals('Friday, 18 Nov 2011 at 03:45 AM', $last_accessed);
     }
 
 }
