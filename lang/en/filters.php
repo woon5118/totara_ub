@@ -43,7 +43,11 @@ The filter has the following options:
 * matches any selected - this option allows information, if it matches any of the checked options
 * matches all selected - this option allows information, if it matches all of the checked options';
 $string['filterdate'] = 'Date filter';
-$string['filterdate_help'] = 'This filter allows you to filter information from before and/or after selected dates.';
+$string['filterdate_help'] = 'This filter allows you to filter information from:
+
+* before and / or after given dates,
+* a number of daye before or after today,
+* list any records where no date is set.';
 $string['filternumber'] = 'Number filter';
 $string['filternumber_help'] = '
 This filter allows you to filter numerical information based on its value.

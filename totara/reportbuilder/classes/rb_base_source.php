@@ -2741,6 +2741,7 @@ abstract class rb_base_source {
             'date',
             array(
                 'includetime' => true,
+                'includenotset' => true,
                 'addtypetoheading' => $addtypetoheading
             )
         );
@@ -2763,6 +2764,7 @@ abstract class rb_base_source {
             'date',
             array(
                 'includetime' => true,
+                'includenotset' => true,
                 'addtypetoheading' => $addtypetoheading
             )
         );

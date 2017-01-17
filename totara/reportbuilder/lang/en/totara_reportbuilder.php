@@ -224,6 +224,7 @@ $string['dateisbetween'] = 'is between today and ';
 $string['datelabelisdaysafter'] = 'After today\'s date and before {$a->daysafter}';
 $string['datelabelisdaysbefore'] = 'Before today\'s date and after {$a->daysbefore}.';
 $string['datelabelisdaysbetween'] = '{$a->label} is after {$a->daysbefore} and before {$a->daysafter}';
+$string['datenotset'] = 'show blank date records';
 $string['deactivateglobalrestriction'] = 'Deactivate';
 $string['defaultsortcolumn'] = 'Default column';
 $string['defaultsortorder'] = 'Default order';
@@ -453,9 +454,8 @@ $string['initialdisplay_help'] = 'This setting controls how the report is initia
 **Enabled**: the report will not generate results until a filter is applied or an empty search is run.';
 $string['initialdisplay_pending'] = 'Please apply a filter to view the results of this report, or hit search without adding any filters to view all entries';
 $string['is'] = 'is';
-$string['isaftertoday'] = 'days after today';
-$string['isbeforetoday'] = 'days before today';
-$string['isrelativetotoday'] = ' (date of report generation)';
+$string['isaftertoday'] = 'days after today (date of report generation)';
+$string['isbeforetoday'] = 'days before today (date of report generation)';
 $string['isbelow'] = 'is below';
 $string['isnotempty'] = 'is not empty (NOT NULL)';
 $string['isnotfound'] = ' is NOT FOUND';
@@ -1155,3 +1155,11 @@ $string['xofyrecord'] = '{$a->filtered} of {$a->unfiltered} record shown';
 $string['xofyrecords'] = '{$a->filtered} of {$a->unfiltered} records shown';
 $string['xrecord'] = '{$a} record shown';
 $string['xrecords'] = '{$a} records shown';
+
+/**
+ * Deprecated strings.
+ *
+ * @deprecated since Totara 10.0.
+ */
+
+$string['isrelativetotoday'] = ' (date of report generation)';

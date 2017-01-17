@@ -53,11 +53,16 @@ class rb_filter_date extends rb_filter_type {
         if (!isset($this->options['includebetween'])) {
             $this->options['includebetween'] = true;
         }
+
         // When true - "is after" timestamp will be switched to selected date + 1 day at 00:00 of users timezone
         // E.g. "is after 17 Jan 2017" will be compared as "[field] >= (18 Jan 2017 00:00 in current user's timezone)
         // has effect only when includetime == false
         if (!isset($this->options['castdate'])) {
             $this->options['castdate'] = false;
+        }
+
+        if (!isset($this->options['includenotset'])) {
+            $this->options['includenotset'] = false;
         }
     }
 
@@ -71,6 +76,7 @@ class rb_filter_date extends rb_filter_type {
         $advanced = $this->advanced;
         $includetime = $this->options['includetime'];
         $includebetween = $this->options['includebetween'];
+        $includenotset = $this->options['includenotset'];
 
         $objs = array();
 
@@ -100,9 +106,7 @@ class rb_filter_date extends rb_filter_type {
             $objs[] =& $mform->createElement('static', null, null, $accesslabel);
             $objs[] =& $mform->createElement('text', $this->name.'daysbefore', get_string('isbeforetoday', 'totara_reportbuilder'), 'size="2"');
             $mform->setType($this->name.'daysbefore', PARAM_INT);
-            $objs[] =& $mform->createElement('static', null, null, get_string('isbeforetoday', 'totara_reportbuilder'));
-            $objs[] =& $mform->createElement('static', null, null,
-                    html_writer::span(get_string('isrelativetotoday', 'totara_reportbuilder')));
+            $objs[] =& $mform->createElement('static', null, null, html_writer::span(get_string('isbeforetoday', 'totara_reportbuilder')));
             $objs[] =& $mform->createElement('static', null, null, html_writer::empty_tag('br'));
             $objs['post'] =& $mform->createElement('checkbox', $this->name.'daysafterchkbox', null,
                     get_string('dateisbetween', 'totara_reportbuilder'));
@@ -114,10 +118,14 @@ class rb_filter_date extends rb_filter_type {
             $objs[] =& $mform->createElement('static', null, null, $accesslabel);
             $objs[] =& $mform->createElement('text', $this->name.'daysafter', get_string('isaftertoday', 'totara_reportbuilder'), 'size="2"');
             $mform->setType($this->name.'daysafter', PARAM_INT);
-            $objs[] =& $mform->createElement('static', null, null, get_string('isaftertoday', 'totara_reportbuilder'));
-            $objs[] =& $mform->createElement('static', null, null,
-                    html_writer::span(get_string('isrelativetotoday', 'totara_reportbuilder')));
+            $objs[] =& $mform->createElement('static', null, null, html_writer::span(get_string('isaftertoday', 'totara_reportbuilder')));
         }
+
+        if ($includenotset) {
+            $objs[] =& $mform->createElement('static', null, null, html_writer::empty_tag('br'));
+            $objs[] =& $mform->createElement('checkbox', $this->name.'notset', null, get_string('datenotset', 'totara_reportbuilder'));
+        }
+
         $grp =& $mform->addElement('group', $this->name.'_grp', $label, $objs, '', false);
         $mform->addHelpButton($grp->_name, 'filterdate', 'filters');
 
@@ -193,6 +201,9 @@ class rb_filter_date extends rb_filter_type {
             }
         }
 
+        if ($includenotset) {
+            $mform->setDefault($this->name.'notset', 0);
+        }
     }
 
     /**
@@ -260,9 +271,11 @@ class rb_filter_date extends rb_filter_type {
         $daysafterdt = $this->name.'daysafter';
         $daysbeforeck = $this->name.'daysbeforechkbox';
         $daysbeforedt = $this->name.'daysbefore';
+        $notset = $this->name.'notset';
 
-        if ((!isset($formdata->$sck) and !isset($formdata->$eck))
-                and (!isset($formdata->$daysafterck) and !isset($formdata->$daysbeforeck))) {
+        if ((!isset($formdata->$sck) && !isset($formdata->$eck))
+                and (!isset($formdata->$daysafterck) and !isset($formdata->$daysbeforeck))
+                and (!isset($formdata->$notset))) {
             return false;
         }
 
@@ -270,7 +283,7 @@ class rb_filter_date extends rb_filter_type {
         // Record what filters we're applying so if we're working with
         // the epoch (1970-01-01 00:00:00) as a search date we know we
         // need to apply the filter and not just reply on the integer
-        // value for the date. (The UNIX timstamp of the epoch is 0.)
+        // value for the date. (The UNIX timestamp of the epoch is 0.)
         if (isset($formdata->$sck)) {
             $data['after'] = $formdata->$sdt;
             $data['after_applied'] = true;
@@ -292,6 +305,12 @@ class rb_filter_date extends rb_filter_type {
             $data['daysbefore'] = $formdata->$daysbeforedt;
         } else {
             $data['daysbefore'] = 0;
+        }
+
+        if (isset($formdata->$notset)) {
+            $data['notset'] = intval($formdata->$notset);
+        } else {
+            $data['notset'] = 0;
         }
 
         return $data;
@@ -334,40 +353,62 @@ class rb_filter_date extends rb_filter_type {
 
         $params = array();
         $uniqueparam = rb_unique_param('fdnotnull');
-        $res = "{$query} != :{$uniqueparam}";
+        $resbase = "{$query} != :{$uniqueparam}";
         $params[$uniqueparam] = 0;
         $resdaysbefore = "$query <= $datetoday";
         $resdaysafter = "$query >= $datetoday";
 
-        if (isset($after) && isset($data['after_applied'])) {
+        if (isset($after) && isset($data['after_applied']) && isset($before) && isset($data['before_applied'])) {
+            $uniqueparamafter = rb_unique_param('fdafter');
+            $uniqueparambefore = rb_unique_param('fdbefore');
+            $res = $resbase . " AND {$query} >= :{$uniqueparamafter} AND {$query} < :{$uniqueparambefore}";
+            $params[$uniqueparamafter] = $after;
+            $params[$uniqueparambefore] = $before;
+        } else if (isset($after) && isset($data['after_applied'])) {
             $uniqueparam = rb_unique_param('fdafter');
-            $res .= " AND {$query} >= :{$uniqueparam}";
+            $res = $resbase . " AND {$query} >= :{$uniqueparam}";
             $params[$uniqueparam] = $after;
-        }
-        if (isset($before) && isset($data['before_applied'])) {
+        } else if (isset($before) && isset($data['before_applied'])) {
             $uniqueparam = rb_unique_param('fdbefore');
-            $res .= " AND {$query} < :{$uniqueparam}";
+            $res = $resbase ." AND {$query} < :{$uniqueparam}";
             $params[$uniqueparam] = $before;
         }
+
         if ($daysafter and $daysbefore) {
             $uniqueparamdaysafter = rb_unique_param('fdaysafter');
             $uniqueparamdaysbefore = rb_unique_param('fdaysbefore');
-            $result = "($resdaysafter AND {$query} <= :{$uniqueparamdaysafter}
+            $res = "($resdaysafter AND {$query} <= :{$uniqueparamdaysafter}
                 OR $resdaysbefore AND {$query} >= :{$uniqueparamdaysbefore})";
             $params[$uniqueparamdaysafter] = $daysafter;
             $params[$uniqueparamdaysbefore] = $daysbefore;
-            return array($result, $params);
         } else if ($daysafter) {
             $uniqueparam = rb_unique_param('fdaysafter');
-            $resdaysafter .= " AND {$query} <= :{$uniqueparam}";
+            $res = $resdaysafter . " AND {$query} <= :{$uniqueparam}";
             $params[$uniqueparam] = $daysafter;
-            return array($resdaysafter, $params);
         } else if ($daysbefore) {
             $uniqueparam = rb_unique_param('fdaysbefore');
-            $resdaysbefore .= " AND {$query} >= :{$uniqueparam}";
+            $res = $resdaysbefore . " AND {$query} >= :{$uniqueparam}";
             $params[$uniqueparam] = $daysbefore;
-            return array($resdaysbefore, $params);
         }
+
+        // The 'not set' option works differently to the others. When used
+        // with the other options it's as an OR against ALL the other SQL.
+        if (!empty($data['notset'])) {
+            $uniqueparam = rb_unique_param('fnotset');
+            $params[$uniqueparam] = 0;
+
+            // Add the SQL to check that the timestamp is zero.
+            if (isset($res)) {
+                $res = "({$res}) OR {$query} = :{$uniqueparam}";
+            } else {
+                $res = "{$query} = :{$uniqueparam}";
+            }
+        }
+
+        if (!isset($res)) {
+            $res = $resbase;
+        }
+
         return array($res, $params);
     }
 
