@@ -2536,6 +2536,17 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading
             )
         );
+        $columnoptions[] = new rb_column_option(
+            $groupname,
+            'totarasync',
+            get_string('totarasyncenableduser', 'totara_reportbuilder'),
+            "$join.totarasync",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'yes_or_no',
+                'addtypetoheading' => $addtypetoheading
+            )
+        );
 
         return true;
     }
@@ -2660,6 +2671,18 @@ abstract class rb_base_source {
             'date',
             array(
                 'includetime' => true,
+                'addtypetoheading' => $addtypetoheading
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            $groupname,
+            'totarasync',
+            get_string('totarasyncenableduser', 'totara_reportbuilder'),
+            'select',
+            array(
+                'selectchoices' => array(0 => get_string('no'), 1 => get_string('yes')),
+                'simplemode' => true,
                 'addtypetoheading' => $addtypetoheading
             )
         );

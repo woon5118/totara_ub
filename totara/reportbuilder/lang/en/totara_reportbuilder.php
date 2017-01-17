@@ -997,6 +997,7 @@ $string['toolbarsearchdisabled_help'] = 'Checking this box will prevent the sear
 report. This has the same result as removing all search fields.';
 $string['toolbarsearchtextiscontainedinsingle'] = '"{$a->searchtext}" is contained in the column "{$a->field}"';
 $string['toolbarsearchtextiscontainedinmultiple'] = '"{$a}" is contained in one or more of the following columns: ';
+$string['totarasyncenableduser'] = 'HR Import';
 $string['trainerownrecords'] = 'Show records where the user is the trainer';
 $string['trainerstaffrecords'] = 'Records where one of the user\'s direct reports is the trainer';
 $string['transformtypeday_heading'] = '{$a} - day of month';
