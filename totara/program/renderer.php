@@ -818,8 +818,6 @@ class totara_program_renderer extends plugin_renderer_base {
 
         // Generate an id and the required JS call to make this a nice widget.
         $id = html_writer::random_id('course_category_tree');
-        $this->page->requires->js_init_call('M.util.init_toggle_class_on_click',
-                        array($id, '.category.with_children.loaded > .info .name', 'collapsed', '.category.with_children.loaded'));
 
         $content = '';
         $attributes = $chelper->get_and_erase_attributes('course_category_tree clearfix');
