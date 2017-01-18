@@ -67,6 +67,7 @@ class rb_source_site_logstore extends rb_base_source {
 
         // Include some standard joins.
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_role_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_course_table_to_joinlist($joinlist, 'base', 'courseid');
         // Requires the course join.
         $this->add_course_category_table_to_joinlist($joinlist,
@@ -78,6 +79,7 @@ class rb_source_site_logstore extends rb_base_source {
 
         // Add related user support.
         $this->add_user_table_to_joinlist($joinlist, 'base', 'relateduserid', 'ruser');
+        $this->add_role_tables_to_joinlist($joinlist, 'base', 'relateduserid', 'ruser');
         return $joinlist;
     }
 
@@ -244,6 +246,7 @@ class rb_source_site_logstore extends rb_base_source {
 
         // Include some standard columns.
         $this->add_user_fields_to_columns($columnoptions);
+        $this->add_role_fields_to_columns($columnoptions, 'base', 'user', 'user', true);
         $this->add_course_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions);
         $this->add_job_assignment_fields_to_columns($columnoptions);
@@ -252,6 +255,7 @@ class rb_source_site_logstore extends rb_base_source {
         $this->add_cohort_course_fields_to_columns($columnoptions);
         // Add related user support.
         $this->add_user_fields_to_columns($columnoptions, 'ruser', 'relateduser', true);
+        $this->add_role_fields_to_columns($columnoptions, 'ruser', 'ruser', 'relateduser', true);
 
         return $columnoptions;
     }
@@ -305,8 +309,10 @@ class rb_source_site_logstore extends rb_base_source {
         );
 
         // Include some standard filters.
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_user_fields_to_filters($filteroptions, 'relateduser', true);
+        $this->add_user_fields_to_filters($filteroptions, 'user', true);
+        $this->add_user_fields_to_filters($filteroptions, 'relateduser', true, 'ruser');
+        $this->add_role_fields_to_filters($filteroptions, 'base', 'user', 'user', true);
+        $this->add_role_fields_to_filters($filteroptions, 'ruser', 'ruser', 'relateduser', true);
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
         $this->add_job_assignment_fields_to_filters($filteroptions);

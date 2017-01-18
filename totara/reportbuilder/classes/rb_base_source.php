@@ -120,8 +120,10 @@ abstract class rb_base_source {
 
         // Add custom user fields for columns added via add_user_fields_to_columns() and friends.
         foreach ($this->addeduserjoins as $join => $info) {
-            if (empty($info['groupname'])) {
-                // Most likely somebody did not add any user columns, in that case do not add custom fields and rely on the BC fallback later.
+            // If groupname is not set it's most likely no columns have been added so don't add custom
+            // fields. Also don't reprocess any that have already been processed and avoid any that
+            // shouldn't have custom fields added.
+            if (empty($info['groupname']) || isset($info['processed']) || isset($info['nocustomfields'])) {
                 continue;
             }
             $this->add_custom_user_fields($this->joinlist, $this->columnoptions, $this->filteroptions, $join, $info['groupname'], $info['addtypetoheading'], empty($info['filters']));
@@ -192,14 +194,24 @@ abstract class rb_base_source {
                 $joindata['add_custom_evidence_fields'] = 'base';
                 break;
         }
+
         //and then use the flags to call the appropriate add functions
         foreach ($joindata as $joinfunction => $jointable) {
+            // Don't add any custom fields if it's already been done or is not wanted.
+            if (isset($this->addeduserjoins['processed']) || isset($this->addeduserjoins['nocustomfields'])) {
+                continue;
+            }
+
             $this->$joinfunction($this->joinlist,
                                  $this->columnoptions,
                                  $this->filteroptions,
                                  $jointable
                                 );
 
+            // Only mark any pre-existing joins in here so we don't upset things.
+            if (isset($this->addeduserjoins[$jointable])) {
+                $this->addeduserjoins[$jointable]['processed'] = true;
+            }
         }
     }
 
@@ -2337,6 +2349,7 @@ abstract class rb_base_source {
      * @return boolean True
      */
     protected function add_user_table_to_joinlist(&$joinlist, $join, $field, $alias = 'auser') {
+
         if (isset($this->addeduserjoins[$alias])) {
             debugging("User join '{$alias}' was already added to the source", DEBUG_DEVELOPER);
         } else {
@@ -2351,6 +2364,47 @@ abstract class rb_base_source {
             "{$alias}.id = $join.$field",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
+        );
+
+        return true;
+    }
+
+
+    /**
+     * Adds adds SQL to the $joinlist array to return concatenated roles.
+     *
+     * @param array &$joinlist  Array of current join options passed by reference and updated to include new table joins.
+     * @param string $join      Name of the join that provides the id field.
+     * @param string $field     Name of id field to use with $join.
+     * @param string $alias     An alias to name the new join.
+     *
+     * @return boolean True
+     */
+    protected function add_role_tables_to_joinlist(&$joinlist, $join, $field, $alias = 'user') {
+        global $DB;
+
+        $rolejoinalias = $alias . 'systemrole';
+
+        if (isset($this->addeduserjoins[$rolejoinalias])) {
+            debugging("User join '{$rolejoinalias}' was already added to the source", DEBUG_DEVELOPER);
+        } else {
+            $this->addeduserjoins[$rolejoinalias] = array('join' => $join, 'nocustomfields' => true);
+        }
+
+        // Add a join so the User System Role column can be used.
+        $joinsql = "(SELECT a.userid AS userid, CONCAT('|'," . $DB->sql_group_concat('a.roleid', '|', 'a.roleid') . ",'|') systemrolelist
+            FROM {role_assignments} a
+            WHERE a.contextid = " . SYSCONTEXTID . "
+            GROUP BY a.userid)";
+
+        $joinlist[] = new rb_join(
+            $rolejoinalias,
+            'LEFT',
+            $joinsql,
+            $rolejoinalias . ".userid = $join.$field",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            $join,
+            array('nocustomfields' => true)
         );
 
         return true;
@@ -2669,6 +2723,45 @@ abstract class rb_base_source {
 
 
     /**
+     * Adds columns that relate to a user role.
+     *
+     * @param array &$columnoptions         Array of current column options passed by reference and updated by this method.
+     * @param string $join                  The join to use for the columns.
+     * @param string $alias                 The table alias to use for the column field.
+     * @param string $groupname             Which group to add this column to.
+     * @param boolean $$addtypetoheading    Add the group name to distinguish between multiple uses of the same column.
+     *
+     * @return True
+     */
+    protected function add_role_fields_to_columns(&$columnoptions, $join = 'base', $alias = 'user', $groupname = 'user', $addtypetoheading = false) {
+
+        $rolejoinalias = $alias . 'systemrole';
+
+        if (!isset($this->addeduserjoins[$rolejoinalias])) {
+            debugging("Add join '{$rolejoinalias}' via add_role_tables_to_joinlist() before calling add_role_fields_to_columns()", DEBUG_DEVELOPER);
+        } else if (isset($this->addeduserjoins[$rolejoinalias]['groupname'])) {
+            debugging("Role columns for {$rolejoinalias} were already added to the source", DEBUG_DEVELOPER);
+        } else {
+            $this->addeduserjoins[$rolejoinalias]['groupname'] = $groupname;
+            $this->addeduserjoins[$rolejoinalias]['addtypetoheading'] = $addtypetoheading;
+        }
+
+        $columnoptions[] = new rb_column_option(
+            $groupname,
+            'systemrolelist',
+            get_string('usersystemrole', 'totara_reportbuilder'),
+            $rolejoinalias . ".systemrolelist",
+            array(
+                'joins' => array($join, $rolejoinalias),
+                'addtypetoheading' => $addtypetoheading,
+                'displayfunc' => 'role'
+            )
+        );
+
+        return true;
+    }
+
+    /**
      * Adds some common user field to the $filteroptions array
      *
      * @param array &$filteroptions Array of current filter options
@@ -2678,7 +2771,7 @@ abstract class rb_base_source {
      *                          a custom group name, you must define a language
      *                          string with the key "type_{$groupname}" in your
      *                          report source language file.
-     * @return True
+     * @return true
      */
     protected function add_user_fields_to_filters(&$filteroptions, $groupname = 'user', $addtypetoheading = false) {
         global $CFG;
@@ -2857,6 +2950,56 @@ abstract class rb_base_source {
 
         return true;
     }
+
+
+    /**
+     * Adds filters that relate to a user role.
+     *
+     * @param array &$filteroptions         Array of current filter options passed by reference and updated by this method
+     * @param string $join                  The join to use for the filter.
+     * @param string $alias                 The table alias to use for the filter field.
+     * @param string $groupname             Which group to add this filter to.
+     * @param boolean $$addtypetoheading    Add the group name to distinguish between multiple uses of the same filter.
+     *
+     * @return true
+     */
+    protected function add_role_fields_to_filters(&$filteroptions, $join = 'base', $alias = 'user', $groupname = 'user', $addtypetoheading = false) {
+
+        $rolejoinalias = $alias . 'systemrole';
+
+        $found = false;
+        foreach ($this->addeduserjoins as $joinname => $unused) {
+            if (!isset($this->addeduserjoins[$joinname]['groupname'])) {
+                continue;
+            }
+            if ($this->addeduserjoins[$joinname]['groupname'] === $groupname) {
+                $this->addeduserjoins[$joinname]['filters'] = true;
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            debugging("Add role join with group name '{$groupname}' via add_role_tables_to_joinlist() before calling add_role_fields_to_filters()", DEBUG_DEVELOPER);
+        }
+
+        $filteroptions[] = new rb_filter_option(
+            $groupname,
+            'roleid',
+            get_string('usersystemrole', 'totara_reportbuilder'),
+            'role',
+            array(
+                'selectchoices' => array('' => get_string('chooserole', 'totara_reportbuilder'),
+                        '0' => get_string('anyrole', 'totara_reportbuilder')) + get_assignable_roles(context_system::instance()),
+                'dataseparator' => '|',
+                'addtypetoheading' => $addtypetoheading
+            ),
+            $rolejoinalias . ".systemrolelist",
+            array($join, $rolejoinalias)
+        );
+
+        return true;
+    }
+
 
     public function rb_filter_auth_options() {
         $authoptions = array();
