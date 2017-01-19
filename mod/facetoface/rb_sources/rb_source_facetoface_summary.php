@@ -104,6 +104,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
         $this->add_job_assignment_tables_to_joinlist($joinlist, 'allattendees', 'userid');
         $this->add_user_table_to_joinlist($joinlist, 'allattendees', 'userid');
+        $this->add_user_table_to_joinlist($joinlist, 'sessions', 'usermodified', 'modifiedby');
         $this->add_facetoface_session_roles_to_joinlist($joinlist, 'sessions.id');
         $this->add_facetoface_currentuserstatus_to_joinlist($joinlist);
 
@@ -112,7 +113,10 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
 
     public function define_columnoptions() {
 
-        global $CFG;
+        global $CFG, $DB;
+
+        $usernamefieldscreator = totara_get_all_user_name_fields_join('modifiedby');
+
         $intimezone = '';
         if (!empty($CFG->facetoface_displaysessiontimezones)) {
             $intimezone = '_in_timezone';
@@ -315,6 +319,40 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                     )
                 );
             }
+            $columnoptions[] = new rb_column_option(
+                'session',
+                'eventtimecreated',
+                get_string('eventtimecreated', 'rb_source_facetoface_events'),
+                "sessions.timecreated",
+                array(
+                    'joins' => 'sessions',
+                    'displayfunc' => 'nice_datetime',
+                    'dbdatatype' => 'timestamp',
+                )
+            );
+            $columnoptions[] = new rb_column_option(
+                'session',
+                'eventtimemodified',
+                get_string('lastupdated', 'rb_source_facetoface_summary'),
+                "sessions.timemodified",
+                array(
+                    'joins' => 'sessions',
+                    'displayfunc' => 'nice_datetime',
+                    'dbdatatype' => 'timestamp',
+                )
+            );
+            $columnoptions[] = new rb_column_option(
+                'session',
+                'eventmodifiedby',
+                get_string('lastupdatedby', 'rb_source_facetoface_summary'),
+                "CASE WHEN sessions.usermodified = 0 THEN null
+                  ELSE " . $DB->sql_concat_join("' '", $usernamefieldscreator) . " END",
+                array(
+                    'joins' => 'modifiedby',
+                    'displayfunc' => 'link_user',
+                    'extrafields' => array_merge(array('id' => 'modifiedby.id'), $usernamefieldscreator),
+                )
+            );
         }
 
         $this->add_session_status_to_columns($columnoptions);
@@ -375,6 +413,24 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 array(
                     'selectfunc' => 'overallstatus',
                 )
+            ),
+            new rb_filter_option(
+                'session',
+                'eventtimecreated',
+                get_string('eventtimecreated', 'rb_source_facetoface_events'),
+                'date'
+            ),
+            new rb_filter_option(
+                'session',
+                'eventtimemodified',
+                get_string('lastupdated', 'rb_source_facetoface_summary'),
+                'date'
+            ),
+            new rb_filter_option(
+                'session',
+                'eventmodifiedby',
+                get_string('lastupdatedby', 'rb_source_facetoface_summary'),
+                'text'
             ),
             new rb_filter_option(
                 'asset',
