@@ -2655,7 +2655,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         ob_start();
         facetoface_notify_under_capacity();
         $mtrace = ob_get_clean();
-        $this->assertContains('is under capacity', $mtrace);
+        $this->assertContains('is under minimum bookings', $mtrace);
         $messages = $sink->get_messages();
 
         // Only the teacher should get a message.
@@ -2666,7 +2666,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertEquals(get_string('sessionundercapacity', 'facetoface', format_string($facetoface1->name)), $messages[0]->subject);
     }
 
-    // Face-to-face minimum capacity specification.
+    // Face-to-face minimum bookings specification.
     function test_facetoface_disable_notify_under_capacity() {
         global $DB;
         $this->init_sample_data();
@@ -2711,14 +2711,14 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         ob_start();
         facetoface_notify_under_capacity();
         $mtrace = ob_get_clean();
-        $this->assertNotContains('is under capacity', $mtrace);
+        $this->assertNotContains('is under minimum bookings', $mtrace);
         $messages = $sink->get_messages();
 
         // There should be no messages received.
         $this->assertCount(0, $messages);
     }
 
-    // Face-to-face minimum capacity specification.
+    // Face-to-face minimum bookings specification.
     public function test_under_capacity_notification() {
         global $DB;
         $this->init_sample_data();
@@ -2779,14 +2779,14 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         ob_start();
         facetoface_notify_under_capacity();
         $mtrace = ob_get_clean();
-        $this->assertContains('is under capacity - 1/10 (min capacity 4)', $mtrace);
+        $this->assertContains('is under minimum bookings - 1/10 (min capacity 4)', $mtrace);
         $messages = $sink->get_messages();
 
         // There should be one messages received.
         $this->assertCount(1, $messages);
         $message = array_pop($messages);
-        $this->assertSame('Event under capacity for: facetoface1', $message->subject);
-        $this->assertContains('The following event is under capacity:', $message->fullmessage);
+        $this->assertSame('Event under minimum bookings for: facetoface1', $message->subject);
+        $this->assertContains('The following event is under minimum bookings:', $message->fullmessage);
         $this->assertContains('Capacity: 1 / 10 (minimum: 4)', $message->fullmessage);
     }
 

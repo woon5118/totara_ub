@@ -93,7 +93,7 @@ class send_notifications_task extends \core\task\scheduled_task {
 
         // Notify of sessions that are under capacity.
         if (!$this->testing) {
-            mtrace("Checking for sessions below minimum capacity");
+            mtrace("Checking for sessions below minimum bookings");
         }
         facetoface_notify_under_capacity();
 

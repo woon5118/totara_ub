@@ -1300,7 +1300,7 @@ function facetoface_notify_under_capacity() {
             continue;
         }
 
-        // We've found a session that has not reached the minimum capacity by the cut-off - time to send out emails.
+        // We've found a session that has not reached the minimum bookings by the cut-off - time to send out emails.
         $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
         $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course, false);
         $url = new moodle_url('/mod/facetoface/view.php', array('id' => $cm->id));
@@ -1333,7 +1333,7 @@ function facetoface_notify_under_capacity() {
         );
 
         if (CLI_SCRIPT) {
-            mtrace("Facetoface '{$info->name}' in course {$facetoface->course} is under capacity - {$info->booked}/{$info->capacity} (min capacity {$info->mincapacity}) - emailing session roles.");
+            mtrace("Facetoface '{$info->name}' in course {$facetoface->course} is under minimum bookings - {$info->booked}/{$info->capacity} (min capacity {$info->mincapacity}) - emailing session roles.");
         }
 
         // Get all the users who need to receive the under capacity warning.

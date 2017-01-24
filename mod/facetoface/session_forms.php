@@ -100,7 +100,7 @@ class mod_facetoface_session_form extends moodleform {
             $mform->addHelpButton('waitlisteveryone', 'waitlisteveryone', 'facetoface');
         }
 
-        // Show minimum capacity and cut-off (for when this should be reached).
+        // Show minimum bookings and cut-off (for when this should be reached).
         $mform->addElement('text', 'mincapacity', get_string('minbookings', 'facetoface'), array('size' => 5));
         $mform->setType('mincapacity', PARAM_INT);
         $mform->setDefault('mincapacity', get_config('facetoface', 'defaultminbookings'));
@@ -561,7 +561,7 @@ class mod_facetoface_session_form extends moodleform {
             }
         }
 
-        // Check the minimum capacity.
+        // Check the minimum bookings.
         $mincapacity = $data['mincapacity'];
         if (!is_numeric($mincapacity) || (intval($mincapacity) != $mincapacity)) {
             $errors['mincapacity'] = get_string('error:mincapacitynotnumeric', 'facetoface');

@@ -145,7 +145,7 @@ Feature: Filter seminar events in calendar by their customfields
     And I set the following fields to these values:
       | Name                          | Room 1          |
       | Address                       | 123 here street |
-      | Maximum bookings              | 5               |
+      | Room capacity                 | 5               |
       | Building                      | That house      |
       | Checkbox                      | 1               |
       | customfield_datetime[enabled] | 1               |
@@ -162,7 +162,7 @@ Feature: Filter seminar events in calendar by their customfields
     And I set the following fields to these values:
       | Name                          | Room 2        |
       | Address                       | 123 other ave |
-      | Maximum bookings              | 5             |
+      | Room capacity                 | 5             |
       | Building                      | My house      |
       | Checkbox                      | 0             |
       | customfield_datetime[enabled] | 1             |

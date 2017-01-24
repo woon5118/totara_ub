@@ -22,19 +22,19 @@ Feature: Seminar room availability
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                         | Room 1          |
-      | Maximum bookings             | 10              |
+      | Room capacity                | 10              |
       | Allow room booking conflicts | 0               |
     And I press "Add a room"
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                         | Room 2          |
-      | Maximum bookings             | 10              |
+      | Room capacity                | 10              |
       | Allow room booking conflicts | 1               |
     And I press "Add a room"
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                         | Room 3          |
-      | Maximum bookings             | 10              |
+      | Room capacity                | 10              |
       | Allow room booking conflicts | 0               |
     And I press "Add a room"
     And I click on "Hide from users when choosing a room on the Add/Edit event page" "link" in the "Room 3" "table_row"

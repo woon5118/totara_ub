@@ -110,7 +110,7 @@ $string['approved'] = 'Approved';
 $string['approvername'] = 'Approver name';
 $string['approverrolename'] = 'Approver role';
 $string['approveuserevent'] = 'Approve {$a} for this event';
-$string['areyousureconfirmwaitlist'] = 'This will be over the event capacity allowance. Are you sure you want to continue?';
+$string['areyousureconfirmwaitlist'] = 'This will be over the event maximum bookings allowance. Are you sure you want to continue?';
 $string['assessmentyour'] = 'Your assessment';
 $string['assetalreadybooked'] = ' (asset unavailable on selected dates)';
 $string['assetcreatesuccess'] = 'Successfully created asset';
@@ -374,7 +374,7 @@ $string['customfieldroom'] = 'Room: {$a}';
 $string['customfieldsession'] = 'Event: {$a}';
 $string['cutoff'] = 'Cut-off';
 $string['cutoffnote'] = 'before event starts';
-$string['cutoff_help'] = 'The amount of time before the first event that messages about minimum capacity will be sent.
+$string['cutoff_help'] = 'The amount of time before the first event that messages about minimum bookings will be sent.
 This must be at least 24 hours before the event.
 The start date of the earliest event must be at least this far in the future.';
 $string['created'] = 'Created';
@@ -519,8 +519,8 @@ $string['error:cannotsendconfirmationusermanager'] = 'A confirmation message cou
 $string['error:canttakeattendanceforunstartedsession'] = 'Can not take attendance for a event that has yet to start.';
 $string['error:capabilityaddattendees'] = 'You do not have the necessary permissions to add attendees';
 $string['error:capabilityremoveattendees'] = 'You do not have the necessary permissions to remove attendees';
-$string['error:capacitynotnumeric'] = 'Event capacity is not a number';
-$string['error:capacityzero'] = 'Event capacity must be greater than zero';
+$string['error:capacitynotnumeric'] = 'Event maximum bookings is not a number';
+$string['error:capacityzero'] = 'Event maximum bookings must be greater than zero';
 $string['error:conflictingsession'] = 'The user {$a} is already signed up for another event';
 $string['error:couldnotaddfield'] = 'Could not add custom event field.';
 $string['error:couldnotaddnotice'] = 'Could not add site notice.';
@@ -547,8 +547,8 @@ $string['error:csvinconsistentrows'] = 'Rows {$a} of your file contain a differe
 $string['error:csvnoidfields'] = 'You did not provide a column called \'username\', \'email\', or \'idnumber\'';
 $string['error:csvnorequiredcf'] = 'You did not provide a column called \'{$a}\'';
 $string['error:csvtoomanyidfields'] = 'Your file contained more than one of the following columns: \'username\', \'email\', \'idnumber\'';
-$string['error:cutofftooclose'] = 'The cut-off time for minimum capacity is too close to the events earliest start date, please set at least a 24 hours cut-off';
-$string['error:cutofftoolate'] = 'The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect.';
+$string['error:cutofftooclose'] = 'The cut-off time for minimum bookings is too close to the events earliest start date, please set at least a 24 hours cut-off';
+$string['error:cutofftoolate'] = 'The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect.';
 $string['error:datesunavailablestuff'] = 'The new dates you have selected are unavailable due to a scheduling conflict with the following resources:<br/>{$a}Please choose different dates or change the selected room/assets.';
 $string['error:emailnotfound'] = 'No users were found with the following emails: {$a}';
 $string['error:emptylocation'] = 'Location was empty.';
@@ -571,9 +571,9 @@ $string['error:isalreadybooked'] = '{$a} is already booked';
 $string['error:jobassignementsonsignupdisabled'] = 'Select job assignments on sign up is not enabled for this Seminar activity.';
 $string['error:manageremailaddressmissing'] = 'You are currently not assigned to a manager in the system. Please contact the site administrator.';
 $string['error:mincapacitymissing'] = 'Session minimum bookings value is missing';
-$string['error:mincapacitynotnumeric'] = 'Event minimum capacity is not a number';
-$string['error:mincapacitytoolarge'] = 'Event minimum capacity cannot be greater than the capacity';
-$string['error:mincapacityzero'] = 'Event minimum capacity cannot be zero';
+$string['error:mincapacitynotnumeric'] = 'Event minimum bookings is not a number';
+$string['error:mincapacitytoolarge'] = 'Event minimum bookings cannot be greater than the capacity';
+$string['error:mincapacityzero'] = 'Event minimum bookings cannot be zero';
 $string['error:missingrequiredmanager'] = 'This seminar requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator.';
 $string['error:missingrequiredrole'] = 'This seminar requires role approval, there are no users assigned to this role. Please contact the site administrator.';
 $string['error:missingselectedmanager'] = 'This seminar requires manager approval, please select a manager to request approval';
@@ -750,7 +750,7 @@ $string['mark_selected_as'] = 'Mark all selected as: ';
 $string['maxbookings'] = 'Maximum bookings';
 $string['maxbookings_help'] = '**Maximum bookings** is the number of seats available in a event.
 
-When a seminar event reaches capacity the event details do not appear on the course page. The details will appear greyed out on the \'View all events\' page and the learner cannot enrol on the event.
+When a seminar event reaches maximum bookings the event details do not appear on the course page. The details will appear greyed out on the \'View all events\' page and the learner cannot enrol on the event.
 &nbsp;';
 $string['maximumpoints'] = 'Maximum number of points';
 $string['maximumsize'] = 'Maximum number of attendees';
@@ -900,7 +900,7 @@ $string['reserveallallocatedother'] = 'This manager has already allocated the ma
 $string['reservecancel'] = 'Automatically cancel reservations';
 $string['reservecanceldays'] = 'Reservation cancellation days';
 $string['reservecanceldays_help'] = 'The number of days in advance of the event that reservations will be automatically cancelled, if not confirmed';
-$string['reservecapacitywarning'] = '* Any new reservations over the current event capacity ({$a} left) will be added to the waiting list';
+$string['reservecapacitywarning'] = '* Any new reservations over the current event maximum bookings ({$a} left) will be added to the waiting list';
 $string['reserved'] = 'Reserved';
 $string['reservedby'] = 'Reserved ({$a})';
 $string['reservedays'] = 'Reservation deadline';
@@ -930,6 +930,7 @@ $string['roomnameedittoolong'] = 'Room name can only be upto {$a} characters in 
 $string['room'] = 'Room';
 $string['rooms'] = 'Rooms';
 $string['roomshown'] = 'Room shown successfully';
+$string['roomcapacity'] = 'Room capacity';
 $string['roomcreatesuccess'] = 'Successfully created room';
 $string['roomtype'] = 'Room type';
 $string['roomtype_help'] = 'If checked, allows the room to be booked for different events that are running at the same time.';
@@ -1087,9 +1088,9 @@ $string['sessionstarttime_help'] = 'When creating or editing a event, the event 
 $string['sessiontimezone'] = 'Timezone displayed';
 $string['sessiontimezone_help'] = 'Select the timezone you want this event to be displayed in e.g. "Pacific/Auckland". This will display the start time, finish time and timezone in accordance with the timezone selected. If you choose "User timezone", this will display the start time, finish date and timezone in relation to the timezone of the user viewing the event.';
 $string['sessiontimezoneunknown'] = 'Unknown Timezone';
-$string['sessionundercapacity'] = 'Event under capacity for: {$a}';
+$string['sessionundercapacity'] = 'Event under minimum bookings for: {$a}';
 $string['sessioncancellationcustomfieldtab'] = 'Event cancellation';
-$string['sessionundercapacity_body'] = 'The following event is under capacity:
+$string['sessionundercapacity_body'] = 'The following event is under minimum bookings:
 
 Name: {$a->name}
 Event start: {$a->starttime}
@@ -1119,7 +1120,7 @@ $string['setting:approval_admin'] = 'Manager and Administrative approval';
 $string['setting:allowschedulingconflicts_caption'] = 'Allow override user conflicts:';
 $string['setting:allowschedulingconflicts'] = 'Allow or disallow user conflicts to exist while creating a new event.';
 $string['setting:allowwaitlisteveryone_caption'] = 'Everyone on waiting list';
-$string['setting:allowwaitlisteveryone'] = 'When enabled a setting will appear in seminar event settings to put all users onto the waiting list when they signup regardless of event capacity.';
+$string['setting:allowwaitlisteveryone'] = 'When enabled a setting will appear in seminar event settings to put all users onto the waiting list when they signup regardless of event maximum bookings.';
 $string['setting:calendarfilters'] = 'Selected fields will be displayed as filters in the user\'s calendar';
 $string['setting:calendarfilterscaption'] = 'Add calendar filters:';
 $string['setting:defaultcancellationinstrmngr'] = 'Default cancellation message sent to managers.';
@@ -1986,7 +1987,7 @@ $string['setting:reservedays_desc'] = 'The number of days before the event start
 $string['setting:showinsummary'] = 'Show in exports and lists';
 $string['setting:sessionroles'] = 'Users assigned to the selected roles in a course can be tracked with each seminar event';
 $string['setting:sessionroles_caption'] = 'Event roles:';
-$string['setting:sessionrolesnotify'] = 'The roles that will receive the automated notifications for seminar events, for example the minimum capacity warning';
+$string['setting:sessionrolesnotify'] = 'The roles that will receive the automated notifications for seminar events, for example the minimum bookings warning';
 $string['setting:sessionrolesnotify_caption'] = 'Notification recipients';
 $string['setting:type'] = 'Field type';
 $string['setting:notificationdisable'] = 'Turn on/off seminar activity notification emails to users';
@@ -2424,7 +2425,7 @@ $string['waitliststatus'] = 'You have a place on the waitlist of the following s
 $string['cancel'] = 'Cancel';
 $string['capacity_help'] = '**Capacity** is the number of seats available in a event.
 
-When a face-to-face event reaches capacity the event details do not appear on the course page. The details will appear greyed out on the \'View all events\' page and the learner cannot enrol on the event.
+When a Seminar event reaches capacity the event details do not appear on the course page. The details will appear greyed out on the \'View all events\' page and the learner cannot enrol on the event.
 &nbsp;';
 $string['copy'] = 'Copy';
 $string['datetimeknownhinttext'] = '';

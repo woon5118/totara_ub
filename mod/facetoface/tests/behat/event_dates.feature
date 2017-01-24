@@ -44,7 +44,7 @@ Feature: I can add and edit seminar session dates
       | capacity                  | 10   |
 
     When I press "Save changes"
-    Then I should not see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    Then I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     And I should see "Upcoming events"
     And I should see "1 January 2020"
 
@@ -60,7 +60,7 @@ Feature: I can add and edit seminar session dates
     When I set the following fields to these values:
       | Details | This event was run in the past |
     And I press "Save changes"
-    And I should not see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     Then I should see "Upcoming events"
 
     When I click to edit the seminar session in row 1
@@ -73,7 +73,7 @@ Feature: I can add and edit seminar session dates
     And I press "OK"
     And I press "Save changes"
     Then I should see "Upcoming events"
-    And I should not see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
 
   @javascript
   Scenario: I can edit a future seminar session
@@ -104,7 +104,7 @@ Feature: I can add and edit seminar session dates
     And I set the following fields to these values:
       | capacity                  | 10   |
     When I press "Save changes"
-    Then I should not see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    Then I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     And I should see "Upcoming events"
     And I should see "1 January 2020"
 
@@ -114,7 +114,7 @@ Feature: I can add and edit seminar session dates
     When I set the following fields to these values:
       | Details | This event was run in the past |
     And I press "Save changes"
-    And I should not see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     Then I should see "Upcoming events"
 
     When I click to edit the seminar session in row 1
@@ -137,10 +137,10 @@ Feature: I can add and edit seminar session dates
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     Then I should see "Upcoming events"
-    And I should not see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
 
   @javascript
-  Scenario: I can edit a past seminar session with a minimum capacity and cutoff
+  Scenario: I can edit a past seminar session with a minimum bookings and cutoff
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -172,7 +172,7 @@ Feature: I can add and edit seminar session dates
       | sendcapacityemail          | 1    |
       | cutoff[number]             | 24   |
     And I press "Save changes"
-    And I should not see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     And I should see "Upcoming events"
     And I should see "1 January 2020"
     And I use magic to adjust the seminar event "start" from "01/01/2020 10:00" "Pacific/Auckland" to "26/10/2016 10:00"
@@ -188,7 +188,7 @@ Feature: I can add and edit seminar session dates
     When I set the following fields to these values:
       | Details | This event was run in the past |
     And I press "Save changes"
-    And I should not see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     Then I should see "Upcoming events"
 
     When I click to edit the seminar session in row 1
@@ -210,11 +210,11 @@ Feature: I can add and edit seminar session dates
       | timefinish[timezone] | Pacific/Auckland |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    Then I should see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    Then I should see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     And I should not see "Upcoming events"
 
   @javascript
-  Scenario: I can edit a future seminar session with a minimum capacity and cutoff
+  Scenario: I can edit a future seminar session with a minimum bookings and cutoff
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
@@ -246,7 +246,7 @@ Feature: I can add and edit seminar session dates
       | sendcapacityemail          | 1    |
       | cutoff[number]             | 24   |
     When I press "Save changes"
-    Then I should not see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    Then I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     And I should see "Upcoming events"
     And I should see "1 January 2020"
 
@@ -256,7 +256,7 @@ Feature: I can add and edit seminar session dates
     When I set the following fields to these values:
       | Details | This event was run in the past |
     And I press "Save changes"
-    And I should not see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     Then I should see "Upcoming events"
 
     When I click to edit the seminar session in row 1
@@ -278,5 +278,5 @@ Feature: I can add and edit seminar session dates
       | timefinish[timezone] | Pacific/Auckland |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    Then I should not see "The cut-off for minimum capacity is after the events earliest start date, it must be before to have any effect."
+    Then I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     And I should see "Upcoming events"

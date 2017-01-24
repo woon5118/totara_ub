@@ -20,7 +20,7 @@ Feature: Test room conflicts through backup/restore
       | Name              | Room 1          |
       | Building          | Building 123    |
       | Address           | 123 Tory street |
-      | Maximum bookings  | 10              |
+      | Room capacity     | 10              |
       | Allow room booking conflicts | 0    |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
@@ -32,7 +32,7 @@ Feature: Test room conflicts through backup/restore
       | Name              | Room 2          |
       | Building          | Building 234    |
       | Address           | 234 Tory street |
-      | Maximum bookings  | 10              |
+      | Room capacity     | 10              |
       | Allow room booking conflicts | 1    |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
