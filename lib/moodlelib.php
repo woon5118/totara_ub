@@ -6934,12 +6934,12 @@ function get_directory_size($rootdir, $excludefile='') {
 
     // Do it this way if we can, it's much faster.
     if (!empty($CFG->pathtodu) && is_executable(trim($CFG->pathtodu))) {
-        $command = trim($CFG->pathtodu).' -sk '.escapeshellarg($rootdir);
-        $output = null;
-        $return = null;
-        exec($command, $output, $return);
-        if (is_array($output)) {
+        $ducommand = new \core\command\executable($CFG->pathtodu);
+        $ducommand->add_switch('-sk');
+        $ducommand->add_value($rootdir, \core\command\argument::PARAM_FULLFILEPATH);
+        if ($ducommand->execute()->get_return_status() == 0) {
             // We told it to return k.
+            $output = $ducommand->get_output();
             return get_real_size(intval($output[0]).'k');
         }
     }

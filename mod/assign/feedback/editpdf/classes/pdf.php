@@ -441,23 +441,27 @@ class pdf extends \FPDI {
 
         if ($generate) {
             // Use ghostscript to generate an image of the specified page.
-            $gsexec = \escapeshellarg($CFG->pathtogs);
-            $imageres = \escapeshellarg(100);
-            $imagefilearg = \escapeshellarg($imagefile);
-            $filename = \escapeshellarg($this->filename);
-            $pagenoinc = \escapeshellarg($pageno + 1);
-            $command = "$gsexec -q -sDEVICE=png16m -dSAFER -dBATCH -dNOPAUSE -r$imageres -dFirstPage=$pagenoinc -dLastPage=$pagenoinc ".
-                "-dDOINTERPOLATE -dGraphicsAlphaBits=4 -dTextAlphaBits=4 -sOutputFile=$imagefilearg $filename";
+            $gscommand = new \core\command\executable($CFG->pathtogs, '=');
+            $gscommand->add_switch('-q');
+            $gscommand->add_argument('-sDEVICE', 'png16m');
+            $gscommand->add_switch('-dSAFER');
+            $gscommand->add_switch('-dBATCH');
+            $gscommand->add_switch('-dNOPAUSE');
+            $gscommand->add_argument('-r', 100, PARAM_INT, ''); // Image resolution.
+            $gscommand->add_argument('-dFirstPage', $pageno + 1, PARAM_INT);
+            $gscommand->add_argument('-dLastPage', $pageno + 1, PARAM_INT);
+            $gscommand->add_switch('-dDOINTERPOLATE');
+            $gscommand->add_argument('-dGraphicsAlphaBits', 4, PARAM_INT);
+            $gscommand->add_argument('-dTextAlphaBits', 4, PARAM_INT);
+            $gscommand->add_argument('-sOutputFile', $imagefile, \core\command\argument::PARAM_FULLFILEPATH);
+            $gscommand->add_value($this->filename, \core\command\argument::PARAM_FULLFILEPATH);
 
-            $output = null;
-            $result = exec($command, $output);
+            $gscommand->execute();
+
+            $output = $gscommand->get_output();
             if (!file_exists($imagefile)) {
-                $fullerror = '<pre>'.get_string('command', 'assignfeedback_editpdf')."\n";
-                $fullerror .= $command . "\n\n";
-                $fullerror .= get_string('result', 'assignfeedback_editpdf')."\n";
-                $fullerror .= htmlspecialchars($result) . "\n\n";
-                $fullerror .= get_string('output', 'assignfeedback_editpdf')."\n";
-                $fullerror .= htmlspecialchars(implode("\n", $output)) . '</pre>';
+                $fullerror = '<pre>' . get_string('output', 'assignfeedback_editpdf')."\n";
+                $fullerror .= htmlspecialchars(implode("\n",$output)) . '</pre>';
                 throw new \moodle_exception('errorgenerateimage', 'assignfeedback_editpdf', '', $fullerror);
             }
         }
@@ -494,11 +498,15 @@ class pdf extends \FPDI {
             return $tempsrc;
         }
 
-        $gsexec = \escapeshellarg($CFG->pathtogs);
-        $tempdstarg = \escapeshellarg($tempdst);
-        $tempsrcarg = \escapeshellarg($tempsrc);
-        $command = "$gsexec -q -sDEVICE=pdfwrite -dBATCH -dNOPAUSE -sOutputFile=$tempdstarg $tempsrcarg";
-        exec($command);
+        $gscommand = new \core\command\executable($CFG->pathtogs, '=');
+        $gscommand->add_switch('-q');
+        $gscommand->add_argument('-sDEVICE', 'pdfwrite', PARAM_ALPHA);
+        $gscommand->add_switch('-dBATCH');
+        $gscommand->add_switch('-dNOPAUSE');
+        $gscommand->add_argument('-sOutputFile', $tempdst, \core\command\argument::PARAM_FULLFILEPATH);
+        $gscommand->add_value($tempsrc, \core\command\argument::PARAM_FULLFILEPATH);
+
+        $gscommand->execute();
         @unlink($tempsrc);
         if (!file_exists($tempdst)) {
             // Something has gone wrong in the conversion.

@@ -106,17 +106,15 @@ if ($action == 'snapshot') {
     \core\session\manager::write_close();
 
     if (!empty($CFG->pathtowkhtmltopdf) and file_exists($CFG->pathtowkhtmltopdf) and is_executable($CFG->pathtowkhtmltopdf)) {
-        $wkhtmltopdf = escapeshellarg($CFG->pathtowkhtmltopdf); // Do not use escapeshellcmd() here.
-        $sessioname = escapeshellarg(session_name());
-        $sessioncookie = escapeshellarg(session_id());
+        $command = new \core\command\executable($CFG->pathtowkhtmltopdf);
+        $command->add_argument('--cookie', session_name())->add_value(session_id());
+
         $pageurl = new moodle_url($PAGE->url, array('action' => 'generatepdf'));
-        $pageurl = escapeshellarg($pageurl->out(false));
-        $escapedfile = escapeshellarg($file);
+        $command->add_value($pageurl->out(false), PARAM_URL);
+        $command->add_value($file, \core\command\argument::PARAM_FULLFILEPATH);
 
         // Note: let's hope executables may access it's own web server directly.
-        $command = "$wkhtmltopdf --cookie $sessioname $sessioncookie $pageurl $escapedfile";
-
-        exec($command);
+        $command->execute();
 
     } else {
         // This may throw various warnings, keep it in error logs only.

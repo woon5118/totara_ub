@@ -121,7 +121,7 @@ class scanner extends \core\antivirus\scanner {
      * @return int Scanning result constant.
      */
     public function scan_file_execute_commandline($file) {
-        $pathtoclam = trim($this->get_config('pathtoclam'));
+        $pathtoclam = $this->get_config('pathtoclam');
 
         if (!file_exists($pathtoclam) or !is_executable($pathtoclam)) {
             // Misconfigured clam, notify admins.
@@ -130,18 +130,22 @@ class scanner extends \core\antivirus\scanner {
             return self::SCAN_RESULT_ERROR;
         }
 
-        $clamparam = ' --stdout ';
+        $command = new \core\command\executable($pathtoclam);
+        $command->add_switch('--stdout');
+
         // If we are dealing with clamdscan, clamd is likely run as a different user
         // that might not have permissions to access your file.
         // To make clamdscan work, we use --fdpass parameter that passes the file
         // descriptor permissions to clamd, which allows it to scan given file
         // irrespective of directory and file permissions.
         if (basename($pathtoclam) == 'clamdscan') {
-            $clamparam .= '--fdpass ';
+            $command->add_switch('--fdpass');
         }
         // Execute scan.
-        $cmd = escapeshellcmd($pathtoclam).$clamparam.escapeshellarg($file);
-        exec($cmd, $output, $return);
+        // We allow any filename as the file could be anywhere on the system when we scan it.
+        $command->add_value($file, PARAM_RAW);
+        $return = $command->execute()->get_return_status();
+        $output = $command->get_output();
         // Return variable will contain execution return code. It will be 0 if no virus is found,
         // 1 if virus is found, and 2 or above for the error. Return codes 0 and 1 correspond to
         // SCAN_RESULT_OK and SCAN_RESULT_FOUND constants, so we return them as it is.

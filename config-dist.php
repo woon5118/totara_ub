@@ -568,6 +568,23 @@ $CFG->directorypermissions = 02777;
 //      $CFG->clone_dboptions = $CFG->dboptions; //optional
 //
 //
+// Setting for the path to the php binary to be used for PCNTL functions, which can be a more secure way of
+// executing external programs. Will only work on Unix-based systems. Do not add this setting
+// if you do not want PCNTL functions to be used when executing external programs.
+// This path is only used when PCNTL functions are run via the \core\command\executable class.
+//
+//      $CFG->pcntl_phpclipath = '/usr/bin/php';
+//
+//
+// Array where the keys are full pathnames for external applications used by any custom plugins.
+// The value should be true if it should be executed from a script triggered via a web request,
+// and false if it should only be triggered by scripts run on CLI.
+// This restriction only takes place if the plugin is using the \core\command\executable class, rather than
+// built-in php functions such as exec(), passthru() and others.
+//
+//      $CFG->thirdpartyexeclist = array('/full/path/to/bin' => true, '/another/path/to/script.sh' => false);
+//
+//
 //=========================================================================
 // 7. SETTINGS FOR DEVELOPMENT SERVERS - not intended for production use!!!
 //=========================================================================
