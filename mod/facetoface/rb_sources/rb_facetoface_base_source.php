@@ -97,6 +97,12 @@ abstract class rb_facetoface_base_source extends rb_base_source {
      * @param string $sessiondatejoin Join that provides {facetoface_sessions_dates}
      */
     public function add_session_common_to_columns(&$columnoptions, $sessiondatejoin = 'base') {
+        global $CFG;
+
+        $intimezone = '';
+        if (!empty($CFG->facetoface_displaysessiontimezones)) {
+            $intimezone = '_in_timezone';
+        }
 
         $columnoptions[] = new rb_column_option(
             'facetoface',
@@ -127,7 +133,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             array(
                 'joins' => array($sessiondatejoin),
                 'extrafields' => array('timezone' => "{$sessiondatejoin}.sessiontimezone"),
-                'displayfunc' => 'event_date',
+                'displayfunc' => 'nice_datetime' . $intimezone,
                 'dbdatatype' => 'timestamp'
             )
         );
@@ -140,7 +146,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             array(
                 'joins' => array($sessiondatejoin),
                 'extrafields' => array('timezone' => "{$sessiondatejoin}.sessiontimezone"),
-                'displayfunc' => 'event_date',
+                'displayfunc' => 'nice_datetime' . $intimezone,
                 'dbdatatype' => 'timestamp'
             )
         );
