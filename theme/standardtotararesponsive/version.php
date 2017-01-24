@@ -31,6 +31,6 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version  = 2016122100;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2015111607;       // Requires this Moodle version.
+$plugin->version  = 2017012500;       // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2015111608;       // Requires this Moodle version.
 $plugin->component = 'theme_standardtotararesponsive'; // Full name of the plugin (used for diagnostics).

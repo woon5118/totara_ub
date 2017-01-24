@@ -3,6 +3,226 @@
 
 Totara LMS Changelog
 
+Release Evergreen 20170125 (25th January 2017):
+===============================================
+
+
+Security issues:
+
+    TL-10773       Added safeguards to protect user anonymity when providing feedback within 360 Feedback
+    TL-12322       Improved validation within the 360° Feedback request confirmation form
+
+                   Previously, if a user manipulated the HTML of the form for confirming
+                   requests for feedback in 360° Feedback, they could change emails to an
+                   invalid format or, in some cases, alter requests they should not have
+                   access to.
+                   Additional validation following the submission of the confirmation form now
+                   prevents this.
+
+    TL-12327       Added a setting to prevent the malicious deletion of files via the Completion Import tool
+
+                   When adding completion records for courses and certifications via CSV, a
+                   pathname can be specified instead of uploading a file. After the upload
+                   occurs, the target file is deleted. Users with the capability to upload
+                   completion records may have been able to delete other files aside from
+                   those related to completion import. In some cases they were also being
+                   shown the first line of the file. By default, only site managers have the
+                   capability to upload completion records.
+                   Additionally in order to exploit this the web server would need to have
+                   been configured to permit read/write access on the targeted files.
+
+                   There is now a new setting ($CFG->completionimportdir) for specifying how
+                   the pathname must begin in order to add completion records with this
+                   method. This setting can only be added via the config.php file. When a
+                   directory is specified in this setting, files immediately within it, as
+                   well as within its subdirectories, can be used for completion import.
+
+                   If the setting is not added, completion imports can no longer be performed
+                   via this method. They can still be performed by uploading a file using the
+                   file picker.
+
+    TL-12411       MDL-56225: Removed unnecessary parameters when posting to a Forum
+
+                   Previously it was possible to maliciously modify a forum post form
+                   submission to fake the author of a forum post due to the presence of a
+                   redundant input parameter and poor forum post submission handling.
+                   The unused parameter has been removed and the post submission handling
+                   improved.
+
+    TL-12412       MDL-57531: Improved email sender handling to prevent PHPMailer vulnerabilities from being exploited
+    TL-12413       MDL-57580: Improved type handling within the Assignment module
+
+                   Previously loose type handling when submitting to an assignment activity
+                   could potentially be exploited to perform XSS attacks, stricter type
+                   handling has been implemented in order to remove this attack vector.
+
+Improvements:
+
+    TL-2276        Added a User's authentication method column and filter to all Report Builder reports that present user information
+    TL-6535        Added "HR Import" as a column and filter to the user columns and filters in Reportbuilder
+    TL-8552        Added additional filters to the Program Overview report source
+
+                   Program Status and Job assignment filters have been added to the Program
+                   Overview report source
+
+    TL-8766        Added a goal description column and filter to the Goal Custom Fields report source
+    TL-9016        Added content restrictions to the Goal custom fields report source
+
+                   Content restrictions for restricting records by management, organisation
+                   and position have been added to the Goal custom fields report source.
+
+    TL-9211        Added related user filters to the Site logs report source
+    TL-10849       Improved the language strings used to describe Program and Certification exception types and actions
+    TL-11074       Added additional text to the manager and approver copies of original Seminar notifications
+    TL-11099       Added audience membership as a badge criteria
+
+                   This improvement adds new criteria for site-level badges which allows an
+                   administrator to award a badge based on membership of an audience / cohort.
+
+    TL-11174       Improved the display and listing of users assigned to an Appraisal
+
+                   * The 'Learners' column on the Appraisal Management page has been changed
+                   to 'Assigned' and now show the number of users assigned to the appraisal as
+                   well as the number of users that have completed the assignment. For
+                   'Closed' Appraisals, the number always equals completed
+                   * The Assignments tab for a specific appraisal list the assigned learners
+                   for appraisals in the Draft and Active state, but only lists the users that
+                   completed the appraisal for Closed appraisals. The table headings reflects
+                   what is shown.
+                   * The reported number of assigned, completed and cancelled users shown in
+                   the reports, as well as the status of the listed users now correlates
+                   better to what is shown in the Management and Detail pages.
+
+    TL-11288       Improved the accessibility of course home page actions
+
+                   Accessible text has been added to the following course actions:
+                   * Inline editing of an activities summary
+                   * Changing an activities group mode
+
+    TL-12261       Improved code exception validation in several unit tests
+    TL-12353       Improved program messaging performance
+
+Bug fixes:
+
+    TL-10416       Fixed an error when answering appraisal competency questions as the manager's manager or appraiser
+    TL-10945       Prevented loops in management job assignments in HR Import
+
+                   Previously, if a circular management assignment was imported, HR Import
+                   would fail without sensible warning. Now, if a circular management is found
+                   when importing a manager with HR Import, then one or more of the users
+                   forming the circular reference will fail to have their manager assigned,
+                   with a notice explaining why. When importing, as many manager assignments
+                   as possible will be assigned.
+
+    TL-11150       Fixed an undefined property error in HR Import on the CSV configuration page
+    TL-11238       Fixed the Seminar name link column within the Seminar sessions report
+    TL-11270       Fixed Course Completion status not being set to "Not yet started" when removing RPL completions
+
+                   Previously, when you removed RPL completion using the Course administration
+                   -> Reports -> Course completion report, it would set the record to "In
+                   progress", regardless of whether or not the user had actually done anything
+                   that warranted being marked as such. If the user had already met the
+                   criteria for completion, the record would not be updated until the
+                   completion cron task next ran.
+
+                   Now, the records will be set to "Not yet started". Reaggregation occurs
+                   immediately, and may update the user to "In progress" or "Complete"
+                   depending on their progress. Note that if a course is set to "Mark as In
+                   Progress on first view" and the user had previously viewed the course but
+                   made no other progress, then their status will still be "Not yet started"
+                   after reaggregation.
+
+    TL-11316       Fixed an error when cloning an Appraisal containing aggregated questions
+    TL-12243       Fixed a Totara menu issue leading to incorrectly encoded ampersands
+    TL-12256       Prevented an incorrect redirect occurring when dismissing a notification from within a modal dialog
+    TL-12263       Fixed an issue with the display of assigned users within 360° Feedback
+
+                   The assigned group information is no longer shown for 360° Feedback in the
+                   Active or Closed state. In these states, the pages always reflect actual
+                   assigned users.
+
+    TL-12277       Corrected an issue where redirects with a message did not have a page URL set
+    TL-12280       Fixed a bug preventing block weights being cloned when a dashboard is cloned
+    TL-12283       Fixed several issues on the waitlist page when Seminar approval type is changed
+
+                   The waitlist page showed the wrong approval date (1 Jan 1970) and debug
+                   messages when a seminar changed its approval type from no approval required
+                   to manager approved.
+
+    TL-12284       Fixed an upgrade error due to an incorrectly unique index in the completion import tables on SQL Server
+
+                   Previously, if a site running SQL Server had imported course or
+                   certification completions, there could have been an error when trying to
+                   upgrade to Totara 9. This has been fixed. Sites that had already
+                   successfully upgraded will have the unique index replaced with a non-unique
+                   equivalent.
+
+    TL-12287       Ensured Hierarchy 'ID number' field type is set as string in Excel and ODS format exports to avoid incorrect automatic type detection
+    TL-12297       Removed options from the Reportbuilder "message type" filter when the corresponding feature is disabled
+    TL-12299       Fixed an error on the search page when setting Program assignment relative due dates
+    TL-12301       Fixed the replacement of course links from placeholders in notifications when restoring a Seminar
+
+                   Previously when a course URL was embedded in a seminar notification
+                   template, it would be changed to a placeholder string when the seminar was
+                   backed up. Restoring the seminar would not change the placeholder back to
+                   the proper URL. This fix ensures it does.
+
+    TL-12303       Fixed the HTML formatting of Seminar notification templates for third-party emails
+    TL-12305       Fixed incorrect wording in Learning Plan help text
+    TL-12311       Fixed the "is after" criteria in the "Start date" filter within the Course report source
+
+                   The "is after" start date filter criteria now correctly searching for
+                   courses starting immediately after midnight in the users timezone.
+
+    TL-12315       Waitlist notifications are now sent when one message per date is enabled
+
+                   If a Seminar event was created with no dates, people could still sign up
+                   and be waitlisted.
+                   However, they would only receive a sign up email if the "one message per
+                   date" option was off.
+                   Now, the system will send the notification regardless of this setting.
+
+    TL-12323       Removed references to the SCORM course format from course format help string
+    TL-12325       Fixed the Quick Links block to ensure it decodes URL entities correctly
+    TL-12333       Made improvements to the handling of invalid job assignment dates
+    TL-12337       Fixed the formatting of event details placeholder in Seminar notifications
+    TL-12339       Reverted removal of style causing regression in IE
+
+                   TL-11341 applied a patch for a display issue in Chrome 55.
+                   This caused a regression for users of Edge / IE browsers making it
+                   difficult and in some cases impossible to click grouped form elements.
+                   The Chrome rendering bug has since been addressed.
+
+    TL-12344       Fixed an error message when updating Competency scale values
+    TL-12352       Fixed a bug in the cache API when fetching multiple keys having specified MUST_EXIST
+
+                   Previously when fetching multiple entries from a cache, if you specified
+                   that the data must exist, in some circumstances the expected exception was
+                   not being thrown.
+                   Now if MUST_EXIST is provide to cache::get_many() an exception will be
+                   thrown if one or more of the requested keys cannot be found.
+
+    TL-12369       Marked class totara_dialog_content_manager as deprecated
+
+                   This class is no longer in use now that Totara has multiple job
+                   assignments. Class totara_job_dialog_assign_manager should be used instead.
+
+Miscellaneous Moodle fixes:
+
+    TL-12406       MDL-57100: Prevented javascript exceptions from being displayed during an AJAX request
+    TL-12407       MDL-56948: Fixed Assignment bug when viewing a submission with a grade type of "none"
+    TL-12408       MDL-57163: Improved the feedback given when trying to install without the curl extension installed
+    TL-12409       MDL-57170: Fixed fault in legacy Dropbox API usage
+    TL-12410       MDL-57193: Fixed external database authentication where more than 10000 users are imported
+
+Contributions:
+
+    * André Yamin at Kineo NZ - TL-6535
+    * David Shaw at Kineo UK - TL-12243
+    * Eugene Venter at Catalyst NZ - TL-11099
+    * Lee Campbell at Learning Pool - TL-2276
+
+
 Release Evergreen 20161221 (21st December 2016):
 =======================================
 
