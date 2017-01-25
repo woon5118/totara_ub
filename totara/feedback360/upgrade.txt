@@ -10,3 +10,5 @@ the response should be queried via this value, particularly if anonymous feedbac
 When a user that has requested feedback views a response, a 'responseid' in the url can no longer
 be used to fetch feedback, they must use the 'requestertoken'. This does not apply to users who are
 submitting feedback.
+* Reduced specificy of CSS selectors to improve RTL support
+* Renamed CSS class "previewer" to "feedback360-previewer" so that it did not clash with the same CSS class in appraisals
