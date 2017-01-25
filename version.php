@@ -36,7 +36,7 @@ $version  = 2015111608.00;              // 20151116      = branching date YYYYMM
 $release  = '3.0.8 (Build: 20170109)'; // Human-friendly version name
 
 $branch   = '30';                       // This version's branch.
-$maturity = MATURITY_ALPHA            // this version's maturity level
+$maturity = MATURITY_ALPHA;            // this version's maturity level
 
 
 // TOTARA VERSION INFORMATION
