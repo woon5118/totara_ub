@@ -2325,6 +2325,13 @@ define(['jquery', 'jqueryui'], function($){
             }
 
             datepoly.inited.done(function() {
+                if ($('#' + id).attr('type') === 'date') {
+                    datepoly.language.showTimepicker = false;
+                    datepoly.language.timeFormat = '';
+                    datepoly.language.showTime = false;
+                    datepoly.language.showTimezone = false;
+                    datepoly.language.separator = '';
+                }
                 $('#' + id).datetimepicker(datepoly.language);
             });
         }

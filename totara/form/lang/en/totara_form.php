@@ -32,4 +32,5 @@ $string['now'] = 'Now';
 $string['pluginname'] = 'Totara forms';
 $string['submissionerror'] = 'Form could not be submitted, validation failed';
 $string['urlvalidationerror'] = 'Invalid URL address format';
+$string['utc10datevalidationerror'] = 'Invalid date, expected valid date in YYYY-MM-DD format';
 $string['durationvalidationerror'] = 'Invalid duration format';
