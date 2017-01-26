@@ -456,9 +456,6 @@ M.totara_programassignment = M.totara_programassignment || {
         totaraDialogs['savechanges'] = new totaraDialog_savechanges();
         totaraDialogs['completionevent'] = new totaraDialog_completion_event();
 
-        // call assignment setup, in window scope
-        program_assignment.setup();
-
         //
         this.storeInitialFormValues();
     },
@@ -605,7 +602,17 @@ program_assignment = new function() {
     this.categories = [];
     this.num_deleted_items = 0;
     this.num_added_items = 0;
+    /**
+     * total_count
+     * @deprecated since 10
+     * @type {number}
+     */
     this.total_count = 0;
+    /**
+     * is_setup
+     * @deprecated since 10
+     * @type {boolean}
+     */
     this.is_setup = false;
     this.is_modified = false;
 
@@ -627,6 +634,9 @@ program_assignment = new function() {
         return result;
     };
 
+    /**
+     * @deprecated since 10
+     */
     this.update_total_user_count = function() {
         var count = 0;
         $.each(this.categories, function(index, category) {
@@ -639,6 +649,9 @@ program_assignment = new function() {
         }
     };
 
+    /**
+     * @deprecated since 10
+     */
     this.setup = function() {
         this.is_setup = true;
         this.update_total_user_count();
@@ -671,6 +684,11 @@ function category(id, name, find_url, title, programid) {
 
     // Add a span for printing the total number
     this.user_count = 0;
+    /**
+     * user_count_label
+     * @deprecated since 10
+     * @type {any}
+     */
     this.user_count_label = $('.user_count',this.element);
 
     /**
@@ -796,10 +814,11 @@ function category(id, name, find_url, title, programid) {
         } else {
             this.table.show();
         }
-
-        this.update_user_count();
     };
 
+    /**
+     * @deprecated since 10
+     */
     this.update_user_count = function() {
         this.user_count = 0;
         for (var x in this.items) {
@@ -1072,8 +1091,6 @@ function item(category, element, isexistingitem) {
         this.users = count;
         this.usersElement.html(this.users);
         this.usersElement.data('complete', true);
-        this.category.update_user_count();
-
     };
 
     // Do an ajax request to get an updated count

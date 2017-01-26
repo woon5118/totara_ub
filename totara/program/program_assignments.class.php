@@ -356,14 +356,8 @@ class prog_assignments {
 
                 $categoryrow++;
             }
-            $helpbutton = $OUTPUT->help_icon('totalassignments', 'totara_program');
-            $table->data[] = array(
-                html_writer::tag('strong', get_string('totalassignments', 'totara_program')),
-                html_writer::tag('strong', $usertotal)
-            );
-            $table->rowclass[] = 'total';
 
-            $out .= html_writer::table($table, true);
+            $out .= $OUTPUT->render($table);
 
         } else {
             $out .= get_string('noprogramassignments', 'totara_program');
@@ -404,7 +398,7 @@ class prog_assignments {
     }
 
     public static function get_confirmation_template() {
-        global $ASSIGNMENT_CATEGORY_CLASSNAMES;
+        global $ASSIGNMENT_CATEGORY_CLASSNAMES, $OUTPUT;
 
         $table = new html_table();
         $table->head = array('', get_string('added', 'totara_program'), get_string('removed', 'totara_program'));
@@ -416,11 +410,7 @@ class prog_assignments {
             $table->data[] = array($category->name, $spanadded, $spanremoved);
         }
 
-        $spanTotalAdded = html_writer::tag('strong', html_writer::tag('span', '0', array('class' => 'total_added')));
-        $spanTotalRemoved = html_writer::tag('strong', html_writer::tag('span', '0', array('class' => 'total_removed')));
-        $table->data[] = array(html_writer::tag('strong', get_string('total')), $spanTotalAdded, $spanTotalRemoved);
-
-        $tableHTML = html_writer::table($table, true);
+        $tableHTML = $OUTPUT->render($table);
         // Strip new lines as they screw up the JS
         $order   = array("\r\n", "\n", "\r");
         $table = str_replace($order, '', $tableHTML);
@@ -468,17 +458,19 @@ abstract class prog_assignment_category {
      * Builds the table that appears for this category by filling $this->headers
      * and $this->data
      *
-     * @param string $prefix
-     * @param int $programid
+     * @param int|program $programidorinstance - id or instance of the program.
+     *    Instance of program accepted since 10 (prior to this, only int was accepted).
      */
-    abstract function build_table($programid);
+    abstract function build_table($programidorinstance);
 
     /**
      * Builds a single row by looking at the passed in item
      *
      * @param object $item
+     * @param bool $canupdate - true if user will be able to update data for this table.
+     *   Since Totara 10.
      */
-    abstract function build_row($item);
+    abstract function build_row($item, $canupdate = true);
 
     /**
      * Returns any javascript that should be loaded to be used by the category
@@ -702,9 +694,28 @@ abstract class prog_assignment_category {
      */
     abstract function get_includechildren($data, $object);
 
-    function get_completion($item, $programid = null) {
+    /**
+     * Outputs html for a given set of completion criteria.
+     *
+     * Will be a link if updating the criteria is allowed.
+     * Will be fixed text if updating is not allowed.
+     *
+     * Hidden input fields will be included for updating of data.
+     *
+     * @param stdClass $item containing any existing completion criteria.
+     * @param null|int $programid
+     * @param bool $canupdate set to true if the user can update the due date criteria here.
+     *    Since Totara 10.
+     * @return string of html containing due date criteria, will be as a link if update is allowed.
+     */
+    function get_completion($item, $programid = null, $canupdate = true) {
         global $OUTPUT;
-        $completion_string = get_string('setduedate', 'totara_program');
+
+        if ($canupdate) {
+            $completion_string = get_string('setduedate', 'totara_program');
+        } else {
+            $completion_string = get_string('noduedate', 'totara_program');
+        }
 
         $hour = 0;
         $minute = 0;
@@ -742,6 +753,10 @@ abstract class prog_assignment_category {
             $show_deletecompletionlink = true;
         }
 
+        if (!$canupdate) {
+            $show_deletecompletionlink = false;
+        }
+
         $html = html_writer::start_tag('div', array('class' => "completionlink_{$item->id}"));
         if ($item->completiontime != COMPLETION_TIME_NOT_SET && !empty($item->completiontime)) {
             $html .= html_writer::empty_tag('input', array('type' => 'hidden',
@@ -759,23 +774,35 @@ abstract class prog_assignment_category {
             $html .= html_writer::empty_tag('input', array('type' => 'hidden',
                 'name' => 'completioninstance['.$this->id.']['.$item->id.']', 'value' => $item->completioninstance));
         }
-        $html .= html_writer::link('#', $completion_string, array('class' => 'completionlink'));
+
+        if ($canupdate) {
+            $html .= html_writer::link('#', $completion_string, array('class' => 'completionlink'));
+        } else {
+            $html .= html_writer::span($completion_string);
+        }
+
         $html .= html_writer::empty_tag('input',
             array('type' => 'hidden', 'class' => 'completionprogramid', 'value' => $programid));
+
         if ($show_deletecompletionlink) {
             $html .= $OUTPUT->action_icon('#', new pix_icon('t/delete', get_string('removeduedate', 'totara_program')), null,
                 array('class' => 'deletecompletiondatelink'));
         }
+
         $html .= html_writer::end_tag('div');
         return $html;
     }
 
-    public function build_first_table_cell($name, $id, $itemid) {
+    public function build_first_table_cell($name, $id, $itemid, $canupdate = true) {
         global $OUTPUT;
         $output = html_writer::start_tag('div', array('class' => 'totara-item-group'));
         $output .= format_string($name);
-        $output .= $OUTPUT->action_icon('#', new pix_icon('t/delete', get_string('delete')), null,
-            array('class' => 'deletelink totara-item-group-icon'));
+
+        if ($canupdate) {
+            $output .= $OUTPUT->action_icon('#', new pix_icon('t/delete', get_string('delete')), null,
+                array('class' => 'deletelink totara-item-group-icon'));
+        }
+
         $output .= html_writer::end_tag('div');
         $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'item['.$id.']['.$itemid.']', 'value' => '1'));
         return $output;
@@ -854,18 +881,35 @@ class organisations_category extends prog_assignment_category {
         $this->buttonname = get_string('addorganisationstoprogram', 'totara_program');
     }
 
-    function build_table($programid) {
+    /**
+     * Builds table for displaying within assignment category.
+     *
+     * @param int|program $programidorinstance - id or instance of the program.
+     *   Instance of program accepted since Totara 10 (prior to this, only int was accepted).
+     * @throws coding_exception
+     */
+    function build_table($programidorinstance) {
         global $DB, $OUTPUT;
+
+        if (is_numeric($programidorinstance)) {
+            $program = new program($programidorinstance);
+        } else if (get_class($programidorinstance) === 'program') {
+            $program = $programidorinstance;
+        } else {
+            throw new coding_exception('programidorinstance must be a program id (integer) or instance of program class');
+        }
 
         $this->headers = array(
             get_string('organisationname', 'totara_program'),
             get_string('allbelow', 'totara_program'),
             get_string('assignmentduedate', 'totara_program') .
-                $OUTPUT->help_icon('assignmentduedate', 'totara_program', null),
-            get_string('actualduedate', 'totara_program') .
-                $OUTPUT->help_icon('groupactualduedate', 'totara_program', null),
-            get_string('numlearners', 'totara_program')
-        );
+            $OUTPUT->help_icon('assignmentduedate', 'totara_program', null));
+
+        if (!$program->has_expired()) {
+            $this->headers[] = get_string('actualduedate', 'totara_program') .
+                $OUTPUT->help_icon('groupactualduedate', 'totara_program', null);
+            $this->headers[] = get_string('numlearners', 'totara_program');
+        }
 
         // Go to the database and gets the assignments
         $items = $DB->get_records_sql(
@@ -876,12 +920,12 @@ class organisations_category extends prog_assignment_category {
         FROM {prog_assignment} prog_assignment
         INNER JOIN {org} org on org.id = prog_assignment.assignmenttypeid
         WHERE prog_assignment.programid = ?
-        AND prog_assignment.assignmenttype = ?", array($programid, $this->id));
+        AND prog_assignment.assignmenttype = ?", array($program->id, $this->id));
 
         // Convert these into html
         if (!empty($items)) {
             foreach ($items as $item) {
-                $this->data[] = $this->build_row($item);
+                $this->data[] = $this->build_row($item, !$program->has_expired());
             }
         }
     }
@@ -891,7 +935,15 @@ class organisations_category extends prog_assignment_category {
         return $DB->get_record('org', array('id' => $itemid));
     }
 
-    function build_row($item) {
+    /**
+     * Create row to be added to this assignment category's table.
+     *
+     * @param object $item - data to be added to the row
+     * @param bool $canupdate - true if user will be able to update data for this table.
+     *   Since Totara 10.
+     * @return array
+     */
+    function build_row($item, $canupdate = true) {
 
         if (is_int($item)) {
             $item = $this->get_item($item);
@@ -899,19 +951,34 @@ class organisations_category extends prog_assignment_category {
 
         $checked = (isset($item->includechildren) && $item->includechildren == 1) ? true : false;
 
-        $row = array();
-        $row[] = $this->build_first_table_cell($item->fullname, $this->id, $item->id);
-        $row[] = html_writer::checkbox('includechildren['.$this->id.']['.$item->id.']', '', $checked);
-        $row[] = $this->get_completion($item);
         if (isset($item->programid)) {
-            $viewsql = new moodle_url('/totara/program/assignment/duedates_report.php',
-                array('programid' => $item->programid, 'assignmentid' => $item->assignmentid));
-            $row[] = html_writer::link($viewsql, get_string('viewdates', 'totara_program'),
-                array('class' => 'assignment-duedates'));
-        } else {
-            $row[] = get_string('notyetset', 'totara_program');
+            $programid = $item->programid;
+        } else  {
+            $programid = null;
         }
-        $row[] = $this->user_affected_count($item);
+
+        $row = array();
+        $row[] = $this->build_first_table_cell($item->fullname, $this->id, $item->id, $canupdate);
+
+        if ($canupdate) {
+            $row[] = html_writer::checkbox('includechildren[' . $this->id . '][' . $item->id . ']', '', $checked);
+        } else {
+            $row[] = html_writer::checkbox('includechildren[' . $this->id . '][' . $item->id . ']', '', $checked, '', array('disabled' => 'disabled'));
+        }
+
+        $row[] = $this->get_completion($item, $programid, $canupdate);
+
+        if ($canupdate) {
+            if (isset($item->programid)) {
+                $viewsql = new moodle_url('/totara/program/assignment/duedates_report.php',
+                    array('programid' => $item->programid, 'assignmentid' => $item->assignmentid));
+                $row[] = html_writer::link($viewsql, get_string('viewdates', 'totara_program'),
+                    array('class' => 'assignment-duedates'));
+            } else {
+                $row[] = get_string('notyetset', 'totara_program');
+            }
+            $row[] = $this->user_affected_count($item);
+        }
 
         return $row;
     }
@@ -1020,17 +1087,35 @@ class positions_category extends prog_assignment_category {
         $this->buttonname = get_string('addpositiontoprogram', 'totara_program');
     }
 
-    function build_table($programid) {
+    /**
+     * Builds table for displaying within assignment category.
+     *
+     * @param int|program $programidorinstance - id or instance of the program.
+     *   Instance of program accepted since Totara 10 (prior to this, only int was accepted).
+     * @throws coding_exception
+     */
+    function build_table($programidorinstance) {
         global $DB, $OUTPUT;
+
+        if (is_numeric($programidorinstance)) {
+            $program = new program($programidorinstance);
+        } else if (get_class($programidorinstance) === 'program') {
+            $program = $programidorinstance;
+        } else {
+            throw new coding_exception('programidorinstance must be a program id (integer) or instance of program class');
+        }
+
         $this->headers = array(
             get_string('positionsname', 'totara_program'),
             get_string('allbelow', 'totara_program'),
             get_string('assignmentduedate', 'totara_program') .
-                $OUTPUT->help_icon('assignmentduedate', 'totara_program', null),
-            get_string('actualduedate', 'totara_program') .
-                $OUTPUT->help_icon('groupactualduedate', 'totara_program', null),
-            get_string('numlearners', 'totara_program')
-        );
+                $OUTPUT->help_icon('assignmentduedate', 'totara_program', null));
+
+        if (!$program->has_expired()) {
+            $this->headers[] = get_string('actualduedate', 'totara_program') .
+                $OUTPUT->help_icon('groupactualduedate', 'totara_program', null);
+            $this->headers[] = get_string('numlearners', 'totara_program');
+        }
 
         // Go to the database and gets the assignments
         $items = $DB->get_records_sql(
@@ -1041,11 +1126,11 @@ class positions_category extends prog_assignment_category {
                FROM {prog_assignment} prog_assignment
          INNER JOIN {pos} pos on pos.id = prog_assignment.assignmenttypeid
               WHERE prog_assignment.programid = ?
-                AND prog_assignment.assignmenttype = ?", array($programid, $this->id));
+                AND prog_assignment.assignmenttype = ?", array($program->id, $this->id));
 
         // Convert these into html
         foreach ($items as $item) {
-            $this->data[] = $this->build_row($item);
+            $this->data[] = $this->build_row($item, !$program->has_expired());
         }
     }
 
@@ -1054,26 +1139,49 @@ class positions_category extends prog_assignment_category {
         return $DB->get_record('pos', array('id' => $itemid));
     }
 
-    function build_row($item) {
+    /**
+     * Create row to be added to this assignment category's table.
+     *
+     * @param object $item - data to be added to the row
+     * @param bool $canupdate - true if user will be able to update data for this table.
+     *   Since Totara 10.
+     * @return array
+     */
+    function build_row($item, $canupdate = true) {
         if (is_int($item)) {
             $item = $this->get_item($item);
         }
 
         $checked = (isset($item->includechildren) && $item->includechildren == 1) ? true : false;
 
-        $row = array();
-        $row[] = $this->build_first_table_cell($item->fullname, $this->id, $item->id);
-        $row[] = html_writer::checkbox('includechildren['.$this->id.']['.$item->id.']', '', $checked);
-        $row[] = $this->get_completion($item);
         if (isset($item->programid)) {
-            $viewsql = new moodle_url('/totara/program/assignment/duedates_report.php',
-                array('programid' => $item->programid, 'assignmentid' => $item->assignmentid));
-            $row[] = html_writer::link($viewsql, get_string('viewdates', 'totara_program'),
-                array('class' => 'assignment-duedates'));
-        } else {
-            $row[] = get_string('notyetset', 'totara_program');
+            $programid = $item->programid;
+        } else  {
+            $programid = null;
         }
-        $row[] = $this->user_affected_count($item);
+
+        $row = array();
+        $row[] = $this->build_first_table_cell($item->fullname, $this->id, $item->id, $canupdate);
+
+        if ($canupdate) {
+            $row[] = html_writer::checkbox('includechildren[' . $this->id . '][' . $item->id . ']', '', $checked);
+        } else {
+            $row[] = html_writer::checkbox('includechildren[' . $this->id . '][' . $item->id . ']', '', $checked, '', array('disabled' => 'disabled'));
+        }
+
+        $row[] = $this->get_completion($item, $programid, $canupdate);
+
+        if ($canupdate) {
+            if (isset($item->programid)) {
+                $viewsql = new moodle_url('/totara/program/assignment/duedates_report.php',
+                    array('programid' => $item->programid, 'assignmentid' => $item->assignmentid));
+                $row[] = html_writer::link($viewsql, get_string('viewdates', 'totara_program'),
+                    array('class' => 'assignment-duedates'));
+            } else {
+                $row[] = get_string('notyetset', 'totara_program');
+            }
+            $row[] = $this->user_affected_count($item);
+        }
 
         return $row;
     }
@@ -1182,17 +1290,36 @@ class cohorts_category extends prog_assignment_category {
         $this->buttonname = get_string('addcohortstoprogram', 'totara_program');
     }
 
-    function build_table($programid) {
+    /**
+     * Builds table for displaying within assignment category.
+     *
+     * @param int|program $programidorinstance - id or instance of the program.
+     *   Instance of program accepted since Totara 10 (prior to this, only int was accepted).
+     * @throws coding_exception
+     */
+    function build_table($programidorinstance) {
         global $DB, $OUTPUT;
+
+        if (is_numeric($programidorinstance)) {
+            $program = new program($programidorinstance);
+        } else if (get_class($programidorinstance) === 'program') {
+            $program = $programidorinstance;
+        } else {
+            throw new coding_exception('programidorinstance must be a program id (integer) or instance of program class');
+        }
+
         $this->headers = array(
             get_string('cohortname', 'totara_program'),
             get_string('type', 'totara_program'),
             get_string('assignmentduedate', 'totara_program') .
-                $OUTPUT->help_icon('assignmentduedate', 'totara_program', null),
-            get_string('actualduedate', 'totara_program') .
-                $OUTPUT->help_icon('groupactualduedate', 'totara_program', null),
-            get_string('numlearners', 'totara_program')
+                $OUTPUT->help_icon('assignmentduedate', 'totara_program', null)
         );
+
+        if (!$program->has_expired()) {
+            $this->headers[] = get_string('actualduedate', 'totara_program') .
+                $OUTPUT->help_icon('groupactualduedate', 'totara_program', null);
+            $this->headers[] = get_string('numlearners', 'totara_program');
+        }
 
         // Go to the database and gets the assignments.
         $items = $DB->get_records_sql(
@@ -1202,12 +1329,12 @@ class cohorts_category extends prog_assignment_category {
             FROM {prog_assignment} prog_assignment
             INNER JOIN {cohort} cohort ON cohort.id = prog_assignment.assignmenttypeid
             WHERE prog_assignment.programid = ?
-            AND prog_assignment.assignmenttype = ?", array($programid, $this->id));
+            AND prog_assignment.assignmenttype = ?", array($program->id, $this->id));
 
         // Convert these into html.
         if (!empty($items)) {
             foreach ($items as $item) {
-                $this->data[] = $this->build_row($item);
+                $this->data[] = $this->build_row($item, !$program->has_expired());
             }
         }
     }
@@ -1217,7 +1344,15 @@ class cohorts_category extends prog_assignment_category {
         return $DB->get_record('cohort', array('id' => $itemid), 'id, name as fullname, cohorttype');
     }
 
-    function build_row($item) {
+    /**
+     * Create row to be added to this assignment category's table.
+     *
+     * @param object $item - data to be added to the row
+     * @param bool $canupdate - true if user will be able to update data for this table.
+     *   Since Totara 10.
+     * @return array
+     */
+    function build_row($item, $canupdate = true) {
         global $CFG;
 
         require_once($CFG->dirroot.'/cohort/lib.php');
@@ -1226,22 +1361,31 @@ class cohorts_category extends prog_assignment_category {
             $item = $this->get_item($item);
         }
 
+        if (isset($item->programid)) {
+            $programid = $item->programid;
+        } else {
+            $programid = null;
+        }
+
         $cohorttypes = cohort::getCohortTypes();
         $cohortstring = $cohorttypes[$item->cohorttype];
 
         $row = array();
-        $row[] = $this->build_first_table_cell($item->fullname, $this->id, $item->id);
+        $row[] = $this->build_first_table_cell($item->fullname, $this->id, $item->id, $canupdate);
         $row[] = $cohortstring;
-        $row[] = $this->get_completion($item);
-        if (isset($item->programid)) {
-            $viewsql = new moodle_url('/totara/program/assignment/duedates_report.php',
-                array('programid' => $item->programid, 'assignmentid' => $item->assignmentid));
-            $row[] = html_writer::link($viewsql, get_string('viewdates', 'totara_program'),
+        $row[] = $this->get_completion($item, $programid, $canupdate);
+
+        if ($canupdate) {
+            if (isset($item->programid)) {
+                $viewsql = new moodle_url('/totara/program/assignment/duedates_report.php',
+                    array('programid' => $item->programid, 'assignmentid' => $item->assignmentid));
+                $row[] = html_writer::link($viewsql, get_string('viewdates', 'totara_program'),
                     array('class' => 'assignment-duedates'));
-        } else {
-            $row[] = get_string('notyetset', 'totara_program');
+            } else {
+                $row[] = get_string('notyetset', 'totara_program');
+            }
+            $row[] = $this->user_affected_count($item);
         }
-        $row[] = $this->user_affected_count($item);
 
         return $row;
     }
@@ -1306,19 +1450,36 @@ class managers_category extends prog_assignment_category {
         $this->buttonname = get_string('addmanagerstoprogram', 'totara_program');
     }
 
-    function build_table($programid) {
+    /**
+     * Builds table for displaying within assignment category.
+     *
+     * @param int|program $programidorinstance - id or instance of the program.
+     *   Instance of program accepted since Totara 10 (prior to this, only int was accepted).
+     * @throws coding_exception
+     */
+    function build_table($programidorinstance) {
         global $DB, $OUTPUT, $CFG;
         require_once($CFG->dirroot . '/totara/job/lib.php');
+
+        if (is_numeric($programidorinstance)) {
+            $program = new program($programidorinstance);
+        } else if (get_class($programidorinstance) === 'program') {
+            $program = $programidorinstance;
+        } else {
+            throw new coding_exception('programidorinstance must be a program id (integer) or instance of program class');
+        }
 
         $this->headers = array(
             get_string('managername', 'totara_program'),
             get_string('for', 'totara_program'),
             get_string('assignmentduedate', 'totara_program') .
-                $OUTPUT->help_icon('assignmentduedate', 'totara_program', null),
-            get_string('actualduedate', 'totara_program') .
-                $OUTPUT->help_icon('groupactualduedate', 'totara_program', null),
-            get_string('numlearners', 'totara_program')
-        );
+                $OUTPUT->help_icon('assignmentduedate', 'totara_program', null));
+
+        if (!$program->has_expired()) {
+            $this->headers[] = get_string('actualduedate', 'totara_program') .
+                $OUTPUT->help_icon('groupactualduedate', 'totara_program', null);
+            $this->headers[] = get_string('numlearners', 'totara_program');
+        }
 
         // Go to the database and gets the assignments.
         $usernamefields = get_all_user_name_fields(true, 'u');
@@ -1332,7 +1493,7 @@ class managers_category extends prog_assignment_category {
          LEFT JOIN {user} u ON u.id = ja.userid
              WHERE prog_assignment.programid = ?
                AND prog_assignment.assignmenttype = ?
-        ", array($programid, $this->id));
+        ", array($program->id, $this->id));
 
         // Convert these into html.
         if (!empty($items)) {
@@ -1345,7 +1506,7 @@ class managers_category extends prog_assignment_category {
                 if (empty($item->path)) {
                     $item->path = '/' . $item->id;
                 }
-                $this->data[] = $this->build_row($item);
+                $this->data[] = $this->build_row($item, !$program->has_expired());
             }
         }
     }
@@ -1371,9 +1532,23 @@ class managers_category extends prog_assignment_category {
         return $item;
     }
 
-    function build_row($item) {
+    /**
+     * Create row to be added to this assignment category's table.
+     *
+     * @param object $item - data to be added to the row
+     * @param bool $canupdate - true if user will be able to update data for this table.
+     *   Since Totara 10.
+     * @return array
+     */
+    function build_row($item, $canupdate = true) {
         if (is_int($item)) {
             $item = $this->get_item($item);
+        }
+
+        if (isset($item->programid)) {
+            $programid = $item->programid;
+        } else  {
+            $programid = null;
         }
 
         $selectedid = (isset($item->includechildren) && $item->includechildren == 1) ? 1 : 0;
@@ -1382,18 +1557,27 @@ class managers_category extends prog_assignment_category {
             1 => get_string('allbelowlower', 'totara_program'));
 
         $row = array();
-        $row[] = $this->build_first_table_cell($item->fullname, $this->id, $item->id);
-        $row[] = html_writer::select($options, 'includechildren['.$this->id.']['.$item->id.']', $selectedid);
-        $row[] = $this->get_completion($item);
-        if (isset($item->programid)) {
-            $viewsql = new moodle_url('/totara/program/assignment/duedates_report.php',
-                array('programid' => $item->programid, 'assignmentid' => $item->assignmentid));
-            $row[] = html_writer::link($viewsql, get_string('viewdates', 'totara_program'),
-                array('class' => 'assignment-duedates'));
+        $row[] = $this->build_first_table_cell($item->fullname, $this->id, $item->id, $canupdate);
+
+        if ($canupdate) {
+            $row[] = html_writer::select($options, 'includechildren[' . $this->id . '][' . $item->id . ']', $selectedid);
         } else {
-            $row[] = get_string('notyetset', 'totara_program');
+            $row[] = html_writer::span($options[$selectedid]);
         }
-        $row[] = $this->user_affected_count($item);
+
+        $row[] = $this->get_completion($item, $programid, $canupdate);
+
+        if ($canupdate) {
+            if (isset($item->programid)) {
+                $viewsql = new moodle_url('/totara/program/assignment/duedates_report.php',
+                    array('programid' => $item->programid, 'assignmentid' => $item->assignmentid));
+                $row[] = html_writer::link($viewsql, get_string('viewdates', 'totara_program'),
+                    array('class' => 'assignment-duedates'));
+            } else {
+                $row[] = get_string('notyetset', 'totara_program');
+            }
+            $row[] = $this->user_affected_count($item);
+        }
 
         return $row;
     }
@@ -1482,8 +1666,24 @@ class individuals_category extends prog_assignment_category {
         $this->buttonname = get_string('addindividualstoprogram', 'totara_program');
     }
 
-    function build_table($programid) {
+    /**
+     * Builds table for displaying within assignment category.
+     *
+     * @param int|program $programidorinstance - id or instance of the program.
+     *   Instance of program accepted since Totara 10 (prior to this, only int was accepted).
+     * @throws coding_exception
+     */
+    function build_table($programidorinstance) {
         global $DB, $OUTPUT;
+
+        if (is_numeric($programidorinstance)) {
+            $program = new program($programidorinstance);
+        } else if (get_class($programidorinstance) === 'program') {
+            $program = $programidorinstance;
+        } else {
+            throw new coding_exception('programidorinstance must be a program id (integer) or instance of program class');
+        }
+
         $this->headers = array(
             get_string('individualname', 'totara_program'),
             get_string('userid', 'totara_program'),
@@ -1510,13 +1710,13 @@ class individuals_category extends prog_assignment_category {
           LEFT JOIN {certif_completion} cc
                  ON cc.certifid = prog.certifid AND cc.userid = pc.userid
               WHERE prog_assignment.programid = ?
-                AND prog_assignment.assignmenttype = ?", array($programid, $this->id));
+                AND prog_assignment.assignmenttype = ?", array($program->id, $this->id));
 
         // Convert these into html.
         if (!empty($items)) {
             foreach ($items as $item) {
                 $item->fullname = fullname($item);
-                $this->data[] = $this->build_row($item);
+                $this->data[] = $this->build_row($item, !$program->has_expired());
             }
         }
     }
@@ -1531,13 +1731,21 @@ class individuals_category extends prog_assignment_category {
         return $item;
     }
 
-    function build_row($item) {
+    /**
+     * Create row to be added to this assignment category's table.
+     *
+     * @param object $item - data to be added to the row
+     * @param bool $canupdate - true if user will be able to update data for this table.
+     *   Since Totara 10.
+     * @return array
+     */
+    function build_row($item, $canupdate = true) {
         if (is_int($item)) {
             $item = $this->get_item($item);
         }
 
         $row = array();
-        $row[] = $this->build_first_table_cell($item->fullname, $this->id, $item->id);
+        $row[] = $this->build_first_table_cell($item->fullname, $this->id, $item->id, $canupdate);
         $row[] = $item->id;
         if (isset($item->progid)) {
             $isprog = empty($item->certifid);
@@ -1559,7 +1767,7 @@ class individuals_category extends prog_assignment_category {
                 }
             } else if (empty($item->timedue) || $item->timedue == COMPLETION_TIME_NOT_SET) {
                 // No date set.
-                $row[] = $this->get_completion($item);
+                $row[] = $this->get_completion($item, $item->progid, $canupdate);
                 if ($item->completionevent == COMPLETION_EVENT_NONE) {
                     $row[] = get_string('noduedate', 'totara_program');
                 } else {
@@ -1569,7 +1777,7 @@ class individuals_category extends prog_assignment_category {
                 // Date set.
                 $item->completiontime = COMPLETION_TIME_NOT_SET;
                 $item->completionevent = COMPLETION_EVENT_NONE;
-                $row[] = $this->get_completion($item);
+                $row[] = $this->get_completion($item, $item->progid, $canupdate);
                 $row[] = trim(userdate($item->timedue,
                     get_string('strfdateattime', 'langconfig'), 99, false));
             }
@@ -1577,7 +1785,7 @@ class individuals_category extends prog_assignment_category {
             // New individual assignment.
             $item->completiontime = COMPLETION_TIME_NOT_SET;
             $item->completionevent = COMPLETION_EVENT_NONE;
-            $row[] = $this->get_completion($item);
+            $row[] = $this->get_completion($item, null, $canupdate);
             $row[] = get_string('notyetset', 'totara_program');
         }
 

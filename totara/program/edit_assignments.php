@@ -28,7 +28,7 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
-require_once('lib.php');
+require_once($CFG->dirroot . '/totara/program/lib.php');
 require_once($CFG->dirroot.'/totara/certification/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
@@ -148,6 +148,8 @@ echo $OUTPUT->header();
 echo $OUTPUT->container_start('program assignments', 'program-assignments');
 
 echo $OUTPUT->heading($heading);
+
+/** @var totara_program_renderer $renderer */
 $renderer = $PAGE->get_renderer('totara_program');
 
 // Display the current status
@@ -156,9 +158,11 @@ $exceptions = $program->get_exception_count();
 $currenttab = 'assignments';
 require('tabs.php');
 
-echo $renderer->display_edit_assignment_form($id, $categories, CERTIFPATH_STD); // Can use STD or CERT, they are the same.
+echo $renderer->display_edit_assignment_form($program, $categories, CERTIFPATH_STD); // Can use STD or CERT, they are the same.
 
-echo $renderer->get_cancel_button(array('id' => $program->id));
+if (!$program->has_expired()) {
+    echo $renderer->get_cancel_button(array('id' => $program->id));
+}
 
 echo $OUTPUT->container_end();
 

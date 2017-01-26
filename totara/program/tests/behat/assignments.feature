@@ -78,7 +78,7 @@ Feature: Users assignments to a program
     And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
-    Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
+    Then I should see "2 learner(s) assigned: 2 active, 0 exception(s)"
 
     When I log out
     And I log in as "user001"
@@ -127,7 +127,7 @@ Feature: Users assignments to a program
     And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
-    Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
+    Then I should see "2 learner(s) assigned: 2 active, 0 exception(s)"
 
     When I log out
     And I log in as "user002"
@@ -205,7 +205,7 @@ Feature: Users assignments to a program
     And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
-    Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
+    Then I should see "2 learner(s) assigned: 2 active, 0 exception(s)"
 
     When I log out
     And I log in as "user001"
@@ -278,7 +278,7 @@ Feature: Users assignments to a program
     And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
-    Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
+    Then I should see "2 learner(s) assigned: 2 active, 0 exception(s)"
 
     When I log out
     And I log in as "user001"
@@ -352,7 +352,7 @@ Feature: Users assignments to a program
     And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
-    Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
+    Then I should see "2 learner(s) assigned: 2 active, 0 exception(s)"
 
     When I log out
     And I log in as "user002"
@@ -431,3 +431,33 @@ Feature: Users assignments to a program
     And I should see "fn_002 ln_002 (user002@example.com)" in the "#search-tab" "css_element"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
     And I wait "1" seconds
+
+  @javascript
+  Scenario: Assignments can not be updated after program end date
+    Given I log in as "admin"
+    And I click on "Programs" in the totara menu
+    And I click on "Assignment Program Tests" "link"
+    And I click on "Edit program details" "button"
+    And I click on "Assignments" "link"
+    And I click on "Individuals" "option" in the "#menucategory_select_dropdown" "css_element"
+    And I click on "Add" "button" in the "#category_select" "css_element"
+    And I click on "Add individuals to program" "button"
+    And I click on "fn_001 ln_001 (user001@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
+    And I click on "fn_002 ln_002 (user002@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
+    And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
+    And I wait "1" seconds
+    And I press "Save changes"
+    And I press "Save all changes"
+    Then I should see "2 learner(s) assigned: 2 active, 0 exception(s)"
+    When I switch to "Details" tab
+    And I set the following fields to these values:
+     | availableuntil[enabled] | 1       |
+     | availableuntil[day]     | 15      |
+     | availableuntil[month]   | January |
+     | availableuntil[year]    | 2017    |
+    And I press "Save changes"
+    And I switch to "Assignments" tab
+    Then I should see "This program is no longer available to learners."
+    And I should see "Note: If program is reactivated, the assigned learners may be updated based on any changes within selected groups."
+    And "Save changes" "button" should not exist
+    And "Add individuals to program" "button" should not exist

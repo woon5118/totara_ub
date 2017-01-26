@@ -6,5 +6,10 @@ chosedismissexception,totara_program
 currentlyassigned,totara_program
 dismissandtakenoaction,totara_program
 duplicatecourse,totara_program
+learnersassigned,totara_program
+learnersassignedexceptions,totara_program
 overrideandaddprogram,totara_program
 setrealistictimeallowance,totara_program
+total,totara_program
+totalassignments,totara_program
+totalassignments_help,totara_program

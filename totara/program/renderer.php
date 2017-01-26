@@ -90,24 +90,26 @@ class totara_program_renderer extends plugin_renderer_base {
         $programstatusclass = $data->statusclass;
         $programstatusstring = get_string($data->statusstr, 'totara_program');
 
-        $learnerinfo = html_writer::empty_tag('br') . html_writer::start_tag('span', array('class' => 'assignmentcount'));
-        if ($data->exceptions > 0) {
-            $learnerinfo .= get_string('learnersassignedexceptions', 'totara_program', $data);
+        if (($data->statusstr === 'notduetostartuntil') or ($data->statusstr === 'nolongeravailabletolearners')) {
+            $notification = $programstatusstring;
         } else {
-            $learnerinfo .= get_string('learnersassigned', 'totara_program', $data);
-        }
-        $learnerinfo .= html_writer::end_tag('span');
+            $learnerinfo = html_writer::empty_tag('br') . html_writer::start_tag('span', array('class' => 'assignmentcount'));
+            $learnerinfo .= get_string('learnersassignedbreakdown', 'totara_program', $data);
+            $learnerinfo .= html_writer::end_tag('span');
 
-        $coursevisibilityinfo = html_writer::empty_tag('br') . html_writer::start_tag('span');
-        if ($data->audiencevisibilitywarning) {
-            $coursevisibilityinfo .= get_string('audiencevisibilityconflictmessage', 'totara_program');
-        }
-        if ($data->assignmentsdeferred) {
-            $coursevisibilityinfo .= get_string('assignmentsdeferred', 'totara_program');
-        }
-        $coursevisibilityinfo .= html_writer::end_tag('span');
+            $coursevisibilityinfo = html_writer::empty_tag('br') . html_writer::start_tag('span');
+            if ($data->audiencevisibilitywarning) {
+                $coursevisibilityinfo .= get_string('audiencevisibilityconflictmessage', 'totara_program');
+            }
+            if ($data->assignmentsdeferred) {
+                $coursevisibilityinfo .= get_string('assignmentsdeferred', 'totara_program');
+            }
+            $coursevisibilityinfo .= html_writer::end_tag('span');
 
-        $out = $this->output->notification($programstatusstring . $learnerinfo . $coursevisibilityinfo, $programstatusclass);
+            $notification = $programstatusstring . $learnerinfo . $coursevisibilityinfo;
+        }
+
+        $out = $this->output->notification($notification, $programstatusclass);
 
         // This js variable is added so that is available to javascript and can
         // be retrieved and displayed in the dialog when saving the content
@@ -127,6 +129,8 @@ class totara_program_renderer extends plugin_renderer_base {
      * @return string HTML fragment.
      */
     public function assignment_category_display($assignment_class, $headers, $buttonname, $data, $canadd) {
+        global $OUTPUT;
+
         // If we've got no data to display and the data can't
         // be added to, then don't display the fieldset.
         if (!$canadd && !$data) {
@@ -163,14 +167,13 @@ class totara_program_renderer extends plugin_renderer_base {
                 $table->data[] = $row;
             }
         }
-        $html .= html_writer::table($table);
+        $html .= $OUTPUT->render($table);
         // Add a button for adding new items to the category if we have a name.
         if ($canadd) {
             $html .= html_writer::start_tag('button', array('id' => 'add-assignment-' . $assignment_class->id));
             $html .= $buttonname . html_writer::end_tag('button');
         }
-        $html .= html_writer::start_tag('div', array('class' => 'total_user_count')) . get_string('total', 'totara_program') . ': ';
-        $html .= html_writer::tag('span', '0', array('class' => 'user_count')) . html_writer::end_tag('div');
+
         $html .= html_writer::end_tag('fieldset');
 
         return $html;
@@ -178,26 +181,47 @@ class totara_program_renderer extends plugin_renderer_base {
     /**
      * Generates HTML for edit assignments form
      *
-     * @param int $id Program ID.
-     * @param array $categories Assignment categories to display.
+     * @param int|program $programidorinstance Program ID.
+     *   Instance of program accepted since Totara 10 (prior to this, only int was accepted).
+     * @param organisations_category[]|positions_category[]|cohorts_category[]|managers_category[]|individuals_category[] $categories
+     * Assignment categories to display.
      * @param int $certificationpath
-     * @return str HTML fragment
+     * @return string HTML fragment
      */
-    public function display_edit_assignment_form($id, $categories, $certificationpath) {
+    public function display_edit_assignment_form($programidorinstance, $categories, $certificationpath) {
         $dropdown_options = array();
         $out = '';
         $out .= html_writer::start_tag('form', array('name' => 'form_prog_assignments', 'method' => 'post', 'class' => 'mform'));
         $out .= $this->output->heading(get_string('programassignments', 'totara_program'), 3);
 
         // Show the program time required so people know the minimum to set completion to.
-        $program = new program($id);
-        $programtime = $program->content->get_total_time_allowance($certificationpath);
 
-        if ($programtime > 0) {
-            $out .= prog_format_seconds($programtime);
+        if (is_numeric($programidorinstance)) {
+            $program = new program($programidorinstance);
+        } else if (get_class($programidorinstance) === 'program') {
+            $program = $programidorinstance;
+        } else {
+            throw new coding_exception('programidorinstance must be a program id (integer) or instance of program class');
         }
 
-        $out .= html_writer::tag('p', get_string('instructions:programassignments', 'totara_program'));
+        if ($program->has_expired()) {
+            $learners = $program->get_program_learners();
+            if (empty($learners)) {
+                $learnercount = 0;
+            } else {
+                $learnercount = count($learners);
+            }
+            $out .= html_writer::tag('p', get_string('learnerswereassigned', 'totara_program', $learnercount));
+        } else {
+            $programtime = $program->content->get_total_time_allowance($certificationpath);
+
+            if ($programtime > 0) {
+                $out .= prog_format_seconds($programtime);
+            }
+
+            $out .= html_writer::tag('p', get_string('instructions:programassignments', 'totara_program'));
+        }
+
         $out .= html_writer::start_tag('div', array('id' => 'assignment_categories'));
 
         // Display the categories!
@@ -205,16 +229,18 @@ class totara_program_renderer extends plugin_renderer_base {
         foreach ($categories as $category) {
             if (get_class($category) === 'positions_category' && totara_feature_disabled('positions')) {
                 $canadd = false;
+            } else if ($program->has_expired()) {
+                $canadd = false;
             } else {
                 $canadd = true;
             }
 
-            $category->build_table($id);
+            $category->build_table($program);
             if (!$category->has_items() && $canadd) {
                 $dropdown_options[$category->id] = $category->name;
             } else {
                 $out .= $category->display($canadd);
-                $js .= $category->get_js($id);
+                $js .= $category->get_js($program->id);
             }
         }
         if ($js != '') {
@@ -227,23 +253,24 @@ class totara_program_renderer extends plugin_renderer_base {
         }
         $out .= html_writer::end_tag('div');
 
-        // Display the drop-down if there's any categories that aren't yet being used
-        if (!empty($dropdown_options)) {
-            $out .= html_writer::start_tag('div', array('id' => 'category_select'));
-            $out .= html_writer::tag('label', get_string('addnew', 'totara_program'), array('for' => 'menucategory_select_dropdown'));
-            $out .= html_writer::select($dropdown_options, 'category_select_dropdown', array('initialvalue' => 1));
-            $out .= html_writer::tag('span', get_string('toprogram', 'totara_program'));
-            $out .= html_writer::tag('button', get_string('add'));
-            $out .= html_writer::end_tag('div');
+        if ($program->has_expired()) {
+            $out .= html_writer::tag('p', get_string('ifreactivatinglearnerupdate', 'totara_program'));
+        } else {
+            // Display the drop-down if there's any categories that aren't yet being used
+            if (!empty($dropdown_options)) {
+                $out .= html_writer::start_tag('div', array('id' => 'category_select'));
+                $out .= html_writer::tag('label', get_string('addnew', 'totara_program'), array('for' => 'menucategory_select_dropdown'));
+                $out .= html_writer::select($dropdown_options, 'category_select_dropdown', array('initialvalue' => 1));
+                $out .= html_writer::tag('span', get_string('toprogram', 'totara_program'));
+                $out .= html_writer::tag('button', get_string('add'));
+                $out .= html_writer::end_tag('div');
+            }
+
+            $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "id", 'value' => $program->id));
+            $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "sesskey", 'value' => sesskey()));
+            $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => "savechanges", 'value' => get_string('savechanges'), 'class' => 'savechanges-overview program-savechanges'));
         }
-        $out .= html_writer::start_tag('div', array('class' => 'overall_total'));
-        $out .= $this->output->help_icon('totalassignments', 'totara_program');
-        $out .= ' ' . get_string('totalassignments', 'totara_program') . ': ';
-        $out .= html_writer::start_tag('span', array('class' => 'total')) . '0' . html_writer::end_tag('span');
-        $out .= html_writer::end_tag('div');
-        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "id", 'value' => $id));
-        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => "sesskey", 'value' => sesskey()));
-        $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => "savechanges", 'value' => get_string('savechanges'), 'class' => 'savechanges-overview program-savechanges'));
+
         $out .= html_writer::end_tag('form');
         return $out;
     }
