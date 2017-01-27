@@ -106,7 +106,6 @@ class rb_source_totaramessages extends rb_base_source {
         // Include some standard joins. Including the user the message was sent from.
         $this->add_user_table_to_joinlist($joinlist, 'msg', 'useridfrom');
         $this->add_job_assignment_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
-        $this->add_cohort_user_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
 
         return $joinlist;
     }
@@ -223,7 +222,6 @@ class rb_source_totaramessages extends rb_base_source {
         // Include some standard columns. Including the user that the message was sent from.
         $this->add_user_fields_to_columns($columnoptions, 'auser', 'user', true);
         $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_cohort_user_fields_to_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -270,7 +268,6 @@ class rb_source_totaramessages extends rb_base_source {
         // Include some standard filters. Including the user that the message was sent from.
         $this->add_user_fields_to_filters($filteroptions, 'user', true);
         $this->add_job_assignment_fields_to_filters($filteroptions);
-        $this->add_cohort_user_fields_to_filters($filteroptions);
 
         return $filteroptions;
     }

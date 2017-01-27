@@ -103,7 +103,6 @@ class rb_source_course_completion_all extends rb_base_source {
 
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
         $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_course_table_to_joinlist($joinlist, 'base', 'courseid', 'INNER');
 
         return $joinlist;
@@ -151,7 +150,6 @@ class rb_source_course_completion_all extends rb_base_source {
 
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_course_fields_to_columns($columnoptions);
 
         return $columnoptions;
@@ -193,7 +191,6 @@ class rb_source_course_completion_all extends rb_base_source {
 
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_job_assignment_fields_to_filters($filteroptions);
-        $this->add_cohort_user_fields_to_filters($filteroptions);
         $this->add_course_fields_to_filters($filteroptions);
 
         return $filteroptions;

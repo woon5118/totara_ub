@@ -2353,6 +2353,9 @@ abstract class rb_base_source {
             $join
         );
 
+        // Add cohort tables
+        $this->add_cohort_user_tables_to_joinlist($joinlist, $join, $field, $alias.'cohort');
+
         return true;
     }
 
@@ -2671,6 +2674,8 @@ abstract class rb_base_source {
             )
         );
 
+        $this->add_cohort_user_fields_to_columns($columnoptions, $join.'cohort', $groupname);
+
         return true;
     }
 
@@ -2863,6 +2868,8 @@ abstract class rb_base_source {
                 'addtypetoheading' => $addtypetoheading
             )
         );
+
+        $this->add_cohort_user_fields_to_filters($filteroptions, $groupname);
 
         return true;
     }
@@ -5660,17 +5667,17 @@ abstract class rb_base_source {
      * @return boolean True
      */
     protected function add_cohort_user_tables_to_joinlist(&$joinlist,
-                                                          $join, $field) {
+                                                          $join, $field, $alias = 'ausercohort') {
 
         $joinlist[] = new rb_join(
-            'cohortuser',
+            $alias,
             'LEFT',
             // subquery as table name
             "(SELECT cm.userid AS userid, " .
                 sql_group_concat(sql_cast2char('cm.cohortid'),'|', true) .
                 " AS idlist FROM {cohort_members} cm
                 GROUP BY cm.userid)",
-            "cohortuser.userid = $join.$field",
+            "{$alias}.userid = $join.$field",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
         );
@@ -5754,20 +5761,25 @@ abstract class rb_base_source {
      * @param array &$columnoptions Array of current column options
      *                              Passed by reference and updated by
      *                              this method
-     * @param string $cohortids Name of the join that provides the
+     * @param string $join Name of the join that provides the
      *                          'cohortuser' table.
      *
      * @return True
      */
     protected function add_cohort_user_fields_to_columns(&$columnoptions,
-                                                         $cohortids='cohortuser') {
+                                                         $join='ausercohort', $groupname = 'user',
+                                                         $addtypetoheading = false) {
 
         $columnoptions[] = new rb_column_option(
-            'cohort',
+            $groupname,
             'usercohortids',
             get_string('usercohortids', 'totara_reportbuilder'),
-            "$cohortids.idlist",
-            array('joins' => $cohortids, 'selectable' => false)
+            "$join.idlist",
+            array(
+                'joins' => $join,
+                'selectable' => false,
+                'addtypetoheading' => $addtypetoheading
+            )
         );
 
         return true;
@@ -5829,17 +5841,18 @@ abstract class rb_base_source {
      *                              this method
      * @return True
      */
-    protected function add_cohort_user_fields_to_filters(&$filteroptions) {
+    protected function add_cohort_user_fields_to_filters(&$filteroptions, $groupname = 'user', $addtypetoheading = false) {
 
         if (!has_capability('moodle/cohort:view', context_system::instance())) {
             return true;
         }
 
         $filteroptions[] = new rb_filter_option(
-            'cohort',
+            $groupname,
             'usercohortids',
             get_string('userincohort', 'totara_reportbuilder'),
-            'cohort'
+            'cohort',
+            array('addtypetoheading' => $addtypetoheading)
         );
         return true;
     }

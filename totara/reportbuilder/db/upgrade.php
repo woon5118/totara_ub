@@ -85,5 +85,15 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017050400, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2017052200) {
+        // Update filter to match updated code.
+        reportbuilder_rename_data('filters', '*', 'cohort', 'usercohortids', 'user', 'usercohortids');
+
+        // Update filter names in saved searches.
+        totara_reportbuilder_migrate_saved_search_filters(array('usercohortids' => 'usercohortids'), 'cohort', 'user');
+
+        upgrade_plugin_savepoint(true, 2017052200, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

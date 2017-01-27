@@ -96,7 +96,6 @@ class rb_source_badge_issued extends rb_base_source {
             'course', 'category');
         $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_tag_tables_to_joinlist('course', $joinlist, 'badge', 'courseid');
-        $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_cohort_course_tables_to_joinlist($joinlist, 'badge', 'courseid');
 
         return $joinlist;
@@ -198,7 +197,6 @@ class rb_source_badge_issued extends rb_base_source {
         $this->add_course_category_fields_to_columns($columnoptions);
         $this->add_job_assignment_fields_to_columns($columnoptions);
         $this->add_tag_fields_to_columns('course', $columnoptions);
-        $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_course_fields_to_columns($columnoptions);
 
         return $columnoptions;
@@ -279,7 +277,6 @@ class rb_source_badge_issued extends rb_base_source {
         $this->add_course_category_fields_to_filters($filteroptions);
         $this->add_job_assignment_fields_to_filters($filteroptions);
         $this->add_tag_fields_to_filters('course', $filteroptions);
-        $this->add_cohort_user_fields_to_filters($filteroptions);
         $this->add_cohort_course_fields_to_filters($filteroptions);
 
         return $filteroptions;

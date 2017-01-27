@@ -207,7 +207,6 @@ class rb_source_dp_course extends rb_base_source {
         $this->add_context_table_to_joinlist($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
         $this->add_user_table_to_joinlist($joinlist, 'base','userid');
         $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_cohort_course_tables_to_joinlist($joinlist, 'base', 'courseid');
 
         return $joinlist;
@@ -472,7 +471,6 @@ class rb_source_dp_course extends rb_base_source {
 
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_course_fields_to_columns($columnoptions);
 
         return $columnoptions;
@@ -546,7 +544,6 @@ class rb_source_dp_course extends rb_base_source {
 
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_job_assignment_fields_to_filters($filteroptions);
-        $this->add_cohort_user_fields_to_filters($filteroptions);
         $this->add_cohort_course_fields_to_filters($filteroptions);
 
         return $filteroptions;

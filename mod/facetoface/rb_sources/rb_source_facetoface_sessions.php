@@ -209,7 +209,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
 
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
 
-        $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_cohort_course_tables_to_joinlist($joinlist, 'facetoface', 'course');
 
         return $joinlist;
@@ -533,7 +532,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_assets_fields_to_columns($columnoptions);
         $this->add_rooms_fields_to_columns($columnoptions);
 
-        $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_course_fields_to_columns($columnoptions);
 
         return $columnoptions;
@@ -688,7 +686,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         // add session role fields to filters
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
 
-        $this->add_cohort_user_fields_to_filters($filteroptions);
         $this->add_cohort_course_fields_to_filters($filteroptions);
 
         return $filteroptions;
