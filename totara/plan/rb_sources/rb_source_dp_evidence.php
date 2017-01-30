@@ -61,6 +61,8 @@ class rb_source_dp_evidence extends rb_base_source {
                 e.name,
                 e.userid,
                 e.readonly,
+                e.timecreated,
+                e.timemodified,
                 e.evidencetypeid,
                 et.name AS evidencetypename,
                 CASE
@@ -170,6 +172,26 @@ class rb_source_dp_evidence extends rb_base_source {
 
         $columnoptions[] = new rb_column_option(
             'evidence',
+            'timecreated',
+            get_string('timecreated', 'rb_source_dp_evidence'),
+            'base.timecreated',
+            array(
+                'displayfunc' => 'nice_datetime'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'evidence',
+            'timemodified',
+            get_string('timemodified', 'rb_source_dp_evidence'),
+            'base.timemodified',
+            array(
+                'displayfunc' => 'nice_datetime'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'evidence',
             'viewevidencelink',
             get_string('viewevidencelink', 'rb_source_dp_evidence'),
             'base.name',
@@ -255,6 +277,20 @@ class rb_source_dp_evidence extends rb_base_source {
                 array(
                     'selectfunc' => 'evidencetypes',
                 )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'evidence',
+            'timecreated',
+            get_string('timecreated', 'rb_source_dp_evidence'),
+            'date'
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'evidence',
+            'timemodified',
+            get_string('timemodified', 'rb_source_dp_evidence'),
+            'date'
         );
 
         $this->add_user_fields_to_filters($filteroptions);
