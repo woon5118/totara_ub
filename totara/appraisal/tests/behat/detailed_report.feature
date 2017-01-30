@@ -114,7 +114,7 @@ Feature: Test appraisal detailed report with numeric question
     And I click on "Next" "button" in the "#fitem_id_submitbutton" "css_element"
     And I set the following fields to these values:
       | Your answer | One |
-    And I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+    And I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     And I log out
 
     # Load report with new column

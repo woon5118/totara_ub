@@ -23,6 +23,8 @@
 
 @padding-small-horizontal: 10px;
 @padding-small-vertical: 5px;
+@padding-large-vertical: 10px;
+@gray-light: #6e6e6e;
 
 div.appraisal-content {
     padding-left:1em;
@@ -276,21 +278,12 @@ li.yui3-dd-draggable {
   min-height: 100px;
 }
 .appraisal-stage > div {
-  display: inline-block;
-  vertical-align: top;
+  display: block;
+  float: left;
 }
 
-.appraisal-stage-completed {
+.appraisal-stage {
   background:#F5F5F5;
-}
-.appraisal-stage-inprogress {
-  background:#FFE599;
-}
-.appraisal-stage-overdue {
-  background:#F5A5A5;
-}
-.appraisal-stage-locked {
-  background:#D5D5D5;
 }
 
 .appraisal-headerbuttons {
@@ -308,7 +301,7 @@ li.yui3-dd-draggable {
 }
 
 .appraisal-stageinfo {
-  width: 65%;
+  width: 51%;
   margin: 0 1%;
 }
 
@@ -338,6 +331,24 @@ li.yui3-dd-draggable {
 
 .appraisal-stageactions input[type="submit"] {
   width: 120px;
+}
+
+.appraisal-stage .appraisal-stagestate {
+  width: 14%;
+  text-align: center;
+  float: right;
+  margin-top: 20px;
+
+  .flex-icon {
+    font-size: 40px;
+    width: 100%;
+    display: block;
+  }
+
+  .appraisal-statetext {
+    font-size: 20px;
+    display: block;
+  }
 }
 
 div.tabtree {
@@ -410,6 +421,10 @@ form.print-stages-form .fitem .fitemtitle {
 
 #assignedusers .dataTables_length {
   padding-bottom: 1em;
+}
+
+.appraisal-usermessage {
+  display: block;
 }
 
 @media print {
@@ -508,4 +523,16 @@ form.print-stages-form .fitem .fitemtitle {
 
 .plan_box a {
     text-decoration: none;
+}
+
+.appraisal-usermessage .flex-icon:after {
+  content: " ";
+}
+
+.appraisal-disabled {
+  color: @gray-light;
+
+  &:after {
+    content: " ";
+  }
 }

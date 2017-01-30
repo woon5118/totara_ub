@@ -83,7 +83,7 @@ Feature: Complete review questions in appraisals
     And I click on "Save" "button" in the "Choose goals to review" "totaradialogue"
     And I wait "1" seconds
     Then I should see "Company Goal One"
-    When I press "Complete Stage"
+    When I press "Complete stage"
     And I press "View"
     Then I should see "Company Goal One"
     When I log out
@@ -97,6 +97,6 @@ Feature: Complete review questions in appraisals
     And I click on "Save" "button" in the "Choose goals to review" "totaradialogue"
     And I wait "1" seconds
     Then I should see "Company Goal Two"
-    When I press "Complete Stage"
+    When I press "Complete stage"
     And I press "View"
     Then I should see "Company Goal Two"

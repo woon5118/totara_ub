@@ -188,7 +188,7 @@ Feature: Test reported learners in appraisal assignments
     And I click on "All Appraisals" in the totara menu
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
-    And I click on "Complete Stage" "button"
+    And I click on "Complete stage" "button"
     Then I should see "Completed" in the "div.appraisal-stageinfo" "css_element"
     And I log out
 
@@ -296,7 +296,7 @@ Feature: Test reported learners in appraisal assignments
     And I click on "All Appraisals" in the totara menu
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
-    And I click on "Complete Stage" "button"
+    And I click on "Complete stage" "button"
     Then I should see "Completed" in the "div.appraisal-stageinfo" "css_element"
     And I log out
 
@@ -361,7 +361,7 @@ Feature: Test reported learners in appraisal assignments
     And I click on "All Appraisals" in the totara menu
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
-    And I click on "Complete Stage" "button"
+    And I click on "Complete stage" "button"
     Then I should see "Completed" in the "div.appraisal-stageinfo" "css_element"
     And I log out
 
@@ -369,7 +369,7 @@ Feature: Test reported learners in appraisal assignments
     And I click on "All Appraisals" in the totara menu
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
-    And I click on "Complete Stage" "button"
+    And I click on "Complete stage" "button"
     Then I should see "Completed" in the "div.appraisal-stageinfo" "css_element"
     And I log out
 
@@ -669,7 +669,7 @@ Feature: Test reported learners in appraisal assignments
     And I click on "All Appraisals" in the totara menu
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
-    And I click on "Complete Stage" "button"
+    And I click on "Complete stage" "button"
     Then I should see "Completed" in the "div.appraisal-stageinfo" "css_element"
     And I log out
 
@@ -677,7 +677,7 @@ Feature: Test reported learners in appraisal assignments
     And I click on "All Appraisals" in the totara menu
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
-    And I click on "Complete Stage" "button"
+    And I click on "Complete stage" "button"
     Then I should see "Completed" in the "div.appraisal-stageinfo" "css_element"
     And I log out
 
@@ -850,7 +850,7 @@ Feature: Test reported learners in appraisal assignments
     And I click on "All Appraisals" in the totara menu
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
-    And I click on "Complete Stage" "button"
+    And I click on "Complete stage" "button"
     Then I should see "Completed" in the "div.appraisal-stageinfo" "css_element"
     And I log out
 
@@ -858,7 +858,7 @@ Feature: Test reported learners in appraisal assignments
     And I click on "All Appraisals" in the totara menu
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
-    And I click on "Complete Stage" "button"
+    And I click on "Complete stage" "button"
     Then I should see "Completed" in the "div.appraisal-stageinfo" "css_element"
     And I log out
 

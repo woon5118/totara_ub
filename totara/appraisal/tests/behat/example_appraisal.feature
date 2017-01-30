@@ -159,7 +159,7 @@ Feature: Complete the example appraisal
     Then I should see "Has this been agreed between learner and manager?"
     When I set the following fields to these values:
       | Yes | 1 |
-    And I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+    And I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     Then I should see "You have completed this stage"
     When I log out
     And I log in as "manager1"
@@ -199,7 +199,7 @@ Feature: Complete the example appraisal
     Then I should see "Has this been agreed between learner and manager?"
     When I set the following fields to these values:
       | Yes | 1 |
-    And I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+    And I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     Then I should see "You have completed this stage"
     When I press "Start"
     And I press "Choose goals to review"
@@ -229,7 +229,7 @@ Feature: Complete the example appraisal
     Then I should see "Overall comments"
     When I set the following fields to these values:
       | Your answer | Manager One overall comments (mid-year) |
-    And I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+    And I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     Then I should see "You have completed this stage"
     When I log out
     And I log in as "learner1"
@@ -271,7 +271,7 @@ Feature: Complete the example appraisal
     Then I should see "Manager One overall comments (mid-year)"
     When I set the following fields to these values:
       | Your answer | Learner One overall comments (mid-year) |
-    And I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+    And I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     Then I should see "You have completed this stage"
     When I press "Start"
     Then I should see "End of Year Review"
@@ -304,7 +304,7 @@ Feature: Complete the example appraisal
     And I press "Next"
     And I set the following fields to these values:
       | Your answer | Learner One overall comments (end-of-year) |
-    And I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+    And I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     And I log out
     And I log in as "manager1"
     And I click on "All Appraisals" in the totara menu
@@ -325,7 +325,7 @@ Feature: Complete the example appraisal
     Then I should see "Learner One overall comments (end-of-year)"
     When I set the following fields to these values:
       | Your answer | Manager One overall comments (end-of-year) |
-    And I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+    And I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     Then I should see "You have completed this stage"
     When I click on "All Appraisals" in the totara menu
     Then I should see "Completed" in the "Learner One" "table_row"

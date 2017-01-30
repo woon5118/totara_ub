@@ -143,7 +143,7 @@ Feature: Perform basic actions for aggregate questions
       Then I should see "Average score: 5.5"
       And I should see "Median score: 5.5"
 
-      When I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+      When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
       And I log out
       And I log in as "manager"
       And I click on "All Appraisals" in the totara menu
@@ -157,7 +157,7 @@ Feature: Perform basic actions for aggregate questions
       And I should see "Average score: 5.5"
       And I should see "Median score: 5.5"
 
-      When I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+      When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
       And I log out
       And I log in as "appraiser"
       And I click on "All Appraisals" in the totara menu
@@ -171,7 +171,7 @@ Feature: Perform basic actions for aggregate questions
       And I should see "Average score: 5.5"
       And I should see "Median score: 5.5"
 
-      When I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+      When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
       And I log out
       And I log in as "jimmy"
       And I click on "All Appraisals" in the totara menu
@@ -183,7 +183,7 @@ Feature: Perform basic actions for aggregate questions
       Then I should see "Average score: 6"
       And I should see "Median score: 6"
 
-      When I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+      When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
       And I log out
       And I log in as "manager"
       And I click on "All Appraisals" in the totara menu
@@ -199,7 +199,7 @@ Feature: Perform basic actions for aggregate questions
       And I should see "Average score: 6"
       And I should see "Median score: 6"
 
-      When I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+      When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
       And I log out
       And I log in as "appraiser"
       And I click on "All Appraisals" in the totara menu
@@ -215,7 +215,7 @@ Feature: Perform basic actions for aggregate questions
       And I should see "Average score: 6"
       And I should see "Median score: 6"
 
-      When I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+      When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
 
       Then I should see "This appraisal was completed"
 
@@ -255,7 +255,7 @@ Feature: Perform basic actions for aggregate questions
         And I should see "Average score: 37.5" in the "//fieldset[legend[contains(.,'S0-Agg_Cust3')]]//div[@id='fitem_id_aggregate' and div[@class='fitemtitle' and contains(.,'Learner')]]" "xpath_element"
         And I should see "Median score: 25" in the "//fieldset[legend[contains(.,'S0-Agg_Cust3')]]//div[@id='fitem_id_aggregate' and div[@class='fitemtitle' and contains(.,'Learner')]]" "xpath_element"
 
-      When I click on "Complete Stage" "button" in the "#fitem_id_submitbutton" "css_element"
+      When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
         And I log out
         And I log in as "manager"
         And I click on "All Appraisals" in the totara menu

@@ -9,3 +9,9 @@ information provided here is intended especially for developers.
 * Renamed CSS class "previewer" to "appraisal-previewer" so that it did not clash with the same CSS class in feedback360
 * totara_appraisal_renderer::display_appraisal_header() has changed
 * totara_appraisal_renderer::display_job_assignment() has changed
+* store_role_assignments() function returns array of removed appraisal_role_assignments
+* update_role_assignments() function returns array of removed appraisal_role_assignments
+* update_roles() function also return a list of removed role assignments
+* totara_appraisal_renderer::display_stage() has changed to render from a mustache template (totara_appraisal/stage_brief)
+* totara_appraisal_renderer::display_stage_actions_for_stages() has changed
+* totara_appraisal_renderer::display_stage_actions_for_pages() has changed
