@@ -180,6 +180,16 @@ class rb_source_badge_issued extends rb_base_source {
                 'badge.status',
                 array('displayfunc' => 'badgestatus', 'joins' => 'badge')
             ),
+            new rb_column_option(
+                'badge',
+                'description',
+                get_string('badgedescription', 'rb_source_badge_issued'),
+                'badge.description',
+                array(
+                    'displayfunc' => 'text',
+                    'joins' => 'badge',
+                )
+            )
         );
 
         // Include some standard columns.
@@ -255,6 +265,12 @@ class rb_source_badge_issued extends rb_base_source {
                     'attributes' => rb_filter_option::select_width_limiter(),
                 )
             ),
+            new rb_filter_option(
+                'badge',
+                'description',
+                get_string('badgedescription', 'rb_source_badge_issued'),
+                'text'
+            )
         );
 
         // Include some standard filters.
