@@ -277,12 +277,12 @@ class enrol_self_plugin extends enrol_plugin {
      * @return bool|string true if successful, else error message or false.
      */
     public function can_self_enrol(stdClass $instance, $checkuserenrolment = true) {
-        global $CFG, $DB, $OUTPUT, $USER;
+        global $CFG, $DB, $USER;
 
         if ($checkuserenrolment) {
             if (isguestuser()) {
                 // Can not enrol guest.
-                return get_string('noguestaccess', 'enrol') . $OUTPUT->continue_button(get_login_url());
+                return get_string('noguestaccess', 'enrol') . ' ' . html_writer::link(get_login_url(), get_string('login', 'core'), array('class' => 'btn btn-default'));
             }
             // Check if user is already enroled.
             if ($DB->get_record('user_enrolments', array('userid' => $USER->id, 'enrolid' => $instance->id))) {

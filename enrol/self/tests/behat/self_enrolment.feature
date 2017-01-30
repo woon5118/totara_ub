@@ -27,8 +27,8 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     And I log out
     When I follow "Course 1"
     And I press "Log in as a guest"
-    Then I should see "Guests cannot access this course. Please log in."
-    And I press "Continue"
+    Then I should see "Guests cannot access this course."
+    And I click on "Log in" "link"
     And I should see "Log in"
 
   Scenario: Self-enrolment enabled

@@ -104,7 +104,7 @@ foreach ($forms as $form) {
 
 if (!$forms) {
     if (isguestuser()) {
-        notice(get_string('noguestaccess', 'enrol'), get_login_url());
+        echo get_string('noguestaccess', 'enrol') . ' ' . html_writer::link(get_login_url(), get_string('login', 'core'), array('class' => 'btn btn-default'));
     } else if ($returnurl) {
         notice(get_string('notenrollable', 'enrol'), $returnurl);
     } else {

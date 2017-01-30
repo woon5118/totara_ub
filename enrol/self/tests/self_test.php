@@ -576,7 +576,7 @@ class enrol_self_testcase extends advanced_testcase {
      * This will check user enrolment only, rest has been tested in test_show_enrolme_link.
      */
     public function test_can_self_enrol() {
-        global $DB, $CFG, $OUTPUT;
+        global $DB, $CFG;
         $this->resetAfterTest();
         $this->preventResetByRollback();
 
@@ -602,7 +602,7 @@ class enrol_self_testcase extends advanced_testcase {
         $selfplugin->enrol_user($instance1, $user2->id, $editingteacherrole->id);
 
         $this->setUser($guest);
-        $noaccesshtml = get_string('noguestaccess', 'enrol') . $OUTPUT->continue_button(get_login_url());
+        $noaccesshtml = get_string('noguestaccess', 'enrol') . ' ' . html_writer::link(get_login_url(), get_string('login', 'core'), array('class' => 'btn btn-default'));
         $this->assertSame($noaccesshtml, $selfplugin->can_self_enrol($instance1, true));
 
         $this->setUser($user1);
