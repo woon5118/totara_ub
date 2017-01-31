@@ -159,7 +159,8 @@ class rb_source_pos extends rb_base_source {
                 'idnumber',
                 get_string('idnumber', 'rb_source_pos'),
                 "base.idnumber",
-                array('dbdatatype' => 'char',
+                array('displayfunc' => 'plaintext',
+                      'dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
             new rb_column_option(
@@ -220,6 +221,7 @@ class rb_source_pos extends rb_base_source {
                 get_string('typeidnumber', 'rb_source_pos'),
                 'postype.idnumber',
                 array('joins' => 'postype',
+                    'displayfunc' => 'plaintext',
                     'dbdatatype' => 'char',
                     'outputformat' => 'text'
                 )
@@ -239,6 +241,7 @@ class rb_source_pos extends rb_base_source {
                 get_string('frameworkidnumber', 'rb_source_pos'),
                 "framework.idnumber",
                 array('joins' => 'framework',
+                    'displayfunc' => 'plaintext',
                     'dbdatatype' => 'char',
                     'outputformat' => 'text')
             ),
@@ -255,6 +258,7 @@ class rb_source_pos extends rb_base_source {
                 get_string('parentidnumber', 'rb_source_pos'),
                 'parent.idnumber',
                 array('joins' => 'parent',
+                      'displayfunc' => 'plaintext',
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
