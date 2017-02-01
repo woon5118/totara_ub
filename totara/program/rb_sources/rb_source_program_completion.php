@@ -292,6 +292,19 @@ class rb_source_program_completion extends rb_base_source {
                   'outputformat' => 'text')
         );
 
+        $columnoptions[] = new rb_column_option(
+            'progcompletion',
+            'isassigned',
+            get_string('isuserassigned', 'rb_source_program_completion'),
+            'CASE WHEN prog_user_assignment.id IS NOT NULL THEN 1 ELSE 0 END',
+            array(
+                'joins' => 'prog_user_assignment',
+                'displayfunc' => 'yes_or_no',
+                'dbdatatype' => 'boolean',
+                'defaultheading' => get_string('isuserassigned', 'rb_source_program_completion')
+            )
+        );
+
         // Include some standard columns.
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_job_assignment_fields_to_columns($columnoptions);
@@ -441,6 +454,17 @@ class rb_source_program_completion extends rb_base_source {
             'hierarchy',
             array(
                 'hierarchytype' => 'pos',
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'progcompletion',
+            'isassigned',
+            get_string('isuserassigned', 'rb_source_program_completion'),
+            'select',
+            array(
+                'selectfunc' => 'yesno_list',
+                'simplemode' => 'true'
             )
         );
 

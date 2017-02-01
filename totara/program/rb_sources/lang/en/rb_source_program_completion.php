@@ -35,6 +35,7 @@ $string['completionorgname'] = 'Completion organisation';
 $string['completionposid'] = 'Completion position ID';
 $string['completionpospath'] = 'Completion position path';
 $string['completionposname'] = 'Completion position';
+$string['isuserassigned'] = 'Is user assigned?';
 $string['iscomplete'] = 'Is complete?';
 $string['isinprogress'] = 'Is in progress?';
 $string['isnotcomplete'] = 'Is not complete?';
