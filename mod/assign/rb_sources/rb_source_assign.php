@@ -41,6 +41,7 @@ class rb_source_assign extends rb_base_source {
         $this->add_global_report_restriction_join('base', 'userid', 'auser');
 
         $this->base = '{assign_submission}';
+        $this->usedcomponents[] = 'mod_assign';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -140,7 +141,8 @@ class rb_source_assign extends rb_base_source {
      * @return array
      */
     protected function define_columnoptions() {
-        $a = array();
+        global $CFG;
+        include_once($CFG->dirroot.'/mod/assign/locallib.php');
 
         $columnoptions = array(
             // Assignment name.
@@ -164,6 +166,22 @@ class rb_source_assign extends rb_base_source {
                 'assign.intro',
                 array(
                     'joins' => 'assign',
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text'
+                )
+            ),
+
+            // Assignment status.
+            new rb_column_option(
+                'assignment',
+                'status',
+                get_string('submissionstatus', 'rb_source_assign'),
+                "CASE WHEN assign_grades.grade IS NOT NULL THEN 'graded'
+                      WHEN base.status = '" . ASSIGN_SUBMISSION_STATUS_SUBMITTED . "' THEN 'submitted'
+                      ELSE 'notsubmitted' END",
+                array(
+                    'joins' => 'assign_grades',
+                    'displayfunc' => 'submission_status',
                     'dbdatatype' => 'text',
                     'outputformat' => 'text'
                 )
@@ -290,6 +308,20 @@ class rb_source_assign extends rb_base_source {
                 'intro',
                 get_string('assignmentintro', 'rb_source_assign'),
                 'text'
+            ),
+
+            // Submission status.
+            new rb_filter_option(
+                'assignment',
+                'status',
+                get_string('submissionstatus', 'rb_source_assign'),
+                'select',
+                array(
+                    'selectchoices' => array(
+                        'notsubmitted' => get_string('status_notsubmitted', 'rb_source_assign'),
+                        'submitted' => get_string('status_submitted', 'rb_source_assign'),
+                        'graded' => get_string('status_graded', 'rb_source_assign')),
+                )
             ),
 
             // Submission grade.
