@@ -433,6 +433,18 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 'type' => 'facetoface',
                 'value' => 'namelink',
             ),
+            array(
+                'type' => 'session',
+                'value' => 'capacity',
+            ),
+            array(
+                'type' => 'session',
+                'value' => 'totalnumattendees',
+            ),
+            array(
+                'type' => 'session',
+                'value' => 'numspaces',
+            ),
         );
 
         return $defaultcolumns;
