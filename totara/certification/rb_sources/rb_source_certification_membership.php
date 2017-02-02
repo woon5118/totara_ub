@@ -51,6 +51,7 @@ class rb_source_certification_membership extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
+        $this->usedcomponents[] = 'totara_certification';
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_certification_membership');
 
         parent::__construct();
@@ -241,26 +242,6 @@ class rb_source_certification_membership extends rb_base_source {
             $out[$code] = get_string($statusstring, 'totara_certification');
         }
         return $out;
-    }
-
-    /**
-     * Certification display the certification status as string.
-     *
-     * @param string $status    CERTIFSTATUS_X constant to describe the status of the certification.
-     * @param array $row        The record used to generate the table row
-     * @param bool $isexport
-     * @return string
-     */
-    public function rb_display_certif_status($status, $row, $isexport) {
-        global $CERTIFSTATUS;
-
-        if ($status && isset($CERTIFSTATUS[$status])) {
-            return get_string($CERTIFSTATUS[$status], 'totara_certification');
-        } else if ($status) {
-            return get_string('error:invalidstatus', 'totara_program');
-        } else {
-            return get_string('notassigned', 'totara_certification');
-        }
     }
 
     public function rb_display_edit_completion($id, $row, $isexport) {

@@ -273,6 +273,7 @@ $string['managecertifications'] = 'Manage certifications';
 $string['managecertifsinthiscat'] = 'Manage certifications in this category';
 $string['months'] = 'Month(s)';
 $string['moveselectedcertificationsto'] = 'Move selected certifications to...';
+$string['na'] = 'N/A'; // Abbreviation for not applicable.
 $string['nocertifdetailsfound'] = 'No certification details setup';
 $string['nocertifications'] = 'No certifications';
 $string['notapplicable'] = 'Not applicable';

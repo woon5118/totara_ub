@@ -1074,29 +1074,6 @@ abstract class rb_base_source {
     }
 
     /**
-     * Certification display the certification renewal status as string.
-     *
-     * @param string $renewalstatus CERTIFRENEWALSTATUS_X constant to describe current renewal status
-     * @param array $row            The record used to generate the table row
-     * @return string
-     */
-    function rb_display_certif_renewalstatus($renewalstatus, $row) {
-        global $CERTIFRENEWALSTATUS;
-
-        if (!empty($row->unassigned)) {
-            return '';
-        } else if (!empty($row->status) && $row->status == CERTIFSTATUS_ASSIGNED) {
-            // Just assigned.
-            return '';
-        } else if (!empty($row->status) && $row->status == CERTIFSTATUS_INPROGRESS && $renewalstatus == CERTIFRENEWALSTATUS_NOTDUE) {
-            // First assignment and have made some progress.
-            return '';
-        } else {
-            return get_string($CERTIFRENEWALSTATUS[$renewalstatus], 'totara_certification');
-        }
-    }
-
-    /**
      * Expanding content to display when clicking a course.
      * Will be placed inside a table cell which is the width of the table.
      * Call required_param to get any param data that is needed.

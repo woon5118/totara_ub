@@ -57,6 +57,7 @@ class rb_source_program_overview extends rb_base_source {
         $this->sourcewhere = $this->define_sourcewhere();
         $this->sourcejoins = $this->get_source_joins();
         $this->usedcomponents[] = 'totara_program';
+        $this->usedcomponents[] = 'totara_certification';
 
         parent::__construct();
     }

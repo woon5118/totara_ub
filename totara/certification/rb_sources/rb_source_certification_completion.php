@@ -356,23 +356,6 @@ class rb_source_certification_completion extends rb_source_program_completion {
     }
 
     /**
-     * Certification display the certification status as string.
-     *
-     * @param string $status    CERTIFSTATUS_X constant to describe the status of the certification.
-     * @param array $row        The record used to generate the table row
-     * @return string
-     */
-    public function rb_display_certif_status($status, $row) {
-        global $CERTIFSTATUS;
-
-        $strstatus = '';
-        if ($status && isset($CERTIFSTATUS[$status])) {
-            $strstatus = get_string($CERTIFSTATUS[$status], 'totara_certification');
-        }
-        return $strstatus;
-    }
-
-    /**
      * Filter rag status.
      *
      * @return array

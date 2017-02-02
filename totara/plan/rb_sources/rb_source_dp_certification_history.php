@@ -59,6 +59,10 @@ class rb_source_dp_certification_history extends rb_base_source {
                 cc.id AS completionid,
                 certifid,
                 userid,
+                certifpath,
+                status,
+                renewalstatus,
+                timewindowopens,
                 timecompleted,
                 timeexpires
                 FROM {certif_completion} cc
@@ -69,6 +73,10 @@ class rb_source_dp_certification_history extends rb_base_source {
                 cch.id AS completionid,
                 certifid,
                 userid,
+                certifpath,
+                status,
+                renewalstatus,
+                timewindowopens,
                 timecompleted,
                 timeexpires
                 FROM {certif_completion_history} cch
@@ -76,6 +84,7 @@ class rb_source_dp_certification_history extends rb_base_source {
                 WHERE unassigned = 0)';
         $this->base = $sql;
         $this->joinlist = $this->define_joinlist();
+        $this->usedcomponents[] = 'totara_certification';
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
         $this->contentoptions = $this->define_contentoptions();
@@ -254,6 +263,52 @@ class rb_source_dp_certification_history extends rb_base_source {
                 )
         );
 
+        $columnoptions[] = new rb_column_option(
+            'base',
+            'status',
+            get_string('status', 'rb_source_dp_certification_history'),
+            'base.status',
+            array(
+                'displayfunc' => 'certif_status',
+                'dbdatatype' => 'integer',
+                'extrafields' => array(
+                    'active' => 'base.active'
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'base',
+            'renewalstatus',
+            get_string('renewalstatus', 'rb_source_dp_certification_history'),
+            'base.renewalstatus',
+            array(
+                'displayfunc' => 'certif_renewalstatus',
+                'dbdatatype' => 'integer',
+                'extrafields' => array(
+                    'status' => 'base.status',
+                    'active' => 'base.active'
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'base',
+            'progress',
+            get_string('progress', 'rb_source_dp_certification_history'),
+            'base.status',
+            array(
+                'displayfunc' => 'certif_completion_progress',
+                'joins' => 'prog',
+                'extrafields' => array(
+                    'completion' => 'base.timecompleted',
+                    'window' => 'base.timewindowopens',
+                    'histpath' => 'base.certifpath',
+                    'histcomp' => 'base.timecompleted'
+                )
+            )
+        );
+
         // Include some standard columns.
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_job_assignment_fields_to_columns($columnoptions);
@@ -262,7 +317,6 @@ class rb_source_dp_certification_history extends rb_base_source {
 
         return $columnoptions;
     }
-
 
     /**
      * Creates the array of rb_filter_option objects required for $this->filteroptions
@@ -324,12 +378,68 @@ class rb_source_dp_certification_history extends rb_base_source {
                 'date'
         );
 
+        $filteroptions[] = new rb_filter_option(
+            'base',
+            'status',
+            get_string('status', 'rb_source_dp_certification_history'),
+            'select',
+            array(
+                'selectfunc' => 'cert_status_list',
+                'attributes' => rb_filter_option::select_width_limiter()
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'base',
+            'renewalstatus',
+            get_string('renewalstatus', 'rb_source_dp_certification_history'),
+            'select',
+            array(
+                'selectfunc' => 'renewal_status_list',
+                'attributes' => rb_filter_option::select_width_limiter()
+            )
+        );
+
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_job_assignment_fields_to_filters($filteroptions);
         $this->add_cohort_user_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
 
         return $filteroptions;
+    }
+
+    /**
+     * Creates an array of Certification renewal statuses for use in the renewal status filter
+     *
+     * return array list of Certification renewal statuses
+     */
+    public function rb_filter_renewal_status_list() {
+        global $CERTIFRENEWALSTATUS;
+
+        $list = array();
+
+        foreach ($CERTIFRENEWALSTATUS as $key => $status) {
+            $list[$key] = get_string($status, 'totara_certification');
+        }
+
+        return $list;
+    }
+
+    /*
+     * Creates an array of Certification statuses for use in the status filter
+     *
+     * return array List of Certification statuses
+     */
+    public function rb_filter_cert_status_list() {
+        global $CERTIFSTATUS;
+
+        $list = array();
+
+        foreach ($CERTIFSTATUS as $key => $status) {
+            $list[$key] = get_string($status, 'totara_certification');
+        }
+
+        return $list;
     }
 
 
