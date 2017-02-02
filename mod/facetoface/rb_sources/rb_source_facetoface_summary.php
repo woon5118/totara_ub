@@ -290,7 +290,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                         'timezone' => 'base.sessiontimezone',
                     ),
                     'defaultheading' => get_string('sessdatetime', 'rb_source_facetoface_summary'),
-                    'displayfunc' => 'link_f2f_session' . $intimezone,
+                    'displayfunc' => 'event_date_link',
                     'dbdatatype' => 'timestamp'
                 )
             )
@@ -511,6 +511,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
 
     /**
      * Convert a f2f date into a link to that session with timezone.
+     * @deprecated since Totara 10. Please user event_date_time instead
      *
      * @param string $date Date of session
      * @param object $row Report row
@@ -519,6 +520,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
      */
     function rb_display_link_f2f_session_in_timezone($date, $row, $isexport = false) {
         global $OUTPUT;
+        debugging('Function rb_display_link_f2f_session_in_timezone is deprecated. Use event_date_link instead ', DEBUG_DEVELOPER);
         $sessionid = $row->session_id;
         if ($date && is_numeric($date)) {
             $date = $this->rb_display_nice_datetime_in_timezone($date, $row);

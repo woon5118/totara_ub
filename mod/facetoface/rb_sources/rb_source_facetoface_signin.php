@@ -246,7 +246,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' =>'sessiondate',
-                    'displayfunc' => 'nice_date_in_timezone',
+                    'displayfunc' => 'event_date',
                     'dbdatatype' => 'timestamp'
                 )
             ),
@@ -257,7 +257,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'sessiondate.timestart',
                 array(
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'link_f2f_session',
+                    'displayfunc' => 'event_date_link',
                     'defaultheading' => get_string('sessdate', 'rb_source_facetoface_signin'),
                     'extrafields' => array('session_id' => 'base.sessionid', 'timezone' => 'sessiondate.sessiontimezone'),
                     'dbdatatype' => 'timestamp'
@@ -271,7 +271,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_date_in_timezone',
+                    'displayfunc' => 'event_date',
                     'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(

@@ -127,6 +127,27 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2017052200, 'facetoface');
     }
 
+    if ($oldversion < 2017062900) {
+        $table = new xmldb_table('facetoface_sessions_dates');
+
+        // Adding unique indexes to timestart and timefinish. It is required as reports during event grouping rely
+        // on timestart and timefinish to get their timezone.
+        $index = new xmldb_index('facesessdate_sessta_ix', XMLDB_INDEX_UNIQUE, array('sessionid', 'timestart'));
+        // Conditionally launch add index sessionid, timestart
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('facesessdate_sesfin_ix', XMLDB_INDEX_UNIQUE, array('sessionid', 'timefinish'));
+        // Conditionally launch add index sessionid, timefinish
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2017062900, 'facetoface');
+    }
+
     return true;
 
 }

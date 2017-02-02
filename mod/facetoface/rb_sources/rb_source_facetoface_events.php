@@ -384,9 +384,22 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
         $joinlist[] = new rb_join(
             'eventdateinfo',
             'LEFT',
-            '( SELECT sessionid, MIN(timestart) AS eventstart, MAX(timefinish) AS eventfinish
-               FROM {facetoface_sessions_dates}
-               GROUP BY sessionid)',
+            '(  SELECT  sd.sessionid,
+                        sd.eventstart,
+                        sd.eventfinish,
+                        tzstart.sessiontimezone AS tzstart,
+                        tzfinish.sessiontimezone AS tzfinish
+                FROM (
+                        SELECT   sessionid,
+                                 MIN(timestart) AS eventstart,
+                                 MAX(timefinish) AS eventfinish
+                        FROM     {facetoface_sessions_dates}
+                        GROUP BY sessionid
+                     ) sd
+                INNER JOIN {facetoface_sessions_dates} tzstart
+                    ON sd.eventstart = tzstart.timestart AND sd.sessionid = tzstart.sessionid
+                INNER JOIN {facetoface_sessions_dates} tzfinish
+                    ON sd.eventfinish = tzfinish.timefinish AND sd.sessionid = tzfinish.sessionid )',
             "eventdateinfo.sessionid = {$join}.{$field}",
             REPORT_BUILDER_RELATION_ONE_TO_MANY
         );
@@ -450,6 +463,32 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                     'timestart' => "eventdateinfo.eventstart",
                     'timefinish' => "eventdateinfo.eventfinish"
                 )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'eventstartdate',
+            get_string('eventstartdatetime', 'rb_source_facetoface_events'),
+            "eventdateinfo.eventstart",
+            array(
+                'joins' => array('eventdateinfo'),
+                'displayfunc' => 'event_date',
+                'extrafields' => array('timezone' => 'eventdateinfo.tzstart'),
+                'dbdatatype' => 'timestamp',
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'session',
+            'eventfinishdate',
+            get_string('eventfinishdatetime', 'rb_source_facetoface_events'),
+            "eventdateinfo.eventfinish",
+            array(
+                'joins' => array('eventdateinfo'),
+                'displayfunc' => 'event_date',
+                'extrafields' => array('timezone' => 'eventdateinfo.tzfinish'),
+                'dbdatatype' => 'timestamp',
             )
         );
     }

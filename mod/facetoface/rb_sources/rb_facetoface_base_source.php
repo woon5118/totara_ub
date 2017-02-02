@@ -133,7 +133,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             array(
                 'joins' => array($sessiondatejoin),
                 'extrafields' => array('timezone' => "{$sessiondatejoin}.sessiontimezone"),
-                'displayfunc' => 'nice_datetime' . $intimezone,
+                'displayfunc' => 'event_date',
                 'dbdatatype' => 'timestamp'
             )
         );
@@ -146,7 +146,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             array(
                 'joins' => array($sessiondatejoin),
                 'extrafields' => array('timezone' => "{$sessiondatejoin}.sessiontimezone"),
-                'displayfunc' => 'nice_datetime' . $intimezone,
+                'displayfunc' => 'event_date',
                 'dbdatatype' => 'timestamp'
             )
         );
@@ -590,7 +590,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
     //
     /**
      * Convert a f2f date into a link to that session
-     *
+     * @deprecated since Totara 10. Please user event_date_time instead
      * @param int $date
      * @param object $row
      * @return string
@@ -598,6 +598,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
     function rb_display_link_f2f_session($date, $row) {
         global $OUTPUT, $CFG;
 
+        debugging('Function rb_display_link_f2f_session is deprecated. Use event_date_link instead ', DEBUG_DEVELOPER);
         if (!$date || !is_numeric($date)) {
             return '';
         }

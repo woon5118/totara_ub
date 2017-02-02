@@ -356,7 +356,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'sessiondate.timestart',
                 array(
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'link_f2f_session',
+                    'displayfunc' => 'event_date_link',
                     'defaultheading' => get_string('sessdate', 'rb_source_facetoface_sessions'),
                     'extrafields' => array(
                         'session_id' => 'base.sessionid',

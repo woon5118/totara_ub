@@ -524,6 +524,7 @@ abstract class rb_base_source {
      * @return string Date and time in a nice format
      */
     function rb_display_nice_datetime_in_timezone($date, $row) {
+
         if ($date && is_numeric($date)) {
             if (empty($row->timezone)) {
                 $targetTZ = core_date::get_user_timezone();

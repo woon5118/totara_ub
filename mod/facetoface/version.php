@@ -27,7 +27,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2017052200;       // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2017062900;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2016120502;       // Requires this Moodle version.
 $plugin->release   = '2.4.0 (2012112900)'; // User-friendly version number
 $plugin->component = 'mod_facetoface';
