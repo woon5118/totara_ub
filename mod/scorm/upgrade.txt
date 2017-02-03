@@ -1,2 +1,7 @@
 This files describes API changes in the mod_scorm code,
 information provided here is intended especially for developers.
+
+=== 10 ===
+
+* Group and groupings support has now been enabled.
+
