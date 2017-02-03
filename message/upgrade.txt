@@ -1,2 +1,6 @@
 This files describes API changes in /message/ messaging system,
 information provided here is intended especially for developers.
+
+=== 10 ===
+
+* get_message_processors accepts an addition parameter for testing, which will just reset processor and exit.
