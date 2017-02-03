@@ -1,2 +1,16 @@
 This files describes API changes in the quiz code,
-information provided here is intended especially for developers.
+
+=== 10 ===
+
+* quiz_attempt::question_print_comment_fields() has been removed. It was broken
+  since at least Moodle 2.0.
+
+* quiz::confirm_start_attempt_message and mod_quiz_view_object::$startattemptwarning
+  have been deprecated. This functionality is now entirely handled within the
+  quiz access rule plugins.
+
+* The third argument to mod_quiz_renderer::start_attempt_button has been changed
+  from a warning string to a mod_quiz_preflight_check_form.
+
+* mod_quiz_renderer::review_next_navigation has a new optional argument. If you
+  have overridden that method, consider updating your code to match.

@@ -56,7 +56,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
                 $this->questions($attemptobj, true, $slots, $page, $showall, $displayoptions),
                 $attemptobj);
 
-        $output .= $this->review_next_navigation($attemptobj, $page, $lastpage);
+        $output .= $this->review_next_navigation($attemptobj, $page, $lastpage, $showall);
         $output .= $this->footer();
         return $output;
     }
@@ -238,25 +238,40 @@ class mod_quiz_renderer extends plugin_renderer_base {
                     array($url), false, quiz_get_js_module());
             return html_writer::empty_tag('input', array('type' => 'button',
                     'value' => get_string('finishreview', 'quiz'),
-                    'id' => 'secureclosebutton'));
+                    'id' => 'secureclosebutton',
+                    'class' => 'mod_quiz-next-nav'));
 
         } else {
-            return html_writer::link($url, get_string('finishreview', 'quiz'));
+            return html_writer::link($url, get_string('finishreview', 'quiz'),
+                    array('class' => 'mod_quiz-next-nav'));
         }
     }
 
     /**
-     * Creates a next page arrow or the finishing link
+     * Creates the navigation links/buttons at the bottom of the reivew attempt page.
+     *
+     * Note, the name of this function is no longer accurate, but when the design
+     * changed, it was decided to keep the old name for backwards compatibility.
      *
      * @param quiz_attempt $attemptobj instance of quiz_attempt
      * @param int $page the current page
      * @param bool $lastpage if true current page is the last page
+     * @param bool|null $showall if true, the URL will be to review the entire attempt on one page,
+     *      and $page will be ignored. If null, a sensible default will be chosen.
+     *
+     * @return string HTML fragment.
      */
-    public function review_next_navigation(quiz_attempt $attemptobj, $page, $lastpage) {
+    public function review_next_navigation(quiz_attempt $attemptobj, $page, $lastpage, $showall = null) {
+        $nav = '';
+        if ($page > 0) {
+            $nav .= link_arrow_left(get_string('navigateprevious', 'quiz'),
+                    $attemptobj->review_url(null, $page - 1, $showall), false, 'mod_quiz-prev-nav');
+        }
         if ($lastpage) {
-            $nav = $this->finish_review_link($attemptobj);
+            $nav .= $this->finish_review_link($attemptobj);
         } else {
-            $nav = link_arrow_right(get_string('next'), $attemptobj->review_url(null, $page + 1));
+            $nav .= link_arrow_right(get_string('navigatenext', 'quiz'),
+                    $attemptobj->review_url(null, $page + 1, $showall), false, 'mod_quiz-next-nav');
         }
         return html_writer::tag('div', $nav, array('class' => 'submitbtns'));
     }
@@ -477,10 +492,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
                     $attemptobj->attempt_url($slot, $page), $this);
         }
 
-        $output .= html_writer::start_tag('div', array('class' => 'submitbtns'));
-        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'next',
-                'value' => get_string('next')));
-        $output .= html_writer::end_tag('div');
+        $output .= $this->attempt_navigation_buttons($page, $attemptobj->is_last_page($page));
 
         // Some hidden fields to trach what is going on.
         $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
@@ -507,6 +519,33 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('form');
 
         $output .= $this->connection_warning();
+
+        return $output;
+    }
+
+    /**
+     * Display the prev/next buttons that go at the bottom of each page of the attempt.
+     *
+     * @param int $page the page number. Starts at 0 for the first page.
+     * @param bool $lastpage is this the last page in the quiz?
+     * @return string HTML fragment.
+     */
+    protected function attempt_navigation_buttons($page, $lastpage) {
+        $output = '';
+
+        $output .= html_writer::start_tag('div', array('class' => 'submitbtns'));
+        if ($page > 0) {
+            $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'previous',
+                    'value' => get_string('navigateprevious', 'quiz'), 'class' => 'mod_quiz-prev-nav'));
+        }
+        if ($lastpage) {
+            $nextlabel = get_string('endtest', 'quiz');
+        } else {
+            $nextlabel = get_string('navigatenext', 'quiz');
+        }
+        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'next',
+                'value' => $nextlabel, 'class' => 'mod_quiz-next-nav'));
+        $output .= html_writer::end_tag('div');
 
         return $output;
     }
