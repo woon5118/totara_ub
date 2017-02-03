@@ -620,7 +620,7 @@ function SCORMapi1_2(def, cmiobj, cmiint, cmistring256, cmistring4096, scormdebu
             }
             if (cmi.core.lesson_mode == 'normal') {
                 if (cmi.core.credit == 'credit') {
-                    if (masteryoverride === '1' && cmi.student_data.mastery_score !== '' && cmi.core.score.raw !== '') {
+                    if (masteryoverride && cmi.student_data.mastery_score !== '' && cmi.core.score.raw !== '') {
                         if (parseFloat(cmi.core.score.raw) >= parseFloat(cmi.student_data.mastery_score)) {
                             cmi.core.lesson_status = 'passed';
                         } else {
