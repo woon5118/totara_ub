@@ -35,7 +35,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     // Conditional activities: completion and availability
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablecompletion',
         new lang_string('enablecompletion','completion'),
-        new lang_string('configenablecompletion','completion'), 1));
+        new lang_string('configenablecompletion', 'completion'), 1));
 
     $options = array(
         1 => get_string('completionactivitydefault', 'completion'),
@@ -46,7 +46,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     $optionalsubsystems->add($checkbox = new admin_setting_configcheckbox('enableavailability',
             new lang_string('enableavailability', 'availability'),
-            new lang_string('enableavailability_desc', 'availability'), 0));
+            new lang_string('enableavailability_desc', 'availability'), 1));
     $checkbox->set_affects_modinfo(true);
 
     // Course RPL
