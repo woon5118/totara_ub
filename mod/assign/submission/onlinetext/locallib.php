@@ -450,7 +450,7 @@ class assign_submission_onlinetext extends assign_submission_plugin {
             }
         }
 
-        return $result . $plagiarismlinks;
+        return $plagiarismlinks . $result;
     }
 
     /**
