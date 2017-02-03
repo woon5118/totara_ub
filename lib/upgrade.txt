@@ -14,6 +14,10 @@ information provided here is intended especially for developers.
 * \core\output\block::from_block_contents() now always returns ->header attribute.
   As such, lib/templates/block.mustache has changed (removing the {{^header}} section).
 * Upgraded jQuery 2.2.1 to 2.2.4
+* Plugins can extend the navigation for user by declaring the following callback:
+  <frankenstyle>_extend_navigation_user(navigation_node $parentnode, stdClass $user,
+                                        context_user $context, stdClass $course,
+                                        context_course $coursecontext)
 
 === 9.2 ===
 
