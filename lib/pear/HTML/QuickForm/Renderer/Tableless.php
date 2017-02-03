@@ -258,7 +258,7 @@ class HTML_QuickForm_Renderer_Tableless extends HTML_QuickForm_Renderer_Default
         $this->_html = str_replace('></label>', '>&nbsp;</label>', $this->_html);
         // add a validation script
         if ('' != ($script = $form->getValidationScript())) {
-            $this->_html = $script . "\n" . $this->_html;
+            $this->_html = $this->_html . "\n" . $script;
         }
     } // end func finishForm
 

@@ -1058,9 +1058,6 @@ class HTML_QuickForm extends HTML_Common {
         if (!isset($this->_rules[$element])) {
             $this->_rules[$element] = array();
         }
-        if ($validation == 'client') {
-            $this->updateAttributes(array('onsubmit' => 'try { var myValidator = validate_' . $this->_attributes['id'] . '; } catch(e) { return true; } return myValidator(this);'));
-        }
         $this->_rules[$element][] = array(
             'type'        => $type,
             'format'      => $format,
@@ -1129,9 +1126,6 @@ class HTML_QuickForm extends HTML_Common {
                         $this->_required[] = $elementName;
                         $required++;
                     }
-                    if ('client' == $validation) {
-                        $this->updateAttributes(array('onsubmit' => 'try { var myValidator = validate_' . $this->_attributes['id'] . '; } catch(e) { return true; } return myValidator(this);'));
-                    }
                 }
             }
             if ($required > 0 && count($groupObj->getElements()) == $required) {
@@ -1162,9 +1156,6 @@ class HTML_QuickForm extends HTML_Common {
                                             'reset'      => $reset);
             if ($type == 'required') {
                 $this->_required[] = $group;
-            }
-            if ($validation == 'client') {
-                $this->updateAttributes(array('onsubmit' => 'try { var myValidator = validate_' . $this->_attributes['id'] . '; } catch(e) { return true; } return myValidator(this);'));
             }
         }
     } // end func addGroupRule
