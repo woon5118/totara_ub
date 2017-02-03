@@ -45,6 +45,7 @@ class rb_source_appraisal extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->embeddedparams = $this->define_embeddedparams();
+        $this->usedcomponents[] = 'totara_appraisal';
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_appraisal');
         $this->shortname = 'appraisal_status';
 
@@ -127,6 +128,18 @@ class rb_source_appraisal extends rb_base_source {
                 '(SELECT * FROM {appraisal_role_assignment} WHERE appraisalrole = 8)',
                 'araappraiser.appraisaluserassignmentid = base.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
+            new rb_join(
+                'activestageincomplete',
+                'LEFT',
+                '(SELECT aua.id AS appraisaluserassignmentid, ' . sql_group_concat(sql_cast2char('ara.appraisalrole'),'|', true) . ' AS incompleteroles FROM {appraisal_role_assignment} ara
+                    LEFT JOIN {appraisal_stage_data} asd ON ara.id=asd.appraisalroleassignmentid
+                    JOIN {appraisal_user_assignment} aua ON ara.appraisaluserassignmentid = aua.id
+                    WHERE asd.timecompleted is null
+                    GROUP BY aua.id)',
+                'base.id = activestageincomplete.appraisaluserassignmentid',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                array('appraisal')
             )
         );
 
@@ -243,6 +256,28 @@ class rb_source_appraisal extends rb_base_source {
                       'displayfunc' => 'nice_date',
                       'dbdatatype' => 'timestamp',
                       'defaultheading' => get_string('appraisaltimefinishedheading', 'rb_source_appraisal'))
+            ),
+            new rb_column_option(
+                'appraisal',
+                'activestageincomplete',
+                get_string('activestageincomplete', 'rb_source_appraisal'),
+                'activestageincomplete.incompleteroles',
+                array(
+                    'joins' => array(
+                        'activestageincomplete',
+                        'aralearner',
+                        'aramanager',
+                        'arateamlead',
+                        'araappraiser'
+                    ),
+                    'displayfunc' => 'appraisal_role_list',
+                    'extrafields' => array(
+                        'role_1' => 'aralearner.userid',
+                        'role_2' => 'aramanager.userid',
+                        'role_4' => 'arateamlead.userid',
+                        'role_8' => 'araappraiser.userid'
+                    ),
+                )
             )
         );
 
