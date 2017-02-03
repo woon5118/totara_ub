@@ -24,6 +24,8 @@
 
 // Certification db upgrades.
 
+require_once($CFG->dirroot.'/totara/certification/db/upgradelib.php');
+
 /**
  * Certification database upgrade script
  *
@@ -36,6 +38,15 @@ function xmldb_totara_certification_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
+
+    // TL-12606 Recalculate non-zero course set group completion records.
+    if ($oldversion < 2017020700) {
+
+        totara_certification_upgrade_non_zero_prog_completions();
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2017020700, 'totara', 'certification');
+    }
 
     return true;
 }
