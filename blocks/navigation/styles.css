@@ -17,6 +17,16 @@
     cursor: pointer;
 }
 
+.block_navigation .block_tree .loading .tree_item.branch {
+    background-image: url('[[pix:i/loading_small]]');
+}
+
+.block_navigation .block_tree .emptybranch .tree_item,
+.block_navigation .block_tree [aria-expanded="false"].emptybranch .tree_item.branch {
+    padding-left: 21px;
+    background-image: url('[[pix:t/collapsed_empty]]');
+}
+
 .block_navigation .block_tree .tree_item img {
     width: 1.3em;
     font-size: 16px;
@@ -48,8 +58,21 @@
     list-style: none;
 }
 
-.jsenabled .block_navigation .block_tree li.collapsed ul {
+.jsenabled .block_navigation .block_tree [aria-expanded="false"] ul {
     display: none;
+}
+
+.jsenabled .block_navigation .block_tree [aria-expanded="false"] .tree_item.branch {
+    background-image: url('[[pix:t/collapsed]]');
+}
+
+.jsenabled .block_navigation .block_tree [aria-expanded="false"].loading .tree_item.branch {
+    background-image: url('[[pix:i/loading_small]]');
+}
+
+.jsenabled .block_navigation .block_tree [aria-expanded="false"].emptybranch .tree_item.branch {
+    padding-left: 21px;
+    background-image: url('[[pix:t/collapsed_empty]]');
 }
 
 .jsenabled .block_navigation.dock_on_load {
@@ -60,6 +83,22 @@
     padding-left: 0;
 }
 
+.dir-rtl .block_navigation .block_tree .tree_item {
+    background-position: 100% 50%;
+}
+
+.dir-rtl .block_navigation .block_tree .tree_item.branch {
+    padding-right: 21px;
+    padding-left: 0;
+}
+
+.dir-rtl .block_navigation .block_tree .tree_item.emptybranch,
+.dir-rtl .block_navigation .block_tree .emptybranch .tree_item {
+    padding-right: 21px;
+    padding-left: 0;
+    background-image: url('[[pix:t/collapsed_empty_rtl]]');
+}
+
 .dir-rtl .block_navigation .block_tree .tree_item img {
     margin-right: 0;
     margin-left: 5px;
@@ -67,4 +106,12 @@
 
 .dir-rtl .block_navigation .block_tree ul ul {
     margin: 0 16px 0 0;
+}
+
+.dir-rtl.jsenabled .block_navigation .block_tree [aria-expanded="false"] .tree_item.branch {
+    background-image: url('[[pix:t/collapsed_rtl]]');
+}
+
+.dir-rtl.jsenabled .block_navigation .block_tree [aria-expanded="false"].emptybranch .tree_item.branch {
+    background-image: url('[[pix:t/collapsed_empty_rtl]]');
 }
