@@ -48,5 +48,18 @@ function xmldb_forum_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
+    if ($oldversion < 2015120800) {
+
+        // Add support for pinned discussions.
+        $table = new xmldb_table('forum_discussions');
+        $field = new xmldb_field('pinned', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'timeend');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Forum savepoint reached.
+        upgrade_mod_savepoint(true, 2015120800, 'forum');
+    }
     return true;
 }

@@ -194,6 +194,10 @@ class mod_forum_generator extends testing_module_generator {
             $mailed = $record['mailed'];
         }
 
+        if (!isset($record['pinned'])) {
+            $record['pinned'] = FORUM_DISCUSSION_UNPINNED;
+        }
+
         $record = (object) $record;
 
         // Add the discussion.
