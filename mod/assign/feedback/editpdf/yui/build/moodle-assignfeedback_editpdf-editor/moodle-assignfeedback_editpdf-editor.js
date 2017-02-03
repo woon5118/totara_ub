@@ -4093,6 +4093,7 @@ EDITOR.prototype = {
     setup_navigation : function() {
         var pageselect,
             i,
+            strinfo,
             option,
             previousbutton,
             nextbutton;
@@ -4104,7 +4105,8 @@ EDITOR.prototype = {
             for (i = 0; i < this.pages.length; i++) {
                 option = Y.Node.create('<option/>');
                 option.setAttribute('value', i);
-                option.setHTML(M.util.get_string('pagenumber', 'assignfeedback_editpdf', i+1));
+                strinfo = {page: i+1, total: this.pages.length};
+                option.setHTML(M.util.get_string('pagexofy', 'assignfeedback_editpdf', strinfo));
                 pageselect.append(option);
             }
         }
