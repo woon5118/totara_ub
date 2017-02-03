@@ -1142,7 +1142,7 @@ $functions = array(
     ),
 
     // Tag functions.
-   'core_tag_update_tags' => array(
+    'core_tag_update_tags' => array(
         'classname'   => 'core_tag_external',
         'methodname'  => 'update_tags',
         'description' => 'Updates tags',
@@ -1280,6 +1280,7 @@ $services = array(
             'mod_lti_view_lti',
             'mod_imscp_view_imscp',
             'mod_imscp_get_imscps_by_courses',
+            'mod_glossary_get_glossaries_by_courses',
             ),
         'enabled' => 0,
         'restrictedusers' => 0,
