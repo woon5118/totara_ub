@@ -1162,8 +1162,10 @@ class core_plugin_manager {
                 // Totara uninstalled themes.
                 , 'canvas', 'clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara', 'kiwifruitresponsive'
             ),
+            'webservice' => array('amf'),
             // Other Totara leftovers and mistakes.
             'connect' => array('totara'),
+            
         );
 
         if (!isset($plugins[$type])) {
@@ -1444,7 +1446,7 @@ class core_plugin_manager {
             ),
 
             'webservice' => array(
-                'amf', 'rest', 'soap', 'xmlrpc'
+                'rest', 'soap', 'xmlrpc'
             ),
 
             'workshopallocation' => array(

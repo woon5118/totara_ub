@@ -107,5 +107,17 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2015111606.02);
     }
 
+    if ($oldversion < 2016011200.00) {
+
+        // Force uninstall of deleted tool.
+        if (!file_exists("$CFG->dirroot/webservice/amf")) {
+            // Remove capabilities.
+            capabilities_cleanup('webservice_amf');
+            // Remove all other associated config.
+            unset_all_config_for_plugin('webservice_amf');
+        }
+        upgrade_main_savepoint(true, 2016011200.00);
+    }
+
     return true;
 }
