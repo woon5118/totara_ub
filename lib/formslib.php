@@ -2676,7 +2676,7 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
 
         'actionbuttons'=>"\n\t\t".'<div id="{id}" class="fitem fitem_actionbuttons fitem_{type}"><div class="felement {type}">{element}</div></div>',
 
-        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}"><fieldset class="{type}<!-- BEGIN error --> error<!-- END error -->">{legendtemplate}<div class="felement"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><!-- END error -->{element}</div></fieldset></div>',
+        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {class}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}"><div class="fitemtitle"><div class="fgrouplabel"><label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>{help}</div></div><fieldset class="felement {type}<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</fieldset></div>',
         'legendtemplate' => '<legend><span class="legend">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</span></legend>',
 
         'static'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {emptylabel}"><div class="fitemtitle"><div class="fstaticlabel">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</div></div><div class="felement fstatic <!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',
@@ -2800,6 +2800,7 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
             $html = str_replace('{type}', '{type} ' . $cssclass, $html);
         }
         $html =str_replace('{type}', 'fgroup', $html);
+        $html =str_replace('{class}', $group->getAttribute('class'), $html);
         $emptylabel = '';
         if ($group->getLabel() == '') {
             $emptylabel = 'femptylabel';
