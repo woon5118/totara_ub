@@ -1184,6 +1184,10 @@ class core_plugin_manager {
 
         $standard_plugins = array(
 
+            'antivirus' => array(
+                'clamav'
+            ),
+
             'atto' => array(
                 'accessibilitychecker', 'accessibilityhelper', 'align',
                 'backcolor', 'bold', 'charmap', 'clear', 'collapse', 'emoticon',
