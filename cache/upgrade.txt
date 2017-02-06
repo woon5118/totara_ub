@@ -1,2 +1,10 @@
 This files describes API changes in /cache/stores/* - cache store plugins.
 Information provided here is intended especially for developers.
+
+=== 10 ===
+
+* Cache stores has a new feature DEREFERENCES_OBJECTS.
+  This allows the cache loader to decide if it needs to handle dereferencing or whether the data
+  coming directly to it has already had references resolved.
+  - see supports_dereferencing_objects in store.php.
+
