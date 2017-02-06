@@ -14,6 +14,29 @@ information provided here is intended especially for developers.
 * \core\output\block::from_block_contents() now always returns ->header attribute.
   As such, lib/templates/block.mustache has changed (removing the {{^header}} section).
 * Upgraded jQuery 2.2.1 to 2.2.4
+* The redirect() function will now redirect immediately if output has not
+  already started. Messages will be displayed on the subsequent page using
+  session notifications. The type of message output can be configured using the
+  fourth parameter to redirect().
+* The specification of extra classes in the $OUTPUT->notification()
+  function, and \core\output\notification renderable have been deprecated
+  and will be removed in a future version.
+  Notifications should use the levels found in \core\output\notification.
+* The constants for NOTIFY_PROBLEM, NOTIFY_REDIRECT, and NOTIFY_MESSAGE in
+  \core\output\notification have been deprecated in favour of NOTIFY_ERROR,
+  NOTIFY_WARNING, and NOTIFY_INFO respectively.
+* The following functions, previously used (exclusively) by upgrade steps are not available
+  anymore because of the upgrade cleanup performed for this version. See MDL-51580 for more info:
+    - upgrade_mysql_fix_unsigned_and_lob_columns()
+    - upgrade_course_completion_remove_duplicates()
+    - upgrade_save_orphaned_questions()
+    - upgrade_rename_old_backup_files_using_shortname()
+    - upgrade_mssql_nvarcharmax()
+    - upgrade_mssql_varbinarymax()
+    - upgrade_fix_missing_root_folders()
+    - upgrade_course_modules_sequences()
+    - upgrade_grade_item_fix_sortorder()
+    - upgrade_availability_item()
 * Plugins can extend the navigation for user by declaring the following callback:
   <frankenstyle>_extend_navigation_user(navigation_node $parentnode, stdClass $user,
                                         context_user $context, stdClass $course,

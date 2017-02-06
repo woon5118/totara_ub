@@ -123,8 +123,7 @@ if ($activate) {
     $url = new moodle_url('/badges/action.php', $params);
 
     if (!$badge->has_criteria()) {
-        echo $OUTPUT->notification(get_string('error:cannotact', 'badges', $badge->name) . get_string('nocriteria', 'badges'));
-        echo $OUTPUT->continue_button($returnurl);
+        redirect($returnurl, get_string('error:cannotact', 'badges', $badge->name) . get_string('nocriteria', 'badges'), null, \core\output\notification::NOTIFY_ERROR);
     } else {
         $message = get_string('reviewconfirm', 'badges', $badge->name);
         echo $OUTPUT->confirm($message, $url, $returnurl);
