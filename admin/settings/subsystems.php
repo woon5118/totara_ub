@@ -82,6 +82,9 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablebadges', new lang_string('enablebadges', 'badges'), new lang_string('configenablebadges', 'badges'), 1));
 
+    $optionalsubsystems->add(new admin_setting_configcheckbox('enableglobalsearch', new lang_string('enableglobalsearch', 'admin'),
+        new lang_string('enableglobalsearch_desc', 'admin'), 0, 1, 0));
+
     // Report caching and global restrictions.
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablereportcaching', new lang_string('enablereportcaching','totara_reportbuilder'), new lang_string('configenablereportcaching','totara_reportbuilder'), 0));
     $optionalsubsystems->add(new admin_setting_configcheckbox('enableglobalrestrictions', new lang_string('enableglobalrestrictions', 'totara_reportbuilder'), new lang_string('enableglobalrestrictions_desc', 'totara_reportbuilder'), 0));
