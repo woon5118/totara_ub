@@ -771,9 +771,11 @@ function get_courses_page($categoryid="all", $sort="c.sortorder ASC", $fields="c
  * @param int $page The page number to get
  * @param int $recordsperpage The number of records per page
  * @param int $totalcount Passed in by reference.
+ * @param array $requiredcapabilities Extra list of capabilities used to filter courses
  * @return object {@link $COURSE} records
  */
-function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$totalcount) {
+function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$totalcount,
+                            $requiredcapabilities = array()) {
     global $CFG, $DB, $USER;
     require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
@@ -829,8 +831,7 @@ function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$total
     }
 
     if (empty($searchcond)) {
-        $totalcount = 0;
-        return array();
+        $searchcond = array('1 = 1');
     }
 
     $searchcond = implode(" AND ", $searchcond);
@@ -859,6 +860,17 @@ function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$total
 
     $rs = $DB->get_recordset_sql($sql, $params);
     foreach($rs as $course) {
+        // Preload contexts only for hidden courses or courses we need to return.
+        context_helper::preload_from_record($course);
+        $coursecontext = context_course::instance($course->id);
+        if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', $coursecontext)) {
+            continue;
+        }
+        if (!empty($requiredcapabilities)) {
+            if (!has_all_capabilities($requiredcapabilities, $coursecontext)) {
+                continue;
+            }
+        }
         // Don't exit this loop till the end
         // we need to count all the visible courses
         // to update $totalcount
