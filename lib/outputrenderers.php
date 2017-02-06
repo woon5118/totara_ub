@@ -255,6 +255,13 @@ class core_renderer extends renderer_base {
         }
 
         $output = '';
+
+        // Allow a url_rewrite plugin to setup any dynamic head content.
+        if (isset($CFG->urlrewriteclass) && !isset($CFG->upgraderunning)) {
+            $class = $CFG->urlrewriteclass;
+            $output .= $class::html_head_setup();
+        }
+
         $output .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . "\n";
 
         // Totara: remove script names and url parameters from referrers when linking external content to increase security.
