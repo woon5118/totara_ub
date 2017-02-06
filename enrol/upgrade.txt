@@ -1,2 +1,6 @@
 This files describes API changes in /enrol/* - plugins,
 information provided here is intended especially for developers.
+
+=== 10 ===
+
+* core_enrol_external::get_enrolled_users now supports two additional parameters for ordering: sortby and sortdirection.
