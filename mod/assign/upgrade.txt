@@ -1,2 +1,8 @@
-This files describes API changes in the assign code,
+This files describes API changes in the assign code.
 information provided here is intended especially for developers.
+
+=== 10 ===
+
+* The feedback plugins now need to implement the is_feedback_modified() method. The default is to return true
+  for backwards compatibility.
+
