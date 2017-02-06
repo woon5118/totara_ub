@@ -43,6 +43,7 @@ class rb_source_certification_completion extends rb_source_program_completion {
 
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_certification_completion');
         $this->sourcewhere = $this->define_sourcewhere();
+        $this->usedcomponents[] = "totara_certification";
     }
 
     /**
@@ -189,6 +190,36 @@ class rb_source_certification_completion extends rb_source_program_completion {
             )
         );
 
+        // Note.
+        // The field select uses a case statement that returns a concatenated value comprising of the following,
+        //  * Numeric order for the column sort.
+        //  * Text used for the filter, (problem, action required, no action required / red, amber, green).
+        //  * Status text identifier used by the display class.
+        $now = time();
+        $columnoptions[] = new rb_column_option(
+            'certcompletion',
+            'redambergreenstatus',
+            get_string('redambergreenstatus', 'rb_source_certification_completion'),
+            "CASE WHEN certif_completion.status = " . CERTIFSTATUS_EXPIRED . " THEN '1|problem|expired'
+                  WHEN certif_completion.timecompleted = 0 AND (base.timedue > 0 AND base.timedue <= " . $now . ")  THEN '1|problem|overdue'
+                  WHEN certif_completion.timecompleted = 0 AND base.timedue <= 0  THEN '3|success|assignedwithoutduedate'
+                  WHEN certif_completion.timecompleted = 0 AND base.timedue > 0  THEN '2|action|assignedwithduedate'
+                  WHEN certif_completion.timecompleted <> 0
+                    AND certif_completion.timewindowopens <> 0
+                    AND certif_completion.timewindowopens <= " . $now . "
+                    AND certif_completion.timeexpires >= " . $now . " THEN '2|action|windowopen'
+                  WHEN certif_completion.timecompleted <> 0  THEN '3|success|certified'
+                  ELSE null END",
+            array(
+                'joins' => 'certif_completion',
+                'displayfunc' => 'redambergreenstatus',
+                'extrafields' => array(
+                    'timedue' => 'base.timedue',
+                    'timewindowopens' => 'certif_completion.timewindowopens'),
+                'defaultheading' => get_string('status', 'rb_source_certification_completion')
+            )
+        );
+
         return $columnoptions;
     }
 
@@ -256,6 +287,17 @@ class rb_source_certification_completion extends rb_source_program_completion {
                 'simplemode' => true,
             )
         );
+        $filteroptions[] = new rb_filter_option(
+            'certcompletion',
+            'redambergreenstatus',
+            get_string('redambergreenstatus', 'rb_source_certification_completion'),
+            'grpconcat_multi',
+            array(
+                'selectfunc' => 'rag_status_list',
+                'concat' => true,
+                'simplemode' => true
+            )
+        );
 
         return $filteroptions;
     }
@@ -272,7 +314,7 @@ class rb_source_certification_completion extends rb_source_program_completion {
             ),
             array(
                 'type' => 'certcompletion',
-                'value' => 'status',
+                'value' => 'redambergreenstatus',
             ),
             array(
                 'type' => 'progcompletion',
@@ -296,7 +338,7 @@ class rb_source_certification_completion extends rb_source_program_completion {
             ),
             array(
                 'type' => 'certcompletion',
-                'value' => 'status',
+                'value' => 'redambergreenstatus',
                 'advanced' => 0,
             ),
         );
@@ -328,5 +370,30 @@ class rb_source_certification_completion extends rb_source_program_completion {
             $strstatus = get_string($CERTIFSTATUS[$status], 'totara_certification');
         }
         return $strstatus;
+    }
+
+    /**
+     * Filter rag status.
+     *
+     * @return array
+     */
+    public function rb_filter_rag_status_list() {
+
+        // Problem.
+        $str = get_string('filter:problem', 'rb_source_certification_completion');
+        $class = 'label label-danger';
+        $statuslist['problem'] = \html_writer::span($str, $class);
+
+        // Action required.
+        $str = get_string('filter:action', 'rb_source_certification_completion');
+        $class = 'label label-warning';
+        $statuslist['action'] = \html_writer::span($str, $class);
+
+        // No action required.
+        $str = get_string('filter:noaction', 'rb_source_certification_completion');
+        $class = 'label label-success';
+        $statuslist['success'] = \html_writer::span($str, $class);
+
+        return $statuslist;
     }
 }
