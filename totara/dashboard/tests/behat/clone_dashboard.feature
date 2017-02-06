@@ -18,18 +18,18 @@ Feature: Clone a dashboard
     And I navigate to "Dashboards" node in "Site administration > Appearance"
     And I click on "Primary dashboard" "link"
     And I press "Blocks editing on"
-    And I add the "Latest news" block
-    Then "Latest news" "block" should exist
+    And I add the "Latest announcements" block
+    Then "Latest announcements" "block" should exist
 
     # Check the latest news block is definitely there
     When I navigate to "Dashboards" node in "Site administration > Appearance"
     And I click on "Primary dashboard" "link"
-    And "Latest news" "block" should exist
+    And "Latest announcements" "block" should exist
 
-    # Check that the Latest news block is not present
+    # Check that the Latest announcements block is not present
     When I navigate to "Dashboards" node in "Site administration > Appearance"
     And I click on "Secondary dashboard" "link"
-    And "Latest news" "block" should not exist
+    And "Latest announcements" "block" should not exist
 
     # Clone the primary dashboard
     When I navigate to "Dashboards" node in "Site administration > Appearance"
@@ -53,7 +53,7 @@ Feature: Clone a dashboard
 
     # Confirm the cloned dashboard
     When I click on "Primary dashboard" "link"
-    And "Latest news" "block" should exist
+    And "Latest announcements" "block" should exist
 
   @javascript
   Scenario: Cloning a dashboard copies audiences

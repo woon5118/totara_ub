@@ -21,9 +21,12 @@ Feature: Reset dashboard page to default
 
   Scenario: Add blocks to page and reset
     When I press "Customise this page"
-    And I add the "Online users" block
+    And I add the "Latest announcements" block
     And I add the "Comments" block
-    And I press "Reset dashboard to default"
-    Then I should not see "Online users"
+    And I press "Reset page to default"
+    Then I should not see "Latest announcements"
+    And I should see "Latest badges"
+    And I should see "Calendar"
+    And I should see "Upcoming events"
     And I should not see "Comments"
     And I should not see "Reset dashboard to default"

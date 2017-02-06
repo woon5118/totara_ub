@@ -16,9 +16,9 @@ Feature: Block visibility
   @javascript
   Scenario: Hiding all blocks on the page should remove the column they're in
     Given I open the "Search forums" blocks action menu
-    And I click on "Hide Search forums block" "link" in the ".block_search_forums .block-control-actions" "css_element"
-    And I open the "Latest news" blocks action menu
-    And I click on "Hide Latest news block" "link" in the ".block_news_items .block-control-actions" "css_element"
+    And I click on "Hide Search forums block" "link" in the "Search forums" "block"
+    And I open the "Latest announcements" blocks action menu
+    And I click on "Hide Latest announcements block" "link" in the "Latest announcements" "block"
     And I open the "Upcoming events" blocks action menu
     And I click on "Hide Upcoming events block" "link" in the ".block_calendar_upcoming .block-control-actions" "css_element"
     And I open the "Recent activity" blocks action menu

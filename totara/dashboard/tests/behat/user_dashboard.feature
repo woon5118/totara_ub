@@ -37,26 +37,26 @@ Feature: Perform basic dashboard user changes
 
     # Add block.
     When I press "Customise this page"
-    And I add the "Latest news" block
-    Then "Latest news" "block" should exist
+    And I add the "Latest announcements" block
+    Then "Latest announcements" "block" should exist
     And I press "Stop customising this page"
-    And "Latest news" "block" should exist
+    And "Latest announcements" "block" should exist
     And I log out
 
     # Check that other users unaffected.
     When I log in as "learner2"
     And I follow "Dashboard unlocked published"
-    Then "Latest news" "block" should not exist
+    Then "Latest announcements" "block" should not exist
     And I log out
 
     # Reset dashboard to master version.
     When I log in as "learner1"
     And I follow "Dashboard unlocked published"
-    And "Latest news" "block" should exist
+    And "Latest announcements" "block" should exist
     And "Customise this page" "button" should exist
     And I press "Customise this page"
     And I press "Reset dashboard to default"
-    Then "Latest news" "block" should not exist
+    Then "Latest announcements" "block" should not exist
 
   Scenario: Confirm that dashboard blocks positions maintained when customised by users
     Given I log in as "admin"
@@ -64,10 +64,10 @@ Feature: Perform basic dashboard user changes
     And I press "Manage dashboards"
     And I click on "Dashboard unlocked published" "link"
     And I press "Blocks editing on"
-    And I add the "Latest news" block
+    And I add the "Latest announcements" block
 
     # Move blocks around
-    And I click on "span.moodle-core-dragdrop-draghandle" "css_element" in the "Latest news" "block"
+    And I click on "span.moodle-core-dragdrop-draghandle" "css_element" in the "Latest announcements" "block"
     And I click on "//a[contains(., 'To item \"Navigation\"')]" "xpath_element"
     And I click on "span.moodle-core-dragdrop-draghandle" "css_element" in the "Navigation" "block"
     And I click on "//a[contains(., 'To item \"Dashboards\"')]" "xpath_element"
@@ -77,14 +77,14 @@ Feature: Perform basic dashboard user changes
     And I follow "Dashboard unlocked published"
     And I should see "Navigation" in the "#region-main" "css_element"
     And I should not see "Navigation" in the "#block-region-side-pre" "css_element"
-    And I should see "Latest news" in the "#block-region-side-pre" "css_element"
-    And I should not see "Latest news" in the "#region-main" "css_element"
+    And I should see "Latest announcements" in the "#block-region-side-pre" "css_element"
+    And I should not see "Latest announcements" in the "#region-main" "css_element"
 
     When I press "Customise this page"
     Then I should see "Navigation" in the "#region-main" "css_element"
     And I should not see "Navigation" in the "#block-region-side-pre" "css_element"
-    And I should see "Latest news" in the "#block-region-side-pre" "css_element"
-    And I should not see "Latest news" in the "#region-main" "css_element"
+    And I should see "Latest announcements" in the "#block-region-side-pre" "css_element"
+    And I should not see "Latest announcements" in the "#region-main" "css_element"
 
   Scenario: Cannot change locked dashboard
     When I log in as "learner1"
