@@ -1639,9 +1639,11 @@ class mod_assign_external extends external_api {
         $pluginsubmissionparams = array();
 
         foreach ($instance->get_submission_plugins() as $plugin) {
-            $pluginparams = $plugin->get_external_parameters();
-            if (!empty($pluginparams)) {
-                $pluginsubmissionparams = array_merge($pluginsubmissionparams, $pluginparams);
+            if ($plugin->is_visible()) {
+                $pluginparams = $plugin->get_external_parameters();
+                if (!empty($pluginparams)) {
+                    $pluginsubmissionparams = array_merge($pluginsubmissionparams, $pluginparams);
+                }
             }
         }
 
@@ -1719,9 +1721,11 @@ class mod_assign_external extends external_api {
         $pluginfeedbackparams = array();
 
         foreach ($instance->get_feedback_plugins() as $plugin) {
-            $pluginparams = $plugin->get_external_parameters();
-            if (!empty($pluginparams)) {
-                $pluginfeedbackparams = array_merge($pluginfeedbackparams, $pluginparams);
+            if ($plugin->is_visible()) {
+                $pluginparams = $plugin->get_external_parameters();
+                if (!empty($pluginparams)) {
+                    $pluginfeedbackparams = array_merge($pluginfeedbackparams, $pluginparams);
+                }
             }
         }
 
@@ -1859,9 +1863,11 @@ class mod_assign_external extends external_api {
         $pluginfeedbackparams = array();
 
         foreach ($instance->get_feedback_plugins() as $plugin) {
-            $pluginparams = $plugin->get_external_parameters();
-            if (!empty($pluginparams)) {
-                $pluginfeedbackparams = array_merge($pluginfeedbackparams, $pluginparams);
+            if ($plugin->is_visible()) {
+                $pluginparams = $plugin->get_external_parameters();
+                if (!empty($pluginparams)) {
+                    $pluginfeedbackparams = array_merge($pluginfeedbackparams, $pluginparams);
+                }
             }
         }
 
