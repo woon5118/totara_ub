@@ -160,6 +160,9 @@ abstract class moodleform {
     /** @var array globals workaround */
     protected $_customdata;
 
+    /** @var array submitted form data when using mforms with ajax */
+    protected $_ajaxformdata;
+
     /** @var object definition_after_data executed flag */
     protected $_definition_finalized = false;
 
@@ -188,10 +191,12 @@ abstract class moodleform {
      *               it if you don't need to as the target attribute is deprecated in xhtml strict.
      * @param mixed $attributes you can pass a string of html attributes here or an array.
      * @param bool $editable
+     * @param array $ajaxformdata Forms submitted via ajax, must pass their data here, instead of relying on _GET and _POST.
      * @param string $formidprefix (optional) Prefix for the automatically generated form id. (Passed directly to MoodleQuickForm())
      * @return object moodleform
      */
-    function __construct($action=null, $customdata=null, $method='post', $target='', $attributes=null, $editable=true, $formidprefix='mform') {
+    public function __construct($action=null, $customdata=null, $method='post', $target='', $attributes=null, $editable=true,
+                                $ajaxformdata=null, $formidprefix='mform') {
         global $CFG, $FULLME;
         // no standard mform in moodle should allow autocomplete with the exception of user signup
         if (empty($attributes)) {
@@ -203,6 +208,7 @@ abstract class moodleform {
                 $attributes .= ' autocomplete="off" ';
             }
         }
+
 
         if (empty($action)){
             // do not rely on PAGE->url here because dev often do not setup $actualurl properly in admin_externalpage_setup()
@@ -217,6 +223,7 @@ abstract class moodleform {
         // Assign custom data first, so that get_form_identifier can use it.
         $this->_customdata = $customdata;
         $this->_formname = $this->get_form_identifier();
+        $this->_ajaxformdata = $ajaxformdata;
 
         $this->_form = new MoodleQuickForm($this->_formname, $method, $action, $target, $attributes, $formidprefix);
         if (!$editable){
@@ -303,7 +310,9 @@ abstract class moodleform {
      */
     function _process_submission($method) {
         $submission = array();
-        if ($method == 'post') {
+        if (!empty($this->_ajaxformdata)) {
+            $submission = $this->_ajaxformdata;
+        } else if ($method == 'post') {
             if (!empty($_POST)) {
                 $submission = $_POST;
             }
