@@ -28,8 +28,8 @@
 
 require_once(__DIR__ . '/../../../lib/behat/behat_base.php');
 
-use Behat\Behat\Context\Step\Given as Given;
-use Behat\Behat\Context\Step\When as When;
+use Moodle\BehatExtension\Context\Step\Given as Given;
+use Moodle\BehatExtension\Context\Step\When as When;
 
 /**
  * Log in log out steps definitions.
@@ -51,11 +51,12 @@ class behat_auth extends behat_base {
         $this->getSession()->visit($this->locate_path('login/index.php'));
 
         // Enter username and password.
-        $this->execute('behat_forms::i_set_the_field_to', array('Username', $this->escape($username)));
-        $this->execute('behat_forms::i_set_the_field_to', array('Password', $this->escape($username)));
+        $behatforms = behat_context_helper::get('behat_forms');
+        $behatforms->i_set_the_field_to('Username', $this->escape($username));
+        $behatforms->i_set_the_field_to('Password', $this->escape($username));
 
-        // Press log in button, no need to check for exceptions as it will checked after this step execution.
-        $this->execute('behat_forms::press_button', get_string('login'));
+        // Press log in button.
+        $behatforms->press_button(get_string('login'));
     }
 
     /**
@@ -81,5 +82,4 @@ class behat_auth extends behat_base {
             $this->execute('behat_forms::press_button', get_string('logout'));
         }
     }
-
 }

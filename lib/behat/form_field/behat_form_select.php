@@ -50,70 +50,36 @@ class behat_form_select extends behat_form_field {
     public function set_value($value) {
         // Totara: Moodle hacks were prone to double clicking which breaks Totara tests very badly...
 
-        // Multiple-selects should not have any JS magic attached, let's use the selectOption() always.
+        // Is the select multiple?
         $multiple = $this->field->hasAttribute('multiple');
+        $singleselect = ($this->field->hasClass('singleselect') || $this->field->hasClass('urlselect'));
 
-        if ($multiple or !$this->running_javascript()) {
-            if ($multiple) {
-                // Split and decode values. Comma separated list of values allowed. With valuable commas escaped with backslash.
-                $options = preg_replace('/\\\,/', ',',  preg_split('/(?<!\\\),/', $value));
-                // This is a multiple select, let's pass the multiple flag after first option.
-                $afterfirstoption = false;
-                foreach ($options as $option) {
-                    $this->field->selectOption(trim($option), $afterfirstoption);
-                    $afterfirstoption = true;
-                }
-            } else {
-                // This is a single select, let's pass the last one specified.
-                $this->field->selectOption(trim($value));
+        // Here we select the option(s).
+        if ($multiple) {
+            // Split and decode values. Comma separated list of values allowed. With valuable commas escaped with backslash.
+            $options = preg_replace('/\\\,/', ',',  preg_split('/(?<!\\\),/', trim($value)));
+            // This is a multiple select, let's pass the multiple flag after first option.
+            $afterfirstoption = false;
+            foreach ($options as $option) {
+                $this->field->selectOption(trim($option), $afterfirstoption);
+                $afterfirstoption = true;
             }
-
-            return;
-        }
-
-        $autosubmit = $this->field->hasClass('autosubmit');
-        if ($autosubmit) {
-            $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
-        }
-
-        // Make sure the option actually exists!
-        $selectxpath = $this->field->getXpath();
-        $optionxpath = $this->get_option_xpath(trim($value), $selectxpath);
-        if (!$optionnodes = $this->session->getDriver()->find($optionxpath)) {
-            // We do want to know when tests contain invalid select options!
-            throw new \Behat\Mink\Exception\ExpectationException('Cannot find select value "' . $value .'" in field' . $selectxpath, $this->session);
-        }
-        /** @var \Behat\Mink\Element\NodeElement $option */
-        $option = reset($optionnodes);
-
-        $browser = '';
-        $driver = $this->session->getDriver();
-        if (method_exists($driver, 'getBrowser')) {
-            $browser = $driver->getBrowser();
-        }
-
-        if ($browser === 'firefox') {
-            // Firefox is a total nightmare, recent versions cannot even click properly,
-            // sometimes first click on select option breaks click on the next element,
-            // the reason is that the select box is kept expanded after the click on option.
-
-            $currentelementid = $this->get_internal_field_id();
-            $option->click();
-            try {
-                $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
-                if ($currentelementid === $this->get_internal_field_id()) {
-                    if ($option->hasAttribute('selected')) {
-                        // This click on the select field should not change value, it should only collapse the select box.
-                        $this->field->click();
-                    }
-                }
-            } catch (Exception $e) {
-                // Do nothing, we are likely on a different page now.
-            }
-
         } else {
-            // Do a click because selectOption() may not always trigger all JS events.
-            $option->click();
+           // By default, assume the passed value is a non-multiple option.
+            $this->field->selectOption(trim($value));
+       }
+
+        // Wait for all the possible AJAX requests that have been
+        // already triggered by selectOption() to be finished.
+        if ($this->running_javascript()) {
+            // Trigger change event as this is needed by some drivers (Phantomjs). Don't do it for
+            // Singleselect as this will cause multiple event fire and lead to race-around condition.
+            $browser = \Moodle\BehatExtension\Driver\MoodleSelenium2Driver::getBrowser();
+            if (!$singleselect && ($browser == 'phantomjs')) {
+                $script = "Syn.trigger('change', {}, {{ELEMENT}})";
+                $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
+            }
+            $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
         }
 
         // In case there was some ajax or redirect triggered make sure we are ready to continue.
@@ -151,9 +117,6 @@ class behat_form_select extends behat_form_field {
         }
 
         // We are dealing with a multi-select.
-
-        // Can pass multiple comma separated, with valuable commas escaped with backslash.
-        $expectedarr = array(); // Array of passed text options to test.
 
         // Unescape + trim all options and flip it to have the expected values as keys.
         $expectedoptions = $this->get_unescaped_options($expectedvalue);
@@ -225,56 +188,25 @@ class behat_form_select extends behat_form_field {
 
         $selectedoptions = array(); // To accumulate found selected options.
 
-        // Selenium getValue() implementation breaks - separates - values having
-        // commas within them, so we'll be looking for options with the 'selected' attribute instead.
-        if ($this->running_javascript()) {
-            // Totara: try to make this faster by looking at the initially selected option first.
-            if (!$multiple) {
-                $initialselected = $this->field->find('xpath', '//option[@selected=\'selected\']');
-                if ($initialselected and $initialselected->hasAttribute('selected')) {
-                    return trim($initialselected->{$method}());
-                }
-            }
-            // Get all the options in the select and extract their value/text pairs.
-            $alloptions = $this->field->findAll('xpath', '//option');
-            foreach ($alloptions as $option) {
-                // Is it selected?
-                if ($option->hasAttribute('selected')) {
-                    if ($multiple) {
-                        // If the select is multiple, text commas must be encoded.
-                        $selectedoptions[] = trim(str_replace(',', '\,', $option->{$method}()));
-                    } else {
-                        $selectedoptions[] = trim($option->{$method}());
-                        // Totara: single selects may have only one value, there is no point in continuing looking for more selected options.
-                        break;
-                    }
-                }
-            }
+        // Driver returns the values as an array or as a string depending
+        // on whether multiple options are selected or not.
+        $values = $this->field->getValue();
+        if (!is_array($values)) {
+            $values = array($values);
+        }
 
-        } else {
-            // Goutte does not keep the 'selected' attribute updated, but its getValue() returns
-            // the selected elements correctly, also those having commas within them.
-
-            // Goutte returns the values as an array or as a string depending
-            // on whether multiple options are selected or not.
-            $values = $this->field->getValue();
-            if (!is_array($values)) {
-                $values = array($values);
-            }
-
-            // Get all the options in the select and extract their value/text pairs.
-            $alloptions = $this->field->findAll('xpath', '//option');
-            foreach ($alloptions as $option) {
-                // Is it selected?
-                if (in_array($option->getValue(), $values)) {
-                    if ($multiple) {
-                        // If the select is multiple, text commas must be encoded.
-                        $selectedoptions[] = trim(str_replace(',', '\,', $option->{$method}()));
-                    } else {
-                        $selectedoptions[] = trim($option->{$method}());
-                        // Totara: single selects may have only one value, there is no point in continuing looking for more selected options.
-                        break;
-                    }
+        // Get all the options in the select and extract their value/text pairs.
+        $alloptions = $this->field->findAll('xpath', '//option');
+        foreach ($alloptions as $option) {
+            // Is it selected?
+            if (in_array($option->getValue(), $values)) {
+                if ($multiple) {
+                    // If the select is multiple, text commas must be encoded.
+                    $selectedoptions[] = trim(str_replace(',', '\,', $option->{$method}()));
+                } else {
+                    $selectedoptions[] = trim($option->{$method}());
+                    // Totara: single selects may have only one value, there is no point in continuing looking for more selected options.
+                    break;
                 }
             }
         }
