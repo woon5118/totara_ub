@@ -3,7 +3,7 @@
  *
  * Used when we just want a list of things that can be re-ordered by dragging.
  *
- * @class M.core.dragdrop_reorder
+ * @class M.tool_lp.dragdrop_reorder
  * @constructor
  * @extends M.core.dragdrop
  */
@@ -56,12 +56,12 @@ Y.extend(DRAGREORDER, M.core.dragdrop, {
     }
 
 }, {
-    NAME: 'core-dragdrop-reorder',
+    NAME: 'tool_lp-dragdrop-reorder',
     ATTRS: {
     }
 });
 
-M.core = M.core || {};
-M.core.dragdrop_reorder = function(params) {
+M.tool_lp = M.tool_lp || {};
+M.tool_lp.dragdrop_reorder = function(params) {
     new DRAGREORDER(params);
 };
