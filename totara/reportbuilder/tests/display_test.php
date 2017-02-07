@@ -41,7 +41,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $user->timemodified = strtotime('2013-01-10 10:00:00 UTC');
         $user->lastlogin    = 0;
         $user->currentlogin = strtotime('2013-01-10 10:00:00 UTC'); // This is the lastlogin in reports.
-        $user->timecreated  = strtotime('2013-01-10 10:00:00 UTC');
+        $user->timecreated  = strtotime('2013-01-07 10:00:00 UTC');
         $user->firstname  = 'řízek';
         $DB->update_record('user', $user);
 
@@ -101,7 +101,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertSame('10 Jan 2013', $processed[2]);
         $this->assertStringStartsWith('10 Jan 2013 at ', $processed[3]);
         $this->assertSame('Řízek', $processed[4]);
-        $this->assertSame('Thursday', $processed[5]);
+        $this->assertSame('Monday', $processed[5]);
         $this->assertSame('Some html <strong>text</strong>', $processed[6]);
 
         $processed = $report->src->process_data_row($row, 'pdf', $report);
@@ -111,7 +111,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertSame('10 Jan 2013', $processed[2]);
         $this->assertStringStartsWith('10 Jan 2013 at ', $processed[3]);
         $this->assertSame('Řízek', $processed[4]);
-        $this->assertSame('Thursday', $processed[5]);
+        $this->assertSame('Monday', $processed[5]);
         $this->assertSame('Some html TEXT', $processed[6]);
 
         $processed = $report->src->process_data_row($row, 'excel', $report);
@@ -125,7 +125,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertSame('1357812000', $processed[3][1]);
         $this->assertInstanceOf('MoodleExcelFormat', $processed[3][2]);
         $this->assertSame('Řízek', $processed[4]);
-        $this->assertSame('Thursday', $processed[5]);
+        $this->assertSame('Monday', $processed[5]);
         $this->assertSame('Some html TEXT', $processed[6]);
 
         $processed = $report->src->process_data_row($row, 'ods', $report);
@@ -139,7 +139,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $this->assertSame('1357812000', $processed[3][1]);
         $this->assertInstanceOf('MoodleODSFormat', $processed[3][2]);
         $this->assertSame('Řízek', $processed[4]);
-        $this->assertSame('Thursday', $processed[5]);
+        $this->assertSame('Monday', $processed[5]);
         $this->assertSame('Some html TEXT', $processed[6]);
 
         // Now try the custom fields in course.

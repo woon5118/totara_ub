@@ -2644,7 +2644,14 @@ abstract class rb_base_source {
             $groupname,
             'timemodified',
             get_string('usertimemodified', 'totara_reportbuilder'),
-            "$join.timemodified",
+            // Check whether the user record has been updated since it was created.
+            // The timecreated field is 0 for guest and admin accounts, so this guest
+            // username can be used to identify them. The site admin's username can
+            // be changed so this can't be relied upon.
+            "CASE WHEN {$join}.username = 'guest' AND {$join}.timecreated = 0 THEN 0
+                  WHEN {$join}.username != 'guest' AND {$join}.timecreated = 0 AND {$join}.firstaccess < {$join}.timemodified THEN {$join}.timemodified
+                  WHEN {$join}.timecreated != 0 AND {$join}.timecreated < {$join}.timemodified THEN {$join}.timemodified
+                  ELSE 0 END",
             array(
                 'joins' => $join,
                 'displayfunc' => 'nice_datetime',
@@ -2805,6 +2812,7 @@ abstract class rb_base_source {
             'date',
             array(
                 'includetime' => true,
+                'includenotset' => true,
                 'addtypetoheading' => $addtypetoheading
             )
         );
@@ -2839,6 +2847,7 @@ abstract class rb_base_source {
             'date',
             array(
                 'includetime' => true,
+                'includenotset' => true,
                 'addtypetoheading' => $addtypetoheading
             )
         );

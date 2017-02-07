@@ -201,8 +201,8 @@ class rb_filter_date extends rb_filter_type {
             }
         }
 
-        if ($includenotset) {
-            $mform->setDefault($this->name.'notset', 0);
+        if ($includenotset && isset($defaults['notset'])) {
+            $mform->setDefault($this->name.'notset', $defaults['notset']);
         }
     }
 
@@ -436,33 +436,44 @@ class rb_filter_date extends rb_filter_type {
         } else {
             $daysbefore = 0;
         }
-        $label  = $this->label;
 
         $a = new stdClass();
-        $a->label  = $label;
+        $a->label  = $this->label;
         $a->after  = userdate($after);
         $a->before = userdate($before);
         $a->daysafter = userdate($daysafter);
         $a->daysbefore = userdate($daysbefore);
 
+        $label = '';
+
         if ($after and $before) {
-            return get_string('datelabelisbetween', 'filters', $a);
-
+            $label = 'datelabelisbetween';
         } else if ($after) {
-            return get_string('datelabelisafter', 'filters', $a);
-
+            $label = 'datelabelisafter';
         } else if ($before) {
-            return get_string('datelabelisbefore', 'filters', $a);
+            $label = 'datelabelisbefore';
         }
+
         if ($daysafter and $daysbefore) {
-            return get_string('datelabelisdaysbetween', 'totara_reportbuilder', $a);
-
+            $label = 'datelabelisdaysbetween';
         } else if ($daysafter) {
-            return get_string('datelabelisdaysafter', 'totara_reportbuilder', $a);
-
+            $label = 'datelabelisdaysafter';
         } else if ($daysbefore) {
-            return get_string('datelabelisdaysbefore', 'totara_reportbuilder', $a);
+            $label = 'datelabelisdaysbefore';
         }
-        return '';
+
+        if (isset($data['notset']) && $data['notset']) {
+            if ($label) {
+                $label .= 'andnotset';
+            } else {
+                $label = 'datelabelnotset';
+            }
+        }
+
+        if ($label) {
+            return get_string($label, 'totara_reportbuilder', $a);
+        } else {
+            return '';
+        }
     }
 }
