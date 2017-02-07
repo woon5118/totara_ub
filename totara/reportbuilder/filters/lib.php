@@ -157,19 +157,18 @@ class rb_filter_type {
      * @return object|false A filteroption, or false if not found
      */
     protected function get_filteroption($type, $value) {
-        $sourcename = get_class($this->report->src);
-        $filteroption = reportbuilder::get_single_item($this->report->src->filteroptions, $type, $value);
+        $key = $type . '-' . $value;
 
-        if (!$filteroption) {
+        if (!isset($this->report->filteroptions[$key])) {
             $a = new stdClass();
             $a->type = $type;
             $a->value = $value;
-            $a->source = $sourcename;
+            $a->source = get_class($this->report->src);
             debugging(get_string('error:filteroptiontypexandvalueynotfoundinz', 'totara_reportbuilder', $a), DEBUG_DEVELOPER);
             return false;
         }
 
-        return $filteroption;
+        return $this->report->filteroptions[$key];
     }
 
     /**
@@ -301,7 +300,7 @@ class rb_filter_type {
      *                          when advanced options are shown (1)
      * @param reportbuilder object $report The report this filter is for
      *
-     * @return @object A filter_[type] object or false
+     * @return rb_filter_type|bool false on failure
      */
     public static function get_filter($type, $value, $advanced, $region, $report) {
         global $CFG;
@@ -338,10 +337,13 @@ class rb_filter_type {
      * @return string|false The filtertype of the filter from this report's source, if found
      */
     static function get_filter_type($type, $value, $report) {
-        $filteroptions = $report->src->filteroptions;
-        if (!$filteroption = reportbuilder::get_single_item($filteroptions, $type, $value)) {
+        $key = $type . '-' . $value;
+
+        if (!isset($report->filteroptions[$key])) {
             return false;
         }
+
+        $filteroption = $report->filteroptions[$key];
 
         if (!isset($filteroption->filtertype)) {
             return false;

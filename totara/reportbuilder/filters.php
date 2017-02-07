@@ -49,14 +49,33 @@ $report = new reportbuilder($id, null, false, null, null, true);
 // Check filterheadings and searchcolumnheadings for multilang spans. Need to set context to use format_string.
 $PAGE->set_context(context_user::instance($USER->id));
 
+// Are we handling a 'group' source?
+if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $report->source, $matches)) {
+    // Use original source name (minus any suffix).
+    $sourcename = $matches[1];
+} else {
+    // Standard source.
+    $sourcename = $report->source;
+}
+
 $filterheadings = array();
-foreach ($report->src->filteroptions as $option) {
+foreach ($report->filteroptions as $option) {
     $key = $option->type . '-' . $option->value;
 
     // There may be more than one type of data (for exmaple, users), for example columns,
     // so add the type to the heading to differentiate the types - if required.
     if (isset($option->filteroptions['addtypetoheading']) && $option->filteroptions['addtypetoheading']) {
-        $type = get_string ('type_' . $option->type, 'totara_reportbuilder');
+        $langstr = 'type_' . $option->type;
+        if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
+            // Is there a type string in the source file?
+            $type = get_string($langstr, 'rb_source_' . $sourcename);
+        } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
+            // How about in report builder?
+            $type = get_string($langstr, 'totara_reportbuilder');
+        } else {
+            // Display in missing string format to make it obvious.
+            $type = get_string($langstr, 'rb_source_' . $sourcename);
+        }
         $text = (object) array ('column' => $option->label, 'type' => $type);
         $heading = get_string ('headingformat', 'totara_reportbuilder', $text);
     } else {
@@ -67,21 +86,14 @@ foreach ($report->src->filteroptions as $option) {
 }
 
 $searchcolumnheadings = array();
+$defaultheadings = $report->get_default_headings_array();
+
 foreach ($report->columnoptions as $option) {
     if ($option->is_searchable()) {
         $key = $option->type . '-' . $option->value;
-
-        // There may be more than one type of data (for exmaple, users), for example columns,
-        // so add the type to the heading to differentiate the types - if required.
-        if (isset($option->addtypetoheading) && $option->addtypetoheading) {
-            $type = get_string ('type_' . $option->type, 'totara_reportbuilder');
-            $text = (object) array ('column' => $option->name, 'type' => $type);
-            $heading = get_string ('headingformat', 'totara_reportbuilder', $text);
-        } else {
-            $heading = $option->name;
+        if (isset($defaultheadings[$key])) {
+            $searchcolumnheadings[$key] = $defaultheadings[$key];
         }
-
-        $searchcolumnheadings[$key] = ($heading);
     }
 }
 
@@ -238,15 +250,23 @@ function build_filters($id, $fromform) {
             $fromform->$advancedname != $oldfilter->advanced ||
             $fromform->$headingname != $oldfilter->filtername ||
             $fromform->$customheadingname != $oldfilter->customname)) {
-            $name = isset($fromform->$headingname) ? $fromform->$headingname : '';
             $todb = new stdClass();
             $todb->id = $fid;
             $todb->advanced = $fromform->$advancedname;
             $parts = explode('-', $fromform->$filtername);
             $todb->type = $parts[0];
             $todb->value = $parts[1];
-            $todb->filtername = $name;
             $todb->customname = $fromform->$customheadingname;
+            if ($todb->customname) {
+                if (empty($fromform->$headingname)) {
+                    $todb->filtername = '';
+                    $todb->customname = 0;
+                } else {
+                    $todb->filtername = $fromform->$headingname;
+                }
+            } else {
+                $todb->filtername = '';
+            }
             $DB->update_record('report_builder_filters', $todb);
         }
     }

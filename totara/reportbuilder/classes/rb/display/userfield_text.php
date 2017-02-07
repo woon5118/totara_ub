@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2014 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,15 @@ namespace totara_reportbuilder\rb\display;
  * @author Petr Skoda <petr.skoda@totaralearning.com>
  * @package totara_reportbuilder
  */
-class userfield_textarea extends base {
+class userfield_text extends base {
     use userfield_trait;
 
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        if ($column->extracontext['param3']) {
+            // Better not display or export any passwords in report builder.
+            return get_string('hiddencellvalue', 'totara_reportbuilder');
+        }
+
         if (!self::is_cell_visible($value, $format, $row, $column, $report)) {
             return get_string('hiddencellvalue', 'totara_reportbuilder');
         }
@@ -41,13 +46,22 @@ class userfield_textarea extends base {
             return '';
         }
 
-        $extrafields = self::get_extrafields_row($row, $column);
-        $textformat = isset($extrafields->format) ? $extrafields->format : FORMAT_HTML;
+        if ($column->extracontext['param4']) {
+            // Define the target.
+            if (!empty($column->extracontext['param5'])) {
+                $target = 'target="' . $column->extracontext['param5'] . '"';
+            } else {
+                $target = '';
+            }
 
-        $displaytext = format_text($value, $textformat);
+            // Create the link.
+            $displaytext = clean_text('<a href="' . str_replace('$$', urlencode($value), $column->extracontext['param4']) . '" ' . $target . '>' . htmlspecialchars($value) . '</a>');
+        } else {
+            $displaytext = format_string($value);
+        }
 
         if ($format !== 'html') {
-            $displaytext = static::to_plaintext($displaytext, true);
+            $displaytext = static::to_plaintext($displaytext, false);
         }
 
         return $displaytext;

@@ -77,7 +77,7 @@ class rb_source_site_logstore extends rb_base_source {
         $this->add_cohort_course_tables_to_joinlist($joinlist, 'base', 'courseid');
 
         // Add related user support.
-        $this->add_relateduser_table_to_joinlist($joinlist, 'base', 'relateduserid');
+        $this->add_user_table_to_joinlist($joinlist, 'base', 'relateduserid', 'ruser');
         return $joinlist;
     }
 
@@ -251,7 +251,7 @@ class rb_source_site_logstore extends rb_base_source {
         $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_course_fields_to_columns($columnoptions);
         // Add related user support.
-        $this->add_user_fields_to_columns($columnoptions, 'ruser', 'relateduser');
+        $this->add_user_fields_to_columns($columnoptions, 'ruser', 'relateduser', true);
 
         return $columnoptions;
     }
@@ -306,7 +306,7 @@ class rb_source_site_logstore extends rb_base_source {
 
         // Include some standard filters.
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_user_fields_to_filters($filteroptions, 'relateduser');
+        $this->add_user_fields_to_filters($filteroptions, 'relateduser', true);
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
         $this->add_job_assignment_fields_to_filters($filteroptions);
@@ -420,28 +420,6 @@ class rb_source_site_logstore extends rb_base_source {
         $requiredcolumns = array(
         );
         return $requiredcolumns;
-    }
-
-    /**
-     * Adds the user table to the $joinlist array with different join name
-     *
-     * @param array &$joinlist Array of current join options
-     *                         Passed by reference and updated to
-     *                         include new table joins
-     * @param string $join Name of the join that provides the
-     *                     'user id' field
-     * @param string $field Name of user id field to join on
-     * @return boolean True
-     */
-    protected function add_relateduser_table_to_joinlist(&$joinlist, $join, $field) {
-        $joinlist[] = new rb_join(
-            'ruser',
-            'LEFT',
-            '{user}',
-            "ruser.id = $join.$field",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'base'
-        );
     }
 
     /**

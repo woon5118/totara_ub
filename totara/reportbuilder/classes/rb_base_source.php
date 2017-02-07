@@ -61,6 +61,9 @@ abstract class rb_base_source {
      */
     protected $uniquedelimiter = '\.|./';
 
+    /** @var array $addeduserjoins internal tracking of user columns */
+    private $addeduserjoins = array();
+
     /**
      * Class constructor
      *
@@ -114,6 +117,17 @@ abstract class rb_base_source {
 
         // basic sanity checking of joinlist
         $this->validate_joinlist();
+
+        // Add custom user fields for columns added via add_user_fields_to_columns() and friends.
+        foreach ($this->addeduserjoins as $join => $info) {
+            if (empty($info['groupname'])) {
+                // Most likely somebody did not add any user columns, in that case do not add custom fields and rely on the BC fallback later.
+                continue;
+            }
+            $this->add_custom_user_fields($this->joinlist, $this->columnoptions, $this->filteroptions, $join, $info['groupname'], $info['addtypetoheading'], empty($info['filters']));
+            $this->addeduserjoins[$join]['processed'] = true;
+        }
+
         //create array to store the join functions and join table
         $joindata = array();
         $base = $this->base;
@@ -123,7 +137,10 @@ abstract class rb_base_source {
             $table = $join->table;
             switch ($table) {
                 case '{user}':
-                    $joindata['add_custom_user_fields'] = 'auser';
+                    if ($join->name !== 'auser') {
+                        break;
+                    }
+                    $joindata['add_custom_user_fields'] = 'auser'; // This is a fallback only for sources that does not add user fields properly!
                     break;
                 case '{course}':
                     $joindata['add_custom_course_fields'] = 'course';
@@ -148,7 +165,7 @@ abstract class rb_base_source {
         //now ensure customfields fields are added if there are no joins but the base table is customfield-related
         switch ($base) {
             case '{user}':
-                $joindata['add_custom_user_fields'] = 'base';
+                $joindata['add_custom_user_fields'] = 'base'; // This is a fallback only for sources that does not add user fields properly!
                 break;
             case '{course}':
                 $joindata['add_custom_course_fields'] = 'base';
@@ -2343,6 +2360,12 @@ abstract class rb_base_source {
      * @return boolean True
      */
     protected function add_user_table_to_joinlist(&$joinlist, $join, $field, $alias = 'auser') {
+        if (isset($this->addeduserjoins[$alias])) {
+            debugging("User join '{$alias}' was already added to the source", DEBUG_DEVELOPER);
+        } else {
+            $this->addeduserjoins[$alias] = array('join' => $join);
+        }
+
         // join uses 'auser' as name because 'user' is a reserved keyword
         $joinlist[] = new rb_join(
             $alias,
@@ -2376,6 +2399,19 @@ abstract class rb_base_source {
     protected function add_user_fields_to_columns(&$columnoptions,
         $join='auser', $groupname = 'user', $addtypetoheading = false) {
         global $DB, $CFG;
+
+        if ($join === 'base' and !isset($this->addeduserjoins['base'])) {
+            $this->addeduserjoins['base'] = array('join' => 'base');
+        }
+
+        if (!isset($this->addeduserjoins[$join])) {
+            debugging("Add user join '{$join}' via add_user_table_to_joinlist() before calling add_user_fields_to_columns()", DEBUG_DEVELOPER);
+        } else if (isset($this->addeduserjoins[$join]['groupname'])) {
+            debugging("User columns for {$join} were already added to the source", DEBUG_DEVELOPER);
+        } else {
+            $this->addeduserjoins[$join]['groupname'] = $groupname;
+            $this->addeduserjoins[$join]['addtypetoheading'] = $addtypetoheading;
+        }
 
         $usednamefields = totara_get_all_user_name_fields_join($join, null, true);
         $allnamefields = totara_get_all_user_name_fields_join($join);
@@ -2669,6 +2705,22 @@ abstract class rb_base_source {
      */
     protected function add_user_fields_to_filters(&$filteroptions, $groupname = 'user', $addtypetoheading = false) {
         global $CFG;
+
+        $found = false;
+        foreach ($this->addeduserjoins as $join => $unused) {
+            if (!isset($this->addeduserjoins[$join]['groupname'])) {
+                continue;
+            }
+            if ($this->addeduserjoins[$join]['groupname'] === $groupname) {
+                $this->addeduserjoins[$join]['filters'] = true;
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            debugging("Add user join with group name '{$groupname}' via add_user_table_to_joinlist() before calling add_user_fields_to_filters()", DEBUG_DEVELOPER);
+        }
+
         // auto-generate filters for user fields
         $fields = array(
             'fullname' => get_string('userfullname', 'totara_reportbuilder'),
@@ -4591,17 +4643,16 @@ abstract class rb_base_source {
             throw new ReportBuilderException(get_string('error:missingdependencytable', 'totara_reportbuilder', $a));
         }
 
+        if ($cf_prefix === 'user') {
+            return $this->add_custom_user_fields($joinlist, $columnoptions, $filteroptions, $join, 'user', false, $nofilter);
+        }
+
         // Build the table names for this sort of custom field data.
         $fieldtable = $cf_prefix.'_info_field';
         $datatable = $cf_prefix.'_info_data';
 
         // Check if there are any visible custom fields of this type.
-        if ($cf_prefix == 'user') {
-            // For user fields include them all - below we require moodle/user:update to actually display the column.
-            $items = $DB->get_recordset($fieldtable);
-        } else {
-            $items = $DB->get_recordset($fieldtable, array('hidden' => '0'));
-        }
+        $items = $DB->get_recordset($fieldtable, array('hidden' => '0'));
 
         if (empty($items)) {
             $items->close();
@@ -4613,10 +4664,6 @@ abstract class rb_base_source {
             $value = "custom_field_{$id}{$suffix}";
             $name = isset($record->fullname) ? $record->fullname : $record->name;
             $column_options = array('joins' => $joinname);
-            // If profile field isn't available to everyone require a capability to display the column.
-            if ($cf_prefix == 'user' && $record->visible == PROFILE_VISIBLE_NONE) {
-                $column_options['capability'] = 'moodle/user:viewalldetails';
-            }
             $filtertype = 'text'; // default filter type
             $filter_options = array();
 
@@ -4743,17 +4790,10 @@ abstract class rb_base_source {
 
                 case 'textarea':
                     $filtertype = 'textarea';
-                    if ($cf_prefix == 'user') {
-                        $column_options['displayfunc'] = 'userfield_textarea';
-                    } else {
-                        $column_options['displayfunc'] = 'customfield_textarea';
-                    }
+                    $column_options['displayfunc'] = 'customfield_textarea';
                     $column_options['extrafields'] = array(
                         "itemid" => "{$joinname}.id"
                     );
-                    if ($cf_prefix === 'user') {
-                        $column_options['extrafields']["{$cf_prefix}_custom_field_{$id}_format"] = "{$joinname}.dataformat";
-                    }
                     $column_options['dbdatatype'] = 'text';
                     $column_options['outputformat'] = 'text';
                     break;
@@ -4847,19 +4887,6 @@ abstract class rb_base_source {
                     continue 2;
             }
 
-            if ($cf_prefix === 'user') {
-                $column_options['displayfunc'] = 'user_customfield';
-                $column_options['extracontext']['visible'] = $record->visible;
-                $column_options['extracontext']['datatype'] = $record->datatype;
-                if ($jointable === '{user}') {
-                    // We are linking the user table, it is safe to use the id directly.
-                    $column_options['extrafields']['userid'] = "{$join}.id";
-                } else {
-                    // This comes from a left join, we will have problems with NULLs if profile data is missing.
-                    $column_options['extrafields']['userid'] = "{$joinname}.{$joinfield}";
-                }
-            }
-
             $joinlist[] = new rb_join(
                     $joinname,
                     'LEFT',
@@ -4933,25 +4960,176 @@ abstract class rb_base_source {
     }
 
     /**
-     * Adds user custom fields to the report
+     * Adds user custom fields to the report.
      *
      * @param array $joinlist
      * @param array $columnoptions
      * @param array $filteroptions
-     * @param string $basetable
+     * @param string $basejoin
+     * @param string $groupname
+     * @param bool $addtypetoheading
+     * @param bool $nofilter
      * @return boolean
      */
     protected function add_custom_user_fields(array &$joinlist, array &$columnoptions,
-        array &$filteroptions, $basetable = 'auser') {
-        return $this->add_custom_fields_for('user',
-                                            $basetable,
-                                            'userid',
-                                            $joinlist,
-                                            $columnoptions,
-                                            $filteroptions);
+        array &$filteroptions, $basejoin = 'auser', $groupname = 'user', $addtypetoheading = false, $nofilter = false) {
+
+        global $DB;
+
+        if (!empty($this->addeduserjoins[$basejoin]['processed'])) {
+            // Already added.
+            return false;
+        }
+
+        $jointable = false;
+        if ($basejoin === 'base') {
+            $jointable = $this->base;
+        } else {
+            foreach ($joinlist as $object) {
+                if ($object->name === $basejoin) {
+                    $jointable = $object->table;
+                    break;
+                }
+            }
+        }
+
+        // Check if there are any visible custom fields of this type.
+        $items = $DB->get_recordset('user_info_field');
+        foreach ($items as $record) {
+            $id = $record->id;
+            $joinname = "{$basejoin}_cf_{$id}";
+            $value = "custom_field_{$id}";
+            $name = isset($record->fullname) ? $record->fullname : $record->name;
+
+            $column_options = array();
+            $column_options['joins'] = array($joinname);
+            $column_options['extracontext'] = (array)$record;
+            $column_options['addtypetoheading'] = $addtypetoheading;
+            $column_options['displayfunc'] = 'userfield_' . $record->datatype;
+            if ($jointable === '{user}') {
+                $column_options['extrafields'] = array('userid' => "{$basejoin}.id");
+            } else {
+                $column_options['extrafields'] = array('userid' => "{$joinname}.userid");
+            }
+            if ($record->visible == PROFILE_VISIBLE_NONE) {
+                // If profile field isn't available to everyone require a capability to display the column.
+                $column_options['capability'] = 'moodle/user:viewalldetails';
+            }
+
+            $filter_options = array();
+            $filter_options['addtypetoheading'] = $addtypetoheading;
+
+            $columnsql = "{$joinname}.data";
+
+            switch ($record->datatype) {
+                case 'textarea':
+                    $column_options['extrafields']["format"] = "{$joinname}.dataformat";
+                    $column_options['dbdatatype'] = 'text';
+                    $column_options['outputformat'] = 'text';
+                    $filtertype = 'textarea';
+                    break;
+
+                case 'menu':
+                    $default = $record->defaultdata;
+                    if ($default !== '' and $default !== null) {
+                        // Note: there is no safe way to inject the default value into the query, use extra join instead.
+                        $fieldjoin = $joinname . '_fielddefault';
+                        $joinlist[] = new rb_join(
+                            $fieldjoin,
+                            'INNER',
+                            "{user_info_field}",
+                            "{$fieldjoin}.id = {$id}",
+                            REPORT_BUILDER_RELATION_MANY_TO_ONE
+                        );
+                        $columnsql = "COALESCE({$columnsql}, {$fieldjoin}.defaultdata)";
+                        $column_options['joins'][] = $fieldjoin;
+                    }
+                    $column_options['dbdatatype'] = 'text';
+                    $column_options['outputformat'] = 'text';
+                    $filtertype = 'menuofchoices';
+                    $filter_options['selectchoices'] = $this->list_to_array($record->param1,"\n");
+                    $filter_options['simplemode'] = true;
+                    break;
+
+                case 'checkbox':
+                    $default = (int)$record->defaultdata;
+                    $columnsql = "CASE WHEN ( {$columnsql} IS NULL OR {$columnsql} = '' ) THEN {$default} ELSE " . $DB->sql_cast_char2int($columnsql, true) . " END";
+                    $filtertype = 'select';
+                    $filter_options['selectchoices'] = array(0 => get_string('no'), 1 => get_string('yes'));
+                    $filter_options['simplemode'] = true;
+                    break;
+
+                case 'datetime':
+                    $columnsql = "CASE WHEN {$columnsql} = '' THEN NULL ELSE " . $DB->sql_cast_char2int($columnsql, true) . " END";
+                    $column_options['dbdatatype'] = 'timestamp';
+                    $filtertype = 'date';
+                    if ($record->param3) {
+                        $filter_options['includetime'] = true;
+                    }
+                    break;
+
+                case 'date': // Midday in UTC, date without timezone.
+                    $columnsql = "CASE WHEN {$columnsql} = '' THEN NULL ELSE " . $DB->sql_cast_char2int($columnsql, true) . " END";
+                    $column_options['dbdatatype'] = 'timestamp';
+                    $filtertype = 'date';
+                    break;
+
+                case 'text':
+                    $default = $record->defaultdata;
+                    if ($default !== '' and $default !== null) {
+                        // Note: there is no safe way to inject the default value into the query, use extra join instead.
+                        $fieldjoin = $joinname . '_fielddefault';
+                        $joinlist[] = new rb_join(
+                            $fieldjoin,
+                            'INNER',
+                            "{user_info_field}",
+                            "{$fieldjoin}.id = {$id}",
+                            REPORT_BUILDER_RELATION_MANY_TO_ONE
+                        );
+                        $columnsql = "COALESCE({$columnsql}, {$fieldjoin}.defaultdata)";
+                        $column_options['joins'][] = $fieldjoin;
+                    }
+                    $column_options['dbdatatype'] = 'text';
+                    $column_options['outputformat'] = 'text';
+                    $filtertype = 'text';
+                    break;
+
+                default:
+                    // Unsupported customfields.
+                    continue 2;
+            }
+
+            $joinlist[] = new rb_join(
+                $joinname,
+                'LEFT',
+                "{user_info_data}",
+                "{$joinname}.userid = {$basejoin}.id AND {$joinname}.fieldid = {$id}",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                $basejoin
+            );
+            $columnoptions[] = new rb_column_option(
+                $groupname,
+                $value,
+                $name,
+                $columnsql,
+                $column_options
+            );
+
+            if (!$nofilter) {
+                $filteroptions[] = new rb_filter_option(
+                    $groupname,
+                    $value,
+                    $name,
+                    $filtertype,
+                    $filter_options
+                );
+            }
+        }
+
+        $items->close();
+
+        return true;
     }
-
-
 
     protected function add_custom_evidence_fields(array &$joinlist, array &$columnoptions,
         array &$filteroptions, $basetable = 'dp_plan_evidence') {

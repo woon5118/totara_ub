@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2014 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ namespace totara_reportbuilder\rb\display;
  * @author Petr Skoda <petr.skoda@totaralearning.com>
  * @package totara_reportbuilder
  */
-class userfield_textarea extends base {
+class userfield_checkbox extends \totara_reportbuilder\rb\display\yes_or_no {
     use userfield_trait;
 
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
@@ -37,23 +37,6 @@ class userfield_textarea extends base {
             return get_string('hiddencellvalue', 'totara_reportbuilder');
         }
 
-        if (is_null($value) or $value === '') {
-            return '';
-        }
-
-        $extrafields = self::get_extrafields_row($row, $column);
-        $textformat = isset($extrafields->format) ? $extrafields->format : FORMAT_HTML;
-
-        $displaytext = format_text($value, $textformat);
-
-        if ($format !== 'html') {
-            $displaytext = static::to_plaintext($displaytext, true);
-        }
-
-        return $displaytext;
-    }
-
-    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
-        return false;
+        return parent::display($value, $format, $row, $column, $report);
     }
 }

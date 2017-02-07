@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2014 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2017 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ namespace totara_reportbuilder\rb\display;
  * @author Petr Skoda <petr.skoda@totaralearning.com>
  * @package totara_reportbuilder
  */
-class userfield_textarea extends base {
+class userfield_menu extends base {
     use userfield_trait;
 
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
@@ -41,13 +41,10 @@ class userfield_textarea extends base {
             return '';
         }
 
-        $extrafields = self::get_extrafields_row($row, $column);
-        $textformat = isset($extrafields->format) ? $extrafields->format : FORMAT_HTML;
-
-        $displaytext = format_text($value, $textformat);
+        $displaytext = format_string($value);
 
         if ($format !== 'html') {
-            $displaytext = static::to_plaintext($displaytext, true);
+            $displaytext = static::to_plaintext($displaytext, false);
         }
 
         return $displaytext;

@@ -424,7 +424,15 @@ class reportbuilder {
 
         $this->contentoptions = $this->src->contentoptions;
 
-        $this->filteroptions = $this->src->filteroptions;
+        $this->filteroptions = array();
+        foreach ($this->src->filteroptions as $filteroption) {
+            $key = $filteroption->type . '-' . $filteroption->value;
+            if (isset($this->filteroptions[$key])) {
+                debugging("Duplicate filter option $key detected in source " . get_class($this->src), DEBUG_DEVELOPER);
+            }
+            $this->filteroptions[$key] = $filteroption;
+        }
+
         $this->filters = $this->get_filters();
 
         $this->searchcolumns = $this->get_search_columns();
@@ -1119,6 +1127,19 @@ class reportbuilder {
     public function get_filters() {
         global $DB;
 
+        if (!$this->filteroptions) {
+            return array();
+        }
+
+        // Are we handling a 'group' source?
+        if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $this->source, $matches)) {
+            // Use original source name (minus any suffix).
+            $sourcename = $matches[1];
+        } else {
+            // Standard source.
+            $sourcename = $this->source;
+        }
+
         $out = array();
         $filters = $DB->get_records('report_builder_filters', array('reportid' => $this->_id), 'sortorder');
         foreach ($filters as $filter) {
@@ -1126,27 +1147,37 @@ class reportbuilder {
             $value = $filter->value;
             $advanced = $filter->advanced;
             $region = $filter->region;
-            $name = "{$filter->type}-{$filter->value}";
+            $key = "{$filter->type}-{$filter->value}";
 
-            // To properly support multiple languages - only use value in database if it's different from the default.
-            // If it's the same as the default for that filter, use the default string directly.
-            if (isset($filter->customname)) {
-                // Use value from database.
-                $filtername = $filter->filtername;
-            } else {
-                // Use default value.
-                $defaultnames = $this->get_default_headings_array();
-                $filtername = isset($defaultnames[$filter->type . '-' . $filter->value]) ?
-                    $defaultnames[$filter->type . '-' . $filter->value] : null;
+            if (!isset($this->filteroptions[$key])) {
+                continue;
             }
+            $option = $this->filteroptions[$key];
+
             // Only include filter if a valid object is returned.
             if ($filterobj = rb_filter_type::get_filter($type, $value, $advanced, $region, $this)) {
                 $filterobj->filterid = $filter->id;
-                $filterobj->filtername = $filtername;
-                $filterobj->customname = isset($filter->customname) ? $filter->customname : 0;
-                // Change label if there is a customname for this filter.
-                $filterobj->label = ($filter->customname == 1) ? $filtername : $filterobj->label;
-                $out[$name] = $filterobj;
+                $filterobj->filtername = $filter->filtername;
+                $filterobj->customname = $filter->customname;
+                if ($filter->customname and $filter->filtername) {
+                    // Use value from database.
+                    $filterobj->label = $filter->filtername;
+                } else if (!empty($option->filteroptions['addtypetoheading'])) {
+                    $langstr = 'type_' . $option->type;
+                    if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
+                        // Is there a type string in the source file?
+                        $type = get_string($langstr, 'rb_source_' . $sourcename);
+                    } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
+                        // How about in report builder?
+                        $type = get_string($langstr, 'totara_reportbuilder');
+                    } else {
+                        // Display in missing string format to make it obvious.
+                        $type = get_string($langstr, 'rb_source_' . $sourcename);
+                    }
+                    $text = (object) array ('column' => $option->label, 'type' => $type);
+                    $filterobj->label = get_string ('headingformat', 'totara_reportbuilder', $text);
+                }
+                $out[$key] = $filterobj;
 
                 // enabled report grouping if any filters are grouped
                 if (isset($filterobj->grouping) && $filterobj->grouping != 'none') {
@@ -1592,6 +1623,15 @@ class reportbuilder {
             return false;
         }
 
+        // Are we handling a 'group' source?
+        if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $this->source, $matches)) {
+            // Use original source name (minus any suffix).
+            $sourcename = $matches[1];
+        } else {
+            // Standard source.
+            $sourcename = $this->source;
+        }
+
         $out = array();
         foreach ($this->columnoptions as $option) {
             $key = $option->type . '-' . $option->value;
@@ -1612,7 +1652,17 @@ class reportbuilder {
             // There may be more than one type of data (for exmaple, users), for example columns,
             // so add the type to the heading to differentiate the types - if required.
             if (isset($option->addtypetoheading) && $option->addtypetoheading) {
-                $type = get_string ('type_' . $option->type, 'totara_reportbuilder');
+                $langstr = 'type_' . $option->type;
+                if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
+                    // Is there a type string in the source file?
+                    $type = get_string($langstr, 'rb_source_' . $sourcename);
+                } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
+                    // How about in report builder?
+                    $type = get_string($langstr, 'totara_reportbuilder');
+                } else {
+                    // Display in missing string format to make it obvious.
+                    $type = get_string($langstr, 'rb_source_' . $sourcename);
+                }
                 $text = (object) array ('column' => $defaultheading, 'type' => $type);
                 $defaultheading = get_string ('headingformat', 'totara_reportbuilder', $text);
             }

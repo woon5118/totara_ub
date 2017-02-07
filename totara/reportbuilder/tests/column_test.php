@@ -963,5 +963,14 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             $message .= "SQL Params : " . var_export($sql[1], true) . "\n";
             $this->assertRegExp('/[012]/', (string)$rb->get_filtered_count(), $message);
         }
+
+        // Make sure that joins are not using reserved SQL keywords.
+        $reserved = \sql_generator::getAllReservedWords();
+        foreach ($src->joinlist as $join) {
+            $message = "\nReport title : {$title}\n";
+            $message .= "Report sourcename : {$sourcename}\n";
+            $message .= "Join name {$join->name} is invalid, it cannot be any SQL reserved word!\n";
+            $this->assertArrayNotHasKey($join->name, $reserved, $message);
+        }
     }
 }
