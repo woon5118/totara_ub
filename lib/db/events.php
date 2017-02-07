@@ -66,10 +66,6 @@ $observers = array(
         'eventname'   => '\core\event\cohort_member_added',
         'callback'    => 'core_badges_observer::cohort_criteria_review',
     ),
-    array(
-        'eventname'   => '\core\event\search_indexed',
-        'callback'    => 'core_search_observer::invalidate_caches',
-    ),
 );
 
 // List of all events triggered by Moodle can be found using Events list report.
