@@ -207,7 +207,11 @@ class feedback_item_multichoicerated extends feedback_item_base {
         $analysed_item = $this->get_analysed($item, $groupid, $courseid);
         if ($analysed_item) {
             echo '<tr><th colspan="2" align="' . $align . '">';
-            echo $itemnr.'&nbsp;('.format_string($item->label).') ' . format_string($analysed_item[1]);
+            echo $itemnr . ' ';
+            if (strval($item->label) !== '') {
+                echo '('. format_string($item->label).') ';
+            }
+            echo $analysed_item[1];
             echo '</th></tr>';
             $analysed_vals = $analysed_item[2];
             $pixnr = 0;
@@ -305,7 +309,9 @@ class feedback_item_multichoicerated extends feedback_item_base {
         if ($info->subtype == 'd') {
             echo '<label for="'. $item->typ . '_' . $item->id .'">';
         }
-        echo '('.format_string($item->label).') ';
+        if (strval($item->label) !== '') {
+            echo '('. format_string($item->label).') ';
+        }
         echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         if ($item->dependitem) {
             if ($dependitem = $DB->get_record('feedback_item', array('id'=>$item->dependitem))) {
@@ -355,7 +361,7 @@ class feedback_item_multichoicerated extends feedback_item_base {
         echo '<div class="feedback_item_label_'.$align.'">';
         if ($info->subtype == 'd') {
             echo '<label for="'. $inputname .'">';
-            echo format_text($item->name.$requiredmark, true, false, false);
+            echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
             if ($highlightrequire AND $item->required AND intval($value) <= 0) {
                 echo '<br class="error"><span id="id_error_'.$inputname.'" class="error"> '.get_string('err_required', 'form').
                     '</span><br id="id_error_break_'.$inputname.'" class="error" >';
@@ -401,8 +407,10 @@ class feedback_item_multichoicerated extends feedback_item_base {
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-            echo '('.format_string($item->label).') ';
-            echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
+        if (strval($item->label) !== '') {
+            echo '('. format_string($item->label).') ';
+        }
+        echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         echo '</div>';
 
         //print the presentation

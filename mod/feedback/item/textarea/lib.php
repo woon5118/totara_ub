@@ -152,7 +152,11 @@ class feedback_item_textarea extends feedback_item_base {
         $values = feedback_get_group_values($item, $groupid, $courseid);
         if ($values) {
             echo '<tr><th colspan="2" align="' . $align . '">';
-            echo $itemnr.'&nbsp;('.format_string($item->label).') ' . format_string($item->name);
+            echo $itemnr . ' ';
+            if (strval($item->label) !== '') {
+                echo '('. format_string($item->label).') ';
+            }
+            echo format_text($item->name, FORMAT_HTML, array('noclean' => true, 'para' => false));
             echo '</th></tr>';
             $blank  = 0;
             foreach ($values as $value) {
@@ -205,8 +209,10 @@ class feedback_item_textarea extends feedback_item_base {
         $inputname = $item->typ . '_' . $item->id;
         echo '<div class="feedback_item_label_'.$align.'">';
         echo '<label for="'. $inputname .'">';
-        echo '('.format_string($item->label).') ';
-        echo format_text($item->name.$requiredmark, true, false, false);
+        if (strval($item->label) !== '') {
+            echo '('. format_string($item->label).') ';
+        }
+        echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         if ($item->dependitem) {
             if ($dependitem = $DB->get_record('feedback_item', array('id'=>$item->dependitem))) {
                 echo ' <span class="feedback_depend">';
@@ -250,7 +256,7 @@ class feedback_item_textarea extends feedback_item_base {
         $inputname = $item->typ . '_' . $item->id;
         echo '<div class="feedback_item_label_'.$align.'">';
         echo '<label for="'. $inputname .'">';
-            echo format_text($item->name . $requiredmark, true, false, false);
+        echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         if ($highlightrequire AND $item->required AND strval($value) == '') {
             echo '<br class="error"><span id="id_error_'.$inputname.'" class="error"> '.get_string('err_required', 'form').
                 '</span><br id="id_error_break_'.$inputname.'" class="error" >';
@@ -290,8 +296,10 @@ class feedback_item_textarea extends feedback_item_base {
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-            echo '('.format_string($item->label).') ';
-            echo format_text($item->name . $requiredmark, true, false, false);
+        if (strval($item->label) !== '') {
+            echo '('. format_string($item->label).') ';
+        }
+        echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         echo '</div>';
 
         //print the presentation

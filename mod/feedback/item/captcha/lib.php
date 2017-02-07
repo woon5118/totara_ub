@@ -55,7 +55,7 @@ class feedback_item_captcha extends feedback_item_base {
         $this->item->feedback = $feedback->id;
         $this->item->template = 0;
         $this->item->name = get_string('captcha', 'feedback');
-        $this->item->label = get_string('captcha', 'feedback');
+        $this->item->label = '';
         $this->item->presentation = '';
         $this->item->typ = $this->type;
         $this->item->hasvalue = $this->get_hasvalue();
@@ -138,8 +138,10 @@ class feedback_item_captcha extends feedback_item_base {
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-        echo '('.format_string($item->label).') ';
-        echo format_text($item->name.$requiredmark, true, false, false);
+        if (strval($item->label) !== '') {
+            echo '('. format_string($item->label).') ';
+        }
+        echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         echo '</div>';
 
     }
@@ -191,8 +193,10 @@ class feedback_item_captcha extends feedback_item_base {
 
             //print the question and label
             echo '<div class="feedback_item_label_'.$align.'">';
-            echo '('.format_string($item->label).') ';
-            echo format_text($item->name.$requiredmark, true, false, false);
+            if (strval($item->label) !== '') {
+                echo '('. format_string($item->label).') ';
+            }
+            echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
             $inputname = 'name="'.$item->typ.'_'.$item->id.'"';
             echo '<input type="hidden" value="'.$USER->sesskey.'" '.$inputname.' />';
             echo '</div>';
@@ -258,25 +262,18 @@ class feedback_item_captcha extends feedback_item_base {
      * @return void
      */
     public function print_item_show_value($item, $value = '') {
-        global $DB, $OUTPUT;
+        global $OUTPUT;
 
         $align = right_to_left() ? 'right' : 'left';
 
-        $cmid = 0;
-        $feedbackid = $item->feedback;
-        if ($feedbackid > 0) {
-            $feedback = $DB->get_record('feedback', array('id'=>$feedbackid));
-            if ($cm = get_coursemodule_from_instance("feedback", $feedback->id, $feedback->course)) {
-                $cmid = $cm->id;
-            }
-        }
-
-        $requiredmark  = $OUTPUT->flex_icon('required', array('classes' => 'flex-icon-pre', 'alt' => get_string('requiredelement', 'form')));
+        $requiredmark = $OUTPUT->flex_icon('required', array('classes' => 'flex-icon-pre', 'alt' => get_string('requiredelement', 'form')));
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-        echo '('.format_string($item->label).') ';
-        echo format_text($item->name.$requiredmark, true, false, false);
+        if (strval($item->label) !== '') {
+            echo '('. format_string($item->label).') ';
+        }
+        echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         echo '</div>';
     }
 

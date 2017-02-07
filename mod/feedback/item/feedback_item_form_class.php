@@ -76,7 +76,7 @@ abstract class feedback_item_form extends moodleform {
         $mform->setType('template', PARAM_INT);
 
         $mform->setType('name', PARAM_TEXT);
-        $mform->setType('label', PARAM_TEXT);
+        $mform->setType('label', PARAM_NOTAGS);
 
         $mform->addElement('hidden', 'typ', $this->type);
         $mform->setType('typ', PARAM_ALPHA);

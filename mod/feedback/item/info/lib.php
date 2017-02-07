@@ -150,7 +150,11 @@ class feedback_item_info extends feedback_item_base {
         $data = $analysed_item->data;
         if (is_array($data)) {
             echo '<tr><th colspan="2" align="left">';
-            echo $itemnr.'&nbsp;('.format_string($item->label).') '.format_string($item->name);
+            echo $itemnr . ' ';
+            if (strval($item->label) !== '') {
+                echo '('. format_string($item->label).') ';
+            }
+            echo format_text($item->name, FORMAT_HTML, array('noclean' => true, 'para' => false));
             echo '</th></tr>';
             $sizeofdata = count($data);
             for ($i = 0; $i < $sizeofdata; $i++) {
@@ -234,10 +238,14 @@ class feedback_item_info extends feedback_item_base {
                 break;
         }
 
+        $requiredmark = $OUTPUT->flex_icon('required', array('classes' => 'flex-icon-pre', 'alt' => get_string('requiredelement', 'form')));
+
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-        echo '('.format_string($item->label).') ';
-        echo format_text($item->name, true, false, false);
+        if (strval($item->label) !== '') {
+            echo '('. format_string($item->label).') ';
+        }
+        echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         if ($item->dependitem) {
             if ($dependitem = $DB->get_record('feedback_item', array('id'=>$item->dependitem))) {
                 echo ' <span class="feedback_depend">';
@@ -320,10 +328,12 @@ class feedback_item_info extends feedback_item_base {
                 break;
         }
 
+        $requiredmark = $OUTPUT->flex_icon('required', array('classes' => 'flex-icon-pre', 'alt' => get_string('requiredelement', 'form')));
+
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
         echo '<span class="'.$highlight.'">';
-        echo format_text($item->name, true, false, false);
+        echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         echo '</span>';
         echo '</div>';
 
@@ -352,10 +362,14 @@ class feedback_item_info extends feedback_item_base {
             $value = $value ? userdate($value) : '&nbsp;';
         }
 
+        $requiredmark = $OUTPUT->flex_icon('required', array('classes' => 'flex-icon-pre', 'alt' => get_string('requiredelement', 'form')));
+
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-            echo '('.format_string($item->label).') ';
-            echo format_text($item->name, true, false, false);
+        if (strval($item->label) !== '') {
+            echo '('. format_string($item->label).') ';
+        }
+        echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         echo '</div>';
 
         //print the presentation
