@@ -108,8 +108,8 @@ class mod_quiz_locallib_testcase extends advanced_testcase {
         $question->questiontextformat = FORMAT_HTML;
 
         $summary = quiz_question_tostring($question);
-        $this->assertEquals('<span class="questionname" data-movetext="true">The question name</span> ' .
-                '<span class="questiontext">What sort of INEQUALITY is x &lt; y[?]</span>', $summary);
+        $this->assertEquals('<span class="questionname">The question name</span> ' .
+                '<span class="questiontext">What sort of INEQUALITY is x &lt; y[?]' . "\n" . '</span>', $summary);
     }
 
     /**
