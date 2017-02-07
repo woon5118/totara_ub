@@ -24,7 +24,6 @@
 namespace tool_lp;
 
 use stdClass;
-use context_system;
 
 /**
  * Class for loading/storing template_competencies from the DB.
@@ -39,6 +38,9 @@ class template_competency extends persistent {
 
     /** @var int $competencyid The competency id */
     private $competencyid = 0;
+
+    /** @var int $sortorder A number used to influence sorting */
+    private $sortorder = 0;
 
     /**
      * Method that provides the table name matching this class.
@@ -68,6 +70,24 @@ class template_competency extends persistent {
     }
 
     /**
+     * Get the sort order index.
+     *
+     * @return string The sort order index
+     */
+    public function get_sortorder() {
+        return $this->sortorder;
+    }
+
+    /**
+     * Set the sort order index.
+     *
+     * @param string $sortorder The sort order index
+     */
+    public function set_sortorder($sortorder) {
+        $this->sortorder = $sortorder;
+    }
+
+    /**
      * Get the template id
      *
      * @return int The template id
@@ -89,7 +109,7 @@ class template_competency extends persistent {
      * Populate this class with data from a DB record.
      *
      * @param stdClass $record A DB record.
-     * @return framework
+     * @return template_competency
      */
     public function from_record($record) {
         if (isset($record->id)) {
@@ -100,6 +120,9 @@ class template_competency extends persistent {
         }
         if (isset($record->competencyid)) {
             $this->set_competencyid($record->competencyid);
+        }
+        if (isset($record->sortorder)) {
+            $this->set_sortorder($record->sortorder);
         }
         if (isset($record->timecreated)) {
             $this->set_timecreated($record->timecreated);
@@ -123,6 +146,7 @@ class template_competency extends persistent {
         $record->id = $this->get_id();
         $record->templateid = $this->get_templateid();
         $record->competencyid = $this->get_competencyid();
+        $record->sortorder = $this->get_sortorder();
         $record->timecreated = $this->get_timecreated();
         $record->timemodified = $this->get_timemodified();
         $record->usermodified = $this->get_usermodified();
@@ -140,12 +164,13 @@ class template_competency extends persistent {
     public function count_templates($competencyid, $onlyvisible) {
         global $DB;
 
+        $template = new template();
         $sql = 'SELECT COUNT(template.id)
-                FROM {' . self::get_table_name() . '} tplcomp
-                JOIN {' . template::get_table_name() . '} tpl
-                ON tplcomp.templateid = tpl.id
-                WHERE tplcomp.competencyid = ? ';
-        $params = array($templateid);
+                  FROM {' . $this->get_table_name() . '} tplcomp
+                  JOIN {' . $template->get_table_name() . '} tpl
+                    ON tplcomp.templateid = tpl.id
+                 WHERE tplcomp.competencyid = ? ';
+        $params = array($competencyid);
 
         if ($onlyvisible) {
             $sql .= ' AND tpl.visible = ?';
@@ -168,12 +193,11 @@ class template_competency extends persistent {
         global $DB;
 
         $template = new template();
-
         $sql = 'SELECT tpl.*
-                FROM {' . $template->get_table_name() . '} tpl
-                JOIN {' . self::get_table_name() . '} tplcomp
-                ON tplcomp.templateid = tpl.id
-                WHERE tplcomp.competencyid = ? ';
+                  FROM {' . $template->get_table_name() . '} tpl
+                  JOIN {' . $this->get_table_name() . '} tplcomp
+                    ON tplcomp.templateid = tpl.id
+                 WHERE tplcomp.competencyid = ? ';
         $params = array($competencyid);
 
         if ($onlyvisible) {
@@ -201,11 +225,12 @@ class template_competency extends persistent {
     public function count_competencies($templateid, $onlyvisible) {
         global $DB;
 
+        $competency = new competency();
         $sql = 'SELECT COUNT(comp.id)
-                FROM {' . self::get_table_name() . '} tplcomp
-                JOIN {' . competency::get_table_name() . '} comp
-                ON tplcomp.competencyid = comp.id
-                WHERE tplcomp.templateid = ? ';
+                  FROM {' . $this->get_table_name() . '} tplcomp
+                  JOIN {' . $competency->get_table_name() . '} comp
+                    ON tplcomp.competencyid = comp.id
+                 WHERE tplcomp.templateid = ? ';
         $params = array($templateid);
 
         if ($onlyvisible) {
@@ -229,12 +254,12 @@ class template_competency extends persistent {
         global $DB;
 
         $competency = new competency();
-
         $sql = 'SELECT comp.*
-                FROM {' . $competency->get_table_name() . '} comp
-                JOIN {' . self::get_table_name() . '} tplcomp
-                ON tplcomp.competencyid = comp.id
-                WHERE tplcomp.templateid = ? ';
+                  FROM {' . $competency->get_table_name() . '} comp
+                  JOIN {' . $this->get_table_name() . '} tplcomp
+                    ON tplcomp.competencyid = comp.id
+                 WHERE tplcomp.templateid = ?
+              ORDER BY tplcomp.sortorder ASC';
         $params = array($templateid);
 
         if ($onlyvisible) {
@@ -250,5 +275,15 @@ class template_competency extends persistent {
         }
 
         return $instances;
+    }
+
+    /**
+     * Add a default for the sortorder field to the default create logic.
+     *
+     * @return persistent
+     */
+    public function create() {
+        $this->sortorder = $this->count_records(array('templateid' => $this->get_templateid()));
+        return parent::create();
     }
 }
