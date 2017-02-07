@@ -60,7 +60,7 @@ class template extends persistent {
      * @return string
      */
     public function get_table_name() {
-        return 'tool_lp_plan_template';
+        return 'tool_lp_template';
     }
 
     /**
@@ -171,7 +171,6 @@ class template extends persistent {
         $this->duedate = $duedate;
     }
 
-
     /**
      * Get the visible flag.
      *
@@ -269,6 +268,5 @@ class template extends persistent {
         $this->sortorder = $this->count_records();
         return parent::create();
     }
-
 
 }

@@ -39,8 +39,24 @@ use tool_lp\api;
  */
 class template_competencies_page implements renderable, templatable {
 
+    /** @var int $templateid Template id for this page. */
+    protected $templateid = null;
+
+    /** @var \tool_lp\competency[] $competencies List of competencies. */
+    protected $competencies = array();
+
+    /** @var bool $canmanagecompetencyframeworks Can the current user manage competency frameworks. */
+    protected $canmanagecompetencyframeworks = false;
+
+    /** @var bool $canmanagecoursecompetencies Can the current user manage course competency frameworks.. */
+    protected $canmanagecoursecompetencies = false;
+
+    /** @var string $manageurl manage url. */
+    protected $manageurl = null;
+
     /**
      * Construct this renderable.
+     *
      * @param int $templateid The learning plan template id for this page.
      */
     public function __construct($templateid) {
@@ -49,7 +65,7 @@ class template_competencies_page implements renderable, templatable {
         $this->templateid = $templateid;
         $this->competencies = api::list_competencies_in_template($templateid);
         $this->canmanagecompetencyframeworks = has_capability('tool/lp:competencymanage', $context);
-        $this->canmanagetemplatecompetencies = has_capability('tool/lp:templatecompetencymanage', $context);
+        $this->canmanagetemplatecompetencies = has_capability('tool/lp:templatemanage', $context);
         $this->manageurl = new moodle_url('/admin/tool/lp/competencyframeworks.php');
     }
 
