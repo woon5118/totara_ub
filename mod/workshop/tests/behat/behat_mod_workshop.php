@@ -48,8 +48,8 @@ class behat_mod_workshop extends behat_base {
      */
     public function i_change_phase_in_workshop_to($workshopname, $phase) {
         $workshopname = $this->escape($workshopname);
-        $phaseliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($phase);
-        $switchphase = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('switchphase', 'workshop'));
+        $phaseliteral = behat_context_helper::escape($phase);
+        $switchphase = behat_context_helper::escape(get_string('switchphase', 'workshop'));
 
         $xpath = "//*[@class='userplan']/descendant::div[./span[contains(.,$phaseliteral)]]/".
                 "descendant-or-self::a[./span[text()=$switchphase]]";
@@ -109,7 +109,7 @@ class behat_mod_workshop extends behat_base {
      */
     public function i_assess_submission_in_workshop_as($submission, $workshopname, TableNode $table) {
         $workshopname = $this->escape($workshopname);
-        $submissionliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($submission);
+        $submissionliteral = behat_context_helper::escape($submission);
         $xpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' assessment-summary ') ".
                 "and contains(.,$submissionliteral)]";
         $assess = $this->escape(get_string('assess', 'workshop'));
@@ -131,9 +131,9 @@ class behat_mod_workshop extends behat_base {
      * @param string $reviewer
      */
     public function i_should_see_grade_for_workshop_participant_set_by_peer($grade, $participant, $reviewer) {
-        $participantliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($participant);
-        $reviewerliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($reviewer);
-        $gradeliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($grade);
+        $participantliteral = behat_context_helper::escape($participant);
+        $reviewerliteral = behat_context_helper::escape($reviewer);
+        $gradeliteral = behat_context_helper::escape($grade);
         $participantselector = "contains(concat(' ', normalize-space(@class), ' '), ' participant ') ".
                 "and contains(.,$participantliteral)";
         $trxpath = "//table/tbody/tr[td[$participantselector]]";

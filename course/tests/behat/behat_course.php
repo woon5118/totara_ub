@@ -169,7 +169,7 @@ class behat_course extends behat_base {
             $sectionxpath = "//li[@id='section-" . $section . "']";
         }
 
-        $activityliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral(ucfirst($activity));
+        $activityliteral = behat_context_helper::escape(ucfirst($activity));
 
         if ($this->running_javascript()) {
 
@@ -848,7 +848,7 @@ class behat_course extends behat_base {
         $steps = array();
 
         $activity = $this->escape($activityname);
-        $activityliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($activityname);
+        $activityliteral = behat_context_helper::escape($activityname);
 
         $steps[] = new Given('I duplicate "' . $activity . '" activity');
 
@@ -975,7 +975,7 @@ class behat_course extends behat_base {
         $courseformat = $this->get_course_format();
 
         // Checking the show button alt text and show icon.
-        $showtext = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('showfromothers', $courseformat));
+        $showtext = behat_context_helper::escape(get_string('showfromothers', $courseformat));
         $linkxpath = $xpath . "/descendant::a[@title=$showtext]";
         $imgxpath = $linkxpath . "/descendant::*[contains(@data-flex-icon, 'show')]";
 
@@ -1002,7 +1002,7 @@ class behat_course extends behat_base {
         $courseformat = $this->get_course_format();
 
         // Checking the hide button alt text and hide icon.
-        $hidetext = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('hidefromothers', $courseformat));
+        $hidetext = behat_context_helper::escape(get_string('hidefromothers', $courseformat));
         $linkxpath = $xpath . "/descendant::a[@title=$hidetext]";
         $imgxpath = $linkxpath . "/descendant::*[contains(@data-flex-icon, 'hide')]";
 
@@ -1069,7 +1069,7 @@ class behat_course extends behat_base {
      */
     protected function get_activity_node($activityname) {
 
-        $activityname = $this->getSession()->getSelectorsHandler()->xpathLiteral($activityname);
+        $activityname = behat_context_helper::escape($activityname);
         $xpath = "//li[contains(concat(' ', normalize-space(@class), ' '), ' activity ')][contains(., $activityname)]";
 
         return $this->find('xpath', $xpath);
@@ -1640,7 +1640,7 @@ class behat_course extends behat_base {
         }
 
         $exception = new ExpectationException('"' . $categoryname . '" category can not be found', $this->getSession());
-        $categoryliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($categoryname);
+        $categoryliteral = behat_context_helper::escape($categoryname);
         $xpath = "//div[@class='info']/descendant::*[" . implode(' or ', $headingtags) . "][@class='categoryname'][./descendant::a[.=$categoryliteral]]";
         $node = $this->find('xpath', $xpath, $exception);
         $node->click();

@@ -51,7 +51,7 @@ class behat_completion extends behat_base {
     public function user_has_completed_activity($userfullname, $activityname) {
 
         // Will throw an exception if the element can not be hovered.
-        $titleliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($userfullname . ", " . $activityname . ": Completed");
+        $titleliteral = behat_context_helper::escape($userfullname . ", " . $activityname . ": Completed");
         $xpath = "//table[@id='completion-progress']" .
             "/descendant::span[contains(., $titleliteral)]";
 
@@ -71,7 +71,7 @@ class behat_completion extends behat_base {
     public function user_has_not_completed_activity($userfullname, $activityname) {
 
         // Will throw an exception if the element can not be hovered.
-        $titleliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($userfullname . ", " . $activityname . ": Not completed");
+        $titleliteral = behat_context_helper::escape($userfullname . ", " . $activityname . ": Not completed");
         $xpath = "//table[@id='completion-progress']" .
             "/descendant::span[contains(., $titleliteral)]";
         return array(

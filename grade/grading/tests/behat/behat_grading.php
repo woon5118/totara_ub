@@ -65,8 +65,8 @@ class behat_grading extends behat_base {
     public function i_go_to_advanced_grading_definition_page($activityname) {
 
         // Transforming to literals, probably not necessary, just in case.
-        $newactionliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string("manageactionnew", "grading"));
-        $editactionliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string("manageactionedit", "grading"));
+        $newactionliteral = behat_context_helper::escape(get_string("manageactionnew", "grading"));
+        $editactionliteral = behat_context_helper::escape(get_string("manageactionedit", "grading"));
 
         // Working both when adding and editing.
         $definitionxpath = "//a[@class='action']" .
@@ -92,7 +92,7 @@ class behat_grading extends behat_base {
         $gradeuserstep = new Given('I follow "' . $this->escape($usergradetext) . '"');
 
         // Shortcut in case we already are in the grading page.
-        $usergradetextliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($usergradetext);
+        $usergradetextliteral = behat_context_helper::escape($usergradetext);
         if ($this->getSession()->getPage()->find('named_partial', array('link', $usergradetextliteral))) {
             return $gradeuserstep;
         }
@@ -130,14 +130,14 @@ class behat_grading extends behat_base {
      */
     public function i_set_activity_to_use_grading_form($activityname, $templatename) {
 
-        $templateliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($templatename);
+        $templateliteral = behat_context_helper::escape($templatename);
 
         $templatexpath = "//h2[@class='template-name'][contains(., $templateliteral)]/" .
             "following-sibling::div[contains(concat(' ', normalize-space(@class), ' '), ' template-actions ')]";
 
         // Should work with both templates and own forms.
-        $literaltemplate = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('templatepick', 'grading'));
-        $literalownform = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('templatepickownform', 'grading'));
+        $literaltemplate = behat_context_helper::escape(get_string('templatepick', 'grading'));
+        $literalownform = behat_context_helper::escape(get_string('templatepickownform', 'grading'));
         $usetemplatexpath = "/a[./descendant::div[text()=$literaltemplate]]|" .
             "/a[./descendant::div[text()=$literalownform]]";
 

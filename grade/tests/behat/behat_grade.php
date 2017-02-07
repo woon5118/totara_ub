@@ -77,23 +77,22 @@ class behat_grade extends behat_base {
      */
     public function i_set_the_following_settings_for_grade_item($gradeitem, TableNode $data) {
 
-        $steps = array();
-        $gradeitem = $this->getSession()->getSelectorsHandler()->xpathLiteral($gradeitem);
+        $gradeitem = behat_context_helper::escape($gradeitem);
 
         if ($this->running_javascript()) {
             $xpath = "//tr[contains(.,$gradeitem)]//*[contains(@class,'moodle-actionmenu')]//a[contains(@class,'toggle-display')]";
             if ($this->getSession()->getPage()->findAll('xpath', $xpath)) {
-                $steps[] = new Given('I click on "' . $this->escape($xpath) . '" "xpath_element"');
+                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"));
             }
         }
 
         $savechanges = get_string('savechanges', 'grades');
-        $edit = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('edit') . '  ');
-        $linkxpath = "//a[./*[contains(@class, 'sr-only') and starts-with(text(),$edit) and contains(text(),$gradeitem)]]";
-        $steps[] = new Given('I click on "' . $this->escape($linkxpath) . '" "xpath_element"');
-        $steps[] = new Given('I set the following fields to these values:', $data);
-        $steps[] = new Given('I press "' . $this->escape($savechanges) . '"');
-        return $steps;
+        $edit = behat_context_helper::escape(get_string('edit') . '  ');
+        $linkxpath = "//a[./img[starts-with(@title,$edit) and contains(@title,$gradeitem)]]";
+
+        $this->execute("behat_general::i_click_on", array($this->escape($linkxpath), "xpath_element"));
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
+        $this->execute('behat_forms::press_button', $this->escape($savechanges));
     }
 
     /**
@@ -108,26 +107,20 @@ class behat_grade extends behat_base {
      */
     public function i_set_calculation_for_grade_item_with_idnumbers($calculation, $gradeitem, TableNode $data) {
 
-        $steps = array();
-        $gradeitem = $this->getSession()->getSelectorsHandler()->xpathLiteral($gradeitem);
+        $gradeitem = behat_context_helper::escape($gradeitem);
 
         if ($this->running_javascript()) {
             $xpath = "//tr[contains(.,$gradeitem)]//*[contains(@class,'moodle-actionmenu')]//a[contains(@class,'toggle-display')]";
             if ($this->getSession()->getPage()->findAll('xpath', $xpath)) {
-                $steps[] = new Given('I click on "' . $this->escape($xpath) . '" "xpath_element"');
+                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"));
             }
         }
 
         // Going to edit calculation.
         $savechanges = get_string('savechanges', 'grades');
-        $edit = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('editcalculation', 'grades'));
-        $linkxpath = "//a[./*[starts-with(text(),$edit) and contains(text(),$gradeitem)]]";
-        $steps[] = new Given('I click on "' . $this->escape($linkxpath) . '" "xpath_element"');
-
-        // After adding id numbers we should wait until the page is reloaded.
-        if ($this->running_javascript()) {
-            $steps[] = new Given('I wait until the page is ready');
-        }
+        $edit = behat_context_helper::escape(get_string('editcalculation', 'grades'));
+        $linkxpath = "//a[./img[starts-with(@title,$edit) and contains(@title,$gradeitem)]]";
+        $this->execute("behat_general::i_click_on", array($this->escape($linkxpath), "xpath_element"));
 
         // Mapping names to idnumbers.
         $datahash = $data->getRowsHash();
@@ -138,21 +131,13 @@ class behat_grade extends behat_base {
                 "parent::li[@class='item'][text()='" . $gradeitem . "']" .
                 " or " .
                 "parent::li[@class='categoryitem' or @class='courseitem']/parent::ul/parent::li[starts-with(text(),'" . $gradeitem . "')]" .
-            "]";
-            $steps[] = new Given('I set the field with xpath "' . $inputxpath . '" to "' . $idnumber . '"');
+                "]";
+            $this->execute('behat_forms::i_set_the_field_with_xpath_to', array($inputxpath, $idnumber));
         }
 
-        $steps[] = new Given('I press "' . get_string('addidnumbers', 'grades') . '"');
-
-        // After adding id numbers we should wait until the page is reloaded.
-        if ($this->running_javascript()) {
-            $steps[] = new Given('I wait until the page is ready');
-        }
-
-        $steps[] = new Given('I set the field "' . get_string('calculation', 'grades') . '" to "' . $calculation . '"');
-        $steps[] = new Given('I press "' . $savechanges . '"');
-
-        return $steps;
+        $this->execute('behat_forms::press_button', get_string('addidnumbers', 'grades'));
+        $this->execute('behat_forms::i_set_the_field_to', array(get_string('calculation', 'grades'), $calculation));
+        $this->execute('behat_forms::press_button', $savechanges);
     }
 
     /**
@@ -167,26 +152,22 @@ class behat_grade extends behat_base {
      */
     public function i_set_calculation_for_grade_category_with_idnumbers($calculation, $gradeitem, TableNode $data) {
 
-        $steps = array();
-        $gradecategorytotal = $this->getSession()->getSelectorsHandler()->xpathLiteral($gradeitem . ' total');
-        $gradeitem = $this->getSession()->getSelectorsHandler()->xpathLiteral($gradeitem);
+        $gradecategorytotal = behat_context_helper::escape($gradeitem . ' total');
+        $gradeitem = behat_context_helper::escape($gradeitem);
 
         if ($this->running_javascript()) {
             $xpath = "//tr[contains(.,$gradecategorytotal)]//*[contains(@class,'moodle-actionmenu')]" .
                 "//a[contains(@class,'toggle-display')]";
             if ($this->getSession()->getPage()->findAll('xpath', $xpath)) {
-                $steps[] = new Given('I click on "' . $this->escape($xpath) . '" "xpath_element"');
+                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"));
             }
         }
 
         // Going to edit calculation.
         $savechanges = get_string('savechanges', 'grades');
-        $edit = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('editcalculation', 'grades'));
-        $linkxpath = "//a[./*[starts-with(text(),$edit) and contains(text(),$gradeitem)]]";
-        $steps[] = new Given('I click on "' . $this->escape($linkxpath) . '" "xpath_element"');
-
-        // After adding id numbers we should wait until the page is reloaded.
-        $steps[] = new Given('I wait until the page is ready');
+        $edit = behat_context_helper::escape(get_string('editcalculation', 'grades'));
+        $linkxpath = "//a[./img[starts-with(@title,$edit) and contains(@title,$gradeitem)]]";
+        $this->execute("behat_general::i_click_on", array($this->escape($linkxpath), "xpath_element"));
 
         // Mapping names to idnumbers.
         $datahash = $data->getRowsHash();
@@ -198,19 +179,14 @@ class behat_grade extends behat_base {
                 " | " .
                 "parent::li[@class='categoryitem' | @class='courseitem']" .
                 "/parent::ul/parent::li[starts-with(text(),'" . $gradeitem . "')]" .
-            "]";
-            $steps[] = new Given('I set the field with xpath "' . $inputxpath . '" to "' . $idnumber . '"');
+                "]";
+            $this->execute('behat_forms::i_set_the_field_with_xpath_to', array($inputxpath, $idnumber));
         }
 
-        $steps[] = new Given('I press "' . get_string('addidnumbers', 'grades') . '"');
+        $this->execute('behat_forms::press_button', get_string('addidnumbers', 'grades'));
 
-        // After adding id numbers we should wait until the page is reloaded.
-        $steps[] = new Given('I wait until the page is ready');
-
-        $steps[] = new Given('I set the field "' . get_string('calculation', 'grades') . '" to "' . $calculation . '"');
-        $steps[] = new Given('I press "' . $savechanges . '"');
-
-        return $steps;
+        $this->execute('behat_forms::i_set_the_field_to', array(get_string('calculation', 'grades'), $calculation));
+        $this->execute('behat_forms::press_button', $savechanges);
     }
 
     /**
@@ -227,16 +203,15 @@ class behat_grade extends behat_base {
         $steps = array();
 
         if ($this->running_javascript()) {
-            $gradeitemliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($gradeitem);
+            $gradeitemliteral = behat_context_helper::escape($gradeitem);
             $xpath = "//tr[contains(.,$gradeitemliteral)]//*[contains(@class,'moodle-actionmenu')]//a[contains(@class,'toggle-display')]";
             if ($this->getSession()->getPage()->findAll('xpath', $xpath)) {
-                $steps[] = new Given('I click on "' . $this->escape($xpath) . '" "xpath_element"');
+                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"));
             }
         }
 
         $linktext = get_string('resetweights', 'grades', (object)array('itemname' => $gradeitem));
-        $steps[] = new Given('I click on "' . $this->escape($linktext) . '" "link"');
-        return $steps;
+        $this->execute("behat_general::i_click_on", array($this->escape($linktext), "link"));
     }
 
     /**
