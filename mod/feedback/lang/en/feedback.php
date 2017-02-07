@@ -158,9 +158,8 @@ $string['mapcourse'] = 'Map feedback to courses';
 $string['mapcourse_help'] = 'By default, feedback forms created on your homepage are available site-wide
 and will appear in all courses using the feedback block. You can force the feedback form to appear by making it a sticky block or limit the courses in which a feedback form will appear by mapping it to specific courses.';
 $string['mapcourses'] = 'Map feedback to courses';
-$string['mapcourses_help'] = 'Once you have selected the relevant course(s) from your search,
-you can associate them with this feedback using map course(s). Multiple courses may be selected by holding down the Apple or Ctrl key whilst clicking on the course names. A course may be disassociated from a feedback at any time.';
 $string['mappedcourses'] = 'Mapped courses';
+$string['mappingchanged'] = 'Course mapping has been changed';
 $string['max_args_exceeded'] = 'Max 6 arguments can be handled, too many arguments for';
 $string['minimal'] = 'minimum';
 $string['maximal'] = 'maximum';
@@ -321,3 +320,7 @@ $string['lastnamefilter'] = 'Last name contains';
 $string['maxdayshigherwarning'] = 'The global setting, \'Maximum days since completion\', is currently set to {$a} days. Any messages with a \'Period\' value greater than or equal to this will not be sent.';
 $string['setting_maxtimesincecomp_name'] = 'Maximum days since completion';
 $string['setting_maxtimesincecomp_desc'] = 'Course or activity completions older than this will not be considered when sending out feedback reminders. Zero or an empty value represents no limit.';
+
+// Deprecated since Moodle 3.1.
+$string['mapcourses_help'] = 'Once you have selected the relevant course(s) from your search,
+you can associate them with this feedback using map course(s). Multiple courses may be selected by holding down the Apple or Ctrl key whilst clicking on the course names. A course may be disassociated from a feedback at any time.';
