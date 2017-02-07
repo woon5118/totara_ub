@@ -38,6 +38,9 @@ env:
     # Run a check for unbuilt files with Grunt.
     - DB=none     TASK=GRUNT
 
+    # Perform an upgrade test too.
+    - DB=pgsql    PHPUNIT=false   INSTALL=true   CITEST=false   UPGRADE=true
+
 matrix:
     # Enable fast finish.
     # This will fail the build if a single job fails (except those in allow_failures).
@@ -58,6 +61,10 @@ matrix:
 
         - env: DB=none     TASK=GRUNT
           php: 5.4
+
+        # Moodle 2.7 is not compatible with PHP 7 for the upgrade test.
+        - env: DB=pgsql    PHPUNIT=false   INSTALL=true   CITEST=false   UPGRADE=true
+          php: 7.0
 
 cache:
     directories:
@@ -181,24 +188,38 @@ before_script:
         bash local/ci/php_lint/php_lint.sh;
       fi
 
-script:
+    ########################################################################
+    # Upgrade test
+    ########################################################################
     - >
-      if [ "$TASK" = 'PHPUNIT' ];
+      if [ "$UPGRADE" = 'true' ];
       then
-        vendor/bin/phpunit;
-      fi
+        # We need the official upstream.
+        git remote add upstream https://github.com/moodle/moodle.git;
 
-    - >
-      if [ "$TASK" = 'CITEST' ];
-      then
-        bash local/ci/php_lint/php_lint.sh;
-      fi
+        # Checkout 27 STABLE branch.
+        git fetch upstream MOODLE_27_STABLE;
+        git checkout MOODLE_27_STABLE;
 
-    - >
-      if [ "$TASK" = 'GRUNT' ];
-      then
-        # Add all files to the git index and then run diff --cached to see all changes.
-        # This ensures that we get the status of all files, including new files.
-        git add . ;
-        git diff --cached --exit-code ;
+        # Perform the upgrade
+        php admin/cli/install_database.php --agree-license --adminpass=Password --adminemail=admin@example.com --fullname="Upgrade test" --shortname=Upgrade;
+
+        # Return to the previous commit
+        git checkout -;
+
+        # Perform the upgrade
+        php admin/cli/upgrade.php --non-interactive --allow-unstable ;
+
+        # The local_ci repository can be used to check upgrade savepoints.
+        git clone https://github.com/moodlehq/moodle-local_ci.git local/ci ;
+
+        cp local/ci/check_upgrade_savepoints/check_upgrade_savepoints.php ./check_upgrade_savepoints.php
+        result=`php check_upgrade_savepoints.php`;
+        # Check if there are problems
+        count=`echo "$result" | grep -P "ERROR|WARN" | wc -l` ;
+        if (($count > 0));
+        then
+          echo "$result"
+          exit 1 ;
+        fi
       fi
