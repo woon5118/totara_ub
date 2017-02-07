@@ -648,8 +648,8 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
     }
 
     // Setup the top row of tabs
-    $inactive = NULL;
-    $activetwo = NULL;
+    $inactive = null;
+    $activetwo = null;
     $toprow = array();
     $cohortcontext = context::instance_by_id($cohort->contextid, MUST_EXIST);
     $systemcontext = context_system::instance();
@@ -663,30 +663,30 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
 
     if ($canview) {
         $toprow[] = new tabobject('view', new moodle_url('/cohort/view.php', array('id' => $cohortid)),
-                    get_string('overview','totara_cohort'));
+            get_string('overview', 'totara_cohort'));
     }
 
     if ($canmanage) {
         $toprow[] = new tabobject('edit', new moodle_url('/cohort/edit.php', array('id' => $cohortid)),
-                    get_string('editdetails','totara_cohort'));
+            get_string('editdetails', 'totara_cohort'));
     }
 
     if ($canmanagerules && $cohorttype == cohort::TYPE_DYNAMIC) {
         $toprow[] = new tabobject(
             'editrules',
             new moodle_url('/totara/cohort/rules.php', array('id' => $cohortid)),
-            get_string('editrules','totara_cohort')
+            get_string('editrules', 'totara_cohort')
         );
     }
 
     if ($canview) {
         $toprow[] = new tabobject('viewmembers', new moodle_url('/cohort/members.php', array('id' => $cohortid)),
-            get_string('viewmembers','totara_cohort'));
+            get_string('viewmembers', 'totara_cohort'));
     }
 
     if ($canassign && $cohorttype == cohort::TYPE_STATIC) {
         $toprow[] = new tabobject('editmembers', new moodle_url('/cohort/assign.php', array('id' => $cohortid)),
-            get_string('editmembers','totara_cohort'));
+            get_string('editmembers', 'totara_cohort'));
     }
 
     if ($canview) {
@@ -716,4 +716,20 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
 
     $tabs = array($toprow);
     return print_tabs($tabs, $currenttab, $inactive, $activetwo, true);
+}
+
+/**
+ * Implements callback inplace_editable() allowing to edit values in-place
+ *
+ * @param string $itemtype
+ * @param int $itemid
+ * @param mixed $newvalue
+ * @return \core\output\inplace_editable
+ */
+function core_cohort_inplace_editable($itemtype, $itemid, $newvalue) {
+    if ($itemtype === 'cohortname') {
+        return \core_cohort\output\cohortname::update($itemid, $newvalue);
+    } else if ($itemtype === 'cohortidnumber') {
+        return \core_cohort\output\cohortidnumber::update($itemid, $newvalue);
+    }
 }
