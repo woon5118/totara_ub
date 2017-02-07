@@ -7,4 +7,5 @@ information provided here is intended especially for developers.
   and the folder structure is kept intact.
 * The feedback plugins now need to implement the is_feedback_modified() method. The default is to return true
   for backwards compatibility.
-
+* External function mod_assign_external::get_assignments now have a new optional parameter: includenotenrolledcourses.
+  Its default value is false, setting it to true will return assignments for courses a user can see even if it's not enroled.
