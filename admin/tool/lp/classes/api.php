@@ -416,7 +416,7 @@ class api {
         global $DB;
 
         // Get all the relevant contexts.
-        $contexts = self::get_framework_related_contexts($context, $includes,
+        $contexts = self::get_related_contexts($context, $includes,
             array('tool/lp:competencyread', 'tool/lp:competencymanage'));
 
         if (empty($contexts)) {
@@ -446,7 +446,7 @@ class api {
         global $DB;
 
         // Get all the relevant contexts.
-        $contexts = self::get_framework_related_contexts($context, $includes,
+        $contexts = self::get_related_contexts($context, $includes,
             array('tool/lp:competencyread', 'tool/lp:competencymanage'));
 
         if (empty($contexts)) {
@@ -460,7 +460,9 @@ class api {
     }
 
     /**
-     * Fetches all the contexts relevant to frameworks.
+     * Fetches all the relevant contexts.
+     *
+     * Note: This currently only supports system and category contexts.
      *
      * @param context $context The context to start from.
      * @param string $includes Defines what other contexts to find.
@@ -471,7 +473,7 @@ class api {
      * @param array $hasanycapability Array of capabilities passed to {@link has_any_capability()} in each context.
      * @return context[] An array of contexts where keys are context IDs.
      */
-    public static function get_framework_related_contexts($context, $includes, array $hasanycapability = null) {
+    public static function get_related_contexts($context, $includes, array $hasanycapability = null) {
         global $DB;
 
         if (!in_array($includes, array('children', 'parents', 'self'))) {
@@ -745,17 +747,18 @@ class api {
     /**
      * Create a learning plan template from a record containing all the data for the class.
      *
-     * Requires tool/lp:templatemanage capability at the system context.
+     * Requires tool/lp:templatemanage capability.
      *
      * @param stdClass $record Record containing all the data for an instance of the class.
      * @return template
      */
     public static function create_template(stdClass $record) {
+        $template = new template(0, $record);
+
         // First we do a permissions check.
-        require_capability('tool/lp:templatemanage', context_system::instance());
+        require_capability('tool/lp:templatemanage', $template->get_context());
 
         // OK - all set.
-        $template = new template(0, $record);
         $id = $template->create();
         return $template;
     }
@@ -763,35 +766,39 @@ class api {
     /**
      * Delete a learning plan template by id.
      *
-     * Requires tool/lp:templatemanage capability at the system context.
+     * Requires tool/lp:templatemanage capability.
      *
      * @param int $id The record to delete.
      * @return boolean
      */
     public static function delete_template($id) {
+        $template = new template($id);
+
         // First we do a permissions check.
-        require_capability('tool/lp:templatemanage', context_system::instance());
+        require_capability('tool/lp:templatemanage', $template->get_context());
 
         // OK - all set.
-        $template = new template();
-        $template->set_id($id);
         return $template->delete();
     }
 
     /**
      * Update the details for a learning plan template.
      *
-     * Requires tool/lp:templatemanage capability at the system context.
+     * Requires tool/lp:templatemanage capability.
      *
      * @param stdClass $record The new details for the template. Note - must contain an id that points to the template to update.
      * @return boolean
      */
     public static function update_template($record) {
-        // First we do a permissions check.
-        require_capability('tool/lp:templatemanage', context_system::instance());
+        $template = new template($record->id);
 
-        // OK - all set.
-        $template = new template(0, $record);
+        // First we do a permissions check.
+        require_capability('tool/lp:templatemanage', $template->get_context());
+        if (isset($record->contextid) && $record->contextid != $template->get_contextid()) {
+            throw new coding_exception('Changing the context of an existing tempalte is forbidden.');
+        }
+
+        $template->from_record($record);
         return $template->update();
     }
 
@@ -804,52 +811,17 @@ class api {
      * @return template
      */
     public static function read_template($id) {
+        $template = new template($id);
+        $context = $template->get_context();
+
         // First we do a permissions check.
-        $context = context_system::instance();
         $caps = array('tool/lp:templateread', 'tool/lp:templatemanage');
         if (!has_any_capability($caps, $context)) {
              throw new required_capability_exception($context, 'tool/lp:templateread', 'nopermissions', '');
         }
 
         // OK - all set.
-        return new template($id);
-    }
-
-    /**
-     * Move the learning plan template up or down in the display list.
-     *
-     * Requires tool/lp:templatemanage capability at the system context.
-     *
-     * @param int $templateidfrom The template we are moving.
-     * @param int $templateidto Where we are moving to. If moving down, it will go after this template,
-     *                           If moving up, it will go before this template.
-     * @return boolean
-     */
-    public static function reorder_template($templateidfrom, $templateidto) {
-        require_capability('tool/lp:templatemanage', context_system::instance());
-        $down = true;
-        $templatefrom = new template($templateidfrom);
-        $templateto = new template($templateidto);
-
-        $all = self::list_templates(array(), 'sortorder', 'ASC', 0, 0);
-
-        if ($templatefrom->get_sortorder() > $templateto->get_sortorder()) {
-            // We are moving down, so put it after the "to" item.
-            $down = false;
-        }
-
-        foreach ($all as $id => $template) {
-            $sort = $template->get_sortorder();
-            if ($down && $sort > $templatefrom->get_sortorder() && $sort <= $templateto->get_sortorder()) {
-                $template->set_sortorder($template->get_sortorder() - 1);
-                $template->update();
-            } else if (!$down && $sort >= $templateto->get_sortorder() && $sort < $templatefrom->get_sortorder()) {
-                $template->set_sortorder($template->get_sortorder() + 1);
-                $template->update();
-            }
-        }
-        $templatefrom->set_sortorder($templateto->get_sortorder());
-        return $templatefrom->update();
+        return $template;
     }
 
     /**
@@ -857,24 +829,40 @@ class api {
      *
      * Requires tool/lp:templateread capability at the system context.
      *
-     * @param array $filters A list of filters to apply to the list.
      * @param string $sort The column to sort on
      * @param string $order ('ASC' or 'DESC')
      * @param int $skip Number of records to skip (pagination)
      * @param int $limit Max of records to return (pagination)
+     * @param context $context The parent context of the frameworks.
+     * @param string $includes Defines what other contexts to fetch frameworks from.
+     *                         Accepted values are:
+     *                          - children: All descendants
+     *                          - parents: All parents, grand parents, etc...
+     *                          - self: Context passed only.
      * @return array of competency_framework
      */
-    public static function list_templates($filters = array(), $sort = '', $order = 'ASC', $skip = 0, $limit = 0) {
+    public static function list_templates($sort, $order, $skip, $limit, $context, $includes = 'children') {
+        global $DB;
+
+        // Get all the relevant contexts.
+        $contexts = self::get_related_contexts($context, $includes,
+            array('tool/lp:templateread', 'tool/lp:templatemanage'));
+
         // First we do a permissions check.
-        $context = context_system::instance();
-        $caps = array('tool/lp:templateread', 'tool/lp:templatemanage');
-        if (!has_any_capability($caps, $context)) {
+        if (empty($contexts)) {
              throw new required_capability_exception($context, 'tool/lp:templateread', 'nopermissions', '');
+        }
+
+        // Make the order by.
+        $orderby = '';
+        if (!empty($sort)) {
+            $orderby = $sort . ' ' . $order;
         }
 
         // OK - all set.
         $template = new template();
-        return $template->get_records($filters, $sort, $order, $skip, $limit);
+        list($insql, $inparams) = $DB->get_in_or_equal(array_keys($contexts), SQL_PARAMS_NAMED);
+        return $template->get_records_select("contextid $insql", $inparams, $orderby, '*', $skip, $limit);
     }
 
     /**
@@ -882,20 +870,29 @@ class api {
      *
      * Requires tool/lp:templateread capability at the system context.
      *
-     * @param array $filters A list of filters to apply to the list.
+     * @param context $context The parent context of the frameworks.
+     * @param string $includes Defines what other contexts to fetch frameworks from.
+     *                         Accepted values are:
+     *                          - children: All descendants
+     *                          - parents: All parents, grand parents, etc...
+     *                          - self: Context passed only.
      * @return int
      */
-    public static function count_templates($filters) {
+    public static function count_templates($context, $includes) {
+        global $DB;
+
         // First we do a permissions check.
-        $context = context_system::instance();
-        $caps = array('tool/lp:templateread', 'tool/lp:templatemanage');
-        if (!has_any_capability($caps, $context)) {
+        $contexts = self::get_related_contexts($context, $includes,
+            array('tool/lp:templateread', 'tool/lp:templatemanage'));
+
+        if (empty($contexts)) {
              throw new required_capability_exception($context, 'tool/lp:templateread', 'nopermissions', '');
         }
 
         // OK - all set.
         $template = new template();
-        return $template->count_records($filters);
+        list($insql, $inparams) = $DB->get_in_or_equal(array_keys($contexts), SQL_PARAMS_NAMED);
+        return $template->count_records_select("contextid $insql", $inparams);
     }
 
     /**
@@ -957,7 +954,8 @@ class api {
      */
     public static function count_competencies_in_template($templateid) {
         // First we do a permissions check.
-        $context = context_system::instance();
+        $template = new template($templateid);
+        $context = $template->get_context();
         $onlyvisible = 1;
 
         $capabilities = array('tool/lp:templateread', 'tool/lp:templatemanage');
@@ -982,7 +980,8 @@ class api {
      */
     public static function list_competencies_in_template($templateid) {
         // First we do a permissions check.
-        $context = context_system::instance();
+        $template = new template($templateid);
+        $context = $template->get_context();
         $onlyvisible = 1;
 
         $capabilities = array('tool/lp:templateread', 'tool/lp:templatemanage');
@@ -1008,9 +1007,8 @@ class api {
      */
     public static function add_competency_to_template($templateid, $competencyid) {
         // First we do a permissions check.
-        $context = context_system::instance();
-
-        require_capability('tool/lp:templatemanage', $context);
+        $template = new template($templateid);
+        require_capability('tool/lp:templatemanage', $template->get_context());
 
         $record = new stdClass();
         $record->templateid = $templateid;
@@ -1042,15 +1040,14 @@ class api {
      */
     public static function remove_competency_from_template($templateid, $competencyid) {
         // First we do a permissions check.
-        $context = context_system::instance();
-
-        require_capability('tool/lp:templatemanage', $context);
+        $template = new template($templateid);
+        require_capability('tool/lp:templatemanage', $template->get_context());
 
         $record = new stdClass();
         $record->templateid = $templateid;
         $record->competencyid = $competencyid;
 
-        $competency = new competency();
+        $competency = new competency($competencyid);
         $competency->set_id($competencyid);
         if (!$competency->read()) {
              throw new coding_exception('The competency does not exist');

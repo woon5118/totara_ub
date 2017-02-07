@@ -70,7 +70,7 @@ function xmldb_tool_lp_upgrade($oldversion) {
         // Define field contextid to be added to tool_lp_competency_framework.
         $table = new xmldb_table('tool_lp_competency_framework');
         $field = new xmldb_field('contextid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null,
-            context_system::instance()->id, 'id');
+            context_system::instance()->id, 'shortname');
 
         // Conditionally launch add field contextid.
         if (!$dbman->field_exists($table, $field)) {
@@ -96,6 +96,36 @@ function xmldb_tool_lp_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015052406, 'tool', 'lp');
     }
 
+    if ($oldversion < 2015052407) {
+
+        // Define field contextid to be added to tool_lp_template.
+        $table = new xmldb_table('tool_lp_template');
+        $field = new xmldb_field('contextid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null,
+            context_system::instance()->id, 'shortname');
+
+        // Conditionally launch add field contextid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Lp savepoint reached.
+        upgrade_plugin_savepoint(true, 2015052407, 'tool', 'lp');
+    }
+
+    if ($oldversion < 2015052408) {
+
+        // Define field sortorder to be dropped from tool_lp_template.
+        $table = new xmldb_table('tool_lp_template');
+        $field = new xmldb_field('sortorder');
+
+        // Conditionally launch drop field sortorder.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Lp savepoint reached.
+        upgrade_plugin_savepoint(true, 2015052408, 'tool', 'lp');
+    }
 
     return true;
 }

@@ -19,7 +19,6 @@
 
     Classes required for JS:
     * drag-parentnode
-    * drag-handlecontainer
     * drag-samenode
     * templateactions
 
@@ -29,8 +28,7 @@
     * data-action = deletetemplate
 
     Context variables required for this template:
-    * templates - array of objects containing id, shortname, idnumber, sortorder, visible
-    * canmanage - true if this user has permission to manage the templates
+    * templates - array of objects containing id, shortname, idnumber, visible, canmanage, contextname
     * navigation - array of strings containing buttons for navigation
 }}
 <div data-region="managetemplates">
@@ -39,13 +37,15 @@
     <thead>
         <tr>
             <th scope="col">{{#str}}templatename, tool_lp{{/str}}</th>
+            <th scope="col">{{#str}}context, core_role{{/str}}</th>
             <th scope="col">{{#str}}actions, tool_lp{{/str}}</th>
         </tr>
     </thead>
     <tbody class="drag-parentnode">
         {{#templates}}
         <tr class="drag-samenode" data-templateid="{{id}}">
-            <td><span class="drag-handlecontainer"></span><span><a href="{{pluginbaseurl}}/templatecompetencies.php?templateid={{id}}">{{shortname}} {{idnumber}}</a></span> {{^visible}}{{#str}}hiddenhint, tool_lp{{/str}}{{/visible}}</td>
+            <td><a href="{{pluginbaseurl}}/templatecompetencies.php?templateid={{id}}&amp;pagecontextid={{pagecontextid}}">{{shortname}} {{idnumber}}</a></span> {{^visible}}{{#str}}hiddenhint, tool_lp{{/str}}{{/visible}}</td>
+            <td>{{contextname}}</td>
             <td>
             {{#canmanage}}
             <ul class="templateactions">
@@ -53,7 +53,7 @@
                     <a href="#">{{#str}}edit{{/str}}</a><b class="caret"></b>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="{{pluginbaseurl}}/edittemplate.php?id={{id}}">
+                            <a href="{{pluginbaseurl}}/edittemplate.php?id={{id}}&amp;pagecontextid={{pagecontextid}}">
                                 {{#pix}}t/edit{{/pix}} {{#str}}edit{{/str}}
                             </a>
                         </li>
@@ -86,11 +86,10 @@
 {{#js}}
 // Initialise the JS.
 require(['tool_lp/templatedelete',
-         'tool_lp/menubar',
-         'tool_lp/templatemove'],
-        function(deleteMod, menubar, moveMod) {
+         'tool_lp/menubar'],
+        function(deleteMod, menubar) {
 
-    moveMod.init();
+    deleteMod.init({{pagecontextid}});
 
     menubar.enhance('.templateactions', {
         '[data-action="deletetemplate"]': deleteMod.deleteHandler

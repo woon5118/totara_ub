@@ -23,6 +23,7 @@
  */
 namespace tool_lp;
 
+use context;
 use stdClass;
 
 /**
@@ -36,14 +37,11 @@ class template extends persistent {
     /** @var string $shortname Short name for this template */
     private $shortname = '';
 
-    /** @var string $description Description for this framework */
+    /** @var string $description Description for this template */
     private $description = '';
 
     /** @var int $descriptionformat Format for the description */
     private $descriptionformat = 0;
-
-    /** @var int $sortorder A number used to influence sorting */
-    private $sortorder = 0;
 
     /** @var string $idnumber Unique idnumber for this template - must be unique if it is non-empty */
     private $idnumber = '';
@@ -54,6 +52,8 @@ class template extends persistent {
     /** @var bool $visible Used to show/hide this template */
     private $visible = true;
 
+    /** @var int $contextid The context ID in which the template is set. */
+    private $contextid = null;
     /**
      * Method that provides the table name matching this class.
      *
@@ -79,6 +79,24 @@ class template extends persistent {
      */
     public function set_shortname($shortname) {
         $this->shortname = $shortname;
+    }
+
+    /**
+     * Get the context.
+     *
+     * @return context The context
+     */
+    public function get_context() {
+        return context::instance_by_id($this->contextid);
+    }
+
+    /**
+     * Get the contextid.
+     *
+     * @return string The contextid
+     */
+    public function get_contextid() {
+        return $this->contextid;
     }
 
     /**
@@ -133,24 +151,6 @@ class template extends persistent {
      */
     public function set_description($description) {
         $this->description = $description;
-    }
-
-    /**
-     * Get the sort order index.
-     *
-     * @return string The sort order index
-     */
-    public function get_sortorder() {
-        return $this->sortorder;
-    }
-
-    /**
-     * Set the sort order index.
-     *
-     * @param string $sortorder The sort order index
-     */
-    public function set_sortorder($sortorder) {
-        $this->sortorder = $sortorder;
     }
 
     /**
@@ -211,9 +211,6 @@ class template extends persistent {
         if (isset($record->descriptionformat)) {
             $this->set_descriptionformat($record->descriptionformat);
         }
-        if (isset($record->sortorder)) {
-            $this->set_sortorder($record->sortorder);
-        }
         if (isset($record->visible)) {
             $this->set_visible($record->visible);
         }
@@ -228,6 +225,9 @@ class template extends persistent {
         }
         if (isset($record->usermodified)) {
             $this->set_usermodified($record->usermodified);
+        }
+        if (isset($record->contextid)) {
+            $this->contextid = $record->contextid;
         }
         return $this;
     }
@@ -250,23 +250,13 @@ class template extends persistent {
         $record->description = $this->get_description();
         $record->descriptionformat = $this->get_descriptionformat();
         $record->descriptionformatted = format_text($this->get_description(), $this->get_descriptionformat());
-        $record->sortorder = $this->get_sortorder();
         $record->visible = $this->get_visible();
         $record->timecreated = $this->get_timecreated();
         $record->timemodified = $this->get_timemodified();
         $record->usermodified = $this->get_usermodified();
+        $record->contextid = $this->get_contextid();
 
         return $record;
-    }
-
-    /**
-     * Add a default for the sortorder field to the default create logic.
-     *
-     * @return persistent
-     */
-    public function create() {
-        $this->sortorder = $this->count_records();
-        return parent::create();
     }
 
 }
