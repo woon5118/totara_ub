@@ -1109,7 +1109,6 @@ $string['markedthistopic'] = 'This topic is highlighted as the current topic';
 $string['markthistopic'] = 'Highlight this topic as the current topic';
 $string['matchingsearchandrole'] = 'Matching \'{$a->search}\' and {$a->role}';
 $string['maxareabytesreached'] = 'The file (or the total size of several files) is larger than the space remaining in this area.';
-$string['maxbytesforfile'] = 'The file {$a} is larger than the maximum size allowed.';
 $string['maxfilesize'] = 'Maximum size for new files: {$a}';
 $string['maxfilesreached'] = 'You are allowed to attach a maximum of {$a} file(s) to this item';
 $string['maximumchars'] = 'Maximum of {$a} characters';
@@ -2065,3 +2064,7 @@ $string['trainer'] = 'Trainer';
 $string['trainerdescription'] = 'Responsible for delivering training of learners, but may not alter activities.';
 $string['editingtrainer'] = 'Editing Trainer';
 $string['editingtrainerdescription'] = 'Responsible for delivering training of learners, and can alter activities';
+
+// Deprecated since Moodle 3.1.
+$string['filetoolarge'] = 'is too large to upload';
+$string['maxbytesforfile'] = 'The file {$a} is larger than the maximum size allowed.';
