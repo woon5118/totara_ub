@@ -92,7 +92,7 @@ class participant_details implements \renderable {
      *
      * @returns HTML as defined by the course_participants mustache template
      */
-    public static function output_from_user($user, $course, $extrafields, $bulkoperations) {
+    public static function output_from_user($user, $course, $extrafields, $bulkoperations, $selectall = false) {
         global $CFG, $USER, $OUTPUT;
 
         \context_helper::preload_from_record($user);
@@ -118,6 +118,7 @@ class participant_details implements \renderable {
         $userdata->id = $user->id;
         $userdata->image = $OUTPUT->user_picture($user, array('size' => 100, 'courseid' => $course->id));
         $userdata->name = fullname($user, has_capability('moodle/site:viewfullnames', $context));
+        $userdata->selectall = (bool)$selectall;
 
         // Get the hidden field list.
         if (has_capability('moodle/course:viewhiddenuserfields', $context)) {

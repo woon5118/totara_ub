@@ -42,6 +42,7 @@ $search       = optional_param('search', '', PARAM_RAW); // Make sure it is proc
 $roleid       = optional_param('roleid', 0, PARAM_INT); // Optional roleid, 0 means all enrolled users (or all on the frontpage).
 $contextid    = optional_param('contextid', 0, PARAM_INT); // One of this or.
 $courseid     = optional_param('id', 0, PARAM_INT); // This are required.
+$selectall    = optional_param('selectall', false, PARAM_BOOL); // When rendering checkboxes against users mark them all checked.
 
 $PAGE->set_url('/user/index.php', array(
         'page' => $page,
@@ -613,7 +614,7 @@ if ($mode === MODE_USERDETAILS) {    // Print simple listing.
                     continue;
                 }
                 $usersprinted[] = $user->id; // Add new user to the array of users printed.
-                $new .= html_writer::tag('li', \core_user\output\participant_details::output_from_user($user, $course, $extrafields, $bulkoperations, $hiddenfields));
+                $new .= html_writer::tag('li', \core_user\output\participant_details::output_from_user($user, $course, $extrafields, $bulkoperations, $hiddenfields, $selectall));
             }
             $outputinfo = new stdClass();
             $outputinfo->users = $users;
@@ -667,8 +668,13 @@ if ($mode === MODE_USERDETAILS) {    // Print simple listing.
 
             $data = array();
             if ($bulkoperations) {
+                if ($selectall) {
+                    $checked = 'checked="true"';
+                } else {
+                    $checked = '';
+                }
                 // TL-6296: added aria-label
-                $data[] = '<input type="checkbox" class="usercheckbox" name="user'.$user->id.'" aria-label="' . get_string('select', 'grades', fullname($user)) . '"/>';
+                $data[] = '<input type="checkbox" class="usercheckbox" name="user'.$user->id.'" ' . $checked .' aria-label="' . get_string('select', 'grades', fullname($user)) . '"/>';
             }
             $data[] = $OUTPUT->user_picture($user, array('size' => 35, 'courseid' => $course->id));
             $data[] = $profilelink;
@@ -698,7 +704,27 @@ if ($mode === MODE_USERDETAILS) {    // Print simple listing.
 
 if ($bulkoperations) {
     echo '<br /><div class="buttons">';
-    echo '<input type="button" id="checkall" value="'.get_string('selectall').'" /> ';
+
+    if ($matchcount > 0 && $perpage < $matchcount) {
+        $perpageurl = clone($baseurl);
+        $perpageurl->remove_params('perpage');
+        $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
+        $perpageurl->param('selectall', true);
+        $showalllink = $perpageurl;
+    } else {
+        $showalllink = false;
+    }
+
+    if ($perpage < $matchcount) {
+        // Select all users, refresh page showing all users and mark them all selected.
+        $label = get_string('selectalluserswithcount', 'moodle', $matchcount);
+        echo '<input type="button" id="checkall" value="' . $label . '" data-showallink="' . $showalllink . '" /> ';
+        // Select all users, mark all users on page as selected.
+        echo '<input type="button" id="checkallonpage" value="' . get_string('selectallusersonpage') . '" /> ';
+    } else {
+        echo '<input type="button" id="checkallonpage" value="' . get_string('selectall') . '" /> ';
+    }
+
     echo '<input type="button" id="checknone" value="'.get_string('deselectall').'" /> ';
     $displaylist = array();
     $displaylist['messageselect.php'] = get_string('messageselectadd');
