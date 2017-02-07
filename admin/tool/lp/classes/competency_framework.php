@@ -24,6 +24,7 @@
 namespace tool_lp;
 
 use stdClass;
+use context;
 
 /**
  * Class for loading/storing competency frameworks from the DB.
@@ -45,9 +46,6 @@ class competency_framework extends persistent {
     /** @var int $descriptionformat Format for the description */
     private $descriptionformat = 0;
 
-    /** @var int $sortorder A number used to influence sorting */
-    private $sortorder = 0;
-
     /** @var bool $visible Used to show/hide this framework */
     private $visible = true;
 
@@ -56,6 +54,9 @@ class competency_framework extends persistent {
 
     /** @var string $scaleconfiguration scale information relevant to this framework*/
     private $scaleconfiguration = '';
+
+    /** @var int $contextid The context ID in which the framework is set. */
+    private $contextid = null;
 
     /**
      * Method that provides the table name matching this class.
@@ -138,24 +139,6 @@ class competency_framework extends persistent {
     }
 
     /**
-     * Get the sort order index.
-     *
-     * @return string The sort order index
-     */
-    public function get_sortorder() {
-        return $this->sortorder;
-    }
-
-    /**
-     * Set the sort order index.
-     *
-     * @param string $sortorder The sort order index
-     */
-    public function set_sortorder($sortorder) {
-        $this->sortorder = $sortorder;
-    }
-
-    /**
      * Get the visible flag.
      *
      * @return string The visible flag
@@ -171,6 +154,24 @@ class competency_framework extends persistent {
      */
     public function set_visible($visible) {
         $this->visible = $visible;
+    }
+
+    /**
+     * Get the context.
+     *
+     * @return context The context
+     */
+    public function get_context() {
+        return context::instance_by_id($this->contextid);
+    }
+
+    /**
+     * Get the contextid.
+     *
+     * @return string The contextid
+     */
+    public function get_contextid() {
+        return $this->contextid;
     }
 
     /**
@@ -231,9 +232,6 @@ class competency_framework extends persistent {
         if (isset($record->descriptionformat)) {
             $this->set_descriptionformat($record->descriptionformat);
         }
-        if (isset($record->sortorder)) {
-            $this->set_sortorder($record->sortorder);
-        }
         if (isset($record->scaleid)) {
             $this->set_scaleid($record->scaleid);
         }
@@ -252,6 +250,9 @@ class competency_framework extends persistent {
         if (isset($record->usermodified)) {
             $this->set_usermodified($record->usermodified);
         }
+        if (isset($record->contextid)) {
+            $this->contextid = $record->contextid;
+        }
         return $this;
     }
 
@@ -268,25 +269,15 @@ class competency_framework extends persistent {
         $record->description = $this->get_description();
         $record->descriptionformat = $this->get_descriptionformat();
         $record->descriptionformatted = format_text($this->get_description(), $this->get_descriptionformat());
-        $record->sortorder = $this->get_sortorder();
         $record->scaleid = $this->get_scaleid();
         $record->scaleconfiguration = $this->get_scaleconfiguration();
         $record->visible = $this->get_visible();
         $record->timecreated = $this->get_timecreated();
         $record->timemodified = $this->get_timemodified();
         $record->usermodified = $this->get_usermodified();
+        $record->contextid = $this->get_contextid();
 
         return $record;
-    }
-
-    /**
-     * Add a default for the sortorder field to the default create logic.
-     *
-     * @return persistent
-     */
-    public function create() {
-        $this->sortorder = $this->count_records();
-        return parent::create();
     }
 
 }

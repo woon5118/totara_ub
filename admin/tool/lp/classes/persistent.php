@@ -264,9 +264,7 @@ abstract class persistent {
     public function get_records_select($select, $params = null, $sort = '', $fields = '*', $limitfrom = 0, $limitnum = 0) {
         global $DB;
 
-        if (!$records = $DB->get_records_select($this->get_table_name(), $select, $params, $sort, $fields, $limitfrom, $limitnum)) {
-            return false;
-        }
+        $records = $DB->get_records_select($this->get_table_name(), $select, $params, $sort, $fields, $limitfrom, $limitnum);
 
         // We return class instances.
         $instances = array();
@@ -281,13 +279,26 @@ abstract class persistent {
     /**
      * Count a list of records.
      *
-     * @param array $filters Filters to apply.
      * @return int
      */
-    public function count_records($filters = array()) {
+    public function count_records() {
         global $DB;
 
-        $count = $DB->count_records($this->get_table_name(), $filters);
+        $count = $DB->count_records($this->get_table_name());
+        return $count;
+    }
+
+    /**
+     * Count a list of records.
+     *
+     * @param string $select
+     * @param array $params
+     * @return int
+     */
+    public function count_records_select($select, $params = null) {
+        global $DB;
+
+        $count = $DB->count_records_select($this->get_table_name(), $select, $params);
         return $count;
     }
 }
