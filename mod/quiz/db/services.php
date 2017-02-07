@@ -164,4 +164,31 @@ $functions = array(
         'capabilities'  => 'mod/quiz:view',
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
     ),
+
+    'mod_quiz_get_quiz_access_information' => array(
+        'classname'     => 'mod_quiz_external',
+        'methodname'    => 'get_quiz_access_information',
+        'description'   => 'Return access information for a given quiz.',
+        'type'          => 'read',
+        'capabilities'  => 'mod/quiz:view',
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
+    ),
+
+    'mod_quiz_get_attempt_access_information' => array(
+        'classname'     => 'mod_quiz_external',
+        'methodname'    => 'get_attempt_access_information',
+        'description'   => 'Return access information for a given attempt in a quiz.',
+        'type'          => 'read',
+        'capabilities'  => 'mod/quiz:view',
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
+    ),
+
+    'mod_quiz_get_quiz_required_qtypes' => array(
+        'classname'     => 'mod_quiz_external',
+        'methodname'    => 'get_quiz_required_qtypes',
+        'description'   => 'Return the potential question types that would be required for a given quiz.',
+        'type'          => 'read',
+        'capabilities'  => 'mod/quiz:view',
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
+    ),
 );

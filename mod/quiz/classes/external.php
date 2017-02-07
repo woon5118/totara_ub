@@ -272,6 +272,27 @@ class mod_quiz_external extends external_api {
         );
     }
 
+
+    /**
+     * Utility function for validating a quiz.
+     *
+     * @param int $quizid quiz instance id
+     * @return array array containing the quiz, course, context and course module objects
+     * @since  Moodle 3.1
+     */
+    protected static function validate_quiz($quizid) {
+        global $DB;
+
+        // Request and permission validation.
+        $quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
+        list($course, $cm) = get_course_and_cm_from_instance($quiz, 'quiz');
+
+        $context = context_module::instance($cm->id);
+        self::validate_context($context);
+
+        return array($quiz, $course, $cm, $context);
+    }
+
     /**
      * Describes the parameters for view_quiz.
      *
@@ -300,12 +321,7 @@ class mod_quiz_external extends external_api {
         $params = self::validate_parameters(self::view_quiz_parameters(), array('quizid' => $quizid));
         $warnings = array();
 
-        // Request and permission validation.
-        $quiz = $DB->get_record('quiz', array('id' => $params['quizid']), '*', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($quiz, 'quiz');
-
-        $context = context_module::instance($cm->id);
-        self::validate_context($context);
+        list($quiz, $course, $cm, $context) = self::validate_quiz($params['quizid']);
 
         // Trigger course_module_viewed event and completion.
         quiz_view($quiz, $course, $cm, $context);
@@ -373,12 +389,7 @@ class mod_quiz_external extends external_api {
         );
         $params = self::validate_parameters(self::get_user_attempts_parameters(), $params);
 
-        // Request and permission validation.
-        $quiz = $DB->get_record('quiz', array('id' => $params['quizid']), '*', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($quiz, 'quiz');
-
-        $context = context_module::instance($cm->id);
-        self::validate_context($context);
+        list($quiz, $course, $cm, $context) = self::validate_quiz($params['quizid']);
 
         if (!in_array($params['status'], array('all', 'finished', 'unfinished'))) {
             throw new invalid_parameter_exception('Invalid status value');
@@ -488,12 +499,7 @@ class mod_quiz_external extends external_api {
         );
         $params = self::validate_parameters(self::get_user_best_grade_parameters(), $params);
 
-        // Request and permission validation.
-        $quiz = $DB->get_record('quiz', array('id' => $params['quizid']), '*', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($quiz, 'quiz');
-
-        $context = context_module::instance($cm->id);
-        self::validate_context($context);
+        list($quiz, $course, $cm, $context) = self::validate_quiz($params['quizid']);
 
         // Default value for userid.
         if (empty($params['userid'])) {
@@ -572,12 +578,7 @@ class mod_quiz_external extends external_api {
         );
         $params = self::validate_parameters(self::get_combined_review_options_parameters(), $params);
 
-        // Request and permission validation.
-        $quiz = $DB->get_record('quiz', array('id' => $params['quizid']), '*', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($quiz, 'quiz');
-
-        $context = context_module::instance($cm->id);
-        self::validate_context($context);
+        list($quiz, $course, $cm, $context) = self::validate_quiz($params['quizid']);
 
         // Default value for userid.
         if (empty($params['userid'])) {
@@ -691,12 +692,7 @@ class mod_quiz_external extends external_api {
         $params = self::validate_parameters(self::start_attempt_parameters(), $params);
         $forcenew = $params['forcenew'];
 
-        // Request and permission validation.
-        $quiz = $DB->get_record('quiz', array('id' => $params['quizid']), '*', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($quiz, 'quiz');
-
-        $context = context_module::instance($cm->id);
-        self::validate_context($context);
+        list($quiz, $course, $cm, $context) = self::validate_quiz($params['quizid']);
 
         $quizobj = quiz::create($cm->instance, $USER->id);
 
@@ -1589,12 +1585,7 @@ class mod_quiz_external extends external_api {
         $params = self::validate_parameters(self::get_quiz_feedback_for_grade_parameters(), $params);
         $warnings = array();
 
-        // Request and permission validation.
-        $quiz = $DB->get_record('quiz', array('id' => $params['quizid']), '*', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($quiz, 'quiz');
-
-        $context = context_module::instance($cm->id);
-        self::validate_context($context);
+        list($quiz, $course, $cm, $context) = self::validate_quiz($params['quizid']);
 
         $result = array();
         $result['feedbacktext'] = '';
@@ -1623,6 +1614,257 @@ class mod_quiz_external extends external_api {
             array(
                 'feedbacktext' => new external_value(PARAM_RAW, 'the comment that corresponds to this grade (empty for none)'),
                 'feedbacktextformat' => new external_format_value('feedbacktext', VALUE_OPTIONAL),
+                'warnings' => new external_warnings(),
+            )
+        );
+    }
+
+    /**
+     * Describes the parameters for get_quiz_access_information.
+     *
+     * @return external_external_function_parameters
+     * @since Moodle 3.1
+     */
+    public static function get_quiz_access_information_parameters() {
+        return new external_function_parameters (
+            array(
+                'quizid' => new external_value(PARAM_INT, 'quiz instance id')
+            )
+        );
+    }
+
+    /**
+     * Return access information for a given quiz.
+     *
+     * @param int $quizid quiz instance id
+     * @return array of warnings and the access information
+     * @since Moodle 3.1
+     * @throws  moodle_quiz_exception
+     */
+    public static function get_quiz_access_information($quizid) {
+        global $DB, $USER;
+
+        $warnings = array();
+
+        $params = array(
+            'quizid' => $quizid
+        );
+        $params = self::validate_parameters(self::get_quiz_access_information_parameters(), $params);
+
+        list($quiz, $course, $cm, $context) = self::validate_quiz($params['quizid']);
+
+        $result = array();
+        // Capabilities first.
+        $result['canattempt'] = has_capability('mod/quiz:attempt', $context);;
+        $result['canmanage'] = has_capability('mod/quiz:manage', $context);;
+        $result['canpreview'] = has_capability('mod/quiz:preview', $context);;
+        $result['canreviewmyattempts'] = has_capability('mod/quiz:reviewmyattempts', $context);;
+        $result['canviewreports'] = has_capability('mod/quiz:viewreports', $context);;
+
+        // Access manager now.
+        $quizobj = quiz::create($cm->instance, $USER->id);
+        $ignoretimelimits = has_capability('mod/quiz:ignoretimelimits', $context, null, false);
+        $timenow = time();
+        $accessmanager = new quiz_access_manager($quizobj, $timenow, $ignoretimelimits);
+
+        $result['accessrules'] = $accessmanager->describe_rules();
+        $result['activerulenames'] = $accessmanager->get_active_rule_names();
+        $result['preventaccessreasons'] = $accessmanager->prevent_access();
+
+        $result['warnings'] = $warnings;
+        return $result;
+    }
+
+    /**
+     * Describes the get_quiz_access_information return value.
+     *
+     * @return external_single_structure
+     * @since Moodle 3.1
+     */
+    public static function get_quiz_access_information_returns() {
+        return new external_single_structure(
+            array(
+                'canattempt' => new external_value(PARAM_BOOL, 'Whether the user can do the quiz or not.'),
+                'canmanage' => new external_value(PARAM_BOOL, 'Whether the user can edit the quiz settings or not.'),
+                'canpreview' => new external_value(PARAM_BOOL, 'Whether the user can preview the quiz or not.'),
+                'canreviewmyattempts' => new external_value(PARAM_BOOL, 'Whether the users can review their previous attempts
+                                                                or not.'),
+                'canviewreports' => new external_value(PARAM_BOOL, 'Whether the user can view the quiz reports or not.'),
+                'accessrules' => new external_multiple_structure(
+                                    new external_value(PARAM_TEXT, 'rule description'), 'list of rules'),
+                'activerulenames' => new external_multiple_structure(
+                                    new external_value(PARAM_PLUGIN, 'rule plugin names'), 'list of active rules'),
+                'preventaccessreasons' => new external_multiple_structure(
+                                            new external_value(PARAM_TEXT, 'access restriction description'), 'list of reasons'),
+                'warnings' => new external_warnings(),
+            )
+        );
+    }
+
+    /**
+     * Describes the parameters for get_attempt_access_information.
+     *
+     * @return external_external_function_parameters
+     * @since Moodle 3.1
+     */
+    public static function get_attempt_access_information_parameters() {
+        return new external_function_parameters (
+            array(
+                'quizid' => new external_value(PARAM_INT, 'quiz instance id'),
+                'attemptid' => new external_value(PARAM_INT, 'attempt id, 0 for the user last attempt if exists', VALUE_DEFAULT, 0),
+            )
+        );
+    }
+
+    /**
+     * Return access information for a given attempt in a quiz.
+     *
+     * @param int $quizid quiz instance id
+     * @param int $attemptid attempt id, 0 for the user last attempt if exists
+     * @return array of warnings and the access information
+     * @since Moodle 3.1
+     * @throws  moodle_quiz_exception
+     */
+    public static function get_attempt_access_information($quizid, $attemptid = 0) {
+        global $DB, $USER;
+
+        $warnings = array();
+
+        $params = array(
+            'quizid' => $quizid,
+            'attemptid' => $attemptid,
+        );
+        $params = self::validate_parameters(self::get_attempt_access_information_parameters(), $params);
+
+        list($quiz, $course, $cm, $context) = self::validate_quiz($params['quizid']);
+
+        $attempttocheck = 0;
+        if (!empty($params['attemptid'])) {
+            $attemptobj = quiz_attempt::create($params['attemptid']);
+            if ($attemptobj->get_userid() != $USER->id) {
+                throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
+            }
+            $attempttocheck = $attemptobj->get_attempt();
+        }
+
+        // Access manager now.
+        $quizobj = quiz::create($cm->instance, $USER->id);
+        $ignoretimelimits = has_capability('mod/quiz:ignoretimelimits', $context, null, false);
+        $timenow = time();
+        $accessmanager = new quiz_access_manager($quizobj, $timenow, $ignoretimelimits);
+
+        $attempts = quiz_get_user_attempts($quiz->id, $USER->id, 'finished', true);
+        $lastfinishedattempt = end($attempts);
+        if ($unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id)) {
+            $attempts[] = $unfinishedattempt;
+
+            // Check if the attempt is now overdue. In that case the state will change.
+            $quizobj->create_attempt_object($unfinishedattempt)->handle_if_time_expired(time(), false);
+
+            if ($unfinishedattempt->state != quiz_attempt::IN_PROGRESS and $unfinishedattempt->state != quiz_attempt::OVERDUE) {
+                $lastfinishedattempt = $unfinishedattempt;
+            }
+        }
+        $numattempts = count($attempts);
+
+        if (!$attempttocheck) {
+            $attempttocheck = $unfinishedattempt ? $unfinishedattempt : $lastfinishedattempt;
+        }
+
+        $result = array();
+        $result['isfinished'] = $accessmanager->is_finished($numattempts, $lastfinishedattempt);
+        $result['preventnewattemptreasons'] = $accessmanager->prevent_new_attempt($numattempts, $lastfinishedattempt);
+
+        if ($attempttocheck) {
+            $endtime = $accessmanager->get_end_time($attempttocheck);
+            $result['endtime'] = ($endtime === false) ? 0 : $endtime;
+            $attemptid = $unfinishedattempt ? $unfinishedattempt->id : null;
+            $result['ispreflightcheckrequired'] = $accessmanager->is_preflight_check_required($attemptid);
+        }
+
+        $result['warnings'] = $warnings;
+        return $result;
+    }
+
+    /**
+     * Describes the get_attempt_access_information return value.
+     *
+     * @return external_single_structure
+     * @since Moodle 3.1
+     */
+    public static function get_attempt_access_information_returns() {
+        return new external_single_structure(
+            array(
+                'endtime' => new external_value(PARAM_INT, 'When the attempt must be submitted (determined by rules).',
+                                                VALUE_OPTIONAL),
+                'isfinished' => new external_value(PARAM_BOOL, 'Whether there is no way the user will ever be allowed to attempt.'),
+                'ispreflightcheckrequired' => new external_value(PARAM_BOOL, 'whether a check is required before the user
+                                                                    starts/continues his attempt.', VALUE_OPTIONAL),
+                'preventnewattemptreasons' => new external_multiple_structure(
+                                                new external_value(PARAM_TEXT, 'access restriction description'),
+                                                                    'list of reasons'),
+                'warnings' => new external_warnings(),
+            )
+        );
+    }
+
+    /**
+     * Describes the parameters for get_quiz_required_qtypes.
+     *
+     * @return external_external_function_parameters
+     * @since Moodle 3.1
+     */
+    public static function get_quiz_required_qtypes_parameters() {
+        return new external_function_parameters (
+            array(
+                'quizid' => new external_value(PARAM_INT, 'quiz instance id')
+            )
+        );
+    }
+
+    /**
+     * Return the potential question types that would be required for a given quiz.
+     * Please note that for random question types we return the potential question types in the category choosen.
+     *
+     * @param int $quizid quiz instance id
+     * @return array of warnings and the access information
+     * @since Moodle 3.1
+     * @throws  moodle_quiz_exception
+     */
+    public static function get_quiz_required_qtypes($quizid) {
+        global $DB, $USER;
+
+        $warnings = array();
+
+        $params = array(
+            'quizid' => $quizid
+        );
+        $params = self::validate_parameters(self::get_quiz_required_qtypes_parameters(), $params);
+
+        list($quiz, $course, $cm, $context) = self::validate_quiz($params['quizid']);
+
+        $quizobj = quiz::create($cm->instance, $USER->id);
+        $quizobj->preload_questions();
+        $quizobj->load_questions();
+
+        // Question types used.
+        $result = array();
+        $result['questiontypes'] = $quizobj->get_all_question_types_used(true);
+        $result['warnings'] = $warnings;
+        return $result;
+    }
+
+    /**
+     * Describes the get_quiz_required_qtypes return value.
+     *
+     * @return external_single_structure
+     * @since Moodle 3.1
+     */
+    public static function get_quiz_required_qtypes_returns() {
+        return new external_single_structure(
+            array(
+                'questiontypes' => new external_multiple_structure(
+                                    new external_value(PARAM_PLUGIN, 'question type'), 'list of question types used in the quiz'),
                 'warnings' => new external_warnings(),
             )
         );
