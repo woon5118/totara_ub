@@ -1,2 +1,6 @@
 This files describes API changes in /mod/forum/*,
 information provided here is intended especially for developers.
+
+=== 10 ===
+
+ * The inteface to forum_get_email_message_id() has changed and no longer needs the $host argument.
