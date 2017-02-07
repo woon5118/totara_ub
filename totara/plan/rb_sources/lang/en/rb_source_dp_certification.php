@@ -46,3 +46,5 @@ $string['type_certif_completion_history'] = 'Certification completion history';
 
 $string['datenotset'] = '(not set)';
 $string['unassigned'] = '(prior to unassigned from certification)';
+
+$string['viewpreviouscompletions'] = 'View previous completions for certification {$a}';
