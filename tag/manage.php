@@ -47,6 +47,9 @@ if ($perpage != DEFAULT_PAGE_SIZE) {
 if ($page > 0) {
     $params['page'] = $page;
 }
+if ($tagcollid) {
+    $params['tc'] = $tagcollid;
+}
 
 admin_externalpage_setup('managetags', '', $params, '', array('pagelayout' => 'report'));
 
@@ -63,8 +66,7 @@ $tagcoll = core_tag_collection::get_by_id($tagcollid);
 $tagarea = core_tag_area::get_by_id($tagareaid);
 $manageurl = new moodle_url('/tag/manage.php');
 if ($tagcoll) {
-    // We are inside a tag collection - add it to the page url and the breadcrumb.
-    $PAGE->set_url(new moodle_url($PAGE->url, array('tc' => $tagcoll->id)));
+    // We are inside a tag collection - add it to the breadcrumb.
     $PAGE->navbar->add(core_tag_collection::display_name($tagcoll),
             new moodle_url($manageurl, array('tc' => $tagcoll->id)));
 }
@@ -172,37 +174,51 @@ switch($action) {
         break;
 
     case 'delete':
-        require_sesskey();
-        if (!$tagschecked && $tagid) {
-            $tagschecked = array($tagid);
-        }
-        core_tag_tag::delete_tags($tagschecked);
-        redirect(new moodle_url($PAGE->url, $tagschecked ? array('notice' => 'deleted') : null));
-        break;
-
-    case 'setflag':
-        require_sesskey();
         if ($tagid) {
-            $tagobject->flag();
-            redirect(new moodle_url($PAGE->url, array('notice' => 'flagged')));
+            require_sesskey();
+            core_tag_tag::delete_tags(array($tagid));
+            \core\notification::success(get_string('deleted', 'core_tag'));
         }
         redirect($PAGE->url);
         break;
 
-    case 'resetflag':
-        require_sesskey();
-        if ($tagid) {
-            $tagobject->reset_flag();
-            redirect(new moodle_url($PAGE->url, array('notice' => 'resetflag')));
+    case 'bulk':
+        if (optional_param('bulkdelete', null, PARAM_RAW) !== null) {
+            if ($tagschecked) {
+                require_sesskey();
+                core_tag_tag::delete_tags($tagschecked);
+                \core\notification::success(get_string('deleted', 'core_tag'));
+            }
+            redirect($PAGE->url);
+        } else if (optional_param('bulkcombine', null, PARAM_RAW) !== null) {
+            $tags = core_tag_tag::get_bulk($tagschecked, '*');
+            if (count($tags) > 1) {
+                require_sesskey();
+                if (($maintag = optional_param('maintag', 0, PARAM_INT)) && array_key_exists($maintag, $tags)) {
+                    $tag = $tags[$maintag];
+                } else {
+                    $tag = array_shift($tags);
+                }
+                $tag->combine_tags($tags);
+                \core\notification::success(get_string('combined', 'core_tag'));
+            }
+            redirect($PAGE->url);
         }
-        redirect($PAGE->url);
         break;
 
-    case 'changetype':
-        require_sesskey();
-        if ($tagid && $tagobject->update(
-                array('isstandard' => $isstandard ? 1 : 0))) {
-            redirect(new moodle_url($PAGE->url, array('notice' => 'typechanged')));
+    case 'renamecombine':
+        // Allows to rename the tag and if the tag with the new name already exists these tags will be combined.
+        if ($tagid && ($newname = required_param('newname', PARAM_TAG))) {
+            require_sesskey();
+            $tag = core_tag_tag::get($tagid, '*', MUST_EXIST);
+            $targettag = core_tag_tag::get_by_name($tag->tagcollid, $newname, '*');
+            if ($targettag) {
+                $targettag->combine_tags(array($tag));
+                \core\notification::success(get_string('combined', 'core_tag'));
+            } else {
+                $tag->update(array('rawname' => $newname));
+                \core\notification::success(get_string('changessaved', 'core_tag'));
+            }
         }
         redirect($PAGE->url);
         break;
@@ -269,7 +285,7 @@ $table = new core_tag_manage_table($tagcollid);
 echo '<form class="tag-management-form" method="post" action="'.$CFG->wwwroot.'/tag/manage.php">';
 echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'tc', 'value' => $tagcollid));
 echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
-echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'action', 'value' => 'delete'));
+echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'action', 'value' => 'bulk'));
 echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'perpage', 'value' => $perpage));
 echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'page', 'value' => $page));
 echo $table->out($perpage, true);
@@ -277,7 +293,9 @@ echo $table->out($perpage, true);
 if ($table->rawdata) {
     echo html_writer::start_tag('p');
     echo html_writer::tag('button', get_string('deleteselected', 'tag'),
-            array('id' => 'tag-management-delete', 'type' => 'submit', 'class' => 'tagdeleteselected'));
+            array('id' => 'tag-management-delete', 'type' => 'submit', 'class' => 'tagdeleteselected', 'name' => 'bulkdelete'));
+    echo html_writer::tag('button', get_string('combineselected', 'tag'),
+        array('id' => 'tag-management-combine', 'type' => 'submit', 'class' => 'tagcombineselected', 'name' => 'bulkcombine'));
     echo html_writer::end_tag('p');
 }
 echo '</form>';
