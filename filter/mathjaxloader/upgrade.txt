@@ -1,2 +1,0 @@
-This files describes API changes in the mathjaxloader plugin,
-information provided here is intended especially for developers.
