@@ -50,6 +50,7 @@ function tag_page_type_list($pagetype, $parentcontext, $currentcontext) {
  * @return \core\output\inplace_editable
  */
 function core_tag_inplace_editable($itemtype, $itemid, $newvalue) {
+    \external_api::validate_context(context_system::instance());
     if ($itemtype === 'tagname') {
         require_capability('moodle/tag:manage', context_system::instance());
         $tag = core_tag_tag::get($itemid, '*', MUST_EXIST);
