@@ -33,7 +33,7 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
-use tool_lp\external\competency_exporter;
+use tool_lp\external\competency_summary_exporter;
 use tool_lp\external\course_summary_exporter;
 use tool_lp\external\user_competency_exporter;
 use tool_lp\external\user_summary_exporter;
@@ -57,20 +57,14 @@ class external extends external_api {
             'The course id',
             VALUE_REQUIRED
         );
-        $groupid = new external_value(
+        $userid = new external_value(
             PARAM_INT,
-            'The group id',
-            VALUE_REQUIRED
-        );
-        $onlyactive = new external_value(
-            PARAM_BOOL,
-            'Only active users',
+            'The user id',
             VALUE_REQUIRED
         );
         $params = array(
             'courseid' => $courseid,
-            'groupid' => $groupid,
-            'onlyactive' => $onlyactive,
+            'userid' => $userid
         );
         return new external_function_parameters($params);
     }
@@ -79,25 +73,25 @@ class external extends external_api {
      * Loads the data required to render the report.
      *
      * @param int $courseid The course id
-     * @param int $groupid The group id
-     * @param boolean $onlyactive Only show active enrolments
      * @return \stdClass
      */
-    public static function data_for_report($courseid, $groupid, $onlyactive) {
+    public static function data_for_report($courseid, $userid) {
         global $PAGE;
 
         $params = self::validate_parameters(
             self::data_for_report_parameters(),
             array(
                 'courseid' => $courseid,
-                'groupid' => $groupid,
-                'onlyactive' => $onlyactive
+                'userid' => $userid
             )
         );
-        $context = context_course::instance($courseid);
+        $context = context_course::instance($params['courseid']);
         self::validate_context($context);
+        if (!is_enrolled($context, $params['userid'], 'tool/lp:coursecompetencygradable')) {
+            throw new coding_exception('invaliduser');
+        }
 
-        $renderable = new output\report($params['courseid'], $params['groupid'], $params['onlyactive']);
+        $renderable = new output\report($params['courseid'], $params['userid']);
         $renderer = $PAGE->get_renderer('report_competency');
 
         $data = $renderable->export_for_template($renderer);
@@ -113,19 +107,13 @@ class external extends external_api {
     public static function data_for_report_returns() {
         return new external_single_structure(array (
             'courseid' => new external_value(PARAM_INT, 'Course id'),
-            'groupid' => new external_value(PARAM_INT, 'Group id'),
-            'onlyactive' => new external_value(PARAM_BOOL, 'Only include active enrolments'),
-            'competencies' => new external_multiple_structure(
-                competency_exporter::get_read_structure()
-            ),
+            'user' => user_summary_exporter::get_read_structure(),
             'course' => course_summary_exporter::get_read_structure(),
             'pluginbaseurl' => new external_value(PARAM_LOCALURL, 'Url to the tool_lp plugin folder on this Moodle site'),
             'usercompetencies' => new external_multiple_structure(
                 new external_single_structure(array(
-                    'user' => user_summary_exporter::get_read_structure(),
-                    'usercompetencies' => new external_multiple_structure(
-                        user_competency_exporter::get_read_structure()
-                    )
+                    'usercompetency' => user_competency_exporter::get_read_structure(),
+                    'competency' => competency_summary_exporter::get_read_structure()
                 ))
             )
         ));

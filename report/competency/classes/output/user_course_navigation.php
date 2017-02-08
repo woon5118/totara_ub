@@ -15,36 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * User competency page class.
+ * User navigation class.
  *
- * @package    tool_lp
+ * @package    report_competency
  * @copyright  2015 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace tool_lp\output;
+namespace report_competency\output;
 
 use renderable;
 use renderer_base;
 use templatable;
 use context_course;
 use \tool_lp\external\user_summary_exporter;
-use \tool_lp\external\competency_exporter;
 use stdClass;
 
 /**
- * User competency course navigation class.
+ * User course navigation class.
  *
  * @package    tool_lp
  * @copyright  2015 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class user_competency_course_navigation implements renderable, templatable {
+class user_course_navigation implements renderable, templatable {
 
     /** @var userid */
     protected $userid;
-
-    /** @var competencyid */
-    protected $competencyid;
 
     /** @var courseid */
     protected $courseid;
@@ -56,12 +52,11 @@ class user_competency_course_navigation implements renderable, templatable {
      * Construct.
      *
      * @param $userid
-     * @param $competencyid
      * @param $courseid
+     * @param $baseurl
      */
-    public function __construct($userid, $competencyid, $courseid, $baseurl) {
+    public function __construct($userid, $courseid, $baseurl) {
         $this->userid = $userid;
-        $this->competencyid = $competencyid;
         $this->courseid = $courseid;
         $this->baseurl = $baseurl;
     }
@@ -79,7 +74,6 @@ class user_competency_course_navigation implements renderable, templatable {
 
         $data = new stdClass();
         $data->userid = $this->userid;
-        $data->competencyid = $this->competencyid;
         $data->courseid = $this->courseid;
         $data->baseurl = $this->baseurl;
         $data->groupselector = '';
@@ -117,24 +111,6 @@ class user_competency_course_navigation implements renderable, templatable {
             $data->hasusers = false;
         }
 
-        $coursecompetencies = \tool_lp\api::list_course_competencies($this->courseid);
-        $data->competencies = array();
-        $contextcache = array();
-        foreach ($coursecompetencies as $coursecompetency) {
-            $frameworkid = $coursecompetency['competency']->get_competencyframeworkid();
-            if (!isset($contextcache[$frameworkid])) {
-                $contextcache[$frameworkid] = $coursecompetency['competency']->get_context();
-            }
-            $context = $contextcache[$frameworkid];
-            $coursecompetencycontext = $context;
-            $exporter = new competency_exporter($coursecompetency['competency'], array('context' => $coursecompetencycontext));
-            $competency = $exporter->export($output);
-            if ($competency->id == $this->competencyid) {
-                $competency->selected = true;
-            }
-            $data->competencies[] = $competency;
-        }
-        $data->hascompetencies = count($data->competencies);
         return $data;
     }
 }
