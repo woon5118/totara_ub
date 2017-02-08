@@ -90,8 +90,6 @@ class mod_assign_base_testcase extends advanced_testcase {
 
         $this->resetAfterTest(true);
 
-        set_config('enablecompletion', 1);
-
         $this->course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
         $this->teachers = array();
         for ($i = 0; $i < self::DEFAULT_TEACHER_COUNT; $i++) {
