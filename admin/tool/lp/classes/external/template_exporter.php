@@ -33,13 +33,21 @@ use renderer_base;
  */
 class template_exporter extends persistent_exporter {
 
-    protected function get_persistent_class() {
+    protected static function define_class() {
         return 'tool_lp\\template';
     }
 
-    public function export(renderer_base $output) {
-        $result = parent::export($output);
-        $result->duedateformatted = userdate($result->duedate);
-        return $result;
+    protected function get_values(renderer_base $output) {
+        return array(
+            'duedateformatted' => userdate($this->persistent->get_duedate())
+        );
+    }
+
+    protected static function define_properties() {
+        return array(
+            'duedateformatted' => array(
+                'type' => PARAM_RAW
+            )
+        );
     }
 }

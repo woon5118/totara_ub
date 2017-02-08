@@ -30,6 +30,9 @@ use renderer_base;
 use context;
 use context_system;
 use coding_exception;
+use external_single_structure;
+use external_value;
+use external_format_value;
 
 /**
  * An extended version of the persistent class with a default implementation of export
@@ -40,27 +43,10 @@ use coding_exception;
 abstract class persistent_exporter {
 
     /** @var \tool_lp\persistent The persistent object we will export. */
-    var $persistent = null;
+    protected $persistent = null;
 
     /** @var array $related List of related objects used to avoid DB queries. */
-    var $related = array();
-
-    /**
-     * Returns a list of objects that are related to this persistent. Only objects listed here
-     * will be cached in this object.
-     *
-     * @return array of 'propertyname' => classname
-     */
-    protected function get_related() {
-        return array();
-    }
-
-    /**
-     * Returns the specific class the persistent should be an instance of.
-     *
-     * @return string
-     */
-    abstract protected function get_persistent_class();
+    protected $related = array();
 
     /**
      * Constructor - saves the persistent object, and the related objects.
@@ -68,16 +54,16 @@ abstract class persistent_exporter {
      * @param \tool_lp\persistent $persistent The persistent object to export.
      * @param array $related - An optional list of pre-loaded objects related to this persistent.
      */
-    function __construct(\tool_lp\persistent $persistent, $related = array()) {
-        $classname = $this->get_persistent_class();
+    public final function __construct(\tool_lp\persistent $persistent, $related = array()) {
+        $classname = static::define_class();
         if (!$persistent instanceof $classname) {
             throw new coding_exception('Invalid type for persistent. ' .
-                                       'Expected: ' . $this->get_persistent_class() . ' got: ' . get_class($persistent));
+                                       'Expected: ' . $classname . ' got: ' . get_class($persistent));
         }
         $this->persistent = $persistent;
 
         // Cache the valid related objects.
-        foreach ($this->get_related() as $key => $classname) {
+        foreach (static::define_related() as $key => $classname) {
             if (isset($related[$key]) && ($related[$key] instanceof $classname)) {
                 $this->related[$key] = $related[$key];
             } else {
@@ -87,11 +73,54 @@ abstract class persistent_exporter {
     }
 
     /**
+     * Function to export the renderer data in a format that is suitable for a
+     * mustache template. This means raw records are generated as in to_record,
+     * but all strings are correctly passed through external_format_text (or external_format_string).
+     *
+     * @param renderer_base $output Used to do a final render of any components that need to be rendered for export.
+     * @return stdClass
+     */
+    final public function export(renderer_base $output) {
+        $data = new stdClass();
+        $properties = self::properties_definition(true);
+        $context = $this->get_context();
+        $values = (array) $this->persistent->to_record();
+        $values += $this->get_values($output);
+        $record = (object) $values;
+
+        foreach ($properties as $property => $definition) {
+            if (isset($data->$property)) {
+                // This happens when we have already defined the format properties.
+                continue;
+            } else if (!property_exists($record, $property)) {
+                // Whoops, we got something that wasn't defined.
+                throw new coding_exception('Unexpected property ' . $property);
+            }
+
+            $data->$property = $record->$property;
+
+            // If the field is PARAM_TEXT and has a format field.
+            if ($propertyformat = self::get_format_field($properties, $property)) {
+                $format = $record->$propertyformat;
+                list($text, $format) = external_format_text($data->$property, $format, $context->id, 'tool_lp', '', 0);
+                $data->$property = $text;
+                $data->$propertyformat = $format;
+
+            // If it's a PARAM_TEXT without format field.
+            } else if ($definition['type'] === PARAM_TEXT) {
+                $data->$property = external_format_string($data->$property, $context->id);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Function to guess the correct context, falling back to system context.
      *
      * @return context
      */
-    protected function get_context() {
+    final protected function get_context() {
         $context = null;
         if (isset($this->related['context']) && $this->related['context'] instanceof context) {
             $context = $this->related['context'];
@@ -104,36 +133,251 @@ abstract class persistent_exporter {
     }
 
     /**
-     * Function to export the renderer data in a format that is suitable for a
-     * mustache template. This means raw records are generated as in to_record,
-     * but all strings are correctly passed through external_format_text (or external_format_string).
+     * Get the additional values to inject while exporting.
      *
-     * @param renderer_base $output Used to do a final render of any components that need to be rendered for export.
-     * @return stdClass|array
+     * This should be overriden by child classes if needed. Existing persistent
+     * properties cannot be overridden. For your convenience the format_text or
+     * format_string functions do not need to be applied to PARAM_TEXT fields,
+     * it will be done automatically during export.
+     *
+     * Note: These must be defined in {@link self::define_properties()}.
+     *
+     * @return array Keys are the property names, values are their values.
      */
-    public function export(renderer_base $output) {
-        $data = new stdClass();
-        $properties = $this->persistent->properties_definition();
-        $context = $this->get_context();
-        $record = $this->persistent->to_record();
+    protected function get_values(renderer_base $output) {
+        return array();
+    }
+
+    /**
+     * Get the properties definition of this exporter.
+     *
+     * @param bool $additional Whether or not to include the additional properties.
+     * @return array Keys are the property names, and value their definition.
+     */
+    final public static function properties_definition($additional = false) {
+        $classname = static::define_class();
+        $properties = $classname::properties_definition();
+        if ($additional) {
+            $customprops = static::define_properties();
+            foreach ($customprops as $property => $definition) {
+                // Ensures that null is set to its default.
+                if (!isset($definition['null'])) {
+                    $customprops[$property]['null'] = NULL_NOT_ALLOWED;
+                }
+            }
+            $properties += $customprops;
+        }
+        return $properties;
+    }
+
+    /**
+     * Returns the specific class the persistent should be an instance of.
+     *
+     * @return string
+     */
+    protected static function define_class() {
+        throw new coding_exception('define_class() must be overidden.');
+    }
+
+    /**
+     * Return the list of additional properties.
+     *
+     * Additional properties are only ever used for the read structure, and during
+     * export of the persistent data.
+     *
+     * The format of the array returned by this method has to match the structure
+     * defined in {@link \tool_lp\persistent::define_properties()}.
+     *
+     * @return array
+     */
+    protected static function define_properties() {
+        return array();
+    }
+
+    /**
+     * Returns a list of objects that are related to this persistent.
+     *
+     * Only objects listed here can be cached in this object.
+     *
+     * @return array of 'propertyname' => classname
+     */
+    protected static function define_related() {
+        return array();
+    }
+
+    /**
+     * Get the context structure.
+     *
+     * @return external_single_structure
+     */
+    final protected static function get_context_structure() {
+        return array(
+            'contextid' => new external_value(PARAM_INT, 'The context id', VALUE_OPTIONAL),
+            'contextlevel' => new external_value(PARAM_ALPHA, 'The context level', VALUE_OPTIONAL),
+            'instanceid' => new external_value(PARAM_INT, 'The Instance id', VALUE_OPTIONAL),
+        );
+    }
+
+    /**
+     * Get the format field name.
+     *
+     * @param  array $definitions List of properties definitions.
+     * @param  string $property The name of the property that may have a format field.
+     * @return bool|string False, or the name of the format property.
+     */
+    final protected static function get_format_field($definitions, $property) {
+        $formatproperty = $property . 'format';
+        if ($definitions[$property]['type'] == PARAM_TEXT && isset($definitions[$formatproperty])
+                && $definitions[$formatproperty]['type'] == PARAM_INT) {
+            return $formatproperty;
+        }
+        return false;
+    }
+
+    /**
+     * Get the format structure.
+     *
+     * @param  string $property   The name of the property on which the format applies.
+     * @param  array  $definition The definition of the format property.
+     * @param  int    $required   Constant VALUE_*.
+     * @return external_format_value
+     */
+    final protected static function get_format_structure($property, $definition, $required = VALUE_REQUIRED) {
+        if (array_key_exists('default', $definition)) {
+            $required = VALUE_DEFAULT;
+        }
+        return new external_format_value($property, $required);
+    }
+
+    /**
+     * Returns the create structure.
+     *
+     * @return external_single_structure
+     */
+    final public static function get_create_structure() {
+        $properties = self::properties_definition(false);
+        $returns = array();
 
         foreach ($properties as $property => $definition) {
-            if (!isset($data->$property)) {
-                $data->$property = $record->$property;
-                if ($definition['type'] === PARAM_TEXT) {
-                    $propertyformat = $property . 'format';
+            if ($property == 'id') {
+                // The can not be set on create.
+                continue;
 
-                    if (isset($properties[$propertyformat]) && $properties[$propertyformat]['type'] == PARAM_INT) {
-                        $format = $record->$propertyformat;
-                        list($text, $format) = external_format_text($data->$property, $format, $context->id, 'tool_lp', '', 0);
-                        $data->$property = $text;
-                        $data->$propertyformat = $format;
-                    } else {
-                        $data->$property = external_format_string($data->$property, $context->id);
+            } else if (isset($returns[$property]) && substr($property, -6) === 'format') {
+                // We've already treated the format.
+                continue;
+            }
+
+            $required = VALUE_REQUIRED;
+            $default = null;
+
+            // We cannot use isset here because we want to detect nulls.
+            if (array_key_exists('default', $definition)) {
+                $required = VALUE_DEFAULT;
+                $default = $definition['default'];
+            }
+
+            // Magically treat the contextid fields.
+            if ($property == 'contextid') {
+                if (isset($properties['context'])) {
+                    throw new coding_exception('There cannot be a context and a contextid column');
+                }
+                $returns += self::get_context_structure();
+
+            } else {
+                $returns[$property] = new external_value($definition['type'], $property, $required, $default, $definition['null']);
+
+                // Magically treat the format properties.
+                if ($formatproperty = self::get_format_field($properties, $property)) {
+                    if (isset($returns[$formatproperty])) {
+                        throw new coding_exception('The format for \'' . $property . '\' is already defined.');
                     }
+                    $returns[$formatproperty] = self::get_format_structure($property,
+                        $properties[$formatproperty], VALUE_REQUIRED);
                 }
             }
         }
-        return $data;
+
+        return new external_single_structure($returns);
     }
+
+    /**
+     * Returns the read structure.
+     *
+     * @return external_single_structure
+     */
+    final public static function get_read_structure() {
+        $properties = self::properties_definition(true);
+        $returns = array();
+
+        foreach ($properties as $property => $definition) {
+            if (isset($returns[$property]) && substr($property, -6) === 'format') {
+                // We've already treated the format.
+                continue;
+            }
+
+            $type = $definition['type'];
+            if ($definition['type'] == PARAM_TEXT) {
+                // PARAM_TEXT always becomes PARAM_RAW because filters may be applied.
+                $type = PARAM_RAW;
+            }
+            $returns[$property] = new external_value($type, $property);
+
+            // Magically treat the format properties.
+            if ($formatproperty = self::get_format_field($properties, $property)) {
+                if (isset($returns[$formatproperty])) {
+                    throw new coding_exception('The format for \'' . $property . '\' is already defined.');
+                }
+                $returns[$formatproperty] = self::get_format_structure($property, $properties[$formatproperty]);
+            }
+        }
+
+        return new external_single_structure($returns);
+    }
+
+    /**
+     * Returns the update structure.
+     *
+     * @return external_single_structure
+     */
+    final public static function get_update_structure() {
+        $properties = self::properties_definition(false);
+        $returns = array();
+
+        foreach ($properties as $property => $definition) {
+            if (isset($returns[$property]) && substr($property, -6) === 'format') {
+                // We've already treated the format.
+                continue;
+            }
+
+            $default = null;
+            $required = VALUE_OPTIONAL;
+            if ($property == 'id') {
+                $required = VALUE_REQUIRED;
+            }
+
+            // Magically treat the contextid fields.
+            if ($property == 'contextid') {
+                if (isset($properties['context'])) {
+                    throw new coding_exception('There cannot be a context and a contextid column');
+                }
+                $returns += self::get_context_structure();
+
+            } else {
+                $returns[$property] = new external_value($definition['type'], $property, $required, $default, $definition['null']);
+
+                // Magically treat the format properties.
+                if ($formatproperty = self::get_format_field($properties, $property)) {
+                    if (isset($returns[$formatproperty])) {
+                        throw new coding_exception('The format for \'' . $property . '\' is already defined.');
+                    }
+                    $returns[$formatproperty] = self::get_format_structure($property,
+                        $properties[$formatproperty], VALUE_OPTIONAL);
+                }
+            }
+        }
+
+        return new external_single_structure($returns);
+    }
+
 }

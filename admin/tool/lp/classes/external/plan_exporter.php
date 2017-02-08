@@ -33,13 +33,25 @@ use renderer_base;
  */
 class plan_exporter extends persistent_exporter {
 
-    protected function get_persistent_class() {
+    protected static function define_class() {
         return 'tool_lp\\plan';
     }
 
-    public function export(renderer_base $output) {
-        $result = parent::export($output);
-        $result->statusname = $this->persistent->get_statusname();
-        return $result;
+    protected function get_values(renderer_base $output) {
+        return array(
+            'statusname' => $this->persistent->get_statusname(),
+            'usercanupdate' => $this->persistent->can_manage(),
+        );
+    }
+
+    public static function define_properties() {
+        return array(
+            'statusname' => array(
+                'type' => PARAM_RAW,
+            ),
+            'usercanupdate' => array(
+                'type' => PARAM_BOOL,
+            ),
+        );
     }
 }
