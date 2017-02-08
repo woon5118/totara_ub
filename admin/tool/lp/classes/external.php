@@ -30,6 +30,7 @@ use context;
 use context_system;
 use context_course;
 use context_user;
+use coding_exception;
 use external_api;
 use external_function_parameters;
 use external_value;
@@ -40,6 +41,7 @@ use invalid_parameter_exception;
 use grade_scale;
 use tool_lp\external\competency_framework_exporter;
 use tool_lp\external\competency_summary_exporter;
+use tool_lp\external\user_summary_exporter;
 use tool_lp\external\user_competency_exporter;
 use tool_lp\external\user_competency_plan_exporter;
 use tool_lp\external\competency_exporter;
@@ -3298,4 +3300,236 @@ class external extends external_api {
             'showdeleterelatedaction' => new external_value(PARAM_BOOL, 'Whether to show the delete relation link or not')
         ));
     }
+
+    /**
+     * Returns the description of external function parameters.
+     *
+     * @return external_function_parameters.
+     */
+    public static function search_users_parameters() {
+        $query = new external_value(
+            PARAM_RAW,
+            'Query string'
+        );
+        $capability = new external_value(
+            PARAM_RAW,
+            'Required capability'
+        );
+        $limitfrom = new external_value(
+            PARAM_INT,
+            'Number of records to skip',
+            VALUE_DEFAULT,
+            0
+        );
+        $limitnum = new external_value(
+            PARAM_RAW,
+            'Number of records to fetch',
+            VALUE_DEFAULT,
+            100
+        );
+        return new external_function_parameters(array(
+            'query' => $query,
+            'capability' => $capability,
+            'limitfrom' => $limitfrom,
+            'limitnum' => $limitnum
+        ));
+    }
+
+    /**
+     * TODO: MDL-52243 Move this function to lib/accesslib.php
+     *
+     * Function used to return a list of users where the given user has a particular capability.
+     * This is used e.g. to find all the users where someone is able to manage their learning plans,
+     * it also would be useful for mentees etc.
+     * @param $capability String - The capability string we are filtering for. If '' is passed,
+     *                             an always matching filter is returned.
+     * @param $userid int - The user id we are using for the access checks. Defaults to current user.
+     * @param $type int - The type of named params to return (passed to $DB->get_in_or_equal).
+     * @param $prefix string - The type prefix for the db table (passed to $DB->get_in_or_equal).
+     * @return list($sql, $params) Same as $DB->get_in_or_equal().
+     */
+    public static function filter_users_with_capability_on_user_context_sql($capability,
+                                                                            $userid = 0,
+                                                                            $type=SQL_PARAMS_QM,
+                                                                            $prefix='param') {
+        global $USER, $DB;
+        $allresultsfilter = array('> 0', array());
+        $noresultsfilter = array('= -1', array());
+
+        if (empty($capability)) {
+            return $allresultsfilter;
+        }
+
+        if (!$capinfo = get_capability_info($capability)) {
+            throw new coding_exception('Capability does not exist: ' . $capability);
+        }
+
+        if (empty($userid)) {
+            $userid = $USER->id;
+        }
+
+        // Make sure the guest account and not-logged-in users never get any risky caps no matter what the actual settings are.
+        if (($capinfo->captype === 'write') or ($capinfo->riskbitmask & (RISK_XSS | RISK_CONFIG | RISK_DATALOSS))) {
+            if (isguestuser($userid) or $userid == 0) {
+                return $noresultsfilter;
+            }
+        }
+
+        if (is_siteadmin($userid)) {
+            // No filtering for site admins.
+            return $allresultsfilter;
+        }
+
+        // Check capability on system level.
+
+        $sql = 'SELECT
+                    rc.id,
+                    ctx.id contextid,
+                    ctx.instanceid,
+                    rc.roleid,
+                    rc.capability,
+                    rc.permission
+                FROM {role_capabilities} rc
+                JOIN {role_assignments} ra ON ra.contextid = rc.contextid
+                JOIN {context} ctx ON (ctx.id = rc.contextid)
+                WHERE ctx.contextlevel = :userlevel AND ra.userid = :userid';
+        $siterecords = $DB->get_records_sql($sql, array('userlevel' => CONTEXT_SYSTEM, 'userid' => $userid));
+        $userrecords = $DB->get_records_sql($sql, array('userlevel' => CONTEXT_USER, 'userid' => $userid));
+
+        $hassystem = false;
+        if (!empty($siterecords)) {
+            foreach ($siterecords as $record) {
+                if ($record->permission == CAP_PROHIBIT) {
+                    return $noresultsfilter;
+                } else if ($record->permission == CAP_ALLOW) {
+                    $hassystem = true;
+                }
+            }
+        }
+
+        if ($hassystem) {
+            // If allowed at system, search for roles prohibiting the capability at user context.
+            $excludeusers = array();
+            foreach ($userrecords as $record) {
+                if ($record->permission == CAP_PROHIBIT) {
+                    $excludeusers[$record->instanceid] = $record->instanceid;
+                }
+            }
+
+            // Construct SQL excluding users with this role assigned for this user.
+            if (empty($excludeusers)) {
+                return $allresultsfilter;
+            }
+            list($sql, $params) = $DB->get_in_or_equal($excludeusers, $type, $prefix, false);
+        } else {
+            // If not allowed at system, search for roles allowing the capability at user context.
+            // Construct SQL excluding users with this role NOT assigned for this user.
+            $allowusers = array();
+            $prohibitusers = array();
+            foreach ($userrecords as $record) {
+                if ($record->permission == CAP_PROHIBIT) {
+                    $prohibitusers[$record->instanceid] = $record->instanceid;
+                }
+                if ($record->permission == CAP_ALLOW) {
+                    $allowusers[$record->instanceid] = $record->instanceid;
+                }
+            }
+
+            foreach ($prohibitusers as $userid => $userid2) {
+                unset($allowusers[$record->instanceid]);
+            }
+
+            if (empty($allowusers)) {
+                return $noresultsfilter;
+            }
+            list($sql, $params) = $DB->get_in_or_equal($allowusers, $type, $prefix);
+        }
+
+        // Return the goods!.
+        return array($sql, $params);
+    }
+
+    /**
+     * Search users.
+     *
+     * @param string $query
+     * @return array
+     */
+    public static function search_users($query, $capability = '', $limitfrom = 0, $limitnum = 100) {
+        global $DB, $CFG, $PAGE, $USER;
+
+        $params = self::validate_parameters(self::search_users_parameters(),
+                                            array(
+                                                'query' => $query,
+                                                'capability' => $capability,
+                                                'limitfrom' => $limitfrom,
+                                                'limitnum' => $limitnum,
+                                            ));
+        $query = $params['query'];
+        $cap = $params['capability'];
+        $limitfrom = $params['limitfrom'];
+        $limitnum = $params['limitnum'];
+
+        $context = context_system::instance();
+        self::validate_context($context);
+        $output = $PAGE->get_renderer('tool_lp');
+
+        list($filtercapsql, $filtercapparams) = self::filter_users_with_capability_on_user_context_sql($cap,
+                                                                                                       $USER->id,
+                                                                                                       SQL_PARAMS_NAMED);
+
+        $extrasearchfields = array();
+        if (!empty($CFG->showuseridentity) && has_capability('moodle/site:viewuseridentity', $context)) {
+            $extrasearchfields = explode(',', $CFG->showuseridentity);
+        }
+        $fields = \user_picture::fields('u', $extrasearchfields);
+
+        list($wheresql, $whereparams) = users_search_sql($query, 'u', true, $extrasearchfields);
+        list($sortsql, $sortparams) = users_order_by_sql('u', $query, $context);
+
+        $countsql = "SELECT COUNT('x') FROM {user} u WHERE $wheresql AND u.id $filtercapsql";
+        $countparams = $whereparams + $filtercapparams;
+        $sql = "SELECT $fields FROM {user} u WHERE $wheresql AND u.id $filtercapsql ORDER BY $sortsql";
+        $params = $whereparams + $filtercapparams + $sortparams;
+
+        $count = $DB->count_records_sql($countsql, $countparams);
+        $result = $DB->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
+
+        $users = array();
+        foreach ($result as $key => $user) {
+            // Make sure all required fields are set.
+            foreach (user_summary_exporter::define_properties() as $propertykey => $definition) {
+                if (empty($user->$propertykey) || !in_array($propertykey, $extrasearchfields)) {
+                    if ($propertykey != 'id') {
+                        $user->$propertykey = '';
+                    }
+                }
+            }
+            $exporter = new user_summary_exporter($user);
+            $newuser = $exporter->export($output);
+
+            $users[$key] = $newuser;
+        }
+        $result->close();
+
+        return array(
+            'users' => $users,
+            'count' => $count
+        );
+    }
+
+    /**
+     * Returns description of external function result value.
+     *
+     * @return external_description
+     */
+    public static function search_users_returns() {
+        global $CFG;
+        require_once($CFG->dirroot . '/user/externallib.php');
+        return new external_single_structure(array(
+            'users' => new external_multiple_structure(user_summary_exporter::get_read_structure()),
+            'count' => new external_value(PARAM_INT, 'Total number of results.')
+        ));
+    }
+
 }
