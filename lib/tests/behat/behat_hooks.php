@@ -464,11 +464,18 @@ class behat_hooks extends behat_base {
             return false;
         }
 
-        list ($dir, $filename) = $this->get_faildump_filename($scope, 'png');
+        // Some drivers (e.g. chromedriver) may throw an exception while trying to take a screenshot.  If this isn't handled,
+        // the behat run dies.  We don't want to lose the information about the failure that triggered the screenshot,
+        // so let's log the exception message to a file (to explain why there's no screenshot) and allow the run to continue,
+        // handling the failure as normal.
         try {
+            list ($dir, $filename) = $this->get_faildump_filename($scope, 'png');
             $this->saveScreenshot($filename, $dir);
         } catch (Exception $e) {
-            // Totara: this must not throw exception!!!
+            // Catching all exceptions as we don't know what the driver might throw.
+            list ($dir, $filename) = $this->get_faildump_filename($scope, 'txt');
+            $message = "Could not save screenshot due to an error\n" . $e->getMessage();
+            file_put_contents($dir . DIRECTORY_SEPARATOR . $filename, $message);
         }
         // Totara: fix new file permissions!
         global $CFG;
