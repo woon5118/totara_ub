@@ -520,7 +520,9 @@ class api {
     /**
      * Fetches all the relevant contexts.
      *
-     * Note: This currently only supports system and category contexts.
+     * Note: This currently only supports system, category and user contexts. However user contexts
+     * behave a bit differently and will fallback on the system context. This is what makes the most
+     * sense because a user context does not have descendants, and only has system as a parent.
      *
      * @param context $context The context to start from.
      * @param string $includes Defines what other contexts to find.
@@ -536,6 +538,11 @@ class api {
 
         if (!in_array($includes, array('children', 'parents', 'self'))) {
             throw new coding_exception('Invalid parameter value for \'includes\'.');
+        }
+
+        // If context user swap it for the context_system.
+        if ($context->contextlevel == CONTEXT_USER) {
+            $context = context_system::instance();
         }
 
         $contexts = array($context->id => $context);
@@ -1350,6 +1357,119 @@ class api {
         }
 
         return $result;
+    }
+
+    /**
+     * Add a competency to a plan.
+     *
+     * @param int $planid The id of the plan
+     * @param int $competencyid The id of the competency
+     * @return bool
+     */
+    public static function add_competency_to_plan($planid, $competencyid) {
+        $plan = new plan($planid);
+
+        // First we do a permissions check.
+        if (!$plan->can_manage()) {
+            throw new required_capability_exception($plan->get_context(), 'tool/lp:planmanage', 'nopermissions', '');
+
+        } else if ($plan->is_based_on_template()) {
+            throw new coding_exception('A competency can not be added to a learning plan based on a template');
+        }
+
+        $exists = plan_competency::get_record(array('planid' => $planid, 'competencyid' => $competencyid));
+        if (!$exists) {
+            $record = new stdClass();
+            $record->planid = $planid;
+            $record->competencyid = $competencyid;
+            $plancompetency = new plan_competency(0, $record);
+            $plancompetency->create();
+        }
+
+        return true;
+    }
+
+    /**
+     * Remove a competency from a plan.
+     *
+     * @param int $planid The plan id
+     * @param int $competencyid The id of the competency
+     * @return bool
+     */
+    public static function remove_competency_from_plan($planid, $competencyid) {
+        $plan = new plan($planid);
+
+        // First we do a permissions check.
+        if (!$plan->can_manage()) {
+            $context = context_user::instance($plan->get_userid());
+            throw new required_capability_exception($context, 'tool/lp:planmanage', 'nopermissions', '');
+
+        } else if ($plan->is_based_on_template()) {
+            throw new coding_exception('A competency can not be removed from a learning plan based on a template');
+        }
+
+        $link = plan_competency::get_record(array('planid' => $planid, 'competencyid' => $competencyid));
+        if ($link) {
+            return $link->delete();
+        }
+        return false;
+    }
+
+    /**
+     * Move the plan competency up or down in the display list.
+     *
+     * Requires tool/lp:planmanage capability at the system context.
+     *
+     * @param int $planid The plan  id
+     * @param int $competencyidfrom The id of the competency we are moving.
+     * @param int $competencyidto The id of the competency we are moving to.
+     * @return boolean
+     */
+    public static function reorder_plan_competency($planid, $competencyidfrom, $competencyidto) {
+        $plan = new plan($planid);
+
+        // First we do a permissions check.
+        if (!$plan->can_manage()) {
+            $context = context_user::instance($plan->get_userid());
+            throw new required_capability_exception($context, 'tool/lp:planmanage', 'nopermissions', '');
+
+        } else if ($plan->is_based_on_template()) {
+            throw new coding_exception('A competency can not be reordered in a learning plan based on a template');
+        }
+
+        $down = true;
+        $matches = plan_competency::get_records(array('planid' => $planid, 'competencyid' => $competencyidfrom));
+        if (count($matches) == 0) {
+            throw new coding_exception('The link does not exist');
+        }
+
+        $competencyfrom = array_pop($matches);
+        $matches = plan_competency::get_records(array('planid' => $planid, 'competencyid' => $competencyidto));
+        if (count($matches) == 0) {
+            throw new coding_exception('The link does not exist');
+        }
+
+        $competencyto = array_pop($matches);
+
+        $all = plan_competency::get_records(array('planid' => $planid), 'sortorder', 'ASC', 0, 0);
+
+        if ($competencyfrom->get_sortorder() > $competencyto->get_sortorder()) {
+            // We are moving up, so put it before the "to" item.
+            $down = false;
+        }
+
+        foreach ($all as $id => $plancompetency) {
+            $sort = $plancompetency->get_sortorder();
+            if ($down && $sort > $competencyfrom->get_sortorder() && $sort <= $competencyto->get_sortorder()) {
+                $plancompetency->set_sortorder($plancompetency->get_sortorder() - 1);
+                $plancompetency->update();
+            } else if (!$down && $sort >= $competencyto->get_sortorder() && $sort < $competencyfrom->get_sortorder()) {
+                $plancompetency->set_sortorder($plancompetency->get_sortorder() + 1);
+                $plancompetency->update();
+            }
+        }
+        $competencyfrom->set_sortorder($competencyto->get_sortorder());
+        return $competencyfrom->update();
     }
 
     /**

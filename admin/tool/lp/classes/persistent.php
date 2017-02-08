@@ -650,6 +650,19 @@ abstract class persistent {
     }
 
     /**
+     * Load a single record.
+     *
+     * @param array $filters Filters to apply.
+     * @return false|\tool_lp\persistent
+     */
+    public static function get_record($filters = array()) {
+        global $DB;
+
+        $record = $DB->get_record(static::TABLE, $filters);
+        return $record ? new static(0, $record) : false;
+    }
+
+    /**
      * Load a list of records based on a select query.
      *
      * @param string $select
