@@ -19,3 +19,5 @@ This information is intended for authors of webservices, not people writing webs
   on the string returned by the getMessage() method of the thrown exception.
 * With Zend_SOAP dropped, moodle_zend_soap_server is now also deprecated.
 * Web service functions deprecated in 2.9 have now been removed.
+* Since our new XML-RPC server implementation does not support introspection, it is critical that all clients send
+  parameters in the correct order.
