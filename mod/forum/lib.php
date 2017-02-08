@@ -1899,8 +1899,6 @@ function forum_get_all_discussion_posts($discussionid, $sort, $tracking=false) {
     $params = array();
 
     if ($tracking) {
-        $now = time();
-        $cutoffdate = $now - ($CFG->forum_oldpostdays * 24 * 3600);
         $tr_sel  = ", fr.id AS postread";
         $tr_join = "LEFT JOIN {forum_read} fr ON (fr.postid = p.id AND fr.userid = ?)";
         $params[] = $USER->id;
@@ -3010,8 +3008,6 @@ function forum_get_discussions_count($cm) {
     } else {
         $groupselect = "";
     }
-
-    $cutoffdate = $now - ($CFG->forum_oldpostdays*24*60*60);
 
     $timelimit = "";
 
