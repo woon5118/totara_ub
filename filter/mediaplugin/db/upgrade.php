@@ -34,5 +34,8 @@ function xmldb_filter_mediaplugin_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
+    // Moodle v3.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
     return true;
 }
