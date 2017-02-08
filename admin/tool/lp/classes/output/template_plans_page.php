@@ -15,44 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class for exporting template data.
+ * Template plans renderable.
  *
  * @package    tool_lp
- * @copyright  2015 Damyon Wiese
+ * @copyright  2015 Frédéric Massart - FMCorz.net
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace tool_lp\external;
 
-use renderer_base;
-use tool_lp\plan;
+namespace tool_lp\output;
+defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class for exporting template data.
+ * Template plans renderable.
  *
- * @copyright  2015 Damyon Wiese
+ * @package    tool_lp
+ * @copyright  2015 Frédéric Massart - FMCorz.net
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class template_exporter extends persistent_exporter {
+class template_plans_page implements \renderable {
 
-    protected static function define_class() {
-        return 'tool_lp\\template';
+    public function __construct(\tool_lp\template $template, \moodle_url $url) {
+        $this->template = $template;
+        $this->url = $url;
+        $this->table = new template_plans_table('tplplans', $template);
+        $this->table->define_baseurl($url);
     }
 
-    protected function get_values(renderer_base $output) {
-        return array(
-            'duedateformatted' => userdate($this->persistent->get_duedate()),
-            'planscount' => plan::count_records(array('templateid' => $this->persistent->get_id()))
-        );
-    }
-
-    protected static function define_properties() {
-        return array(
-            'duedateformatted' => array(
-                'type' => PARAM_RAW
-            ),
-            'planscount' => array(
-                'type' => PARAM_INT
-            )
-        );
-    }
 }
