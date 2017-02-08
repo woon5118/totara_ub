@@ -17,12 +17,16 @@
  * Implement an accessible aria tree widget, from a nested unordered list.
  * Based on http://oaa-accessibility.org/example/41/
  *
+ * To respond to selection changed events - use tree.on("selectionchanged", handler).
+ * The handler will receive an array of nodes, which are the list items that are currently
+ * selected.
+ *
  * @module     tool_lp/tree
  * @package    core
  * @copyright  2015 Damyon Wiese <damyon@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['jquery', 'core/url'], function($, url) {
+define(['jquery', 'core/url', 'core/log'], function($, url, log) {
     // Private variables and functions.
     /** @var {String} expandedImage The html for an expanded tree node twistie. */
     var expandedImage = $('<img alt="" src="' + url.imageUrl('t/expanded') + '"/>');
@@ -33,9 +37,8 @@ define(['jquery', 'core/url'], function($, url) {
      * Constructor
      *
      * @param {String} selector
-     * @param {function} selectCallback Called when the active node is changed.
      */
-    var Tree = function(selector, selectCallback) {
+    var Tree = function(selector) {
         this.treeRoot = $(selector);
 
         this.items = this.treeRoot.find('li');
@@ -43,7 +46,6 @@ define(['jquery', 'core/url'], function($, url) {
 
         this.visibleItems = null;
         this.activeItem = null;
-        this.selectCallback = selectCallback;
 
         this.keys = {
             tab:      9,
@@ -146,7 +148,7 @@ define(['jquery', 'core/url'], function($, url) {
     Tree.prototype.updateFocus = function(item) {
         this.items.attr('aria-selected', 'false').attr('tabindex', '-1');
         item.attr('aria-selected', 'true').attr('tabindex', 0);
-        this.selectCallback(item);
+        this.treeRoot.trigger('selectionchanged', [item]);
     };
 
     /**
@@ -335,6 +337,21 @@ define(['jquery', 'core/url'], function($, url) {
         }
 
         return true;
+    };
+
+    /**
+     * Attach an event listener to the tree.
+     *
+     * @method on
+     * @param {String} eventname This is the name of the event to listen for. Only 'selectionchanged' is supported for now.
+     * @param {Function} handler The function to call when the event is triggered.
+     */
+    Tree.prototype.on = function(eventname, handler) {
+        if (eventname !== 'selectionchanged') {
+            log.warning('Invalid custom event name for tree. Only "selectionchanged" is supported.');
+        } else {
+            this.treeRoot.on(eventname, handler);
+        }
     };
 
     /**

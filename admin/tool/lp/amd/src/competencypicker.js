@@ -82,7 +82,9 @@ define(['jquery',
     Picker.prototype._afterRender = function() {
 
         // Initialise the tree.
-        new Tree(self._find('[data-enhance=linktree]'), function(target) {
+        var tree = new Tree(self._find('[data-enhance=linktree]'));
+
+        tree.on('selectionchanged', function(evt, target) {
             var compId = target.data('id'),
                 valid = true;
 
