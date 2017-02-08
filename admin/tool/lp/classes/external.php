@@ -45,6 +45,7 @@ use grade_scale;
 use tool_lp\external\competency_framework_exporter;
 use tool_lp\external\competency_summary_exporter;
 use tool_lp\external\competency_path_exporter;
+use tool_lp\external\course_competency_settings_exporter;
 use tool_lp\external\cohort_summary_exporter;
 use tool_lp\external\template_statistics_exporter;
 use tool_lp\external\user_summary_exporter;
@@ -1889,6 +1890,8 @@ class external extends external_api {
             'gradableuserid' => new external_value(PARAM_INT, 'Current user id, if the user is a gradable user.', VALUE_OPTIONAL),
             'canmanagecompetencyframeworks' => new external_value(PARAM_BOOL, 'User can manage competency frameworks'),
             'canmanagecoursecompetencies' => new external_value(PARAM_BOOL, 'User can manage linked course competencies'),
+            'canconfigurecoursecompetencies' => new external_value(PARAM_BOOL, 'User can configure course competency settings'),
+            'settings' => course_competency_settings_exporter::get_read_structure(),
             'competencies' => new external_multiple_structure(new external_single_structure(array(
                 'competency' => competency_exporter::get_read_structure(),
                 'coursecompetency' => course_competency_exporter::get_read_structure(),
@@ -4900,11 +4903,6 @@ class external extends external_api {
             'New grade',
             VALUE_REQUIRED
         );
-        $override = new external_value(
-            PARAM_BOOL,
-            'Override the grade, or just suggest it',
-            VALUE_REQUIRED
-        );
         $note = new external_value(
             PARAM_NOTAGS,
             'A note to attach to the evidence',
@@ -4915,7 +4913,6 @@ class external extends external_api {
             'userid' => $userid,
             'competencyid' => $competencyid,
             'grade' => $grade,
-            'override' => $override,
             'note' => $note,
         );
         return new external_function_parameters($params);
@@ -4927,17 +4924,15 @@ class external extends external_api {
      * @param int $userid The user ID.
      * @param int $competencyid The competency id
      * @param int $grade The new grade value
-     * @param bool $override Override the grade or only suggest it
      * @param string $note A note to attach to the evidence
      * @return bool
      */
-    public static function grade_competency($userid, $competencyid, $grade, $override, $note = null) {
+    public static function grade_competency($userid, $competencyid, $grade, $note = null) {
         global $USER, $PAGE;
         $params = self::validate_parameters(self::grade_competency_parameters(), array(
             'userid' => $userid,
             'competencyid' => $competencyid,
             'grade' => $grade,
-            'override' => $override,
             'note' => $note
         ));
 
@@ -4949,7 +4944,6 @@ class external extends external_api {
                 $uc->get_userid(),
                 $uc->get_competencyid(),
                 $params['grade'],
-                $params['override'],
                 $params['note']
         );
 
@@ -4988,11 +4982,6 @@ class external extends external_api {
             'New grade',
             VALUE_REQUIRED
         );
-        $override = new external_value(
-            PARAM_BOOL,
-            'Override the grade, or just suggest it',
-            VALUE_REQUIRED
-        );
         $note = new external_value(
             PARAM_NOTAGS,
             'A note to attach to the evidence',
@@ -5003,7 +4992,6 @@ class external extends external_api {
             'planid' => $planid,
             'competencyid' => $competencyid,
             'grade' => $grade,
-            'override' => $override,
             'note' => $note
         );
         return new external_function_parameters($params);
@@ -5015,11 +5003,10 @@ class external extends external_api {
      * @param int $planid The plan id
      * @param int $competencyid The competency id
      * @param int $grade The new grade value
-     * @param bool $override Override the grade or only suggest it
      * @param string $note A note to add to the evidence
      * @return bool
      */
-    public static function grade_competency_in_plan($planid, $competencyid, $grade, $override, $note = null) {
+    public static function grade_competency_in_plan($planid, $competencyid, $grade, $note = null) {
         global $USER, $PAGE;
 
         $params = self::validate_parameters(self::grade_competency_in_plan_parameters(),
@@ -5027,7 +5014,6 @@ class external extends external_api {
                                                 'planid' => $planid,
                                                 'competencyid' => $competencyid,
                                                 'grade' => $grade,
-                                                'override' => $override,
                                                 'note' => $note
                                             ));
 
@@ -5040,7 +5026,6 @@ class external extends external_api {
                 $plan->get_id(),
                 $params['competencyid'],
                 $params['grade'],
-                $params['override'],
                 $params['note']
         );
         $competency = api::read_competency($params['competencyid']);
@@ -5479,11 +5464,6 @@ class external extends external_api {
             'New grade',
             VALUE_REQUIRED
         );
-        $override = new external_value(
-            PARAM_BOOL,
-            'Override the grade, or just suggest it',
-            VALUE_REQUIRED
-        );
         $note = new external_value(
             PARAM_NOTAGS,
             'A note to attach to the evidence',
@@ -5495,7 +5475,6 @@ class external extends external_api {
             'userid' => $userid,
             'competencyid' => $competencyid,
             'grade' => $grade,
-            'override' => $override,
             'note' => $note,
         );
         return new external_function_parameters($params);
@@ -5508,11 +5487,10 @@ class external extends external_api {
      * @param int $userid The user id
      * @param int $competencyid The competency id
      * @param int $grade The new grade value
-     * @param bool $override Override the grade or only suggest it
      * @param string $note A note to add to the evidence
      * @return bool
      */
-    public static function grade_competency_in_course($courseid, $userid, $competencyid, $grade, $override, $note = null) {
+    public static function grade_competency_in_course($courseid, $userid, $competencyid, $grade, $note = null) {
         global $USER, $PAGE, $DB;
 
         $params = self::validate_parameters(self::grade_competency_in_course_parameters(),
@@ -5521,7 +5499,6 @@ class external extends external_api {
                                                 'userid' => $userid,
                                                 'competencyid' => $competencyid,
                                                 'grade' => $grade,
-                                                'override' => $override,
                                                 'note' => $note
                                             ));
 
@@ -5535,7 +5512,6 @@ class external extends external_api {
                 $params['userid'],
                 $params['competencyid'],
                 $params['grade'],
-                $params['override'],
                 $params['note']
         );
         $competency = api::read_competency($params['competencyid']);
@@ -5644,4 +5620,59 @@ class external extends external_api {
         return new external_value(PARAM_BOOL, 'True if the log of the view was successful');
     }
 
+    /**
+     * Returns description of update_course_competency_settings() parameters.
+     *
+     * @return \external_function_parameters
+     */
+    public static function update_course_competency_settings_parameters() {
+        $courseid = new external_value(
+            PARAM_INT,
+            'Course id for the course to update',
+            VALUE_REQUIRED
+        );
+        $pushratingstouserplans = new external_value(
+            PARAM_BOOL,
+            'New value of the setting',
+            VALUE_REQUIRED
+        );
+        $settings = new external_single_structure(array(
+            'pushratingstouserplans' => $pushratingstouserplans
+        ));
+        $params = array(
+            'courseid' => $courseid,
+            'settings' => $settings,
+        );
+        return new external_function_parameters($params);
+    }
+
+    /**
+     * Update the course competency settings
+     *
+     * @param int $id the course id
+     * @param stdClass $settings The list of settings (currently only pushratingstouserplans).
+     * @throws moodle_exception
+     */
+    public static function update_course_competency_settings($courseid, $settings) {
+        $params = self::validate_parameters(self::update_course_competency_settings_parameters(),
+                                            array(
+                                                'courseid' => $courseid,
+                                                'settings' => $settings
+                                            ));
+
+        $context = context_course::instance($params['courseid']);
+        self::validate_context($context);
+        $result = api::update_course_competency_settings($params['courseid'], $params['settings']);
+
+        return $result;
+    }
+
+    /**
+     * Returns description of update_course_competency_settings() result value.
+     *
+     * @return \external_value
+     */
+    public static function update_course_competency_settings_returns() {
+        return new external_value(PARAM_BOOL, 'True if the update was successful.');
+    }
 }

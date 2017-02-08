@@ -4168,6 +4168,16 @@ class api {
 
             // Completing a competency.
             case evidence::ACTION_COMPLETE:
+                // The logic here goes like this:
+                // if rating outside a course
+                //   set the default grade and proficiency ONLY if there is no current grade
+                // else we are in a course
+                //   set the defautl grade and proficiency in the course ONLY if there is no current grade in the course
+                //   then check the course settings to see if we should push the rating outside the course
+                //   if we should push it
+                //     push it only if the user_competency (outside the course) has no grade
+                // Done.
+
                 if ($grade !== null) {
                     throw new coding_exception("The grade MUST NOT be set with a 'completing' evidence.");
                 }
@@ -4178,12 +4188,51 @@ class api {
                 }
                 list($grade, $proficiency) = $competency->get_default_grade();
 
-                // When completing the competency we fetch the default grade from the competency. But we only mark
-                // the user competency when a grade has not been set yet. Complete is an action to use with automated systems.
-                if ($usercompetency->get_grade() === null) {
-                    $setucgrade = true;
-                    $ucgrade = $grade;
-                    $ucproficiency = $proficiency;
+                // Add user_competency_course record when in a course or module.
+                if (in_array($context->contextlevel, array(CONTEXT_COURSE, CONTEXT_MODULE))) {
+                    $coursecontext = $context->get_course_context();
+                    $courseid = $coursecontext->instanceid;
+                    $filterparams = array(
+                        'userid' => $userid,
+                        'competencyid' => $competencyid,
+                        'courseid' => $courseid
+                    );
+                    // Fetch or create user competency course.
+                    $usercompetencycourse = user_competency_course::get_record($filterparams);
+                    if (!$usercompetencycourse) {
+                        $usercompetencycourse = user_competency_course::create_relation($userid, $competencyid, $courseid);
+                        $usercompetencycourse->create();
+                    }
+                    // Only update the grade and proficiency if there is not already a grade.
+                    if ($usercompetencycourse->get_grade() === null) {
+                        // Set grade.
+                        $usercompetencycourse->set_grade($grade);
+                        // Set proficiency.
+                        $usercompetencycourse->set_proficiency($proficiency);
+                    }
+
+                    // Check the course settings to see if we should push to user plans.
+                    $coursesettings = course_competency_settings::get_by_courseid($courseid);
+                    $setucgrade = $coursesettings->get_pushratingstouserplans();
+
+                    if ($setucgrade) {
+                        // Only push to user plans if there is not already a grade.
+                        if ($usercompetency->get_grade() !== null) {
+                            $setucgrade = false;
+                        } else {
+                            $ucgrade = $grade;
+                            $ucproficiency = $proficiency;
+                        }
+                    }
+                } else {
+
+                    // When completing the competency we fetch the default grade from the competency. But we only mark
+                    // the user competency when a grade has not been set yet. Complete is an action to use with automated systems.
+                    if ($usercompetency->get_grade() === null) {
+                        $setucgrade = true;
+                        $ucgrade = $grade;
+                        $ucproficiency = $proficiency;
+                    }
                 }
 
                 break;
@@ -4197,13 +4246,6 @@ class api {
                 }
                 if ($ucgrade !== null) {
                     $ucproficiency = $competency->get_proficiency_of_grade($ucgrade);
-                }
-                break;
-
-            // Suggesting a grade with an evidence.
-            case evidence::ACTION_SUGGEST:
-                if ($grade === null) {
-                    throw new coding_exception("The grade MUST be set when 'suggesting' an evidence. Or use ACTION_LOG instead.");
                 }
 
                 // Add user_competency_course record when in a course or module.
@@ -4233,14 +4275,19 @@ class api {
                     $usercompetencycourse->set_grade($grade);
                     // Set proficiency.
                     $usercompetencycourse->set_proficiency($proficiency);
+
+                    $coursesettings = course_competency_settings::get_by_courseid($courseid);
+                    if (!$coursesettings->get_pushratingstouserplans()) {
+                        $setucgrade = false;
+                    }
                 }
+
                 break;
 
             // Simply logging an evidence.
             case evidence::ACTION_LOG:
                 if ($grade !== null) {
-                    throw new coding_exception("The grade MUST NOT be set when 'logging' an evidence. "
-                        . "Or use ACTION_SUGGEST instead.");
+                    throw new coding_exception("The grade MUST NOT be set when 'logging' an evidence.");
                 }
                 break;
 
@@ -4522,24 +4569,17 @@ class api {
      * @param int $userid
      * @param int $competencyid
      * @param int $grade
-     * @param boolean $override
      * @param string $note A note to attach to the evidence
      * @return array of \tool_lp\user_competency
      */
-    public static function grade_competency($userid, $competencyid, $grade, $override, $note = null) {
+    public static function grade_competency($userid, $competencyid, $grade, $note = null) {
         global $USER;
         static::require_enabled();
 
         $uc = static::get_user_competency($userid, $competencyid);
         $context = $uc->get_context();
-        if ($override) {
-            if (!user_competency::can_grade_user($uc->get_userid())) {
-                throw new required_capability_exception($context, 'tool/lp:competencygrade', 'nopermissions', '');
-            }
-        } else {
-            if (!user_competency::can_suggest_grade_user($uc->get_userid())) {
-                throw new required_capability_exception($context, 'tool/lp:competencysuggestgrade', 'nopermissions', '');
-            }
+        if (!user_competency::can_grade_user($uc->get_userid())) {
+            throw new required_capability_exception($context, 'tool/lp:competencygrade', 'nopermissions', '');
         }
 
         // Throws exception if competency not in plan.
@@ -4551,10 +4591,6 @@ class api {
 
         $action = evidence::ACTION_OVERRIDE;
         $desckey = 'evidence_manualoverride';
-        if (!$override) {
-            $action = evidence::ACTION_SUGGEST;
-            $desckey = 'evidence_manualsuggest';
-        }
 
         $result = self::add_evidence($uc->get_userid(),
                                   $competency,
@@ -4570,11 +4606,7 @@ class api {
                                   $note);
         if ($result) {
             $uc->read();
-            if ($action == evidence::ACTION_OVERRIDE) {
-                $event = \tool_lp\event\user_competency_grade_rated::create_from_user_competency($uc);
-            } else {
-                $event = \tool_lp\event\user_competency_grade_suggested::create_from_user_competency($uc, $grade);
-            }
+            $event = \tool_lp\event\user_competency_grade_rated::create_from_user_competency($uc);
             $event->trigger();
         }
         return $result;
@@ -4586,11 +4618,10 @@ class api {
      * @param mixed $planorid
      * @param int $competencyid
      * @param int $grade
-     * @param boolean $override
      * @param string $note A note to attach to the evidence
      * @return array of \tool_lp\user_competency
      */
-    public static function grade_competency_in_plan($planorid, $competencyid, $grade, $override, $note = null) {
+    public static function grade_competency_in_plan($planorid, $competencyid, $grade, $note = null) {
         global $USER;
         static::require_enabled();
 
@@ -4600,14 +4631,8 @@ class api {
         }
 
         $context = $plan->get_context();
-        if ($override) {
-            if (!user_competency::can_grade_user($plan->get_userid())) {
-                throw new required_capability_exception($context, 'tool/lp:competencygrade', 'nopermissions', '');
-            }
-        } else {
-            if (!user_competency::can_suggest_grade_user($plan->get_userid())) {
-                throw new required_capability_exception($context, 'tool/lp:competencysuggestgrade', 'nopermissions', '');
-            }
+        if (!user_competency::can_grade_user($plan->get_userid())) {
+            throw new required_capability_exception($context, 'tool/lp:competencygrade', 'nopermissions', '');
         }
 
         // Throws exception if competency not in plan.
@@ -4619,10 +4644,6 @@ class api {
 
         $action = evidence::ACTION_OVERRIDE;
         $desckey = 'evidence_manualoverrideinplan';
-        if (!$override) {
-            $action = evidence::ACTION_SUGGEST;
-            $desckey = 'evidence_manualsuggestinplan';
-        }
 
         $result = self::add_evidence($plan->get_userid(),
                                   $competency,
@@ -4638,31 +4659,26 @@ class api {
                                   $note);
         if ($result) {
             $uc = static::get_user_competency($plan->get_userid(), $competency->get_id());
-            if ($action == evidence::ACTION_OVERRIDE) {
-                $event = \tool_lp\event\user_competency_grade_rated_in_plan::create_from_user_competency($uc, $plan->get_id());
-            } else {
-                $event = \tool_lp\event\user_competency_grade_suggested_in_plan::create_from_user_competency($uc,
-                    $plan->get_id(),
-                    $grade
-                );
-            }
+            $event = \tool_lp\event\user_competency_grade_rated_in_plan::create_from_user_competency($uc, $plan->get_id());
             $event->trigger();
         }
         return $result;
     }
 
     /**
-     * Manually grade a user competency from the course page.
+     * Manually grade a user course competency from the course page.
+     *
+     * This may push the rating to the user competency
+     * if the course is configured this way.
      *
      * @param mixed $courseorid
      * @param int $userid
      * @param int $competencyid
      * @param int $grade
-     * @param boolean $override
      * @param string $note A note to attach to the evidence
      * @return array of \tool_lp\user_competency
      */
-    public static function grade_competency_in_course($courseorid, $userid, $competencyid, $grade, $override, $note = null) {
+    public static function grade_competency_in_course($courseorid, $userid, $competencyid, $grade, $note = null) {
         global $USER, $DB;
         static::require_enabled();
 
@@ -4677,15 +4693,9 @@ class api {
             throw new required_capability_exception($context, 'tool/lp:usercompetencyview', 'nopermissions', '');
         }
 
-        // Validate the permission to grade or suggest.
-        if ($override) {
-            if (!user_competency::can_grade_user_in_course($userid, $course->id)) {
-                throw new required_capability_exception($context, 'tool/lp:competencygrade', 'nopermissions', '');
-            }
-        } else {
-            if (!user_competency::can_suggest_grade_user_in_course($userid, $course->id)) {
-                throw new required_capability_exception($context, 'tool/lp:competencysuggestgrade', 'nopermissions', '');
-            }
+        // Validate the permission to grade.
+        if (!user_competency::can_grade_user_in_course($userid, $course->id)) {
+            throw new required_capability_exception($context, 'tool/lp:competencygrade', 'nopermissions', '');
         }
 
         // Check that competency is in course and visible to the current user.
@@ -4702,10 +4712,6 @@ class api {
 
         $action = evidence::ACTION_OVERRIDE;
         $desckey = 'evidence_manualoverrideincourse';
-        if (!$override) {
-            $action = evidence::ACTION_SUGGEST;
-            $desckey = 'evidence_manualsuggestincourse';
-        }
 
         $result = self::add_evidence($userid,
                                   $competency,
@@ -4720,16 +4726,9 @@ class api {
                                   $USER->id,
                                   $note);
         if ($result) {
-            $all = user_competency::get_multiple($userid, array($competency->get_id()));
+            $all = user_competency_course::get_multiple($userid, $course->id, array($competency->get_id()));
             $uc = reset($all);
-            if ($action == evidence::ACTION_OVERRIDE) {
-                $event = \tool_lp\event\user_competency_grade_rated_in_course::create_from_user_competency($uc, $course->id);
-            } else {
-                $event = \tool_lp\event\user_competency_grade_suggested_in_course::create_from_user_competency($uc,
-                    $course->id,
-                    $grade
-                );
-            }
+            $event = \tool_lp\event\user_competency_grade_rated_in_course::create_from_user_competency_course($uc);
             $event->trigger();
         }
         return $result;
@@ -4854,5 +4853,62 @@ class api {
         \tool_lp\event\template_viewed::create_from_template($template)->trigger();
 
         return true;
+    }
+
+    /**
+     * Get the competency settings for a course.
+     *
+     * Requires tool/lp:coursecompetencyview capability at the course context.
+     *
+     * @param int $courseid The course id
+     * @return course_competency_settings
+     */
+    public static function read_course_competency_settings($courseid) {
+        static::require_enabled();
+
+        // First we do a permissions check.
+        if (!course_competency_settings::can_read($courseid)) {
+            $context = context_course::instance($courseid);
+            throw new required_capability_exception($context, 'tool/lp:coursecompetencyview', 'nopermissions', '');
+        }
+
+        return course_competency_settings::get_by_courseid($courseid);
+    }
+
+    /**
+     * Update the competency settings for a course.
+     *
+     * Requires tool/lp:coursecompetencyconfigure capability at the course context.
+     *
+     * @param int $courseid The course id
+     * @param stdClass $settings List of settings. The only valid setting ATM is pushratginstouserplans (boolean).
+     * @return bool
+     */
+    public static function update_course_competency_settings($courseid, $settings) {
+        static::require_enabled();
+
+        $settings = (object) $settings;
+
+        // Get all the valid settings.
+        $pushratingstouserplans = isset($settings->pushratingstouserplans) ? $settings->pushratingstouserplans : false;
+
+        // First we do a permissions check.
+        if (!course_competency_settings::can_manage_course($courseid)) {
+            $context = context_course::instance($courseid);
+            throw new required_capability_exception($context, 'tool/lp:coursecompetencyconfigure', 'nopermissions', '');
+        }
+
+        $exists = course_competency_settings::get_record(array('courseid' => $courseid));
+
+        // Now update or insert.
+        if ($exists) {
+            $settings = $exists;
+            $settings->set_pushratingstouserplans($pushratingstouserplans);
+            return $settings->update();
+        } else {
+            $data = (object) array('courseid' => $courseid, 'pushratingstouserplans' => $pushratingstouserplans);
+            $settings = new course_competency_settings(0, $data);
+            return !empty($settings->create());
+        }
     }
 }

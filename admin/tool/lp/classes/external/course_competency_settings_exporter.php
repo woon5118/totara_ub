@@ -15,16 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version info
+ * Class for exporting course_competency_settings data.
  *
  * @package    tool_lp
- * @copyright  2015 Damyon Wiese
+ * @copyright  2016 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace tool_lp\external;
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * Class for exporting course_competency_settings data.
+ *
+ * @package    tool_lp
+ * @copyright  2016 Damyon Wiese
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class course_competency_settings_exporter extends persistent_exporter {
 
+    protected static function define_class() {
+        return 'tool_lp\\course_competency_settings';
+    }
 
-$plugin->version   = 2016020922; // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2014110400; // Requires this Moodle version.
-$plugin->component = 'tool_lp'; // Full name of the plugin (used for diagnostics).
+}

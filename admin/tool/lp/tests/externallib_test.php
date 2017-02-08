@@ -35,6 +35,7 @@ use tool_lp\user_competency;
 use tool_lp\user_competency_plan;
 use tool_lp\plan_competency;
 use tool_lp\template_competency;
+use tool_lp\course_competency_settings;
 
 /**
  * External learning plans webservice API tests.
@@ -105,7 +106,6 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
 
         // Reset all default authenticated users permissions.
         unassign_capability('tool/lp:competencygrade', $authrole->id);
-        unassign_capability('tool/lp:competencysuggestgrade', $authrole->id);
         unassign_capability('tool/lp:competencymanage', $authrole->id);
         unassign_capability('tool/lp:competencyview', $authrole->id);
         unassign_capability('tool/lp:planmanage', $authrole->id);
@@ -118,12 +118,14 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
         unassign_capability('tool/lp:templatemanage', $authrole->id);
         unassign_capability('tool/lp:templateview', $authrole->id);
         unassign_capability('moodle/cohort:manage', $authrole->id);
+        unassign_capability('tool/lp:coursecompetencyconfigure', $authrole->id);
 
         // Creating specific roles.
         $this->creatorrole = create_role('Creator role', 'creatorrole', 'learning plan creator role description');
         $this->userrole = create_role('User role', 'userrole', 'learning plan user role description');
 
         assign_capability('tool/lp:competencymanage', CAP_ALLOW, $this->creatorrole, $syscontext->id);
+        assign_capability('tool/lp:competencycompetencyconfigure', CAP_ALLOW, $this->creatorrole, $syscontext->id);
         assign_capability('tool/lp:competencyview', CAP_ALLOW, $this->userrole, $syscontext->id);
         assign_capability('tool/lp:planmanage', CAP_ALLOW, $this->creatorrole, $syscontext->id);
         assign_capability('tool/lp:planmanagedraft', CAP_ALLOW, $this->creatorrole, $syscontext->id);
@@ -132,10 +134,8 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
         assign_capability('tool/lp:planviewdraft', CAP_ALLOW, $this->creatorrole, $syscontext->id);
         assign_capability('tool/lp:templatemanage', CAP_ALLOW, $this->creatorrole, $syscontext->id);
         assign_capability('tool/lp:competencygrade', CAP_ALLOW, $this->creatorrole, $syscontext->id);
-        assign_capability('tool/lp:competencysuggestgrade', CAP_ALLOW, $this->creatorrole, $syscontext->id);
         assign_capability('moodle/cohort:manage', CAP_ALLOW, $this->creatorrole, $syscontext->id);
         assign_capability('tool/lp:templateview', CAP_ALLOW, $this->userrole, $syscontext->id);
-        assign_capability('tool/lp:competencysuggestgrade', CAP_ALLOW, $this->userrole, $syscontext->id);
         assign_capability('tool/lp:planviewown', CAP_ALLOW, $this->userrole, $syscontext->id);
         assign_capability('tool/lp:planviewowndraft', CAP_ALLOW, $this->userrole, $syscontext->id);
 
@@ -2937,23 +2937,16 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
 
         $uc = $lpg->create_user_competency(array('userid' => $this->user->id, 'competencyid' => $c1->get_id()));
 
-        $evidence = external::grade_competency_in_plan($plan->get_id(), $c1->get_id(), 1, false, 'Evil note');
-
-        $this->assertEquals('The competency grade was manually suggested in the plan \'Evil\'.', $evidence->description);
-        $this->assertEquals('A', $evidence->gradename);
-        $this->assertEquals('Evil note', $evidence->note);
-        $evidence = external::grade_competency_in_plan($plan->get_id(), $c1->get_id(), 1, true);
+        $evidence = external::grade_competency_in_plan($plan->get_id(), $c1->get_id(), 1, 'Evil note');
 
         $this->assertEquals('The competency grade was manually set in the plan \'Evil\'.', $evidence->description);
         $this->assertEquals('A', $evidence->gradename);
+        $this->assertEquals('Evil note', $evidence->note);
 
         $this->setUser($this->user);
-        $evidence = external::grade_competency_in_plan($plan->get_id(), $c1->get_id(), 1, false);
-        $this->assertEquals('The competency grade was manually suggested in the plan \'Evil\'.', $evidence->description);
-        $this->assertEquals('A', $evidence->gradename);
 
         $this->setExpectedException('required_capability_exception');
-        $evidence = external::grade_competency_in_plan($plan->get_id(), $c1->get_id(), 1, true);
+        $evidence = external::grade_competency_in_plan($plan->get_id(), $c1->get_id(), 1);
     }
 
     public function test_data_for_user_competency_summary_in_plan() {
@@ -2975,12 +2968,11 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
 
         $uc = $lpg->create_user_competency(array('userid' => $this->user->id, 'competencyid' => $c1->get_id()));
 
-        $evidence = external::grade_competency_in_plan($plan->get_id(), $c1->get_id(), 1, false);
+        $evidence = external::grade_competency_in_plan($plan->get_id(), $c1->get_id(), 1, true);
         $evidence = external::grade_competency_in_plan($plan->get_id(), $c1->get_id(), 2, true);
 
         $summary = external::data_for_user_competency_summary_in_plan($c1->get_id(), $plan->get_id());
         $this->assertTrue($summary->usercompetencysummary->cangrade);
-        $this->assertTrue($summary->usercompetencysummary->cansuggest);
         $this->assertEquals('Evil', $summary->plan->name);
         $this->assertEquals('B', $summary->usercompetencysummary->usercompetency->gradename);
         $this->assertEquals('B', $summary->usercompetencysummary->evidence[0]->gradename);
@@ -3059,4 +3051,47 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
         }
     }
 
+    /**
+     * Test update course competency settings.
+     */
+    public function test_update_course_competency_settings() {
+        $this->resetAfterTest(true);
+
+        $dg = $this->getDataGenerator();
+
+        $course = $dg->create_course();
+        $roleid = $dg->create_role();
+        $noobroleid = $dg->create_role();
+        $context = context_course::instance($course->id);
+        $compmanager = $this->getDataGenerator()->create_user();
+        $compnoob = $this->getDataGenerator()->create_user();
+
+        assign_capability('tool/lp:coursecompetencyconfigure', CAP_ALLOW, $roleid, $context->id, true);
+        assign_capability('tool/lp:coursecompetencyview', CAP_ALLOW, $roleid, $context->id, true);
+        assign_capability('tool/lp:coursecompetencyview', CAP_ALLOW, $noobroleid, $context->id, true);
+
+        role_assign($roleid, $compmanager->id, $context->id);
+        role_assign($noobroleid, $compnoob->id, $context->id);
+        $dg->enrol_user($compmanager->id, $course->id, $roleid);
+        $dg->enrol_user($compnoob->id, $course->id, $noobroleid);
+
+        $this->setUser($compmanager);
+
+        // Start the test.
+        $result = external::update_course_competency_settings($course->id, array('pushratingstouserplans' => true));
+
+        $settings = course_competency_settings::get_by_courseid($course->id);
+
+        $this->assertTrue((bool)$settings->get_pushratingstouserplans());
+        
+        $result = external::update_course_competency_settings($course->id, array('pushratingstouserplans' => false));
+
+        $settings = course_competency_settings::get_by_courseid($course->id);
+
+        $this->assertFalse((bool)$settings->get_pushratingstouserplans());
+        $this->setUser($compnoob);
+
+        $this->setExpectedException('required_capability_exception');
+        $result = external::update_course_competency_settings($course->id, array('pushratingstouserplans' => true));
+    }
 }
