@@ -34,12 +34,6 @@ env:
 
     # Run unit tests on Postgres
     - DB=pgsql    TASK=PHPUNIT
-<<<<<<< HEAD
-
-    # Run a check for unbuilt files with Grunt.
-    - DB=none     TASK=GRUNT
-=======
->>>>>>> 6b4a2baed09... 0TL-9618 / MDL-54059 testing: Simplify travis output
 
     # Perform an upgrade test too.
     - DB=pgsql    TASK=UPGRADE

@@ -126,7 +126,6 @@ if ($mform && ($mform->is_cancelled() || !empty($CFG->preventscheduledtaskchange
 
 } else {
     echo $OUTPUT->header();
-<<<<<<< HEAD
 
     // Check if the cron has run recently, if not notify the admin about configuration recommendations.
     $lastrun = $DB->get_field_sql('SELECT MAX(lastruntime) FROM {task_scheduled}');
