@@ -2571,6 +2571,150 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
         $this->assertEquals(2, $c2a->get_sortorder());
     }
 
+    public function test_search_users_by_capability() {
+        global $CFG;
+        $this->resetAfterTest(true);
+
+        $dg = $this->getDataGenerator();
+        $ux = $dg->create_user();
+        $u1 = $dg->create_user(array('idnumber' => 'Cats', 'firstname' => 'Bob', 'lastname' => 'Dyyylan',
+            'email' => 'bobbyyy@dyyylan.com', 'phone1' => '123456', 'phone2' => '78910', 'department' => 'Marketing',
+            'institution' => 'HQ'));
+
+        // First we search with no capability assigned.
+        $this->setUser($ux);
+        $result = external::search_users('yyylan', 'tool/lp:planmanage');
+        $result = external_api::clean_returnvalue(external::search_users_returns(), $result);
+        $this->assertCount(0, $result['users']);
+        $this->assertEquals(0, $result['count']);
+
+        // Now we assign a different capability.
+        $usercontext = context_user::instance($u1->id);
+        $systemcontext = context_system::instance();
+        $customrole = $this->assignUserCapability('tool/lp:planview', $usercontext->id);
+
+        $result = external::search_users('yyylan', 'tool/lp:planmanage');
+        $result = external_api::clean_returnvalue(external::search_users_returns(), $result);
+        $this->assertCount(0, $result['users']);
+        $this->assertEquals(0, $result['count']);
+
+        // Now we assign a matching capability in the same role.
+        $usercontext = context_user::instance($u1->id);
+        $this->assignUserCapability('tool/lp:planmanage', $usercontext->id, $customrole);
+
+        $result = external::search_users('yyylan', 'tool/lp:planmanage');
+        $result = external_api::clean_returnvalue(external::search_users_returns(), $result);
+        $this->assertCount(1, $result['users']);
+        $this->assertEquals(1, $result['count']);
+
+        // Now assign another role with the same capability (test duplicates).
+        role_assign($this->creatorrole, $ux->id, $usercontext->id);
+        $result = external::search_users('yyylan', 'tool/lp:planmanage');
+        $result = external_api::clean_returnvalue(external::search_users_returns(), $result);
+        $this->assertCount(1, $result['users']);
+        $this->assertEquals(1, $result['count']);
+
+        // Now lets try a different user with only the role at system level.
+        $ux2 = $dg->create_user();
+        role_assign($this->creatorrole, $ux2->id, $systemcontext->id);
+        $this->setUser($ux2);
+        $result = external::search_users('yyylan', 'tool/lp:planmanage');
+        $result = external_api::clean_returnvalue(external::search_users_returns(), $result);
+        $this->assertCount(1, $result['users']);
+        $this->assertEquals(1, $result['count']);
+
+        // Now lets try a different user with only the role at user level.
+        $ux3 = $dg->create_user();
+        role_assign($this->creatorrole, $ux3->id, $usercontext->id);
+        $this->setUser($ux3);
+        $result = external::search_users('yyylan', 'tool/lp:planmanage');
+        $result = external_api::clean_returnvalue(external::search_users_returns(), $result);
+        $this->assertCount(1, $result['users']);
+        $this->assertEquals(1, $result['count']);
+
+        // Switch back.
+        $this->setUser($ux);
+
+        // Now add a prevent override (will change nothing because we still have an ALLOW).
+        assign_capability('tool/lp:planmanage', CAP_PREVENT, $customrole, $usercontext->id);
+        $result = external::search_users('yyylan', 'tool/lp:planmanage');
+        $result = external_api::clean_returnvalue(external::search_users_returns(), $result);
+        $this->assertCount(1, $result['users']);
+        $this->assertEquals(1, $result['count']);
+
+        // Now change to a prohibit override (should prevent access).
+        assign_capability('tool/lp:planmanage', CAP_PROHIBIT, $customrole, $usercontext->id);
+        $result = external::search_users('yyylan', 'tool/lp:planmanage');
+        $result = external_api::clean_returnvalue(external::search_users_returns(), $result);
+        $this->assertCount(1, $result['users']);
+        $this->assertEquals(1, $result['count']);
+
+    }
+
+    /**
+     * Ensures that overrides, as well as system permissions, are respected.
+     */
+    public function test_search_users_by_capability_the_comeback() {
+        $this->resetAfterTest();
+        $dg = $this->getDataGenerator();
+
+        $master = $dg->create_user();
+        $manager = $dg->create_user();
+        $slave1 = $dg->create_user(array('lastname' => 'MOODLER'));
+        $slave2 = $dg->create_user(array('lastname' => 'MOODLER'));
+        $slave3 = $dg->create_user(array('lastname' => 'MOODLER'));
+
+        $syscontext = context_system::instance();
+        $slave1context = context_user::instance($slave1->id);
+        $slave2context = context_user::instance($slave2->id);
+        $slave3context = context_user::instance($slave3->id);
+
+        // Creating a role giving the site config.
+        $roleid = $dg->create_role();
+        assign_capability('moodle/site:config', CAP_ALLOW, $roleid, $syscontext->id, true);
+
+        // Create a role override for slave 2.
+        assign_capability('moodle/site:config', CAP_PROHIBIT, $roleid, $slave2context->id, true);
+
+        // Assigning the role.
+        // Master -> System context.
+        // Manager -> User context.
+        role_assign($roleid, $master->id, $syscontext);
+        role_assign($roleid, $manager->id, $slave1context);
+
+        // Flush accesslib.
+        accesslib_clear_all_caches_for_unit_testing();
+
+        // Confirm.
+        // Master has system permissions.
+        $this->setUser($master);
+        $this->assertTrue(has_capability('moodle/site:config', $syscontext));
+        $this->assertTrue(has_capability('moodle/site:config', $slave1context));
+        $this->assertFalse(has_capability('moodle/site:config', $slave2context));
+        $this->assertTrue(has_capability('moodle/site:config', $slave3context));
+
+        // Manager only has permissions in slave 1.
+        $this->setUser($manager);
+        $this->assertFalse(has_capability('moodle/site:config', $syscontext));
+        $this->assertTrue(has_capability('moodle/site:config', $slave1context));
+        $this->assertFalse(has_capability('moodle/site:config', $slave2context));
+        $this->assertFalse(has_capability('moodle/site:config', $slave3context));
+
+        // Now do the test.
+        $this->setUser($master);
+        $result = external::search_users('MOODLER', 'moodle/site:config');
+        $this->assertCount(2, $result['users']);
+        $this->assertEquals(2, $result['count']);
+        $this->assertArrayHasKey($slave1->id, $result['users']);
+        $this->assertArrayHasKey($slave3->id, $result['users']);
+
+        $this->setUser($manager);
+        $result = external::search_users('MOODLER', 'moodle/site:config');
+        $this->assertCount(1, $result['users']);
+        $this->assertEquals(1, $result['count']);
+        $this->assertArrayHasKey($slave1->id, $result['users']);
+    }
+
     public function test_search_users() {
         global $CFG;
         $this->resetAfterTest(true);
