@@ -104,7 +104,7 @@ class mod_lti_edit_types_form extends moodleform{
 
         if (!$istool && !empty($this->_customdata->isadmin)) {
             // TL-8482 removed '&nbsp;' as it was causing an empty label to be displayed
-            $mform->addElement('checkbox', 'lti_coursevisible', '', get_string('show_in_course', 'lti'));
+            $mform->addElement('advcheckbox', 'lti_coursevisible', '', get_string('show_in_course', 'lti'));
             $mform->addHelpButton('lti_coursevisible', 'show_in_course', 'lti');
             $mform->setDefault('lti_coursevisible', '1');
         } else {
