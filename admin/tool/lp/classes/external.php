@@ -27,6 +27,7 @@ require_once("$CFG->libdir/externallib.php");
 require_once("$CFG->libdir/grade/grade_scale.php");
 
 use context;
+use context_system;
 use external_api;
 use external_function_parameters;
 use external_value;
@@ -286,7 +287,10 @@ class external extends external_api {
 
         $params = (object) $params;
         $result = api::create_framework($params);
-        return $result->to_record();
+        $record = $result->to_record();
+        $record->descriptionformatted = format_text($record->description, $record->descriptionformat,
+            array('context' => context_system::instance()));
+        return $record;
     }
 
     /**
@@ -337,7 +341,10 @@ class external extends external_api {
                                             ));
 
         $result = api::read_framework($params['id']);
-        return $result->to_record();
+        $record = $result->to_record();
+        $record->descriptionformatted = format_text($record->description, $record->descriptionformat,
+            array('context' => context_system::instance()));
+        return $record;
     }
 
     /**
@@ -593,6 +600,8 @@ class external extends external_api {
         $records = array();
         foreach ($results as $result) {
             $record = $result->to_record();
+            $record->descriptionformatted = format_text($record->description, $record->descriptionformat,
+                array('context' => context_system::instance()));
             array_push($records, $record);
         }
         return $records;
@@ -906,7 +915,10 @@ class external extends external_api {
         $params = (object) $params;
 
         $result = api::create_competency($params);
-        return $result->to_record();
+        $record = $result->to_record();
+        $record->descriptionformatted = format_text($record->description, $record->descriptionformat,
+            array('context' => context_system::instance()));
+        return $record;
     }
 
     /**
@@ -957,7 +969,10 @@ class external extends external_api {
                                             ));
 
         $result = api::read_competency($params['id']);
-        return $result->to_record();
+        $record = $result->to_record();
+        $options = array('context' => context_system::instance());
+        $record->descriptionformatted = format_text($record->description, $record->descriptionformat, $options);
+        return $record;
     }
 
     /**
@@ -1175,8 +1190,10 @@ class external extends external_api {
                                                      $params['skip'],
                                                      $params['limit']);
         $records = array();
+        $options = array('context' => context_system::instance());
         foreach ($results as $result) {
             $record = $result->to_record();
+            $record->descriptionformatted = format_text($record->description, $record->descriptionformat, $options);
             array_push($records, $record);
         }
         return $records;
@@ -1244,9 +1261,11 @@ class external extends external_api {
                                             ));
 
         $results = api::search_competencies($searchtext, $competencyframeworkid);
+        $options = array('context' => context_system::instance());
         $records = array();
         foreach ($results as $result) {
             $record = $result->to_record();
+            $record->descriptionformatted = format_text($record->description, $record->descriptionformat, $options);
             array_push($records, $record);
         }
         return $records;
@@ -1765,9 +1784,11 @@ class external extends external_api {
                                             ));
 
         $competencies = api::list_competencies_in_course($params['id']);
+        $options = array('context' => context_system::instance());
         $results = array();
         foreach ($competencies as $competency) {
             $record = $competency->to_record();
+            $record->descriptionformatted = format_text($record->description, $record->descriptionformat, $options);
             array_push($results, $record);
         }
         return $results;
@@ -2256,7 +2277,11 @@ class external extends external_api {
         $params->contextid = $context->id;
 
         $result = api::create_template($params);
-        return $result->to_record();
+        $record = $result->to_record();
+        $record->descriptionformatted = format_text($record->description, $record->descriptionformat,
+            array('context' => context_system::instance()));
+        $record->duedateformatted = userdate($record->duedate);
+        return $record;
     }
 
     /**
@@ -2307,7 +2332,11 @@ class external extends external_api {
                                             ));
 
         $result = api::read_template($params['id']);
-        return $result->to_record();
+        $record = $result->to_record();
+        $record->descriptionformatted = format_text($record->description, $record->descriptionformat,
+            array('context' => context_system::instance()));
+        $record->duedateformatted = userdate($record->duedate);
+        return $record;
     }
 
     /**
@@ -2569,6 +2598,9 @@ class external extends external_api {
         $records = array();
         foreach ($results as $result) {
             $record = $result->to_record();
+            $record->descriptionformatted = format_text($record->description, $record->descriptionformat,
+                array('context' => context_system::instance()));
+            $record->duedateformatted = userdate($record->duedate);
             array_push($records, $record);
         }
         return $records;
@@ -2886,9 +2918,11 @@ class external extends external_api {
                                             ));
 
         $competencies = api::list_competencies_in_template($params['id']);
+        $options = array('context' => context_system::instance());
         $results = array();
         foreach ($competencies as $competency) {
             $record = $competency->to_record();
+            $record->descriptionformatted = format_text($record->description, $record->descriptionformat, $options);
             array_push($results, $record);
         }
         return $results;
@@ -3257,7 +3291,10 @@ class external extends external_api {
         $params = (object) $params;
 
         $result = api::create_plan($params);
-        return external_api::clean_returnvalue(self::create_plan_returns(), $result->to_record());
+        $record = $result->to_record();
+        $record->statusname = $result->get_statusname();
+        $record->usercanupdate = $result->can_update();
+        return external_api::clean_returnvalue(self::create_plan_returns(), $record);
     }
 
     /**
@@ -3370,7 +3407,10 @@ class external extends external_api {
         $params = (object) $params;
 
         $result = api::update_plan($params);
-        return external_api::clean_returnvalue(self::update_plan_returns(), $result->to_record());
+        $record = $result->to_record();
+        $record->statusname = $result->get_statusname();
+        $record->usercanupdate = $result->can_update();
+        return external_api::clean_returnvalue(self::update_plan_returns(), $record);
     }
 
     /**
@@ -3417,7 +3457,10 @@ class external extends external_api {
                                             ));
 
         $result = api::read_plan($params['id']);
-        return external_api::clean_returnvalue(self::read_plan_returns(), $result->to_record());
+        $record = $result->to_record();
+        $record->statusname = $result->get_statusname();
+        $record->usercanupdate = $result->can_update();
+        return external_api::clean_returnvalue(self::read_plan_returns(), $record);
     }
 
     /**

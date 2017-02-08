@@ -74,7 +74,6 @@ class api {
         require_capability('tool/lp:competencymanage', $competency->get_framework()->get_context());
 
         // OK - all set.
-        $competency->set_id($id);
         return $competency->delete();
     }
 
@@ -93,7 +92,7 @@ class api {
         require_capability('tool/lp:competencymanage', $current->get_framework()->get_context());
 
         $max = self::count_competencies(array('parentid' => $current->get_parentid(),
-                                             'competencyframeworkid' => $current->get_competencyframeworkid()));
+                                              'competencyframeworkid' => $current->get_competencyframeworkid()));
         if ($max > 0) {
             $max--;
         }
@@ -177,11 +176,6 @@ class api {
             $parent = new competency($newparentid);
             $parentframeworkid = $parent->get_competencyframeworkid();
             $parentpath = $parent->get_path();
-        }
-
-        if ($parentframeworkid != $current->get_competencyframeworkid()) {
-            // Only allow moving within the same framework.
-            throw new coding_exception('Moving competencies is only supported within the same framework.');
         }
 
         // If we are moving a node to a child of itself, promote all the child nodes by one level.
@@ -271,8 +265,7 @@ class api {
         }
 
         // OK - all set.
-        $competency = new competency();
-        return $competency->search($textsearch, $competencyframeworkid);
+        return competency::search($textsearch, $competencyframeworkid);
     }
 
     /**
@@ -301,8 +294,7 @@ class api {
         }
 
         // OK - all set.
-        $competency = new competency();
-        return $competency->get_records($filters, $sort, $order, $skip, $limit);
+        return competency::get_records($filters, $sort, $order, $skip, $limit);
     }
 
     /**
@@ -327,8 +319,7 @@ class api {
         }
 
         // OK - all set.
-        $competency = new competency();
-        return $competency->count_records($filters);
+        return competency::count_records($filters);
     }
 
     /**
@@ -372,9 +363,6 @@ class api {
         $framework = new competency_framework($record->id);
         // Check the permissions before update.
         require_capability('tool/lp:competencymanage', $framework->get_context());
-        if (isset($record->contextid) && $record->contextid != $framework->get_contextid()) {
-            throw new coding_exception('Changing the context of an existing framework is forbidden.');
-        }
         $framework->from_record($record);
         return $framework->update();
     }
@@ -424,9 +412,8 @@ class api {
         }
 
         // OK - all set.
-        $framework = new competency_framework();
         list($insql, $inparams) = $DB->get_in_or_equal(array_keys($contexts), SQL_PARAMS_NAMED);
-        return $framework->get_records_select("contextid $insql", $inparams, $sort, '*', $skip, $limit);
+        return competency_framework::get_records_select("contextid $insql", $inparams, $sort, '*', $skip, $limit);
     }
 
     /**
@@ -454,9 +441,8 @@ class api {
         }
 
         // OK - all set.
-        $framework = new competency_framework();
         list($insql, $inparams) = $DB->get_in_or_equal(array_keys($contexts), SQL_PARAMS_NAMED);
-        return $framework->count_records_select("contextid $insql", $inparams);
+        return competency_framework::count_records_select("contextid $insql", $inparams);
     }
 
     /**
@@ -916,8 +902,7 @@ class api {
         }
 
         // OK - all set.
-        $templatecompetency = new template_competency();
-        return $templatecompetency->count_templates($competencyid, $onlyvisible);
+        return template_competency::count_templates($competencyid, $onlyvisible);
     }
 
     /**
@@ -941,8 +926,7 @@ class api {
         }
 
         // OK - all set.
-        $templatecompetency = new template_competency();
-        return $templatecompetency->list_templates($competencyid, $onlyvisible);
+        return template_competency::list_templates($competencyid, $onlyvisible);
 
     }
 
@@ -968,8 +952,7 @@ class api {
         }
 
         // OK - all set.
-        $templatecompetency = new template_competency();
-        return $templatecompetency->count_competencies($templateid, $onlyvisible);
+        return template_competency::count_competencies($templateid, $onlyvisible);
     }
 
     /**
@@ -994,8 +977,7 @@ class api {
         }
 
         // OK - all set.
-        $templatecompetency = new template_competency();
-        return $templatecompetency->list_competencies($templateid, $onlyvisible);
+        return template_competency::list_competencies($templateid, $onlyvisible);
     }
 
     /**
@@ -1020,13 +1002,11 @@ class api {
             throw new coding_exception('The competency does not exist');
         }
 
-        $templatecompetency = new template_competency();
-        $exists = $templatecompetency->get_records(array('templateid' => $templateid, 'competencyid' => $competencyid));
+        $exists = template_competency::get_records(array('templateid' => $templateid, 'competencyid' => $competencyid));
         if (!$exists) {
-            $templatecompetency->from_record($record);
-            if ($templatecompetency->create()) {
-                return true;
-            }
+            $templatecompetency = new template_competency(0, $record);
+            $templatecompetency->create();
+            return true;
         }
         return false;
     }
@@ -1053,8 +1033,7 @@ class api {
              throw new coding_exception('The competency does not exist');
         }
 
-        $templatecompetency = new template_competency();
-        $exists = $templatecompetency->get_records(array('templateid' => $templateid, 'competencyid' => $competencyid));
+        $exists = template_competency::get_records(array('templateid' => $templateid, 'competencyid' => $competencyid));
         if ($exists) {
             $link = array_pop($exists);
             return $link->delete();
@@ -1079,21 +1058,20 @@ class api {
         require_capability('tool/lp:templatemanage', $context);
 
         $down = true;
-        $templatecompetency = new template_competency();
-        $matches = $templatecompetency->get_records(array('templateid' => $templateid, 'competencyid' => $competencyidfrom));
+        $matches = template_competency::get_records(array('templateid' => $templateid, 'competencyid' => $competencyidfrom));
         if (count($matches) == 0) {
             throw new coding_exception('The link does not exist');
         }
 
         $competencyfrom = array_pop($matches);
-        $matches = $templatecompetency->get_records(array('templateid' => $templateid, 'competencyid' => $competencyidto));
+        $matches = template_competency::get_records(array('templateid' => $templateid, 'competencyid' => $competencyidto));
         if (count($matches) == 0) {
             throw new coding_exception('The link does not exist');
         }
 
         $competencyto = array_pop($matches);
 
-        $all = $templatecompetency->get_records(array('templateid' => $templateid), 'sortorder', 'ASC', 0, 0);
+        $all = template_competency::get_records(array('templateid' => $templateid), 'sortorder', 'ASC', 0, 0);
 
         if ($competencyfrom->get_sortorder() > $competencyto->get_sortorder()) {
             // We are moving up, so put it before the "to" item.
@@ -1141,8 +1119,7 @@ class api {
             $params['statusdraft'] = plan::STATUS_DRAFT;
         }
 
-        $plans = new plan();
-        return $plans->get_records_select($select, $params, 'timemodified DESC');
+        return plan::get_records_select($select, $params, 'timemodified DESC');
     }
 
     /**
@@ -1177,7 +1154,7 @@ class api {
         }
 
         $plan = new plan(0, $record);
-        $id = $plan->create();
+        $plan->create();
         return $plan;
     }
 
@@ -1203,13 +1180,13 @@ class api {
             throw new required_capability_exception($context, 'tool/lp:planmanageall', 'nopermissions', '');
         }
 
-        $current = new plan($record->id);
+        $plan = new plan($record->id);
 
         // We don't allow users without planmanage and without
         // planmanageown to edit plans that other users modified.
-        if (!$manageplans && !$manageownplan && $USER->id != $current->get_usermodified()) {
+        if (!$manageplans && !$manageownplan && $USER->id != $plan->get_usermodified()) {
             throw new \moodle_exception('erroreditingmodifiedplan', 'tool_lp');
-        } else if (!$manageplans && $USER->id != $current->get_userid()) {
+        } else if (!$manageplans && $USER->id != $plan->get_userid()) {
             throw new required_capability_exception($context, 'tool/lp:planmanageall', 'nopermissions', '');
         }
 
@@ -1218,7 +1195,7 @@ class api {
             throw new required_capability_exception($context, 'tool/lp:planmanageown', 'nopermissions', '');
         }
 
-        $plan = new plan($record->id, $record);
+        $plan->from_record($record);
         return $plan->update();
     }
 
@@ -1241,7 +1218,7 @@ class api {
         }
 
         // We require any of these capabilities to retrieve draft plans.
-        if ($plan->get_status() === plan::STATUS_DRAFT &&
+        if ($plan->get_status() == plan::STATUS_DRAFT &&
                 !has_any_capability(array('tool/lp:planmanageown', 'tool/lp:planmanageall', 'tool/lp:plancreatedraft'), $context)) {
             // Exception about plancreatedraft as it is the one that is closer to basic users.
             throw new required_capability_exception($context, 'tool/lp:plancreatedraft', 'nopermissions', '');
