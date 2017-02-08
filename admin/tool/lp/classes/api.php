@@ -3841,6 +3841,32 @@ class api {
     }
 
     /**
+     * Send request review for user evidence competencies.
+     *
+     * @param  int $id The user evidence ID.
+     * @return bool
+     */
+    public static function request_review_of_user_evidence_linked_competencies($id) {
+        $onlyidle = false;
+        $userevidence = new user_evidence($id);
+        $context = $userevidence->get_context();
+        $userid = $userevidence->get_userid();
+
+        if (!$userevidence->can_manage()) {
+            throw new required_capability_exception($context, 'tool/lp:userevidencemanage', 'nopermissions', '');
+        }
+
+        $usercompetencies = user_evidence_competency::get_user_competencies_by_userevidenceid($id);
+        foreach ($usercompetencies as $usercompetency) {
+            if ($usercompetency->get_status() == user_competency::STATUS_IDLE) {
+                static::user_competency_request_review($userid, $usercompetency->get_competencyid());
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Recursively duplicate competencies from a tree, we start duplicating from parents to children to have a correct path.
      * This method does not copy the related competencies.
      *

@@ -80,7 +80,6 @@ define(['jquery',
                 self._loadCompetencies().then(self._refresh.bind(self));
             }.bind(self));
         }
-
     };
 
     /**
