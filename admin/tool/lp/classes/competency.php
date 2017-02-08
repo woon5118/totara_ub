@@ -413,4 +413,34 @@ class competency extends persistent {
         return $DB->count_records_select(self::TABLE, "id $insql", $params, "COUNT(DISTINCT(competencyframeworkid))") == 1;
     }
 
+    /**
+     * Build a framework tree with competency nodes.
+     *
+     * @param  int  $frameworkid the framework id
+     * @return node[] tree of framework competency nodes
+     */
+    public static function get_framework_tree($frameworkid) {
+        $competencies = self::search('', $frameworkid);
+        return self::build_tree($competencies, 0);
+    }
+
+    /**
+     * Recursively build up the tree of nodes.
+     *
+     * @param array $all - List of all competency classes.
+     * @param int $parentid - The current parent ID. Pass 0 to build the tree from the top.
+     */
+    protected static function build_tree($all, $parentid) {
+        $tree = array();
+        foreach ($all as $one) {
+            if ($one->get_parentid() == $parentid) {
+                $node = new stdClass();
+                $node->competency = $one;
+                $node->children = self::build_tree($all, $one->get_id());
+                $tree[] = $node;
+            }
+        }
+        return $tree;
+    }
+
 }
