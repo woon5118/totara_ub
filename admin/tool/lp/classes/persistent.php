@@ -533,11 +533,11 @@ abstract class persistent {
     final public function validate() {
         global $CFG;
 
+        // Before validate hook.
+        $this->before_validate();
+
         // If this object has not been validated yet.
         if ($this->validated !== true) {
-
-            // Before validate hook.
-            $this->before_validate();
 
             $errors = array();
             $properties = static::properties_definition();
@@ -680,8 +680,8 @@ abstract class persistent {
 
         // We return class instances.
         $instances = array();
-        foreach ($records as $record) {
-            array_push($instances, new static(0, $record));
+        foreach ($records as $key => $record) {
+            $instances[$key] = new static(0, $record);
         }
 
         return $instances;
