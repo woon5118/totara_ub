@@ -30,6 +30,7 @@ use context_system;
 use context_course;
 use context_user;
 use coding_exception;
+use require_login_exception;
 use moodle_url;
 use required_capability_exception;
 
@@ -40,6 +41,31 @@ use required_capability_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class api {
+
+    /**
+     * Validate if current user have acces to the course if hidden.
+     *
+     * @param mixed $courseorid The course or it ID.
+     * @param bool $throwexception Throw an exception or not.
+     * @return bool
+     */
+    protected static function validate_course($courseorid, $throwexception = true) {
+        $course = $courseorid;
+        if (!is_object($course)) {
+            $course = get_course($course);
+        }
+
+        $coursecontext = context_course::instance($course->id);
+        if (!$course->visible and !has_capability('moodle/course:viewhiddencourses', $coursecontext)) {
+            if ($throwexception) {
+                throw new require_login_exception('Course is hidden');
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /**
      * Create a competency from a record containing all the data for the class.
@@ -596,13 +622,13 @@ class api {
 
         // Now check permissions on each course.
         foreach ($courses as $course) {
-            $context = context_course::instance($course->id);
-            $capabilities = array('tool/lp:coursecompetencyread', 'tool/lp:coursecompetencymanage');
-            if (!has_any_capability($capabilities, $context)) {
+            if (!self::validate_course($course, false)) {
                 continue;
             }
 
-            if (!$course->visible && !has_capability('course:viewhidden', $context)) {
+            $context = context_course::instance($course->id);
+            $capabilities = array('tool/lp:coursecompetencyread', 'tool/lp:coursecompetencymanage');
+            if (!has_any_capability($capabilities, $context)) {
                 continue;
             }
 
@@ -632,7 +658,7 @@ class api {
                 unset($courses[$id]);
                 continue;
             }
-            if (!$course->visible && !has_capability('course:viewhidden', $context)) {
+            if (!self::validate_course($course, false)) {
                 unset($courses[$id]);
                 continue;
             }
@@ -649,6 +675,9 @@ class api {
      * @return int
      */
     public static function count_competencies_in_course($courseid) {
+        // Check the user have access to the course.
+        self::validate_course($courseid);
+
         // First we do a permissions check.
         $context = context_course::instance($courseid);
         $onlyvisible = 1;
@@ -667,27 +696,49 @@ class api {
     }
 
     /**
-     * List all the competencies in a course.
+     * List the competencies associated to a course.
      *
-     * @param int $courseid The id of the course to check.
-     * @return array of competencies
+     * @param mixed $courseorid The course, or its ID.
+     * @return array( array(
+     *                   'competency' => \tool_lp\competency,
+     *                   'coursecompetency' => \tool_lp\course_competency
+     *              ))
      */
-    public static function list_competencies_in_course($courseid) {
-        // First we do a permissions check.
-        $context = context_course::instance($courseid);
+    public static function list_course_competencies($courseorid) {
+        $course = $courseorid;
+        if (!is_object($courseorid)) {
+            $course = get_course($courseorid);
+        }
+
+        // Check the user have access to the course.
+        self::validate_course($course);
+        $context = context_course::instance($course->id);
         $onlyvisible = 1;
 
         $capabilities = array('tool/lp:coursecompetencyread', 'tool/lp:coursecompetencymanage');
         if (!has_any_capability($capabilities, $context)) {
-             throw new required_capability_exception($context, 'tool/lp:coursecompetencyread', 'nopermissions', '');
+            throw new required_capability_exception($context, 'tool/lp:coursecompetencyread', 'nopermissions', '');
         }
 
         if (has_capability('tool/lp:coursecompetencymanage', $context)) {
             $onlyvisible = 0;
         }
 
-        // OK - all set.
-        return course_competency::list_competencies($courseid, $onlyvisible);
+        $result = array();
+
+        // TODO We could improve the performance of this into one single query.
+        $coursecompetencies = course_competency::list_course_competencies($course->id, $onlyvisible);
+        $competencies = course_competency::list_competencies($course->id, $onlyvisible);
+
+        // Build the return values.
+        foreach ($coursecompetencies as $key => $coursecompetency) {
+            $result[] = array(
+                'competency' => $competencies[$coursecompetency->get_competencyid()],
+                'coursecompetency' => $coursecompetency
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -698,6 +749,9 @@ class api {
      * @return bool
      */
     public static function add_competency_to_course($courseid, $competencyid) {
+        // Check the user have access to the course.
+        self::validate_course($courseid);
+
         // First we do a permissions check.
         $context = context_course::instance($courseid);
 
@@ -732,6 +786,9 @@ class api {
      * @return bool
      */
     public static function remove_competency_from_course($courseid, $competencyid) {
+        // Check the user have access to the course.
+        self::validate_course($courseid);
+
         // First we do a permissions check.
         $context = context_course::instance($courseid);
 
@@ -767,6 +824,9 @@ class api {
      * @return boolean
      */
     public static function reorder_course_competency($courseid, $competencyidfrom, $competencyidto) {
+        // Check the user have access to the course.
+        self::validate_course($courseid);
+
         // First we do a permissions check.
         $context = context_course::instance($courseid);
 
@@ -806,6 +866,29 @@ class api {
         }
         $competencyfrom->set_sortorder($competencyto->get_sortorder());
         return $competencyfrom->update();
+    }
+
+    /**
+     * Update ruleoutcome value for a course competency.
+     *
+     * @param int|course_competency $coursecompetencyorid The course_competency, or its ID.
+     * @param int $ruleoutcome The value of ruleoutcome.
+     * @return bool True on success.
+     */
+    public static function set_course_competency_ruleoutcome($coursecompetencyorid, $ruleoutcome) {
+        $coursecompetency = $coursecompetencyorid;
+        if (!is_object($coursecompetency)) {
+            $coursecompetency = new course_competency($coursecompetencyorid);
+        }
+
+        $courseid = $coursecompetency->get_courseid();
+        self::validate_course($courseid);
+        $coursecontext = context_course::instance($courseid);
+
+        require_capability('tool/lp:coursecompetencymanage', $coursecontext);
+
+        $coursecompetency->set_ruleoutcome($ruleoutcome);
+        return $coursecompetency->update();
     }
 
     /**
@@ -2119,4 +2202,5 @@ class api {
 
         return $evidence;
     }
+
 }

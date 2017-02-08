@@ -1084,4 +1084,33 @@ class tool_lp_api_testcase extends advanced_testcase {
         $this->assertEquals(1, \tool_lp\user_competency::count_records_select('id = :id',
                                                                               array('id' => $evidence->get_usercompetencyid())));
     }
+
+    /**
+     * Test update ruleoutcome for course_competency.
+     */
+    public function test_set_ruleoutcome_course_competency() {
+        $this->resetAfterTest(true);
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('tool_lp');
+        $u1 = $dg->create_user();
+        $u2 = $dg->create_user();
+        $course = $dg->create_course();
+
+        $this->setAdminUser();
+        $f = $lpg->create_framework();
+        $c = $lpg->create_competency(array('competencyframeworkid' => $f->get_id()));
+        $cc = api::add_competency_to_course($course->id, $c->get_id());
+
+        // Check record was created with default rule value Evidence.
+        $this->assertEquals(1, \tool_lp\course_competency::count_records());
+        $recordscc = api::list_course_competencies($course->id);
+        $this->assertEquals(\tool_lp\course_competency::OUTCOME_EVIDENCE, $recordscc[0]['coursecompetency']->get_ruleoutcome());
+
+        // Check ruleoutcome value is updated to None.
+        $this->assertTrue(api::set_course_competency_ruleoutcome($recordscc[0]['coursecompetency']->get_id(),
+            \tool_lp\course_competency::OUTCOME_NONE));
+        $recordscc = api::list_course_competencies($course->id);
+        $this->assertEquals(\tool_lp\course_competency::OUTCOME_NONE, $recordscc[0]['coursecompetency']->get_ruleoutcome());
+    }
+
 }
