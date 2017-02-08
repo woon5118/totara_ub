@@ -26,6 +26,7 @@ namespace tool_lp\external;
 use context_user;
 use renderer_base;
 use stdClass;
+use tool_lp\user_competency;
 
 /**
  * Class for exporting user competency data with additional related data.
@@ -76,7 +77,11 @@ class user_competency_summary_exporter extends exporter {
             'evidence' => array(
                 'type' => evidence_exporter::read_properties_definition(),
                 'multiple' => true
-            )
+            ),
+            'commentarea' => array(
+                'type' => comment_area_exporter::read_properties_definition(),
+                'optional' => true
+            ),
         );
     }
 
@@ -96,8 +101,8 @@ class user_competency_summary_exporter extends exporter {
         $result->competency = $exporter->export($output);
 
         $context = context_user::instance($this->related['user']->id);
-        $result->cangrade = has_capability('tool/lp:competencygrade', $context);
-        $result->cansuggest = has_capability('tool/lp:competencysuggestgrade', $context);
+        $result->cangrade = user_competency::can_grade_user($this->related['user']->id, $competency->get_id());
+        $result->cansuggest = user_competency::can_suggest_grade_user($this->related['user']->id, $competency->get_id());
         $result->cangradeorsuggest = $result->cangrade || $result->cansuggest;
         if ($this->related['user']) {
             $exporter = new user_summary_exporter($this->related['user']);
@@ -136,11 +141,18 @@ class user_competency_summary_exporter extends exporter {
 
             foreach ($this->related['evidence'] as $evidence) {
                 $related = array('scale' => $scale);
-                $related['actionuser'] = $usercache[$evidence->get_actionuserid()];
+                $related['actionuser'] = !empty($evidence->get_actionuserid()) ? $usercache[$evidence->get_actionuserid()] : null;
                 $exporter = new evidence_exporter($evidence, $related);
                 $allevidence[] = $exporter->export($output);
             }
             $result->evidence = $allevidence;
+        }
+
+        $usercompetency = !empty($this->related['usercompetency']) ? $this->related['usercompetency'] : null;
+
+        if (!empty($usercompetency)) {
+            $commentareaexporter = new comment_area_exporter($usercompetency->get_comment_object());
+            $result->commentarea = $commentareaexporter->export($output);
         }
 
         return (array) $result;
