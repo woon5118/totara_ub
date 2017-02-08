@@ -32,7 +32,11 @@ use tool_monitor\subscription_manager;
  *  - Removal:      If a user has a subscription that has been inactive for longer than the prescribed period, then
  *                  delete the subscription entirely.
  *
+<<<<<<< HEAD
  * @since      3.0.5
+=======
+ * @since      3.1.1
+>>>>>>> 50c342c3e77... TL-9550 / MDL-53431 tool_monitor: Access control for tool monitor subscriptions
  * @package    tool_monitor
  * @copyright  2016 Jake Dallimore <jrhdallimore@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -50,7 +54,11 @@ class check_subscriptions extends \core\task\scheduled_task {
     /**
      * Get a descriptive name for this task.
      *
+<<<<<<< HEAD
      * @since 3.0.5
+=======
+     * @since 3.1.1
+>>>>>>> 50c342c3e77... TL-9550 / MDL-53431 tool_monitor: Access control for tool monitor subscriptions
      * @return string name of the task.
      */
     public function get_name() {
@@ -76,7 +84,11 @@ class check_subscriptions extends \core\task\scheduled_task {
      * 5. Check whether the user has course access, breaking only if the subscription is not also course-module-level.
      * 6. Check whether the user has course-module access.
      *
+<<<<<<< HEAD
      * @since 3.0.5
+=======
+     * @since 3.1.1
+>>>>>>> 50c342c3e77... TL-9550 / MDL-53431 tool_monitor: Access control for tool monitor subscriptions
      */
     public function execute() {
         global $DB;
@@ -193,7 +205,11 @@ class check_subscriptions extends \core\task\scheduled_task {
     /**
      * Determines whether a user is fully set up, using cached results where possible.
      *
+<<<<<<< HEAD
      * @since 3.0.5
+=======
+     * @since 3.1.1
+>>>>>>> 50c342c3e77... TL-9550 / MDL-53431 tool_monitor: Access control for tool monitor subscriptions
      * @param \stdClass $user the user record.
      * @return bool true if the user is fully set up, false otherwise.
      */
@@ -207,7 +223,11 @@ class check_subscriptions extends \core\task\scheduled_task {
     /**
      * Determines a user's access to a course with a given capability, using cached results where possible.
      *
+<<<<<<< HEAD
      * @since 3.0.5
+=======
+     * @since 3.1.1
+>>>>>>> 50c342c3e77... TL-9550 / MDL-53431 tool_monitor: Access control for tool monitor subscriptions
      * @param \stdClass $user the user record.
      * @param \stdClass $course the course record.
      * @param string $capability the capability to check.
@@ -224,7 +244,11 @@ class check_subscriptions extends \core\task\scheduled_task {
      * Returns a partial subscription record, created from properties of the supplied recordset row object.
      * Intended to return a minimal record for specific use within this class and in subsequent access control calls only.
      *
+<<<<<<< HEAD
      * @since 3.0.5
+=======
+     * @since 3.1.1
+>>>>>>> 50c342c3e77... TL-9550 / MDL-53431 tool_monitor: Access control for tool monitor subscriptions
      * @param \stdClass $rowdata the row object.
      * @return \stdClass a partial subscription record.
      */
@@ -242,7 +266,11 @@ class check_subscriptions extends \core\task\scheduled_task {
      * Returns a partial course record, created from properties of the supplied recordset row object.
      * Intended to return a minimal record for specific use within this class and in subsequent access control calls only.
      *
+<<<<<<< HEAD
      * @since 3.0.5
+=======
+     * @since 3.1.1
+>>>>>>> 50c342c3e77... TL-9550 / MDL-53431 tool_monitor: Access control for tool monitor subscriptions
      * @param \stdClass $rowdata the row object.
      * @return \stdClass a partial course record.
      */
@@ -258,7 +286,11 @@ class check_subscriptions extends \core\task\scheduled_task {
      * Returns a partial user record, created from properties of the supplied recordset row object.
      * Intended to return a minimal record for specific use within this class and in subsequent access control calls only.
      *
+<<<<<<< HEAD
      * @since 3.0.5
+=======
+     * @since 3.1.1
+>>>>>>> 50c342c3e77... TL-9550 / MDL-53431 tool_monitor: Access control for tool monitor subscriptions
      * @param \stdClass $rowdata the row object.
      * @return \stdClass a partial user record.
      */
