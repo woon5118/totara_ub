@@ -30,6 +30,7 @@ require_once($CFG->libdir . '/tablelib.php');
 use html_writer;
 use moodle_url;
 use table_sql;
+use tool_lp\template;
 
 /**
  * Template cohorts table class.
@@ -59,8 +60,10 @@ class template_cohorts_table extends table_sql {
         global $CFG;
         parent::__construct($uniqueid);
 
-        // This object should not be used without the right permissions.
-        require_capability('tool/lp:templatemanage', $template->get_context());
+         // This object should not be used without the right permissions.
+        if (!$template->can_read()) {
+            throw new required_capability_exception($template->get_context(), 'tool/lp:templateread', 'nopermissions', '');
+        }
 
         // Set protected properties.
         $this->template = $template;
@@ -81,10 +84,15 @@ class template_cohorts_table extends table_sql {
      */
     protected function col_actions($row) {
         global $OUTPUT;
+
         $action = new \confirm_action(get_string('areyousure'));
         $url = new moodle_url($this->baseurl);
         $url->params(array('removecohort' => $row->id, 'sesskey' => sesskey()));
-        return $OUTPUT->action_link($url, '', $action, null, new \pix_icon('t/delete', get_string('stopsyncingcohort', 'tool_lp')));
+        $actionlink = $OUTPUT->action_link($url, '', $action, null, new \pix_icon('t/delete',
+            get_string('stopsyncingcohort', 'tool_lp')));
+
+        return $actionlink;
+
     }
 
     /**
@@ -97,8 +105,11 @@ class template_cohorts_table extends table_sql {
         $cols = array(
             'name' => get_string('name', 'cohort'),
             'idnumber' => get_string('idnumber', 'cohort'),
-            'actions' => get_string('actions')
         );
+
+        if ($this->template->can_manage()) {
+            $cols['actions'] = get_string('actions');
+        }
 
         $this->define_columns(array_keys($cols));
         $this->define_headers(array_values($cols));
