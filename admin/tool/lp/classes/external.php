@@ -47,6 +47,7 @@ use tool_lp\external\user_summary_exporter;
 use tool_lp\external\user_competency_exporter;
 use tool_lp\external\user_competency_plan_exporter;
 use tool_lp\external\competency_exporter;
+use tool_lp\external\course_competency_exporter;
 use tool_lp\external\course_summary_exporter;
 use tool_lp\external\plan_exporter;
 use tool_lp\external\template_exporter;
@@ -1045,13 +1046,77 @@ class external extends external_api {
             'canmanage' => new external_value(PARAM_BOOL, 'True if this user has permission to manage competency frameworks'),
             'pagecontextid' => new external_value(PARAM_INT, 'Context id for the framework'),
             'search' => new external_value(PARAM_RAW, 'Current search string'),
-            'rulesmodules' => new external_multiple_structure(new external_single_structure(array(
-                'type' => new external_value(PARAM_RAW, 'The rule type'),
-                'amd' => new external_value(PARAM_RAW, 'The AMD module of the rule'),
-                'name' => new external_value(PARAM_TEXT, 'The name of the rule'),
-            )))
+            'rulesmodules' => new external_value(PARAM_RAW, 'JSON encoded data for rules')
         ));
 
+    }
+
+    /**
+     * Returns description of data_for_competency_summary() parameters.
+     *
+     * @return \external_function_parameters
+     */
+    public static function data_for_competency_summary_parameters() {
+        $competencyid = new external_value(
+            PARAM_INT,
+            'The competency id',
+            VALUE_REQUIRED
+        );
+        $includerelated = new external_value(
+            PARAM_BOOL,
+            'Include or not related competencies',
+            VALUE_DEFAULT,
+            false
+        );
+        $includecourses = new external_value(
+            PARAM_BOOL,
+            'Include or not competency courses',
+            VALUE_DEFAULT,
+            false
+        );
+        $params = array(
+            'competencyid' => $competencyid,
+            'includerelated' => $includerelated,
+            'includecourses' => $includecourses
+        );
+        return new external_function_parameters($params);
+    }
+
+    /**
+     * Loads the data required to render the competency_page template.
+     *
+     * @param int $competencyid Competency id.
+     * @param boolean $includerelated Include or not related competencies.
+     * @param boolean $includecourses Include or not competency courses.
+     *
+     * @return \stdClass
+     */
+    public static function data_for_competency_summary($competencyid, $includerelated = false, $includecourses = false) {
+        global $PAGE;
+        $params = self::validate_parameters(self::data_for_competency_summary_parameters(),
+                                            array(
+                                                'competencyid' => $competencyid,
+                                                'includerelated' => $includerelated,
+                                                'includecourses' => $includecourses
+                                            ));
+
+        $competency = api::read_competency($params['competencyid']);
+        $framework = api::read_framework($competency->get_competencyframeworkid());
+        $renderable = new output\competency_summary($competency, $framework, $params['includerelated'], $params['includecourses']);
+        $renderer = $PAGE->get_renderer('tool_lp');
+
+        $data = $renderable->export_for_template($renderer);
+
+        return $data;
+    }
+
+    /**
+     * Returns description of data_for_competency_summary_() result value.
+     *
+     * @return \external_description
+     */
+    public static function data_for_competency_summary_returns() {
+        return competency_summary_exporter::get_read_structure();
     }
 
     /**
@@ -1561,12 +1626,13 @@ class external extends external_api {
             'canmanagecoursecompetencies' => new external_value(PARAM_BOOL, 'User can manage linked course competencies'),
             'competencies' => new external_multiple_structure(new external_single_structure(array(
                 'competency' => competency_exporter::get_read_structure(),
-                'coursecompetency' => competency_exporter::get_read_structure(),
-                'ruleoutcomeoptions' => new external_single_structure(array(
-                    'value' => new external_value(PARAM_INT, 'The option value'),
-                    'text' => new external_value(PARAM_NOTAGS, 'The name of the option'),
-                    'selected' => new external_value(PARAM_BOOL, 'If this is the currently selected option'),
-                ))
+                'coursecompetency' => course_competency_exporter::get_read_structure(),
+                'ruleoutcomeoptions' => new external_multiple_structure(
+                    new external_single_structure(array(
+                        'value' => new external_value(PARAM_INT, 'The option value'),
+                        'text' => new external_value(PARAM_NOTAGS, 'The name of the option'),
+                        'selected' => new external_value(PARAM_BOOL, 'If this is the currently selected option'),
+                )))
             ))),
             'manageurl' => new external_value(PARAM_LOCALURL, 'Url to the manage competencies page.'),
         ));
@@ -2646,8 +2712,9 @@ class external extends external_api {
     public static function data_for_template_competencies_page_returns() {
         return new external_single_structure(array (
             'templateid' => new external_value(PARAM_INT, 'The current template id'),
+            'pagecontextid' => new external_value(PARAM_INT, 'Context ID'),
             'canmanagecompetencyframeworks' => new external_value(PARAM_BOOL, 'User can manage competency frameworks'),
-            'canmanagetemplates' => new external_value(PARAM_BOOL, 'User can manage learning plan templates'),
+            'canmanagetemplatecompetencies' => new external_value(PARAM_BOOL, 'User can manage learning plan templates'),
             'competencies' => new external_multiple_structure(
                 competency_summary_exporter::get_read_structure()
             ),
@@ -2700,15 +2767,23 @@ class external extends external_api {
      * @return \external_description
      */
     public static function data_for_plan_competencies_page_returns() {
+        $uc = user_competency_exporter::get_read_structure();
+        $ucp = user_competency_plan_exporter::get_read_structure();
+
+        $uc->required = VALUE_OPTIONAL;
+        $ucp->required = VALUE_OPTIONAL;
+
         return new external_single_structure(array (
             'planid' => new external_value(PARAM_INT, 'Learning Plan id'),
             'canmanage' => new external_value(PARAM_BOOL, 'User can manage learning plan'),
+            'canbeedited' => new external_value(PARAM_BOOL, 'Plan can be edited'),
             'iscompleted' => new external_value(PARAM_BOOL, 'Is the plan completed'),
+            'contextid' => $id = new external_value(PARAM_INT, 'Context ID.'),
             'competencies' => new external_multiple_structure(
                 new external_single_structure(array(
                     'competency' => competency_exporter::get_read_structure(),
-                    'usercompetency' => user_competency_exporter::get_read_structure(),
-                    'usercompetencyplan' => user_competency_plan_exporter::get_read_structure()
+                    'usercompetency' => $uc,
+                    'usercompetencyplan' => $ucp
                 ))
             )
         ));
