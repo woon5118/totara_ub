@@ -25,6 +25,7 @@
 
 use tool_lp\competency;
 use tool_lp\competency_framework;
+use tool_lp\course_competency;
 use tool_lp\external;
 use tool_lp\plan;
 use tool_lp\related_competency;
@@ -105,6 +106,11 @@ class tool_lp_generator extends component_generator_base {
         if (!isset($record->visible)) {
             $record->visible = 1;
         }
+        if (isset($record->scaleconfiguration)
+                && (is_array($record->scaleconfiguration) || is_object($record->scaleconfiguration))) {
+            // Conveniently encode the config.
+            $record->scaleconfiguration = json_encode($record->scaleconfiguration);
+        }
 
         $competency = new competency(0, $record);
         $competency->create();
@@ -139,27 +145,34 @@ class tool_lp_generator extends component_generator_base {
         if (!isset($record->visible)) {
             $record->visible = 1;
         }
-        // TODO MDL-51442 make sure this passes validation.
         if (!isset($record->scaleid)) {
             if (isset($record->scaleconfiguration)) {
                 throw new coding_exception('Scale configuration must be provided with a scale.');
             }
             if (!$this->scale) {
-                $this->scale = $generator->create_scale();
+                $this->scale = $generator->create_scale(array('scale' => 'A,B,C,D'));
             }
             $record->scaleid = $this->scale->id;
         }
-        // TODO MDL-51442 make sure this passes validation.
         if (!isset($record->scaleconfiguration)) {
             $values = external::get_scale_values($record->scaleid);
+            if (count($values) < 2) {
+                throw new coding_exception('Please provide the scale configuration for one-item scales.');
+            }
             $scaleconfig = array(array('scaleid' => $record->scaleid));
-            $scaleconfig[] = array(
-                'name' => $values[0]['name'],
-                'id' => $values[0]['id'],
-                'scaledefault' => 1,
-                'proficient' => 1,
-            );
+            foreach ($values as $key => $value) {
+                $scaleconfig[] = array(
+                    'name' => $value['name'],
+                    'id' => $value['id'],
+                    'scaledefault' => $key == count($values) - 2 ? 1 : 0,       // Second to last is default.
+                    'proficient' => $key >= count($values) - 2 ? 1 : 0,       // Second to last and last are proficient.
+                );
+            }
             $record->scaleconfiguration = json_encode($scaleconfig);
+        }
+        if (is_array($record->scaleconfiguration) || is_object($record->scaleconfiguration)) {
+            // Conveniently encode the config.
+            $record->scaleconfiguration = json_encode($record->scaleconfiguration);
         }
         if (!isset($record->contextid)) {
             $record->contextid = context_system::instance()->id;
@@ -379,11 +392,19 @@ class tool_lp_generator extends component_generator_base {
         if (!isset($record->usercompetencyid)) {
             throw new coding_exception('The usercompetencyid value is required.');
         }
+        if (!isset($record->action) && !isset($record->grade)) {
+            $record->action = evidence::ACTION_LOG;
+        }
+        if (!isset($record->action)) {
+            throw new coding_exception('The action value is required with a grade.');
+        }
 
+        if (!isset($record->contextid)) {
+            $record->contextid = context_system::instance()->id;
+        }
         if (!isset($record->descidentifier)) {
             $record->descidentifier = 'invalidevidencedesc';
         }
-
         if (!isset($record->desccomponent)) {
             $record->desccomponent = 'tool_lp';
         }
@@ -391,6 +412,28 @@ class tool_lp_generator extends component_generator_base {
         $evidence->create();
 
         return $evidence;
+    }
+
+    /**
+     * Create a new course competency.
+     *
+     * @param array|stdClass $record
+     * @return user_competency
+     */
+    public function create_course_competency($record = null) {
+        $record = (object) $record;
+
+        if (!isset($record->courseid)) {
+            throw new coding_exception('The courseid value is required.');
+        }
+        if (!isset($record->competencyid)) {
+            throw new coding_exception('The competencyid value is required.');
+        }
+
+        $cc = new course_competency(0, $record);
+        $cc->create();
+
+        return $cc;
     }
 
 }
