@@ -278,5 +278,4 @@ class plan extends persistent {
     public function is_based_on_template() {
         return $this->get_templateid() !== null;
     }
-
 }
