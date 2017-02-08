@@ -38,7 +38,7 @@ class template extends persistent {
 
     const TABLE = 'tool_lp_template';
 
-    /** @var template Object before update. */
+    /** @var template object before update. */
     protected $beforeupdate = null;
 
     /**
@@ -164,26 +164,29 @@ class template extends persistent {
     /**
      * Validate the due date.
      *
+     * The due date can always be changed, but when it is it must be:
+     *  - unset
+     *  - set in the future.
+     *
      * @param  int $value The due date.
      * @return bool|lang_string
      */
     protected function validate_duedate($value) {
-        $neworupdated = true;
 
         // During update.
         if ($this->get_id()) {
             $before = $this->beforeupdate->get_duedate();
-            $haschanged = $before != $value;
 
-            if (!empty($before) && $before < time() && $haschanged) {
-                // We cannot set a due date after it was reached.
-                return new lang_string('errorcannotchangeapastduedate', 'tool_lp');
+            // The value has not changed, then it's always OK.
+            if ($before == $value) {
+                return true;
             }
         }
 
-        // During create and update when it has changed.
-        if (!empty($value) && $value < time() && $haschanged) {
-            // We cannot set the date in the past, but we can leave it empty.
+        // During create and update, the date must be set in the future, or not set.
+        if (!empty($value) && $value <= time() - 600) {
+            // We cannot set the date in the past. But we allow for 10 minutes of margin so that
+            // a user can set the due date to "now" without risking to hit a validation error.
             return new lang_string('errorcannotsetduedateinthepast', 'tool_lp');
         }
 

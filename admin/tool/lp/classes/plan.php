@@ -47,6 +47,12 @@ class plan extends persistent {
     /** Complete status */
     const STATUS_COMPLETE = 2;
 
+    /** 10 minutes threshold **/
+    const DUEDATE_THRESHOLD = 600;
+
+    /** @var plan object before update. */
+    protected $beforeupdate = null;
+
     /**
      * Return the definition of the properties of this model.
      *
@@ -89,6 +95,20 @@ class plan extends persistent {
                 'default' => 0,
             ),
         );
+    }
+
+    /**
+     * Hook to execute before validate.
+     *
+     * @return void
+     */
+    protected function before_validate() {
+        $this->beforeupdate = null;
+
+        // During update.
+        if ($this->get_id()) {
+            $this->beforeupdate = new self($this->get_id());
+        }
     }
 
     /**
@@ -397,5 +417,47 @@ class plan extends persistent {
      */
     public function can_be_edited() {
         return !$this->is_based_on_template() && $this->get_status() != self::STATUS_COMPLETE && $this->can_manage();
+    }
+
+    /**
+     * Validate the due date.
+     * When setting a due date it must not exceed the DUEDATE_THRESHOLD.
+     *
+     * @param  int $value The due date.
+     * @return bool|lang_string
+     */
+    protected function validate_duedate($value) {
+
+        // We do not check duedate when plan is draft, complete, unset, or based on a template.
+        if ($this->is_based_on_template()
+                || $this->get_status() == self::STATUS_DRAFT
+                || $this->get_status() == self::STATUS_COMPLETE
+                || empty($value)) {
+            return true;
+        }
+
+        // During update.
+        if ($this->get_id()) {
+            $before = $this->beforeupdate->get_duedate();
+            $beforestatus = $this->beforeupdate->get_status();
+
+            // The value has not changed, then it's always OK. Though if we're going
+            // from draft to active it has to has to be validated.
+            if ($before == $value && $beforestatus != self::STATUS_DRAFT) {
+                return true;
+            }
+        }
+
+        if ($value <= time()) {
+            // We cannot set the date in the past.
+            return new lang_string('errorcannotsetduedateinthepast', 'tool_lp');
+        }
+
+        if ($value <= time() + self::DUEDATE_THRESHOLD) {
+            // We cannot set the date too soon, but we can leave it empty.
+            return new lang_string('errorcannotsetduedatetoosoon', 'tool_lp');
+        }
+
+        return true;
     }
 }
