@@ -1568,7 +1568,7 @@ class external extends external_api {
         $result = array();
 
         foreach ($apiresult as $cmrecord) {
-            $one = new stdClass();
+            $one = new \stdClass();
             $exporter = new competency_exporter($cmrecord['competency']);
             $one->competency = $exporter->export($output);
             $exporter = new course_module_competency_exporter($cmrecord['coursemodulecompetency']);
@@ -1627,11 +1627,10 @@ class external extends external_api {
     public static function list_course_modules_using_competency($competencyid, $courseid) {
         global $PAGE;
 
-        $params = self::validate_parameters(self::list_course_modules_using_competency_parameters(),
-                                            array(
-                                                'competencyid' => $competencyid,
-                                                'courseid' => $courseid,
-                                            ));
+        $params = self::validate_parameters(self::list_course_modules_using_competency_parameters(), array(
+            'competencyid' => $competencyid,
+            'courseid' => $courseid,
+        ));
 
         $coursecontext = context_course::instance($params['courseid']);
         self::validate_context($coursecontext);
@@ -1641,7 +1640,7 @@ class external extends external_api {
         $coursemodules = api::list_course_modules_using_competency($params['competencyid'], $params['courseid']);
         $result = array();
 
-        $fastmodinfo = get_fast_modinfo($cm->course);
+        $fastmodinfo = get_fast_modinfo($params['courseid']);
 
         foreach ($coursemodules as $cmid) {
             $cminfo = $fastmodinfo->cms[$cmid];
@@ -2610,7 +2609,6 @@ class external extends external_api {
      * @return int
      */
     public static function count_competencies_in_template($templateid) {
-        global $PAGE;
         $params = self::validate_parameters(self::count_competencies_in_template_parameters(),
                                             array(
                                                 'id' => $templateid,
