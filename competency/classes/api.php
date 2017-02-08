@@ -49,6 +49,10 @@ class api {
     /**
      * Returns whether competencies are enabled.
      *
+     * This method should never do more than checking the config setting, the reason
+     * being that some other code could be checking the config value directly
+     * to avoid having to load this entire file into memory.
+     *
      * @return boolean True when enabled.
      */
     public static function is_enabled() {
@@ -795,7 +799,7 @@ class api {
      * @return array of competency_framework
      */
     public static function list_frameworks($sort, $order, $skip, $limit, $context, $includes = 'children',
-            $onlyvisible = false, $query = '') {
+                                           $onlyvisible = false, $query = '') {
         global $DB;
         static::require_enabled();
 
@@ -1606,12 +1610,11 @@ class api {
         $record->courseid = $courseid;
         $record->competencyid = $competencyid;
 
-        $competency = new competency($competencyid);
         $coursecompetency = new course_competency();
-        $exists = $coursecompetency->get_record(array('courseid' => $courseid, 'competencyid' => $competencyid));
+        $exists = course_competency::get_record(array('courseid' => $courseid, 'competencyid' => $competencyid));
         if ($exists) {
             // Delete all course_module_competencies for this competency in this course.
-            $cmcs = course_module_competency::list_course_module_competencies($competencyid, $courseid);
+            $cmcs = course_module_competency::get_records_by_competencyid_in_course($competencyid, $courseid);
             foreach ($cmcs as $cmc) {
                 $cmc->delete();
             }
@@ -4098,13 +4101,8 @@ class api {
      * @return \core_competency\evidence[]
      * @return array of \core_competency\evidence
      */
-    public static function list_evidence($userid = 0,
-                                         $competencyid = 0,
-                                         $planid = 0,
-                                         $sort = 'timecreated',
-                                         $order = 'DESC',
-                                         $skip = 0,
-                                         $limit = 0) {
+    public static function list_evidence($userid = 0, $competencyid = 0, $planid = 0, $sort = 'timecreated',
+                                         $order = 'DESC', $skip = 0, $limit = 0) {
         static::require_enabled();
 
         if (!user_competency::can_read_user($userid)) {
@@ -4151,13 +4149,8 @@ class api {
      * @param int $limit Number of records to return.
      * @return \core_competency\evidence[]
      */
-    public static function list_evidence_in_course($userid = 0,
-                                                   $courseid = 0,
-                                                   $competencyid = 0,
-                                                   $sort = 'timecreated',
-                                                   $order = 'DESC',
-                                                   $skip = 0,
-                                                   $limit = 0) {
+    public static function list_evidence_in_course($userid = 0, $courseid = 0, $competencyid = 0, $sort = 'timecreated',
+                                                   $order = 'DESC', $skip = 0, $limit = 0) {
         static::require_enabled();
 
         if (!user_competency::can_read_user_in_course($userid, $courseid)) {
@@ -4201,17 +4194,8 @@ class api {
      * @throws invalid_persistent_exception
      * @throws moodle_exception
      */
-    public static function add_evidence($userid,
-                                        $competencyorid,
-                                        $contextorid,
-                                        $action,
-                                        $descidentifier,
-                                        $desccomponent,
-                                        $desca = null,
-                                        $recommend = false,
-                                        $url = null,
-                                        $grade = null,
-                                        $actionuserid = null,
+    public static function add_evidence($userid, $competencyorid, $contextorid, $action, $descidentifier, $desccomponent,
+                                        $desca = null, $recommend = false, $url = null, $grade = null, $actionuserid = null,
                                         $note = null) {
         global $DB;
         static::require_enabled();
@@ -4490,7 +4474,7 @@ class api {
      * @return void
      */
     protected static function apply_competency_rules_from_usercompetency(user_competency $usercompetency,
-            competency $competency = null) {
+                                                                         competency $competency = null) {
 
         // Perform some basic checks.
         if (!$usercompetency->get_proficiency()) {
@@ -5119,8 +5103,8 @@ class api {
      * @return list($sql, $params) Same as $DB->get_in_or_equal().
      * @todo MDL-52243 Move this function to lib/accesslib.php
      */
-    public static function filter_users_with_capability_on_user_context_sql($capability, $userid = 0,
-            $type=SQL_PARAMS_QM, $prefix='param') {
+    public static function filter_users_with_capability_on_user_context_sql($capability, $userid = 0, $type = SQL_PARAMS_QM,
+                                                                            $prefix='param') {
 
         global $USER, $DB;
         $allresultsfilter = array('> 0', array());
