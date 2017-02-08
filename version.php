@@ -36,8 +36,7 @@ $version  = 2016050400.00;              // YYYYMMDD      = weekly release date o
 $release  = '3.1beta (Build: 20160504)'; // Human-friendly version name
 
 $branch   = '31';                       // This version's branch.
-<<<<<<< HEAD
-$maturity = MATURITY_ALPHA;             // This version's maturity level.
+$maturity = MATURITY_BETA;             // This version's maturity level.
 
 
 // TOTARA VERSION INFORMATION
@@ -55,6 +54,3 @@ if ($maturity == MATURITY_EVERGREEN) {
 } else {
     $TOTARA->release = "{$TOTARA->version} (Build: {$TOTARA->build})";
 }
-=======
-$maturity = MATURITY_BETA;             // This version's maturity level.
->>>>>>> fc1ef59fbed... Moodle release 3.1beta
