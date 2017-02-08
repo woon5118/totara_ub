@@ -2388,6 +2388,35 @@ class api {
     }
 
     /**
+     * List all the evidence for a user competency
+     *
+     * @param int $userid The user id - only used if usercompetencyid is 0.
+     * @param int $competencyid The competency id - only used it usercompetencyid is 0.
+     * @param int $planid The plan id - not used yet - but can be used to only list archived evidence if a plan is completed.
+     * @return array of \tool_lp\evidence
+     */
+    public static function list_evidence($userid = 0,
+                                         $competencyid = 0,
+                                         $planid = 0,
+                                         $sort = 'timecreated',
+                                         $order = 'DESC',
+                                         $skip = 0,
+                                         $limit = 0) {
+
+        $context = context_user::instance($userid);
+        require_capability('tool/lp:planview', $context);
+
+        // TODO - handle archived plans.
+
+        $usercompetency = user_competency::get_record(array('userid' => $userid, 'competencyid' => $competencyid));
+        if (!$usercompetency) {
+            return array();
+        }
+
+        return evidence::get_records(array('usercompetencyid' => $usercompetency->get_id()), $sort, $order, $skip, $limit);
+    }
+
+    /**
      * Create an evidence from a list of parameters.
      *
      * Requires no capability because evidence can be added in many situations under any user.
@@ -2682,5 +2711,63 @@ class api {
                 $event->get_url()
             );
         }
+    }
+
+    /**
+     * Manually grade a user competency from the plans page.
+     *
+     * @param mixed $planorid
+     * @param int $competencyid
+     * @param int $grade
+     * @param boolean $override
+     * @return array of \tool_lp\user_competency
+     */
+    public static function grade_competency_in_plan($planorid, $competencyid, $grade, $override) {
+        global $USER;
+
+        $plan = $planorid;
+        if (!is_object($planorid)) {
+            $plan = new plan($planorid);
+        }
+        $context = $plan->get_context();
+        if ($override) {
+            require_capability('tool/lp:competencygrade', $context);
+        } else {
+            require_capability('tool/lp:competencysuggestgrade', $context);
+        }
+
+        // Verify the data.
+
+
+        $userplancompetencies = self::list_plan_competencies($plan);
+        $competency = null;
+
+        foreach ($userplancompetencies as $userplancompetency) {
+            if ($userplancompetency->competency->get_id() == $competencyid) {
+                $competency = $userplancompetency->competency;
+            }
+        }
+        if (!$competency) {
+            throw new coding_exception('The competency does not belong to this plan: ' . $competencyid . ', ' . $planid);
+        }
+
+        $action = evidence::ACTION_OVERRIDE;
+        $desckey = 'evidence_manualoverrideinplan';
+        if (!$override) {
+            $action = evidence::ACTION_SUGGEST;
+            $desckey = 'evidence_manualsuggestinplan';
+        }
+
+        return self::add_evidence($plan->get_userid(),
+                                  $competency,
+                                  $context->id,
+                                  $action,
+                                  $desckey,
+                                  'tool_lp',
+                                  $plan->get_name(),
+                                  false,
+                                  null,
+                                  $grade,
+                                  $USER->id);
     }
 }

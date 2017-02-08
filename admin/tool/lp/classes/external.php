@@ -47,6 +47,8 @@ use tool_lp\external\cohort_summary_exporter;
 use tool_lp\external\user_summary_exporter;
 use tool_lp\external\user_competency_exporter;
 use tool_lp\external\user_competency_plan_exporter;
+use tool_lp\external\user_competency_summary_exporter;
+use tool_lp\external\user_competency_summary_in_plan_exporter;
 use tool_lp\external\user_evidence_exporter;
 use tool_lp\external\user_evidence_competency_exporter;
 use tool_lp\external\competency_exporter;
@@ -54,6 +56,7 @@ use tool_lp\external\course_competency_exporter;
 use tool_lp\external\course_summary_exporter;
 use tool_lp\external\plan_exporter;
 use tool_lp\external\template_exporter;
+use tool_lp\external\evidence_exporter;
 
 /**
  * This is the external API for this tool.
@@ -3546,8 +3549,7 @@ class external extends external_api {
         // The following section is not learning plan specific and so has not been moved to the api.
         // Retrieve the scale value from the database.
         $scale = grade_scale::fetch(array('id' => $scaleid));
-        // Reverse the array so that high levels are at the top.
-        $scalevalues = array_reverse($scale->load_items());
+        $scalevalues = $scale->load_items();
         foreach ($scalevalues as $key => $value) {
             // Add a key (make the first value 1).
             $scalevalues[$key] = array(
@@ -4113,6 +4115,186 @@ class external extends external_api {
      */
     public static function set_course_competency_ruleoutcome_returns() {
         return new external_value(PARAM_BOOL, 'True if the update was successful');
+    }
+
+    /**
+     * Returns description of grade_competency_in_plan() parameters.
+     *
+     * @return \external_function_parameters
+     */
+    public static function grade_competency_in_plan_parameters() {
+        $planid = new external_value(
+            PARAM_INT,
+            'Plan id',
+            VALUE_REQUIRED
+        );
+        $competencyid = new external_value(
+            PARAM_INT,
+            'Competency id',
+            VALUE_REQUIRED
+        );
+        $grade = new external_value(
+            PARAM_INT,
+            'New grade',
+            VALUE_REQUIRED
+        );
+        $override = new external_value(
+            PARAM_BOOL,
+            'Override the grade, or just suggest it',
+            VALUE_REQUIRED
+        );
+
+        $params = array(
+            'planid' => $planid,
+            'competencyid' => $competencyid,
+            'grade' => $grade,
+            'override' => $override
+        );
+        return new external_function_parameters($params);
+    }
+
+    /**
+     * Grade a competency in a plan.
+     *
+     * @param int $planid The plan id
+     * @param int $competencyid The competency id
+     * @param int $grade The new grade value
+     * @param bool $override Override the grade or only suggest it
+     * @return bool
+     */
+    public static function grade_competency_in_plan($planid, $competencyid, $grade, $override) {
+        global $USER, $PAGE;
+
+        $params = self::validate_parameters(self::grade_competency_in_plan_parameters(),
+                                            array(
+                                                'planid' => $planid,
+                                                'competencyid' => $competencyid,
+                                                'grade' => $grade,
+                                                'override' => $override
+                                            ));
+
+        $plan = new plan($params['planid']);
+        $context = $plan->get_context();
+        self::validate_context($context);
+        $output = $PAGE->get_renderer('tool_lp');
+
+        $evidence = api::grade_competency_in_plan(
+                $plan->get_id(),
+                $params['competencyid'],
+                $params['grade'],
+                $params['override']
+        );
+        $competency = api::read_competency($params['competencyid']);
+        $scale = $competency->get_scale();
+        $exporter = new evidence_exporter($evidence, array('actionuser' => $USER, 'scale' => $scale));
+        return $exporter->export($output);
+    }
+
+    /**
+     * Returns description of grade_competency_in_plan() result value.
+     *
+     * @return \external_value
+     */
+    public static function grade_competency_in_plan_returns() {
+        return evidence_exporter::get_read_structure();
+    }
+
+    /**
+     * Returns description of data_for_user_competency_summary_in_plan() parameters.
+     *
+     * @return \external_function_parameters
+     */
+    public static function data_for_user_competency_summary_in_plan_parameters() {
+        $userid = new external_value(
+            PARAM_INT,
+            'Data base record id for the user',
+            VALUE_REQUIRED
+        );
+        $competencyid = new external_value(
+            PARAM_INT,
+            'Data base record id for the competency',
+            VALUE_REQUIRED
+        );
+        $planid = new external_value(
+            PARAM_INT,
+            'Data base record id for the plan',
+            VALUE_REQUIRED
+        );
+
+        $params = array(
+            'userid' => $userid,
+            'competencyid' => $competencyid,
+            'planid' => $planid,
+        );
+        return new external_function_parameters($params);
+    }
+
+    /**
+     * Read a user competency summary.
+     *
+     * @param int $userid The user id
+     * @param int $competencyid The competency id
+     * @param int $planid The plan id
+     * @return \stdClass
+     */
+    public static function data_for_user_competency_summary_in_plan($userid, $competencyid, $planid) {
+        global $PAGE, $DB, $CFG;
+        $params = self::validate_parameters(self::data_for_user_competency_summary_in_plan_parameters(),
+                                            array(
+                                                'userid' => $userid,
+                                                'competencyid' => $competencyid,
+                                                'planid' => $planid
+                                            ));
+        $context = context_user::instance($params['userid']);
+        self::validate_context($context);
+        $output = $PAGE->get_renderer('tool_lp');
+        $plan = api::read_plan($params['planid']);
+        if ($plan->get_userid() != $params['userid']) {
+            throw new invalid_parameter_exception('Invalid params. The plan does not belong to the user.');
+        }
+
+        $records = api::list_plan_competencies($planid);
+
+        $competency = $usercompetency = $usercompetencyplan = null;
+        foreach ($records as $record) {
+            if ($record->competency->get_id() == $params['competencyid']) {
+                $competency = $record->competency;
+                $usercompetency = $record->usercompetency;
+                $usercompetencyplan = $record->usercompetencyplan;
+                break;
+            }
+        }
+        if (empty($competency)) {
+            throw new invalid_parameter_exception('Invalid params. The competency does not belong to the plan.');
+        }
+
+        $relatedcompetencies = api::list_related_competencies($competency->get_id());
+        $userid = $params['userid'];
+        $user = $DB->get_record('user', array('id' => $userid));
+        $evidence = api::list_evidence($params['userid'], $params['competencyid'], $plan->get_id());
+
+        $params = array(
+            'competency' => $competency,
+            'usercompetency' => $usercompetency,
+            'usercompetencyplan' => $usercompetencyplan,
+            'evidence' => $evidence,
+            'user' => $user,
+            'plan' => $plan,
+            'relatedcompetencies' => $relatedcompetencies
+        );
+        $exporter = new user_competency_summary_in_plan_exporter(null, $params);
+        $data = $exporter->export($output);
+
+        return $data;
+    }
+
+    /**
+     * Returns description of data_for_user_competency_summary_in_plan() result value.
+     *
+     * @return \external_description
+     */
+    public static function data_for_user_competency_summary_in_plan_returns() {
+        return user_competency_summary_in_plan_exporter::get_read_structure();
     }
 
 }
