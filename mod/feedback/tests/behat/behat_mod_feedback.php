@@ -54,6 +54,9 @@ class behat_mod_feedback extends behat_base {
         $additem = $this->escape(get_string('add_item', 'feedback'));
         $rv[] = new Given("I select \"{$questiontype}\" from the \"{$additem}\" singleselect");
 
+        // Wait again, for page to reloaded.
+        $this->execute('behat_general::i_wait_to_be_redirected');
+
         $rows = $questiondata->getRows();
         $modifiedrows = array();
         foreach ($rows as $row) {

@@ -1584,6 +1584,24 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Press tab key on a specific element.
+     *
+     * @When /^I press tab key in "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)"$/
+     * @param string $element Element we look for
+     * @param string $selectortype The type of what we look for
+     * @throws DriverException
+     * @throws ExpectationException
+     */
+    public function i_post_tab_key_in_element($element, $selectortype) {
+        if (!$this->running_javascript()) {
+            throw new DriverException('Tab press step is not available with Javascript disabled');
+        }
+        // Gets the node based on the requested selector type and locator.
+        $node = $this->get_selected_node($selectortype, $element);
+        $this->getSession()->getDriver()->post_key("\xEE\x80\x84", $node->getXpath());
+    }
+
+    /**
      * Checks if database family used is using one of the specified, else skip. (mysql, postgres, mssql, oracle, etc.)
      *
      * @Given /^database family used is one of the following:$/
