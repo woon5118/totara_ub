@@ -67,10 +67,6 @@ class user_editadvanced_form extends moodleform {
         // Print the required moodle fields first.
         $mform->addElement('header', 'moodle', $strgeneral);
 
-        $mform->addElement('text', 'username', get_string('username'), 'size="20"');
-        $mform->addRule('username', $strrequired, 'required', null, 'client');
-        $mform->setType('username', core_user::get_property_type('username'));
-
         $auths = core_component::get_plugin_list('auth');
         $enabled = get_string('pluginenabled', 'core_plugin');
         $disabled = get_string('plugindisabled', 'core_plugin');
@@ -102,7 +98,7 @@ class user_editadvanced_form extends moodleform {
 
         $mform->addElement('text', 'username', get_string('username'), 'size="20"');
         $mform->addHelpButton('username', 'username', 'auth');
-        $mform->setType('username', PARAM_RAW);
+        $mform->setType('username', core_user::get_property_type('username'));
         if ($userid !== -1) {
             $mform->disabledIf('username', 'auth', 'in', $cannotchangeusername);
         }
