@@ -71,17 +71,32 @@ class behat_enrol extends behat_base {
      */
     public function i_enrol_user_as($userfullname, $rolename) {
 
-        // Totara 2.7 and above does not go to list of users to enrol after course creation.
-        // New JS UI is not very reliable, use the old non-JS always.
-        $steps = array();
+        // Navigate to enrolment page.
+        $parentnodes = get_string('courseadministration') . ' > ' . get_string('users', 'admin');
+        $this->execute("behat_navigation::i_navigate_to_node_in",
+            array(get_string('enrolledusers', 'enrol'), $parentnodes)
+        );
 
-        $steps[] = new Given('I navigate to "Enrolment methods" node in "Course administration > Users"');
-        $steps[] = new Given('I click on "Enrol users" "link" in the "Manual enrolments" "table_row"');
-        $steps[] = new Given('I set the field "' . get_string('assignrole', 'role') . '" to "' . $rolename . '"');
-        $steps[] = new Given('I set the field "addselect" to "' . $userfullname . '"');
-        $steps[] = new Given('I press "add"');
+        $this->execute("behat_forms::press_button", get_string('enrolusers', 'enrol'));
 
-        return $steps;
+        if ($this->running_javascript()) {
+            $this->execute('behat_forms::i_set_the_field_to', array(get_string('assignroles', 'role'), $rolename));
+
+            // We have a div here, not a tr.
+            $userliteral = behat_context_helper::escape($userfullname);
+            $userrowxpath = "//div[contains(concat(' ',normalize-space(@class),' '),' user ')][contains(., $userliteral)]";
+
+            $steps[] = new Given('I navigate to "Enrolment methods" node in "Course administration > Users"');
+            $steps[] = new Given('I click on "Enrol users" "link" in the "Manual enrolments" "table_row"');
+            $steps[] = new Given('I set the field "' . get_string('assignrole', 'role') . '" to "' . $rolename . '"');
+            $steps[] = new Given('I set the field "addselect" to "' . $userfullname . '"');
+            $steps[] = new Given('I press "add"');
+
+        } else {
+            $this->execute('behat_forms::i_set_the_field_to', array(get_string('assignrole', 'role'), $rolename));
+            $this->execute('behat_forms::i_set_the_field_to', array("addselect", $userfullname));
+            $this->execute("behat_forms::press_button", "add");
+        }
     }
 
 }
