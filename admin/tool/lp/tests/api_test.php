@@ -420,7 +420,229 @@ class tool_lp_api_testcase extends advanced_testcase {
         $record->name = 'plan create own modified';
         $plan = api::update_plan($record);
         $this->assertInstanceOf('\tool_lp\plan', $plan);
+    }
 
+    public function test_create_plan_from_template() {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $u1 = $this->getDataGenerator()->create_user();
+        $tpl = $this->getDataGenerator()->get_plugin_generator('tool_lp')->create_template();
+
+        // Creating a new plan.
+        $plan = api::create_plan_from_template($tpl, $u1->id);
+        $record = $plan->to_record();
+        $this->assertInstanceOf('\tool_lp\plan', $plan);
+        $this->assertTrue(\tool_lp\plan::record_exists($plan->get_id()));
+        $this->assertEquals($tpl->get_id(), $plan->get_templateid());
+        $this->assertEquals($u1->id, $plan->get_userid());
+        $this->assertTrue($plan->is_based_on_template());
+
+        // Creating a plan that already exists.
+        $plan = api::create_plan_from_template($tpl, $u1->id);
+        $this->assertFalse($plan);
+
+        // Check that api::create_plan cannot be used.
+        $this->setExpectedException('coding_exception');
+        unset($record->id);
+        $plan = api::create_plan($record);
+    }
+
+    public function test_update_plan_based_on_template() {
+        $this->resetAfterTest(true);
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('tool_lp');
+        $u1 = $dg->create_user();
+        $u2 = $dg->create_user();
+
+        $this->setAdminUser();
+        $tpl1 = $lpg->create_template();
+        $tpl2 = $lpg->create_template();
+        $up1 = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $tpl1->get_id()));
+        $up2 = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => null));
+
+        try {
+            // Trying to remove the template dependency.
+            $record = $up1->to_record();
+            $record->templateid = null;
+            api::update_plan($record);
+            $this->fail('A plan cannot be unlinked using api::update_plan()');
+        } catch (coding_exception $e) {
+        }
+
+        try {
+            // Trying to switch to another template.
+            $record = $up1->to_record();
+            $record->templateid = $tpl2->get_id();
+            api::update_plan($record);
+            $this->fail('A plan cannot be moved to another template.');
+        } catch (coding_exception $e) {
+        }
+
+        try {
+            // Trying to switch to using a template.
+            $record = $up2->to_record();
+            $record->templateid = $tpl1->get_id();
+            api::update_plan($record);
+            $this->fail('A plan cannot be update to use a template.');
+        } catch (coding_exception $e) {
+        }
+    }
+
+    public function test_unlink_plan_from_template() {
+        $this->resetAfterTest(true);
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('tool_lp');
+        $u1 = $dg->create_user();
+        $u2 = $dg->create_user();
+
+        $this->setAdminUser();
+        $f1 = $lpg->create_framework();
+        $f2 = $lpg->create_framework();
+        $c1a = $lpg->create_competency(array('competencyframeworkid' => $f1->get_id()));
+        $c2a = $lpg->create_competency(array('competencyframeworkid' => $f2->get_id()));
+        $c1b = $lpg->create_competency(array('competencyframeworkid' => $f1->get_id()));
+
+        $tpl1 = $lpg->create_template();
+        $tpl2 = $lpg->create_template();
+
+        $tplc1a = $lpg->create_template_competency(array('templateid' => $tpl1->get_id(), 'competencyid' => $c1a->get_id(),
+            'sortorder' => 9));
+        $tplc1b = $lpg->create_template_competency(array('templateid' => $tpl1->get_id(), 'competencyid' => $c1b->get_id(),
+            'sortorder' => 8));
+        $tplc2a = $lpg->create_template_competency(array('templateid' => $tpl2->get_id(), 'competencyid' => $c2a->get_id()));
+
+        $plan1 = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $tpl1->get_id()));
+        $plan2 = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $tpl2->get_id()));
+
+        // Check that we have what we expect at this stage.
+        $this->assertEquals(2, \tool_lp\template_competency::count_records(array('templateid' => $tpl1->get_id())));
+        $this->assertEquals(1, \tool_lp\template_competency::count_records(array('templateid' => $tpl2->get_id())));
+        $this->assertEquals(0, \tool_lp\plan_competency::count_records(array('planid' => $plan1->get_id())));
+        $this->assertEquals(0, \tool_lp\plan_competency::count_records(array('planid' => $plan2->get_id())));
+        $this->assertTrue($plan1->is_based_on_template());
+        $this->assertTrue($plan2->is_based_on_template());
+
+        // Let's do this!
+        $tpl1comps = \tool_lp\template_competency::list_competencies($tpl1->get_id(), true);
+        $tpl2comps = \tool_lp\template_competency::list_competencies($tpl2->get_id(), true);
+
+        api::unlink_plan_from_template($plan1);
+
+        $plan1->read();
+        $plan2->read();
+        $this->assertCount(2, $tpl1comps);
+        $this->assertCount(1, $tpl2comps);
+        $this->assertEquals(2, \tool_lp\template_competency::count_records(array('templateid' => $tpl1->get_id())));
+        $this->assertEquals(1, \tool_lp\template_competency::count_records(array('templateid' => $tpl2->get_id())));
+        $this->assertEquals(2, \tool_lp\plan_competency::count_records(array('planid' => $plan1->get_id())));
+        $this->assertEquals(0, \tool_lp\plan_competency::count_records(array('planid' => $plan2->get_id())));
+        $this->assertFalse($plan1->is_based_on_template());
+        $this->assertEquals($tpl1->get_id(), $plan1->get_origtemplateid());
+        $this->assertTrue($plan2->is_based_on_template());
+        $this->assertEquals(null, $plan2->get_origtemplateid());
+
+        // Even the order remains.
+        $plan1comps = \tool_lp\plan_competency::list_competencies($plan1->get_id());
+        $before = reset($tpl1comps);
+        $after = reset($plan1comps);
+        $this->assertEquals($before->get_id(), $after->get_id());
+        $this->assertEquals($before->get_sortorder(), $after->get_sortorder());
+        $before = next($tpl1comps);
+        $after = next($plan1comps);
+        $this->assertEquals($before->get_id(), $after->get_id());
+        $this->assertEquals($before->get_sortorder(), $after->get_sortorder());
+    }
+
+    public function test_update_template_updates_plans() {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $dg = $this->getDataGenerator();
+        $u1 = $dg->create_user();
+        $u2 = $dg->create_user();
+        $lpg = $dg->get_plugin_generator('tool_lp');
+        $tpl1 = $lpg->create_template();
+        $tpl2 = $lpg->create_template();
+
+
+        // Create plans with data not matching templates.
+        $time = time();
+        $plan1 = $lpg->create_plan(array('templateid' => $tpl1->get_id(), 'userid' => $u1->id,
+            'name' => 'Not good name', 'duedate' => $time + 3600, 'description' => 'Ahah', 'descriptionformat' => FORMAT_MARKDOWN));
+        $plan2 = $lpg->create_plan(array('templateid' => $tpl1->get_id(), 'userid' => $u2->id,
+            'name' => 'Not right name', 'duedate' => $time + 3601, 'description' => 'Ahah', 'descriptionformat' => FORMAT_PLAIN));
+        $plan3 = $lpg->create_plan(array('templateid' => $tpl2->get_id(), 'userid' => $u1->id,
+            'name' => 'Not sweet name', 'duedate' => $time + 3602, 'description' => 'Ahah', 'descriptionformat' => FORMAT_PLAIN));
+
+        // Prepare our expectations.
+        $plan1->read();
+        $plan2->read();
+        $plan3->read();
+
+        $this->assertEquals($tpl1->get_id(), $plan1->get_templateid());
+        $this->assertEquals($tpl1->get_id(), $plan2->get_templateid());
+        $this->assertEquals($tpl2->get_id(), $plan3->get_templateid());
+        $this->assertNotEquals($tpl1->get_shortname(), $plan1->get_name());
+        $this->assertNotEquals($tpl1->get_shortname(), $plan2->get_name());
+        $this->assertNotEquals($tpl2->get_shortname(), $plan3->get_name());
+        $this->assertNotEquals($tpl1->get_description(), $plan1->get_description());
+        $this->assertNotEquals($tpl1->get_description(), $plan2->get_description());
+        $this->assertNotEquals($tpl2->get_description(), $plan3->get_description());
+        $this->assertNotEquals($tpl1->get_descriptionformat(), $plan1->get_descriptionformat());
+        $this->assertNotEquals($tpl1->get_descriptionformat(), $plan2->get_descriptionformat());
+        $this->assertNotEquals($tpl2->get_descriptionformat(), $plan3->get_descriptionformat());
+        $this->assertNotEquals($tpl1->get_duedate(), $plan1->get_duedate());
+        $this->assertNotEquals($tpl1->get_duedate(), $plan2->get_duedate());
+        $this->assertNotEquals($tpl2->get_duedate(), $plan3->get_duedate());
+
+        // Update the template without changing critical fields does not update the plans.
+        $data = $tpl1->to_record();
+        $data->visible = 0;
+        api::update_template($data);
+        $this->assertNotEquals($tpl1->get_shortname(), $plan1->get_name());
+        $this->assertNotEquals($tpl1->get_shortname(), $plan2->get_name());
+        $this->assertNotEquals($tpl2->get_shortname(), $plan3->get_name());
+        $this->assertNotEquals($tpl1->get_description(), $plan1->get_description());
+        $this->assertNotEquals($tpl1->get_description(), $plan2->get_description());
+        $this->assertNotEquals($tpl2->get_description(), $plan3->get_description());
+        $this->assertNotEquals($tpl1->get_descriptionformat(), $plan1->get_descriptionformat());
+        $this->assertNotEquals($tpl1->get_descriptionformat(), $plan2->get_descriptionformat());
+        $this->assertNotEquals($tpl2->get_descriptionformat(), $plan3->get_descriptionformat());
+        $this->assertNotEquals($tpl1->get_duedate(), $plan1->get_duedate());
+        $this->assertNotEquals($tpl1->get_duedate(), $plan2->get_duedate());
+        $this->assertNotEquals($tpl2->get_duedate(), $plan3->get_duedate());
+
+        // Now really update the template.
+        $data = $tpl1->to_record();
+        $data->shortname = 'Awesome!';
+        $data->description = 'This is too awesome!';
+        $data->descriptionformat = FORMAT_HTML;
+        $data->duedate = $time + 7200;
+        api::update_template($data);
+        $tpl1->read();
+
+        // Now confirm that the right plans were updated.
+        $plan1->read();
+        $plan2->read();
+        $plan3->read();
+
+        $this->assertEquals($tpl1->get_id(), $plan1->get_templateid());
+        $this->assertEquals($tpl1->get_id(), $plan2->get_templateid());
+        $this->assertEquals($tpl2->get_id(), $plan3->get_templateid());
+
+        $this->assertEquals($tpl1->get_shortname(), $plan1->get_name());
+        $this->assertEquals($tpl1->get_shortname(), $plan2->get_name());
+        $this->assertNotEquals($tpl2->get_shortname(), $plan3->get_name());
+        $this->assertEquals($tpl1->get_description(), $plan1->get_description());
+        $this->assertEquals($tpl1->get_description(), $plan2->get_description());
+        $this->assertNotEquals($tpl2->get_description(), $plan3->get_description());
+        $this->assertEquals($tpl1->get_descriptionformat(), $plan1->get_descriptionformat());
+        $this->assertEquals($tpl1->get_descriptionformat(), $plan2->get_descriptionformat());
+        $this->assertNotEquals($tpl2->get_descriptionformat(), $plan3->get_descriptionformat());
+        $this->assertEquals($tpl1->get_duedate(), $plan1->get_duedate());
+        $this->assertEquals($tpl1->get_duedate(), $plan2->get_duedate());
+        $this->assertNotEquals($tpl2->get_duedate(), $plan3->get_duedate());
     }
 
     /**

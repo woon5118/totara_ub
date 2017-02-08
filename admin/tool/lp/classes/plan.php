@@ -73,6 +73,11 @@ class plan extends persistent {
                 'default' => null,
                 'null' => NULL_ALLOWED,
             ),
+            'origtemplateid' => array(
+                'type' => PARAM_INT,
+                'default' => null,
+                'null' => NULL_ALLOWED,
+            ),
             'status' => array(
                 'choices' => array(self::STATUS_DRAFT, self::STATUS_COMPLETE, self::STATUS_ACTIVE),
                 'type' => PARAM_INT,
@@ -280,6 +285,42 @@ class plan extends persistent {
             $status[self::STATUS_COMPLETE] = get_string('planstatuscomplete', 'tool_lp');
         }
         return $status;
+    }
+
+    /**
+     * Update from template.
+     *
+     * Bulk update a lot of plans from a template
+     *
+     * @param  template $template
+     * @return bool
+     */
+    public static function update_multiple_from_template(template $template) {
+        global $DB;
+        if (!$template->is_valid()) {
+            // As we will bypass this model's validation we rely on the template being validated.
+            throw new coding_exception('The template must be validated before updating plans.');
+        }
+
+        $params = array(
+            'templateid' => $template->get_id(),
+            'status' => self::STATUS_COMPLETE,
+
+            'name' => $template->get_shortname(),
+            'description' => $template->get_description(),
+            'descriptionformat' => $template->get_descriptionformat(),
+            'duedate' => $template->get_duedate(),
+        );
+
+        $sql = "UPDATE {" . self::TABLE . "}
+                   SET name = :name,
+                       description = :description,
+                       descriptionformat = :descriptionformat,
+                       duedate = :duedate
+                 WHERE templateid = :templateid
+                   AND status != :status";
+
+        return $DB->execute($sql, $params);
     }
 
     /**

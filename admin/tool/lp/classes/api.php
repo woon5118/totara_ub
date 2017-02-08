@@ -818,7 +818,9 @@ class api {
         $template = new template(0, $record);
 
         // First we do a permissions check.
-        require_capability('tool/lp:templatemanage', $template->get_context());
+        if (!$template->can_manage()) {
+            throw new required_capability_exception($template->get_context(), 'tool/lp:templatemanage', 'nopermissions', '');
+        }
 
         // OK - all set.
         $id = $template->create();
@@ -837,7 +839,9 @@ class api {
         $template = new template($id);
 
         // First we do a permissions check.
-        require_capability('tool/lp:templatemanage', $template->get_context());
+        if (!$template->can_manage()) {
+            throw new required_capability_exception($template->get_context(), 'tool/lp:templatemanage', 'nopermissions', '');
+        }
 
         // OK - all set.
         $competencies = template_competency::list_competencies($id, false);
@@ -867,7 +871,9 @@ class api {
         $template = new template($id);
 
         // First we do a permissions check.
-        require_capability('tool/lp:templatemanage', $template->get_context());
+        if (!$template->can_manage()) {
+            throw new required_capability_exception($template->get_context(), 'tool/lp:templatemanage', 'nopermissions', '');
+        }
 
         // OK - all set.
         return $template->delete();
@@ -882,16 +888,48 @@ class api {
      * @return boolean
      */
     public static function update_template($record) {
+        global $DB;
         $template = new template($record->id);
 
         // First we do a permissions check.
-        require_capability('tool/lp:templatemanage', $template->get_context());
-        if (isset($record->contextid) && $record->contextid != $template->get_contextid()) {
+        if (!$template->can_manage()) {
+            throw new required_capability_exception($template->get_context(), 'tool/lp:templatemanage', 'nopermissions', '');
+
+        // We can never change the context of a template.
+        } else if (isset($record->contextid) && $record->contextid != $template->get_contextid()) {
             throw new coding_exception('Changing the context of an existing tempalte is forbidden.');
+
         }
 
+        $updateplans = false;
+        $before = $template->to_record();
+
         $template->from_record($record);
-        return $template->update();
+        $after = $template->to_record();
+
+        // Should we update the related plans?
+        if ($before->duedate != $after->duedate ||
+                $before->shortname != $after->shortname ||
+                $before->description != $after->description ||
+                $before->descriptionformat != $after->descriptionformat) {
+            $updateplans = true;
+        }
+
+        $transaction = $DB->start_delegated_transaction();
+        $success = $template->update();
+
+        if (!$success) {
+            $transaction->rollback(new moodle_exception('Error while updating the template.'));
+            return $success;
+        }
+
+        if ($updateplans) {
+            plan::update_multiple_from_template($template);
+        }
+
+        $transaction->allow_commit();
+
+        return $success;
     }
 
     /**
@@ -907,9 +945,8 @@ class api {
         $context = $template->get_context();
 
         // First we do a permissions check.
-        $caps = array('tool/lp:templateread', 'tool/lp:templatemanage');
-        if (!has_any_capability($caps, $context)) {
-             throw new required_capability_exception($context, 'tool/lp:templateread', 'nopermissions', '');
+        if (!$template->can_read()) {
+             throw new required_capability_exception($template->get_context(), 'tool/lp:templateread', 'nopermissions', '');
         }
 
         // OK - all set.
@@ -1048,12 +1085,11 @@ class api {
         $context = $template->get_context();
         $onlyvisible = 1;
 
-        $capabilities = array('tool/lp:templateread', 'tool/lp:templatemanage');
-        if (!has_any_capability($capabilities, $context)) {
-             throw new required_capability_exception($context, 'tool/lp:templateread', 'nopermissions', '');
+        if (!$template->can_read()) {
+            throw new required_capability_exception($template->get_context(), 'tool/lp:templateread', 'nopermissions', '');
         }
 
-        if (has_capability('tool/lp:templatemanage', $context)) {
+        if ($template->can_manage()) {
             $onlyvisible = 0;
         }
 
@@ -1073,12 +1109,11 @@ class api {
         $context = $template->get_context();
         $onlyvisible = 1;
 
-        $capabilities = array('tool/lp:templateread', 'tool/lp:templatemanage');
-        if (!has_any_capability($capabilities, $context)) {
-             throw new required_capability_exception($context, 'tool/lp:templateread', 'nopermissions', '');
+        if (!$template->can_read()) {
+            throw new required_capability_exception($template->get_context(), 'tool/lp:templateread', 'nopermissions', '');
         }
 
-        if (has_capability('tool/lp:templatemanage', $context)) {
+        if ($template->can_manage()) {
             $onlyvisible = 0;
         }
 
@@ -1096,7 +1131,9 @@ class api {
     public static function add_competency_to_template($templateid, $competencyid) {
         // First we do a permissions check.
         $template = new template($templateid);
-        require_capability('tool/lp:templatemanage', $template->get_context());
+        if (!$template->can_manage()) {
+            throw new required_capability_exception($template->get_context(), 'tool/lp:templatemanage', 'nopermissions', '');
+        }
 
         $record = new stdClass();
         $record->templateid = $templateid;
@@ -1127,7 +1164,9 @@ class api {
     public static function remove_competency_from_template($templateid, $competencyid) {
         // First we do a permissions check.
         $template = new template($templateid);
-        require_capability('tool/lp:templatemanage', $template->get_context());
+        if (!$template->can_manage()) {
+            throw new required_capability_exception($template->get_context(), 'tool/lp:templatemanage', 'nopermissions', '');
+        }
 
         $record = new stdClass();
         $record->templateid = $templateid;
@@ -1305,6 +1344,10 @@ class api {
         global $USER;
         $plan = new plan(0, $record);
 
+        if ($plan->is_based_on_template()) {
+            throw new coding_exception('To create a plan from a template use api::create_plan_from_template().');
+        }
+
         if (!$plan->can_manage()) {
             $context = context_user::instance($plan->get_userid());
             throw new required_capability_exception($context, 'tool/lp:planmanage', 'nopermissions', '');
@@ -1312,6 +1355,108 @@ class api {
 
         $plan->create();
         return $plan;
+    }
+
+    /**
+     * Create a learning plan from a template.
+     *
+     * @param  mixed $templateorid The template object or ID.
+     * @param  int $userid
+     * @return false|\tool_lp\plan Returns false when the plan already exists.
+     */
+    public static function create_plan_from_template($templateorid, $userid) {
+        $template = $templateorid;
+        if (!is_object($template)) {
+            $template = new template($template);
+        }
+
+        // The user must be able to view the template to use it as a base for a plan.
+        if (!$template->can_read()) {
+            throw new required_capability_exception($template->get_context(), 'tool/lp:templateread', 'nopermissions', '');
+        }
+
+        // Convert the template to a plan.
+        $record = $template->to_record();
+        $record->templateid = $record->id;
+        $record->userid = $userid;
+        $record->name = $record->shortname;
+        $record->status = plan::STATUS_ACTIVE;
+
+        unset($record->id);
+        unset($record->timecreated);
+        unset($record->timemodified);
+        unset($record->usermodified);
+
+        // Remove extra keys.
+        $properties = plan::properties_definition();
+        foreach ($record as $key => $value) {
+            if (!array_key_exists($key, $properties)) {
+                unset($record->$key);
+            }
+        }
+
+        $plan = new plan(0, $record);
+        if (!$plan->can_manage()) {
+            throw new required_capability_exception($plan->get_context(), 'tool/lp:planmanage', 'nopermissions', '');
+        }
+
+        // We first apply the permission checks as we wouldn't want to leak information by returning early that
+        // the plan already exists.
+        if (plan::record_exists_select('templateid = :templateid AND userid = :userid', array(
+                'templateid' => $template->get_id(), 'userid' => $userid))) {
+            return false;
+        }
+
+        $plan->create();
+        return $plan;
+    }
+
+    /**
+     * Unlink a plan from its template.
+     *
+     * @param  \tool_lp\plan|int $planorid The plan or its ID.
+     * @return bool
+     */
+    public static function unlink_plan_from_template($planorid) {
+        global $DB;
+
+        $plan = $planorid;
+        if (!is_object($planorid)) {
+            $plan = new plan($planorid);
+        }
+
+        // The user must be allowed to manage the plans of the user, nothing about the template.
+        if (!$plan->can_manage()) {
+            throw new required_capability_exception($plan->get_context(), 'tool/lp:planmanage', 'nopermissions', '');
+        }
+
+        // Early exit, it's already done...
+        if (!$plan->is_based_on_template()) {
+            return true;
+        }
+
+        // Fetch the template.
+        $template = new template($plan->get_templateid());
+
+        // Now, proceed by copying all competencies to the plan, then update the plan.
+        $transaction = $DB->start_delegated_transaction();
+        $competencies = template_competency::list_competencies($template->get_id(), false);
+        $i = 0;
+        foreach ($competencies as $competency) {
+            $record = (object) array(
+                'planid' => $plan->get_id(),
+                'competencyid' => $competency->get_id(),
+                'sortorder' => $i++
+            );
+            $pc = new plan_competency(null, $record);
+            $pc->create();
+        }
+        $plan->set_origtemplateid($template->get_id());
+        $plan->set_templateid(null);
+        $success = $plan->update();
+        $transaction->allow_commit();
+
+        return $success;
     }
 
     /**
@@ -1329,10 +1474,13 @@ class api {
         if (!$plan->can_manage()) {
             $context = context_user::instance($plan->get_userid());
             throw new required_capability_exception($context, 'tool/lp:planmanage', 'nopermissions', '');
-        }
+
+        // Prevent a plan based on a template to be edited.
+        } else if ($plan->is_based_on_template()) {
+            throw new coding_exception('Cannot update a plan that is based on a template.');
 
         // Prevent change of ownership as the capabilities are checked against that.
-        if (isset($record->userid) && $plan->get_userid() != $record->userid) {
+        } else if (isset($record->userid) && $plan->get_userid() != $record->userid) {
             throw new coding_exception('A plan cannot be transfered to another user');
         }
 
@@ -1343,6 +1491,10 @@ class api {
         if (!$plan->can_manage()) {
             $context = context_user::instance($plan->get_userid());
             throw new required_capability_exception($context, 'tool/lp:planmanage', 'nopermissions', '');
+
+        // Prevent a plan to be updated to use a template.
+        } else if ($plan->is_based_on_template()) {
+            throw new coding_exception('Cannot update a plan to be based on a template.');
         }
 
         // Are we trying to set the plan as complete?
@@ -1385,6 +1537,8 @@ class api {
 
     /**
      * Deletes a plan.
+     *
+     * Plans based on a template can be removed just like any other one.
      *
      * @param int $id
      * @return bool Success?
