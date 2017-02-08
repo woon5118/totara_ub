@@ -371,11 +371,14 @@ class behat_course extends behat_base {
      */
     public function i_edit_the_section_and_i_fill_the_form_with($sectionnumber, TableNode $data) {
 
-        return array(
-            new Given('I edit the section "' . $sectionnumber . '"'),
-            new Given('I set the following fields to these values:', $data),
-            new Given('I press "' . get_string('savechanges') . '"')
-        );
+        // Edit given section.
+        $this->execute("behat_course::i_edit_the_section", $sectionnumber);
+
+        // Set form fields.
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
+
+        // Save section settings.
+        $this->execute("behat_forms::press_button", get_string('savechanges'));
     }
 
     /**
