@@ -27,10 +27,10 @@ defined('MOODLE_INTERNAL') || die();
 
 use coding_exception;
 use moodle_exception;
-use tool_lp\api;
-use tool_lp\competency;
-use tool_lp\course_competency;
-use tool_lp\course_module_competency;
+use core_competency\api;
+use core_competency\competency;
+use core_competency\course_competency;
+use core_competency\course_module_competency;
 
 /**
  * Processor class.
@@ -464,8 +464,8 @@ class framework_processor {
                         $competenciestoremovefromcourse[$competencyid] = true;
                         $this->coursecompetencymigrations++;
 
-                    // The competency was already in the course...
                     } else {
+                        // The competency was already in the course...
                         if ($this->removeoriginalwhenalreadypresent) {
                             $competenciestoremovefromcourse[$competencyid] = true;
                         } else {
@@ -474,8 +474,8 @@ class framework_processor {
                         }
                     }
 
-                // There was a major problem with this competency, we will ignore it entirely for the course.
                 } catch (moodle_exception $e) {
+                    // There was a major problem with this competency, we will ignore it entirely for the course.
                     $skipcompetencies[$competencyid] = true;
 
                     $this->log_error($courseid, $competencyid, null,
@@ -512,8 +512,8 @@ class framework_processor {
                                 $remove = false;
                             }
 
-                        // We have a mapping.
                         } else {
+                            // We have a mapping.
                             $transaction = $DB->start_delegated_transaction();
                             try {
                                 // The competency was added successfully.
@@ -531,8 +531,8 @@ class framework_processor {
 
                                     $this->modulecompetencymigrations++;
 
-                                // The competency was already in the module.
                                 } else {
+                                    // The competency was already in the module.
                                     if (!$this->removeoriginalwhenalreadypresent) {
                                         $remove = false;
                                         $competencieswithissues[$competencyid] = true;
@@ -541,8 +541,8 @@ class framework_processor {
                                     }
                                 }
 
-                            // There was a major problem with this competency in this module.
                             } catch (moodle_exception $e) {
+                                // There was a major problem with this competency in this module.
                                 $message = get_string('errorwhilemigratingmodulecompetencywithexception', 'tool_lpmigrate',
                                     $e->getMessage());
                                 $this->log_error($courseid, $competencyid, $cmid, $message);

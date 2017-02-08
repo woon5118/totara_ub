@@ -32,13 +32,13 @@ $url = new moodle_url("/admin/tool/lp/competencyframeworks.php");
 $url->param('pagecontextid', $pagecontextid);
 
 require_login();
-\tool_lp\api::require_enabled();
+\core_competency\api::require_enabled();
 
-if (!\tool_lp\competency_framework::can_read_context($context)) {
-    throw new required_capability_exception($context, 'tool/lp:competencyview', 'nopermissions', '');
+if (!\core_competency\competency_framework::can_read_context($context)) {
+    throw new required_capability_exception($context, 'moodle/competency:competencyview', 'nopermissions', '');
 }
 
-$title = get_string('competencies', 'tool_lp');
+$title = get_string('competencies', 'core_competency');
 $pagetitle = get_string('competencyframeworks', 'tool_lp');
 $pagesubtitle = get_string('listcompetencyframeworkscaption', 'tool_lp');
 

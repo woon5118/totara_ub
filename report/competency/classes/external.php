@@ -33,10 +33,10 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use core_competency\external\user_competency_course_exporter;
+use core_competency\external\user_summary_exporter;
 use tool_lp\external\competency_summary_exporter;
 use tool_lp\external\course_summary_exporter;
-use tool_lp\external\user_competency_course_exporter;
-use tool_lp\external\user_summary_exporter;
 
 /**
  * This is the external API for this report.
@@ -88,7 +88,7 @@ class external extends external_api {
         );
         $context = context_course::instance($params['courseid']);
         self::validate_context($context);
-        if (!is_enrolled($context, $params['userid'], 'tool/lp:coursecompetencygradable')) {
+        if (!is_enrolled($context, $params['userid'], 'moodle/competency:coursecompetencygradable')) {
             throw new coding_exception('invaliduser');
         }
 
@@ -110,7 +110,6 @@ class external extends external_api {
             'courseid' => new external_value(PARAM_INT, 'Course id'),
             'user' => user_summary_exporter::get_read_structure(),
             'course' => course_summary_exporter::get_read_structure(),
-            'pluginbaseurl' => new external_value(PARAM_LOCALURL, 'Url to the tool_lp plugin folder on this Moodle site'),
             'usercompetencies' => new external_multiple_structure(
                 new external_single_structure(array(
                     'usercompetencycourse' => user_competency_course_exporter::get_read_structure(),

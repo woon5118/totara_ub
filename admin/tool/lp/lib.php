@@ -23,7 +23,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->libdir . '/externallib.php');
 
 /**
  * This function extends the course navigation
@@ -33,7 +32,7 @@ require_once($CFG->libdir . '/externallib.php');
  * @param context $coursecontext The context of the course
  */
 function tool_lp_extend_navigation_course($navigation, $course, $coursecontext) {
-    if (!\tool_lp\api::is_enabled()) {
+    if (!\core_competency\api::is_enabled()) {
         return;
     }
 
@@ -62,15 +61,15 @@ function tool_lp_extend_navigation_course($navigation, $course, $coursecontext) 
  * @param context_course $coursecontext The context of the course
  */
 function tool_lp_extend_navigation_user($navigation, $user, $usercontext, $course, $coursecontext) {
-    if (!\tool_lp\api::is_enabled()) {
+    if (!\core_competency\api::is_enabled()) {
         return;
     }
 
-    if (\tool_lp\plan::can_read_user($user->id)) {
+    if (\core_competency\plan::can_read_user($user->id)) {
         $node = $navigation->add(get_string('learningplans', 'tool_lp'),
             new moodle_url('/admin/tool/lp/plans.php', array('userid' => $user->id)));
 
-        if (\tool_lp\user_evidence::can_read_user($user->id)) {
+        if (\core_competency\user_evidence::can_read_user($user->id)) {
             $node->add(get_string('userevidence', 'tool_lp'),
                 new moodle_url('/admin/tool/lp/user_evidence_list.php', array('userid' => $user->id)));
         }
@@ -89,9 +88,9 @@ function tool_lp_extend_navigation_user($navigation, $user, $usercontext, $cours
  * @return bool
  */
 function tool_lp_myprofile_navigation(core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
-    if (!\tool_lp\api::is_enabled()) {
+    if (!\core_competency\api::is_enabled()) {
         return false;
-    } else if (!\tool_lp\plan::can_read_user($user->id)) {
+    } else if (!\core_competency\plan::can_read_user($user->id)) {
         return false;
     }
 
@@ -110,13 +109,13 @@ function tool_lp_myprofile_navigation(core_user\output\myprofile\tree $tree, $us
  * @param context $coursecategorycontext The context of the course category
  */
 function tool_lp_extend_navigation_category_settings($navigation, $coursecategorycontext) {
-    if (!\tool_lp\api::is_enabled()) {
+    if (!\core_competency\api::is_enabled()) {
         return false;
     }
 
     // We check permissions before renderring the links.
-    $templatereadcapability = \tool_lp\template::can_read_context($coursecategorycontext);
-    $competencyreadcapability = \tool_lp\competency_framework::can_read_context($coursecategorycontext);
+    $templatereadcapability = \core_competency\template::can_read_context($coursecategorycontext);
+    $competencyreadcapability = \core_competency\competency_framework::can_read_context($coursecategorycontext);
     if (!$templatereadcapability && !$competencyreadcapability) {
         return false;
     }
@@ -152,281 +151,6 @@ function tool_lp_extend_navigation_category_settings($navigation, $coursecategor
     }
 }
 
-
-/**
- * File serving.
- *
- * @param stdClass $course The course object.
- * @param stdClass $cm The cm object.
- * @param context $context The context object.
- * @param string $filearea The file area.
- * @param array $args List of arguments.
- * @param bool $forcedownload Whether or not to force the download of the file.
- * @param array $options Array of options.
- * @return void|false
- */
-function tool_lp_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
-    global $CFG;
-
-    if (!\tool_lp\api::is_enabled()) {
-        return false;
-    }
-
-    $fs = get_file_storage();
-    $file = null;
-
-    $itemid = array_shift($args);
-    $filename = array_shift($args);
-    $filepath = $args ? '/' .implode('/', $args) . '/' : '/';
-
-    if ($filearea == 'userevidence' && $context->contextlevel == CONTEXT_USER) {
-        if (\tool_lp\user_evidence::can_read_user($context->instanceid)) {
-            $file = $fs->get_file($context->id, 'tool_lp', $filearea, $itemid, $filepath, $filename);
-        }
-    }
-
-    if (!$file) {
-        return false;
-    }
-
-    send_stored_file($file, null, 0, $forcedownload);
-}
-
-/**
- * Hook when a comment is added.
- *
- * @param  stdClass $comment The comment.
- * @param  stdClass $params The parameters.
- * @return array
- */
-function tool_lp_comment_add($comment, $params) {
-    global $USER;
-
-    if (!\tool_lp\api::is_enabled()) {
-        return;
-    }
-
-    if ($params->commentarea == 'user_competency') {
-        $uc = new \tool_lp\user_competency($params->itemid);
-
-        // Message both the user and the reviewer, except when they are the author of the message.
-        $recipients = array($uc->get_userid());
-        if ($uc->get_reviewerid()) {
-            $recipients[] = $uc->get_reviewerid();
-        }
-        $recipients = array_diff($recipients, array($comment->userid));
-        if (empty($recipients)) {
-            return;
-        }
-
-        // Get the sender.
-        $user = $USER;
-        if ($USER->id != $comment->userid) {
-            $user = core_user::get_user($comment->userid);
-        }
-        $fullname = fullname($user);
-
-        // Get the competency.
-        $competency = $uc->get_competency();
-        $competencyname = format_string($competency->get_shortname(), true, array('context' => $competency->get_context()));
-
-        // We want to send a message for one plan, trying to find an active one first, or the last modified one.
-        $plan = null;
-        $plans = $uc->get_plans();
-        foreach ($plans as $candidate) {
-            if ($candidate->get_status() == \tool_lp\plan::STATUS_ACTIVE) {
-                $plan = $candidate;
-                break;
-
-            } else if (!empty($plan) && $plan->get_timemodified() < $candidate->get_timemodified()) {
-                $plan = $candidate;
-
-            } else if (empty($plan)) {
-                $plan = $candidate;
-            }
-        }
-
-        // Urls.
-        // TODO MDL-52749 Replace the link to the plan with the user competency page.
-        if (empty($plan)) {
-            $urlname = get_string('userplans', 'tool_lp');
-            $url = new moodle_url('/admin/tool/lp/plans.php', array('userid' => $uc->get_userid()));
-        } else {
-            $urlname = $competencyname;
-            $url = new moodle_url('/admin/tool/lp/user_competency_in_plan.php', array(
-                'userid' => $uc->get_userid(),
-                'competencyid' => $uc->get_competencyid(),
-                'planid' => $plan->get_id()
-            ));
-        }
-
-        // Construct the message content.
-        $fullmessagehtml = get_string('usercommentedonacompetencyhtml', 'tool_lp', array(
-            'fullname' => $fullname,
-            'competency' => $competencyname,
-            'comment' => format_text($comment->content, $comment->format, array('context' => $params->context->id)),
-            'url' => $url->out(true),
-            'urlname' => $urlname,
-        ));
-        if ($comment->format == FORMAT_PLAIN || $comment->format == FORMAT_MOODLE) {
-            $format = FORMAT_MOODLE;
-            $fullmessage = get_string('usercommentedonacompetency', 'tool_lp', array(
-                'fullname' => $fullname,
-                'competency' => $competencyname,
-                'comment' => $comment->content,
-                'url' => $url->out(false),
-            ));
-        } else {
-            $format = FORMAT_HTML;
-            $fullmessage = $fullmessagehtml;
-        }
-
-        $message = new \core\message\message();
-        $message->component = 'tool_lp';
-        $message->name = 'user_competency_comment';
-        $message->notification = 1;
-        $message->userfrom = core_user::get_noreply_user();
-        $message->subject = get_string('usercommentedonacompetencysubject', 'tool_lp', $fullname);
-        $message->fullmessage = $fullmessage;
-        $message->fullmessageformat = $format;
-        $message->fullmessagehtml = $fullmessagehtml;
-        $message->smallmessage = get_string('usercommentedonacompetencysmall', 'tool_lp', array(
-            'fullname' => $fullname,
-            'competency' => $competencyname,
-        ));
-        $message->contexturl = $url->out(false);
-        $message->contexturlname = $urlname;
-
-        // Message each recipient.
-        foreach ($recipients as $recipient) {
-            $msgcopy = clone($message);
-            $msgcopy->userto = $recipient;
-            message_send($msgcopy);
-        }
-
-    } else if ($params->commentarea == 'plan') {
-        $plan = new \tool_lp\plan($params->itemid);
-
-        // Message both the user and the reviewer, except when they are the author of the message.
-        $recipients = array($plan->get_userid());
-        if ($plan->get_reviewerid()) {
-            $recipients[] = $plan->get_reviewerid();
-        }
-        $recipients = array_diff($recipients, array($comment->userid));
-        if (empty($recipients)) {
-            return;
-        }
-
-        // Get the sender.
-        $user = $USER;
-        if ($USER->id != $comment->userid) {
-            $user = core_user::get_user($comment->userid);
-        }
-
-        $fullname = fullname($user);
-        $planname = format_string($plan->get_name(), true, array('context' => $plan->get_context()));
-        $urlname = $planname;
-        $url = new moodle_url('/admin/tool/lp/plan.php', array(
-            'id' => $plan->get_id()
-        ));
-
-        // Construct the message content.
-        $fullmessagehtml = get_string('usercommentedonaplanhtml', 'tool_lp', array(
-            'fullname' => $fullname,
-            'plan' => $planname,
-            'comment' => format_text($comment->content, $comment->format, array('context' => $params->context->id)),
-            'url' => $url->out(true),
-            'urlname' => $urlname,
-        ));
-        if ($comment->format == FORMAT_PLAIN || $comment->format == FORMAT_MOODLE) {
-            $format = FORMAT_MOODLE;
-            $fullmessage = get_string('usercommentedonaplan', 'tool_lp', array(
-                'fullname' => $fullname,
-                'plan' => $planname,
-                'comment' => $comment->content,
-                'url' => $url->out(false),
-            ));
-        } else {
-            $format = FORMAT_HTML;
-            $fullmessage = $fullmessagehtml;
-        }
-
-        $message = new \core\message\message();
-        $message->component = 'tool_lp';
-        $message->name = 'plan_comment';
-        $message->notification = 1;
-        $message->userfrom = core_user::get_noreply_user();
-        $message->subject = get_string('usercommentedonaplansubject', 'tool_lp', $fullname);
-        $message->fullmessage = $fullmessage;
-        $message->fullmessageformat = $format;
-        $message->fullmessagehtml = $fullmessagehtml;
-        $message->smallmessage = get_string('usercommentedonaplansmall', 'tool_lp', array(
-            'fullname' => $fullname,
-            'plan' => $planname,
-        ));
-        $message->contexturl = $url->out(false);
-        $message->contexturlname = $urlname;
-
-        // Message each recipient.
-        foreach ($recipients as $recipient) {
-            $msgcopy = clone($message);
-            $msgcopy->userto = $recipient;
-            message_send($msgcopy);
-        }
-    }
-}
-
-/**
- * Return the permissions of for the comments.
- *
- * @param  stdClass $params The parameters.
- * @return array
- */
-function tool_lp_comment_permissions($params) {
-    if (!\tool_lp\api::is_enabled()) {
-        return array('post' => false, 'view' => false);
-    }
-
-    if ($params->commentarea == 'user_competency') {
-        $uc = new \tool_lp\user_competency($params->itemid);
-        if ($uc->can_read()) {
-            return array('post' => $uc->can_comment(), 'view' => $uc->can_read_comments());
-        }
-    } else if ($params->commentarea == 'plan') {
-        $plan = new \tool_lp\plan($params->itemid);
-        if ($plan->can_read()) {
-            return array('post' => $plan->can_comment(), 'view' => $plan->can_read_comments());
-        }
-    }
-
-    return array('post' => false, 'view' => false);
-}
-
-/**
- * Validates comments.
- *
- * @param  stdClass $params The parameters.
- * @return bool
- */
-function tool_lp_comment_validate($params) {
-    if (!\tool_lp\api::is_enabled()) {
-        return false;
-    }
-
-    if ($params->commentarea == 'user_competency') {
-        if (!\tool_lp\user_competency::record_exists($params->itemid)) {
-            return false;
-        }
-        return true;
-    } else if ($params->commentarea == 'plan') {
-        if (!\tool_lp\plan::record_exists($params->itemid)) {
-            return false;
-        }
-        return true;
-    }
-    return false;
-}
-
 /**
  * Inject the competencies elements into all moodle module settings forms.
  *
@@ -436,13 +160,13 @@ function tool_lp_comment_validate($params) {
 function tool_lp_coursemodule_standard_elements($formwrapper, $mform) {
     global $CFG, $COURSE;
 
-    if (!\tool_lp\api::is_enabled()) {
+    if (!\core_competency\api::is_enabled()) {
         return;
-    } else if (!has_capability('tool/lp:coursecompetencymanage', $formwrapper->get_context())) {
+    } else if (!has_capability('moodle/competency:coursecompetencymanage', $formwrapper->get_context())) {
         return;
     }
 
-    $mform->addElement('header', 'competenciessection', get_string('competencies', 'tool_lp'));
+    $mform->addElement('header', 'competenciessection', get_string('competencies', 'core_competency'));
 
     MoodleQuickForm::registerElementType('course_competencies',
                                          "$CFG->dirroot/admin/tool/lp/classes/course_competencies_form_element.php",
@@ -471,7 +195,7 @@ function tool_lp_coursemodule_standard_elements($formwrapper, $mform) {
  * @param stdClass $course The course.
  */
 function tool_lp_coursemodule_edit_post_actions($data, $course) {
-    if (!\tool_lp\api::is_enabled()) {
+    if (!\core_competency\api::is_enabled()) {
         return $data;
     }
 
@@ -482,7 +206,7 @@ function tool_lp_coursemodule_edit_post_actions($data, $course) {
 
     // We bypass the API here and go direct to the persistent layer - because we don't want to do permission
     // checks here - we need to load the real list of existing course module competencies.
-    $existing = \tool_lp\course_module_competency::list_course_module_competencies($data->coursemodule);
+    $existing = \core_competency\course_module_competency::list_course_module_competencies($data->coursemodule);
 
     $existingids = array();
     foreach ($existing as $cmc) {
@@ -495,29 +219,19 @@ function tool_lp_coursemodule_edit_post_actions($data, $course) {
     $added = array_diff($newids, $existingids);
 
     foreach ($removed as $removedid) {
-        \tool_lp\api::remove_competency_from_course_module($data->coursemodule, $removedid);
+        \core_competency\api::remove_competency_from_course_module($data->coursemodule, $removedid);
     }
     foreach ($added as $addedid) {
-        \tool_lp\api::add_competency_to_course_module($data->coursemodule, $addedid);
+        \core_competency\api::add_competency_to_course_module($data->coursemodule, $addedid);
     }
 
     if (isset($data->competency_rule)) {
         // Now update the rules for each course_module_competency.
-        $current = \tool_lp\api::list_course_module_competencies_in_course_module($data->coursemodule);
+        $current = \core_competency\api::list_course_module_competencies_in_course_module($data->coursemodule);
         foreach ($current as $coursemodulecompetency) {
-            \tool_lp\api::set_course_module_competency_ruleoutcome($coursemodulecompetency, $data->competency_rule);
+            \core_competency\api::set_course_module_competency_ruleoutcome($coursemodulecompetency, $data->competency_rule);
         }
     }
 
     return $data;
-}
-
-/**
- * Reports whether a scale is being used in the plugin.
- *
- * @param int $scaleid The scale ID.
- * @return bool
- */
-function tool_lp_scale_used_anywhere($scaleid) {
-    return \tool_lp\api::is_scale_used_anywhere($scaleid);
 }

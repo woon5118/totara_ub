@@ -30,9 +30,9 @@ require_login(null, false);
 if (isguestuser()) {
     throw new require_login_exception('Guests are not allowed here.');
 }
-\tool_lp\api::require_enabled();
+\core_competency\api::require_enabled();
 
-$uc = \tool_lp\api::get_user_competency_by_id($id);
+$uc = \core_competency\api::get_user_competency_by_id($id);
 $params = array('id' => $id);
 $url = new moodle_url('/admin/tool/lp/user_competency.php', $params);
 
@@ -43,7 +43,7 @@ if (!$user || !core_user::is_real_user($user->id)) {
 $iscurrentuser = ($USER->id == $user->id);
 
 $competency = $uc->get_competency();
-$compexporter = new \tool_lp\external\competency_exporter($competency, array('context' => $competency->get_context()));
+$compexporter = new \core_competency\external\competency_exporter($competency, array('context' => $competency->get_context()));
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url($url);
@@ -63,6 +63,6 @@ echo $output->header();
 $page = new \tool_lp\output\user_competency_summary($uc);
 echo $output->render($page);
 // Trigger viewed event.
-\tool_lp\api::user_competency_viewed($uc);
+\core_competency\api::user_competency_viewed($uc);
 
 echo $output->footer();

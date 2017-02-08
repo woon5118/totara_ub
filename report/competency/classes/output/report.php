@@ -24,18 +24,19 @@
 namespace report_competency\output;
 
 use context_course;
-use tool_lp\external\competency_summary_exporter;
-use tool_lp\external\course_summary_exporter;
-use tool_lp\external\user_competency_course_exporter;
-use tool_lp\external\user_summary_exporter;
-use tool_lp\user_competency;
 use renderable;
 use core_user;
 use templatable;
 use renderer_base;
 use moodle_url;
 use stdClass;
-use tool_lp\api;
+use core_competency\api;
+use core_competency\external\user_competency_course_exporter;
+use core_competency\external\user_summary_exporter;
+use core_competency\url;
+use core_competency\user_competency;
+use tool_lp\external\competency_summary_exporter;
+use tool_lp\external\course_summary_exporter;
 
 /**
  * Class containing data for learning plan template competencies page
@@ -83,7 +84,6 @@ class report implements renderable, templatable {
         $data->pushratingstouserplans = $coursecompetencysettings->get_pushratingstouserplans();
         $data->course = $exporter->export($output);
 
-        $data->pluginbaseurl = (new moodle_url('/admin/tool/lp/'))->out(false);
         $data->usercompetencies = array();
         $scalecache = array();
         $frameworkcache = array();
@@ -130,11 +130,13 @@ class report implements renderable, templatable {
             $exporter = new user_competency_course_exporter($usercompetencycourse, array('scale' => $scale));
             $record = $exporter->export($output);
             $onerow->usercompetencycourse = $record;
-            $exporter = new competency_summary_exporter(null, array('competency' => $competency,
-                                                                    'framework' => $framework,
-                                                                    'context' => $framework->get_context(),
-                                                                    'relatedcompetencies' => array(),
-                                                                    'linkedcourses' => array()));
+            $exporter = new competency_summary_exporter(null, array(
+                'competency' => $competency,
+                'framework' => $framework,
+                'context' => $framework->get_context(),
+                'relatedcompetencies' => array(),
+                'linkedcourses' => array()
+            ));
             $onerow->competency = $exporter->export($output);
             array_push($data->usercompetencies, $onerow);
         }

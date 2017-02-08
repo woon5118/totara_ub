@@ -25,11 +25,13 @@
 namespace block_lp\output;
 defined('MOODLE_INTERNAL') || die();
 
-use tool_lp\api;
-use tool_lp\external\competency_exporter;
-use tool_lp\external\plan_exporter;
-use tool_lp\external\user_competency_exporter;
-use tool_lp\external\user_summary_exporter;
+use core_competency\api;
+use core_competency\external\competency_exporter;
+use core_competency\external\plan_exporter;
+use core_competency\external\user_competency_exporter;
+use core_competency\external\user_summary_exporter;
+use core_competency\plan;
+use core_competency\url;
 use renderable;
 use renderer_base;
 use templatable;
@@ -81,7 +83,7 @@ class summary implements renderable, templatable {
             if (count($plans) >= 3) {
                 break;
             }
-            if ($plan->get_status() == \tool_lp\plan::STATUS_ACTIVE) {
+            if ($plan->get_status() == plan::STATUS_ACTIVE) {
                 $plans[] = $plan;
             }
         }
@@ -129,7 +131,7 @@ class summary implements renderable, templatable {
             'hasplanstoreview' => $this->planstoreview['count'] > 0,
             'hasmoreplanstoreview' => $this->planstoreview['count'] > 3,
 
-            'cbebaseurl' => (new \moodle_url('/admin/tool/lp'))->out(false),
+            'plansurl' => url::plans($this->user->id)->out(false),
             'pluginbaseurl' => (new \moodle_url('/blocks/lp'))->out(false),
             'userid' => $this->user->id,
         );

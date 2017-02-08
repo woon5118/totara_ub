@@ -33,7 +33,7 @@ use moodle_url;
  * @copyright  2016 Issam Taboubi <issam.taboubi@umontreal.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class competency_path_exporter extends exporter {
+class competency_path_exporter extends \core_competency\external\exporter {
 
     /**
      * Constructor.
@@ -51,8 +51,8 @@ class competency_path_exporter extends exporter {
      */
     protected static function define_related() {
         return [
-            'ancestors' => 'tool_lp\\competency[]',
-            'framework' => 'tool_lp\\competency_framework',
+            'ancestors' => 'core_competency\\competency[]',
+            'framework' => 'core_competency\\competency_framework',
             'context' => 'context'
         ];
     }

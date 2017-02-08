@@ -31,12 +31,12 @@ use stdClass;
 use context;
 use context_system;
 use moodle_url;
-use tool_lp\api;
+use core_competency\external\template_exporter;
+use core_competency\template;
+use core_competency\api;
 use tool_lp\external\competency_summary_exporter;
-use tool_lp\template;
-use tool_lp\template_statistics;
-use tool_lp\external\template_exporter;
 use tool_lp\external\template_statistics_exporter;
+use tool_lp\template_statistics;
 
 /**
  * Class containing data for learning plan template competencies page
@@ -49,7 +49,7 @@ class template_competencies_page implements renderable, templatable {
     /** @var template $template Template for this page. */
     protected $template = null;
 
-    /** @var \tool_lp\competency[] $competencies List of competencies. */
+    /** @var \core_competency\competency[] $competencies List of competencies. */
     protected $competencies = array();
 
     /** @var bool $canmanagecompetencyframeworks Can the current user manage competency frameworks. */
@@ -78,8 +78,8 @@ class template_competencies_page implements renderable, templatable {
         $this->template = $template;
         $this->templatestatistics = new template_statistics($template->get_id());
         $this->competencies = api::list_competencies_in_template($template);
-        $this->canmanagecompetencyframeworks = has_capability('tool/lp:competencymanage', $this->pagecontext);
-        $this->canmanagetemplatecompetencies = has_capability('tool/lp:templatemanage', $this->pagecontext);
+        $this->canmanagecompetencyframeworks = has_capability('moodle/competency:competencymanage', $this->pagecontext);
+        $this->canmanagetemplatecompetencies = has_capability('moodle/competency:templatemanage', $this->pagecontext);
         $this->manageurl = new moodle_url('/admin/tool/lp/competencyframeworks.php',
             array('pagecontextid' => $this->pagecontext->id));
     }

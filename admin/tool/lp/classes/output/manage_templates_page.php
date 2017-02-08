@@ -32,9 +32,9 @@ use single_button;
 use stdClass;
 use moodle_url;
 use context_system;
-use tool_lp\api;
-use tool_lp\template;
-use tool_lp\external\template_exporter;
+use core_competency\api;
+use core_competency\template;
+use core_competency\external\template_exporter;
 
 /**
  * Class containing data for managecompetencyframeworks page

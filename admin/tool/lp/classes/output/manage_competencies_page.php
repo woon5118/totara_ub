@@ -31,10 +31,10 @@ use single_button;
 use stdClass;
 use moodle_url;
 use context_system;
-use tool_lp\api;
-use tool_lp\competency;
-use tool_lp\competency_framework;
-use tool_lp\external\competency_framework_exporter;
+use core_competency\api;
+use core_competency\competency;
+use core_competency\competency_framework;
+use core_competency\external\competency_framework_exporter;
 
 /**
  * Class containing data for managecompetencies page
@@ -44,10 +44,10 @@ use tool_lp\external\competency_framework_exporter;
  */
 class manage_competencies_page implements renderable, templatable {
 
-    /** @var \tool_lp\competency_framework $framework This competency framework. */
+    /** @var \core_competency\competency_framework $framework This competency framework. */
     protected $framework = null;
 
-    /** @var \tool_lp\competency[] $competencies List of competencies. */
+    /** @var \core_competency\competency[] $competencies List of competencies. */
     protected $competencies = array();
 
     /** @var string $search Text to search for. */
@@ -65,7 +65,7 @@ class manage_competencies_page implements renderable, templatable {
     /**
      * Construct this renderable.
      *
-     * @param \tool_lp\competency_framework $framework Competency framework.
+     * @param \core_competency\competency_framework $framework Competency framework.
      * @param string $search Search string.
      * @param context $pagecontext The page context.
      */
@@ -79,7 +79,7 @@ class manage_competencies_page implements renderable, templatable {
         );
         $this->navigation[] = $addpage;
 
-        $this->canmanage = has_capability('tool/lp:competencymanage', $framework->get_context());
+        $this->canmanage = has_capability('moodle/competency:competencymanage', $framework->get_context());
     }
 
     /**
@@ -97,12 +97,27 @@ class manage_competencies_page implements renderable, templatable {
         $data->pagecontextid = $this->pagecontext->id;
         $data->pluginbaseurl = (new moodle_url('/admin/tool/lp'))->out(true);
 
+        $rulesmodules = array();
         $rules = competency::get_available_rules();
-        foreach ($rules as $type => $rule) {
-            $rule->name = (string) $rule->name;
-            $rule->type = $type;
+        foreach ($rules as $type => $rulename) {
+
+            $amd = null;
+            if ($type == 'core_competency\\competency_rule_all') {
+                $amd = 'tool_lp/competency_rule_all';
+            } else if ($type == 'core_competency\\competency_rule_points') {
+                $amd = 'tool_lp/competency_rule_points';
+            } else {
+                // We do not know how to display that rule.
+                continue;
+            }
+
+            $rulesmodules[] = [
+                'name' => (string) $rulename,
+                'type' => $type,
+                'amd' => $amd,
+            ];
         }
-        $data->rulesmodules = json_encode(array_values($rules));
+        $data->rulesmodules = json_encode(array_values($rulesmodules));
 
         return $data;
     }

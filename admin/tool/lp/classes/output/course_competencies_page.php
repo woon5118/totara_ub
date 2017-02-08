@@ -31,18 +31,18 @@ use stdClass;
 use moodle_url;
 use context_system;
 use context_course;
-use tool_lp\api;
-use tool_lp\course_competency;
+use core_competency\api;
 use tool_lp\course_competency_statistics;
-use tool_lp\competency;
-use tool_lp\external\competency_exporter;
+use core_competency\competency;
+use core_competency\course_competency;
+use core_competency\external\competency_exporter;
+use core_competency\external\course_competency_exporter;
+use core_competency\external\course_competency_settings_exporter;
+use core_competency\external\user_competency_course_exporter;
+use core_competency\external\user_competency_exporter;
 use tool_lp\external\competency_path_exporter;
-use tool_lp\external\course_competency_exporter;
 use tool_lp\external\course_competency_statistics_exporter;
-use tool_lp\external\course_competency_settings_exporter;
 use tool_lp\external\course_module_summary_exporter;
-use tool_lp\external\user_competency_exporter;
-use tool_lp\external\user_competency_course_exporter;
 
 /**
  * Class containing data for course competencies page
@@ -58,7 +58,7 @@ class course_competencies_page implements renderable, templatable {
     /** @var context $context The context for this page. */
     protected $context = null;
 
-    /** @var \tool_lp\course_competency[] $competencies List of competencies. */
+    /** @var \core_competency\course_competency[] $competencies List of competencies. */
     protected $coursecompetencylist = array();
 
     /** @var bool $canmanagecompetencyframeworks Can the current user manage competency frameworks. */
@@ -78,8 +78,8 @@ class course_competencies_page implements renderable, templatable {
         $this->context = context_course::instance($courseid);
         $this->courseid = $courseid;
         $this->coursecompetencylist = api::list_course_competencies($courseid);
-        $this->canmanagecoursecompetencies = has_capability('tool/lp:coursecompetencymanage', $this->context);
-        $this->canconfigurecoursecompetencies = has_capability('tool/lp:coursecompetencyconfigure', $this->context);
+        $this->canmanagecoursecompetencies = has_capability('moodle/competency:coursecompetencymanage', $this->context);
+        $this->canconfigurecoursecompetencies = has_capability('moodle/competency:coursecompetencyconfigure', $this->context);
         $this->coursecompetencysettings = api::read_course_competency_settings($courseid);
         $this->coursecompetencystatistics = new course_competency_statistics($courseid);
 
@@ -88,7 +88,7 @@ class course_competencies_page implements renderable, templatable {
         $this->canmanagecompetencyframeworks = false;
         $contexts = array_reverse($this->context->get_parent_contexts(true));
         foreach ($contexts as $context) {
-            $canmanage = has_capability('tool/lp:competencymanage', $context);
+            $canmanage = has_capability('moodle/competency:competencymanage', $context);
             if ($canmanage) {
                 $this->manageurl = new moodle_url('/admin/tool/lp/competencyframeworks.php',
                     array('pagecontextid' => $context->id));
@@ -113,7 +113,7 @@ class course_competencies_page implements renderable, templatable {
         $data->competencies = array();
         $contextcache = array();
 
-        $gradable = is_enrolled($this->context, $USER, 'tool/lp:coursecompetencygradable');
+        $gradable = is_enrolled($this->context, $USER, 'moodle/competency:coursecompetencygradable');
         if ($gradable) {
             $usercompetencycourses = api::list_user_competencies_in_course($this->courseid, $USER->id);
             $data->gradableuserid = $USER->id;

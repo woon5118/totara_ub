@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use renderer_base;
 use moodle_url;
+use core_competency\external\competency_exporter;
 
 /**
  * Class for exporting a course competency statistics summary.
@@ -33,7 +34,7 @@ use moodle_url;
  * @copyright  2015 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_competency_statistics_exporter extends exporter {
+class course_competency_statistics_exporter extends \core_competency\external\exporter {
 
     public static function define_properties() {
         return array(
@@ -78,7 +79,8 @@ class course_competency_statistics_exporter extends exporter {
         $proficientcompetencypercentage = 0;
         $proficientcompetencypercentageformatted = '';
         if ($this->data->competencycount > 0) {
-            $proficientcompetencypercentage = ((float) $this->data->proficientcompetencycount / (float) $this->data->competencycount) * 100.0;
+            $proficientcompetencypercentage = ((float) $this->data->proficientcompetencycount
+                / (float) $this->data->competencycount) * 100.0;
             $proficientcompetencypercentageformatted = format_float($proficientcompetencypercentage);
         }
         $competencies = array();
@@ -96,8 +98,8 @@ class course_competency_statistics_exporter extends exporter {
             'proficientcompetencypercentageformatted' => $proficientcompetencypercentageformatted,
             'leastproficient' => $competencies,
             'leastproficientcount' => count($competencies),
-            'canbegradedincourse' => has_capability('tool/lp:coursecompetencygradable', $this->related['context']),
-            'canmanagecoursecompetencies' => has_capability('tool/lp:coursecompetencymanage', $this->related['context'])
+            'canbegradedincourse' => has_capability('moodle/competency:coursecompetencygradable', $this->related['context']),
+            'canmanagecoursecompetencies' => has_capability('moodle/competency:coursecompetencymanage', $this->related['context'])
         );
     }
 }

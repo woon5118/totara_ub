@@ -32,20 +32,20 @@ require_login(null, false);
 if (isguestuser()) {
     throw new require_login_exception('Guests are not allowed here.');
 }
-\tool_lp\api::require_enabled();
+\core_competency\api::require_enabled();
 
 $course = $DB->get_record('course', array('id' => $courseid));
 $context = context_course::instance($courseid);
 $currentgroup = groups_get_course_group($course, true);
 if (empty($userid)) {
-    $gradable = get_enrolled_users($context, 'tool/lp:coursecompetencygradable', $currentgroup, 'u.id', null, 0, 1);
+    $gradable = get_enrolled_users($context, 'moodle/competency:coursecompetencygradable', $currentgroup, 'u.id', null, 0, 1);
     if (empty($gradable)) {
         $userid = 0;
     } else {
         $userid = array_pop($gradable)->id;
     }
 } else {
-    $gradable = get_enrolled_users($context, 'tool/lp:coursecompetencygradable', $currentgroup, 'u.id');
+    $gradable = get_enrolled_users($context, 'moodle/competency:coursecompetencygradable', $currentgroup, 'u.id');
     if (count($gradable) == 0) {
         $userid = 0;
     } else if (!in_array($userid, array_keys($gradable))) {
@@ -60,11 +60,11 @@ if ($userid > 0) {
     $usercontext = context_user::instance($userid);
     $user = $DB->get_record('user', array('id' => $userid));
 }
-$competency = new \tool_lp\competency($competencyid);
+$competency = new \core_competency\competency($competencyid);
 
 // Does a permissions check for us.
 if ($userid > 0) {
-    $usercompetencycourses = \tool_lp\api::list_user_competencies_in_course($courseid, $userid);
+    $usercompetencycourses = \core_competency\api::list_user_competencies_in_course($courseid, $userid);
 }
 $subtitle = $competency->get_shortname() . ' <em>' . $competency->get_idnumber() . '</em>';
 
@@ -91,8 +91,8 @@ if ($userid > 0) {
     echo $output->render($page);
 
     // Trigger the viewed event.
-    $uc = \tool_lp\api::get_user_competency_in_course($courseid, $userid, $competencyid);
-    \tool_lp\api::user_competency_viewed_in_course($uc, $courseid);
+    $uc = \core_competency\api::get_user_competency_in_course($courseid, $userid, $competencyid);
+    \core_competency\api::user_competency_viewed_in_course($uc, $courseid);
 } else {
     echo $output->container('', 'clearfix');
     echo $output->notify_problem(get_string('noparticipants', 'tool_lp'));

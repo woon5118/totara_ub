@@ -25,7 +25,7 @@
 namespace tool_lp\form;
 defined('MOODLE_INTERNAL') || die();
 
-use tool_lp\plan as planpersistent;
+use core_competency\plan as planpersistent;
 use required_capability_exception;
 
 /**
@@ -37,7 +37,7 @@ use required_capability_exception;
  */
 class plan extends persistent {
 
-    protected static $persistentclass = 'tool_lp\\plan';
+    protected static $persistentclass = 'core_competency\\plan';
 
     /**
      * Define the form - called by parent constructor
@@ -75,7 +75,7 @@ class plan extends persistent {
             // There is only one status to select from.
             $mform->addElement('static', 'staticstatus', get_string('status', 'tool_lp'), current($status));
         } else {
-            throw new required_capability_exception($context, 'tool/lp:planmanage', 'nopermissions', '');
+            throw new required_capability_exception($context, 'moodle/competency:planmanage', 'nopermissions', '');
         }
 
         // Disable short forms.

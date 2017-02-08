@@ -31,8 +31,11 @@ use moodle_url;
 use renderable;
 use templatable;
 use stdClass;
-use tool_lp\competency;
-use tool_lp\competency_framework;
+use core_competency\competency;
+use core_competency\competency_framework;
+use core_competency\external\competency_exporter;
+use core_competency\external\competency_framework_exporter;
+use core_competency\url;
 use tool_lpmigrate\framework_processor;
 
 /**
@@ -95,9 +98,9 @@ class migrate_framework_results implements renderable, templatable {
         $data->unmappedfrom = array();
         $data->unmappedto = array();
 
-        $exporter = new \tool_lp\external\competency_framework_exporter($this->frameworkfrom);
+        $exporter = new competency_framework_exporter($this->frameworkfrom);
         $data->frameworkfrom = $exporter->export($output);
-        $exporter = new \tool_lp\external\competency_framework_exporter($this->frameworkto);
+        $exporter = new competency_framework_exporter($this->frameworkto);
         $data->frameworkto = $exporter->export($output);
 
         $fromcontext = $this->frameworkfrom->get_context();
@@ -105,12 +108,12 @@ class migrate_framework_results implements renderable, templatable {
 
         $compcontext = null;
         foreach ($this->unmappedfrom as $comp) {
-            $exporter = new \tool_lp\external\competency_exporter($comp, array('context' => $fromcontext));
+            $exporter = new competency_exporter($comp, array('context' => $fromcontext));
             $data->unmappedfrom[] = $exporter->export($output);
         }
 
         foreach ($this->unmappedto as $comp) {
-            $exporter = new \tool_lp\external\competency_exporter($comp, array('context' => $tocontext));
+            $exporter = new competency_exporter($comp, array('context' => $tocontext));
             $data->unmappedto[] = $exporter->export($output);
         }
 
@@ -145,7 +148,7 @@ class migrate_framework_results implements renderable, templatable {
         }
 
         $data->pluginbaseurl = (new moodle_url('/admin/tool/lpmigrate'))->out(false);
-        $data->cbebaseurl = (new moodle_url('/admin/tool/lp'))->out(false);
+        $data->frameworksurl = url::frameworks($this->pagecontext->id)->out(false);
 
         return $data;
     }

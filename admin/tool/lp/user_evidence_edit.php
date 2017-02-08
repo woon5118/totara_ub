@@ -28,7 +28,7 @@ require_login(null, false);
 if (isguestuser()) {
     throw new require_login_exception('Guests are not allowed here.');
 }
-\tool_lp\api::require_enabled();
+\core_competency\api::require_enabled();
 
 $userid = optional_param('userid', $USER->id, PARAM_INT);
 $id = optional_param('id', null, PARAM_INT);
@@ -43,7 +43,7 @@ if (empty($id)) {
         $pagetitle, $returntype);
 
 } else {
-    $userevidence = \tool_lp\api::read_user_evidence($id);
+    $userevidence = \core_competency\api::read_user_evidence($id);
 
     // The userid parameter must be the same as the owner of the evidence.
     if ($userid != $userevidence->get_userid()) {
@@ -68,12 +68,12 @@ $customdata = array(
 // Check if user has permissions to manage user evidence.
 if ($userevidence != null) {
     if (!$userevidence->can_manage()) {
-        throw new required_capability_exception($context, 'tool/lp:userevidencemanage', 'nopermissions', '');
+        throw new required_capability_exception($context, 'moodle/competency:userevidencemanage', 'nopermissions', '');
     }
     $customdata['evidence'] = $userevidence;
 
-} else if (!\tool_lp\user_evidence::can_manage_user($userid)) {
-    throw new required_capability_exception($context, 'tool/lp:userevidencemanage', 'nopermissions', '');
+} else if (!\core_competency\user_evidence::can_manage_user($userid)) {
+    throw new required_capability_exception($context, 'moodle/competency:userevidencemanage', 'nopermissions', '');
 }
 
 $form = new \tool_lp\form\user_evidence($url->out(false), $customdata);
@@ -89,7 +89,7 @@ if ($userevidence) {
 
 // Massaging the file API.
 $draftitemid = file_get_submitted_draft_itemid('files');
-file_prepare_draft_area($draftitemid, $context->id, 'tool_lp', 'userevidence', $itemid, $fileareaoptions);
+file_prepare_draft_area($draftitemid, $context->id, 'core_competency', 'userevidence', $itemid, $fileareaoptions);
 $form->set_data((object) array('files' => $draftitemid));
 
 // Hurray, the user has submitted the form! Everyone loves forms :)!
@@ -99,11 +99,11 @@ if ($data = $form->get_data()) {
     unset($data->files);
 
     if (empty($userevidence)) {
-        $userevidence = \tool_lp\api::create_user_evidence($data, $draftitemid);
+        $userevidence = \core_competency\api::create_user_evidence($data, $draftitemid);
         $returnurl = new moodle_url('/admin/tool/lp/user_evidence.php', ['id' => $userevidence->get_id()]);
         $returnmsg = get_string('userevidencecreated', 'tool_lp');
     } else {
-        \tool_lp\api::update_user_evidence($data, $draftitemid);
+        \core_competency\api::update_user_evidence($data, $draftitemid);
         $returnmsg = get_string('userevidenceupdated', 'tool_lp');
     }
     redirect($returnurl, $returnmsg, null, \core\output\notification::NOTIFY_SUCCESS);

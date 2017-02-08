@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use renderer_base;
 use moodle_url;
+use core_competency\external\competency_exporter;
 
 /**
  * Class for exporting a cohort summary from an stdClass.
@@ -33,7 +34,7 @@ use moodle_url;
  * @copyright  2015 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class template_statistics_exporter extends exporter {
+class template_statistics_exporter extends \core_competency\external\exporter {
 
     public static function define_properties() {
         return array(
@@ -112,8 +113,8 @@ class template_statistics_exporter extends exporter {
         $proficientusercompetencyplanpercentage = 0;
         $proficientusercompetencyplanpercentageformatted = '';
         if ($this->data->usercompetencyplancount > 0) {
-            $proficientusercompetencyplanpercentage = ((float) $this->data->proficientusercompetencyplancount /
-                    (float) $this->data->usercompetencyplancount) * 100.0;
+            $proficientusercompetencyplanpercentage = ((float) $this->data->proficientusercompetencyplancount
+                    / (float) $this->data->usercompetencyplancount) * 100.0;
             $proficientusercompetencyplanpercentageformatted = format_float($proficientusercompetencyplanpercentage);
         }
         $competencies = array();

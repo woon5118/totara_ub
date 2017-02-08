@@ -28,8 +28,8 @@ use core_user;
 use renderer_base;
 use renderable;
 use templatable;
-use tool_lp\api;
-use tool_lp\user_competency;
+use core_competency\api;
+use core_competency\user_competency;
 use tool_lp\external\user_competency_summary_exporter;
 
 /**

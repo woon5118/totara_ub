@@ -28,11 +28,11 @@ use renderable;
 use templatable;
 use stdClass;
 use moodle_url;
-use tool_lp\api;
-use tool_lp\plan;
-use tool_lp\external\competency_exporter;
+use core_competency\api;
+use core_competency\plan;
+use core_competency\external\competency_exporter;
+use core_competency\external\plan_exporter;
 use tool_lp\external\competency_path_exporter;
-use tool_lp\external\plan_exporter;
 
 /**
  * Plan page class.
@@ -75,10 +75,10 @@ class plan_page implements renderable, templatable {
 
         if ($data->plan->iscompleted) {
             $ucproperty = 'usercompetencyplan';
-            $ucexporter = 'tool_lp\\external\\user_competency_plan_exporter';
+            $ucexporter = 'core_competency\\external\\user_competency_plan_exporter';
         } else {
             $ucproperty = 'usercompetency';
-            $ucexporter = 'tool_lp\\external\\user_competency_exporter';
+            $ucexporter = 'core_competency\\external\\user_competency_exporter';
         }
 
         $pclist = api::list_plan_competencies($this->plan);

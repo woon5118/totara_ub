@@ -99,7 +99,7 @@ class page_helper {
      *
      * @param  int $pagecontextid The page context ID.
      * @param  moodle_url $url The current page.
-     * @param  \tool_lp\template $template The template, if any.
+     * @param  \core_competency\template $template The template, if any.
      * @param  string $subtitle The title of the subpage, if any.
      * @param  string $returntype The desired return page.
      * @return array With the following:
@@ -177,7 +177,7 @@ class page_helper {
      *
      * @param  int $userid The user ID.
      * @param  moodle_url $url The current page.
-     * @param  \tool_lp\plan $plan The plan, if any.
+     * @param  \core_competency\plan $plan The plan, if any.
      * @param  string $subtitle The title of the subpage, if any.
      * @param  string $returntype The desired return page.
      * @return array With the following:
@@ -251,7 +251,7 @@ class page_helper {
      *
      * @param  int $userid The user ID.
      * @param  moodle_url $url The current page.
-     * @param  \tool_lp\user_evidence $evidence The user evidence, if any.
+     * @param  \core_competency\user_evidence $evidence The user evidence, if any.
      * @param  string $subtitle The title of the subpage, if any.
      * @param  string $returntype The desired return page.
      * @return array With the following:
@@ -325,7 +325,7 @@ class page_helper {
      *
      * @param  int $id The framework ID.
      * @param  int $pagecontextid The page context ID.
-     * @param  \tool_lp\competency_framework $framework The framework.
+     * @param  \core_competency\competency_framework $framework The framework.
      * @param  string $returntype The desired return page.
      * @return array With the following:
      *               - Page title
@@ -344,7 +344,7 @@ class page_helper {
         $frameworksurl = new moodle_url('/admin/tool/lp/competencyframeworks.php', array('pagecontextid' => $pagecontextid));
 
         $PAGE->navigation->override_active_url($frameworksurl);
-        $title = get_string('competencies', 'tool_lp');
+        $title = get_string('competencies', 'core_competency');
         if (empty($id)) {
             $pagetitle = get_string('competencyframeworks', 'tool_lp');
             $pagesubtitle = get_string('addnewcompetencyframework', 'tool_lp');
@@ -385,9 +385,9 @@ class page_helper {
      *
      * @param  int $pagecontextid The page context ID.
      * @param  moodle_url $url The current page.
-     * @param  \tool_lp\competency_framework $framework The competency framework.
-     * @param  \tool_lp\competency $competency The competency, if any.
-     * @param  \tool_lp\competency $parent The parent competency, if any.
+     * @param  \core_competency\competency_framework $framework The competency framework.
+     * @param  \core_competency\competency $competency The competency, if any.
+     * @param  \core_competency\competency $parent The parent competency, if any.
      * @return array With the following:
      *               - Page title
      *               - Page sub title

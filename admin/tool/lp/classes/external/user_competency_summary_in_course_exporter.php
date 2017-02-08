@@ -23,7 +23,7 @@
  */
 namespace tool_lp\external;
 
-use tool_lp\api;
+use core_competency\api;
 use context_course;
 use renderer_base;
 use stdClass;
@@ -34,16 +34,16 @@ use stdClass;
  * @copyright  2015 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class user_competency_summary_in_course_exporter extends exporter {
+class user_competency_summary_in_course_exporter extends \core_competency\external\exporter {
 
     protected static function define_related() {
         // We cache the context so it does not need to be retrieved from the framework every time.
-        return array('competency' => '\\tool_lp\\competency',
-                     'relatedcompetencies' => '\\tool_lp\\competency[]',
+        return array('competency' => '\\core_competency\\competency',
+                     'relatedcompetencies' => '\\core_competency\\competency[]',
                      'user' => '\\stdClass',
                      'course' => '\\stdClass',
-                     'usercompetencycourse' => '\\tool_lp\\user_competency_course?',
-                     'evidence' => '\\tool_lp\\evidence[]',
+                     'usercompetencycourse' => '\\core_competency\\user_competency_course?',
+                     'evidence' => '\\core_competency\\evidence[]',
                      'scale' => '\\grade_scale');
     }
 

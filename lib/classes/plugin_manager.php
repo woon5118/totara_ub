@@ -1227,7 +1227,7 @@ class core_plugin_manager {
                 'calendar_upcoming', 'comments', 'community',
                 'completionstatus', 'course_list', 'course_overview',
                 'course_summary', 'feedback', 'globalsearch', 'glossary_random', 'html',
-                'login', 'mentees', 'messages', 'mnet_hosts', 'myprofile',
+                'login', 'lp', 'mentees', 'messages', 'mnet_hosts', 'myprofile',
                 'navigation', 'news_items', 'online_users', 'participants',
                 'private_files', 'quiz_results', 'recent_activity',
                 'rss_client', 'search_forums', 'section_links',
@@ -1396,7 +1396,7 @@ class core_plugin_manager {
             ),
 
             'report' => array(
-                'backups', 'completion', 'configlog', 'courseoverview', 'eventlist',
+                'backups', 'competency', 'completion', 'configlog', 'courseoverview', 'eventlist',
                 'log', 'loglive', 'outline', 'participation', 'progress', 'questioninstances', 'search',
                 'security', 'stats', 'performance', 'usersessions'
             ),
@@ -1433,10 +1433,10 @@ class core_plugin_manager {
             ),
 
             'tool' => array(
-                'assignmentupgrade', 'availabilityconditions', 'behat', 'capability', 'customlang',
-                'dbtransfer', 'filetypes', 'generator', 'health', 'innodb',
-                'langimport', 'log', 'messageinbound', 'multilangupgrade', 'monitor', 'phpunit', 'profiling',
-                'recyclebin', 'replace', 'spamcleaner', 'task', 'templatelibrary',
+                'assignmentupgrade', 'availabilityconditions', 'behat', 'capability', 'cohortroles', 'customlang',
+                'dbtransfer', 'filetypes', 'generator', 'health', 'innodb', 'installaddon',
+                'langimport', 'log', 'lp', 'lpmigrate', 'messageinbound', 'multilangupgrade', 'monitor',
+                'phpunit', 'profiling', 'recyclebin', 'replace', 'spamcleaner', 'task', 'templatelibrary',
                 'unittest', 'uploadcourse', 'uploaduser', 'unsuproles', 'xmldb'
                 // Totara:
                 , 'totara_sync', 'totara_timezonefix'

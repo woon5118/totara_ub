@@ -30,7 +30,7 @@ $id = optional_param('id', false, PARAM_INT);
 $returntype = optional_param('return', null, PARAM_ALPHA);
 
 require_login(0, false);
-\tool_lp\api::require_enabled();
+\core_competency\api::require_enabled();
 
 $url = new moodle_url('/admin/tool/lp/editplan.php', array('id' => $id, 'userid' => $userid, 'return' => $returntype));
 
@@ -39,7 +39,7 @@ if (empty($id)) {
     $pagetitle = get_string('addnewplan', 'tool_lp');
     list($title, $subtitle, $returnurl) = \tool_lp\page_helper::setup_for_plan($userid, $url, null, $pagetitle, $returntype);
 } else {
-    $plan = \tool_lp\api::read_plan($id);
+    $plan = \core_competency\api::read_plan($id);
 
     // The userid parameter must be the same as the owner of the plan.
     if ($userid != $plan->get_userid()) {
@@ -57,18 +57,18 @@ $customdata = array('userid' => $userid, 'context' => $PAGE->context, 'persisten
 
 // User can create plan if he can_manage_user with active/complete status
 // or if he can_manage_user_draft with draft status.
-$cancreate = \tool_lp\plan::can_manage_user_draft($userid) || \tool_lp\plan::can_manage_user($userid);
+$cancreate = \core_competency\plan::can_manage_user_draft($userid) || \core_competency\plan::can_manage_user($userid);
 
 // If editing plan, check if user has permissions to edit it.
 if ($plan != null) {
     if (!$plan->can_manage()) {
-        throw new required_capability_exception($PAGE->context, 'tool/lp:planmanage', 'nopermissions', '');
+        throw new required_capability_exception($PAGE->context, 'moodle/competency:planmanage', 'nopermissions', '');
     }
     if (!$plan->can_be_edited()) {
         throw new coding_exception('Completed plan can not be edited');
     }
 } else if (!$cancreate) {
-    throw new required_capability_exception($PAGE->context, 'tool/lp:planmanage', 'nopermissions', '');
+    throw new required_capability_exception($PAGE->context, 'moodle/competency:planmanage', 'nopermissions', '');
 }
 
 $form = new \tool_lp\form\plan($url->out(false), $customdata);
@@ -80,11 +80,11 @@ $data = $form->get_data();
 
 if ($data) {
     if (empty($data->id)) {
-        $plan = \tool_lp\api::create_plan($data);
+        $plan = \core_competency\api::create_plan($data);
         $returnurl = new moodle_url('/admin/tool/lp/plan.php', ['id' => $plan->get_id()]);
         $returnmsg = get_string('plancreated', 'tool_lp');
     } else {
-        \tool_lp\api::update_plan($data);
+        \core_competency\api::update_plan($data);
         $returnmsg = get_string('planupdated', 'tool_lp');
     }
     redirect($returnurl, $returnmsg, null, \core\output\notification::NOTIFY_SUCCESS);

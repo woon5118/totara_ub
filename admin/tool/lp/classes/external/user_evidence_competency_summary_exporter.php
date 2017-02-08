@@ -25,6 +25,8 @@ namespace tool_lp\external;
 
 use moodle_url;
 use renderer_base;
+use core_competency\external\competency_exporter;
+use core_competency\external\user_competency_exporter;
 
 /**
  * Class for exporting user evidence competency data.
@@ -32,11 +34,11 @@ use renderer_base;
  * @copyright  2016 Serge Gauthier - <serge.gauthier.2@umontreal.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class user_evidence_competency_summary_exporter extends exporter {
+class user_evidence_competency_summary_exporter extends \core_competency\external\exporter {
 
     protected static function define_related() {
-        return array('competency' => '\\tool_lp\\competency',
-                     'usercompetency' => '\\tool_lp\\user_competency',
+        return array('competency' => '\\core_competency\\competency',
+                     'usercompetency' => '\\core_competency\\user_competency',
                      'scale' => 'grade_scale',
                      'context' => '\\context'
                     );

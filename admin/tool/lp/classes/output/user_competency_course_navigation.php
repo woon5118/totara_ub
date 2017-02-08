@@ -27,8 +27,8 @@ use renderable;
 use renderer_base;
 use templatable;
 use context_course;
-use \tool_lp\external\user_summary_exporter;
-use \tool_lp\external\competency_exporter;
+use \core_competency\external\competency_exporter;
+use \core_competency\external\user_summary_exporter;
 use stdClass;
 
 /**
@@ -85,7 +85,7 @@ class user_competency_course_navigation implements renderable, templatable {
         $data->baseurl = $this->baseurl;
         $data->groupselector = '';
 
-        if (has_capability('tool/lp:coursecompetencymanage', $context)) {
+        if (has_capability('moodle/competency:coursecompetencymanage', $context)) {
             $course = $DB->get_record('course', array('id' => $this->courseid));
             $currentgroup = groups_get_course_group($course, true);
             if ($currentgroup !== false) {
@@ -97,7 +97,7 @@ class user_competency_course_navigation implements renderable, templatable {
             $showonlyactiveenrol = get_user_preferences('grade_report_showonlyactiveenrol', $defaultgradeshowactiveenrol);
             $showonlyactiveenrol = $showonlyactiveenrol || !has_capability('moodle/course:viewsuspendedusers', $context);
 
-            $users = get_enrolled_users($context, 'tool/lp:coursecompetencygradable', $currentgroup,
+            $users = get_enrolled_users($context, 'moodle/competency:coursecompetencygradable', $currentgroup,
                                         'u.*', null, 0, 0, $showonlyactiveenrol);
 
             $data->users = array();
@@ -115,7 +115,7 @@ class user_competency_course_navigation implements renderable, templatable {
             $data->hasusers = false;
         }
 
-        $coursecompetencies = \tool_lp\api::list_course_competencies($this->courseid);
+        $coursecompetencies = \core_competency\api::list_course_competencies($this->courseid);
         $data->competencies = array();
         $contextcache = array();
         foreach ($coursecompetencies as $coursecompetency) {

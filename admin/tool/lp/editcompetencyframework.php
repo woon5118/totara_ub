@@ -32,7 +32,7 @@ $pagecontextid = required_param('pagecontextid', PARAM_INT);  // Reference to wh
 $framework = null;
 if (!empty($id)) {
     // Always use the context from the framework when it exists.
-    $framework = new \tool_lp\competency_framework($id);
+    $framework = new \core_competency\competency_framework($id);
     $context = $framework->get_context();
 } else {
     $context = context::instance_by_id($pagecontextid);
@@ -40,8 +40,8 @@ if (!empty($id)) {
 
 // We check that we have the permission to edit this framework, in its own context.
 require_login();
-\tool_lp\api::require_enabled();
-require_capability('tool/lp:competencymanage', $context);
+\core_competency\api::require_enabled();
+require_capability('moodle/competency:competencymanage', $context);
 
 // Set up the framework page.
 list($pagetitle, $pagesubtitle, $url, $frameworksurl) = tool_lp\page_helper::setup_for_framework($id,
@@ -55,7 +55,7 @@ if ($form->is_cancelled()) {
     if (empty($data->id)) {
         // Create new framework.
         $data->contextid = $context->id;
-        $framework = \tool_lp\api::create_framework($data);
+        $framework = \core_competency\api::create_framework($data);
         $frameworkmanageurl = new moodle_url('/admin/tool/lp/competencies.php', array(
             'pagecontextid' => $pagecontextid,
             'competencyframeworkid' => $framework->get_id()
@@ -63,7 +63,7 @@ if ($form->is_cancelled()) {
         $messagesuccess = get_string('competencyframeworkcreated', 'tool_lp');
         redirect($frameworkmanageurl, $messagesuccess, 0, \core\output\notification::NOTIFY_SUCCESS);
     } else {
-        \tool_lp\api::update_framework($data);
+        \core_competency\api::update_framework($data);
         $messagesuccess = get_string('competencyframeworkupdated', 'tool_lp');
         redirect($frameworksurl, $messagesuccess, 0, \core\output\notification::NOTIFY_SUCCESS);
     }

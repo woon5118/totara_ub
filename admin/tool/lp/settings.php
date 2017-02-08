@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Links and settings
+ * Links and settings.
  *
- * This file contains links and settings used by tool_lp
+ * This file contains links and settings used by tool_lp.
  *
  * @package    tool_lp
  * @copyright  2015 Damyon Wiese
@@ -25,19 +25,17 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$parentname = 'toollprootpage';
-$category = new admin_category($parentname, get_string('competencies', 'tool_lp'));
-$ADMIN->add('root', $category, 'badges');
+$parentname = 'competencies';
 
 // If the plugin is enabled we add the pages.
-if (\tool_lp\api::is_enabled()) {
+if (\core_competency\api::is_enabled()) {
 
     // Manage competency frameworks page.
     $temp = new admin_externalpage(
         'toollpcompetencies',
         get_string('competencyframeworks', 'tool_lp'),
         new moodle_url('/admin/tool/lp/competencyframeworks.php', array('pagecontextid' => context_system::instance()->id)),
-        array('tool/lp:competencymanage')
+        array('moodle/competency:competencymanage')
     );
     $ADMIN->add($parentname, $temp);
 
@@ -46,19 +44,7 @@ if (\tool_lp\api::is_enabled()) {
         'toollplearningplans',
         get_string('templates', 'tool_lp'),
         new moodle_url('/admin/tool/lp/learningplans.php', array('pagecontextid' => context_system::instance()->id)),
-        array('tool/lp:templatemanage')
+        array('moodle/competency:templatemanage')
     );
     $ADMIN->add($parentname, $temp);
-}
-
-// Settings.
-$settings = new admin_settingpage('toollpsettingspage', get_string('competenciessettings', 'tool_lp'), 'moodle/site:config', false);
-$ADMIN->add($parentname, $settings);
-if ($ADMIN->fulltree) {
-    $setting = new admin_setting_configcheckbox('tool_lp/enabled', get_string('enablecompetencies', 'tool_lp'),
-        get_string('enablecompetencies_desc', 'tool_lp'), 1);
-    $settings->add($setting);
-    $setting = new admin_setting_configcheckbox('tool_lp/pushcourseratingstouserplans', get_string('pushcourseratingstouserplans', 'tool_lp'),
-        get_string('pushcourseratingstouserplans_desc', 'tool_lp'), 1);
-    $settings->add($setting);
 }
