@@ -937,7 +937,7 @@ class api {
         $capabilities = array('tool/lp:coursecompetencyread', 'tool/lp:coursecompetencymanage');
         if (!has_any_capability($capabilities, $context)) {
             throw new required_capability_exception($context, 'tool/lp:coursecompetencyread', 'nopermissions', '');
-        } else if (!user_competency::can_read_user($userid, $competencyid)) {
+        } else if (!user_competency::can_read_user_in_course($userid, $courseid)) {
             throw new required_capability_exception($context, 'tool/lp:usercompetencyview', 'nopermissions', '');
         }
 
@@ -1001,6 +1001,93 @@ class api {
         }
 
         return $orderedusercompetencies;
+    }
+
+    /**
+     * List the user competencies to review.
+     *
+     * The method returns values in this format:
+     *
+     * array(
+     *     'competencies' => array(
+     *         (stdClass)(
+     *             'usercompetency' => (user_competency),
+     *             'competency' => (competency),
+     *             'user' => (user)
+     *         )
+     *     ),
+     *     'count' => (int)
+     * )
+     *
+     * @param int $skip The number of records to skip.
+     * @param int $limit The number of results to return.
+     * @param int $userid The user we're getting the competencies to review for.
+     * @return array Containing the keys 'count', and 'competencies'. The 'competencies' key contains an object
+     *               which contains 'competency', 'usercompetency' and 'user'.
+     */
+    public static function list_user_competencies_to_review($skip = 0, $limit = 50, $userid = null) {
+        global $DB, $USER;
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        $capability = 'tool/lp:usercompetencyreview';
+        $ucfields = user_competency::get_sql_fields('uc');
+        $compfields = competency::get_sql_fields('c');
+        $usercols = array('id') + get_user_fieldnames();
+        $userfields = array();
+        foreach ($usercols as $field) {
+            $userfields[] = "u." . $field . " AS usr_" . $field;
+        }
+        $userfields = implode(',', $userfields);
+
+        $select = "SELECT $ucfields, $compfields, $userfields";
+        $countselect = "SELECT COUNT('x')";
+        $sql = "  FROM {" . user_competency::TABLE . "} uc
+                  JOIN {" . competency::TABLE . "} c
+                    ON c.id = uc.competencyid
+                  JOIN {user} u
+                    ON u.id = uc.userid
+                 WHERE (uc.status = :waitingforreview
+                    OR (uc.status = :inreview AND uc.reviewerid = :reviewerid))";
+        $ordersql = " ORDER BY c.shortname ASC";
+        $params = array(
+            'inreview' => user_competency::STATUS_IN_REVIEW,
+            'reviewerid' => $userid,
+            'waitingforreview' => user_competency::STATUS_WAITING_FOR_REVIEW,
+        );
+        $countsql = $countselect . $sql;
+
+        // Primary check to avoid the hard work of getting the users in which the user has permission.
+        $count = $DB->count_records_sql($countselect . $sql, $params);
+        if ($count < 1) {
+            return array('count' => 0, 'competencies' => array());
+        }
+
+        // TODO MDL-52243 Use core function.
+        list($insql, $inparams) = external::filter_users_with_capability_on_user_context_sql(
+            $capability, $userid, SQL_PARAMS_NAMED);
+        $params += $inparams;
+        $countsql = $countselect . $sql . " AND uc.userid $insql";
+        $getsql = $select . $sql . " AND uc.userid $insql " . $ordersql;
+
+        // Extracting the results.
+        $competencies = array();
+        $records = $DB->get_recordset_sql($getsql, $params, $skip, $limit);
+        foreach ($records as $record) {
+            $objects = (object) array(
+                'usercompetency' => new user_competency(0, user_competency::extract_record($record)),
+                'competency' => new competency(0, competency::extract_record($record)),
+                'user' => persistent::extract_record($record, 'usr_'),
+            );
+            $competencies[] = $objects;
+        }
+        $records->close();
+
+        return array(
+            'count' => $DB->count_records_sql($countsql, $params),
+            'competencies' => $competencies
+        );
     }
 
     /**
@@ -1734,6 +1821,98 @@ class api {
     }
 
     /**
+     * List the plans to review.
+     *
+     * The method returns values in this format:
+     *
+     * array(
+     *     'plans' => array(
+     *         (stdClass)(
+     *             'plan' => (plan),
+     *             'template' => (template),
+     *             'owner' => (stdClass)
+     *         )
+     *     ),
+     *     'count' => (int)
+     * )
+     *
+     * @param int $skip The number of records to skip.
+     * @param int $limit The number of results to return.
+     * @param int $userid The user we're getting the plans to review for.
+     * @return array Containing the keys 'count', and 'plans'. The 'plans' key contains an object
+     *               which contains 'plan', 'template' and 'owner'.
+     */
+    public static function list_plans_to_review($skip = 0, $limit = 100, $userid = null) {
+        global $DB, $USER;
+
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        $planfields = plan::get_sql_fields('p');
+        $tplfields = template::get_sql_fields('t');
+        $usercols = array('id') + get_user_fieldnames();
+        $userfields = array();
+        foreach ($usercols as $field) {
+            $userfields[] = "u." . $field . " AS usr_" . $field;
+        }
+        $userfields = implode(',', $userfields);
+
+        $select = "SELECT $planfields, $tplfields, $userfields";
+        $countselect = "SELECT COUNT('x')";
+
+        $sql = "  FROM {" . plan::TABLE . "} p
+                  JOIN {user} u
+                    ON u.id = p.userid
+             LEFT JOIN {" . template::TABLE . "} t
+                    ON t.id = p.templateid
+                 WHERE (p.status = :waitingforreview
+                    OR (p.status = :inreview AND p.reviewerid = :reviewerid))
+                   AND p.userid != :userid";
+
+        $params = array(
+            'waitingforreview' => plan::STATUS_WAITING_FOR_REVIEW,
+            'inreview' => plan::STATUS_IN_REVIEW,
+            'reviewerid' => $userid,
+            'userid' => $userid
+        );
+
+        // Primary check to avoid the hard work of getting the users in which the user has permission.
+        $count = $DB->count_records_sql($countselect . $sql, $params);
+        if ($count < 1) {
+            return array('count' => 0, 'plans' => array());
+        }
+
+        // TODO MDL-52243 Use core function.
+        list($insql, $inparams) = external::filter_users_with_capability_on_user_context_sql('tool/lp:planreview', $userid, SQL_PARAMS_NAMED);
+        $sql .= " AND p.userid $insql";
+        $params += $inparams;
+
+        $plans = array();
+        $records = $DB->get_recordset_sql($select . $sql, $params, $skip, $limit);
+        foreach ($records as $record) {
+            $plan = new plan(0, plan::extract_record($record));
+            $template = null;
+
+            if ($plan->is_based_on_template()) {
+                $template = new template(0, template::extract_record($record));
+            }
+
+            $plans[] = (object) array(
+                'plan' => $plan,
+                'template' => $template,
+                'owner' => persistent::extract_record($record, 'usr_'),
+            );
+        }
+        $records->close();
+
+        return array(
+            'count' => $DB->count_records_sql($countselect . $sql, $params),
+            'plans' => $plans
+        );
+    }
+
+    /**
      * Creates a learning plan based on the provided data.
      *
      * @param stdClass $record
@@ -2345,7 +2524,7 @@ class api {
             $plan = new plan($planorid);
         }
 
-        if (!user_competency::can_read_user($plan->get_userid(), $competencyid)) {
+        if (!user_competency::can_read_user($plan->get_userid())) {
             throw new required_capability_exception($plan->get_context(), 'tool/lp:usercompetencyview', 'nopermissions', '');
         }
 
@@ -3106,11 +3285,16 @@ class api {
     }
 
     /**
-     * List all the evidence for a user competency
+     * List all the evidence for a user competency.
      *
      * @param int $userid The user id - only used if usercompetencyid is 0.
      * @param int $competencyid The competency id - only used it usercompetencyid is 0.
      * @param int $planid The plan id - not used yet - but can be used to only list archived evidence if a plan is completed.
+     * @param string $sort The field to sort the evidence by.
+     * @param string $order The ordering of the sorting.
+     * @param int $skip Number of records to skip.
+     * @param int $limit Number of records to return.
+     * @return \tool_lp\evidence[]
      * @return array of \tool_lp\evidence
      */
     public static function list_evidence($userid = 0,
@@ -3121,7 +3305,7 @@ class api {
                                          $skip = 0,
                                          $limit = 0) {
 
-        if (!user_competency::can_read_user($userid, $competencyid)) {
+        if (!user_competency::can_read_user($userid)) {
             $context = context_user::instance($userid);
             throw new required_capability_exception($context, 'tool/lp:usercompetencyview', 'nopermissions', '');
         }
@@ -3134,6 +3318,43 @@ class api {
         }
 
         return evidence::get_records(array('usercompetencyid' => $usercompetency->get_id()), $sort, $order, $skip, $limit);
+    }
+
+    /**
+     * List all the evidence for a user competency in a course.
+     *
+     * @param int $userid The user ID.
+     * @param int $courseid The course ID.
+     * @param int $competencyid The competency ID.
+     * @param string $sort The field to sort the evidence by.
+     * @param string $order The ordering of the sorting.
+     * @param int $skip Number of records to skip.
+     * @param int $limit Number of records to return.
+     * @return \tool_lp\evidence[]
+     */
+    public static function list_evidence_in_course($userid = 0,
+                                                   $courseid = 0,
+                                                   $competencyid = 0,
+                                                   $sort = 'timecreated',
+                                                   $order = 'DESC',
+                                                   $skip = 0,
+                                                   $limit = 0) {
+
+        if (!user_competency::can_read_user_in_course($userid, $courseid)) {
+            $context = context_user::instance($userid);
+            throw new required_capability_exception($context, 'tool/lp:usercompetencyview', 'nopermissions', '');
+        }
+
+        $usercompetency = user_competency::get_record(array('userid' => $userid, 'competencyid' => $competencyid));
+        if (!$usercompetency) {
+            return array();
+        }
+
+        $params = array(
+            'usercompetencyid' => $usercompetency->get_id(),
+            'contextid' => context_course::instance($courseid)->id
+        );
+        return evidence::get_records($params, $sort, $order, $skip, $limit);
     }
 
     /**
@@ -3452,11 +3673,11 @@ class api {
 
         $context = $plan->get_context();
         if ($override) {
-            if (!user_competency::can_grade_user($plan->get_userid(), $competencyid)) {
+            if (!user_competency::can_grade_user($plan->get_userid())) {
                 throw new required_capability_exception($context, 'tool/lp:competencygrade', 'nopermissions', '');
             }
         } else {
-            if (!user_competency::can_suggest_grade_user($plan->get_userid(), $competencyid)) {
+            if (!user_competency::can_suggest_grade_user($plan->get_userid())) {
                 throw new required_capability_exception($context, 'tool/lp:competencysuggestgrade', 'nopermissions', '');
             }
         }
@@ -3507,11 +3728,11 @@ class api {
         }
         $context = context_course::instance($course->id);
         if ($override) {
-            if (!user_competency::can_grade_user($userid, $competencyid)) {
+            if (!user_competency::can_grade_user_in_course($userid, $course->id)) {
                 throw new required_capability_exception($context, 'tool/lp:competencygrade', 'nopermissions', '');
             }
         } else {
-            if (!user_competency::can_suggest_grade_user($userid, $competencyid)) {
+            if (!user_competency::can_suggest_grade_user_in_course($userid, $course->id)) {
                 throw new required_capability_exception($context, 'tool/lp:competencysuggestgrade', 'nopermissions', '');
             }
         }
