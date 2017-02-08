@@ -3946,7 +3946,7 @@ class settings_navigation extends navigation_node {
         // Reset this course
         if (has_capability('moodle/course:reset', $coursecontext)) {
             $url = new moodle_url('/course/reset.php', array('id'=>$course->id));
-            $coursenode->add(get_string('reset'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/return', ''));
+            $coursenode->add(get_string('reset'), $url, self::TYPE_SETTING, null, 'reset', new pix_icon('i/return', ''));
         }
 
         // Questions
@@ -3996,7 +3996,7 @@ class settings_navigation extends navigation_node {
             }
         }
         if (is_array($roles) && count($roles)>0) {
-            $switchroles = $this->add(get_string('switchroleto'));
+            $switchroles = $this->add(get_string('switchroleto'), null, self::TYPE_CONTAINER, null, 'switchroleto');
             if ((count($roles)==1 && array_key_exists(0, $roles))|| $assumedrole!==false) {
                 $switchroles->force_open();
             }
