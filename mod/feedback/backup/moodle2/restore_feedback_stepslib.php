@@ -88,6 +88,13 @@ class restore_feedback_activity_structure_step extends restore_activity_structur
         $data->feedback = $this->get_new_parentid('feedback');
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
+        if ($this->task->is_samesite() && !empty($data->courseid)) {
+            $data->courseid = $data->courseid;
+        } else if ($this->get_courseid() == SITEID) {
+            $data->courseid = SITEID;
+        } else {
+            $data->courseid = 0;
+        }
 
         $newitemid = $DB->insert_record('feedback_completed', $data);
         $this->set_mapping('feedback_completed', $oldid, $newitemid);
@@ -112,37 +119,17 @@ class restore_feedback_activity_structure_step extends restore_activity_structur
         $oldid = $data->id;
         $data->completed = $this->get_new_parentid('feedback_completed');
         $data->item = $this->get_mappingid('feedback_item', $data->item);
-        $data->course_id = $this->get_courseid();
+        if ($this->task->is_samesite() && !empty($data->course_id)) {
+            $data->course_id = $data->course_id;
+        } else if ($this->get_courseid() == SITEID) {
+            $data->course_id = SITEID;
+        } else {
+            $data->course_id = 0;
+        }
 
         $newitemid = $DB->insert_record('feedback_value', $data);
         $this->set_mapping('feedback_value', $oldid, $newitemid);
     }
-
-    protected function process_feedback_value_history($data) {
-        global $DB;
-
-        $data = (object)$data;
-        $oldid = $data->id;
-        $data->completed = $this->get_new_parentid('feedback_completed_history');
-        $data->item = $this->get_mappingid('feedback_item', $data->item);
-        $data->course_id = $this->get_courseid();
-
-        $newitemid = $DB->insert_record('feedback_value_history', $data);
-        $this->set_mapping('feedback_value_history', $oldid, $newitemid);
-    }
-
-    protected function process_feedback_tracking($data) {
-        global $DB;
-
-        $data = (object)$data;
-        $oldid = $data->id;
-        $data->feedback = $this->get_new_parentid('feedback');
-        $data->completed = $this->get_mappingid('feedback_completed', $data->completed);
-        $data->userid = $this->get_mappingid('user', $data->userid);
-
-        $newitemid = $DB->insert_record('feedback_tracking', $data);
-    }
-
 
     protected function after_execute() {
         // Add feedback related files, no need to match by itemname (just internally handled context)

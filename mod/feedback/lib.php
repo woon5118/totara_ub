@@ -302,9 +302,6 @@ function feedback_delete_instance($id) {
         }
     }
 
-    //deleting the referenced tracking data
-    $DB->delete_records('feedback_tracking', array('feedback'=>$id));
-
     //deleting the completeds
     $DB->delete_records("feedback_completed", array("feedback"=>$id));
 
@@ -569,7 +566,7 @@ function feedback_get_completion_state($course, $cm, $userid, $type) {
     // If completion option is enabled, evaluate it and return true/false
     if ($feedback->completionsubmit) {
         $params = array('userid'=>$userid, 'feedback'=>$feedback->id);
-        return $DB->record_exists('feedback_tracking', $params);
+        return $DB->record_exists('feedback_completed', $params);
     } else {
         // Completion option is not enabled so just return $type
         return $type;
@@ -689,7 +686,7 @@ function feedback_reset_userdata($data) {
     //reset the selected feedbacks
     foreach ($resetfeedbacks as $id) {
         $feedback = $DB->get_record('feedback', array('id'=>$id));
-        feedback_delete_all_completeds($id);
+        feedback_delete_all_completeds($feedback);
         $status[] = array('component'=>$componentstr.':'.$feedback->name,
                         'item'=>get_string('resetting_data', 'feedback'),
                         'error'=>false);
@@ -930,11 +927,14 @@ function feedback_delete_course_module($id) {
 /**
  * returns the context-id related to the given coursemodule-id
  *
+ * @deprecated since 3.1
  * @staticvar object $context
  * @param int $cmid the coursemodule-id
  * @return object $context
  */
 function feedback_get_context($cmid) {
+    debugging('Function feedback_get_context() is deprecated because it was not used.',
+            DEBUG_DEVELOPER);
     static $context;
 
     if (isset($context)) {
@@ -1126,31 +1126,6 @@ function feedback_get_complete_users($cm,
         $pagecount = false;
     }
     return $DB->get_records_sql($sql, $params, $startpage, $pagecount);
-}
-
-/**
- * If there are any new responses to the anonymous feedback, re-shuffle all
- * responses and assign response number to each of them.
- *
- * @param stdClass $feedback
- */
-function feedback_shuffle_anonym_responses($feedback) {
-    global $DB;
-    $params = array('feedback' => $feedback->id,
-                    'random_response' => 0,
-                    'anonymous_response' => FEEDBACK_ANONYMOUS_YES);
-
-    if ($DB->count_records('feedback_completed', $params, 'random_response')) {
-        // Get all of the anonymous records, go through them and assign a response id.
-        unset($params['random_response']);
-        $feedbackcompleteds = $DB->get_records('feedback_completed', $params, 'id');
-        shuffle($feedbackcompleteds);
-        $num = 1;
-        foreach ($feedbackcompleteds as $compl) {
-            $compl->random_response = $num++;
-            $DB->update_record('feedback_completed', $compl);
-        }
-    }
 }
 
 /**
@@ -1381,8 +1356,6 @@ function feedback_items_from_template($feedback, $templateid, $deleteold = false
             foreach ($feedbackitems as $item) {
                 feedback_delete_item($item->id, false);
             }
-            //delete tracking-data
-            $DB->delete_records('feedback_tracking', array('feedback'=>$feedback->id));
 
             $params = array('feedback'=>$feedback->id);
             if ($completeds = $DB->get_records('feedback_completed', $params)) {
@@ -1490,9 +1463,8 @@ function feedback_get_template_list($course, $onlyownorpublic = '') {
 /**
  * load the lib.php from item-plugin-dir and returns the instance of the itemclass
  *
- * @global object
- * @param object $item
- * @return object the instanz of itemclass
+ * @param string $typ
+ * @return feedback_item_base the instance of itemclass
  */
 function feedback_get_item_class($typ) {
     global $CFG;
@@ -1589,11 +1561,13 @@ function feedback_get_depend_candidates_for_item($feedback, $item) {
 /**
  * creates a new item-record
  *
- * @global object
+ * @deprecated since 3.1
  * @param object $data the data from edit_item_form
  * @return int the new itemid
  */
 function feedback_create_item($data) {
+    debugging('Function feedback_create_item() is deprecated because it was not used.',
+            DEBUG_DEVELOPER);
     global $DB;
 
     $item = new stdClass();
@@ -1903,57 +1877,43 @@ function feedback_move_item($moveitem, $pos) {
  * prints the given item as a preview.
  * each item-class has an own print_item_preview function implemented.
  *
+ * @deprecated since Moodle 3.1
  * @global object
  * @param object $item the item what we want to print out
  * @return void
  */
 function feedback_print_item_preview($item) {
-    global $CFG;
-    if ($item->typ == 'pagebreak') {
-        return;
-    }
-    //get the instance of the item-class
-    $itemobj = feedback_get_item_class($item->typ);
-    $itemobj->print_item_preview($item);
+    debugging('Function feedback_print_item_preview() is deprecated and does nothing. '
+            . 'Items must implement complete_form_element()', DEBUG_DEVELOPER);
 }
 
 /**
  * prints the given item in the completion form.
  * each item-class has an own print_item_complete function implemented.
  *
+ * @deprecated since Moodle 3.1
  * @param object $item the item what we want to print out
  * @param mixed $value the value
  * @param boolean $highlightrequire if this set true and the value are false on completing so the item will be highlighted
  * @return void
  */
 function feedback_print_item_complete($item, $value = false, $highlightrequire = false) {
-    global $CFG;
-    if ($item->typ == 'pagebreak') {
-        return;
-    }
-
-    //get the instance of the item-class
-    $itemobj = feedback_get_item_class($item->typ);
-    $itemobj->print_item_complete($item, $value, $highlightrequire);
+    debugging('Function feedback_print_item_complete() is deprecated and does nothing. '
+            . 'Items must implement complete_form_element()', DEBUG_DEVELOPER);
 }
 
 /**
  * prints the given item in the show entries page.
  * each item-class has an own print_item_show_value function implemented.
  *
+ * @deprecated since Moodle 3.1
  * @param object $item the item what we want to print out
  * @param mixed $value
  * @return void
  */
 function feedback_print_item_show_value($item, $value = false) {
-    global $CFG;
-    if ($item->typ == 'pagebreak') {
-        return;
-    }
-
-    //get the instance of the item-class
-    $itemobj = feedback_get_item_class($item->typ);
-    $itemobj->print_item_show_value($item, $value);
+    debugging('Function feedback_print_item_show_value() is deprecated and does nothing. '
+            . 'Items must implement complete_form_element()', DEBUG_DEVELOPER);
 }
 
 /**
@@ -1966,6 +1926,8 @@ function feedback_print_item_show_value($item, $value = false) {
  */
 function feedback_set_tmp_values($feedbackcompleted) {
     global $DB;
+    debugging('Function feedback_set_tmp_values() is deprecated and since it is '
+            . 'no longer used in mod_feedback', DEBUG_DEVELOPER);
 
     //first we create a completedtmp
     $tmpcpl = new stdClass();
@@ -1993,10 +1955,9 @@ function feedback_set_tmp_values($feedbackcompleted) {
  * @global object
  * @param object $feedbackcompletedtmp the temporary completed
  * @param object $feedbackcompleted the target completed
- * @param int $userid
  * @return int the id of the completed
  */
-function feedback_save_tmp_values($feedbackcompletedtmp, $feedbackcompleted, $userid) {
+function feedback_save_tmp_values($feedbackcompletedtmp, $feedbackcompleted) {
     global $DB;
 
     $tmpcplid = $feedbackcompletedtmp->id;
@@ -2009,23 +1970,22 @@ function feedback_save_tmp_values($feedbackcompletedtmp, $feedbackcompleted, $us
     } else {
         $feedbackcompleted = clone($feedbackcompletedtmp);
         $feedbackcompleted->id = '';
-        $feedbackcompleted->userid = $userid;
         $feedbackcompleted->timemodified = time();
         $feedbackcompleted->id = $DB->insert_record('feedback_completed', $feedbackcompleted);
     }
 
+    $allitems = $DB->get_records('feedback_item', array('feedback' => $feedbackcompleted->feedback));
+
     //save all the new values from feedback_valuetmp
     //get all values of tmp-completed
     $params = array('completed'=>$feedbackcompletedtmp->id);
-    if (!$values = $DB->get_records('feedback_valuetmp', $params)) {
-        return false;
-    }
+    $values = $DB->get_records('feedback_valuetmp', $params);
     foreach ($values as $value) {
         //check if there are depend items
         $item = $DB->get_record('feedback_item', array('id'=>$value->item));
-        if ($item->dependitem > 0) {
+        if ($item->dependitem > 0 && isset($allitems[$item->dependitem])) {
             $check = feedback_compare_item_value($tmpcplid,
-                                        $item->dependitem,
+                                        $allitems[$item->dependitem],
                                         $item->dependvalue,
                                         true);
         } else {
@@ -2043,20 +2003,7 @@ function feedback_save_tmp_values($feedbackcompletedtmp, $feedbackcompleted, $us
 
     // Trigger event for the delete action we performed.
     $cm = get_coursemodule_from_instance('feedback', $feedbackcompleted->feedback);
-    $event = \mod_feedback\event\response_submitted::create(array(
-        'relateduserid' => $userid,
-        'objectid' => $feedbackcompleted->id,
-        'context' => context_module::instance($cm->id),
-        'anonymous' => ($feedbackcompleted->anonymous_response == FEEDBACK_ANONYMOUS_YES),
-        'other' => array(
-            'cmid' => $cm->id,
-            'instanceid' => $feedbackcompleted->feedback,
-            'anonymous' => $feedbackcompleted->anonymous_response // Deprecated.
-        )
-    ));
-
-    $event->add_record_snapshot('feedback_completed', $feedbackcompleted);
-
+    $event = \mod_feedback\event\response_submitted::create_from_record($feedbackcompleted, $cm);
     $event->trigger();
     return $feedbackcompleted->id;
 
@@ -2065,12 +2012,16 @@ function feedback_save_tmp_values($feedbackcompletedtmp, $feedbackcompleted, $us
 /**
  * deletes the given temporary completed and all related temporary values
  *
- * @global object
+ * @deprecated since Moodle 3.1
+ *
  * @param int $tmpcplid
  * @return void
  */
 function feedback_delete_completedtmp($tmpcplid) {
     global $DB;
+
+    debugging('Function feedback_delete_completedtmp() is deprecated because it is no longer used',
+            DEBUG_DEVELOPER);
 
     $DB->delete_records('feedback_valuetmp', array('completed'=>$tmpcplid));
     $DB->delete_records('feedback_completedtmp', array('id'=>$tmpcplid));
@@ -2151,6 +2102,7 @@ function feedback_get_last_break_position($feedbackid) {
 /**
  * this returns the position where the user can continue the completing.
  *
+ * @deprecated since Moodle 3.1
  * @global object
  * @global object
  * @global object
@@ -2161,6 +2113,9 @@ function feedback_get_last_break_position($feedbackid) {
  */
 function feedback_get_page_to_continue($feedbackid, $courseid = false, $guestid = false) {
     global $CFG, $USER, $DB;
+
+    debugging('Function feedback_get_page_to_continue() is deprecated and since it is '
+            . 'no longer used in mod_feedback', DEBUG_DEVELOPER);
 
     //is there any break?
 
@@ -2216,12 +2171,13 @@ function feedback_get_page_to_continue($feedbackid, $courseid = false, $guestid 
 /**
  * cleans the userinput while submitting the form.
  *
+ * @deprecated since Moodle 3.1
  * @param mixed $value
  * @return mixed
  */
 function feedback_clean_input_value($item, $value) {
-    $itemobj = feedback_get_item_class($item->typ);
-    return $itemobj->clean_input_value($value);
+    debugging('Function feedback_clean_input_value() is deprecated and does nothing. '
+            . 'Items must implement complete_form_element()', DEBUG_DEVELOPER);
 }
 
 /**
@@ -2230,16 +2186,20 @@ function feedback_clean_input_value($item, $value) {
  * if there is already a completed and the userid is set so the values are updated.
  * on all other things new value records will be created.
  *
- * @global object
- * @param int $userid
+ * @deprecated since Moodle 3.1
+ *
+ * @param int $usrid
  * @param boolean $tmp
  * @return mixed false on error or the completeid
  */
 function feedback_save_values($usrid, $tmp = false) {
     global $DB;
 
-    $completedid = optional_param('completedid', 0, PARAM_INT);
+    debugging('Function feedback_save_values() was deprecated because it did not have '.
+            'enough arguments, was not suitable for non-temporary table and was taking '.
+            'data directly from input', DEBUG_DEVELOPER);
 
+    $completedid = optional_param('completedid', 0, PARAM_INT);
     $tmpstr = $tmp ? 'tmp' : '';
     $time = time();
     $timemodified = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
@@ -2259,12 +2219,17 @@ function feedback_save_values($usrid, $tmp = false) {
 /**
  * this saves the values from anonymous user such as guest on the main-site
  *
- * @global object
+ * @deprecated since Moodle 3.1
+ *
  * @param string $guestid the unique guestidentifier
  * @return mixed false on error or the completeid
  */
 function feedback_save_guest_values($guestid) {
     global $DB;
+
+    debugging('Function feedback_save_guest_values() was deprecated because it did not have '.
+            'enough arguments, was not suitable for non-temporary table and was taking '.
+            'data directly from input', DEBUG_DEVELOPER);
 
     $completedid = optional_param('completedid', false, PARAM_INT);
 
@@ -2300,23 +2265,21 @@ function feedback_get_item_value($completedid, $itemid, $tmp = false) {
  * this is used if a depend item is set.
  * the value can come as temporary or as permanently value. the deciding is done by $tmp.
  *
- * @global object
- * @global object
- * @param int $completeid
- * @param int $itemid
+ * @param int $completedid
+ * @param stdClass|int $item
  * @param mixed $dependvalue
- * @param boolean $tmp
+ * @param bool $tmp
  * @return bool
  */
-function feedback_compare_item_value($completedid, $itemid, $dependvalue, $tmp = false) {
-    global $DB, $CFG;
+function feedback_compare_item_value($completedid, $item, $dependvalue, $tmp = false) {
+    global $DB;
 
-    $dbvalue = feedback_get_item_value($completedid, $itemid, $tmp);
+    if (is_int($item)) {
+        $item = $DB->get_record('feedback_item', array('id' => $item));
+    }
 
-    //get the class of the given item-typ
-    $item = $DB->get_record('feedback_item', array('id'=>$itemid));
+    $dbvalue = feedback_get_item_value($completedid, $item->id, $tmp);
 
-    //get the instance of the item-class
     $itemobj = feedback_get_item_class($item->typ);
     return $itemobj->compare_value($item, $dbvalue, $dependvalue); //true or false
 }
@@ -2333,66 +2296,8 @@ function feedback_compare_item_value($completedid, $itemid, $dependvalue, $tmp =
  * @return boolean
  */
 function feedback_check_values($firstitem, $lastitem) {
-    global $DB, $CFG;
-
-    $feedbackid = optional_param('feedbackid', 0, PARAM_INT);
-
-    //get all items between the first- and lastitem
-    $select = "feedback = ?
-                    AND position >= ?
-                    AND position <= ?
-                    AND hasvalue = 1";
-    $params = array($feedbackid, $firstitem, $lastitem);
-    if (!$feedbackitems = $DB->get_records_select('feedback_item', $select, $params)) {
-        //if no values are given so no values can be wrong ;-)
-        return true;
-    }
-
-    foreach ($feedbackitems as $item) {
-        //get the instance of the item-class
-        $itemobj = feedback_get_item_class($item->typ);
-
-        //the name of the input field of the completeform is given in a special form:
-        //<item-typ>_<item-id> eg. numeric_234
-        //this is the key to get the value for the correct item
-        $formvalname = $item->typ . '_' . $item->id;
-
-        if ($itemobj->value_is_array()) {
-            //get the raw value here. It is cleaned after that by the object itself
-            $value = optional_param_array($formvalname, null, PARAM_RAW);
-        } else {
-            //get the raw value here. It is cleaned after that by the object itself
-            $value = optional_param($formvalname, null, PARAM_RAW);
-        }
-        $value = $itemobj->clean_input_value($value);
-
-        // If the item is not visible due to its dependency so it shouldn't be required.
-        // Many thanks to Pau Ferrer Ocaña.
-        if ($item->dependitem > 0 AND $item->required == 1) {
-            $comparevalue = false;
-            if ($feedbackcompletedtmp = feedback_get_current_completed($item->feedback, true)) {
-                $comparevalue = feedback_compare_item_value($feedbackcompletedtmp->id,
-                                                            $item->dependitem,
-                                                            $item->dependvalue,
-                                                            true);
-            }
-
-            if (!$comparevalue) {
-                $item->required = 0; // Override the required property.
-            }
-        }
-
-        //check if the value is set
-        if (is_null($value) AND $item->required == 1) {
-            return false;
-        }
-
-        //now we let check the value by the item-class
-        if (!$itemobj->check_value($value, $item)) {
-            return false;
-        }
-    }
-    //if no wrong values so we can return true
+    debugging('Function feedback_check_values() is deprecated and does nothing. '
+            . 'Items must implement complete_form_element()', DEBUG_DEVELOPER);
     return true;
 }
 
@@ -2400,7 +2305,8 @@ function feedback_check_values($firstitem, $lastitem) {
  * this function create a complete-record and the related value-records.
  * depending on the $tmp (true/false) the values are saved temporary or permanently
  *
- * @global object
+ * @deprecated since Moodle 3.1
+ *
  * @param int $userid
  * @param int $timemodified
  * @param boolean $tmp
@@ -2410,9 +2316,9 @@ function feedback_check_values($firstitem, $lastitem) {
 function feedback_create_values($usrid, $timemodified, $tmp = false, $guestid = false) {
     global $DB;
 
-    $feedbackid = optional_param('feedbackid', false, PARAM_INT);
-    $anonymous_response = optional_param('anonymous_response', false, PARAM_INT);
-    $courseid = optional_param('courseid', false, PARAM_INT);
+    debugging('Function feedback_create_values() was deprecated because it did not have '.
+            'enough arguments, was not suitable for non-temporary table and was taking '.
+            'data directly from input', DEBUG_DEVELOPER);
 
     $tmpstr = $tmp ? 'tmp' : '';
     //first we create a new completed record
@@ -2443,10 +2349,10 @@ function feedback_create_values($usrid, $timemodified, $tmp = false, $guestid = 
 
         $keyname = $item->typ.'_'.$item->id;
 
-        if ($itemobj->value_is_array()) {
-            $itemvalue = optional_param_array($keyname, null, $itemobj->value_type());
+        if ($item->typ === 'multichoice') {
+            $itemvalue = optional_param_array($keyname, null, PARAM_INT);
         } else {
-            $itemvalue = optional_param($keyname, null, $itemobj->value_type());
+            $itemvalue = optional_param($keyname, null, PARAM_NOTAGS);
         }
 
         if (is_null($itemvalue)) {
@@ -2478,6 +2384,10 @@ function feedback_create_values($usrid, $timemodified, $tmp = false, $guestid = 
 function feedback_update_values($completed, $tmp = false) {
     global $DB;
 
+    debugging('Function feedback_update_values() was deprecated because it did not have '.
+            'enough arguments, was not suitable for non-temporary table and was taking '.
+            'data directly from input', DEBUG_DEVELOPER);
+
     $courseid = optional_param('courseid', false, PARAM_INT);
     $tmpstr = $tmp ? 'tmp' : '';
 
@@ -2498,10 +2408,10 @@ function feedback_update_values($completed, $tmp = false) {
 
         $keyname = $item->typ.'_'.$item->id;
 
-        if ($itemobj->value_is_array()) {
-            $itemvalue = optional_param_array($keyname, null, $itemobj->value_type());
+        if ($item->typ === 'multichoice') {
+            $itemvalue = optional_param_array($keyname, null, PARAM_INT);
         } else {
-            $itemvalue = optional_param($keyname, null, $itemobj->value_type());
+            $itemvalue = optional_param($keyname, null, PARAM_NOTAGS);
         }
 
         //is the itemvalue set (could be a subset of items because pagebreak)?
@@ -2620,19 +2530,15 @@ function feedback_get_group_values($item,
 function feedback_is_already_submitted($feedbackid, $courseid = false) {
     global $USER, $DB;
 
-    $params = array('userid'=>$USER->id, 'feedback'=>$feedbackid);
-    if (!$trackings = $DB->get_records_menu('feedback_tracking', $params, '', 'id, completed')) {
+    if (!isloggedin() || isguestuser()) {
         return false;
     }
 
+    $params = array('userid' => $USER->id, 'feedback' => $feedbackid);
     if ($courseid) {
-        $select = 'completed IN ('.implode(',', $trackings).') AND course_id = ?';
-        if (!$values = $DB->get_records_select('feedback_value', $select, array($courseid))) {
-            return false;
-        }
+        $params['courseid'] = $courseid;
     }
-
-    return true;
+    return $DB->record_exists('feedback_completed', $params);
 }
 
 /**
@@ -2640,9 +2546,7 @@ function feedback_is_already_submitted($feedbackid, $courseid = false) {
  * by pagebreak or by multiple submit so the complete must be found.
  * if the param $tmp is set true so all things are related to temporary completeds
  *
- * @global object
- * @global object
- * @global object
+ * @deprecated since Moodle 3.1
  * @param int $feedbackid
  * @param boolean $tmp
  * @param int $courseid
@@ -2653,6 +2557,10 @@ function feedback_get_current_completed($feedbackid,
                                         $tmp = false,
                                         $courseid = false,
                                         $guestid = false) {
+
+    debugging('Function feedback_get_current_completed() is deprecated. Please use either '.
+            'feedback_get_current_completed_tmp() or feedback_get_last_completed()',
+            DEBUG_DEVELOPER);
 
     global $USER, $CFG, $DB;
 
@@ -2778,18 +2686,32 @@ function feedback_get_completeds_group_count($feedback, $groupid = false, $cours
  * deletes all completed-recordsets from a feedback.
  * all related data such as values also will be deleted
  *
- * @global object
- * @param int $feedbackid
+ * @param stdClass|int $feedback
+ * @param stdClass|cm_info $cm
+ * @param stdClass $course
  * @return void
  */
-function feedback_delete_all_completeds($feedbackid) {
+function feedback_delete_all_completeds($feedback, $cm = null, $course = null) {
     global $DB;
 
-    if (!$completeds = $DB->get_records('feedback_completed', array('feedback'=>$feedbackid))) {
+    if (is_int($feedback)) {
+        $feedback = $DB->get_record('feedback', array('id' => $feedback));
+    }
+
+    if (!$completeds = $DB->get_records('feedback_completed', array('feedback' => $feedback->id))) {
         return;
     }
+
+    if (!$course && !($course = $DB->get_record('course', array('id' => $feedback->course)))) {
+        return false;
+    }
+
+    if (!$cm && !($cm = get_coursemodule_from_instance('feedback', $feedback->id))) {
+        return false;
+    }
+
     foreach ($completeds as $completed) {
-        feedback_delete_completed($completed->id);
+        feedback_delete_completed($completed, $feedback, $cm, $course);
     }
 }
 
@@ -2797,38 +2719,36 @@ function feedback_delete_all_completeds($feedbackid) {
  * deletes a completed given by completedid.
  * all related data such values or tracking data also will be deleted
  *
- * @global object
- * @param int $completedid
+ * @param int|stdClass $completed
+ * @param stdClass $feedback
+ * @param stdClass|cm_info $cm
+ * @param stdClass $course
  * @return boolean
  */
-function feedback_delete_completed($completedid) {
+function feedback_delete_completed($completed, $feedback = null, $cm = null, $course = null) {
     global $DB, $CFG;
     require_once($CFG->libdir.'/completionlib.php');
 
-    if (!$completed = $DB->get_record('feedback_completed', array('id'=>$completedid))) {
+    if (!isset($completed->id)) {
+        if (!$completed = $DB->get_record('feedback_completed', array('id' => $completed))) {
+            return false;
+        }
+    }
+
+    if (!$feedback && !($feedback = $DB->get_record('feedback', array('id' => $completed->feedback)))) {
         return false;
     }
 
-    if (!$feedback = $DB->get_record('feedback', array('id'=>$completed->feedback))) {
+    if (!$course && !($course = $DB->get_record('course', array('id' => $feedback->course)))) {
         return false;
     }
 
-    if (!$course = $DB->get_record('course', array('id'=>$feedback->course))) {
-        return false;
-    }
-
-    if (!$cm = get_coursemodule_from_instance('feedback', $feedback->id)) {
+    if (!$cm && !($cm = get_coursemodule_from_instance('feedback', $feedback->id))) {
         return false;
     }
 
     //first we delete all related values
-    $DB->delete_records('feedback_value', array('completed'=>$completed->id));
-
-    //now we delete all tracking data
-    $params = array('completed'=>$completed->id, 'feedback'=>$completed->feedback);
-    if ($tracking = $DB->get_record('feedback_tracking', $params)) {
-        $DB->delete_records('feedback_tracking', array('completed'=>$completed->id));
-    }
+    $DB->delete_records('feedback_value', array('completed' => $completed->id));
 
     // Update completion state
     $completion = new completion_info($course);
@@ -2836,25 +2756,10 @@ function feedback_delete_completed($completedid) {
         $completion->update_state($cm, COMPLETION_INCOMPLETE, $completed->userid);
     }
     // Last we delete the completed-record.
-    $return = $DB->delete_records('feedback_completed', array('id'=>$completed->id));
+    $return = $DB->delete_records('feedback_completed', array('id' => $completed->id));
 
     // Trigger event for the delete action we performed.
-    $event = \mod_feedback\event\response_deleted::create(array(
-        'relateduserid' => $completed->userid,
-        'objectid' => $completedid,
-        'courseid' => $course->id,
-        'context' => context_module::instance($cm->id),
-        'anonymous' => ($completed->anonymous_response == FEEDBACK_ANONYMOUS_YES),
-        'other' => array(
-            'cmid' => $cm->id,
-            'instanceid' => $feedback->id,
-            'anonymous' => $completed->anonymous_response) // Deprecated.
-    ));
-
-    $event->add_record_snapshot('feedback_completed', $completed);
-    $event->add_record_snapshot('course', $course);
-    $event->add_record_snapshot('feedback', $feedback);
-
+    $event = \mod_feedback\event\response_deleted::create_from_record($completed, $cm, $feedback);
     $event->trigger();
 
     return $return;
@@ -2869,12 +2774,14 @@ function feedback_delete_completed($completedid) {
 /**
  * checks if the course and the feedback is in the table feedback_sitecourse_map.
  *
- * @global object
+ * @deprecated since 3.1
  * @param int $feedbackid
  * @param int $courseid
  * @return int the count of records
  */
 function feedback_is_course_in_sitecourse_map($feedbackid, $courseid) {
+    debugging('Function feedback_is_course_in_sitecourse_map() is deprecated because it was not used.',
+            DEBUG_DEVELOPER);
     global $DB;
     $params = array('feedbackid'=>$feedbackid, 'courseid'=>$courseid);
     return $DB->count_records('feedback_sitecourse_map', $params);
@@ -2883,11 +2790,13 @@ function feedback_is_course_in_sitecourse_map($feedbackid, $courseid) {
 /**
  * checks if the feedback is in the table feedback_sitecourse_map.
  *
- * @global object
+ * @deprecated since 3.1
  * @param int $feedbackid
  * @return boolean
  */
 function feedback_is_feedback_in_sitecourse_map($feedbackid) {
+    debugging('Function feedback_is_feedback_in_sitecourse_map() is deprecated because it was not used.',
+            DEBUG_DEVELOPER);
     global $DB;
     return $DB->record_exists('feedback_sitecourse_map', array('feedbackid'=>$feedbackid));
 }
@@ -2999,11 +2908,14 @@ function feedback_update_sitecourse_map($feedback, $courses) {
  * it shouldn't be called all too often
  * a good place for it could be the mapcourse.php or unmapcourse.php
  *
+ * @deprecated since 3.1
  * @global object
  * @return void
  */
 function feedback_clean_up_sitecourse_map() {
     global $DB;
+    debugging('Function feedback_clean_up_sitecourse_map() is deprecated because it was not used.',
+            DEBUG_DEVELOPER);
 
     $maps = $DB->get_records('feedback_sitecourse_map');
     foreach ($maps as $map) {
@@ -3029,6 +2941,7 @@ function feedback_clean_up_sitecourse_map() {
 
 /**
  * prints the option items of a selection-input item (dropdownlist).
+ * @deprecated since 3.1
  * @param int $startval the first value of the list
  * @param int $endval the last value of the list
  * @param int $selectval which item should be selected
@@ -3036,6 +2949,8 @@ function feedback_clean_up_sitecourse_map() {
  * @return void
  */
 function feedback_print_numeric_option_list($startval, $endval, $selectval = '', $interval = 1) {
+    debugging('Function feedback_print_numeric_option_list() is deprecated because it was not used.',
+            DEBUG_DEVELOPER);
     for ($i = $startval; $i <= $endval; $i += $interval) {
         if ($selectval == ($i)) {
             $selected = 'selected="selected"';
@@ -3056,17 +2971,19 @@ function feedback_print_numeric_option_list($startval, $endval, $selectval = '',
  * @param object $cm the coursemodule-record
  * @param object $feedback
  * @param object $course
- * @param int $userid
+ * @param stdClass|int $user
  * @return void
  */
-function feedback_send_email($cm, $feedback, $course, $userid) {
+function feedback_send_email($cm, $feedback, $course, $user) {
     global $CFG, $DB;
 
     if ($feedback->email_notification == 0) {  // No need to do anything
         return;
     }
 
-    $user = $DB->get_record('user', array('id'=>$userid));
+    if (is_int($user)) {
+        $user = $DB->get_record('user', array('id' => $user));
+    }
 
     if (isset($cm->groupmode) && empty($course->groupmodeforce)) {
         $groupmode =  $cm->groupmode;
@@ -3080,7 +2997,7 @@ function feedback_send_email($cm, $feedback, $course, $userid) {
                                               WHERE g.courseid = ?
                                                     AND g.id = m.groupid
                                                     AND m.userid = ?
-                                           ORDER BY name ASC", array($course->id, $userid));
+                                           ORDER BY name ASC", array($course->id, $user->id));
         $groups = array_values($groups);
 
         $teachers = feedback_get_receivemail_users($cm->id, $groups);
@@ -3103,7 +3020,7 @@ function feedback_send_email($cm, $feedback, $course, $userid) {
             $info->feedback = format_string($feedback->name, true);
             $info->url = $CFG->wwwroot.'/mod/feedback/show_entries.php?'.
                             'id='.$cm->id.'&'.
-                            'userid=' . $userid;
+                            'userid=' . $user->id;
 
             $a = array('username' => $info->username, 'feedbackname' => $feedback->name);
 
