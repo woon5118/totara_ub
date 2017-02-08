@@ -20,6 +20,7 @@
     Classes required for JS:
 
     Data attibutes required for JS:
+    * data-action=add
     * data-enhance=tree
 
     Context variables required for this template:
@@ -90,6 +91,11 @@
                         <li>
                             <a href="#" data-action="linkedcourses">
                                 {{#pix}}t/viewdetails{{/pix}} {{#str}}linkedcourses, tool_lp{{/str}}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-action="relatedcompetencies">
+                                {{#pix}}t/add{{/pix}} {{#str}}addrelatedcompetency, tool_lp{{/str}}
                             </a>
                         </li>
                     </ul>

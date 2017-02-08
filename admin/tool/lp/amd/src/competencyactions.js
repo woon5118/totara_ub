@@ -30,8 +30,9 @@ define(['jquery',
         'tool_lp/dragdrop-reorder',
         'tool_lp/tree',
         'tool_lp/dialogue',
-        'tool_lp/menubar'],
-       function($, url, templates, notification, str, ajax, dragdrop, Ariatree, Dialogue, menubar) {
+        'tool_lp/menubar',
+        'tool_lp/competencypicker'],
+       function($, url, templates, notification, str, ajax, dragdrop, Ariatree, Dialogue, menubar, Picker) {
 
     // Private variables and functions.
     /** @var {Object} treeModel - This is an object representing the nodes in the tree. */
@@ -42,6 +43,10 @@ define(['jquery',
     var moveTarget = null;
     /** @var {Number} pageContextId The page context ID. */
     var pageContextId;
+    /** @type {Object} Picker instance. */
+    var pickerInstance;
+    /** @type {Object} The competency we're picking a relation to. */
+    var relatedTarget;
 
     /**
      * Respond to choosing the "Add" menu item for the selected node in the tree.
@@ -139,6 +144,7 @@ define(['jquery',
                 methodname: 'tool_lp_search_competencies',
                 args: {
                     competencyframeworkid: competency.competencyframeworkid,
+                    context: { contextid: pageContextId },
                     searchtext: ''
                 }
             },{
@@ -156,7 +162,7 @@ define(['jquery',
             var i, competenciestree = [];
             for (i = 0; i < competencies.length; i++) {
                 var onecompetency = competencies[i];
-                if (onecompetency.parentid === "0") {
+                if (onecompetency.parentid == "0") {
                     onecompetency.children = [];
                     onecompetency.haschildren = 0;
                     competenciestree[competenciestree.length] = onecompetency;
@@ -305,6 +311,40 @@ define(['jquery',
     };
 
     /**
+     * Open a competencies popup to relate competencies.
+     *
+     * @method relateCompetenciesHandler
+     */
+    var relateCompetenciesHandler = function() {
+        relatedTarget = $('[data-region="competencyactions"]').data('competency');
+
+        if (!pickerInstance) {
+            pickerInstance = new Picker(pageContextId, relatedTarget.competencyframeworkid);
+            pickerInstance.on('save', function(e, data) {
+                var compId = data.competencyId;
+
+                var promises = ajax.call([
+                    { methodname: 'tool_lp_add_related_competency',
+                        args: { competencyid: compId, relatedcompetencyid: relatedTarget.id }},
+                    { methodname: 'tool_lp_data_for_related_competencies_section',
+                        args: { competencyid: relatedTarget.id }}
+                ]);
+
+                promises[1].then(function(context) {
+                    return templates.render('tool_lp/related_competencies', context).done(function(html, js) {
+                        $('[data-region="relatedcompetencies"]').replaceWith(html);
+                        templates.runTemplateJS(js);
+                        updatedRelatedCompetencies();
+                    });
+                }, notification.exception);
+            });
+        }
+
+        pickerInstance.setDisallowedCompetencyIDs([relatedTarget.id]);
+        pickerInstance.display();
+    };
+
+    /**
      * Delete a competency.
      * @method doDelete
      */
@@ -324,10 +364,14 @@ define(['jquery',
 
     /**
      * Show a confirm dialogue before deleting a competency.
-     * @method deleteHandler
+     * @method deleteCompetencyHandler
      */
-    var deleteHandler = function() {
+    var deleteCompetencyHandler = function() {
         var competency = $('[data-region="competencyactions"]').data('competency');
+
+        // We don't need to show related actions when showing the competency info.
+        delete competency.showdeleterelatedaction;
+        delete competency.showrelatedcompetencies;
 
         templates.render('tool_lp/competency_summary', competency)
            .done(function(html) {
@@ -398,6 +442,46 @@ define(['jquery',
         doMove();
     };
 
+    /**
+     * Deletes a related competency without confirmation.
+     *
+     * @param {Event} e The event that triggered the action.
+     * @method deleteRelatedHandler
+     */
+    var deleteRelatedHandler = function(e) {
+        e.preventDefault();
+
+        var relatedid = this.id.substr(11);
+        var competency = $('[data-region="competencyactions"]').data('competency');
+        var removeRelated = ajax.call([
+            { methodname: 'tool_lp_remove_related_competency',
+              args: { relatedcompetencyid: relatedid, competencyid: competency.id } },
+            { methodname: 'tool_lp_data_for_related_competencies_section',
+              args: { competencyid: competency.id } }
+        ]);
+
+        removeRelated[1].done(function(context) {
+            templates.render('tool_lp/related_competencies', context).done(function(html) {
+                $('[data-region="relatedcompetencies"]').replaceWith(html);
+                updatedRelatedCompetencies();
+            }.bind(this)).fail(notification.exception);
+        }.bind(this)).fail(notification.exception);
+    };
+
+    /**
+     * Updates the competencies list (with relations) and add listeners.
+     *
+     * @method updatedRelatedCompetencies
+     */
+    var updatedRelatedCompetencies = function() {
+
+        // Listeners to newly loaded related competencies.
+        $('[data-action="deleterelation"]').on('click', deleteRelatedHandler);
+
+        // We update the full list of competencies.
+        treeModel.reloadCompetencies();
+    };
+
     return {
         /**
          * Initialise this page (attach event handlers etc).
@@ -410,15 +494,16 @@ define(['jquery',
             treeModel = model;
             pageContextId = pagectxid;
 
-            $('[data-region="competencyactions"]').on('click', addHandler);
+            $('[data-region="competencyactions"] [data-action="add"]').on('click', addHandler);
 
             menubar.enhance('.competencyactionsmenu', {
                 '[data-action="edit"]': editHandler,
-                '[data-action="delete"]': deleteHandler,
+                '[data-action="delete"]': deleteCompetencyHandler,
                 '[data-action="move"]': moveHandler,
                 '[data-action="moveup"]': moveUpHandler,
                 '[data-action="movedown"]': moveDownHandler,
-                '[data-action="linkedcourses"]': seeCoursesHandler
+                '[data-action="linkedcourses"]': seeCoursesHandler,
+                '[data-action="relatedcompetencies"]': relateCompetenciesHandler.bind(this)
             });
             $('[data-region="competencyactionsmenu"]').hide();
 
@@ -448,16 +533,18 @@ define(['jquery',
                 $('[data-region="competencyactions"] [data-action="add"]').removeAttr("disabled");
             } else {
                 var competency = treeModel.getCompetency(id);
+                competency.showdeleterelatedaction = true;
+                competency.showrelatedcompetencies = true;
 
                 $('[data-region="competencyactionsmenu"]').show();
                 templates.render('tool_lp/competency_summary', competency)
                    .done(function(html) {
                         $('[data-region="competencyinfo"]').html(html);
+                        $('[data-action="deleterelation"]').on('click', deleteRelatedHandler);
                    }).fail(notification.exception);
 
                 $('[data-region="competencyactions"]').data('competency', competency);
                 $('[data-region="competencyactions"] [data-action="add"]').removeAttr("disabled");
-
             }
         }
     };
