@@ -396,9 +396,9 @@ class mod_workshop_mod_form extends moodleform_mod {
         }
 
         // Check that the submission grade pass is a valid number.
-        if (!empty($data['submissiongradepass'])) {
+        if (isset($data['submissiongradepass'])) {
             $submissiongradefloat = unformat_float($data['submissiongradepass'], true);
-            if ($submissiongradefloat === false) {
+            if ($submissiongradefloat === false || $submissiongradefloat === null) {
                 $errors['submissiongradepass'] = get_string('err_numeric', 'form');
             } else {
                 if ($submissiongradefloat > $data['grade']) {
@@ -408,9 +408,9 @@ class mod_workshop_mod_form extends moodleform_mod {
         }
 
         // Check that the grade pass is a valid number.
-        if (!empty($data['gradinggradepass'])) {
+        if (isset($data['gradinggradepass'])) {
             $gradepassfloat = unformat_float($data['gradinggradepass'], true);
-            if ($gradepassfloat === false) {
+            if ($gradepassfloat === false || $gradepassfloat === null) {
                 $errors['gradinggradepass'] = get_string('err_numeric', 'form');
             } else {
                 if ($gradepassfloat > $data['gradinggrade']) {
