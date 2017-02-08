@@ -1151,8 +1151,10 @@ if ($formdata = $mform2->is_cancelled()) {
     }
     $upt->close(); // close table
     if (!empty($validation)) {
-        foreach ($validation as $username => $error) {
-            \core\notification::warning(get_string('invaliduserdata', 'tool_uploaduser', s($username)));
+        foreach ($validation as $username => $result) {
+            if ($result !== true) {
+                \core\notification::warning(get_string('invaliduserdata', 'tool_uploaduser', s($username)));
+            }
         }
     }
     $cir->close();
