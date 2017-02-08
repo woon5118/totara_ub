@@ -190,6 +190,9 @@ function cohort_delete_cohort($cohort) {
 
     $transaction->allow_commit();
 
+    // Notify the competency subsystem.
+    \core_competency\api::hook_cohort_deleted($cohort);
+
     $event = \core\event\cohort_deleted::create(array(
         'context' => context::instance_by_id($cohort->contextid),
         'objectid' => $cohort->id,
