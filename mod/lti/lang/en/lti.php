@@ -63,6 +63,7 @@ Some tool providers support reporting grades back to Totara based on actions tak
 Note that this setting may be overridden in the tool configuration.';
 $string['action'] = 'Action';
 $string['activate'] = 'Activate';
+$string['activatetoadddescription'] = 'You will need to activate this tool before you can add a description.';
 $string['active'] = 'Active';
 $string['activity'] = 'Activity';
 $string['addnewapp'] = 'Enable external application';
@@ -162,6 +163,7 @@ $string['embed_no_blocks'] = 'Embed, without blocks';
 $string['enableemailnotification'] = 'Send notification emails';
 $string['enableemailnotification_help'] = 'If enabled, students will receive email notification when their tool submissions are graded.';
 $string['enterkeyandsecret'] = 'Enter your consumer key and shared secret';
+$string['errorbadurl'] = 'URL is not a valid tool URL or cartridge.';
 $string['errormisconfig'] = 'Misconfigured tool. Please ask your Totara administrator to fix the configuration of the tool.';
 $string['existing_window'] = 'Existing window';
 $string['extensions'] = 'LTI extension services';
@@ -185,9 +187,11 @@ It also provides an opportunity for configuration defaults and setting up additi
 Three icons are available after the preconfigured tool dropdown list:
 
 * **Add** - Create a course level tool configuration. All External Tool instances in this course may use the tool configuration.
-* **Edit** - Select a course level tool type from the dropdown, then click this icon. The details of the tool configuration may be edited.
-* **Delete** - Remove the selected course level tool type.';
-$string['failedtocreatetooltype'] = 'Failed to create new tool.';
+* **Edit** - Select a course level tool from the dropdown, then click this icon. The details of the tool configuration may be edited.
+* **Delete** - Remove the selected course level tool.';
+$string['external_tool_types'] = 'Preconfigured tools';
+$string['failedtoconnect'] = 'Totara was unable to communicate with the "{$a}" system';
+$string['failedtocreatetooltype'] = 'Failed to create new tool. Please check the url and try again.';
 $string['failedtodeletetoolproxy'] = 'Failed to delete tool registration. You may need to visit "Manage external tool registrations" and delete it manually.';
 $string['filter_basiclti_configlink'] = 'Configure your preferred sites and their passwords';
 $string['filter_basiclti_password'] = 'Password is mandatory';
