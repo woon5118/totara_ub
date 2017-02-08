@@ -1210,7 +1210,7 @@ class core_plugin_manager {
             ),
 
             'auth' => array(
-                'cas', 'db', 'email', 'fc', 'imap', 'ldap', 'manual', 'mnet',
+                'cas', 'db', 'email', 'fc', 'imap', 'ldap', 'lti', 'manual', 'mnet',
                 'nntp', 'nologin', 'none', 'pam', 'pop3', 'radius',
                 'shibboleth', 'webservice'
                 // Totara
@@ -1281,7 +1281,7 @@ class core_plugin_manager {
 
             'enrol' => array(
                 'category', 'cohort', 'database', 'flatfile',
-                'guest', 'imsenterprise', 'ldap', 'manual', 'meta', 'mnet',
+                'guest', 'imsenterprise', 'ldap', 'lti', 'manual', 'meta', 'mnet',
                 'paypal', 'self'
                 // Totara
                 , 'totara_learningplan', 'totara_program', 'totara_facetoface',
