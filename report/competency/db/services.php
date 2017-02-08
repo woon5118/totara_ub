@@ -14,34 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
 /**
- * This page lets users to manage site wide competencies.
+ * Competency report webservice functions
  *
- * @package    tool_lp
+ *
+ * @package    report_competency
  * @copyright  2015 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__ . '/../../../config.php');
+defined('MOODLE_INTERNAL') || die();
 
-$id = required_param('courseid', PARAM_INT);
+$functions = array(
 
-$params = array('id' => $id);
-$course = $DB->get_record('course', $params, '*', MUST_EXIST);
-require_login($course);
-$context = context_course::instance($course->id);
-$urlparams = array('courseid' => $id);
+    // Learning plan related functions.
 
-$url = new moodle_url('/admin/tool/lp/coursecompetencies.php', $urlparams);
+    'report_competency_data_for_report' => array(
+        'classname'    => 'report_competency\external',
+        'methodname'   => 'data_for_report',
+        'classpath'    => '',
+        'description'  => 'Load the data for the competency report in a course.',
+        'type'         => 'read',
+        'capabilities' => 'tool/lp:coursecompetencyread',
+        'ajax'         => true,
+    )
+);
 
-list($title, $subtitle) = \tool_lp\page_helper::setup_for_course($url, $course);
-
-$output = $PAGE->get_renderer('tool_lp');
-echo $output->header();
-echo $output->heading($title);
-
-
-$page = new \tool_lp\output\course_competencies_page($course->id);
-echo $output->render($page);
-
-echo $output->footer();

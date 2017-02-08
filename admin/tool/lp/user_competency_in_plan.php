@@ -36,7 +36,7 @@ if (isguestuser()) {
 $params = array('userid' => $userid, 'competencyid' => $competencyid);
 $params['planid'] = $planid;
 $plan = \tool_lp\api::read_plan($planid);
-$url = new moodle_url('/admin/tool/lp/usercompetencyplan.php', $params);
+$url = new moodle_url('/admin/tool/lp/user_competency_in_plan.php', $params);
 $competency = new \tool_lp\competency($competencyid);
 $framework = $competency->get_framework();
 $subtitle = $competency->get_shortname();
@@ -49,7 +49,7 @@ echo $output->header();
 echo $output->heading($title);
 echo $output->heading($subtitle, 3);
 
-$page = new \tool_lp\output\user_competency_summary_in_plan_page($userid, $competencyid, $planid);
+$page = new \tool_lp\output\user_competency_summary_in_plan($competencyid, $planid);
 echo $output->render($page);
 
 echo $output->footer();

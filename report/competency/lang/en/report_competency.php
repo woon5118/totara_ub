@@ -24,3 +24,4 @@
 
 $string['pluginname'] = 'Competency breakdown';
 $string['coursecompetencybreakdownsummary'] = 'A report of all the students in the course, and their progress towards the course competencies';
+$string['usercompetencysummary'] = 'User competency summary';
