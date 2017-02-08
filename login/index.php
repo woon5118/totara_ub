@@ -148,7 +148,7 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
     $frm->username = trim(core_text::strtolower($frm->username));
 
     if (is_enabled_auth('none') ) {
-        if ($frm->username !== clean_param($frm->username, PARAM_USERNAME)) {
+        if ($frm->username !== core_user::clean_field($frm->username, 'username')) {
             $errormsg = get_string('username').': '.get_string("invalidusername");
             $errorcode = 2;
             $user = null;
@@ -338,6 +338,7 @@ if (empty($frm->username) && $authsequence[0] != 'shibboleth') {  // See bug 518
     if (isset($SESSION->login_username)){
         $frm->username = $SESSION->login_username;
     } elseif (!empty($_GET["username"])) {
+        // we do not want data from _POST here
         $frm->username = clean_param($_GET["username"], PARAM_RAW); // we do not want data from _POST here
     } else {
         // returning a username in the line below has always meant remember username checkbox should be checked.
