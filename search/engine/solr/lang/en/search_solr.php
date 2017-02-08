@@ -25,15 +25,15 @@
 $string['connectionerror'] = 'The specified Solr server is not available or the specified index does not exist';
 $string['connectionsettings'] = 'Connection settings';
 $string['errorcreatingschema'] = 'Error creating the Solr schema: {$a}';
-$string['errorvalidatingschema'] = 'Error validating Solr schema, field {$a->fieldname} does not exist. Please <a href="{$a->setupurl}">follow this link</a> to setup the fields required by Moodle.';
+$string['errorvalidatingschema'] = 'Error validating Solr schema, field {$a->fieldname} does not exist. Please <a href="{$a->setupurl}">follow this link</a> to setup the required fields.';
 $string['extensionerror'] = 'The Apache Solr PHP extension is not installed. Please check the documentation.';
 $string['fileindexing'] = 'Enable file indexing';
-$string['fileindexing_help'] = 'If your Solr install supports it, this feature allows Moodle to send files to be indexed.';
+$string['fileindexing_help'] = 'If your Solr install supports it, this feature allows Totara to send files to be indexed.';
 $string['fileindexsettings'] = 'File indexing settings';
 $string['maxindexfilekb'] = 'Maximum file size to index (kB)';
 $string['maxindexfilekb_help'] = 'Files larger than this number of kilobytes will be skipped for search indexing. 0 to index files of any size.';
-$string['minimumsolr4'] = 'Solr 4.0 is the minimum version required for Moodle';
-$string['missingconfig'] = 'Your Apache Solr server is not yet configured in Moodle.';
+$string['minimumsolr4'] = 'Solr 4.0 is the minimum version required for Totara';
+$string['missingconfig'] = 'Your Apache Solr server is not yet configured in Totara.';
 $string['multivaluedfield'] = 'Field "{$a}" returned an array instead of a scalar, the field is probably defined in Solr with "Multivalued" to true, this means that Solr autocreated the field for you when you indexed data because you forgot to run search/engine/solr/cli/setup_schema.php. Please delete the current index, create a new one and run setup_schema.php before indexing data in Solr.';
 $string['nodatafromserver'] = 'No data from server';
 $string['pluginname'] = 'Solr';
@@ -43,14 +43,14 @@ $string['searchinfo'] = 'Search queries';
 $string['searchinfo_help'] = 'Features you can use while performing search queries:
 
 * Fields: You can specify which fields you want results from.<br/>
-  * title:(moodle + perth): returns all records that contains both "moodle" and "perth" in the title. Available fields: title, content, name, intro
+  * title:(beach + perth): returns all records that contains both "beach" and "perth" in the title. Available fields: title, content, name, intro
 * Boolean Operators ("AND", "OR", "NOT"):<br/>
-  * (moodle AND perth) OR (moodle AND australia)
+  * (beach AND perth) OR (beach AND australia)
 * Wildcards ("&#42;", "?"):<br/>
-  * "mo??l&#42;" returns both "moodle" and "moodledata".
+  * "be??l&#42;" returns both "beach" and "beachfront".
 * Proximity Searches ("~"):<br/>
-  * mood~2 returns "moodle". (2 alphabets away from "mood").
-  * moodle australia~3 returns results containing "moodle hq at perth australia" (the queried terms were within 3 words of each other)
+  * bea~2 returns "beach". (2 alphabets away from "bea").
+  * beach australia~3 returns results containing "beach at perth australia" (the queried terms were within 3 words of each other)
 * Boosting Terms ("^"): To boost certain words/phrases:<br/>
   * "perth australia"^5 "australia" will make results with the phrase "perth australia" more relevant.
 ';
