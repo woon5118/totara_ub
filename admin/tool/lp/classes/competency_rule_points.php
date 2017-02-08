@@ -25,6 +25,7 @@
 namespace tool_lp;
 defined('MOODLE_INTERNAL') || die();
 
+use coding_exception;
 use lang_string;
 
 
@@ -195,5 +196,30 @@ class competency_rule_points extends competency_rule {
      */
     public static function get_name() {
         return new lang_string('pointsrequiredaremet', 'tool_lp');
+    }
+
+    /**
+     * Migrate rule config when duplicate competency based on mapping competencies ids.
+     *
+     * @param string $config the config rule of a competency
+     * @param array $mappings array that match the old competency ids with the new competencies
+     * @return string
+     */
+    public static function migrate_config($config, $mappings) {
+        $ruleconfig = json_decode($config, true);
+        if (is_array($ruleconfig)) {
+            foreach ($ruleconfig['competencies'] as $key => $rulecomp) {
+                $rulecmpid = $rulecomp['id'];
+                if (array_key_exists($rulecmpid, $mappings)) {
+                    $ruleconfig['competencies'][$key]['id'] = $mappings[$rulecmpid]->get_id();
+                } else {
+                    throw new coding_exception("The competency id is not found in the matchids.");
+                }
+            }
+        } else {
+            throw new coding_exception("Invalid JSON config rule.");
+        }
+
+        return json_encode($ruleconfig);
     }
 }

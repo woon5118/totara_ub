@@ -98,4 +98,18 @@ abstract class competency_rule {
         throw new coding_exception('Method not implemented.');
     }
 
+    /**
+     * Migrate rule config from one set of competencies to another.
+     *
+     * Exceptions should be thrown when the migration can not be performed.
+     *
+     * @param string $config Original config rule of a competency.
+     * @param array $mappings Array that matches the original competency IDs with the new competencies objects.
+     * @return string New configuration.
+     * @throws Exception
+     */
+    public static function migrate_config($config, $mappings) {
+        return $config;
+    }
+
 }
