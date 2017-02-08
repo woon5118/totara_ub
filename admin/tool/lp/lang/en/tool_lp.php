@@ -23,6 +23,7 @@
  */
 
 $string['actions'] = 'Actions';
+$string['addcohorts'] = 'Add cohorts';
 $string['addcompetency'] = 'Add competency';
 $string['addnewcompetency'] = 'Add new competency';
 $string['addnewcompetencyframework'] = 'Add new competency framework';
@@ -158,10 +159,12 @@ $string['scalevalue'] = 'Scale value';
 $string['search'] = 'Search...';
 $string['selectcompetencymovetarget'] = 'Select a location to move this competency to:';
 $string['selectedcompetency'] = 'Selected competency';
+$string['selectcohortstosync'] = 'Select cohorts to sync';
 $string['selectuserstocreateplansfor'] = 'Select users to create plans for';
 $string['shortname'] = 'Name';
 $string['state'] = 'State';
 $string['status'] = 'Status';
+$string['stopsyncingcohort'] = 'Stop syncing cohort';
 $string['taxonomies'] = 'Taxonomies';
 $string['taxonomy_add_behaviour'] = 'Add behaviour';
 $string['taxonomy_add_competency'] = 'Add competency';
