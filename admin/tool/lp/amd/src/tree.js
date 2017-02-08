@@ -19,7 +19,7 @@
  *
  * To respond to selection changed events - use tree.on("selectionchanged", handler).
  * The handler will receive an array of nodes, which are the list items that are currently
- * selected.
+ * selected. (Or a single node if multiselect is disabled).
  *
  * @module     tool_lp/tree
  * @package    core
@@ -37,16 +37,25 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
      * Constructor
      *
      * @param {String} selector
+     * @param {Boolean} multiSelect
      */
-    var Tree = function(selector) {
+    var Tree = function(selector, multiSelect) {
         this.treeRoot = $(selector);
+        this.multiSelect = (typeof multiSelect === 'undefined' || multiSelect === true);
 
         this.items = this.treeRoot.find('li');
         this.expandAll = this.items.length < 20;
         this.parents = this.treeRoot.find('li:has(ul)');
 
+        if (multiSelect) {
+            this.treeRoot.attr('aria-multiselectable', 'true');
+        }
+
+        this.items.attr('aria-selected', 'false');
+
         this.visibleItems = null;
         this.activeItem = null;
+        this.lastActiveItem = null;
 
         this.keys = {
             tab:      9,
@@ -149,12 +158,55 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
     };
 
     /**
-     * Set the focus to this item.
+     * Whenever the currently selected node has changed, trigger an event using this function.
      *
-     * @method updateFocus
-     * @param {Object} item is the jquery id of the parent item of the group
+     * @method triggerChange
      */
-    Tree.prototype.updateFocus = function(item) {
+    Tree.prototype.triggerChange = function() {
+        var allSelected = this.items.filter('[aria-selected=true]');
+        if (!this.multiSelect) {
+            allSelected = allSelected.first();
+        }
+        this.treeRoot.trigger('selectionchanged', { selected: allSelected });
+    };
+
+    /**
+     * Select all the items between the last focused item and this currently focused item.
+     *
+     * @method multiSelectItem
+     * @param {Object} item is the jquery id of the newly selected item.
+     */
+    Tree.prototype.multiSelectItem = function(item) {
+        if (!this.multiSelect) {
+            this.items.attr('aria-selected', 'false');
+        } else if (this.lastActiveItem !== null) {
+            var lastIndex = this.visibleItems.index(this.lastActiveItem);
+            var currentIndex = this.visibleItems.index(this.activeItem);
+            var oneItem = null;
+
+            while (lastIndex < currentIndex) {
+                oneItem  = $(this.visibleItems.get(lastIndex));
+                oneItem.attr('aria-selected', 'true');
+                lastIndex++;
+            }
+            while (lastIndex > currentIndex) {
+                oneItem  = $(this.visibleItems.get(lastIndex));
+                oneItem.attr('aria-selected', 'true');
+                lastIndex--;
+            }
+        }
+
+        item.attr('aria-selected', 'true');
+        this.triggerChange();
+    };
+
+    /**
+     * Select a single item. Make sure all the parents are expanded. De-select all other items.
+     *
+     * @method selectItem
+     * @param {Object} item is the jquery id of the newly selected item.
+     */
+    Tree.prototype.selectItem = function(item) {
         // Expand all nodes up the tree.
         var walk = item.parent();
         while (walk.attr('role') != 'tree') {
@@ -164,9 +216,52 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
             }
             walk = walk.parent();
         }
-        this.items.attr('aria-selected', 'false').attr('tabindex', '-1');
-        item.attr('aria-selected', 'true').attr('tabindex', 0);
-        this.treeRoot.trigger('selectionchanged', [item]);
+        this.items.attr('aria-selected', 'false');
+        item.attr('aria-selected', 'true');
+        this.triggerChange();
+    };
+
+    /**
+     * Toggle the selected state for an item back and forth.
+     *
+     * @method toggleItem
+     * @param {Object} item is the jquery id of the item to toggle.
+     */
+    Tree.prototype.toggleItem = function(item) {
+        if (!this.multiSelect) {
+            return this.selectItem(item);
+        }
+
+        var current = item.attr('aria-selected');
+        if (current === 'true') {
+            current = 'false';
+        } else {
+            current = 'true';
+        }
+        item.attr('aria-selected', current);
+        this.triggerChange();
+    };
+
+    /**
+     * Set the focus to this item.
+     *
+     * @method updateFocus
+     * @param {Object} item is the jquery id of the parent item of the group
+     */
+    Tree.prototype.updateFocus = function(item) {
+        this.lastActiveItem = this.activeItem;
+        this.activeItem = item;
+        // Expand all nodes up the tree.
+        var walk = item.parent();
+        while (walk.attr('role') != 'tree') {
+            walk = walk.parent();
+            if (walk.attr('aria-expanded') == 'false') {
+                this.expandGroup(walk);
+            }
+            walk = walk.parent();
+        }
+        this.items.attr('tabindex', '-1');
+        item.attr('tabindex', 0);
     };
 
     /**
@@ -178,27 +273,31 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
      */
     Tree.prototype.handleKeyDown = function(item, e) {
         var currentIndex = this.visibleItems.index(item);
-
-        if ((e.altKey || e.ctrlKey) || (e.shiftKey && e.keyCode != this.keys.tab)) {
-            // Do nothing.
-            return true;
-        }
+        var newItem = null;
 
         switch (e.keyCode) {
             case this.keys.home: {
                  // Jump to first item in tree.
-                this.activeItem = this.parents.first();
-
-                this.activeItem.focus();
+                newItem = this.parents.first();
+                newItem.focus();
+                if (e.shiftKey) {
+                    this.multiSelectItem(newItem);
+                } else if (!e.ctrlKey) {
+                    this.selectItem(newItem);
+                }
 
                 e.stopPropagation();
                 return false;
             }
             case this.keys.end: {
                  // Jump to last visible item.
-                this.activeItem = this.visibleItems.last();
-
-                this.activeItem.focus();
+                newItem = this.visibleItems.last();
+                newItem.focus();
+                if (e.shiftKey) {
+                    this.multiSelectItem(newItem);
+                } else if (!e.ctrlKey) {
+                    this.selectItem(newItem);
+                }
 
                 e.stopPropagation();
                 return false;
@@ -206,8 +305,12 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
             case this.keys.enter:
             case this.keys.space: {
 
-                if (item.has('ul')) {
-                    this.toggleGroup(item, true);
+                if (e.shiftKey) {
+                    this.multiSelectItem(item);
+                } else if (e.ctrlKey) {
+                    this.toggleItem(item);
+                } else {
+                    this.selectItem(item);
                 }
 
                 e.stopPropagation();
@@ -220,10 +323,13 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
                     // Move up to the parent.
                     var itemUL = item.parent();
                     var itemParent = itemUL.parent();
+                    itemParent.focus();
+                    if (e.shiftKey) {
+                        this.multiSelectItem(itemParent);
+                    } else if (!e.ctrlKey) {
+                        this.selectItem(itemParent);
+                    }
 
-                    this.activeItem = itemParent;
-
-                    this.activeItem.focus();
                 }
 
                 e.stopPropagation();
@@ -234,9 +340,13 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
                     this.expandGroup(item);
                 } else {
                     // Move to the first item in the child group.
-                    this.activeItem = item.children('ul').children('li').first();
-
-                    this.activeItem.focus();
+                    newItem = item.children('ul').children('li').first();
+                    newItem.focus();
+                    if (e.shiftKey) {
+                        this.multiSelectItem(newItem);
+                    } else if (!e.ctrlKey) {
+                        this.selectItem(newItem);
+                    }
                 }
 
                 e.stopPropagation();
@@ -246,10 +356,12 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
 
                 if (currentIndex > 0) {
                     var prev = this.visibleItems.eq(currentIndex - 1);
-
-                    this.activeItem = prev;
-
                     prev.focus();
+                    if (e.shiftKey) {
+                        this.multiSelectItem(prev);
+                    } else if (!e.ctrlKey) {
+                        this.selectItem(prev);
+                    }
                 }
 
                 e.stopPropagation();
@@ -259,9 +371,12 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
 
                 if (currentIndex < this.visibleItems.length - 1) {
                     var next = this.visibleItems.eq(currentIndex + 1);
-
-                    this.activeItem = next;
                     next.focus();
+                    if (e.shiftKey) {
+                        this.multiSelectItem(next);
+                    } else if (!e.ctrlKey) {
+                        this.selectItem(next);
+                    }
                 }
                 e.stopPropagation();
                 return false;
@@ -346,8 +461,7 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
                 }
 
                 if (match === true) {
-                    this.activeItem = this.visibleItems.eq(currentIndex);
-                    this.activeItem.focus();
+                    this.updateFocus(this.visibleItems.eq(currentIndex));
                 }
                 e.stopPropagation();
                 return false;
@@ -386,9 +500,6 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
             return true;
         }
 
-        // Update the active item.
-        this.activeItem = item;
-
         // Apply the focus markup.
         this.updateFocus(item);
 
@@ -402,22 +513,36 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
     /**
      * Handle a click (select).
      *
+     * @method handleExpandCollapseClick
+     * @param {Object} item is the jquery id of the parent item of the group
+     * @param {Event} e The event.
+     */
+    Tree.prototype.handleExpandCollapseClick = function(item, e) {
+
+        // Do not shift the focus.
+        this.toggleGroup(item);
+        e.stopPropagation();
+        return false;
+    };
+
+
+    /**
+     * Handle a click (select).
+     *
      * @method handleClick
      * @param {Object} item is the jquery id of the parent item of the group
      * @param {Event} e The event.
      */
     Tree.prototype.handleClick = function(item, e) {
 
-        if (e.altKey || e.ctrlKey || e.shiftKey) {
-            // Do nothing.
-            return true;
+        if (e.shiftKey) {
+            this.multiSelectItem(item);
+        } else if (e.ctrlKey) {
+            this.toggleItem(item);
+        } else {
+            this.selectItem(item);
         }
-
-        // Update the active item.
-        this.activeItem = item;
-
         this.updateFocus(item);
-
         e.stopPropagation();
         return false;
     };
@@ -442,11 +567,7 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
      */
     Tree.prototype.handleFocus = function(item) {
 
-        if (this.activeItem === null) {
-            this.activeItem = item;
-        }
-
-        this.updateFocus(this.activeItem);
+        this.updateFocus(item);
 
         return true;
     };
@@ -467,6 +588,11 @@ define(['jquery', 'core/url', 'core/log'], function($, url, log) {
         // Bind a click handler.
         this.items.click(function(e) {
             return thisObj.handleClick($(this), e);
+        });
+
+        // Bind a toggle handler to the expand/collapse icons.
+        this.items.children('img').click(function(e) {
+            return thisObj.handleExpandCollapseClick($(this).parent(), e);
         });
 
         // Bind a keydown handler.

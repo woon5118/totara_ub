@@ -16,6 +16,10 @@
 /**
  * Competency picker.
  *
+ * To handle 'save' events use: picker.on('save')
+ * This will receive a object with either a single 'competencyId', or an array in 'competencyIds'
+ * depending on the value of multiSelect.
+ *
  * @package    tool_lp
  * @copyright  2015 Frédéric Massart - FMCorz.net
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,8 +40,10 @@ define(['jquery',
      * Competency picker class.
      * @param {Number} pageContextId The page context ID.
      * @param {Number|false} singleFramework The ID of the framework when limited to one.
+     * @param {String} pageContextIncludes One of 'children', 'parents', 'self'.
+     * @param {Boolean} multiSelect Support multi-select in the tree.
      */
-    var Picker = function(pageContextId, singleFramework, pageContextIncludes) {
+    var Picker = function(pageContextId, singleFramework, pageContextIncludes, multiSelect) {
         self = this;
         self._eventNode = $('<div></div>');
         self._frameworks = [];
@@ -45,6 +51,7 @@ define(['jquery',
 
         self._pageContextId = pageContextId;
         self._pageContextIncludes = pageContextIncludes || 'children';
+        self._multiSelect = (typeof multiSelect === 'undefined' || multiSelect === true);
         if (singleFramework) {
             self._frameworkId = singleFramework;
             self._singleFramework = true;
@@ -70,9 +77,11 @@ define(['jquery',
     /** @type {String} The string we filter the competencies with. */
     Picker.prototype._searchText = '';
     /** @type {Object} The competency that was selected. */
-    Picker.prototype._selectedCompetency = null;
-    /** @type {Boolean} Whether we can browser frameworks or not. */
+    Picker.prototype._selectedCompetencies = null;
+    /** @type {Boolean} Whether we can browse frameworks or not. */
     Picker.prototype._singleFramework = false;
+    /** @type {Boolean} Do we allow multi select? */
+    Picker.prototype._multiSelect = true;
 
     /**
      * Hook to executed after the view is rendered.
@@ -82,26 +91,38 @@ define(['jquery',
     Picker.prototype._afterRender = function() {
 
         // Initialise the tree.
-        var tree = new Tree(self._find('[data-enhance=linktree]'));
+        var tree = new Tree(self._find('[data-enhance=linktree]'), self._multiSelect);
 
-        tree.on('selectionchanged', function(evt, target) {
-            var compId = target.data('id'),
-                valid = true;
+        // To prevent jiggling we only show the tree after it is enhanced.
+        self._find('[data-enhance=linktree]').show();
 
-            $.each(self._disallowedCompetencyIDs, function(i, id) {
-                if (id == compId) {
+        tree.on('selectionchanged', function(evt, params) {
+            var selected = params.selected;
+            evt.preventDefault();
+            var validIds = [];
+            $.each(selected, function(index, item) {
+                var compId = $(item).data('id'),
+                    valid = true;
+
+                if (typeof compId === 'undefined') {
+                    // Do not allow picking nodes with no id.
                     valid = false;
-                    return false;
+                } else {
+                    $.each(self._disallowedCompetencyIDs, function(i, id) {
+                        if (id == compId) {
+                            valid = false;
+                        }
+                    });
+                }
+                if (valid) {
+                    validIds.push(compId);
                 }
             });
 
-            self._selectedCompetency = null;
-            if (valid) {
-                self._selectedCompetency = compId;
-            }
+            self._selectedCompetencies = validIds;
 
             // TODO Implement disabling of nodes in the tree module somehow.
-            if (!self._selectedCompetency) {
+            if (!self._selectedCompetencies.length) {
                 self._find('[data-region="competencylinktree"] [data-action="add"]').attr('disabled', 'disabled');
             } else {
                 self._find('[data-region="competencylinktree"] [data-action="add"]').removeAttr('disabled');
@@ -135,13 +156,31 @@ define(['jquery',
         // Add listener for add.
         self._find('[data-region="competencylinktree"] [data-action="add"]').click(function(e) {
             e.preventDefault();
-            if (!self._selectedCompetency) {
+            if (!self._selectedCompetencies.length) {
                 return;
             }
 
-            self._trigger('save', { competencyId: self._selectedCompetency });
+            if (self._multiSelect) {
+                self._trigger('save', { competencyIds: self._selectedCompetencies });
+            } else {
+                // We checked above that the array has at least one value.
+                self._trigger('save', { competencyId: self._selectedCompetencies[0] });
+            }
+
             self.close();
         });
+
+        // The list of selected competencies will be modified while looping (because of the listeners above).
+        var currentItems = self._selectedCompetencies.slice(0);
+
+        $.each(currentItems, function(index, id) {
+            var node = self._find('[data-id=' + id + ']');
+            if (node.length) {
+                tree.toggleItem(node);
+                tree.updateFocus(node);
+            }
+        });
+
     };
 
     /**
@@ -380,7 +419,7 @@ define(['jquery',
         self._disallowedCompetencyIDs = [];
         self._popup = null;
         self._searchText = '';
-        self._selectedCompetency = null;
+        self._selectedCompetencies = [];
     };
 
     /**
