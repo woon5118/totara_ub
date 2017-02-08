@@ -29,6 +29,7 @@ use context;
 use context_helper;
 use context_system;
 use context_course;
+use context_module;
 use context_user;
 use coding_exception;
 use require_login_exception;
@@ -43,6 +44,36 @@ use required_capability_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class api {
+
+    /**
+     * Validate if current user have acces to the course_module if hidden.
+     *
+     * @param mixed $cmmixed The cm_info class, course module record or its ID.
+     * @param bool $throwexception Throw an exception or not.
+     * @return bool
+     */
+    protected static function validate_course_module($cmmixed, $throwexception = true) {
+        $cm = $cmmixed;
+        if (!is_object($cm)) {
+            $cmrecord = get_coursemodule_from_id(null, $cmmixed);
+            $modinfo = get_fast_modinfo($cmrecord->course);
+            $cm = $modinfo->get_cm($cmmixed);
+        } else if (!$cm instanceof cm_info) {
+            // Assume we got a course module record.
+            $modinfo = get_fast_modinfo($cm->course);
+            $cm = $modinfo->get_cm($cm->id);
+        }
+
+        if (!$cm->uservisible) {
+            if ($throwexception) {
+                throw new require_login_exception('Course module is hidden');
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /**
      * Validate if current user have acces to the course if hidden.
@@ -807,6 +838,67 @@ class api {
     }
 
     /**
+     * List all the courses modules using a competency in a course.
+     *
+     * @param int $competencyid The id of the competency to check.
+     * @param int $courseid The id of the course to check.
+     * @return array[int] Array of course modules ids.
+     */
+    public static function list_course_modules_using_competency($competencyid, $courseid) {
+
+        $result = array();
+        self::validate_course($courseid);
+
+        $coursecontext = context_course::instance($courseid);
+
+        // We will not check each module - course permissions should be enough.
+        $capabilities = array('tool/lp:coursecompetencyread', 'tool/lp:coursecompetencymanage');
+        if (!has_any_capability($capabilities, $coursecontext)) {
+            throw new required_capability_exception($coursecontext, 'tool/lp:coursecompetencyread', 'nopermissions', '');
+        }
+
+        $cmlist = course_module_competency::list_course_modules($competencyid, $courseid);
+        foreach ($cmlist as $cmid) {
+            if (self::validate_course_module($cmid, false)) {
+                array_push($result, $cmid);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * List all the competencies linked to a course module.
+     *
+     * @param mixed $cmorid The course module, or its ID.
+     * @return array[competency] Array of competency records.
+     */
+    public static function list_course_module_competencies_in_course_module($cmorid) {
+        $cm = $cmorid;
+        if (!is_object($cmorid)) {
+            $cm = get_coursemodule_from_id('', $cmorid, 0, true, MUST_EXIST);
+        }
+
+        // Check the user have access to the course module.
+        self::validate_course_module($cm);
+        $context = context_module::instance($cm->id);
+
+        $capabilities = array('tool/lp:coursecompetencyread', 'tool/lp:coursecompetencymanage');
+        if (!has_any_capability($capabilities, $context)) {
+            throw new required_capability_exception($context, 'tool/lp:coursecompetencyread', 'nopermissions', '');
+        }
+
+        $result = array();
+
+        $cmclist = course_module_competency::list_course_module_competencies($cm->id);
+        foreach ($cmclist as $id => $cmc) {
+            array_push($result, $cmc);
+        }
+
+        return $result;
+    }
+
+    /**
      * List all the courses using a competency.
      *
      * @param int $competencyid The id of the competency to check.
@@ -979,6 +1071,47 @@ class api {
     }
 
     /**
+     * List the competencies associated to a course module.
+     *
+     * @param mixed $cmorid The course module, or its ID.
+     * @return array( array(
+     *                   'competency' => \tool_lp\competency,
+     *                   'coursemodulecompetency' => \tool_lp\course_module_competency
+     *              ))
+     */
+    public static function list_course_module_competencies($cmorid) {
+        $cm = $cmorid;
+        if (!is_object($cmorid)) {
+            $cm = get_coursemodule_from_id('', $cmorid, 0, true, MUST_EXIST);
+        }
+
+        // Check the user have access to the course module.
+        self::validate_course_module($cm);
+        $context = context_module::instance($cm->id);
+
+        $capabilities = array('tool/lp:coursecompetencyread', 'tool/lp:coursecompetencymanage');
+        if (!has_any_capability($capabilities, $context)) {
+            throw new required_capability_exception($context, 'tool/lp:coursecompetencyread', 'nopermissions', '');
+        }
+
+        $result = array();
+
+        // TODO We could improve the performance of this into one single query.
+        $coursemodulecompetencies = course_competency::list_course_module_competencies($cm->id);
+        $competencies = course_module_competency::list_competencies($cm->id);
+
+        // Build the return values.
+        foreach ($coursemodulecompetencies as $key => $coursemodulecompetency) {
+            $result[] = array(
+                'competency' => $competencies[$coursemodulecompetency->get_competencyid()],
+                'coursemodulecompetency' => $coursemodulecompetency
+            );
+        }
+
+        return $result;
+    }
+
+    /**
      * Get a user competency in a course.
      *
      * @param int $courseid The id of the course to check.
@@ -1147,6 +1280,169 @@ class api {
     }
 
     /**
+     * Add a competency to this course module.
+     *
+     * @param mixed $cmorid The course module, or id of the course module
+     * @param int $competencyid The id of the competency
+     * @return bool
+     */
+    public static function add_competency_to_course_module($cmorid, $competencyid) {
+        $cm = $cmorid;
+        if (!is_object($cmorid)) {
+            $cm = get_coursemodule_from_id('', $cmorid, 0, true, MUST_EXIST);
+        }
+
+        // Check the user have access to the course module.
+        self::validate_course_module($cm);
+
+        // First we do a permissions check.
+        $context = context_module::instance($cm->id);
+
+        require_capability('tool/lp:coursecompetencymanage', $context);
+
+        // Check that the competency belongs to the course.
+        $exists = course_competency::get_records(array('courseid' => $cm->course, 'competencyid' => $competencyid));
+        if (!$exists) {
+            throw new coding_exception('Cannot add a competency to a module if it does not belong to the course');
+        }
+
+        $competency = new competency($competencyid);
+
+        // Can not add a competency that belong to a hidden framework.
+        if ($competency->get_framework()->get_visible() == false) {
+            throw new coding_exception('A competency belonging to hidden framework can not be linked to course module');
+        }
+
+        $record = new stdClass();
+        $record->cmid = $cm->id;
+        $record->competencyid = $competencyid;
+
+        $coursemodulecompetency = new course_module_competency();
+        $exists = $coursemodulecompetency->get_records(array('cmid' => $cm->id, 'competencyid' => $competencyid));
+        if (!$exists) {
+            $coursemodulecompetency->from_record($record);
+            if ($coursemodulecompetency->create()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Remove a competency from this course module.
+     *
+     * @param mixed $cmorid The course module, or id of the course module
+     * @param int $competencyid The id of the competency
+     * @return bool
+     */
+    public static function remove_competency_from_course_module($cmorid, $competencyid) {
+        $cm = $cmorid;
+        if (!is_object($cmorid)) {
+            $cm = get_coursemodule_from_id('', $cmorid, 0, true, MUST_EXIST);
+        }
+        // Check the user have access to the course module.
+        self::validate_course_module($cm);
+
+        // First we do a permissions check.
+        $context = context_module::instance($cm->id);
+
+        require_capability('tool/lp:coursecompetencymanage', $context);
+
+        $record = new stdClass();
+        $record->cmid = $cm->id;
+        $record->competencyid = $competencyid;
+
+        $competency = new competency($competencyid);
+        $exists = course_module_competency::get_record(array('cmid' => $cm->id, 'competencyid' => $competencyid));
+        if ($exists) {
+            return $exists->delete();
+        }
+        return false;
+    }
+
+    /**
+     * Move the course module competency up or down in the display list.
+     *
+     * Requires tool/lp:coursecompetencymanage capability at the course module context.
+     *
+     * @param mixed $cmorid The course module, or id of the course module
+     * @param int $competencyidfrom The id of the competency we are moving.
+     * @param int $competencyidto The id of the competency we are moving to.
+     * @return boolean
+     */
+    public static function reorder_course_module_competency($cmorid, $competencyidfrom, $competencyidto) {
+        $cm = $cmorid;
+        if (!is_object($cmorid)) {
+            $cm = get_coursemodule_from_id('', $cmorid, 0, true, MUST_EXIST);
+        }
+        // Check the user have access to the course module.
+        self::validate_course_module($cm);
+
+        // First we do a permissions check.
+        $context = context_module::instance($cm->id);
+
+        require_capability('tool/lp:coursecompetencymanage', $context);
+
+        $down = true;
+        $matches = course_module_competency::get_records(array('cmid' => $cm->id, 'competencyid' => $competencyidfrom));
+        if (count($matches) == 0) {
+             throw new coding_exception('The link does not exist');
+        }
+
+        $competencyfrom = array_pop($matches);
+        $matches = course_module_competency::get_records(array('cmid' => $cm->id, 'competencyid' => $competencyidto));
+        if (count($matches) == 0) {
+             throw new coding_exception('The link does not exist');
+        }
+
+        $competencyto = array_pop($matches);
+
+        $all = course_module_competency::get_records(array('cmid' => $cm->id), 'sortorder', 'ASC', 0, 0);
+
+        if ($competencyfrom->get_sortorder() > $competencyto->get_sortorder()) {
+            // We are moving up, so put it before the "to" item.
+            $down = false;
+        }
+
+        foreach ($all as $id => $coursemodulecompetency) {
+            $sort = $coursemodulecompetency->get_sortorder();
+            if ($down && $sort > $competencyfrom->get_sortorder() && $sort <= $competencyto->get_sortorder()) {
+                $coursemodulecompetency->set_sortorder($coursemodulecompetency->get_sortorder() - 1);
+                $coursemodulecompetency->update();
+            } else if (!$down && $sort >= $competencyto->get_sortorder() && $sort < $competencyfrom->get_sortorder()) {
+                $coursemodulecompetency->set_sortorder($coursemodulecompetency->get_sortorder() + 1);
+                $coursemodulecompetency->update();
+            }
+        }
+        $competencyfrom->set_sortorder($competencyto->get_sortorder());
+        return $competencyfrom->update();
+    }
+
+    /**
+     * Update ruleoutcome value for a course module competency.
+     *
+     * @param int|course_module_competency $coursemodulecompetencyorid The course_module_competency, or its ID.
+     * @param int $ruleoutcome The value of ruleoutcome.
+     * @return bool True on success.
+     */
+    public static function set_course_module_competency_ruleoutcome($coursemodulecompetencyorid, $ruleoutcome) {
+        $coursemodulecompetency = $coursemodulecompetencyorid;
+        if (!is_object($coursemodulecompetency)) {
+            $coursemodulecompetency = new course_module_competency($coursemodulecompetencyorid);
+        }
+
+        $cm = get_coursemodule_from_id('', $coursemodulecompetency->get_cmid(), 0, true, MUST_EXIST);
+
+        self::validate_course_module($cm);
+        $context = context_module::instance($cm->id);
+
+        require_capability('tool/lp:coursecompetencymanage', $context);
+
+        $coursemodulecompetency->set_ruleoutcome($ruleoutcome);
+        return $coursemodulecompetency->update();
+    }
+
+    /**
      * Add a competency to this course.
      *
      * @param int $courseid The id of the course
@@ -1206,10 +1502,14 @@ class api {
 
         $competency = new competency($competencyid);
         $coursecompetency = new course_competency();
-        $exists = $coursecompetency->get_records(array('courseid' => $courseid, 'competencyid' => $competencyid));
+        $exists = $coursecompetency->get_record(array('courseid' => $courseid, 'competencyid' => $competencyid));
         if ($exists) {
-            $competency = array_pop($exists);
-            return $competency->delete();
+            // Delete all course_module_competencies for this competency in this course.
+            $cmcs = course_module_competency::list_course_module_competencies($competencyid, $courseid);
+            foreach ($cmcs as $cmc) {
+                $cmc->delete();
+            }
+            return $exists->delete();
         }
         return false;
     }
@@ -3653,6 +3953,64 @@ class api {
             null,
             $recommend
         );
+    }
+
+    /**
+     * Observe when a course module is marked as completed.
+     *
+     * Note that the user being logged in while this happens may be anyone.
+     * Do not rely on capability checks here!
+     *
+     * @param  \core\event\course_module_completion_updated $event
+     * @return void
+     */
+    public static function observe_course_module_completion_updated(\core\event\course_module_completion_updated $event) {
+
+        $eventdata = $event->get_record_snapshot('course_modules_completion', $event->objectid);
+
+        if ($eventdata->completionstate == COMPLETION_COMPLETE
+                || $eventdata->completionstate == COMPLETION_COMPLETE_PASS) {
+            $coursemodulecompetencies = course_module_competency::list_course_module_competencies($eventdata->coursemoduleid);
+
+            $cm = get_coursemodule_from_id(null, $eventdata->coursemoduleid);
+            $fastmodinfo = get_fast_modinfo($cm->course)->cms[$cm->id];
+
+            $cmname = $fastmodinfo->name;
+            $url = $fastmodinfo->url;
+
+            foreach ($coursemodulecompetencies as $coursemodulecompetency) {
+                $outcome = $coursemodulecompetency->get_ruleoutcome();
+                $action = null;
+                $recommend = false;
+                $strdesc = 'evidence_coursemodulecompleted';
+
+                if ($outcome == course_module_competency::OUTCOME_EVIDENCE) {
+                    $action = evidence::ACTION_LOG;
+
+                } else if ($outcome == course_module_competency::OUTCOME_RECOMMEND) {
+                    $action = evidence::ACTION_LOG;
+                    $recommend = true;
+
+                } else if ($outcome == course_module_competency::OUTCOME_COMPLETE) {
+                    $action = evidence::ACTION_COMPLETE;
+
+                } else {
+                    throw new moodle_exception('Unexpected rule outcome: ' + $outcome);
+                }
+
+                static::add_evidence(
+                    $event->relateduserid,
+                    $coursemodulecompetency->get_competencyid(),
+                    $event->contextid,
+                    $action,
+                    $strdesc,
+                    'tool_lp',
+                    $cmname,
+                    $recommend,
+                    $url
+                );
+            }
+        }
     }
 
     /**

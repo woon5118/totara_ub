@@ -48,6 +48,18 @@ class restore_tool_lp_plugin extends restore_tool_plugin {
     }
 
     /**
+     * Return the paths.
+     *
+     * @return restore_path_element[]
+     */
+    protected function define_module_plugin_structure() {
+        $paths = array(
+            new restore_path_element('course_module_competency', $this->get_pathfor('/course_module_competencies/competency'))
+        );
+        return $paths;
+    }
+
+    /**
      * Process a course competency.
      *
      * @param  array $data The data.
@@ -72,7 +84,8 @@ class restore_tool_lp_plugin extends restore_tool_plugin {
             'competencyid' => $competency->get_id(),
             'courseid' => $this->task->get_courseid()
         );
-        $existing = \tool_lp\course_competency::record_exists_select('competencyid = :competencyid AND courseid = :courseid', $params);
+        $query = 'competencyid = :competencyid AND courseid = :courseid';
+        $existing = \tool_lp\course_competency::record_exists_select($query, $params);
 
         if (!$existing) {
             // Sortorder is ignored by precaution, anyway we should walk through the records in the right order.
@@ -80,6 +93,44 @@ class restore_tool_lp_plugin extends restore_tool_plugin {
             $record->ruleoutcome = $data->ruleoutcome;
             $coursecompetency = new \tool_lp\course_competency(0, $record);
             $coursecompetency->create();
+        }
+
+    }
+
+    /**
+     * Process a course module competency.
+     *
+     * @param  array $data The data.
+     */
+    public function process_course_module_competency($data) {
+        global $DB;
+
+        $data = (object) $data;
+
+        // Mapping the competency by ID numbers.
+        $framework = \tool_lp\competency_framework::get_record(array('idnumber' => $data->frameworkidnumber));
+        if (!$framework) {
+            return;
+        }
+        $competency = \tool_lp\competency::get_record(array('idnumber' => $data->idnumber,
+            'competencyframeworkid' => $framework->get_id()));
+        if (!$competency) {
+            return;
+        }
+
+        $params = array(
+            'competencyid' => $competency->get_id(),
+            'cmid' => $this->task->get_moduleid()
+        );
+        $query = 'competencyid = :competencyid AND cmid = :cmid';
+        $existing = \tool_lp\course_module_competency::record_exists_select($query, $params);
+
+        if (!$existing) {
+            // Sortorder is ignored by precaution, anyway we should walk through the records in the right order.
+            $record = (object) $params;
+            $record->ruleoutcome = $data->ruleoutcome;
+            $coursemodulecompetency = new \tool_lp\course_module_competency(0, $record);
+            $coursemodulecompetency->create();
         }
 
     }
