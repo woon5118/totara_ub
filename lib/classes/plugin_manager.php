@@ -1267,6 +1267,10 @@ class core_plugin_manager {
                 'number', 'picture', 'radiobutton', 'text', 'textarea', 'url'
             ),
 
+            'dataformat' => array(
+                'html', 'csv', 'json', 'excel', 'ods',
+            ),
+
             'datapreset' => array(
                 'imagegallery'
             ),
