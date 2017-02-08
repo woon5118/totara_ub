@@ -2069,7 +2069,6 @@ $capabilities = array(
         'archetypes' => array(
             'user' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/block:view'
     ),
     'moodle/competency:competencygrade' => array(
         'captype' => 'write',
@@ -2088,7 +2087,6 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:backup'
     ),
     'moodle/competency:coursecompetencyconfigure' => array(
         'captype' => 'write',
@@ -2096,7 +2094,6 @@ $capabilities = array(
         'archetypes' => array(
             'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:backup'
     ),
     'moodle/competency:coursecompetencygradable' => array(
         'captype' => 'read',
@@ -2112,7 +2109,6 @@ $capabilities = array(
         'archetypes' => array(
             'user' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/block:view'
     ),
     // Evidence.
     'moodle/competency:evidencedelete' => array(
@@ -2127,43 +2123,41 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:planmanagedraft' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:planmanageown' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:planmanageowndraft' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:planview' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:planviewdraft' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:planviewown' => array(
         'captype' => 'read',
@@ -2171,19 +2165,18 @@ $capabilities = array(
         'archetypes' => array(
             'user' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/block:view'
     ),
     'moodle/competency:planviewowndraft' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:planrequestreview' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         )
     ),
     'moodle/competency:planrequestreviewown' => array(
@@ -2197,15 +2190,15 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:plancomment' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:plancommentown' => array(
         'captype' => 'write',
@@ -2219,6 +2212,7 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_USER,     // And CONTEXT_COURSE.
         'archetypes' => array(
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'teacher' => CAP_ALLOW
         )
@@ -2227,6 +2221,7 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         )
     ),
     'moodle/competency:usercompetencyrequestreviewown' => array(
@@ -2240,15 +2235,15 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:usercompetencycomment' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:usercompetencycommentown' => array(
         'captype' => 'write',
@@ -2262,23 +2257,23 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:templateview' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     // User evidence.
     'moodle/competency:userevidencemanage' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
     'moodle/competency:userevidencemanageown' => array(
         'captype' => 'write',
@@ -2286,14 +2281,13 @@ $capabilities = array(
         'archetypes' => array(
             'user' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/block:view'
     ),
     'moodle/competency:userevidenceview' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'moodle/site:config'
     ),
 
 );
