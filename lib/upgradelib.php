@@ -2469,3 +2469,27 @@ function check_libcurl_version(environment_results $result) {
 
     return null;
 }
+/**
+ * Method used to check the installed unoconv version.
+ *
+ * @param environment_results $result object to update, if relevant.
+ * @return environment_results|null updated results or null if unoconv path is not executable.
+ */
+function check_unoconv_version(environment_results $result) {
+    global $CFG;
+
+    if (!during_initial_install() && !empty($CFG->pathtounoconv) && file_is_executable(trim($CFG->pathtounoconv))) {
+        $unoconvbin = \escapeshellarg($CFG->pathtounoconv);
+        $command = "$unoconvbin --version";
+        exec($command, $output);
+        preg_match('/([0-9]+\.[0-9]+)/', $output[0], $matches);
+        $currentversion = (float)$matches[0];
+        $supportedversion = 0.7;
+        if ($currentversion < $supportedversion) {
+            $result->setInfo('unoconv version not supported');
+            $result->setStatus(false);
+            return $result;
+        }
+    }
+    return null;
+}
