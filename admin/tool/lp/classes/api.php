@@ -30,6 +30,7 @@ use context_system;
 use context_course;
 use context_user;
 use coding_exception;
+use moodle_url;
 use required_capability_exception;
 
 /**
@@ -632,8 +633,6 @@ class api {
                 unset($courses[$id]);
                 continue;
             }
-            $course->fullnameformatted = format_text($course->fullname, array('context' => $context));
-            $course->shortnameformatted = format_text($course->shortname, array('context' => $context));
             array_push($result, $course);
         }
 
