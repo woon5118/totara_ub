@@ -30,4 +30,3 @@ $redirecturl = totara_feature_disabled('totaradashboard') ? new moodle_url('/') 
 debugging('The My Learning page has been removed. Existing My Learning content has been moved to a hidden dashboard called "Legacy My Learning".');
 
 redirect($redirecturl);
-
