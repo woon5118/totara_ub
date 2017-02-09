@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 // Save processing when the user will not be able to access anything.
 if (has_capability('moodle/site:config', $systemcontext)) {
 
-    $parentname = 'competencies';
+    $parentname = 'moodlecompetencies';
 
     // Settings page.
     $settings = new admin_settingpage('competencysettings', new lang_string('competenciessettings', 'core_competency'),

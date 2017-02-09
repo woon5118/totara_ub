@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 if (get_config('core_competency', 'enabled')) {
 
-    $parentname = 'competencies';
+    $parentname = 'moodlecompetencies';
 
     // Manage competency frameworks page.
     $temp = new admin_externalpage(

@@ -399,13 +399,9 @@ $string['secure_icon_url'] = 'Secure icon URL';
 $string['secure_icon_url_help'] = 'Similar to the icon URL, but used if the user accessing Totara securely through SSL. The main purpose for this field is to prevent
 the browser from warning the user if the underlying page was accessed over SSL, but requesting to show an unsecure image.';
 $string['secure_launch_url'] = 'Secure launch URL';
-<<<<<<< HEAD
-$string['secure_launch_url_help'] = 'Similar to Launch URL, but used instead of the launch url if high security is required. Totara will use the
+$string['secure_launch_url_help'] = 'Similar to the Launch URL, but used instead of the launch url if high security is required. Totara will use the
 secure launch URL instead of the launch URL if the Totara site is accessed through SSL, or if the tool configuration
 is set to always launch through SSL.
-=======
-$string['secure_launch_url_help'] = 'Similar to the launch URL, but used instead of the launch URL if high security is required. Moodle will use the secure launch URL instead of the launch URL if the Moodle site is accessed through SSL, or if the tool configuration is set to always launch through SSL.
->>>>>>> c83ca030d03... TL-9563 / MDL-55002 lang: Merge English strings from the en_fix language pack
 
 The launch URL may also be set to an https address to force launching through SSL, and this field may be left blank.';
 $string['send'] = 'Send';

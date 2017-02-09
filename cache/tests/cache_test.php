@@ -1788,7 +1788,6 @@ class core_cache_testcase extends advanced_testcase {
     }
 
     /**
-<<<<<<< HEAD
      * Totara test!
      *
      * This test covers the situation where the site is sharing the config and dbmeta cache with sites of the same allversionshash.

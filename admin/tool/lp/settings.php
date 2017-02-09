@@ -25,7 +25,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$parentname = 'competencies';
+$parentname = 'moodlecompetencies';
 
 // If the plugin is enabled we add the pages.
 if (get_config('core_competency', 'enabled')) {
