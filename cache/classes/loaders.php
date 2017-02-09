@@ -310,9 +310,6 @@ class cache implements cache_loader {
                     $result = $result->data;
                 }
             }
-            if ($result instanceof cache_cached_object) {
-                $result = $result->restore_object();
-            }
             if ($usesstaticacceleration) {
                 $this->static_acceleration_set($key, $result);
             }
