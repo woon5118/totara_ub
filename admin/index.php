@@ -32,6 +32,12 @@ if (!file_exists('../config.php')) {
 // Make sure we have everything necessary for standard libraries.
 require(__DIR__ . '/../lib/environmentmincheck.php');
 
+// Make sure xml extension is available.
+if (!extension_loaded('xml')) {
+    echo 'Moodle requires the xml PHP extension. Please install or enable the xml extension.';
+    die();
+}
+
 define('NO_OUTPUT_BUFFERING', true);
 
 if (isset($_POST['upgradekey'])) {
