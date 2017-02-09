@@ -2172,11 +2172,9 @@ class mod_assign_external extends external_api {
      * @since Moodle 2.6
      */
     public static function copy_previous_attempt($assignmentid) {
-        global $CFG, $USER;
-        require_once("$CFG->dirroot/mod/assign/locallib.php");
 
         $params = self::validate_parameters(self::copy_previous_attempt_parameters(),
-                                            array('assignmentid' => $assignmentid));
+            array('assignmentid' => $assignmentid));
 
         $cm = get_coursemodule_from_instance('assign', $params['assignmentid'], 0, false, MUST_EXIST);
         $context = context_module::instance($cm->id);
@@ -2191,8 +2189,8 @@ class mod_assign_external extends external_api {
         $warnings = array();
         foreach ($notices as $notice) {
             $warnings[] = self::generate_warning($assignmentid,
-                                                 'couldnotcopyprevioussubmission',
-                                                 $notice);
+                'couldnotcopyprevioussubmission',
+                $notice);
         }
 
         return $warnings;
