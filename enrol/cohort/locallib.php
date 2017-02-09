@@ -54,9 +54,11 @@ class enrol_cohort_handler {
         $sql = "SELECT e.*, r.id as roleexists
                   FROM {enrol} e
              LEFT JOIN {role} r ON (r.id = e.roleid)
-                 WHERE e.customint1 = :cohortid AND e.enrol = 'cohort'
+                 WHERE e.customint1 = :cohortid AND e.enrol = 'cohort' AND e.status = :enrolstatus
               ORDER BY e.id ASC";
-        if (!$instances = $DB->get_records_sql($sql, array('cohortid'=>$event->objectid))) {
+        $params['cohortid'] = $event->objectid;
+        $params['enrolstatus'] = ENROL_INSTANCE_ENABLED;
+        if (!$instances = $DB->get_records_sql($sql, $params)) {
             return true;
         }
 
