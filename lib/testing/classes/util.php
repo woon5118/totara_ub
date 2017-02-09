@@ -959,6 +959,9 @@ abstract class testing_util {
         if (file_exists($tablesupdatedfile)) {
             unlink($tablesupdatedfile);
         }
+
+        // Reset static cache of cli process.
+        self::reset_updated_table_list();
     }
 
     /**
