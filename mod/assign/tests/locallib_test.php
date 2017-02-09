@@ -797,7 +797,7 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
 
         // This is to make sure the grade happens after the submission because
         // we have no control over the timemodified values.
-        sleep(1);
+        $this->waitForSecond();
         // Grade the submission.
         $this->setUser($this->teachers[0]);
 
