@@ -139,6 +139,11 @@ abstract class moodle_database {
     protected $replacetextuniqueindex = 1; // guarantees unique parameters in each request
 
     /**
+     * @var boolean variable use to temporarily disable logging.
+     */
+    protected $skiplogging = false;
+
+    /**
      * Constructor - Instantiates the database, specifying if it's external (connect to other systems) or not (Moodle DB).
      *              Note that this affects the decision of whether prefix checks must be performed or not.
      * @param bool $external True means that an external database is used.
@@ -489,6 +494,11 @@ abstract class moodle_database {
      * @return void
      */
     public function query_log($error=false) {
+        // Logging disabled by the driver.
+        if ($this->skiplogging) {
+            return;
+        }
+
         $logall    = !empty($this->dboptions['logall']);
         $logslow   = !empty($this->dboptions['logslow']) ? $this->dboptions['logslow'] : false;
         $logerrors = !empty($this->dboptions['logerrors']);
@@ -525,6 +535,20 @@ abstract class moodle_database {
             }
             $this->loggingquery = false;
         }
+    }
+
+    /**
+     * Disable logging temporarily.
+     */
+    protected function query_log_prevent() {
+        $this->skiplogging = true;
+    }
+
+    /**
+     * Restore old logging behavior.
+     */
+    protected function query_log_allow() {
+        $this->skiplogging = false;
     }
 
     /**
