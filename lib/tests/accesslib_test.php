@@ -1485,7 +1485,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertCount(1, $users);
         $this->assertArrayHasKey($user3->id, $users);
 
-        $users = get_role_users(array($noeditteacherrole->id, $studentrole->id), $coursecontext, false, 'u.id, u.username, ra.roleid', 'r.sortorder ASC');
+        $users = get_role_users(array($noeditteacherrole->id, $studentrole->id), $coursecontext, false, 'u.id, u.username, r.sortorder, ra.roleid', 'r.sortorder ASC');
         $this->assertDebuggingNotCalled();
         $this->assertCount(1, $users);
         $this->assertArrayHasKey($user4->id, $users);
@@ -1493,7 +1493,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertEquals($studentrole->id, $user->roleid);
         $this->assertEquals($user4->id, $user->id);
 
-        $users = get_role_users(array($noeditteacherrole->id, $studentrole->id), $coursecontext, false, 'u.id, u.username, ra.roleid', 'r.sortorder DESC');
+        $users = get_role_users(array($noeditteacherrole->id, $studentrole->id), $coursecontext, false, 'u.id, u.username, r.sortorder, ra.roleid', 'r.sortorder DESC');
         $this->assertDebuggingNotCalled();
         $this->assertCount(1, $users);
         $this->assertArrayHasKey($user4->id, $users);
