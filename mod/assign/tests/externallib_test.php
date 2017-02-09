@@ -1799,7 +1799,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
 
         $data = new stdClass();
         $data->onlinetext_editor = array('itemid' => file_get_unused_draft_itemid(),
-                                         'text' => 'Submission text',
+                                         'text' => 'Submission text with a <a href="@@PLUGINFILE@@/intro.txt">link</a>',
                                          'format' => FORMAT_MOODLE);
 
         $draftidfile = file_get_unused_draft_itemid();
@@ -1839,6 +1839,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
         $this->resetAfterTest(true);
 
         list($assign, $instance, $student1, $student2, $teacher) = $this->create_submission_for_testing_status();
+        $studentsubmission = $assign->get_user_submission($student1->id, true);
 
         $result = mod_assign_external::get_submission_status($assign->get_instance()->id);
         // We expect debugging because of the $PAGE object, this won't happen in a normal WS request.
@@ -1868,8 +1869,22 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
         $this->assertEquals(0, $result['lastattempt']['submission']['groupid']);
         $this->assertEquals($assign->get_instance()->id, $result['lastattempt']['submission']['assignment']);
         $this->assertEquals(1, $result['lastattempt']['submission']['latest']);
-        $this->assertEquals('Submission text', $result['lastattempt']['submission']['plugins'][0]['editorfields'][0]['text']);
-        $this->assertEquals('/t.txt', $result['lastattempt']['submission']['plugins'][1]['fileareas'][0]['files'][0]['filepath']);
+
+        // Map plugins based on their type - we can't rely on them being in a
+        // particular order, especially if 3rd party plugins are installed.
+        $submissionplugins = array();
+        foreach ($result['lastattempt']['submission']['plugins'] as $plugin) {
+            $submissionplugins[$plugin['type']] = $plugin;
+        }
+
+        // Format expected online text.
+        $onlinetext = 'Submission text with a <a href="@@PLUGINFILE@@/intro.txt">link</a>';
+        list($expectedtext, $expectedformat) = external_format_text($onlinetext, FORMAT_HTML, $assign->get_context()->id,
+                'assignsubmission_onlinetext', ASSIGNSUBMISSION_ONLINETEXT_FILEAREA, $studentsubmission->id);
+
+        $this->assertEquals($expectedtext, $submissionplugins['onlinetext']['editorfields'][0]['text']);
+        $this->assertEquals($expectedformat, $submissionplugins['onlinetext']['editorfields'][0]['format']);
+        $this->assertEquals('/t.txt', $submissionplugins['file']['fileareas'][0]['files'][0]['filepath']);
     }
 
     /**
@@ -1939,6 +1954,7 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
         $this->resetAfterTest(true);
 
         list($assign, $instance, $student1, $student2, $teacher) = $this->create_submission_for_testing_status(true);
+        $studentsubmission = $assign->get_user_submission($student1->id, true);
 
         $this->setUser($teacher);
         // Grade and reopen.
@@ -1997,10 +2013,28 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
         $this->assertEquals(50, $result['previousattempts'][0]['grade']['grade']);
         $this->assertEquals($teacher->id, $result['previousattempts'][0]['grade']['grader']);
         $this->assertEquals($student1->id, $result['previousattempts'][0]['grade']['userid']);
-        $this->assertEquals('Yeeha!', $result['previousattempts'][0]['feedbackplugins'][0]['editorfields'][0]['text']);
-        $submissionplugins = $result['previousattempts'][0]['submission']['plugins'];
-        $this->assertEquals('Submission text', $submissionplugins[0]['editorfields'][0]['text']);
-        $this->assertEquals('/t.txt', $submissionplugins[1]['fileareas'][0]['files'][0]['filepath']);
+
+        // Map plugins based on their type - we can't rely on them being in a
+        // particular order, especially if 3rd party plugins are installed.
+        $feedbackplugins = array();
+        foreach ($result['previousattempts'][0]['feedbackplugins'] as $plugin) {
+            $feedbackplugins[$plugin['type']] = $plugin;
+        }
+        $this->assertEquals('Yeeha!', $feedbackplugins['comments']['editorfields'][0]['text']);
+
+        $submissionplugins = array();
+        foreach ($result['previousattempts'][0]['submission']['plugins'] as $plugin) {
+            $submissionplugins[$plugin['type']] = $plugin;
+        }
+
+        // Format expected online text.
+        $onlinetext = 'Submission text with a <a href="@@PLUGINFILE@@/intro.txt">link</a>';
+        list($expectedtext, $expectedformat) = external_format_text($onlinetext, FORMAT_HTML, $assign->get_context()->id,
+                'assignsubmission_onlinetext', ASSIGNSUBMISSION_ONLINETEXT_FILEAREA, $studentsubmission->id);
+
+        $this->assertEquals($expectedtext, $submissionplugins['onlinetext']['editorfields'][0]['text']);
+        $this->assertEquals($expectedformat, $submissionplugins['onlinetext']['editorfields'][0]['format']);
+        $this->assertEquals('/t.txt', $submissionplugins['file']['fileareas'][0]['files'][0]['filepath']);
     }
 
     /**
