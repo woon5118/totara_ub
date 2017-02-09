@@ -1723,6 +1723,12 @@ function set_coursemodule_name($id, $name) {
     $grademodule->modname = $cm->modname;
     grade_update_mod_grades($grademodule);
 
+    // Update calendar events with the new name.
+    $refresheventsfunction = $cm->modname . '_refresh_events';
+    if (function_exists($refresheventsfunction)) {
+        call_user_func($refresheventsfunction, $cm->course);
+    }
+
     return true;
 }
 
