@@ -266,6 +266,28 @@ class rb_source_course_completion extends rb_base_source {
             ),
             new rb_column_option(
                 'course_completion',
+                'timecompletedsincestart',
+                get_string('timetocompletesincestart', 'rb_source_course_completion'),
+                "CASE WHEN base.timecompleted IS NULL OR base.timecompleted = 0 THEN null
+                      ELSE base.timecompleted - base.timestarted END",
+                array(
+                    'displayfunc' => 'duration',
+                    'dbdatatype' => 'integer'
+                )
+            ),
+            new rb_column_option(
+                'course_completion',
+                'timecompletedsinceenrol',
+                get_string('timetocompletesinceenrol', 'rb_source_course_completion'),
+                "CASE WHEN base.timecompleted IS NULL OR base.timecompleted = 0 THEN null
+                      ELSE base.timecompleted - base.timeenrolled END",
+                array(
+                    'displayfunc' => 'duration',
+                    'dbdatatype' => 'integer'
+                )
+            ),
+            new rb_column_option(
+                'course_completion',
                 'organisationid',
                 get_string('completionorgid', 'rb_source_course_completion'),
                 'base.organisationid'
