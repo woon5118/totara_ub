@@ -36,7 +36,7 @@ class core_component_testcase extends advanced_testcase {
      * this is defined here to annoy devs that try to add more without any thinking,
      * always verify that it does not collide with any existing add-on modules and subplugins!!!
      */
-    const SUBSYSTEMCOUNT = 65;
+    const SUBSYSTEMCOUNT = 66;
 
     public function test_get_core_subsystems() {
         global $CFG;
@@ -456,6 +456,97 @@ class core_component_testcase extends advanced_testcase {
     }
 
     public function test_get_component_classes_int_namespace() {
+
+        // Totara, do some actual real testing! Just a little, its deprecated!
+
+        // Test a component that does not exist.
+        $result = core_component::get_component_classes_in_namespace('wellington', 'stupid');
+        $this->assertDebuggingCalled();
+        $this->resetDebugging();
+        $this->assertInternalType('array', $result);
+        $this->assertCount(0, $result);
+
+        // Test a plugin that does not exist.
+        $result = core_component::get_component_classes_in_namespace('blackboard_core', 'stupid');
+        $this->assertDebuggingCalled();
+        $this->resetDebugging();
+        $this->assertInternalType('array', $result);
+        $this->assertCount(0, $result);
+
+        // Test a namespace that does not exist.
+        $result = core_component::get_component_classes_in_namespace('totara_core', 'stupid');
+        $this->assertDebuggingCalled();
+        $this->resetDebugging();
+        $this->assertInternalType('array', $result);
+        $this->assertCount(0, $result);
+
+        // Test a complex namespace that does not exist.
+        $result = core_component::get_component_classes_in_namespace('totara_core', 'stupid\monkey');
+        $this->assertDebuggingCalled();
+        $this->resetDebugging();
+        $this->assertInternalType('array', $result);
+        $this->assertCount(0, $result);
+        $result = core_component::get_component_classes_in_namespace('totara_core', '\stupid\monkey');
+        $this->assertDebuggingCalled();
+        $this->resetDebugging();
+        $this->assertInternalType('array', $result);
+        $this->assertCount(0, $result);
+        $result = core_component::get_component_classes_in_namespace('totara_core', 'stupid\monkey\\');
+        $this->assertDebuggingCalled();
+        $this->resetDebugging();
+        $this->assertInternalType('array', $result);
+        $this->assertCount(0, $result);
+        $result = core_component::get_component_classes_in_namespace('totara_core', '\stupid\monkey\\');
+        $this->assertDebuggingCalled();
+        $this->resetDebugging();
+        $this->assertInternalType('array', $result);
+        $this->assertCount(0, $result);
+
+        // Test an invalid component.
+        $result = core_component::get_component_classes_in_namespace('_', 'stupid');
+        $this->assertDebuggingCalled();
+        $this->resetDebugging();
+        $this->assertInternalType('array', $result);
+        $this->assertCount(0, $result);
+
+        // Test an invalid namespace.
+        $result = core_component::get_component_classes_in_namespace('core', '-');
+        $this->assertDebuggingCalled();
+        $this->resetDebugging();
+        $this->assertInternalType('array', $result);
+        $this->assertCount(0, $result);
+
+        // Test it can find rb_display classes within totara_reportbuilder.
+        $displayclasses = core_component::get_component_classes_in_namespace('totara_reportbuilder', 'rb\display');
+        $this->assertDebuggingCalled();
+        $this->resetDebugging();
+        $this->assertInternalType('array', $displayclasses);
+        $this->assertGreaterThan(26, $displayclasses);
+        foreach ($displayclasses as $displayclass => $classpaths) {
+            $this->assertContains('totara_reportbuilder\rb\display\\', $displayclass);
+            $this->assertCount(1, $classpaths);
+            $this->assertSame('totara_reportbuilder\rb\display\\', reset($classpaths));
+        }
+        $this->assertArrayHasKey('totara_reportbuilder\rb\display\base', $displayclasses);
+
+        // This directory only contains one class, the others are interfaces in the namespace.
+        $classes = core_component::get_component_classes_in_namespace('core', 'log');
+        $this->assertDebuggingCalled();
+        $this->resetDebugging();
+        $this->assertCount(1, $classes);
+        foreach ($classes as $classname => $classpaths) {
+            $this->assertSame('core\log\dummy_manager', $classname);
+        }
+
+        // HORRIBLE CODE WARNING.
+        // Ever time Moodle adds a class in one of these plugins they are going to get a conflict.
+        // Worth noting this also doesn't test anything more than one number equals another, really they should
+        // be testing that the returned plugins are the ones they expect, rather than this half-arsed testing.
+        // Importantly the function itself has several issues, including exploits, and as such
+        // was immediately deprecated in favour of core_component::get_namespace_classes.
+        // We return immediately so that we don't hit continuous conflicts here.
+        // There
+        return;
 
         // Unexisting.
         $this->assertCount(0, core_component::get_component_classes_in_namespace('core_unexistingcomponent', 'something'));

@@ -1016,6 +1016,15 @@ $cache = '.var_export($cache, true).';
      */
     public static function get_component_classes_in_namespace($component, $namespace = '') {
 
+        // debugging('get_component_classes_in_namespace has been deprecated, please call core_component::get_namespace_classes instead.', DEBUG_DEVELOPER);
+        // Totara: To convert you would do this:
+        //
+        //     \core_component::get_component_classes_in_namespace('core_course', 'search');
+        //            =
+        //     \core_component::get_namespace_classes('search', null, 'core_course');
+        //
+        // Please note that the return formats are different.
+
         $component = self::normalize_componentname($component);
 
         if ($namespace) {
