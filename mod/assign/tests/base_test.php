@@ -88,6 +88,8 @@ class mod_assign_base_testcase extends advanced_testcase {
     protected function setUp() {
         global $DB;
 
+        set_config('enablecompletion', 1);
+
         $this->resetAfterTest(true);
 
         $this->course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
