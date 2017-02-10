@@ -119,7 +119,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $tag_data = array(
-        'id' => 1, 'userid' => 2, 'name' => 'Tag', 'tagtype' => 'official',
+        'id' => 1, 'userid' => 2, 'name' => 'Tag', 'isstandard' => '1',
     );
 
     protected $grade_items_data = array(

@@ -505,12 +505,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         \totara_job\job_assignment::create_default($user->id, array('organisationid' => 1, 'positionid' => 1));
 
-        $tag = new stdClass();
-        $tag->userid = $user->id;
-        $tag->name = 'test';
-        $tag->rawname = 'test';
-        $tag->tagtype = 'official';
-        $tag->id = $DB->insert_record('tag', $tag);
+        core_tag_tag::create_if_missing(core_tag_collection::get_default(), ['test'], true);
 
         $this->shortname = 'plan_competencies';
 

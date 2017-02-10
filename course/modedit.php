@@ -242,7 +242,7 @@ if (!empty($add)) {
 
     if ($usetags) {
         // Retrieve module's official tags
-        $data->tags = tag_get_tags_array($module->name, $cm->instance);
+        $data->tags = core_tag_tag::get_item_tags_array('core', 'course_modules', $cm->id);
     }
 
 } else {
@@ -294,7 +294,13 @@ if ($mform->is_cancelled()) {
 
     if ($usetags) {
         // Populate module tags.
-        tag_set($fromform->modulename, $fromform->instance, $fromform->tags, "mod_{$fromform->modulename}", context_module::instance($fromform->coursemodule)->id);
+        core_tag_tag::set_item_tags(
+            "mod_{$fromform->modulename}",
+            $fromform->modulename,
+            $fromform->instance,
+            context_module::instance($fromform->coursemodule),
+            $fromform->tags
+        );
     }
 
     if (isset($fromform->submitbutton)) {

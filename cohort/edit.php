@@ -48,7 +48,7 @@ $category = null;
 if ($id) {
     $cohort = $DB->get_record('cohort', array('id'=>$id), '*', MUST_EXIST);
     if ($usetags) {
-        $cohort->tags = tag_get_tags_array('cohort', $cohort->id);
+        $cohort->tags = core_tag_tag::get_item_tags_array('core', 'cohort', $cohort->id);
     }
 
     $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
@@ -175,7 +175,7 @@ if ($editform->is_cancelled()) {
         // Totara: handle tags and go to view page after update.
         if ($usetags) {
             if (isset($data->tags)) {
-                tag_set('cohort', $cohort->id, $data->tags, 'core', $data->contextid);
+                core_tag_tag::set_item_tags('core', 'cohort', $cohort->id, $context, $data->tags);
             }
         }
         $url = new moodle_url('/cohort/view.php', array('id' => $data->id));
@@ -195,7 +195,7 @@ if ($editform->is_cancelled()) {
         // Totara: handle tags and go to relevant page after insert.
         if ($usetags) {
             if (isset($data->tags)) {
-                tag_set('cohort', $data->id, $data->tags, 'core', $context->id);
+                core_tag_tag::set_item_tags('core', 'cohort', $data->id, $context, $data->tags);
             }
         }
         if ($data->cohorttype == cohort::TYPE_STATIC && has_capability('moodle/cohort:assign', $context)) {
@@ -209,7 +209,7 @@ if ($editform->is_cancelled()) {
     }
     if ($usetags) {
         if (isset($data->tags)) {
-            tag_set('cohort', $cohort->id, $data->tags, 'core', $data->contextid);
+            core_tag_tag::set_item_tags('core', 'cohort', $cohort->id, $context, $data->tags);
         }
     }
 

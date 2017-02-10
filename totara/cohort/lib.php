@@ -1182,9 +1182,10 @@ function totara_cohort_clone_cohort($oldcohortid) {
 
     // Copy tags
     require_once($CFG->dirroot . '/tag/lib.php');
-    $tags = tag_get_tags_array('cohort', $oldcohortid, 'official');
+    $tags = core_tag_tag::get_item_tags_array('core', 'cohort', $oldcohortid, core_tag_tag::STANDARD_ONLY);
     if (!empty($tags)) {
-        tag_set('cohort', $newcohort->id, $tags);
+        $context = context::instance_by_id($newcohort->contextid);
+        core_tag_tag::set_item_tags('core', 'cohort', $newcohort->id, $context, $tags);
     }
 
     // Copy the learning items

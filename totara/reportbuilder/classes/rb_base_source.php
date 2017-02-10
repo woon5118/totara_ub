@@ -1929,7 +1929,7 @@ abstract class rb_base_source {
     function rb_filter_tags_list() {
         global $DB, $OUTPUT, $CFG;
 
-        return $DB->get_records_menu('tag', array('tagtype' => 'official'), 'name', 'id, name');
+        return $DB->get_records_menu('tag', array('isstandard' => 1), 'name', 'id, name');
     }
 
     function rb_filter_organisations_list($report) {
@@ -5279,7 +5279,7 @@ abstract class rb_base_source {
                 LEFT JOIN {tag_instance} ti
                     ON til.id = ti.itemid AND ti.itemtype = '{$type}'
                 LEFT JOIN {tag} t
-                    ON ti.tagid = t.id AND t.tagtype = 'official'
+                    ON ti.tagid = t.id AND t.isstandard = '1'
                 GROUP BY til.id)",
             "tagids.tilid = {$join}.{$field}",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
@@ -5296,7 +5296,7 @@ abstract class rb_base_source {
                 LEFT JOIN {tag_instance} ti
                     ON tnl.id = ti.itemid AND ti.itemtype = '{$type}'
                 LEFT JOIN {tag} t
-                    ON ti.tagid = t.id AND t.tagtype = 'official'
+                    ON ti.tagid = t.id AND t.isstandard = '1'
                 GROUP BY tnl.id)",
             "tagnames.tnlid = {$join}.{$field}",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
@@ -5304,7 +5304,7 @@ abstract class rb_base_source {
         );
 
         // create a join for each official tag
-        $tags = $DB->get_records('tag', array('tagtype' => 'official'));
+        $tags = $DB->get_records('tag', array('isstandard' => '1'));
         foreach ($tags as $tag) {
             $tagid = $tag->id;
             $name = "{$type}_tag_$tagid";
@@ -5356,7 +5356,7 @@ abstract class rb_base_source {
         );
 
         // create a on/off field for every official tag
-        $tags = $DB->get_records('tag', array('tagtype' => 'official'));
+        $tags = $DB->get_records('tag', array('isstandard' => '1'));
         foreach ($tags as $tag) {
             $tagid = $tag->id;
             $name = $tag->name;
@@ -5389,7 +5389,7 @@ abstract class rb_base_source {
         global $DB;
 
         // create a yes/no filter for every official tag
-        $tags = $DB->get_records('tag', array('tagtype' => 'official'));
+        $tags = $DB->get_records('tag', array('isstandard' => 1));
         foreach ($tags as $tag) {
             $tagid = $tag->id;
             $name = $tag->name;
@@ -5420,7 +5420,7 @@ abstract class rb_base_source {
                                                       "LEFT JOIN {tag_instance} ti ON base.id = ti.itemid " .
                                                             "AND ti.itemtype = '{$type}'" .
                                                       "LEFT JOIN {tag} tag ON ti.tagid = tag.id " .
-                                                            "AND tag.tagtype = 'official')\n {$type}_tagids_filter " .
+                                                            "AND tag.isstandard = '1')\n {$type}_tagids_filter " .
                                                 "ON base.id = {$type}_tagids_filter.itemid"),
                         'dataalias' => $type.'_tagids_filter',
                         'datafield' => 'tagid')

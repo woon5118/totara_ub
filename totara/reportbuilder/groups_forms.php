@@ -62,7 +62,7 @@ class report_builder_new_group_form extends moodleform {
         $mform->addElement('header', 'general', get_string('newgroup', 'totara_reportbuilder'));
 
         // get all official tags
-        $tags = $DB->get_records_menu('tag', array('tagtype' => 'official'), 'id', 'id, name');
+        $tags = $DB->get_records_menu('tag', array('isstandard' => 1), 'id', 'id, name');
         if (!$tags) {
             $mform->addElement('html', html_writer::tag('p', get_string('notags', 'totara_reportbuilder')));
             return;

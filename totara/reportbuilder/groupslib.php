@@ -48,7 +48,7 @@ function update_tag_grouping($groupid) {
         return false;
     }
 
-    $tag = $DB->get_record('tag', array('id' => $tagid, 'tagtype' => 'official'));
+    $tag = $DB->get_record('tag', array('id' => $tagid, 'isstandard' => 1));
     if (empty($tag)) {
         // no such official tag exists
         return false;

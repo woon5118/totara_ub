@@ -1050,7 +1050,7 @@ class rb_tag_content extends rb_base_content {
             $settings['exclude_logic'] == 0) ? ' OR ' : ' AND ';
 
         // loop through current official tags
-        $tags = $DB->get_records('tag', array('tagtype' => 'official'), 'name');
+        $tags = $DB->get_records('tag', array('isstandard' => 1), 'name');
         $params = array();
         $count = 1;
         foreach ($tags as $tag) {
@@ -1151,7 +1151,7 @@ class rb_tag_content extends rb_base_content {
         $exclude_logic = (isset($settings['exclude_logic']) &&
             $settings['exclude_logic'] == 0) ? 'and' : 'or';
 
-        $tags = $DB->get_records('tag', array('tagtype' => 'official'), 'name');
+        $tags = $DB->get_records('tag', array('isstandard' => 1), 'name');
         foreach ($tags as $tag) {
             if (in_array($tag->id, $itags)) {
                 $include_text[] = '"' . $tag->name . '"';
@@ -1220,7 +1220,7 @@ class rb_tag_content extends rb_base_content {
         $mform->addElement('html', html_writer::empty_tag('br'));
 
         // include the following tags
-        $tags = $DB->get_records('tag', array('tagtype' => 'official'), 'name');
+        $tags = $DB->get_records('tag', array('isstandard' => 1), 'name');
         if (!empty($tags)) {
             $checkgroup = array();
             $opts = array(1 => get_string('anyofthefollowing', 'totara_reportbuilder'),
@@ -1305,7 +1305,7 @@ class rb_tag_content extends rb_base_content {
             'exclude_logic', $excludelogic);
 
         // tag settings
-        $tags = $DB->get_records('tag', array('tagtype' => 'official'));
+        $tags = $DB->get_records('tag', array('isstandard' => 1));
         if (!empty($tags)) {
             $activeincludes = array();
             $activeexcludes = array();

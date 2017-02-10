@@ -140,7 +140,7 @@
             LEFT JOIN (
                 SELECT id, name
                 FROM {tag}
-                WHERE tagtype = ?
+                WHERE isstandard = ?
             ) tag ON g.assigntype = ? AND g.assignvalue = tag.id
             LEFT JOIN (
                 SELECT $substr_sql as groupid,
@@ -149,7 +149,7 @@
                 WHERE $likesql
                 GROUP BY $substr_sql
             ) reports ON " . $DB->sql_cast_char2int('reports.groupid') . " = g.id ORDER BY g.name";
-        $params = array($feedbackmoduleid, 'official', 'tag', $likeparam);
+        $params = array($feedbackmoduleid, '1', 'tag', $likeparam);
         $groups = $DB->get_records_sql($sql, $params);
     } else {
         $groups = false;

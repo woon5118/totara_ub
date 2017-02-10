@@ -199,9 +199,14 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
         // Enable and create tags
         $CFG->usetags = true;
         set_config('coursetagging', 1, 'moodlecourse');
-        $itags = tag_add(array('taga', 'tagb', 'tagc'), 'official');
-        $tags = array_flip($itags);
 
+        $objects = core_tag_tag::create_if_missing(core_tag_collection::get_default(), ['taga', 'tagb', 'tagc'], true);
+        $tags = [];
+        foreach ($objects as $name => $tagobject) {
+            if (isset($tagobject->id)) {
+                $tags[$tagobject->id] = $tagobject->name;
+            }
+        }
         // Add tags for courses
         $taga = array_slice($tags, 0, 1, true);
         $tagab = array_slice($tags, 0, 2, true);
@@ -281,8 +286,15 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
         // Enable and create tags
         $CFG->usetags = true;
         set_config('coursetagging', 1, 'moodlecourse');
-        $itags = tag_add(array('taga', 'tagb', 'tagc'), 'official');
-        $tags = array_flip($itags);
+
+
+        $objects = core_tag_tag::create_if_missing(core_tag_collection::get_default(), ['taga', 'tagb', 'tagc'], true);
+        $tags = [];
+        foreach ($objects as $name => $tagobject) {
+            if (isset($tagobject->id)) {
+                $tags[$tagobject->id] = $tagobject->name;
+            }
+        }
         $this->add_tags_info($thatcourse->id, $tags);
 
         // Add two mods
@@ -351,7 +363,7 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
      * @param array $tags
      */
     protected function add_tags_info($courseid, $tags) {
-       tag_set('course', $courseid, $tags, 'course', context_course::instance($courseid)->id);
+        core_tag_tag::set_item_tags('core', 'course', $courseid, context_course::instance($courseid), $tags);
     }
 
     /**
