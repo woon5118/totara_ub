@@ -2684,12 +2684,12 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
         // switch next two lines for ol li containers for form items.
         //        $this->_elementTemplates=array('default'=>"\n\t\t".'<li class="fitem"><label>{label}{help}<!-- BEGIN required -->{req}<!-- END required --></label><div class="qfelement<!-- BEGIN error --> error<!-- END error --> {type}"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div></li>');
         $this->_elementTemplates = array(
-        'default'=>"\n\t\t".'<div id="{id}" class="fitem {advanced}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel} {class}" {aria-live}><div class="fitemtitle"><label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>{help}</div><div class="felement {type}<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',
+        'default'=>"\n\t\t".'<div id="{id}" class="fitem {advanced}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel} {class}" {aria-live}><div class="fitemtitle">{labeltemplate}{help}</div><div class="felement {type}<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',
+        'labeltemplate' => '<label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>',
 
         'actionbuttons'=>"\n\t\t".'<div id="{id}" class="fitem fitem_actionbuttons fitem_{type} {class}"><div class="felement {type}">{element}</div></div>',
 
-        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {class}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}"><div class="fitemtitle"><div class="fgrouplabel"><label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>{help}</div></div><fieldset class="felement {type}<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</fieldset></div>',
-        'legendtemplate' => '<legend><span class="legend">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</span></legend>',
+        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {class}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}"><div class="fitemtitle"><div class="fgrouplabel">{labeltemplate}{help}</div></div><fieldset class="felement {type}<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</fieldset></div>',
 
         'static'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {emptylabel} {class}"><div class="fitemtitle"><div class="fstaticlabel">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</div></div><div class="felement fstatic <!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',
 
@@ -2793,13 +2793,11 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
             $html = $this->_elementTemplates['default'];
 
         }
-
         if ($group->getLabel() != '') {
-            $html = str_replace('{legendtemplate}', $this->_elementTemplates['legendtemplate'], $html);
+            $html = str_replace('{labeltemplate}', $this->_elementTemplates['labeltemplate'], $html);
         } else {
-            $html = str_replace('{legendtemplate}', '', $html);
+            $html = str_replace('{labeltemplate}', '', $html);
         }
-
         if (isset($this->_advancedElements[$group->getName()])){
             $html =str_replace(' {advanced}', ' advanced', $html);
             $html =str_replace('{advancedimg}', $this->_advancedHTML, $html);
@@ -2814,9 +2812,6 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
         }
         $html = str_replace('{id}', $group->getAttribute('id'), $html);
         $html =str_replace('{name}', $group->getName(), $html);
-        if ($cssclass = $group->getAttribute('class')) {
-            $html = str_replace('{type}', '{type} ' . $cssclass, $html);
-        }
         $html =str_replace('{type}', 'fgroup', $html);
         $html =str_replace('{class}', $group->getAttribute('class'), $html);
         $emptylabel = '';
@@ -2862,12 +2857,9 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
         }
 
         if ($element->getLabel() != '') {
-            $labeltemplate = '<label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>';
             $html = str_replace('{labeltemplate}', $this->_elementTemplates['labeltemplate'], $html);
-            $html = str_replace('{legendtemplate}', $this->_elementTemplates['legendtemplate'], $html);
         } else {
             $html = str_replace('{labeltemplate}', '', $html);
-            $html = str_replace('{legendtemplate}', '', $html);
         }
 
         if (isset($this->_advancedElements[$element->getName()])){

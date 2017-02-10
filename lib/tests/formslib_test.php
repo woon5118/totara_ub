@@ -348,7 +348,7 @@ class core_formslib_testcase extends advanced_testcase {
         $group->updateAttributes(array('class' => 'test'));
         $formrender->startGroup($group, false, '');
 
-        $expected = '<div id="fgroup_id_group_1" class="fitem fitem_fgroup test femptylabel"><fieldset class="fgroup test error"><div class="felement"><span class="error" tabindex="0"></span>{element}</div></fieldset></div>';
+        $expected = '<div id="fgroup_id_group_1" class="fitem test fitem_fgroup femptylabel"><div class="fitemtitle"><div class="fgrouplabel"></div></div><fieldset class="felement fgroup error"><span class="error" tabindex="0"></span><br />{element}</fieldset></div>';
         $this->assertSame($expected, trim($formrender->_groupTemplate));
     }
 
