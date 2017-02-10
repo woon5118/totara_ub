@@ -1239,18 +1239,33 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
 }
 
 /*
- * Handles change in signup status if relevant for enrolment
+ * DEPRECATED: Handles change in signup status if relevant for enrolment
+ *
+ * @deprecated since Totara 10
  * @param object $newstatus
+ * @return bool
  */
 function enrol_totara_facetoface_statushandler($newstatus) {
+
+    debugging(__FUNCTION__.' has been deprecated, it is no longer required and will be removed after Totara 11.', DEBUG_DEVELOPER);
+
     $status = enrol_totara_facetoface_enrol_on_approval($newstatus);
     $status = enrol_totara_facetoface_unenrol_on_removal($newstatus) && $status;
 
     return $status;
 }
 
+/**
+ * DEPRECATED: Handles the deletion of a module by legacy event handler.
+ *
+ * @deprecated since Totara 10
+ * @param stdClass $info
+ * @return bool
+ */
 function enrol_totara_facetoface_deletedhandler($info) {
     global $DB;
+
+    debugging(__FUNCTION__.' has been deprecated, it is no longer required and will be removed after Totara 11.', DEBUG_DEVELOPER);
 
     $status = true;
     if ($info->modulename == 'facetoface') { // Facetoface activity deleted.
