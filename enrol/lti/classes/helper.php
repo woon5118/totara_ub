@@ -263,16 +263,17 @@ class helper {
             }
 
             // Finally, enrol the user.
-            $instance = new \stdClass();
-            $instance->id = $tool->enrolid;
-            $instance->courseid = $tool->courseid;
-            $instance->enrol = 'lti';
-            $instance->status = $tool->status;
+            $ltiinstance = false;
+            foreach (enrol_get_instances($tool->courseid, true) as $instance) {
+                if ($instance->enrol === 'lti' && $instance->id == $tool->enrolid) {
+                    $ltiinstance = $instance;
+                }
+            }
             $ltienrol = enrol_get_plugin('lti');
 
             // Hack - need to do this to workaround DB caching hack. See MDL-53977.
             $timestart = intval(substr(time(), 0, 8) . '00') - 1;
-            $ltienrol->enrol_user($instance, $userid, null, $timestart, $timeend);
+            $ltienrol->enrol_user($ltiinstance, $userid, null, $timestart, $timeend);
         }
 
         return self::ENROLMENT_SUCCESSFUL;

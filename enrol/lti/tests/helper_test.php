@@ -254,7 +254,13 @@ class enrol_lti_helper_testcase extends advanced_testcase {
      * @return stdClass the tool
      */
     protected function create_tool($data = array()) {
-        global $DB;
+        global $CFG, $DB;
+
+        if (strpos($CFG->enrol_plugins_enabled, 'lti') === false) {
+            $enabled = explode(',', $CFG->enrol_plugins_enabled);
+            $enabled[] = 'lti';
+            set_config('enrol_plugins_enabled', implode(',', $enabled));
+        }
 
         $studentrole = $DB->get_record('role', array('shortname' => 'student'));
         $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
