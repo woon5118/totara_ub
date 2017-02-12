@@ -51,11 +51,11 @@ class core_webservice_external extends external_api {
                 new external_value(
                     PARAM_ALPHANUMEXT,
                     'service shortname'),
-                    'DEPRECATED PARAMETER - it was a design error in the original implementation. \
+                'DEPRECATED PARAMETER - it was a design error in the original implementation. \
                     It is ignored now. (parameter kept for backward compatibility)',
-                    VALUE_DEFAULT,
-                    array()
-                ),
+                VALUE_DEFAULT,
+                array()
+            ),
             )
         );
     }
@@ -74,7 +74,7 @@ class core_webservice_external extends external_api {
         global $USER, $SITE, $CFG, $DB, $PAGE;
 
         $params = self::validate_parameters(self::get_site_info_parameters(),
-                      array('serviceshortnames'=>$serviceshortnames));
+            array('serviceshortnames'=>$serviceshortnames));
 
         $context = context_user::instance($USER->id);
 
@@ -166,7 +166,7 @@ class core_webservice_external extends external_api {
 
         // Retrieve some advanced features. Only enable/disable ones (bool).
         $advancedfeatures = array("usecomments", "usetags", "enablenotes", "messaging", "enableblogs",
-                                    "enablecompletion", "enablebadges");
+            "enablecompletion", "enablebadges");
         foreach ($advancedfeatures as $feature) {
             if (isset($CFG->{$feature})) {
                 $siteinfo['advancedfeatures'][] = array(
@@ -227,13 +227,13 @@ class core_webservice_external extends external_api {
                         array(
                             'name' => new external_value(PARAM_RAW, 'function name'),
                             'version' => new external_value(PARAM_TEXT,
-                                        'The version number of the component to which the function belongs')
+                                'The version number of the component to which the function belongs')
                         ), 'functions that are available')
-                    ),
+                ),
                 'downloadfiles'  => new external_value(PARAM_INT, '1 if users are allowed to download files, 0 if not',
-                                                       VALUE_OPTIONAL),
+                    VALUE_OPTIONAL),
                 'uploadfiles'  => new external_value(PARAM_INT, '1 if users are allowed to upload files, 0 if not',
-                                                       VALUE_OPTIONAL),
+                    VALUE_OPTIONAL),
                 'release'  => new external_value(PARAM_TEXT, 'Moodle release number', VALUE_OPTIONAL),
                 'version'  => new external_value(PARAM_TEXT, 'Moodle version number', VALUE_OPTIONAL),
                 'mobilecssurl'  => new external_value(PARAM_URL, 'Mobile custom CSS theme', VALUE_OPTIONAL),
@@ -249,15 +249,15 @@ class core_webservice_external extends external_api {
                     VALUE_OPTIONAL
                 ),
                 'usercanmanageownfiles' => new external_value(PARAM_BOOL,
-                                            'true if the user can manage his own files', VALUE_OPTIONAL),
+                    'true if the user can manage his own files', VALUE_OPTIONAL),
                 'userquota' => new external_value(PARAM_INT,
-                                    'user quota (bytes). 0 means user can ignore the quota', VALUE_OPTIONAL),
+                    'user quota (bytes). 0 means user can ignore the quota', VALUE_OPTIONAL),
                 'usermaxuploadfilesize' => new external_value(PARAM_INT,
-                                            'user max upload file size (bytes). -1 means the user can ignore the upload file size',
-                                            VALUE_OPTIONAL),
+                    'user max upload file size (bytes). -1 means the user can ignore the upload file size',
+                    VALUE_OPTIONAL),
                 'userhomepage' => new external_value(PARAM_INT,
-                                                        'the default home page for the user: 0 for the site home, 1 for dashboard',
-                                                        VALUE_OPTIONAL)
+                    'the default home page for the user: 0 for the site home, 1 for dashboard',
+                    VALUE_OPTIONAL)
             )
         );
     }

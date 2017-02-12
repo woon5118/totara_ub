@@ -124,7 +124,7 @@ class core_webservice_externallib_testcase extends externallib_advanced_testcase
         $this->assertEquals(get_max_upload_file_size($maxbytes), $siteinfo['usermaxuploadfilesize']);
         $this->assertEquals(true, $siteinfo['usercanmanageownfiles']);
 
-        $this->assertEquals(HOMEPAGE_MY, $siteinfo['userhomepage']);
+        $this->assertEquals(HOMEPAGE_TOTARA_DASHBOARD, $siteinfo['userhomepage']);
 
         // Now as admin.
         $this->setAdminUser();

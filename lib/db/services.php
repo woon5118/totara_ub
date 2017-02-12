@@ -248,7 +248,7 @@ $functions = array(
         'description' => 'Return course details',
         'type' => 'read',
         'capabilities' => 'moodle/course:view, moodle/course:update, moodle/course:viewhiddencourses',
-        'ajax' => '1',
+        'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
     'core_course_import_course' => array(
@@ -265,7 +265,7 @@ $functions = array(
         'classpath' => 'course/externallib.php',
         'description' => 'Search courses by (name, module, block, tag)',
         'type' => 'read',
-        'ajax' => '1',
+        'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
     'core_course_update_categories' => array(
@@ -359,8 +359,8 @@ $functions = array(
         'description' => 'Return all raw strings (with {$a->xxx}), for a specific component ' .
             '- similar to core get_component_strings(), call',
         'type' => 'read',
-        'loginrequired' => '',
-        'ajax' => '1',
+        'loginrequired' => false,
+        'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
     'core_get_fragment' => array(
@@ -785,14 +785,6 @@ $functions = array(
         'ajax'        => true,
     ),
 
-    // Completion related functions.
-    'core_completion_update_activity_completion_status_manually' => array(
-        'classname'   => 'core_completion_external',
-        'methodname'  => 'update_activity_completion_status_manually',
-        'description' => 'Update completion status for the current user in an activity, only for activities with manual tracking.',
-        'type'        => 'write',
-    ),
-
     'core_user_add_user_private_files' => array(
         'classname' => 'core_user_external',
         'methodname' => 'add_user_private_files',
@@ -844,6 +836,7 @@ $functions = array(
             . 'core_user_get_users()',
         'type' => 'read',
         'capabilities' => 'moodle/user:viewdetails, moodle/user:viewhiddendetails, moodle/course:useremail, moodle/user:update',
+        'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
     'core_user_remove_user_device' => array(
@@ -1397,7 +1390,7 @@ $functions = array(
         'capabilities' => 'moodle/competency:planmanage',
         'ajax'         => true,
     ),
-     'core_competency_template_has_related_data' => array(
+    'core_competency_template_has_related_data' => array(
         'classname'    => 'core_competency\external',
         'methodname'   => 'template_has_related_data',
         'classpath'    => '',
@@ -1632,8 +1625,8 @@ $functions = array(
 );
 
 $services = array(
-   'Moodle mobile web service'  => array(
-        'functions' => array(),
+    'Moodle mobile web service'  => array(
+        'functions' => array(), // Unused as we add the service in each function definition, third party services would use this.
         'enabled' => 0,
         'restrictedusers' => 0,
         'shortname' => MOODLE_OFFICIAL_MOBILE_SERVICE,

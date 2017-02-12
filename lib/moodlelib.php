@@ -6671,7 +6671,7 @@ function get_max_upload_file_size($sitebytes=0, $coursebytes=0, $modulebytes=0, 
  * @return int The maximum size for uploading files.
  */
 function get_user_max_upload_file_size($context, $sitebytes = 0, $coursebytes = 0, $modulebytes = 0, $user = null,
-        $unused = false) {
+                                       $unused = false) {
     global $USER;
 
     if (empty($user)) {
@@ -6679,7 +6679,7 @@ function get_user_max_upload_file_size($context, $sitebytes = 0, $coursebytes = 
     }
 
     if (has_capability('moodle/course:ignorefilesizelimits', $context, $user)) {
-        return get_max_upload_file_size(USER_CAN_IGNORE_FILE_SIZE_LIMITS);
+        return USER_CAN_IGNORE_FILE_SIZE_LIMITS;
     }
 
     return get_max_upload_file_size($sitebytes, $coursebytes, $modulebytes);
