@@ -95,7 +95,7 @@ class behat_hooks extends behat_base {
      * Includes config.php to use moodle codebase with $CFG->behat_*
      * instead of $CFG->prefix and $CFG->dataroot, called once per suite.
      *
-     * @param SuiteEvent $event event before suite.
+     * @param BeforeSuiteScope $scope scope passed by event fired before suite.
      * @static
      * @throws Exception
      * @BeforeSuite
@@ -169,28 +169,28 @@ class behat_hooks extends behat_base {
     /**
      * Gives access to moodle codebase, to keep track of feature start time.
      *
-     * @param FeatureEvent $event event fired before feature.
+     * @param BeforeFeatureScope $scope scope passed by event fired before feature.
      * @BeforeFeature
      */
-    public static function before_feature(BeforeFeatureScope $event) {
+    public static function before_feature(BeforeFeatureScope $scope) {
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
             return;
         }
-        $file = $event->getFeature()->getFile();
+        $file = $scope->getFeature()->getFile();
         self::$timings[$file] = microtime(true);
     }
 
     /**
      * Gives access to moodle codebase, to keep track of feature end time.
      *
-     * @param FeatureEvent $event event fired after feature.
+     * @param AfterFeatureScope $scope scope passed by event fired after feature.
      * @AfterFeature
      */
-    public static function after_feature(AfterFeatureScope $event) {
+    public static function after_feature(AfterFeatureScope $scope) {
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
             return;
         }
-        $file = $event->getFeature()->getFile();
+        $file = $scope->getFeature()->getFile();
         self::$timings[$file] = microtime(true) - self::$timings[$file];
         // Probably didn't actually run this, don't output it.
         if (self::$timings[$file] < 1) {
@@ -201,10 +201,10 @@ class behat_hooks extends behat_base {
     /**
      * Gives access to moodle codebase, to keep track of suite timings.
      *
-     * @param SuiteEvent $event event fired after suite.
+     * @param AfterSuiteScope $scope scope passed by event fired after suite.
      * @AfterSuite
      */
-    public static function after_suite(AfterSuiteScope $event) {
+    public static function after_suite(AfterSuiteScope $scope) {
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
             return;
         }
@@ -224,19 +224,20 @@ class behat_hooks extends behat_base {
     /**
      * Resets the test environment.
      *
-     * @param OutlineExampleEvent|ScenarioEvent $event event fired before scenario.
-     * @throws coding_exception If here we are not using the test database it should be because of a coding error
      * @BeforeScenario
+     * @param BeforeScenarioScope $scope scope passed by event fired before scenario.
+     * @throws behat_stop_exception If here we are not using the test database it should be because of a coding error
      */
     public function before_scenario(BeforeScenarioScope $scope) {
         global $DB, $SESSION, $CFG;
 
         // As many checks as we can.
         if (!defined('BEHAT_TEST') ||
-               !defined('BEHAT_SITE_RUNNING') ||
-               php_sapi_name() != 'cli' ||
-               !behat_util::is_test_mode_enabled() ||
-               !behat_util::is_test_site()) {
+            !defined('BEHAT_SITE_RUNNING') ||
+            php_sapi_name() != 'cli' ||
+            !behat_util::is_test_mode_enabled() ||
+            !behat_util::is_test_site()
+        ) {
             throw new coding_exception('Behat only can modify the test database and the test dataroot!');
         }
 
@@ -278,14 +279,15 @@ class behat_hooks extends behat_base {
         } catch (CurlExec $e) {
             // Exception thrown by WebDriver, so only @javascript tests will be caugth; in
             // behat_util::check_server_status() we already checked that the server is running.
-            $this->stop_execution($driverexceptionmsg);
+            throw new Exception($driverexceptionmsg);
         } catch (DriverException $e) {
-            $this->stop_execution($driverexceptionmsg);
+            throw new Exception($driverexceptionmsg);
         } catch (UnknownError $e) {
             // Generic 'I have no idea' Selenium error. Custom exception to provide more feedback about possible solutions.
-            $this->stop_execution($e->getMessage());
+            throw new Exception($e->getMessage());
         } catch (Exception $e) {
-            $this->stop_execution($e->getMessage());
+            // Generic 'I have no idea' Selenium error. Custom exception to provide more feedback about possible solutions.
+            throw new Exception($e->getMessage());
         }
 
         // We need the Mink session to do it and we do it only before the first scenario.
@@ -334,14 +336,14 @@ class behat_hooks extends behat_base {
                 sleep(5);
                 $session->visit($this->locate_path('/'));
             } catch (Exception $e) {
-                $this->stop_execution($e->getMessage());
+                throw new Exception('Visiting of the main page failed', 0, $e);
             }
         }
 
         raise_memory_limit(MEMORY_EXTRA); // Totara includes very many files.
         // Checking that the root path is a Moodle test site.
         if (self::is_first_scenario()) {
-            $notestsiteexception = new Exception('The base URL (' . $CFG->wwwroot . ') is not a behat test site, ' .
+            $notestsiteexception = new behat_stop_exception('The base URL (' . $CFG->wwwroot . ') is not a behat test site, ' .
                 'ensure you started the built-in web server in the correct directory or your web server is correctly started and set up');
             $this->find("xpath", "//head/child::title[normalize-space(.)='" . behat_util::BEHATSITENAME . "']", $notestsiteexception);
 
@@ -375,7 +377,7 @@ class behat_hooks extends behat_base {
      *
      * @BeforeStep
      */
-    public function before_step_javascript(StepEvent $event) {
+    public function before_step_javascript(Behat\Behat\Hook\Scope\BeforeStepScope $scope) {
         // Totara: we do not know if the previous step failed or not,
         //         doing JS stuff makes no sense, do it after the step when we know the result!
     }
@@ -392,6 +394,7 @@ class behat_hooks extends behat_base {
      * default would be at framework level, which will stop the execution of
      * the run.
      *
+     * @param AfterStepScope $scope scope passed by event fired after step..
      * @AfterStep
      */
     public function after_step_javascript(AfterStepScope $scope) {
@@ -444,10 +447,10 @@ class behat_hooks extends behat_base {
      * This is needed to close all extra browser windows and starting
      * one browser window.
      *
-     * @param AfterScenarioScope $event event fired after scenario.
+     * @param AfterScenarioScope $scope scope passed by event fired after scenario.
      * @AfterScenario @_switch_window
      */
-    public function after_scenario_switchwindow(AfterScenarioScope $event) {
+    public function after_scenario_switchwindow(AfterScenarioScope $scope) {
         // Totara: let's use our own session restart tricks in the switch_to_window() step itself.
     }
 
@@ -464,7 +467,7 @@ class behat_hooks extends behat_base {
      * Take screenshot when a step fails.
      *
      * @throws Exception
-     * @param AfterStepScope $scope
+     * @param AfterStepScope $scope scope passed by event after step.
      */
     protected function take_screenshot(AfterStepScope $scope) {
         // Goutte can't save screenshots.
@@ -494,7 +497,7 @@ class behat_hooks extends behat_base {
      * Take a dump of the page content when a step fails.
      *
      * @throws Exception
-     * @param AfterStepScope $scope
+     * @param AfterStepScope $scope scope passed by event after step.
      */
     protected function take_contentdump(AfterStepScope $scope) {
         list ($dir, $filename) = $this->get_faildump_filename($scope, 'html');
@@ -517,7 +520,7 @@ class behat_hooks extends behat_base {
      *
      * This is used for content such as the DOM, and screenshots.
      *
-     * @param AfterStepScope $scope
+     * @param AfterStepScope $scope scope passed by event after step.
      * @param String $filetype The file suffix to use. Limited to 4 chars.
      */
     protected function get_faildump_filename(AfterStepScope $scope, $filetype) {
@@ -570,9 +573,9 @@ class behat_hooks extends behat_base {
      * @param string $html
      * @return string
      */
-    protected function get_debug_text($html) {
+    /*protected function get_debug_text($html) {
 
-    }
+    }*/
 
     /**
      * Returns whether the first scenario of the suite is running
@@ -582,18 +585,15 @@ class behat_hooks extends behat_base {
     protected static function is_first_scenario() {
         return !(self::$initprocessesfinished);
     }
-
-    /**
-     * Stops execution because of some exception.
-     *
-     * @param string $exception
-     * @return void
-     */
-    protected function stop_execution($exception) {
-        $text = get_string('unknownexceptioninfo', 'tool_behat');
-        echo $text . PHP_EOL . $exception . PHP_EOL;
-        exit(1);
-    }
-
 }
 
+/**
+ * Behat stop exception
+ *
+ * This exception is thrown from before suite or scenario if any setup problem found.
+ *
+ * @package    core_test
+ * @copyright  2016 Rajesh Taneja <rajesh@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class behat_stop_exception extends \Exception{}
