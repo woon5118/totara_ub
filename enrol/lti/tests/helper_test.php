@@ -80,7 +80,7 @@ class enrol_lti_helper_testcase extends advanced_testcase {
 
         // Get the user's profile picture and make sure it is correct.
         $userpicture = new user_picture($this->user1);
-        $this->assertSame($CFG->wwwroot . '/pluginfile.php/' . $usercontext->id . '/user/icon/clean/f2?rev=' .$this->user1->picture,
+        $this->assertSame($CFG->wwwroot . '/pluginfile.php/' . $usercontext->id . '/user/icon/basis/f2?rev=' .$this->user1->picture,
             $userpicture->get_url($page, $renderer)->out(false));
     }
 
