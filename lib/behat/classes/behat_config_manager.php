@@ -406,10 +406,6 @@ class behat_config_manager {
         // https://github.com/Behat/Behat/pull/628.
         $config = array(
             'default' => array(
-                // Totara: by default skip @totaraperformance.
-                'filters' => array(
-                    'tags' => '~@totaraperformance',
-                ),
                 'formatters' => array(
                     'moodle_progress' => array(
                         'output_styles' => array(
@@ -419,7 +415,11 @@ class behat_config_manager {
                 'suites' => array(
                     'default' => array(
                         'paths' => $features,
-                        'contexts' => array_keys($stepsdefinitions)
+                        'contexts' => array_keys($stepsdefinitions),
+                        // Totara: by default skip @totaraperformance.
+                        'filters' => array(
+                            'tags' => '~@totaraperformance',
+                        )
                     )
                 ),
                 'extensions' => array(
@@ -440,12 +440,6 @@ class behat_config_manager {
         if (!empty($CFG->behat_config)) {
             foreach ($CFG->behat_config as $profile => $values) {
                 $config = self::merge_config($config, self::merge_behat_config($profile, $values));
-            }
-        }
-        // Check for Moodle custom ones.
-        if (!empty($CFG->behat_profiles) && is_array($CFG->behat_profiles)) {
-            foreach ($CFG->behat_profiles as $profile => $values) {
-                $config = self::merge_config($config, self::get_behat_profile($profile, $values));
             }
         }
         // Check for Moodle custom ones.
