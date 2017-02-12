@@ -791,8 +791,9 @@ class core_message_externallib_testcase extends externallib_advanced_testcase {
         try {
             $result = core_message_external::delete_message(-1, $user1->id);
             $this->fail('Exception expected due invalid messageid.');
-        } catch (dml_missing_record_exception $e) {
-            $this->assertEquals('invalidrecord', $e->errorcode);
+        } catch (moodle_exception $e) {
+            // Totara: do not show any table hints.
+            $this->assertInstanceOf('dml_missing_record_exception', $e);
         }
 
         // Invalid user.
@@ -800,7 +801,8 @@ class core_message_externallib_testcase extends externallib_advanced_testcase {
             $result = core_message_external::delete_message($m1to2, -1, false);
             $this->fail('Exception expected due invalid user.');
         } catch (moodle_exception $e) {
-            $this->assertEquals('invaliduser', $e->errorcode);
+            // Totara: do not show any table hints.
+            $this->assertInstanceOf('dml_missing_record_exception', $e);
         }
 
         // Not active user.
