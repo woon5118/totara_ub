@@ -486,12 +486,15 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
         // A user with permissions in the category.
         $this->setUser($this->catcreator);
         $result = external::search_cohorts("Cohortsearch", $catcontext, 'parents');
-        $this->assertEquals(2, count($result['cohorts']));
+        // Totora: ignore Moodle visibility hacks TL-7124.
+        // $this->assertEquals(2, count($result['cohorts']));
+        $this->assertEquals(1, count($result['cohorts']));
         $cohorts = array();
         foreach ($result['cohorts'] as $cohort) {
             $cohorts[] = $cohort->name;
         }
-        $this->assertTrue(in_array('Cohortsearch 1', $cohorts));
+        // Totora: ignore Moodle visibility hacks TL-7124.
+        // $this->assertTrue(in_array('Cohortsearch 1', $cohorts));
         $this->assertTrue(in_array('Cohortsearch 2', $cohorts));
 
         // Check for parameter $includes = 'self'.
