@@ -116,7 +116,7 @@ try {
     $html = ob_get_contents();
     ob_end_clean();
 } catch (Exception $e) {
-    throw new coding_exception('Error: '.$e->getMessage());
+    throw $e;
 }
 
 // Check if the buffer contianed anything if it did ERROR!

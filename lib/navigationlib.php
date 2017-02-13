@@ -4374,7 +4374,7 @@ class settings_navigation extends navigation_node {
                 if ($course->id == SITEID) {
                     $url = user_mygrades_url($user->id, $course->id);
                 } else { // Otherwise we are in a course and should redirect to the user grade report (Activity report version).
-                    $url = new moodle_url('/course/user.php', array('mode' => 'grade', 'user' => $user->id));
+                    $url = new moodle_url('/course/user.php', array('mode' => 'grade', 'id' => $course->id, 'user' => $user->id));
                 }
                 $dashboard->add(get_string('grades', 'grades'), $url, self::TYPE_SETTING, null, 'mygrades');
             }
