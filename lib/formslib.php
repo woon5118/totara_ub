@@ -193,7 +193,6 @@ abstract class moodleform {
      * @param bool $editable
      * @param array $ajaxformdata Forms submitted via ajax, must pass their data here, instead of relying on _GET and _POST.
      * @param string $formidprefix (optional) Prefix for the automatically generated form id. (Passed directly to MoodleQuickForm())
-     * @return object moodleform
      */
     public function __construct($action=null, $customdata=null, $method='post', $target='', $attributes=null, $editable=true,
                                 $ajaxformdata=null, $formidprefix='mform') {
@@ -209,6 +208,21 @@ abstract class moodleform {
             }
         }
 
+        // TOTARA HACK:
+        // In Moodle 3.1 they added a 7th argument $ajaxformdata, however Totara has had a 7th argument well before that, $formidprefix.
+        // A conflict existed and to resolve it we shifted our argument to the 8th arg. The consequence of this is that any old Totara
+        // form now provides a form prefix to $ajaxformdata.
+        // We want to detect that (and we can with ease luckily) and correct the situation.
+        if (is_string($ajaxformdata) && $formidprefix === 'mform') {
+            // $ajaxformdata is expected to be an array, because its a string we can assume that this is an old Totara form
+            // that has not been converted to use the updated API.
+            // Shuffle the arguments one step to the left.
+            $ajaxformdata = null;
+            $formidprefix = $ajaxformdata;
+            // And let the developer know, we want to fix this sooner rather than later and we don't want new ones arriving.
+            debugging('Arguments when constructing '.get_called_class().' have changed and need to be updated', DEBUG_DEVELOPER);
+            error_log('Arguments when constructing class "'.get_called_class().'" have changed and need to be updated');
+        }
 
         if (empty($action)){
             // do not rely on PAGE->url here because dev often do not setup $actualurl properly in admin_externalpage_setup()
@@ -245,9 +259,12 @@ abstract class moodleform {
     }
 
     /**
-     * Old syntax of class constructor for backward compatibility.
+     * Old syntax of class constructor. Deprecated in PHP7.
+     *
+     * @deprecated since Moodle 3.1
      */
     public function moodleform($action=null, $customdata=null, $method='post', $target='', $attributes=null, $editable=true) {
+        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
         self::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
 
@@ -1479,7 +1496,7 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
      * @param mixed $attributes (optional)Extra attributes for <form> tag
      * @param string $formidprefix (optional)An optional prefix to the form id. Without this, it defaults to mform (mform1, mform2, etc)
      */
-    function __construct($formName, $method, $action, $target='', $attributes=null, $formidprefix='mform'){
+    public function __construct($formName, $method, $action, $target='', $attributes=null, $formidprefix='mform'){
         global $CFG, $OUTPUT;
 
         static $formcounter = 1;
@@ -1516,9 +1533,12 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
     }
 
     /**
-     * Old syntax of class constructor for backward compatibility.
+     * Old syntax of class constructor. Deprecated in PHP7.
+     *
+     * @deprecated since Moodle 3.1
      */
     public function MoodleQuickForm($formName, $method, $action, $target='', $attributes=null) {
+        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
         self::__construct($formName, $method, $action, $target, $attributes);
     }
 
@@ -2690,7 +2710,8 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
 
         'actionbuttons'=>"\n\t\t".'<div id="{id}" class="fitem fitem_actionbuttons fitem_{type} {class}"><div class="felement {type}">{element}</div></div>',
 
-        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {class}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}"><div class="fitemtitle"><div class="fgrouplabel">{labeltemplate}{help}</div></div><fieldset class="felement {type}<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</fieldset></div>',
+        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {class}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}"><fieldset class="{type}<!-- BEGIN error --> error<!-- END error -->">{legendtemplate}<div class="felement"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><!-- END error -->{element}</div></fieldset></div>',
+        'legendtemplate' => '<legend><span class="legend">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</span></legend>',
 
         'static'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {emptylabel} {class}"><div class="fitemtitle"><div class="fstaticlabel">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</div></div><div class="felement fstatic <!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',
 
@@ -2702,9 +2723,12 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
     }
 
     /**
-     * Old syntax of class constructor for backward compatibility.
+     * Old syntax of class constructor. Deprecated in PHP7.
+     *
+     * @deprecated since Moodle 3.1
      */
     public function MoodleQuickForm_Renderer() {
+        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
         self::__construct();
     }
 
@@ -2795,9 +2819,9 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
 
         }
         if ($group->getLabel() != '') {
-            $html = str_replace('{labeltemplate}', $this->_elementTemplates['labeltemplate'], $html);
+            $html = str_replace('{legendtemplate}', $this->_elementTemplates['legendtemplate'], $html);
         } else {
-            $html = str_replace('{labeltemplate}', '', $html);
+            $html = str_replace('{legendtemplate}', '', $html);
         }
         if (isset($this->_advancedElements[$group->getName()])){
             $html =str_replace(' {advanced}', ' advanced', $html);
@@ -2859,8 +2883,10 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
 
         if ($element->getLabel() != '') {
             $html = str_replace('{labeltemplate}', $this->_elementTemplates['labeltemplate'], $html);
+            $html = str_replace('{legendtemplate}', $this->_elementTemplates['legendtemplate'], $html);
         } else {
             $html = str_replace('{labeltemplate}', '', $html);
+            $html = str_replace('{legendtemplate}', '', $html);
         }
 
         if (isset($this->_advancedElements[$element->getName()])){
