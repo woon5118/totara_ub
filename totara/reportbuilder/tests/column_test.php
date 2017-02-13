@@ -114,17 +114,21 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         'id' => 1, 'course_id' => 0, 'item' => 1, 'completed' => 1, 'value' => 2,
     );
 
+    protected $tag_coll_data = array(
+        'id' => 2, 'sortorder' => 1
+    );
+
     protected $tag_instance_data = array(
         'id' => 1, 'tagid' => 1, 'itemtype' => 'feedback', 'itemid' => 1,
     );
 
     protected $tag_data = array(
-        'id' => 1, 'userid' => 2, 'name' => 'Tag', 'isstandard' => '1',
+        'id' => 1, 'userid' => 2, 'name' => 'Tag', 'isstandard' => '1', 'tagcollid' => 2
     );
 
     protected $grade_items_data = array(
-        array('id' => 1, 'courseid' => 2, 'itemtype' => 'course', 'gradepass' => 2, 'itemmodule' => 'assignment', 'iteminstance' => 1, 'scaleid' => 1),
-        array('id' => 2, 'courseid' => 2, 'itemtype' => 'mod', 'gradepass' => 0, 'itemmodule' => 'assign', 'iteminstance' => 1, 'scaleid' => 1),
+        array('id' => 1, 'courseid' => 2, 'itemtype' => 'course', 'gradepass' => 2, 'itemmodule' => 'assignment', 'iteminstance' => 1, 'scaleid' => 3),
+        array('id' => 2, 'courseid' => 2, 'itemtype' => 'mod', 'gradepass' => 0, 'itemmodule' => 'assign', 'iteminstance' => 1, 'scaleid' => 3),
     );
 
     protected $grade_grades_data = array(
@@ -441,10 +445,10 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
     protected $scale_data = array(
         array(
-            'id' => 1, 'courseid' => 0, 'userid' => 2, 'name' => 'Scale 001', 'scale' => 'Bad,Average,Good', 'description' => '', 'timemodified' => 1332243112,
+            'id' => 3, 'courseid' => 0, 'userid' => 2, 'name' => 'Scale 001', 'scale' => 'Bad,Average,Good', 'description' => '', 'timemodified' => 1332243112,
         ),
         array(
-            'id' => 2, 'courseid' => 0, 'userid' => 2, 'name' => 'Scale 002', 'scale' => 'Awful,Satisfactory,Good,Excellent', 'description' => '', 'timemodified' => 1332243112,
+            'id' => 4, 'courseid' => 0, 'userid' => 2, 'name' => 'Scale 002', 'scale' => 'Awful,Satisfactory,Good,Excellent', 'description' => '', 'timemodified' => 1332243112,
         ),
     );
 
@@ -479,7 +483,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $goal_personal_data = array(
-        'id' => 1, 'userid' => 2, 'name' => 'My Personal Goal', 'description' => '', 'targetdate' => 1332153671, 'scaleid' => 1, 'scalevalueid' => 1,
+        'id' => 1, 'userid' => 2, 'name' => 'My Personal Goal', 'description' => '', 'targetdate' => 1332153671, 'scaleid' => 3, 'scalevalueid' => 1,
         'assigntype' => 1, 'timecreated' => 1332153671, 'usercreated' => 2, 'timemodified' => 1332153671, 'usermodified' => 2, 'deleted' => 0,
     );
 
@@ -630,6 +634,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'feedback_item' => array($this->feedback_item_data),
             'feedback_completed' => array($this->feedback_completed_data),
             'feedback_value' => array($this->feedback_value_data),
+            'tag_coll' => array($this->tag_coll_data),
             'tag' => array($this->tag_data),
             'tag_instance' => array($this->tag_instance_data),
             'course_info_field' => array($this->course_info_field_data),
