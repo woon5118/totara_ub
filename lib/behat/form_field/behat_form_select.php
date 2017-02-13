@@ -48,7 +48,6 @@ class behat_form_select extends behat_form_field {
      * @return void
      */
     public function set_value($value) {
-        // Totara: Moodle hacks were prone to double clicking which breaks Totara tests very badly...
 
         // Is the select multiple?
         $multiple = $this->field->hasAttribute('multiple');
@@ -94,9 +93,6 @@ class behat_form_select extends behat_form_field {
             }
             $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
         }
-
-        // In case there was some ajax or redirect triggered make sure we are ready to continue.
-        $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
     }
 
     /**
