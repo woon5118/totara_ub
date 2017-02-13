@@ -233,7 +233,7 @@ class mod_facetoface_notifications_testcase extends advanced_testcase {
         $initlocation = $this->get_ical_values($init->content, 'LOCATION');
         $inituids = $this->get_ical_values($init->content, 'UID');
         $initseqs = $this->get_ical_values($init->content, 'SEQUENCE');
-        $this->assertEquals('Site x 1\, Address, Test, Test2', $initlocation[0]);
+        $this->assertEquals('Site x 1\, Address,Test,Test2', $initlocation[0]);
         $this->assertNotEquals($inituids[0], $inituids[1]);
 
         $initother = facetoface_get_ical_attachment(MDL_F2F_INVITE, $facetoface, $session, $student2);
