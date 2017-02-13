@@ -2866,6 +2866,7 @@ class mod_forum_lib_testcase extends advanced_testcase {
         $record->course = $course->id;
         $record->userid = $user->id;
         $record->forum = $forum->id;
+        $record->groupid = groups_get_activity_group($cm);
         $discussion = self::getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
 
         // I already posted, I shouldn't be able to post.
