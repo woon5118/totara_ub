@@ -76,12 +76,13 @@ class mod_glossary_lib_testcase extends advanced_testcase {
         $events = $sink->get_events();
 
         // Assertions.
-        $this->assertCount(3, $events);
+        $this->assertCount(4, $events);
         $this->assertEquals('\core\event\course_module_completion_updated', $events[0]->eventname);
         $this->assertEquals('\core\event\course_module_completion_updated', $events[1]->eventname);
-        $this->assertEquals('\mod_glossary\event\course_module_viewed', $events[2]->eventname);
-        $this->assertEquals($g1->id, $events[2]->objectid);
-        $this->assertEquals('letter', $events[2]->other['mode']);
+        $this->assertEquals('\totara_core\event\module_completion', $events[2]->eventname);
+        $this->assertEquals('\mod_glossary\event\course_module_viewed', $events[3]->eventname);
+        $this->assertEquals($g1->id, $events[3]->objectid);
+        $this->assertEquals('letter', $events[3]->other['mode']);
         $this->assertEquals(COMPLETION_VIEWED, $completion->get_data($cm1, false, $u1->id)->viewed);
         $this->assertEquals(COMPLETION_COMPLETE, $completion->get_data($cm1, false, $u1->id)->completionstate);
         $this->assertEquals(COMPLETION_NOT_VIEWED, $completion->get_data($cm2, false, $u1->id)->viewed);
