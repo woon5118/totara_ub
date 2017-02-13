@@ -226,9 +226,50 @@ class totara_cohort_lib_testcase extends advanced_testcase {
         $this->assertSame('cohort', $enrolinstance->enrol);
         $this->assertSame((string)ENROL_INSTANCE_ENABLED, $enrolinstance->status);
         $this->assertSame((string)$this->course->id, $enrolinstance->courseid);
-        // Check that we got the two expected events.
-        $this->assertSame(2, $sink->count());
+
+        $expected = [
+            'core\event\enrol_instance_created',
+            'totara_core\event\bulk_enrolments_started',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'core\event\user_enrolment_created',
+            'totara_core\event\bulk_enrolments_ended',
+            'totara_core\event\bulk_role_assignments_started',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'core\event\role_assigned',
+            'totara_core\event\bulk_role_assignments_ended',
+            'totara_cohort\event\enrolled_course_item_added',
+        ];
+        $this->assertSame(count($expected), $sink->count());
         $events = $sink->get_events();
+        foreach ($events as $event) {
+            $this->assertInstanceOf(array_shift($expected), $event);
+        }
         $event = array_shift($events);
         $eventdata = $event->get_data();
         $this->assertInstanceOf('core\event\enrol_instance_created', $event);
@@ -238,7 +279,7 @@ class totara_cohort_lib_testcase extends advanced_testcase {
         $this->assertSame('enrol' , $eventdata['objecttable']);
         $this->assertEquals($this->course->id, $eventdata['contextinstanceid']);
         $this->assertEquals('cohort', $eventdata['other']['enrol']);
-        $event = array_shift($events);
+        $event = array_pop($events);
         $eventdata = $event->get_data();
         $this->assertInstanceOf('totara_cohort\event\enrolled_course_item_added', $event);
         $this->assertSame('added' , $eventdata['action']);
