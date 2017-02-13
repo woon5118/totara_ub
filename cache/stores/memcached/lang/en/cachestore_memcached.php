@@ -96,4 +96,4 @@ $string['useserialiser_help'] = 'Specifies the serializer to use for serializing
 The valid serializers are Memcached::SERIALIZER_PHP or Memcached::SERIALIZER_IGBINARY.
 The latter is supported only when memcached is configured with --enable-memcached-igbinary option and the igbinary extension is loaded.';
 $string['upgrade200recommended'] = 'We recommend you upgrade your Memcached PHP extension to version 2.0.0 or greater.
-The version of the Memcached PHP extension you are currently using does not provide the functionality Moodle uses to ensure a sandboxed cache. Until you upgrade we recommend you do not configure any other applications to use the same Memcached servers as Moodle is configured to use.';
+The version of the Memcached PHP extension you are currently using does not provide the functionality Totara uses to ensure a sandboxed cache. Until you upgrade we recommend you do not configure any other applications to use the same Memcached servers as Totara is configured to use.';
