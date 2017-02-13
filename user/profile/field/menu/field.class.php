@@ -92,6 +92,16 @@ class profile_field_menu extends profile_field_base {
     }
 
     /**
+     * Old syntax of class constructor. Deprecated in PHP7.
+     *
+     * @deprecated since Moodle 3.1
+     */
+    public function profile_field_menu($fieldid=0, $userid=0) {
+        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        self::__construct($fieldid, $userid);
+    }
+
+    /**
      * Create the code snippet for this field instance
      * Overwrites the base class method
      * @param moodleform $mform Moodle form instance
