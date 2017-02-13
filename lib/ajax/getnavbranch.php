@@ -124,9 +124,10 @@ if (trim($html) !== '') {
     throw new coding_exception('Errors were encountered while producing the navigation branch'."\n\n\n".$html);
 }
 // Check that branch isn't empty... if it is ERROR!
-if (empty($branch) || ($branch->nodetype !== navigation_node::NODETYPE_BRANCH && !$branch->isexpandable)) {
-    throw new coding_exception('No further information available for this branch');
-}
+// TOTARA: it is now acceptable to expand an empty node.
+// if (empty($branch) || ($branch->nodetype !== navigation_node::NODETYPE_BRANCH && !$branch->isexpandable)) {
+//     throw new coding_exception('No further information available for this branch');
+// }
 
 // Prepare an XML converter for the branch
 $converter->set_expandable($navigation->get_expandable());
