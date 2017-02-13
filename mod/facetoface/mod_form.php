@@ -279,14 +279,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->setType('shortname', PARAM_TEXT);
         $mform->addHelpButton('shortname', 'shortname', 'facetoface');
 
-        $features = new stdClass;
-        $features->groups = false;
-        $features->groupings = false;
-        $features->groupmembersonly = false;
-        $features->outcomes = false;
-        $features->gradecat = false;
-        $features->idnumber = true;
-        $this->standard_coursemodule_elements($features);
+        $this->standard_coursemodule_elements();
 
         $this->add_action_buttons();
     }

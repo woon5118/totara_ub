@@ -88,13 +88,19 @@ class mod_facetoface_approvals_testcase extends advanced_testcase {
         $facetoface = $facetofacegenerator->create_instance(array('course' => $course->id));
         $cm = get_coursemodule_from_id('facetoface', $facetoface->cmid, $course->id, true, MUST_EXIST);
 
+        // Output is going to be initialised, and its going to cause $COURSE to be set to the site course.
+        // The mod_form stuff doesn't use $course consistently so this is a big problem.
+        global $PAGE;
+        $PAGE->set_course($course);
+
         $form = new mod_facetoface_mod_form($cm, 0, $cm, $course);
         $mockdata = array(
             'name' => 'test',
             'modulename' => 'facetoface',
             'instance' => $cm->instance,
             'coursemodule' => $cm->id,
-            'cmidnumber' => $cm->idnumber
+            'cmidnumber' => $cm->idnumber,
+            'availabilityconditionsjson' => '{}',
         );
         // Many errors.
         $mockdata['selectedapprovers'] = "$user1,$user2,$inactive,$user2,$admin,$guest,$deleted";
