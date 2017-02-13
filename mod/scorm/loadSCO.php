@@ -168,7 +168,7 @@ echo html_writer::tag('title', 'LoadSCO');
     }
     <?php // Totara: BOF open in popup (simple) option. ?>
     function openContentWindow() {
-        cWin = window.top.open("<?php echo $result ?>","scorm_content_<?php echo $scorm->id; ?>");
+        cWin = window.top.open("<?php echo $scolaunchurl ?>","scorm_content_<?php echo $scorm->id; ?>");
         monitorContentWindow();
     }
     function monitorContentWindow() {
