@@ -532,6 +532,10 @@ M.course_dndupload = {
         this.hide_preview_element();
         var preview = section.one('li.dndupload-preview').removeClass('dndupload-hidden');
         section.addClass('dndupload-over');
+
+        // Horrible work-around to allow the 'Add X here' text to be a drop target in Firefox.
+        var node = preview.one('span').getDOMNode();
+        node.firstChild.nodeValue = type.addmessage;
     },
 
     /**
@@ -745,9 +749,7 @@ M.course_dndupload = {
         var self = this;
 
         if (file.size > this.maxbytes) {
-            new M.core.alert({
-                message: "'" + file.name + "' " + M.util.get_string('filetoolarge', 'moodle')
-            });
+            new M.core.alert({message: M.util.get_string('namedfiletoolarge', 'moodle', {filename: file.name})});
             return;
         }
 
