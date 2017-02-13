@@ -24,7 +24,6 @@
 // NOTE: no MOODLE_INTERNAL used, this file may be required by behat before including /config.php.
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Behat\Context\Step\Given as Given;
 use Behat\Gherkin\Node\TableNode as TableNode;
 
 /**
@@ -176,6 +175,15 @@ class behat_facetoface extends behat_base {
             new \Behat\Mink\Exception\ExpectationException('Could not find specific link "'.$text.'" in the row' . $row . $xpath, $this->getSession())
         );
         $node->click();
+    }
+
+    /**
+     * Select to approve the given user.
+     *
+     * @Given /^I select to approve "([^"]*)"$/
+     */
+    public function i_select_to_approve($user) {
+        $this->execute("behat_general::i_click_on_in_the", array("input[value='2']", 'css_element', $this->escape($user), 'table_row'));
     }
 
     /**

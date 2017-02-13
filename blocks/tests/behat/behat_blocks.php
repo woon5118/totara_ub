@@ -134,10 +134,9 @@ class behat_blocks extends behat_base {
      *
      * @Given /^I should see the "([^"]*)" block$/
      * @param string $title
-     * @return Given
      */
     public function i_should_see_the_block($title) {
-        return new Given('I should see "'.$this->escape($title).'" in the ".block" "css_element"');
+        $this->execute('behat_general::assert_element_contains_text', array($this->escape($title), '.block', 'css_element'));
     }
 
     /**
@@ -145,12 +144,11 @@ class behat_blocks extends behat_base {
      *
      * @Given /^I should not see the "([^"]*)" block$/
      * @param string $title
-     * @return Given
      */
     public function i_should_not_see_the_block($title) {
-        $xpathliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($title);
+        $xpathliteral = \behat_context_helper::escape($title);
         $xpath = '//div[contains(concat(\' \', normalize-space(@class), \' \'), \' block \')]//h2[text()[contains(.,'.$xpathliteral.')]]';
-        return new Given('"'.$xpath.'" "xpath_element" should not exist');
+        $this->execute('behat_general::should_not_exist', array($xpath, 'xpath_element'));
     }
 
 }

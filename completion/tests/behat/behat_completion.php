@@ -27,8 +27,6 @@
 
 require_once(__DIR__ . '/../../../lib/behat/behat_base.php');
 
-use Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException;
-
 /**
  * Steps definitions to deal with course and activities completion.
  *
@@ -97,16 +95,14 @@ class behat_completion extends behat_base {
      */
     public function completion_is_toggled_sitewide($completionstatus) {
 
-        $toggle = strtolower($completionstatus) == 'enabled' ? 'check' : 'uncheck';
+        $toggle = (strtolower($completionstatus) == 'enabled') ? '1' : '';
 
-        return array(
-            new Given('I log in as "admin"'),
-            new Given('I am on homepage'),
-            new Given('I follow "Advanced features"'),
-            new Given('I '.$toggle.' "Enable completion tracking"'),
-            new Given('I press "Save changes"'),
-            new Given('I log out')
-        );
+        $this->execute('behat_auth::i_log_in_as', 'admin');
+        $this->execute("behat_general::i_am_on_homepage");
+        $this->execute("behat_general::i_click_on", array('Advanced features', 'link'));
+        $this->execute("behat_forms::i_set_the_field_to", array("Enable completion tracking", "{$toggle}"));
+        $this->execute("behat_forms::press_button", "Save changes");
+        $this->execute('behat_auth::i_log_out');
     }
 
     /**

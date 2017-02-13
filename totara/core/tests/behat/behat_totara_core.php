@@ -24,8 +24,7 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Behat\Context\Step\Given as Given,
-    Behat\Gherkin\Node\TableNode as TableNode,
+use Behat\Gherkin\Node\TableNode as TableNode,
     Behat\Mink\Exception\ElementNotFoundException,
     Behat\Mink\Exception\ExpectationException;
 
@@ -144,7 +143,6 @@ class behat_totara_core extends behat_base {
         $possiblemenufields = array('Parent item', 'Menu title', 'Visibility', 'Menu default url address', 'Open link in new window');
         $first = false;
 
-        $steps = array();
         $menufields = array();
         $rulefields = array();
 
@@ -180,18 +178,16 @@ class behat_totara_core extends behat_base {
                 }
             }
 
-            $steps[] = new Given('I navigate to "Main menu" node in "Site administration > Appearance"');
-            $steps[] = new Given('I press "Add new menu item"');
-            $steps[] = new Given('I set the following fields to these values:', $menutable);
-            $steps[] = new Given('I press "Add new menu item"');
-            $steps[] = new Given('I should see "Edit menu item"');
-            $steps[] = new Given('I click on "Access" "link"');
-            $steps[] = new Given('I expand all fieldsets');
-            $steps[] = new Given('I set the following fields to these values:', $ruletable);
-            $steps[] = new Given('I press "Save changes"');
+            $this->execute("behat_navigation::i_navigate_to_node_in", array("Main menu", "Site administration > Appearance"));
+            $this->execute("behat_forms::press_button", "Add new menu item");
+            $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $menutable);
+            $this->execute("behat_forms::press_button", "Add new menu item");
+            $this->execute("behat_general::assert_page_contains_text", "Edit menu item");
+            $this->execute("behat_general::i_click_on", array('Access', 'link'));
+            $this->execute("behat_forms::i_expand_all_fieldsets");
+            $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $ruletable);
+            $this->execute("behat_forms::press_button", "Save changes");
         }
-
-        return $steps;
     }
 
     /**
@@ -219,20 +215,18 @@ class behat_totara_core extends behat_base {
      */
     public function i_set_self_completion_for($course, $category) {
 
-        $steps = array();
-        $steps[] = new Given('I navigate to "Manage courses and categories" node in "Site administration > Courses"');
-        $steps[] = new Given('I click on "' . $category . '" "link" in the ".category-listing" "css_element"');
-        $steps[] = new Given('I click on "' . $course .'" "link" in the ".course-listing" "css_element"');
-        $steps[] = new Given('I click on "View" "link" in the ".course-detail-listing-actions" "css_element"');
-        $steps[] = new Given('I click on "Course completion" "link"');
-        $steps[] = new Given('I expand all fieldsets');
-        $steps[] = new Given('I click on "criteria_self_value" "checkbox"');
-        $steps[] = new Given('I press "Save changes"');
-        $steps[] = new Given('I press "Turn editing on"');
-        $steps[] = new Given('I add the "Self completion" block');
-        $steps[] = new Given('I press "Turn editing off"');
+        $this->execute("behat_navigation::i_navigate_to_node_in", array("Manage courses and categories", "Site administration > Courses"));
+        $this->execute("behat_general::i_click_on_in_the", array($this->escape($category), 'link', ".category-listing", "css_element"));
+        $this->execute("behat_general::i_click_on_in_the", array($this->escape($course), 'link', ".course-listing", "css_element"));
+        $this->execute("behat_general::i_click_on_in_the", array('View', 'link', ".course-detail-listing-actions", "css_element"));
+        $this->execute("behat_general::i_click_on", array('Course completio', 'link'));
+        $this->execute("behat_forms::i_expand_all_fieldsets");
+        $this->execute("behat_forms::i_set_the_field_to", array("criteria_self_value", "1"));
+        $this->execute("behat_forms::press_button", "Save changes");
+        $this->execute("behat_forms::press_button", "Turn editing on");
+        $this->execute('behat_blocks::i_add_the_block', array('Self completion'));
+        $this->execute("behat_forms::press_button", "Turn editing off");
 
-        return $steps;
     }
 
     /**

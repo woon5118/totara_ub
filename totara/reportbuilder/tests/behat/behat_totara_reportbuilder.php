@@ -24,7 +24,6 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use \Behat\Behat\Context\Step\Given;
 use \Behat\Mink\Exception\ExpectationException;
 
 class behat_totara_reportbuilder extends behat_base {
@@ -37,12 +36,12 @@ class behat_totara_reportbuilder extends behat_base {
      * @Given /^I add the "([^"]*)" column to the report$/
      */
     public function i_add_the_column_to_the_report($columnname) {
-        return array(
-            new Given('I set the field "newcolumns" to "'.$columnname.'"'),
-            new Given('I press "Save changes"'),
-            new Given('I should see "Columns updated"'),
-            new Given('I should see "'.$columnname.'"'),
-        );
+
+        $this->execute("behat_forms::i_set_the_field_to", array("newcolumns", $this->escape($columnname)));
+        $this->execute("behat_forms::press_button", "Save changes");
+        $this->execute("behat_general::assert_page_contains_text", "Columns updated");
+        $this->execute("behat_general::assert_page_contains_text", $this->escape($columnname));
+
     }
 
     /**
@@ -90,11 +89,11 @@ class behat_totara_reportbuilder extends behat_base {
      * @Given /^I navigate to my "([^"]*)" report$/
      */
     public function i_navigate_to_my_report($reportname) {
-        return array(
-            new Given('I click on "Reports" in the totara menu'),
-            new Given('I click on "'.$reportname.'" "link" in the ".reportmanager" "css_element"'),
-            new Given('I should see "'.$reportname.'" in the "h2" "css_element"'),
-        );
+
+        $this->execute('behat_totara_core::i_click_on_in_the_totara_menu', 'Reports');
+        $this->execute("behat_general::i_click_on_in_the", array($this->escape($reportname), 'link', ".reportmanager", "css_element"));
+        $this->execute("behat_general::assert_element_contains_text", array($this->escape($reportname), "h2", "css_element"));
+
     }
 
     /**
