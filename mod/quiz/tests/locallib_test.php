@@ -108,7 +108,7 @@ class mod_quiz_locallib_testcase extends advanced_testcase {
         $question->questiontextformat = FORMAT_HTML;
 
         $summary = quiz_question_tostring($question);
-        $this->assertEquals('<span class="questionname">The question name</span> ' .
+        $this->assertEquals('<span class="questionname" data-movetext="true">The question name</span> ' .
                 '<span class="questiontext">What sort of INEQUALITY is x &lt; y[?]' . "\n" . '</span>', $summary);
     }
 
@@ -137,7 +137,7 @@ class mod_quiz_locallib_testcase extends advanced_testcase {
 
         $events = $sink->get_events();
         // 2 additional events thanks to completion.
-        $this->assertCount(3, $events);
+        $this->assertCount(4, $events);
         $event = array_shift($events);
 
         // Checking that the event contains the expected values.

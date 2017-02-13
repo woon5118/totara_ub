@@ -309,7 +309,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
             mod_quiz_external::view_quiz(0);
             $this->fail('Exception expected due to invalid mod_quiz instance id.');
         } catch (moodle_exception $e) {
-            $this->assertEquals('invalidrecord', $e->errorcode);
+            $this->assertEquals('invalidrecordunknown', $e->errorcode); // Totara: we hide the details.
         }
 
         // Test not-enrolled user.
@@ -748,7 +748,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
             testable_mod_quiz_external::validate_attempt($params);
             $this->fail('Exception expected due to invalid attempt id.');
         } catch (dml_missing_record_exception $e) {
-            $this->assertEquals('invalidrecord', $e->errorcode);
+            $this->assertEquals('invalidrecordunknown', $e->errorcode); // Totara: we hide the details.
         }
 
         // Test OK case.
@@ -1148,7 +1148,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
             testable_mod_quiz_external::validate_attempt_review($params);
             $this->fail('Exception expected due invalid id.');
         } catch (dml_missing_record_exception $e) {
-            $this->assertEquals('invalidrecord', $e->errorcode);
+            $this->assertEquals('invalidrecordunknown', $e->errorcode); // Totara: we hide the details.
         }
 
         // Invalid attempt, not closed.
