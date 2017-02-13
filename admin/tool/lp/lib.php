@@ -102,7 +102,7 @@ function tool_lp_myprofile_navigation(core_user\output\myprofile\tree $tree, $us
     }
 
     $url = new moodle_url('/admin/tool/lp/plans.php', array('userid' => $user->id));
-    $node = new core_user\output\myprofile\node('miscellaneous', 'learningplans',
+    $node = new core_user\output\myprofile\node('miscellaneous', 'moodlelearningplans',
                                                 get_string('learningplans', 'tool_lp'), null, $url);
     $tree->add_node($node);
 
