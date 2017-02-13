@@ -145,6 +145,7 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $u = new stdClass();
         $u->id = $user->id;
         $u->email = $user->email;
+        $u->username = $user->username;
 
         $result = email_to_user($u, $admin, 'subject', 'message');
         $this->assertTrue($result);
