@@ -807,7 +807,7 @@ class mod_scorm_external_testcase extends externallib_advanced_testcase {
             mod_scorm_external::launch_sco(0);
             $this->fail('Exception expected due to invalid mod_scorm instance id.');
         } catch (moodle_exception $e) {
-            $this->assertEquals('invalidrecord', $e->errorcode);
+            $this->assertEquals('invalidrecordunknown', $e->errorcode); // Totara: we hide the details.
         }
 
         // Test not-enrolled user.
