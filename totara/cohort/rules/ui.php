@@ -37,7 +37,7 @@ require_once($CFG->dirroot.'/lib/formslib.php');
  */
 class emptyruleuiform extends moodleform {
     public function __construct($action){
-        parent::__construct($action, null, 'post', '', null, true, 'cohortruledialogform');
+        parent::__construct($action, null, 'post', '', null, true, null, 'cohortruledialogform');
     }
     public function definition(){}
 
