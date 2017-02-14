@@ -218,7 +218,7 @@ $string['id'] = 'id';
 $string['invalidid'] = 'LTI ID was incorrect';
 $string['launch_in_moodle'] = 'Launch tool in Totara';
 $string['launch_in_popup'] = 'Launch tool in a pop-up';
-$string['launch_url'] = 'Launch/Cartridge URL';
+$string['launch_url'] = 'Launch/cartridge URL';
 $string['launch_url_help'] = 'The Launch URL indicates the web address of the External Tool, and may contain additional information, such as the resource to show.
 If you are unsure what to enter for the Launch URL, please check with the tool provider for more information.
 
@@ -247,7 +247,7 @@ $string['lti:manage'] = 'Be an Instructor when the tool is launched';
 $string['lti:requesttooladd'] = 'Request a tool is configured site-wide';
 $string['lti:view'] = 'Launch external tool activities';
 $string['ltisettings'] = 'LTI settings';
-$string['lti_administration'] = 'LTI administration';
+$string['lti_administration'] = 'Edit preconfigured tool';
 $string['lti_errormsg'] = 'The tool returned the following error message: "{$a}"';
 $string['lti_launch_error'] = 'An error occurred when launching the external tool:';
 $string['lti_launch_error_tool_request'] = '<p>
@@ -276,7 +276,7 @@ Tools listed on this page are separated into three categories:
 $string['manage_external_tools'] = 'Manage tools';
 $string['manage_tools'] = 'Manage preconfigured tools';
 $string['manage_tool_proxies'] = 'Manage external tool registrations';
-$string['manuallyaddtype'] = 'alternatively, you can <a href="{$a}">configure a tool manually</a>.';
+$string['manuallyaddtype'] = 'Alternatively, you can <a href="{$a}">configure a tool manually</a>.';
 $string['miscellaneous'] = 'Miscellaneous';
 $string['misconfiguredtools'] = 'Misconfigured tool instances were detected';
 $string['missingparameterserror'] = 'The page is misconfigured: "{$a}"';
@@ -346,8 +346,8 @@ along with the consumer key from the tool provider.
 Tools which do not require secure communication from Totara and do not provide additional services (such as grade reporting)
 may not require a shared secret.';
 $string['pending'] = 'Pending';
-$string['pluginadministration'] = 'LTI administration';
-$string['pluginname'] = 'LTI';
+$string['pluginadministration'] = 'External tool administration';
+$string['pluginname'] = 'External tool';
 $string['preferheight'] = 'Preferred height';
 $string['preferwidget'] = 'Prefer widget launch';
 $string['preferwidth'] = 'Preferred width';
@@ -480,7 +480,7 @@ $string['tooltypeadded'] = 'Preconfigured tool added';
 $string['tooltypedeleted'] = 'Preconfigured tool deleted';
 $string['tooltypenotdeleted'] = 'Could not delete preconfigured tool';
 $string['tooltypeupdated'] = 'Preconfigured tool updated';
-$string['toolurl'] = 'Tool base URL/Cartridge URL';
+$string['toolurl'] = 'Tool base URL/cartridge URL';
 $string['toolurlplaceholder'] = 'Tool URL...';
 $string['toolurl_help'] = 'The tool base URL is used to match tool launch URLs to the correct tool configuration. Prefixing the URL with http(s) is optional.
 
