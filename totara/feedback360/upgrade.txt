@@ -12,3 +12,5 @@ be used to fetch feedback, they must use the 'requestertoken'. This does not app
 submitting feedback.
 * Reduced specificy of CSS selectors to improve RTL support
 * Renamed CSS class "previewer" to "feedback360-previewer" so that it did not clash with the same CSS class in appraisals
+* Altered the renderer display_feedback_header()
+* Altered the renderer display_preview_feedback_header()

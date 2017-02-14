@@ -300,22 +300,20 @@ class totara_feedback360_renderer extends plugin_renderer_base {
             $message .= html_writer::tag('p', $anonmessage);
         }
 
-        $r = new html_table_row(array($this->output->user_picture($subjectuser, array('link' => false)), $message));
-
-        $t = new html_table();
-        $t->attributes['class'] = 'invisiblepadded viewing-xs-feedback360';
-        $t->data[] = $r;
-        $save = '';
+        $content = $this->output->user_picture($subjectuser, array('link' => false)) . $message;
 
         if (!$resp->is_completed() && !$resp->is_fake()) {
             $savebutton = new single_button(new moodle_url('#'), get_string('saveprogress', 'totara_feedback360'));
             $savebutton->formid = 'saveprogress';
             $save = html_writer::tag('div', $this->output->render($savebutton), array('class' => 'feedback360-save'));
+            $content = $save . $content;
         }
 
         $out = html_writer::tag('div', '', array('class' => "empty", 'id' => 'feedbackhead-anchor'));
-        $out .= html_writer::tag('div', $save.html_writer::table($t), array('class' => "plan_box notifymessage alert alert-info",
-            'id' => 'feedbackhead'));
+
+        // $this->notification strips out the save button so go direct to the template.
+        $context = array('message' => $content);
+        $out .= html_writer::tag('div', $this->render_from_template('core/notification_message', $context), array('id' => 'feedbackhead'));
 
         return $out;
     }
@@ -324,17 +322,11 @@ class totara_feedback360_renderer extends plugin_renderer_base {
         $headerstr = get_string('previewheader', 'totara_feedback360', $feedbackname);
         $subheader = get_string('previewsubheader', 'totara_feedback360');
 
-        $rows = array();
-        $rows[] = new html_table_row(array($this->output->heading($headerstr)));
-        $rows[] = new html_table_row(array($subheader));
-
-        $table = new html_table();
-        $table->attributes['class'] = 'invisiblepadded viewing-xs-feedback360';
-        $table->data = $rows;
+        $content = $this->output->heading($headerstr);
+        $content .= $subheader;
 
         $out = html_writer::tag('div', '', array('class' => "empty", 'id' => 'feedbackhead-anchor'));
-        $out .= html_writer::tag('div', html_writer::table($table), array('class' => "plan_box notifymessage",
-            'id' => 'feedbackhead'));
+        $out .= $this->notification($content, 'notifymessage');
 
         return $out;
     }
