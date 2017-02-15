@@ -379,7 +379,13 @@ class reportbuilder {
 
         // Run the embedded report's capability checks.
         if ($embed) {
-            if (method_exists($embed, 'is_capable')) {
+            if (defined('REPORTBUIDLER_MANAGE_REPORTS_PAGE')) {
+                // The is_capable is intended for report viewing only!
+                require_capability('totara/reportbuilder:managereports', context_system::instance());
+                if (!method_exists($embed, 'is_capable')) {
+                    debugging("Missing is_capable() method in embedded report {$embed->fullname}", DEBUG_DEVELOPER);
+                }
+            } else if (method_exists($embed, 'is_capable')) {
                 if (!$embed->is_capable($this->reportfor, $this)) {
                     print_error('nopermission', 'totara_reportbuilder');
                 }

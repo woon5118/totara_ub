@@ -21,6 +21,9 @@
  * @package totara_reportbuilder
  */
 
+define('REPORTBUIDLER_MANAGE_REPORTS_PAGE', true);
+define('REPORT_BUILDER_IGNORE_PAGE_PARAMETERS', true); // We are setting up report here, do not accept source params.
+
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_global_restriction_set.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
