@@ -89,6 +89,7 @@ $string['core:programmanagecustomfield'] = 'Manage a program custom field';
 $string['core:seedeletedusers'] = 'See deleted users';
 $string['core:undeleteuser'] = 'Undelete user';
 $string['core:updateuseridnumber'] = 'Update user ID number';
+$string['core:viewprivatedetails'] = 'View restricted user information';
 $string['core:viewrecordoflearning'] = 'View a learners Record of Learning';
 $string['couldntreaddataforblockid'] = 'Could not read data for blockid={$a}';
 $string['couldntreaddataforcourseid'] = 'Could not ready data for courseid={$a}';
