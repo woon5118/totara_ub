@@ -1399,7 +1399,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             }
             $participants[] = $participant;
         }
-        $out .= html_writer::tag('div', html_writer::tag('label', get_string('participants', 'totara_appraisal')) .
+        $out .= html_writer::tag('div', html_writer::span(get_string('participants', 'totara_appraisal')) .
                     html_writer::alist($participants), array('class' => 'appraisal-participants'));
 
         if (!$preview) {
@@ -1981,7 +1981,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
     ) {
         global $OUTPUT;
 
-        $heading = html_writer::label(
+        $heading = html_writer::span(
             get_string('jobassignment', 'totara_appraisal') . ':', null
         );
 
