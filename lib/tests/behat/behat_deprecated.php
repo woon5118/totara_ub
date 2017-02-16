@@ -304,6 +304,7 @@ class behat_deprecated extends behat_base {
      * Click on a given link in the moodle-actionmenu that is currently open.
      * @Given /^I follow "(?P<link_string>(?:[^"]|\\")*)" in the open menu$/
      * @param string $linkstring the text (or id, etc.) of the link to click.
+     * @deprecated since Moodle 3.2 MDL-55839 - please do not use this step any more.
      */
     public function i_follow_in_the_open_menu($linkstring) {
         $alternative = 'I choose "' . $this->escape($linkstring) . '" from the open action menu';
