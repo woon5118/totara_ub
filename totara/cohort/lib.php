@@ -1171,7 +1171,7 @@ function totara_cohort_clone_cohort($oldcohortid) {
     }
     $newcohort->description =       $oldcohort->description;
     $newcohort->descriptionformat = $oldcohort->descriptionformat;
-    $newcohort->component =         $oldcohort->component;
+    $newcohort->component = ''; // Cloned cohort must not be added to any plugin, it must be manual.
     $newcohort->cohorttype =        $oldcohort->cohorttype;
     $newcohort->visibility =        $oldcohort->visibility;
     $newcohort->alertmembers =      $oldcohort->alertmembers;

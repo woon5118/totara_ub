@@ -673,7 +673,7 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
                     get_string('overview','totara_cohort'));
     }
 
-    if ($canmanage) {
+    if ($canmanage && !$cohort->component) {
         $toprow[] = new tabobject('edit', new moodle_url('/cohort/edit.php', array('id' => $cohortid)),
                     get_string('editdetails','totara_cohort'));
     }
@@ -691,7 +691,7 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
             get_string('viewmembers','totara_cohort'));
     }
 
-    if ($canassign && $cohorttype == cohort::TYPE_STATIC) {
+    if ($canassign && $cohorttype == cohort::TYPE_STATIC && !$cohort->component) {
         $toprow[] = new tabobject('editmembers', new moodle_url('/cohort/assign.php', array('id' => $cohortid)),
             get_string('editmembers','totara_cohort'));
     }

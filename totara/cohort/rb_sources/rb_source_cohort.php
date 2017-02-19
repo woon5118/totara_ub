@@ -191,8 +191,9 @@ class rb_source_cohort extends rb_base_source {
             'base.id',
             array(
                 'displayfunc' => 'cohort_actions',
-                'extrafields' => array('contextid' => 'base.contextid'),
-                'nosort' => true
+                'extrafields' => array('contextid' => 'base.contextid', 'component' => 'base.component'),
+                'nosort' => true,
+                'noexport' => true
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -421,49 +422,33 @@ class rb_source_cohort extends rb_base_source {
     /**
      * RB helper function to show the "action" links for a cohort -- edit/clone/delete
      * @param int $cohortid
-     * @param object $row
-     * @return string|string
+     * @param stdClass $row
+     * @return string
      */
     public function rb_display_cohort_actions($cohortid, $row) {
         global $OUTPUT;
 
-        static $canedit = null;
-
         $contextid = $row->contextid;
         if ($contextid) {
-            $context = context::instance_by_id($contextid, MUST_EXIST);
+            $context = context::instance_by_id($contextid);
         } else {
             $context = context_system::instance();
         }
-        if ($canedit === null) {
-            $canedit = has_capability('moodle/cohort:manage', $context);
+
+        if (!has_capability('moodle/cohort:manage', $context)) {
+            return '';
         }
 
-        if ($canedit) {
+        $str = '';
+        if (empty($row->component)) {
             $editurl = new moodle_url('/cohort/edit.php', array('id' => $cohortid));
-            $str = html_writer::link(
-                $editurl,
-                $OUTPUT->pix_icon('t/edit', get_string('edit'), null, array('class' => 'iconsmall')),
-                null,
-                array('class' => 'action-icon')
-            );
-            $cloneurl = new moodle_url('/cohort/view.php', array('id' => $cohortid, 'clone' => 1, 'cancelurl' => qualified_me()));
-            $str .= html_writer::link(
-                $cloneurl,
-                $OUTPUT->pix_icon('t/copy', get_string('copy', 'totara_cohort'), null, array('class' => 'iconsmall')),
-                null,
-                array('class' => 'action-icon')
-            );
-            $delurl = new moodle_url('/cohort/view.php', array('id'=>$cohortid, 'delete' => 1, 'cancelurl' => qualified_me()));
-            $str .= html_writer::link(
-                $delurl,
-                $OUTPUT->pix_icon('t/delete', get_string('delete'), null, array('class' => 'iconsmall')),
-                null,
-                array('class' => 'action-icon')
-            );
-            return $str;
+            $str .= html_writer::link($editurl, $OUTPUT->pix_icon('t/edit', get_string('edit')));
         }
-        return '';
+        $cloneurl = new moodle_url('/cohort/view.php', array('id' => $cohortid, 'clone' => 1, 'cancelurl' => qualified_me()));
+        $str .= html_writer::link($cloneurl, $OUTPUT->pix_icon('t/copy', get_string('copy', 'totara_cohort')));
+        $delurl = new moodle_url('/cohort/view.php', array('id' => $cohortid, 'delete' => 1, 'cancelurl' => qualified_me()));
+        $str .= html_writer::link($delurl, $OUTPUT->pix_icon('t/delete', get_string('delete')));
+        return $str;
     }
 
     public function rb_display_cohort_status($cohortid, $row) {
