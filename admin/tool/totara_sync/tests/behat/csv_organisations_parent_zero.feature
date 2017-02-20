@@ -82,10 +82,10 @@ Feature: Verify that parentid is set correctly for organisation CSV uploads.
     Then I should see these hierarchy items at the following depths:
       | Head Office           | 1 |
       | UK Office             | 2 |
+      | Marketing             | 3 |
       | Development & Support | 3 |
       | Development           | 2 |
       | Support               | 2 |
-      | Marketing             | 1 |
     And I should not see "Development Team"
 
   Scenario: Verify organisations CSV upload deletes a record and parentid appropriately.

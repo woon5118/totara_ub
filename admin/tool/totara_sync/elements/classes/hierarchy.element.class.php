@@ -71,7 +71,14 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
     }
 
     function config_save($data) {
-        $this->set_config('csvsaveemptyfields', !empty($data->csvsaveemptyfields));
+        // Only set this config is we get some data. Vaiid values are 0 and 1, but if set
+        // to null it can be used to determine whether CSV or database sync is being used.
+        if (isset($data->csvsaveemptyfields)) {
+            $this->set_config('csvsaveemptyfields', !empty($data->csvsaveemptyfields));
+        } else {
+            $this->set_config('csvsaveemptyfields', null);
+        }
+
         $this->set_config('allow_create', !empty($data->allow_create));
         $this->set_config('allow_update', !empty($data->allow_update));
         $this->set_config('allow_delete', !empty($data->allow_delete));
@@ -189,6 +196,12 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             }
             // Update parentid with the newly-created one
             $parentid = $DB->get_field($elname, 'id', array('idnumber' => $newitem->parentidnumber));
+
+        // This action is only required for CSV imports. If csvsaveemptyfields is set to zero, an
+        // empty string for the parentid should not update or delete the existing value. To ensure
+        // this we need to retrieve the existing value and set the parentid to it.
+        } else if ($newitem->parentidnumber === '' && isset($this->config->csvsaveemptyfields) && $this->config->csvsaveemptyfields == 0) {
+            $parentid = $DB->get_field($elname, 'parentid', array('idnumber' => $newitem->idnumber));
         }
 
         $newitem->parentid = isset($parentid) && $parentid !== '' ? $parentid : 0;

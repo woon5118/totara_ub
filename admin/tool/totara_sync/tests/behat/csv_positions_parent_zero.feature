@@ -82,10 +82,10 @@ Feature: Verify that parentid is set correctly for position CSV uploads.
     Then I should see these hierarchy items at the following depths:
       | Department Manager  | 1 |
       | Team Leader 2       | 2 |
+      | Position 3          | 3 |
       | Position 2          | 3 |
       | Team Leader 1       | 2 |
       | Position 1          | 3 |
-      | Position 3          | 1 |
     And I should not see "A Team Leader"
 
   Scenario: Verify positions CSV upload deletes a record and parentid appropriately.
