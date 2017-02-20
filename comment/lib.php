@@ -896,7 +896,8 @@ class comment {
             $html .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey',   'value' => sesskey()));
             $html .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'returnurl', 'value' => $PAGE->url));
             // Textarea for the actual comment
-            $html .= html_writer::tag('textarea', '', array('name' => 'content', 'rows' => 2));
+            $html .= html_writer::label(get_string('addcomment', 'moodle'), 'newcommenttext', '', array('class' => 'sr-only'));
+            $html .= html_writer::tag('textarea', '', array('name' => 'content', 'rows' => 2, 'id' => 'newcommenttext'));
             // Submit button to add the comment
             $html .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('submit')));
             $html .= html_writer::end_tag('form');
