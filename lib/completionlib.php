@@ -85,6 +85,8 @@ define('COMPLETION_COMPLETE_PASS', 2);
  */
 define('COMPLETION_COMPLETE_FAIL', 3);
 /** A record of prior learning has been added for a user in this activity */
+// TOTARA: This isn't used anywhere in Totara, and hasn't since 2.2.0 at least, so we're going to
+//         remove it after the release of Totara 10.
 define('COMPLETION_COMPLETE_RPL', 4);
 
 /**
@@ -1000,10 +1002,16 @@ class completion_info {
     public function delete_course_completion_data_including_rpl() {
         global $DB;
 
+        $transaction = $DB->start_delegated_transaction();
+
         $DB->delete_records('course_completions', array('course' => $this->course_id));
         $DB->delete_records('course_completion_crit_compl', array('course' => $this->course_id));
         $DB->delete_records('block_totara_stats', array('eventtype' => STATS_EVENT_COURSE_STARTED, 'data2' => $this->course_id));
         $DB->delete_records('block_totara_stats', array('eventtype' => STATS_EVENT_COURSE_COMPLETE, 'data2' => $this->course_id));
+        \core_completion\helper::save_completion_log($this->course_id, null,
+            "Deleted current completion and all crit compl records in delete_course_completion_data_including_rpl");
+
+        $transaction->allow_commit();
 
         // Difficult to find affected users, just purge all completion cache.
         $this->get_completion_cache()->purge();
@@ -1060,18 +1068,22 @@ class completion_info {
                                     AND cc.status = :status)";
             $coursesql .= " AND status <> :status";
             $params['status'] = COMPLETION_STATUS_COMPLETEVIARPL;
+            $message = "Deleted current completion and all crit compl records except where the current completion was RPL in delete_course_completion_data";
         } else {
             // Just delete the records for the specified user, even if they have a matching course RPL record.
             $criteriasql .= " AND {course_completion_crit_compl}.userid = :userid";
             $statssql .= " AND {block_totara_stats}.userid = :userid";
             $coursesql .= " AND {course_completions}.userid = :userid";
             $params['userid'] = $userid;
+            $message = "Deleted current completion and all crit compl records in delete_course_completion_data";
         }
 
         $DB->execute($criteriasql, $params);
         $DB->execute($statssql, $params);
         // Do course_completions last, as the other two may depend on these records.
         $DB->execute($coursesql, $params);
+
+        \core_completion\helper::save_completion_log($this->course_id, $userid, $message);
 
         $transaction->allow_commit();
 
@@ -1100,13 +1112,18 @@ class completion_info {
     public function delete_all_completion_data() {
         global $DB;
 
+        $transaction = $DB->start_delegated_transaction();
+
         // Delete from database.
         $DB->delete_records_select('course_modules_completion',
                 'coursemoduleid IN (SELECT id FROM {course_modules} WHERE course=?)',
                 array($this->course_id));
+        \core_completion\helper::save_completion_log($this->course_id, null, "Deleted all module completions in delete_all_completion_data");
 
         // Wipe course completion data too.
         $this->delete_course_completion_data_including_rpl();
+
+        $transaction->allow_commit();
     }
 
     /**
@@ -1117,9 +1134,25 @@ class completion_info {
      * @param stdClass|cm_info $cm Activity
      */
     public function delete_all_state($cm) {
-        global $DB;
+        global $DB, $USER;
+
+        $now = time();
+
+        $transaction = $DB->start_delegated_transaction();
 
         // Delete from database
+        $description = $DB->sql_concat(
+            "'Deleted module completion in unused function delete_all_state<br><ul><li>CMCID: '",
+            $DB->sql_cast_2char("cmc.id"),
+            "'</li></ul>'"
+        );
+        $sql = "INSERT INTO {course_completion_log} (courseid, userid, changeuserid, description, timemodified)
+                SELECT cm.course, cmc.userid, :changeuserid, {$description}, :now
+                  FROM {course_modules_completion} cmc
+                  JOIN {course_modules} cm
+                    ON cm.id = cmc.coursemoduleid
+                 WHERE coursemoduleid = :cmid";
+        $DB->execute($sql, array('changeuserid' => $USER->id, 'now' => $now, 'cmid' => $cm->id));
         $DB->delete_records('course_modules_completion', array('coursemoduleid'=>$cm->id));
 
         // Check if there is an associated course completion criteria
@@ -1134,10 +1167,34 @@ class completion_info {
 
         if ($acriteria) {
             // Delete all criteria completions relating to this activity, but skip any RPL records.
-            $where = "course = ? AND criteriaid = ? AND (rpl = '' OR rpl IS NULL)";
-            $DB->delete_records_select('course_completion_crit_compl', $where, array($this->course_id, $acriteria->id));
-            $DB->delete_records_select('course_completions', "course = ? AND (rpl = '' OR rpl IS NULL)", array($this->course_id));
+            $where = "course = :courseid AND criteriaid = :criteriaid AND (rpl = '' OR rpl IS NULL)";
+            $params = array('courseid' => $this->course_id, 'criteriaid' => $acriteria->id);
+            $description = $DB->sql_concat(
+                "'Deleted crit compl in unused function delete_all_state<br><ul><li>CCCCID: '",
+                $DB->sql_cast_2char("id"),
+                "'</li></ul>'"
+            );
+            $sql = "INSERT INTO {course_completion_log} (courseid, userid, changeuserid, description, timemodified)
+                SELECT course, userid, :changeuserid, {$description}, :now
+                  FROM {course_completion_crit_compl}
+                 WHERE {$where}";
+            $logparams = array_merge(array('changeuserid' => $USER->id, 'now' => $now), $params);
+            $DB->execute($sql, $logparams);
+            $DB->delete_records_select('course_completion_crit_compl', $where, $params);
+
+            $where = "course = :courseid AND (rpl = '' OR rpl IS NULL)";
+            $params = array('courseid' => $this->course_id);
+            $description = "'Deleted current completion in unused function delete_all_state'";
+            $sql = "INSERT INTO {course_completion_log} (courseid, userid, changeuserid, description, timemodified)
+                SELECT course, userid, :changeuserid, {$description}, :now
+                  FROM {course_completions}
+                 WHERE {$where}";
+            $logparams = array_merge(array('changeuserid' => $USER->id, 'now' => $now), $params);
+            $DB->execute($sql, $logparams);
+            $DB->delete_records_select('course_completions', $where, $params);
         }
+
+        $transaction->allow_commit();
 
         $this->get_completion_cache()->purge();
         // Difficult to find affected users, just purge all completion caches.
@@ -1429,9 +1486,11 @@ class completion_info {
         if (!$data->id) {
             // Didn't exist before, needs creating
             $data->id = $DB->insert_record('course_modules_completion', $data);
+            \core_completion\helper::log_course_module_completion($data->id, "Created module completion in internal_set_data");
         } else {
             // Has real (nonzero) id meaning that a database row exists, update
             $DB->update_record('course_modules_completion', $data);
+            \core_completion\helper::log_course_module_completion($data->id, "Updated module completion in internal_set_data");
         }
         $transaction->allow_commit();
 
