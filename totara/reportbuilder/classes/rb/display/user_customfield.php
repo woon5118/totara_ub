@@ -56,9 +56,6 @@ final class user_customfield extends base {
 
         $hiddenmsg = get_string('hiddencellvalue', 'totara_reportbuilder');
         $isadmin = is_siteadmin($USER);
-        $hasrights = has_capability(
-            'totara/core:viewprivatedetails', \context_user::instance($USER->id)
-        );
 
         if ($visibility === PROFILE_VISIBLE_NONE && !$isadmin) {
             // It should be not be possible to get here because this should be
@@ -67,8 +64,7 @@ final class user_customfield extends base {
         }
         else if ($visibility === PROFILE_VISIBLE_PRIVATE
                  && $USER->id != $row->id
-                 && !$isadmin
-                 && !$hasrights) {
+                 && !$isadmin) {
             return $hiddenmsg;
         }
 
