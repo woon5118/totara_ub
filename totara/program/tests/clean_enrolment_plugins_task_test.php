@@ -251,7 +251,7 @@ class totara_clean_enrolments_plugins_task_testcase extends advanced_testcase {
     private function remove_prog_courseset($programid) {
         global $DB;
 
-        $sql = "DELETE FROM {prog_courseset_course} pcc
+        $sql = "DELETE FROM {prog_courseset_course}
                 WHERE coursesetid IN (
                     SELECT id
                       FROM {prog_courseset} pc
@@ -260,8 +260,8 @@ class totara_clean_enrolments_plugins_task_testcase extends advanced_testcase {
 
         $this->assertTrue($DB->execute($sql, $params));
 
-        $sql = "DELETE FROM {prog_courseset} pc
-                 WHERE pc.programid = :programid";
+        $sql = "DELETE FROM {prog_courseset}
+                 WHERE programid = :programid";
         $params = array ('programid' => $programid);
 
         $this->assertTrue($DB->execute($sql, $params));
@@ -309,13 +309,14 @@ class totara_clean_enrolments_plugins_task_testcase extends advanced_testcase {
     private function update_user_enrolment_status($courseid, $userid, $status) {
         global $DB;
 
-        $sql = "UPDATE {user_enrolments} ue
+        $sql = "UPDATE {user_enrolments}
                    SET status = :status
-                  FROM {enrol} e
-                 WHERE ue.userid = :userid
-                   AND ue.enrolid = e.id
-                   AND e.enrol = 'totara_program'
-                   AND e.courseid = :courseid";
+                 WHERE userid = :userid
+                   AND enrolid IN (
+                       SELECT e.id
+                         FROM {enrol} e
+                        WHERE e.enrol = 'totara_program'
+                          AND e.courseid = :courseid)";
         $params = array ('status' => $status, 'userid' => $userid, 'courseid' => $courseid);
 
         $this->assertTrue($DB->execute($sql, $params));
