@@ -484,6 +484,7 @@ from
                         'compevscaleid' => 'evidence_scale_value.scaleid',
                         'compevscalevalueid' => 'evidence_scale_value.id',
                         'compframeworkid' => 'competency.frameworkid',
+                        'compfullname' => 'competency.fullname',
                         'plancompid' => 'dp_competency.id',
                         'planid' => 'dp_competency.planid',
                         'competencyid' => 'dp_competency.competencyid',
@@ -771,6 +772,7 @@ from
                     $this->compscales[$compframeworkid] = $compscale;
                 }
 
+                $label = html_writer::label(get_string('statusof', 'totara_plan', $row->compfullname), 'menucompetencyevidencestatus' . $plancompid, '', array('class' => 'sr-only'));
                 $action = "var response; ".
                           "response = \$.get(".
                               "'{$CFG->wwwroot}/totara/plan/components/competency/update-competency-setting.php".
@@ -779,7 +781,7 @@ from
                               "&prof=' + $(this).val()".
                               "); ";
                 $attributes = array('onchange' => $action);
-                $content[] = html_writer::select($compscale,
+                $content[] = $label . html_writer::select($compscale,
                                               'competencyevidencestatus'.$plancompid,
                                               $compevscalevalueid,
                                               array(($compevscalevalueid ? '' : 0) => ($compevscalevalueid ? '' : get_string('notset', 'totara_hierarchy'))),

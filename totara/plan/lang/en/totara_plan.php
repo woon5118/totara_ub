@@ -981,6 +981,7 @@ $string['signoff'] = 'Sign-off';
 $string['simpleworkflow'] = 'Simple workflow settings';
 $string['startdate'] = 'Start date';
 $string['status'] = 'Status';
+$string['statusof'] = 'Status of {$a}';
 $string['teammembers'] = 'Team Members';
 $string['templatecomponentsettings'] = 'Component Settings';
 $string['templatecomponentsettings_help'] = 'The **Component Settings** allows you to show/hide components in the learning plan and define the order in which they appear.
