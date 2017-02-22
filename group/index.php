@@ -171,7 +171,7 @@ echo '<p><label for="groups"><span id="groupslabel">'.get_string('groups').':</s
 
 $onchange = 'M.core_group.membersCombo.refreshMembers();';
 
-echo '<div class="userselector" id="addselect_wrapper">';
+echo '<div class="userselector addselect_wrapper">';
 echo '<select name="groups[]" multiple="multiple" id="groups" size="15" class="select" onchange="'.$onchange.'">'."\n";
 
 $groups = groups_get_all_groups($courseid);
@@ -227,7 +227,7 @@ echo '<p><label for="members"><span id="memberslabel">'.
     get_string('membersofselectedgroup', 'group').
     ' </span><span id="thegroup">'.$selectedname.'</span></label></p>'."\n";
 //NOTE: the SELECT was, multiple="multiple" name="user[]" - not used and breaks onclick.
-echo '<div class="userselector" id="addselect_wrapper">';
+echo '<div class="userselector addselect_wrapper">';
 echo '<select name="user" id="members" size="15">'."\n";
 
 $member_names = array();
