@@ -1250,6 +1250,7 @@ $string['showtypefullname'] = 'Show Type Fullname';
 $string['sortthreadview'] = 'Sort Thread';
 $string['startdate'] = 'Start date';
 $string['startdate_help'] = 'Click the calendar icon to select the date the user started in that position.';
+$string['statusof'] = 'Status of {$a}';
 $string['switchframework'] = 'Switch framework: ';
 $string['template'] = 'Competency template';
 $string['templatecompetencyremovecheck'] = 'Are you absolutely sure you want to unassign this competency from this template?';

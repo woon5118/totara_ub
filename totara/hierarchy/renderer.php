@@ -645,6 +645,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                         array('type' => 'hidden', 'name' => "goalitemid", 'value' => $goalrecord->id));
                 $scalevalue .= html_writer::empty_tag('input',
                         array('type' => 'hidden', 'name' => "sesskey", 'value' => sesskey()));
+                $scalevalue .= html_writer::label(get_string('statusof','totara_hierarchy', format_string($assignment->goalname)), $attributes['id'], '', array('class' => 'sr-only'));
                 $scalevalue .= html_writer::select($options, 'scalevalueid', $currentscalevalueid, false, $attributes);
                 $scalevalue .= html_writer::start_tag('noscript');
                 $scalevalue .= html_writer::empty_tag('input',
@@ -781,6 +782,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                             array('type' => 'hidden', 'name' => "goalitemid", 'value' => $assignment->id));
                     $scalevalue .= html_writer::empty_tag('input',
                             array('type' => 'hidden', 'name' => "sesskey", 'value' => sesskey()));
+                    $scalevalue .= html_writer::label(get_string('statusof','totara_hierarchy', format_string($assignment->name)), $attributes['id'], '', array('class' => 'sr-only'));
                     $scalevalue .= html_writer::select($options, 'scalevalueid',
                             $assignment->scalevalueid, false, $attributes);
                     $scalevalue .= html_writer::start_tag('noscript');
