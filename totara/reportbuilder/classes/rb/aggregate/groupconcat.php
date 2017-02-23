@@ -30,16 +30,7 @@ class groupconcat extends base {
     protected static function get_field_aggregate($field) {
         global $DB;
 
-        $dbfamily = $DB->get_dbfamily();
-        if ($dbfamily === 'mysql') {
-            $field = "GROUP_CONCAT($field SEPARATOR ', ')";
-        } else if ($dbfamily === 'mssql') {
-            $field = "dbo.GROUP_CONCAT_D($field, ', ')";
-        } else {
-            $field = "string_agg(CAST($field AS text), ', ')";
-        }
-
-        return $field;
+        return $DB->sql_group_concat($field, ', ', $field);
     }
 
     public static function is_column_option_compatible(\rb_column_option $option) {

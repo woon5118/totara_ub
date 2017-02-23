@@ -1,0 +1,6 @@
+This files describes database driver classes,
+information provided here is intended especially for developers.
+
+=== 10 ===
+
+* sql_group_concat() function has changed and added optional argument $unique as its fourth parameter which defaults to false

@@ -1327,15 +1327,17 @@ class mssql_native_moodle_database extends moodle_database {
      * @param string $expr      Expression to get individual values
      * @param string $separator The delimiter to separate the values, a simple string value only
      * @param string $orderby   ORDER BY clause that determines order of rows with values - required
+     * @param boolen $unique    use DISTINCT in the query, default value false
      * @return string SQL fragment equivalent to GROUP_CONCAT()
      */
-    public function sql_group_concat($expr, $separator, $orderby) {
+    public function sql_group_concat($expr, $separator, $orderby, $unique = false) {
         if ((string)$orderby === '') {
             throw new coding_exception('sql_group_concat method requires $orderby parameter');
         }
         $separator = $this->get_manager()->generator->addslashes($separator);
+        $distinct = $unique ? 'DISTINCT' : '';
         // TODO TL-9311 - change the user-defined mssql function to support $orderby.
-        return " dbo.GROUP_CONCAT_D($expr, '{$separator}') ";
+        return " dbo.GROUP_CONCAT_D($distinct $expr, '{$separator}') ";
     }
 
     public function sql_concat_join($separator="' '", $elements=array()) {

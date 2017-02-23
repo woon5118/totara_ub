@@ -55,9 +55,11 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source
     }
 
     protected function define_joinlist() {
+        global $DB;
+
         $joinlist = array();
 
-        $namesconactsql = sql_group_concat(sql_cast2char('fa.name'), ',');
+        $namesconactsql = $DB->sql_group_concat(sql_cast2char('fa.name'), ',', 'fa.name');
         $joinlist[] = new rb_join(
             'asset',
             'LEFT',

@@ -1500,9 +1500,9 @@ function facetoface_get_session_dates($sessionid) {
     global $DB;
     $ret = array();
 
+    $assetid = $DB->sql_group_concat(sql_cast2char('fad.assetid'), ',', 'fad.assetid');
     $sql = "
-        SELECT fsd.id, fsd.sessionid, fsd.sessiontimezone, fsd.timestart, fsd.timefinish, fsd.roomid,
-            " . sql_group_concat(sql_cast2char('fad.assetid'), ',') . " AS assetids
+        SELECT fsd.id, fsd.sessionid, fsd.sessiontimezone, fsd.timestart, fsd.timefinish, fsd.roomid, {$assetid} AS assetids
         FROM {facetoface_sessions_dates} fsd
         LEFT JOIN {facetoface_asset_dates} fad ON (fad.sessionsdateid = fsd.id)
         WHERE fsd.sessionid = :sessionid

@@ -2158,32 +2158,44 @@ abstract class rb_base_source {
 
     // return list as single field, separated by commas
     function rb_group_comma_list($field) {
-        return sql_group_concat($field);
+        global $DB;
+
+        return $DB->sql_group_concat($field, ', ', $field);
     }
 
     // Return list as single field, without a separator delimiter.
     function rb_group_list_nodelimiter($field) {
-        return sql_group_concat($field, '');
+        global $DB;
+
+        return $DB->sql_group_concat($field, '', $field);
     }
 
     // return unique list items as single field, separated by commas
     function rb_group_comma_list_unique($field) {
-        return sql_group_concat($field, ', ', true);
+        global $DB;
+
+        return $DB->sql_group_concat($field, ', ', $field, true);
     }
 
     // return list as single field, one per line
     function rb_group_list($field) {
-        return sql_group_concat($field, html_writer::empty_tag('br'));
+        global $DB;
+
+        return $DB->sql_group_concat($field, html_writer::empty_tag('br'), $field);
     }
 
     // return unique list items as single field, one per line
     function rb_group_list_unique($field) {
-        return sql_group_concat($field, html_writer::empty_tag('br'), true);
+        global $DB;
+
+        return $DB->sql_group_concat($field, html_writer::empty_tag('br'), $field, true);
     }
 
     // return list as single field, separated by a line with - on (in HTML)
     function rb_group_list_dash($field) {
-        return sql_group_concat($field, html_writer::empty_tag('br') . '-' . html_writer::empty_tag('br'));
+        global $DB;
+
+        return $DB->sql_group_concat($field, html_writer::empty_tag('br') . '-' . html_writer::empty_tag('br'), $field);
     }
 
     //
@@ -4598,11 +4610,11 @@ abstract class rb_base_source {
                 $filter_options['concat'] = true;
                 $filter_options['simplemode'] = true;
 
+                $data = $DB->sql_group_concat(sql_cast2char('cfidp.value'), '|', 'cfidp.value', true);
                 $joinlist[] = new rb_join(
                         $joinname,
                         'LEFT',
-                        '(SELECT '.sql_group_concat(sql_cast2char('cfidp.value'), '|', true).' AS data,
-                                 cfid.'.$joinfield.' AS joinid, '.sql_cast2char('cfid.data').' AS jsondata
+                        '(SELECT '.$data.' AS data, cfid.'.$joinfield.' AS joinid, '.sql_cast2char('cfid.data').' AS jsondata
                             FROM {'.$datatable.'} cfid
                             LEFT JOIN {'.$datatable.'_param} cfidp ON (cfidp.dataid = cfid.id)
                            WHERE cfid.fieldid = '.$id.'
@@ -5277,13 +5289,13 @@ abstract class rb_base_source {
 
         global $DB;
 
+        $idlist = $DB->sql_group_concat(sql_cast2char('t.id'), '|', 't.id');
         $joinlist[] = new rb_join(
             'tagids',
             'LEFT',
             // subquery as table name
-            "(SELECT til.id AS tilid, " .
-                sql_group_concat(sql_cast2char('t.id'), '|') .
-                " AS idlist FROM {{$type}} til
+            "(SELECT til.id AS tilid, {$idlist} AS idlist
+                FROM {{$type}} til
                 LEFT JOIN {tag_instance} ti
                     ON til.id = ti.itemid AND ti.itemtype = '{$type}'
                 LEFT JOIN {tag} t
@@ -5293,14 +5305,13 @@ abstract class rb_base_source {
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
         );
-
+        $namelist = $DB->sql_group_concat(sql_cast2char('t.name'), ', ', 't.name');
         $joinlist[] = new rb_join(
             'tagnames',
             'LEFT',
             // subquery as table name
-            "(SELECT tnl.id AS tnlid, " .
-                sql_group_concat(sql_cast2char('t.name'), ', ') .
-                " AS namelist FROM {{$type}} tnl
+            "(SELECT tnl.id AS tnlid, {$namelist} AS namelist
+                FROM {{$type}} tnl
                 LEFT JOIN {tag_instance} ti
                     ON tnl.id = ti.itemid AND ti.itemtype = '{$type}'
                 LEFT JOIN {tag} t
@@ -5449,16 +5460,17 @@ abstract class rb_base_source {
      * @param string $field Name of user id field to join on
      * @return boolean True
      */
-    protected function add_cohort_user_tables_to_joinlist(&$joinlist,
-                                                          $join, $field) {
+    protected function add_cohort_user_tables_to_joinlist(&$joinlist, $join, $field) {
+        global $DB;
+
+        $idlist = $DB->sql_group_concat(sql_cast2char('cm.cohortid'), '|', 'cm.cohortid', true);
 
         $joinlist[] = new rb_join(
             'cohortuser',
             'LEFT',
             // subquery as table name
-            "(SELECT cm.userid AS userid, " .
-                sql_group_concat(sql_cast2char('cm.cohortid'),'|', true) .
-                " AS idlist FROM {cohort_members} cm
+            "(SELECT cm.userid AS userid, {$idlist} AS idlist
+                FROM {cohort_members} cm
                 GROUP BY cm.userid)",
             "cohortuser.userid = $join.$field",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
@@ -5479,19 +5491,19 @@ abstract class rb_base_source {
      * @param string $field Name of course id field to join on
      * @return boolean True
      */
-    protected function add_cohort_course_tables_to_joinlist(&$joinlist,
-                                                            $join, $field) {
+    protected function add_cohort_course_tables_to_joinlist(&$joinlist, $join, $field) {
+        global $CFG, $DB;
 
-        global $CFG;
         require_once($CFG->dirroot . '/cohort/lib.php');
+
+        $idlist = $DB->sql_group_concat(sql_cast2char('customint1'), '|', 'customint1', true);
 
         $joinlist[] = new rb_join(
             'cohortenrolledcourse',
             'LEFT',
             // subquery as table name
-            "(SELECT courseid AS course, " .
-                sql_group_concat(sql_cast2char('customint1'), '|', true) .
-                " AS idlist FROM {enrol} e
+            "(SELECT courseid AS course, {$idlist} AS idlist
+                FROM {enrol} e
                 WHERE e.enrol = 'cohort'
                 GROUP BY courseid)",
             "cohortenrolledcourse.course = $join.$field",
@@ -5514,19 +5526,19 @@ abstract class rb_base_source {
      * @param string $field Name of program id field to join on
      * @return boolean True
      */
-    protected function add_cohort_program_tables_to_joinlist(&$joinlist,
-                                                             $join, $field) {
+    protected function add_cohort_program_tables_to_joinlist(&$joinlist, $join, $field) {
+        global $CFG, $DB;
 
-        global $CFG;
         require_once($CFG->dirroot . '/cohort/lib.php');
+
+        $idlist = $DB->sql_group_concat(sql_cast2char('assignmenttypeid'), '|', 'assignmenttypeid', true);
 
         $joinlist[] = new rb_join(
             'cohortenrolledprogram',
             'LEFT',
             // subquery as table name
-            "(SELECT programid AS program, " .
-                sql_group_concat(sql_cast2char('assignmenttypeid'), '|', true) .
-                " AS idlist FROM {prog_assignment} pa
+            "(SELECT programid AS program, {$idlist} AS idlist
+                FROM {prog_assignment} pa
                 WHERE assignmenttype = " . ASSIGNTYPE_COHORT . "
                 GROUP BY programid)",
             "cohortenrolledprogram.program = $join.$field",
