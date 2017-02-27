@@ -96,8 +96,9 @@ Feature: Seminar Approval required
     And I should see "Sam5 Student5"
     And I should see "Sam6 Student6"
 
-    Then I select to approve "Sam1 Student1"
-    And I select to approve "Sam2 Student2"
+    And I set the following fields to these values:
+      | Approve Sam1 Student1 for this event | 1 |
+      | Approve Sam2 Student2 for this event | 1 |
     And I press "Update requests"
     When I follow "Attendees"
     Then I should see "Sam1 Student1" in the "#facetoface_sessions" "css_element"
@@ -178,8 +179,9 @@ Feature: Seminar Approval required
     And I should see "Sam5 Student5"
     And I should see "Sam6 Student6"
 
-    Then I select to approve "Sam1 Student1"
-    And I select to approve "Sam2 Student2"
+    And I set the following fields to these values:
+      | Approve Sam1 Student1 for this event | 1 |
+      | Approve Sam2 Student2 for this event | 1 |
     And I press "Update requests"
     When I follow "Attendees"
     Then I should see "Sam1 Student1" in the "#facetoface_sessions" "css_element"

@@ -138,10 +138,12 @@ Feature: Seminar event cancellation status
     And I should see "Learner Three"
     And I should see "Learner Four"
     And I should not see "Learner Five"
-    Then I select to approve "Learner Three"
-    And I select to approve "Learner Four"
-    And I select to approve "Learner One"
-    And I click on "input[value='1']" "css_element" in the "Learner Two" "table_row"
+
+    And I set the following fields to these values:
+      | Approve Learner Three for this event | 1 |
+      | Approve Learner Four for this event  | 1 |
+      | Approve Learner One for this event   | 1 |
+      | Decline Learner Two for this event   | 1 |
     And I press "Update requests"
     Then I should see "Attendance requests updated"
     And I should see "No pending approvals"

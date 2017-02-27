@@ -1311,12 +1311,22 @@ if ($action == 'approvalrequired') {
                 $data[] = html_writer::span($state, 'approvalstate' . $attendee->id, array('id' => 'approvalstate' . $attendee->id));
                 $data[] = html_writer::span($time, 'approvaltime' . $attendee->id, array('id' => 'approvaltime' . $attendee->id));
             }
-    }
+        }
 
+        $id = 'requests_' . $attendee->id . '_noaction';
+        $label = html_writer::label(get_string('decideuserlater', 'mod_facetoface', format_string(fullname($attendee))), $id, '', array('class' => 'sr-only'));
+        $radio = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '0', 'checked' => 'checked', 'id' => $id)));
+        $data[] = $label . $radio;
 
-        $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '0', 'checked' => 'checked')));
-        $data[] = html_writer::empty_tag('input',array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '1')));
-        $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '2')));
+        $id = 'requests_' . $attendee->id . '_decline';
+        $label = html_writer::label(get_string('declineuserevent', 'mod_facetoface', format_string(fullname($attendee))), $id, '', array('class' => 'sr-only'));
+        $radio = html_writer::empty_tag('input',array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '1', 'id' => $id)));
+        $data[] = $label . $radio;
+
+        $id = 'requests_' . $attendee->id . '_approve';
+        $label = html_writer::label(get_string('approveuserevent', 'mod_facetoface', format_string(fullname($attendee))), $id, '', array('class' => 'sr-only'));
+        $radio = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '2', 'id' => $id)));
+        $data[] = $label . $radio;
         $table->data[] = $data;
     }
 

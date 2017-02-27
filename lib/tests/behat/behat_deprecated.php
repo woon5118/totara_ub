@@ -284,6 +284,18 @@ class behat_deprecated extends behat_base {
         $this->deprecated_message('Use "I click on "<item>" in the totara menu" instead');
     }
 
+    /**
+     * Select to approve the given user.
+     *
+     * @Given /^I select to approve "([^"]*)"$/
+     * @deprecated since Totara 10
+     */
+    public function i_select_to_approve($user) {
+        $this->deprecated_message('Use "I set the field "Approve <user> for this event" to "1"');
+        return array(
+            new Given('I click on "input[value=\'2\']" "css_element" in the "'.$user.'" "table_row"')
+        );
+    }
 
     /**
      * Throws an exception if $CFG->behat_usedeprecated is not allowed.

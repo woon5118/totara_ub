@@ -82,7 +82,7 @@ Feature: Seminar Event Registration Closure
     And I press "Continue"
     And I press "Confirm"
     And I follow "Approval required"
-    And I select to approve "Sally Sal"
+    And I set the field "Approve Sally Sal for this event" to "1"
     And I press "Update requests"
     And I log out
     And I log in as "manager"
@@ -91,7 +91,7 @@ Feature: Seminar Event Registration Closure
     And I click on "Test facetoface name" "link"
     And I follow "Attendees"
     And I follow "Approval required"
-    And I select to approve "Jelly Jel"
+    And I set the field "Approve Jelly Jel for this event" to "1"
     And I press "Update requests"
     And I log out
     And I log in as "admin"
