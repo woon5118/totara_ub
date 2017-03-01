@@ -217,8 +217,8 @@ abstract class moodleform {
             // $ajaxformdata is expected to be an array, because its a string we can assume that this is an old Totara form
             // that has not been converted to use the updated API.
             // Shuffle the arguments one step to the left.
-            $ajaxformdata = null;
             $formidprefix = $ajaxformdata;
+            $ajaxformdata = null;
             // And let the developer know, we want to fix this sooner rather than later and we don't want new ones arriving.
             debugging('Arguments when constructing '.get_called_class().' have changed and need to be updated', DEBUG_DEVELOPER);
             error_log('Arguments when constructing class "'.get_called_class().'" have changed and need to be updated');
@@ -2709,7 +2709,7 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
 
         'actionbuttons'=>"\n\t\t".'<div id="{id}" class="fitem fitem_actionbuttons fitem_{type} {class}"><div class="felement {type}">{element}</div></div>',
 
-        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {class}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}"><fieldset class="{type}<!-- BEGIN error --> error<!-- END error -->">{legendtemplate}<div class="felement"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><!-- END error -->{element}</div></fieldset></div>',
+        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {class}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}"><fieldset class="{type} {class}<!-- BEGIN error --> error<!-- END error -->">{legendtemplate}<div class="felement"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><!-- END error -->{element}</div></fieldset></div>',
         'legendtemplate' => '<legend><span class="legend">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</span></legend>',
 
         'static'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {emptylabel} {class}"><div class="fitemtitle"><div class="fstaticlabel">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</div></div><div class="felement fstatic <!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',

@@ -133,10 +133,6 @@ class engine extends \core_search\engine {
 
         // If there is any problem we trigger the exception as soon as possible.
         $client = $this->get_search_client();
-        $serverstatus = $this->is_server_ready();
-        if ($serverstatus !== true) {
-            throw new \core_search\engine_exception('engineserverstatus', 'search');
-        }
 
         // Create the query object.
         $query = $this->create_user_query($filters, $usercontexts);

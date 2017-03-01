@@ -18,7 +18,7 @@
  * This file keeps track of upgrades to the manual enrolment plugin
  *
  * @package    enrol_manual
- * @copyright  2012 Petr Skoda {@link http://skodak.org
+ * @copyright  2012 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,10 +31,5 @@ function xmldb_enrol_manual_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
-
     return true;
 }
-
-

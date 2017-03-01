@@ -52,7 +52,6 @@ function xmldb_folder_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
-
     // Add showdownloadfolder option.
     if ($oldversion < 2016020201) {
         $table = new xmldb_table('folder');
@@ -63,9 +62,6 @@ function xmldb_folder_upgrade($oldversion) {
 
         upgrade_mod_savepoint(true, 2016020201, 'folder');
     }
-
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
 
     return true;
 }

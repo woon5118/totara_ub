@@ -1631,7 +1631,9 @@ class mod_assign_external_testcase extends externallib_advanced_testcase {
         // We need a explicit prohibit since this capability is only defined in authenticated user and guest roles.
         $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
         assign_capability('mod/assign:view', CAP_PROHIBIT, $teacherrole->id, $context->id);
+        // Empty all the caches that may be affected by this change.
         accesslib_clear_all_caches_for_unit_testing();
+        course_modinfo::clear_instance_cache();
 
         $this->setExpectedException('require_login_exception', 'Course or activity not accessible. (Activity is hidden)');
         mod_assign_external::view_grading_table($assign->id);

@@ -40,8 +40,6 @@ function xmldb_feedback_upgrade($oldversion) {
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
-    $dbman = $DB->get_manager();
-
     // Totara 10 branching line.
 
     if ($oldversion < 2016031600) {
@@ -135,9 +133,6 @@ function xmldb_feedback_upgrade($oldversion) {
         // Feedback savepoint reached.
         upgrade_mod_savepoint(true, 2016051105, 'feedback');
     }
-
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
 
     return true;
 }

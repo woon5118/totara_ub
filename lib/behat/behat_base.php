@@ -30,9 +30,7 @@
 
 use Behat\Mink\Exception\ExpectationException as ExpectationException,
     Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException,
-    Behat\Mink\Element\NodeElement as NodeElement,
-    WebDriver\Exception\UnknownError,
-    WebDriver\Exception\NoSuchWindow;
+    Behat\Mink\Element\NodeElement as NodeElement;
 
 /**
  * Steps definitions base class.
@@ -709,9 +707,20 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
             return;
         }
 
+        // Totara: this is the start for timeout calculations.
+        $start = time();
+
         // We don't use behat_base::spin() here as we don't want to end up with an exception
         // if the page & JSs don't finish loading properly.
         for ($i = 0; $i < self::EXTENDED_TIMEOUT * 10; $i++) {
+            if ($i != 0) {
+                if ($start + self::EXTENDED_TIMEOUT < time()) {
+                    // We have waited long enough, throw exception.
+                    break;
+                }
+                // Sleep for 0.1 seconds only.
+                usleep(100000);
+            }
             $pending = '';
             try {
                 $jscode = '
@@ -727,31 +736,30 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                         } else if (typeof M.util !== "undefined") {
                             return M.util.pending_js.join(":");
                         } else {
-                            return "incomplete"
+                            return "incomplete";
                         }
                     }();';
                 $pending = $this->getSession()->evaluateScript($jscode);
-            } catch (NoSuchWindow $nsw) {
+            } catch (WebDriver\Exception\ScriptTimeout $e) {
+                // Totara: this is a common problem in Chrome, the JS just stops executing with long timeouts.
+                $pending = 'timeout';
+            } catch (\WebDriver\Exception\NoSuchWindow $nsw) {
                 // We catch an exception here, in case we just closed the window we were interacting with.
                 // No javascript is running if there is no window right?
                 $pending = '';
-            } catch (UnknownError $e) {
+            } catch (\WebDriver\Exception\UnknownError $e) {
                 // M is not defined when the window or the frame don't exist anymore.
                 if (strstr($e->getMessage(), 'M is not defined') != false) {
                     $pending = '';
                 }
             }
-
             // If there are no pending JS we stop waiting.
             if ($pending === '') {
                 return true;
             }
-
-            // 0.1 seconds.
-            usleep(100000);
         }
 
-        // Timeout waiting for JS to complete. It will be catched and forwarded to behat_hooks::i_look_for_exceptions().
+        // Timeout waiting for JS to complete.
         // It is unlikely that Javascript code of a page or an AJAX request needs more than self::EXTENDED_TIMEOUT seconds
         // to be loaded, although when pages contains Javascript errors M.util.js_complete() can not be executed, so the
         // number of JS pending code and JS completed code will not match and we will reach this point.

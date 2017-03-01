@@ -73,6 +73,8 @@ class behat_files extends behat_base {
         } else {
             // Gets the ffilemanager node specified by the locator which contains the filepicker container.
             $filepickerelement = behat_context_helper::escape($filepickerelement);
+            // Totara: TL-8025 we need to be able to select required file pickers, so lets use contains instead of equals,
+            //         this means that you cannot test forms that have "Import" and 'Import xx" file managers, you need to use better labels.
             $filepickercontainer = $this->find(
                 'xpath',
                 "//input[./@id = //label[contains(normalize-space(.), $filepickerelement)]/@for]" .

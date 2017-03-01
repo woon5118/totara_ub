@@ -541,7 +541,7 @@ class core_user {
 
         self::fill_properties_cache();
 
-        if (!array_key_exists($property, self::$propertiescache) || !array_key_exists('choices',
+        if (!array_key_exists($property, self::$propertiescache) && !array_key_exists('choices',
                 self::$propertiescache[$property])) {
 
             throw new coding_exception('Invalid property requested, or the property does not has a list of choices.');

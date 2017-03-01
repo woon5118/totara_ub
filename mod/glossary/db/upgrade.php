@@ -20,15 +20,14 @@
 // Please do not forget to use upgrade_set_timeout()
 // before any action that may take longer time to finish.
 
+defined('MOODLE_INTERNAL') || die();
+
 function xmldb_glossary_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
-
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
 
     return true;
 }

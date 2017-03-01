@@ -1,5 +1,4 @@
 <?php
-
 // This file keeps track of upgrades to
 // the data module
 //
@@ -19,6 +18,8 @@
 //
 // Please do not forget to use upgrade_set_timeout()
 // before any action that may take longer time to finish.
+
+defined('MOODLE_INTERNAL') || die();
 
 function xmldb_data_upgrade($oldversion) {
     global $CFG, $DB;
@@ -41,10 +42,6 @@ function xmldb_data_upgrade($oldversion) {
         // Data savepoint reached.
         upgrade_mod_savepoint(true, 2016030300, 'data');
     }
-
-
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
 
     return true;
 }

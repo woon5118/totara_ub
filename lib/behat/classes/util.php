@@ -86,10 +86,9 @@ class behat_util extends testing_util {
         install_cli_database($options, false);
 
         // Undo Totara changed defaults to allow upstream testing without hacks.
-        set_config('enablecompletion', 0);
         set_config('forcelogin', 0);
         set_config('guestloginbutton', 1);
-        set_config('enablecompletion', 0, 'moodlecourse');
+        //set_config('enablecompletion', 0, 'moodlecourse');
         set_config('completionstartonenrol', 0, 'moodlecourse');
         set_config('enrol_plugins_enabled', 'manual,guest,self,cohort');
         set_config('enhancedcatalog', 0);
@@ -215,6 +214,7 @@ class behat_util extends testing_util {
                 }
             }
             echo $output;
+            ob_flush();
         }
     }
 

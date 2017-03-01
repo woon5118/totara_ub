@@ -790,7 +790,7 @@ if ($mform_post->is_cancelled()) {
         $message = '';
         $addpost = $fromform;
         $addpost->forum=$forum->id;
-        if ($fromform->id = forum_add_new_post($addpost, $mform_post, $message)) {
+        if ($fromform->id = forum_add_new_post($addpost, $mform_post)) {
             $subscribemessage = forum_post_subscription($fromform, $forum, $discussion);
 
             if (!empty($fromform->mailnow)) {

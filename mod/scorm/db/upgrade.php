@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * @global moodle_database $DB
@@ -47,10 +48,5 @@ function xmldb_scorm_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2016021000, 'scorm');
     }
 
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
-
     return true;
 }
-
-

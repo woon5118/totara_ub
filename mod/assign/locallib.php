@@ -3361,7 +3361,7 @@ class assign {
         if ($grade) {
             $data = new stdClass();
             if ($grade->grade !== null && $grade->grade >= 0) {
-                $data->grade = format_float($grade->grade, 2);
+                $data->grade = format_float($grade->grade, $this->get_grade_item()->get_decimals());
             }
         } else {
             $data = new stdClass();
@@ -6533,7 +6533,6 @@ class assign {
             foreach ($team as $member) {
                 if ($member->id != $userid) {
                     $membersubmission = clone($submission);
-                    $membersubmission->status = ASSIGN_SUBMISSION_STATUS_DRAFT;
                     $this->update_submission($membersubmission, $member->id, true, $instance->teamsubmission);
                 }
             }
@@ -6692,7 +6691,9 @@ class assign {
         $userid = isset($params['userid']) ? $params['userid'] : 0;
         $attemptnumber = isset($params['attemptnumber']) ? $params['attemptnumber'] : 0;
         $gradingpanel = !empty($params['gradingpanel']);
-        if (!$userid) {
+        $bothids = ($userid && $useridlistid);
+
+	    if (!$userid || $bothids) {
             $useridlistkey = $this->get_useridlist_key($useridlistid);
             if (empty($SESSION->mod_assign_useridlist[$useridlistkey])) {
                 $SESSION->mod_assign_useridlist[$useridlistkey] = $this->get_grading_userid_list();

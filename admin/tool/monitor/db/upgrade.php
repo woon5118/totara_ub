@@ -37,9 +37,6 @@ function xmldb_tool_monitor_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
-
     if ($oldversion < 2016052305) {
 
         // Define field inactivedate to be added to tool_monitor_subscriptions.

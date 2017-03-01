@@ -507,7 +507,7 @@ module.exports = function(grunt) {
     grunt.registerTask('js', ['amd', 'shifter']);
 
     // Register Totara tasks.
-    grunt.registerTask('css', ['less:totara', 'postcss:prefix', 'postcss:rtl']);
+    grunt.registerTask('css', ['less:bootstrapbase', 'less:totara', 'postcss:prefix', 'postcss:rtl']);
 
     // Register the startup task.
     grunt.registerTask('startup', 'Run the correct tasks for the current directory', tasks.startup);

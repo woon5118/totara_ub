@@ -18,7 +18,7 @@
  * This file keeps track of upgrades to the guest enrolment plugin.
  *
  * @package    enrol_guest
- * @copyright  2011 Petr Skoda {@link http://skodak.org
+ * @copyright  2011 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,9 +30,6 @@ function xmldb_enrol_guest_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
-
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
 
     return true;
 }

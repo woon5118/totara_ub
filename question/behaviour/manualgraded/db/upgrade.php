@@ -22,9 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * Manual graded question behaviour upgrade code.
@@ -35,9 +33,6 @@ function xmldb_qbehaviour_manualgraded_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
-
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
 
     return true;
 }

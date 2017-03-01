@@ -69,4 +69,9 @@ foreach ($requests as $request) {
     }
 }
 
+// Totara: note that the returned value is not validated in any way,
+// this is intentional because the returned data may have flexible format
+// and cannot be described with external_description structure.
+// It was a really bad idea to abuse externallib for ajax stuff!
+
 echo json_encode($responses);

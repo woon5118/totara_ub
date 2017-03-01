@@ -92,32 +92,8 @@ function xmldb_main_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
-    if ($oldversion < 2015111606.02) {
-
-        // Define index attemptstepid-name (unique) to be dropped from question_attempt_step_data.
-        $table = new xmldb_table('question_attempt_step_data');
-        $index = new xmldb_index('attemptstepid-name', XMLDB_INDEX_UNIQUE, array('attemptstepid', 'name'));
-
-        // Conditionally launch drop index attemptstepid-name.
-        if ($dbman->index_exists($table, $index)) {
-            $dbman->drop_index($table, $index);
-        }
-
-        // Main savepoint reached.
-        upgrade_main_savepoint(true, 2015111606.02);
-    }
-
-    if ($oldversion < 2016011200.00) {
-
-        // Force uninstall of deleted tool.
-        if (!file_exists("$CFG->dirroot/webservice/amf")) {
-            // Remove capabilities.
-            capabilities_cleanup('webservice_amf');
-            // Remove all other associated config.
-            unset_all_config_for_plugin('webservice_amf');
-        }
-        upgrade_main_savepoint(true, 2016011200.00);
-    }
+    // Moodle v3.0.0 release upgrade line.
+    // Put any upgrade step following this.
 
     if ($oldversion < 2016011300.01) {
 
@@ -418,7 +394,25 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2016020201.00);
     }
 
-    if ($oldversion < 2016021100.01) {
+    if ($oldversion < 2016021500.00) {
+        $root = $CFG->tempdir . '/download';
+        if (is_dir($root)) {
+            // Fetch each repository type - include all repos, not just enabled.
+            $repositories = $DB->get_records('repository', array(), '', 'type');
+
+            foreach ($repositories as $id => $repository) {
+                $directory = $root . '/repository_' . $repository->type;
+                if (is_dir($directory)) {
+                    fulldelete($directory);
+                }
+            }
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2016021500.00);
+    }
+
+    if ($oldversion < 2016021501.00) {
         // This could take a long time. Unfortunately, no way to know how long, and no way to do progress, so setting for 1 hour.
         upgrade_set_timeout(3600);
 
@@ -432,7 +426,7 @@ function xmldb_main_upgrade($oldversion) {
         }
 
         // Main savepoint reached.
-        upgrade_main_savepoint(true, 2016021100.01);
+        upgrade_main_savepoint(true, 2016021501.00);
     }
 
     if ($oldversion < 2016030103.00) {
@@ -1018,11 +1012,11 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2016041500.66);
     }
 
-    if ($oldversion < 2016040700.01) {
+    if ($oldversion < 2016042100.00) {
         // Update all countries to upper case.
         $DB->execute("UPDATE {user} SET country = UPPER(country)");
         // Main savepoint reached.
-        upgrade_main_savepoint(true, 2016040700.01);
+        upgrade_main_savepoint(true, 2016042100.00);
     }
 
     if ($oldversion < 2016042600.01) {

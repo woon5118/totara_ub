@@ -31,8 +31,11 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool
  */
 function xmldb_antivirus_clamav_upgrade($oldversion) {
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
+    global $CFG, $DB;
+
+    $dbman = $DB->get_manager();
+
+    // Totara 10 branching line.
 
     return true;
 }

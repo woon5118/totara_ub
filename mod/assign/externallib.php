@@ -2181,6 +2181,8 @@ class mod_assign_external extends external_api {
      * @since Moodle 2.6
      */
     public static function copy_previous_attempt($assignmentid) {
+        global $CFG;
+        require_once("$CFG->dirroot/mod/assign/locallib.php");
 
         $params = self::validate_parameters(self::copy_previous_attempt_parameters(),
             array('assignmentid' => $assignmentid));

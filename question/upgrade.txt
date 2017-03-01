@@ -1,2 +1,8 @@
 This files describes API changes for code that uses the question API,
 information provided here is intended especially for developers.
+
+=== 10 ===
+
+1) The argument $requirecourseid was removed from question_edit_setup() and
+   is no longer respected. The behaviour was found to be buggy and now throws
+   debugging notices if passed.

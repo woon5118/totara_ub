@@ -496,7 +496,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
             mod_quiz_external::get_user_best_grade($this->quiz->id, -1);
             $this->fail('Exception expected due to missing capability.');
         } catch (dml_missing_record_exception $e) {
-            $this->assertEquals('invaliduser', $e->errorcode);
+            $this->assertEquals('invalidrecordunknown', $e->errorcode); // Totara doesn't give any information away.
         }
 
         // Remove the created data.
@@ -636,7 +636,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
             mod_quiz_external::get_combined_review_options($quiz->id, -1);
             $this->fail('Exception expected due to missing capability.');
         } catch (dml_missing_record_exception $e) {
-            $this->assertEquals('invaliduser', $e->errorcode);
+            $this->assertEquals('invalidrecordunknown', $e->errorcode);
         }
     }
 

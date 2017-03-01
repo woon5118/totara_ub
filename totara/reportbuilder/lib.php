@@ -3791,7 +3791,7 @@ class reportbuilder {
             $toolbarsearchtext = isset($SESSION->reportbuilder[$this->get_uniqueid()]['toolbarsearchtext']) ?
                     $SESSION->reportbuilder[$this->get_uniqueid()]['toolbarsearchtext'] : '';
             $mform = new report_builder_toolbar_search_form($this->get_current_url(),
-                    array('toolbarsearchtext' => $toolbarsearchtext), 'post', '', null, true, 'toolbarsearch');
+                    array('toolbarsearchtext' => $toolbarsearchtext), 'post', '', null, true, null, 'toolbarsearch');
             $table->add_toolbar_content($mform->render());
 
             if ($this->embedded && $content = $this->embedobj->get_extrabuttons()) {

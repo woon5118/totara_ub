@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * @param int $oldversion the version we are upgrading from
  * @return bool result
@@ -33,9 +35,6 @@ function xmldb_filter_mediaplugin_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
-
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
 
     return true;
 }

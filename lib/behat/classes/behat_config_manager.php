@@ -442,6 +442,7 @@ class behat_config_manager {
                 $config = self::merge_config($config, self::merge_behat_config($profile, $values));
             }
         }
+
         // Check for Moodle custom ones.
         if (!empty($CFG->behat_profiles) && is_array($CFG->behat_profiles)) {
             foreach ($CFG->behat_profiles as $profile => $values) {

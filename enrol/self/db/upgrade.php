@@ -18,7 +18,7 @@
  * This file keeps track of upgrades to the self enrolment plugin
  *
  * @package    enrol_self
- * @copyright  2012 Petr Skoda {@link http://skodak.org
+ * @copyright  2012 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,9 +30,6 @@ function xmldb_enrol_self_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
-
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
 
     if ($oldversion < 2016052301) {
         global $DB;
@@ -53,5 +50,3 @@ function xmldb_enrol_self_upgrade($oldversion) {
 
     return true;
 }
-
-

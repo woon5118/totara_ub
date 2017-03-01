@@ -85,13 +85,6 @@ class profile_field_menu extends profile_field_base {
     }
 
     /**
-     * Old syntax of class constructor for backward compatibility.
-     */
-    public function profile_field_menu($fieldid=0, $userid=0) {
-        self::__construct($fieldid, $userid);
-    }
-
-    /**
      * Old syntax of class constructor. Deprecated in PHP7.
      *
      * @deprecated since Moodle 3.1

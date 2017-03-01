@@ -23,15 +23,13 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+
 function xmldb_enrol_database_upgrade($oldversion, $block) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
-
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
 
     return true;
 }

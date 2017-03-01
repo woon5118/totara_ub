@@ -1438,7 +1438,7 @@ class core_plugin_manager {
 
             'tool' => array(
                 'assignmentupgrade', 'availabilityconditions', 'behat', 'capability', 'cohortroles', 'customlang',
-                'dbtransfer', 'filetypes', 'generator', 'health', 'innodb', 'installaddon',
+                'dbtransfer', 'filetypes', 'generator', 'health', 'innodb',
                 'langimport', 'log', 'lp', 'lpmigrate', 'messageinbound', 'mobile', 'multilangupgrade', 'monitor',
                 'phpunit', 'profiling', 'recyclebin', 'replace', 'spamcleaner', 'task', 'templatelibrary',
                 'unittest', 'uploadcourse', 'uploaduser', 'unsuproles', 'xmldb'

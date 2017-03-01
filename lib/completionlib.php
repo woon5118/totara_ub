@@ -1230,10 +1230,8 @@ class completion_info {
 
             // Reindex by cm id
             $alldata = array();
-            if ($alldatabycmc) {
-                foreach ($alldatabycmc as $data) {
-                    $alldata[$data->coursemoduleid] = $data;
-                }
+            foreach ($alldatabycmc as $data) {
+                $alldata[$data->coursemoduleid] = $data;
             }
 
             // Get the module info and build up condition info for each one
@@ -1241,7 +1239,7 @@ class completion_info {
                 $modinfo = get_fast_modinfo($this->course, $userid);
             }
             foreach ($modinfo->cms as $othercm) {
-                if (array_key_exists($othercm->id, $alldata)) {
+                if (isset($alldata[$othercm->id])) {
                     $data = $alldata[$othercm->id];
                 } else {
                     // Row not present counts as 'not complete'

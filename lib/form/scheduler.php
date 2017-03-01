@@ -45,7 +45,8 @@ class MoodleQuickForm_scheduler extends MoodleQuickForm_group {
      * @param mixed $attributes Either a typical HTML attribute string or an associative array
      */
     public function __construct($elementName = null, $elementLabel = null, $options = array(), $attributes = null) {
-        $this->HTML_QuickForm_element($elementName, $elementLabel, $attributes);
+        parent::__construct($elementName, $elementLabel);
+        $this->setAttributes($attributes);
         $this->_persistantFreeze = true;
         $this->_appendName = true;
         $this->_type = 'scheduler';

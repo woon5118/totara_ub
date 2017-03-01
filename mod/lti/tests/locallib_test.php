@@ -306,8 +306,8 @@ class mod_lti_locallib_testcase extends advanced_testcase {
         $this->assertEquals('Example tool', $type->lti_typename);
         $this->assertEquals('Example tool description', $type->lti_description);
         $this->assertEquals('http://www.example.com/lti/provider.php', $type->lti_toolurl);
-        $this->assertEquals('http://download.moodle.org/unittest/test.jpg', $type->lti_icon);
-        $this->assertEquals('https://download.moodle.org/unittest/test.jpg', $type->lti_secureicon);
+        $this->assertEquals('http://test.totaralms.com/exttests/test.jpg', $type->lti_icon);
+        $this->assertEquals('https://test.totaralms.com/exttests/test.jpg', $type->lti_secureicon);
     }
 
     /**
@@ -323,8 +323,8 @@ class mod_lti_locallib_testcase extends advanced_testcase {
         $this->assertEquals('Example tool description', $lti->intro);
         $this->assertEquals('http://www.example.com/lti/provider.php', $lti->toolurl);
         $this->assertEquals('https://www.example.com/lti/provider.php', $lti->securetoolurl);
-        $this->assertEquals('http://download.moodle.org/unittest/test.jpg', $lti->icon);
-        $this->assertEquals('https://download.moodle.org/unittest/test.jpg', $lti->secureicon);
+        $this->assertEquals('http://test.totaralms.com/exttests/test.jpg', $lti->icon);
+        $this->assertEquals('https://test.totaralms.com/exttests/test.jpg', $lti->secureicon);
     }
 
     /**
