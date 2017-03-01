@@ -1,4 +1,4 @@
-This files describes API changes for code that uses the question API,
+This files describes API changes for code that uses the appraisal API,
 information provided here is intended especially for developers.
 
 === 10.0 ===
@@ -15,3 +15,4 @@ information provided here is intended especially for developers.
 * totara_appraisal_renderer::display_stage() has changed to render from a mustache template (totara_appraisal/stage_brief)
 * totara_appraisal_renderer::display_stage_actions_for_stages() has changed
 * totara_appraisal_renderer::display_stage_actions_for_pages() has changed
+* totara_appraisal_renderer::display_pages() has changed
