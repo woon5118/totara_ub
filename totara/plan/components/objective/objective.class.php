@@ -1336,13 +1336,15 @@ class dp_objective_component extends dp_base_component {
                 $options[$id] = $val->name;
             }
 
-            return html_writer::select(
+            $label = html_writer::label(get_string('statusof', 'totara_plan', format_string($ca->fullname)), "menuproficiencies{$ca->id}", true, array('class' => 'sr-only'));
+            $select = html_writer::select(
                 $options,
                 "proficiencies[{$ca->id}]",
                 $selected,
                 null,
                 array()
             );
+            return $label . $select;
 
         } else {
             // They can't change the setting, so show it as-is

@@ -1494,7 +1494,8 @@ class dp_competency_component extends dp_base_component {
         }
 
         $attributes = array(); //in this case no attributes are set
-        $output = html_writer::select($formatscale,
+        $output = html_writer::label(get_string('statusof', 'totara_plan', format_string($item->fullname)), "menucompprof_{$this->component}{$item->id}", true, array('class' => 'sr-only'));
+        $output .= html_writer::select($formatscale,
                                     "compprof_{$this->component}[{$item->id}]",
                                     $item->profscalevalueid,
                                     array(($item->profscalevalueid ? '' : 0) => ($item->profscalevalueid ? '' : get_string('notset', 'totara_hierarchy'))),

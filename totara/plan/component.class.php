@@ -507,7 +507,7 @@ abstract class dp_base_component {
         }
 
         if (!$plancompleted) {
-            $tableheaders[] = '';  // don't show status header
+            $tableheaders[] = get_string('approvalstatus', 'totara_plan');
             $tablecolumns[] = 'status';
             $tablehide[] = 'status';
         }
@@ -563,12 +563,14 @@ abstract class dp_base_component {
 
         foreach ($pendingitems as $item) {
             // @todo write abstracted display_item_name() and use here
+            $html_id = "reasonfordecision_{$this->component}_{$item->id}";
             $controls .= html_writer::start_tag('div', array('style' => 'display: table-row'));
             $controls .= html_writer::tag('div', format_string($item->fullname), array('style' => 'display: table-cell'));
             $controls .= html_writer::tag('div', $this->display_approval_options($item, $item->approved), array('style' => 'display: table-cell'));
             $controls .= html_writer::start_div('', array('style' => 'display: table-cell'));
             $controls .= get_string('reasonfordecision', 'totara_message');
-            $controls .= html_writer::empty_tag('input', array('type' => 'text', 'name' => "reasonfordecision_{$this->component}[$item->id]"));
+            $controls .= html_writer::label(get_string('reasonforapprovedecline', 'totara_plan', format_string($item->fullname)), $html_id, null, array('class' => 'sr-only'));
+            $controls .= html_writer::empty_tag('input', array('type' => 'text', 'name' => "reasonfordecision_{$this->component}[$item->id]", 'id' => $html_id));
             $controls .= html_writer::end_div();
             $controls .= html_writer::end_tag('div');
         }
@@ -1351,7 +1353,7 @@ abstract class dp_base_component {
      * @return string
      */
     protected function display_list_item_duedate($item) {
-        return $this->display_duedate($item->id, $item->duedate);
+        return $this->display_duedate($item->id, $item->duedate, $item->fullname);
     }
 
     /**
@@ -1484,9 +1486,10 @@ abstract class dp_base_component {
      *
      * @param int $itemid
      * @param int $duedate
+     * @param string $componentname
      * @return string
      */
-    function display_duedate($itemid, $duedate) {
+    function display_duedate($itemid, $duedate, $componentname) {
         $baddates = explode(',',optional_param('badduedates', null, PARAM_TEXT));
 
         $plancompleted = $this->plan->status == DP_PLAN_STATUS_COMPLETE;
@@ -1497,7 +1500,7 @@ abstract class dp_base_component {
         // only show a form if they have permission to change due dates
         if ($cansetduedate) {
             $class = in_array($itemid, $baddates) ? 'dp-plan-component-input-error' : '';
-            $out .= $this->display_duedate_as_form($duedate, "duedate_{$this->component}[{$itemid}]", $class, $itemid);
+            $out .= $this->display_duedate_as_form($duedate, "duedate_{$this->component}[{$itemid}]", $class, $itemid, $componentname);
         } else {
             $out .= $this->display_duedate_as_text($duedate);
         }
@@ -1513,14 +1516,18 @@ abstract class dp_base_component {
      * @param string $name
      * @param int $duedate
      * @param string $inputclass
+     * @param string $componentname
      * @return string
      */
-    function display_duedate_as_form($duedate, $name, $inputclass='', $itemid) {
+    function display_duedate_as_form($duedate, $name, $inputclass='', $itemid, $componentname) {
         global $CFG;
         $duedatestr = !empty($duedate) ? userdate($duedate, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false) : '';
-        return html_writer::empty_tag('input',
+        $label = html_writer::label(get_string('duedatefor', 'totara_plan', format_string($componentname)), $name, true, array('class' => 'sr-only'));
+        $input = html_writer::empty_tag('input',
             array('id' => $name, 'type' => "text", 'name' => $name, 'placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core'),
                 'value' => $duedatestr, 'size' => "8", 'maxlength' => "20", 'class' => $inputclass));
+
+        return $label . $input;
     }
 
 
@@ -1595,7 +1602,7 @@ abstract class dp_base_component {
 
         if ($cansetpriority) {
             // show a pulldown menu of priority options
-            $out .= $this->display_priority_picker("priorities_{$this->component}[{$item->id}]", $item->priority, $item->id, $priorityvalues, $prioritydefaultid, $priorityrequired);
+            $out .= $this->display_priority_picker("priorities_{$this->component}[{$item->id}]", $item->priority, $item->id, $priorityvalues, $prioritydefaultid, $priorityrequired, $item->fullname);
         } else {
             // just display priority if no permissions to set it
             $out .= $this->display_priority_as_text($item->priority, $priorityname, $priorityvalues);
@@ -1614,9 +1621,10 @@ abstract class dp_base_component {
      * @param array $priorityvalues
      * @param int $prioritydefaultid
      * @param boolean $priorityrequired
+     * @param string $componentname
      * @return string
      */
-    function display_priority_picker($name, $priorityid, $itemid, $priorityvalues, $prioritydefaultid, $priorityrequired=false) {
+    function display_priority_picker($name, $priorityid, $itemid, $priorityvalues, $prioritydefaultid, $priorityrequired=false, $componentname) {
 
         if (!$priorityvalues) {
             return '';
@@ -1642,7 +1650,13 @@ abstract class dp_base_component {
             $selected = ($priorityrequired) ? $defaultchooseval : 0;
         }
 
-        return html_writer::select($options, $name, $selected, array('choose' => $choose), array());
+        $id = 'menu' . $name;
+        $id = str_replace('[', '', $id);
+        $id = str_replace(']', '', $id);
+
+        $label = html_writer::label(get_string('priorityof', 'totara_plan', format_string($componentname)), $id, true, array('class' => 'sr-only'));
+        $input = html_writer::select($options, $name, $selected, array('choose' => $choose), array());
+        return $label . $input;
     }
 
     /**
@@ -1719,14 +1733,13 @@ abstract class dp_base_component {
             $out .= $OUTPUT->pix_icon('/learning_plan_alert', get_string('unapproved', 'totara_plan'), 'totara_plan');
             $out .= get_string('unapproved', 'totara_plan');
             if ($canapprove) {
-                $out .= ' '.$this->display_approval_options($obj, $approvalstatus);
+                $out .= ' ' . $this->display_approval_options($obj, $approvalstatus);
             }
             break;
         case DP_APPROVAL_REQUESTED:
             $out .= html_writer::tag('span', get_string('pendingapproval', 'totara_plan'), array('class' => 'plan_highlight'));
-            $out .= html_writer::empty_tag('br');
             if ($canapprove) {
-                $out .= ' '.$this->display_approval_options($obj, $approvalstatus);
+                $out .= ' ' . $this->display_approval_options($obj, $approvalstatus);
             }
             break;
         case DP_APPROVAL_APPROVED:
@@ -1754,13 +1767,19 @@ abstract class dp_base_component {
             DP_APPROVAL_DECLINED => get_string('decline', 'totara_plan'),
         );
 
-        return html_writer::select(
+        $id = 'menu' . $name;
+        $id = str_replace('[', '', $id);
+        $id = str_replace(']', '', $id);
+
+        $label = html_writer::label(get_string('approvalstatusof', 'totara_plan', format_string($obj->fullname)), $id, true, array('class' => 'sr-only'));
+        $input = html_writer::select(
             $options,
             $name,
             $approvalstatus,
             array(0 => 'choose'),
             array('class' => 'approval')
         );
+        return $label . $input;
     }
 
     /**
