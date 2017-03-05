@@ -139,11 +139,15 @@ class backup_feedback_activity_structure_step extends backup_activity_structure_
                 array(backup::VAR_PARENTID));
 
             $value->set_source_table('feedback_value', array('completed' => backup::VAR_PARENTID));
+
+            $value_history->set_source_table('feedback_value_history', array('completed' => backup::VAR_PARENTID));
         }
 
         // Define id annotations
 
         $completed->annotate_ids('user', 'userid');
+
+        $completed_history->annotate_ids('user', 'userid');
 
         // Define file annotations
 

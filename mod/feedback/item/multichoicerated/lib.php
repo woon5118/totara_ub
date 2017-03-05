@@ -105,10 +105,9 @@ class feedback_item_multichoicerated extends feedback_item_base {
      * @param stdClass $item the db-object from feedback_item
      * @param int $groupid
      * @param int $courseid
-     * @param bool $donl2br
      * @return array
      */
-    protected function get_analysed($item, $groupid = false, $courseid = false, $donl2br = true) {
+    protected function get_analysed($item, $groupid = false, $courseid = false) {
         $analysed_item = array();
         $analysed_item[] = $item->typ;
         $analysed_item[] = $item->name;
@@ -177,10 +176,10 @@ class feedback_item_multichoicerated extends feedback_item_base {
 
     public function print_analysed($item, $itemnr = '', $groupid = false, $courseid = false) {
         global $OUTPUT;
-
+        $align = right_to_left() ? "right" : "left";
         $analysed_item = $this->get_analysed($item, $groupid, $courseid);
         if ($analysed_item) {
-            echo '<tr><th colspan="2" align="' . $align . '">';
+            echo '<tr><th colspan="2" align="'.$align.'">';
             echo $itemnr . ' ';
             if (strval($item->label) !== '') {
                 echo '('. format_string($item->label).') ';
@@ -216,7 +215,7 @@ class feedback_item_multichoicerated extends feedback_item_base {
                 echo '</td></tr>';
             }
             $avg = format_float($avg, 2);
-            echo '<tr><td align="left" colspan="2"><b>';
+            echo '<tr><td align="'.$align.'" colspan="2"><b>';
             echo get_string('average', 'feedback').': '.$avg.'</b>';
             echo '</td></tr>';
         }
@@ -226,7 +225,7 @@ class feedback_item_multichoicerated extends feedback_item_base {
                              $xls_formats, $item,
                              $groupid, $courseid = false) {
 
-        $analysed_item = $this->get_analysed($item, $groupid, $courseid, false);
+        $analysed_item = $this->get_analysed($item, $groupid, $courseid);
 
         $data = $analysed_item[2];
 

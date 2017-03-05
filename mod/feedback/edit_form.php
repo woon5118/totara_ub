@@ -36,6 +36,7 @@ class feedback_edit_use_template_form extends moodleform {
      */
     public function definition() {
         $mform =& $this->_form;
+        $mform->disable_form_change_checker();
 
         $course = $this->_customdata['course'];
 

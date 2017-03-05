@@ -1,7 +1,7 @@
 This files describes API changes in /mod/feedback/*,
 information provided here is intended especially for developers.
 
-=== 10.0 ===
+== 10.0 ===
 
 * feedback_get_courses_from_sitecourse_map() now returns course id as 'id' attribute
 * Base class for feedback items - feedback_item_base - has been significantly changed, all item types now
@@ -28,5 +28,3 @@ information provided here is intended especially for developers.
   * feedback_is_feedback_in_sitecourse_map()
   * feedback_clean_up_sitecourse_map()
   * feedback_print_numeric_option_list()
-* Abstract function feedback_item_base::get_analysed added argument $donl2br. Argument also added to all implementations of this function
-* feedback_get_courses_from_sitecourse_map() now returns course id as 'id' attribute

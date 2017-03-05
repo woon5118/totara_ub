@@ -106,10 +106,9 @@ class feedback_item_info extends feedback_item_base {
      * @param stdClass $item the db-object from feedback_item
      * @param int|false $groupid
      * @param int $courseid
-     * @param bool $donl2br
      * @return stdClass
      */
-    protected function get_analysed($item, $groupid = false, $courseid = false, $donl2br = true) {
+    protected function get_analysed($item, $groupid = false, $courseid = false) {
 
         $presentation = $item->presentation;
         $analysed_val = new stdClass();
@@ -176,10 +175,10 @@ class feedback_item_info extends feedback_item_base {
     public function excelprint_item(&$worksheet, $row_offset,
                              $xls_formats, $item,
                              $groupid, $courseid = false) {
-        $analysed_item = $this->get_analysed($item, $groupid, $courseid, false);
+        $analysed_item = $this->get_analysed($item, $groupid, $courseid);
 
         $worksheet->write_string($row_offset, 0, format_string($item->label), $xls_formats->head2);
-        $worksheet->write_string($row_offset, 1, format_string($item->name), $xls_formats->head2);
+        $worksheet->write_string($row_offset, 1, format_text($item->name, FORMAT_HTML, array('noclean' => true, 'para' => false), $xls_formats->head2);
         $data = $analysed_item->data;
         if (is_array($data)) {
             foreach ($data as $row) {

@@ -118,10 +118,6 @@ class mod_feedback_mod_form extends moodleform_mod {
 
         $mform->setType('page_after_submit_editor', PARAM_RAW);
 
-        $mform->addElement('selectyesno', 'grade', get_string('generategrade','feedback'));
-        $mform->setType('grade', PARAM_INT);
-        $mform->addHelpButton('grade', 'generategrade', 'feedback');
-
         $mform->addElement('text',
                            'site_after_submit',
                            get_string('url_for_continue', 'feedback'),
@@ -182,7 +178,7 @@ class mod_feedback_mod_form extends moodleform_mod {
 
         return $data;
     }
-    
+
     /**
      * Enforce validation rules here
      *

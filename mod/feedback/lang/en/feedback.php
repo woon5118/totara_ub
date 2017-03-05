@@ -124,11 +124,6 @@ $string['feedback:viewanalysepage'] = 'View the analysis page after submit';
 $string['feedback:viewreports'] = 'View reports';
 $string['file'] = 'File';
 $string['filter_by_course'] = 'Filter by course';
-$string['generategrade'] = 'Generate Grade';
-$string['generategrade_help'] = 'If you want to use this feedback as a prerequisite for a conditional activity -
-requiring that the feedback must be completed before that conditional activity becomes available -
-then you must set Generate Grade to Yes';
-
 $string['handling_error'] = 'Error occurred in feedback module action handling';
 $string['hide_no_select_option'] = 'Hide the "Not selected" option';
 $string['horizontal'] = 'horizontal';
@@ -274,29 +269,6 @@ $string['using_templates'] = 'Use a template';
 $string['vertical'] = 'vertical';
 // Deprecated since Moodle 3.0.
 $string['completed'] = 'completed';
-
-// Archives
-$string['error:completedhistorynotfound'] = 'Completed history not found for id : {$a}';
-$string['viewarchive'] = 'Feedback archive';
-$string['timearchived'] = 'Time archived';
-$string['coursename'] = 'Course name';
-$string['feedbackname'] = 'Feedback name';
-$string['timecompleted'] = 'Time completed';
-$string['feedback:viewarchive'] = 'View archive';
-
-// View archive form
-$string['filteroptions'] = 'Filter options';
-$string['coursenamefilter'] = 'Course name contains';
-$string['feedbacknamefilter'] = 'Feedback name contains';
-$string['usernamefilter'] = 'Username contains';
-$string['firstnamefilter'] = 'First name contains';
-$string['lastnamefilter'] = 'Last name contains';
-
-// Totara strings
-$string['maxdayshigherwarning'] = 'The global setting, \'Maximum days since completion\', is currently set to {$a} days. Any messages with a \'Period\' value greater than or equal to this will not be sent.';
-$string['setting_maxtimesincecomp_name'] = 'Maximum days since completion';
-$string['setting_maxtimesincecomp_desc'] = 'Course or activity completions older than this will not be considered when sending out feedback reminders. Zero or an empty value represents no limit.';
-
 // Deprecated since Moodle 3.1.
 $string['cannotmapfeedback'] = 'Database problem, unable to map feedback to course';
 $string['line_values'] = 'Rating';
@@ -327,3 +299,33 @@ $string['relateditemsdeleted'] = 'All responses for this question will also be d
 $string['radiorated'] = 'Radiobutton (rated)';
 $string['radiobutton'] = 'Multiple choice - single answer allowed (radio buttons)';
 $string['radiobutton_rated'] = 'Radiobutton (rated)';
+
+// Deprecated since Totara 10.
+$string['submission'] = 'Submission';
+$string['submitted'] = 'Submitted';
+$string['generategrade'] = 'Generate Grade';
+$string['generategrade_help'] = 'If you want to use this feedback as a prerequisite for a conditional activity -
+requiring that the feedback must be completed before that conditional activity becomes available -
+then you must set Generate Grade to Yes';
+
+// Archives
+$string['error:completedhistorynotfound'] = 'Completed history not found for id : {$a}';
+$string['viewarchive'] = 'Feedback archive';
+$string['timearchived'] = 'Time archived';
+$string['coursename'] = 'Course name';
+$string['feedbackname'] = 'Feedback name';
+$string['timecompleted'] = 'Time completed';
+$string['feedback:viewarchive'] = 'View archive';
+
+// View archive form
+$string['filteroptions'] = 'Filter options';
+$string['coursenamefilter'] = 'Course name contains';
+$string['feedbacknamefilter'] = 'Feedback name contains';
+$string['usernamefilter'] = 'Username contains';
+$string['firstnamefilter'] = 'First name contains';
+$string['lastnamefilter'] = 'Last name contains';
+
+// Totara strings
+$string['maxdayshigherwarning'] = 'The global setting, \'Maximum days since completion\', is currently set to {$a} days. Any messages with a \'Period\' value greater than or equal to this will not be sent.';
+$string['setting_maxtimesincecomp_name'] = 'Maximum days since completion';
+$string['setting_maxtimesincecomp_desc'] = 'Course or activity completions older than this will not be considered when sending out feedback reminders. Zero or an empty value represents no limit.';

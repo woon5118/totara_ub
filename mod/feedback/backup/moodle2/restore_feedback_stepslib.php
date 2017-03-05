@@ -42,7 +42,6 @@ class restore_feedback_activity_structure_step extends restore_activity_structur
             $paths[] = new restore_path_element('feedback_completed_history', '/activity/feedback/completeds_history/completed_history');
             $paths[] = new restore_path_element('feedback_value', '/activity/feedback/completeds/completed/values/value');
             $paths[] = new restore_path_element('feedback_value_history', '/activity/feedback/completeds_history/completed_history/values_history/value_history');
-            $paths[] = new restore_path_element('feedback_tracking', '/activity/feedback/trackings/tracking');
         }
 
         // Return the paths wrapped into standard activity structure
@@ -129,6 +128,19 @@ class restore_feedback_activity_structure_step extends restore_activity_structur
 
         $newitemid = $DB->insert_record('feedback_value', $data);
         $this->set_mapping('feedback_value', $oldid, $newitemid);
+    }
+
+    protected function process_feedback_value_history($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+        $data->completed = $this->get_new_parentid('feedback_completed_history');
+        $data->item = $this->get_mappingid('feedback_item', $data->item);
+        $data->course_id = $this->get_courseid();
+
+        $newitemid = $DB->insert_record('feedback_value_history', $data);
+        $this->set_mapping('feedback_value_history', $oldid, $newitemid);
     }
 
     protected function after_execute() {

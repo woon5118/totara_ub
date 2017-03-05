@@ -101,10 +101,9 @@ class feedback_item_textarea extends feedback_item_base {
      * @param stdClass $item the db-object from feedback_item
      * @param int $groupid
      * @param int $courseid
-     * @param bool $donl2br
      * @return stdClass
      */
-    protected function get_analysed($item, $groupid = false, $courseid = false, $donl2br = true) {
+    protected function get_analysed($item, $groupid = false, $courseid = false) {
         global $DB;
 
         $analysed_val = new stdClass();
@@ -115,7 +114,7 @@ class feedback_item_textarea extends feedback_item_base {
         if ($values) {
             $data = array();
             foreach ($values as $value) {
-                $data[] = $donl2br ? nl2br($value->value) : $value->value;
+                $data[] = str_replace("\n", '<br />', $value->value);
             }
             $analysed_val->data = $data;
         }
@@ -135,7 +134,7 @@ class feedback_item_textarea extends feedback_item_base {
         $align = right_to_left() ? 'right' : 'left';
         $values = feedback_get_group_values($item, $groupid, $courseid);
         if ($values) {
-            echo '<tr><th colspan="2" align="' . $align . '">';
+            echo '<tr><th colspan="2" align="'.$align.'">';
             echo $itemnr . ' ';
             if (strval($item->label) !== '') {
                 echo '('. format_string($item->label).') ';
@@ -150,6 +149,21 @@ class feedback_item_textarea extends feedback_item_base {
                 echo str_replace("\n", '<br />', $value->value);
                 echo '</td>';
                 echo '</tr>';
+
+                if (strlen(trim($value->value)) === 0) {
+                    $blank++;
+                } else {
+                    echo '<tr>';
+                    echo '<td colspan="2" class="singlevalue" align="' . $align . '>';
+                    echo str_replace("\n", '<br />', $value->value);
+                    echo '</td>';
+                    echo '</tr>';
+                }
+            }
+            if ($blank>0) {
+                    echo '<tr><td colspan="2" valign="top" align="' . $align . '">';
+                    echo '-&nbsp;&nbsp;'.get_string('blank_responses', 'feedback', (string)$blank);
+                    echo '</td></tr>';
             }
         }
     }
@@ -158,14 +172,18 @@ class feedback_item_textarea extends feedback_item_base {
                              $xls_formats, $item,
                              $groupid, $courseid = false) {
 
-        $analysed_item = $this->get_analysed($item, $groupid, $courseid, false);
+        $analysed_item = $this->get_analysed($item, $groupid, $courseid);
 
         $worksheet->write_string($row_offset, 0, format_string($item->label), $xls_formats->head2);
-        $worksheet->write_string($row_offset, 1, format_string($item->name), $xls_formats->head2);
+        $worksheet->write_string($row_offset, 1, format_text($item->name, FORMAT_HTML, array('noclean' => true, 'para' => false)), $xls_formats->head2);
         $data = $analysed_item->data;
         if (is_array($data)) {
+            if (isset($data[0])) {
+                $worksheet->write_string($row_offset, 2, htmlspecialchars_decode($data[0], ENT_QUOTES), $xls_formats->value_bold);
+            }
+            $row_offset++;
             $sizeofdata = count($data);
-            for ($i = 0; $i < $sizeofdata; $i++) {
+            for ($i = 1; $i < $sizeofdata; $i++) {
                 $worksheet->write_string($row_offset, 2, htmlspecialchars_decode($data[$i], ENT_QUOTES), $xls_formats->default);
                 $row_offset++;
             }

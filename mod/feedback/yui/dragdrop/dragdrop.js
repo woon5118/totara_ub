@@ -22,15 +22,23 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
 
             var groups = ['feedbackitem'];
 
-            var handletitle = M.util.get_string('move_item', 'feedback');
+            handletitle = M.util.get_string('move_item', 'feedback');
             this.mydraghandle = this.get_drag_handle(handletitle, CSS.DRAGHANDLE, 'icon');
 
             //Get the list of li's in the lists and add the drag handle.
-            basenode = Y.Node.one(CSS.DRAGLIST);
-            listitems = basenode.all(CSS.DRAGITEM).each(function(v) {
+            var basenode = Y.Node.one(CSS.DRAGLIST);
+            var listitems = basenode.all(CSS.DRAGITEM).each(function(v) {
                 var item_id = this.get_node_id(v.get('id')); //Get the id of the feedback item.
                 var item_box = Y.Node.one(CSS.ITEMBOX + item_id); //Get the current item box so we can add the drag handle.
-                item_box.append(this.mydraghandle.cloneNode(true)); // Insert the new handle into the item box.
+                var that = this;
+                var cloneNode = function () {
+                    if (that.mydraghandle.all('img').size() > 0 || that.mydraghandle.all('.flex-icon').size() > 0) {
+                        v.insert(that.mydraghandle.cloneNode(true), item_box); //Insert the new handle into the item box.
+                    } else {
+                        setTimeout(cloneNode, 20);
+                    }
+                };
+                cloneNode();
             }, this);
 
             //We use a delegate to make all items draggable

@@ -166,6 +166,7 @@ if ($do_show == 'edit') {
     $select->label = get_string('add_item', 'mod_feedback');
     echo $OUTPUT->render($select);
 
+
     $form = new mod_feedback_complete_form(mod_feedback_complete_form::MODE_EDIT,
             $feedbackstructure, 'feedback_edit_form');
     echo '<div id="feedback_dragarea">'; // The container for the dragging area.

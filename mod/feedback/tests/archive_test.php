@@ -141,14 +141,6 @@ class mod_feedback_archive_testcase extends advanced_testcase {
         $DB->insert_record('feedback_value', $value);
         $this->assertEquals(1, $DB->count_records('feedback_value'));
 
-        $this->assertEquals(0, $DB->count_records('feedback_tracking'));
-        $tracking = new stdClass();
-        $tracking->userid = $user->id;
-        $tracking->feedback = $feedback->id;
-        $tracking->completed = $completedid;
-        $DB->insert_record('feedback_tracking', $tracking);
-        $this->assertEquals(1, $DB->count_records('feedback_tracking'));
-
         // Update completion state
         $completioninfo = new completion_info($course);
         if ($completioninfo->is_enabled($course_module) && $feedback->completionsubmit) {

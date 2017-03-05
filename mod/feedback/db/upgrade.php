@@ -34,6 +34,8 @@
 // Please do not forget to use upgrade_set_timeout()
 // before any action that may take longer time to finish.
 
+defined('MOODLE_INTERNAL') || die();
+
 function xmldb_feedback_upgrade($oldversion) {
     global $CFG, $DB;
     require_once($CFG->dirroot . '/mod/feedback/db/upgradelib.php');
@@ -41,6 +43,7 @@ function xmldb_feedback_upgrade($oldversion) {
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
     // Totara 10 branching line.
+    // Put any upgrade step following this
 
     if ($oldversion < 2016031600) {
         // Remove labels from all 'captcha' and 'label' items.
@@ -136,5 +139,3 @@ function xmldb_feedback_upgrade($oldversion) {
 
     return true;
 }
-
-

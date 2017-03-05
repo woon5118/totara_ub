@@ -92,16 +92,16 @@ class feedback_item_textfield extends feedback_item_base {
         return $DB->get_record('feedback_item', array('id'=>$item->id));
     }
 
+
     /**
      * Helper function for collected data for exporting to excel
      *
      * @param stdClass $item the db-object from feedback_item
      * @param int $groupid
      * @param int $courseid
-     * @param bool $donl2br
      * @return stdClass
      */
-    protected function get_analysed($item, $groupid = false, $courseid = false, $donl2br = true) {
+    protected function get_analysed($item, $groupid = false, $courseid = false) {
 
         $analysed_val = new stdClass();
         $analysed_val->data = null;
@@ -139,11 +139,20 @@ class feedback_item_textfield extends feedback_item_base {
             echo '</th></tr>';
             $blank  = 0;
             foreach ($values as $value) {
-                $class = strlen(trim($value->value)) ? '' : ' class="isempty"';
-                echo '<tr'.$class.'><td colspan="2" class="singlevalue">';
-                echo str_replace("\n", '<br />', $value->value);
+                if (strlen(trim($value->value)) === 0) {
+                    $blank++;
+                } else {
+                    echo '<tr><td colspan="2" class="singlevalue" align="' . $align . '>';
+                    echo str_replace("\n", '<br />', $value->value);
+                    echo '</td></tr>';
+                }
+            }
+            if ($blank>0) {
+                echo '<tr><td colspan="2" valign="top" align="' . $align . '">';
+                echo '-&nbsp;&nbsp;' . get_string('blank_responses', 'feedback', (string)$blank);
                 echo '</td></tr>';
             }
+
         }
     }
 
@@ -151,14 +160,16 @@ class feedback_item_textfield extends feedback_item_base {
                              $xls_formats, $item,
                              $groupid, $courseid = false) {
 
-        $analysed_item = $this->get_analysed($item, $groupid, $courseid, false);
+        $analysed_item = $this->get_analysed($item, $groupid, $courseid);
 
         $worksheet->write_string($row_offset, 0, format_string($item->label), $xls_formats->head2);
-        $worksheet->write_string($row_offset, 1, format_string($item->name), $xls_formats->head2);
+        $worksheet->write_string($row_offset, 1, $this->get_display_name($item), $xls_formats->head2);
         $data = $analysed_item->data;
         if (is_array($data)) {
+            $worksheet->write_string($row_offset, 2, htmlspecialchars_decode($data[0], ENT_QUOTES), $xls_formats->value_bold);
+            $row_offset++;
             $sizeofdata = count($data);
-            for ($i = 0; $i < $sizeofdata; $i++) {
+            for ($i = 1; $i < $sizeofdata; $i++) {
                 $worksheet->write_string($row_offset, 2, htmlspecialchars_decode($data[$i], ENT_QUOTES), $xls_formats->default);
                 $row_offset++;
             }

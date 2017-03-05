@@ -93,16 +93,19 @@ class feedback_item_multichoice extends feedback_item_base {
         return $DB->get_record('feedback_item', array('id'=>$item->id));
     }
 
+
+    //gets an array with three values(typ, name, XXX)
+    //XXX is an object with answertext, answercount and quotient
+
     /**
      * Helper function for collected data, both for analysis page and export to excel
      *
      * @param stdClass $item the db-object from feedback_item
      * @param int $groupid
      * @param int $courseid
-     * @param bool $donl2br
      * @return array
      */
-    protected function get_analysed($item, $groupid = false, $courseid = false, $donl2br = true) {
+    protected function get_analysed($item, $groupid = false, $courseid = false) {
         $info = $this->get_info($item);
 
         $analysed_item = array();
@@ -200,11 +203,11 @@ class feedback_item_multichoice extends feedback_item_base {
 
     public function print_analysed($item, $itemnr = '', $groupid = false, $courseid = false) {
         global $OUTPUT;
-
+        $align = right_to_left() ? 'right' : 'left';
         $analysed_item = $this->get_analysed($item, $groupid, $courseid);
         if ($analysed_item) {
             $itemname = $analysed_item[1];
-            echo '<tr><th colspan="2" align="' . $align . '">';
+            echo '<tr><th colspan="2" align="'.$align.'">';
             echo $itemnr . ' ';
             if (strval($item->label) !== '') {
                 echo '('. format_string($item->label).') ';
@@ -244,7 +247,7 @@ class feedback_item_multichoice extends feedback_item_base {
                              $xls_formats, $item,
                              $groupid, $courseid = false) {
 
-        $analysed_item = $this->get_analysed($item, $groupid, $courseid, false);
+        $analysed_item = $this->get_analysed($item, $groupid, $courseid);
 
         $data = $analysed_item[2];
 
