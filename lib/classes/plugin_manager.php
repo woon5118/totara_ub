@@ -1165,7 +1165,6 @@ class core_plugin_manager {
             'webservice' => array('amf'),
             // Other Totara leftovers and mistakes.
             'connect' => array('totara'),
-            
         );
 
         if (!isset($plugins[$type])) {
@@ -1227,7 +1226,7 @@ class core_plugin_manager {
                 'calendar_upcoming', 'comments', 'community',
                 'completionstatus', 'course_list', 'course_overview',
                 'course_summary', 'feedback', 'globalsearch', 'glossary_random', 'html',
-                'login', 'lp', 'mentees', 'messages', 'mnet_hosts', 'myprofile',
+                'login', 'mentees', 'messages', 'mnet_hosts', 'myprofile',
                 'navigation', 'news_items', 'online_users', 'participants',
                 'private_files', 'quiz_results', 'recent_activity',
                 'rss_client', 'search_forums', 'section_links',
@@ -1400,7 +1399,7 @@ class core_plugin_manager {
             ),
 
             'report' => array(
-                'backups', 'competency', 'completion', 'configlog', 'courseoverview', 'eventlist',
+                'backups', 'completion', 'configlog', 'courseoverview', 'eventlist',
                 'log', 'loglive', 'outline', 'participation', 'progress', 'questioninstances', 'search',
                 'security', 'stats', 'performance', 'usersessions'
             ),
@@ -1437,9 +1436,9 @@ class core_plugin_manager {
             ),
 
             'tool' => array(
-                'assignmentupgrade', 'availabilityconditions', 'behat', 'capability', 'cohortroles', 'customlang',
+                'assignmentupgrade', 'availabilityconditions', 'behat', 'capability', 'customlang',
                 'dbtransfer', 'filetypes', 'generator', 'health', 'innodb',
-                'langimport', 'log', 'lp', 'lpmigrate', 'messageinbound', 'mobile', 'multilangupgrade', 'monitor',
+                'langimport', 'log', 'messageinbound', 'mobile', 'multilangupgrade', 'monitor',
                 'phpunit', 'profiling', 'recyclebin', 'replace', 'spamcleaner', 'task', 'templatelibrary',
                 'unittest', 'uploadcourse', 'uploaduser', 'unsuproles', 'xmldb'
                 // Totara:

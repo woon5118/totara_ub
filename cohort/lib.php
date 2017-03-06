@@ -190,8 +190,9 @@ function cohort_delete_cohort($cohort) {
 
     $transaction->allow_commit();
 
+    // TOTARA: We removed Moodle's competency and learning plan code.
     // Notify the competency subsystem.
-    \core_competency\api::hook_cohort_deleted($cohort);
+    // \core_competency\api::hook_cohort_deleted($cohort);
 
     $event = \core\event\cohort_deleted::create(array(
         'context' => context::instance_by_id($cohort->contextid),

@@ -48,7 +48,8 @@ class course_reset_form extends moodleform {
         $mform->addElement('checkbox', 'reset_completion', get_string('deletecompletiondata', 'completion'));
         $mform->addElement('checkbox', 'delete_blog_associations', get_string('deleteblogassociations', 'blog'));
         $mform->addHelpButton('delete_blog_associations', 'deleteblogassociations', 'blog');
-        $mform->addElement('checkbox', 'reset_competency_ratings', get_string('deletecompetencyratings', 'core_competency'));
+        // TOTARA: We removed Moodle's competency and learning plan code.
+        // $mform->addElement('checkbox', 'reset_competency_ratings', get_string('deletecompetencyratings', 'core_competency'));
 
         $mform->addElement('header', 'rolesheader', get_string('roles'));
 

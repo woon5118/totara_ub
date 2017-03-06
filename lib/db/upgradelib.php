@@ -399,8 +399,7 @@ function upgrade_standardise_score($rawgrade, $sourcemin, $sourcemax, $targetmin
  * need to maintain backward compatibility with many different
  * existing language translations and older sites.
  *
- * @global object
- * @return void
+ * @return stdClass
  */
 function make_default_scale() {
     global $DB;
@@ -423,8 +422,7 @@ function make_default_scale() {
 /**
  * Create another default scale.
  *
- * @param int $oldversion
- * @return bool always true
+ * @return stdClass always true
  */
 function make_competence_scale() {
     global $DB;

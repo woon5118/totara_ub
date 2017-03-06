@@ -5089,8 +5089,10 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
                         // Delete activity context questions and question categories.
                         question_delete_activity($cm,  $showfeedback);
 
-                        // Notify the competency subsystem.
-                        \core_competency\api::hook_course_module_deleted($cm);
+                        // TOTARA: Commented out as we removed Moodles competency and learning plan code in favour
+                        // of our own competencies and learning plans, which we have had for years.
+                        // // Notify the competency subsystem.
+                        // \core_competency\api::hook_course_module_deleted($cm);
                     }
                     if (function_exists($moddelete)) {
                         // This purges all module data in related tables, extra user prefs, settings, etc.
@@ -5214,8 +5216,10 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
         echo $OUTPUT->notification($strdeleted.get_string('remindersmenuitem', 'totara_coursecatalog'), 'notifysuccess');
     }
 
+    // TOTARA: Commented out as we removed Moodles competency and learning plan code in favour
+    // of our own competencies and learning plans, which we have had for years.
     // Notify the competency subsystem.
-    \core_competency\api::hook_course_deleted($course);
+    // \core_competency\api::hook_course_deleted($course);
 
     // Delete calendar events.
     $DB->delete_records('event', array('courseid' => $course->id));
@@ -5425,11 +5429,13 @@ function reset_course_userdata($data) {
                 'item' => get_string('deletecompletiondata', 'completion'), 'error' => false);
     }
 
-    if (!empty($data->reset_competency_ratings)) {
-        \core_competency\api::hook_course_reset_competency_ratings($data->courseid);
-        $status[] = array('component' => $componentstr,
-            'item' => get_string('deletecompetencyratings', 'core_competency'), 'error' => false);
-    }
+    // TOTARA: Commented out as we removed Moodles competency and learning plan code in favour
+    // of our own competencies and learning plans, which we have had for years.
+    // if (!empty($data->reset_competency_ratings)) {
+    //    \core_competency\api::hook_course_reset_competency_ratings($data->courseid);
+    //    $status[] = array('component' => $componentstr,
+    //        'item' => get_string('deletecompetencyratings', 'core_competency'), 'error' => false);
+    //}
 
     $componentstr = get_string('roles');
 
