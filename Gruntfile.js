@@ -270,9 +270,6 @@ module.exports = function(grunt) {
         return destPath;
     };
 
-    // Globbing pattern for matching all AMD JS source files.
-    var amdSrc = [inAMD ? cwd + '/src/*.js' : '**/amd/src/*.js'];
-
     // Project configuration.
     grunt.initConfig({
         jshint: {

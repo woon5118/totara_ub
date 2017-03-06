@@ -204,7 +204,6 @@ Feature: Seminar event cancellation learner views
     And I click on "Dashboard" in the totara menu
     And I click on "Bookings" "link"
     And I click on "Past Bookings" "link"
-    And I pause
     Then I should see "Course 1" in the "Test Seminar" "table_row"
     And I should see "10 April 2015" in the "Test Seminar" "table_row"
     And I should see "9:00 AM Pacific/Auckland" in the "Test Seminar" "table_row"
