@@ -1396,10 +1396,17 @@ function stats_get_report_options($courseid,$mode) {
     case STATS_MODE_GENERAL:
         $reportoptions[STATS_REPORT_ACTIVITY] = get_string('statsreport'.STATS_REPORT_ACTIVITY);
         if ($courseid != SITEID && $context = context_course::instance($courseid)) {
-            $sql = 'SELECT r.id, r.name FROM {role} r JOIN {stats_daily} s ON s.roleid = r.id WHERE s.courseid = :courseid GROUP BY r.id, r.name';
-            if ($roles = $DB->get_records_sql($sql, array('courseid' => $courseid))) {
+            // TOTARA: fetch the role name as a coursealias for the role_get_name() function
+            // which is the proper way to get a role name.
+            $sql = 'SELECT DISTINCT r.id, r.name, r.shortname, rn.name AS coursealias
+                      FROM {role} r
+                      JOIN {stats_daily} s ON s.roleid = r.id
+                 LEFT JOIN {role_names} rn ON rn.roleid = r.id AND rn.contextid = :contextid
+                     WHERE s.courseid = :courseid';
+            if ($roles = $DB->get_records_sql($sql, array('courseid' => $courseid, 'contextid' => $context->id))) {
                 foreach ($roles as $role) {
-                    $reportoptions[STATS_REPORT_ACTIVITYBYROLE.$role->id] = get_string('statsreport'.STATS_REPORT_ACTIVITYBYROLE). ' '.$role->name;
+                    $reportoptions[STATS_REPORT_ACTIVITYBYROLE.$role->id] = get_string('statsreport'.STATS_REPORT_ACTIVITYBYROLE).
+                        ' ' . role_get_name($role, $context);
                 }
             }
         }

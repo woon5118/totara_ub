@@ -734,4 +734,61 @@ class core_statslib_testcase extends advanced_testcase {
 
         $this->verify_stats($dataset[1], $output);
     }
+
+    /**
+     * @depends test_statslib_get_base_daily
+     * @depends test_statslib_get_next_day_start
+     */
+    public function test_stats_get_report_options() {
+        global $CFG, $DB;
+
+        $this->resetAfterTest();
+
+        require_once($CFG->dirroot . '/course/lib.php');
+
+        $dataset = $this->load_xml_data_file(__DIR__."/fixtures/statslib-test07.xml");
+
+        list($logs, $stats) = $dataset;
+        $this->prepare_db($logs, array('log'));
+
+        // Stats cron daily uses mtrace, turn on buffering to silence output.
+        ob_start();
+        stats_cron_daily(1);
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $this->verify_stats($stats, $output);
+
+        $course = $DB->get_record('course', ['shortname' => 'course1'], '*', MUST_EXIST);
+        $context = context_course::instance($course->id);
+        $options = stats_get_report_options($course->id, STATS_MODE_GENERAL);
+
+        $this->assertCount(5, $options);
+        $this->assertSame("All activity (all roles)", reset($options));
+        $this->assertSame("All activity (views and posts) Learner", next($options));
+        $this->assertSame("All activity (views and posts) Guest", next($options));
+        $this->assertSame("Views (all roles)", next($options));
+        $this->assertSame("Posts (all roles)", next($options));
+
+        $roles = get_roles_used_in_context($context);
+        $renamed = false;
+        foreach ($roles as $role) {
+            if ($role->shortname === 'student') {
+                $data = new stdClass;
+                $data->{'role_'.$role->id} = 'Professors';
+                save_local_role_names($course->id, $data);
+                $renamed = true;
+                break;
+            }
+        }
+        $this->assertTrue($renamed, 'Failed to rename the student role in the course');
+
+        $options = stats_get_report_options($course->id, STATS_MODE_GENERAL);
+        $this->assertCount(5, $options);
+        $this->assertSame("All activity (all roles)", reset($options));
+        $this->assertSame("All activity (views and posts) Professors", next($options));
+        $this->assertSame("All activity (views and posts) Guest", next($options));
+        $this->assertSame("Views (all roles)", next($options));
+        $this->assertSame("Posts (all roles)", next($options));
+    }
 }
