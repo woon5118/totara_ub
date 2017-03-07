@@ -167,10 +167,10 @@ class navigation_node implements renderable {
                 $this->shorttext = $properties['shorttext'];
             }
             if (!array_key_exists('icon', $properties)) {
-                $properties['icon'] = new pix_icon('i/navigationitem', '');
+                $properties['icon'] = self::get_generic_navigation_item_icon();
             }
             $this->icon = $properties['icon'];
-            if ($this->icon instanceof pix_icon) {
+            if ($this->icon instanceof pix_icon && !isset($this->icon->attributes['data-generic-navigation-icon']) && !isset($this->icon->attributes['data-generic-settings-icon'])) {
                 if (empty($this->icon->attributes['class'])) {
                     $this->icon->attributes['class'] = 'navicon';
                 } else {
@@ -206,6 +206,20 @@ class navigation_node implements renderable {
         }
         // Instantiate a new navigation node collection for this nodes children
         $this->children = new navigation_node_collection();
+    }
+
+    /**
+     * Returns the generic navigation item icon.
+     *
+     * @return pix_icon
+     */
+    private static function get_generic_navigation_item_icon() {
+        static $icon;
+        if (!$icon) {
+            $icon = new pix_icon('i/navigationitem', '', 'moodle', ['data-generic-navigation-icon' => '1']);
+            $icon->attributes['class'] .= ' navicon';
+        }
+        return $icon;
     }
 
     /**
@@ -3739,9 +3753,23 @@ class settings_navigation extends navigation_node {
                     $this->load_administration_settings($reference, $branch);
                 }
             } else {
-                $reference->icon = new pix_icon('i/settings', '');
+                $reference->icon = \settings_navigation::get_generic_settings_icon();
             }
         }
+    }
+
+    /**
+     * Returns the generic navigation item icon.
+     *
+     * @return pix_icon
+     */
+    private static function get_generic_settings_icon() {
+        static $icon;
+        if (!$icon) {
+            $icon = new pix_icon('i/settings', '', 'moodle', ['data-generic-settings-icon' => '1']);
+            $icon->attributes['class'] .= ' navicon';
+        }
+        return $icon;
     }
 
     /**
@@ -4970,7 +4998,7 @@ class navigation_json {
         }
     }
     /**
-     * Recusively converts a child node and its children to XML for output
+     * Recursively converts a child node and its children to XML for output
      *
      * @param navigation_node $child The child to convert
      * @param int $depth Pointlessly used to track the depth of the XML structure
@@ -4992,24 +5020,85 @@ class navigation_json {
 
         if ($child->icon instanceof pix_icon) {
 
-            // TOTARA: convert the icon to a flex icon, if we can.
-            $flexicon = \core\output\flex_icon::create_from_pix_icon($child->icon);
-            if ($flexicon) {
-                $attributes['flex_icon'] = $OUTPUT->render($flexicon);
-            }
+            if (isset($child->icon->attributes['data-generic-navigation-icon'])) {
 
-            $attributes['icon'] = array(
-                'component' => $child->icon->component,
-                'pix' => $child->icon->pix,
-            );
-            foreach ($child->icon->attributes as $key=>$value) {
-                if ($key == 'class') {
-                    $attributes['icon']['classes'] = explode(' ', $value);
-                } else if (!array_key_exists($key, $attributes['icon'])) {
-                    $attributes['icon'][$key] = $value;
+                // Totara performance hack here! beware!
+                static $genericnavigationicon;
+                if (!$genericnavigationicon) {
+                    $genericnavigationicon = [];
+                    // TOTARA: convert the icon to a flex icon, if we can.
+                    $flexicon = \core\output\flex_icon::create_from_pix_icon($child->icon);
+                    if ($flexicon) {
+                        $genericnavigationicon['flex_icon'] = $OUTPUT->render($flexicon);
+                    }
+
+                    $genericnavigationicon['icon'] = array(
+                        'component' => $child->icon->component,
+                        'pix' => $child->icon->pix,
+                    );
+                    foreach ($child->icon->attributes as $key => $value) {
+                        if ($key == 'class') {
+                            $genericnavigationicon['icon']['classes'] = explode(' ', $value);
+                        } else if (!array_key_exists($key, $genericnavigationicon['icon'])) {
+                            $genericnavigationicon['icon'][$key] = $value;
+                        }
+
+                    }
+                }
+                foreach ($genericnavigationicon as $key => $value) {
+                    $attributes[$key] = $value;
                 }
 
+            } else if (isset($child->icon->attributes['data-generic-settings-icon'])) {
+
+                // Totara performance hack here! beware!
+                static $genericsettingsicon;
+                if (!$genericsettingsicon) {
+                    $genericsettingsicon = [];
+                    // TOTARA: convert the icon to a flex icon, if we can.
+                    $flexicon = \core\output\flex_icon::create_from_pix_icon($child->icon);
+                    if ($flexicon) {
+                        $genericsettingsicon['flex_icon'] = $OUTPUT->render($flexicon);
+                    }
+
+                    $genericsettingsicon['icon'] = array(
+                        'component' => $child->icon->component,
+                        'pix' => $child->icon->pix,
+                    );
+                    foreach ($child->icon->attributes as $key=>$value) {
+                        if ($key == 'class') {
+                            $genericsettingsicon['icon']['classes'] = explode(' ', $value);
+                        } else if (!array_key_exists($key, $genericsettingsicon['icon'])) {
+                            $genericsettingsicon['icon'][$key] = $value;
+                        }
+
+                    }
+                }
+                foreach ($genericsettingsicon as $key => $value) {
+                    $attributes[$key] = $value;
+                }
+
+            } else {
+
+                // TOTARA: convert the icon to a flex icon, if we can.
+                $flexicon = \core\output\flex_icon::create_from_pix_icon($child->icon);
+                if ($flexicon) {
+                    $attributes['flex_icon'] = $OUTPUT->render($flexicon);
+                }
+
+                $attributes['icon'] = array(
+                    'component' => $child->icon->component,
+                    'pix' => $child->icon->pix,
+                );
+                foreach ($child->icon->attributes as $key => $value) {
+                    if ($key == 'class') {
+                        $attributes['icon']['classes'] = explode(' ', $value);
+                    } else if (!array_key_exists($key, $attributes['icon'])) {
+                        $attributes['icon'][$key] = $value;
+                    }
+                }
             }
+
         } else if (!empty($child->icon)) {
             $attributes['icon'] = (string)$child->icon;
         }

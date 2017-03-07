@@ -777,7 +777,7 @@ class admin_category implements parentable_part_of_admin_tree {
     public $visiblepath;
 
     /** @var array fast lookup category cache, all categories of one tree point to one cache */
-    protected $category_cache;
+    protected static $category_cache;
 
     /** @var bool If set to true children will be sorted when calling {@link admin_category::get_children()} */
     protected $sort = false;
@@ -811,10 +811,6 @@ class admin_category implements parentable_part_of_admin_tree {
      *                  defaults to false
      */
     public function locate($name, $findpath=false) {
-        if (!isset($this->category_cache[$this->name])) {
-            // somebody much have purged the cache
-            $this->category_cache[$this->name] = $this;
-        }
 
         if ($this->name == $name) {
             if ($findpath) {
@@ -825,8 +821,8 @@ class admin_category implements parentable_part_of_admin_tree {
         }
 
         // quick category lookup
-        if (!$findpath and isset($this->category_cache[$name])) {
-            return $this->category_cache[$name];
+        if (!$findpath and isset(self::$category_cache[$name])) {
+            return self::$category_cache[$name];
         }
 
         $return = NULL;
@@ -878,9 +874,8 @@ class admin_category implements parentable_part_of_admin_tree {
         foreach($this->children as $precedence => $child) {
             if ($child->name == $name) {
                 // clear cache and delete self
-                while($this->category_cache) {
-                    // delete the cache, but keep the original array address
-                    array_pop($this->category_cache);
+                if ($child instanceof admin_category) {
+                    $child->prune_from_category_cache();
                 }
                 unset($this->children[$precedence]);
                 return true;
@@ -889,6 +884,18 @@ class admin_category implements parentable_part_of_admin_tree {
             }
         }
         return false;
+    }
+
+    /**
+     * Removes this admin_category and all child categories from the category cache.
+     */
+    protected function prune_from_category_cache() {
+        unset(self::$category_cache[$this->name]);
+        foreach ($this->children as $child) {
+            if ($child instanceof admin_category) {
+                $child->prune_from_category_cache();
+            }
+        }
     }
 
     /**
@@ -919,16 +926,22 @@ class admin_category implements parentable_part_of_admin_tree {
                 debugging('error - parts of tree can be inserted only into parentable parts');
                 return false;
             }
-            if ($CFG->debugdeveloper && !is_null($this->locate($something->name))) {
-                // The name of the node is already used, simply warn the developer that this should not happen.
-                // It is intentional to check for the debug level before performing the check.
-                debugging('Duplicate admin page name: ' . $something->name, DEBUG_DEVELOPER);
+            if ($CFG->debugdeveloper) {
+                if ($something instanceof admin_category) {
+                    if (isset(self::$category_cache[$something->name])) {
+                        debugging('Duplicate admin category name: ' . $something->name);
+                    }
+                } else if (!is_null($this->locate($something->name))) {
+                    // The name of the node is already used, simply warn the developer that this should not happen.
+                    // It is intentional to check for the debug level before performing the check.
+                    debugging('Duplicate admin page name: ' . $something->name, DEBUG_DEVELOPER);
+                }
             }
             if (is_null($beforesibling)) {
                 // Append $something as the parent's last child.
                 $parent->children[] = $something;
             } else {
-                if (!is_string($beforesibling) or trim($beforesibling) === '') {
+                if ($CFG->debugdeveloper && (!is_string($beforesibling) or trim($beforesibling) === '')) {
                     throw new coding_exception('Unexpected value of the beforesibling parameter');
                 }
                 // Try to find the position of the sibling.
@@ -951,19 +964,15 @@ class admin_category implements parentable_part_of_admin_tree {
                 }
             }
             if ($something instanceof admin_category) {
-                if (isset($this->category_cache[$something->name])) {
-                    debugging('Duplicate admin category name: '.$something->name);
-                } else {
-                    $this->category_cache[$something->name] = $something;
-                    $something->category_cache =& $this->category_cache;
+                if (!isset(self::$category_cache[$something->name])) {
+                    self::$category_cache[$something->name] = $something;
                     foreach ($something->children as $child) {
                         // just in case somebody already added subcategories
                         if ($child instanceof admin_category) {
-                            if (isset($this->category_cache[$child->name])) {
+                            if (isset(self::$category_cache[$child->name])) {
                                 debugging('Duplicate admin category name: '.$child->name);
                             } else {
-                                $this->category_cache[$child->name] = $child;
-                                $child->category_cache =& $this->category_cache;
+                                self::$category_cache[$child->name] = $child;
                             }
                         }
                     }
@@ -1144,8 +1153,6 @@ class admin_root extends admin_category {
         $this->fulltree = $fulltree;
         $this->loaded   = false;
 
-        $this->category_cache = array();
-
         // Totara: Default settings may be overridden from the config.php OR admin settings UI.
         $this->custom_defaults = array();
 
@@ -1193,14 +1200,14 @@ class admin_root extends admin_category {
      * @param bool $requirefulltree
      */
     public function purge_children($requirefulltree) {
+        foreach ($this->children as $child) {
+            if ($child instanceof admin_category) {
+                $child->prune_from_category_cache();
+            }
+        }
         $this->children = array();
         $this->fulltree = ($requirefulltree || $this->fulltree);
         $this->loaded   = false;
-        //break circular dependencies - this helps PHP 5.2
-        while($this->category_cache) {
-            array_pop($this->category_cache);
-        }
-        $this->category_cache = array();
     }
 }
 

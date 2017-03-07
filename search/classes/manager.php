@@ -227,46 +227,15 @@ class manager {
 
         $searchareas = array();
 
-        $plugintypes = \core_component::get_plugin_types();
-        foreach ($plugintypes as $plugintype => $unused) {
-            $plugins = \core_component::get_plugin_list($plugintype);
-            foreach ($plugins as $pluginname => $pluginfullpath) {
-
-                $componentname = $plugintype . '_' . $pluginname;
-                $searchclasses = \core_component::get_component_classes_in_namespace($componentname, 'search');
-                foreach ($searchclasses as $classname => $classpath) {
-                    $areaname = substr(strrchr($classname, '\\'), 1);
-
-                    if (!static::is_search_area($classname)) {
-                        continue;
-                    }
-
-                    $areaid = static::generate_areaid($componentname, $areaname);
-                    $searchclass = new $classname();
-                    if (!$enabled || ($enabled && $searchclass->is_enabled())) {
-                        $searchareas[$areaid] = $searchclass;
-                    }
-                }
+        $classnames = \core_component::get_namespace_classes('search');
+        foreach ($classnames as $classname) {
+            if (!static::is_search_area($classname)) {
+                continue;
             }
-        }
-
-        $subsystems = \core_component::get_core_subsystems();
-        foreach ($subsystems as $subsystemname => $subsystempath) {
-            $componentname = 'core_' . $subsystemname;
-            $searchclasses = \core_component::get_component_classes_in_namespace($componentname, 'search');
-
-            foreach ($searchclasses as $classname => $classpath) {
-                $areaname = substr(strrchr($classname, '\\'), 1);
-
-                if (!static::is_search_area($classname)) {
-                    continue;
-                }
-
-                $areaid = static::generate_areaid($componentname, $areaname);
-                $searchclass = new $classname();
-                if (!$enabled || ($enabled && $searchclass->is_enabled())) {
-                    $searchareas[$areaid] = $searchclass;
-                }
+            /** @var \core_search\area\base $searchclass */
+            $searchclass = new $classname();
+            if (!$enabled || ($enabled && $searchclass->is_enabled())) {
+                $searchareas[$searchclass->get_area_id()] = $searchclass;
             }
         }
 
