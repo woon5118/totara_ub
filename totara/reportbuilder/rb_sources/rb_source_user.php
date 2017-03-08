@@ -35,12 +35,34 @@ class rb_source_user extends rb_base_source {
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
+
+    /**
+     * Conditional SQL to filter the data source available to the report.
+     *
+     * @var string
+     */
+    public $sourcewhere;
+
+    /**
+     * Parameters to support the conditional SQL that filters the data source available to the report.
+     *
+     * @var array
+     */
+    public $sourceparams;
+
     /**
      * Whether the "staff_facetoface_sessions" report exists or not (used to determine
      * whether or not to display icons that link to it)
      * @var boolean
      */
     private $staff_f2f;
+
+    /*
+     * Indicate if the actions column is permitted on the source. It should ONLY
+     * be available to the user source and not any class that extends from it.
+     * @var boolean.
+     */
+    protected $allow_actions_column = false;
 
     /**
      * Constructor
@@ -57,7 +79,11 @@ class rb_source_user extends rb_base_source {
         // Remember the active global restriction set.
         $this->globalrestrictionset = $globalrestrictionset;
 
-        $this->base = '{user}';
+        // Allow the actions column to be used in the user source.
+        $this->allow_actions_column = (get_class($this) === 'rb_source_user');
+
+        $this->base = "{user}";
+        list($this->sourcewhere, $this->sourceparams) = $this->define_sourcewhere();
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -88,6 +114,38 @@ class rb_source_user extends rb_base_source {
     // Methods for defining contents of source
     //
     //
+
+    /**
+     * Define some extra SQL for the base to limit the data set.
+     *
+     * @return array The SQL and parmeters that defines the WHERE for the source.
+     */
+    protected function define_sourcewhere() {
+        global $DB;
+
+        $sql = '';
+        $params = array ();
+
+        // If the user doesn't have permission to see deleted users ensure they can't.
+        if (!has_capability('totara/core:seedeletedusers', context_system::instance())) {
+            $sql = 'deleted = 0';
+        } else {
+            // Always exclude fully deleted users but not partially deleted ones.
+            // Fully deleted users can be identified by their MD5ed email field.
+            if ($DB->sql_regex_supported()) {
+                $sql .= 'email ' . $DB->sql_regex(false) . ' :user_source_deleted_user_md5';
+                $params['user_source_deleted_user_md5'] = "^[a-f0-9]{32}$";
+            } else {
+                $sql = 'NOT' . $DB->sql_length('email') . ' = :user_source_deleted_user_len';
+                $sql .= ' AND ' . $DB->sql_like('email', ':user_source_deleted_user_email');
+                $params['user_source_deleted_user_len'] = 32;
+                $params['user_source_deleted_user_email'] = '%@%';
+            }
+        }
+
+        return array($sql, $params);
+    }
+
 
     /**
      * Creates the array of rb_join objects required for this->joinlist
@@ -296,6 +354,37 @@ class rb_source_user extends rb_base_source {
                             'extrafields' => array('user_id' => 'base.id')
                         )
         );
+
+        $usednamefields = totara_get_all_user_name_fields_join('base', null, true);
+        $systemcontext = context_system::instance();
+        $can_update = has_capability('moodle/user:update', $systemcontext);
+        $can_delete = has_capability('moodle/user:delete', $systemcontext);
+
+        if (($can_delete || $can_update) && $this->allow_actions_column) {
+            $columnoptions[] = new rb_column_option(
+                'user',
+                'actions',
+                get_string('actions', 'totara_reportbuilder'),
+                'base.id',
+                array(
+                    'displayfunc' => 'user_actions',
+                    'noexport' => true,
+                    'nosort' => true,
+                    'graphable' => false,
+                    'extrafields' => array(
+                        'can_update' => $can_update ? 1 : 0,
+                        'can_delete' => $can_delete ? 1 : 0,
+                        'fullname' => $DB->sql_concat_join("' '", $usednamefields),
+                        'username' => 'base.username',
+                        'email' => 'base.email',
+                        'mnethostid' => 'base.mnethostid',
+                        'confirmed' => 'base.confirmed',
+                        'suspended' => 'base.suspended',
+                        'deleted' => 'base.deleted'
+                    )
+                )
+            );
+        }
 
         return $columnoptions;
     }

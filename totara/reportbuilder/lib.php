@@ -3394,8 +3394,13 @@ class reportbuilder {
         $joins = $this->collect_joins(reportbuilder::FILTERALL);
 
         $where = array();
+        $sqlparams = array();
         if (!empty($this->src->sourcewhere)) {
             $where[] = $this->src->sourcewhere;
+
+            if (!empty($this->src->sourceparams)) {
+                $sqlparams = array_merge($sqlparams, $this->src->sourceparams);
+            }
         }
         $sql = $this->collect_sql($fields, $this->src->base, $joins, $where);
 
@@ -3403,7 +3408,7 @@ class reportbuilder {
         $this->_params = $paramssave;
         $this->cacheignore = false;
         $this->grouped = $groupedsave;
-        return array($sql, array());
+        return array($sql, $sqlparams);
     }
 
     /**
@@ -3479,6 +3484,10 @@ class reportbuilder {
         // apply any SQL specified by the source
         if (!empty($this->src->sourcewhere)) {
             $where[] = $this->src->sourcewhere;
+
+            if (!empty($this->src->sourceparams)) {
+                $sqlparams = array_merge($sqlparams, $this->src->sourceparams);
+            }
         }
         $sql = $this->collect_sql($fields, $this->src->base, $joins, $where, $group, $having, $countonly, $allgrouped);
 
@@ -3578,6 +3587,10 @@ class reportbuilder {
         // Apply any SQL specified by the source.
         if (!$iscached && !empty($this->src->sourcewhere)) {
             $where[] = $this->src->sourcewhere;
+
+            if (!empty($this->src->sourceparams)) {
+                $sqlparams = array_merge($sqlparams, $this->src->sourceparams);
+            }
         }
 
         // Get the base sql query with all other joins and (active) filters applied.

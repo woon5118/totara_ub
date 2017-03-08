@@ -1309,3 +1309,12 @@ $string['wwwroot'] = 'Site www root';
 
 // Deprecated since Moodle 3.2.
 $string['mobile'] = 'Mobile';
+
+/*
+ * @deprecated since Totara 10.0
+ */
+$string['uselegacybrowselistofusersreport'] = 'Use legacy Browse List of Users report';
+$string['uselegacybrowselistofusersreport_desc'] = 'In Totara 10 the original Browse List of Users report was replaced
+by a new report builder based version that included all the main functionality of the original, with exception of Mnet
+support. Mnet will be deprecated and removed in the next major release of Totara. By default the new Browse List of
+Users report will be used. However, you can override that by choosing this option.';
