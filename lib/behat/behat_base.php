@@ -325,19 +325,6 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         }
 
         for ($i = 0; $i < $loops; $i++) {
-            // Totara: run at least once, but then use the total time spent here for timeout calculation.
-            if ($i != 0) {
-                if ($start + $timeout < time()) {
-                    break;
-                }
-                if ($microsleep) {
-                    // Sleep for 0.1 seconds only.
-                    usleep(100000);
-                } else {
-                    sleep(1);
-                }
-            }
-
             // We catch the exception thrown by the step definition to execute it again.
             try {
                 // We don't check with !== because most of the time closures will return
@@ -351,8 +338,16 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                 if (!$exception) {
                     $exception = $e;
                 }
-                // We wait until no exception is thrown or timeout expires.
-                continue;
+            }
+            // Totara: run at least once, but then use the total time spent here for timeout calculation.
+            if ($start + $timeout < time()) {
+                break;
+            }
+            if ($microsleep) {
+                // Sleep for 0.1 seconds only.
+                usleep(100000);
+            } else {
+                sleep(1);
             }
         }
 
@@ -704,41 +699,34 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
     public function wait_for_pending_js() {
         // Waiting for JS is only valid for JS scenarios.
         if (!$this->running_javascript()) {
-            return;
+            return true;
         }
 
         // Totara: this is the start for timeout calculations.
         $start = time();
 
+        $jscode = '
+            return function() {
+                if (typeof M === "undefined") {
+                    if (document.readyState === "complete") {
+                        return "";
+                    } else {
+                        return "incomplete";
+                    }
+                } else if (' . self::PAGE_READY_JS . ') {
+                    return "";
+                } else if (typeof M.util !== "undefined") {
+                    return M.util.pending_js.join(":");
+                } else {
+                    return "incomplete";
+                }
+            }();';
+
         // We don't use behat_base::spin() here as we don't want to end up with an exception
         // if the page & JSs don't finish loading properly.
         for ($i = 0; $i < self::EXTENDED_TIMEOUT * 10; $i++) {
-            if ($i != 0) {
-                if ($start + self::EXTENDED_TIMEOUT < time()) {
-                    // We have waited long enough, throw exception.
-                    break;
-                }
-                // Sleep for 0.1 seconds only.
-                usleep(100000);
-            }
             $pending = '';
             try {
-                $jscode = '
-                    return function() {
-                        if (typeof M === "undefined") {
-                            if (document.readyState === "complete") {
-                                return "";
-                            } else {
-                                return "incomplete";
-                            }
-                        } else if (' . self::PAGE_READY_JS . ') {
-                            return "";
-                        } else if (typeof M.util !== "undefined") {
-                            return M.util.pending_js.join(":");
-                        } else {
-                            return "incomplete";
-                        }
-                    }();';
                 $pending = $this->getSession()->evaluateScript($jscode);
             } catch (WebDriver\Exception\ScriptTimeout $e) {
                 // Totara: this is a common problem in Chrome, the JS just stops executing with long timeouts.
@@ -757,6 +745,12 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
             if ($pending === '') {
                 return true;
             }
+            if ($start + self::EXTENDED_TIMEOUT < time()) {
+                // We have waited long enough, throw exception.
+                break;
+            }
+            // Sleep for 0.1 seconds only.
+            usleep(100000);
         }
 
         // Timeout waiting for JS to complete.
@@ -779,6 +773,28 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
     public function look_for_exceptions() {
         // Wrap in try in case we were interacting with a closed window.
         try {
+
+            // For performance reasons we've going to search for indicators first!
+            $strings = [
+                'data-rel="debugging"', // We control this, debugging calls, weblib.php.
+                'fatalerror', // A fatal error.
+                'phpdebugmessage', // PHP debugging message.
+                ': call to ' // An exception.
+            ];
+            $content = $this->getSession()->getDriver()->getContent();
+            $found = false;
+            foreach ($strings as $str) {
+                if (strpos($content, $str) !== false) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                // Ok we found no indicators. Just move on.
+                return;
+            }
+
+            // OK one or more indicators were found, start the full blown investigation.
 
             // Exceptions.
             $exceptionsxpath = "//div[@data-rel='fatalerror']";

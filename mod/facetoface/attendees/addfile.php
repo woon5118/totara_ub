@@ -21,6 +21,7 @@
  * @package mod_facetoface
  */
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
+require_once($CFG->dirroot . '/lib/csvlib.class.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/attendees/forms.php');
 

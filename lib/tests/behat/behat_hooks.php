@@ -236,8 +236,7 @@ class behat_hooks extends behat_base {
             !defined('BEHAT_SITE_RUNNING') ||
             php_sapi_name() != 'cli' ||
             !behat_util::is_test_mode_enabled() ||
-            !behat_util::is_test_site()
-        ) {
+            !behat_util::is_test_site()) {
             throw new coding_exception('Behat only can modify the test database and the test dataroot!');
         }
 
@@ -279,15 +278,14 @@ class behat_hooks extends behat_base {
         } catch (CurlExec $e) {
             // Exception thrown by WebDriver, so only @javascript tests will be caugth; in
             // behat_util::check_server_status() we already checked that the server is running.
-            throw new Exception($driverexceptionmsg);
+            throw new Exception($driverexceptionmsg, 0, $e);
         } catch (DriverException $e) {
-            throw new Exception($driverexceptionmsg);
+            throw new Exception($driverexceptionmsg, 0, $e);
         } catch (UnknownError $e) {
             // Generic 'I have no idea' Selenium error. Custom exception to provide more feedback about possible solutions.
-            throw new Exception($e->getMessage());
+            $this->throw_unknown_exception($e, 0, $e);
         } catch (Exception $e) {
-            // Generic 'I have no idea' Selenium error. Custom exception to provide more feedback about possible solutions.
-            throw new Exception($e->getMessage());
+            throw new Exception(get_string('unknownexceptioninfo', 'tool_behat'), 0, $e);
         }
 
         // We need the Mink session to do it and we do it only before the first scenario.
@@ -300,7 +298,7 @@ class behat_hooks extends behat_base {
         try {
             $session->reset();
         } catch (Exception $e) {
-            // Totara: This point is reached when Chrome driver freezes, let's gite it one more kick.
+            // Totara: This point is reached when Chrome driver freezes, let's give it one more kick.
             try {
                 sleep(5);
                 $session->restart();
@@ -442,6 +440,21 @@ class behat_hooks extends behat_base {
     }
 
     /**
+     * Execute any steps required after the step has finished.
+     *
+     * This includes creating an HTML dump of the content if there was a failure.
+     *
+     * @param AfterStepScope $scope Scope fired after step.
+     * @AfterStep
+     */
+    public function after_step(AfterStepScope $scope) {
+        // Totara: better restart browser after any failure to prevent cascading problems.
+        if ($scope->getTestResult()->getResultCode() === \Behat\Testwork\Tester\Result\TestResult::FAILED) {
+            self::$forcerestart = true;
+        }
+    }
+
+    /**
      * Totara: nothing to do
      * Executed after scenario having switch window to restart session.
      * This is needed to close all extra browser windows and starting
@@ -475,14 +488,11 @@ class behat_hooks extends behat_base {
             return false;
         }
 
-        // Some drivers (e.g. chromedriver) may throw an exception while trying to take a screenshot.  If this isn't handled,
-        // the behat run dies.  We don't want to lose the information about the failure that triggered the screenshot,
-        // so let's log the exception message to a file (to explain why there's no screenshot) and allow the run to continue,
-        // handling the failure as normal.
+        list ($dir, $filename) = $this->get_faildump_filename($scope, 'png');
         try {
-            list ($dir, $filename) = $this->get_faildump_filename($scope, 'png');
             $this->saveScreenshot($filename, $dir);
         } catch (Exception $e) {
+            // Totara: this must not throw exception!!!
             // Catching all exceptions as we don't know what the driver might throw.
             list ($dir, $filename) = $this->get_faildump_filename($scope, 'txt');
             $message = "Could not save screenshot due to an error\n" . $e->getMessage();
@@ -566,16 +576,6 @@ class behat_hooks extends behat_base {
     public function i_look_for_exceptions() {
         $this->look_for_exceptions();
     }
-
-    /**
-     * Converts HTML tags to line breaks to display the info in CLI
-     *
-     * @param string $html
-     * @return string
-     */
-    /*protected function get_debug_text($html) {
-
-    }*/
 
     /**
      * Returns whether the first scenario of the suite is running

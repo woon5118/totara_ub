@@ -43,9 +43,11 @@ class behat_facetoface extends behat_base {
     public function i_fill_seminar_session_with_relative_date_in_form_data(TableNode $data) {
 
         $behatformcontext = behat_context_helper::get('behat_forms');
-        $dataclone = clone $data;
         $rowday = array();
         $rows = array();
+        foreach ($data->getRows() as $row) {
+            $rows[] = $row;
+        }
         $timestartday = '';
         $timestartmonth = '';
         $timestartyear = '';
@@ -59,7 +61,7 @@ class behat_facetoface extends behat_base {
         $timefinishmin = '';
         $timefinishzone = '';
 
-        foreach ($dataclone->getRows() as $row) {
+        foreach ($data->getRows() as $row) {
             switch ($row[0]) {
                 case 'timestart[day]':
                     $timestartday = (!empty($row[1]) ? $row[1] . ' days': '');
@@ -154,9 +156,8 @@ class behat_facetoface extends behat_base {
         $rows[] = array('timefinish[minute]', (int) $finishdate->format('i'));
 
         // Set the the rows back to data.
-        $dataclone->setRows($rows);
-        $dataday = new TableNode();
-        $dataday->setRows($rowday);
+        $dataclone = new TableNode($rows);
+        $dataday = new TableNode($rowday);
 
         $behatformcontext->i_set_the_following_fields_to_these_values($dataday);
         $behatformcontext->i_set_the_following_fields_to_these_values($dataclone);
