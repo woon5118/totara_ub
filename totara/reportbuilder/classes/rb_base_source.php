@@ -3046,6 +3046,17 @@ abstract class rb_base_source {
         );
         $columnoptions[] = new rb_column_option(
             'course',
+            'timecreated',
+            get_string('coursedatecreated', 'totara_reportbuilder'),
+            "$join.timecreated",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp'
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course',
             'startdate',
             get_string('coursestartdate', 'totara_reportbuilder'),
             "$join.startdate",
@@ -3190,6 +3201,13 @@ abstract class rb_base_source {
                     COHORT_VISIBLE_ALL => get_string('visibleall', 'totara_cohort')),
                 'simplemode' => true
             )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'course',
+            'timecreated',
+            get_string('coursedatecreated', 'totara_reportbuilder'),
+            'date',
+            array('castdate' => true)
         );
         $filteroptions[] = new rb_filter_option(
             'course',
