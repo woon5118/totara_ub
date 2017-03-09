@@ -81,6 +81,7 @@ Feature: Cancellation for session
     And I should see "Show cancellation reason"
     And I click on "a.attendee-cancellation-note" "css_element"
     And I should see "Sam1 Student1 - Cancellation note"
+    And I am on homepage
     And I log out
 
     # Check that teacher can not manage cancellation notes
@@ -91,6 +92,7 @@ Feature: Cancellation for session
     And I click on the link "Attendees" in row 1
     And I follow "Cancellations"
     And I should not see "Show cancellation reason"
+    And I am on homepage
     And I log out
 
   @javascript

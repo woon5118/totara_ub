@@ -263,7 +263,7 @@ class_alias('core_question\bank\view', 'question_bank_view', true);
  * @param bool $unused no longer used, do no pass
  * @return array $thispageurl, $contexts, $cmid, $cm, $module, $pagevars
  */
-function question_edit_setup($edittab, $baseurl, $requirecmid = false, $unused = true) {
+function question_edit_setup($edittab, $baseurl, $requirecmid = false, $unused = null) {
     global $DB, $PAGE, $CFG;
 
     if ($unused !== null) {

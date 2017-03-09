@@ -73,7 +73,7 @@ Feature: Learners can submit assignments again when certification is expired
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
     And I follow "Test assignment name"
-    And I follow "View/grade all submissions"
+    And I follow "View all submissions"
     And I click on "Edit" "link" in the "Student 1" "table_row"
     And I click on "Prevent submission changes" "link"
     And I should see "Submission changes not allowed"

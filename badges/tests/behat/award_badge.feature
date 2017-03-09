@@ -229,7 +229,7 @@ Feature: Award badges
     And I am on homepage
     And I follow "Course 1"
     And I follow "Test assignment name"
-    And I follow "View/grade all submissions"
+    And I follow "View all submissions"
     And I should see "Not marked" in the "Student First" "table_row"
     And I click on "Grade Student First" "link" in the "Student First" "table_row"
     And I set the field "Grade out of 100" to "30"

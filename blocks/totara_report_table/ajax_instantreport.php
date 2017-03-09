@@ -37,6 +37,9 @@ $blockid = required_param('blockid', PARAM_INT);
 $blockcontext = context_block::instance($blockid, MUST_EXIST);
 list($context, $course, $cm) = get_context_info_array($blockcontext->id);
 
+if (empty($course)) {
+    $PAGE->set_context(context_system::instance());
+}
 if ($CFG->forcelogin) {
     require_login($course, false, $cm, false, true);
 } else {
