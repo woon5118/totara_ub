@@ -777,7 +777,7 @@ $functions = array(
 
     // TOTARA: support for getting flex icons list.
     'core_output_get_flex_icons' => array(
-        'classname'   => 'core\output\external',
+        'classname'   => 'core\output\flex_icon_external',
         'methodname'  => 'get_flex_icons',
         'description' => 'Get list of flex icon definitions for the specified theme',
         'type'        => 'read',
