@@ -173,6 +173,7 @@ $string['course_completion'] = 'Course Completion';
 $string['courseenddate'] = 'End date';
 $string['courseenrolavailable'] = 'Open enrolment';
 $string['courseenroltype'] = 'Enrolment type';
+$string['courseenroltypes'] = 'Enrolment Types';
 $string['courseexpandlink'] = 'Course Name (expanding details)';
 $string['coursecategory'] = 'Course Category';
 $string['coursecategoryid'] = 'Course Category ID';

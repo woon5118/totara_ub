@@ -125,6 +125,21 @@ class rb_source_course_completion extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'grade_items'
             ),
+            new rb_join(
+                'user_enrolments',
+                'LEFT',
+                '{user_enrolments}',
+                'user_enrolments.userid = base.userid',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
+            new rb_join(
+                'enrol',
+                'LEFT',
+                '{enrol}',
+                'enrol.id = user_enrolments.enrolid',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'user_enrolments'
+            ),
         );
 
         // include some standard joins
@@ -236,6 +251,18 @@ class rb_source_course_completion extends rb_base_source {
                 get_string('dateenrolled', 'rb_source_course_completion'),
                 'base.timeenrolled',
                 array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
+            ),
+            new rb_column_option(
+                'course_completion',
+                'enrolltype',
+                get_string('courseenroltypes', 'totara_reportbuilder'),
+                'enrol.enrol',
+                array(
+                    'joins' => 'enrol',
+                    'grouping' => 'comma_list_unique',
+                    'displayfunc' => 'enrolment_types_list',
+                    'dbdatatype' => 'char'
+                )
             ),
             new rb_column_option(
                 'course_completion',
@@ -528,6 +555,12 @@ class rb_source_course_completion extends rb_base_source {
                 array(),
                 // special enrol filter requires a composite field
                 array('course' => 'base.course', 'user' => 'base.userid')
+            ),
+            new rb_filter_option(
+                'course_completion',
+                'enrolltype',
+                get_string('courseenroltypes', 'totara_reportbuilder'),
+                'text'
             ),
         );
 
