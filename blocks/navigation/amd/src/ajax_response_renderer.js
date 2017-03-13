@@ -175,7 +175,6 @@ define(['jquery'], function($) {
             } else {
                 if (element.parent().hasClass('contains_branch')) {
                     element.parent().removeClass('contains_branch');
-                    element.addClass('emptybranch');
                     require(['core/templates'], function (templates) {
                         templates.renderIcon('collapsed-empty').done(function (html) {
                             if (element.attr('aria-expanded') === 'true') {
