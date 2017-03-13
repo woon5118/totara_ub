@@ -266,7 +266,7 @@ class core_plugin_manager_testcase extends advanced_testcase {
         // Missing already installed.
         set_config('version', 2013091300, 'mod_xxxxxxx');
         // Deleted present.
-        set_config('version', 2013091300, 'enrol_authorize');
+        set_config('version', 2013091300, 'tool_installaddon');
 
         core_plugin_manager::reset_caches();
 
@@ -282,7 +282,7 @@ class core_plugin_manager_testcase extends advanced_testcase {
                     $this->assertSame(core_plugin_manager::PLUGIN_STATUS_NEW, $info->get_status(), 'Invalid '.$info->component.' state');
                 } else if ($info->component === 'mod_xxxxxxx') {
                     $this->assertSame(core_plugin_manager::PLUGIN_STATUS_MISSING, $info->get_status(), 'Invalid '.$info->component.' state');
-                } else if ($info->component === 'enrol_authorize') {
+                } else if ($info->component === 'tool_installaddon') {
                     $this->assertSame(core_plugin_manager::PLUGIN_STATUS_DELETE, $info->get_status(), 'Invalid '.$info->component.' state');
                 } else {
                     $this->assertSame(core_plugin_manager::PLUGIN_STATUS_UPTODATE, $info->get_status(), 'Invalid '.$info->component.' state');
