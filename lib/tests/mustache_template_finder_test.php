@@ -83,6 +83,33 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
     }
 
     /**
+     * Ensure optional $CFG->themedir is added to template search paths.
+     *
+     * Encapsulate in own method as this test requires us to mutate
+     * global state which could lead to unexpected results if assertions
+     * are added after it in future.
+     */
+    public function test_custom_themedir_get_template_directories_for_component() {
+        global $CFG;
+
+        // Roll back state changes.
+        $this->resetAfterTest();
+
+        $CFG->themedir = '/foo/bar';
+        $dirs = mustache_template_finder::get_template_directories_for_component('totara_core', 'standardtotararesponsive');
+        $correct = array(
+            $CFG->dirroot . '/theme/standardtotararesponsive/templates/totara_core/',
+            '/foo/bar/standardtotararesponsive/templates/totara_core/',
+            $CFG->dirroot . '/theme/bootstrapbase/templates/totara_core/',
+            '/foo/bar/bootstrapbase/templates/totara_core/',
+            $CFG->dirroot . '/theme/base/templates/totara_core/',
+            '/foo/bar/base/templates/totara_core/',
+            $CFG->dirroot . '/totara/core/templates/'
+        );
+        $this->assertEquals($correct, $dirs);
+    }
+
+    /**
      * @expectedException coding_exception
      */
     public function test_invalid_get_template_directories_for_component() {
