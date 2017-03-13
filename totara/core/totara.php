@@ -55,6 +55,7 @@ define('COHORT_ASSN_ITEMTYPE_COURSE', 50);
 define('COHORT_ASSN_ITEMTYPE_PROGRAM', 45);
 define('COHORT_ASSN_ITEMTYPE_CERTIF', 55);
 define('COHORT_ASSN_ITEMTYPE_MENU', 65);
+define('COHORT_ASSN_ITEMTYPE_FEATURED_LINKS', 66);
 
 // This should be extended when adding other tabs.
 define ('COHORT_ASSN_VALUE_VISIBLE', 10);
@@ -70,20 +71,24 @@ define('COHORT_VISIBLE_NOUSERS', 3);
 /**
  * Returns true or false depending on whether or not this course is visible to a user.
  *
- * @param int $courseid
+ * @param int|stdClass $courseorid
  * @param int $userid
  * @return bool
  */
-function totara_course_is_viewable($courseid, $userid = null) {
-    global $USER, $CFG, $DB;
+function totara_course_is_viewable($courseorid, $userid = null) {
+    global $USER, $CFG;
 
     if ($userid === null) {
         $userid = $USER->id;
     }
 
-    $coursecontext = context_course::instance($courseid);
+    if (is_object($courseorid)) {
+        $course = $courseorid;
+    } else {
+        $course = get_course($courseorid);
+    }
+    $coursecontext = context_course::instance($course->id);
 
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     if (empty($CFG->audiencevisibility)) {
         // This check is moved from require_login().
         if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', $coursecontext, $userid)) {

@@ -9,6 +9,7 @@ theme/roots/style/totara-rtl.css
 # CSS compiled from less
 blocks/current_learning/styles.css
 blocks/totara_alerts/styles.css
+blocks/totara_featured_links/styles.css
 report/participation/styles.css
 report/progress/styles.css
 totara/appraisal/styles.css
@@ -29,6 +30,8 @@ admin/tool/usertours/amd/src/tour.js
 admin/tool/usertours/amd/src/popper.js
 auth/cas/CAS/
 auth/fc/fcFPP.php
+blocks/totara_featured_links/spectrum/
+blocks/totara_featured_links/amd/src/spectrum.js
 enrol/lti/ims-blti/
 filter/algebra/AlgParser.pm
 filter/tex/mimetex.*
