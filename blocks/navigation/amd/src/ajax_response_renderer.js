@@ -74,19 +74,33 @@ define(['jquery'], function($) {
                 li.addClass('collapsed contains_branch');
                 p.attr('aria-expanded', false);
                 p.addClass('branch');
+
+                require(['core/templates'], function (templates) {
+                    templates.renderIcon('collapsed').done(function (html) {
+                        if (p.attr('aria-expanded') === 'false') {
+                            p.find('.flex-icon').remove();
+                            p.prepend(html);
+                        }
+                    });
+                });
             }
 
             if (node.icon && (!isBranch || node.type === NODETYPE.ACTIVITY || node.type === NODETYPE.RESOURCE)) {
                 li.addClass('item_with_icon');
                 p.addClass('hasicon');
+                var flexicon = node.flex_icon;
 
-                icon = $('<img/>');
-                icon.attr('alt', node.icon.alt);
-                icon.attr('title', node.icon.title);
-                icon.attr('src', M.util.image_url(node.icon.pix, node.icon.component));
-                $.each(node.icon.classes, function(index, className) {
-                    icon.addClass(className);
-                });
+                if (typeof flexicon === 'string') {
+                    icon = $(flexicon);
+                } else {
+                    icon = $('<img/>');
+                    icon.attr('alt', node.icon.alt);
+                    icon.attr('title', node.icon.title);
+                    icon.attr('src', M.util.image_url(node.icon.pix, node.icon.component));
+                    $.each(node.icon.classes, function(index, className) {
+                        icon.addClass(className);
+                    });
+                }
             }
 
             if (node.link) {
@@ -129,6 +143,15 @@ define(['jquery'], function($) {
             } else if (isBranch && !node.requiresajaxloading) {
                 li.removeClass('contains_branch');
                 p.addClass('emptybranch');
+
+                require(['core/templates'], function (templates) {
+                    templates.renderIcon('collapsed-empty').done(function (html) {
+                        if (p.attr('aria-expanded') === 'true') {
+                            p.find('.flex-icon').remove();
+                            p.prepend(html);
+                        }
+                    });
+                });
             }
         });
 
@@ -153,7 +176,14 @@ define(['jquery'], function($) {
             } else {
                 if (element.parent().hasClass('contains_branch')) {
                     element.parent().removeClass('contains_branch');
-                    element.addClass('emptybranch');
+                    require(['core/templates'], function (templates) {
+                        templates.renderIcon('collapsed-empty').done(function (html) {
+                            if (element.attr('aria-expanded') === 'true') {
+                                element.find('.flex-icon').remove();
+                                element.prepend(html);
+                            }
+                        });
+                    });
                 }
             }
         }

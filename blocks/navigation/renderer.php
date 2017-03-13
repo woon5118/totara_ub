@@ -78,6 +78,8 @@ class block_navigation_renderer extends plugin_renderer_base {
             if (!$item->display && !$item->contains_active_node()) {
                 continue;
             }
+            $collapsed = false;
+            $icon = new \core\output\flex_icon('spacer');
 
             $isexpandable = (empty($expansionlimit) || ($item->type > navigation_node::TYPE_ACTIVITY || $item->type < $expansionlimit) || ($item->contains_active_node() && $item->children->count() > 0));
 
@@ -95,7 +97,6 @@ class block_navigation_renderer extends plugin_renderer_base {
             $pattr += !empty($item->id) ? ['id' => $item->id] : [];
             $isbranch = $isexpandable && ($item->children->count() > 0 || ($item->has_children() && (isloggedin() || $item->type <= navigation_node::TYPE_CATEGORY)));
             $hasicon = ((!$isbranch || $item->type == navigation_node::TYPE_ACTIVITY || $item->type == navigation_node::TYPE_RESOURCE) && $item->icon instanceof renderable);
-            $icon = '';
 
             if ($hasicon) {
                 $liattr['class'][] = 'item_with_icon';
@@ -137,7 +138,11 @@ class block_navigation_renderer extends plugin_renderer_base {
             if ($isbranch) {
                 $pattr['class'][] = 'branch';
                 $liattr['class'][] = 'contains_branch';
-                $pattr += ['aria-expanded' => ($item->has_children() && (!$item->forceopen || $item->collapse)) ? "false" : "true"];
+                $expanded = ($item->has_children() && (!$item->forceopen || $item->collapse)) ? "false" : "true";
+                $pattr += ['aria-expanded' => $expanded];
+                $icon = new \core\output\flex_icon($expanded === "true" ? 'expanded' : 'collapsed');
+                $icon = $this->render($icon);
+                $content = $icon . $content;
                 if ($item->requiresajaxloading) {
                     $pattr += [
                         'data-requires-ajax' => 'true',

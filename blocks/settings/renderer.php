@@ -89,8 +89,14 @@ class block_settings_renderer extends plugin_renderer_base {
                 if (!$item->forceopen || (!$item->forceopen && $item->collapse) || ($item->children->count() == 0
                         && $item->nodetype == navigation_node::NODETYPE_BRANCH)) {
                     $pattr += ['aria-expanded' => 'false'];
+
+                    $icon = new \core\output\flex_icon('collapsed');
+                    $icon = $this->render($icon);
                 } else {
                     $pattr += ['aria-expanded' => 'true'];
+
+                    $icon = new \core\output\flex_icon('expanded');
+                    $icon = $this->render($icon);
                 }
                 if ($item->requiresajaxloading) {
                     $pattr['data-requires-ajax'] = 'true';
@@ -125,7 +131,7 @@ class block_settings_renderer extends plugin_renderer_base {
                 $ulattr += ['aria-hidden' => 'true'];
             }
 
-            $content = html_writer::tag('p', $content, $pattr) . $this->navigation_node($item, $ulattr, $depth + 1);
+            $content = html_writer::tag('p', $icon . $content, $pattr) . $this->navigation_node($item, $ulattr, $depth + 1);
             if (!empty($item->preceedwithhr) && $item->preceedwithhr===true) {
                 $content = html_writer::empty_tag('hr') . $content;
             }
