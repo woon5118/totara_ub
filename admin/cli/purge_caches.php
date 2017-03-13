@@ -35,7 +35,7 @@ if ($unrecognized) {
 
 if ($options['help']) {
     $help =
-"Invalidates all Moodle internal caches
+"Invalidates all Totara internal caches
 
 Options:
 -h, --help            Print out this help

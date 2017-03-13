@@ -64,7 +64,7 @@ if (CLI_MAINTENANCE) {
 }
 
 if (moodle_needs_upgrading()) {
-    echo "Moodle upgrade pending, backup execution suspended.\n";
+    echo "Totara upgrade pending, backup execution suspended.\n";
     exit(1);
 }
 

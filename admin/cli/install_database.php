@@ -52,7 +52,7 @@ Options:
 --lang=CODE           Installation and default site language. Default is en.
 --adminuser=USERNAME  Username for the admin account. Default is admin.
 --adminpass=PASSWORD  Password for the admin account.
---adminemail=STRING   Email address for the moodle admin account.
+--adminemail=STRING   Email address for the totara admin account.
 --agree-license       Indicates agreement with software license.
 --fullname=STRING     Name of the site
 --shortname=STRING    Name of the site

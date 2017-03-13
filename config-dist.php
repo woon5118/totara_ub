@@ -369,7 +369,7 @@ $CFG->admin = 'admin';
 // To get the values logged in Apache's log, add to your httpd.conf
 // the following statements. In the General part put:
 //     LogFormat "%h %l %{MOODLEUSER}n %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\"" moodleformat
-// And in the part specific to your Moodle install / virtualhost:
+// And in the part specific to your Totara install / virtualhost:
 //     CustomLog "/your/path/to/log" moodleformat
 // CAUTION: Use of this option will expose usernames in the Apache log,
 // If you are going to publish your log, or the output of your web stats analyzer
@@ -757,7 +757,7 @@ $CFG->admin = 'admin';
 //           )
 //       )
 //   );
-// You can also use the following config to override default Moodle configuration for Behat.
+// You can also use the following config to override default Totara configuration for Behat.
 // This config is limited to default suite and will be supported in later versions.
 // It will have precedence over $CFG->behat_config.
 // $CFG->behat_profiles = array(

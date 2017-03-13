@@ -54,7 +54,7 @@ Options:
 -h, --help                  Print out this help.
 
 Example:
-\$sudo -u www-data /usr/bin/php admin/cli/backup.php --courseid=2 --destination=/moodle/backup/\n
+\$sudo -u www-data /usr/bin/php admin/cli/backup.php --courseid=2 --destination=/totara/backup/\n
 EOL;
 
     echo $help;
