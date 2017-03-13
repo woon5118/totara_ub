@@ -16,7 +16,6 @@ Feature: Set the site home page and dashboard as the default home page
     And I set the field "Allow default page selection" to "1"
     And I press "Save changes"
     And I am on site homepage
-    And I follow "Make this my default home page"
     And I should not see "Make this my default home page"
     And I follow "Course 1"
     And "Home" "text" should exist in the ".breadcrumb-nav" "css_element"
@@ -25,9 +24,8 @@ Feature: Set the site home page and dashboard as the default home page
     And I follow "Make Dashboard my default page"
     And I should not see "Make Dashboard my default page"
     And I should see "Dashboard" in the ".breadcrumb-nav" "css_element"
-    And "//*[@class='breadcrumb-nav']//li/a[text()='Dashboard']" "xpath_element" should exist
     And I click on "Home" in the totara menu
     And I follow "Make Home my default page"
     And I should not see "Make Home my default page"
     When I follow "Course 1"
-    Then "Dashboard" "text" should exist in the ".breadcrumb-nav" "css_element"
+    Then "Home" "text" should exist in the ".breadcrumb-nav" "css_element"
