@@ -36,29 +36,14 @@ function xmldb_totara_core_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
-    if ($oldversion < 2016111100) {
-        // Delete all removed update and install settings.
-        unset_config('disableupdatenotifications');
-        unset_config('disableupdateautodeploy');
-        unset_config('updateautodeploy');
-        unset_config('updateautocheck');
-        unset_config('updatenotifybuilds');
-        unset_config('updateminmaturity');
-        unset_config('updatenotifybuilds');
-
-        // Uninstall deleted plugin.
-        uninstall_plugin('tool', 'installaddon');
-
-        upgrade_plugin_savepoint(true, 2016111100, 'totara', 'core');
-    }
 
     if ($oldversion < 2016112201) {
-        // Kiwifruit responsive was removed in Totara 10.
-        // Clean up configuration if it has not been re-introduced.
+        // Kiwifruit responsive was removed in Totara 10,
+        // do a full plugin uninstall if not present.
         if (!file_exists("{$CFG->dirroot}/theme/kiwifruitresponsive/config.php")) {
-            unset_all_config_for_plugin('theme_kiwifruitresponsive');
+            uninstall_plugin('theme' , 'kiwifruitresponsive');
         }
-        totara_upgrade_mod_savepoint(true, 2016112201, 'totara_core');
+        upgrade_plugin_savepoint(true, 2016112201, 'totara', 'core');
     }
 
     if ($oldversion < 2017030800) {
@@ -81,7 +66,17 @@ function xmldb_totara_core_upgrade($oldversion) {
             totara_program_fix_timestarted();
         }
 
-        totara_upgrade_mod_savepoint(true, 2017030800, 'totara_core');
+        upgrade_plugin_savepoint(true, 2017030800, 'totara', 'core');
+    }
+
+    if ($oldversion < 2017031300) {
+        totara_core_upgrade_delete_moodle_plugins_31();
+        upgrade_plugin_savepoint(true, 2017031300, 'totara', 'core');
+    }
+
+    if ($oldversion < 2017031301) {
+        totara_core_upgrade_add_moodle_competencies_314();
+        upgrade_plugin_savepoint(true, 2017031301, 'totara', 'core');
     }
 
     return true;

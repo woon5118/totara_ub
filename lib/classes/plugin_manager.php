@@ -1136,7 +1136,7 @@ class core_plugin_manager {
     }
 
     /**
-     * Defines a list of all plugins that were originally shipped in the standard Moodle distribution,
+     * Defines a list of all plugins that were originally shipped in the standard Totara or Moodle distribution,
      * but are not anymore and are deleted during upgrades.
      *
      * The main purpose of this list is to hide missing plugins during upgrade.
@@ -1146,35 +1146,31 @@ class core_plugin_manager {
      * @return bool
      */
     public static function is_deleted_standard_plugin($type, $name) {
-        // Do not include plugins that were removed during upgrades to versions that are
-        // not supported as source versions for upgrade any more. For example, at MOODLE_23_STABLE
-        // branch, listed should be no plugins that were removed at 1.9.x - 2.1.x versions as
-        // Moodle 2.3 supports upgrades from 2.2.x only.
+        // TOTARA: Do not include plugins that were removed during upgrades to Totara 9 or Moodle 3.0 and earlier.
         $plugins = array(
-            'block' => array('facetoface'),
-            'qformat' => array('blackboard', 'learnwise'),
-            'enrol' => array('authorize'),
-            'tinymce' => array('dragmath'),
-            'tool' => array('bloglevelupgrade', 'qeupgradehelper', 'timezoneimport', 'installaddon'),
-            'theme' => array('mymobile', 'afterburner', 'anomaly', 'arialist', 'binarius', 'boxxie', 'brick', 'formal_white',
-                'formfactor', 'fusion', 'leatherbound', 'magazine', 'nimble', 'nonzero', 'overlay', 'serenity', 'sky_high',
-                'splash', 'standard', 'standardold'
-                // Totara uninstalled themes.
-                , 'canvas', 'clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara', 'kiwifruitresponsive'
-            ),
-            'webservice' => array('amf'),
-            // Other Totara leftovers and mistakes.
-            'connect' => array('totara'),
+            // Totara 10.0 removals.
+            'theme_kiwifruitresponsive',
+            'tool_installaddon',
+
+            // Moodle 3.1.4 merge removals - we do not want these!
+            'block_lp',
+            'report_competency',
+            'theme_canvas',
+            'theme_clean',
+            'theme_more',
+            'tool_cohortroles',
+            'tool_lp',
+            'tool_lpmigrate',
+
+            // Upstream Moodle 3.1 removals.
+            'webservice_amf',
         );
 
-        if (!isset($plugins[$type])) {
-            return false;
-        }
-        return in_array($name, $plugins[$type]);
+        return in_array($type . '_' . $name, $plugins);
     }
 
     /**
-     * Defines a white list of all plugins shipped in the standard Moodle distribution
+     * Defines a white list of all plugins shipped in the standard Totara distribution
      *
      * @param string $type
      * @return false|array array of standard plugins or false if the type is unknown
