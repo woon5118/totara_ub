@@ -486,7 +486,7 @@ foreach ($pages as $page) {
 
 if ($hassiteconfig) {
     // Global Search engine plugins.
-    $ADMIN->add('modules', new admin_category('searchplugins', new lang_string('search', 'admin')));
+    $ADMIN->add('experimental', new admin_category('searchplugins', new lang_string('search', 'admin')));
     $temp = new admin_settingpage('manageglobalsearch', new lang_string('globalsearchmanage', 'admin'));
 
     $pages = array();
@@ -504,6 +504,7 @@ if ($hassiteconfig) {
         }
     }
 
+if ($ADMIN->fulltree) { // Totara: do not load the settings when we do not need them, this saves lots of memory and file inclusions.
     // Setup status.
     $temp->add(new admin_setting_searchsetupinfo());
 
@@ -519,6 +520,7 @@ if ($hassiteconfig) {
         list($componentname, $varname) = $searcharea->get_config_var_name();
         $temp->add(new admin_setting_configcheckbox($componentname . '/' . $varname . '_enabled', $searcharea->get_visible_name(true),
             '', 1, 1, 0));
+}
     }
     $ADMIN->add('searchplugins', $temp);
 

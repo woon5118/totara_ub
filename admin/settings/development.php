@@ -18,6 +18,9 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $enablecssoptimiser->set_updatedcallback('theme_reset_all_caches');
     $temp->add($enablecssoptimiser);
 
+    $temp->add(new admin_setting_configcheckbox('enableglobalsearch', new lang_string('enableglobalsearch', 'admin'),
+        new lang_string('enableglobalsearch_desc', 'admin'), 0, 1, 0));
+
     $ADMIN->add('experimental', $temp);
 
     // "debugging" settingpage
