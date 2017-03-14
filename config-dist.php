@@ -307,9 +307,10 @@ $CFG->admin = 'admin';
 // This setting will make some graphs (eg user logs) use lines instead of bars
 //      $CFG->preferlinegraphs = true;
 //
-// This setting allows you to specify a class to rewrite outgoing urls
+// This experimental setting allows you to specify a class to rewrite outgoing urls
 // enabling 'clean urls' in conjunction with an apache / nginx handler.
 // The handler must implement \core\output\url_rewriter.
+// This may require other hacks and it may not be compatible with some features.
 //      $CFG->urlrewriteclass = '\local_cleanurls\url_rewriter';
 //
 // Enabling this will allow custom scripts to replace existing Totara scripts.
