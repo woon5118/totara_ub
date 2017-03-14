@@ -111,6 +111,138 @@ class core_admintree_testcase extends advanced_testcase {
         $tree->add('root', new admin_category('bar', 'Bar'), '');
     }
 
+    public function test_path() {
+        $tree = new admin_root(true);
+        $tree->add('root', $one = new admin_category('one', 'One'));
+        $tree->add('root', $three = new admin_category('three', 'Three'));
+        $tree->add('one', $oneone = new admin_category('one-one', 'One-one'));
+        $tree->add('one-one', $oneoneone = new admin_externalpage('one-one-one', 'One-one-one', new moodle_url('/')));
+        $onethree = new admin_category('one-three', 'One-three');
+        $onethree->add('one-three', $onethreeone = new admin_settingpage('one-three-one', 'One-three-one'));
+        $onethreeone->add(new admin_setting_heading('xx', 'XXX xxx', 'YYY yyy'));
+        $tree->add('one', $onethree);
+
+        $expected = array('one-three-one', 'one-three', 'one', 'root');
+        $this->assertSame($expected, $onethreeone->path);
+    }
+
+    public function test_visiblepath() {
+        $tree = new admin_root(true);
+        $tree->add('root', $one = new admin_category('one', 'One'));
+        $tree->add('root', $three = new admin_category('three', 'Three'));
+        $tree->add('one', $oneone = new admin_category('one-one', 'One-one'));
+        $tree->add('one-one', $oneoneone = new admin_externalpage('one-one-one', 'One-one-one', new moodle_url('/')));
+        $onethree = new admin_category('one-three', 'One-three');
+        $onethree->add('one-three', $onethreeone = new admin_settingpage('one-three-one', 'One-three-one'));
+        $onethreeone->add(new admin_setting_heading('xx', 'XXX xxx', 'YYY yyy'));
+        $tree->add('one', $onethree);
+
+        $expected = array('One-three-one', 'One-three', 'One', 'Administration');
+        $this->assertSame($expected, $onethreeone->visiblepath);
+    }
+
+    public function test_locate() {
+        $tree = new admin_root(true);
+        $tree->add('root', $one = new admin_category('one', 'One'));
+        $tree->add('root', $three = new admin_category('three', 'Three'));
+        $tree->add('one', $oneone = new admin_category('one-one', 'One-one'));
+        $tree->add('one-one', $oneoneone = new admin_externalpage('one-one-one', 'One-one-one', new moodle_url('/')));
+        $onethree = new admin_category('one-three', 'One-three');
+        $onethree->add('one-three', $onethreeone = new admin_settingpage('one-three-one', 'One-three-one'));
+        $onethreeone->add(new admin_setting_heading('xx', 'XXX xxx', 'YYY yyy'));
+        $tree->add('one', $onethree);
+
+        // The is recommended way to look up stuff!
+        $this->assertSame($tree, $tree->locate('root'));
+        $this->assertSame($one, $tree->locate('one'));
+        $this->assertSame($oneone, $tree->locate('one-one'));
+        $this->assertSame($oneoneone, $tree->locate('one-one-one'));
+        $this->assertSame($onethree, $tree->locate('one-three'));
+        $this->assertSame($onethreeone, $tree->locate('one-three-one'));
+
+        // Lookup via any category - this works only without the paths because it uses the cache.
+        $this->assertSame($tree, $onethree->locate('root'));
+        $this->assertSame($one, $onethree->locate('one'));
+        $this->assertSame($oneone, $onethree->locate('one-one'));
+        $this->assertSame($oneoneone, $onethree->locate('one-one-one'));
+        $this->assertSame($onethree, $onethree->locate('one-three'));
+        $this->assertSame($onethreeone, $onethree->locate('one-three-one'));
+    }
+
+    public function test_locate_not_attached() {
+        $onethree = new admin_category('one-three', 'One-three');
+        $onethree->add('one-three', $onethreeone = new admin_settingpage('one-three-one', 'One-three-one'));
+
+        $this->assertSame($onethree, $onethree->locate('one-three'));
+        $this->assertSame($onethreeone, $onethree->locate('one-three-one'));
+    }
+
+    public function test_prune() {
+        $tree = new admin_root(true);
+        $tree->add('root', $one = new admin_category('one', 'One'));
+        $tree->add('root', $three = new admin_category('three', 'Three'));
+        $tree->add('one', $oneone = new admin_category('one-one', 'One-one'));
+        $tree->add('one-one', $oneoneone = new admin_externalpage('one-one-one', 'One-one-one', new moodle_url('/')));
+        $onethree = new admin_category('one-three', 'One-three');
+        $onethree->add('one-three', $onethreeone = new admin_settingpage('one-three-one', 'One-three-one'));
+        $onethreeone->add(new admin_setting_heading('xx', 'XXX xxx', 'YYY yyy'));
+        $tree->add('one', $onethree);
+
+        // The is recommended way to look up stuff!
+        $this->assertSame($tree, $tree->locate('root'));
+        $this->assertSame($one, $tree->locate('one'));
+        $this->assertSame($oneone, $tree->locate('one-one'));
+        $this->assertSame($oneoneone, $tree->locate('one-one-one'));
+        $this->assertSame($onethree, $tree->locate('one-three'));
+        $this->assertSame($onethreeone, $tree->locate('one-three-one'));
+
+        $this->assertTrue($tree->prune('one-three'));
+
+        $this->assertSame($tree, $tree->locate('root'));
+        $this->assertSame($one, $tree->locate('one'));
+        $this->assertSame($oneone, $tree->locate('one-one'));
+        $this->assertSame($oneoneone, $tree->locate('one-one-one'));
+        $this->assertSame(null, $tree->locate('one-three'));
+        $this->assertSame(null, $tree->locate('one-three-one'));
+        $this->assertSame($three, $tree->locate('three'));
+
+        $this->assertFalse($tree->prune('xxx'));
+
+        $this->assertSame($tree, $tree->locate('root'));
+        $this->assertSame($one, $tree->locate('one'));
+        $this->assertSame($oneone, $tree->locate('one-one'));
+        $this->assertSame($oneoneone, $tree->locate('one-one-one'));
+        $this->assertSame(null, $tree->locate('one-three'));
+        $this->assertSame(null, $tree->locate('one-three-one'));
+        $this->assertSame($three, $tree->locate('three'));
+
+        $this->assertTrue($tree->prune('one-one-one'));
+
+        $this->assertSame($tree, $tree->locate('root'));
+        $this->assertSame($one, $tree->locate('one'));
+        $this->assertSame($oneone, $tree->locate('one-one'));
+        $this->assertSame(null, $tree->locate('one-one-one'));
+        $this->assertSame(null, $tree->locate('one-three'));
+        $this->assertSame(null, $tree->locate('one-three-one'));
+        $this->assertSame($three, $tree->locate('three'));
+
+        $this->assertTrue($tree->prune('one'));
+
+        $this->assertSame($tree, $tree->locate('root'));
+        $this->assertSame(null, $tree->locate('one'));
+        $this->assertSame(null, $tree->locate('one-one'));
+        $this->assertSame(null, $tree->locate('one-one-one'));
+        $this->assertSame(null, $tree->locate('one-three'));
+        $this->assertSame(null, $tree->locate('one-three-one'));
+        $this->assertSame($three, $tree->locate('three'));
+
+        try {
+            $tree->prune('root');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf('coding_exception', $e);
+        }
+    }
+
     /**
      * Testing whether a configexecutable setting is executable.
      */

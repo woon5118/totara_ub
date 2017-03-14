@@ -655,26 +655,51 @@ function enable_cli_maintenance_mode() {
  * block. It forces inheriting classes to define a method for checking user permissions
  * and methods for finding something in the admin tree.
  *
+ * @property string $name unique identifier name
+ * @property string $visiblename localised name
+ * @property bool $hidden should this item be hidden in admin tree?
+ * @property array $path array of admin tree part id names going to the top
+ * @property array $visiblepath array of admin tree visible names going to the top
+ *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface part_of_admin_tree {
 
-/**
- * Finds a named part_of_admin_tree.
- *
- * Used to find a part_of_admin_tree. If a class only inherits part_of_admin_tree
- * and not parentable_part_of_admin_tree, then this function should only check if
- * $this->name matches $name. If it does, it should return a reference to $this,
- * otherwise, it should return a reference to NULL.
- *
- * If a class inherits parentable_part_of_admin_tree, this method should be called
- * recursively on all child objects (assuming, of course, the parent object's name
- * doesn't match the search criterion).
- *
- * @param string $name The internal name of the part_of_admin_tree we're searching for.
- * @return mixed An object reference or a NULL reference.
- */
+    /**
+     * Finds a named part_of_admin_tree.
+     *
+     * Used to find a part_of_admin_tree. If a class only inherits part_of_admin_tree
+     * and not parentable_part_of_admin_tree, then this function should only check if
+     * $this->name matches $name. If it does, it should return a reference to $this,
+     * otherwise, it should return a reference to NULL.
+     *
+     * If a class inherits parentable_part_of_admin_tree, this method should be called
+     * recursively on all child objects (assuming, of course, the parent object's name
+     * doesn't match the search criterion).
+     * 
+     * NOTE: elements may use global tree map to speed up the lookup in the whole tree.
+     *
+     * @param string $name The internal name of the part_of_admin_tree we're searching for.
+     * @return part_of_admin_tree An object reference or a NULL reference.
+     */
     public function locate($name);
+
+    /**
+     * Set parent of this item.
+     *
+     * @param parentable_part_of_admin_tree $parent
+     */
+    public function set_parent(parentable_part_of_admin_tree $parent);
+
+    /**
+     * Get parent of this item.
+     *
+     * NOTE: this can be called only after the item is added to tree,
+     *       otherwise you get a coding exception.
+     *
+     * @return parentable_part_of_admin_tree
+     */
+    public function get_parent();
 
     /**
      * Removes named part_of_admin_tree.
@@ -717,6 +742,148 @@ interface part_of_admin_tree {
      * @return bool
      */
     public function show_save();
+
+    /**
+     * Destroy admin tree item.
+     *
+     * Intended for releasing of references.
+     */
+    public function destroy();
+}
+
+/**
+ * Shared code for admin tree parts.
+ */
+trait part_of_admin_tree_trait {
+    /** @var string An internal name for this category. Must be unique amongst ALL part_of_admin_tree objects */
+    public $name;
+    /** @var string The displayed name for this category. Usually obtained through get_string() */
+    public $visiblename;
+    /** @var bool Should this item be hidden in admin tree block? */
+    public $hidden;
+
+    /** @var parentable_part_of_admin_tree */
+    protected $parent;
+
+    /**
+     * Set parent of this item.
+     *
+     * @param parentable_part_of_admin_tree $parent
+     */
+    public function set_parent(parentable_part_of_admin_tree $parent) {
+        if (isset($this->parent)) {
+            throw new coding_exception('parent is already set');
+        }
+        $this->parent = $parent;
+    }
+
+    /**
+     * Get parent of this item.
+     *
+     * Null is returned if parent not set yet and for root element.
+     *
+     * @return parentable_part_of_admin_tree
+     */
+    public function get_parent() {
+        return $this->parent;
+    }
+
+    /**
+     * Get the admin tree cache if known.
+     *
+     * @return admin_tree_map|null
+     */
+    public function get_tree_map() {
+        $parent = $this->parent;
+        while ($parent) {
+            if ($parent instanceof admin_root) {
+                return $parent->get_tree_map();
+            }
+            $parent = $parent->get_parent();
+        }
+        return null;
+    }
+
+    /**
+     * Destroy admin tree item.
+     * 
+     * Intended for releasing of references.
+     */
+    public function destroy() {
+        $treemap = $this->get_tree_map();
+        if ($treemap) {
+            $treemap->delete($this->name);
+        }
+        $this->parent = null;
+    }
+
+    /**
+     * Magically gets a property from this object.
+     *
+     * @param $property
+     * @return part_of_admin_tree[]
+     * @throws coding_exception
+     */
+    public function __get($property) {
+        if ($property === 'children' and method_exists($this, 'get_children')) {
+            return $this->get_children(true);
+        }
+        if ($property === 'path') {
+            $return = array($this->name);
+            $parent = $this->parent;
+            while ($parent) {
+                $return[] = $parent->name;
+                $parent = $parent->get_parent();
+            }
+            return $return;
+        }
+        if ($property === 'visiblepath') {
+            $return = array($this->visiblename);
+            $parent = $this->parent;
+            while ($parent) {
+                $return[] = $parent->visiblename;
+                $parent = $parent->get_parent();
+            }
+            return $return;
+        }
+        throw new coding_exception('Invalid __get property requested: ' . $property);
+    }
+
+    /**
+     * Magically sets a property against this object.
+     *
+     * @param string $property
+     * @param mixed $value
+     * @throws coding_exception
+     */
+    public function __set($property, $value) {
+        if ($property === 'children' and property_exists($this, 'children')) {
+            $this->sorted = false;
+            $this->children = $value;
+        }
+        throw new coding_exception('Invalid __set property requested: ' .  $property);
+    }
+
+    /**
+     * Checks if an inaccessible property is set.
+     *
+     * @param string $property
+     * @return bool
+     * @throws coding_exception
+     */
+    public function __isset($property) {
+        if ($property === 'children') {
+            return isset($this->children);
+        }
+        if ($property === 'path') {
+            return isset($this->parent);
+        }
+        if ($property === 'visiblepath') {
+            return isset($this->parent);
+        }
+        throw new coding_exception('Invalid __isset property requested: ' .  $property);
+    }
+
 }
 
 
@@ -727,6 +894,8 @@ interface part_of_admin_tree {
  * to other part_of_admin_tree's. (For now, this only includes admin_category.) Apart
  * from ensuring part_of_admin_tree compliancy, it also ensures inheriting methods
  * include an add method for adding other part_of_admin_tree objects as children.
+ *
+ * @property part_of_admin_tree[] $children
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -751,8 +920,65 @@ interface parentable_part_of_admin_tree extends part_of_admin_tree {
  */
     public function add($destinationname, $something, $beforesibling = null);
 
+    /**
+     * Returns children of this parent.
+     *
+     * @param bool $sort true means sort if requested, use false to prevent sorting before adding of all items
+     * @return part_of_admin_tree[]
+     */
+    public function get_children($sort = true);
 }
 
+/**
+ * Admin tree mapping structure.
+ *
+ * This is used for fast item lookup and duplicate checking.
+ */
+class admin_tree_map {
+    /** @var array part_of_admin_tree */
+    protected $parts = array();
+
+    /**
+     * Add new part to map.
+     * @param part_of_admin_tree $part
+     */
+    public function add(part_of_admin_tree $part) {
+        if (isset($this->parts[$part->name])) {
+            debugging('Duplicate admin part name: ' . $part->name);
+            return;
+        }
+        $this->parts[$part->name] = $part;
+    }
+
+    /**
+     * Get part from map.
+     *
+     * @param string $name
+     * @return part_of_admin_tree|null
+     */
+    public function get($name) {
+        if (isset($this->parts[$name])) {
+            return $this->parts[$name];
+        }
+        return null;
+    }
+
+    /**
+     * Delete part from cache.
+     *
+     * @param string $name
+     */
+    public function delete($name) {
+        unset($this->parts[$name]);
+    }
+
+    /**
+     * Destroy tree map.
+     */
+    public function destroy() {
+        $this->parts = array();
+    }
+}
 
 /**
  * The object used to represent folders (a.k.a. categories) in the admin tree block.
@@ -762,22 +988,10 @@ interface parentable_part_of_admin_tree extends part_of_admin_tree {
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class admin_category implements parentable_part_of_admin_tree {
+    use part_of_admin_tree_trait;
 
     /** @var part_of_admin_tree[] An array of part_of_admin_tree objects that are this object's children */
     protected $children;
-    /** @var string An internal name for this category. Must be unique amongst ALL part_of_admin_tree objects */
-    public $name;
-    /** @var string The displayed name for this category. Usually obtained through get_string() */
-    public $visiblename;
-    /** @var bool Should this category be hidden in admin tree block? */
-    public $hidden;
-    /** @var mixed Either a string or an array or strings */
-    public $path;
-    /** @var mixed Either a string or an array or strings */
-    public $visiblepath;
-
-    /** @var array fast lookup category cache, all categories of one tree point to one cache */
-    protected $category_cache;
 
     /** @var bool If set to true children will be sorted when calling {@link admin_category::get_children()} */
     protected $sort = false;
@@ -806,53 +1020,38 @@ class admin_category implements parentable_part_of_admin_tree {
      * Returns a reference to the part_of_admin_tree object with internal name $name.
      *
      * @param string $name The internal name of the object we want.
-     * @param bool $findpath initialize path and visiblepath arrays
-     * @return mixed A reference to the object with internal name $name if found, otherwise a reference to NULL.
-     *                  defaults to false
+     * @return part_of_admin_tree An object reference or a NULL reference.
      */
-    public function locate($name, $findpath=false) {
-        if (!isset($this->category_cache[$this->name])) {
-            // somebody much have purged the cache
-            $this->category_cache[$this->name] = $this;
-        }
-
-        if ($this->name == $name) {
-            if ($findpath) {
-                $this->visiblepath[] = $this->visiblename;
-                $this->path[]        = $this->name;
-            }
+    public function locate($name) {
+        if ($this->name === $name) {
             return $this;
         }
 
-        // quick category lookup
-        if (!$findpath and isset($this->category_cache[$name])) {
-            return $this->category_cache[$name];
+        // Use quick global lookup if this element was already attached to the tree.
+        $treemap = $this->get_tree_map();
+        if ($treemap) {
+            // If it is not in the map it does not exist!
+            return $treemap->get($name);
         }
 
-        $return = NULL;
-        foreach($this->children as $childid=>$unused) {
-            if ($return = $this->children[$childid]->locate($name, $findpath)) {
-                break;
+        foreach($this->children as $childid => $unused) {
+            if ($return = $this->children[$childid]->locate($name)) {
+                return $return;
             }
         }
 
-        if (!is_null($return) and $findpath) {
-            $return->visiblepath[] = $this->visiblename;
-            $return->path[]        = $this->name;
-        }
-
-        return $return;
+        return null;
     }
 
     /**
      * Search using query
      *
-     * @param string query
+     * @param string $query
      * @return mixed array-object structure of found settings and pages
      */
     public function search($query) {
         $result = array();
-        foreach ($this->get_children() as $child) {
+        foreach ($this->children as $child) {
             $subsearch = $child->search($query);
             if (!is_array($subsearch)) {
                 debugging('Incorrect search result from '.$child->name);
@@ -870,21 +1069,29 @@ class admin_category implements parentable_part_of_admin_tree {
      * @return bool success
      */
     public function prune($name) {
+        if ($name === 'root') {
+            throw new coding_exception('root element cannot be removed from admin tree!');
+        }
 
-        if ($this->name == $name) {
-            return false;  //can not remove itself
+        if ($this->name === $name) {
+            // We want to delete this whole category.
+            foreach ($this->children as $precedence => $child) {
+                $child->prune($child->name);
+                $child->destroy();
+            }
+            $this->children = array();
+            $this->destroy();
+            return false;
         }
 
         foreach($this->children as $precedence => $child) {
-            if ($child->name == $name) {
-                // clear cache and delete self
-                while($this->category_cache) {
-                    // delete the cache, but keep the original array address
-                    array_pop($this->category_cache);
-                }
+            if ($child->name === $name) {
+                $child->prune($child->name);
+                $child->destroy();
                 unset($this->children[$precedence]);
                 return true;
-            } else if ($this->children[$precedence]->prune($name)) {
+            }
+            if ($child->prune($name)) {
                 return true;
             }
         }
@@ -913,6 +1120,8 @@ class admin_category implements parentable_part_of_admin_tree {
             debugging('parent does not exist!');
             return false;
         }
+
+        $treemap = $this->get_tree_map();
 
         if ($something instanceof part_of_admin_tree) {
             if (!($parent instanceof parentable_part_of_admin_tree)) {
@@ -950,22 +1159,12 @@ class admin_category implements parentable_part_of_admin_tree {
                     );
                 }
             }
-            if ($something instanceof admin_category) {
-                if (isset($this->category_cache[$something->name])) {
-                    debugging('Duplicate admin category name: '.$something->name);
-                } else {
-                    $this->category_cache[$something->name] = $something;
-                    $something->category_cache =& $this->category_cache;
-                    foreach ($something->children as $child) {
-                        // just in case somebody already added subcategories
-                        if ($child instanceof admin_category) {
-                            if (isset($this->category_cache[$child->name])) {
-                                debugging('Duplicate admin category name: '.$child->name);
-                            } else {
-                                $this->category_cache[$child->name] = $child;
-                                $child->category_cache =& $this->category_cache;
-                            }
-                        }
+            $something->set_parent($parent);
+            if ($treemap) {
+                $treemap->add($something);
+                if ($something instanceof parentable_part_of_admin_tree) {
+                    foreach ($something->get_children(false) as $child) {
+                        $treemap->add($child);
                     }
                 }
             }
@@ -1035,11 +1234,12 @@ class admin_category implements parentable_part_of_admin_tree {
     /**
      * Returns the children associated with this category.
      *
+     * @param bool $sort true means sort if requested, use false to prevent sorting before adding of all items
      * @return part_of_admin_tree[]
      */
-    public function get_children() {
+    public function get_children($sort = true) {
         // If we should sort and it hasn't already been sorted.
-        if ($this->sort && !$this->sorted) {
+        if ($sort && $this->sort && !$this->sorted) {
             if ($this->sortsplit) {
                 $categories = array();
                 $pages = array();
@@ -1067,50 +1267,6 @@ class admin_category implements parentable_part_of_admin_tree {
         }
         return $this->children;
     }
-
-    /**
-     * Magically gets a property from this object.
-     *
-     * @param $property
-     * @return part_of_admin_tree[]
-     * @throws coding_exception
-     */
-    public function __get($property) {
-        if ($property === 'children') {
-            return $this->get_children();
-        }
-        throw new coding_exception('Invalid property requested.');
-    }
-
-    /**
-     * Magically sets a property against this object.
-     *
-     * @param string $property
-     * @param mixed $value
-     * @throws coding_exception
-     */
-    public function __set($property, $value) {
-        if ($property === 'children') {
-            $this->sorted = false;
-            $this->children = $value;
-        } else {
-            throw new coding_exception('Invalid property requested.');
-        }
-    }
-
-    /**
-     * Checks if an inaccessible property is set.
-     *
-     * @param string $property
-     * @return bool
-     * @throws coding_exception
-     */
-    public function __isset($property) {
-        if ($property === 'children') {
-            return isset($this->children);
-        }
-        throw new coding_exception('Invalid property requested.');
-    }
 }
 
 
@@ -1120,7 +1276,7 @@ class admin_category implements parentable_part_of_admin_tree {
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class admin_root extends admin_category {
-/** @var array List of errors */
+    /** @var array List of errors */
     public $errors;
     /** @var string search query */
     public $search;
@@ -1128,8 +1284,11 @@ class admin_root extends admin_category {
     public $fulltree;
     /** @var bool flag indicating loaded tree */
     public $loaded;
-    /** @var mixed site custom defaults overriding defaults in settings files*/
+    /** @var mixed site custom defaults overriding defaults in settings files */
     public $custom_defaults;
+
+    /** @var admin_tree_map shared fast lookup category cache */
+    protected $treemap;
 
     /**
      * @param bool $fulltree true means all settings required,
@@ -1139,52 +1298,46 @@ class admin_root extends admin_category {
         global $CFG;
 
         parent::__construct('root', get_string('administration'), false);
-        $this->errors   = array();
-        $this->search   = '';
+        $this->errors = array();
+        $this->search = '';
         $this->fulltree = $fulltree;
-        $this->loaded   = false;
-
-        $this->category_cache = array();
+        $this->loaded = false;
+        $this->treemap = new admin_tree_map();
+        $this->treemap->add($this);
 
         // Totara: Default settings may be overridden from the config.php OR admin settings UI.
         $this->custom_defaults = array();
+    }
 
-        // Totara: Load flavour defaults as the base.
-        $flavourdefaults = \totara_flavour\helper::get_defaults_setting();
-        foreach ($flavourdefaults as $plugin => $settings) {
-            foreach ($settings as $setting => $value) {
-                $this->custom_defaults[$plugin][$setting] = $value;
-            }
-        }
+    /**
+     * Get the admin tree cache if known.
+     *
+     * @return admin_tree_map|null
+     */
+    public function get_tree_map() {
+        return $this->treemap;
+    }
 
-        // Totara: Local server defaults may override any flavour recommended defaults.
-        $defaultsfile = "$CFG->dirroot/local/defaults.php";
-        if (is_readable($defaultsfile)) {
-            $defaults = array();
-            include($defaultsfile);
-            if (is_array($defaults)) {
-                foreach ($defaults as $plugin => $settings) {
-                    if (is_array($settings)) {
-                        if ($plugin === '') {
-                            // Support both '' and 'moodle' as the fake main CFG plugin name.
-                            $plugin = 'moodle';
-                        }
-                        foreach ($settings as $setting => $value) {
-                            $this->custom_defaults[$plugin][$setting] = $value;
-                        }
-                    }
-                }
-            }
-        }
+    /**
+     * Set parent of this item.
+     *
+     * @param parentable_part_of_admin_tree $parent
+     */
+    public function set_parent(parentable_part_of_admin_tree $parent) {
+        throw new coding_exception('admin tree root cannot have a parent');
+    }
 
-        // Totara: Finally override with the enforced flavour setting values,
-        // enforced settings cannot be changed via admin UI.
-        $enforedsettings = \totara_flavour\helper::get_enforced_settings();
-        foreach ($enforedsettings as $plugin => $settings) {
-            foreach ($settings as $setting => $value) {
-                $this->custom_defaults[$plugin][$setting] = $value;
-            }
+    /**
+     * Removes part_of_admin_tree object with internal name $name.
+     *
+     * @param string $name The internal name of the object we want to remove.
+     * @return bool success
+     */
+    public function prune($name) {
+        if (!$this->locate($name)) {
+            return false;
         }
+        return parent::prune($name);
     }
 
     /**
@@ -1195,15 +1348,15 @@ class admin_root extends admin_category {
     public function purge_children($requirefulltree) {
         $this->children = array();
         $this->fulltree = ($requirefulltree || $this->fulltree);
-        $this->loaded   = false;
-        //break circular dependencies - this helps PHP 5.2
-        while($this->category_cache) {
-            array_pop($this->category_cache);
-        }
-        $this->category_cache = array();
+        $this->loaded = false;
+        // Purge old cache to break circular references and create a new one.
+        $this->treemap->destroy();
+        $this->treemap = new admin_tree_map();
+        $this->treemap->add($this);
+        // Reload flavour info too in case the settings changed.
+        $this->custom_defaults = array();
     }
 }
-
 
 /**
  * Links external PHP pages into the admin tree.
@@ -1213,12 +1366,7 @@ class admin_root extends admin_category {
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class admin_externalpage implements part_of_admin_tree {
-
-    /** @var string An internal name for this external page. Must be unique amongst ALL part_of_admin_tree objects */
-    public $name;
-
-    /** @var string The displayed name for this external page. Usually obtained through get_string(). */
-    public $visiblename;
+    use part_of_admin_tree_trait;
 
     /** @var string The external URL that we should link to when someone requests this external page. */
     public $url;
@@ -1228,15 +1376,6 @@ class admin_externalpage implements part_of_admin_tree {
 
     /** @var object The context in which capability/permission should be checked, default is site context. */
     public $context;
-
-    /** @var bool hidden in admin tree block. */
-    public $hidden;
-
-    /** @var mixed either string or array of string */
-    public $path;
-
-    /** @var array list of visible names of page parents */
-    public $visiblepath;
 
     /**
      * Constructor for adding an external page into the admin tree.
@@ -1266,19 +1405,13 @@ class admin_externalpage implements part_of_admin_tree {
      * Returns a reference to the part_of_admin_tree object with internal name $name.
      *
      * @param string $name The internal name of the object we want.
-     * @param bool $findpath defaults to false
-     * @return mixed A reference to the object with internal name $name if found, otherwise a reference to NULL.
+     * @return part_of_admin_tree An object reference or a NULL reference.
      */
-    public function locate($name, $findpath=false) {
-        if ($this->name == $name) {
-            if ($findpath) {
-                $this->visiblepath = array($this->visiblename);
-                $this->path        = array($this->name);
-            }
+    public function locate($name) {
+        if ($this->name === $name) {
             return $this;
         } else {
-            $return = NULL;
-            return $return;
+            return null;
         }
     }
 
@@ -1356,12 +1489,7 @@ class admin_externalpage implements part_of_admin_tree {
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class admin_settingpage implements part_of_admin_tree {
-
-    /** @var string An internal name for this external page. Must be unique amongst ALL part_of_admin_tree objects */
-    public $name;
-
-    /** @var string The displayed name for this external page. Usually obtained through get_string(). */
-    public $visiblename;
+    use part_of_admin_tree_trait;
 
     /** @var mixed An array of admin_setting objects that are part of this setting page. */
     public $settings;
@@ -1371,15 +1499,6 @@ class admin_settingpage implements part_of_admin_tree {
 
     /** @var object The context in which capability/permission should be checked, default is site context. */
     public $context;
-
-    /** @var bool hidden in admin tree block. */
-    public $hidden;
-
-    /** @var mixed string of paths or array of strings of paths */
-    public $path;
-
-    /** @var array list of visible names of page parents */
-    public $visiblepath;
 
     /**
      * see admin_settingpage for details of this function
@@ -1408,19 +1527,13 @@ class admin_settingpage implements part_of_admin_tree {
      * see admin_category
      *
      * @param string $name
-     * @param bool $findpath
-     * @return mixed Object (this) if name ==  this->name, else returns null
+     * @return part_of_admin_tree An object reference or a NULL reference.
      */
-    public function locate($name, $findpath=false) {
-        if ($this->name == $name) {
-            if ($findpath) {
-                $this->visiblepath = array($this->visiblename);
-                $this->path        = array($this->name);
-            }
+    public function locate($name) {
+        if ($this->name === $name) {
             return $this;
         } else {
-            $return = NULL;
-            return $return;
+            return null;
         }
     }
 
@@ -7340,24 +7453,60 @@ function admin_externalpage_setup($section, $extrabutton = '', array $extraurlpa
 /**
  * Returns the reference to admin tree root
  *
- * @return object admin_root object
+ * @return admin_root object
  */
 function admin_get_root($reload=false, $requirefulltree=true) {
     global $CFG, $DB, $OUTPUT;
 
+    /** @var admin_root $ADMIN */
     static $ADMIN = NULL;
 
     if (is_null($ADMIN)) {
     // create the admin tree!
         $ADMIN = new admin_root($requirefulltree);
-    }
-
-    if ($reload or ($requirefulltree and !$ADMIN->fulltree)) {
+    } else if ($reload or ($requirefulltree and !$ADMIN->fulltree)) {
         $ADMIN->purge_children($requirefulltree);
     }
 
     if (!$ADMIN->loaded) {
-    // we process this file first to create categories first and in correct order
+        // Totara: Load flavour defaults as the base.
+        $flavourdefaults = \totara_flavour\helper::get_defaults_setting();
+        foreach ($flavourdefaults as $plugin => $settings) {
+            foreach ($settings as $setting => $value) {
+                $ADMIN->custom_defaults[$plugin][$setting] = $value;
+            }
+        }
+
+        // Totara: Local server defaults may override any flavour recommended defaults.
+        $defaultsfile = "$CFG->dirroot/local/defaults.php";
+        if (is_readable($defaultsfile)) {
+            $defaults = array();
+            include($defaultsfile);
+            if (is_array($defaults)) {
+                foreach ($defaults as $plugin => $settings) {
+                    if (is_array($settings)) {
+                        if ($plugin === '') {
+                            // Support both '' and 'moodle' as the fake main CFG plugin name.
+                            $plugin = 'moodle';
+                        }
+                        foreach ($settings as $setting => $value) {
+                            $ADMIN->custom_defaults[$plugin][$setting] = $value;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Totara: Finally override with the enforced flavour setting values,
+        // enforced settings cannot be changed via admin UI.
+        $enforedsettings = \totara_flavour\helper::get_enforced_settings();
+        foreach ($enforedsettings as $plugin => $settings) {
+            foreach ($settings as $setting => $value) {
+                $ADMIN->custom_defaults[$plugin][$setting] = $value;
+            }
+        }
+
+        // we process this file first to create categories first and in correct order
         require($CFG->dirroot.'/'.$CFG->admin.'/settings/top.php');
 
         // now we process all other files in admin/settings to build the admin tree

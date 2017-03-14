@@ -3708,7 +3708,8 @@ class settings_navigation extends navigation_node {
             // Use the admin structure to locate the active page
             if (!$this->contains_active_node() && $current = $adminroot->locate($this->adminsection, true)) {
                 $currentnode = $this;
-                while (($pathkey = array_pop($current->path))!==null && $currentnode) {
+                $path = $current->path;
+                while (($pathkey = array_pop($path))!==null && $currentnode) {
                     $currentnode = $currentnode->get($pathkey);
                 }
                 if ($currentnode) {
