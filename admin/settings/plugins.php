@@ -317,7 +317,7 @@ if ($hassiteconfig || $hasmodconfig) {
     }
 
     $temp->add(new admin_setting_configtext('mobilecssurl', new lang_string('mobilecssurl', 'admin'), new lang_string('configmobilecssurl','admin'), '', PARAM_URL));
-    $ADMIN->add('webservicesettings', $temp);
+    $ADMIN->add('experimental', $temp); // Totara: Moodle mobile apps will not work much
     /// overview page
     $temp = new admin_settingpage('webservicesoverview', new lang_string('webservicesoverview', 'webservice'));
     $temp->add(new admin_setting_webservicesoverview());
