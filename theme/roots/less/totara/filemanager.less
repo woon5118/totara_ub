@@ -315,6 +315,12 @@
   padding-bottom: 12px;
   min-width: 112px;
 }
+.dir-rtl .fp-iconview .fp-file.fp-hasreferences .fp-reficons1 {
+    transform: scaleX(-1);
+}
+.dir-rtl .fp-iconview .fp-file.fp-isreference .fp-reficons2 {
+    transform: scaleX(-1);
+}
 // Table view (File Picker only)
 .file-picker .yui3-datatable table {
   border: 0 solid #bbb;
@@ -339,97 +345,122 @@
 // first or middle sibling, no children
 .file-picker .ygtvtn,
 .filemanager .ygtvtn {
-  background: url('[[pix:y/tn]]')  0 0 no-repeat;
-  width: 17px;
-  height: 22px;
+    background: url('[[pix:moodle|y/tn]]') 0 0 no-repeat;
+    width: 17px;
+    height: 22px;
+}
+.dir-rtl .filemanager .ygtvtn,
+.dir-rtl .file-picker .ygtvtn {
+    background: url('[[pix:moodle|y/tn_rtl]]') 0 0 no-repeat;
+    width: 17px;
+    height: 22px;
 }
 // first or middle sibling, collapsable
 .file-picker .ygtvtm,
 .filemanager .ygtvtm {
-  background: url('[[pix:y/tm]]') 0 0 no-repeat;
-  width: 17px;
-  height: 22px;
-  cursor: pointer;
+    background: url('[[pix:moodle|y/tm]]') 0 10px no-repeat;
+    width: 13px;
+    height: 12px;
+    cursor: pointer;
 }
 // first or middle sibling, collapsable, hover
 .file-picker .ygtvtmh,
 .filemanager .ygtvtmh {
-  background: url('[[pix:y/tm]]') 0 10px no-repeat;
-  width: 13px;
-  height: 12px;
-  cursor: pointer;
+    background: url('[[pix:moodle|y/tm]]') 0 10px no-repeat;
+    width: 13px;
+    height: 12px;
+    cursor: pointer;
 }
 // first or middle sibling, expandable
 .file-picker .ygtvtp,
 .filemanager .ygtvtp {
-  background-image: url('[[pix:y/tp]]') 0 10px no-repeat;
-  width: 13px;
-  height: 12px;
-  cursor: pointer;
+    background: url('[[pix:moodle|y/tp]]') 0 10px no-repeat;
+    width: 13px;
+    height: 12px;
+    cursor: pointer;
+}
+.dir-rtl .file-picker .ygtvtp,
+.dir-rtl .filemanager .ygtvtp {
+    background: url('[[pix:moodle|y/tp_rtl]]') 0 10px no-repeat;
 }
 // first or middle sibling, expandable, hover
 .file-picker .ygtvtph,
 .filemanager .ygtvtph {
-  background-image: url('[[pix:y/tp]]') 0 10px no-repeat;
-  width: 13px;
-  height: 22px;
-  cursor: pointer;
+    background: url('[[pix:moodle|y/tp]]') 0 10px no-repeat;
+    width: 13px;
+    height: 22px;
+    cursor: pointer;
+}
+.dir-rtl .file-picker .ygtvtph,
+.dir-rtl .filemanager .ygtvtph {
+    background: url('[[pix:moodle|y/tp_rtl]]') 0 10px no-repeat;
 }
 // last sibling, no children
 .file-picker .ygtvln,
 .filemanager .ygtvln {
-  background-image: url('[[pix:y/ln]]') 0 0 no-repeat;
-  width: 17px;
-  height: 22px;
+    background: url('[[pix:moodle|y/ln]]') 0 0 no-repeat;
+    width: 17px;
+    height: 22px;
+}
+.dir-rtl .file-picker .ygtvln,
+.dir-rtl .filemanager .ygtvln {
+    background: url('[[pix:moodle|y/ln_rtl]]') 0 0 no-repeat;
 }
 // Last sibling, collapsable
 .file-picker .ygtvlm,
 .filemanager .ygtvlm {
-  background-image: url('[[pix:y/lm]]')  0 10px no-repeat;
-  width: 13px;
-  height: 12px;
-  cursor: pointer;
+    background: url('[[pix:moodle|y/lm]]') 0 10px no-repeat;
+    width: 13px;
+    height: 12px;
+    cursor: pointer;
 }
 // Last sibling, collapsable, hover
 .file-picker .ygtvlmh,
 .filemanager .ygtvlmh {
-  background-image: url('[[pix:y/lm]]')  0 10px no-repeat;
-  width: 13px;
-  height: 12px;
-  cursor: pointer;
+    background: url('[[pix:moodle|y/lm]]') 0 10px no-repeat;
+    width: 13px;
+    height: 12px;
+    cursor: pointer;
 }
 // Last sibling, expandable
 .file-picker .ygtvlp,
 .filemanager .ygtvlp {
-  background-image: url('[[pix:y/lp]]')  0 0 no-repeat;
-  width: 13px;
-  height: 12px;
-  cursor: pointer;
+    background: url('[[pix:moodle|y/lp]]') 0 10px no-repeat;
+    width: 13px;
+    height: 12px;
+    cursor: pointer;
+}
+.dir-rtl .file-picker .ygtvlp,
+.dir-rtl .filemanager .ygtvlp {
+    background: url('[[pix:moodle|y/lp_rtl]]') 0 10px no-repeat;
 }
 // Last sibling, expandable, hover
 .file-picker .ygtvlph,
 .filemanager .ygtvlph {
-  background-image: url('[[pix:y/lp]]') 0 10px no-repeat;
-  background-position: left 10px;
-  background-repeat: no-repeat;
-  width: 13px;
-  height: 12px;
-  cursor: pointer;
+    background: url('[[pix:moodle|y/lp]]') 0 10px no-repeat;
+    width: 13px;
+    height: 12px;
+    cursor: pointer;
+}
+.dir-rtl .file-picker .ygtvlph,
+.dir-rtl .filemanager .ygtvlph {
+    background: url('[[pix:moodle|y/lp_rtl]]') 0 10px no-repeat;
 }
 // Loading icon
 .file-picker .ygtvloading,
 .filemanager .ygtvloading {
-  background: transparent url('[[pix:y/loading]]') 0 0 no-repeat;
-  width: 16px;
-  height: 22px;
+    background: transparent url('[[pix:moodle|y/loading]]') 0 0 no-repeat;
+    width: 16px;
+    height: 22px;
 }
 // the style for the empty cells that are used for rendering the depth of the node
 .file-picker .ygtvdepthcell,
 .filemanager .ygtvdepthcell {
-  background: url('[[pix:y/vline]]') 0 0 no-repeat;
-  width: 17px;
-  height: 32px;
+    background: url('[[pix:moodle|y/vline]]') 0 0 no-repeat;
+    width: 17px;
+    height: 32px;
 }
+
 .file-picker .ygtvblankdepthcell,
 .filemanager .ygtvblankdepthcell {
   width: 17px;
@@ -812,6 +843,14 @@ a.ygtvspacer:hover {
 .filemanager .fp-iconview .fp-file.fp-originalmissing .fp-thumbnail {
   background: url([[pix:s/dead]]) no-repeat;
   background-position: center center;
+}
+.dir-rtl .filemanager .fp-filename-icon.fp-hasreferences .fp-reficons1 {
+    transform: scaleX(-1);
+    left: -17px;
+}
+.dir-rtl .filemanager .fp-filename-icon.fp-isreference .fp-reficons2 {
+    transform: scaleX(-1);
+    left: 6px;
 }
 // Table view (File Manager only)
 .filemanager .yui3-datatable table {
