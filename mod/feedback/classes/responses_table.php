@@ -207,7 +207,7 @@ class mod_feedback_responses_table extends table_sql {
         $deleteentryurl = new moodle_url($this->baseurl, ['delete' => $row->id, 'sesskey' => sesskey()]);
         $deleteaction = new confirm_action(get_string('confirmdeleteentry', 'feedback'));
         return $OUTPUT->action_icon($deleteentryurl,
-            new \core\output\flex_icon('delete', array ('alt' => $strdelete)), $deleteaction);
+            new \core\output\flex_icon('delete', array ('alt' => get_string('delete_entry', 'feedback'))), $deleteaction);
     }
 
     /**
