@@ -1168,6 +1168,11 @@ class admin_category implements parentable_part_of_admin_tree {
                     }
                 }
             }
+            if ($parent instanceof admin_category) {
+                if ($parent->is_sorted()) {
+                    debugging('Somehow the admin category was already sorted before adding of all children: ' . $parent->name, DEBUG_DEVELOPER);
+                }
+            }
             return true;
 
         } else {
@@ -1229,6 +1234,14 @@ class admin_category implements parentable_part_of_admin_tree {
         $this->sort = (bool)$sort;
         $this->sortasc = (bool)$asc;
         $this->sortsplit = (bool)$split;
+    }
+
+    /**
+     * Is this category already sorted?
+     * @return bool
+     */
+    public function is_sorted() {
+        return $this->sorted;
     }
 
     /**
