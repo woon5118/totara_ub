@@ -123,11 +123,17 @@ XPATH
 and
   contains(concat(' ', normalize-space(@class), ' '), ' totara-dialog ')
 and
-  descendant::div[
+  ./descendant::div[
     contains(concat(' ', normalize-space(@class), ' '), ' ui-dialog-titlebar ')
   ]//*/text()[normalize-space(.)=%locator%]
+]
 |
-  descendant::div[@id=%locator%]
+//div[
+  contains(concat(' ', normalize-space(@class), ' '), ' ui-dialog ')
+and
+  contains(concat(' ', normalize-space(@class), ' '), ' totara-dialog ')
+and
+  ./descendant::div[@id=%locator%]
 ]
 XPATH
         , 'filemanager' => <<<XPATH

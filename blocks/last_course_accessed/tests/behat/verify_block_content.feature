@@ -134,7 +134,6 @@ Feature: Verify the LCA block content displays the correct information.
     And I set the field "Message" to "<p><a href='../../mod/page/view.php?id=1'>Link to Course 2 activity</a>.</p>"
     And I press "Post to forum"
     Then I should see "Your post was successfully added."
-    And I follow "Continue"
     And I log out
 
     Given I log in as "learner1"
