@@ -430,7 +430,7 @@ class request_select_users extends moodleform {
         $mform->setType('anonymous', PARAM_INT);
 
         if ($this->_customdata['anon']) {
-            $html = $OUTPUT->notify_message(get_string('anonrequestform', 'totara_feedback360'));
+            $html = \core\notification::add(get_string('anonrequestform', 'totara_feedback360'), 'warning');
             $mform->addElement('static', 'formnotices', '', $html);
         }
 
