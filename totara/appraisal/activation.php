@@ -59,7 +59,7 @@ switch ($action) {
         $appraisal->alertbody = get_string('closealertbodydefault', 'totara_appraisal', $appraisal);
         $appraisal->alertbodyformat = FORMAT_HTML;
         $appraisal = file_prepare_standard_editor($appraisal, 'alertbody', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context']);
-        $form = new appraisal_close_form(null, array('appraisal' => $appraisal), 'post', '', null, true, 'appraisalclose');
+        $form = new appraisal_close_form(null, array('appraisal' => $appraisal), 'post', '', null, true, null, 'appraisalclose');
         if ($form->is_submitted()) {
             if (!confirm_sesskey()) {
                 print_error('confirmsesskeybad', 'error');

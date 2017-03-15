@@ -121,7 +121,7 @@ if ($action == 'pages') {
         $islastpage = ($page == end($visiblepages));
         $form = new appraisal_answer_form(null, array('appraisal' => $appraisal, 'page' => $page,
             'roleassignment' => $roleassignment, 'otherassignments' => $otherassignments,
-            'action' => $action, 'preview' => $preview, 'islastpage' => $islastpage), 'post', '', null, true, 'appraisalanswers');
+            'action' => $action, 'preview' => $preview, 'islastpage' => $islastpage), 'post', '', null, true, null, 'appraisalanswers');
 
         // We only deal with form data if it is not preview (can only be draft if it is also preview).
         if (!$preview) {
