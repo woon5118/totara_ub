@@ -25,22 +25,44 @@ defined('MOODLE_INTERNAL') || die();
 
 class progress_display_test extends \advanced_testcase {
 
+    protected $reflectionclass;
+
+    protected $instance;
+
+    public function setUp() {
+         $this->reflectionclass = new ReflectionClass('\core\progress\display');
+    }
+
+    protected function make_property_accessible($propname) {
+        $reflectionprop = $this->reflectionclass->getProperty($propname);
+        $reflectionprop->setAccessible(true);
+        return $reflectionprop;
+    }
+
+    protected function get_inaccessible_property($instance, $propname) {
+        return $this->make_property_accessible($propname)->getValue($instance);
+    }
+
+    protected function set_inaccessible_property($instance, $propname, $value) {
+        return $this->make_property_accessible($propname)->setValue($instance, $value);
+    }
+
     /**
      * Test basic function of progress_display, updating status and outputting wibbler.
      */
     public function test_progress_display_update() {
         ob_start();
-        $progress = new core_mock_progress_display();
+        $progress = new \core\progress\display();
         $progress->start_progress('');
-        $this->assertEquals(1, $progress->get_current_state());
-        $this->assertEquals(1, $progress->get_direction());
-        $this->assertTimeCurrent($progress->get_last_wibble());
+        $this->assertEquals(1, $this->get_inaccessible_property($progress, 'currentstate'));
+        $this->assertEquals(1, $this->get_inaccessible_property($progress, 'direction'));
+        $this->assertTimeCurrent($this->get_inaccessible_property($progress, 'lastwibble'));
         // Wait 1 second to ensure that all code in update_progress is run.
         $this->waitForSecond();
         $progress->update_progress();
-        $this->assertEquals(2, $progress->get_current_state());
-        $this->assertEquals(1, $progress->get_direction());
-        $this->assertTimeCurrent($progress->get_last_wibble());
+        $this->assertEquals(2, $this->get_inaccessible_property($progress, 'currentstate'));
+        $this->assertEquals(1, $this->get_inaccessible_property($progress, 'direction'));
+        $this->assertTimeCurrent($this->get_inaccessible_property($progress, 'lastwibble'));
         $output = ob_get_clean();
         $this->assertContains('wibbler', $output);
         $this->assertContains('wibble state0', $output);
@@ -52,23 +74,23 @@ class progress_display_test extends \advanced_testcase {
      */
     public function test_progress_display_wibbler() {
         ob_start();
-        $progress = new core_mock_progress_display();
+        $progress = new \core\progress\display();
         $progress->start_progress('');
-        $this->assertEquals(1, $progress->get_direction());
+        $this->assertEquals(1, $this->get_inaccessible_property($progress, 'direction'));
 
         // Set wibbler to final state and progress to check that it reverses direction.
-        $progress->set_current_state(core_mock_progress_display::WIBBLE_STATES);
+        $this->set_inaccessible_property($progress, 'currentstate', \core\progress\display::WIBBLE_STATES);
         $this->waitForSecond();
         $progress->update_progress();
-        $this->assertEquals(core_mock_progress_display::WIBBLE_STATES - 1, $progress->get_current_state());
-        $this->assertEquals(-1, $progress->get_direction());
+        $this->assertEquals(\core\progress\display::WIBBLE_STATES - 1, $this->get_inaccessible_property($progress, 'currentstate'));
+        $this->assertEquals(-1, $this->get_inaccessible_property($progress, 'direction'));
 
         // Set wibbler to beginning and progress to check that it reverses direction.
-        $progress->set_current_state(0);
+        $this->set_inaccessible_property($progress, 'currentstate', 0);
         $this->waitForSecond();
         $progress->update_progress();
-        $this->assertEquals(1, $progress->get_current_state());
-        $this->assertEquals(1, $progress->get_direction());
+        $this->assertEquals(1, $this->get_inaccessible_property($progress, 'currentstate'));
+        $this->assertEquals(1, $this->get_inaccessible_property($progress, 'direction'));
         $output = ob_get_clean();
         $this->assertContains('wibbler', $output);
         $this->assertContains('wibble state0', $output);
@@ -76,29 +98,4 @@ class progress_display_test extends \advanced_testcase {
 
     }
 
-}
-
-/**
- * Helper class that allows access to private values
- */
-class core_mock_progress_display extends \core\progress\display {
-    public function get_last_wibble() {
-        return $this->lastwibble;
-    }
-
-    public function get_current_state() {
-        return $this->currentstate;
-    }
-
-    public function get_direction() {
-        return $this->direction;
-    }
-
-    public function set_current_state($state) {
-        $this->currentstate = $state;
-    }
-
-    public function set_direction($direction) {
-        $this->direction = $direction;
-    }
 }
