@@ -147,8 +147,8 @@ class behat_totara_core extends behat_base {
 
         // We are take table c
         foreach ($table->getRows() as $row) {
-            $menutable = new TableNode();
-            $ruletable = new TableNode();
+            $menurows = array();
+            $rulerows = array();
 
             if ($first === false) {
                 // The first row is the headings.
@@ -169,13 +169,15 @@ class behat_totara_core extends behat_base {
                 if (in_array($key, $menufields)) {
                     $menurow[] = array_search($key, $menufields);
                     $menurow[] = $row[$key];
-                    $menutable->addRow($menurow);
+                    $menurows[] = $menurow;
                 } else {
                     $rulerow[] = array_search($key, $rulefields);
                     $rulerow[] = $row[$key];
-                    $ruletable->addRow($rulerow);
+                    $rulerows[] = $rulerow;
                 }
             }
+            $menutable = new TableNode($menurows);
+            $ruletable = new TableNode($rulerows);
 
             $this->execute("behat_navigation::i_navigate_to_node_in", array("Main menu", "Site administration > Appearance"));
             $this->execute("behat_forms::press_button", "Add new menu item");
