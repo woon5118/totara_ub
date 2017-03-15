@@ -99,7 +99,6 @@ class behat_util extends testing_util {
         $DB->set_field('role', 'name', 'Non-editing teacher',array('shortname' => 'teacher'));
         $DB->set_field('role', 'name', 'Student', array('shortname' => 'student'));
         $DB->set_field('modules', 'visible', 1, array('name'=>'workshop'));
-        $DB->set_field('modules', 'visible', 0, array('name'=>'feedback'));
 
         // Some more Totara tricks.
         $DB->set_field('task_scheduled', 'disabled', 1, array('component' => 'tool_langimport')); // No cron lang updates in behat.
