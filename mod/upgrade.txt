@@ -12,3 +12,9 @@ information provided here is intended especially for developers.
   https://docs.moodle.org/dev/version.php for details (MDL-43896).
 * Modules using rating component must implement a callback mod_x_rating_can_see_item_ratings(). Refer
   to mod_forum_rating_can_see_item_ratings() for example.
+
+Functions may now be added to the lib.php file of any plugin that will be called each time
+any course module create/update form is used. The functions to do this are as follows:
+* To add form elements - (plugin_name)_coursemodule_standard_elements($formwrapper, $mform)
+* To validate form elements - (plugin_name)_coursemodule_validation($formwrapper, $data)
+* To perform actions after passing validation - (plugin_name)_coursemodule_edit_post_actions($data, $course)
