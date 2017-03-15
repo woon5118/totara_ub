@@ -25,6 +25,7 @@ use \totara_connect\util;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/lib/formslib.php');
 
 class totara_connect_form_client_edit extends moodleform {

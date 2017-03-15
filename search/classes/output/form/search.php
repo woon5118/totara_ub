@@ -26,6 +26,7 @@ namespace core_search\output\form;
 
 defined('MOODLE_INTERNAL') || die;
 
+global $CFG;
 require_once($CFG->libdir . '/formslib.php');
 
 class search extends \moodleform {

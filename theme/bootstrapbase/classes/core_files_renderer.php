@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . "/files/renderer.php");
 
 class theme_bootstrapbase_core_files_renderer extends core_files_renderer {

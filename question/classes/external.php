@@ -24,6 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+global $CFG;
 require_once("$CFG->libdir/externallib.php");
 require_once($CFG->dirroot . '/question/engine/lib.php');
 

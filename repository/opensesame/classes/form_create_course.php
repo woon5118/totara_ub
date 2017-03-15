@@ -23,6 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once("$CFG->libdir/formslib.php");
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir. '/coursecatlib.php');

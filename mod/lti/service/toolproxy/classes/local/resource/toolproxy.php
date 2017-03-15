@@ -28,6 +28,7 @@ namespace ltiservice_toolproxy\local\resource;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/mod/lti/OAuth.php');
 require_once($CFG->dirroot . '/mod/lti/TrivialStore.php');
 

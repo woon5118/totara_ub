@@ -25,6 +25,7 @@ namespace scormreport_objectives;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot.'/mod/scorm/report/objectives/responsessettings_form.php');
 
 /**

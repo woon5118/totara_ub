@@ -27,6 +27,7 @@ namespace mod_forum\message\inbound;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/mod/forum/lib.php');
 require_once($CFG->dirroot . '/repository/lib.php');
 require_once($CFG->libdir . '/completionlib.php');

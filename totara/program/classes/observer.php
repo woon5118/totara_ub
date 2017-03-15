@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/totara/program/program_assignments.class.php'); // Needed for ASSIGNTYPE_XXX constants.
 
 class totara_program_observer {

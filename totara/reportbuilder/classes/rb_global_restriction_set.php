@@ -23,6 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_global_restriction.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib/assign/lib.php');
 

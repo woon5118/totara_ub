@@ -25,6 +25,7 @@ namespace scormreport_interactions;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot.'/mod/scorm/report/interactions/responsessettings_form.php');
 
 class report extends \mod_scorm\report {

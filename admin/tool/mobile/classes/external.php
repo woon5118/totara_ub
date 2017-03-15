@@ -24,6 +24,7 @@
 
 namespace tool_mobile;
 
+global $CFG;
 require_once("$CFG->libdir/externallib.php");
 
 use external_api;

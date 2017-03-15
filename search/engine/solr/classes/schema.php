@@ -26,6 +26,7 @@ namespace search_solr;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/lib/filelib.php');
 
 /**

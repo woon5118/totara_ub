@@ -22,6 +22,7 @@
  * @subpackage totara_sync
  */
 
+global $CFG;
 require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/classes/source.class.php');
 require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/org.php'); // Needed for totara_sync_element_org.
 

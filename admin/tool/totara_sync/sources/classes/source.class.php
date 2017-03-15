@@ -22,6 +22,7 @@
  * @subpackage totara_sync
  */
 
+global $CFG;
 require_once($CFG->dirroot.'/admin/tool/totara_sync/lib.php');
 
 abstract class totara_sync_source {

@@ -24,6 +24,8 @@
 namespace scormreport_basic;
 
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 require_once($CFG->libdir . '/csvlib.class.php');
 
 class report extends \mod_scorm\report {

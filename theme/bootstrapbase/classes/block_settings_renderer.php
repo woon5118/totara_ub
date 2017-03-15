@@ -26,6 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . "/blocks/settings/renderer.php");
 
 class theme_bootstrapbase_block_settings_renderer extends block_settings_renderer {

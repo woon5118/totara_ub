@@ -22,6 +22,7 @@
  * @subpackage totara_sync
  */
 
+global $CFG;
 require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/classes/element.class.php');
 require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
 

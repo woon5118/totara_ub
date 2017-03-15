@@ -26,6 +26,7 @@ namespace core_search;
 
 defined('MOODLE_INTERNAL') || die;
 
+global $CFG;
 require_once($CFG->dirroot . '/lib/accesslib.php');
 
 /**

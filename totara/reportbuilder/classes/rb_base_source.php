@@ -22,6 +22,7 @@
  * @subpackage reportbuilder
  */
 
+global $CFG;
 require_once($CFG->dirroot . '/user/profile/lib.php');
 
 /**

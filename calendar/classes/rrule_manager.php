@@ -24,6 +24,8 @@
 
 namespace core_calendar;
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 require_once($CFG->dirroot . '/calendar/lib.php');
 
 /**
