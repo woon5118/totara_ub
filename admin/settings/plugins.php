@@ -302,22 +302,25 @@ if ($hassiteconfig || $hasmodconfig) {
 
 /// Web services
     $ADMIN->add('modules', new admin_category('webservicesettings', new lang_string('webservices', 'webservice')));
-    // Mobile
-    $temp = new admin_settingpage('mobile', new lang_string('mobile','admin'), 'moodle/site:config', false);
+    // You must have site config for this.
+    if ($hassiteconfig) {
+        // Mobile
+        $temp = new admin_settingpage('mobile', new lang_string('mobile', 'admin'), 'moodle/site:config', false);
 
-    // We should wait to the installation to finish since we depend on some configuration values that are set once
-    // the admin user profile is configured.
-    if (!during_initial_install()) {
-        $enablemobiledocurl = new moodle_url(get_docs_url('Enable_mobile_web_services'));
-        $enablemobiledoclink = html_writer::link($enablemobiledocurl, new lang_string('documentation'));
-        $default = 0; // Totara: no mobile!
-        $temp->add(new admin_setting_enablemobileservice('enablemobilewebservice',
+        // We should wait to the installation to finish since we depend on some configuration values that are set once
+        // the admin user profile is configured.
+        if (!during_initial_install()) {
+            $enablemobiledocurl = new moodle_url(get_docs_url('Enable_mobile_web_services'));
+            $enablemobiledoclink = html_writer::link($enablemobiledocurl, new lang_string('documentation'));
+            $default = 0; // Totara: no mobile!
+            $temp->add(new admin_setting_enablemobileservice('enablemobilewebservice',
                 new lang_string('enablemobilewebservice', 'admin'),
                 new lang_string('configenablemobilewebservice', 'admin', $enablemobiledoclink), $default));
-    }
+        }
 
-    $temp->add(new admin_setting_configtext('mobilecssurl', new lang_string('mobilecssurl', 'admin'), new lang_string('configmobilecssurl','admin'), '', PARAM_URL));
-    $ADMIN->add('experimental', $temp); // Totara: Moodle mobile apps will not work much
+        $temp->add(new admin_setting_configtext('mobilecssurl', new lang_string('mobilecssurl', 'admin'), new lang_string('configmobilecssurl', 'admin'), '', PARAM_URL));
+        $ADMIN->add('experimental', $temp); // Totara: Moodle mobile apps will not work much
+    }
     /// overview page
     $temp = new admin_settingpage('webservicesoverview', new lang_string('webservicesoverview', 'webservice'));
     $temp->add(new admin_setting_webservicesoverview());
