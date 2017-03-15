@@ -61,7 +61,11 @@ class behat_cohort extends behat_base {
         }
 
         $this->execute('behat_general::i_click_on_in_the',
-            array(get_string('assign', 'cohort'), "link", $this->escape($cohortidnumber), "table_row")
+            array(get_string('edit', 'moodle'), "link", $this->escape($cohortidnumber), "table_row")
+        );
+
+        $this->execute('behat_general::i_click_on',
+            array(get_string('editmembers', 'totara_cohort'), "link")
         );
 
         $this->execute("behat_forms::i_set_the_field_to",
