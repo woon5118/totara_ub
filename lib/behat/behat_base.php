@@ -842,6 +842,8 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                     // If ajax/JS exception.
                     if ($errorinfoboxes) {
                         $errorinfo = $this->get_debug_text($errorinfoboxes[0]->getHtml());
+                    } else {
+                        $errorinfo = 'Unable to get error information.';
                     }
 
                 } else {

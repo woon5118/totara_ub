@@ -80,7 +80,7 @@ class mod_feedback_templates_table extends flexible_table {
             $url = new moodle_url($this->baseurl, array('deletetempl' => $template->id, 'sesskey' => sesskey()));
 
             $deleteaction = new confirm_action(get_string('confirmdeletetemplate', 'feedback'));
-            $data[] = $OUTPUT->action_icon($url, new \core\output\flex_icon('delete', array ('alt' => $strdelete)), $deleteaction);
+            $data[] = $OUTPUT->action_icon($url, new \core\output\flex_icon('delete', array ('alt' => $strdeletefeedback)), $deleteaction);
             $this->add_data($data);
         }
         $this->finish_output();

@@ -154,16 +154,16 @@ class feedback_item_textarea extends feedback_item_base {
                     $blank++;
                 } else {
                     echo '<tr>';
-                    echo '<td colspan="2" class="singlevalue" align="' . $align . '>';
+                    echo '<td colspan="2" class="singlevalue" align="' . $align . '">';
                     echo str_replace("\n", '<br />', $value->value);
                     echo '</td>';
                     echo '</tr>';
                 }
             }
-            if ($blank>0) {
-                    echo '<tr><td colspan="2" valign="top" align="' . $align . '">';
-                    echo '-&nbsp;&nbsp;'.get_string('blank_responses', 'feedback', (string)$blank);
-                    echo '</td></tr>';
+            if ($blank > 0) {
+                echo '<tr><td colspan="2" valign="top" align="' . $align . '">';
+                echo '-&nbsp;&nbsp;'.get_string('blank_responses', 'feedback', (string)$blank);
+                echo '</td></tr>';
             }
         }
     }
