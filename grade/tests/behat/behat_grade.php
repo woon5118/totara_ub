@@ -84,7 +84,7 @@ class behat_grade extends behat_base {
 
         $savechanges = get_string('savechanges', 'grades');
         $edit = behat_context_helper::escape(get_string('edit') . '  ');
-        $linkxpath = "//a[./img[starts-with(@title,$edit) and contains(@title,$gradeitem)]]";
+        $linkxpath = "//a[starts-with(.,$edit) and contains(.,$gradeitem)]";
 
         $this->execute("behat_general::i_click_on", array($this->escape($linkxpath), "xpath_element"));
         $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
