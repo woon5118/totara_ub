@@ -167,10 +167,12 @@ class mod_feedback_complete_form extends moodleform {
      * This will add all items to the form, including pagebreaks as horizontal rules.
      */
     protected function definition_preview() {
+        $this->_form->addElement('html', '<div data-rel="feedback-items">');
         foreach ($this->structure->get_items() as $feedbackitem) {
             $itemobj = feedback_get_item_class($feedbackitem->typ);
             $itemobj->complete_form_element($feedbackitem, $this);
         }
+        $this->_form->addElement('html', '</div>');
     }
 
     /**

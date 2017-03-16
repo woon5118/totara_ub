@@ -4,7 +4,7 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
         DRAGAREA : '#feedback_dragarea',
         DRAGITEMCLASS : 'feedback_itemlist',
         DRAGITEM : 'div.feedback_itemlist',
-        DRAGLIST : '#feedback_dragarea form > fieldset > div',
+        DRAGLIST : 'div[data-rel="feedback-items"]',
         ITEMBOX : '#feedback_item_box_',
         DRAGHANDLE : 'itemhandle'
     };
@@ -27,19 +27,13 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
 
             //Get the list of li's in the lists and add the drag handle.
             var basenode = Y.Node.one(CSS.DRAGLIST);
-            var listitems = basenode.all(CSS.DRAGITEM).each(function(v) {
-                var item_id = this.get_node_id(v.get('id')); //Get the id of the feedback item.
-                var item_box = Y.Node.one(CSS.ITEMBOX + item_id); //Get the current item box so we can add the drag handle.
-                var that = this;
-                var cloneNode = function () {
-                    if (that.mydraghandle.all('img').size() > 0 || that.mydraghandle.all('.flex-icon').size() > 0) {
-                        v.insert(that.mydraghandle.cloneNode(true), item_box); //Insert the new handle into the item box.
-                    } else {
-                        setTimeout(cloneNode, 20);
-                    }
-                };
-                cloneNode();
-            }, this);
+            if (basenode) {
+                var listitems = basenode.all(CSS.DRAGITEM).each(function (v) {
+                    //var item_id = this.get_node_id(v.get('id')); //Get the id of the feedback item.
+                    //var item_box = Y.Node.one(CSS.ITEMBOX + item_id); //Get the current item box so we can add the drag handle.
+                    v.append(this.get_drag_handle(handletitle, CSS.DRAGHANDLE, 'icon')); // Insert the new handle into the item box.
+                }, this);
+            }
 
             //We use a delegate to make all items draggable
             var del = new Y.DD.Delegate({
@@ -78,10 +72,9 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
             del.on('drag:dropmiss',  this.drag_dropmiss_handler, this);
 
             //Create targets for drop.
-            var droparea = Y.Node.one(CSS.DRAGLIST);
             var tar = new Y.DD.Drop({
                 groups: groups,
-                node: droparea
+                node: basenode
             });
 
         },
@@ -183,7 +176,7 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
                 }, this);
                 var spinner = M.util.add_spinner(Y, dragnode);
                 this.save_item_order(this.cmid, myElements, spinner);
-           }
+            }
         },
 
         /**
@@ -199,9 +192,9 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
             Y.io(M.cfg.wwwroot + '/mod/feedback/ajax.php', {
                 //The needed paramaters
                 data: {action: 'saveitemorder',
-                       id: cmid,
-                       itemorder: itemorder,
-                       sesskey: M.cfg.sesskey
+                    id: cmid,
+                    itemorder: itemorder,
+                    sesskey: M.cfg.sesskey
                 },
 
                 timeout: 5000, //5 seconds for timeout I think it is enough.
