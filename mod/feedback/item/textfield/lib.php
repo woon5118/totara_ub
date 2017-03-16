@@ -142,7 +142,7 @@ class feedback_item_textfield extends feedback_item_base {
                 if (strlen(trim($value->value)) === 0) {
                     $blank++;
                 } else {
-                    echo '<tr><td colspan="2" class="singlevalue" align="' . $align . '>';
+                    echo '<tr><td colspan="2" class="singlevalue" align="' . $align . '">';
                     echo str_replace("\n", '<br />', $value->value);
                     echo '</td></tr>';
                 }
