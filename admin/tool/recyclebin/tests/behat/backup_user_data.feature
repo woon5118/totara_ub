@@ -65,5 +65,5 @@ Feature: Backup user data
     And I log in as "student1"
     And I follow "Course 1"
     When I navigate to "Grades" node in "Course administration"
-    Then "Quiz 1" row "Grade" column of "user-grade" table should contain "5"
-    And "Quiz 1" row "Percentage" column of "user-grade" table should contain "50"
+    Then "QuizQuiz 1" row "Grade" column of "user-grade" table should contain "5"
+    And "QuizQuiz 1" row "Percentage" column of "user-grade" table should contain "50"

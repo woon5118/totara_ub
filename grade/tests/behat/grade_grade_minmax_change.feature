@@ -53,11 +53,11 @@ Feature: We can change the maximum and minimum number of points for manual items
     And I select "Student 1" from the "Select all or one user" singleselect
     Then the following should exist in the "user-grade" table:
       | Grade item    | Calculated weight | Grade  | Contribution to course total |
-      | Manual item 1 | 100.00 %          | 10.00  | 100.00 %                     |
+      | Manual itemManual item 1 | 100.00 %          | 10.00  | 100.00 %                     |
     And I select "Student 2" from the "Select all or one user" singleselect
     And the following should exist in the "user-grade" table:
       | Grade item    | Calculated weight | Grade  | Contribution to course total |
-      | Manual item 1 | 100.00 %          | 8.00   | 80.00 %                      |
+      | Manual itemManual item 1 | 100.00 %          | 8.00   | 80.00 %                      |
     And I navigate to "Gradebook setup" node in "Grade administration > Setup"
     And I click on "Edit" "link" in the "Manual item 1" "table_row"
     And I click on "Edit settings" "link" in the "Manual item 1" "table_row"
@@ -69,8 +69,8 @@ Feature: We can change the maximum and minimum number of points for manual items
     And I select "Student 1" from the "Select all or one user" singleselect
     And the following should exist in the "user-grade" table:
       | Grade item    | Calculated weight | Grade  | Contribution to course total |
-      | Manual item 1 | 100.00 %          | 20.00  | 100.00 %                     |
+      | Manual itemManual item 1 | 100.00 %          | 20.00  | 100.00 %                     |
     And I select "Student 2" from the "Select all or one user" singleselect
     And the following should exist in the "user-grade" table:
       | Grade item    | Calculated weight | Grade  | Contribution to course total |
-      | Manual item 1 | 100.00 %          | 16.00   | 80.00 %                     |
+      | Manual itemManual item 1 | 100.00 %          | 16.00   | 80.00 %                     |
