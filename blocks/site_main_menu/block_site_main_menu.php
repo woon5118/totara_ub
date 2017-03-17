@@ -51,6 +51,7 @@ class block_site_main_menu extends block_list {
         require_once($CFG->dirroot.'/course/lib.php');
         $context = context_course::instance($course->id);
         $isediting = $this->page->user_is_editing() && has_capability('moodle/course:manageactivities', $context);
+        /** @var core_course_renderer $courserenderer */
         $courserenderer = $this->page->get_renderer('core', 'course');
 
 /// extra fast view mode
@@ -140,7 +141,7 @@ class block_site_main_menu extends block_list {
                     if (!$mod->url) {
                         $content = $mod->get_formatted_content(array('overflowdiv' => true, 'noclean' => true));
                     } else {
-                        $content = html_writer::div($courserenderer->course_section_cm_name($mod), ' activity');
+                        $content = html_writer::div($courserenderer->course_section_cm_name($mod, array('nolink' => true, 'inlinetag' => true)), ' activity');
                     }
                     $this->content->items[] = $indent . html_writer::div($content . $editbuttons, 'main-menu-content');
                 }

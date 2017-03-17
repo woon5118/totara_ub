@@ -797,13 +797,17 @@ class core_course_renderer extends plugin_renderer_base {
         $activitylink .= $accesstext;
         $activitylink .= html_writer::tag('span', $instancename . $altname, array('class' => 'instancename', 'data-movetext' => 'true'));
 
-        if ($mod->uservisible) {
+        if ($mod->uservisible && empty($displayoptions['nolink'])) {
             $output .= html_writer::link($url, $activitylink, array('class' => $linkclasses, 'onclick' => $onclick)) .
                     $groupinglabel;
         } else {
             // We may be displaying this just in order to show information
             // about visibility, without the actual link ($mod->uservisible)
-            $output .= html_writer::tag('div', $activitylink, array('class' => $textclasses)) .
+            $tag = 'div';
+            if (!empty($displayoptions['inlinetag'])) {
+                $tag = 'span';
+            }
+            $output .= html_writer::tag($tag, $activitylink, array('class' => $textclasses)) .
                     $groupinglabel;
         }
         return $output;

@@ -70,6 +70,7 @@ class course_module_name extends \core\output\inplace_editable {
      */
     public function export_for_template(\renderer_base $output) {
         global $PAGE;
+        /** @var \core_course_renderer $courserenderer */
         $courserenderer = $PAGE->get_renderer('core', 'course');
         $this->displayvalue = $courserenderer->course_section_cm_name_title($this->cm, $this->displayoptions);
         if (strval($this->displayvalue) === '') {

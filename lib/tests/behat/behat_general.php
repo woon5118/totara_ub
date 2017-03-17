@@ -825,7 +825,7 @@ class behat_general extends behat_base {
 
                 foreach ($args['nodes'] as $node) {
                     if ($node->isVisible()) {
-                        throw new ExpectationException('"' . $args['text'] . '" text was found in the "' . $args['element'] . '" element', $context->getSession());
+                        throw new ExpectationException('"' . $args['text'] . '" text was found in the "' . $args['element'] . '" element and was visible', $context->getSession());
                     }
                 }
 

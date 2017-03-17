@@ -48,6 +48,7 @@ class block_social_activities extends block_list {
         }
 
         $course = $this->page->course;
+        /** @var core_course_renderer $courserenderer */
         $courserenderer = $this->page->get_renderer('core', 'course');
 
         require_once($CFG->dirroot.'/course/lib.php');
@@ -70,7 +71,7 @@ class block_social_activities extends block_list {
                         $this->content->items[] = $content;
                         $this->content->icons[] = '';
                     } else {
-                        $this->content->items[] = html_writer::div($courserenderer->course_section_cm_name($cm), 'activity');
+                        $this->content->items[] = html_writer::div($courserenderer->course_section_cm_name($cm, array('nolink' => true, 'inlinetag' => true)), 'activity');
                     }
                 }
             }
@@ -85,12 +86,12 @@ class block_social_activities extends block_list {
         if ($ismoving) {
             $strmovehere = get_string('movehere');
             $strmovefull = strip_tags(get_string('movefull', '', "'$USER->activitycopyname'"));
-            $strcancel= get_string('cancel');
         } else {
             $strmove = get_string('move');
         }
 
         if ($ismoving) {
+            $strcancel= get_string('cancel');
             $this->content->icons[] = '&nbsp;<img align="bottom" src="'.$OUTPUT->pix_url('t/move') . '" class="iconsmall" alt="" />';
             $this->content->items[] = $USER->activitycopyname.'&nbsp;(<a href="'.$CFG->wwwroot.'/course/mod.php?cancelcopy=true&amp;sesskey='.sesskey().'">'.$strcancel.'</a>)';
         }
@@ -132,7 +133,7 @@ class block_social_activities extends block_list {
                         $this->content->items[] = $content . $editbuttons;
                         $this->content->icons[] = '';
                     } else {
-                        $this->content->items[] = html_writer::div($courserenderer->course_section_cm_name($mod), 'activity') .
+                        $this->content->items[] = html_writer::div($courserenderer->course_section_cm_name($mod, array('nolink' => true, 'inlinetag' => true)), 'activity') .
                             $editbuttons;
                     }
                 }
