@@ -143,7 +143,7 @@ class behat_completion extends behat_base {
         }
         $csselementforactivitytype = "li.modtype_".strtolower($activitytype);
 
-        $xpathtocheck = "//img[contains(@alt, '$imgalttext')]";
+        $xpathtocheck = "//span[contains(@class, 'sr-only') and contains(., '$imgalttext')]";
         $this->execute("behat_general::should_exist_in_the",
             array($xpathtocheck, "xpath_element", $csselementforactivitytype, "css_element")
         );
@@ -163,7 +163,7 @@ class behat_completion extends behat_base {
         }
         $csselementforactivitytype = "li.modtype_".strtolower($activitytype);
 
-        $xpathtocheck = "//img[contains(@alt, '$imgalttext')]";
+        $xpathtocheck = "//span[contains(@class, 'sr-only') and contains(., '$imgalttext')]";
         $this->execute("behat_general::should_exist_in_the",
             array($xpathtocheck, "xpath_element", $csselementforactivitytype, "css_element")
         );
