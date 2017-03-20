@@ -144,7 +144,7 @@ class radios implements base {
                     throw new ExpectationException('Attempting to select an already selected ' . $this->mytype . ' value', $this->context->getSession());
                 }
                 if ($this->context->running_javascript()) {
-                    $radio->check();
+                    $radio->selectOption($radio->getAttribute('value'));
                 } else {
                     // Goutte is weird sometimes.
                     $radio->setValue($radio->getAttribute('value'));
