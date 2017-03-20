@@ -59,7 +59,7 @@ Feature: Generating quiz results statistics using Multiple choice questions
     And I click on "Test quiz 1" "link"
     And I click on "Attempt quiz now" "button"
     And I set the field "q1:1_answer2" to "1"
-    And I click on "Next" "button"
+    And I click on "Finish attempt ..." "button"
     And I click on "Submit all and finish" "button"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then I should see "Your answer is correct."
