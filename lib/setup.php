@@ -214,6 +214,9 @@ if (!isset($CFG->langlocalroot)) {
     $CFG->langlocalroot = $CFG->dataroot.'/lang';
 }
 
+// Totara: make sure forbidden settings are disabled.
+$CFG->pathtounoconv = ''; // Unoconv is not secure for web servers!
+
 // The current directory in PHP version 4.3.0 and above isn't necessarily the
 // directory of the script when run from the command line. The require_once()
 // would fail, so we'll have to chdir()

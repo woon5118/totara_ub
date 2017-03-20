@@ -6693,7 +6693,7 @@ class assign {
         $gradingpanel = !empty($params['gradingpanel']);
         $bothids = ($userid && $useridlistid);
 
-	    if (!$userid || $bothids) {
+        if (!$userid || $bothids) {
             $useridlistkey = $this->get_useridlist_key($useridlistid);
             if (empty($SESSION->mod_assign_useridlist[$useridlistkey])) {
                 $SESSION->mod_assign_useridlist[$useridlistkey] = $this->get_grading_userid_list();

@@ -189,6 +189,9 @@ class file_storage {
      */
     public function get_converted_document(stored_file $file, $format, $forcerefresh = false) {
 
+        // Totara: it is not secure to use unoconv on servers!
+        return false;
+
         $context = context_system::instance();
         $path = '/' . $format . '/';
         $conversion = $this->get_file($context->id, 'core', 'documentconversion', 0, $path, $file->get_contenthash());
@@ -211,6 +214,9 @@ class file_storage {
      */
     protected function is_format_supported_by_unoconv($format) {
         global $CFG;
+
+        // Totara: it is not secure to use unoconv on servers!
+        return false;
 
         if (!isset($this->unoconvformats)) {
             // Ask unoconv for it's list of supported document formats.
@@ -239,6 +245,10 @@ class file_storage {
      */
     public static function can_convert_documents() {
         global $CFG;
+
+        // Totara: it is not secure to use unoconv on servers!
+        return false;
+
         $currentversion = 0;
         $supportedversion = 0.7;
         $unoconvbin = \escapeshellarg($CFG->pathtounoconv);
@@ -265,6 +275,9 @@ class file_storage {
     public static function send_test_pdf() {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
+
+        // Totara: it is not secure to use unoconv on servers!
+        exit(1);
 
         $filerecord = array(
             'contextid' => \context_system::instance()->id,
@@ -337,6 +350,9 @@ class file_storage {
      */
     protected function create_converted_document(stored_file $file, $format, $forcerefresh = false) {
         global $CFG;
+
+        // Totara: it is not secure to use unoconv on servers!
+        return false;
 
         if (empty($CFG->pathtounoconv) || !file_is_executable(trim($CFG->pathtounoconv))) {
             // No conversions are possible, sorry.

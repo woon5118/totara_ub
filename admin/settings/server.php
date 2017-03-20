@@ -13,7 +13,8 @@ $temp->add(new admin_setting_configexecutable('aspellpath', new lang_string('asp
 $temp->add(new admin_setting_configexecutable('pathtodot', new lang_string('pathtodot', 'admin'), new lang_string('pathtodot_help', 'admin'), ''));
 $temp->add(new admin_setting_configexecutable('pathtogs', new lang_string('pathtogs', 'admin'), new lang_string('pathtogs_help', 'admin'), '/usr/bin/gs'));
 $temp->add(new admin_setting_configexecutable('pathtowkhtmltopdf', new lang_string('pathtowkhtmltopdf', 'totara_core'), new lang_string('pathtowkhtmltopdf_help', 'totara_core'), ''));
-$temp->add(new admin_setting_configexecutable('pathtounoconv', new lang_string('pathtounoconv', 'admin'), new lang_string('pathtounoconv_help', 'admin'), '/usr/bin/unoconv'));
+// Totara: it is not secure to use unoconv on servers!
+//$temp->add(new admin_setting_configexecutable('pathtounoconv', new lang_string('pathtounoconv', 'admin'), new lang_string('pathtounoconv_help', 'admin'), '/usr/bin/unoconv'));
 $ADMIN->add('server', $temp);
 
 

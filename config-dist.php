@@ -889,11 +889,7 @@ $CFG->admin = 'admin';
 // (Development->Profiling) built into Totara.
 //      $CFG->pathtodot = '';
 //
-// Path to unoconv.
-// Probably something like /usr/bin/unoconv. Used as a fallback to convert between document formats.
-// Unoconv is used convert between file formats supported by LibreOffice.
-// Use a recent version of unoconv ( >= 0.7 ), older versions have trouble running from a webserver.
-//      $CFG->pathtounoconv = '';
+// Note: $CFG->pathtounoconv setting is not supported for security reasons!
 //
 // Permitted path for completion upload files.
 // If users will be selecting files via a directory on the server for course
