@@ -50,7 +50,7 @@ class behat_completion extends behat_base {
         // Will throw an exception if the element can not be hovered.
         $titleliteral = behat_context_helper::escape($userfullname . ", " . $activityname . ": Completed");
         $xpath = "//table[@id='completion-progress']" .
-            "/descendant::span[contains(., $titleliteral)]";
+            "/descendant::span[contains(@class, 'sr-only') and contains(., $titleliteral)]";
 
         $this->execute("behat_completion::go_to_the_current_course_activity_completion_report");
         $this->execute("behat_general::should_exist",
@@ -70,7 +70,7 @@ class behat_completion extends behat_base {
         // Will throw an exception if the element can not be hovered.
         $titleliteral = behat_context_helper::escape($userfullname . ", " . $activityname . ": Not completed");
         $xpath = "//table[@id='completion-progress']" .
-            "/descendant::img[contains(@title, $titleliteral)]";
+            "/descendant::span[contains(@class, 'sr-only') and contains(., $titleliteral)]";
 
         $this->execute("behat_completion::go_to_the_current_course_activity_completion_report");
         $this->execute("behat_general::should_exist", array($this->escape($xpath), "xpath_element"));
