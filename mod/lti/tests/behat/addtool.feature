@@ -26,7 +26,7 @@ Feature: Add tools
     And I log out
 
   @javascript
-  Scenario: Add a tool via the acitivity picker
+  Scenario: Add a tool via the activity picker
     When I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
@@ -35,4 +35,4 @@ Feature: Add tools
       | Launch container | Embed |
     And I open "Test tool activity 1" actions menu
     And I follow "Edit settings" in the open menu
-    Then the field "Preconfigured tool" matches value "Teaching Tool 1"
+    Then the field "External tool type" matches value "Teaching Tool 1"
