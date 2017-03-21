@@ -304,4 +304,43 @@ class feedback_item_numeric extends feedback_item_base {
         }
         return $data;
     }
+
+    /**
+     * Check range value is a numeric value or hyphen.
+     *
+     * Added this method as part of TL-11674 / MDL-53557
+     * upstream merge. The issue fixed a problem saving
+     * empty ('-') range values but highlighted the lack of
+     * validation going on. Expected values are confusing
+     * (a value ultimately failing is_numeric() is
+     * forced to a hyphen '-' which represents the value
+     * has intentionally been left blank. This method is
+     * intended to mitigate this and provide the end user
+     * some feedback when the value is not numeric (incl.
+     * some locale support) or the '-' hyphen character.
+     *
+     * @param string $value
+     * @return boolean
+     */
+    public static function is_valid_range_value($value) {
+
+        // We expect a text-area form value only.
+        if (!is_string($value)) {
+            return false;
+        }
+
+        $trimmed = trim($value);
+
+        if ($trimmed === '-') {
+            return true;
+        }
+
+        if ($trimmed === '') {
+            return true;
+        }
+
+        $standardised = unformat_float($value, true);
+
+        return is_numeric($standardised) ;
+    }
 }

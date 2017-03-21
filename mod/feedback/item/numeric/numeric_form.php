@@ -85,4 +85,26 @@ class feedback_numeric_form extends feedback_item_form {
         return $item;
     }
 
+    /**
+     * Implements form validation.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    public function validation($data, $files) {
+
+        $errors = [];
+
+        if (false === feedback_item_numeric::is_valid_range_value($data['rangefrom'])) {
+            $errors['rangefrom'] = get_string('invalidnum', 'error');
+        }
+
+        if (false === feedback_item_numeric::is_valid_range_value($data['rangeto'])) {
+            $errors['rangeto'] = get_string('invalidnum', 'error');
+        }
+
+        return $errors;
+    }
+
 }
