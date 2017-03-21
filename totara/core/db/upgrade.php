@@ -74,10 +74,5 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017031300, 'totara', 'core');
     }
 
-    if ($oldversion < 2017031301) {
-        totara_core_upgrade_add_moodle_competencies_314();
-        upgrade_plugin_savepoint(true, 2017031301, 'totara', 'core');
-    }
-
     return true;
 }

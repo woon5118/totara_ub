@@ -258,7 +258,5 @@ function xmldb_totara_core_install() {
 
     totara_core_upgrade_delete_moodle_plugins_31();
 
-    totara_core_upgrade_add_moodle_competencies_314();
-
     return true;
 }
