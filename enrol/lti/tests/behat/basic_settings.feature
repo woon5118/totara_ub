@@ -17,8 +17,8 @@ Feature: Check that settings are adhered to when creating an enrolment plugin
       | teacher1 | C1 | editingteacher |
     And I log in as "admin"
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
-    And I click on "Enable" "link" in the "Publish as LTI tool" "table_row"
-    And I navigate to "Publish as LTI tool" node in "Site administration > Plugins > Enrolments"
+    And I click on "Enable" "link" in the "Publish as LTI tool (Experimental)" "table_row"
+    And I navigate to "Publish as LTI tool (Experimental)" node in "Site administration > Plugins > Enrolments"
     And I set the following fields to these values:
       | Email display       | Allow everyone to see my email address |
       | City/town           | Perth                                  |

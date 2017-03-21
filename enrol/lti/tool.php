@@ -28,31 +28,39 @@ require_once($CFG->dirroot . '/enrol/lti/ims-blti/blti.php');
 
 $toolid = required_param('id', PARAM_INT);
 
+// Totara: make sure no harm can be done if LTI is disabled!!!
+
+// Check if the authentication plugin is disabled.
+if (!is_enabled_auth('lti')) {
+    print_error('pluginnotenabled', 'auth', '', get_string('pluginname', 'auth_lti'));
+    exit();
+}
+
+// Check if the enrolment plugin is disabled.
+if (!enrol_is_enabled('lti')) {
+    print_error('enrolisdisabled', 'enrol_lti');
+    exit();
+}
+
+// Totara: current user id must NEVER change!!!
+if (isloggedin() and !isguestuser()) {
+    throw new coding_exception('LTI plugin must not hijack active user sessions!');
+}
+
 // Get the tool.
 $tool = \enrol_lti\helper::get_lti_tool($toolid);
+
+// Check if the enrolment instance is disabled.
+if ($tool->status != ENROL_INSTANCE_ENABLED) {
+    print_error('enrolisdisabled', 'enrol_lti');
+    exit();
+}
 
 // Create the BLTI request.
 $ltirequest = new BLTI($tool->secret, false, false);
 
 // Correct launch request.
 if ($ltirequest->valid) {
-    // Check if the authentication plugin is disabled.
-    if (!is_enabled_auth('lti')) {
-        print_error('pluginnotenabled', 'auth', '', get_string('pluginname', 'auth_lti'));
-        exit();
-    }
-
-    // Check if the enrolment plugin is disabled.
-    if (!enrol_is_enabled('lti')) {
-        print_error('enrolisdisabled', 'enrol_lti');
-        exit();
-    }
-
-    // Check if the enrolment instance is disabled.
-    if ($tool->status != ENROL_INSTANCE_ENABLED) {
-        print_error('enrolisdisabled', 'enrol_lti');
-        exit();
-    }
 
     // Before we do anything check that the context is valid.
     $context = context::instance_by_id($tool->contextid);
@@ -77,7 +85,7 @@ if ($ltirequest->valid) {
     $user = \enrol_lti\helper::assign_user_tool_data($tool, $user);
 
     // Check if the user exists.
-    if (!$dbuser = $DB->get_record('user', array('username' => $user->username, 'deleted' => 0))) {
+    if (!$dbuser = $DB->get_record('user', array('username' => $user->username, 'deleted' => 0, 'mnethostid' => $CFG->mnet_localhost_id))) {
         // If the email was stripped/not set then fill it with a default one. This
         // stops the user from being redirected to edit their profile page.
         if (empty($user->email)) {
@@ -85,11 +93,19 @@ if ($ltirequest->valid) {
         }
 
         $user->auth = 'lti';
-        $user->id = user_create_user($user);
+        $user->id = user_create_user($user, false);
 
         // Get the updated user record.
         $user = $DB->get_record('user', array('id' => $user->id));
     } else {
+        // Totara: do NOT steal users from other auth plugins and work around suspended users!
+        if ($dbuser->auth !== 'lti') {
+            throw new coding_exception('LTI plugin must not steal users from other auth plugins');
+        }
+        if ($dbuser->suspended) {
+            throw new coding_exception('LTI plugin was not designed to deal with suspended users');
+        }
+
         if (\enrol_lti\helper::user_match($user, $dbuser)) {
             $user = $dbuser;
         } else {
@@ -99,7 +115,7 @@ if ($ltirequest->valid) {
             }
 
             $user->id = $dbuser->id;
-            user_update_user($user);
+            user_update_user($user, false);
 
             // Get the updated user record.
             $user = $DB->get_record('user', array('id' => $user->id));

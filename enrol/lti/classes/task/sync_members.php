@@ -167,7 +167,7 @@ class sync_members extends \core\task\scheduled_task {
                             // Get the user data from the LTI consumer.
                             $user = \enrol_lti\helper::assign_user_tool_data($tool, $user);
 
-                            if (!$dbuser = $DB->get_record('user', array('username' => $user->username, 'deleted' => 0))) {
+                            if (!$dbuser = $DB->get_record('user', array('username' => $user->username, 'deleted' => 0, 'mnethostid' => $CFG->mnet_localhost_id))) {
                                 if ($tool->membersyncmode == \enrol_lti\helper::MEMBER_SYNC_ENROL_AND_UNENROL ||
                                     $tool->membersyncmode == \enrol_lti\helper::MEMBER_SYNC_ENROL_NEW) {
                                     // If the email was stripped/not set then fill it with a default one. This
@@ -177,20 +177,25 @@ class sync_members extends \core\task\scheduled_task {
                                     }
 
                                     $user->auth = 'lti';
-                                    $user->id = user_create_user($user);
+                                    $user->id = user_create_user($user, false);
 
                                     // Add the information to the necessary arrays.
                                     $currentusers[] = $user->id;
                                     $userphotos[$user->id] = $member->user_image;
                                 }
                             } else {
+                                // Totara: do NOT steal users from other auth plugins and work around suspended users!
+                                if ($dbuser->auth !== 'lti') {
+                                    continue;
+                                }
+
                                 // If email is empty remove it, so we don't update the user with an empty email.
                                 if (empty($user->email)) {
                                     unset($user->email);
                                 }
 
                                 $user->id = $dbuser->id;
-                                user_update_user($user);
+                                user_update_user($user, false);
 
                                 // Add the information to the necessary arrays.
                                 $currentusers[] = $user->id;
