@@ -151,3 +151,27 @@ a.comments-icon-none {
 .jsenabled .comment-link {display:block}
 .jsenabled .showcommentsnonjs{display:none}
 .jsenabled .comment-report-selectall{display:inline}
+
+.path-admin-tool-capability .comparisontable {
+
+  .inverse-text () {
+    font-weight: bold;
+    color: white;
+  }
+
+  .inherit {
+    color: @gray-darker
+  }
+  .allow {
+    background-color: @brand-success;
+    .inverse-text();
+  }
+  .prevent {
+    background-color: @brand-warning;
+    .inverse-text();
+  }
+  .prohibit {
+    background-color: @brand-danger;
+    .inverse-text();
+  }
+}
