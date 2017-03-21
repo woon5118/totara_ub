@@ -142,7 +142,7 @@ class core_webservice_externallib_testcase extends externallib_advanced_testcase
         $DB->insert_record('external_tokens', $externaltoken);
 
         // Set a home page by user preferences.
-        $CFG->defaulthomepage = HOMEPAGE_USER;
+        $CFG->defaulthomepage = HOMEPAGE_TOTARA_DASHBOARD;
         set_user_preference('user_home_page_preference', HOMEPAGE_SITE);
 
         $siteinfo = core_webservice_external::get_site_info();
@@ -156,6 +156,13 @@ class core_webservice_externallib_testcase extends externallib_advanced_testcase
 
         $this->assertEquals(HOMEPAGE_SITE, $siteinfo['userhomepage']);
 
+        // Set the homepage user preference to the Totar Dashboard.
+        set_user_preference('user_home_page_preference', HOMEPAGE_TOTARA_DASHBOARD);
+
+        $siteinfo = core_webservice_external::get_site_info();
+        $siteinfo = external_api::clean_returnvalue(core_webservice_external::get_site_info_returns(), $siteinfo);
+
+        $this->assertEquals(HOMEPAGE_TOTARA_DASHBOARD, $siteinfo['userhomepage']);
     }
 
 }

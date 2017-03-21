@@ -256,7 +256,7 @@ class core_webservice_external extends external_api {
                                             'user max upload file size (bytes). -1 means the user can ignore the upload file size',
                                             VALUE_OPTIONAL),
                 'userhomepage' => new external_value(PARAM_INT,
-                                                        'the default home page for the user: 0 for the site home, 1 for dashboard',
+                                                        'the default home page for the user: 0 for the site home, 105 for Totara dashboard',
                                                         VALUE_OPTIONAL)
             )
         );
