@@ -316,4 +316,16 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         $this->assertInstanceOf('moodle_url', $url);
         $this->assertSame("http://www.example.com/moodle/theme/image.php/_s/{$CFG->theme}/core/1/i/edit", $url->out());
     }
+
+    /**
+     * Make sure that the externallib exploit with NULL return description allows us to pass back any data.
+     */
+    public function test_get_flex_icons_ws() {
+        global $CFG;
+        require_once("$CFG->libdir/externallib.php");
+        $response = external_api::call_external_function('core_output_get_flex_icons', array('themename' => 'roots'), true);
+        $this->assertFalse($response['error']);
+        $this->assertArrayHasKey('templates', $response['data']);
+        $this->assertArrayHasKey('datas', $response['data']);
+    }
 }

@@ -228,6 +228,7 @@ class external_api {
             $result = call_user_func_array($callable,
                                            array_values($params));
 
+            // Totara: NULL return_desc means either void or dynamic data, this should be abused in ajax scripts only because some ws protocols do not support dynamic return types
             // Validate the return parameters.
             if ($externalfunctioninfo->returns_desc !== null) {
                 $callable = array($externalfunctioninfo->classname, 'clean_returnvalue');
