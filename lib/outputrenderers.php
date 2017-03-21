@@ -849,7 +849,7 @@ class core_renderer extends renderer_base {
      * @return string HTML fragment
      */
     public function footer() {
-        global $CFG, $DB, $PAGE;
+        global $CFG, $DB; // Totara: do NOT use $PAGE here!
 
         $output = $this->container_end_all(true);
 
@@ -874,10 +874,10 @@ class core_renderer extends renderer_base {
         }
         $footer = str_replace($this->unique_performance_info_token, $performanceinfo, $footer);
 
-        // Only show notifications when we have a $PAGE context id.
-        if (!empty($PAGE->context->id)) {
+        // Totara: use the proper API to detect pages that cannot do popup notifications.
+        if ($this->page->get_popup_notification_allowed() and !empty($this->page->context->id)) {
             $this->page->requires->js_call_amd('core/notification', 'init', array(
-                $PAGE->context->id,
+                $this->page->context->id,
                 \core\notification::fetch_as_array($this)
             ));
         }
