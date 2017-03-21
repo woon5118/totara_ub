@@ -6053,8 +6053,10 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
             }
         }
 
+        // Totara: obscure the real path name the same way as format_backtrace(), keep the leading slash.
+        $dirroot = dirname(dirname(__FILE__));
         $originheader = $CFG->wwwroot . ' => ' . gethostname() . ':'
-             . str_replace($CFG->dirroot . '/', '', $origin['file']) . ':' . $origin['line'];
+             . str_replace($dirroot, '', $origin['file']) . ':' . $origin['line'];
         $mail->addCustomHeader('X-Moodle-Originating-Script: ' . $originheader);
     }
 
