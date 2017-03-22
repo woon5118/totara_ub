@@ -92,7 +92,7 @@ class webservice_xmlrpc_client {
         );
 
         // Get the response.
-        $response = download_file_content($this->serverurl, $headers, $request);
+        $response = download_file_content($this->serverurl->out(false), $headers, $request); // Totara: explicitly convert to string value to work around TL-12939
 
         // Decode the response.
         $result = xmlrpc_decode($response);

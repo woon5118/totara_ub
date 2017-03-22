@@ -19,6 +19,7 @@ Feature: Basic web service access
       | enablemobilewebservice | 1 |
     And I navigate to "Manage protocols" node in "Site administration > Plugins > Web services"
     And I "Enable" the "SOAP" web service protocol
+    And I "Enable" the "XML-RPC protocol" web service protocol
 
     # Enable web services authentication
     And I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
