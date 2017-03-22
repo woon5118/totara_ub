@@ -1829,6 +1829,20 @@ $icons = array(
                     'classes' => 'fa-table',
                 ),
         ),
+    'tags-searchable' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-check-square-o'
+                ),
+        ),
+    'tags-unsearchable' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-square-o',
+                ),
+        ),
     'thumbs-down-danger' =>
         array(
             'data' =>

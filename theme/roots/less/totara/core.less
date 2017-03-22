@@ -1601,3 +1601,36 @@ body.behat-site {
     clear: both;
   }
 }
+
+// inplace_editables do not all allow editable text, some are dropdowns and some
+// are basic toggles. for those with editable text, a brief instruction appears
+// alongside the inline replaced DOM elements.
+.inplaceeditable {
+    &.inplaceeditingon {
+        position: relative;
+
+        .editinstructions {
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin-top: -22px;
+            margin-right: -300px;
+            line-height: 16px;
+            font-size: @font-size-small;
+            padding: .1em .4em;
+            background-color: @state-info-bg;
+            color: @state-info-text;
+            text-decoration: none;
+            z-index: 9999;
+            box-shadow: 2px 2px 5px 1px #ccc;
+            border: 1px solid @state-info-border;
+        }
+    }
+    .quickeditlink {
+        color: inherit;
+        text-decoration: inherit;
+    }
+    &.inplaceeditable-toggle .quickediticon {
+        display: none;
+    }
+}

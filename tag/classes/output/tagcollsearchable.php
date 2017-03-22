@@ -61,9 +61,9 @@ class tagcollsearchable extends \core\output\inplace_editable {
      */
     public function export_for_template(\renderer_base $output) {
         if ($this->value) {
-            $this->displayvalue = $output->pix_icon('i/checked', get_string('yes'));
+            $this->displayvalue = $output->flex_icon('tags-searchable', array('alt'=>get_string('yes')));
         } else {
-            $this->displayvalue = $output->pix_icon('i/unchecked', get_string('no'));
+            $this->displayvalue = $output->flex_icon('tags-unsearchable', array('alt'=>get_string('no')));
         }
 
         return parent::export_for_template($output);
