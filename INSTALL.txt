@@ -13,7 +13,8 @@ Before installing Totara you should have a server with:
 * Access to a supported database (PostgreSQL 9.2 or greater, Mysql 5.5.31 or greater, MariaDB 5.5.31, MSSQL 2008 or greater).
   * If your database is MSSQL, your database user must have the permissions: ALTER SETTINGS(SERVER).
 * A domain name that resolves to your server
-* Recommended minimum browser: Recent Google Chrome, Recent Firefox, Safari 9, Internet Explorer 9 (IE 10 required for drag and drop of files from outside the browser into Totara)
+
+Supported desktop browsers: recent Google Chrome, recent Firefox, Safari 10, Microsoft Internet Explorer 11, recent Microsoft Edge
 
 1. If you are planning to use Totara in multiple user languages, you should ensure that the server is properly configured with the correct locales.
    This is important to ensure that date, number and currency data is displayed correctly for each language.
