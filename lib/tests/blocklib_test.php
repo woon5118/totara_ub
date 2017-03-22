@@ -307,6 +307,33 @@ class core_blocklib_testcase extends advanced_testcase {
         $this->assertEquals('4', $blocks[1]->instance->weight);
     }
 
+    /**
+     * TOTARA: Tests that blocks all display with a border by default.
+     */
+    public function test_blocks_display_with_border_by_default() {
+        $this->purge_blocks();
+
+        // Set up fixture.
+        $regionname = 'a-region';
+        $blockname = $this->get_a_known_block_type();
+        $context = context_system::instance();
+
+        list($page, $blockmanager) = $this->get_a_page_and_block_manager([$regionname], $context, 'page-type');
+
+        $blockmanager->add_blocks([$regionname => [$blockname, $blockname]], null, null, false, 3);
+        $blockmanager->load_blocks();
+
+        $blocks = $blockmanager->get_blocks_for_region($regionname);
+
+        // We expect two "block_ablocktype"'s.
+        $this->assertCount(2, $blocks);
+
+        foreach ($blocks as $block) {
+            /* @var block_ablocktype $block */
+            $this->assertTrue($block->display_with_border());
+        }
+    }
+
     public function test_block_not_included_in_different_context() {
         $this->purge_blocks();
 

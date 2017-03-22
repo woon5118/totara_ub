@@ -63,6 +63,13 @@ class block_edit_form extends moodleform {
         // First show fields specific to this type of block.
         $this->specific_definition($mform);
 
+        // TOTARA: This is a little hacky, we are going to force this as a config option for all blocks.
+        // Because its prefixed with "config_" it will be collected from and stored in the block_instance.configdata field
+        // automatically for us.
+        $mform->addElement('header', 'displayconfig', get_string('displayconfig', 'block'));
+        $mform->addElement('selectyesno', 'config_display_with_border', get_string('config_display_with_border', 'block'));
+        $mform->setDefault('config_display_with_border', $this->block->display_with_border());
+
         // Then show the fields about where this block appears.
         $mform->addElement('header', 'whereheader', get_string('wherethisblockappears', 'block'));
 

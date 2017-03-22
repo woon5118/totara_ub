@@ -79,6 +79,25 @@
     .singleselect select {
         .form-control;
     }
+    &.chromeless {
+        border: none;
+        padding: 0;
+        &.block {
+            box-shadow: none;
+        }
+        .block-header {
+            padding: 0;
+            .block-control-actions {
+                margin: 0;
+            }
+        }
+        .title.block-title {
+            padding: @panel-body-padding;
+        }
+        .content {
+            padding: 0;
+        }
+    }
 }
 
 .editing {

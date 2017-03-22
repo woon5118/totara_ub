@@ -681,6 +681,28 @@ EOD;
     public function get_aria_role() {
         return 'complementary';
     }
+
+    /**
+     * This returns if this block instance should be displayed with a border.
+     * If this is false then the block should be displayed chromeless.
+     *
+     * @return bool
+     */
+    protected function display_with_border_by_default() {
+        return true;
+    }
+
+    /**
+     * Returns true if this block should be chromeless.
+     *
+     * @return bool
+     */
+    public function display_with_border() {
+        if (isset($this->config->display_with_border)) {
+            return (bool)$this->config->display_with_border;
+        }
+        return $this->display_with_border_by_default();
+    }
 }
 
 /**

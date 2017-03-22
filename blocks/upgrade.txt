@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 10 ===
 
+* New block_base::display_with_border_by_default() method to set whether the block type should be displayed with a border by default.
+* New block_base::display_with_border() method that returns true  if the block instance should be displayed with a border.
 * The collapsed class was removed from the navigation block to make it compatible with aria.
 * New aria attributes were added on the navigation block [aria-expanded="false"].
 * The tree JS handling were moved from YUI to AMD module (Jquery).

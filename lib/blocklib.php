@@ -1156,7 +1156,7 @@ class block_manager {
     /**
      * Return an array of content objects from a set of block instances
      *
-     * @param array $instances An array of block instances
+     * @param block_base[] $instances An array of block instances
      * @param renderer_base The renderer to use.
      * @param string $region the region name.
      * @return array An array of block_content (and possibly block_move_target) objects.
@@ -1177,6 +1177,9 @@ class block_manager {
             $content = $instance->get_content_for_output($output);
             if (empty($content)) {
                 continue;
+            }
+            if (!$instance->display_with_border()) {
+                $content->add_class('chromeless');
             }
 
             if ($this->movingblock && $lastweight != $instance->instance->weight &&
