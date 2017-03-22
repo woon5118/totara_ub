@@ -38,7 +38,8 @@ Feature: A teacher can put questions in categories in the question bank
   Scenario: A question category can be edited
     When I navigate to "Categories" node in "Course administration > Question bank"
     And I click on "Edit" "link" in the "Subcategory" "list_item"
-    And the field "parent" matches value "   Default for C1"
+    #Totara: TL-6117 adds prefix 'Default for' t odefault categories
+    And the field "parent" matches value "   Default for Default for C1"
     And I set the following fields to these values:
       | Name            | New name     |
       | Category info   | I was edited |
