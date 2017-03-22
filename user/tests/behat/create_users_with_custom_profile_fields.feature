@@ -48,10 +48,11 @@ Feature: Create users with custom profile fields
     And I set the following fields to these values:
       | datatype | text |
     #redirect
+    # Note: do not make the field required because we would be redirected to own profile to fill the missing value
     And I set the following fields to these values:
       | Short name                      | textfield     |
       | Name                            | Text Field    |
-      | Is this field required          | Yes               |
+      | Is this field required          | No            |
     And I press "Save changes"
     And I set the following fields to these values:
       | datatype | menu |
