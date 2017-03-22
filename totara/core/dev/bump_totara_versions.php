@@ -22,7 +22,7 @@
 
 define('CLI_SCRIPT', true);
 
-require(__DIR__ . '/../../config.php');
+require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir.'/clilib.php');
 
 list($options, $unrecognized) = cli_get_params(
@@ -221,7 +221,7 @@ function dev_get_maturity() {
  */
 function dev_is_upstream_file($file) {
     global $CFG;
-    $tag = 'b022c2cd1c5e183659739c9e5bc1b4542c6967de'; // 3.0.6 - Totara 9.0 and up
+    $tag = 'edab0782a354995c60ff2c7874031addb155a49c'; // 3.1.4 - Totara 10
     $cwd = getcwd();
     chdir($CFG->dirroot);
     $file = substr($file, strlen($CFG->dirroot) +1);
