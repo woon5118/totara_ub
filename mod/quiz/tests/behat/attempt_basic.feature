@@ -37,7 +37,7 @@ Feature: Attemp a quiz where some questions require that the previous question h
     And I press "Attempt quiz now"
     And I click on "True" "radio" in the "First question" "question"
     And I click on "False" "radio" in the "Second question" "question"
-    And I press "Finish attempt ..."
+    And I press "Finish attempt"
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then I should see "25.00 out of 100.00"
@@ -80,7 +80,7 @@ Feature: Attemp a quiz where some questions require that the previous question h
     And I should see question "5" in section "Section 3" in the quiz navigation
     And I should see question "6" in section "Section 3" in the quiz navigation
 
-    And I follow "Finish attempt ..."
+    And I follow "Finish attempt"
     And I should see question "1" in section "Section 1" in the quiz navigation
     And I should see question "2" in section "Section 1" in the quiz navigation
     And I should see question "3" in section "Section 2" in the quiz navigation
@@ -116,18 +116,18 @@ Feature: Attemp a quiz where some questions require that the previous question h
     And I press "Attempt quiz now"
     Then I should see "Text of the first question"
     And I should not see "Text of the second question"
-    And I press "Next page"
+    And I press "Next"
     And I should see "Text of the second question"
     And I should not see "Text of the first question"
-    And I click on "Finish attempt ..." "button" in the "region-main" "region"
+    And I click on "Finish attempt" "button" in the "region-main" "region"
     And I should see "Summary of attempt"
     And I press "Return to attempt"
     And I should see "Text of the second question"
     And I should not see "Text of the first question"
-    And I press "Previous page"
+    And I press "Previous"
     And I should see "Text of the first question"
     And I should not see "Text of the second question"
-    And I follow "Finish attempt ..."
+    And I follow "Finish attempt"
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     And I should see "Text of the first question"
@@ -135,9 +135,9 @@ Feature: Attemp a quiz where some questions require that the previous question h
     And I follow "Show one page at a time"
     And I should see "Text of the first question"
     And I should not see "Text of the second question"
-    And I follow "Next page"
+    And I follow "Next"
     And I should see "Text of the second question"
     And I should not see "Text of the first question"
-    And I follow "Previous page"
+    And I follow "Previous"
     And I should see "Text of the first question"
     And I should not see "Text of the second question"

@@ -37,7 +37,7 @@ Feature: Preview a quiz as a teacher
     And I press "Preview quiz now"
     And I click on "True" "radio" in the "First question" "question"
     And I click on "False" "radio" in the "Second question" "question"
-    And I press "Finish attempt ..."
+    And I press "Finish attempt"
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then I should see "25.00 out of 100.00"

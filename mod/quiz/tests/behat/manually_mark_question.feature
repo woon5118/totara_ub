@@ -32,7 +32,7 @@ Feature: Teachers can override the grade for any question
     And I follow "Course 1"
     And I follow "Quiz 1"
     And I press "Attempt quiz now"
-    And I follow "Finish attempt ..."
+    And I follow "Finish attempt"
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     And I log out

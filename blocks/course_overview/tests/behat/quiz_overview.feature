@@ -86,7 +86,7 @@ Feature: View the quiz being due
     And I follow "Course 1"
     And I follow "Quiz 1D Future deadline"
     And I press "Attempt quiz now"
-    And I follow "Finish attempt ..."
+    And I follow "Finish attempt"
     And I press "Submit all and finish"
     And I follow "Course 1"
     And I follow "Quiz 1E Future deadline"
