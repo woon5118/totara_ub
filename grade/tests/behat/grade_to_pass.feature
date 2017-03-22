@@ -32,7 +32,6 @@ Feature: We can set the grade to pass value
     And the "Grade to pass" "field" should be disabled
     And I press "Save and return to course"
 
-  @javascript
   Scenario: Create an activity with a Grade to pass value greater than the maximum grade
     When I turn editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
@@ -78,7 +77,7 @@ Feature: We can set the grade to pass value
       | Grade to pass | 3 |
     And I navigate to "Grades" node in "Course administration"
     And I turn editing mode on
-    And I click on "Edit  assign Test Assignment 1" "link"
+    And I click on "Edit assign Test Assignment 1" "link"
     And I expand all fieldsets
     Then the field "Grade to pass" matches value "3"
     And I set the field "Grade to pass" to "4"
@@ -109,12 +108,12 @@ Feature: We can set the grade to pass value
       | Assessment grade to pass | 10 |
     And I navigate to "Grades" node in "Course administration"
     And I turn editing mode on
-    And I click on "Edit  workshop Test Workshop 1 (submission)" "link"
+    And I click on "Edit workshop Test Workshop 1 (submission)" "link"
     And I expand all fieldsets
     Then the field "Grade to pass" matches value "40"
     And I set the field "Grade to pass" to "45"
     And I press "Save changes"
-    And I click on "Edit  workshop Test Workshop 1 (assessment)" "link"
+    And I click on "Edit workshop Test Workshop 1 (assessment)" "link"
     And I expand all fieldsets
     And the field "Grade to pass" matches value "10"
     And I set the field "Grade to pass" to "15"
@@ -144,7 +143,7 @@ Feature: We can set the grade to pass value
       | Grade to pass | 9.5 |
     And I navigate to "Grades" node in "Course administration"
     And I turn editing mode on
-    And I click on "Edit  quiz Test Quiz 1" "link"
+    And I click on "Edit quiz Test Quiz 1" "link"
     And I expand all fieldsets
     Then the field "Grade to pass" matches value "9.5"
     And I set the field "Grade to pass" to "8"
@@ -162,7 +161,7 @@ Feature: We can set the grade to pass value
       | Grade to pass | 90            |
     And I navigate to "Grades" node in "Course administration"
     And I turn editing mode on
-    And I click on "Edit  lesson Test Lesson 1" "link"
+    And I click on "Edit lesson Test Lesson 1" "link"
     And I expand all fieldsets
     Then the field "Grade to pass" matches value "90"
     And I set the field "Grade to pass" to "80"
@@ -181,7 +180,7 @@ Feature: We can set the grade to pass value
       | Grade to pass  | 90                 |
     And I navigate to "Grades" node in "Course administration"
     And I turn editing mode on
-    And I click on "Edit  data Test Database 1" "link"
+    And I click on "Edit data Test Database 1" "link"
     And I expand all fieldsets
     Then the field "Grade to pass" matches value "90"
     And I set the field "Grade to pass" to "80"
@@ -210,7 +209,7 @@ Feature: We can set the grade to pass value
       | Grade to pass  | 90                 |
     And I navigate to "Grades" node in "Course administration"
     And I turn editing mode on
-    And I click on "Edit  forum Test Forum 1" "link"
+    And I click on "Edit forum Test Forum 1" "link"
     And I expand all fieldsets
     Then the field "Grade to pass" matches value "90"
     And I set the field "Grade to pass" to "80"
@@ -229,7 +228,7 @@ Feature: We can set the grade to pass value
       | Grade to pass  | 90                 |
     And I navigate to "Grades" node in "Course administration"
     And I turn editing mode on
-    And I click on "Edit  glossary Test Glossary 1" "link"
+    And I click on "Edit glossary Test Glossary 1" "link"
     And I expand all fieldsets
     Then the field "Grade to pass" matches value "90"
     And I set the field "Grade to pass" to "80"

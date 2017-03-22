@@ -70,28 +70,28 @@ Feature: View gradebook when single item scales are used
     And I follow "User report"
     And I select "Student 1" from the "Select all or one user" singleselect
     And the following should exist in the "user-grade" table:
-      | Grade item          | Grade | Range     | Contribution to course total |
-      | Test assignment one | Ace!  | Ace!–Ace! | 100.00 %                     |
-      | Sub category 1 total| 1.00  | 0–1       | -                            |
-      | Course total        | 1.00  | 0–1       | -                            |
+      | Grade item                    | Grade | Range     | Contribution to course total |
+      | AssignmentTest assignment one | Ace!  | Ace!–Ace! | 100.00 %                     |
+      | NaturalSub category 1 total   | 1.00  | 0–1       | -                            |
+      | NaturalCourse total           | 1.00  | 0–1       | -                            |
     And I select "Student 2" from the "Select all or one user" singleselect
     And the following should exist in the "user-grade" table:
-      | Grade item          | Grade | Range     | Contribution to course total |
-      | Test assignment one | -     | Ace!–Ace! | -                            |
-      | Sub category 1 total| -     | 0–1       | -                            |
-      | Course total        | -     | 0–1       | -                            |
+      | Grade item                    | Grade | Range     | Contribution to course total |
+      | AssignmentTest assignment one | -     | Ace!–Ace! | -                            |
+      | NaturalSub category 1 total   | -     | 0–1       | -                            |
+      | NaturalCourse total           | -     | 0–1       | -                            |
     And I select "Gradebook setup" from the "jump" singleselect
     And the following should exist in the "grade_edit_tree_table" table:
-      | Name                               | Max grade |
+      | Name                          | Max grade |
       | Move AssignmentTest assignment one | 1.00      |
-      | NaturalSub category 1 total        | 1.00      |
-      | NaturalCourse total                | 1.00      |
+      | NaturalSub category 1 total   | 1.00      |
+      | NaturalCourse total           | 1.00      |
 
   Scenario Outline: Test displaying single item scales in gradebook in all other aggregation methods
     When I follow "Edit Course 1"
     And I set the field "Aggregation" to "<aggregation>"
     And I press "Save changes"
-    And I follow "Edit   Sub category 1"
+    And I follow "Edit Sub category 1"
     And I set the following fields to these values:
       | Aggregation     | <aggregation> |
       | Category name   | Sub category (<aggregation>) |
@@ -108,16 +108,16 @@ Feature: View gradebook when single item scales are used
     And I follow "User report"
     And I select "Student 1" from the "Select all or one user" singleselect
     And the following should exist in the "user-grade" table:
-      | Grade item                                       | Grade          | Range       | Contribution to course total |
-      | Test assignment one                              | Ace!           | Ace!–Ace!   | <contrib1>                   |
-      | Sub category (<aggregation>) total<aggregation>. | <cattotal1>    | 0–100       | -                            |
-      | Course total<aggregation>.                       | <coursetotal1> | 0–100       | -                            |
+      | Grade item                                                    | Grade          | Range       | Contribution to course total |
+      | AssignmentTest assignment one                                 | Ace!           | Ace!–Ace!   | <contrib1>                   |
+      | <aggregation>Sub category (<aggregation>) total<aggregation>. | <cattotal1>    | 0–100       | -                            |
+      | <aggregation>Course total<aggregation>.                       | <coursetotal1> | 0–100       | -                            |
     And I select "Gradebook setup" from the "jump" singleselect
     And the following should exist in the "grade_edit_tree_table" table:
-      | Name                                             | Max grade |
-      | Test assignment one                              | Ace! (1)  |
-      | Sub category (<aggregation>) total<aggregation>. | 100.00    |
-      | Course total<aggregation>.                       | 100.00    |
+      | Name                                                          | Max grade |
+      | Move AssignmentTest assignment one                                 | Ace! (1)  |
+      | <aggregation>Sub category (<aggregation>) total<aggregation>. | 100.00    |
+      | <aggregation>Course total<aggregation>.                       | 100.00    |
 
     Examples:
       | aggregation                         | contrib1 | cattotal1 | coursetotal1 | catavg | overallavg |
