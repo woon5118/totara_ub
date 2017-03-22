@@ -4376,7 +4376,8 @@ function sort_by_roleassignment_authority($users, context $context, $roles = arr
  * system is more flexible. If you really need, you can to use this
  * function but consider has_capability() as a possible substitute.
  *
- * All $sort fields are added into $fields if not present there yet.
+ * The caller function is responsible for including all the
+ * $sort fields in $fields param.
  *
  * If $roleid contains no role or if there are more roles in array
  * you should specify r.sortorder in $sort parameter.
@@ -4456,41 +4457,6 @@ function get_role_users($roleid, context $context, $parent = false, $fields = ''
     if (!$sort) {
         list($sort, $sortparams) = users_order_by_sql('u');
         $params = array_merge($params, $sortparams);
-    }
-
-    // Adding the fields from $sort that are not present in $fields.
-    $sortarray = preg_split('/,\s*/', $sort);
-    $fieldsarray = preg_split('/,\s*/', $fields);
-
-    // Discarding aliases from the fields.
-    $fieldnames = array();
-    foreach ($fieldsarray as $key => $field) {
-        list($fieldnames[$key]) = explode(' ', $field);
-    }
-
-    $addedfields = array();
-    foreach ($sortarray as $sortfield) {
-        // Throw away any additional arguments to the sort (e.g. ASC/DESC).
-        list($sortfield) = explode(' ', $sortfield);
-        list($tableprefix) = explode('.', $sortfield);
-        $fieldpresent = false;
-        foreach ($fieldnames as $fieldname) {
-            if ($fieldname === $sortfield || $fieldname === $tableprefix.'.*') {
-                $fieldpresent = true;
-                break;
-            }
-        }
-
-        if (!$fieldpresent) {
-            $fieldsarray[] = $sortfield;
-            $addedfields[] = $sortfield;
-        }
-    }
-
-    $fields = implode(', ', $fieldsarray);
-    if (!empty($addedfields)) {
-        $addedfields = implode(', ', $addedfields);
-        debugging('get_role_users() adding '.$addedfields.' to the query result because they were required by $sort but missing in $fields');
     }
 
     if ($all === null) {
