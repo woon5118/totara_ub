@@ -72,12 +72,9 @@ if (isguestuser($user)) {
 // User interests separated by commas.
 $user->interests = core_tag_tag::get_item_tags_array('core', 'user', $user->id);
 
-// Remote users cannot be edited. We have to perform the strict
-// user_not_fully_set_up() check, otherwise the remote user could end up in
-// endless loop between user/view.php and herein. Note that required custom
-// fields are not supported in MNet environment anyway.
+// Remote users cannot be edited.
 if (is_mnet_remote_user($user)) {
-    if (user_not_fully_set_up($user, true)) {
+    if (user_not_fully_set_up($user)) {
         $hostwwwroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $user->mnethostid));
         print_error('usernotfullysetup', 'mnet', '', $hostwwwroot);
     }
