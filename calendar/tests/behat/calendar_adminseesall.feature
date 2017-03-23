@@ -28,6 +28,8 @@ Feature: Config setting calendar_adminseesall allows admin to view all events on
       | capability                    | permission | role   | contextlevel | reference |
       | moodle/calendar:manageentries | Allow      | seeall | System       |           |
     And I log in as "admin"
+    And I set the following administration settings values:
+      | enableavailability | 0 |
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on

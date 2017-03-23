@@ -122,6 +122,7 @@ $PAGE->set_heading($COURSE->fullname);
 $PAGE->set_button(calendar_preferences_button($course));
 $PAGE->set_totara_menu_selected('calendar');
 
+/** @var core_calendar_renderer $renderer */
 $renderer = $PAGE->get_renderer('core_calendar');
 $calendar->add_sidecalendar_blocks($renderer, true, $view);
 
