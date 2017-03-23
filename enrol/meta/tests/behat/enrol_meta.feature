@@ -32,7 +32,7 @@ Feature: Enrolments are synchronised with meta courses
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Course meta link" "table_row"
     And I am on homepage
-    And I follow "Courses"
+    And I click on "Courses" in the totara menu
 
   Scenario: Add meta enrolment instance without groups
     When I follow "Course 3"
@@ -95,7 +95,7 @@ Feature: Enrolments are synchronised with meta courses
     And I press "Perform restore"
     And I trigger cron
     And I am on homepage
-    And I follow "Courses"
+    And I click on "Courses" in the totara menu
     And I follow "Course 4"
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Course meta link (Course 1)"
