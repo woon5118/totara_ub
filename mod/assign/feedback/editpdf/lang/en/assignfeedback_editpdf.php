@@ -90,6 +90,7 @@ $string['test_empty'] = 'The ghostscript path is empty - please enter the correc
 $string['test_unoconv'] = 'Test unoconv path';
 $string['test_unoconvdoesnotexist'] = 'The unoconv path does not point to the unoconv program. Please review your path settings.';
 $string['test_unoconvdownload'] = 'Download the converted pdf test file.';
+$string['test_unoconvempty'] ='The unoconv feature is disabled.';
 $string['test_unoconvisdir'] = 'The unoconv path points to a folder, please include the unoconv program in the path you specify';
 $string['test_unoconvnotestfile'] = 'The test document to be coverted into a PDF is missing';
 $string['test_unoconvnotexecutable'] = 'The unoconv path points to a file that is not executable';
