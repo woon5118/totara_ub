@@ -231,13 +231,14 @@ Feature: Award badges
     And I follow "Test assignment name"
     And I follow "View all submissions"
     And I should see "Not marked" in the "Student First" "table_row"
-    And I click on "Grade Student First" "link" in the "Student First" "table_row"
+    And I click on "Grade" "link" in the "Student First" "table_row"
     And I set the field "Grade out of 100" to "30"
     And I set the field "Feedback comments" to "Great job! Lol, not really."
     And I set the field "Marking workflow state" to "Released"
     And I press "Save changes"
-    And I press "Continue"
-    Then I should see "Released" in the "Student First" "table_row"
+    And I press "Ok"
+    Then I should see "Released" in the ".submissiongraded" "css_element"
+    And I click on "Edit settings" "link"
     # Check the user can see the badge.
     When I log out
     And I trigger cron
