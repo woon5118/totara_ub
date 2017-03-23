@@ -8,8 +8,10 @@ Feature: Create and edit activity pages handle tags correctly
     Given I am on a totara site
     And I log in as "admin"
     And I navigate to "Manage tags" node in "Site administration > Appearance"
-    And I set the field "otagsadd" to "Superb, Supreme, Superfluous"
-    And I press "Add official tags"
+    And I click on "Default collection" "link"
+    And I click on "Add standard tags" "link"
+    And I set the field "Enter comma-separated list of new tags" to "Superb, Supreme, Superfluous"
+    And I press "Continue"
     And the following "courses" exist:
       | fullname | shortname | format |
       | Course 1 | C1        | topics |
