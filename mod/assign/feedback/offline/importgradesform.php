@@ -184,7 +184,7 @@ class assignfeedback_offline_import_grades_form extends moodleform implements re
         $mform->setType('importid', PARAM_INT);
 
         $mform->addElement('hidden', 'encoding', $gradeimporter->get_encoding());
-        $mform->setType('encoding', PARAM_ALPHAEXT);
+        $mform->setType('encoding', PARAM_ALPHANUMEXT); // Totara: encoding names include numbers!
         $mform->addElement('hidden', 'separator', $gradeimporter->get_separator());
         $mform->setType('separator', PARAM_ALPHA);
 
