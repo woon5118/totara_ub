@@ -463,6 +463,9 @@ class core_external extends external_api {
         $context = \context::instance_by_id($contextid);
         self::validate_context($context);
 
-        return \core\notification::fetch_as_array($PAGE->get_renderer('core'));
+        // TL-11584 / MDL-30811 for compatibitlity with legacy Totara
+        // notifications do not fetch Totara notifications to preserve
+        // their functionality.
+        return \core\notification::totara_fetch_as_array($PAGE->get_renderer('core'));
     }
 }

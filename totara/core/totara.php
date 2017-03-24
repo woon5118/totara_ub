@@ -594,11 +594,16 @@ function totara_set_notification($message, $redirect = null, $options = array(),
         print_error('error:notificationsparamtypewrong', 'totara_core');
     }
 
-    // Add message to options array
-    $options['message'] = $message;
+    $data = [];
+    $data['message'] = $message;
+    $data['class'] = isset($options['class']) ? $options['class'] : null;
+    // Add anything apart from 'classes' from the options object.
+    $data['customdata'] = array_filter($options, function($key) {
+        return !($key === 'class');
+    }, ARRAY_FILTER_USE_KEY);
 
     // Add to notifications queue
-    totara_queue_append('notifications', $options);
+    totara_queue_append('notifications', $data);
 
     // Redirect if requested
     if ($redirect !== null) {
@@ -624,9 +629,12 @@ function totara_set_notification($message, $redirect = null, $options = array(),
  * @return  array
  */
 function totara_get_notifications() {
-    return totara_queue_shift('notifications', true);
-}
 
+    $notifications = \core\notification::fetch();
+
+    // Ensure notifications are in the format Totara expects from this function.
+    return array_map('totara_convert_notification_to_legacy_array', $notifications);
+}
 
 /**
  * Add an item to a totara session queue
@@ -637,6 +645,12 @@ function totara_get_notifications() {
  */
 function totara_queue_append($key, $data) {
     global $SESSION;
+
+    // Since TL-11584 / MDL-30811
+    if ($key === 'notifications') {
+        \core\notification::add_totara_legacy($data['message'], $data['class'], $data['customdata']);
+        return;
+    }
 
     if (!isset($SESSION->totara_queue)) {
         $SESSION->totara_queue = array();
@@ -2461,4 +2475,20 @@ function totara_core_generate_unique_db_value($table, $column, $prefix = null) {
         $exists = $DB->record_exists($table, array($column => $name));
     }
     return $name;
+}
+
+/**
+ * Convert a core\output\notification instance to the legacy array format.
+ *
+ * @param \core\output\notification $notification The templatable to be converted.
+ */
+function totara_convert_notification_to_legacy_array(\core\output\notification $notification) {
+    global $OUTPUT;
+
+    $type = $notification->get_message_type();
+    $variables = $notification->export_for_template($OUTPUT);
+
+    $data = [ 'message' => $variables['message'], 'class' => trim($type . ' ' . $variables['extraclasses'])];
+
+    return array_merge($notification->get_totara_customdata(), $data);
 }

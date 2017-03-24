@@ -275,6 +275,9 @@ information provided here is intended especially for developers.
 * core_renderer::render_help_icon() has changed.
 * help_icon::export_for_template() includes icon, linktext, title, url in the return object
 * loglevel.js has been updated 1.4.1 from 1.4.0
+* Notifications are now output above the main content container by core_renderer not at the top of it by totara_core renderer.
+* CSS class names used to define notification type when passed to totara_set_notification() e.g. 'notifysuccess' are now stripped
+  and converted to Bootstrap equivalents. Other custom classes passed to totara_set_notification are preserved.
 
 === 9.2 ===
 

@@ -822,9 +822,7 @@ class core_renderer extends renderer_base {
         $this->opencontainers->push('header/footer', $footer);
         $this->page->set_state(moodle_page::STATE_IN_BODY);
 
-        $totararenderer = $this->page->get_renderer('totara_core', null);
-        return $header . $this->skip_link_target('maincontent') .
-            $totararenderer->totara_notifications();
+        return $header . $this->skip_link_target('maincontent');
     }
 
     /**
@@ -915,6 +913,31 @@ class core_renderer extends renderer_base {
     }
 
     /**
+     * Totara: Provide a way for 3rd party developers to override notifications area rendering.
+     *
+     * Straight lift of code from course_content_header so that it's possible
+     * to override display of session notifications. Long name intended to
+     * make this relationship clear.
+     *
+     * @return string
+     */
+    public function course_content_header_notifications() {
+
+        // Output any session notification.
+        $notifications = \core\notification::fetch();
+
+        $bodynotifications = '';
+        foreach ($notifications as $notification) {
+            $bodynotifications .= $this->render_from_template(
+                $notification->get_template_name(),
+                $notification->export_for_template($this)
+            );
+        }
+
+        return html_writer::span($bodynotifications, 'notifications', array('id' => 'user-notifications'));
+    }
+
+    /**
      * Returns course-specific information to be output immediately above content on any course page
      * (for the current course)
      *
@@ -929,18 +952,8 @@ class core_renderer extends renderer_base {
             return '';
         }
 
-        // Output any session notification.
-        $notifications = \core\notification::fetch();
-
-        $bodynotifications = '';
-        foreach ($notifications as $notification) {
-            $bodynotifications .= $this->render_from_template(
-                    $notification->get_template_name(),
-                    $notification->export_for_template($this)
-                );
-        }
-
-        $output = html_writer::span($bodynotifications, 'notifications', array('id' => 'user-notifications'));
+        // Totara: Move notifications logic into separate method.
+        $output = $this->course_content_header_notifications();
 
         if ($this->page->course->id == SITEID) {
             // return immediately and do not include /course/lib.php if not necessary
