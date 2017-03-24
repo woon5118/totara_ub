@@ -297,7 +297,6 @@ Feature: Unlocking without deleting course completion data
      | Subject | My first post |
      | Message | This is my first post |
     And I press "Post to forum"
-    And I follow "Continue"
     And I follow "Course 1"
     And I click on "Not completed: Test forum name. Select to mark as complete." "link"
     And I trigger cron
@@ -383,7 +382,6 @@ Feature: Unlocking without deleting course completion data
       | Subject | My first post |
       | Message | This is my first post |
     And I press "Post to forum"
-    And I follow "Continue"
     And I follow "Course 1"
     And I click on "Not completed: Test forum name. Select to mark as complete." "link"
     And I trigger cron
