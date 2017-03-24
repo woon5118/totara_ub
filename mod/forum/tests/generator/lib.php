@@ -235,9 +235,9 @@ class mod_forum_generator extends testing_module_generator {
         // Add the discussion.
         $record->id = forum_add_discussion($record, null, null, $record->userid);
 
-        if (isset($timemodified) || isset($mailed)) {
-            $post = $DB->get_record('forum_posts', array('discussion' => $record->id));
+        $post = $DB->get_record('forum_posts', array('discussion' => $record->id));
 
+        if (isset($timemodified) || isset($mailed)) {
             if (isset($mailed)) {
                 $post->mailed = $mailed;
             }
@@ -253,10 +253,18 @@ class mod_forum_generator extends testing_module_generator {
             $DB->update_record('forum_posts', $post);
         }
 
+        if (property_exists($record, 'tags')) {
+            $cm = get_coursemodule_from_instance('forum', $record->forum);
+            $tags = is_array($record->tags) ? $record->tags : preg_split('/,/', $record->tags);
+
+            core_tag_tag::set_item_tags('mod_forum', 'forum_posts', $post->id,
+                context_module::instance($cm->id), $tags);
+        }
+
         // Totara: include extra fields.
         $result = $DB->get_record('forum_discussions', array('id' => $record->id));
         $result->subject = $record->subject;
-        return $result;
+        return $record;
     }
 
     /**
@@ -332,6 +340,15 @@ class mod_forum_generator extends testing_module_generator {
 
         // Add the post.
         $record->id = $DB->insert_record('forum_posts', $record);
+
+        if (property_exists($record, 'tags')) {
+            $discussion = $DB->get_record('forum_discussions', ['id' => $record->discussion]);
+            $cm = get_coursemodule_from_instance('forum', $discussion->forum);
+            $tags = is_array($record->tags) ? $record->tags : preg_split('/,/', $record->tags);
+
+            core_tag_tag::set_item_tags('mod_forum', 'forum_posts', $record->id,
+                context_module::instance($cm->id), $tags);
+        }
 
         // Update the last post.
         forum_discussion_update_last_post($record->discussion);
