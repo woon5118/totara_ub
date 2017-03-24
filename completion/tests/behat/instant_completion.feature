@@ -174,6 +174,6 @@ Feature: Instant completion
     Then I should see "Complete" in the "Course 1" "table_row"
     And  I should see "Complete" in the "Course 2" "table_row"
     And  I should see "Complete" in the "Course 3" "table_row"
-#    And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
-#    And I click on "Program1" "link"
-#    Then I should see "100%" program progress
+    And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
+    And I click on "Program1" "link"
+    Then I should see "100%" program progress
