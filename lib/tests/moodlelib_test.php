@@ -2796,8 +2796,9 @@ class core_moodlelib_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
-        $user1 = $this->getDataGenerator()->create_user();
-        $user2 = $this->getDataGenerator()->create_user();
+        // Totara: we do not want the default mail format see TL-7360 fix
+        $user1 = $this->getDataGenerator()->create_user(array('mailformat' => 0));
+        $user2 = $this->getDataGenerator()->create_user(array('mailformat' => 0));
 
         $subject = 'subject';
         $messagetext = 'message text';

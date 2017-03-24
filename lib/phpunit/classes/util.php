@@ -481,7 +481,7 @@ class phpunit_util extends testing_util {
         set_config('enabled_stores', '', 'tool_log');
 
         // Undo Totara changed defaults to allow upstream testing without hacks.
-        set_config('enablecompletion', 0);
+        // NOTE: completion is automatically enabled since Moodle 3.1
         set_config('forcelogin', 0);
         set_config('enrol_plugins_enabled', 'manual,guest,self,cohort');
         set_config('enableblogs', 1);

@@ -62,6 +62,9 @@ class mod_scorm_event_testcase extends advanced_testcase {
 
         global $USER;
 
+        // Totara: we do not want instant completion events to mess up this test
+        set_config('enablecompletion', 0);
+
         $this->resetAfterTest();
         scorm_insert_track(2, $this->eventscorm->id, 1, 4, 'cmi.core.score.raw', 10);
         $sink = $this->redirectEvents();
@@ -359,6 +362,9 @@ class mod_scorm_event_testcase extends advanced_testcase {
      * Tests for userreport viewed event validations.
      */
     public function test_user_report_viewed_event_validations() {
+        // Totara: we do not want instant completion events to mess up this test
+        set_config('enablecompletion', 0);
+
         $this->resetAfterTest();
         try {
             \mod_scorm\event\user_report_viewed::create(array(

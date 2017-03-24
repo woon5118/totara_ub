@@ -341,6 +341,9 @@ class totara_program_user_learning_item_testcase extends advanced_testcase {
 
     public function test_ensure_completion_loaded() {
         global $CFG;
+
+        set_config('enablecompletion', 0);
+
         // Assign user to the program.
         $this->program_generator->assign_program($this->program1->id, array($this->user1->id));
 
@@ -372,7 +375,7 @@ class totara_program_user_learning_item_testcase extends advanced_testcase {
         $this->assertEmpty($progress_summary->getValue($program_item));
 
         // Lets turn on completion and try again.
-        $CFG->enablecompletion = true;
+        set_config('enablecompletion', 1);
         $rm = new ReflectionMethod('totara_program\user_learning\item', 'ensure_completion_loaded');
         $rm->setAccessible(true);
 
