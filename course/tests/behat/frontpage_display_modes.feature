@@ -26,8 +26,9 @@ Feature: Front page displays items in different modes
 
   @javascript
   Scenario: Displays a list of categories
-    When I set the following administration settings values:
-      | Front page items when logged in | List of categories |
+    When the following config values are set as admin:
+      | frontpageloggedin | 2 |
+    And I set the following administration settings values:
       | Maximum category depth | 2 |
     And I am on site homepage
     Then I should see "Category 1" in the "region-main" "region"
@@ -42,8 +43,9 @@ Feature: Front page displays items in different modes
 
   @javascript
   Scenario: Displays a combo list
-    When I set the following administration settings values:
-      | Front page items when logged in | Combo list |
+    When the following config values are set as admin:
+      | frontpageloggedin | 4 |
+    And I set the following administration settings values:
       | Maximum category depth | 2 |
     And I am on site homepage
     Then I should see "Category 1" in the "region-main" "region"

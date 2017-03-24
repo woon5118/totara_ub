@@ -44,8 +44,8 @@ Feature: Test course visibility
       | user     | cohort |
       | learner2 | AUD1   |
     And I log in as "admin"
-    And I set the following administration settings values:
-      | Front page items when logged in | Combo list |
+    And the following config values are set as admin:
+      | frontpageloggedin | 4 |
     And I navigate to "Dashboards" node in "Site administration > Appearance"
     And I click on "My Learning" "link"
     And I press "Blocks editing on"
