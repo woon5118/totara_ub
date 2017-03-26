@@ -14,7 +14,7 @@ Feature: Edit activities in main menu block
     And I click on "Edit title" "link" in the "//div[contains(@class,'block_site_main_menu')]//li[contains(.,'My forum name')]" "xpath_element"
     And I set the field "New name for activity My forum name" to "New forum name"
     And I press key "13" in the field "New name for activity My forum name"
-    Then I should not see "My forum name" in the ".main-menu-content .activity" "css_element"
+    Then I should not see "My forum name" in the ".block_site_main_menu .activity" "css_element"
     And I should see "New forum name" in the "Main menu" "block"
     And I follow "New forum name"
     And I should not see "My forum name"
