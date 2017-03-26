@@ -36,6 +36,7 @@ $string['append_new_items'] = 'Append new items';
 $string['autonumbering'] = 'Auto number questions';
 $string['autonumbering_help'] = 'Enables or disables automated numbers for each question';
 $string['average'] = 'Average';
+$string['blank_responses'] = '{$a} blank responses';
 $string['bold'] = 'Bold';
 $string['calendarend'] = 'Feedback {$a} closes';
 $string['calendarstart'] = 'Feedback {$a} opens';
