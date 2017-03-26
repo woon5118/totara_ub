@@ -87,7 +87,18 @@ class core_question_external extends external_api {
         );
 
         $warnings = array();
-        self::validate_context(context_system::instance());
+
+        // TOTARA: In PHP through the web Moodle relies on verifying the checksum which is generated
+        // to be unique to the user, and when coupled with sesskey appears somewhat safe.
+        // Its not, there is no validation that the given parameters have anything to do with the current user.
+        // Because a question *can* be used anywhere validation is practically entirely missing.
+        // As a stop gap solution we will at least validate the correct context.
+        $sql = "SELECT qu.contextid
+                  FROM {question_usages} qu
+                  JOIN {question_attempts} qa ON qa.questionusageid = qu.id
+                 WHERE qa.id = :qaid AND qu.id = :quid";
+        $contextid = $DB->get_field_sql($sql, ['qaid' => $qaid, 'quid' => $qubaid], MUST_EXIST);
+        self::validate_context(context_helper::instance_by_id($contextid, MUST_EXIST));
 
         // The checksum will be checked to provide security flagging other users questions.
         question_flags::update_flag($params['qubaid'], $params['questionid'], $params['qaid'], $params['slot'], $params['checksum'],
