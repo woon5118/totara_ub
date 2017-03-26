@@ -78,7 +78,7 @@ class mod_glossary_external extends external_api {
      * Get the return value of an entry.
      *
      * @param bool $includecat Whether the definition should include category info.
-     * @return external_definition
+     * @return external_single_structure
      */
     protected static function get_entry_return_structure($includecat = false) {
         $params = array(
@@ -183,7 +183,7 @@ class mod_glossary_external extends external_api {
     /**
      * Describes the parameters for get_glossaries_by_courses.
      *
-     * @return external_external_function_parameters
+     * @return external_function_parameters
      * @since Moodle 3.1
      */
     public static function get_glossaries_by_courses_parameters() {
@@ -207,6 +207,7 @@ class mod_glossary_external extends external_api {
      * @since Moodle 3.1
      */
     public static function get_glossaries_by_courses($courseids = array()) {
+        global $CFG;
         $params = self::validate_parameters(self::get_glossaries_by_courses_parameters(), array('courseids' => $courseids));
 
         $warnings = array();
@@ -838,9 +839,11 @@ class mod_glossary_external extends external_api {
         list($glossary, $context) = self::validate_glossary($id);
 
         // Fetching the entries.
+        /** @var moodle_recordset $users */
         list($users, $count) = glossary_get_authors($glossary, $context, $limit, $from, $options);
 
         $canviewfullnames = has_capability('moodle/site:viewfullnames', $context);
+        $authors = array();
         foreach ($users as $user) {
             $userpicture = new user_picture($user);
             $userpicture->size = 1;
