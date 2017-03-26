@@ -36,7 +36,7 @@ class feedback_label_form extends feedback_item_form {
         $mform->addElement('hidden', 'name', 'label');
         $mform->setType('template', PARAM_ALPHA);
         $mform->addElement('hidden', 'label', '');
-        $mform->setType('label', PARAM_ALPHA);
+        $mform->setType('label', PARAM_TEXT); // Totara: use format string to support multilang and to remove all other tags.
 
         $mform->addElement('header', 'general', get_string($this->type, 'feedback'));
         $mform->addElement('editor', 'presentation_editor', get_string('labelcontents', 'feedback'), null, $presentationoptions);
