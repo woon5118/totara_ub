@@ -112,8 +112,7 @@ class block_navigation_renderer extends plugin_renderer_base {
                 continue;
             }
 
-            $nodetextid = 'label_' . $depth . '_' . $number;
-            $attributes = array('tabindex' => '-1', 'id' => $nodetextid);
+            $attributes = array('tabindex' => '-1');
             if ($title !== '') {
                 $attributes['title'] = $title;
             }
@@ -179,7 +178,6 @@ class block_navigation_renderer extends plugin_renderer_base {
                 $content = html_writer::empty_tag('hr') . $content;
             }
 
-            $liattr['aria-labelledby'] = $nodetextid;
             $content = html_writer::tag('li', $content, $liattr);
             $lis[] = $content;
         }
