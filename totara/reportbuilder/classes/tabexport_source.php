@@ -109,9 +109,6 @@ class tabexport_source extends \totara_core\tabexport_source {
         foreach ($this->columns as $column) {
             $result[] = $this->report->format_column_heading($column, $plaintext);
         }
-        if (right_to_left()) {
-            $result = array_reverse($result);
-        }
         return $result;
     }
 
@@ -167,9 +164,6 @@ class tabexport_source extends \totara_core\tabexport_source {
     public function current() {
         $record = $this->rs->current();
         $row = $this->report->src->process_data_row($record, $this->format, $this->report);
-        if (right_to_left()) {
-            $row = array_reverse($row);
-        }
         return $row;
     }
 
