@@ -60,11 +60,13 @@ class theme_bootstrapbase_core_admin_renderer extends core_admin_renderer {
      */
     public function admin_notifications_page($maturity, $insecuredataroot, $errorsdisplayed,
                                              $cronoverdue, $dbproblems, $maintenancemode, $availableupdates, $availableupdatesfetch,
-                                             $buggyiconvnomb, $registered, array $cachewarnings = array(), $latesterror, $activeusers, $totara_release) {
+                                             $buggyiconvnomb, $registered, array $cachewarnings = array(), $eventshandlers = 0,
+                                             $latesterror, $activeusers, $totara_release) {
 
         $output = parent::admin_notifications_page($maturity, $insecuredataroot, $errorsdisplayed,
             $cronoverdue, $dbproblems, $maintenancemode, $availableupdates, $availableupdatesfetch,
-            $buggyiconvnomb, $registered, $cachewarnings, $latesterror, $activeusers, $totara_release);
+            $buggyiconvnomb, $registered, $cachewarnings, $eventshandlers = 0,
+                $latesterror, $activeusers, $totara_release);
 
         $output = str_replace('class="copyright-acknowledgements"', 'class="box generalbox adminwarning copyright-acknowledgements"', $output);
         return $output;
