@@ -86,4 +86,10 @@ $tagareas = array(
         'callback' => 'course_get_tagged_course_modules',
         'callbackfile' => '/course/lib.php',
     ),
+    array(
+        'itemtype' => 'core_cohort', // Audiences.
+        'component' => 'core',
+        'callback' => 'totara_cohort_get_tagged_cohorts',
+        'callbackfile' => '/totara/cohort/locallib.php',
+    ),
 );

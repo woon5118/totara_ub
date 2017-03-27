@@ -129,6 +129,7 @@ $string['tag'] = 'Tag';
 $string['tagarea_blog_external'] = 'External blog posts';
 $string['tagarea_post'] = 'Blog posts';
 $string['tagarea_user'] = 'User interests';
+$string['tagarea_core_cohort'] = 'Audiences';
 $string['tagarea_course'] = 'Courses';
 $string['tagarea_course_modules'] = 'Activities and resources';
 $string['tagareaenabled'] = 'Enabled';
