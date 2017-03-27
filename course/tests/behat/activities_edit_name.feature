@@ -25,7 +25,8 @@ Feature: Edit activity name in-place
     And I click on "Edit title" "link" in the "//div[contains(@class,'activityinstance') and contains(.,'Test forum name')]" "xpath_element"
     And I set the field "New name for activity Test forum name" to "Good news"
     And I press key "13" in the field "New name for activity Test forum name"
-    Then I should not see "Test forum name" in the ".course-content" "css_element"
+    # Totara: there are some leftovers in edit icons
+    Then I should not see "Test forum name" in the ".course-content .instancename" "css_element"
     And "New name for activity Test forum name" "field" should not exist
     And I should see "Good news"
     And I follow "Course 1"

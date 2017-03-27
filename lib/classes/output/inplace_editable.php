@@ -201,7 +201,8 @@ class inplace_editable implements templatable, renderable {
             return true;
         }
 
-        if (preg_match('#<a .*>.*</a>#', $this->displayvalue) === 1) {
+        // Totara: the template in Totara has line breaks, use /s (PCRE_DOTALL).
+        if (preg_match('#<a .*>.*</a>#s', $this->displayvalue) === 1) {
             return false;
         }
 
