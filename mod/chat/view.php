@@ -121,7 +121,6 @@ if (has_capability('mod/chat:chat', $context)) {
         echo '<p>';
         $chatinfo = new stdClass();
         $chatinfo->date = userdate($chat->chattime);
-        $chatinfo->fromnow = format_time($span);
         echo get_string('sessionstart', 'chat', $chatinfo);
         echo '</p>';
     }
