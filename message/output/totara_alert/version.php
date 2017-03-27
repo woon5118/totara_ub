@@ -28,6 +28,6 @@
  * Popup processor version information
  */
 
-$plugin->version  = 2017012500;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2015111608;       // Requires this Moodle version.
+$plugin->version  = 2017032700;       // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2016052304;       // Requires this Moodle version.
 $plugin->component = 'message_totara_alert';  // Full name of the plugin (used for diagnostics)

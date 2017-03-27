@@ -179,15 +179,6 @@ class behat_facetoface extends behat_base {
     }
 
     /**
-     * Select to approve the given user.
-     *
-     * @Given /^I select to approve "([^"]*)"$/
-     */
-    public function i_select_to_approve($user) {
-        $this->execute("behat_general::i_click_on_in_the", array("input[value='2']", 'css_element', $this->escape($user), 'table_row'));
-    }
-
-    /**
      * Use magic to alter facetoface cut off to value which is not allowed in UI so that we do not have to wait in tests.
      *
      * @Given /^I use magic to set Seminar "([^"]*)" to send capacity notification two days ahead$/
