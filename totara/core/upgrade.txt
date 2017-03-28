@@ -6,3 +6,4 @@ information provided here is intended especially for developers.
 * totara_dialog_content_manager has been deprecated, please use totara_job_dialog_assign_manager instead.
 * updated totara/core/templates/totara_search.mustache
 * totara/core/templates/totara_search.mustache context object has changed, the property ->alt has been deprecated
+* updated totara/core/templates/course_progress_bar.mustache
