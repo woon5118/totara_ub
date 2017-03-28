@@ -6189,12 +6189,8 @@ function facetoface_get_staff_to_allocate($facetoface, $session, $managerid = nu
                 continue;
             }
 
-            if (!facetoface_user_can_be_unallocated($user, $managerid)) {
-                $ret->cannotunallocate[$user->id] = $user;
-            }
-            // Allocated to a different session - cannot be unbooked here.
+            facetoface_user_can_be_unallocated($user, $managerid);
             $ret->othersession[$user->id] = $user;
-
         }
 
         // If the user doesn't have a sign-up for this session check if we can put him in the potential list.
@@ -6209,7 +6205,7 @@ function facetoface_get_staff_to_allocate($facetoface, $session, $managerid = nu
             }
         } else {
             if (!facetoface_user_can_be_unallocated($usersignupsession, $managerid)) {
-                $ret->cannotunallocate[$usersignupsession->id] = $usersignupsession;
+                $ret->cannotunallocate[$member] = $usersignupsession;
             }
             $ret->current[$member] = $usersignupsession;
         }
