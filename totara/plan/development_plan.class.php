@@ -1415,7 +1415,7 @@ class development_plan {
         if (empty($this->learner)) {
             $usernamefields = get_all_user_name_fields(true);
             $learner = $DB->get_record('user', array('id' => $this->userid),
-                'id, email, lang, auth, suspended, deleted, emailstop, '. $usernamefields);
+                'id, username, email, lang, auth, suspended, deleted, emailstop, '. $usernamefields);
             if (empty($learner)) {
                 throw new coding_exception('User not found.');
             } else {
@@ -1458,7 +1458,7 @@ class development_plan {
             } else {
                 list($insql, $inparams) = $DB->get_in_or_equal($mgrids);
                 $usernamefields = get_all_user_name_fields(true);
-                $sql = "SELECT id, email, lang, auth, suspended, deleted, emailstop, " . $usernamefields . "
+                $sql = "SELECT id, username, email, lang, auth, suspended, deleted, emailstop, " . $usernamefields . "
                 FROM {user}
                 WHERE id " . $insql;
                 $managers = $DB->get_records_sql($sql, $inparams);
