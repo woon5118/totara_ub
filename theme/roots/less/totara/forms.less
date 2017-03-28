@@ -766,3 +766,12 @@ textarea#id_approval_termsandconds {
     -webkit-user-select: text;
     user-select: text;
 }
+
+// Styles for the JS file types browser provided by the "filetypes" element.
+[data-filetypesbrowserbody] {
+    [aria-expanded="false"] > [role="group"],
+    [aria-expanded="false"] [data-filetypesbrowserfeature="hideifcollapsed"],
+    [aria-expanded="true"] [data-filetypesbrowserfeature="hideifexpanded"] {
+        display: none;
+    }
+}
