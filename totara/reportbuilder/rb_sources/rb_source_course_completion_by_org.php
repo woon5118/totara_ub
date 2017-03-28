@@ -119,7 +119,7 @@ class rb_source_course_completion_by_org extends rb_base_source {
         $this->add_course_category_table_to_joinlist($joinlist,
             'course', 'category');
         $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_tag_tables_to_joinlist('course', $joinlist, 'base', 'course');
+        $this->add_core_tag_tables_to_joinlist('core', 'course', $joinlist, 'base', 'course');
 
         return $joinlist;
     }
@@ -277,7 +277,7 @@ class rb_source_course_completion_by_org extends rb_base_source {
         $this->add_course_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions);
         $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_tag_fields_to_columns('course', $columnoptions);
+        $this->add_core_tag_fields_to_columns('core', 'course', $columnoptions);
 
         return $columnoptions;
     }
@@ -366,7 +366,7 @@ class rb_source_course_completion_by_org extends rb_base_source {
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
         $this->add_job_assignment_fields_to_filters($filteroptions);
-        $this->add_tag_fields_to_filters('course', $filteroptions);
+        $this->add_core_tag_fields_to_filters('core', 'course', $filteroptions);
 
         return $filteroptions;
     }

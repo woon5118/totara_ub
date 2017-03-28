@@ -1948,8 +1948,13 @@ abstract class rb_base_source {
         return $out;
     }
 
+    /**
+     * @deprecated Since 10.0
+     */
     function rb_filter_tags_list() {
         global $DB, $OUTPUT, $CFG;
+
+        debugging('rb_filter_tags_list() is deprecated. This function was used in the tags filter and is no longer needed.', DEBUG_DEVELOPER);
 
         return $DB->get_records_menu('tag', array('isstandard' => 1), 'name', 'id, name');
     }
@@ -5495,10 +5500,24 @@ abstract class rb_base_source {
 
     }
 
+
+    /**
+     * DEPRECATED: The tag API has changed and your code needs to be updated.
+     *
+     * Please call add_core_tag_tables_to_joinlist instead.
+     *
+     * @deprecated since Totara 10
+     */
+    protected function add_tag_tables_to_joinlist() {
+        throw new coding_exception('add_tag_tables_to_joinlist has been deprecated due to tag API changes, please upgrade your code to call add_core_tag_tables_to_joinlist instead.', DEBUG_DEVELOPER);
+    }
+
+
     /**
      * Adds the tag tables to the $joinlist array
      *
-     * @param string $type tag itemtype
+     * @param string $component component for the tag
+     * @param string $itemtype tag itemtype
      * @param array &$joinlist Array of current join options
      *                         Passed by reference and updated to
      *                         include new table joins
@@ -5507,7 +5526,7 @@ abstract class rb_base_source {
      * @param string $field Name of course id field to join on
      * @return boolean True
      */
-    protected function add_tag_tables_to_joinlist($type, &$joinlist, $join, $field) {
+    protected function add_core_tag_tables_to_joinlist($component, $itemtype, &$joinlist, $join, $field) {
         global $DB;
 
         $idlist = $DB->sql_group_concat(sql_cast2char('t.id'), '|');
@@ -5516,8 +5535,8 @@ abstract class rb_base_source {
             'LEFT',
             // subquery as table name
             "(SELECT til.id AS tilid, {$idlist} AS idlist
-                FROM {{$type}} til
-           LEFT JOIN {tag_instance} ti ON til.id = ti.itemid AND ti.itemtype = '{$type}'
+                FROM {{$itemtype}} til
+           LEFT JOIN {tag_instance} ti ON til.id = ti.itemid AND ti.itemtype = '{$itemtype}'
            LEFT JOIN {tag} t ON ti.tagid = t.id AND t.isstandard = '1'
             GROUP BY til.id)",
             "tagids.tilid = {$join}.{$field}",
@@ -5531,8 +5550,8 @@ abstract class rb_base_source {
             'LEFT',
             // subquery as table name
             "(SELECT tnl.id AS tnlid, {$namelist} AS namelist
-                FROM {{$type}} tnl
-           LEFT JOIN {tag_instance} ti ON tnl.id = ti.itemid AND ti.itemtype = '{$type}'
+                FROM {{$itemtype}} tnl
+           LEFT JOIN {tag_instance} ti ON tnl.id = ti.itemid AND ti.itemtype = '{$itemtype}'
            LEFT JOIN {tag} t ON ti.tagid = t.id AND t.isstandard = '1'
             GROUP BY tnl.id)",
             "tagnames.tnlid = {$join}.{$field}",
@@ -5540,17 +5559,18 @@ abstract class rb_base_source {
             $join
         );
 
-        // create a join for each official tag
-        $tags = $DB->get_records('tag', array('isstandard' => '1'));
+        // Create a join for each tag in the collection.
+        $tagcollectionid = core_tag_area::get_collection($component, $itemtype);
+        $tags = core_tag_collection::get_tags($tagcollectionid);
         foreach ($tags as $tag) {
             $tagid = $tag->id;
-            $name = "{$type}_tag_$tagid";
+            $name = "{$itemtype}_tag_$tagid";
             $joinlist[] = new rb_join(
                 $name,
                 'LEFT',
                 '{tag_instance}',
                 "($name.itemid = $join.$field AND $name.tagid = $tagid " .
-                    "AND $name.itemtype = '{$type}')",
+                    "AND $name.itemtype = '{$itemtype}')",
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 $join
             );
@@ -5561,9 +5581,22 @@ abstract class rb_base_source {
 
 
     /**
+     * DEPRECATED: The tag API has changed and your code needs to be updated.
+     *
+     * Please call add_core_fields_to_columns instead.
+     *
+     * @deprecated since Totara 10
+     */
+    protected function add_tag_fields_to_columns() {
+        throw new coding_exception('add_tag_fields_to_columns has been deprecated due to tag API changes, please upgrade your code to call add_core_tag_fields_to_columns instead.', DEBUG_DEVELOPER);
+    }
+
+
+    /**
      * Adds some common tag info to the $columnoptions array
      *
-     * @param string $type tag itemtype
+     * @param string $component component for the tag
+     * @param string $itemtype tag itemtype
      * @param array &$columnoptions Array of current column options
      *                              Passed by reference and updated by
      *                              this method
@@ -5572,7 +5605,7 @@ abstract class rb_base_source {
      *
      * @return True
      */
-    protected function add_tag_fields_to_columns($type, &$columnoptions, $tagids='tagids', $tagnames='tagnames') {
+    protected function add_core_tag_fields_to_columns($component, $itemtype, &$columnoptions, $tagids='tagids', $tagnames='tagnames') {
         global $DB;
 
         $columnoptions[] = new rb_column_option(
@@ -5592,12 +5625,15 @@ abstract class rb_base_source {
                   'outputformat' => 'text')
         );
 
-        // create a on/off field for every official tag
-        $tags = $DB->get_records('tag', array('isstandard' => '1'));
+        // Only get the tags in the collection for this item type.
+        $tagcollectionid = core_tag_area::get_collection($component, $itemtype);
+        $tags = core_tag_collection::get_tags($tagcollectionid);
+
+        // Create a on/off field for every official tag.
         foreach ($tags as $tag) {
             $tagid = $tag->id;
             $name = $tag->name;
-            $join = "{$type}_tag_$tagid";
+            $join = "{$itemtype}_tag_$tagid";
             $columnoptions[] = new rb_column_option(
                 'tags',
                 $join,
@@ -5614,23 +5650,39 @@ abstract class rb_base_source {
 
 
     /**
+     * DEPRECATED: The tag API has changed and your code needs to be updated.
+     *
+     * Please call add_core_fields_to_filters instead.
+     *
+     * @deprecated since Totara 10
+     */
+    protected function add_tag_fields_to_filters($component, $itemtype, &$filteroptions) {
+        throw new coding_exception('add_tag_fields_to_filters has been deprecated due to tag API changes, please upgrade your code to call add_core_tag_fields_to_filters instead.', DEBUG_DEVELOPER);
+    }
+
+
+    /**
      * Adds some common tag filters to the $filteroptions array
      *
-     * @param string $type tag itemtype
+     * @param string $component component for the tag
+     * @param string $itemtype tag itemtype
      * @param array &$filteroptions Array of current filter options
      *                              Passed by reference and updated by
      *                              this method
      * @return True
      */
-    protected function add_tag_fields_to_filters($type, &$filteroptions) {
+    protected function add_core_tag_fields_to_filters($component, $itemtype, &$filteroptions) {
         global $DB;
 
-        // create a yes/no filter for every official tag
-        $tags = $DB->get_records('tag', array('isstandard' => 1));
+        // Only get the tags in the collection for this item type.
+        $tagcollectionid = core_tag_area::get_collection($component, $itemtype);
+        $tags = core_tag_collection::get_tags($tagcollectionid);
+
+        // Create a yes/no filter for every official tag
         foreach ($tags as $tag) {
             $tagid = $tag->id;
             $name = $tag->name;
-            $join = "{$type}_tag_{$tagid}";
+            $join = "{$itemtype}_tag_{$tagid}";
             $filteroptions[] = new rb_filter_option(
                 'tags',
                 $join,
@@ -5643,6 +5695,12 @@ abstract class rb_base_source {
             );
         }
 
+        // Build filter list from tag list.
+        $tagoptions = array();
+        foreach ($tags as $tag) {
+            $tagoptions[$tag->id] = $tag->name;
+        }
+
         // create a tag list selection filter
         $filteroptions[] = new rb_filter_option(
             'tags',         // type
@@ -5650,16 +5708,16 @@ abstract class rb_base_source {
             get_string('tags', 'totara_reportbuilder'), // label
             'multicheck',     // filtertype
             array(            // options
-                'selectchoices' => $this->rb_filter_tags_list(),
+                'selectchoices' => $tagoptions,
                 'concat' => true, // Multicheck filter needs to know that we are working with concatenated values
                 'showcounts' => array(
-                        'joins' => array("LEFT JOIN (SELECT ti.itemid, ti.tagid FROM {{$type}} base " .
+                        'joins' => array("LEFT JOIN (SELECT ti.itemid, ti.tagid FROM {{$itemtype}} base " .
                                                       "LEFT JOIN {tag_instance} ti ON base.id = ti.itemid " .
-                                                            "AND ti.itemtype = '{$type}'" .
+                                                            "AND ti.itemtype = '{$itemtype}'" .
                                                       "LEFT JOIN {tag} tag ON ti.tagid = tag.id " .
-                                                            "AND tag.isstandard = '1')\n {$type}_tagids_filter " .
-                                                "ON base.id = {$type}_tagids_filter.itemid"),
-                        'dataalias' => $type.'_tagids_filter',
+                                                            "AND tag.isstandard = '1')\n {$itemtype}_tagids_filter " .
+                                                "ON base.id = {$itemtype}_tagids_filter.itemid"),
+                        'dataalias' => $itemtype.'_tagids_filter',
                         'datafield' => 'tagid')
             )
         );

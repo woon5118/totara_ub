@@ -398,6 +398,50 @@ class core_tag_collection {
     }
 
     /**
+     * Returns a list of tags in a collection.
+     *
+     *
+     * @param int $tagcollid
+     * @param null|bool $isstandard return only standard tags
+     * @param int $limit maximum number of tags to retrieve, tags are sorted by the instance count
+     *            descending here regardless of $sort parameter
+     * @param string $sort sort order for display, default 'name' - tags will be sorted after they are retrieved
+     * @param string $search search string
+     *
+     * @return array List of tags in the collection
+     */
+    public static function get_tags($tagcollid, $isstandard = false, $limit = 150, $sort = 'name',
+            $search = '') {
+
+        global $DB;
+
+        $fromclause = 'FROM {tag} tg';
+        $whereclause = 'WHERE 1=1';
+        list($sql, $params) = $DB->get_in_or_equal($tagcollid ? array($tagcollid) :
+            array_keys(self::get_collections(true)));
+        $whereclause .= ' AND tg.tagcollid ' . $sql;
+        if ($isstandard) {
+            $whereclause .= ' AND tg.isstandard = 1';
+        }
+
+        if (strval($search) !== '') {
+            $whereclause .= ' AND tg.name LIKE ?';
+            $params[] = '%' . core_text::strtolower($search) . '%';
+        }
+
+        $tags = array();
+
+        $tags = $DB->get_records_sql(
+            "SELECT tg.id, tg.rawname, tg.name, tg.isstandard, tg.flag, tg.tagcollid
+            $fromclause
+            $whereclause
+            ORDER BY tg.name ASC",
+            $params, 0, $limit);
+
+        return $tags;
+    }
+
+    /**
      * This function is used to sort the tags in the cloud.
      *
      * @param   string $a Tag name to compare against $b

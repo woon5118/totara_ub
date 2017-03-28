@@ -205,7 +205,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_course_category_table_to_joinlist($joinlist,
             'course', 'category');
         $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_tag_tables_to_joinlist('course', $joinlist, 'facetoface', 'course');
+        $this->add_core_tag_tables_to_joinlist('core', 'course', $joinlist, 'facetoface', 'course');
 
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
 
@@ -526,7 +526,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_course_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions);
         $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_tag_fields_to_columns('course', $columnoptions);
+        $this->add_core_tag_fields_to_columns('core', 'course', $columnoptions);
 
         $this->add_facetoface_session_roles_to_columns($columnoptions);
         $this->add_assets_fields_to_columns($columnoptions);
@@ -681,7 +681,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_course_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
         $this->add_job_assignment_fields_to_filters($filteroptions);
-        $this->add_tag_fields_to_filters('course', $filteroptions);
+        $this->add_core_tag_fields_to_filters('core', 'course', $filteroptions);
 
         // add session role fields to filters
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
