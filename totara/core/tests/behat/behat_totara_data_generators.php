@@ -29,7 +29,7 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 require_once(__DIR__ . '/helper_generator.php');
 
 use Behat\Gherkin\Node\TableNode as TableNode;
-use Behat\Behat\Exception\PendingException as PendingException;
+use Behat\Behat\Tester\Exception\PendingException as PendingException;
 
 /**
  * Class to set up quickly a Given environment.

@@ -33,7 +33,7 @@
 
 use Behat\Behat\Context\Step\Then as Then;
 use Behat\Gherkin\Node\TableNode as TableNode;
-use Behat\Behat\Exception\PendingException as PendingException;
+use Behat\Behat\Tester\Exception\PendingException as PendingException;
 
 class behat_totara_hierarchy extends behat_base {
 
