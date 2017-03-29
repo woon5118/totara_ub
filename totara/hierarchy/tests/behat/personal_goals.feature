@@ -426,7 +426,7 @@ Scenario: Verify personal goal data can be added to an appraisal.
   # Login as a learner and start the appraisal.
   And I click on "Latest Appraisal" in the totara menu
   And I press "Start"
-  Then I should see "In progress"
+  Then I should see "Incomplete"
 
   # Add the personal goal to the appraisal.
   When I press "Choose goals to review"
@@ -454,7 +454,7 @@ Scenario: Verify personal goal data can be added to an appraisal.
     | customfield_url1_1[target]       | 1                         |
     | Your answer                      | How did I do?             |
 
-  And I press "Complete Stage"
+  And I press "Complete stage"
   Then I should see "You have completed this stage"
   And I log out
 
@@ -498,7 +498,7 @@ Scenario: Verify personal goal data can be added to an appraisal.
     | Your answer                      | Not bad.                       |
 
   And I upload "/totara/hierarchy/tests/behat/fixtures/logo.png" file to "File 1" filemanager
-  And I press "Complete Stage"
+  And I press "Complete stage"
   Then I should see "You have completed this stage"
 
   # Verify the fields are stored.
