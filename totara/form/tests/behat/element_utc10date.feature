@@ -18,20 +18,20 @@ Feature: Totara form utc10date element tests
       | Required basic utc10date | 2018-09-09 |
     And I press "Save changes"
     Then I should see "The form has been submit"
-    And "utc10date_basic" row "Value" column of "form_results" table should contain "2015/07/26"
-    And "utc10date_required" row "Value" column of "form_results" table should contain "2018/09/09"
-    And "utc10date_with_current_data" row "Value" column of "form_results" table should contain "2016/03/07"
-    And "utc10date_frozen_empty" row "Value" column of "form_results" table should contain "--null--"
-    And "utc10date_frozen_with_current_data" row "Value" column of "form_results" table should contain "2016/06/23"
-    And "hiddenif_primary" row "Value" column of "form_results" table should contain "--null--"
-    And "hiddenif_secondary_a" row "Value" column of "form_results" table should contain "--null--"
-    And "hiddenif_secondary_b" row "Value" column of "form_results" table should contain "--null--"
-    And "hiddenif_secondary_e" row "Value" column of "form_results" table should contain "--null--"
-    And "hiddenif_secondary_f" row "Value" column of "form_results" table should contain "--null--"
-    And "hiddenif_required_a" row "Value" column of "form_results" table should contain "--null--"
-    And "hiddenif_required_b" row "Value" column of "form_results" table should contain "--null--"
-    And "form_select" row "Value" column of "form_results" table should contain "totara_form\form\testform\element_utc10date"
-    And "submitbutton" row "Value" column of "form_results" table should contain "1"
+    And "utc10date_basic" row "Value" column of "form_results" table should contain "«1437904800 (2015/07/26)»"
+    And "utc10date_required" row "Value" column of "form_results" table should contain "«1536487200 (2018/09/09)»"
+    And "utc10date_with_current_data" row "Value" column of "form_results" table should contain "«1457344800 (2016/03/07)»"
+    And "utc10date_frozen_empty" row "Value" column of "form_results" table should contain "«--null--»"
+    And "utc10date_frozen_with_current_data" row "Value" column of "form_results" table should contain "«1466676000 (2016/06/23)»"
+    And "hiddenif_primary" row "Value" column of "form_results" table should contain "«--null--»"
+    And "hiddenif_secondary_a" row "Value" column of "form_results" table should contain "«--null--»"
+    And "hiddenif_secondary_b" row "Value" column of "form_results" table should contain "«--null--»"
+    And "hiddenif_secondary_e" row "Value" column of "form_results" table should contain "«--null--»"
+    And "hiddenif_secondary_f" row "Value" column of "form_results" table should contain "«--null--»"
+    And "hiddenif_required_a" row "Value" column of "form_results" table should contain "«--null--»"
+    And "hiddenif_required_b" row "Value" column of "form_results" table should contain "«--null--»"
+    And "form_select" row "Value" column of "form_results" table should contain "«totara_form\form\testform\element_utc10date»"
+    And "submitbutton" row "Value" column of "form_results" table should contain "«1"
 
   @javascript
   Scenario: Test required utc10date elements in Totara forms with JavaScript enabled
@@ -43,8 +43,8 @@ Feature: Totara form utc10date element tests
       | Required basic utc10date | 2018/09/09 |
     And I press "Save changes"
     Then I should see "The form has been submit"
-    And "utc10date_basic" row "Value" column of "form_results" table should contain "2015/07/26"
-    And "utc10date_required" row "Value" column of "form_results" table should contain "2018/09/09"
+    And "utc10date_basic" row "Value" column of "form_results" table should contain "«1437904800 (2015/07/26)»"
+    And "utc10date_required" row "Value" column of "form_results" table should contain "«1536487200 (2018/09/09)»"
 
     When I press "Reset"
     Then I should see "Form: Basic utc10date element"
@@ -53,8 +53,8 @@ Feature: Totara form utc10date element tests
       | Required basic utc10date | 2018/09/09 |
     And I press "Save changes"
     Then I should see "The form has been submit"
-    And "utc10date_basic" row "Value" column of "form_results" table should contain "--null--"
-    And "utc10date_required" row "Value" column of "form_results" table should contain "2018/09/09"
+    And "utc10date_basic" row "Value" column of "form_results" table should contain "«--null--»"
+    And "utc10date_required" row "Value" column of "form_results" table should contain "«1536487200 (2018/09/09)»"
 
     When I press "Reset"
     Then I should see "Form: Basic utc10date element"
@@ -72,8 +72,8 @@ Feature: Totara form utc10date element tests
       | Required basic utc10date | 2015/07/26 |
     And I press "Save changes"
     Then I should see "The form has been submit"
-    And "utc10date_basic" row "Value" column of "form_results" table should contain "2018/09/09"
-    And "utc10date_required" row "Value" column of "form_results" table should contain "2015/07/26"
+    And "utc10date_basic" row "Value" column of "form_results" table should contain "«1536487200 (2018/09/09)»"
+    And "utc10date_required" row "Value" column of "form_results" table should contain "«1437904800 (2015/07/26)»"
 
   Scenario: Test required utc10date elements in Totara forms with JavaScript disabled
     When I select "Basic utc10date element [totara_form\form\testform\element_utc10date]" from the "Test form" singleselect
@@ -84,8 +84,8 @@ Feature: Totara form utc10date element tests
       | Required basic utc10date | 2018/09/09 |
     And I press "Save changes"
     Then I should see "The form has been submit"
-    And "utc10date_basic" row "Value" column of "form_results" table should contain "2015/07/26"
-    And "utc10date_required" row "Value" column of "form_results" table should contain "2018/09/09"
+    And "utc10date_basic" row "Value" column of "form_results" table should contain "«1437904800 (2015/07/26)»"
+    And "utc10date_required" row "Value" column of "form_results" table should contain "«1536487200 (2018/09/09)»"
 
     When I press "Reset"
     Then I should see "Form: Basic utc10date element"
@@ -94,8 +94,8 @@ Feature: Totara form utc10date element tests
       | Required basic utc10date | 2018/09/09 |
     And I press "Save changes"
     Then I should see "The form has been submit"
-    And "utc10date_basic" row "Value" column of "form_results" table should contain "--null--"
-    And "utc10date_required" row "Value" column of "form_results" table should contain "2018/09/09"
+    And "utc10date_basic" row "Value" column of "form_results" table should contain "«--null--»"
+    And "utc10date_required" row "Value" column of "form_results" table should contain "«1536487200 (2018/09/09)»"
 
     When I press "Reset"
     Then I should see "Form: Basic utc10date element"
@@ -112,8 +112,8 @@ Feature: Totara form utc10date element tests
       | Required basic utc10date | 2018/09/09 |
     And I press "Save changes"
     Then I should see "The form has been submit"
-    And "utc10date_basic" row "Value" column of "form_results" table should contain "2015/07/26"
-    And "utc10date_required" row "Value" column of "form_results" table should contain "2018/09/09"
+    And "utc10date_basic" row "Value" column of "form_results" table should contain "«1437904800 (2015/07/26)»"
+    And "utc10date_required" row "Value" column of "form_results" table should contain "«1536487200 (2018/09/09)»"
 
   @javascript
   Scenario: Test hidden if on utc10date elements in Totara forms
@@ -161,17 +161,17 @@ Feature: Totara form utc10date element tests
       | Visible when 'Required basic utc10date' is not empty | 2000 02 28 |
     And I press "Save changes"
     Then I should see "The form has been submit"
-    And "utc10date_basic" row "Value" column of "form_results" table should contain "2015/07/26"
-    And "utc10date_required" row "Value" column of "form_results" table should contain "2020/08/06"
-    And "utc10date_with_current_data" row "Value" column of "form_results" table should contain "1999/12/01"
-    And "utc10date_frozen_empty" row "Value" column of "form_results" table should contain "--null--"
-    And "utc10date_frozen_with_current_data" row "Value" column of "form_results" table should contain "2016/06/23"
-    And "hiddenif_primary" row "Value" column of "form_results" table should contain "2016/06/23"
-    And "hiddenif_secondary_a" row "Value" column of "form_results" table should contain "2017/06/05"
-    And "hiddenif_secondary_b" row "Value" column of "form_results" table should contain "1987/12/31"
-    And "hiddenif_secondary_e" row "Value" column of "form_results" table should contain "2000/01/01"
-    And "hiddenif_secondary_f" row "Value" column of "form_results" table should contain "2000/03/31"
-    And "hiddenif_required_a" row "Value" column of "form_results" table should contain "2000/02/28"
-    And "hiddenif_required_b" row "Value" column of "form_results" table should contain "2000/02/28"
-    And "form_select" row "Value" column of "form_results" table should contain "totara_form\form\testform\element_utc10date"
-    And "submitbutton" row "Value" column of "form_results" table should contain "1"
+    And "utc10date_basic" row "Value" column of "form_results" table should contain "«1437904800 (2015/07/26)»"
+    And "utc10date_required" row "Value" column of "form_results" table should contain "«1596708000 (2020/08/06)»"
+    And "utc10date_with_current_data" row "Value" column of "form_results" table should contain "«944042400 (1999/12/01)»"
+    And "utc10date_frozen_empty" row "Value" column of "form_results" table should contain "«--null--»"
+    And "utc10date_frozen_with_current_data" row "Value" column of "form_results" table should contain "«1466676000 (2016/06/23)»"
+    And "hiddenif_primary" row "Value" column of "form_results" table should contain "«1466676000 (2016/06/23)»"
+    And "hiddenif_secondary_a" row "Value" column of "form_results" table should contain "«1496656800 (2017/06/05)»"
+    And "hiddenif_secondary_b" row "Value" column of "form_results" table should contain "«567943200 (1987/12/31)»"
+    And "hiddenif_secondary_e" row "Value" column of "form_results" table should contain "«946720800 (2000/01/01)»"
+    And "hiddenif_secondary_f" row "Value" column of "form_results" table should contain "«954496800 (2000/03/31)»"
+    And "hiddenif_required_a" row "Value" column of "form_results" table should contain "«951732000 (2000/02/28)»"
+    And "hiddenif_required_b" row "Value" column of "form_results" table should contain "«951732000 (2000/02/28)»"
+    And "form_select" row "Value" column of "form_results" table should contain "«totara_form\form\testform\element_utc10date»"
+    And "submitbutton" row "Value" column of "form_results" table should contain "«1»"
