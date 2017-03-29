@@ -1278,7 +1278,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      *     - tagid - id of tag
      * @param array $options display options, same as in get_courses() except 'recursive' is ignored -
      *                       search is always category-independent
-     * @param array $requiredcapabilites List of capabilities required to see return course.
+     * @param array $requiredcapabilities List of capabilities required to see return course.
      * @return course_in_list[]
      */
     public static function search_courses($search, $options = array(), $requiredcapabilities = array()) {

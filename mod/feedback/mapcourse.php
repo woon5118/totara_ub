@@ -41,7 +41,7 @@ $context = context_module::instance($cm->id);
 require_capability('mod/feedback:mapcourse', $context);
 
 $coursemap = array_keys(feedback_get_courses_from_sitecourse_map($feedback->id));
-$form = new mod_feedback_course_map_form();
+$form = new mod_feedback_course_map_form(null, array('mappedcourses' => $coursemap));
 $form->set_data(array('id' => $cm->id, 'mappedcourses' => $coursemap));
 $mainurl = new moodle_url('/mod/feedback/view.php', ['id' => $id]);
 if ($form->is_cancelled()) {

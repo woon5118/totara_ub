@@ -55,8 +55,15 @@ if (\core_search\manager::is_global_search_enabled() === false) {
 
 $search = \core_search\manager::instance();
 
+// Current course ids need to be passed to the form during creation.
+$courseids = optional_param('courseids', '', PARAM_RAW);
+if (!empty($courseids)) {
+    $courseids = explode(',', $courseids);
+    $courseids = clean_param_array($courseids, PARAM_INT);
+}
+
 // We first get the submitted data as we want to set it all in the page URL.
-$mform = new \core_search\output\form\search(null, array('searchengine' => $search->get_engine()->get_plugin_name()));
+$mform = new \core_search\output\form\search(null, array('searchengine' => $search->get_engine()->get_plugin_name(), 'courseids' => $courseids));
 
 $data = $mform->get_data();
 if (!$data && $q) {
@@ -70,10 +77,8 @@ if (!$data && $q) {
         $areaids = explode(',', $areaids);
         $data->areaids = clean_param_array($areaids, PARAM_ALPHANUMEXT);
     }
-    $courseids = optional_param('courseids', '', PARAM_RAW);
     if (!empty($courseids)) {
-        $courseids = explode(',', $courseids);
-        $data->courseids = clean_param_array($courseids, PARAM_INT);
+        $data->courseids = $courseids;
     }
     $data->timestart = optional_param('timestart', 0, PARAM_INT);
     $data->timeend = optional_param('timeend', 0, PARAM_INT);

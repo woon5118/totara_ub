@@ -764,6 +764,8 @@ function get_courses_page($categoryid="all", $sort="c.sortorder ASC", $fields="c
 /**
  * A list of courses that match a search
  *
+ * Note that all courses will be returned if no search criteria are provided.
+ *
  * @global object
  * @global object
  * @param array $searchterms An array of search criteria
@@ -863,9 +865,6 @@ function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$total
         // Preload contexts only for hidden courses or courses we need to return.
         context_helper::preload_from_record($course);
         $coursecontext = context_course::instance($course->id);
-        if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', $coursecontext)) {
-            continue;
-        }
         if (!empty($requiredcapabilities)) {
             if (!has_all_capabilities($requiredcapabilities, $coursecontext)) {
                 continue;

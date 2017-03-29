@@ -69,10 +69,13 @@ class MoodleQuickForm_course extends MoodleQuickForm_autocomplete {
      *                       'multiple' - boolean multi select
      *                       'exclude' - array or int, list of course ids to never show
      *                       'requiredcapabilities' - array of capabilities. Uses ANY to combine them.
+     *                       'currentdata' - array of course ids that are currently selected - must be provided if the course might not be visible to the viewer
      *                       'limittoenrolled' - boolean Limits to enrolled courses.
      *                       'includefrontpage' - boolean Enables the frontpage to be selected.
      */
     public function __construct($elementname = null, $elementlabel = null, $options = array()) {
+        global $DB;
+
         if (isset($options['multiple'])) {
             $this->multiple = $options['multiple'];
         }
@@ -104,11 +107,24 @@ class MoodleQuickForm_course extends MoodleQuickForm_autocomplete {
         if (isset($options['placeholder'])) {
             $validattributes['placeholder'] = $options['placeholder'];
         }
-        if (!empty($options['includefrontpage'])) {
+        // Front page course option can only be shown if the user has the capability. If the front page is inaccessible but
+        // already selected, then it should have been specified in currentdata, and will appear selected in the form element.
+        if (!empty($options['includefrontpage']) && has_capability('moodle/course:view', context_course::instance(SITEID))) {
             $validattributes['data-includefrontpage'] = SITEID;
         }
 
         parent::__construct($elementname, $elementlabel, array(), $validattributes);
+
+        // Set up all currently selected courses as options, so that they will definitely exist.
+        if (isset($options['currentdata'])) {
+            foreach ($options['currentdata'] as $courseid) {
+                $course = $DB->get_record('course', array('id' => $courseid));
+                context_helper::preload_from_record($course);
+                $context = context_course::instance($course->id);
+                $label = format_string(get_course_display_name_for_list($course), true, ['context' => $context]);
+                $this->addOption($label, $courseid);
+            }
+        }
     }
 
     /**
@@ -119,46 +135,32 @@ class MoodleQuickForm_course extends MoodleQuickForm_autocomplete {
      */
     public function setValue($value) {
         global $DB;
-        $values = (array) $value;
-        $coursestofetch = array();
 
-        foreach ($values as $onevalue) {
-            if ((!$this->optionExists($onevalue)) &&
-                    ($onevalue !== '_qf__force_multiselect_submission')) {
-                array_push($coursestofetch, $onevalue);
+        $courseids = (array) $value;
+        $coursestoadd = array();
+
+        // We only need to validate submitted course ids if they are not already in the list of options.
+        foreach ($courseids as $courseid) {
+            if ((!$this->optionExists($courseid)) &&
+                ($courseid !== '_qf__force_multiselect_submission')) {
+                array_push($coursestoadd, $courseid);
             }
         }
 
-        if (empty($coursestofetch)) {
-            return $this->setSelected($values);
-        }
-
-        // There is no API function to load a list of course from a list of ids.
-        $ctxselect = context_helper::get_preload_record_columns_sql('ctx');
-        $fields = array('c.id', 'c.category', 'c.sortorder',
-                        'c.shortname', 'c.fullname', 'c.idnumber',
-                        'c.startdate', 'c.visible', 'c.cacherev');
-        list($whereclause, $params) = $DB->get_in_or_equal($coursestofetch, SQL_PARAMS_NAMED, 'id');
-
-        $sql = "SELECT ". join(',', $fields). ", $ctxselect
-                FROM {course} c
-                JOIN {context} ctx ON c.id = ctx.instanceid AND ctx.contextlevel = :contextcourse
-                WHERE c.id ". $whereclause." ORDER BY c.sortorder";
-        $list = $DB->get_records_sql($sql, array('contextcourse' => CONTEXT_COURSE) + $params);
-
-        $coursestoselect = array();
-        foreach ($list as $course) {
-            context_helper::preload_from_record($course);
-            $context = context_course::instance($course->id);
-            // Make sure we can see the course.
-            if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', $context)) {
-                continue;
+        foreach ($coursestoadd as $courseid) {
+            if (totara_course_is_viewable($courseid)) {
+                $context = context_course::instance($courseid);
+                if (empty($this->requiredcapabilities) || has_any_capability($this->requiredcapabilities, $context)) {
+                    // The course is valid, so add it to the list of options (so that it is not removed during validation).
+                    $course = $DB->get_record('course', array('id' => $courseid));
+                    context_helper::preload_from_record($course);
+                    $context = context_course::instance($course->id);
+                    $label = format_string(get_course_display_name_for_list($course), true, ['context' => $context]);
+                    $this->addOption($label, $courseid);
+                }
             }
-            $label = format_string(get_course_display_name_for_list($course), true, ['context' => $context]);
-            $this->addOption($label, $course->id);
-            array_push($coursestoselect, $course->id);
         }
 
-        return $this->setSelected($values);
+        return $this->setSelected($courseids);
     }
 }

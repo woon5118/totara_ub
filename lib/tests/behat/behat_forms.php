@@ -491,6 +491,17 @@ class behat_forms extends behat_base {
     }
 
     /**
+     * Enters a search term into an autocomplete field without selecting anything.
+     *
+     * @When I search for :arg1 in the :arg2 autocomplete
+     */
+    public function i_search_for_in_the_autocomplete($text, $inputlabel) {
+        /** @var behat_form_autocomplete $field */
+        $field = behat_field_manager::get_form_field_from_label($inputlabel, $this);
+        $field->search_value($text);
+    }
+
+    /**
      * Select a value from single select and redirect.
      *
      * @Given /^I select "(?P<singleselect_option_string>(?:[^"]|\\")*)" from the "(?P<singleselect_name_string>(?:[^"]|\\")*)" singleselect$/
