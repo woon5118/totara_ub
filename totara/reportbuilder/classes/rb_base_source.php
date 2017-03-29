@@ -4665,6 +4665,7 @@ abstract class rb_base_source {
                                 "LEFT JOIN {{$cf_prefix}_info_data_param} {$cf_prefix}_idpt_{$id} " .
                                        "ON {$cf_prefix}_idt_{$id}.id = {$cf_prefix}_idpt_{$id}.dataid"),
                         'basefields' => array("{$join}.id AS base_{$cf_prefix}_idt_{$id}"),
+                        'basegroups' => array("{$join}.id"),
                         'dependency' => $join,
                         'dataalias' => "{$cf_prefix}_idpt_{$id}",
                         'datafield' => "value");
@@ -4692,6 +4693,7 @@ abstract class rb_base_source {
                                 "LEFT JOIN {{$cf_prefix}_info_data_param} {$cf_prefix}_idpi_{$id} " .
                                        "ON {$cf_prefix}_idi_{$id}.id = {$cf_prefix}_idpi_{$id}.dataid"),
                         'basefields' => array("{$join}.id AS base_{$cf_prefix}_idi_{$id}"),
+                        'basegroups' => array("{$join}.id"),
                         'dependency' => $join,
                         'dataalias' => "{$cf_prefix}_idpi_{$id}",
                         'datafield' => "value");
