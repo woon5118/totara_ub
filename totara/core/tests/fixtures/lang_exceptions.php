@@ -31,6 +31,7 @@ $exceptions = array(
         'cfgwwwrootslashwarning', // Link to moodle tracker
         'cfgwwwrootwarning', // Link to moodle tracker,
         'eventshandlersinuse', // Link to docs
+        'profilevisible_help', // Capabilities for profile editing
         'unsupporteddbfileformat', // Link to docs
     ),
     'core_cohort' => array('visible_help'), // Caps.

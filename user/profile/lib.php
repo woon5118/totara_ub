@@ -22,9 +22,25 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define ('PROFILE_VISIBLE_ALL',     '2'); // Only visible for users with moodle/user:update capability.
-define ('PROFILE_VISIBLE_PRIVATE', '1'); // Either we are viewing our own profile or we have moodle/user:update capability.
-define ('PROFILE_VISIBLE_NONE',    '0'); // Only visible for moodle/user:update capability.
+/**
+ * Custom profile fields are visible to everybody who may view profile.
+ */
+define ('PROFILE_VISIBLE_ALL',     '2');
+/**
+ * All users may view own private profile fields, other users need
+ * "moodle/user:viewalldetails" capability in user context
+ * or "moodle/course:viewhiddenuserfields" capability in course context.
+ */
+define ('PROFILE_VISIBLE_PRIVATE', '1');
+/**
+ * Only users with "moodle/user:viewalldetails" capability in user context
+ * or "moodle/course:viewhiddenuserfields" capability in course context
+ * may see this field value.
+ *
+ * The value can be updated only by users with moodle/user:update capability
+ * in user context.
+ */
+define ('PROFILE_VISIBLE_NONE',    '0');
 
 /**
  * Base class for the customisable profile fields.
@@ -361,6 +377,7 @@ class profile_field_base {
                     return has_capability('moodle/user:viewalldetails',
                             context_user::instance($this->userid));
                 }
+            case PROFILE_VISIBLE_NONE:
             default:
                 return has_capability('moodle/user:viewalldetails',
                         context_user::instance($this->userid));

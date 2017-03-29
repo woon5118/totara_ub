@@ -50,27 +50,43 @@ final class user_customfield extends base {
      ) {
         GLOBAL $USER;
 
-        $visibility = empty($column->extracontext['visible'])
-                      ? PROFILE_VISIBLE_ALL
-                      : $column->extracontext['visible'];
+        $visibility = $column->extracontext['visible'];
 
-        $hiddenmsg = get_string('hiddencellvalue', 'totara_reportbuilder');
-        $isadmin = is_siteadmin($USER);
+        if ($visibility == PROFILE_VISIBLE_NONE) {
+            $extrafields = self::get_extrafields_row($row, $column);
+            if (empty($extrafields->userid)) {
+                // This happens when we use LEFT join to find user id and profile data is missing.
+                $context = \context_system::instance();
+            } else {
+                $context = \context_user::instance($extrafields->userid, IGNORE_MISSING);
+                if (!$context) {
+                    // Deleted user.
+                    $context = \context_system::instance();
+                }
+            }
+            if (!has_capability('moodle/user:viewalldetails', $context)) {
+                return get_string('hiddencellvalue', 'totara_reportbuilder');
+            }
 
-        if ($visibility === PROFILE_VISIBLE_NONE && !$isadmin) {
-            // It should be not be possible to get here because this should be
-            // checked elsewhere but you cannot count on that...
-            return $hiddenmsg;
-        }
-        else if ($visibility === PROFILE_VISIBLE_PRIVATE
-                 && $USER->id != $row->id
-                 && !$isadmin
-                 && !has_capability(
-                    'totara/core:viewhiddenusercustomfielddata',
-                    \context_system::instance()
-                 )
-        ) {
-            return $hiddenmsg;
+        } else if ($visibility == PROFILE_VISIBLE_PRIVATE) {
+            $extrafields = self::get_extrafields_row($row, $column);
+            if (!empty($extrafields->userid) and $USER->id == $extrafields->userid) {
+                // Fine - users can view own profile data.
+            } else {
+                if (empty($extrafields->userid)) {
+                    // This happens when we use LEFT join to find user id and profile data is missing.
+                    $context = \context_system::instance();
+                } else {
+                    $context = \context_user::instance($extrafields->userid, IGNORE_MISSING);
+                    if (!$context) {
+                        // Deleted user.
+                        $context = \context_system::instance();
+                    }
+                }
+                if (!has_capability('moodle/user:viewalldetails', $context)) {
+                    return get_string('hiddencellvalue', 'totara_reportbuilder');
+                }
+            }
         }
 
         // If it gets to here, it means the current user has the rights to see

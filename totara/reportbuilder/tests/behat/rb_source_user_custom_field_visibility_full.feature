@@ -18,8 +18,8 @@ Feature: Full visibility of user report source custom field values
       | user  | role       | contextlevel | reference |
       | chief | BigBrother | System       |           |
     And the following "permission overrides" exist:
-      | capability                                | permission | role       | contextlevel | reference |
-      | totara/core:viewhiddenusercustomfielddata | Allow      | BigBrother | System       |           |
+      | capability                 | permission | role       | contextlevel | reference |
+      | moodle/user:viewalldetails | Allow      | BigBrother | System       |           |
 
     Given I log in as "admin"
     And I navigate to "User profile fields" node in "Site administration > Users > Accounts"

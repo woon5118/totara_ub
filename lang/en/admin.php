@@ -921,8 +921,8 @@ $string['profileshortnamenotunique'] = 'This short name is already in use';
 $string['profilesignup'] = 'Display on signup page?';
 $string['profilespecificsettings'] = 'Specific settings';
 $string['profilevisible'] = 'Who is this field visible to?';
-$string['profilevisible_help'] = '* Not visible - For private data only viewable by administrators
-* Restricted visibility - For private data only viewable by the user, the administrators and anyone with the "totara/core:viewhiddenusercustomfielddata" capability.
+$string['profilevisible_help'] = '* Not visible - For private data only viewable by users with "moodle/user:viewalldetails" capability in user context or "moodle/course:viewhiddenuserfields" capability in course context.
+* Restricted visibility - For private data only viewable by the user, and anyone with the "moodle/user:viewalldetails" capability or "moodle/course:viewhiddenuserfields" capability in course context.
 * Visible to everyone';
 $string['profilevisibleall'] = 'Visible to everyone';
 $string['profilevisiblenone'] = 'Not visible';

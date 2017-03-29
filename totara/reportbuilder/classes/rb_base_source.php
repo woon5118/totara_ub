@@ -4537,15 +4537,18 @@ abstract class rb_base_source {
         }
 
         $seek = false;
+        $jointable = false;
         foreach ($joinlist as $object) {
             $seek = ($object->name == $join);
             if ($seek) {
+                $jointable = $object->table;
                 break;
             }
         }
 
         if ($join == 'base') {
             $seek = 'base';
+            $jointable = $this->base;
         }
 
         if (!$seek) {
@@ -4578,7 +4581,7 @@ abstract class rb_base_source {
             $name = isset($record->fullname) ? $record->fullname : $record->name;
             $column_options = array('joins' => $joinname);
             // If profile field isn't available to everyone require a capability to display the column.
-            if ($cf_prefix == 'user' && $record->visible === PROFILE_VISIBLE_NONE) {
+            if ($cf_prefix == 'user' && $record->visible == PROFILE_VISIBLE_NONE) {
                 $column_options['capability'] = 'moodle/user:viewalldetails';
             }
             $filtertype = 'text'; // default filter type
@@ -4815,6 +4818,13 @@ abstract class rb_base_source {
                 $column_options['displayfunc'] = 'user_customfield';
                 $column_options['extracontext']['visible'] = $record->visible;
                 $column_options['extracontext']['datatype'] = $record->datatype;
+                if ($jointable === '{user}') {
+                    // We are linking the user table, it is safe to use the id directly.
+                    $column_options['extrafields']['userid'] = "{$join}.id";
+                } else {
+                    // This comes from a left join, we will have problems with NULLs if profile data is missing.
+                    $column_options['extrafields']['userid'] = "{$joinname}.{$joinfield}";
+                }
             }
 
             $joinlist[] = new rb_join(

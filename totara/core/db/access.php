@@ -190,14 +190,4 @@ $capabilities = array(
         'archetypes'    => array(
         ),
     ),
-
-    // Allows users to see still see user custom field values in reports if the
-    // custom field visibility is set to "restricted". Otherwise, only the value
-    // can only be seen by the owner of the record being displayed.
-    'totara/core:viewhiddenusercustomfielddata' => array(
-        'riskbitmask' => RISK_PERSONAL,
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array()
-    ),
 );
