@@ -314,7 +314,13 @@ class rb_source_program_overview extends rb_base_source {
                 'program_completion',
                 'progress',
                 get_string('programcompletionprogress', 'rb_source_program_overview'),
-                $DB->sql_concat_join("'|'", array(sql_cast2char('prog_courseset.id'), sql_cast2char("prog_completion.status"))),
+                $DB->sql_concat_join(
+                    "'|'",
+                    array(
+                        $DB->sql_cast_2char('prog_courseset.id'),
+                        $DB->sql_cast_2char("prog_completion.status")
+                    )
+                ),
                 array(
                     'displayfunc' => 'program_completion_progress',
                     'grouping' => 'comma_list',
@@ -427,7 +433,7 @@ class rb_source_program_overview extends rb_base_source {
                 'course',
                 'status',
                 get_string('coursecompletionstatus', 'rb_source_program_overview'),
-                'COALESCE('.sql_cast2char('course_completions.status').', \''.COMPLETION_STATUS_NOTYETSTARTED.'\')',
+                'COALESCE('.$DB->sql_cast_2char('course_completions.status').', \''.COMPLETION_STATUS_NOTYETSTARTED.'\')',
                 array(
                     'joins' => 'course_completions',
                     'grouping' => 'sql_aggregate',
@@ -446,7 +452,7 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'timeenrolled',
             get_string('coursecompletiontimeenrolled', 'rb_source_program_overview'),
-            'COALESCE('.sql_cast2char('course_completions.timeenrolled').', \'-\')',
+            'COALESCE('.$DB->sql_cast_2char('course_completions.timeenrolled').', \'-\')',
             array(
                 'joins' => 'course_completions',
                 'grouping' => 'sql_aggregate',
@@ -464,7 +470,7 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'timestarted',
             get_string('coursecompletiontimestarted', 'rb_source_program_overview'),
-            'COALESCE('.sql_cast2char('course_completions.timestarted').', \'-\')',
+            'COALESCE('.$DB->sql_cast_2char('course_completions.timestarted').', \'-\')',
             array(
                 'joins' => 'course_completions',
                 'grouping' => 'sql_aggregate',
@@ -482,7 +488,7 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'timecompleted',
             get_string('coursecompletiontimecompleted', 'rb_source_program_overview'),
-            'COALESCE('.sql_cast2char('course_completions.timecompleted').', \'-\')',
+            'COALESCE('.$DB->sql_cast_2char('course_completions.timecompleted').', \'-\')',
             array(
                 'joins' => 'course_completions',
                 'grouping' => 'sql_aggregate',
@@ -501,7 +507,7 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'finalgrade',
             get_string('finalgrade', 'rb_source_program_overview'),
-            'COALESCE('.sql_cast2char('grade_grades.finalgrade').', \'-\')',
+            'COALESCE('.$DB->sql_cast_2char('grade_grades.finalgrade').', \'-\')',
             array(
                 'joins' => 'grade_grades',
                 'grouping' => 'sql_aggregate',
@@ -522,7 +528,7 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'gradepass',
             get_string('gradepass', 'rb_source_program_overview'),
-            'COALESCE('.sql_cast2char('criteria.gradepass').', \'-\')',
+            'COALESCE('.$DB->sql_cast_2char('criteria.gradepass').', \'-\')',
             array(
                 'joins' => 'criteria',
                 'grouping' => 'sql_aggregate',
@@ -562,7 +568,14 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'namelink',
             get_string('coursecategorylinked', 'totara_reportbuilder'),
-            $DB->sql_concat_join("'|'", array(sql_cast2char('course_category.id'), sql_cast2char("course_category.visible"), 'course_category.name')),
+            $DB->sql_concat_join(
+                "'|'",
+                array(
+                    $DB->sql_cast_2char('course_category.id'),
+                    $DB->sql_cast_2char("course_category.visible"),
+                    'course_category.name'
+                )
+            ),
             array(
                 'joins' => 'course_category',
                 'displayfunc' => 'link_course_category',

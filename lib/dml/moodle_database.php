@@ -2231,6 +2231,29 @@ abstract class moodle_database {
     }
 
     /**
+     * Returns the SQL to be used in order to CAST one column to FLOAT
+     *
+     * Be aware that the CHAR column you're trying to cast contains really
+     * int values or the RDBMS will throw an error!
+     *
+     * @param string fieldname the name of the field to be casted
+     * @return string the piece of SQL code to be used in your statement.
+     */
+    public function sql_cast_char2float($fieldname) {
+        return ' ' . $fieldname . ' ';
+    }
+
+    /**
+     * Returns the SQL to be used in order to CAST one column to CHAR
+     *
+     * @param string fieldname the name of the field to be casted
+     * @return string the piece of SQL code to be used in your statement.
+     */
+    public function sql_cast_2char($fieldname) {
+        return ' ' . $fieldname . ' ';
+    }
+
+    /**
      * Returns the SQL to be used in order to an UNSIGNED INTEGER column to SIGNED.
      *
      * (Only MySQL needs this. MySQL things that 1 * -1 = 18446744073709551615
@@ -2244,7 +2267,7 @@ abstract class moodle_database {
         return ' ' . $fieldname . ' ';
     }
 
-    /**
+     /**
      * Returns the SQL text to be used to compare one TEXT (clob) column with
      * one varchar column, because some RDBMS doesn't support such direct
      * comparisons.

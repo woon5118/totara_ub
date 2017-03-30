@@ -1372,7 +1372,13 @@ abstract class rb_base_source {
         $global_restriction_join_cc = $this->get_global_report_restriction_join('cc', 'userid');
         $global_restriction_join_p1 = $this->get_global_report_restriction_join('p1', 'userid');
 
-        $uniqueid = $DB->sql_concat_join("','", array(sql_cast2char('userid'), sql_cast2char('courseid')));
+        $uniqueid = $DB->sql_concat_join(
+            "','",
+            array(
+                $DB->sql_cast_2char('userid'),
+                $DB->sql_cast_2char('courseid')
+            )
+        );
         return  "(SELECT " . $uniqueid . " AS id, userid, courseid
                     FROM (SELECT ue.userid AS userid, e.courseid AS courseid
                            FROM {user_enrolments} ue
@@ -4828,16 +4834,17 @@ abstract class rb_base_source {
                 $cfield->define_load_preprocess($record);
                 $filter_options['concat'] = true;
                 $filter_options['simplemode'] = true;
-                $data = $DB->sql_group_concat_unique(sql_cast2char('cfidp.value'), '|');
 
+                $jsondata = $DB->sql_cast_2char('cfid.data');
+                $data = $DB->sql_group_concat_unique($DB->sql_cast_2char('cfidp.value'), '|');
                 $joinlist[] = new rb_join(
                         $joinname,
                         'LEFT',
-                        '(SELECT '.$data.' AS data, cfid.'.$joinfield.' AS joinid, '.sql_cast2char('cfid.data').' AS jsondata
+                        '(SELECT '.$data.' AS data, cfid.'.$joinfield.' AS joinid, '.$jsondata.' AS jsondata
                             FROM {'.$datatable.'} cfid
                             LEFT JOIN {'.$datatable.'_param} cfidp ON (cfidp.dataid = cfid.id)
                            WHERE cfid.fieldid = '.$id.'
-                           GROUP BY cfid.'.$joinfield.', '.sql_cast2char('cfid.data').')',
+                           GROUP BY cfid.'.$joinfield.', '.$jsondata.')',
                         "$joinname.joinid = {$join}.id ",
                         REPORT_BUILDER_RELATION_ONE_TO_ONE,
                         $join
@@ -5666,7 +5673,8 @@ abstract class rb_base_source {
     protected function add_core_tag_tables_to_joinlist($component, $itemtype, &$joinlist, $join, $field) {
         global $DB;
 
-        $idlist = $DB->sql_group_concat(sql_cast2char('t.id'), '|');
+
+        $idlist = $DB->sql_group_concat($DB->sql_cast_2char('t.id'), '|');
         $joinlist[] = new rb_join(
             'tagids',
             'LEFT',
@@ -5681,7 +5689,8 @@ abstract class rb_base_source {
             $join
         );
 
-        $namelist = $DB->sql_group_concat(sql_cast2char('t.name'), ', ');
+
+        $namelist = $DB->sql_group_concat($DB->sql_cast_2char('t.name'), ', ');
         $joinlist[] = new rb_join(
             'tagnames',
             'LEFT',
@@ -5876,7 +5885,7 @@ abstract class rb_base_source {
     protected function add_cohort_user_tables_to_joinlist(&$joinlist, $join, $field, $alias = 'ausercohort') {
         global $DB;
 
-        $idlist = $DB->sql_group_concat_unique(sql_cast2char('cm.cohortid'),'|');
+        $idlist = $DB->sql_group_concat_unique($DB->sql_cast_2char('cm.cohortid'),'|');
         $joinlist[] = new rb_join(
             $alias,
             'LEFT',
@@ -5908,7 +5917,7 @@ abstract class rb_base_source {
 
         require_once($CFG->dirroot . '/cohort/lib.php');
 
-        $idlist = $DB->sql_group_concat_unique(sql_cast2char('customint1'), '|');
+        $idlist = $DB->sql_group_concat_unique($DB->sql_cast_2char('customint1'), '|');
         $joinlist[] = new rb_join(
             'cohortenrolledcourse',
             'LEFT',
@@ -5942,7 +5951,7 @@ abstract class rb_base_source {
 
         require_once($CFG->dirroot . '/cohort/lib.php');
 
-        $idlist = $DB->sql_group_concat_unique(sql_cast2char('assignmenttypeid'), '|');
+        $idlist = $DB->sql_group_concat_unique($DB->sql_cast_2char('assignmenttypeid'), '|');
         $joinlist[] = new rb_join(
             'cohortenrolledprogram',
             'LEFT',

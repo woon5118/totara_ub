@@ -53,8 +53,8 @@ class rb_source_dp_competency extends rb_base_source {
         $global_restriction_join_cr = $this->get_global_report_restriction_join('cr', 'userid');
         $global_restriction_join_p1 = $this->get_global_report_restriction_join('p1', 'userid');
 
-        $crjoin = $DB->sql_concat_join("','", array(sql_cast2char('cr.userid'), sql_cast2char('cr.competencyid')));
-        $pjoin  = $DB->sql_concat_join("','", array(sql_cast2char('p1.userid'), sql_cast2char('pca1.competencyid')));
+        $crjoin = $DB->sql_concat_join("','", array($DB->sql_cast_2char('cr.userid'), $DB->sql_cast_2char('cr.competencyid')));
+        $pjoin  = $DB->sql_concat_join("','", array($DB->sql_cast_2char('p1.userid'), $DB->sql_cast_2char('pca1.competencyid')));
 
         $this->base = "(
             SELECT DISTINCT {$crjoin} AS id, cr.userid AS userid, cr.competencyid AS competencyid

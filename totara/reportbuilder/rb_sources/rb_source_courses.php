@@ -63,7 +63,7 @@ class rb_source_courses extends rb_base_source {
     protected function define_joinlist() {
         global $DB;
 
-        $list = $DB->sql_group_concat_unique(sql_cast2char('m.name'), '|');
+        $list = $DB->sql_group_concat_unique($DB->sql_cast_2char('m.name'), '|');
         $joinlist = array(
             new rb_join(
                 'mods',

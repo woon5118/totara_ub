@@ -671,7 +671,7 @@ class appraisal {
             $alert->subject = get_string('closealerttitledefault', 'totara_appraisal', $this);
 
             // Find all users in roles that are not learner, who have a learner who is not finished.
-            $staffuid = $DB->sql_group_concat(sql_cast2char('usr.id'), ',');
+            $staffuid = $DB->sql_group_concat($DB->sql_cast_2char('usr.id'), ',');
             $rolesql = "SELECT ara.userid AS id, {$staffuid} AS staff
                           FROM {appraisal_user_assignment} aua
                           JOIN {appraisal_role_assignment} ara ON aua.id = ara.appraisaluserassignmentid
@@ -1708,7 +1708,9 @@ class appraisal {
     public static function get_user_appraisals($subjectid, $role, $status = array()) {
         global $DB, $USER;
         $params = array($USER->id, $role);
-        $sql = 'SELECT ' . $DB->sql_concat(sql_cast2char('a.id'), "'_'", sql_cast2char('aua.userid')) . ' AS uniqueid,
+        $aidchar    = $DB->sql_cast_2char('a.id');
+        $useridchar = $DB->sql_cast_2char('aua.userid');
+        $sql = 'SELECT ' . $DB->sql_concat($aidchar, "'_'", $useridchar) . ' AS uniqueid,
                        a.id, aua.userid, a.name, a.timestarted, aua.status, MAX(ast.timedue) AS timedue, aua.timecompleted,
                        ara.id as roleassignmentid
                   FROM {appraisal} a
@@ -2562,7 +2564,7 @@ class appraisal_stage {
                   JOIN {appraisal_quest_field} aqf
                     ON asp.id = aqf.appraisalstagepageid
                   JOIN {appraisal_quest_field} aqfr
-                    ON " . sql_cast2char('aqf.id') . ' = ' . $DB->sql_compare_text('aqfr.param1') . "
+                    ON " . $DB->sql_cast_2char('aqf.id') . ' = ' . $DB->sql_compare_text('aqfr.param1') . "
                  WHERE asp.appraisalstageid = ?";
 
         return $DB->count_records_sql($sql, array($stageid));
@@ -3449,7 +3451,7 @@ class appraisal_page {
                   LEFT JOIN {appraisal_quest_field} aqf
                     ON asp.id = aqf.appraisalstagepageid
                   LEFT JOIN {appraisal_quest_field} aqfr
-                    ON (' . sql_cast2char('aqf.id') . ' = ' . $DB->sql_compare_text('aqfr.param1') . '
+                    ON (' . $DB->sql_cast_2char('aqf.id') . ' = ' . $DB->sql_compare_text('aqfr.param1') . '
                     AND aqfr.datatype = ?)
                  WHERE asp.appraisalstageid = ?
                  GROUP BY asp.id, asp.appraisalstageid, asp.name, asp.sortorder
@@ -4266,7 +4268,7 @@ class appraisal_question extends question_storage {
         $sql = 'SELECT aqf.id, aqf.name, aqf.datatype, COUNT(aqfr.id) hasredisplay
                   FROM {appraisal_quest_field} aqf
                   LEFT JOIN {appraisal_quest_field} aqfr
-                    ON (' . sql_cast2char('aqf.id') . ' = ' . $DB->sql_compare_text('aqfr.param1') . '
+                    ON (' . $DB->sql_cast_2char('aqf.id') . ' = ' . $DB->sql_compare_text('aqfr.param1') . '
                     AND aqfr.datatype = ?)
                  WHERE aqf.appraisalstagepageid = ?
                  GROUP BY aqf.id, aqf.name, aqf.datatype, aqf.sortorder

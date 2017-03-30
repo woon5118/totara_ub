@@ -102,6 +102,8 @@ class rb_source_badge_issued extends rb_base_source {
     }
 
     protected function define_columnoptions() {
+        global $DB;
+
         $columnoptions = array(
             new rb_column_option(
                 'base',
@@ -128,7 +130,7 @@ class rb_source_badge_issued extends rb_base_source {
                 'badge',
                 'idchar',
                 'badgeid',
-                sql_cast2char('badge.id'),
+                $DB->sql_cast_2char('badge.id'),
                 array('joins' => 'badge', 'selectable' => false)
             ),
             new rb_column_option(

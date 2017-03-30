@@ -60,16 +60,16 @@ class update_competencies_task extends \core\task\scheduled_task {
         $timestarted = time();
 
         // Loop through each depth level, lowest levels first, processing individually.
-        $sql = "
-            SELECT
-                DISTINCT " . $DB->sql_concat_join("'|'", array(sql_cast2char('depthlevel'), sql_cast2char('frameworkid')))
-                . " AS depthkey, depthlevel, frameworkid
-            FROM
-                {comp}
-            ORDER BY
-                frameworkid,
-                depthlevel DESC
-        ";
+        $depthkey = $DB->sql_concat_join(
+            "'|'",
+            array(
+                $DB->sql_cast_2char('depthlevel'),
+                $DB->sql_cast_2char('frameworkid')
+            )
+        );
+        $sql = "SELECT DISTINCT {$depthkey} AS depthkey, depthlevel, frameworkid
+                FROM {comp}
+                ORDER BY frameworkid, depthlevel DESC";
 
         if ($rs = $DB->get_recordset_sql($sql)) {
 

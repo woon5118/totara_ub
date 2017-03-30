@@ -1664,32 +1664,13 @@ function get_string_in_user_lang($user, $identifier, $module='', $a=NULL, $extra
  *
  * @param string fieldname the name of the field to be casted
  * @return string the piece of SQL code to be used in your statement.
+ *
+ * @deprecated since Totara 10.0
  */
 function sql_cast2char($fieldname) {
-
     global $DB;
-
-    $sql = '';
-
-    switch ($DB->get_dbfamily()) {
-        case 'mysql':
-            $charset = $DB->get_charset();
-            $sql = ' CAST(' . $fieldname . ' AS CHAR) COLLATE ' . $charset . '_bin';
-            break;
-        case 'postgres':
-            $sql = ' CAST(' . $fieldname . ' AS VARCHAR) ';
-            break;
-        case 'mssql':
-            $sql = ' CAST(' . $fieldname . ' AS NVARCHAR(MAX)) ';
-            break;
-        case 'oracle':
-            $sql = ' TO_CHAR(' . $fieldname . ') ';
-            break;
-        default:
-            $sql = ' ' . $fieldname . ' ';
-    }
-
-    return $sql;
+    debugging('sql_cast2char() is deprecated. Use DB->sql_cast_2char() instead.', DEBUG_DEVELOPER);
+    return $DB->sql_cast_2char($fieldname);
 }
 
 
@@ -1698,28 +1679,13 @@ function sql_cast2char($fieldname) {
  *
  * @param string fieldname the name of the field to be casted
  * @return string the piece of SQL code to be used in your statement.
+ *
+ * @deprecated since Totara 10.0
  */
 function sql_cast2float($fieldname) {
     global $DB;
-
-    $sql = '';
-
-    switch ($DB->get_dbfamily()) {
-        case 'mysql':
-            $sql = ' CAST(' . $fieldname . ' AS DECIMAL(20,2)) ';
-            break;
-        case 'mssql':
-        case 'postgres':
-            $sql = ' CAST(' . $fieldname . ' AS FLOAT) ';
-            break;
-        case 'oracle':
-            $sql = ' TO_BINARY_FLOAT(' . $fieldname . ') ';
-            break;
-        default:
-            $sql = ' ' . $fieldname . ' ';
-    }
-
-    return $sql;
+    debugging('sql_cast2float() is deprecated. Use DB->sql_cast_char2float() instead.', DEBUG_DEVELOPER);
+    return $DB->sql_cast_char2float($fieldname);
 }
 
 /**

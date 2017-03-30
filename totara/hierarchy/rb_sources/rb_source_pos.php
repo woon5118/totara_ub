@@ -73,7 +73,7 @@ class rb_source_pos extends rb_base_source {
 
         $pathconcatsql = $DB->sql_concat('p.path', "'/'", "'%'");
         $global_restriction_join_ja = $this->get_global_report_restriction_join('ja', 'userid');
-        $list = $DB->sql_group_concat_unique(sql_cast2char('c.fullname'), '<br>');
+        $list = $DB->sql_group_concat_unique($DB->sql_cast_2char('c.fullname'), '<br>');
 
         $joinlist = array(
             new rb_join(

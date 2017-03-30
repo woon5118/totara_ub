@@ -101,6 +101,8 @@ class rb_filter_number extends rb_filter_type {
      * @return array containing filtering condition SQL clause and params
      */
     function get_sql_filter($data) {
+        global $DB;
+
         $operator = $data['operator'];
         $value    = (float) $data['value'];
         $query    = $this->get_field();
@@ -130,7 +132,7 @@ class rb_filter_number extends rb_filter_type {
 
         // this will cope with empty values but not anything that can't be cast to a float
         // make sure the source column only contains numbers!
-        $sql = 'CASE WHEN (' . $query . ') IS NULL THEN 0 ELSE ' . sql_cast2float($query) . ' END ' . $res;
+        $sql = 'CASE WHEN (' . $query . ') IS NULL THEN 0 ELSE ' . $DB->sql_cast_char2float($query) . ' END ' . $res;
 
         return array($sql, $params);
     }

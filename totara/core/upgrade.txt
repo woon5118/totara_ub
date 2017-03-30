@@ -33,3 +33,8 @@ change calendar_dynamic_content class in totara/core/classes/watcher/calendar_dy
 and create {modulename_hook} as sample
  # mod/facetoface/classes/hook/calendar_dynamic_content.php
  # mod/facetoface/watcher/seminar_calendar_dynamic_content.php
+
+* The following functions has been deprecated and can not be used any more:
+    - sql_cast2char()
+    - sql_cast2float()
+

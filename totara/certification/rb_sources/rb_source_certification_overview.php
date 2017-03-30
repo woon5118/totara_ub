@@ -245,7 +245,13 @@ class rb_source_certification_overview extends rb_source_program_overview {
             'certif_completion',
             'progress',
             get_string('programcompletionprogress', 'rb_source_program_overview'),
-            $DB->sql_concat_join("'|'", array(sql_cast2char('prog_courseset.id'), sql_cast2char("prog_completion.status"))),
+            $DB->sql_concat_join(
+                "'|'",
+                array(
+                    $DB->sql_cast_2char('prog_courseset.id'),
+                    $DB->sql_cast_2char("prog_completion.status")
+                )
+            ),
             array(
                 'extrafields' => array(
                     'completion' => "certif_completion.timecompleted",
@@ -283,7 +289,7 @@ class rb_source_certification_overview extends rb_source_program_overview {
             'course',
             'status',
             get_string('coursecompletionstatus', 'rb_source_program_overview'),
-            sql_cast2char('COALESCE(course_completions.status, '.COMPLETION_STATUS_NOTYETSTARTED.')'),
+            $DB->sql_cast_2char('COALESCE(course_completions.status, '.COMPLETION_STATUS_NOTYETSTARTED.')'),
             array(
                 'joins' => 'course_completions',
                 'grouping' => 'sql_aggregate',

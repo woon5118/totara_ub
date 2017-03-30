@@ -71,8 +71,8 @@ class rb_source_course_completion_all extends rb_base_source {
         $global_restriction_join_cc = $this->get_global_report_restriction_join('cc', 'userid');
         $global_restriction_join_cch = $this->get_global_report_restriction_join('cch', 'userid');
 
-        $ccuniqueid = $DB->sql_concat_join("'CC'", array(sql_cast2char('cc.id')));
-        $cchuniqueid = $DB->sql_concat_join("'CCH'", array(sql_cast2char('cch.id')));
+        $ccuniqueid = $DB->sql_concat_join("'CC'", array($DB->sql_cast_2char('cc.id')));
+        $cchuniqueid = $DB->sql_concat_join("'CCH'", array($DB->sql_cast_2char('cch.id')));
         $grade = "CASE WHEN cc.status = " . COMPLETION_STATUS_COMPLETEVIARPL . " THEN cc.rplgrade ELSE gg.finalgrade END";
         $base = "(SELECT " . $ccuniqueid . " AS id, cc.userid, cc.course AS courseid,
                          cc.timecompleted, " . $grade . " AS grade, 1 AS iscurrent

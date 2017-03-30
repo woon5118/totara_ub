@@ -1647,6 +1647,15 @@ class mysqli_native_moodle_database extends moodle_database {
         }
     }
 
+    public function sql_cast_char2float($fieldname) {
+        return ' CAST(' . $fieldname . ' AS DECIMAL(20,2)) ';
+    }
+
+    public function sql_cast_2char($fieldname) {
+        $charset = $this->get_charset();
+        return ' CAST(' . $fieldname . ' AS CHAR) COLLATE ' . $charset . '_bin';
+    }
+
     /**
      * Returns 'LIKE' part of a query.
      *

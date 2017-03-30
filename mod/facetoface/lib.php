@@ -1499,17 +1499,16 @@ function facetoface_is_session_over($session, $timenow) {
  */
 function facetoface_get_session_dates($sessionid) {
     global $DB;
-    $ret = array();
 
-    $assetid = $DB->sql_group_concat(sql_cast2char('fad.assetid'), ',');
+    $ret = array();
+    $assetid = $DB->sql_group_concat($DB->sql_cast_2char('fad.assetid'), ',');
     $sql = "
         SELECT fsd.id, fsd.sessionid, fsd.sessiontimezone, fsd.timestart, fsd.timefinish, fsd.roomid, {$assetid} AS assetids
-        FROM {facetoface_sessions_dates} fsd
-        LEFT JOIN {facetoface_asset_dates} fad ON (fad.sessionsdateid = fsd.id)
-        WHERE fsd.sessionid = :sessionid
-        GROUP BY fsd.id, fsd.sessionid, fsd.sessiontimezone, fsd.timestart, fsd.timefinish, fsd.roomid
-        ORDER BY timestart
-    ";
+          FROM {facetoface_sessions_dates} fsd
+          LEFT JOIN {facetoface_asset_dates} fad ON (fad.sessionsdateid = fsd.id)
+         WHERE fsd.sessionid = :sessionid
+         GROUP BY fsd.id, fsd.sessionid, fsd.sessiontimezone, fsd.timestart, fsd.timefinish, fsd.roomid
+         ORDER BY timestart";
     if ($dates = $DB->get_records_sql($sql, array('sessionid' => $sessionid))) {
         $i = 0;
         foreach ($dates as $date) {
@@ -6043,9 +6042,11 @@ function facetoface_get_staff_to_allocate($facetoface, $session, $managerid = nu
 
     list($usql, $params) = $DB->get_in_or_equal($staff, SQL_PARAMS_NAMED);
     // Get list of signed-ups that already exist for these users.
+    $uidchar = $DB->sql_cast_2char('u.id');
+    $sessionidchar = $DB->sql_cast_2char('su.sessionid');
     $sql = 'SELECT CASE
-                   WHEN su.sessionid IS NULL THEN '. sql_cast2char('u.id') .'
-                   ELSE '. $DB->sql_concat(sql_cast2char('u.id'), "'_'", sql_cast2char('su.sessionid')) . ' END
+                   WHEN su.sessionid IS NULL THEN '. $uidchar .'
+                   ELSE '. $DB->sql_concat($uidchar, "'_'", $sessionidchar) . ' END
                    AS uniqueid , u.*, su.sessionid, su.bookedby, b.firstname AS bookedbyfirstname, b.lastname AS bookedbylastname,
                    su.statuscode
               FROM {user} u

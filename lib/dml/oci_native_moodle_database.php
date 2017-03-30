@@ -1587,6 +1587,14 @@ class oci_native_moodle_database extends moodle_database {
         }
     }
 
+    public function sql_cast_char2float($fieldname) {
+        return ' TO_BINARY_FLOAT(' . $fieldname . ') ';
+    }
+
+    public function sql_cast_2char($fieldname) {
+        return ' TO_CHAR(' . $fieldname . ') ';
+    }
+
     /**
      * Returns 'LIKE' part of a query.
      *

@@ -74,7 +74,7 @@ class rb_source_appraisal extends rb_base_source {
     protected function define_joinlist() {
         global $DB;
 
-        $incompleteroles = $DB->sql_group_concat_unique(sql_cast2char('ara.appraisalrole'), '|');
+        $incompleteroles = $DB->sql_group_concat_unique($DB->sql_cast_2char('ara.appraisalrole'), '|');
         $joinlist = array(
             new rb_join(
                 'appraisal',
@@ -135,12 +135,12 @@ class rb_source_appraisal extends rb_base_source {
             new rb_join(
                 'activestageincomplete',
                 'LEFT',
-                '(SELECT aua.id AS appraisaluserassignmentid, ' .$incompleteroles . ' AS incompleteroles
+                "(SELECT aua.id AS appraisaluserassignmentid, {$incompleteroles} AS incompleteroles
                     FROM {appraisal_role_assignment} ara
                     LEFT JOIN {appraisal_stage_data} asd ON ara.id=asd.appraisalroleassignmentid
                     JOIN {appraisal_user_assignment} aua ON ara.appraisaluserassignmentid = aua.id
-                    WHERE asd.timecompleted is null
-                    GROUP BY aua.id)',
+                   WHERE asd.timecompleted is null
+                   GROUP BY aua.id)",
                 'base.id = activestageincomplete.appraisaluserassignmentid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 array('appraisal')
