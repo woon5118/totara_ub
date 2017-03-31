@@ -1798,5 +1798,17 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2017051503.02);
     }
 
+    if ($oldversion < 2017061200.00) {
+        $table = new xmldb_table('course_sections');
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'availability');
+
+        // Define a field 'timemodified' in the 'course_sections' table.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_main_savepoint(true, 2017061200.00);
+    }
+
     return true;
 }
