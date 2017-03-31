@@ -810,21 +810,34 @@ class file_storage {
      *
      * @param int $contextid context ID
      * @param string $component component
-     * @param string $filearea file area
+     * @param mixed $filearea file area/s, you cannot specify multiple fileareas as well as an itemid
      * @param int $itemid item ID or all files if not specified
      * @param string $sort A fragment of SQL to use for sorting
      * @param bool $includedirs whether or not include directories
+     * @param int $updatedsince return files updated since this time
      * @return stored_file[] array of stored_files indexed by pathanmehash
      */
-    public function get_area_files($contextid, $component, $filearea, $itemid = false, $sort = "itemid, filepath, filename", $includedirs = true) {
+    public function get_area_files($contextid, $component, $filearea, $itemid = false, $sort = "itemid, filepath, filename",
+                                    $includedirs = true, $updatedsince = 0) {
         global $DB;
 
-        $conditions = array('contextid'=>$contextid, 'component'=>$component, 'filearea'=>$filearea);
-        if ($itemid !== false) {
+        list($areasql, $conditions) = $DB->get_in_or_equal($filearea, SQL_PARAMS_NAMED);
+        $conditions['contextid'] = $contextid;
+        $conditions['component'] = $component;
+
+        if ($itemid !== false && is_array($filearea)) {
+            throw new coding_exception('You cannot specify multiple fileareas as well as an itemid.');
+        } else if ($itemid !== false) {
             $itemidsql = ' AND f.itemid = :itemid ';
             $conditions['itemid'] = $itemid;
         } else {
             $itemidsql = '';
+        }
+
+        $updatedsincesql = '';
+        if (!empty($updatedsince)) {
+            $conditions['time'] = $updatedsince;
+            $updatedsincesql = 'AND f.timemodified > :time';
         }
 
         $sql = "SELECT ".self::instance_sql_fields('f', 'r')."
@@ -833,7 +846,8 @@ class file_storage {
                        ON f.referencefileid = r.id
                  WHERE f.contextid = :contextid
                        AND f.component = :component
-                       AND f.filearea = :filearea
+                       AND f.filearea $areasql
+                       $updatedsincesql
                        $itemidsql";
         if (!empty($sort)) {
             $sql .= " ORDER BY {$sort}";
@@ -2003,12 +2017,13 @@ class file_storage {
         @unlink($hashfile.'.tmp');
         if (!copy($pathname, $hashfile.'.tmp')) {
             // Borked permissions or out of disk space.
+            @unlink($hashfile.'.tmp');
             ignore_user_abort($prev);
             throw new file_exception('storedfilecannotcreatefile');
         }
-        if (filesize($hashfile.'.tmp') !== $filesize) {
-            // This should not happen.
-            unlink($hashfile.'.tmp');
+        if (sha1_file($hashfile.'.tmp') !== $contenthash) {
+            // Highly unlikely edge case, but this can happen on an NFS volume with no space remaining.
+            @unlink($hashfile.'.tmp');
             ignore_user_abort($prev);
             throw new file_exception('storedfilecannotcreatefile');
         }
@@ -2217,7 +2232,12 @@ class file_storage {
             mkdir($trashpath, $this->dirpermissions, true);
         }
         rename($contentfile, $trashfile);
-        chmod($trashfile, $this->filepermissions); // fix permissions if needed
+
+        // Fix permissions, only if needed.
+        $currentperms = octdec(substr(decoct(fileperms($trashfile)), -4));
+        if ((int)$this->filepermissions !== $currentperms) {
+            chmod($trashfile, $this->filepermissions);
+        }
     }
 
     /**

@@ -24,7 +24,7 @@ Feature: Enable Block Completion in a course using manual self completion
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the following fields to these values:
-      | criteria_self_value | 1 |
+      | id_criteria_self | 1 |
     And I press "Save changes"
     And I log out
     When I log in as "student1"

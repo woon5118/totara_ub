@@ -79,12 +79,12 @@ class manager {
     const NO_OWNER_ID = 0;
 
     /**
-     * @var \core_search\area\base[] Enabled search areas.
+     * @var \core_search\base[] Enabled search areas.
      */
     protected static $enabledsearchareas = null;
 
     /**
-     * @var \core_search\area\base[] All system search areas.
+     * @var \core_search\base[] All system search areas.
      */
     protected static $allsearchareas = null;
 
@@ -101,7 +101,7 @@ class manager {
     /**
      * Constructor, use \core_search\manager::instance instead to get a class instance.
      *
-     * @param \core_search\area\base The search engine to use
+     * @param \core_search\base The search engine to use
      */
     public function __construct($engine) {
         $this->engine = $engine;
@@ -121,6 +121,10 @@ class manager {
         // One per request, this should be purged during testing.
         if (static::$instance !== null) {
             return static::$instance;
+        }
+
+        if (empty($CFG->searchengine)) {
+            throw new \core_search\engine_exception('enginenotselected', 'search');
         }
 
         if (!$engine = static::search_engine_instance()) {
@@ -191,19 +195,17 @@ class manager {
      * Returns a new area search indexer instance.
      *
      * @param string $areaid
-     * @return \core_search\area\base|bool False if the area is not available.
+     * @return \core_search\base|bool False if the area is not available.
      */
     public static function get_search_area($areaid) {
 
-        // Try both caches, it does not matter where it comes from.
+        // We have them all here.
         if (!empty(static::$allsearchareas[$areaid])) {
             return static::$allsearchareas[$areaid];
         }
-        if (!empty(static::$enabledsearchareas[$areaid])) {
-            return static::$enabledsearchareas[$areaid];
-        }
 
         $classname = static::get_area_classname($areaid);
+
         if (class_exists($classname) && static::is_search_area($classname)) {
             return new $classname();
         }
@@ -215,7 +217,7 @@ class manager {
      * Return the list of available search areas.
      *
      * @param bool $enabled Return only the enabled ones.
-     * @return \core_search\area\base[]
+     * @return \core_search\base[]
      */
     public static function get_search_areas_list($enabled = false) {
 
@@ -233,7 +235,7 @@ class manager {
             if (!static::is_search_area($classname)) {
                 continue;
             }
-            /** @var \core_search\area\base $searchclass */
+            /** @var \core_search\base $searchclass */
             $searchclass = new $classname();
             if (!$enabled || ($enabled && $searchclass->is_enabled())) {
                 $searchareas[$searchclass->get_area_id()] = $searchclass;
@@ -657,12 +659,11 @@ class manager {
     /**
      * Returns search areas configuration.
      *
-     * @param \core_search\area\base[] $searchareas
+     * @param \core_search\base[] $searchareas
      * @return \stdClass[] $configsettings
      */
     public function get_areas_config($searchareas) {
 
-        $allconfigs = get_config('search');
         $vars = array('indexingstart', 'indexingend', 'lastindexrun', 'docsignored', 'docsprocessed', 'recordsprocessed');
 
         $configsettings =  array();
@@ -695,15 +696,42 @@ class manager {
     }
 
     /**
+     * Triggers search_results_viewed event
+     *
+     * Other data required:
+     * - q: The query string
+     * - page: The page number
+     * - title: Title filter
+     * - areaids: Search areas filter
+     * - courseids: Courses filter
+     * - timestart: Time start filter
+     * - timeend: Time end filter
+     *
+     * @since Moodle 3.2
+     * @param array $other Other info for the event.
+     * @return \core\event\search_results_viewed
+     */
+    public static function trigger_search_results_viewed($other) {
+        $event = \core\event\search_results_viewed::create([
+            'context' => \context_system::instance(),
+            'other' => $other
+        ]);
+        $event->trigger();
+
+        return $event;
+    }
+
+    /**
      * Checks whether a classname is of an actual search area.
      *
      * @param string $classname
      * @return bool
      */
     protected static function is_search_area($classname) {
-        if (is_subclass_of($classname, 'core_search\area\base')) {
+        if (is_subclass_of($classname, 'core_search\base')) {
             return (new \ReflectionClass($classname))->isInstantiable();
         }
+
         return false;
     }
 }

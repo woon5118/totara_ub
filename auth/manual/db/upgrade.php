@@ -29,11 +29,17 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool result
  */
 function xmldb_auth_manual_upgrade($oldversion) {
-    global $CFG, $DB, $OUTPUT;
+    global $CFG, $DB;
 
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
+
+    // Moodle v3.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

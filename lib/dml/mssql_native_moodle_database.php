@@ -1241,6 +1241,24 @@ class mssql_native_moodle_database extends moodle_database {
         return $this->collation;
     }
 
+    public function sql_equal($fieldname, $param, $casesensitive = true, $accentsensitive = true, $notequal = false) {
+        $equalop = $notequal ? '<>' : '=';
+        $collation = $this->get_collation();
+
+        if ($casesensitive) {
+            $collation = str_replace('_CI', '_CS', $collation);
+        } else {
+            $collation = str_replace('_CS', '_CI', $collation);
+        }
+        if ($accentsensitive) {
+            $collation = str_replace('_AI', '_AS', $collation);
+        } else {
+            $collation = str_replace('_AS', '_AI', $collation);
+        }
+
+        return "$fieldname COLLATE $collation $equalop $param";
+    }
+
     /**
      * Escape sql LIKE special characters like '_' or '%'.
      * @param string $text The string containing characters needing escaping.
@@ -1366,7 +1384,8 @@ class mssql_native_moodle_database extends moodle_database {
      */
     public function sql_substr($expr, $start, $length=false) {
         if (count(func_get_args()) < 2) {
-            throw new coding_exception('moodle_database::sql_substr() requires at least two parameters', 'Originally this function was only returning name of SQL substring function, it now requires all parameters.');
+            throw new coding_exception('moodle_database::sql_substr() requires at least two parameters', 'Originaly this function wa
+s only returning name of SQL substring function, it now requires all parameters.');
         }
         if ($length === false) {
             return "SUBSTRING($expr, " . $this->sql_cast_char2int($start) . ", 2^31-1)";

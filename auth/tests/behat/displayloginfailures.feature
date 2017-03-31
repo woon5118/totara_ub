@@ -29,7 +29,7 @@ Feature: Test the 'showlogfailures' feature works.
     And I should see "1 failed logins since your last login" in the "page-footer" "region"
     # Confirm the notices disappear when navigating to another page.
     And I am on homepage
-    And I should not see "1 failed logins since your last login" in the ".navbar" "css_element"
+    And I should not see "1 failed logins since your last login" in the "header.navbar" "css_element"
     And I should not see "1 failed logins since your last login" in the "page-footer" "region"
 
   # Given the user has at least one failed login attempt, when they login, then they should see both header and footer notices.

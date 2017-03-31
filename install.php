@@ -60,6 +60,22 @@ date_default_timezone_set(@date_default_timezone_get());
 @error_reporting(E_ALL);
 @ini_set('display_errors', '1');
 
+// Check that PHP is of a sufficient version.
+if (version_compare(phpversion(), '5.6.5') < 0) {
+    $phpversion = phpversion();
+    // do NOT localise - lang strings would not work here and we CAN not move it after installib
+    echo "Totara 10 or later requires at least PHP 5.6.5 (currently using version $phpversion).<br />";
+    echo "Please upgrade your server software or install older Moodle version.";
+    die;
+}
+
+// make sure iconv is available and actually works
+if (!function_exists('iconv')) {
+    // this should not happen, this must be very borked install
+    echo 'Totara requires the iconv PHP extension. Please install or enable the iconv extension.';
+    die();
+}
+
 if (PHP_INT_SIZE > 4) {
     // most probably 64bit PHP - we need a lot more memory
     $minrequiredmemory = '70M';
@@ -145,7 +161,7 @@ if (!empty($_POST)) {
 global $CFG;
 $CFG = new stdClass();
 $CFG->lang                 = $config->lang;
-$CFG->dirroot              = dirname(__FILE__);
+$CFG->dirroot              = __DIR__;
 $CFG->libdir               = "$CFG->dirroot/lib";
 $CFG->wwwroot              = install_guess_wwwroot(); // can not be changed - ppl must use the real address when installing
 $CFG->httpswwwroot         = $CFG->wwwroot;
@@ -236,7 +252,7 @@ if (isset($_GET['help'])) {
 
 //first time here? find out suitable dataroot
 if (is_null($CFG->dataroot)) {
-    $CFG->dataroot = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'sitedata';
+    $CFG->dataroot = __DIR__.'/../sitedata';
 
     $i = 0; //safety check - dirname might return some unexpected results
     while(is_dataroot_insecure()) {
@@ -421,34 +437,34 @@ if ($config->stage == INSTALL_DATABASE) {
 
     $disabled = empty($distro->dbhost) ? '' : 'disabled="disabled';
     echo '<div class="fitem"><div class="fitemtitle"><label for="id_dbhost">'.$strdbhost.'</label></div>';
-    echo '<div class="fitemelement"><input id="id_dbhost" name="dbhost" '.$disabled.' type="text" value="'.s($config->dbhost).'" size="50" /></div>';
+    echo '<div class="fitemelement"><input id="id_dbhost" name="dbhost" '.$disabled.' type="text" class="text-ltr" value="'.s($config->dbhost).'" size="50" /></div>';
     echo '</div>';
 
     echo '<div class="fitem"><div class="fitemtitle"><label for="id_dbname">'.$strdbname.'</label></div>';
-    echo '<div class="fitemelement"><input id="id_dbname" name="dbname" type="text" value="'.s($config->dbname).'" size="50" /></div>';
+    echo '<div class="fitemelement"><input id="id_dbname" name="dbname" type="text" class="text-ltr" value="'.s($config->dbname).'" size="50" /></div>';
     echo '</div>';
 
     $disabled = empty($distro->dbuser) ? '' : 'disabled="disabled';
     echo '<div class="fitem"><div class="fitemtitle"><label for="id_dbuser">'.$strdbuser.'</label></div>';
-    echo '<div class="fitemelement"><input id="id_dbuser" name="dbuser" '.$disabled.' type="text" value="'.s($config->dbuser).'" size="50" /></div>';
+    echo '<div class="fitemelement"><input id="id_dbuser" name="dbuser" '.$disabled.' type="text" class="text-ltr" value="'.s($config->dbuser).'" size="50" /></div>';
     echo '</div>';
 
     echo '<div class="fitem"><div class="fitemtitle"><label for="id_dbpass">'.$strdbpass.'</label></div>';
     // no password field here, the password may be visible in config.php if we can not write it to disk
-    echo '<div class="fitemelement"><input id="id_dbpass" name="dbpass" type="text" value="'.s($config->dbpass).'" size="50" /></div>';
+    echo '<div class="fitemelement"><input id="id_dbpass" name="dbpass" type="text" class="text-ltr" value="'.s($config->dbpass).'" size="50" /></div>';
     echo '</div>';
 
     echo '<div class="fitem"><div class="fitemtitle"><label for="id_prefix">'.$strprefix.'</label></div>';
-    echo '<div class="fitemelement"><input id="id_prefix" name="prefix" type="text" value="'.s($config->prefix).'" size="10" /></div>';
+    echo '<div class="fitemelement"><input id="id_prefix" name="prefix" type="text" class="text-ltr" value="'.s($config->prefix).'" size="10" /></div>';
     echo '</div>';
 
     echo '<div class="fitem"><div class="fitemtitle"><label for="id_prefix">'.$strdbport.'</label></div>';
-    echo '<div class="fitemelement"><input id="id_dbport" name="dbport" type="text" value="'.s($config->dbport).'" size="10" /></div>';
+    echo '<div class="fitemelement"><input id="id_dbport" name="dbport" type="text" class="text-ltr" value="'.s($config->dbport).'" size="10" /></div>';
     echo '</div>';
 
     if (!(stristr(PHP_OS, 'win') && !stristr(PHP_OS, 'darwin'))) {
         echo '<div class="fitem"><div class="fitemtitle"><label for="id_dbsocket">'.$strdbsocket.'</label></div>';
-        echo '<div class="fitemelement"><input id="id_dbsocket" name="dbsocket" type="text" value="'.s($config->dbsocket).'" size="50" /></div>';
+        echo '<div class="fitemelement"><input id="id_dbsocket" name="dbsocket" type="text" class="text-ltr" value="'.s($config->dbsocket).'" size="50" /></div>';
         echo '</div>';
     }
 
@@ -563,15 +579,15 @@ if ($config->stage == INSTALL_PATHS) {
 
     echo '<div class="userinput">';
     echo '<div class="fitem"><div class="fitemtitle"><label for="id_wwwroot">'.$paths['wwwroot'].'</label></div>';
-    echo '<div class="fitemelement"><input id="id_wwwroot" name="wwwroot" type="text" value="'.s($CFG->wwwroot).'" disabled="disabled" size="70" /></div>';
+    echo '<div class="fitemelement"><input id="id_wwwroot" name="wwwroot" type="text" class="text-ltr" value="'.s($CFG->wwwroot).'" disabled="disabled" size="70" /></div>';
     echo '</div>';
 
     echo '<div class="fitem"><div class="fitemtitle"><label for="id_dirroot">'.$paths['dirroot'].'</label></div>';
-    echo '<div class="fitemelement"><input id="id_dirroot" name="dirroot" type="text" value="'.s($CFG->dirroot).'" disabled="disabled" size="70" /></div>';
+    echo '<div class="fitemelement"><input id="id_dirroot" name="dirroot" type="text" class="text-ltr" value="'.s($CFG->dirroot).'" disabled="disabled" size="70" /></div>';
     echo '</div>';
 
     echo '<div class="fitem"><div class="fitemtitle"><label for="id_dataroot">'.$paths['dataroot'].'</label></div>';
-    echo '<div class="fitemelement"><input id="id_dataroot" name="dataroot" type="text" value="'.s($config->dataroot).'" size="70" /></div>';
+    echo '<div class="fitemelement"><input id="id_dataroot" name="dataroot" type="text" class="text-ltr" value="'.s($config->dataroot).'" size="70" /></div>';
     if ($hint_dataroot !== '') {
         echo '<div class="alert alert-error">'.$hint_dataroot.'</div>';
     }
@@ -580,7 +596,7 @@ if ($config->stage == INSTALL_PATHS) {
 
     if (!file_exists("$CFG->dirroot/admin/environment.xml")) {
         echo '<div class="fitem"><div class="fitemtitle"><label for="id_admin">'.$paths['admindir'].'</label></div>';
-        echo '<div class="fitemelement"><input id="id_admin" name="admin" type="text" value="'.s($config->admin).'" size="10" /></div>';
+        echo '<div class="fitemelement"><input id="id_admin" name="admin" type="text" class="text-ltr" value="'.s($config->admin).'" size="10" /></div>';
         if ($hint_admindir !== '') {
             echo '<div class="alert alert-error">'.$hint_admindir.'</div>';
         }

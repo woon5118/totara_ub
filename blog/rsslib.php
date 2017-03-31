@@ -82,7 +82,7 @@ function blog_rss_print_link($context, $filtertype, $filterselect = 0, $tagid = 
     }
 
     $url = blog_rss_get_url($context->id, $userid, $filtertype, $filterselect, $tagid);
-    print '<div class="mdl-right"><a href="'. $url .'">' . $OUTPUT->flex_icon('rss', array('alt' => strip_tags($tooltiptext))) . '</a></div>';
+    print '<div class="pull-xs-right"><a href="'. $url .'">' . $OUTPUT->flex_icon('rss', array('alt' => strip_tags($tooltiptext))) . '</a></div>';
 }
 
 /**

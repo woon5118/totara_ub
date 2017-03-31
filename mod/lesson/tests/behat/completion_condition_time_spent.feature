@@ -19,7 +19,7 @@ Feature: Set time spent as a completion condition for a lesson
     And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
-    And I click on "Edit settings" "link" in the "Administration" "block"
+    And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Enable completion tracking | Yes |
     And I press "Save and display"
@@ -63,7 +63,7 @@ Feature: Set time spent as a completion condition for a lesson
     And I follow "Course 1"
     And I follow "Test lesson"
     And I press "Next page"
-    And I wait "9" seconds
+    And I wait "11" seconds
     And I press "Next page"
     And I should not see "You might need to attempt the lesson again."
     And I follow "Course 1"

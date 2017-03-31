@@ -96,6 +96,7 @@ class behat_calendar extends behat_base {
 
         $xpath = '//' . $currentmonth . '/descendant::' . $daycell . '/' . $dayofmonth;
         $this->execute("behat_general::i_hover", array($xpath, "xpath_element"));
+
     }
 
     /**

@@ -93,7 +93,7 @@ Example:
 
 
 // distro specific customisation
-$distrolibfile = dirname(dirname(dirname(__FILE__))).'/install/distrolib.php';
+$distrolibfile = __DIR__.'/../../install/distrolib.php';
 $distro = null;
 if (file_exists($distrolibfile)) {
     require_once($distrolibfile);
@@ -103,7 +103,7 @@ if (file_exists($distrolibfile)) {
 }
 
 // Nothing to do if config.php exists
-$configfile = dirname(dirname(dirname(__FILE__))).'/config.php';
+$configfile = __DIR__.'/../../config.php';
 if (file_exists($configfile)) {
     require($configfile);
     require_once($CFG->libdir.'/clilib.php');
@@ -127,6 +127,10 @@ $olddir = getcwd();
 chdir(dirname($_SERVER['argv'][0]));
 
 // Servers should define a default timezone in php.ini, but if they don't then make sure something is defined.
+if (!function_exists('date_default_timezone_set') or !function_exists('date_default_timezone_get')) {
+    fwrite(STDERR, "Timezone functions are not available.\n");
+    exit(1);
+}
 date_default_timezone_set(@date_default_timezone_get());
 
 // make sure PHP errors are displayed - helps with diagnosing of problems
@@ -145,11 +149,20 @@ define('PHPUNIT_TEST', false);
 
 define('IGNORE_COMPONENT_CACHE', true);
 
+// Check that PHP is of a sufficient version
+if (version_compare(phpversion(), "5.6.5") < 0) {
+    $phpversion = phpversion();
+    // do NOT localise - lang strings would not work here and we CAN NOT move it after installib
+    fwrite(STDERR, "Totara 10 or later requires at least PHP 5.6.5 (currently using version $phpversion).\n");
+    fwrite(STDERR, "Please upgrade your server software or install older Moodle version.\n");
+    exit(1);
+}
+
 // set up configuration
 global $CFG;
 $CFG = new stdClass();
 $CFG->lang                 = 'en';
-$CFG->dirroot              = dirname(dirname(dirname(__FILE__)));
+$CFG->dirroot              = dirname(dirname(__DIR__));
 $CFG->libdir               = "$CFG->dirroot/lib";
 $CFG->wwwroot              = "http://localhost";
 $CFG->httpswwwroot         = $CFG->wwwroot;
@@ -162,7 +175,7 @@ $CFG->debug                = (E_ALL | E_STRICT);
 $CFG->debugdisplay         = true;
 $CFG->debugdeveloper       = true;
 
-$parts = explode('/', str_replace('\\', '/', dirname(dirname(__FILE__))));
+$parts = explode('/', str_replace('\\', '/', dirname(__DIR__)));
 $CFG->admin                = array_pop($parts);
 
 //point pear include path to moodles lib/pear so that includes and requires will search there for files before anywhere else
@@ -239,7 +252,7 @@ list($options, $unrecognized) = cli_get_params(
         'chmod'             => isset($distro->directorypermissions) ? sprintf('%04o',$distro->directorypermissions) : '2777', // let distros set dir permissions
         'lang'              => $CFG->lang,
         'wwwroot'           => '',
-        'dataroot'          => empty($distro->dataroot) ? str_replace('\\', '/', dirname(dirname(dirname(dirname(__FILE__)))).'/sitedata'): $distro->dataroot, // initialised later after including libs or by distro
+        'dataroot'          => empty($distro->dataroot) ? str_replace('\\', '/', dirname(dirname(dirname(__DIR__))).'/sitedata'): $distro->dataroot, // initialised later after including libs or by distro
         'dbtype'            => empty($distro->dbtype) ? $defaultdb : $distro->dbtype, // let distro skip dbtype selection
         'dbhost'            => empty($distro->dbhost) ? 'localhost' : $distro->dbhost, // let distros set dbhost
         'dbname'            => 'totaradb',

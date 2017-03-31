@@ -23,7 +23,6 @@
  */
 namespace mod_lti\output;
 
-global $CFG;
 require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
 use renderable;

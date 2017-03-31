@@ -40,6 +40,8 @@ class feedback_edit_use_template_form extends moodleform {
 
         $course = $this->_customdata['course'];
 
+        $course = $this->_customdata['course'];
+
         $elementgroup = array();
         //headline
         $mform->addElement('header', 'using_templates', get_string('using_templates', 'feedback'));
@@ -125,21 +127,19 @@ class feedback_edit_create_template_form extends moodleform {
 
         if (has_capability('mod/feedback:createpublictemplate', context_system::instance())) {
             $elementgroup[] = $mform->createElement('checkbox',
-                                                     'ispublic',
-                                                     get_string('public', 'feedback'),
+                                                     'ispublic', '',
                                                      get_string('public', 'feedback'));
         }
 
-        // buttons
-        $elementgroup[] = $mform->createElement('submit',
-                                                 'create_template',
-                                                 get_string('save_as_new_template', 'feedback'));
 
         $mform->addGroup($elementgroup,
                          'elementgroup',
                          get_string('name', 'feedback'),
                          array(' '),
                          false);
+
+        // Buttons.
+        $mform->addElement('submit', 'create_template', get_string('save_as_new_template', 'feedback'));
 
         $mform->setType('templatename', PARAM_TEXT);
 

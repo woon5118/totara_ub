@@ -30,3 +30,8 @@ submission,mod_feedback
 submitted,mod_feedback
 generategrade,mod_feedback
 generategrade_help,mod_feedback
+start,mod_feedback
+stop,mod_feedback
+switch_group,mod_feedback
+viewcompleted,mod_feedback
+viewcompleted_help,mod_feedback

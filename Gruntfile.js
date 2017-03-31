@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /* jshint node: true, browser: false */
+/* eslint-env node */
 
 /**
  * @copyright  2014 Andrew Nicols
@@ -26,7 +27,80 @@
 module.exports = function(grunt) {
     var path = require('path'),
         tasks = {},
-        cwd = process.env.PWD || process.cwd();
+        cwd = process.env.PWD || process.cwd(),
+        async = require('async'),
+        DOMParser = require('xmldom').DOMParser,
+        xpath = require('xpath'),
+        semver = require('semver');
+
+    // Verify the node version is new enough.
+    var expected = semver.validRange(grunt.file.readJSON('package.json').engines.node);
+    var actual = semver.valid(process.version);
+    if (!semver.satisfies(actual, expected)) {
+        grunt.fail.fatal('Node version too old. Require ' + expected + ', version installed: ' + actual);
+    }
+
+    // Windows users can't run grunt in a subdirectory, so allow them to set
+    // the root by passing --root=path/to/dir.
+    if (grunt.option('root')) {
+        var root = grunt.option('root');
+        if (grunt.file.exists(__dirname, root)) {
+            cwd = path.join(__dirname, root);
+            grunt.log.ok('Setting root to ' + cwd);
+        } else {
+            grunt.fail.fatal('Setting root to ' + root + ' failed - path does not exist');
+        }
+    }
+
+    /**
+     * Function to generate the destination for the uglify task
+     * (e.g. build/file.min.js). This function will be passed to
+     * the rename property of files array when building dynamically:
+     * http://gruntjs.com/configuring-tasks#building-the-files-object-dynamically
+     *
+     * @param {String} destPath the current destination
+     * @param {String} srcPath the  matched src path
+     * @return {String} The rewritten destination path.
+     */
+    var uglifyRename = function(destPath, srcPath) {
+        destPath = srcPath.replace('src', 'build');
+        destPath = destPath.replace('.js', '.min.js');
+        destPath = path.resolve(cwd, destPath);
+        return destPath;
+    };
+
+    /**
+     * Find thirdpartylibs.xml and generate an array of paths contained within
+     * them (used to generate ignore files and so on).
+     *
+     * @return {array} The list of thirdparty paths.
+     */
+    var getThirdPartyPathsFromXML = function() {
+        var thirdpartyfiles = grunt.file.expand('*/**/thirdpartylibs.xml');
+        var libs = ['node_modules/', 'vendor/'];
+
+        thirdpartyfiles.forEach(function(file) {
+          var dirname = path.dirname(file);
+
+          var doc = new DOMParser().parseFromString(grunt.file.read(file));
+          var nodes = xpath.select("/libraries/library/location/text()", doc);
+
+          nodes.forEach(function(node) {
+            var lib = path.join(dirname, node.toString());
+            if (grunt.file.isDir(lib)) {
+                // Ensure trailing slash on dirs.
+                lib = lib.replace(/\/?$/, '/');
+            }
+
+            // Look for duplicate paths before adding to array.
+            if (libs.indexOf(lib) === -1) {
+                libs.push(lib);
+            }
+          });
+        });
+        return libs;
+    };
+
 
     // Totara: Promise polyfill for legacy Node versions.
     if (typeof Promise === 'undefined') {
@@ -84,7 +158,7 @@ module.exports = function(grunt) {
     // source files based on current dir.
     var localLess = grunt.file.isDir(cwd, 'less');
     var customThemeDir = grunt.option('themedir') || '';
-    var inTheme =  false;
+    var inTheme = false;
 
     // Standard theme location.
     if (path.basename(path.dirname(cwd)) === 'theme') {
@@ -253,39 +327,41 @@ module.exports = function(grunt) {
         return grunt.file.isFile(path.dirname(srcPath), 'less', 'styles.css');
     };
 
-    /**
-     * Function to generate the destination for the uglify task
-     * (e.g. build/file.min.js). This function will be passed to
-     * the rename property of files array when building dynamically:
-     * http://gruntjs.com/configuring-tasks#building-the-files-object-dynamically
-     *
-     * @param {String} destPath the current destination
-     * @param {String} srcPath the  matched src path
-     * @return {String} The rewritten destination path.
-     */
-    var uglify_rename = function (destPath, srcPath) {
-        destPath = srcPath.replace('src', 'build');
-        destPath = destPath.replace('.js', '.min.js');
-        destPath = path.resolve(cwd, destPath);
-        return destPath;
-    };
-
     // Project configuration.
     grunt.initConfig({
-        jshint: {
-            /* TODO: remove force from the line below. Currently there is a quite a bit of cruft in Totara files which cause jshint
-             * to spit out a large number of warnings.
-             */
-            options: {jshintrc: '.jshintrc', force: true},
-            amd: { src: amdSrc }
+        eslint: {
+            // Even though warnings dont stop the build we don't display warnings by default because
+            // at this moment we've got too many core warnings.
+            options: {quiet: !grunt.option('show-lint-warnings')},
+            amd: {
+              src: amdSrc,
+              // Check AMD with some slightly stricter rules.
+              rules: {
+                'no-unused-vars': 'error',
+                'no-implicit-globals': 'error'
+              }
+            },
+            // Check YUI module source files.
+            yui: {
+               src: ['**/yui/src/**/*.js', '!*/**/yui/src/*/meta/*.js'],
+               options: {
+                   // Disable some rules which we can't safely define for YUI rollups.
+                   rules: {
+                     'no-undef': 'off',
+                     'no-unused-vars': 'off',
+                     'no-unused-expressions': 'off'
+                   }
+               }
+            }
         },
         uglify: {
             amd: {
                 files: [{
                     expand: true,
                     src: amdSrc,
-                    rename: uglify_rename
-                }]
+                    rename: uglifyRename
+                }],
+                options: {report: 'none'}
             }
         },
         less: {
@@ -307,7 +383,7 @@ module.exports = function(grunt) {
                     "theme/bootstrapbase/style/editor.css": "theme/bootstrapbase/less/editor.less",
                 },
                 options: {
-                    compress: true
+                    compress: false // We must not compress to keep the comments.
                 }
            }
         },
@@ -319,18 +395,18 @@ module.exports = function(grunt) {
                 files: ['**/amd/src/**/*.js'],
                 tasks: ['amd']
             },
+            bootstrapbase: {
+                files: ["theme/bootstrapbase/less/**/*.less"],
+                tasks: ["css"]
+            },
+            yui: {
+                files: ['**/yui/src/**/*.js'],
+                tasks: ['yui']
+            },
             // Totara: Add less watch target.
             less: {
                 files: ['**/less/**/*.less', '!**/node_modules/**/*'],
                 tasks: ['less:totara', 'postcss:prefix', 'postcss:rtl']
-            },
-            bootstrapbase: {
-                files: ["theme/bootstrapbase/less/**/*.less"],
-                tasks: ["less:bootstrapbase"]
-            },
-            yui: {
-                files: ['**/yui/src/**/*.js'],
-                tasks: ['shifter']
             },
         },
         shifter: {
@@ -344,7 +420,7 @@ module.exports = function(grunt) {
             prefix: {
                 options: {
                     processors: [
-                        require('autoprefixer')({ browsers: 'last 2 versions, ie >= 9' })
+                        require('autoprefixer')({browsers: 'last 2 versions, ie >= 9'})
                     ]
                 },
                 files: [{
@@ -366,8 +442,63 @@ module.exports = function(grunt) {
                     filter: rtl_filter
                 }]
             }
+        },
+        stylelint: {
+            less: {
+                options: {
+                    syntax: 'less',
+                    configOverrides: {
+                        rules: {
+                            // These rules have to be disabled in .stylelintrc for scss compat.
+                            "at-rule-no-unknown": true,
+                            "no-browser-hacks": [true, {"severity": "warning"}]
+                        }
+                    }
+                },
+                src: ['theme/**/*.less']
+            },
+            scss: {
+                options: {syntax: 'scss'},
+                src: ['*/**/*.scss']
+            },
+            css: {
+                src: ['*/**/*.css'],
+                options: {
+                    configOverrides: {
+                        rules: {
+                            // These rules have to be disabled in .stylelintrc for scss compat.
+                            "at-rule-no-unknown": true,
+                            "no-browser-hacks": [true, {"severity": "warning"}]
+                        }
+                    }
+                }
+            }
         }
     });
+
+    /**
+     * Generate ignore files (utilising thirdpartylibs.xml data)
+     */
+    tasks.ignorefiles = function() {
+      // An array of paths to third party directories.
+      var thirdPartyPaths = getThirdPartyPathsFromXML();
+      // Generate .eslintignore.
+      var eslintIgnores = ['# Generated by "grunt ignorefiles"', '*/**/yui/src/*/meta/', '*/**/build/'].concat(thirdPartyPaths);
+      grunt.file.write('.eslintignore', eslintIgnores.join('\n'));
+      // Generate .stylelintignore.
+      var stylelintIgnores = [
+          '# Generated by "grunt ignorefiles"',
+          'theme/bootstrapbase/style/',
+          'theme/clean/style/custom.css',
+          'theme/more/style/custom.css',
+
+          '# Totara files to ignore',
+          'theme/roots/less/totara/totara_jquery/',
+          'theme/roots/less/bootstrap3/',
+          'theme/basis/less/bootswatch/',
+      ].concat(thirdPartyPaths);
+      grunt.file.write('.stylelintignore', stylelintIgnores.join('\n'));
+    };
 
     /**
      * Shifter task. Is configured with a path to a specific file or a directory,
@@ -377,14 +508,13 @@ module.exports = function(grunt) {
      * so be careful to to call done().
      */
     tasks.shifter = function() {
-        var async = require('async'),
-            done = this.async(),
+        var done = this.async(),
             options = grunt.config('shifter.options');
 
         // Run the shifter processes one at a time to avoid confusing output.
-        async.eachSeries(options.paths, function (src, filedone) {
+        async.eachSeries(options.paths, function(src, filedone) {
             var args = [];
-            args.push( path.normalize(__dirname + '/node_modules/shifter/bin/shifter'));
+            args.push(path.normalize(__dirname + '/node_modules/shifter/bin/shifter'));
 
             // Always ignore the node_modules directory.
             args.push('--excludes', 'node_modules');
@@ -432,7 +562,7 @@ module.exports = function(grunt) {
                     cmd: "node",
                     args: args,
                     opts: {cwd: src, stdio: 'inherit', env: process.env}
-                }, function (error, result, code) {
+                }, function(error, result, code) {
                     if (code) {
                         grunt.fail.fatal('Shifter failed with code: ' + code);
                     } else {
@@ -461,7 +591,7 @@ module.exports = function(grunt) {
     tasks.startup = function() {
         // Are we in a YUI directory?
         if (path.basename(path.resolve(cwd, '../../')) == 'yui') {
-            grunt.task.run('shifter');
+            grunt.task.run('yui');
         // Are we in an AMD directory?
         } else if (inAMD) {
             grunt.task.run('amd');
@@ -478,9 +608,11 @@ module.exports = function(grunt) {
     var changedFiles = Object.create(null);
     var onChange = grunt.util._.debounce(function() {
           var files = Object.keys(changedFiles);
-          grunt.config('jshint.amd.src', files);
-          grunt.config('uglify.amd.files', [{ expand: true, src: files, rename: uglify_rename }]);
+          grunt.config('eslint.amd.src', files);
+          grunt.config('eslint.yui.src', files);
+          grunt.config('uglify.amd.files', [{expand: true, src: files, rename: uglifyRename}]);
           grunt.config('shifter.options.paths', files);
+          grunt.config('stylelint.less.src', files);
           changedFiles = Object.create(null);
     }, 200);
 
@@ -491,20 +623,23 @@ module.exports = function(grunt) {
 
     // Register NPM tasks.
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-eslint');
+    grunt.loadNpmTasks('grunt-stylelint');
 
     // Totara: Load PostCSS.
     grunt.loadNpmTasks('grunt-postcss');
 
     // Register JS tasks.
     grunt.registerTask('shifter', 'Run Shifter against the current directory', tasks.shifter);
-    grunt.registerTask('amd', ['jshint', 'uglify']);
-    grunt.registerTask('js', ['amd', 'shifter']);
+    grunt.registerTask('ignorefiles', 'Generate ignore files for linters', tasks.ignorefiles);
+    grunt.registerTask('yui', ['eslint:yui', 'shifter']);
+    grunt.registerTask('amd', ['eslint:amd', 'uglify']);
+    grunt.registerTask('js', ['amd', 'yui']);
 
-    // Register Totara tasks.
-    grunt.registerTask('css', ['less:bootstrapbase', 'less:totara', 'postcss:prefix', 'postcss:rtl']);
+    // Register CSS taks.
+    grunt.registerTask('css', ['stylelint:scss', 'stylelint:less', 'less:bootstrapbase', 'less:totara', 'postcss:prefix', 'postcss:rtl', 'stylelint:css']);
 
     // Register the startup task.
     grunt.registerTask('startup', 'Run the correct tasks for the current directory', tasks.startup);

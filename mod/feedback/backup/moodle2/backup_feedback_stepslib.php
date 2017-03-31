@@ -117,6 +117,7 @@ class backup_feedback_activity_structure_step extends backup_activity_structure_
         $completed->add_child($values);
         $completed_history->add_child($values_history);
         $values->add_child($value);
+
         $values_history->add_child($value_history);
 
         // Define sources

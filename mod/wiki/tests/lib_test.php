@@ -67,7 +67,7 @@ class mod_wiki_lib_testcase extends advanced_testcase {
         wiki_view($wiki, $course, $cm, $context);
 
         $events = $sink->get_events();
-        // 3 additional events thanks to completion.
+        // 2 additional events thanks to completion.
         $this->assertCount(4, $events);
         $event = array_shift($events);
 
@@ -112,7 +112,7 @@ class mod_wiki_lib_testcase extends advanced_testcase {
         wiki_page_view($wiki, $firstpage, $course, $cm, $context);
 
         $events = $sink->get_events();
-        // 3 additional events thanks to completion.
+        // 2 additional events thanks to completion.
         $this->assertCount(4, $events);
         $event = array_shift($events);
 

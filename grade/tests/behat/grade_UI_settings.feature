@@ -20,32 +20,32 @@ Feature: Site settings can be used to hide parts of the gradebook UI
     And I log in as "admin"
     And I am on site homepage
     And I follow "Course 1"
-    And I navigate to "Grades" node in "Course administration"
+    And I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
 
   @javascript
   Scenario: Hide minimum grade
-    When I click on "Edit assign Assignment1" "link"
+    When I click on "Edit  assign Assignment1" "link"
     And I should see "Minimum grade"
     Then I navigate to "General settings" node in "Site administration > Grades"
     And I set the field "Show minimum grade" to "0"
     And I press "Save changes"
     And I am on site homepage
     And I follow "Course 1"
-    And I navigate to "Grades" node in "Course administration"
-    And I click on "Edit assign Assignment1" "link"
+    And I navigate to "View > Grader report" in the course gradebook
+    And I click on "Edit  assign Assignment1" "link"
     And I should not see "Minimum grade"
 
   @javascript
   Scenario: Hide calculation icons
-    And "Edit calculation for Course total" "link" should exist
+    And "Edit calculation for   Course total" "link" should exist
     When I navigate to "Grader report" node in "Site administration > Grades > Report settings"
     And I set the field "Show calculations" to "0"
     And I press "Save changes"
     And I am on site homepage
     And I follow "Course 1"
-    And I navigate to "Grades" node in "Course administration"
-    Then "Edit calculation for Course total" "link" should not exist
+    And I navigate to "View > Grader report" in the course gradebook
+    Then "Edit calculation for   Course total" "link" should not exist
 
   @javascript
   Scenario: Disable category overriding
@@ -55,5 +55,5 @@ Feature: Site settings can be used to hide parts of the gradebook UI
     And I press "Save changes"
     And I am on site homepage
     And I follow "Course 1"
-    And I navigate to "Grades" node in "Course administration"
+    And I navigate to "View > Grader report" in the course gradebook
     And "tr .course input[type='text']" "css_element" should not exist

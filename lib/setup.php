@@ -61,7 +61,7 @@ require(__DIR__ . '/../lib/environmentmincheck.php');
 
 // We can detect real dirroot path reliably since PHP 4.0.2,
 // it can not be anything else, there is no point in having this in config.php
-$CFG->dirroot = dirname(dirname(__FILE__));
+$CFG->dirroot = dirname(__DIR__);
 
 // File permissions on created directories in the $CFG->dataroot
 if (!isset($CFG->directorypermissions)) {
@@ -88,7 +88,8 @@ if (defined('BEHAT_SITE_RUNNING')) {
     // Update config variables for parallel behat runs.
     behat_update_vars_for_process();
 
-    if (behat_is_test_site()) {
+    // If behat is being installed for parallel run, then we modify params for parallel run only.
+    if (behat_is_test_site() && !(defined('BEHAT_PARALLEL_UTIL') && empty($CFG->behatrunprocess))) {
         clearstatcache();
 
         // Checking the integrity of the provided $CFG->behat_* vars and the
@@ -120,7 +121,8 @@ if (defined('BEHAT_SITE_RUNNING')) {
 
         if (!defined('BEHAT_UTIL') and !defined('BEHAT_TEST')) {
             // Somebody tries to access test site directly, tell them if not enabled.
-            if (!file_exists($CFG->behat_dataroot . '/behat/test_environment_enabled.txt')) {
+            $behatdir = preg_replace("#[/|\\\]" . BEHAT_PARALLEL_SITE_NAME . "\d{0,}$#", '', $CFG->behat_dataroot);
+            if (!file_exists($behatdir . '/test_environment_enabled.txt')) {
                 behat_error(BEHAT_EXITCODE_CONFIG, 'Behat is configured but not enabled on this test site.');
             }
         }
@@ -324,6 +326,9 @@ if (!defined('WS_SERVER')) {
 // Detect CLI maintenance mode - this is useful when you need to mess with database, such as during upgrades
 if (file_exists("$CFG->dataroot/climaintenance.html")) {
     if (!CLI_SCRIPT) {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 503 Moodle under maintenance');
+        header('Status: 503 Moodle under maintenance');
+        header('Retry-After: 300');
         header('Content-type: text/html; charset=utf-8');
         header('X-UA-Compatible: IE=edge');
         /// Headers to make it not cacheable and json
@@ -344,6 +349,15 @@ if (file_exists("$CFG->dataroot/climaintenance.html")) {
     if (!defined('CLI_MAINTENANCE')) {
         define('CLI_MAINTENANCE', false);
     }
+}
+
+// Sometimes people use different PHP binary for web and CLI, make 100% sure they have the supported PHP version.
+if (version_compare(PHP_VERSION, '5.6.5') < 0) {
+    $phpversion = PHP_VERSION;
+    // Do NOT localise - lang strings would not work here and we CAN NOT move it to later place.
+    echo "Totara 10 or later requires at least PHP 5.6.5 (currently using version $phpversion).\n";
+    echo "Some servers may have multiple PHP versions installed, are you using the correct executable?\n";
+    exit(1);
 }
 
 // Detect ajax scripts - they are similar to CLI because we can not redirect, output html, etc.
@@ -388,8 +402,8 @@ if (!defined('MOODLE_INTERNAL')) { // Necessary because cli installer has to def
 
 // Totara: we support migration from this particular Moodle release only.
 if (!defined('MOODLE_MIGRATION_VERSION')) {
-    define('MOODLE_MIGRATION_VERSION', '2016052304.00'); // Keep as string to simplify comparison with DB data.
-    define('MOODLE_MIGRATION_RELEASE', '3.1.4 (Build: 20170109)');
+    define('MOODLE_MIGRATION_VERSION', '2016120502.00'); // Keep as string to simplify comparison with DB data.
+    define('MOODLE_MIGRATION_RELEASE', '3.2.2 (Build: 20170313)');
 }
 
 // core_component can be used in any scripts, it does not need anything else.

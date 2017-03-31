@@ -78,7 +78,6 @@ class block_navigation_renderer extends plugin_renderer_base {
             if (!$item->display && !$item->contains_active_node()) {
                 continue;
             }
-            $collapsed = false;
             $icon = new \core\output\flex_icon('spacer');
 
             $isexpandable = (empty($expansionlimit) || ($item->type > navigation_node::TYPE_ACTIVITY || $item->type < $expansionlimit) || ($item->contains_active_node() && $item->children->count() > 0));

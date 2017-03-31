@@ -28,7 +28,8 @@
 require_once(__DIR__ . '/../../../lib/behat/behat_base.php');
 
 use Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException,
-    Behat\Gherkin\Node\TableNode as TableNode;
+    Behat\Gherkin\Node\TableNode as TableNode,
+    Behat\Gherkin\Node\PyStringNode as PyStringNode;
 
 /**
  * Deprecated behat step definitions.
@@ -291,8 +292,35 @@ class behat_deprecated extends behat_base {
     public function i_select_to_approve($user) {
         $this->deprecated_message('Use "I set the field "Approve <user> for this event" to "1"');
         return array(
-            new Given('I click on "input[value=\'2\']" "css_element" in the "'.$user.'" "table_row"')
+            new Given('I click on "input[value=\'2\']" "css_element" in the "' . $user . '" "table_row"')
         );
+    }
+
+    /**
+     * Sets the specified value to the field.
+     *
+     * @Given /^I set the field "(?P<field_string>(?:[^"]|\\")*)" to multiline$/
+     * @throws ElementNotFoundException Thrown by behat_base::find
+     * @param string $field
+     * @param PyStringNode $value
+     * @deprecated since Moodle 3.2 MDL-55406 - please do not use this step any more.
+     */
+    public function i_set_the_field_to_multiline($field, PyStringNode $value) {
+
+        $alternative = 'I set the field "' . $this->escape($field) . '"  to multiline:';
+        $this->deprecated_message($alternative);
+
+        $this->execute('behat_forms::i_set_the_field_to_multiline', array($field, $value));
+    }
+
+    /**
+     * Click on a given link in the moodle-actionmenu that is currently open.
+     * @Given /^I follow "(?P<link_string>(?:[^"]|\\")*)" in the open menu$/
+     * @param string $linkstring the text (or id, etc.) of the link to click.
+     */
+    public function i_follow_in_the_open_menu($linkstring) {
+        $alternative = 'I choose "' . $this->escape($linkstring) . '" from the open action menu';
+        $this->deprecated_message($alternative, true);
     }
 
     /**

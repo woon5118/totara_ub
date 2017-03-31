@@ -263,26 +263,55 @@ function totara_readd_course_completion_changes() {
 }
 
 /**
- * Uninstall 3.1 plugins during migration from Moodle.
+ * Uninstall Moodle plugins removed in 3.1 and 3.2 and Totara 10 plugins.
  */
-function totara_core_upgrade_delete_moodle_plugins_31() {
+function totara_core_upgrade_delete_moodle_plugins() {
+    global $DB;
+
+    // NOTE: this should match \core_plugin_manager::is_deleted_standard_plugin() data.
+
     $deleteplugins = array(
+        // Totara 10.0 removals.
+        'theme_kiwifruitresponsive',
+
+        // Moodle merge removals - we do not want these!
         'block_lp',
         'report_competency',
+        'theme_boost',
         'theme_canvas',
         'theme_clean',
         'theme_more',
-        'tool_installaddon',
         'tool_cohortroles',
+        'tool_installaddon',
         'tool_lp',
+        'tool_lpimportcsv',
         'tool_lpmigrate',
+
+        // Upstream Moodle 3.1 removals.
+        'webservice_amf',
+
+        // Upstream Moodle 3.2 removals.
+        'auth_radius',
+        'report_search',
+        'repository_alfresco',
     );
+
     foreach ($deleteplugins as $deleteplugin) {
         list($plugintype, $pluginname) = explode('_', $deleteplugin, 2);
         $dir = core_component::get_plugin_directory($plugintype, $pluginname);
         if ($dir and file_exists("$dir/version.php")) {
             // This should not happen, this is not a standard distribution!
             continue;
+        }
+        if (!get_config($deleteplugin, 'version')) {
+            // Not installed.
+            continue;
+        }
+        if ($deleteplugin === 'auth_radius') {
+            if ($DB->record_exists('user', array('auth' => 'radius', 'deleted' => 0))) {
+                // Do not uninstall if users with this auth exist!
+                continue;
+            }
         }
         uninstall_plugin($plugintype, $pluginname);
     }

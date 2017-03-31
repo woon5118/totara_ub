@@ -1150,20 +1150,26 @@ class core_plugin_manager {
         $plugins = array(
             // Totara 10.0 removals.
             'theme_kiwifruitresponsive',
-            'tool_installaddon',
 
-            // Moodle 3.1.4 merge removals - we do not want these!
+            // Moodle merge removals - we do not want these!
             'block_lp',
             'report_competency',
+            'theme_boost',
             'theme_canvas',
             'theme_clean',
             'theme_more',
             'tool_cohortroles',
+            'tool_installaddon',
             'tool_lp',
+            'tool_lpimportcsv',
             'tool_lpmigrate',
 
             // Upstream Moodle 3.1 removals.
             'webservice_amf',
+
+            // Upstream Moodle 3.2 removals.
+            'auth_radius',
+            'repository_alfresco',
         );
 
         return in_array($type . '_' . $name, $plugins);
@@ -1206,10 +1212,9 @@ class core_plugin_manager {
 
             'auth' => array(
                 'cas', 'db', 'email', 'fc', 'imap', 'ldap', 'lti', 'manual', 'mnet',
-                'nntp', 'nologin', 'none', 'pam', 'pop3', 'radius',
-                'shibboleth', 'webservice'
+                'nntp', 'nologin', 'none', 'pam', 'pop3', 'shibboleth', 'webservice'
                 // Totara
-                , 'gauth', 'connect',
+            , 'gauth', 'connect',
             ),
 
             'availability' => array(
@@ -1246,7 +1251,7 @@ class core_plugin_manager {
             ),
 
             'cachestore' => array(
-                'file', 'memcache', 'memcached', 'mongodb', 'session', 'static'
+                'file', 'memcache', 'memcached', 'mongodb', 'session', 'static', 'apcu', 'redis'
             ),
 
             'calendartype' => array(
@@ -1333,6 +1338,10 @@ class core_plugin_manager {
                 'memberships', 'profile', 'toolproxy', 'toolsettings'
             ),
 
+            'media' => array(
+                'html5audio', 'html5video', 'swf', 'videojs', 'vimeo', 'youtube'
+            ),
+
             'message' => array(
                 'airnotifier', 'email', 'jabber', 'popup'
                 // Totara
@@ -1390,18 +1399,18 @@ class core_plugin_manager {
             ),
 
             'quizaccess' => array(
-                'delaybetweenattempts', 'ipaddress', 'numattempts', 'openclosedate',
+                'delaybetweenattempts', 'ipaddress', 'numattempts', 'offlineattempts', 'openclosedate',
                 'password', 'safebrowser', 'securewindow', 'timelimit'
             ),
 
             'report' => array(
                 'backups', 'completion', 'configlog', 'courseoverview', 'eventlist',
-                'log', 'loglive', 'outline', 'participation', 'progress', 'questioninstances', 'search',
+                'log', 'loglive', 'outline', 'participation', 'progress', 'questioninstances',
                 'security', 'stats', 'performance', 'usersessions'
             ),
 
             'repository' => array(
-                'alfresco', 'areafiles', 'boxnet', 'coursefiles', 'dropbox', 'equella', 'filesystem',
+                'areafiles', 'boxnet', 'coursefiles', 'dropbox', 'equella', 'filesystem',
                 'flickr', 'flickr_public', 'googledocs', 'local', 'merlot',
                 'picasa', 'recent', 'skydrive', 's3', 'upload', 'url', 'user', 'webdav',
                 'wikimedia', 'youtube'
@@ -1436,7 +1445,7 @@ class core_plugin_manager {
                 'dbtransfer', 'filetypes', 'generator', 'health', 'innodb',
                 'langimport', 'log', 'messageinbound', 'mobile', 'multilangupgrade', 'monitor',
                 'phpunit', 'profiling', 'recyclebin', 'replace', 'spamcleaner', 'task', 'templatelibrary',
-                'unittest', 'uploadcourse', 'uploaduser', 'unsuproles', 'xmldb'
+                'unittest', 'uploadcourse', 'uploaduser', 'unsuproles', 'usertours', 'xmldb'
                 // Totara:
                 , 'totara_sync', 'totara_timezonefix'
             ),

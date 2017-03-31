@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -62,6 +61,12 @@ function xmldb_folder_upgrade($oldversion) {
 
         upgrade_mod_savepoint(true, 2016020201, 'folder');
     }
+
+    // Moodle v3.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

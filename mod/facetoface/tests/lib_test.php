@@ -2863,12 +2863,9 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
      */
     public function facetoface_messaging_settings() {
         $data = array(
-            array(1, 'no-reply@example.com', ''),
-            array(1, 'no-reply@example.com', 'facetofacesender@example.com'),
-            array(1, '', ''),
-            array(0, 'no-reply@example.com', 'facetofacesender@example.com'),
-            array(0, 'no-reply@example.com', ''),
-            array(0, '', ''),
+            array('no-reply@example.com', ''),
+            array('no-reply@example.com', 'facetofacesender@example.com'),
+            array('', ''),
         );
         return $data;
     }
@@ -2876,15 +2873,13 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     /**
      * Test facetoface messaging.
      *
-     * When emailonlyfromnoreplyaddress is set, all messages should come from noreplyaddress, otherwise
-     * it should use facetoface_fromaddress or default to the appropiate user set if facetoface_fromaddress is empty
+     * NOTE: emailonlyfromnoreplyaddress is now alway on
      *
-     * @param int $emailonlyfromnoreplyaddress Setting to use only from no reply address
      * @param string $noreplyaddress No-reply address
      * @param string $senderfrom Sender from setting in Face to face
      * @dataProvider facetoface_messaging_settings
      */
-    public function test_facetoface_messages($emailonlyfromnoreplyaddress, $noreplyaddress, $senderfrom) {
+    public function test_facetoface_messages($noreplyaddress, $senderfrom) {
         $this->init_sample_data();
 
         $this->preventResetByRollback();
@@ -2905,7 +2900,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         \totara_job\job_assignment::create_default($user1->id, array('managerjaid' => $manager1ja->id));
         \totara_job\job_assignment::create_default($user2->id, array('managerjaid' => $manager2ja->id));
 
-        set_config('emailonlyfromnoreplyaddress', $emailonlyfromnoreplyaddress);
         set_config('noreplyaddress', $noreplyaddress);
         set_config('facetoface_fromaddress', $senderfrom);
 
@@ -2943,7 +2937,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $userfrom = (!empty($senderfrom)) ? \mod_facetoface\facetoface_user::get_facetoface_user() : $user3;
 
         $checkformat = '%s %s (%s)';
-        $expectedemail = $emailonlyfromnoreplyaddress ? $noreplyaddress : $userfrom->email;
+        $expectedemail = $noreplyaddress;
         $expected = sprintf($checkformat, $userfrom->firstname, $userfrom->lastname, $expectedemail);
 
         foreach ($emails as $email) {

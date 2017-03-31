@@ -4,8 +4,6 @@ require_once('../config.php');
 require_once('lib.php');
 
 $action = optional_param('action', '', PARAM_ALPHA);
-$id = optional_param('id', 0, PARAM_INT);
-$tag = optional_param('tag', '', PARAM_TAG);
 
 require_login();
 

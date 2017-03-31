@@ -17,12 +17,6 @@
 /**
  * Theme version info
  *
- * This theme has been deprecated.
- * We strongly recommend basing all new themes on roots and basis.
- * This theme will be removed from core in a future release at which point
- * it will no longer receive updates from Totara.
- *
- * @deprecated since Totara 9
  * @package    theme_bootstrapbase
  * @copyright  2013 Bas Brands, www.basbrands.nl
  * @author     Bas Brands
@@ -32,6 +26,6 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2016052300;
-$plugin->requires  = 2016051900;
+$plugin->version   = 2016120500;
+$plugin->requires  = 2016112900;
 $plugin->component = 'theme_bootstrapbase';

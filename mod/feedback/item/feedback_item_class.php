@@ -215,7 +215,7 @@ abstract class feedback_item_base {
         $strupdate = get_string('edit_item', 'feedback');
         $actions['update'] = new action_menu_link_secondary(
             new moodle_url('/mod/feedback/edit_item.php', array('id' => $item->id)),
-            new \core\output\flex_icon('edit', array ('alt' => $strupdate)),
+            new pix_icon('t/edit', $strupdate, 'moodle', array('class' => 'iconsmall', 'title' => '')),
             $strupdate,
             array('class' => 'editing_update', 'data-action' => 'update')
         );
@@ -228,7 +228,6 @@ abstract class feedback_item_base {
                 $buttontitle = get_string('switch_item_to_required', 'feedback');
                 $buttonimg = 'notrequired';
             }
-            // No flex_icon equivalent for this icon so keep it as pix_url.
             $actions['required'] = new action_menu_link_secondary(
                 new moodle_url('/mod/feedback/edit.php', array('id' => $cm->id,
                     'switchitemrequired' => $item->id, 'sesskey' => sesskey())),
@@ -241,7 +240,7 @@ abstract class feedback_item_base {
         $strdelete = get_string('delete_item', 'feedback');
         $actions['delete'] = new action_menu_link_secondary(
             new moodle_url('/mod/feedback/edit.php', array('id' => $cm->id, 'deleteitem' => $item->id, 'sesskey' => sesskey())),
-            new \core\output\flex_icon('delete', array ('alt' => $strdelete)),
+            new pix_icon('t/delete', $strdelete, 'moodle', array('class' => 'iconsmall', 'title' => '')),
             $strdelete,
             array('class' => 'editing_delete', 'data-action' => 'delete')
         );
@@ -295,7 +294,11 @@ class feedback_item_pagebreak extends feedback_item_base {
      */
     public function complete_form_element($item, $form) {
         $form->add_form_element($item,
-                ['static', $item->typ.'_'.$item->id, '', '<hr class="feedback_pagebreak">']);
+            ['static',
+                $item->typ.'_'.$item->id,
+                '',
+                html_writer::empty_tag('hr', ['class' => 'feedback_pagebreak', 'id' => 'feedback_item_' . $item->id])
+            ]);
     }
 
     /**
@@ -311,7 +314,7 @@ class feedback_item_pagebreak extends feedback_item_base {
         $strdelete = get_string('delete_pagebreak', 'feedback');
         $actions['delete'] = new action_menu_link_secondary(
             new moodle_url('/mod/feedback/edit.php', array('id' => $cm->id, 'deleteitem' => $item->id, 'sesskey' => sesskey())),
-            new \core\output\flex_icon('delete', array ('alt' => $strdelete)),
+            new pix_icon('t/delete', $strdelete, 'moodle', array('class' => 'iconsmall', 'title' => '')),
             $strdelete,
             array('class' => 'editing_delete', 'data-action' => 'delete')
         );

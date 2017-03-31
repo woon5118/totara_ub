@@ -151,7 +151,7 @@ class HTMLPurifier_AttrTransform_Noreferrer extends HTMLPurifier_AttrTransform {
      */
     public function transform($attr, $config, $context) {
         // Nothing to do If we already have noreferrer in the rel attribute
-        if (!empty($attr['rel']) && substr($attr['rel'], 'noreferrer') !== false) {
+        if (!empty($attr['rel']) && strpos($attr['rel'], 'noreferrer') !== false) { // Totoara: fix notice
             return $attr;
         }
 

@@ -27,6 +27,8 @@ Feature: Allow choice preview
       | option[0] | Option 1 |
       | option[1] | Option 2 |
       | Restrict answering to this time period | 1 |
+      | timeopen[enabled] | 1 |
+      | timeclose[enabled] | 1 |
       | timeopen[day] | 30 |
       | timeopen[month] | December |
       | timeopen[year] | 2037 |

@@ -1207,7 +1207,7 @@ class completion_info {
             if (isset($SESSION->completioncache) &&
                 array_key_exists($this->course->id, $SESSION->completioncache) &&
                 array_key_exists($cm->id, $SESSION->completioncache[$this->course->id])) {
-                return $SESSION->completioncache[$this->course->id][$cm->id];
+                return (object)$SESSION->completioncache[$this->course->id][$cm->id];
             }
         }
 
@@ -1231,7 +1231,7 @@ class completion_info {
             // Reindex by cm id
             $alldata = array();
             foreach ($alldatabycmc as $data) {
-                $alldata[$data->coursemoduleid] = $data;
+                $alldata[$data->coursemoduleid] = (array)$data;
             }
 
             // Get the module info and build up condition info for each one
@@ -1263,6 +1263,7 @@ class completion_info {
                             $data = $newdata;
                         }
                     }
+                    $data = (array)$data;
                 }
                 $SESSION->completioncache[$this->course->id][$othercm->id] = $data;
             }
@@ -1271,12 +1272,14 @@ class completion_info {
             if (!isset($SESSION->completioncache[$this->course->id][$cm->id])) {
                 $this->internal_systemerror("Unexpected error: course-module {$cm->id} could not be found on course {$this->course->id}");
             }
-            return $SESSION->completioncache[$this->course->id][$cm->id];
+            return (object)$SESSION->completioncache[$this->course->id][$cm->id];
 
         } else {
             // Get single record
             $data = $DB->get_record('course_modules_completion', array('coursemoduleid'=>$cm->id, 'userid'=>$userid));
-            if ($data == false) {
+            if ($data) {
+                $data = (array)$data;
+            } else {
                 // Row not present counts as 'not complete'
                 $data = new StdClass;
                 $data->id              = 0;
@@ -1298,6 +1301,8 @@ class completion_info {
                         $data = $newdata;
                     }
                 }
+                
+                $data = (array)$data;
             }
 
             // Put in cache
@@ -1310,7 +1315,7 @@ class completion_info {
             }
         }
 
-        return $data;
+        return (object)$data;
     }
 
     /**
@@ -1419,7 +1424,7 @@ class completion_info {
 
         $result = array();
         foreach ($modinfo->get_cms() as $cm) {
-            if ($cm->completion != COMPLETION_TRACKING_NONE) {
+            if ($cm->completion != COMPLETION_TRACKING_NONE && !$cm->deletioninprogress) {
                 $result[$cm->id] = $cm;
             }
         }

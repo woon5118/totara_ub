@@ -49,7 +49,6 @@ defined('MOODLE_INTERNAL') || die();
  * was complex due to us wanting to remvoe the outmoded blocks that this
  * block was going to replace.
  *
- * @global moodle_database $DB
  * @param int $oldversion
  * @param object $block
  */
@@ -59,6 +58,12 @@ function xmldb_block_navigation_upgrade($oldversion, $block) {
     $dbman = $DB->get_manager();
 
     // Totara 10 branching line.
+
+    // Moodle v3.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

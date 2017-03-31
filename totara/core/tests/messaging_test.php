@@ -73,28 +73,21 @@ class totara_core_messaging_testcase extends advanced_testcase {
      */
     public function messages_setting() {
         $data = array(
-            array(1, 'no-reply@example.com'),
-            array(1, ''),
-            array(0, 'no-reply@example.com'),
-            array(0, ''),
+            array('no-reply@example.com'),
+            array(''),
         );
         return $data;
     }
 
     /**
      * Test from user is correctly set according to settings.
-     * @param int $emailonlyfromnoreplyaddress Setting to use only from no reply address
-     * @param string $noreplyaddress No-reply address
      * @dataProvider messages_setting
      */
-    public function test_messages_from_no_reply($emailonlyfromnoreplyaddress, $noreplyaddress) {
+    public function test_messages_from_no_reply($noreplyaddress) {
         global $USER, $CFG;
         $this->preventResetByRollback();
         $this->resetAfterTest(true);
         $this->setAdminUser();
-
-        // Set email only from no reply address.
-        set_config('emailonlyfromnoreplyaddress', $emailonlyfromnoreplyaddress);
 
         // Set the no reply address.
         set_config('noreplyaddress', $noreplyaddress);
@@ -121,8 +114,8 @@ class totara_core_messaging_testcase extends advanced_testcase {
             // Within PHPUNIT the administrators email address is set the same as the default.
             $noreplyaddress = 'noreply@' . get_host_from_url($CFG->wwwroot);
         }
-        $expectedname = sprintf("%s %s", $fromuser->firstname, $fromuser->lastname);
-        $expectedemail = $emailonlyfromnoreplyaddress ? $noreplyaddress : $fromuser->email;
+        $expectedname = sprintf("%s %s (via phpunit)", $fromuser->firstname, $fromuser->lastname);
+        $expectedemail = $noreplyaddress;
         $checkformat = '%s (%s)';
         $expected = sprintf($checkformat, $expectedname, $expectedemail);
 

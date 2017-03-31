@@ -139,11 +139,11 @@ class feedback_item_numeric extends feedback_item_base {
 
     public function print_analysed($item, $itemnr = '', $groupid = false, $courseid = false) {
 
-        $align = right_to_left() ? 'right' : 'left';
         $values = $this->get_analysed($item, $groupid, $courseid);
 
         if (isset($values->data) AND is_array($values->data)) {
-            echo '<tr><th colspan="2" align="'.$align.'">';
+            echo "<table class=\"analysis itemtype_{$item->typ}\">";
+            echo '<tr><th colspan="2" align="left">';
             echo $itemnr . ' ';
             if (strval($item->label) !== '') {
                 echo '('. format_string($item->label).') ';
@@ -165,6 +165,7 @@ class feedback_item_numeric extends feedback_item_base {
             echo '<tr><td colspan="2"><b>';
             echo get_string('average', 'feedback').': '.$avg;
             echo '</b></td></tr>';
+            echo '</table>';
         }
     }
 

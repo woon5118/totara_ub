@@ -133,7 +133,7 @@ class forum_post implements \renderable, \templatable {
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
-     * @param \base_renderer $renderer The render to be used for formatting the message and attachments
+     * @param \mod_forum_renderer $renderer The render to be used for formatting the message and attachments
      * @param bool $plaintext Whethe the target is a plaintext target
      * @return stdClass Data ready for use in a mustache template
      */
@@ -538,7 +538,6 @@ class forum_post implements \renderable, \templatable {
         }
 
         return userdate($postmodified, "", \core_date::get_user_timezone($this->get_postto()));
-
     }
 
     /**

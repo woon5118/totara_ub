@@ -74,13 +74,13 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Submit"
     And I press "Continue"
     And I should see "Congratulations - end of lesson reached"
-    When I click on "Dashboard" "link" in the "Navigation" "block"
+    When I am on homepage
     Then I should see "You have lessons that are due"
     And I should see "Completed, You can re-attempt this lesson"
 
   Scenario: A completed lesson with only questions that does not allow multiple attempts
     Given  I follow "Test lesson name"
-    And I navigate to "Edit settings" node in "Lesson administration"
+    And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Re-takes allowed | 0 |
     And I press "Save and display"
@@ -125,7 +125,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Submit"
     And I press "Continue"
     And I should see "Congratulations - end of lesson reached"
-    When I click on "Dashboard" "link" in the "Navigation" "block"
+    When I am on homepage
     Then I should not see "You have lessons that are due"
 
   Scenario: A completed lesson with only content pages that allows multiple attempts
@@ -154,13 +154,13 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Next page"
     And I should see "Second page contents"
     And I press "End of lesson"
-    When I click on "Dashboard" "link" in the "Navigation" "block"
+    When I am on homepage
     Then I should see "You have lessons that are due"
     And I should see "Completed, You can re-attempt this lesson"
 
   Scenario: A completed lesson with only content pages that does not allow multiple attempts
     Given I follow "Test lesson name"
-    And I navigate to "Edit settings" node in "Lesson administration"
+    And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Re-takes allowed | 0 |
     And I press "Save and display"
@@ -188,7 +188,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I press "Next page"
     And I should see "Second page contents"
     And I press "End of lesson"
-    When I click on "Dashboard" "link" in the "Navigation" "block"
+    When I am on homepage
     Then I should not see "You have lessons that are due"
 
   Scenario: An incomplete lesson with only questions.
@@ -228,7 +228,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
-    When I click on "Dashboard" "link" in the "Navigation" "block"
+    When I am on homepage
     Then I should see "You have lessons that are due"
     And I should see "Lesson has been started, but not yet completed"
 
@@ -257,7 +257,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I should see "First page contents"
     And I press "Next page"
     And I should see "Second page contents"
-    When I click on "Dashboard" "link" in the "Navigation" "block"
+    When I am on homepage
     Then I should see "You have lessons that are due"
     And I should see "Lesson has been started, but not yet completed"
 
@@ -290,8 +290,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | id_jumpto_1 | This page |
     And I press "Save page"
     And I log out
-    And I log in as "student1"
-    When I click on "Dashboard" "link" in the "Navigation" "block"
+    When I log in as "student1"
     Then I should see "You have lessons that are due"
     And I should see "No attempts have been made on this lesson"
 
@@ -314,8 +313,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | id_jumpto_1 | End of lesson |
     And I press "Save page"
     And I log out
-    And I log in as "student1"
-    When I click on "Dashboard" "link" in the "Navigation" "block"
+    When I log in as "student1"
     Then I should see "You have lessons that are due"
     And I should see "No attempts have been made on this lesson"
 
@@ -342,6 +340,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | id_answer_editor_0 | True |
       | id_answer_editor_1 | False |
     And I press "Save page"
+    And I follow "Course 1"
     And I follow "Test lesson name 2"
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
@@ -352,7 +351,7 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
       | id_answer_editor_0 | True |
       | id_answer_editor_1 | False |
     And I press "Save page"
-    And I click on "Dashboard" "link" in the "Navigation" "block"
+    And I am on homepage
     And I follow "Course 2"
     And I follow "Test lesson name 3"
     And I follow "Add a question page"
@@ -381,14 +380,14 @@ Feature: In Dashboard, a student can see their current status on all lessons wit
     And I set the following fields to these values:
       | True | 1 |
     And I press "Submit"
-    And I click on "Dashboard" "link" in the "Navigation" "block"
+    And I am on homepage
     And I follow "Course 2"
     And I follow "Test lesson name 3"
     And I should see "D035 M00d13 r0x0rz j00 b0x0rs?"
     And I set the following fields to these values:
       | True | 1 |
     And I press "Submit"
-    When I click on "Dashboard" "link" in the "Navigation" "block"
+    When I am on homepage
     Then I should see "You have lessons that are due" in the "//div[contains(concat(' ', normalize-space(@class), ' '), ' coursebox ' ) and contains(normalize-space(.), 'Course 1')]/div[contains( normalize-space(.), 'You have lessons that are due ' )]" "xpath_element"
     And I should see "You have lessons that are due" in the "//div[contains(concat(' ', normalize-space(@class), ' '), ' coursebox ' ) and contains(normalize-space(.), 'Course 2')]/div[contains( normalize-space(.), 'You have lessons that are due ' )]" "xpath_element"
     And I should see "Lesson has been started, but not yet completed" in the "//div[contains(concat(' ', normalize-space(@class), ' '), ' overview ' ) and descendant-or-self::a[.='Test lesson name 3']]" "xpath_element"

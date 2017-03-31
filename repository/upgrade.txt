@@ -6,6 +6,8 @@ http://docs.moodle.org/dev/Repository_API
 === 10 ===
 
 * The method repository::uses_post_requests() has been deprecated and must not be used anymore.
+* The alfresco repository has been moved to the plugins database. It was
+  using an older version of the Alfresco SDK which is not compatible with recent versions of Alfresco.
 * The following functions, previously used (exclusively) by upgrade steps are not available
   anymore because of the upgrade cleanup performed for this version. See MDL-51580 for more info:
     - repository_picasa_admin_upgrade_notification()
@@ -15,4 +17,3 @@ http://docs.moodle.org/dev/Repository_API
 * The prepare_file() function will now return a file in a per-request directory which will
   be automatically cleaned at the end of the request.
   No modifications should be required as a result of this change.
-

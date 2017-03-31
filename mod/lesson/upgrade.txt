@@ -1,4 +1,4 @@
-This files describes API changes in the lesson code,
+This files describes API changes in the lesson code.
 
 === 10 ===
 

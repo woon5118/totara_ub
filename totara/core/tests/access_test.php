@@ -70,6 +70,9 @@ class totara_core_access_testcase extends advanced_testcase {
                             $pluginallowedcreatorcaps = [];
                             list($plugin_type, $plugin_name) = core_component::normalize_component($plugin);
                             $standardplugins = core_plugin_manager::standard_plugins_list($plugin_type);
+                            if ($standardplugins === false) {
+                                $this->fail('There is something wrong with capability ' . $capname . ' - it is not supposed to be enabled for course creators!');
+                            }
                             if (!in_array($plugin_name, $standardplugins)) {
                                 $libfile = core_component::get_plugin_directory($plugin_type, $plugin_name) . '/lib.php';
                                 if (file_exists($libfile)) {

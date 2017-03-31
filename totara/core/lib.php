@@ -36,10 +36,12 @@ require_once($CFG->dirroot . '/totara/core/deprecatedlib.php');
  * @param int Height to resize to
  * @param string Force image to this format
  *
+ * NOTE: this function was called resize_image() until Totara 10
+ *
  * @global $CFG
  * @return string Path to new file else false
  */
-function resize_image($originalfile, $destination, $newwidth, $newheight, $forcetype = false) {
+function totara_resize_image($originalfile, $destination, $newwidth, $newheight, $forcetype = false) {
     global $CFG;
 
     require_once($CFG->libdir.'/gdlib.php');
@@ -518,9 +520,7 @@ function totara_get_user_from($fromuser = null) {
         empty($fromuser) ? $USER : $fromuser
     );
 
-    if (!empty($CFG->emailonlyfromnoreplyaddress)) {
-        $userfrom->email = core_user::get_noreply_user()->email;
-    }
+    $userfrom->email = core_user::get_noreply_user()->email;
     return $userfrom;
 }
 

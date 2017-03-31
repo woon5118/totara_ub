@@ -499,8 +499,8 @@ $string['multichoice'] = 'Multiple choice';
 $string['multipleanswers'] = 'Choose at least one answer.';
 $string['mustbesubmittedby'] = 'This attempt must be submitted by {$a}.';
 $string['name'] = 'Name';
-$string['navigatenext'] = 'Next';
-$string['navigateprevious'] = 'Previous';
+$string['navigatenext'] = 'Next page';
+$string['navigateprevious'] = 'Previous page';
 $string['navmethod'] = 'Navigation method';
 $string['navmethod_free'] = 'Free';
 $string['navmethod_help'] = 'When sequential navigation is enabled a student must progress through the quiz in order and may not return to previous pages nor skip ahead.';
@@ -706,7 +706,7 @@ $string['readytosend'] = 'You are about to send your whole quiz to be graded.  A
 $string['reattemptquiz'] = 'Re-attempt quiz';
 $string['recentlyaddedquestion'] = 'Recently added question!';
 $string['recurse'] = 'Include questions from subcategories too';
-$string['redoquestion'] = 'Redo question';
+$string['redoquestion'] = 'Try another question like this one';
 $string['redoesofthisquestion'] = 'Other questions attempted here: {$a}';
 $string['regrade'] = 'Regrade all attempts';
 $string['regradecomplete'] = 'All attempts have been regraded';
@@ -940,8 +940,3 @@ $string['wronguse'] = 'You can not use this page like that';
 $string['xhtml'] = 'XHTML';
 $string['youneedtoenrol'] = 'You need to enrol in this course before you can attempt this quiz';
 $string['yourfinalgradeis'] = 'Your final grade for this quiz is {$a}.';
-
-// Deprecated since Moodle 2.9.
-
-$string['timelimitmin'] = 'Time limit (minutes)';
-$string['timelimitsec'] = 'Time limit (seconds)';

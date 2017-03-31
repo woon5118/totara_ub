@@ -201,6 +201,10 @@ function tm_message_send($eventdata) {
         tm_message_set_default_message_preferences($eventdata->userto);
     }
 
+    // Most likely all totara messages are outside the course, if not they need to be fixed.
+    if (!isset($eventdata->courseid)) {
+        $eventdata->courseid = SITEID;
+    }
     // call core message processing - this will trigger either output_totara_task output_totara_alert
     $eventdata->savedmessageid = message_send($eventdata);
 

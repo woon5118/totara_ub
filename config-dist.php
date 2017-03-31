@@ -59,6 +59,17 @@ $CFG->dboptions = array(
     'dbport'    => '',          // the TCP port number to use when connecting
                                 //  to the server. keep empty string for the
                                 //  default port
+    'dbhandlesoptions' => false,// On PostgreSQL poolers like pgbouncer don't
+                                // support advanced options on connection.
+                                // If you set those in the database then
+                                // the advanced settings will not be sent.
+    'dbcollation' => 'utf8mb4_unicode_ci', // MySQL has partial and full UTF-8
+                                // support. If you wish to use partial UTF-8
+                                // (three bytes) then set this option to
+                                // 'utf8_unicode_ci', otherwise this option
+                                // can be removed for MySQL (by default it will
+                                // use 'utf8mb4_unicode_ci'. This option should
+                                // be removed for all other databases.
 );
 
 
@@ -431,31 +442,17 @@ $CFG->admin = 'admin';
 //
 //     $CFG->altcacheconfigpath = '/var/www/shared/totara.cache.config.php
 //
-// The CSS files the Totara produces can be extremely large and complex, especially
-// if you are using a custom theme that builds upon several other themes.
-// In Totara 2.4 a CSS optimiser was added as an experimental feature for advanced
-// users. The CSS optimiser organises the CSS in order to reduce the overall number
-// of rules and styles being sent to the client. It does this by collating the
-// CSS before it is cached removing excess styles and rules and stripping out any
-// extraneous content such as comments and empty rules.
-// The following settings are used to enable and control the optimisation.
+// Use the following flag to completely disable the Available update notifications
+// feature and hide it from the server administration UI.
 //
-// Enable the CSS optimiser. This will only optimise the CSS if themedesignermode
-// is not enabled. This can be set through the UI however it is noted here as well
-// because the other CSS optimiser settings can not be set through the UI.
+//      $CFG->disableupdatenotifications = true;
 //
-//      $CFG->enablecssoptimiser = true;
+// Use the following flag to completely disable the installation of plugins
+// (new plugins, available updates and missing dependencies) and related
+// features (such as cancelling the plugin installation or upgrade) via the
+// server administration web interface.
 //
-// If set the CSS optimiser will add stats about the optimisation to the top of
-// the optimised CSS file. You can then inspect the CSS to see the affect the CSS
-// optimiser is having.
-//
-//      $CFG->cssoptimiserstats = true;
-//
-// If set the CSS that is optimised will still retain a minimalistic formatting
-// so that anyone wanting to can still clearly read it.
-//
-//      $CFG->cssoptimiserpretty = true;
+//      $CFG->disableupdateautodeploy = true;
 //
 // Use the following flag to disable modifications to scheduled tasks
 // whilst still showing the state of tasks.
@@ -687,6 +684,7 @@ $CFG->admin = 'admin';
 // $CFG->phpunit_prefix = 'phpu_';
 // $CFG->phpunit_dataroot = '/home/example/phpu_sitedata';
 // $CFG->phpunit_directorypermissions = 02777; // optional
+// $CFG->phpunit_profilingenabled = true; // optional to profile PHPUnit runs.
 //
 //
 //=========================================================================
@@ -907,7 +905,7 @@ $CFG->admin = 'admin';
 // ALL DONE!  To continue installation, visit your main page with a browser
 //=========================================================================
 
-require_once(dirname(__FILE__) . '/lib/setup.php'); // Do not edit
+require_once(__DIR__ . '/lib/setup.php'); // Do not edit
 
 // There is no php closing tag in this file,
 // it is intentional because it prevents trailing whitespace problems!

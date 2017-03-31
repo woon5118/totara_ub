@@ -81,7 +81,6 @@ if ($dataformat) {
             $formfield = new $newfield($field->id, $user->id);
             $formfield->edit_load_user_data($user);
         }
-
         $userprofiledata = array();
         foreach ($fields as $field => $unused) {
             // Custom user profile textarea fields come in an array

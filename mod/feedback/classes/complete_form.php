@@ -111,7 +111,6 @@ class mod_feedback_complete_form extends moodleform {
                     array('class' => 'form-submit'));
             $buttonarray[] = &$mform->createElement('submit', 'savevalues', get_string('save_entries', 'feedback'),
                     array('class' => 'form-submit'));
-            $buttonarray[] = &$mform->createElement('static', 'buttonsseparator', '', '<br>');
             $buttonarray[] = &$mform->createElement('cancel');
             $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
             $mform->closeHeaderBefore('buttonar');
@@ -167,12 +166,10 @@ class mod_feedback_complete_form extends moodleform {
      * This will add all items to the form, including pagebreaks as horizontal rules.
      */
     protected function definition_preview() {
-        $this->_form->addElement('html', '<div data-rel="feedback-items">');
         foreach ($this->structure->get_items() as $feedbackitem) {
             $itemobj = feedback_get_item_class($feedbackitem->typ);
             $itemobj->complete_form_element($feedbackitem, $this);
         }
-        $this->_form->addElement('html', '</div>');
     }
 
     /**
@@ -447,7 +444,6 @@ class mod_feedback_complete_form extends moodleform {
         $menu->set_constraint('.feedback_form');
         $menu->set_alignment(action_menu::TR, action_menu::BR);
         $menu->set_menu_trigger(get_string('edit'));
-        $menu->do_not_enhance();
         $menu->prioritise = true;
 
         $itemobj = feedback_get_item_class($item->typ);

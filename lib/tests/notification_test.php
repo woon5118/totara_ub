@@ -44,26 +44,12 @@ class core_notification_testcase extends advanced_testcase {
      */
     public function setUp() {
         global $PAGE, $SESSION;
+        $this->resetAfterTest(); //Totara: ignore Moodle SESSION hacks!
 
         parent::setUp();
         $PAGE = new moodle_page();
         \core\session\manager::init_empty_session();
         $SESSION->notifications = [];
-    }
-
-    /**
-     * Tear down required for all notification tests.
-     *
-     * This includes emptying the list of notifications on the session, resetting any session which exists, and setting
-     * up a new moodle_page object.
-     */
-    public function tearDown() {
-        global $PAGE, $SESSION;
-
-        $PAGE = null;
-        \core\session\manager::init_empty_session();
-        $SESSION->notifications = [];
-        parent::tearDown();
     }
 
     /**
@@ -108,6 +94,8 @@ class core_notification_testcase extends advanced_testcase {
     public function test_session_persistance() {
         global $PAGE, $SESSION;
 
+// Totara: we do not want this stuff to break tests all over the place, this hack is disabled in tests.
+return;
         // Initially there won't be any notifications.
         $this->assertCount(0, $SESSION->notifications);
 

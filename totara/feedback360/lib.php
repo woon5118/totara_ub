@@ -1918,6 +1918,7 @@ class feedback360_responder {
             $message = new stdClass();
             $message->component         = 'moodle';
             $message->name              = 'instantmessage';
+            $message->courseid          = SITEID;
             $message->userfrom          = $userfrom;
             $message->userto            = $userto;
             $message->subject           = $emailsubject;

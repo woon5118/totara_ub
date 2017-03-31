@@ -127,32 +127,23 @@ class feedback_item_textfield extends feedback_item_base {
     }
 
     public function print_analysed($item, $itemnr = '', $groupid = false, $courseid = false) {
-        $align = right_to_left() ? 'right' : 'left';
         $values = feedback_get_group_values($item, $groupid, $courseid);
         if ($values) {
-            echo '<tr><th colspan="2" align="' . $align . '">';
+            echo "<table class=\"analysis itemtype_{$item->typ}\">";
+            echo '<tr><th colspan="2" align="left">';
             echo $itemnr . ' ';
             if (strval($item->label) !== '') {
                 echo '('. format_string($item->label).') ';
             }
             echo $this->get_display_name($item);
             echo '</th></tr>';
-            $blank  = 0;
             foreach ($values as $value) {
-                if (strlen(trim($value->value)) === 0) {
-                    $blank++;
-                } else {
-                    echo '<tr><td colspan="2" class="singlevalue" align="' . $align . '">';
-                    echo str_replace("\n", '<br />', $value->value);
-                    echo '</td></tr>';
-                }
-            }
-            if ($blank>0) {
-                echo '<tr><td colspan="2" valign="top" align="' . $align . '">';
-                echo '-&nbsp;&nbsp;' . get_string('blank_responses', 'feedback', (string)$blank);
+                $class = strlen(trim($value->value)) ? '' : ' class="isempty"';
+                echo '<tr'.$class.'><td colspan="2" class="singlevalue">';
+                echo str_replace("\n", '<br />', $value->value);
                 echo '</td></tr>';
             }
-
+            echo '</table>';
         }
     }
 

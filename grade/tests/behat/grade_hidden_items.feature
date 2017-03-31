@@ -35,7 +35,7 @@ Feature: Student and teacher's view of aggregated grade items is consistent when
     When I log out
     And I log in as "teacher1"
     And I follow "Course 1"
-    And I navigate to "Grades" node in "Course administration"
+    And I navigate to "View > Grader report" in the course gradebook
     And I turn editing mode on
     And I give the grade "50.00" to the user "Student 1" for the grade item "Test assignment one"
     And I give the grade "50.00" to the user "Student 1" for the grade item "Test assignment three"
@@ -44,24 +44,23 @@ Feature: Student and teacher's view of aggregated grade items is consistent when
       | Hidden | 1 |
     And I press "Save changes"
     And I follow "Course 1"
-    And I navigate to "Grades" node in "Course administration"
-    And I select "User report" from the "Grade report" singleselect
+    And I navigate to "View > User report" in the course gradebook
+    And I select "Myself" from the "View report as" singleselect
     And I select "Student 1" from the "Select all or one user" singleselect
     Then the following should exist in the "user-grade" table:
-      | Grade item                      | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
-      | AssignmentTest assignment one   | 100.00 %          | 50.00  | 0–100 | 50.00 %    | 25.00 %                      |
-      | AssignmentTest assignment two   | 0.00 %( Empty )   | -      | 0–100 | -          | 0.00 %                       |
-      | AssignmentTest assignment three | 100.00 %          | 50.00  | 0–100 | 50.00 %    | 25.00 %                      |
-      | NaturalCourse total             | -                 | 100.00 | 0–200 | 50.00 %    | -                            |
+      | Grade item | Calculated weight | Grade | Range | Percentage | Contribution to course total |
+      | Test assignment one | 100.00 % | 50.00 | 0–100 | 50.00 % | 25.00 % |
+      | Test assignment two | 0.00 %( Empty ) | - | 0–100 | - | 0.00 % |
+      | Test assignment three | 100.00 % | 50.00 | 0–100 | 50.00 % | 25.00 % |
+      | Course total | - | 100.00 | 0–200 | 50.00 % | - |
     When I log out
     And I log in as "student1"
     And I follow "Course 1"
-    And I navigate to "Grades" node in "Course administration"
-    And I navigate to "User report" node in "Grade administration"
+    And I navigate to "User report" in the course gradebook
     Then the following should exist in the "user-grade" table:
-      | Grade item                      | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
-      | AssignmentTest assignment one   | 100.00 %          | 50.00  | 0–100 | 50.00 %    | 25.00 %                      |
-      | AssignmentTest assignment two   | -( Empty )        | -      | 0–100 | -          | -                            |
-      | AssignmentTest assignment three | 100.00 %          | 50.00  | 0–100 | 50.00 %    | 25.00 %                      |
-      | NaturalCourse total             | -                 | 100.00 | 0–200 | 50.00 %    | -                            |
+      | Grade item | Calculated weight | Grade | Range | Percentage | Contribution to course total |
+      | Test assignment one | 100.00 % | 50.00 | 0–100 | 50.00 % |  25.00 % |
+      | Test assignment two | -( Empty ) | - | 0–100 | - | - |
+      | Test assignment three | 100.00 % | 50.00 | 0–100 | 50.00 % | 25.00 % |
+      | Course total | - | 100.00 | 0–200 | 50.00 % | - |
     And I should not see "Test assignment four"

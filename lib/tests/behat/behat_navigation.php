@@ -225,12 +225,20 @@ class behat_navigation extends behat_base {
      *
      * @Given /^I navigate to "(?P<nodetext_string>(?:[^"]|\\")*)" node in "(?P<parentnodes_string>(?:[^"]|\\")*)"$/
      *
+     * @todo MDL-57281 deprecate in Moodle 3.1
+     *
      * @throws ExpectationException
      * @param string $nodetext navigation node to click.
      * @param string $parentnodes comma seperated list of parent nodes.
      * @return void
      */
     public function i_navigate_to_node_in($nodetext, $parentnodes) {
+        // This step needs to be deprecated and replaced with one of:
+        // - I navigate to "PATH" in current page administration
+        // - I navigate to "PATH" in site administration
+        // - I navigate to course participants
+        // - I navigate to "PATH" in the course gradebook
+        // - I click on "LINK" "link" in the "Navigation" "block" .
         $parentnodes = array_map('trim', explode('>', $parentnodes));
         $this->select_node_in_navigation($nodetext, $parentnodes);
     }
@@ -248,6 +256,7 @@ class behat_navigation extends behat_base {
         // Site admin is different and needs special treatment.
         $siteadminstr = get_string('administrationsite');
 
+        // Create array of all parentnodes.
         $countparentnode = count($parentnodes);
 
         // If JS is disabled and Site administration is not expanded we
@@ -371,7 +380,7 @@ class behat_navigation extends behat_base {
             "/li[contains(concat(' ', normalize-space(@class), ' '), ' contains_branch ')]" .
             "/ul/li[contains(concat(' ', normalize-space(@class), ' '), ' contains_branch ')]" .
             "[p[contains(concat(' ', normalize-space(@class), ' '), ' branch ')]" .
-            "/span[normalize-space(.)=" . $nodetextliteral ."]]" .
+            "[span[normalize-space(.)=" . $nodetextliteral ."] or a[normalize-space(.)=" . $nodetextliteral ."]]]" .
             "|" .
             "//div[contains(concat(' ', normalize-space(@class), ' '), ' content ')]/div" .
             "/ul[contains(concat(' ', normalize-space(@class), ' '), ' block_tree ')]" .
@@ -543,4 +552,59 @@ class behat_navigation extends behat_base {
         $lastnode = array_pop($parentnodes);
         $this->select_node_in_navigation($lastnode, $parentnodes);
     }
+
+    /**
+     * Opens the current users profile page in edit mode.
+     *
+     * @Given /^I open my profile in edit mode$/
+     * @throws coding_exception
+     * @return void
+     */
+    public function i_open_my_profile_in_edit_mode() {
+        global $USER;
+
+        $user = $this->get_session_user();
+        $globuser = $USER;
+        $USER = $user; // We need this set to the behat session user so we can call isloggedin.
+
+        $systemcontext = context_system::instance();
+
+        $bodynode = $this->find('xpath', 'body');
+        $bodyclass = $bodynode->getAttribute('class');
+        $matches = [];
+        if (preg_match('/(?<=^course-|\scourse-)\d/', $bodyclass, $matches) && !empty($matches)) {
+            $courseid = intval($matches[0]);
+        } else {
+            $courseid = SITEID;
+        }
+
+        if (isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) {
+            if (is_siteadmin($user) ||  has_capability('moodle/user:update', $systemcontext)) {
+                $url = new moodle_url('/user/editadvanced.php', array('id' => $user->id, 'course' => SITEID,
+                    'returnto' => 'profile'));
+            } else if (has_capability('moodle/user:editownprofile', $systemcontext)) {
+                $userauthplugin = false;
+                if (!empty($user->auth)) {
+                    $userauthplugin = get_auth_plugin($user->auth);
+                }
+                if ($userauthplugin && $userauthplugin->can_edit_profile()) {
+                    $url = $userauthplugin->edit_profile_url();
+                    if (empty($url)) {
+                        if (empty($course)) {
+                            $url = new moodle_url('/user/edit.php', array('id' => $user->id, 'returnto' => 'profile'));
+                        } else {
+                            $url = new moodle_url('/user/edit.php', array('id' => $user->id, 'course' => $courseid,
+                                'returnto' => 'profile'));
+                        }
+                    }
+
+                }
+            }
+            $this->getSession()->visit($this->locate_path($url->out_as_local_url()));
+        }
+
+        // Restore global user variable.
+        $USER = $globuser;
+    }
+
 }

@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../../config.php');
+require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir.'/tablelib.php');
 
@@ -132,6 +132,7 @@ if ($mform && ($mform->is_cancelled() || !empty($CFG->preventscheduledtaskchange
     if ($lastrun < time() - (MINSECS * 5)) {
         echo $OUTPUT->notification(get_string('cronscheduleregularity', 'totara_core'), 'notifynotice');
     }
+
     $tasks = core\task\manager::get_all_scheduled_tasks();
     echo $renderer->scheduled_tasks_table($tasks);
     echo $OUTPUT->footer();

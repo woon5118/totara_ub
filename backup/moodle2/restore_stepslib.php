@@ -1879,6 +1879,10 @@ class restore_course_structure_step extends restore_structure_step {
         $this->legacyrestrictmodules = !empty($data->restrictmodules);
 
         $data->startdate= $this->apply_date_offset($data->startdate);
+        if (isset($data->enddate)) {
+            $data->enddate = $this->apply_date_offset($data->enddate);
+        }
+
         if ($data->defaultgroupingid) {
             $data->defaultgroupingid = $this->get_mappingid('grouping', $data->defaultgroupingid);
         }
@@ -2871,7 +2875,7 @@ class restore_calendarevents_structure_step extends restore_structure_step {
                 'courseid'       => $this->get_courseid(),
                 'groupid'        => $data->groupid,
                 'userid'         => $data->userid,
-                'repeatid'       => $data->repeatid,
+                'repeatid'       => $this->get_mappingid('event', $data->repeatid),
                 'modulename'     => $data->modulename,
                 'eventtype'      => $data->eventtype,
                 'timestart'      => $this->apply_date_offset($data->timestart),
@@ -2889,17 +2893,26 @@ class restore_calendarevents_structure_step extends restore_structure_step {
                   FROM {event}
                  WHERE " . $DB->sql_compare_text('name', 255) . " = " . $DB->sql_compare_text('?', 255) . "
                    AND courseid = ?
-                   AND repeatid = ?
                    AND modulename = ?
                    AND timestart = ?
                    AND timeduration = ?
                    AND " . $DB->sql_compare_text('description', 255) . " = " . $DB->sql_compare_text('?', 255);
-        $arg = array ($params['name'], $params['courseid'], $params['repeatid'], $params['modulename'], $params['timestart'], $params['timeduration'], $params['description']);
+        $arg = array ($params['name'], $params['courseid'], $params['modulename'], $params['timestart'], $params['timeduration'], $params['description']);
         $result = $DB->record_exists_sql($sql, $arg);
         if (empty($result)) {
             $newitemid = $DB->insert_record('event', $params);
             $this->set_mapping('event', $oldid, $newitemid);
             $this->set_mapping('event_description', $oldid, $newitemid, $restorefiles);
+        }
+        // With repeating events, each event has the repeatid pointed at the first occurrence.
+        // Since the repeatid will be empty when the first occurrence is restored,
+        // Get the repeatid from the second occurrence of the repeating event and use that to update the first occurrence.
+        // Then keep a list of repeatids so we only perform this update once.
+        static $repeatids = array();
+        if (!empty($params['repeatid']) && !in_array($params['repeatid'], $repeatids)) {
+            // This entry is repeated so the repeatid field must be set.
+            $DB->set_field('event', 'repeatid', $params['repeatid'], array('id' => $params['repeatid']));
+            $repeatids[] = $params['repeatid'];
         }
 
     }
@@ -3405,7 +3418,6 @@ class restore_course_logstores_structure_step extends restore_structure_step {
  */
 class restore_activity_logstores_structure_step extends restore_course_logstores_structure_step {
 }
-
 
 /**
  * Defines the restore step for advanced grading methods attached to the activity module

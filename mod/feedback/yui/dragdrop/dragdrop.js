@@ -4,7 +4,7 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
         DRAGAREA : '#feedback_dragarea',
         DRAGITEMCLASS : 'feedback_itemlist',
         DRAGITEM : 'div.feedback_itemlist',
-        DRAGLIST : 'div[data-rel="feedback-items"]',
+        DRAGLIST: '#feedback_dragarea form',
         ITEMBOX : '#feedback_item_box_',
         DRAGHANDLE : 'itemhandle'
     };
@@ -26,14 +26,11 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
             this.mydraghandle = this.get_drag_handle(handletitle, CSS.DRAGHANDLE, 'icon');
 
             //Get the list of li's in the lists and add the drag handle.
-            var basenode = Y.Node.one(CSS.DRAGLIST);
-            if (basenode) {
-                var listitems = basenode.all(CSS.DRAGITEM).each(function (v) {
-                    //var item_id = this.get_node_id(v.get('id')); //Get the id of the feedback item.
-                    //var item_box = Y.Node.one(CSS.ITEMBOX + item_id); //Get the current item box so we can add the drag handle.
-                    v.append(this.get_drag_handle(handletitle, CSS.DRAGHANDLE, 'icon')); // Insert the new handle into the item box.
-                }, this);
-            }
+            basenode = Y.Node.one(CSS.DRAGLIST);
+            listitems = basenode.all(CSS.DRAGITEM).each(function(v) {
+                var item_id = this.get_node_id(v.get('id')); //Get the id of the feedback item.
+                v.append(this.mydraghandle.cloneNode(true)); // Insert the new handle into the item box.
+            }, this);
 
             //We use a delegate to make all items draggable
             var del = new Y.DD.Delegate({
@@ -164,19 +161,27 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
          */
         drag_drophit_handler : function(e) {
             var drop = e.drop.get('node'),
-                drag = e.drag.get('node');
-            dragnode = Y.one(drag);
+                drag = e.drag.get('node'),
+                dragnode = Y.one(drag);
             if (!drop.hasClass(CSS.DRAGITEMCLASS)) {
                 if (!drop.contains(drag)) {
                     drop.appendChild(drag);
                 }
-                myElements = '';
+                var childElement;
+                var elementId;
+                var elements = [];
                 drop.all(CSS.DRAGITEM).each(function(v) {
-                    myElements = myElements + ',' + this.get_node_id(v.get('id'));
+                    childElement = v.one('.felement').one('[id^="feedback_item_"]');
+                    if (childElement) {
+                        elementId = this.get_node_id(childElement.get('id'));
+                        if (elements.indexOf(elementId) == -1) {
+                            elements.push(elementId);
+                        }
+                    }
                 }, this);
                 var spinner = M.util.add_spinner(Y, dragnode);
-                this.save_item_order(this.cmid, myElements, spinner);
-            }
+                this.save_item_order(this.cmid, elements.toString(), spinner);
+           }
         },
 
         /**

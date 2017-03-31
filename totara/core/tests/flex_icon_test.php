@@ -305,8 +305,13 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
 
         $expected = $renderer->action_icon($url, $flexicon);
         $expected = str_replace('data-flex-icon="edit"', 'data-flex-icon="core|i/edit"', $expected);
+        $result = $renderer->action_icon($url, $pixicon);
 
-        $this->assertSame($expected, $renderer->action_icon($url, $pixicon));
+        // The action link changes, so get rid of it.
+        $expected = preg_replace('/id="action_link[^"]+"/', '', $expected);
+        $result = preg_replace('/id="action_link[^"]+"/', '', $result);
+
+        $this->assertSame($expected, $result);
     }
 
     public function test_pix_icon_url() {
