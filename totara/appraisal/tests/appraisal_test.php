@@ -29,17 +29,28 @@ require_once($CFG->dirroot.'/totara/appraisal/tests/appraisal_testcase.php');
 
 class appraisal_test extends appraisal_testcase {
 
-    public function skip_test_set_status() {
+    public function test_set_status() {
+        $this->resetAfterTest();
         $appraisal = new appraisal();
 
-        $this->setExpectedException('appraisal_exception');
+        $this->expectException('appraisal_exception');
         $appraisal->set_status($appraisal::STATUS_CLOSED);
+    }
+
+    public function test_set_status2() {
+        $this->resetAfterTest();
+        $appraisal = new appraisal();
 
         $appraisal->set_status($appraisal::STATUS_ACTIVE);
         $this->assertNull($appraisal->timefinished);
+    }
 
+    public function test_set_status3() {
+        $this->resetAfterTest();
+        $appraisal = new appraisal();
+
+        $this->expectException('appraisal_exception');
         $appraisal->set_status($appraisal::STATUS_COMPLETED);
-        $this->assertNotNull($appraisal->timefinished);
     }
 
     public function test_appraisal_create() {

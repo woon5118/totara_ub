@@ -1235,13 +1235,21 @@ class core_moodlelib_testcase extends advanced_testcase {
         $this->assertEquals(array('zombie'), get_extra_user_fields(true, array('frog')));
         $this->assertEquals(array(), get_extra_user_fields(true, array('frog', 'zombie')));
 
-        // Check we can't provide false as context.
-        $this->setExpectedException('coding_exception');
-        get_extra_user_fields(false);
+        try {
+            // Check we can't provide false as context.
+            get_extra_user_fields(false);
+            $this->fail('Coding exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf('coding_Exception', $e);
+        }
 
-        // Check we can't provide null as context.
-        $this->setExpectedException('coding_exception');
-        get_extra_user_fields(null);
+        try {
+            // Check we can't provide null as context.
+            get_extra_user_fields(null);
+            $this->fail('Coding exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf('coding_Exception', $e);
+        }
     }
 
     public function test_get_extra_user_fields_sql() {

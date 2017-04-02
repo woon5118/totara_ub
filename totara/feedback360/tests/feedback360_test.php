@@ -82,8 +82,12 @@ class feedback360_test extends feedback360_testcase {
         // Check deleting of activated feedback.
         $fdbck2->validate();
         $fdbck2->activate();
-        $this->setExpectedException('feedback360_exception');
-        $fdbck2->delete();
+        try {
+            $fdbck2->delete();
+            $this->fail('Exception expected if feedback active');
+        } catch (feedback360_exception $e) {
+            $this->assertSame('Cannot delete active feedback', $e->getMessage());
+        }
         $list2 = feedback360::get_manage_list();
         $this->assertCount(1, $list2);
         $this->assertArrayHasKey($fdbck2->id, $list2);
@@ -91,9 +95,15 @@ class feedback360_test extends feedback360_testcase {
 
         // Check deleting of de-activated feedback.
         $fdbck2->set_status(feedback360::STATUS_CLOSED);
-        $fdbck2->delete();
+        try {
+            $fdbck2->delete();
+            $this->fail('Exception expected if feedback locked');
+        } catch (moodle_exception $e) {
+            $this->assertSame('You cannot make changes to an assignment module instance which is locked', $e->getMessage());
+        }
         $list3 = feedback360::get_manage_list();
-        $this->assertEmpty($list3);
+        $this->assertCount(1, $list3);
+        $this->assertArrayHasKey($fdbck2->id, $list3);
     }
 
     public function test_activate() {
@@ -374,9 +384,12 @@ class feedback360_test extends feedback360_testcase {
         // Check getting manage list as not admin.
         $justuser = $this->getDataGenerator()->create_user();
         $this->setUser($justuser);
-        $this->setExpectedException('required_capability_exception');
-        $list1 = feedback360::get_manage_list();
-        $this->assertEmpty($list1);
+        try {
+            $list1 = feedback360::get_manage_list();
+            $this->fail('permission exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf('required_capability_exception', $e);
+        }
 
         // Get list of all feedbacks.
         $this->setAdminUser();

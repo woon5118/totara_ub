@@ -660,7 +660,7 @@ class core_userliblib_testcase extends advanced_testcase {
         $this->assertEquals($studentfullname, $result['fullname']);
 
         // Get exception for invalid required fields.
-        $this->setExpectedException('moodle_exception');
+        $this->expectException('moodle_exception');
         $result = user_get_user_details($student, $course1, array('wrongrequiredfield'));
     }
 }

@@ -118,7 +118,7 @@ class mustache_flex_icon_helper_testcase extends basic_testcase {
 
         $mustachehelper = new mustache_flex_icon_helper(self::$renderer);
 
-        $this->setExpectedException('\coding_exception');
+        $this->expectException('coding_exception');
         $mustachehelper->flex_icon($helperstring, $this->get_lambda_helper());
 
     }
