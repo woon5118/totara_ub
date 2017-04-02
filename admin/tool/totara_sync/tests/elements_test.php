@@ -240,8 +240,9 @@ class tool_totara_sync_elements_testcase extends advanced_testcase {
             $synctable_clone = $source->get_sync_table_clone();
 
             // Create sync element with some functions mocked.
-            $element = $this->getMock('totara_sync_element_user',
-                    array('get_source', 'get_source_sync_table', 'get_source_sync_table_clone'));
+            $mockbuilder = $this->getMockBuilder('totara_sync_element_user');
+            $mockbuilder->setMethods(array('get_source', 'get_source_sync_table', 'get_source_sync_table_clone'));
+            $element = $mockbuilder->getMock();
 
             $element->expects($this->any())
                     ->method('get_source')
