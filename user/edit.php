@@ -76,7 +76,7 @@ $user->interests = core_tag_tag::get_item_tags_array('core', 'user', $user->id);
 // Otherwise the remote user could end up in endless loop between user/view.php and here.
 // Required custom fields are not supported in MNet environment anyway.
 if (is_mnet_remote_user($user)) {
-    if (user_not_fully_set_up($user, true)) {
+    if (user_not_fully_set_up($user)) {
         $hostwwwroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $user->mnethostid));
         print_error('usernotfullysetup', 'mnet', '', $hostwwwroot);
     }
