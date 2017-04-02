@@ -59,12 +59,12 @@ Feature: Create users with custom profile fields
     And I set the following fields to these values:
       | Short name                      | menufield     |
       | Name                            | Menu Field    |
-    And I set the field "Menu options (one per line)" to multiline
-          """
-          AAA
-          BBB
-          CCC
-          """
+    And I set the field "Menu options (one per line)" to multiline:
+"""
+AAA
+BBB
+CCC
+"""
     And I press "Save changes"
     When I navigate to "Add a new user" node in "Site administration > Users > Accounts"
     And I expand all fieldsets

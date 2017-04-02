@@ -307,7 +307,7 @@ class behat_deprecated extends behat_base {
      */
     public function i_set_the_field_to_multiline($field, PyStringNode $value) {
 
-        $alternative = 'I set the field "' . $this->escape($field) . '"  to multiline:';
+        $alternative = 'I set the field "' . $this->escape($field) . '" to multiline:';
         $this->deprecated_message($alternative);
 
         $this->execute('behat_forms::i_set_the_field_to_multiline', array($field, $value));

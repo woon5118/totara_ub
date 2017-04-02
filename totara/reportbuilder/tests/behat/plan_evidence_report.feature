@@ -145,7 +145,7 @@ Feature: Record of learning evidence report
     When I set the following fields to these values:
       | Full name                   | Choices test |
       | Short name (must be unique) | choicestest  |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       one
       two

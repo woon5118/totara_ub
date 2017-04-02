@@ -179,7 +179,7 @@ Scenario: Verify custom fields can be successfully added to a personal goal type
   And I set the following fields to these values:
     | Full name                   | Menu of choices 1          |
     | Short name (must be unique) | menuofchoices1             |
-  And I set the field "Menu options (one per line)" to multiline
+  And I set the field "Menu options (one per line)" to multiline:
   """
   Choice 1
   Choice 2
@@ -362,7 +362,7 @@ Scenario: Verify personal goal data can be added to an appraisal.
   And I set the following fields to these values:
     | Full name                   | Menu of choices 1          |
     | Short name (must be unique) | menuofchoices1             |
-  And I set the field "Menu options (one per line)" to multiline
+  And I set the field "Menu options (one per line)" to multiline:
   """
   Choice 1
   Choice 2

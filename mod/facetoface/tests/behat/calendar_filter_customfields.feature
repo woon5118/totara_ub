@@ -42,7 +42,7 @@ Feature: Filter seminar events in calendar by their customfields
       | Full name  | Menu of choices |
       | Short name | menuofchoices |
       | Default value | Choice 1          |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       Choice 1
       Choice 2
@@ -96,7 +96,7 @@ Feature: Filter seminar events in calendar by their customfields
       | Full name  | Menu of choices |
       | Short name | menuofchoices |
       | Default value | Choice 1          |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       Choice 1
       Choice 2

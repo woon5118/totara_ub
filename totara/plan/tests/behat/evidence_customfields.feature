@@ -48,7 +48,7 @@ Feature: Evidence custom fields.
     And I set the following fields to these values:
       | Full name                   | Menu test |
       | Short name (must be unique) | menutest  |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       optionone
       optiontwo
@@ -332,7 +332,7 @@ Feature: Evidence custom fields.
     And I set the following fields to these values:
       | Full name                   | Menu test |
       | Short name (must be unique) | menutest   |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       optionone
       optiontwo
@@ -545,7 +545,7 @@ Feature: Evidence custom fields.
       | Full name                   | Unique menu of choices test |
       | Short name (must be unique) | menutest                    |
       | Should the data be unique?  | Yes                         |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       optionone
       optiontwo
@@ -657,7 +657,7 @@ Feature: Evidence custom fields.
       | Full name                   | Locked menu of choices test |
       | Short name (must be unique) | menutest                    |
       | Is this field locked?       | Yes                         |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       menuoptionone
       menuoptiontwo

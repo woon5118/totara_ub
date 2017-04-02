@@ -53,7 +53,7 @@ Feature: Upload users
     And I set the following fields to these values:
       | Short name | fruit     |
       | Name       | Fav fruit |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       Apple
       Orange

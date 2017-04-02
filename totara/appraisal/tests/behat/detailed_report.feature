@@ -39,7 +39,7 @@ Feature: Test appraisal detailed report with numeric question
       | timedue[day]          | 31                      |
       | timedue[month]        | 12                      |
       | timedue[year]         | 2037                    |
-    And I set the field "Page names (optional)" to multiline
+    And I set the field "Page names (optional)" to multiline:
       """
       Page1.1
       Page1.2

@@ -30,7 +30,7 @@ Feature: Verify certification completion data with custom fields can be successf
       | Full name     | Menu of Choices 1 |
       | Short name    | menuofchoices1    |
       | Default value | Choice 1          |
-    And I set the field "Menu options (one per line)" to multiline
+    And I set the field "Menu options (one per line)" to multiline:
       """
       Choice 1
       Choice 2
