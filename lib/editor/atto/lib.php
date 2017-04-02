@@ -239,6 +239,7 @@ class atto_texteditor extends texteditor {
  */
 class atto_page_hack {
     public $oldpage;
+    public $context;
     public $requires;
     public $theme;
     public $url;
@@ -249,6 +250,7 @@ class atto_page_hack {
     public function __construct($oldpage) {
         $this->oldpage = $oldpage;
         $this->requires = $this;
+        $this->context = $oldpage->context;
         $this->theme = $oldpage->theme;
         $this->url = $oldpage->url;
     }
