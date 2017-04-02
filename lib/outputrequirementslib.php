@@ -453,8 +453,7 @@ class page_requirements_manager {
      */
     public function jquery() {
         $this->jquery_plugin('jquery');
-        $this->jquery_plugin('migrate'); // TODO: TL-13958
-        $this->jquery_plugin('migrate3'); // TODO: TL-13958
+        $this->jquery_plugin('migrate3'); // TODO: TL-13958 this is needed four our outdated jquery ui
     }
 
     /**
