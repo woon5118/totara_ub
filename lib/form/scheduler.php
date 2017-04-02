@@ -124,12 +124,12 @@ class MoodleQuickForm_scheduler extends MoodleQuickForm_group {
         }
 
         $this->_elements = array();
-        $this->_elements['frequency'] = @MoodleQuickForm::createElement('select', 'frequency', get_string('schedule', 'totara_core'), $frequencyselect);
-        $this->_elements['daily'] = @MoodleQuickForm::createElement('select', 'daily', get_string('dailyat', 'totara_core'), $dailyselect);
-        $this->_elements['weekly'] = @MoodleQuickForm::createElement('select', 'weekly', get_string('weeklyon', 'totara_core'), $weeklyselect);
-        $this->_elements['monthly'] = @MoodleQuickForm::createElement('select', 'monthly', get_string('monthlyon', 'totara_core'), $monthlyselect);
-        $this->_elements['hourly'] = @MoodleQuickForm::createElement('select', 'hourly', get_string('hourlyon', 'totara_core'), $hourlyselect);
-        $this->_elements['minutely'] = @MoodleQuickForm::createElement('select', 'minutely', get_string('minutelyon', 'totara_core'), $minutelyselect);
+        $this->_elements['frequency'] = $this->createFormElement('select', 'frequency', get_string('schedule', 'totara_core'), $frequencyselect);
+        $this->_elements['daily'] = $this->createFormElement('select', 'daily', get_string('dailyat', 'totara_core'), $dailyselect);
+        $this->_elements['weekly'] = $this->createFormElement('select', 'weekly', get_string('weeklyon', 'totara_core'), $weeklyselect);
+        $this->_elements['monthly'] = $this->createFormElement('select', 'monthly', get_string('monthlyon', 'totara_core'), $monthlyselect);
+        $this->_elements['hourly'] = $this->createFormElement('select', 'hourly', get_string('hourlyon', 'totara_core'), $hourlyselect);
+        $this->_elements['minutely'] = $this->createFormElement('select', 'minutely', get_string('minutelyon', 'totara_core'), $minutelyselect);
 
         foreach ($this->_elements as $element){
             if (method_exists($element, 'setHiddenLabel')){
