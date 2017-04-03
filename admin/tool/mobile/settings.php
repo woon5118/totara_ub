@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
 
-    $ADMIN->add('root', new admin_category('mobileapp', new lang_string('mobileapp', 'tool_mobile')), 'development');
+    $ADMIN->add('experimental', new admin_category('mobileapp', new lang_string('mobileapp', 'tool_mobile'))); // Totara: moodle mobile does not work much with Totara, it has to be marked as Experimental.
 
     $temp = new admin_settingpage('mobilesettings', new lang_string('mobilesettings', 'tool_mobile'), 'moodle/site:config', false);
 
