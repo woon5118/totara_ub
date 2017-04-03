@@ -15,19 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * No authentication plugin upgrade code
  *
- * @package    auth_cas
- * @author     Martin Dougiamas
- * @author     Jerome GUTIERREZ
- * @author     Iñaki Arenaza
+ * @package    auth_email
+ * @copyright  2017 Stephen Bourget
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017020700;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2016112900;        // Requires this Moodle version
-$plugin->component = 'auth_cas';        // Full name of the plugin (used for diagnostics)
+/**
+ * Function to upgrade auth_email.
+ * @param int $oldversion the version we are upgrading from
+ * @return bool result
+ */
+function xmldb_auth_email_upgrade($oldversion) {
+    global $CFG, $DB;
 
-$plugin->dependencies = array('auth_ldap' => 2017020700);
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2017020700) {
+        // Convert info in config plugins from auth/email to auth_email.
+        upgrade_fix_config_auth_plugin_names('email');
+        upgrade_fix_config_auth_plugin_defaults('email');
+        upgrade_plugin_savepoint(true, 2017020700, 'auth', 'email');
+    }
+
+    return true;
+}

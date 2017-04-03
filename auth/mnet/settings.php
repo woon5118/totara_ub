@@ -15,19 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Admin settings and defaults.
  *
- * @package    auth_cas
- * @author     Martin Dougiamas
- * @author     Jerome GUTIERREZ
- * @author     Iñaki Arenaza
+ * @package    auth_mnet
+ * @copyright  2017 Stephen Bourget
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2017020700;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2016112900;        // Requires this Moodle version
-$plugin->component = 'auth_cas';        // Full name of the plugin (used for diagnostics)
+if ($ADMIN->fulltree) {
+    require_once($CFG->dirroot.'/lib/outputlib.php');
 
-$plugin->dependencies = array('auth_ldap' => 2017020700);
+    // Introductory explanation.
+    $settings->add(new admin_setting_heading('auth_mnet/pluginname', '',
+            new lang_string('auth_mnetdescription', 'auth_mnet')));
+
+    // RPC Timeout.
+    $settings->add(new admin_setting_configtext('auth_mnet/rpc_negotiation_timeout',
+            get_string('rpc_negotiation_timeout', 'auth_mnet'),
+            get_string('auth_mnet_rpc_negotiation_timeout', 'auth_mnet'), '30', PARAM_INT));
+
+}
