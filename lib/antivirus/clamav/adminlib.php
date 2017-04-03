@@ -87,7 +87,7 @@ class antivirus_clamav_pathtounixsocket_setting extends admin_setting_configtext
         }
         $runningmethod = get_config('antivirus_clamav', 'runningmethod');
         if ($runningmethod === 'unixsocket') {
-            $socket = stream_socket_client('unix://' . $data, $errno, $errstr, ANTIVIRUS_CLAMAV_SOCKET_TIMEOUT);
+            $socket = @stream_socket_client('unix://' . $data, $errno, $errstr, ANTIVIRUS_CLAMAV_SOCKET_TIMEOUT);
             if (!$socket) {
                 return get_string('errorcantopensocket', 'antivirus_clamav', "$errstr ($errno)");
             } else {
