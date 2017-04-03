@@ -22,14 +22,11 @@ Feature: Create and edit activity pages handle tags correctly
     And I click on "Course 1" "link"
     And I press "Turn editing on"
     And I wait until the page is ready
-    And I click on "Add an activity or resource" "link"
-    And I click on "module_assign" "radio"
-    And I press "Add"
-    And I set the following fields to these values:
+    And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Assignment Example                            |
       | Description     | Assignment Description                        |
       | Tags            | Superb, Superfluous, Salacious, Sanctimonious |
-    And I press "Save and display"
+    And I follow "Assignment Example"
     And I navigate to "Edit settings" node in "Assignment administration"
     And I expand all fieldsets
     Then I should see "Superb" in the "#fitem_id_tags" "css_element"
