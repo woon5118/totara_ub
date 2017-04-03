@@ -480,7 +480,7 @@ class behat_navigation extends behat_base {
     public function i_navigate_to_in_current_page_administration($nodetext) {
         $parentnodes = array_map('trim', explode('>', $nodetext));
         // Find the name of the first category of the administration block tree.
-        $xpath = '//div[contains(@class,\'block_settings\')]//div[@id=\'settingsnav\']/ul/li[1]/p[1]/span';
+        $xpath = '//div[contains(@class,\'block_settings\')]//div[@id=\'settingsnav\']/ul/li[1]/p[1]/span[2]'; // Totara: we have extra span from flex icons
         $node = $this->find('xpath', $xpath);
         array_unshift($parentnodes, $node->getText());
         $lastnode = array_pop($parentnodes);
