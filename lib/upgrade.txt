@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 10.0 ===
 
+* JQuery has been updated to 3.2.1. JQuery migrate plugins are no longer shipped - please read
+  https://jquery.com/upgrade-guide/3.0/ and update your javascript.
 * get_user_capability_course() now has an additional parameter 'limit'. This can be used to return a set number of records with
   the submitted capability. The parameter 'fieldsexceptid' will now accept context fields which can be used for preloading.
 * Admin setting "Show My courses expanded on Dashboard" has been removed.
@@ -11,8 +13,6 @@ information provided here is intended especially for developers.
   added to the options list for best backwards compatibility - if you were manually adding a "no selection" option you will need
   to remove it.
 * Node.js versions >=4 are now required to run grunt.
-* JQuery has been updated to 3.1.0. JQuery migrate plugins are no longer shipped - please read
-  https://jquery.com/upgrade-guide/3.0/ and update your javascript.
 * New option 'blanktarget' added to format_text. This option adds target="_blank" to links
 * A new webservice structure `external_files` has been created which provides a standardised view of files in Moodle and
   should be used for all file return descriptions.
@@ -177,7 +177,6 @@ information provided here is intended especially for developers.
 * core/templates method property renderIcon may alternatively be called with two parameters the second being a custom data object
 * \core\output\block::from_block_contents() now always returns ->header attribute.
   As such, lib/templates/block.mustache has changed (removing the {{^header}} section).
-* Upgraded jQuery 2.2.1 to 2.2.4
 * The redirect() function will now redirect immediately if output has not
   already started. Messages will be displayed on the subsequent page using
   session notifications. The type of message output can be configured using the

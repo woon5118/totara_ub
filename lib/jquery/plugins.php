@@ -38,7 +38,7 @@
  */
 
 $plugins = array(
-    'jquery'  => array('files' => array('jquery-3.1.0.min.js')),
+    'jquery'  => array('files' => array('jquery-3.2.1.min.js')),
     'migrate' => array('files' => array('jquery-migrate-1.4.1.min.js')),
     'migrate3' => array('files' => array('jquery-migrate-3.0.0.min.js')),
     'ui'      => array('files' => array('ui-1.12.1/jquery-ui.min.js')),
