@@ -103,6 +103,9 @@ class behat_util extends testing_util {
         // Some more Totara tricks.
         $DB->set_field('task_scheduled', 'disabled', 1, array('component' => 'tool_langimport')); // No cron lang updates in behat.
 
+        // Totara: Add behat filesystem repository to eliminate problematic file uploads in behat.
+        mkdir("$CFG->dataroot/repository/behat", 02777, true);
+
         // We need to keep the installed dataroot filedir files.
         // So each time we reset the dataroot before running a test, the default files are still installed.
         self::save_original_data_files();
@@ -138,7 +141,6 @@ class behat_util extends testing_util {
         // Totara: Add behat filesystem repository to eliminate problematic file uploads in behat.
         // NOTE: Repository API is a total mess, let's just insert the records directly here
         //       and allow all registered users to access the repo.
-        mkdir("$CFG->dataroot/repository/behat", 02777, true);
         $maxorder = $DB->get_field('repository', 'MAX(sortorder)', array());
         $typeid = $DB->insert_record('repository', (object)array('type' => 'filesystem', 'sortorder' => $maxorder + 1, 'visible' => 1));
         $instanceid = $DB->insert_record('repository_instances',

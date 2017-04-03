@@ -164,8 +164,9 @@ if ($options['diag'] || $options['enable'] || $options['disable']) {
     }
 
     // Remove test file path.
-    if (file_exists(behat_util::get_test_file_path())) {
-        if (!unlink(behat_util::get_test_file_path())) {
+    $enablefile = behat_command::get_parent_behat_dir() . '/test_environment_enabled.txt'; // Totara: you MUST NOT use behat_util here!!!
+    if (file_exists($enablefile)) {
+        if (!unlink($enablefile)) {
             behat_error(BEHAT_EXITCODE_PERMISSIONS, 'Can not delete test file enable info');
         }
     }
