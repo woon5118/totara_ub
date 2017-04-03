@@ -255,7 +255,7 @@ class manager {
                 'linkproperties' => [],
                 'img'   => 'b/tour-import',
                 'title' => get_string('importtour', 'tool_usertours'),
-            ],
+            ],/* Totara: we do not support Moodle tours
             (object) [
                 'link'  => new \moodle_url('https://moodle.net/tours'),
                 'linkproperties' => [
@@ -263,7 +263,7 @@ class manager {
                     ],
                 'img'   => 'b/tour-shared',
                 'title' => get_string('sharedtourslink', 'tool_usertours'),
-            ],
+            ],*/
         ];
 
         echo \html_writer::start_tag('div', [
@@ -783,12 +783,11 @@ class manager {
     public static function update_shipped_tours() {
         global $DB, $CFG;
 
-        // A list of tours that are shipped with Moodle. They are in
+        // A list of tours that are shipped with Totara. They are in
         // the format filename => version. The version value needs to
         // be increased if the tour has been updated.
         $shippedtours = [
-            'boost_administrator.json' => 1,
-            'boost_course_view.json' => 1,
+            // None yet.
         ];
 
         $existingtourrecords = $DB->get_recordset('tool_usertours_tours');

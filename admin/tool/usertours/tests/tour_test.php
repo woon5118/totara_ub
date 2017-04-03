@@ -36,7 +36,7 @@ use tool_usertours\tour;
  * @copyright  2016 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class tour_testcase extends advanced_testcase {
+class tool_usertours_tour_testcase extends advanced_testcase {
 
     /**
      * @var moodle_database

@@ -32,8 +32,6 @@ use tool_usertours\manager;
 function xmldb_tool_usertours_install() {
     global $DB;
 
-// Totara: not implemented yet
-return;
-    // Update the tours shipped with Moodle.
+    // Update the tours shipped with Totara.
     manager::update_shipped_tours();
 }

@@ -85,7 +85,9 @@ class behat_tool_usertours extends behat_base {
                 get_string('usertours', 'tool_usertours'),
                 implode(' > ', [
                     get_string('administrationsite', 'moodle'),
-                    get_string('appearance', 'admin'),
+                    //get_string('appearance', 'admin'),
+                    'Development',
+                    'Experimental',
                 ])
             ]);
     }

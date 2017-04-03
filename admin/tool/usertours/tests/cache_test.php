@@ -34,7 +34,7 @@ require_once(__DIR__ . '/helper_trait.php');
  * @copyright  2016 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class cache_testcase extends advanced_testcase {
+class tool_usertours_cache_testcase extends advanced_testcase {
     // There are shared helpers for these tests in the helper trait.
     use tool_usertours_helper_trait;
 

@@ -29,7 +29,7 @@ $capabilities = [
 ];
 if ($hassiteconfig || has_any_capability($capabilities, context_system::instance())) {
     $ADMIN->add(
-        'appearance',
+        'experimental',
         new admin_externalpage(
             'tool_usertours/tours',
             get_string('usertours', 'tool_usertours'),
