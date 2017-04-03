@@ -7467,25 +7467,31 @@ class admin_setting_managedataformats extends admin_setting {
             } else {
                 $updown .= $spacer;
             }
-            $cnt++;
+
+            $uninstall = '';
+            if ($status === core_plugin_manager::PLUGIN_STATUS_MISSING) {
+                $uninstall = get_string('status_missing', 'core_plugin');
+            } else if ($status === core_plugin_manager::PLUGIN_STATUS_NEW) {
+                $uninstall = get_string('status_new', 'core_plugin');
+            } else if ($uninstallurl = core_plugin_manager::instance()->get_uninstall_url('dataformat_'.$format->name, 'manage')) {
+                if ($totalenabled != 1 || !$format->is_enabled()) {
+                    $uninstall = html_writer::link($uninstallurl, $txt->uninstall);
+                }
+            }
+
             $settings = '';
             if ($format->get_settings_url()) {
                 $settings = html_writer::link($format->get_settings_url(), $txt->settings);
             }
-            $uninstall = '';
-            if ($uninstallurl = core_plugin_manager::instance()->get_uninstall_url('format_'.$format->name, 'manage')) {
-                $uninstall = html_writer::link($uninstallurl, $txt->uninstall);
-            }
+
             $row = new html_table_row(array($strformatname, $hideshow, $updown, $uninstall, $settings));
             if ($class) {
                 $row->attributes['class'] = $class;
             }
             $table->data[] = $row;
+            $cnt++;
         }
         $return .= html_writer::table($table);
-        $link = html_writer::link(new moodle_url('/admin/settings.php', array('section' => 'coursesettings')), new lang_string('coursesettings'));
-        $return .= html_writer::tag('p', get_string('manageformatsgotosettings', 'admin', $link));
-        $return .= $OUTPUT->box_end();
         return highlight($query, $return);
     }
 }
