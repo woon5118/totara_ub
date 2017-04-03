@@ -820,7 +820,7 @@ totaraDialog_handler_treeview.prototype._make_hierarchy = function(parent_elemen
         var par = $(this).parent();
 
         // Check this category doesn't have any children already
-        if ($('> ul > li', par).size()) {
+        if ($('> ul > li', par).length) {
             return false;
         }
 
@@ -952,7 +952,7 @@ totaraDialog_handler_treeview.prototype._append_to_selected = function(element) 
     var selected_area = $('.selected', this._container)
 
     // Check if an element with the same ID already exists
-    if ($('#'+clone.attr('id'), selected_area).size() < 1) {
+    if ($('#'+clone.attr('id'), selected_area).length < 1) {
 
         // Wrap item in a div
         var wrapped = $('<div></div>').append(clone);
@@ -1428,12 +1428,12 @@ totaraDialog_handler_skeletalTreeview.prototype._make_hierarchy = function(paren
         var par = $(this).parent();
 
         // If we have just collapsed this branch, don't reload stuff
-        if ($('li:visible', $(par)).size() == 0) {
+        if ($('li:visible', $(par)).length === 0) {
             return false;
         }
 
         // Check to see if the loading placeholder exists
-        if ($('> ul > li.loading', par).size() == 0) {
+        if ($('> ul > li.loading', par).length === 0) {
             return false;
         }
 

@@ -84,6 +84,8 @@ if ($PAGE->user_allowed_editing()) {
         $url->param('adminedit', 'on');
     }
     $buttons = $OUTPUT->single_button($url, $caption, 'get');
+} else {
+    $buttons = '';
 }
 
 $savebutton = false;
