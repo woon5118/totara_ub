@@ -72,7 +72,7 @@ function tool_recyclebin_extend_navigation_course($navigation, $course, $context
         navigation_node::NODETYPE_LEAF,
         'tool_recyclebin',
         'tool_recyclebin',
-        new pix_icon('trash', $pluginname, 'tool_recyclebin')
+        new pix_icon('trash', '', 'tool_recyclebin')
     );
 
     if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
@@ -130,7 +130,7 @@ function tool_recyclebin_extend_navigation_category_settings($navigation, $conte
         navigation_node::NODETYPE_LEAF,
         'tool_recyclebin',
         'tool_recyclebin',
-        new pix_icon('trash', $pluginname, 'tool_recyclebin')
+        new pix_icon('trash', '', 'tool_recyclebin')
     );
 
     if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
