@@ -41,7 +41,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
                 // Move to existing.
                 $selected.each(function(_i, elem) {
                     var insidx = 0;
-                    if ($('#removeselect option').size()) {
+                    if ($('#removeselect option').length) {
                         // Find best position (closest option will smaller index to insert after it).
                         $('#removeselect option').each(function(extidx, extopt) {
                             if ($(extopt).data('idx') < $(elem).data('idx')) {
@@ -65,7 +65,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
                 // Move to potential.
                 $selected.each(function(_i, elem) {
                     var insidx = 0;
-                    if ($('#addselect option').size()) {
+                    if ($('#addselect option').length) {
                         // Find best position (closest option will smaller index to insert after it).
                         $('#addselect option').each(function(extidx, extopt) {
                             if ($(extopt).data('idx') < $(elem).data('idx')) {
