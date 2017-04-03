@@ -19,7 +19,7 @@ Feature: Add cohorts of users
     And I set the following fields to these values:
       | Name | Test cohort name |
       | Context | System |
-      | Audiences ID | 333 |
+      | Audience ID | 333 |
       | Description | Test cohort description |
     And I press "Save changes"
 
@@ -59,14 +59,3 @@ Feature: Add cohorts of users
     And the "Current users" select box should contain "Third User (third@example.com)"
     And the "Current users" select box should contain "Forth User (forth@example.com)"
     And the "Current users" select box should not contain "First User (first@example.com)"
-
-  @javascript
-  Scenario: Edit cohort name in-place
-    When I follow "Audiences"
-    And I click on "Edit cohort name" "link" in the "Test cohort name" "table_row"
-    And I set the field "New name for cohort Test cohort name" to "Students cohort"
-    And I press key "13" in the field "New name for cohort Test cohort name"
-    Then I should not see "Test cohort name"
-    And I should see "Students cohort"
-    And I follow "Audiences"
-    And I should see "Students cohort"

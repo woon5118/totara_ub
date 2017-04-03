@@ -32,7 +32,8 @@ Feature: Upload users to a cohort
     And I press "Upload users"
     And I press "Continue"
     And I navigate to "Users > Accounts > Audiences" in site administration
-    And I click on "Assign" "link" in the "Cohort 1" "table_row"
+    And I click on "Edit" "link" in the "Cohort 1" "table_row"
+    And I follow "Edit members"
     Then the "Current users" select box should contain "Tom Jones (tomjones@example.com)"
     And the "Current users" select box should contain "Bob Jones (bobjones@example.com)"
     And I press "Back to audiences"
