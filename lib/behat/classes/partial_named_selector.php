@@ -165,9 +165,11 @@ XPATH
 .//*[self::div | self::section | self::aside | self::header | self::footer][./@id = %locator%]
 XPATH
         , 'section' => <<<XPATH
-.//li[contains(concat(' ', normalize-space(@class), ' '), ' section ')][./descendant::*[self::h3]
+.//li[contains(concat(' ', normalize-space(@class), ' '), ' section ')][./descendant::h3
     [normalize-space(.) = %locator%][contains(concat(' ', normalize-space(@class), ' '), ' sectionname ') or
-    contains(concat(' ', normalize-space(@class), ' '), ' section-title ')]] |
+    contains(concat(' ', normalize-space(@class), ' '), ' section-title ')] or ./descendant::h3[contains(concat(' ', normalize-space(@class), ' '), ' sectionname ') or
+    contains(concat(' ', normalize-space(@class), ' '), ' section-title ')]//a
+    [normalize-space(text()) = %locator%]] |
 .//div[contains(concat(' ', normalize-space(@class), ' '), ' sitetopic ')]
     [./descendant::*[self::h2][normalize-space(.) = %locator%] or %locator% = 'frontpage']
 XPATH
