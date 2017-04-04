@@ -114,7 +114,6 @@ class block_settings_renderer extends plugin_renderer_base {
             if (!empty($item->classes) && count($item->classes) > 0) {
                 $pattr['class'] = array_merge($pattr['class'], $item->classes);
             }
-            $nodetextid = 'label_' . $depth . '_' . $number;
 
             // class attribute on the div item which only contains the item content
             $pattr['class'][] = 'tree_item';
@@ -135,7 +134,6 @@ class block_settings_renderer extends plugin_renderer_base {
             if (!empty($item->preceedwithhr) && $item->preceedwithhr===true) {
                 $content = html_writer::empty_tag('hr') . $content;
             }
-            $liattr['aria-labelledby'] = $nodetextid;
             $content = html_writer::tag('li', $content, $liattr);
             $lis[] = $content;
         }
