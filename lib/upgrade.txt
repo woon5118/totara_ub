@@ -3,7 +3,7 @@ information provided here is intended especially for developers.
 
 === 10.0 ===
 
-* JQuery has been updated to 3.2.1. JQuery migrate plugins are no longer shipped - please read
+* JQuery has been updated to 3.2.1. - please read
   https://jquery.com/upgrade-guide/3.0/ and update your javascript.
 * get_user_capability_course() now has an additional parameter 'limit'. This can be used to return a set number of records with
   the submitted capability. The parameter 'fieldsexceptid' will now accept context fields which can be used for preloading.
