@@ -20,6 +20,8 @@
  * @package totara_connect
  */
 
+/* eslint-disable no-undef */
+
 /**
  * This file contains the Javascript for the dialog that lets you
  * add courses to a Totara Connect clients.
@@ -61,9 +63,9 @@ M.totara_connect_course = M.totara_connect_course || {
         ehandler.baseurl = url;
 
         var dbuttons = {};
-        dbuttons[M.util.get_string('ok', 'moodle')] = function() { ehandler._update() };
-        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel() };
-        totaraDialogs['id_coursesadd'] = new totaraDialog(
+        dbuttons[M.util.get_string('ok', 'moodle')] = function() { ehandler._update(); };
+        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel(); };
+        totaraDialogs.id_coursesadd = new totaraDialog(
             'totara-connect-courses-dialog',
             'id_coursesadd',
             {
@@ -118,7 +120,7 @@ totaraDialog_handler_connectcourses.prototype._update = function() {
 
         // Get id
         var itemid = $(this).attr('id').split('_');
-        itemid = itemid[itemid.length-1];  // The last item is the actual id.
+        itemid = itemid[itemid.length - 1];  // The last item is the actual id.
         itemid = parseInt(itemid);
 
         if (!self.course_item_exists(itemid)) {
@@ -137,12 +139,12 @@ totaraDialog_handler_connectcourses.prototype._update = function() {
                 alert(data.error);
                 return;
             }
-            $.each(data['rows'], function(index, html) {
+            $.each(data.rows, function(index, html) {
                 self.create_item(html);
             });
 
             self._dialog.hide();
-        })
+        });
     } else {
         this._dialog.hide();
     }
@@ -152,7 +154,7 @@ totaraDialog_handler_connectcourses.prototype._update = function() {
  * Checks if the item id exists in this category
  */
 totaraDialog_handler_connectcourses.prototype.course_item_exists = function(itemid) {
-    for (x in this.course_items) {
+    for (var x in this.course_items) {
         if (this.course_items[x] == itemid) {
             return true;
         }
@@ -207,7 +209,7 @@ totaraDialog_handler_connectcourses.prototype.remove_course_item = function(item
     var row = $(item).closest('tr');
 
     // Remove the item from the array of items.
-    this.course_items = $.grep(this.course_items, function (element, x) {
+    this.course_items = $.grep(this.course_items, function(element, x) {
         return (element == itemid);
     }, true);
 

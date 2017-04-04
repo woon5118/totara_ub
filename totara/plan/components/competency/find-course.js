@@ -23,6 +23,9 @@
  * @package totara
  * @subpackage totara_core
  */
+
+/* eslint-disable no-undef */
+
 M.totara_plan_competency_find_course = M.totara_plan_competency_find_course || {
 
     Y: null,
@@ -38,7 +41,7 @@ M.totara_plan_competency_find_course = M.totara_plan_competency_find_course || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -61,7 +64,7 @@ M.totara_plan_competency_find_course = M.totara_plan_competency_find_course || {
         this.totaraDialog_handler_preRequisite = function() {
             // Base url
             var baseurl = '';
-        }
+        };
 
         this.totaraDialog_handler_preRequisite.prototype = new totaraDialog_handler_treeview_multiselect();
 
@@ -78,7 +81,7 @@ M.totara_plan_competency_find_course = M.totara_plan_competency_find_course || {
             this._dialog.hide();
 
             // Remove no item warning (if exists)
-            $('.noitems-'+this._title).remove();
+            $('.noitems-' + this._title).remove();
 
             // Grab table
             var table = $('table.dp-plan-component-items');
@@ -97,23 +100,23 @@ M.totara_plan_competency_find_course = M.totara_plan_competency_find_course || {
         };
 
         var url = M.cfg.wwwroot + '/totara/plan/components/competency/';
-        var saveurl = url + 'update-course.php?planid='+this.config.plan_id+'&competencyid='+this.config.competency_id+'&update=';
+        var saveurl = url + 'update-course.php?planid=' + this.config.plan_id + '&competencyid=' + this.config.competency_id + '&update=';
 
         var handler = new this.totaraDialog_handler_preRequisite();
         handler.baseurl = url;
 
         var buttonsObj = {};
-        buttonsObj[M.util.get_string('save','totara_core')] = function() { handler._save(saveurl) }
-        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
+        buttonsObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(saveurl); };
+        buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
 
-        totaraDialogs['evidence'] = new totaraDialog(
+        totaraDialogs.evidence = new totaraDialog(
             'assigncourses',
             'show-course-dialog',
             {
                 buttons: buttonsObj,
                 title: '<h2>' + M.util.get_string('addlinkedcourses', 'totara_plan') + '</h2>'
             },
-            url+'find-course.php?planid='+this.config.plan_id+'&competencyid='+this.config.competency_id,
+            url + 'find-course.php?planid=' + this.config.plan_id + '&competencyid=' + this.config.competency_id,
             handler
         );
     }

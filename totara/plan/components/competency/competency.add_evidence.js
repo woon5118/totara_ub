@@ -24,6 +24,9 @@
  * @package totara
  * @subpackage totara_core
  */
+
+/* eslint-disable no-undef */
+
 M.totara_competencyaddevidence = M.totara_competencyaddevidence || {
 
     Y: null,
@@ -37,7 +40,7 @@ M.totara_competencyaddevidence = M.totara_competencyaddevidence || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -56,15 +59,15 @@ M.totara_competencyaddevidence = M.totara_competencyaddevidence || {
             throw new Error('M.totara_competencyaddevidence.init()-> jQuery dependency required for this module to function.');
         }
 
-        ///
-        /// Position dialog
-        ///
+        // /
+        // / Position dialog
+        // /
         (function() {
-            var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/position/assign/';
+            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/position/assign/';
             totaraSingleSelectDialog(
                 'position',
                 M.util.get_string('chooseposition', 'totara_hierarchy') + M.totara_competencyaddevidence.config.dialog_display_position,
-                url+'position.php?',
+                url + 'position.php?',
                 'positionid',
                 'positiontitle',
                 undefined,
@@ -72,15 +75,15 @@ M.totara_competencyaddevidence = M.totara_competencyaddevidence || {
             );
         })();
 
-        ///
-        /// Organisation dialog
-        ///
+        // /
+        // / Organisation dialog
+        // /
         (function() {
-            var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/organisation/assign/';
+            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/organisation/assign/';
             totaraSingleSelectDialog(
                 'organisation',
                 M.util.get_string('chooseorganisation', 'totara_hierarchy') + M.totara_competencyaddevidence.config.dialog_display_organisation,
-                url+'find.php?',
+                url + 'find.php?',
                 'organisationid',
                 'organisationtitle',
                 undefined,

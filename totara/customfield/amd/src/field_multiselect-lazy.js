@@ -24,7 +24,7 @@
  * @subpackage totara_customfield
  */
 
-define(['jquery', 'core/str'], function ($, strlib) {
+define(['jquery', 'core/str'], function($, strlib) {
 
     return {
         /**
@@ -34,13 +34,13 @@ define(['jquery', 'core/str'], function ($, strlib) {
          * @param string    the id of the object to work with
          * @param int       The maximum number of entries to show on load
          */
-        init : function(multiple, id, max) {
+        init: function(multiple, id, max) {
             var numVisible = 0;
             var $container = $('#fgroup_id' + id);
 
             var $allOptions = $container.find('div[id^="fgroup_id_multiselectitem_"]').slice(0, max);
 
-            $allOptions.each(function(i){
+            $allOptions.each(function(i) {
                 $(this).find("input[type='text']").each(function(j, e) {
                     if ($(e).val() !== '') {
                         numVisible = i + 1;
@@ -56,7 +56,7 @@ define(['jquery', 'core/str'], function ($, strlib) {
             // Hide from numVisible (default is 3) to last.
             $allOptions.slice(numVisible, max).hide();
 
-            $allOptions.each(function(){
+            $allOptions.each(function() {
                 var $this = $(this);
                 if ($($this.find('span')).length > 0) {
                     // Make default part.
@@ -66,14 +66,14 @@ define(['jquery', 'core/str'], function ($, strlib) {
                     requiredstrings.push({key: 'defaultselected', component: 'totara_customfield'});
                     requiredstrings.push({key: 'delete', component: 'moodle'});
 
-                    strlib.get_strings(requiredstrings).done(function (strings) {
-                        var $makeDefault =  $('<a href="#" class="customfield-multiselect-action customfield-multiselect-selectlink">' + strings[0] + '</a>');
+                    strlib.get_strings(requiredstrings).done(function(strings) {
+                        var $makeDefault = $('<a href="#" class="customfield-multiselect-action customfield-multiselect-selectlink">' + strings[0] + '</a>');
                         var $unselect = $('<a href="#" class="customfield-multiselect-action customfield-multiselect-unselectlink">' + strings[1] + '</a>').hide();
                         var $delete = $('<a href="#" class="customfield-multiselect-action customfield-multiselect-deletelink">' + strings[2] + '</a>');
 
-                        $makeDefault.on('click', function(){
+                        $makeDefault.on('click', function() {
                             if (multiple == 1) {
-                                $allOptions.find('.customfield-multiselect-unselectlink').each(function(){
+                                $allOptions.find('.customfield-multiselect-unselectlink').each(function() {
                                     $(this).click();
                                 });
                             }
@@ -85,7 +85,7 @@ define(['jquery', 'core/str'], function ($, strlib) {
                             return false;
                         });
 
-                        $unselect.on('click', function(){
+                        $unselect.on('click', function() {
                             $this.find('input.makedefault').prop('checked', false);
                             $makeDefault.show();
                             $unselect.hide();
@@ -93,7 +93,7 @@ define(['jquery', 'core/str'], function ($, strlib) {
                         });
 
                         // Delete part.
-                        $delete.on('click', function(){
+                        $delete.on('click', function() {
                             $this.find('input.delete').prop('checked', true);
                             $this.addClass('customfield-multiselect-deleted');
                             $this.hide();

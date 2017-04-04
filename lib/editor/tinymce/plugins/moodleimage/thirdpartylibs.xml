@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>tinymce/editor_plugin.js</location>
+    <name>TinyMCE Moodle Image plugin</name>
+    <license>LGPL</license>
+    <version></version>
+    <licenseversion>2.1+</licenseversion>
+  </library>
+</libraries>

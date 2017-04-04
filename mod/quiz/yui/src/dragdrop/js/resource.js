@@ -82,7 +82,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
      */
     setup_for_resource: function(baseselector) {
         var that = this;
-        var cloneNode = function () {
+        var cloneNode = function() {
             if (that.resourcedraghandle.all('img').size() > 0 || that.resourcedraghandle.all('.flex-icon').size() > 0) {
                 Y.Node.all(baseselector).each(function(resourcesnode) {
                     // Replace move icons
@@ -136,7 +136,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
         params.sesskey = M.cfg.sesskey;
         params.courseid = this.get('courseid');
         params.quizid = this.get('quizid');
-        params['class'] = 'resource';
+        params.class = 'resource';
         params.field = 'move';
         params.id = Number(Y.Moodle.mod_quiz.util.slot.getId(dragnode));
         params.sectionId = Y.Moodle.core_course.util.section.getId(dropnode.ancestor('li.section', true));

@@ -89,7 +89,8 @@
 }
 
 .gradingform_rubric.editor {
-    .addlevel, .addcriterion {
+    .addlevel,
+    .addcriterion {
         input {
             // Fallback for IE8: we use Bootstrap 2's button styles normally, but
             // IE8 ignores background-image: linear-gradient rules.
@@ -139,14 +140,14 @@
                     vertical-align: top;
                     padding: @rubricPadding;
                     textarea {
-                        margin-bottom: 0px;
+                        margin-bottom: 0;
                         height: 115px;
                     }
                 }
                 .definition {
                     textarea {
                         width: 80%;
-                        margin-bottom: 0px;
+                        margin-bottom: 0;
                     }
                 }
                 .score {
@@ -154,7 +155,7 @@
                     float: left;
                     margin-right: 28px;
                     input {
-                        margin-bottom: 0px;
+                        margin-bottom: 0;
                     }
                 }
                 .level {
@@ -174,7 +175,7 @@
                             bottom: 0;
                             height: 24px;
                             width: 24px;
-                            margin: 0px;
+                            margin: 0;
                             &:hover {
                                 background-color: #ddd;
                             }
@@ -186,10 +187,13 @@
                         // Should handle at least three chars with room to spare.
                         float: none;
                         width: 3em;
-                        &.hiddenelement, &.pseudotablink {
+                        &.hiddenelement,
+                        &.pseudotablink {
                             // Zero out the width if it's still in the block flow for some reason
                             // when hidden
+                            /* stylelint-disable */
                             width: 0 !important;
+                            /* stylelint-enable */
                         }
                     }
                 }
@@ -197,7 +201,7 @@
                     vertical-align: middle;
                     input {
                         .btn();
-                        background-position: 0px 0px;
+                        background-position: 0 0;
                         height: 30px;
                         margin-right: 5px;
                     }
@@ -212,7 +216,7 @@
                 margin: 0;
                 color: inherit;
                 text-shadow: inherit;
-                border: 0px none;
+                border: 0 none;
                 line-height: inherit;
                 background: transparent url([[pix:t/add]]) no-repeat 7px 8px;
                 padding-left: 26px;

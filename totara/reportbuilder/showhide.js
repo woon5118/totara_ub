@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+/* eslint-disable no-undef */
+
 /**
  * Javascript file containing JQuery bindings for show/hide popup dialog box
  */
@@ -45,42 +47,44 @@ M.totara_reportbuilder_showhide = M.totara_reportbuilder_showhide || {
             throw new Error('M.totara_reportbuilder_showhide.init()-> jQuery dependency required for this module to function.');
         }
 
-        ///
-        /// first, hide columns that should be hidden!
-        ///
+        // /
+        // / first, hide columns that should be hidden!
+        // /
         if (args.length) {
-            for (col in args) {
+            for (var col in args) {
                 $(args[col]).hide();
             }
         }
 
-        ///
-        /// show/hide column dialog
-        ///
+        // /
+        // / show/hide column dialog
+        // /
 
         // id not set when zero results
         // http://verens.com/2005/07/25/isset-for-javascript/#comment-332
-        if (window.id === undefined) {return;}
+        if (window.id === undefined) { return; }
 
-        $('#show-showhide-dialog').css('display','inline');
+        $('#show-showhide-dialog').css('display', 'inline');
         var path = M.cfg.wwwroot + '/totara/reportbuilder/';
 
         var handler = new totaraDialog_handler();
         var name = 'showhide';
         var buttons = {};
-        buttons[M.util.get_string('ok', 'moodle')] = function() { handler._cancel() };
+        buttons[M.util.get_string('ok', 'moodle')] = function() { handler._cancel(); };
 
         var querystring = window.location.search;
 
         totaraDialogs[name] = new totaraDialog(
             name,
-            'show-'+name+'-dialog',
+            'show-' + name + '-dialog',
             {
                 buttons: buttons,
                 title: '<h2>' + M.util.get_string('showhidecolumns', 'totara_reportbuilder') + '</h2>'
             },
+            /* eslint-enable no-undef */
             path + 'showhide.php?id=' + id.toString() + querystring.replace('?', '&'),
+            /* eslint-disable no-undef */
             handler
         );
-    }
-}
+     }
+};

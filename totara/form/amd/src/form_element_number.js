@@ -86,7 +86,7 @@ define(['jquery', 'totara_form/form', 'totara_form/modernizr'], function($, Form
             var requireddeferred = $.Deferred();
             deferreds.push(requireddeferred);
 
-            require(['totara_form/polyfill_required-lazy'], function (poly) {
+            require(['totara_form/polyfill_required-lazy'], function(poly) {
                 poly.init(id);
                 requireddeferred.resolve();
             });
@@ -95,7 +95,7 @@ define(['jquery', 'totara_form/form', 'totara_form/modernizr'], function($, Form
             var placeholderdeferred = $.Deferred();
             deferreds.push(placeholderdeferred);
 
-            require(['totara_form/polyfill_placeholder-lazy'], function (poly) {
+            require(['totara_form/polyfill_placeholder-lazy'], function(poly) {
                 poly.init(id);
                 placeholderdeferred.resolve();
             });

@@ -20,6 +20,9 @@
  * @package totara
  * @subpackage cohort
  */
+
+/* eslint-disable no-undef */
+
 M.totara_cohortplans = M.totara_cohortplans || {
 
     Y: null,
@@ -33,7 +36,7 @@ M.totara_cohortplans = M.totara_cohortplans || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
 
         var module = this;
 
@@ -70,7 +73,7 @@ M.totara_cohortplans = M.totara_cohortplans || {
             var self = this;
             var buttonsObj = {};
             buttonsObj[M.util.get_string('save', 'totara_core')] = function() { self.save(); };
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -79,7 +82,7 @@ M.totara_cohortplans = M.totara_cohortplans || {
                 'unused', // buttonid unused
                 {
                     buttons: buttonsObj,
-                    title: '<h2>'+M.util.get_string('confirmcreateplans', 'totara_plan')+'</h2>'
+                    title: '<h2>' + M.util.get_string('confirmcreateplans', 'totara_plan') + '</h2>'
                 },
                 'unused', // default_url unused
                 handler
@@ -101,7 +104,7 @@ M.totara_cohortplans = M.totara_cohortplans || {
 
             // Don't load anything
             this.load = function(url, method) {
-            }
+            };
         };
 
 
@@ -113,16 +116,16 @@ M.totara_cohortplans = M.totara_cohortplans || {
             return module.handleCreatePlans(event);
         });
 
-        totaraDialogs['createplans'] = new totaraDialog_createplans();
+        totaraDialogs.createplans = new totaraDialog_createplans();
     },
 
 
     /**
      *
      */
-    handleCreatePlans: function(event){
+    handleCreatePlans: function(event) {
 
-        var dialog = totaraDialogs['createplans'];
+        var dialog = totaraDialogs.createplans;
 
         if (dialog.savechanges === true) {
             window.onbeforeunload = null;
@@ -148,12 +151,12 @@ M.totara_cohortplans = M.totara_cohortplans || {
 
         $.getJSON(url, function(data) {
             if (data !== 'error') {
-                html += data['html'];
+                html += data.html;
 
                 $("button:contains(" + M.util.get_string('save', 'totara_core') + ")").show();
-                totaraDialogs['createplans'].open(html);
-                totaraDialogs['createplans'].save = function() {
-                    totaraDialogs['createplans'].savechanges = true;
+                totaraDialogs.createplans.open(html);
+                totaraDialogs.createplans.save = function() {
+                    totaraDialogs.createplans.savechanges = true;
                     this.hide();
                     $('input[name="submitbutton"]').trigger('click');
                 };

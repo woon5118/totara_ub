@@ -25,7 +25,7 @@
 /**
  * Javascript file containing JQuery bindings for processing changes to instant filters
  */
-define(['jquery', 'core/config', 'core/templates'], function ($, mdlcfg, templates) {
+define(['jquery', 'core/config', 'core/templates'], function($, mdlcfg, templates) {
     var instantfilter = {
 
         xhr: null,
@@ -38,14 +38,14 @@ define(['jquery', 'core/config', 'core/templates'], function ($, mdlcfg, templat
         init: function() {
 
             // ignoredirty needs to be avoided as it is the password hack to stop browsers populating password fields
-            $('.rb-sidebar input:not(.ignoredirty), .rb-sidebar select').change(function (event) {
+            $('.rb-sidebar input:not(.ignoredirty), .rb-sidebar select').change(function(event) {
                 // Abort any call to instantreport that is already active.
                 if (instantfilter.xhr) {
                     instantfilter.xhr.abort();
                 }
                 // Add the wait icon if it is not already attached to the clicked item.
                 if ($(event.target).siblings('.instantfilterwait').length === 0) {
-                    templates.renderIcon('loading', 'loading', 'instantfilterwait').done(function (html) {
+                    templates.renderIcon('loading', 'loading', 'instantfilterwait').done(function(html) {
                         $(html).insertAfter($(event.target).parent().children().last());
                     });
                 }
@@ -53,15 +53,15 @@ define(['jquery', 'core/config', 'core/templates'], function ($, mdlcfg, templat
             });
         },
 
-        split_search: function (search) {
+        split_search: function(search) {
             var ar = {};
-            if (search === undefined || search.length < 1) { return ar;}
+            if (search === undefined || search.length < 1) { return ar; }
             var pairs = search.slice(1).split('&');
             for (var i = 0; i < pairs.length; i++) {
                 var key_val = pairs[i].split('=');
                 // Replace '+' (alt space) char explicitly since decode does not.
-                var arkey = decodeURIComponent(key_val[0]).replace(/\+/g,' ');
-                var arval = decodeURIComponent(key_val[1]).replace(/\+/g,' ');
+                var arkey = decodeURIComponent(key_val[0]).replace(/\+/g, ' ');
+                var arval = decodeURIComponent(key_val[1]).replace(/\+/g, ' ');
                 if (ar[arkey] === undefined) {
                     ar[arkey] = [];
                 }
@@ -70,14 +70,14 @@ define(['jquery', 'core/config', 'core/templates'], function ($, mdlcfg, templat
             return ar;
         },
 
-        remove_param: function (ar, key) {
+        remove_param: function(ar, key) {
             if (ar[key]) {
                 delete ar[key];
             }
             return ar;
         },
 
-        build_search: function (ar) {
+        build_search: function(ar) {
             var search = "?";
             for (var key in ar) {
                 for (var i = 0; i < ar[key].length; i++) {
@@ -95,7 +95,7 @@ define(['jquery', 'core/config', 'core/templates'], function ($, mdlcfg, templat
          *
          * @param callback    function to run once data is refreshed
          */
-        refresh_results: function (callback) {
+        refresh_results: function(callback) {
             // Get the current page params and strip off those we don't want to pass on.
             var pageparams = window.location.search;
             var paramsarray = instantfilter.split_search(pageparams);
@@ -109,7 +109,7 @@ define(['jquery', 'core/config', 'core/templates'], function ($, mdlcfg, templat
             return $.post(
                 mdlcfg.wwwroot + '/totara/reportbuilder/ajax/instantreport.php' + pageparams,
                 $('.rb-sidebar').serialize()
-            ).done( function (data) {
+            ).done(function(data) {
                 // Clear all waiting icons.
                 var instantfilter = $('.instantfilterwait');
                 instantfilter.siblings('.sr-only').remove();
@@ -127,10 +127,10 @@ define(['jquery', 'core/config', 'core/templates'], function ($, mdlcfg, templat
                 // Support MSIE 6-7-8.
                 $('.rb-report-pdfgraph').replaceWith($(data).find('.rb-report-pdfgraph'));
                 // Update sidebar filter counts.
-                $(data).find('.rb-sidebar.mform label').each(function (ind, elem) {
+                $(data).find('.rb-sidebar.mform label').each(function(ind, elem) {
                     var $elem = $(elem);
                     if ($elem.attr('for')) {
-                        $('label[for="'+$elem.attr('for')+'"]').html($elem.html());
+                        $('label[for="' + $elem.attr('for') + '"]').html($elem.html());
                     }
                 });
                 if (callback) {

@@ -22,12 +22,15 @@
  * @package totara
  * @subpackage totara_core
  */
+
+/* eslint-disable no-undef */
+
 M.totara_completionrpl = M.totara_completionrpl || {
 
     Y: null,
     // below will override these values
     config: {
-        id:0
+        id: 0
     },
 
     /**
@@ -36,7 +39,7 @@ M.totara_completionrpl = M.totara_completionrpl || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -55,9 +58,9 @@ M.totara_completionrpl = M.totara_completionrpl || {
             throw new Error('M.totara_comlpetionrpl.init()-> jQuery dependency required for this module to function.');
         }
 
-        ///
-        /// Add related competency dialog
-        ///
+        // /
+        // / Add related competency dialog
+        // /
         var wwwroot = M.cfg.wwwroot;
         var courseid = this.config.course;
         var pix_rply = this.config.pix_rply;
@@ -81,7 +84,7 @@ M.totara_completionrpl = M.totara_completionrpl || {
             }
 
             return type;
-        }
+        };
 
         // Display RPL expand if RPLs present
         var fnc_toggleexpand = function() {
@@ -95,7 +98,7 @@ M.totara_completionrpl = M.totara_completionrpl || {
                 var type = fnc_rpltype($(this));
 
                 // Check for any RPLs
-                var rpls = $('td.'+type+' a.rplshow');
+                var rpls = $('td.' + type + ' a.rplshow');
 
                 // If RPLs, show expander
                 if (rpls.length) {
@@ -106,11 +109,11 @@ M.totara_completionrpl = M.totara_completionrpl || {
 
                 // Hide values, show expanders
                 if (rpls.length) {
-                    $('td.'+type+' span.rplvalue').hide();
-                    $('td.'+type+' a.rplshow').show();
+                    $('td.' + type + ' span.rplvalue').hide();
+                    $('td.' + type + ' a.rplshow').show();
                 }
             });
-        }
+        };
         fnc_toggleexpand();
 
 
@@ -129,13 +132,13 @@ M.totara_completionrpl = M.totara_completionrpl || {
             rplvisible[type] = rplvisible[type] ? false : true;
 
             if (rplvisible[type]) {
-                $('td.'+type+' a.rplshow').hide();
-                $('td.'+type+' span.rplvalue').show();
+                $('td.' + type + ' a.rplshow').hide();
+                $('td.' + type + ' span.rplvalue').show();
             } else {
-                $('td.'+type+' a.rplshow').show();
-                $('td.'+type+' span.rplvalue').hide();
+                $('td.' + type + ' a.rplshow').show();
+                $('td.' + type + ' span.rplvalue').hide();
             }
-        }
+        };
         $('a.rplexpand .flex-icon').click(fnc_expand);
 
 
@@ -242,7 +245,7 @@ M.totara_completionrpl = M.totara_completionrpl || {
                 });
 
                 // Create delete button
-                var cancel = $('<a href="#" class="icon rpldelete" title="Delete this RPL">'+pix_cross+'</a>');
+                var cancel = $('<a href="#" class="icon rpldelete" title="Delete this RPL">' + pix_cross + '</a>');
                 cancel.click(function(event) {
 
                     event.preventDefault();
@@ -269,7 +272,7 @@ M.totara_completionrpl = M.totara_completionrpl || {
                 input.focus();
             }
 
-        }
+        };
         $('a.rpledit, a.rplshow').click(fnc_edit);
 
 
@@ -280,7 +283,7 @@ M.totara_completionrpl = M.totara_completionrpl || {
                 // Trigger edit event
                 $('a.rpledit', $(this).parent('td')).trigger('click');
             });
-        }
+        };
 
         // Course module id.
         var cmid;
@@ -311,20 +314,20 @@ M.totara_completionrpl = M.totara_completionrpl || {
             var callback = {
                     method: 'GET',
                     data: {"type": type, "course": courseid, "user": user, "rpl": rpl, "cmid": cmid, "sesskey": M.cfg.sesskey},
-                    arguments: { success : user },
+                    arguments: {success: user},
                     on: {
                         success: function(id, o, args) {
                                     var user = args.success;
                                     // Hide save icon.
-                                    $('#user-'+user+' .rplloading').remove();
+                                    $('#user-' + user + ' .rplloading').remove();
                                 },
                         failure: function(o) { }
                     }
                 };
             Y.use('io-base', 'querystring-stringify-simple', function(Y) {
-                var uri = wwwroot+'/report/completion/save_rpl.php';
+                var uri = wwwroot + '/report/completion/save_rpl.php';
                 Y.io(uri, callback);
             });
-        }
+        };
     }
 };

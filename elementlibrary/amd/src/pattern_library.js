@@ -26,7 +26,7 @@ define(['jquery', 'core_elementlibrary/animate_scroll'], function($) {
             $('.pattern-library__nav a, a[href^="#"]').animateScroll();
 
             // Prevent tab example jumping to top of page.
-            $('.nav-tabs li a').on('click',  function(event) {
+            $('.nav-tabs li a').on('click', function(event) {
                 event.preventDefault();
             });
         }

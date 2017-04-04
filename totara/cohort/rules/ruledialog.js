@@ -22,6 +22,8 @@
  * @subpackage cohort/rules
  */
 
+/* eslint-disable no-undef */
+
 /**
  * This file defines the Totara dialog for creating/editing a single rule for a dynamic cohort.
  */
@@ -71,8 +73,8 @@ M.totara_cohortrules = M.totara_cohortrules || {
         fhandler.baseurl = url;
 
         var fbuttons = {};
-        fbuttons[M.util.get_string('save','totara_core')] = function() { fhandler.submit() }
-        fbuttons[M.util.get_string('cancel','moodle')] = function() { fhandler._cancel() }
+        fbuttons[M.util.get_string('save', 'totara_core')] = function() { fhandler.submit(); };
+        fbuttons[M.util.get_string('cancel', 'moodle')] = function() { fhandler._cancel(); };
         var fdialog = new totaraDialog(
             'cohortruleformdialog',
             'nobutton',
@@ -84,7 +86,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
             fhandler
         );
         fdialog.cohort_base_url = url;
-        totaraDialogs['cohortruleform'] = fdialog;
+        totaraDialogs.cohortruleform = fdialog;
 
         // Hide update operators buttons
         $('#fgroup_id_buttonar').hide();
@@ -92,7 +94,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
         // Membership options checkboxes.
         $('input.memberoptions').click(function() {
 
-            id = M.totara_cohortrules.config.cohortid;
+            var id = M.totara_cohortrules.config.cohortid;
 
             var ajaxdata = {
                 'sesskey':  M.cfg.sesskey,
@@ -102,7 +104,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
             // Use the checkbox name for to create an appropriate parameter.
             var checkbox = $(this);
             var param = checkbox.attr('name');
-            var value = checkbox.prop('checked') ? 1 : 0
+            var value = checkbox.prop('checked') ? 1 : 0;
             ajaxdata[param] = value;
 
             $.ajax({
@@ -125,7 +127,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
 
              var selected = $(this);
              var radioname = selected.attr('name');
-             var opvalue  = selected.val();
+             var opvalue = selected.val();
              var cohortid = M.totara_cohortrules.config.cohortid;
              var type = radioname;
              var id = '';
@@ -152,7 +154,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
                      id: id,
                      type: type,
                      value: opvalue,
-                     cohortid : cohortid,
+                     cohortid: cohortid,
                      sesskey: M.cfg.sesskey
                  }),
                  error: function(h, t, e) {
@@ -183,7 +185,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
                                  operator = M.util.get_string('or', 'totara_cohort');
                              }
                              var divid = '#id_cohort-ruleset-header' + id + " .cohort_rule_type ";
-                             $(divid).each(function (index, value) {
+                             $(divid).each(function(index, value) {
                                  if (index !== 0) {
                                      // Change ruleset operator.
                                      $(this).text(operator);
@@ -210,17 +212,17 @@ M.totara_cohortrules = M.totara_cohortrules || {
                 notification_message = M.util.get_string('rulesupdatefailure', 'totara_cohort');
 
                 // Notify result of operation.
-                var notice = "<div id='notify"+ id +"' class="+notification_class+">" +
+                var notice = "<div id='notify" + id + "' class=" + notification_class + ">" +
                     notification_message + "<div>";
 
-                if ($('div#notify'+ id).length === 0) {
+                if ($('div#notify' + id).length === 0) {
                     if (type === 'updcohortop') {
                         $('#fgroup_id_cohortoperator').prepend(notice);
                     } else if (type === 'updrulesetop') {
                         $('#fgroup_id_rulesetoperator_' + id).prepend(notice);
                     }
                 }
-                $('div#notify'+ id).fadeOut(600).fadeIn(600);
+                $('div#notify' + id).fadeOut(600).fadeIn(600);
             }
         }
 
@@ -228,8 +230,8 @@ M.totara_cohortrules = M.totara_cohortrules || {
         var url = M.cfg.wwwroot + '/totara/cohort/rules/ruledetail.php';
         var thandler = new totaraDialog_handler_cohortruletreeview();
         var tbuttons = {};
-        tbuttons[M.util.get_string('save','totara_core')] = function() { thandler._save() }
-        tbuttons[M.util.get_string('cancel','moodle')] = function() { thandler._cancel() }
+        tbuttons[M.util.get_string('save', 'totara_core')] = function() { thandler._save(); };
+        tbuttons[M.util.get_string('cancel', 'moodle')] = function() { thandler._cancel(); };
         var tdialog = new totaraDialog(
             'cohortruletreeviewdialog',
             'nobutton',
@@ -241,7 +243,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
             thandler
         );
         tdialog.cohort_base_url = url;
-        totaraDialogs['cohortruletreeview'] = tdialog;
+        totaraDialogs.cohortruletreeview = tdialog;
 
         // Bind open event to rule_selector menu(s)
         // Also set their default value
@@ -259,7 +261,9 @@ M.totara_cohortrules = M.totara_cohortrules || {
             // Validate completion date rules.
             validate_completion();
 
+            /* eslint-enable no-undef */
             var dialog = totaraDialogs['cohortrule' + ruleHandlerMap[ruletype]];
+            /* eslint-disable no-undef */
             var url = dialog.cohort_base_url;
             var handler = dialog.handler;
 
@@ -295,7 +299,9 @@ M.totara_cohortrules = M.totara_cohortrules || {
             validate_completion();
 
             // Get the appropriate dialog
+            /* eslint-enable no-undef */
             var dialog = totaraDialogs['cohortrule' + ruleHandlerMap[ruletype]];
+            /* eslint-disable no-undef */
             var url = dialog.cohort_base_url;
 
             // Tell the handler how to handle the response
@@ -309,18 +315,18 @@ M.totara_cohortrules = M.totara_cohortrules || {
             dialog.open();
         });
     }
-}
+};
 
 
 // Function to validate completion date field.
-var funccompletiondate =  function(element) {
+var funccompletiondate = function(element) {
     element = $(element);
     var parent = element.parent();
-    if (!element.val().match(M.util.get_string('datepickerlongyearregexjs', 'totara_core'))){
+    if (!element.val().match(M.util.get_string('datepickerlongyearregexjs', 'totara_core'))) {
         parent.addClass('error');
         if ($('#id_error_completiondate').length == 0) {
             parent.prepend('<span id="id_error_completiondate" class="error">' +
-                M.util.get_string('error:baddate','totara_cohort') +
+                M.util.get_string('error:baddate', 'totara_cohort') +
                 '</span>');
         }
         return false;
@@ -335,11 +341,11 @@ var funccompletiondate =  function(element) {
 var funccompletionduration = function(element) {
     element = $(element);
     var parent = element.parent();
-    if (!element.val().match(/[1-9]+[0-9]*/)){
+    if (!element.val().match(/[1-9]+[0-9]*/)) {
         parent.addClass('error');
-        if ( $('#id_error_completiondurationdate').length == 0 ) {
+        if ($('#id_error_completiondurationdate').length == 0) {
             parent.prepend('<span id="id_error_completiondurationdate" class="error">' +
-                M.util.get_string('error:badduration','totara_cohort') +
+                M.util.get_string('error:badduration', 'totara_cohort') +
                 '</span>');
         }
         return false;
@@ -351,13 +357,13 @@ var funccompletionduration = function(element) {
 };
 
 function validate_completion() {
-    Y.on("contentready", initial_validation, '#form_course_program_date')
+    Y.on("contentready", initial_validation, '#form_course_program_date');
 }
 
 function initial_validation() {
     $('#completiondate').datepicker(
         {
-            dateFormat: M.util.get_string('datepickerlongyeardisplayformat','totara_core'),
+            dateFormat: M.util.get_string('datepickerlongyeardisplayformat', 'totara_core'),
             showOn: 'both',
             buttonImage: M.util.image_url('t/calendar'),
             buttonImageOnly: true,
@@ -409,14 +415,14 @@ $(document).on('click', 'input[name="fixeddynamic"]', function(event) {
 
 // A function to handle the responses generated by cohort handlers
 var cohort_handler_responsefunc = function(response) {
-    if (response.substr(0,4) == 'DONE') {
+    if (response.substr(0, 4) == 'DONE') {
         // Get all root elements in response
         var els = $(response.substr(4));
 
         // If we're updating an existing rule, then replace its content
         if (this.responsetype == 'updaterule') {
             this.responsegoeshere.replaceWith(els);
-            els.effect('pulsate', { times: 3 }, 2000);
+            els.effect('pulsate', {times: 3}, 2000);
         }
 
         // If we're adding a new rule, insert it
@@ -436,7 +442,7 @@ var cohort_handler_responsefunc = function(response) {
     } else {
         this._dialog.render(response);
     }
-}
+};
 
 // Create handler for the dialog
 // As a totaraDialog_handler_form, it means that the content of this dialog should contain an HTML
@@ -445,7 +451,7 @@ var cohort_handler_responsefunc = function(response) {
 totaraDialog_handler_cohortruleform = function() {
     // Base url
     var baseurl = '';
-}
+};
 
 totaraDialog_handler_cohortruleform.prototype = new totaraDialog_handler_form();
 
@@ -473,7 +479,7 @@ totaraDialog_handler_cohortruleform.prototype.every_load = function() {
         e.preventDefault();
 
         // Check whether the original onsubmit worked
-        if (!(typeof(orighandler) == 'function') || orighandler(forms.get(0)) ) {
+        if (!(typeof (orighandler) == 'function') || orighandler(forms.get(0))) {
 
             handler._dialog.showLoading();
 
@@ -527,7 +533,7 @@ totaraDialog_handler_cohortruletreeview.prototype._save = function() {
     var success = true;
     extrafields.each(
         function(intIndex) {
-            if (typeof(this.cohort_validation_func) == 'function') {
+            if (typeof (this.cohort_validation_func) == 'function') {
                 success = success && this.cohort_validation_func(this);
             }
         }
@@ -552,7 +558,7 @@ totaraDialog_handler_cohortruletreeview.prototype._save = function() {
 
     // Send to server
     this._dialog._request(url, {object: this, method: '_update'});
-}
+};
 
 // todo: need to figure out a better way to share this common code between this and the formpicker
 totaraDialog_handler_cohortruletreeview.prototype._update = cohort_handler_responsefunc;

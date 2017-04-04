@@ -24,15 +24,18 @@
  * @package totara
  * @subpackage totara_core
  */
+
+/* eslint-disable no-undef */
+
 M.totara_positionitem = M.totara_positionitem || {
 
     Y: null,
     // optional php params and defaults defined here, args passed to init method
     // below will override these values
     config: {
-        id:0,
-        frameworkid:0,
-        sesskey:0
+        id: 0,
+        frameworkid: 0,
+        sesskey: 0
     },
 
     /**
@@ -41,7 +44,7 @@ M.totara_positionitem = M.totara_positionitem || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
 
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
@@ -67,15 +70,15 @@ M.totara_positionitem = M.totara_positionitem || {
         // Note: assigntype=3 is referring to the constant GOAL_ASSIGNMENT_POSITION.
         //
         (function() {
-            var url = M.cfg.wwwroot+ '/totara/hierarchy/prefix/goal/assign/';
+            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/goal/assign/';
             var saveurl = url + 'assign.php';
             var findurl = url + 'find.php';
 
             // Dialog & handler for hierarchy picker.
             var thandler = new totaraDialog_handler_assigngoaltreeview();
             var tbuttons = {};
-            tbuttons[M.util.get_string('save','totara_core')] = function() { thandler._save(); }
-            tbuttons[M.util.get_string('cancel','moodle')] = function() { thandler._cancel(); }
+            tbuttons[M.util.get_string('save', 'totara_core')] = function() { thandler._save(); };
+            tbuttons[M.util.get_string('cancel', 'moodle')] = function() { thandler._cancel(); };
             var tdialog = new totaraDialog(
                 'assigngoaltreeviewdialog',
                 'nobutton',
@@ -87,7 +90,7 @@ M.totara_positionitem = M.totara_positionitem || {
                 thandler
             );
             tdialog.assigngoal_base_url = url;
-            totaraDialogs['assigngoaltreeview'] = tdialog;
+            totaraDialogs.assigngoaltreeview = tdialog;
 
             // Bind open event to group_selector menu(s)
             // Also set their default value
@@ -100,7 +103,7 @@ M.totara_positionitem = M.totara_positionitem || {
                 var id = M.totara_positionitem.config.id;
                 var sesskey = M.totara_positionitem.config.sesskey;
 
-                var dialog = totaraDialogs['assigngoaltreeview'];
+                var dialog = totaraDialogs.assigngoaltreeview;
                 var url = dialog.assigngoal_base_url;
                 var handler = dialog.handler;
 
@@ -114,34 +117,34 @@ M.totara_positionitem = M.totara_positionitem || {
             });
         })();
 
-        ///
-        /// Competency dialog
-        ///
+        // /
+        // / Competency dialog
+        // /
         (function() {
-            var url = M.cfg.wwwroot+ '/totara/hierarchy/prefix/position/assigncompetency/';
+            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/position/assigncompetency/';
             var id = M.totara_positionitem.config.id;
             var fid = M.totara_positionitem.config.frameworkid;
             totaraMultiSelectDialog(
                 'assignedcompetencies',
                 M.util.get_string('assigncompetencies', 'totara_hierarchy'),
-                url+'find.php?assignto='+id+'&frameworkid='+fid+'&add=',
-                url+'assign.php?assignto='+id+'&frameworkid='+fid+'&deleteexisting=1&add='
+                url + 'find.php?assignto=' + id + '&frameworkid=' + fid + '&add=',
+                url + 'assign.php?assignto=' + id + '&frameworkid=' + fid + '&deleteexisting=1&add='
             );
         })();
 
-        ///
-        /// Template dialog
-        ///
+        // /
+        // / Template dialog
+        // /
         // Stub code for competency templates - not implemented yet
         (function() {
-            var url = M.cfg.wwwroot+ '/totara/hierarchy/prefix/position/assigncompetencytemplate/';
+            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/position/assigncompetencytemplate/';
             var id = M.totara_positionitem.config.id;
             var fid = M.totara_positionitem.config.frameworkid;
             totaraMultiSelectDialog(
                 'assignedcompetencytemplates',
                 M.util.get_string('assigncompetencytemplate', 'totara_hierarchy'),
-                url+'find.php?assignto='+id+'&frameworkid='+fid+'&add=',
-                url+'assign.php?assignto='+id+'&frameworkid='+fid+'&deleteexisting=1&add='
+                url + 'find.php?assignto=' + id + '&frameworkid=' + fid + '&add=',
+                url + 'assign.php?assignto=' + id + '&frameworkid=' + fid + '&deleteexisting=1&add='
             );
         })();
 
@@ -154,25 +157,25 @@ M.totara_positionitem = M.totara_positionitem || {
             // to be double sure our newly appended DOM elements are ready to
             // have a listener bound by a component action generated ID, respond
             // when the attached parent node's 'contentready' event is fired.
-            Y.on('contentready', function(e){
-                var selectid = Y.one('#'+formid+' select').get('id');
+            Y.on('contentready', function(e) {
+                var selectid = Y.one('#' + formid + ' select').get('id');
                 // call the original component action again so it handles the
                 // auto submission of a selected option based on the new select
                 M.core.init_formautosubmit(Y, formid, selectid);
-            }, '#'+formid, Y);
+            }, '#' + formid, Y);
         });
     }
 };
 
 // A function to handle the responses generated by handlers
 var assigngoal_handler_responsefunc = function(response) {
-    if (response.substr(0,4) == 'DONE') {
+    if (response.substr(0, 4) == 'DONE') {
         // Get all root elements in response
         var els = $(response.substr(4));
 
         // Update the assignments table.
         this.responsegoeshere.replaceWith(els);
-        els.effect('pulsate', { times: 3 }, 2000);
+        els.effect('pulsate', {times: 3}, 2000);
 
         $('#assigngoal_action_box').show();
 
@@ -181,7 +184,7 @@ var assigngoal_handler_responsefunc = function(response) {
     } else {
         this._dialog.render(response);
     }
-}
+};
 totaraDialog_handler_assigngoaltreeview = function() {};
 totaraDialog_handler_assigngoaltreeview.prototype = new totaraDialog_handler_treeview_multiselect();
 
@@ -214,7 +217,7 @@ totaraDialog_handler_assigngoaltreeview.prototype._save = function() {
     var success = true;
     extrafields.each(
         function(intIndex) {
-            if (typeof(this.assigngoal_validation_func) == 'function') {
+            if (typeof (this.assigngoal_validation_func) == 'function') {
                 success = success && this.assigngoal_validation_func(this);
             }
         }
@@ -238,7 +241,7 @@ totaraDialog_handler_assigngoaltreeview.prototype._save = function() {
 
     // Send to server
     this._dialog._request(url, {object: this, method: '_update'});
-}
+};
 
 // TODO: T-11233 need to figure out a better way to share this common code between this and the formpicker.
 totaraDialog_handler_assigngoaltreeview.prototype._update = assigngoal_handler_responsefunc;

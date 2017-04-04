@@ -20,9 +20,12 @@
  * @package totara
  * @subpackage totara_core
  */
+
+/* eslint-disable no-undef */
+
 M.totara_core = M.totara_core || {
 
-    Y:null,
+    Y: null,
     // optional php params and defaults defined here, args passed to init method
     // below will override these values
     config: {},
@@ -33,7 +36,7 @@ M.totara_core = M.totara_core || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -58,12 +61,12 @@ M.totara_core = M.totara_core || {
      * @param string    format for date display
      * @param array     values to determine datepicker icon
      */
-    build_datepicker: function(Y, selector, dateformat, button_img){
+    build_datepicker: function(Y, selector, dateformat, button_img) {
         var icon;
         if (button_img) {
             icon = button_img;
         } else {
-            icon = ['t/calendar','totara_core'];
+            icon = ['t/calendar', 'totara_core'];
         }
 
         $(selector).datepicker(

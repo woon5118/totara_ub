@@ -21,6 +21,9 @@
  * @package totara
  * @subpackage reportbuilder
  */
+
+/* eslint-disable no-undef */
+
 M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
 
     Y: null,
@@ -28,7 +31,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
     // below will override these values
     config: {},
     loadingimg: '',
-    advoptionshtml : '',
+    advoptionshtml: '',
     hideicon: '',
     showicon: '',
     deleteicon: '',
@@ -42,7 +45,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
      * @param object    YUI instance
      * @param object    configuration data
      */
-    init: function(Y, config){
+    init: function(Y, config) {
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -59,7 +62,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
         this.advoptionshtml = $('select.new_advanced_selector').html();
 
         var that = this;
-        require(['core/templates'], function (templates) {
+        require(['core/templates'], function(templates) {
             var iconscache = [];
             iconscache.push(templates.renderIcon('loading', M.util.get_string('saving', 'totara_reportbuilder')));
             iconscache.push(templates.renderIcon('hide', M.util.get_string('hide', 'totara_reportbuilder')));
@@ -69,7 +72,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             iconscache.push(templates.renderIcon('arrow-down', M.util.get_string('movedown', 'totara_reportbuilder')));
             iconscache.push(templates.renderIcon('spacer'));
 
-            $.when.apply($, iconscache).then(function (loadingicon, hideicon, showicon, deleteicon, upicon, downicon, spacer) {
+            $.when.apply($, iconscache).then(function(loadingicon, hideicon, showicon, deleteicon, upicon, downicon, spacer) {
                 that.loadingimg = loadingicon;
                 that.hideicon = hideicon;
                 that.showicon = showicon;
@@ -120,13 +123,13 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             // Alter advanced selector to show only possible options.
             advancedSelector.html(module.advoptionshtml);
             advancedSelector.val(advancedSelectorVal);
-            advancedSelector.find('option').each(function () {
+            advancedSelector.find('option').each(function() {
                 var option = $(this);
                 if ($.inArray(option.val(), module.config.rb_allowed_advanced[colName]) == -1) {
                     option.remove();
                 }
             });
-            advancedSelector.children().each(function () {
+            advancedSelector.children().each(function() {
                 var group = $(this);
                 if (group.children().size() == 0) {
                     group.remove();
@@ -152,7 +155,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
     /**
      *
      */
-    rb_init_col_rows: function(){
+    rb_init_col_rows: function() {
 
         var module = this;
 
@@ -225,7 +228,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
     /**
      *
      */
-    rb_init_addbutton: function(colselector){
+    rb_init_addbutton: function(colselector) {
 
         var module = this;
         var newAdvancedBox = $('select.advanced_selector', colselector.parents('tr:first'));
@@ -253,8 +256,8 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                 col: colselector.val(),
                 heading: newHeadingBox.val(),
                 advanced: newAdvancedBox.val(),
-                customheading : (newHeadingCheckbox.is(':checked') ? 1 : 0)
-            }
+                customheading: (newHeadingCheckbox.is(':checked') ? 1 : 0)
+            };
             var oldAddButtonHtml = addbutton.html();
 
             e.preventDefault();
@@ -299,19 +302,19 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                         var columnSelector = $('select.column_selector', columnbox);
                         var newCustomHeading = $('input.column_custom_heading_checkbox', optionsbox.parents('tr:first'));
                         columnSelector.removeClass('new_column_selector');
-                        columnSelector.attr('name', 'column'+colid);
-                        columnSelector.attr('id', 'id_column'+colid);
+                        columnSelector.attr('name', 'column' + colid);
+                        columnSelector.attr('id', 'id_column' + colid);
                         columnbox.find('select optgroup[label=New]').remove();
 
                         newAdvancedBox.removeClass('new_advanced_selector');
-                        newAdvancedBox.attr('name', 'advanced'+colid);
-                        newAdvancedBox.attr('id', 'id_advanced'+colid);
+                        newAdvancedBox.attr('name', 'advanced' + colid);
+                        newAdvancedBox.attr('id', 'id_advanced' + colid);
 
-                        newCustomHeading.attr('name', 'customheading'+colid);
+                        newCustomHeading.attr('name', 'customheading' + colid);
                         newCustomHeading.removeAttr('id');
 
-                        newHeadingBox.attr('name', 'heading'+colid);
-                        newHeadingBox.attr('id', 'id_heading'+colid);
+                        newHeadingBox.attr('name', 'heading' + colid);
+                        newHeadingBox.attr('id', 'id_heading' + colid);
                         newHeadingBox.closest('tr').attr('colid', colid);
 
                         // Append a new col select box
@@ -324,10 +327,10 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                         var colval = colselector.val().split('-')[1];
 
                         // Remove added col from the new col selector
-                        $('.new_column_selector optgroup option[value='+coltype+'-'+colval+']').remove();
+                        $('.new_column_selector optgroup option[value=' + coltype + '-' + colval + ']').remove();
 
                         // Add added col to 'default sort column' selector
-                        $('select[name=defaultsortcolumn]').append('<option value="'+coltype+'_'+colval+'">'+module.config.rb_column_headings[coltype+'-'+colval]+'</option>');
+                        $('select[name=defaultsortcolumn]').append('<option value="' + coltype + '_' + colval + '">' + module.config.rb_column_headings[coltype + '-' + colval] + '</option>');
 
                         module.rb_init_col_rows();
 
@@ -388,19 +391,19 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
 
                         // Add deleted col to new col selector
                         var nlabel = rb_ucwords(delcol.optgroup_label);
-                        var optgroup = $(".new_column_selector optgroup[label='"+nlabel+"']");
+                        var optgroup = $(".new_column_selector optgroup[label='" + nlabel + "']");
                         if (optgroup.length == 0) {
                             // Create optgroup and append to select
-                            optgroup = $('<optgroup label="'+nlabel+'"></optgroup>');
+                            optgroup = $('<optgroup label="' + nlabel + '"></optgroup>');
                             $('.new_column_selector').append(optgroup);
                         }
 
-                        if (optgroup.find('option[value='+delcol.type+'-'+delcol.value+']').length == 0) {
-                            optgroup.append('<option value="'+delcol.type+'-'+delcol.value+'">'+module.config.rb_column_headings[delcol.type+'-'+delcol.value]+'</option>');
+                        if (optgroup.find('option[value=' + delcol.type + '-' + delcol.value + ']').length == 0) {
+                            optgroup.append('<option value="' + delcol.type + '-' + delcol.value + '">' + module.config.rb_column_headings[delcol.type + '-' + delcol.value] + '</option>');
                         }
 
                         // Remove deleted col from 'default sort column' selector
-                        $('select[name=defaultsortcolumn] option[value='+delcol.type+'_'+delcol.value+']').remove();
+                        $('select[name=defaultsortcolumn] option[value=' + delcol.type + '_' + delcol.value + ']').remove();
 
                         module.rb_init_col_rows();
                     } else {
@@ -419,7 +422,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
 
         });
 
-        function rb_ucwords (str) {
+        function rb_ucwords(str) {
             return (str + '').replace(/^([a-z])|\s+([a-z])/g, function($1) {
                 return $1.toUpperCase();
             });
@@ -530,10 +533,10 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             var colrowclone = colrow.clone();
             // Set the selected option, cause for some reason this don't clone so well...
             if (colrow.find('select.column_selector').val() !== '') {
-                colrowclone.find('select.column_selector option[value='+colrow.find('select.column_selector').val()+']').attr('selected', 'selected');
+                colrowclone.find('select.column_selector option[value=' + colrow.find('select.column_selector').val() + ']').attr('selected', 'selected');
             }
             if (colrow.find('select.advanced_selector').val() !== '') {
-                colrowclone.find('select.advanced_selector option[value='+colrow.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+                colrowclone.find('select.advanced_selector option[value=' + colrow.find('select.advanced_selector').val() + ']').attr('selected', 'selected');
             }
 
             var lowersibling = colrow.next('tr');
@@ -541,10 +544,10 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             var lowersiblingclone = lowersibling.clone();
             // Set the selected option, cause for some reason this don't clone so well...
             if (lowersibling.find('select.column_selector').val() !== '') {
-                lowersiblingclone.find('select.column_selector option[value='+lowersibling.find('select.column_selector').val()+']').attr('selected', 'selected');
+                lowersiblingclone.find('select.column_selector option[value=' + lowersibling.find('select.column_selector').val() + ']').attr('selected', 'selected');
             }
             if (lowersibling.find('select.advanced_selector').val() !== '') {
-                lowersiblingclone.find('select.advanced_selector option[value='+lowersibling.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+                lowersiblingclone.find('select.advanced_selector option[value=' + lowersibling.find('select.advanced_selector').val() + ']').attr('selected', 'selected');
             }
 
             $.ajax({
@@ -604,10 +607,10 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             var colrowclone = colrow.clone();
             // Set the selected option, cause for some reason this don't clone so well...
             if (colrow.find('select.column_selector').val() !== '') {
-                colrowclone.find('select.column_selector option[value='+colrow.find('select.column_selector').val()+']').attr('selected', 'selected');
+                colrowclone.find('select.column_selector option[value=' + colrow.find('select.column_selector').val() + ']').attr('selected', 'selected');
             }
             if (colrow.find('select.advanced_selector').val() !== '') {
-                colrowclone.find('select.advanced_selector option[value='+colrow.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+                colrowclone.find('select.advanced_selector option[value=' + colrow.find('select.advanced_selector').val() + ']').attr('selected', 'selected');
             }
 
             var uppersibling = colrow.prev('tr');
@@ -615,10 +618,10 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             var uppersiblingclone = uppersibling.clone();
             // Set the selected option, cause for some reason this don't clone so well...
             if (uppersibling.find('select.column_selector').val() !== '') {
-                uppersiblingclone.find('select.column_selector option[value='+uppersibling.find('select.column_selector').val()+']').attr('selected', 'selected');
+                uppersiblingclone.find('select.column_selector option[value=' + uppersibling.find('select.column_selector').val() + ']').attr('selected', 'selected');
             }
             if (uppersibling.find('select.advanced_selector').val() !== '') {
-                uppersiblingclone.find('select.advanced_selector option[value='+uppersibling.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+                uppersiblingclone.find('select.advanced_selector option[value=' + uppersibling.find('select.advanced_selector').val() + ']').attr('selected', 'selected');
             }
 
             $.ajax({
@@ -696,23 +699,23 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
      *
      */
     rb_get_btn_hide: function(reportid, colid) {
-        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&h=1" class="hidecolbtn action-icon">' + this.hideicon +'</a>');
+        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid=' + colid + '&h=1" class="hidecolbtn action-icon">' + this.hideicon + '</a>');
     },
 
     rb_get_btn_show: function(reportid, colid) {
-        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&h=0" class="showcolbtn action-icon">' + this.showicon + '</a>');
+        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid=' + colid + '&h=0" class="showcolbtn action-icon">' + this.showicon + '</a>');
     },
 
     rb_get_btn_delete: function(reportid, colid) {
-        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&d=1" class="deletecolbtn action-icon">' + this.deleteicon + '</a>');
+        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid=' + colid + '&d=1" class="deletecolbtn action-icon">' + this.deleteicon + '</a>');
     },
 
     rb_get_btn_up: function(reportid, colid) {
-        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&m=up" class="movecolupbtn action-icon">' + this.upicon + '</a>');
+        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid=' + colid + '&m=up" class="movecolupbtn action-icon">' + this.upicon + '</a>');
     },
 
     rb_get_btn_down: function(reportid, colid) {
-        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid='+colid+'&m=down" class="movecoldownbtn action-icon">' + this.downicon + '</a>');
+        return $('<a href="' + M.cfg.wwwroot + '/totara/reportbuilder/columns.php?id=' + reportid + '&cid=' + colid + '&m=down" class="movecoldownbtn action-icon">' + this.downicon + '</a>');
     },
 
     rb_get_btn_add: function(reportid) {

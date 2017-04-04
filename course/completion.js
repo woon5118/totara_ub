@@ -14,7 +14,7 @@ M.core_completion.init = function(Y) {
         Y.one('#completion_dynamic_change').set('value', 1);
 
         if (o.responseText != 'OK') {
-            alert('An error occurred when attempting to save your tick mark.\n\n('+o.responseText+'.)'); //TODO: localize
+            alert('An error occurred when attempting to save your tick mark.\n\n(' + o.responseText + '.)'); // TODO: localize
 
         } else {
             require(['core/templates', 'core/str'], function(templates, stringlib) {
@@ -25,21 +25,21 @@ M.core_completion.init = function(Y) {
                     icon;
                 if (current == 1) {
                     args.state.set('value', 0);
-                    altstr = {component: 'completion', key:'completion-alt-manual-y', param: modulename};
-                    titlestr = {component: 'completion', key:'completion-title-manual-y', param: modulename};
+                    altstr = {component: 'completion', key: 'completion-alt-manual-y', param: modulename};
+                    titlestr = {component: 'completion', key: 'completion-title-manual-y', param: modulename};
                     icon = 'completion-manual-y';
                 } else {
                     args.state.set('value', 1);
-                    altstr = {component: 'completion', key:'completion-alt-manual-n', param: modulename};
-                    titlestr = {component: 'completion', key:'completion-title-manual-n', param: modulename};
+                    altstr = {component: 'completion', key: 'completion-alt-manual-n', param: modulename};
+                    titlestr = {component: 'completion', key: 'completion-title-manual-n', param: modulename};
                     icon = 'completion-manual-n';
                 }
-                stringlib.get_strings([altstr, titlestr]).then(function (strings) {
+                stringlib.get_strings([altstr, titlestr]).then(function(strings) {
                     altstr = strings[0];
                     titlestr = strings[1];
 
                     return templates.renderIcon(icon, {alt: altstr, title: titlestr});
-                }).then(function (html) {
+                }).then(function(html) {
                     var completionicon = args.modulename.ancestor('form').ancestor().one('.completion-icon');
                     completionicon.set('data-loading', 'false');
                     completionicon.setContent(html);
@@ -51,7 +51,7 @@ M.core_completion.init = function(Y) {
     };
 
     var handle_failure = function(id, o, args) {
-        alert('An error occurred when attempting to save your tick mark.\n\n('+o.responseText+'.)'); //TODO: localize
+        alert('An error occurred when attempting to save your tick mark.\n\n(' + o.responseText + '.)'); // TODO: localize
         args.ajax.remove();
     };
 
@@ -66,7 +66,7 @@ M.core_completion.init = function(Y) {
         var modulename = null;
 
         var inputs = Y.Node.getDOMNode(form).getElementsByTagName('input');
-        for (var i=0; i<inputs.length; i++) {
+        for (var i = 0; i < inputs.length; i++) {
             switch (inputs[i].name) {
                  case 'id':
                      cmid = inputs[i].value;
@@ -90,7 +90,7 @@ M.core_completion.init = function(Y) {
 
         var cfg = {
             method: "POST",
-            data: 'id='+cmid+'&completionstate='+completionstate+'&fromajax=1&sesskey='+M.cfg.sesskey,
+            data: 'id=' + cmid + '&completionstate=' + completionstate + '&fromajax=1&sesskey=' + M.cfg.sesskey,
             on: {
                 success: handle_success,
                 failure: handle_failure
@@ -99,7 +99,7 @@ M.core_completion.init = function(Y) {
         };
 
         Y.use('io-base', function(Y) {
-            Y.io(M.cfg.wwwroot+'/course/togglecompletion.php', cfg);
+            Y.io(M.cfg.wwwroot + '/course/togglecompletion.php', cfg);
         });
     };
 
@@ -110,17 +110,17 @@ M.core_completion.init = function(Y) {
         }
     });
 
-    Y.all('.activity .completion-icon').each(function (element) {
+    Y.all('.activity .completion-icon').each(function(element) {
         var form = element.get('parentNode').one('form.togglecompletion');
-        element.on('click', function (e) {
+        element.on('click', function(e) {
             e.preventDefault();
             element.set('data-loading', 'true');
 
             form.one('input[type=image]').simulate("click");
-            require(['core/templates', 'core/str'], function (templates, stringlib) {
-                stringlib.get_string('loading', 'admin').then(function (loading) {
+            require(['core/templates', 'core/str'], function(templates, stringlib) {
+                stringlib.get_string('loading', 'admin').then(function(loading) {
                     return templates.renderIcon('loading', {alt: loading});
-                }).then(function (html) {
+                }).then(function(html) {
                     var newstate = form.one('[name=completionstate]').get('value');
                     if (element.get('data-loading') === 'true') {
                         element.setContent(html);

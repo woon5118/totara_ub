@@ -20,9 +20,12 @@
  * @package totara
  * @subpackage totara_feedback360
  */
+
+/* eslint-disable no-undef */
+
 M.totara_feedback360_content = M.totara_feedback360_content || {
 
-  Y : null,
+  Y: null,
 
   /**
    * module initialisation method called by php js_init_call()
@@ -30,12 +33,12 @@ M.totara_feedback360_content = M.totara_feedback360_content || {
    * @param object    YUI instance
    * @param string    args supplied in JSON format
    */
-  init : function(Y, args) {
+  init: function(Y, args) {
     // save a reference to the Y instance (all of its dependencies included)
     this.Y = Y;
 
     // check jQuery dependency is available
-    if ( typeof $ === 'undefined') {
+    if (typeof $ === 'undefined') {
       throw new Error('M.totara_feedback360_content.init()-> jQuery dependency required for this module to function.');
     }
     makeDraggable(M.cfg.wwwroot + '/totara/feedback360/content.php', '#feedback360-quest-list', 'li');
@@ -47,61 +50,62 @@ M.totara_feedback360_content = M.totara_feedback360_content || {
 
         var lis = Y.all(elID + ' ' + elType);
         var ul = Y.one(elID);
-        /*var slis = Y.all(sID + ' ' + sType);*/
+        /* var slis = Y.all(sID + ' ' + sType);*/
 
         Y.DD.DDM.on('drop:over', function(e) {
-          //Get a reference to our drag and drop nodes
-          var drag = e.drag.get('node'), drop = e.drop.get('node');
+          // Get a reference to our drag and drop nodes
+          var drag = e.drag.get('node'),
+drop = e.drop.get('node');
 
-          //Are we in the same parent?
+          // Are we in the same parent?
           if ('#' + drop.get('parentNode').get('id') == elID) {
-            //Are we dropping on a li node?
+            // Are we dropping on a li node?
             if (drop.get('tagName').toLowerCase() === 'li') {
-              //Are we not going up?
+              // Are we not going up?
               if (!goingUp) {
                 drop = drop.get('nextSibling');
               }
-              //Add the node to this list
+              // Add the node to this list
               e.drop.get('node').get('parentNode').insertBefore(drag, drop);
-              //Set the new parentScroll on the nodescroll plugin
+              // Set the new parentScroll on the nodescroll plugin
               e.drag.nodescroll.set('parentScroll', e.drop.get('node').get('parentNode'));
-              //Resize this nodes shim, so we can drop on it later.
+              // Resize this nodes shim, so we can drop on it later.
               e.drop.sizeShim();
             }
           }
         });
-        //Listen for all drag:drag events
+        // Listen for all drag:drag events
         Y.DD.DDM.on('drag:drag', function(e) {
-          //Get the last y point
+          // Get the last y point
           var y = e.target.lastXY[1];
-          //is it greater than the lastY var?
+          // is it greater than the lastY var?
           if (y < lastY) {
-            //We are going up
+            // We are going up
             goingUp = true;
           } else {
-            //We are going down.
+            // We are going down.
             goingUp = false;
           }
-          //Cache for next check
+          // Cache for next check
           lastY = y;
           Y.DD.DDM.syncActiveShims(true);
         });
-        //Listen for all drag:start events
+        // Listen for all drag:start events
         Y.DD.DDM.on('drag:start', function(e) {
-          //Get our drag object
+          // Get our drag object
           var drag = e.target;
-          //Set some styles here
+          // Set some styles here
           drag.get('node').setStyle('opacity', '.25');
           drag.get('dragNode').set('innerHTML', drag.get('node').get('innerHTML'));
           drag.get('dragNode').setStyles({
-            opacity : '.5',
-            borderColor : 'transparent',
-            height : drag.get('node').getComputedStyle('height'),
-            width : drag.get('node').getComputedStyle('width'),
-            backgroundColor : drag.get('node').getStyle('backgroundColor')
+            opacity: '.5',
+            borderColor: 'transparent',
+            height: drag.get('node').getComputedStyle('height'),
+            width: drag.get('node').getComputedStyle('width'),
+            backgroundColor: drag.get('node').getStyle('backgroundColor')
           });
         });
-        //Listen for a drag:end events
+        // Listen for a drag:end events
         Y.DD.DDM.on('drag:end', function(e) {
           var drag = e.target;
           var node = drag.get('node');
@@ -112,26 +116,27 @@ M.totara_feedback360_content = M.totara_feedback360_content || {
             id: node.getData('pageid') || node.getData('questid'),
             pos: newPos
           });
-          //Put our styles back
+          // Put our styles back
           node.setStyles({
-            visibility : '',
-            opacity : '1'
+            visibility: '',
+            opacity: '1'
           });
         });
 
-        //Static Vars
-        var goingUp = false, lastY = 0;
+        // Static Vars
+        var goingUp = false,
+lastY = 0;
 
         lis.each(function(v, k) {
           var dd = new Y.DD.Drag({
-            node : v,
-            //Make it Drop target and pass this config to the Drop constructor
-            target : {
-              padding : '0 0 0 20'
+            node: v,
+            // Make it Drop target and pass this config to the Drop constructor
+            target: {
+              padding: '0 0 0 20'
             }
           }).plug(Y.Plugin.DDProxy, {
-            //Don't move the node at the end of the drag
-            moveOnEnd : false
+            // Don't move the node at the end of the drag
+            moveOnEnd: false
           }).plug(Y.Plugin.DDNodeScroll, {
             node: v.get('parentNode')
           });
@@ -140,4 +145,4 @@ M.totara_feedback360_content = M.totara_feedback360_content || {
       });
     }
   },
-}
+};

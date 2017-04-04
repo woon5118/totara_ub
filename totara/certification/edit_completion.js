@@ -19,6 +19,9 @@
  * @author Nathan Lewis <nathan.lewis@totaralms.com>
  * @package totara_certification
  */
+
+/* eslint-disable no-undef */
+
 M.totara_editcertcompletion = M.totara_editcertcompletion || {
 
     Y: null,
@@ -30,7 +33,7 @@ M.totara_editcertcompletion = M.totara_editcertcompletion || {
      * @param object    YUI instance
      * @param object    configuration data
      */
-    init: function(Y, config){
+    init: function(Y, config) {
         // Save a reference to the Y instance (all of its dependencies included).
         this.Y = Y;
 
@@ -97,7 +100,7 @@ M.totara_editcertcompletion = M.totara_editcertcompletion || {
 
             // Copy submitted dates that should be automatically set.
             var state = parseInt($('#id_state').val(), 10);
-            switch(state) {
+            switch (state) {
                 case 2: // CERTIFCOMPLETIONSTATE_CERTIFIED.
                     M.totara_editcertcompletion.copyDate('timeexpires', 'timedue');
                     M.totara_editcertcompletion.copyDate('timecompleted', 'progtimecompleted');
@@ -127,7 +130,7 @@ M.totara_editcertcompletion = M.totara_editcertcompletion || {
         var state = parseInt($('#id_state').val(), 10);
         var inprogress = ($('#id_inprogress').val() == "1");
 
-        switch(state) {
+        switch (state) {
             case 0: // CERTIFCOMPLETIONSTATE_INVALID.
                 $('#id_inprogress').closest('.fitem').next().hide();
 
@@ -272,7 +275,7 @@ M.totara_editcertcompletion = M.totara_editcertcompletion || {
 
         var apparentactiveperiod = 'Error - not calculated';
         var apparentwindowperiod = 'Error - not calculated';
-        switch(state) {
+        switch (state) {
             case 0: // CERTIFCOMPLETIONSTATE_INVALID.
             case 2: // CERTIFCOMPLETIONSTATE_CERTIFIED.
             case 3: // CERTIFCOMPLETIONSTATE_WINDOWOPEN.
@@ -329,4 +332,4 @@ M.totara_editcertcompletion = M.totara_editcertcompletion || {
             }
         }
     }
-}
+};

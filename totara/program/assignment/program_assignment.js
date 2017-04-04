@@ -20,6 +20,9 @@
  * @package totara
  * @subpackage program
  */
+
+/* eslint-disable no-undef */
+
 M.totara_programassignment = M.totara_programassignment || {
 
     Y: null,
@@ -37,7 +40,7 @@ M.totara_programassignment = M.totara_programassignment || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
 
         var module = this;
 
@@ -94,7 +97,7 @@ M.totara_programassignment = M.totara_programassignment || {
             this.category = category;
             this.catid = catid;
             this.name = name;
-            this.url = M.cfg.wwwroot+'/totara/program/assignment/';
+            this.url = M.cfg.wwwroot + '/totara/program/assignment/';
             this.ajax_url = this.url + 'get_item.php?cat=' + this.name;
 
             // Setup the handler
@@ -104,8 +107,8 @@ M.totara_programassignment = M.totara_programassignment || {
 
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok','totara_program')] = function() { self.category.save(); };
-            buttonsObj[M.util.get_string('cancel','totara_program')] = function() { self.hide(); };
+            buttonsObj[M.util.get_string('ok', 'totara_program')] = function() { self.category.save(); };
+            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { self.hide(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -114,7 +117,7 @@ M.totara_programassignment = M.totara_programassignment || {
             'add-assignment-' + catid,
             {
                 buttons: buttonsObj,
-                title: '<h2>' + title +'</h2>'
+                title: '<h2>' + title + '</h2>'
             },
             default_url,
             handler);
@@ -143,7 +146,7 @@ M.totara_programassignment = M.totara_programassignment || {
 
         totaraDialog_completion_handler.prototype.first_load = function() {
             M.totara_core.build_datepicker(module.Y, 'input[name="completiontime"]', M.util.get_string('datepickerlongyeardisplayformat', 'totara_core'));
-            $('#ui-datepicker-div').css('z-index',1600);
+            $('#ui-datepicker-div').css('z-index', 1600);
         };
 
         totaraDialog_completion_handler.prototype.every_load = function() {
@@ -183,8 +186,8 @@ M.totara_programassignment = M.totara_programassignment || {
         // The completion dialog
         var totaraDialog_completion = function() {
 
-            //this.item = item;
-            //this.url = url + 'choose_completion.php';
+            // this.item = item;
+            // this.url = url + 'choose_completion.php';
 
             // Setup the handler
             var handler = new totaraDialog_completion_handler();
@@ -192,7 +195,7 @@ M.totara_programassignment = M.totara_programassignment || {
             // Store reference to this
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel','totara_program')] = function() { handler._cancel() };
+            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -201,7 +204,7 @@ M.totara_programassignment = M.totara_programassignment || {
             'unused', // buttonid unused
             {
                 buttons: buttonsObj,
-                title: '<h2>'+ M.util.get_string('completioncriteria', 'totara_program') +'</h2>'
+                title: '<h2>' + M.util.get_string('completioncriteria', 'totara_program') + '</h2>'
             },
             this.url,
             handler
@@ -260,8 +263,8 @@ M.totara_programassignment = M.totara_programassignment || {
             // Store reference to this
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('saveallchanges','totara_program')] = function() { self.save() };
-            buttonsObj[M.util.get_string('editassignments','totara_program')] = function() { handler._cancel() };
+            buttonsObj[M.util.get_string('saveallchanges', 'totara_program')] = function() { self.save(); };
+            buttonsObj[M.util.get_string('editassignments', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -270,7 +273,7 @@ M.totara_programassignment = M.totara_programassignment || {
             'unused', // buttonid unused
             {
                 buttons: buttonsObj,
-                title: '<h2>'+M.util.get_string('confirmassignmentchanges', 'totara_program')+'</h2>'
+                title: '<h2>' + M.util.get_string('confirmassignmentchanges', 'totara_program') + '</h2>'
             },
             'unused', // default_url unused
             handler
@@ -292,7 +295,7 @@ M.totara_programassignment = M.totara_programassignment || {
 
             // Don't load anything
             this.load = function(url, method) {
-            }
+            };
 
         };
 
@@ -305,8 +308,8 @@ M.totara_programassignment = M.totara_programassignment || {
             // Store reference to this
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok','totara_program')] = function() { self.save() };
-            buttonsObj[M.util.get_string('cancel','totara_program')] = function() { handler._cancel() };
+            buttonsObj[M.util.get_string('ok', 'totara_program')] = function() { self.save(); };
+            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -315,26 +318,26 @@ M.totara_programassignment = M.totara_programassignment || {
             'unused2', // buttonid unused
             {
                 buttons: buttonsObj,
-                title: '<h2>'+M.util.get_string('chooseitem', 'totara_program') + module.config.display_selected_completion_event +'</h2>'
+                title: '<h2>' + M.util.get_string('chooseitem', 'totara_program') + module.config.display_selected_completion_event + '</h2>'
             },
             'unused2', // default_url unused
             handler
             );
 
             this.save = function() {
-                var selected_val = $('#treeview_selected_val_'+this.handler._title).val();
-                var selected_text = $('#treeview_selected_text_'+this.handler._title).text();
+                var selected_val = $('#treeview_selected_val_' + this.handler._title).val();
+                var selected_text = $('#treeview_selected_text_' + this.handler._title).text();
 
                 $('#instance').val(selected_val);
                 $('#instancetitle').text(selected_text);
 
                 this.hide();
-            }
+            };
 
             this.clear = function() {
                 $('#instance').val(0);
                 $('#instancetitle').text('');
-            }
+            };
 
             $(document).on('change', '#eventtype', function() {
                 if ($('#eventtype').val() != module.config.COMPLETION_EVENT_FIRST_LOGIN &&
@@ -350,18 +353,18 @@ M.totara_programassignment = M.totara_programassignment || {
          * Event bindings, Dialog instantiation and setup
          */
         // remove the 'unsaved changes' confirmation when submitting the form
-        $('form[name="form_prog_assignments"]').submit(function(){
+        $('form[name="form_prog_assignments"]').submit(function() {
             window.onbeforeunload = null;
         });
 
         // Remove the 'unsaved changes' confirmation when clicking the 'Cancel program management' link
-        $('#cancelprogramedits').click(function(){
+        $('#cancelprogramedits').click(function() {
             window.onbeforeunload = null;
             return true;
         });
 
         $('#category_select button').click(function() {
-            var url = M.cfg.wwwroot+'/totara/program/assignment/get_items.php?progid='+module.config.id;
+            var url = M.cfg.wwwroot + '/totara/program/assignment/get_items.php?progid=' + module.config.id;
 
             var select = $("#category_select select");
             var option = $("option:selected", select);
@@ -380,13 +383,13 @@ M.totara_programassignment = M.totara_programassignment || {
                 }
 
                 // Add the category to the bottom of the list of categories
-                $("#assignment_categories").append(data['html']);
+                $("#assignment_categories").append(data.html);
 
                 // Remove the option from the drop down
                 option.remove();
 
                 // Remove the dropdown box if no options are left
-                if ($("option",select).length === 1) {
+                if ($("option", select).length === 1) {
                     // Remove the category select if there's only the default option left
                     $('#category_select').remove();
                 } else {
@@ -398,15 +401,15 @@ M.totara_programassignment = M.totara_programassignment || {
         });
 
         // On click event for "View dates" links.
-        $('.assignment-duedates').on('click', function(){
-            $.get($(this).attr('href'), function(result){
+        $('.assignment-duedates').on('click', function() {
+            $.get($(this).attr('href'), function(result) {
                 M.totara_programassignment.datesDialogue = new M.core.dialogue({
                     headerContent: null,
-                    bodyContent  : result,
-                    width        : 900,
-                    centered     : true,
-                    modal        : false,
-                    render       : true
+                    bodyContent: result,
+                    width: 900,
+                    centered: true,
+                    modal: false,
+                    render: true
                 });
                 M.totara_programassignment.datesDialogue.show();
             });
@@ -432,15 +435,15 @@ M.totara_programassignment = M.totara_programassignment || {
             '.moodle-dialogue-content form input:submit', function(event) {
             var form = $(this).closest('form');
             var data = form.serializeArray();
-            data.push({ name: $(this).attr('name'), value: $(this).val() });
+            data.push({name: $(this).attr('name'), value: $(this).val()});
             $.ajax({
-                url     : form.attr('action'),
-                type    : form.attr('method'),
-                data    : data,
-                success : function(result) {
+                url: form.attr('action'),
+                type: form.attr('method'),
+                data: data,
+                success: function(result) {
                     M.totara_programassignment.datesDialogue.bodyNode.setHTML(result);
                 },
-                error   : function(xhr, err) {
+                error: function(xhr, err) {
                     alert('Error trying to load submitted report form by ajax');
                 }
             });
@@ -452,9 +455,9 @@ M.totara_programassignment = M.totara_programassignment || {
             return module.handleSaveChanges(event);
         });
 
-        totaraDialogs['completion'] = new totaraDialog_completion();
-        totaraDialogs['savechanges'] = new totaraDialog_savechanges();
-        totaraDialogs['completionevent'] = new totaraDialog_completion_event();
+        totaraDialogs.completion = new totaraDialog_completion();
+        totaraDialogs.savechanges = new totaraDialog_savechanges();
+        totaraDialogs.completionevent = new totaraDialog_completion_event();
 
         //
         this.storeInitialFormValues();
@@ -463,14 +466,16 @@ M.totara_programassignment = M.totara_programassignment || {
     /**
      * Called by AJAX callback data inserted into DOM
      */
-    add_category: function(id, name, find_url, title){
+    add_category: function(id, name, find_url, title) {
+        /* eslint-enable no-undef */
         program_assignment.add_category(new category(id, name, find_url, title, this.config.id));
+        /* eslint-disable no-undef */
     },
 
     /**
      *
      */
-    handleSaveChanges: function(event){
+    handleSaveChanges: function(event) {
 
         // no need to display the confirmation dialog if there are no changes to save
         if (!this.isFormModified()) {
@@ -478,7 +483,7 @@ M.totara_programassignment = M.totara_programassignment || {
             return true;
         }
 
-        var dialog = totaraDialogs['savechanges'];
+        var dialog = totaraDialogs.savechanges;
 
         if (dialog.savechanges === true) {
             window.onbeforeunload = null;
@@ -487,7 +492,7 @@ M.totara_programassignment = M.totara_programassignment || {
 
         // Load a html template in, and switch
         var templateJSON = this.config.confirmation_template;
-        var template = $(templateJSON['html']);
+        var template = $(templateJSON.html);
 
         var totalAdded = 0;
         var totalRemoved = 0;
@@ -515,9 +520,9 @@ M.totara_programassignment = M.totara_programassignment || {
             return true;
         }
 
-        totaraDialogs['savechanges'].open(html);
-        totaraDialogs['savechanges'].save = function() {
-            totaraDialogs['savechanges'].savechanges = true;
+        totaraDialogs.savechanges.open(html);
+        totaraDialogs.savechanges.save = function() {
+            totaraDialogs.savechanges.savechanges = true;
             this.hide();
             $('input[name="savechanges"]').trigger('click');
         };
@@ -527,7 +532,7 @@ M.totara_programassignment = M.totara_programassignment || {
     /**
      * Stores the initial values of the form when the page is loaded
      */
-    storeInitialFormValues: function(){
+    storeInitialFormValues: function() {
         var form = $('form[name="form_prog_assignments"]');
 
         $('input[type="text"], textarea, select', form).each(function() {
@@ -543,7 +548,7 @@ M.totara_programassignment = M.totara_programassignment || {
     /**
      * Checks if the form is modified by comparing the initial and current values
      */
-    isFormModified: function(){
+    isFormModified: function() {
         var form = $('form[name="form_prog_assignments"]');
         var isModified = false;
 
@@ -565,8 +570,8 @@ M.totara_programassignment = M.totara_programassignment || {
         // Check if textareas have been changed
         $('textarea', form).each(function() {
             // See if there's a tiny MCE instance for this text area
-            var instance = undefined;
-            if (typeof(tinyMCE) != 'undefined') {
+            var instance;
+            if (typeof (tinyMCE) != 'undefined') {
                 instance = tinyMCE.getInstanceById($(this).attr('id'));
             }
             if (instance !== undefined && typeof instance.isDirty == 'function') {
@@ -595,7 +600,7 @@ M.totara_programassignment = M.totara_programassignment || {
     }
 };
 
-/***
+/** *
  *** Define and create the object which acts as the main program assignment
  ***/
 program_assignment = new function() {
@@ -656,9 +661,9 @@ program_assignment = new function() {
         this.is_setup = true;
         this.update_total_user_count();
     };
-};
+}();
 
-/***
+/** *
  *** Define the category object for re-use, but don't actually instantiate any!
  ***/
 function category(id, name, find_url, title, programid) {
@@ -689,12 +694,12 @@ function category(id, name, find_url, title, programid) {
      * @deprecated since 10
      * @type {any}
      */
-    this.user_count_label = $('.user_count',this.element);
+    this.user_count_label = $('.user_count', this.element);
 
     /**
      ** Adds an item
      **/
-    this.add_item = function(element,isexistingitem) {
+    this.add_item = function(element, isexistingitem) {
         var newitem = new item(this, element, isexistingitem);
 
         this.items.push(newitem);
@@ -708,7 +713,7 @@ function category(id, name, find_url, title, programid) {
             this.initial_user_count += newitem.users;
         }
 
-        this.removeditems = $.grep(this.removeditems, function (element, x) {
+        this.removeditems = $.grep(this.removeditems, function(element, x) {
             if (element.itemid == newitem.itemid) {
                 return false;
             }
@@ -727,7 +732,7 @@ function category(id, name, find_url, title, programid) {
         // Add the item element to the table
         this.table.append(element);
 
-        this.add_item(element,false);
+        this.add_item(element, false);
     };
 
     this.remove_item = function(item) {
@@ -735,14 +740,14 @@ function category(id, name, find_url, title, programid) {
         item.element.remove();
 
         // Remove the item from the array of items
-        this.items = $.grep(this.items, function (element, x) {
+        this.items = $.grep(this.items, function(element, x) {
             if (element == item) {
             return false;
             }
             return true;
         });
 
-        this.unsaveditems = $.grep(this.unsaveditems, function (element, x) {
+        this.unsaveditems = $.grep(this.unsaveditems, function(element, x) {
             if (element.itemid == item.itemid) {
                 return false;
             }
@@ -851,7 +856,7 @@ function category(id, name, find_url, title, programid) {
                 itemid = parseInt(elementdata.jaid);
             } else {
                 itemid = element.attr('id').split('_');
-                itemid = itemid[itemid.length-1];  // The last item is the actual id
+                itemid = itemid[itemid.length - 1];  // The last item is the actual id
                 itemid = parseInt(itemid);
             }
 
@@ -862,14 +867,14 @@ function category(id, name, find_url, title, programid) {
 
         if (newids.length > 0) {
             this.dialog_additem.showLoading();
-            var postdata = {"cat":self.name,"itemid":newids,"programid":self.programid};
+            var postdata = {"cat": self.name, "itemid": newids, "programid": self.programid};
             $.ajax({
                 type: 'POST',
                 url: self.url + 'get_item.php',
                 data: postdata,
                 dataType: 'json',
                 success: function(data) {
-                    $.each(data['rows'], function(index, html) {
+                    $.each(data.rows, function(index, html) {
                         self.create_item(html);
                     });
 
@@ -884,7 +889,7 @@ function category(id, name, find_url, title, programid) {
         // Go through existing rows and add them
         // NB: when no items are set in this category html_writer::table adds a blank row
         // with one colspanned TD for strict XHTML compatability - we want to ignore that row
-        $('tbody tr',this.element).each(function() {
+        $('tbody tr', this.element).each(function() {
             if ($(this)[0].children.length != 1) {
                 self.add_item($(this), true);
             }
@@ -895,7 +900,7 @@ function category(id, name, find_url, title, programid) {
     };
 }
 
-/***
+/** *
  *** Defines an item in a category
  ***/
 function item(category, element, isexistingitem) {
@@ -906,8 +911,8 @@ function item(category, element, isexistingitem) {
     this.isexistingitem = isexistingitem;
     // Retreive and store item id
     this.itemid = this.element.find('input[name^="item"]').attr('name');
-    this.itemid = this.itemid.replace('item['+ this.category.id +'][','');
-    this.itemid = parseInt(this.itemid.replace(']',''));
+    this.itemid = this.itemid.replace('item[' + this.category.id + '][', '');
+    this.itemid = parseInt(this.itemid.replace(']', ''));
 
     if (this.category.name == "individuals") {
         // Hard code individuals to have 1 user
@@ -950,18 +955,18 @@ function item(category, element, isexistingitem) {
             } else {
                 var deletecompletiondatelink = self.completionlink.parent().find('.deletecompletiondatelink');
                 if (data == M.util.get_string('setcompletion', 'totara_program')) {
-                    //remove deletedate link if it exists
+                    // remove deletedate link if it exists
                     if (deletecompletiondatelink.length > 0) {
                         deletecompletiondatelink.remove();
                     }
                 } else {
-                    //add deletedate link if it does not exist
+                    // add deletedate link if it does not exist
                     if (deletecompletiondatelink.length == 0) {
                         var newlink = $('<a href="#" class="deletecompletiondatelink" title="' + M.util.get_string('removecompletiondate', 'totara_program') + '"></a>');
                         self.completionlink.parent().append(newlink);
 
-                        require(['core/templates'], function (templates) {
-                            templates.renderIcon('delete', M.util.get_string('removecompletiondate', 'totara_program')).done(function (html) {
+                        require(['core/templates'], function(templates) {
+                            templates.renderIcon('delete', M.util.get_string('removecompletiondate', 'totara_program')).done(function(html) {
                                 newlink.html(html);
                             });
                         });
@@ -981,7 +986,7 @@ function item(category, element, isexistingitem) {
                         // Append new hidden element.
                         $('<input>').attr({
                                 type: 'hidden',
-                                name: 'completiontime['+self.category.id+']['+self.itemid+']',
+                                name: 'completiontime[' + self.category.id + '][' + self.itemid + ']',
                                 value: completiontime
                         }).insertBefore(self.completionlink);
                     }
@@ -991,7 +996,7 @@ function item(category, element, isexistingitem) {
                     } else {
                         $('<input>').attr({
                             type: 'hidden',
-                            name: 'completiontimehour['+self.category.id+']['+self.itemid+']',
+                            name: 'completiontimehour[' + self.category.id + '][' + self.itemid + ']',
                             value: completiontimehour
                         }).insertBefore(self.completionlink);
                     }
@@ -1000,7 +1005,7 @@ function item(category, element, isexistingitem) {
                     } else {
                         $('<input>').attr({
                             type: 'hidden',
-                            name: 'completiontimeminute['+self.category.id+']['+self.itemid+']',
+                            name: 'completiontimeminute[' + self.category.id + '][' + self.itemid + ']',
                             value: completiontimeminute
                         }).insertBefore(self.completionlink);
                     }
@@ -1019,7 +1024,7 @@ function item(category, element, isexistingitem) {
                         // Append new hidden element.
                         $('<input>').attr({
                                 type: 'hidden',
-                                name: 'completionevent['+self.category.id+']['+self.itemid+']',
+                                name: 'completionevent[' + self.category.id + '][' + self.itemid + ']',
                                 value: completionevent
                         }).insertBefore(self.completionlink);
                     }
@@ -1038,7 +1043,7 @@ function item(category, element, isexistingitem) {
                         // Append new hidden element.
                         $('<input>').attr({
                                 type: 'hidden',
-                                name: 'completioninstance['+self.category.id+']['+self.itemid+']',
+                                name: 'completioninstance[' + self.category.id + '][' + self.itemid + ']',
                                 value: completioninstance
                         }).insertBefore(self.completionlink);
                     }
@@ -1059,8 +1064,8 @@ function item(category, element, isexistingitem) {
     };
 
     this.get_completion_time = function() { return this.completiontime.val(); };
-    this.get_completion_time_hour = function() { return this.completiontimehour.val(); }
-    this.get_completion_time_minute = function() { return this.completiontimeminute.val(); }
+    this.get_completion_time_hour = function() { return this.completiontimehour.val(); };
+    this.get_completion_time_minute = function() { return this.completiontimeminute.val(); };
     this.get_completion_event = function() { return this.completionevent.val(); };
     this.get_completion_instance = function() { return this.completioninstance.val(); };
     this.get_completion_link = function() { return this.completionlink.html(); };
@@ -1098,7 +1103,7 @@ function item(category, element, isexistingitem) {
     this.get_user_count = function(includechildren) {
 
         var item_count_url = this.category.url + 'get_item_count.php';
-        var postdata = {"cat":this.category.name,"itemid":this.itemid,"include":includechildren,"programid":this.category.programid};
+        var postdata = {"cat": this.category.name, "itemid": this.itemid, "include": includechildren, "programid": this.category.programid};
         this.usersElement.data('complete', false);
 
         this.set_loading();
@@ -1108,15 +1113,15 @@ function item(category, element, isexistingitem) {
             data: postdata,
             dataType: 'json',
             success: function(data) {
-                var count = parseInt(data['count']);
+                var count = parseInt(data.count);
                 self.update_user_count(count);
         }});
     };
 
     this.set_loading = function() {
         var that = this;
-        require(['core/templates'], function (templates) {
-            templates.renderIcon('loading', M.util.get_string('loading', 'admin')).done(function (html) {
+        require(['core/templates'], function(templates) {
+            templates.renderIcon('loading', M.util.get_string('loading', 'admin')).done(function(html) {
                 if (that.usersElement.data('complete') === false) {
                     that.usersElement.html(html);
                 }
@@ -1125,13 +1130,13 @@ function item(category, element, isexistingitem) {
     };
 
     // Add handler to remove this element
-    this.element.on('click', '.deletelink', function(event){
+    this.element.on('click', '.deletelink', function(event) {
         event.preventDefault();
         self.category.remove_item(self);
     });
 
     // Add handler to remove completion dates
-    this.element.on('click', '.deletecompletiondatelink', function(event){
+    this.element.on('click', '.deletecompletiondatelink', function(event) {
         event.preventDefault();
         self.update_completiontime(M.totara_programassignment.config.COMPLETION_TIME_NOT_SET, 0, 0, 0, 0);
     });
@@ -1139,26 +1144,27 @@ function item(category, element, isexistingitem) {
     // Set the current completion name (contained between the single quotes).
     this.get_completioneventname = function(completioneventname) {
         this.completioneventname = completioneventname;
-    }
+    };
 
     // Add handler to add completion dates.
-    this.element.on('click', '.completionlink', function(event){
-        var i, completioneventname = '';
+    this.element.on('click', '.completionlink', function(event) {
+        var i,
+completioneventname = '';
         var completionname = $(this).text(); // Get the completion name currently selected.
 
         // Check if the completion name contains single quotes.
         if (completionname.indexOf("'") != -1) {
             // Get the name contained between the single quotes.
-            completionname = completionname.substring(completionname.indexOf("'"))
-            for (i=1; i<completionname.length-1; i++) {
+            completionname = completionname.substring(completionname.indexOf("'"));
+            for (i = 1; i < completionname.length - 1; i++) {
                 completioneventname = completioneventname + completionname[i];
             }
         }
         self.get_completioneventname(completioneventname);
         event.preventDefault();
-        totaraDialogs['completion'].item = self;
-        totaraDialogs['completion'].default_url = self.category.url + 'set_completion.php?programid=' + self.category.programid;
-        totaraDialogs['completion'].open();
+        totaraDialogs.completion.item = self;
+        totaraDialogs.completion.default_url = self.category.url + 'set_completion.php?programid=' + self.category.programid;
+        totaraDialogs.completion.open();
     });
 
     // Add handler for the include children being toggled

@@ -22,6 +22,8 @@
  * @package mod_facetoface
  */
 
+/* eslint-disable no-undef */
+
 M.totara_f2f_room = M.totara_f2f_room || {
 
     Y: null,
@@ -40,7 +42,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
      * Base url
      * @var string
      */
-    url: M.cfg.wwwroot+'/mod/facetoface/',
+    url: M.cfg.wwwroot + '/mod/facetoface/',
 
     /**
      * module initialisation method called by php js_init_call()
@@ -48,7 +50,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
      * @param object    YUI instance
      * @param object    configuration from PHP script
      */
-    init: function(Y, config){
+    init: function(Y, config) {
         // Save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
         this.config = config;
@@ -141,8 +143,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
             // Offset starts with 0, so no increment is needed here.
             var newoffset = cntdates;
 
-            //Generate new fields and copy their values.
-            module.clonefields.forEach(function(name){
+            // Generate new fields and copy their values.
+            module.clonefields.forEach(function(name) {
                 var $newelem = $('<input type="hidden" name="' + name + '[' + newoffset + ']"/>');
                 var srcval = $('input[name="' + name + '[' + srcoffset + ']"]').val();
                 $newelem.val(srcval);
@@ -154,9 +156,11 @@ M.totara_f2f_room = M.totara_f2f_room || {
         });
 
         // Add new date.
-        $('input[name="date_add_fields"]').click(function(){
+        $('input[name="date_add_fields"]').click(function() {
+            /* eslint-enable no-undef */
             skipClientValidation = true;
-            $('input[name="cntdates"]').val(cntdates+1);
+            /* eslint-disable no-undef */
+            $('input[name="cntdates"]').val(cntdates + 1);
         });
 
         // Show sesion dates.
@@ -197,8 +201,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
             var handler = new totaraDialog_handler_form();
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok','moodle')] = function() { handler.submit(); };
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
+            buttonsObj[M.util.get_string('ok', 'moodle')] = function() { handler.submit(); };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
 
             // Change behaviour of update function.
             handler._updatePage = function(response) {
@@ -211,13 +215,13 @@ M.totara_f2f_room = M.totara_f2f_room || {
                     $('#timeframe-text' + offset).html(dates.html);
 
                     handler._dialog.hide();
-                } catch(e) {
+                } catch (e) {
                     this._dialog.render(response);
                 }
             };
 
-            totaraDialogs['selectdate'+offset] = new totaraDialog(
-                'selectdate'+offset+'-dialog',
+            totaraDialogs['selectdate' + offset] = new totaraDialog(
+                'selectdate' + offset + '-dialog',
                 $(this).attr('id'),
                 {
                     buttons: buttonsObj,
@@ -258,10 +262,10 @@ M.totara_f2f_room = M.totara_f2f_room || {
 
             // Reset name as "Name (Capacity)" durinng gialog save.
             handler.external_function = function() {
-                var selected_val = $('#treeview_selected_val_'+this._title).val();
-                var $item = $('.treeview span.unclickable#item_'+selected_val, this._container);
+                var selected_val = $('#treeview_selected_val_' + this._title).val();
+                var $item = $('.treeview span.unclickable#item_' + selected_val, this._container);
                 var elem = $item.data();
-                $('#'+this.text_element_id).html(elem.name + ' (' + elem.capacity + ')');
+                $('#' + this.text_element_id).html(elem.name + ' (' + elem.capacity + ')');
                 // Re-init delete.
                 this.setup_delete();
 
@@ -295,8 +299,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
                                     totaraDialogs['editcustomroom' + offset].open();
                                 });
                                 $roomitem.append($editbutton);
-                                require(['core/templates'], function (templates) {
-                                    templates.renderIcon('edit', M.util.get_string('editroom', 'facetoface')).done(function (html) {
+                                require(['core/templates'], function(templates) {
+                                    templates.renderIcon('edit', M.util.get_string('editroom', 'facetoface')).done(function(html) {
                                         $editbutton.html(html);
                                     });
                                 });
@@ -325,15 +329,15 @@ M.totara_f2f_room = M.totara_f2f_room || {
                     load_rooms();
                     editcustomroomhandler._dialog.hide();
                     $('input[name="defaultcapacity"]').attr('disabled', false);
-                } catch(e) {
+                } catch (e) {
                     this._dialog.render(response);
                 }
             };
 
             // Create new room dialog.
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok','moodle')] = function() { editcustomroomhandler.submit(); };
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { editcustomroomhandler._cancel(); };
+            buttonsObj[M.util.get_string('ok', 'moodle')] = function() { editcustomroomhandler.submit(); };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { editcustomroomhandler._cancel(); };
 
             totaraDialogs['editcustomroom' + offset] = new totaraDialog(
                 'editcustomroom' + offset + '-dialog',
@@ -357,11 +361,11 @@ M.totara_f2f_room = M.totara_f2f_room || {
 
             // Room dialog.
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok','moodle')] = function() {
+            buttonsObj[M.util.get_string('ok', 'moodle')] = function() {
                 handler._save();
                 $('input[name="defaultcapacity"]').attr('disabled', false);
             };
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
 
             var sessionid = M.totara_f2f_room.config.sessionid;
             // If event is a cloning then remove session id and behave as a new event to get rooms availability.
@@ -369,8 +373,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
                 sessionid = 0;
             }
 
-            totaraDialogs['selectroom'+offset] = new totaraDialog(
-                'selectroom'+offset+'-dialog',
+            totaraDialogs['selectroom' + offset] = new totaraDialog(
+                'selectroom' + offset + '-dialog',
                 $(this).attr('id'),
                 {
                     buttons: buttonsObj,
@@ -406,7 +410,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
          */
         var render_asset_item = function(data, $input, offset) {
             var $elem = $('<li class="assetname" id="assetname' + offset + '_' + data.id + '" data-assetid="' + data.id + '" data-custom="' + data.custom + '">' + data.name + '</li>');
-            require(['core/templates'], function (templates) {
+            require(['core/templates'], function(templates) {
                 if (Number(data.custom) > 0) {
                     var $editbutton = $('<a href="#"></a>');
                     $editbutton.click(function(e) {
@@ -416,7 +420,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                         totaraDialogs['editcustomasset' + offset].open();
                     });
                     $elem.append($editbutton);
-                    templates.renderIcon('edit', M.util.get_string('editasset', 'facetoface')).done(function (html) {
+                    templates.renderIcon('edit', M.util.get_string('editasset', 'facetoface')).done(function(html) {
                         $editbutton.html(html);
                     });
                 }
@@ -435,7 +439,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                     $li.remove();
                 });
                 $elem.append($deletebutton);
-                templates.renderIcon('delete', M.util.get_string('delete', 'totara_core')).done(function (html) {
+                templates.renderIcon('delete', M.util.get_string('delete', 'totara_core')).done(function(html) {
                     $deletebutton.html(html);
                 });
             });
@@ -466,7 +470,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                         },
                         function(data) {
                             $assetlist.empty();
-                            data.forEach(function(elem){
+                            data.forEach(function(elem) {
                                 var $elem = render_asset_item(elem, $input, offset);
                                 $assetlist.append($elem);
                             });
@@ -498,15 +502,15 @@ M.totara_f2f_room = M.totara_f2f_room || {
                     $input.val(ids.toString());
                     load_assets();
                     editcustomassethandler._dialog.hide();
-                } catch(e) {
+                } catch (e) {
                     this._dialog.render(response);
                 }
             };
 
             // Create new room dialog.
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok','moodle')] = function() { editcustomassethandler.submit(); };
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { editcustomassethandler._cancel(); };
+            buttonsObj[M.util.get_string('ok', 'moodle')] = function() { editcustomassethandler.submit(); };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { editcustomassethandler._cancel(); };
 
             totaraDialogs['editcustomasset' + offset] = new totaraDialog(
                 'editcustomasset' + offset + '-dialog',
@@ -536,7 +540,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                 $assetlist.empty();
 
                 // Display elements.
-                ids.forEach(function(id){
+                ids.forEach(function(id) {
                     var $item = $('#item_' + id, this._container).clone();
                     // Get name and render asset.
                     $('span', $item).remove();
@@ -550,11 +554,11 @@ M.totara_f2f_room = M.totara_f2f_room || {
 
             // Select asset dialog.
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok','moodle')] = function() { handler._update(); };
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
+            buttonsObj[M.util.get_string('ok', 'moodle')] = function() { handler._update(); };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
 
-            totaraDialogs['selectassets'+offset] = new totaraDialog(
-                'selectassets'+offset+'-dialog',
+            totaraDialogs['selectassets' + offset] = new totaraDialog(
+                'selectassets' + offset + '-dialog',
                 $(this).attr('id'),
                 {
                     buttons: buttonsObj,

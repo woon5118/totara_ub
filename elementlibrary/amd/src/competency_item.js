@@ -19,7 +19,10 @@
  * @author Alastair Munro <alastair.munro@totaralms.com>
  * @package core_elementlibrary
  */
-define(['core/config', 'core/str'], function (mdlcfg, mdlstrings) {
+
+/* eslint-disable no-undef */
+
+define(['core/config', 'core/str'], function(mdlcfg, mdlstrings) {
     var multiselect = {
 
         id: 0,
@@ -28,7 +31,7 @@ define(['core/config', 'core/str'], function (mdlcfg, mdlstrings) {
          * module initialisation method called by php js_init_call()
          */
         init: function() {
-            var url = mdlcfg.wwwroot+'/totara/hierarchy/prefix/competency/related/';
+            var url = mdlcfg.wwwroot + '/totara/hierarchy/prefix/competency/related/';
 
             // Get moodle strings - yes their implementation isn't great.
             var requiredstrings = [];
@@ -36,7 +39,7 @@ define(['core/config', 'core/str'], function (mdlcfg, mdlstrings) {
             requiredstrings.push({key: 'cancel', component: 'moodle'});
             requiredstrings.push({key: 'assignrelatedcompetencies', component: 'totara_hierarchy'});
 
-            mdlstrings.get_strings(requiredstrings).done(function (strings) {
+            mdlstrings.get_strings(requiredstrings).done(function(strings) {
                 var tstr = [];
                 for (var i = 0; i < requiredstrings.length; i++) {
                     tstr[requiredstrings[i].key] = strings[i];
@@ -55,7 +58,7 @@ define(['core/config', 'core/str'], function (mdlcfg, mdlstrings) {
                         buttons: buttonObj,
                         title: '<h2>' + tstr.assignrelatedcompetencies + '</h2>'
                     },
-                    url+'find.php?id=' + multiselect.id,
+                    url + 'find.php?id=' + multiselect.id,
                     handler
                 );
             });

@@ -31,6 +31,7 @@ define(['jquery', 'totara_form/form'], function($, Form) {
     // Needed for the password unmask.
     // See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat
     if (!String.prototype.repeat) {
+        /* eslint-disable */
         String.prototype.repeat = function(count) {
             'use strict';
             if (this == null) {
@@ -71,7 +72,8 @@ define(['jquery', 'totara_form/form'], function($, Form) {
             // Could we try:
             // return Array(count + 1).join(this);
             return rpt;
-        }
+        };
+        /* eslint-enable */
     }
 
     /**
@@ -136,7 +138,7 @@ define(['jquery', 'totara_form/form'], function($, Form) {
         // Just a safety guard, if for any reason someone focuses on the mask input
         // shift focus automatically to the input focus.
         // This is not entirely accessible, but it will do the job for the time being.
-        this.mask.focus(function(e){
+        this.mask.focus(function(e) {
             input.focus();
         });
 
@@ -156,7 +158,7 @@ define(['jquery', 'totara_form/form'], function($, Form) {
 
             require(['totara_form/modernizr'], function(mod) {
                 if (!mod.input.required) {
-                    require(['totara_form/polyfill_required-lazy'], function (poly) {
+                    require(['totara_form/polyfill_required-lazy'], function(poly) {
                         poly.init(id);
                         requiredDefer.resolve();
                     });
@@ -170,8 +172,8 @@ define(['jquery', 'totara_form/form'], function($, Form) {
             defereds.push(placeholderDefer);
 
             require(['totara_form/modernizr'], function(mod) {
-                if (!mod.input.placeholder ) {
-                    require(['totara_form/polyfill_placeholder-lazy'], function (poly) {
+                if (!mod.input.placeholder) {
+                    require(['totara_form/polyfill_placeholder-lazy'], function(poly) {
                         poly.init(id);
                         placeholderDefer.resolve();
                     });

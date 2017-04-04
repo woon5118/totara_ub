@@ -21,8 +21,10 @@
  * @subpackage totara_appraisal
  */
 
+/* eslint-disable no-undef */
+
 M.totara_appraisal_message = M.totara_appraisal_message || {
-  Y : null,
+  Y: null,
 
   config: {},
   /**
@@ -31,36 +33,36 @@ M.totara_appraisal_message = M.totara_appraisal_message || {
    * @param object    YUI instance
    * @param string    args supplied in JSON format
    */
-  init : function(Y, formid) {
+  init: function(Y, formid) {
     // save a reference to the Y instance (all of its dependencies included)
     this.Y = Y;
 
     // check jQuery dependency is available
-    if ( typeof $ === 'undefined') {
+    if (typeof $ === 'undefined') {
       throw new Error('M.totara_appraisal_stage.init()-> jQuery dependency required for this module to function.');
     }
 
     // Adding custom dependency checkers without changing form.js code.
     M.form.dependencyManager.prototype._dependencyEqhide = function(elements, value) {
-        result = M.form.dependencyManager.prototype._dependencyEq(elements, value);
+        var result = M.form.dependencyManager.prototype._dependencyEq(elements, value);
         if (result.lock) {
             result.hide = true;
         }
         return result;
-    }
+    };
 
     M.form.dependencyManager.prototype._dependencyNotcheckedhide = function(elements, value) {
-        result = M.form.dependencyManager.prototype._dependencyNotchecked(elements, value);
+        var result = M.form.dependencyManager.prototype._dependencyNotchecked(elements, value);
         if (result.lock) {
             result.hide = true;
         }
         return result;
-    }
+    };
 
-    $('select[name=eventid]', '#'+formid).change(function() {
+    $('select[name=eventid]', '#' + formid).change(function() {
         M.totara_appraisal_message.checkTiming(formid);
     });
-    $('select[name=eventtype]', '#'+formid).change(function() {
+    $('select[name=eventtype]', '#' + formid).change(function() {
         M.totara_appraisal_message.checkTiming(formid);
     });
 
@@ -68,7 +70,7 @@ M.totara_appraisal_message = M.totara_appraisal_message || {
   },
 
   checkTiming: function(formid) {
-      form = $('#'+formid);
+      var form = $('#' + formid);
       var eventid = $('select[name=eventid]', form);
       var eventtype = $('select[name=eventtype]', form);
       var eventradio = $('input[name="timinggrp[timing]"]', form);
@@ -87,4 +89,4 @@ M.totara_appraisal_message = M.totara_appraisal_message || {
         M.form.updateFormState(formid);
       }
   }
-}
+};

@@ -88,18 +88,20 @@
         background-color: @gray-lighter;
         box-shadow: inset 0 -@basis-border-thick rgba(0, 0, 0, 0.06);
 
-        .moodle-core-dragdrop-draghandle, a {
+        .moodle-core-dragdrop-draghandle,
+        a {
             color: @block-actions-color;
         }
 
         // Override white knockout.
         ul[role='menubar'] {
             .ft-stack-suffix {
-                text-shadow: -1px 0 0 @block-actions-bg,
-                1px 0 0 @block-actions-bg,
+                text-shadow:
+                    -1px 0 0 @block-actions-bg,
+                    1px 0 0 @block-actions-bg,
                     0 -1px @block-actions-bg,
-                0 1px 0 @block-actions-bg,
-                2px 2px 0 @block-actions-bg;
+                    0 1px 0 @block-actions-bg,
+                    2px 2px 0 @block-actions-bg;
             }
         }
 

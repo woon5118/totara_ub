@@ -79,9 +79,9 @@ define(['jquery', 'totara_form/form'], function($, Form) {
         window.totara_form_editors[this.id] = this;
 
         if (this.input.attr('required')) {
-            require(['totara_form/modernizr'], function (mod) {
+            require(['totara_form/modernizr'], function(mod) {
                 if (!mod.input.required) {
-                    require(['totara_form/polyfill_required-lazy'], function (poly) {
+                    require(['totara_form/polyfill_required-lazy'], function(poly) {
                         poly.init(id);
                         deferred.resolve();
                     });

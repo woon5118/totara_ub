@@ -20,6 +20,9 @@
  * @package totara
  * @subpackage reportbuilder
  */
+
+/* eslint-disable no-undef */
+
 M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
 
     Y: null,
@@ -38,7 +41,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -59,7 +62,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
 
 
         var that = this;
-        require(['core/templates'], function (templates) {
+        require(['core/templates'], function(templates) {
             var iconscache = [];
             iconscache.push(templates.renderIcon('loading', M.util.get_string('saving', 'totara_reportbuilder')));
             iconscache.push(templates.renderIcon('delete', M.util.get_string('delete', 'totara_reportbuilder')));
@@ -67,7 +70,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
             iconscache.push(templates.renderIcon('arrow-down', M.util.get_string('movedown', 'totara_reportbuilder')));
             iconscache.push(templates.renderIcon('spacer'));
 
-            $.when.apply($, iconscache).then(function (loadingicon, deleteicon, upicon, downicon, spacer) {
+            $.when.apply($, iconscache).then(function(loadingicon, deleteicon, upicon, downicon, spacer) {
                 that.loadingimg = loadingicon;
                 that.deleteicon = deleteicon;
                 that.upicon = upicon;
@@ -245,15 +248,15 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                         var filterbox = selector;
                         var customname = $('#id_new' + region + 'customname');
                         var nametext = $('#id_new' + region + 'filtername');
-                        filterbox.find('select.filter_selector').attr('name', 'filter'+fid);
+                        filterbox.find('select.filter_selector').attr('name', 'filter' + fid);
                         filterbox.find('select optgroup[label=New]').remove();
-                        filterbox.find('select.filter_selector').attr('id', 'id_filter'+fid);
-                        customname.attr('id', 'id_customname'+fid);
-                        customname.attr('name', 'customname'+fid);
-                        nametext.attr('id', 'id_filtername'+fid);
-                        nametext.attr('name', 'filtername'+fid);
-                        advancedCheck.attr('name', 'advanced'+fid);
-                        advancedCheck.attr('id', 'id_advanced'+fid);
+                        filterbox.find('select.filter_selector').attr('id', 'id_filter' + fid);
+                        customname.attr('id', 'id_customname' + fid);
+                        customname.attr('name', 'customname' + fid);
+                        nametext.attr('id', 'id_filtername' + fid);
+                        nametext.attr('name', 'filtername' + fid);
+                        advancedCheck.attr('name', 'advanced' + fid);
+                        advancedCheck.attr('id', 'id_advanced' + fid);
                         advancedCheck.closest('tr').attr('fid', fid);
 
                         // Append a new filter select box
@@ -324,9 +327,9 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                         // Set row atts.
                         $('#id_newsearchcolumn').removeClass('new_search_column_selector');
                         var searchcolumnbox = selector;
-                        searchcolumnbox.find('select.search_column_selector').attr('name', 'searchcolumn'+searchcolumnid);
+                        searchcolumnbox.find('select.search_column_selector').attr('name', 'searchcolumn' + searchcolumnid);
                         searchcolumnbox.find('select optgroup[label=New]').remove();
-                        searchcolumnbox.find('select.search_column_selector').attr('id', 'id_searchcolumn'+searchcolumnid);
+                        searchcolumnbox.find('select.search_column_selector').attr('id', 'id_searchcolumn' + searchcolumnid);
 
                         // Append a new filter select box
                         searchcolumnbox.closest('table').append(newsearchcolumninput);
@@ -334,7 +337,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                         // Remove added filter from the new filter selector.
                         var searchcolumntype = searchcolumnselector.val().split('-')[0];
                         var searchcolumnval = searchcolumnselector.val().split('-')[1];
-                        $('.new_search_column_selector optgroup option[value='+searchcolumntype+'-'+searchcolumnval+']').remove();
+                        $('.new_search_column_selector optgroup option[value=' + searchcolumntype + '-' + searchcolumnval + ']').remove();
 
                         module.rb_init_search_column_rows();
 
@@ -400,7 +403,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
 
                         var nlabel = o.type.replace(/[-_]/g, ' ');  // Determine the optgroup label.
                         nlabel = rb_ucwords(nlabel);
-                        var issidebarfilter = $('#id_all_sidebar_filters').find('option[value=' + o.type + '-' + o.value+']').length > 0;
+                        var issidebarfilter = $('#id_all_sidebar_filters').find('option[value=' + o.type + '-' + o.value + ']').length > 0;
 
                         // Add deleted filter to new standard filter selector.
                         var standardoptgroup = $(".new_standard_filter_selector optgroup[label='" + nlabel + "']");
@@ -441,7 +444,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
 
         });
 
-        function rb_ucwords (str) {
+        function rb_ucwords(str) {
             return (str + '').replace(/^([a-z])|\s+([a-z])/g, function($1) {
                 return $1.toUpperCase();
             });
@@ -493,7 +496,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                             $('.new_search_column_selector').append(optgroup);
                         }
                         if (optgroup.find('option[value=' + o.type + '-' + o.value + ']').length == 0) {
-                            optgroup.append('<option value="' + o.type + '-' + o.value + '">'+
+                            optgroup.append('<option value="' + o.type + '-' + o.value + '">' +
                                     rb_search_column_headings[o.type + '-' + o.value] + '</option>');
                         }
 
@@ -511,7 +514,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
 
         });
 
-        function rb_ucwords (str) {
+        function rb_ucwords(str) {
             return (str + '').replace(/^([a-z])|\s+([a-z])/g, function($1) {
                 return $1.toUpperCase();
             });
@@ -529,13 +532,13 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
 
             var filterrowclone = filterrow.clone();
             // Set the selected option, cause for some reason this don't clone so well...
-            filterrowclone.find('select.filter_selector option[value='+filterrow.find('select.filter_selector').val()+']').attr('selected', 'selected');
+            filterrowclone.find('select.filter_selector option[value=' + filterrow.find('select.filter_selector').val() + ']').attr('selected', 'selected');
 
             var lowersibling = filterrow.next('tr');
 
             var lowersiblingclone = lowersibling.clone();
             // Set the selected option, cause for some reason this don't clone so well...
-            lowersiblingclone.find('select.filter_selector option[value='+lowersibling.find('select.filter_selector').val()+']').attr('selected', 'selected');
+            lowersiblingclone.find('select.filter_selector option[value=' + lowersibling.find('select.filter_selector').val() + ']').attr('selected', 'selected');
 
             $.ajax({
                 url: M.cfg.wwwroot + '/totara/reportbuilder/ajax/filter.php',
@@ -586,13 +589,13 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
             var filterrow = $(this).closest('tr');
             var filterrowclone = filterrow.clone();
             // Set the selected option, cause for some reason this don't clone so well...
-            filterrowclone.find('select.filter_selector option[value='+filterrow.find('select.filter_selector').val()+']').attr('selected', 'selected');
+            filterrowclone.find('select.filter_selector option[value=' + filterrow.find('select.filter_selector').val() + ']').attr('selected', 'selected');
 
             var uppersibling = filterrow.prev('tr');
 
             var uppersiblingclone = uppersibling.clone();
             // Set the selected option, cause for some reason this don't clone so well...
-            uppersiblingclone.find('select.filter_selector option[value='+uppersibling.find('select.filter_selector').val()+']').attr('selected', 'selected');
+            uppersiblingclone.find('select.filter_selector option[value=' + uppersibling.find('select.filter_selector').val() + ']').attr('selected', 'selected');
 
             $.ajax({
                 url: M.cfg.wwwroot + '/totara/reportbuilder/ajax/filter.php',
@@ -695,4 +698,4 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                 '" /></a>');
     }
 
-}
+};

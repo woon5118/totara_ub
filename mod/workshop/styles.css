@@ -98,7 +98,7 @@
 .dir-rtl.path-mod-workshop .submission-full .header .title,
 .dir-rtl.path-mod-workshop .submission-full .header .author,
 .dir-rtl.path-mod-workshop .submission-full .header .userdate {
-    margin: 0px 80px 0px 0px;
+    margin: 0 80px 0 0;
 }
 .path-mod-workshop .submission-full.anonymous .header .title,
 .path-mod-workshop .submission-full.anonymous .header .author,
@@ -131,9 +131,9 @@
     top: 3px;
     left: 3px;
 }
-.dir-rtl.path-mod-workshop .submission-full .header .author .picture{
-    right:3px;
-    left:auto;
+.dir-rtl.path-mod-workshop .submission-full .header .author .picture {
+    right: 3px;
+    left: auto;
 }
 
 .path-mod-workshop .submission-full .content,
@@ -404,7 +404,7 @@
     padding: 0 10px 0 20px;
 }
 .dir-rtl.path-mod-workshop .userplan tr.phasetasks .title {
-    padding: 0px 20px 0px 10px;
+    padding: 0 20px 0 10px;
 }
 
 .dir-rtl.path-mod-workshop .userplan dd.phasetasks .title {
@@ -416,7 +416,7 @@
     font-size: 80%;
 }
 .dir-rtl.path-mod-workshop .userplan tr.phasetasks .details {
-    padding: 0px 25px 0px 10px;
+    padding: 0 25px 0 10px;
 }
 
 .dir-rtl.path-mod-workshop .userplan dd.phasetasks .details {
@@ -452,7 +452,7 @@
 .dir-rtl.path-mod-workshop .assessment-full .header .reviewer,
 .dir-rtl.path-mod-workshop .assessment-full .header .grade,
 .dir-rtl.path-mod-workshop .assessment-full .header .weight {
-    margin: 0px 40px 0px 0px;
+    margin: 0 40px 0 0;
 }
 
 .path-mod-workshop .assessment-full.anonymous .header .title,

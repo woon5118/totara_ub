@@ -23,12 +23,14 @@
  * @subpackage reportbuilder
  */
 
+/* eslint-disable no-undef */
+
 /**
  * Javascript file containing JQuery bindings for hierarchy dialog filters.
  */
 
-define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
-    var disable_filter_controls = function(event) {
+define(['jquery', 'core/config', 'core/str'], function($, mdlcfg, mdlstrings) {
+    var disable_filter_controls = function() {
         var name = $(this).attr('name');
 
         if (typeof name === 'undefined') {
@@ -39,21 +41,21 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
         name = name.substr(0, name.length - 3);// Remove _op.
 
         if ($(this).val() === '0') {
-            $('#show-'+name+'-dialog').addClass("disabled");
-            $('#show-'+name+'-dialog').prop('disabled', true);
-            $('#show-'+name+'-dialog').removeAttr('href');
+            $('#show-' + name + '-dialog').addClass("disabled");
+            $('#show-' + name + '-dialog').prop('disabled', true);
+            $('#show-' + name + '-dialog').removeAttr('href');
             $('*[data-filtername="' + name + '"] a').addClass("disabled");
             $('*[data-filtername="' + name + '"] a').prop('disabled', true);
             $('*[data-filtername="' + name + '"] a').removeAttr('href');
         } else {
-            $('#show-'+name+'-dialog').removeClass("disabled");
-            $('#show-'+name+'-dialog').prop('disabled', false);
-            $('#show-'+name+'-dialog').attr('href', '#');
+            $('#show-' + name + '-dialog').removeClass("disabled");
+            $('#show-' + name + '-dialog').prop('disabled', false);
+            $('#show-' + name + '-dialog').attr('href', '#');
             $('*[data-filtername="' + name + '"] a').removeClass("disabled");
             $('*[data-filtername="' + name + '"] a').prop('disabled', false);
             $('*[data-filtername="' + name + '"] a').attr('href', '#');
         }
-    }
+    };
 
     var handler = {
 
@@ -100,7 +102,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
             var waitingitems = $.extend(true, [], handler.waitingitems);
             handler.waitingitems = [];
 
-            $.each(waitingitems, function () {
+            $.each(waitingitems, function() {
                 switch (this.filter) {
                     case "hierarchy":
                         handler.rb_load_hierarchy_filters(this);
@@ -110,7 +112,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                         break;
                     case "jobassign_multi":
                         handler.rb_load_jobassign_multi_filters();
-                        // Note: no break here since we also want to load hierarchy.
+                        // Note: falls through here since we also want to load hierarchy.
                     case "hierarchy_multi":
                         handler.rb_load_hierarchy_multi_filters();
                         break;
@@ -138,7 +140,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                 // Take this element's ID out of the hidden form field.
                 var ids = hiddenfield.val();
                 var id_array = ids.split(',');
-                var new_id_array = $.grep(id_array, function (index) {
+                var new_id_array = $.grep(id_array, function(index) {
                     return index != id;
                 });
                 var new_ids = new_id_array.join(',');
@@ -161,17 +163,17 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
             }
             switch (filter.hierarchytype) {
                 case 'org':
-                    $(inputselector+'.rb-filter-choose-org').each(function() {
+                    $(inputselector + '.rb-filter-choose-org').each(function() {
                         var id = $(this).attr('id');
                         // Remove 'show-' and '-dialog' from ID.
                         id = id.substr(5, id.length - 12);
 
-                        ///
-                        /// Organisation dialog.
-                        ///
+                        // /
+                        // / Organisation dialog.
+                        // /
                         var url = mdlcfg.wwwroot + '/totara/hierarchy/prefix/organisation/assign/';
 
-                        mdlstrings.get_string('chooseorganisation', 'totara_hierarchy').done(function (chooseorganisation) {
+                        mdlstrings.get_string('chooseorganisation', 'totara_hierarchy').done(function(chooseorganisation) {
                             totaraSingleSelectDialog(
                                 id,
                                 chooseorganisation + filter.value,
@@ -191,17 +193,17 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                     break;
 
                 case 'pos':
-                    $(inputselector+'.rb-filter-choose-pos').each(function() {
+                    $(inputselector + '.rb-filter-choose-pos').each(function() {
                         var id = $(this).attr('id');
                         // Remove 'show-' and '-dialog' from ID.
                         id = id.substr(5, id.length - 12);
 
-                        ///
-                        /// Position dialog.
-                        ///
+                        // /
+                        // / Position dialog.
+                        // /
                         var url = mdlcfg.wwwroot + '/totara/hierarchy/prefix/position/assign/';
 
-                        mdlstrings.get_string('chooseposition', 'totara_hierarchy').done(function (chooseposition) {
+                        mdlstrings.get_string('chooseposition', 'totara_hierarchy').done(function(chooseposition) {
                             totaraSingleSelectDialog(
                                 id,
                                 chooseposition + filter.value,
@@ -213,25 +215,25 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
                         // Disable popup buttons if first pulldown is set to 'any value'.
                         if ($('select[name=' + id + '_op]').val() === '0') {
-                            $('input[name=' + id + '_rec]').prop('disabled',true);
-                            $('#show-' + id + '-dialog').prop('disabled',true);
+                            $('input[name=' + id + '_rec]').prop('disabled', true);
+                            $('#show-' + id + '-dialog').prop('disabled', true);
                         }
                     });
 
                     break;
 
                 case 'comp':
-                    $(inputselector+'.rb-filter-choose-comp').each(function() {
+                    $(inputselector + '.rb-filter-choose-comp').each(function() {
                         var id = $(this).attr('id');
                         // Remove 'show-' and '-dialog' from ID.
                         id = id.substr(5, id.length - 12);
 
-                        ///
-                        /// Competency dialog.
-                        ///
+                        // /
+                        // / Competency dialog.
+                        // /
                         var url = mdlcfg.wwwroot + '/totara/hierarchy/prefix/competency/assign/';
 
-                        mdlstrings.get_string('selectcompetency', 'totara_hierarchy').done(function (selectecomptency) {
+                        mdlstrings.get_string('selectcompetency', 'totara_hierarchy').done(function(selectecomptency) {
                             totaraSingleSelectDialog(
                                 id,
                                 selectecomptency + filter.value,
@@ -243,8 +245,8 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
                         // Disable popup buttons if first pulldown is set to 'any value'.
                         if ($('select[name=' + id + '_op]').val() === '0') {
-                            $('input[name=' + id + '_rec]').prop('disabled',true);
-                            $('#show-' + id + '-dialog').prop('disabled',true);
+                            $('input[name=' + id + '_rec]').prop('disabled', true);
+                            $('#show-' + id + '-dialog').prop('disabled', true);
                         }
                     });
 
@@ -267,7 +269,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
                 var url = mdlcfg.wwwroot + '/totara/job/assignfilter/manager/';
 
-                mdlstrings.get_string('choosemanplural', 'totara_reportbuilder').done(function (choosemanplural) {
+                mdlstrings.get_string('choosemanplural', 'totara_reportbuilder').done(function(choosemanplural) {
                     totaraMultiSelectDialogRbFilter(
                         id,
                         choosemanplural,
@@ -289,7 +291,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
                 var url = mdlcfg.wwwroot + '/totara/job/assignfilter/appraiser/';
 
-                mdlstrings.get_string('chooseappplural', 'totara_reportbuilder').done(function (choosemanplural) {
+                mdlstrings.get_string('chooseappplural', 'totara_reportbuilder').done(function(choosemanplural) {
                     totaraMultiSelectDialogRbFilter(
                         id,
                         choosemanplural,
@@ -313,7 +315,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
                 var url = mdlcfg.wwwroot + '/totara/hierarchy/prefix/organisation/assignfilter/';
 
-                mdlstrings.get_string('chooseorgplural', 'totara_reportbuilder').done(function (chooseorgplural) {
+                mdlstrings.get_string('chooseorgplural', 'totara_reportbuilder').done(function(chooseorgplural) {
                     totaraMultiSelectDialogRbFilter(
                         id,
                         chooseorgplural,
@@ -335,7 +337,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
                 var url = mdlcfg.wwwroot + '/totara/hierarchy/prefix/position/assignfilter/';
 
-                mdlstrings.get_string('chooseposplural', 'totara_reportbuilder').done(function (chooseposplural) {
+                mdlstrings.get_string('chooseposplural', 'totara_reportbuilder').done(function(chooseposplural) {
                     totaraMultiSelectDialogRbFilter(
                         id,
                         chooseposplural,
@@ -357,7 +359,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
                 var url = mdlcfg.wwwroot + '/totara/hierarchy/prefix/competency/assignfilter/';
 
-                mdlstrings.get_string('choosecompplural', 'totara_reportbuilder').done(function (choosecompplural) {
+                mdlstrings.get_string('choosecompplural', 'totara_reportbuilder').done(function(choosecompplural) {
                     totaraMultiSelectDialogRbFilter(
                         id,
                         choosecompplural,
@@ -377,7 +379,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
                 var url = mdlcfg.wwwroot + '/totara/reportbuilder/ajax/';
 
-                mdlstrings.get_string('choosecohorts', 'totara_cohort').done(function (choosecohorts) {
+                mdlstrings.get_string('choosecohorts', 'totara_cohort').done(function(choosecohorts) {
                     totaraMultiSelectDialogRbFilter(
                         id,
                         choosecohorts,
@@ -397,7 +399,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
                 var url = mdlcfg.wwwroot + '/totara/reportbuilder/ajax/';
 
-                mdlstrings.get_string('choosebadges', 'badges').done(function (choosebadges) {
+                mdlstrings.get_string('choosebadges', 'badges').done(function(choosebadges) {
                     totaraMultiSelectDialogRbFilter(
                         id,
                         choosebadges,
@@ -415,11 +417,11 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                 name = name.substr(0, name.length - 3);// Remove _op.
 
                 if ($(this).val() === '0') {
-                    $('input[name='+name+'_rec]').prop('disabled', true);
-                    $('#show-'+name+'-dialog').prop('disabled', true);
+                    $('input[name=' + name + '_rec]').prop('disabled', true);
+                    $('#show-' + name + '-dialog').prop('disabled', true);
                 } else {
-                    $('input[name='+name+'_rec]').prop('disabled', false);
-                    $('#show-'+name+'-dialog').prop('disabled', false);
+                    $('input[name=' + name + '_rec]').prop('disabled', false);
+                    $('#show-' + name + '-dialog').prop('disabled', false);
                 }
             });
 
@@ -430,19 +432,19 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
 
                 var url = mdlcfg.wwwroot + '/totara/reportbuilder/ajax/filter/category/';
 
-                mdlstrings.get_string('choosecatplural', 'totara_reportbuilder').done(function (choosecatplural) {
+                mdlstrings.get_string('choosecatplural', 'totara_reportbuilder').done(function(choosecatplural) {
                     totaraMultiSelectDialogRbFilter(
                         id,
                         choosecatplural,
                         url + 'find.php?sesskey=' + mdlcfg.sesskey,
-                        url + 'save.php?filtername=' + id + '&sesskey=' + mdlcfg.sesskey +'&ids='
+                        url + 'save.php?filtername=' + id + '&sesskey=' + mdlcfg.sesskey + '&ids='
                     );
                 });
 
                 // Disable popup buttons if first pulldown is set to 'any value'.
-                if ($('select[name='+id+'_op]').val() === '0') {
-                    $('input[name='+id+'_rec]').prop('disabled',true);
-                    $('#show-'+id+'-dialog').prop('disabled',true);
+                if ($('select[name=' + id + '_op]').val() === '0') {
+                    $('input[name=' + id + '_rec]').prop('disabled', true);
+                    $('#show-' + id + '-dialog').prop('disabled', true);
                 }
             });
         },
@@ -454,11 +456,11 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                 name = name.substr(0, name.length - 3);// Remove _op.
 
                 if ($(this).val() === '0') {
-                    $('input[name='+name+'_rec]').prop('disabled', true);
-                    $('#show-'+name+'-dialog').prop('disabled', true);
+                    $('input[name=' + name + '_rec]').prop('disabled', true);
+                    $('#show-' + name + '-dialog').prop('disabled', true);
                 } else {
-                    $('input[name='+name+'_rec]').prop('disabled', false);
-                    $('#show-'+name+'-dialog').prop('disabled', false);
+                    $('input[name=' + name + '_rec]').prop('disabled', false);
+                    $('#show-' + name + '-dialog').prop('disabled', false);
                 }
             });
 
@@ -468,19 +470,19 @@ define(['jquery', 'core/config', 'core/str'], function ($, mdlcfg, mdlstrings) {
                 id = id.substr(5, id.length - 12);
 
                 var url = mdlcfg.wwwroot + '/totara/reportbuilder/ajax/filter/course_multi/';
-                mdlstrings.get_string('coursemultiitemchoose', 'totara_reportbuilder').done(function (coursemultiitemchoose) {
+                mdlstrings.get_string('coursemultiitemchoose', 'totara_reportbuilder').done(function(coursemultiitemchoose) {
                     totaraMultiSelectDialogRbFilter(
                         id,
                         coursemultiitemchoose,
                         url + 'find.php?sesskey=' + mdlcfg.sesskey,
-                        url + 'save.php?filtername=' + id + '&sesskey=' + mdlcfg.sesskey +'&ids='
+                        url + 'save.php?filtername=' + id + '&sesskey=' + mdlcfg.sesskey + '&ids='
                     );
                 });
 
                 // Disable popup buttons if first pulldown is set to 'any value'.
-                if ($('select[name='+id+'_op]').val() === '0') {
-                    $('input[name='+id+'_rec]').prop('disabled',true);
-                    $('#show-'+id+'-dialog').prop('disabled',true);
+                if ($('select[name=' + id + '_op]').val() === '0') {
+                    $('input[name=' + id + '_rec]').prop('disabled', true);
+                    $('#show-' + id + '-dialog').prop('disabled', true);
                 }
             });
         }

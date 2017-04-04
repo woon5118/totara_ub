@@ -28,8 +28,8 @@ define(['jquery', 'core/yui', 'core/str', 'core/config'], function($, Y, mdlstri
             */
             this.attachCustomClickEvents = function() {
                 // Add handler to edit job assignment button.
-                $('a.attendee-edit-job-assignment').on('click', function(){
-                    $.get($(this).attr('href'), function(href){
+                $('a.attendee-edit-job-assignment').on('click', function() {
+                    $.get($(this).attr('href'), function(href) {
                         addConfirm.editJobAssignmentModalForm(href);
                     });
                     return false;
@@ -48,12 +48,12 @@ define(['jquery', 'core/yui', 'core/str', 'core/config'], function($, Y, mdlstri
             Y.use('panel', function(Y) {
                 var panel = new Y.Panel({
                     headerContent: null,
-                    bodyContent  : href,
-                    width        : 600,
-                    zIndex       : 5,
-                    centered     : true,
-                    modal        : true,
-                    render       : true
+                    bodyContent: href,
+                    width: 600,
+                    zIndex: 5,
+                    centered: true,
+                    modal: true,
+                    render: true
                 });
                 var $content = $('#' + panel.get('id'));
                 $content.find('input[type="text"]').eq(0).focus();
@@ -61,9 +61,9 @@ define(['jquery', 'core/yui', 'core/str', 'core/config'], function($, Y, mdlstri
                     var $theFrm = $content.find('form.mform');
                     var apprObj = $theFrm.serialize();
                     apprObj += ('&submitbutton=' + $(this).attr('value'));
-                    $.post($theFrm.attr('action'), apprObj).done(function(data){
+                    $.post($theFrm.attr('action'), apprObj).done(function(data) {
                         if (data.result == 'success') {
-                            var span = "#jobassign"+data.id;
+                            var span = "#jobassign" + data.id;
                             $(span).html(data.jobassignmentdisplayname);
                             panel.destroy(true);
                         } else {

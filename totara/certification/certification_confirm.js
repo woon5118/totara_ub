@@ -20,7 +20,10 @@
  * @package totara
  * @subpackage certification
  */
-M.totara_certificationconfirm = M.totara_certificationconfirm  || {
+
+/* eslint-disable no-undef */
+
+M.totara_certificationconfirm = M.totara_certificationconfirm || {
 
     Y: null,
     // optional php params and defaults defined here, args passed to init method
@@ -36,7 +39,7 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
 
         var module = this;
 
@@ -74,8 +77,8 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
             var self = this;
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('saveallchanges', 'totara_certification')] = function() { self.save() };
-            buttonsObj[M.util.get_string('editcertif', 'totara_certification')] = function() { handler._cancel() };
+            buttonsObj[M.util.get_string('saveallchanges', 'totara_certification')] = function() { self.save(); };
+            buttonsObj[M.util.get_string('editcertif', 'totara_certification')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -84,7 +87,7 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
             'unused', // buttonid unused
             {
                 buttons: buttonsObj,
-                title: '<h2>'+ M.util.get_string('confirmchanges', 'totara_certification') +'</h2>'
+                title: '<h2>' + M.util.get_string('confirmchanges', 'totara_certification') + '</h2>'
             },
             'unused', // default_url unused
             handler
@@ -102,12 +105,12 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
 
                 this.table = table;
                 this.rows = rows;
-            }
+            };
 
             // Don't load anything
             this.load = function(url, method) {
-            }
-        }
+            };
+        };
 
         // attach a function to the page to prevent unsaved changes from being lost
         // when navigating away
@@ -128,12 +131,12 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
         };
 
         // remove the 'unsaved changes' confirmation when submitting the form
-        $('form[name="form_certif_details"]').submit(function(){
+        $('form[name="form_certif_details"]').submit(function() {
             window.onbeforeunload = null;
         });
 
         // Remove the 'unsaved changes' confirmation when clicking th 'Cancel program management' link
-        $('#cancelprogramedits').click(function(){
+        $('#cancelprogramedits').click(function() {
             window.onbeforeunload = null;
             return true;
         });
@@ -143,7 +146,7 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
             return module.handleSaveChanges();
         });
 
-        totaraDialogs['savechanges'] = new this.totaraDialog_savechanges();
+        totaraDialogs.savechanges = new this.totaraDialog_savechanges();
 
 
         // Set up the display of messages
@@ -156,7 +159,7 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
     /**
      *
      */
-    handleSaveChanges: function(){
+    handleSaveChanges: function() {
 
         // no need to display the confirmation dialog if there are no changes to save
         if (!this.isFormModified()) {
@@ -164,7 +167,7 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
             return true;
         }
 
-        var dialog = totaraDialogs['savechanges'];
+        var dialog = totaraDialogs.savechanges;
 
         if (dialog.savechanges == true) {
             window.onbeforeunload = null;
@@ -176,7 +179,7 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
             dialog.savechanges = true;
             this.hide();
             $('input[name="savechanges"]').trigger('click');
-        }
+        };
 
         return false;
     },
@@ -184,7 +187,7 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
     /**
      * Stores the initial values of the form when the page is loaded
      */
-    storeInitialFormValues: function(){
+    storeInitialFormValues: function() {
         var form = $('form[name="form_certif_details"]');
 
         $('input[type="text"], textarea, select', form).each(function() {
@@ -195,13 +198,13 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
     /**
      * Checks if the form is modified by comparing the initial and current values
      */
-    isFormModified: function(){
+    isFormModified: function() {
         var form = $('form[name="form_certif_details"]');
         var isModified = false;
 
         // Check if text inputs or selects have been changed
         $('input[type="text"], select', form).each(function() {
-            //console.log('this text init='+$(this).attr('initialValue')+' new='+$(this).val());
+            // console.log('this text init='+$(this).attr('initialValue')+' new='+$(this).val());
             if ($(this).attr('initialValue') != $(this).val()) {
                 isModified = true;
             }

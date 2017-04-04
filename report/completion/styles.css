@@ -10,6 +10,7 @@
 #page-report-completion-index #completion-progress th svg {
     direction: ltr;
 }
+/* stylelint-disable */
 .ie8 div.ie-vertical-completion {
     writing-mode: tb-lr;
     max-height: 24% !important;
@@ -27,3 +28,4 @@
     color: #238e23;
     padding-left: 4px;
 }
+/* stylelint-enable */

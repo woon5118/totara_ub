@@ -19,6 +19,9 @@
  * @author Nathan Lewis <nathan.lewis@totaralms.com>
  * @package totara_program
  */
+
+/* eslint-disable no-undef */
+
 M.totara_editprogcompletion = M.totara_editprogcompletion || {
 
     Y: null,
@@ -30,7 +33,7 @@ M.totara_editprogcompletion = M.totara_editprogcompletion || {
      * @param object    YUI instance
      * @param object    configuration data
      */
-    init: function(Y, config){
+    init: function(Y, config) {
         // Save a reference to the Y instance (all of its dependencies included).
         this.Y = Y;
 
@@ -90,7 +93,7 @@ M.totara_editprogcompletion = M.totara_editprogcompletion || {
     updateFormState: function() {
         var status = parseInt($('#id_status').val(), 10);
 
-        switch(status) {
+        switch (status) {
             case -1: // Invalid.
                 $('#id_timecompleted_enabled').prop('checked', false);
                 $('#id_timecompleted_enabled').closest('.fitem').next().hide(); // Not applicable.
@@ -111,4 +114,4 @@ M.totara_editprogcompletion = M.totara_editprogcompletion || {
             M.form.updateFormState("form_prog_completion"); // Required after programatically making changes to the form.
         }
     }
-}
+};

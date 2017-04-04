@@ -21,6 +21,9 @@
  * @package totara
  * @subpackage cohort
  */
+
+/* eslint-disable no-undef */
+
 /**
  * This file contains the Javascript for the dialog that lets you add courses & programs
  * to a cohort's enrolled learning
@@ -69,17 +72,17 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
         var chandler = new totaraDialog_handler_cohortlearning();
         chandler.baseurl = url;
         var cbuttons = {};
-        cbuttons[M.util.get_string('save','totara_core')] = function() { chandler._save(csaveurl) }
-        cbuttons[M.util.get_string('cancel','moodle')] = function() { chandler._cancel() }
+        cbuttons[M.util.get_string('save', 'totara_core')] = function() { chandler._save(csaveurl); };
+        cbuttons[M.util.get_string('cancel', 'moodle')] = function() { chandler._cancel(); };
 
-        totaraDialogs['learningitemcourses'] = new totaraDialog(
+        totaraDialogs.learningitemcourses = new totaraDialog(
             'learningitemcourses',
             'add-course-learningitem-dialog',
             {
                 buttons: cbuttons,
-                title: '<h2>' + M.util.get_string('assign'+assgnstring+'learningcourse', 'totara_cohort') + '</h2>'
+                title: '<h2>' + M.util.get_string('assign' + assgnstring + 'learningcourse', 'totara_cohort') + '</h2>'
             },
-            url+'browselearning.php?cohortid=' + this.config.cohortid  + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_COURSE,
+            url + 'browselearning.php?cohortid=' + this.config.cohortid + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_COURSE,
             chandler
         );
 
@@ -89,17 +92,17 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
         var phandler = new totaraDialog_handler_cohortlearning();
         phandler.baseurl = url;
         var pbuttons = {};
-        pbuttons[M.util.get_string('save','totara_core')] = function() { phandler._save(psaveurl) }
-        pbuttons[M.util.get_string('cancel','moodle')] = function() { phandler._cancel() }
+        pbuttons[M.util.get_string('save', 'totara_core')] = function() { phandler._save(psaveurl); };
+        pbuttons[M.util.get_string('cancel', 'moodle')] = function() { phandler._cancel(); };
 
-        totaraDialogs['learningitemprograms'] = new totaraDialog(
+        totaraDialogs.learningitemprograms = new totaraDialog(
             'learningitemprograms',
             'add-program-learningitem-dialog',
             {
                 buttons: pbuttons,
-                title: '<h2>' + M.util.get_string('assign'+assgnstring+'learningprogram', 'totara_cohort') + '</h2>'
+                title: '<h2>' + M.util.get_string('assign' + assgnstring + 'learningprogram', 'totara_cohort') + '</h2>'
             },
-            url+'browselearning.php?cohortid=' + this.config.cohortid + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_PROGRAM,
+            url + 'browselearning.php?cohortid=' + this.config.cohortid + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_PROGRAM,
             phandler
         );
 
@@ -109,17 +112,17 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
         var pchandler = new totaraDialog_handler_cohortlearning();
         pchandler.baseurl = url;
         var pcbuttons = {};
-        pcbuttons[M.util.get_string('save','totara_core')] = function() { pchandler._save(pcsaveurl) }
-        pcbuttons[M.util.get_string('cancel','moodle')] = function() { pchandler._cancel() }
+        pcbuttons[M.util.get_string('save', 'totara_core')] = function() { pchandler._save(pcsaveurl); };
+        pcbuttons[M.util.get_string('cancel', 'moodle')] = function() { pchandler._cancel(); };
 
-        totaraDialogs['learningitemcertifications'] = new totaraDialog(
+        totaraDialogs.learningitemcertifications = new totaraDialog(
             'learningitemcertifications',
             'add-certification-learningitem-dialog',
             {
                 buttons: pcbuttons,
-                title: '<h2>' + M.util.get_string('assign'+assgnstring+'learningcertification', 'totara_cohort') + '</h2>'
+                title: '<h2>' + M.util.get_string('assign' + assgnstring + 'learningcertification', 'totara_cohort') + '</h2>'
             },
-            url+'browselearning.php?cohortid=' + this.config.cohortid + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_CERTIF,
+            url + 'browselearning.php?cohortid=' + this.config.cohortid + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_CERTIF,
             pchandler
         );
 
@@ -144,8 +147,8 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
                 type: "GET",
                 data: ({}),
                 beforeSend: function() {
-                    require(['core/templates'], function (templates) {
-                        templates.renderIcon('loading', M.util.get_string('savingrule', 'totara_cohort')).done(function (html) {
+                    require(['core/templates'], function(templates) {
+                        templates.renderIcon('loading', M.util.get_string('savingrule', 'totara_cohort')).done(function(html) {
                             link.replaceWith(html);
                         });
                     });
@@ -155,7 +158,7 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
                 },
                 error: function(h, t, e) {
                     alert(M.util.get_string('error:badresponsefromajax', 'totara_cohort'));
-                    //Reload the broken page
+                    // Reload the broken page
                     location.reload();
                 }
             }); // ajax
@@ -166,14 +169,14 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
             }
         });
     }  // init_deletelisteners
-}
+};
 
 
 // Create handler for the dialog
 totaraDialog_handler_cohortlearning = function() {
     // Base url
     var baseurl = '';
-}
+};
 
 totaraDialog_handler_cohortlearning.prototype = new totaraDialog_handler_treeview_multiselect();
 
@@ -189,10 +192,10 @@ totaraDialog_handler_cohortlearning.prototype._update = function(response) {
     // Hide dialog
     this._dialog.hide();
 
-    //TODO: the stuff to add table rows :-P
+    // TODO: the stuff to add table rows :-P
     if (M.totara_cohortlearning.config.saveurl) {
         location.replace(M.cfg.wwwroot + M.totara_cohortlearning.config.saveurl + '?id=' + M.totara_cohortlearning.config.cohortid);
     } else {
         location.replace(M.cfg.wwwroot + '/totara/cohort/enrolledlearning.php?id=' + M.totara_cohortlearning.config.cohortid);
     }
-}
+};

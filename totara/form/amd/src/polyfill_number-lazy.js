@@ -20,10 +20,12 @@
  * @package totara_form
  */
 
+/* eslint-disable */
 /* jshint ignore:start */
-define(['jquery'], function ($) {
+
+define(['jquery'], function($) {
     var number = {
-        init: function (id) {
+        init: function(id) {
             var numberPolyfill;
             numberPolyfill = function(elem) {
               var $fieldContainer, MutationObserver, attrObserver, halfHeight,
@@ -169,9 +171,11 @@ define(['jquery'], function ($) {
             numberPolyfill.raiseNumPrecision = function(rNum, newPrecision) {
               var _i, _ref;
               if (rNum.precision < newPrecision) {
+                /* eslint-enable no-undef */
                 for (i = _i = _ref = rNum.precision; _ref <= newPrecision ? _i < newPrecision : _i > newPrecision; i = _ref <= newPrecision ? ++_i : --_i) {
                   rNum.num += "0";
                 }
+                /* eslint-disable no-undef */
                 rNum.precision = newPrecision;
               }
             };
@@ -316,8 +320,8 @@ define(['jquery'], function ($) {
             numberPolyfill.prototype.stepNormalize = function(value) {
               var cValue, min, params, sn, step;
               params = this.getParams();
-              step = params['step'];
-              min = params['min'];
+              step = params.step;
+              min = params.min;
               if (step == null) {
                 return value;
               } else {
@@ -383,7 +387,7 @@ define(['jquery'], function ($) {
               if (p.elem.val() !== "") {
                 if (numberPolyfill.isNumber(p.elem.val())) {
                   params = p.getParams();
-                  newVal = p.clipValues(params['val'], params['min'], params['max']);
+                  newVal = p.clipValues(params.val, params.min, params.max);
                   newVal = p.stepNormalize(newVal);
                   if (newVal.toString() !== p.elem.val()) {
                     p.elem.val(newVal).change();
@@ -420,15 +424,17 @@ define(['jquery'], function ($) {
                 ei = null;
                 _ref = ["opacity", "visibility", "-moz-transition-property", "-moz-transition-duration", "-moz-transition-timing-function", "-moz-transition-delay", "-webkit-transition-property", "-webkit-transition-duration", "-webkit-transition-timing-function", "-webkit-transition-delay", "-o-transition-property", "-o-transition-duration", "-o-transition-timing-function", "-o-transition-delay", "transition-property", "transition-duration", "transition-timing-function", "transition-delay"];
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  /* eslint-enable no-undef */
                   i = _ref[_i];
                   if ((ei = this.elem.css(i)) !== this.btnContainer.css(i)) {
                     h[i] = ei;
                   }
+                  /* eslint-disable no-undef */
                 }
                 if (this.elem.css("display") === "none") {
-                  h["display"] = "none";
+                  h.display = "none";
                 } else {
-                  h["display"] = "inline-block";
+                  h.display = "inline-block";
                 }
                 this.btnContainer.css(h);
               } else if (name === "min" || name === "max" || name === "step") {
@@ -439,9 +445,9 @@ define(['jquery'], function ($) {
               var newVal, params;
               if (!(this.elem.is(":disabled") || this.elem.is("[readonly]"))) {
                 params = this.getParams();
-                newVal = numberPolyfill.preciseAdd(params['val'], params['step']);
-                if ((params['max'] != null) && parseFloat(newVal) > parseFloat(params['max'])) {
-                  newVal = params['max'];
+                newVal = numberPolyfill.preciseAdd(params.val, params.step);
+                if ((params.max != null) && parseFloat(newVal) > parseFloat(params.max)) {
+                  newVal = params.max;
                 }
                 newVal = this.stepNormalize(newVal);
                 this.elem.val(newVal).change();
@@ -451,9 +457,9 @@ define(['jquery'], function ($) {
               var newVal, params;
               if (!(this.elem.is(":disabled") || this.elem.is("[readonly]"))) {
                 params = this.getParams();
-                newVal = numberPolyfill.preciseSubtract(params['val'], params['step']);
-                if ((params['min'] != null) && parseFloat(newVal) < parseFloat(params['min'])) {
-                  newVal = params['min'];
+                newVal = numberPolyfill.preciseSubtract(params.val, params.step);
+                if ((params.min != null) && parseFloat(newVal) < parseFloat(params.min)) {
+                  newVal = params.min;
                 }
                 newVal = this.stepNormalize(newVal);
                 this.elem.val(newVal).change();

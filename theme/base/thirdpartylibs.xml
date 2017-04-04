@@ -15,7 +15,7 @@
     <licenseversion></licenseversion>
   </library>
   <library>
-    <location>foonts</location>
+    <location>fonts</location>
     <name>Bootstrap - GLYPHICONS Halflings</name>
     <license>MIT</license>
     <version>3.3.7</version>

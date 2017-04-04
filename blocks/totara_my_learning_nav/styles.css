@@ -6,11 +6,12 @@
     padding: 3px 0;
 }
 .block_totara_my_learning_nav li img.smallicon {
-    padding: 4px 0px 4px 0px;
+    padding: 4px 0 4px 0;
 }
 .dir-rtl .block_totara_my_learning_nav li img.smallicon {
-    padding: 4px 0px 4px 0px;
+    padding: 4px 0 4px 0;
 }
+
 @media screen and (min-width: 980px) {
     .block_totara_my_learning_nav li img.smallicon {
         padding: 4px 20px 4px 2px;

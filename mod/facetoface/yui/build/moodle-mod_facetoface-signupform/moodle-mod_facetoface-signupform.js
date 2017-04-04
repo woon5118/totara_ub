@@ -32,7 +32,7 @@ M.mod_facetoface.signupform = {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(){
+    init: function() {
 
         /**
          *  Attaches mouse events to the loaded content.
@@ -40,7 +40,7 @@ M.mod_facetoface.signupform = {
         this.attachCustomClickEvents = function() {
             // Add handler to edit job assignment button.
             Y.all('a.ajax-action').each(function(node) {
-                node.on('click', function(e){
+                node.on('click', function(e) {
                     Y.io(node.getAttribute('href'), {
                         on: {success: M.mod_facetoface.signupform.loadConfirmForm}
                     });
@@ -58,12 +58,12 @@ M.mod_facetoface.signupform = {
         this.loadConfirmForm = function(id, o) {
             var bodyContent = o.responseText;
             var config = {
-                headerContent : null,
-                bodyContent : bodyContent,
-                draggable : true,
-                modal : true,
-                closeButton : false,
-                width : '600px'
+                headerContent: null,
+                bodyContent: bodyContent,
+                draggable: true,
+                modal: true,
+                closeButton: false,
+                width: '600px'
             };
             var dialog = new M.core.dialogue(config);
             Y.one('#' + dialog.get('id')).one('#id_confirm').on('click', function(e) {

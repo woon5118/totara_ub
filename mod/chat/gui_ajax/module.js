@@ -20,28 +20,28 @@ M.mod_chat_ajax.init = function(Y, cfg) {
     var gui_ajax = {
 
         // Properties.
-        api : M.cfg.wwwroot + '/mod/chat/chat_ajax.php?sesskey=' + M.cfg.sesskey,  // The path to the ajax callback script.
-        cfg : {},                                       // A configuration variable.
-        interval : null,                                // The interval object for refreshes.
-        layout : null,                                  // A reference to the layout used in this module.
-        messages : [],                                  // An array of messages.
-        scrollable : true,                              // True is scrolling should occur.
-        thememenu : null,                               // A reference to the menu for changing themes.
+        api: M.cfg.wwwroot + '/mod/chat/chat_ajax.php?sesskey=' + M.cfg.sesskey,  // The path to the ajax callback script.
+        cfg: {},                                       // A configuration variable.
+        interval: null,                                // The interval object for refreshes.
+        layout: null,                                  // A reference to the layout used in this module.
+        messages: [],                                  // An array of messages.
+        scrollable: true,                              // True is scrolling should occur.
+        thememenu: null,                               // A reference to the menu for changing themes.
 
         // Elements
-        messageinput : null,
-        sendbutton : null,
-        messagebox : null,
+        messageinput: null,
+        sendbutton: null,
+        messagebox: null,
 
-        init : function(cfg) {
+        init: function(cfg) {
             this.cfg = cfg;
             this.cfg.req_count = this.cfg.req_count || 0;
-            participantswidth = 180;
+            var participantswidth = 180;
             if (Y.one('#input-message').get('docWidth') < 640) {
                 participantswidth = 120;
             }
             this.layout = new Y.YUI2.widget.Layout({
-                units : [
+                units: [
                      {position: 'right', width: participantswidth, resize: true, gutter: '1px', scroll: true, body: 'chat-userlist', animate: false},
                      {position: 'bottom', height: 42, resize: false, body: 'chat-input-area', gutter: '1px', collapse: false, resize: false},
                      {position: 'center', body: 'chat-messages', gutter: '0px', scroll: true}
@@ -80,21 +80,21 @@ M.mod_chat_ajax.init = function(Y, cfg) {
             }, this);
 
             // Send the message when the enter key is pressed.
-            Y.on('key', this.send, this.messageinput,  'press:13', this);
+            Y.on('key', this.send, this.messageinput, 'press:13', this);
 
             document.title = this.cfg.chatroom_name;
 
             // Prepare and execute the first AJAX request of information.
-            Y.io(this.api,{
-                method : 'POST',
-                data :  build_querystring({
-                    action : 'init',
-                    chat_init : 1,
-                    chat_sid : this.cfg.sid,
-                    theme : this.theme
+            Y.io(this.api, {
+                method: 'POST',
+                data:  build_querystring({
+                    action: 'init',
+                    chat_init: 1,
+                    chat_sid: this.cfg.sid,
+                    theme: this.theme
                 }),
-                on : {
-                    success : function(tid, outcome) {
+                on: {
+                    success: function(tid, outcome) {
                         this.messageinput.removeAttribute('disabled');
                         this.messageinput.set('value', '');
                         this.messageinput.focus();
@@ -106,7 +106,7 @@ M.mod_chat_ajax.init = function(Y, cfg) {
                         this.update_users(data.users);
                     }
                 },
-                context : this
+                context: this
             });
 
             var scope = this;
@@ -115,7 +115,7 @@ M.mod_chat_ajax.init = function(Y, cfg) {
             }, this.cfg.timer, this);
 
             // Create and initalise theme changing menu.
-            this.thememenu = new Y.YUI2.widget.Menu('basicmenu', {xy:[0,0]});
+            this.thememenu = new Y.YUI2.widget.Menu('basicmenu', {xy: [0, 0]});
             this.thememenu.addItems([
                 {text: M.util.get_string('bubble', 'mod_chat'), url: this.cfg.chaturl + '&theme=bubble'},
                 {text: M.util.get_string('compact', 'mod_chat'), url: this.cfg.chaturl + '&theme=compact'},
@@ -128,7 +128,7 @@ M.mod_chat_ajax.init = function(Y, cfg) {
             }, this.thememenu);
         },
 
-        append_message : function(key, message, row) {
+        append_message: function(key, message, row) {
             var item = Y.Node.create('<li id="mdl-chat-entry-' + key + '">' + message.message + '</li>');
             item.addClass((message.mymessage) ? 'mdl-chat-my-entry' : 'mdl-chat-entry');
             Y.one('#messages-list').append(item);
@@ -137,31 +137,31 @@ M.mod_chat_ajax.init = function(Y, cfg) {
             }
         },
 
-        send : function(e, beep) {
-            if((this.messageinput.get('value') != '') || (typeof beep != 'undefined')) {
+        send: function(e, beep) {
+            if ((this.messageinput.get('value') != '') || (typeof beep != 'undefined')) {
                 this.sendbutton.set('value', M.util.get_string('sending', 'chat'));
                 var data = {
-                    chat_message : (!beep) ? this.messageinput.get('value') : '',
-                    chat_sid : this.cfg.sid,
-                    theme : this.cfg.theme
+                    chat_message: (!beep) ? this.messageinput.get('value') : '',
+                    chat_sid: this.cfg.sid,
+                    theme: this.cfg.theme
                 };
                 if (beep) {
-                    data.beep = beep
+                    data.beep = beep;
                 }
                 data.action = 'chat';
 
                 Y.io(this.api, {
-                    method : 'POST',
-                    data : build_querystring(data),
-                    on : {
-                        success : this.send_callback
+                    method: 'POST',
+                    data: build_querystring(data),
+                    on: {
+                        success: this.send_callback
                     },
-                    context : this
+                    context: this
                 });
             }
         },
 
-        send_callback : function(tid, outcome, args) {
+        send_callback: function(tid, outcome, args) {
             try {
                 var data = Y.JSON.parse(outcome.responseText);
             } catch (ex) {
@@ -177,30 +177,30 @@ M.mod_chat_ajax.init = function(Y, cfg) {
             }, this.cfg.timer, this);
         },
 
-        talkto: function (e, name) {
+        talkto: function(e, name) {
             this.messageinput.set('value', "To " + name + ": ");
             this.messageinput.focus();
         },
 
-        update_messages : function() {
+        update_messages: function() {
             this.cfg.req_count++;
             Y.io(this.api, {
-                method : 'POST',
-                data : build_querystring({
+                method: 'POST',
+                data: build_querystring({
                     action: 'update',
-                    chat_lastrow : this.cfg.chat_lastrow || false,
-                    chat_lasttime : this.cfg.chat_lasttime,
-                    chat_sid : this.cfg.sid,
-                    theme : this.cfg.theme
+                    chat_lastrow: this.cfg.chat_lastrow || false,
+                    chat_lasttime: this.cfg.chat_lasttime,
+                    chat_sid: this.cfg.sid,
+                    theme: this.cfg.theme
                 }),
-                on : {
-                    success : this.update_messages_callback
+                on: {
+                    success: this.update_messages_callback
                 },
-                context : this
+                context: this
             });
         },
 
-        update_messages_callback : function(tid, outcome) {
+        update_messages_callback: function(tid, outcome) {
             try {
                 var data = Y.JSON.parse(outcome.responseText);
             } catch (ex) {
@@ -212,9 +212,9 @@ M.mod_chat_ajax.init = function(Y, cfg) {
                 window.location = this.cfg.home;
             }
             this.cfg.chat_lasttime = data.lasttime;
-            this.cfg.chat_lastrow  = data.lastrow;
+            this.cfg.chat_lastrow = data.lastrow;
             // Update messages.
-            for (var key in data.msgs){
+            for (var key in data.msgs) {
                 if (!M.util.in_array(key, this.messages)) {
                     this.messages.push(key);
                     this.append_message(key, data.msgs[key], data.lastrow);
@@ -229,7 +229,7 @@ M.mod_chat_ajax.init = function(Y, cfg) {
             this.messageinput.focus();
         },
 
-        update_users : function(users) {
+        update_users: function(users) {
             if (!users) {
                 return;
             }

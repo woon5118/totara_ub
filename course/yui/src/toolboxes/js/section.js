@@ -78,13 +78,13 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         if (hideicon === null) {
             // Traditional style of icon
             button.one('img').setAttrs({
-                'alt' : newstring,
-                'src' : M.util.image_url('i/' + nextaction)
+                'alt': newstring,
+                'src': M.util.image_url('i/' + nextaction)
             });
         } else {
             // Font style icon
-            require(['core/templates'], function (templates) {
-                templates.renderIcon('core|i/' + nextaction, newstring).done(function (html) {
+            require(['core/templates'], function(templates) {
+                templates.renderIcon('core|i/' + nextaction, newstring).done(function(html) {
                     templates.replaceNode(hideicon.getDOMNode(), html, '');
                 });
             });
@@ -163,10 +163,10 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         var nodes = selectedpage.all(M.course.format.get_section_selector(Y) + '.current ' + SELECTOR.HIGHLIGHT + ' .flex-icon');
 
 
-        require(['core/templates'], function (templates) {
-            nodes.each(function (node) {
+        require(['core/templates'], function(templates) {
+            nodes.each(function(node) {
                 // Font style icon
-                templates.renderIcon('marker-off', old_string).done(function (html) {
+                templates.renderIcon('marker-off', old_string).done(function(html) {
                     templates.replaceNode(node.getDOMNode(), html, '');
                 });
             });
@@ -194,8 +194,8 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
                     .set('src', M.util.image_url('i/marked'));
             } else {
                 // Font style icon
-                require(['core/templates'], function (templates) {
-                    templates.renderIcon('marker-on', new_string).done(function (html) {
+                require(['core/templates'], function(templates) {
+                    templates.renderIcon('marker-on', new_string).done(function(html) {
                         templates.replaceNode(highlighticon.getDOMNode(), html, '');
                     });
                 });

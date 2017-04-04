@@ -84,7 +84,7 @@ define(['jquery', 'totara_form/form', 'core/str', 'core/templates'], function($,
         var that = this;
         if (this.fieldset.hasClass('collapsed')) {
             this.legend.html('<a href="#" role="button" aria-expanded="false">' + this.legend.html() + '</a>');
-            Templates.renderIcon('collapsed').done(function (icon) {
+            Templates.renderIcon('collapsed').done(function(icon) {
                 if (that.fieldset.hasClass('collapsed')) {
                     that.legend.find('.flex-icon').remove();
                     that.legend.prepend(icon);
@@ -92,7 +92,7 @@ define(['jquery', 'totara_form/form', 'core/str', 'core/templates'], function($,
             });
         } else {
             this.legend.html('<a href="#" role="button" aria-expanded="true">' + this.legend.html() + '</a>');
-            Templates.renderIcon('expanded').done(function (icon) {
+            Templates.renderIcon('expanded').done(function(icon) {
                 if (that.fieldset.hasClass('collapsible')) {
                     that.legend.find('.flex-icon').remove();
                     that.legend.prepend(icon);
@@ -132,7 +132,7 @@ define(['jquery', 'totara_form/form', 'core/str', 'core/templates'], function($,
         this.input.val(1);
 
         var that = this;
-        Templates.renderIcon('expanded').done(function (icon) {
+        Templates.renderIcon('expanded').done(function(icon) {
             if (that.fieldset.hasClass('collapsible')) {
                 that.legend.find('.flex-icon').remove();
                 that.legend.prepend(icon);
@@ -148,7 +148,7 @@ define(['jquery', 'totara_form/form', 'core/str', 'core/templates'], function($,
         this.input.val(0);
 
         var that = this;
-        Templates.renderIcon('collapsed').done(function (icon) {
+        Templates.renderIcon('collapsed').done(function(icon) {
             if (that.fieldset.hasClass('collapsed')) {
                 that.legend.find('.flex-icon').remove();
                 that.legend.prepend(icon);
@@ -180,7 +180,7 @@ define(['jquery', 'totara_form/form', 'core/str', 'core/templates'], function($,
 
         form.form.prepend(actionhtml);
         SectionGroup.expandallcontrol = $('.form-section-expandall-control');
-        $.when(Str.get_string('expandall'), Templates.renderIcon('collapsed')).done(function (expandall, icon) {
+        $.when(Str.get_string('expandall'), Templates.renderIcon('collapsed')).done(function(expandall, icon) {
             SectionGroup.expandallcontrol.find('a').html(icon + expandall);
         });
 
@@ -209,7 +209,7 @@ define(['jquery', 'totara_form/form', 'core/str', 'core/templates'], function($,
         if (expand) {
             control.data('state', 'collapse');
             link.addClass('collapse-all');
-            $.when(Str.get_string('collapseall', 'core'), Templates.renderIcon('expanded')).done(function (collapseall, icon) {
+            $.when(Str.get_string('collapseall', 'core'), Templates.renderIcon('expanded')).done(function(collapseall, icon) {
                 if (link.hasClass('collapse-all')) {
                     link.html(icon + collapseall);
                 }
@@ -217,7 +217,7 @@ define(['jquery', 'totara_form/form', 'core/str', 'core/templates'], function($,
         } else {
             control.data('state', 'expand');
             link.removeClass('collapse-all');
-            $.when(Str.get_string('expandall', 'core'), Templates.renderIcon('collapsed')).done(function (expandall, icon) {
+            $.when(Str.get_string('expandall', 'core'), Templates.renderIcon('collapsed')).done(function(expandall, icon) {
                 if (!link.hasClass('collapse-all')) {
                     link.html(icon + expandall);
                 }

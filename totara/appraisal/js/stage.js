@@ -21,13 +21,15 @@
  * @subpackage reportbuilder
  */
 
+/* eslint-disable no-undef */
+
 /**
  * Javascript file containing JQuery bindings for totara appraisals
  */
 
 M.totara_appraisal_stage = M.totara_appraisal_stage || {
 
-  Y : null,
+  Y: null,
 
   // optional php params and defaults defined here, args passed to init method
   // below will override these values
@@ -39,7 +41,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
    * @param object    YUI instance
    * @param string    args supplied in JSON format
    */
-  init : function(Y, args) {
+  init: function(Y, args) {
     // save a reference to the Y instance (all of its dependencies included)
     this.Y = Y;
 
@@ -54,7 +56,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
     }
 
     // check jQuery dependency is available
-    if ( typeof $ === 'undefined') {
+    if (typeof $ === 'undefined') {
       throw new Error('M.totara_appraisal_stage.init()-> jQuery dependency required for this module to function.');
     }
 
@@ -62,7 +64,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
      * Function to turn a {key:value} object into a string for use in a URL
      * @param {Object} obj Javascript Object
      */
-    function objToString (obj) {
+    function objToString(obj) {
       var str = '';
       var first = true;
       for (var p in obj) {
@@ -89,12 +91,14 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
       document.location.hash = objToString(qString);
     }
 
+    /* eslint-enable no-undef */
     $apTable = $('table.appraisal-stages');
+    /* eslint-disable no-undef */
     var stageID = $apTable.find('tr.selected').find('a.appraisal-stagelink').attr('data-id');
     var pageID = null;
     var qString = {};
 
-    document.location.hash.replace(/\#?(?:([^=]+)=([^&]*)&?)/g, function () {
+    document.location.hash.replace(/\#?(?:([^=]+)=([^&]*)&?)/g, function() {
       function decode(s) {
         return decodeURIComponent(s.split("+").join(" "));
       }
@@ -118,13 +122,13 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
       var newPage = newPage || false;
       stageID = sID;
 
-      if (clearQS || (sID != qString['id'])) {
+      if (clearQS || (sID != qString.id)) {
         qString = {};
         setLocObj(qString, 'id', sID);
       }
 
       $.get(M.cfg.wwwroot + '/totara/appraisal/ajax/stage.php', {
-        id : sID
+        id: sID
       }).done(function(data) {
 
         $('#appraisalstagecontainer').html($(data).html());
@@ -138,8 +142,8 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
 
         if (newPage) {
           $('#appraisalstagecontainer').find('a.appraisal-page-list-name').last().click();
-        } else if (qString['appraisalstagepageid']) {
-          $('#appraisalstagecontainer').find('a[data-pageid="' + qString['appraisalstagepageid'] + '"]').click();
+        } else if (qString.appraisalstagepageid) {
+          $('#appraisalstagecontainer').find('a[data-pageid="' + qString.appraisalstagepageid + '"]').click();
         } else {
           $('#appraisalstagecontainer').find('a.appraisal-page-list-name').eq(0).click();
         }
@@ -159,11 +163,11 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
 
       var dialogue = new M.core.dialogue({
         headerContent: null,
-        bodyContent  : content,
-        width        : 500,
-        centered     : true,
-        modal        : true,
-        render       : true
+        bodyContent: content,
+        width: 500,
+        centered: true,
+        modal: true,
+        render: true
       });
 
       var label = M.util.get_string('addpage', 'totara_appraisal');
@@ -179,9 +183,9 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
           var $theFrm = $content.find('form.mform');
           var apprObj = $theFrm.serialize();
           apprObj += ('&submitbutton=' + $(this).attr('value'));
-          $.post($theFrm.attr('action'), apprObj).done(function(data){
+          $.post($theFrm.attr('action'), apprObj).done(function(data) {
             if (data == 'success') {
-              if(func) {
+              if (func) {
                 var theFunc = eval('(' + func + ')');
                 theFunc.apply(null, Array.prototype.slice.call(args));
               }
@@ -216,15 +220,15 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
       var msg = msg || "An unknown error occurred.";
       var dialogue = new M.core.dialogue({
         bodyContent: msg,
-        width        : 300,
-        centered     : true,
-        modal        : true,
-        render       : true
+        width: 300,
+        centered: true,
+        modal: true,
+        render: true
       });
       dialogue.addButton({
-        label: M.util.get_string('ok','moodle'),
+        label: M.util.get_string('ok', 'moodle'),
         section: Y.WidgetStdMod.FOOTER,
-        action : function (e) {
+        action: function(e) {
           e.preventDefault();
           dialogue.destroy(true);
         }
@@ -235,8 +239,8 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
 
     function updateRoles(sID) {
       $.get(M.cfg.wwwroot + '/totara/appraisal/ajax/stage.php', {
-        id : sID,
-        action : 'getroles'
+        id: sID,
+        action: 'getroles'
       }).done(function(data) {
         for (var i = 0; i < $(data).length; i++) {
           var $stage = $($(data)[i]);
@@ -258,11 +262,11 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
     function modalAddEditQuestion(content, url) {
       var dialogue = new M.core.dialogue({
         headerContent: null,
-        bodyContent  : content,
-        width        : 800,
-        centered     : true,
-        modal        : true,
-        focusOn      : []
+        bodyContent: content,
+        width: 800,
+        centered: true,
+        modal: true,
+        focusOn: []
       });
       dialogue.render();
       dialogue.show();
@@ -278,7 +282,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
       });
       if (typeof tinyMCE != 'undefined') {
         var listener = dialogue.before('destroy', function() {
-          for (edId in tinyMCE.editors) {
+          for (var edId in tinyMCE.editors) {
             tinyMCE.editors[edId].save();
             tinyMCE.editors[edId].destroy();
           }
@@ -287,10 +291,14 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
       }
       $.extend(true, M.str, strings);
       $content.find('input[type="text"]').eq(0).focus();
+
+      /* eslint-enable no-undef */
       if (prevRoles.length) {
         $roles = $content.find('input[id^="id_roles_"]');
+        /* eslint-disable no-undef */
+
         $content.find('#id_cloneprevroles').on('click', function() {
-          $roles.each(function(){
+          $roles.each(function() {
             var $this = $(this);
             $this.off('click.props');
             if ($.inArray($this.attr('id'), prevRoles) != -1) { // IE8 doesn't support indexOf.
@@ -304,7 +312,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
                 $this.prop('checked', false);
               }
             }
-            $this.on('click.props', function(){
+            $this.on('click.props', function() {
               $content.find('#id_cloneprevroles').prop('checked', false);
             });
           });
@@ -322,14 +330,14 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
               if (tinymce.activeEditor) {
                   tinymce.activeEditor.save();
               }
-              for (edId in tinyMCE.editors) {
+              for (var edId in tinyMCE.editors) {
                   tinyMCE.editors[edId].save();
                   tinyMCE.editors[edId].destroy();
               }
           }
           var apprObj = $theFrm.serialize();
           apprObj += ('&submitbutton=' + $(this).attr('value'));
-          $.post($theFrm.attr('action'), apprObj).done(function(data){
+          $.post($theFrm.attr('action'), apprObj).done(function(data) {
             if (data == 'success') {
               pageContent(url);
               updateRoles(stageID);
@@ -369,22 +377,22 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
         bodyContent = M.util.get_string('confirmdeleteitem', 'totara_appraisal');
       }
       var dialogue = new M.core.dialogue({
-        bodyContent  : bodyContent,
-        width        : 300,
-        centered     : true,
-        modal        : true,
-        visible      : true,
-        render       : true
+        bodyContent: bodyContent,
+        width: 300,
+        centered: true,
+        modal: true,
+        visible: true,
+        render: true
       });
       dialogue.addButton({
-        label: M.util.get_string('yes','moodle'),
+        label: M.util.get_string('yes', 'moodle'),
         section: Y.WidgetStdMod.FOOTER,
-        action : function (e) {
+        action: function(e) {
           e.preventDefault();
-            $.get(url, {sesskey: M.totara_appraisal_stage.config.sesskey, confirm: 1}).done(function(data){
+            $.get(url, {sesskey: M.totara_appraisal_stage.config.sesskey, confirm: 1}).done(function(data) {
               if (data == 'success') {
                 if ($el) {
-                  $el.slideUp(250, function(){
+                  $el.slideUp(250, function() {
                     $el.remove();
                     if (func) {
                       theFunc = eval('(' + func + ')');
@@ -392,26 +400,26 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
                     }
                   });
                 } else {
-                  if(func) {
+                  if (func) {
                     theFunc = eval('(' + func + ')');
                     theFunc.apply(null, Array.prototype.slice.call(args));
                   }
                 }
                 updateRoles(stageID);
               } else {
-                modalError(M.util.get_string('error:cannotdelete','totara_appraisal'));
+                modalError(M.util.get_string('error:cannotdelete', 'totara_appraisal'));
               }
-            }).fail(function(){
-              modalError(M.util.get_string('error:cannotdelete','totara_appraisal'));
+            }).fail(function() {
+              modalError(M.util.get_string('error:cannotdelete', 'totara_appraisal'));
             });
           dialogue.destroy(true);
         }
       });
 
       dialogue.addButton({
-        label: M.util.get_string('no','moodle'),
+        label: M.util.get_string('no', 'moodle'),
         section: Y.WidgetStdMod.FOOTER,
-        action : function (e) {
+        action: function(e) {
           e.preventDefault();
           dialogue.destroy(true);
         }
@@ -426,7 +434,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
     function pageContent(url, pageLink) {
       var $pageLink = pageLink || false;
       var strings = M.str;
-      $('#appraisal-questions').load(url, function(){
+      $('#appraisal-questions').load(url, function() {
         $.extend(true, M.str, strings);
         var $appQuestions = $('#appraisal-questions');
 
@@ -434,7 +442,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
         $('#id_submitbutton').on('click', function(e) {
           e.preventDefault();
           var apprObj = $appQuestions.find('form.mform').serialize();
-          $.post($appQuestions.find('form.mform').attr('action'), apprObj).done(function(data){
+          $.post($appQuestions.find('form.mform').attr('action'), apprObj).done(function(data) {
             modalAddEditQuestion(data, url);
           });
         });
@@ -446,7 +454,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
           pageID = $pageLink.attr('data-pageid');
         }
 
-        if (!qString['id']) {
+        if (!qString.id) {
           setLocObj(qString, 'id', stageID);
         }
 
@@ -454,7 +462,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
 
         // edit question action-icon link
         $('a.action-icon.edit', '#appraisal-quest-list').on('click', function() {
-          $.get($(this).attr('href')).done(function(data){
+          $.get($(this).attr('href')).done(function(data) {
             modalAddEditQuestion(data, M.cfg.wwwroot + '/totara/appraisal/ajax/question.php?appraisalstagepageid=' + pageID);
           });
           return false;
@@ -477,7 +485,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
         });
 
         if ($('#appraisal-page-list').find('.move').length) {
-          makeDraggable(M.cfg.wwwroot + '/totara/appraisal/ajax/question.php', '#appraisal-quest-list', 'li', [{id:'#appraisal-page-list', type:'li'},{id:'.appraisal-stages', type:'tr'}]);
+          makeDraggable(M.cfg.wwwroot + '/totara/appraisal/ajax/question.php', '#appraisal-quest-list', 'li', [{id: '#appraisal-page-list', type: 'li'}, {id: '.appraisal-stages', type: 'tr'}]);
         }
       });
     }
@@ -496,58 +504,59 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
         }
 
         Y.DD.DDM.on('drop:over', function(e) {
-          //Get a reference to our drag and drop nodes
-          var drag = e.drag.get('node'), drop = e.drop.get('node');
+          // Get a reference to our drag and drop nodes
+          var drag = e.drag.get('node'),
+drop = e.drop.get('node');
 
-          //Are we in the same parent?
+          // Are we in the same parent?
           if ('#' + drop.get('parentNode').get('id') == elID) {
-            //Are we dropping on a li node?
+            // Are we dropping on a li node?
             if (drop.get('tagName').toLowerCase() === 'li') {
-              //Are we not going up?
+              // Are we not going up?
               if (!goingUp) {
                 drop = drop.get('nextSibling');
               }
-              //Add the node to this list
+              // Add the node to this list
               e.drop.get('node').get('parentNode').insertBefore(drag, drop);
-              //Set the new parentScroll on the nodescroll plugin
+              // Set the new parentScroll on the nodescroll plugin
               e.drag.nodescroll.set('parentScroll', e.drop.get('node').get('parentNode'));
-              //Resize this nodes shim, so we can drop on it later.
+              // Resize this nodes shim, so we can drop on it later.
               e.drop.sizeShim();
             }
           }
         });
-        //Listen for all drag:drag events
+        // Listen for all drag:drag events
         Y.DD.DDM.on('drag:drag', function(e) {
-          //Get the last y point
+          // Get the last y point
           var y = e.target.lastXY[1];
-          //is it greater than the lastY var?
+          // is it greater than the lastY var?
           if (y < lastY) {
-            //We are going up
+            // We are going up
             goingUp = true;
           } else {
-            //We are going down.
+            // We are going down.
             goingUp = false;
           }
-          //Cache for next check
+          // Cache for next check
           lastY = y;
           Y.DD.DDM.syncActiveShims(true);
         });
-        //Listen for all drag:start events
+        // Listen for all drag:start events
         Y.DD.DDM.on('drag:start', function(e) {
-          //Get our drag object
+          // Get our drag object
           var drag = e.target;
-          //Set some styles here
+          // Set some styles here
           drag.get('node').setStyle('opacity', '.25');
           drag.get('dragNode').set('innerHTML', drag.get('node').get('innerHTML'));
           drag.get('dragNode').setStyles({
-            opacity : '.5',
-            borderColor : 'transparent',
-            height : drag.get('node').getComputedStyle('height'),
-            width : drag.get('node').getComputedStyle('width'),
-            backgroundColor : drag.get('node').getStyle('backgroundColor')
+            opacity: '.5',
+            borderColor: 'transparent',
+            height: drag.get('node').getComputedStyle('height'),
+            width: drag.get('node').getComputedStyle('width'),
+            backgroundColor: drag.get('node').getStyle('backgroundColor')
           });
         });
-        //Listen for a drag:end events
+        // Listen for a drag:end events
         Y.DD.DDM.on('drag:end', function(e) {
           var drag = e.target;
           var node = drag.get('node');
@@ -562,26 +571,27 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
             id: node.getData('pageid') || node.getData('questid'),
             pos: newPos
           });
-          //Put our styles back
+          // Put our styles back
           node.setStyles({
-            visibility : '',
-            opacity : '1'
+            visibility: '',
+            opacity: '1'
           });
         });
 
-        //Static Vars
-        var goingUp = false, lastY = 0;
+        // Static Vars
+        var goingUp = false,
+lastY = 0;
 
         lis.each(function(v, k) {
           var dd = new Y.DD.Drag({
-            node : v,
-            //Make it Drop target and pass this config to the Drop constructor
-            target : {
-              padding : '0 0 0 20'
+            node: v,
+            // Make it Drop target and pass this config to the Drop constructor
+            target: {
+              padding: '0 0 0 20'
             }
           }).plug(Y.Plugin.DDProxy, {
-            //Don't move the node at the end of the drag
-            moveOnEnd : false
+            // Don't move the node at the end of the drag
+            moveOnEnd: false
           }).plug(Y.Plugin.DDNodeScroll, {
             node: v.get('parentNode')
           });
@@ -589,7 +599,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
         });
 
         for (var i in slis) {
-          slis[i].each(function(v, k){
+          slis[i].each(function(v, k) {
             if (!v.hasClass('selected')) {
               var drop = v.plug(Y.Plugin.Drop);
 
@@ -601,8 +611,9 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
                 e.drop.get('node').removeClass('move-target');
               });
 
-              drop.drop.on('drop:hit', function(e){
-                var drop = e.drop.get('node'), drag = e.drag.get('node');
+              drop.drop.on('drop:hit', function(e) {
+                var drop = e.drop.get('node'),
+drag = e.drag.get('node');
                 drop.removeClass('move-target');
                 drag.setData('moved', 'resetpos');
                 $.get(url, {
@@ -612,7 +623,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
                   target: drop.getData('pageid') || drop.one('a.appraisal-stagelink').getData('id'),
                   type: drop.getData('type') || drop.one('a.appraisal-stagelink').getData('type'),
                   dataType: 'json'
-                }).done(function(data){
+                }).done(function(data) {
                   if (data == 'success') {
                     drag.remove();
                     updateRoles(stageID);
@@ -641,15 +652,15 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
      */
     function attachEvents() {
       // add new page button
-      $('#appraisal-add-page').on('click', function(){
-        $.get($(this).attr('href'), function(data){
+      $('#appraisal-add-page').on('click', function() {
+        $.get($(this).attr('href'), function(data) {
           modalForm(data, 'loadPages', [stageID, null, false, true]);
         });
         return false;
       });
 
       // page title link to display page content in right hand panel
-      $('a.appraisal-page-list-name', '#appraisal-page-list').on('click', function(){
+      $('a.appraisal-page-list-name', '#appraisal-page-list').on('click', function() {
         if (!$(this).parent().hasClass('selected')) {
           pageContent($(this).attr('href'), $(this));
         }
@@ -657,8 +668,8 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
       });
 
       // edit page action-icon link
-      $('a.action-icon.edit', '#appraisal-page-list').on('click', function(){
-        $.get($(this).attr('href'), function(data){
+      $('a.action-icon.edit', '#appraisal-page-list').on('click', function() {
+        $.get($(this).attr('href'), function(data) {
           modalForm(data, 'loadPages', [stageID]);
         });
         return false;
@@ -676,18 +687,18 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
 
       if ($('#appraisal-page-list').find('.move').length) {
         makeDraggable(M.cfg.wwwroot + '/totara/appraisal/ajax/page.php?sesskey=' + M.totara_appraisal_stage.config.sesskey,
-                '#appraisal-page-list', 'li', [{id:'.appraisal-stages', type:'tr'}]);
+                '#appraisal-page-list', 'li', [{id: '.appraisal-stages', type: 'tr'}]);
       }
 
     }
 
     attachEvents();
 
-    if (qString['id']) {
-      loadPages(qString['id'], null);
+    if (qString.id) {
+      loadPages(qString.id, null);
     } else {
       $('#appraisalstagecontainer').find('a.appraisal-page-list-name').eq(0).click();
     }
 
   }
-}
+};

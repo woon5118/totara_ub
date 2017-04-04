@@ -55,7 +55,7 @@ define(function() {
          * @param {Function} onload A function to call once we are ready.
          * @param {Object} config A config object with info from Require.
          */
-        load : function(name, req, onload, config) {
+        load: function(name, req, onload, config) {
             var id,
                 scripttag,
                 firstscript;
@@ -74,7 +74,7 @@ define(function() {
                 scripttag = document.createElement('script');
                 scripttag.setAttribute('type', 'text/javascript');
                 scripttag.setAttribute('async', true);
-                scripttag.setAttribute('src', 'https://maps.google.com/maps/api/js?' + name + '&callback='+id);
+                scripttag.setAttribute('src', 'https://maps.google.com/maps/api/js?' + name + '&callback=' + id);
 
                 firstscript = document.getElementsByTagName('script')[0];
                 firstscript.parentNode.insertBefore(scripttag, firstscript);

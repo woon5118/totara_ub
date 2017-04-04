@@ -20,6 +20,8 @@
  * @package totara_gap
  */
 
+/* eslint-disable no-undef */
+
 M.aspirational_position = M.aspirational_position || {
 
     Y: null,
@@ -31,7 +33,7 @@ M.aspirational_position = M.aspirational_position || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -50,15 +52,15 @@ M.aspirational_position = M.aspirational_position || {
             throw new Error('M.aspirational_position.init()-> jQuery dependency required for this module to function.');
         }
 
-        ///
-        /// Position dialog
-        ///
+        // /
+        // / Position dialog
+        // /
         (function() {
-            var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/position/assign/';
+            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/position/assign/';
             totaraSingleSelectDialog(
                 'aspirationalposition',
                 M.util.get_string('chooseposition', 'totara_hierarchy') + M.aspirational_position.config.dialog_display_position,
-                url+'position.php?',
+                url + 'position.php?',
                 'aspirationalpositionid',
                 'aspirationalpositiontitle',
                 undefined,

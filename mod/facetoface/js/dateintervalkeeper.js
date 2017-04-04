@@ -20,12 +20,14 @@
  * @package mod_facetoface
  */
 
+/* eslint-disable no-undef */
+
 "use strict";
 
 M.totara_f2f_dateintervalkeeper = M.totara_f2f_dateintervalkeeper || {
     previousstartvalues: 0,
 
-    getdate: function (dateelement) {
+    getdate: function(dateelement) {
         return new Date(
             $('.fdate_time_selector select[name="' + dateelement + '[year]"]').val(),
             $('.fdate_time_selector select[name="' + dateelement + '[month]"]').val() - 1,
@@ -35,7 +37,7 @@ M.totara_f2f_dateintervalkeeper = M.totara_f2f_dateintervalkeeper || {
         ).getTime() / 1000;
     },
 
-    setdate: function (dateelement, timestamp) {
+    setdate: function(dateelement, timestamp) {
         var date = new Date(timestamp * 1000);
         $('.fdate_time_selector select[name="' + dateelement + '[year]"]').val(date.getFullYear());
         $('.fdate_time_selector select[name="' + dateelement + '[month]"]').val(date.getMonth() + 1);

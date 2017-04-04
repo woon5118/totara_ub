@@ -20,6 +20,9 @@
  * @package totara
  * @subpackage plan
  */
+
+/* eslint-disable no-undef */
+
 M.totara_plan_find_evidence = M.totara_plan_find_evidence || {
 
     Y: null,
@@ -35,7 +38,7 @@ M.totara_plan_find_evidence = M.totara_plan_find_evidence || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -58,7 +61,7 @@ M.totara_plan_find_evidence = M.totara_plan_find_evidence || {
         this.totaraDialog_handler_preRequisite = function() {
             // Base url
             var baseurl = '';
-        }
+        };
 
         this.totaraDialog_handler_preRequisite.prototype = new totaraDialog_handler_treeview_multiselect();
 
@@ -75,7 +78,7 @@ M.totara_plan_find_evidence = M.totara_plan_find_evidence || {
             this._dialog.hide();
 
             // Remove no item warning (if exists)
-            $('.noitems-'+this._title).remove();
+            $('.noitems-' + this._title).remove();
 
             // Grab table
             var table = $('table.dp-plan-evidence-items');
@@ -91,27 +94,27 @@ M.totara_plan_find_evidence = M.totara_plan_find_evidence || {
 
             // Grab remove button
             $('input#remove-selected-evidence').show();
-        }
+        };
 
-        var url = M.cfg.wwwroot + '/totara/plan/components/'+this.config.component_name+'/';
+        var url = M.cfg.wwwroot + '/totara/plan/components/' + this.config.component_name + '/';
         var evidenceurl = M.cfg.wwwroot + '/totara/plan/components/evidence/';
-        var saveurl = evidenceurl + 'update-evidence.php?planid='+this.config.plan_id+'&component='+this.config.component_name+'&itemid='+this.config.item_id+'&update=';
+        var saveurl = evidenceurl + 'update-evidence.php?planid=' + this.config.plan_id + '&component=' + this.config.component_name + '&itemid=' + this.config.item_id + '&update=';
 
         var handler = new this.totaraDialog_handler_preRequisite();
         handler.baseurl = url;
 
         var buttonsObj = {};
-        buttonsObj[M.util.get_string('save','totara_core')] = function() { handler._save(saveurl) }
-        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
+        buttonsObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(saveurl); };
+        buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
 
-        totaraDialogs['evidence'] = new totaraDialog(
+        totaraDialogs.evidence = new totaraDialog(
             'assignevidence',
             'show-evidence-dialog',
             {
                 buttons: buttonsObj,
                 title: '<h2>' + M.util.get_string('addlinkedevidence', 'totara_plan') + '</h2>'
             },
-            evidenceurl + 'find-evidence.php?planid='+this.config.plan_id+'&component='+this.config.component_name+'&itemid='+this.config.item_id,
+            evidenceurl + 'find-evidence.php?planid=' + this.config.plan_id + '&component=' + this.config.component_name + '&itemid=' + this.config.item_id,
             handler
         );
     }

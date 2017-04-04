@@ -20,6 +20,9 @@
  * @package totara
  * @subpackage program
  */
+
+/* eslint-disable no-undef */
+
 M.totara_programmessages = M.totara_programmessages || {
 
     Y: null,
@@ -36,7 +39,7 @@ M.totara_programmessages = M.totara_programmessages || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
 
         var module = this;
 
@@ -74,8 +77,8 @@ M.totara_programmessages = M.totara_programmessages || {
             var self = this;
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('saveallchanges', 'totara_program')] = function() { self.save() };
-            buttonsObj[M.util.get_string('editmessages', 'totara_program')] = function() { handler._cancel() };
+            buttonsObj[M.util.get_string('saveallchanges', 'totara_program')] = function() { self.save(); };
+            buttonsObj[M.util.get_string('editmessages', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -84,7 +87,7 @@ M.totara_programmessages = M.totara_programmessages || {
             'unused', // buttonid unused
             {
                 buttons: buttonsObj,
-                title: '<h2>'+ M.util.get_string('confirmmessagechanges', 'totara_program') +'</h2>'
+                title: '<h2>' + M.util.get_string('confirmmessagechanges', 'totara_program') + '</h2>'
             },
             'unused', // default_url unused
             handler
@@ -102,12 +105,12 @@ M.totara_programmessages = M.totara_programmessages || {
 
                 this.table = table;
                 this.rows = rows;
-            }
+            };
 
             // Don't load anything
             this.load = function(url, method) {
-            }
-        }
+            };
+        };
 
         // attach a function to the page to prevent unsaved changes from being lost
         // when navigating away
@@ -128,12 +131,12 @@ M.totara_programmessages = M.totara_programmessages || {
         };
 
         // remove the 'unsaved changes' confirmation when submitting the form
-        $('form[name="form_prog_messages"]').submit(function(){
+        $('form[name="form_prog_messages"]').submit(function() {
             window.onbeforeunload = null;
         });
 
         // Remove the 'unsaved changes' confirmation when clicking th 'Cancel program management' link
-        $('#cancelprogramedits').click(function(){
+        $('#cancelprogramedits').click(function() {
             window.onbeforeunload = null;
             return true;
         });
@@ -143,7 +146,7 @@ M.totara_programmessages = M.totara_programmessages || {
             return module.handleSaveChanges();
         });
 
-        totaraDialogs['savechanges'] = new this.totaraDialog_savechanges();
+        totaraDialogs.savechanges = new this.totaraDialog_savechanges();
 
 
         // Set up the display of messages
@@ -156,7 +159,7 @@ M.totara_programmessages = M.totara_programmessages || {
     /**
      *
      */
-    handleSaveChanges: function(){
+    handleSaveChanges: function() {
 
         // no need to display the confirmation dialog if there are no changes to save
         if (!this.isFormModified()) {
@@ -164,7 +167,7 @@ M.totara_programmessages = M.totara_programmessages || {
             return true;
         }
 
-        var dialog = totaraDialogs['savechanges'];
+        var dialog = totaraDialogs.savechanges;
 
         if (dialog.savechanges == true) {
             window.onbeforeunload = null;
@@ -176,7 +179,7 @@ M.totara_programmessages = M.totara_programmessages || {
             dialog.savechanges = true;
             this.hide();
             $('input[name="savechanges"]').trigger('click');
-        }
+        };
 
         return false;
     },
@@ -184,7 +187,7 @@ M.totara_programmessages = M.totara_programmessages || {
     /**
      * Stores the initial values of the form when the page is loaded
      */
-    storeInitialFormValues: function(){
+    storeInitialFormValues: function() {
         var form = $('form[name="form_prog_messages"]');
 
         $('input[type="text"], textarea, select', form).each(function() {
@@ -200,7 +203,7 @@ M.totara_programmessages = M.totara_programmessages || {
     /**
      * Checks if the form is modified by comparing the initial and current values
      */
-    isFormModified: function(){
+    isFormModified: function() {
         var form = $('form[name="form_prog_messages"]');
         var isModified = false;
 
@@ -222,11 +225,11 @@ M.totara_programmessages = M.totara_programmessages || {
         // Check if textareas have been changed
         $('textarea', form).each(function() {
             // See if there's a tiny MCE instance for this text area
-            var instance = undefined;
-            if (typeof(tinyMCE) != 'undefined') {
+            var instance;
+            if (typeof (tinyMCE) != 'undefined') {
                 instance = tinyMCE.getInstanceById($(this).attr('id'));
             }
-            if (instance != undefined  && typeof instance.isDirty == 'function') {
+            if (instance != undefined && typeof instance.isDirty == 'function') {
                 if (instance.isDirty()) {
                     isModified = true;
                 }

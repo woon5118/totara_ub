@@ -21,6 +21,9 @@
  * @package totara
  * @subpackage totara_core
  */
+
+/* eslint-disable no-undef */
+
 M.totara_iconpicker = M.totara_iconpicker || {
 
     Y: null,
@@ -34,7 +37,7 @@ M.totara_iconpicker = M.totara_iconpicker || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
 
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
@@ -56,7 +59,7 @@ M.totara_iconpicker = M.totara_iconpicker || {
 
         // Create a dialog to handle icon selection.
         var btnids = ['show-icon-dialog'];
-        if (!$('#show-icon-dialog').length){
+        if (!$('#show-icon-dialog').length) {
             btnids = [];
             $('.show-icon-dialog').each(function(indx, btnelem) {
                 btnids.push($(btnelem).attr('id'));
@@ -90,17 +93,17 @@ M.totara_iconpicker = M.totara_iconpicker || {
             dialog.close = function() {
                 var id = $(".ui-selected").attr('id');
                 var source = $(".ui-selected > img").attr('src');
-                var data = {'id':id, 'src':source};
+                var data = {'id': id, 'src': source};
                 handler._updatePage(data);
             };
             totaraDialogs['icon-dialog' + suffix] = dialog;
 
             // Render default icon.
             if ($("#src" + suffix).length && $("#src" + suffix).val().length) {
-                id = $("#icon" + suffix).val();
-                src = $("#src" + suffix).val();
+                var id = $("#icon" + suffix).val();
+                var src = $("#src" + suffix).val();
 
-                var data = {'id':id, 'src':src};
+                var data = {'id': id, 'src': src};
                 dialog.handler._updatePage(data);
             }
         });

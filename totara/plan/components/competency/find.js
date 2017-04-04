@@ -23,6 +23,9 @@
  * @package totara
  * @subpackage totara_plan
  */
+
+/* eslint-disable no-undef */
+
 M.totara_plan_competency_find = M.totara_plan_competency_find || {
 
     Y: null,
@@ -38,7 +41,7 @@ M.totara_plan_competency_find = M.totara_plan_competency_find || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
         // save a reference to the Y instance (all of its dependencies included)
         M.totara_plan_competency_find.Y = Y;
 
@@ -57,14 +60,14 @@ M.totara_plan_competency_find = M.totara_plan_competency_find || {
             throw new Error('M.totara_plan_competency_find.init()-> jQuery dependency required for this module to function.');
         }
 
-        require(['totara_plan/component'], function (component) {
+        require(['totara_plan/component'], function(component) {
             component.init(M.totara_plan_competency_find.config);
 
             // Create handler for the dialog
             M.totara_plan_competency_find.totaraDialog_handler_lpCompetency = function() {
                 // Base url
                 var baseurl = '';
-            }
+            };
 
             M.totara_plan_competency_find.totaraDialog_handler_lpCompetency.prototype = new component.totaraDialog_handler_preRequisite();
 
@@ -74,17 +77,18 @@ M.totara_plan_competency_find = M.totara_plan_competency_find || {
              * @return  void
              */
             M.totara_plan_competency_find.totaraDialog_handler_lpCompetency.prototype._open = function() {
-
+                /* eslint-enable no-undef */
                 // Check if user has allow permissions for updating compentencies
                 if (comp_update_allowed) {
                     var buttons = this.continue_buttons;
                 } else {
                     var buttons = this.standard_buttons;
                 }
+                /* eslint-disable no-undef */
 
                 // Reset buttons
                 this._dialog.dialog.dialog('option', 'buttons', buttons);
-            }
+            };
 
 
             /**
@@ -109,7 +113,7 @@ M.totara_plan_competency_find = M.totara_plan_competency_find || {
 
                 // Load url in dialog
                 this._dialog._request(url, {object: this, method: '_continueRender'});
-            }
+            };
 
 
             /**
@@ -140,7 +144,7 @@ M.totara_plan_competency_find = M.totara_plan_competency_find || {
 
                 // Render result
                 return true;
-            }
+            };
 
 
             /**
@@ -160,12 +164,12 @@ M.totara_plan_competency_find = M.totara_plan_competency_find || {
 
                 // Send to server
                 this._dialog._request(url, {object: this, method: '_update'});
-            }
+            };
 
             var url = M.cfg.wwwroot + '/totara/plan/components/competency/';
-            var continueurl = url + 'confirm.php?id='+M.totara_plan_competency_find.config.plan_id+'&update=';
-            var saveurl = url + 'update.php?id='+M.totara_plan_competency_find.config.plan_id+'&update=';
-            var continueskipurl = saveurl + 'id='+M.totara_plan_competency_find.config.plan_id+'&update=';
+            var continueurl = url + 'confirm.php?id=' + M.totara_plan_competency_find.config.plan_id + '&update=';
+            var saveurl = url + 'update.php?id=' + M.totara_plan_competency_find.config.plan_id + '&update=';
+            var continueskipurl = saveurl + 'id=' + M.totara_plan_competency_find.config.plan_id + '&update=';
             var continuesaveurl = url + 'update.php?';
 
             var handler = new M.totara_plan_competency_find.totaraDialog_handler_lpCompetency();
@@ -173,18 +177,18 @@ M.totara_plan_competency_find = M.totara_plan_competency_find || {
             handler.continueskipurl = continueskipurl;
 
             handler.standard_buttons = {};
-            handler.standard_buttons[M.util.get_string('save', 'totara_core')] = function() { handler._save(saveurl) }
-            handler.standard_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() }
+            handler.standard_buttons[M.util.get_string('save', 'totara_core')] = function() { handler._save(saveurl); };
+            handler.standard_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
 
             handler.continue_buttons = {};
-            handler.continue_buttons[M.util.get_string('continue', 'moodle')] = function() { handler._continue(continueurl) }
-            handler.continue_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() }
+            handler.continue_buttons[M.util.get_string('continue', 'moodle')] = function() { handler._continue(continueurl); };
+            handler.continue_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
 
             handler.continuesave_buttons = {};
-            handler.continuesave_buttons[M.util.get_string('save', 'totara_core')] = function() { handler._continueSave(continuesaveurl) }
-            handler.continuesave_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() }
+            handler.continuesave_buttons[M.util.get_string('save', 'totara_core')] = function() { handler._continueSave(continuesaveurl); };
+            handler.continuesave_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
 
-            totaraDialogs['evidence'] = new totaraDialog(
+            totaraDialogs.evidence = new totaraDialog(
                 'assigncompetencies',
                 'show-competency-dialog',
                 {

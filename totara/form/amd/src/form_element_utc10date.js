@@ -78,13 +78,13 @@ define(['jquery', 'totara_form/form', 'totara_form/modernizr'], function($, Form
             var requiredDeferred = $.Deferred();
             deferreds.push(requiredDeferred);
             // Polyfill the required attribute.
-            require(['totara_form/polyfill_required-lazy'], function (poly) {
+            require(['totara_form/polyfill_required-lazy'], function(poly) {
                 poly.init(id);
                 requiredDeferred.resolve();
             });
         }
 
-        if (!Modernizr.inputtypes['date']) {
+        if (!Modernizr.inputtypes.date) {
             var dateDeferred = $.Deferred();
             deferreds.push(dateDeferred);
             // Polyfill the date/time functionality.
@@ -94,10 +94,10 @@ define(['jquery', 'totara_form/form', 'totara_form/modernizr'], function($, Form
             });
         }
 
-        if (this.input.attr('placeholder') && !Modernizr.input.placeholder ) {
+        if (this.input.attr('placeholder') && !Modernizr.input.placeholder) {
             var placeholderDeferred = $.Deferred();
             deferreds.push(placeholderDeferred);
-            require(['totara_form/polyfill_placeholder-lazy'], function (poly) {
+            require(['totara_form/polyfill_placeholder-lazy'], function(poly) {
                 poly.init(id);
                 placeholderDeferred.resolve();
             });

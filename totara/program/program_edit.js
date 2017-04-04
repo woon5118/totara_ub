@@ -19,6 +19,9 @@
  * @package totara
  * @subpackage program
  */
+
+/* eslint-disable no-undef */
+
 M.totara_programedit = M.totara_programedit || {
 
     Y: null,
@@ -32,7 +35,7 @@ M.totara_programedit = M.totara_programedit || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
 
         var module = this;
 
@@ -64,7 +67,7 @@ M.totara_programedit = M.totara_programedit || {
             var selected = $(this);
             var src = $('#program_icon_preview').attr('src');
 
-            src = src.replace(/icon=[^&]*/, 'icon='+selected.val());
+            src = src.replace(/icon=[^&]*/, 'icon=' + selected.val());
 
             $('#program_icon_preview').attr('src', src);
         });
@@ -89,12 +92,12 @@ M.totara_programedit = M.totara_programedit || {
         };
 
         // remove the 'unsaved changes' confirmation when submitting the form
-        $('form[name="form_prog_details"]').submit(function(){
+        $('form[name="form_prog_details"]').submit(function() {
             window.onbeforeunload = null;
         });
 
         // Remove the 'unsaved changes' confirmation when clicking th 'Cancel program management' link
-        $('#cancelprogramedits').click(function(){
+        $('#cancelprogramedits').click(function() {
             window.onbeforeunload = null;
             return true;
         });
@@ -148,11 +151,11 @@ M.totara_programedit = M.totara_programedit || {
         // Check if textareas have been changed
         $('textarea', form).each(function() {
             // See if there's a tiny MCE instance for this text area
-            var instance = undefined;
+            var instance;
             if (typeof tinyMCE != 'undefined') {
                 instance = tinyMCE.getInstanceById($(this).attr('id'));
             }
-            if (instance != undefined  && typeof instance.isDirty == 'function') {
+            if (instance != undefined && typeof instance.isDirty == 'function') {
                 if (instance.isDirty()) {
                     isModified = true;
                 }

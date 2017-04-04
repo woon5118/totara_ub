@@ -21,6 +21,8 @@
  * @subpackage course
  */
 
+/* eslint-disable no-undef */
+
 /**
  * This file contains the Javascript for the dialog that lets you add cohorts
  * to a course
@@ -59,7 +61,7 @@ M.totara_coursecohort = M.totara_coursecohort || {
             throw new Error('M.totara_cohortlearning.init()-> jQuery dependency required for this module.');
         }
 
-        this.config['sesskey'] = M.cfg.sesskey;
+        this.config.sesskey = M.cfg.sesskey;
 
         // Category instance type: coming from COHORT_ASSN_ITEMTYPE_CATEGORY (=40).
         if (this.config.instancetype == 40) {
@@ -68,7 +70,7 @@ M.totara_coursecohort = M.totara_coursecohort || {
             // in the form, not the original value passed in when the
             // page loaded.
             var select = $('select[name="category"] option:selected'),
-                categoryid = (select) ? select.val() : false ;
+                categoryid = (select) ? select.val() : false;
             if (categoryid !== undefined && categoryid != this.config.instanceid) {
                 this.config.instanceid = categoryid;
             }
@@ -88,24 +90,24 @@ M.totara_coursecohort = M.totara_coursecohort || {
         ehandler.baseurl = url;
 
         var dbuttons = {};
-        dbuttons[M.util.get_string('ok', 'moodle')] = function() { ehandler._update() }
-        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel() }
+        dbuttons[M.util.get_string('ok', 'moodle')] = function() { ehandler._update(); };
+        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel(); };
 
-        totaraDialogs['id_cohortsaddenrolled'] = new totaraDialog(
+        totaraDialogs.id_cohortsaddenrolled = new totaraDialog(
             'course-cohorts-enrolled-dialog',
             'id_cohortsaddenrolled',
             {
                 buttons: dbuttons,
                 title: '<h2>' + M.util.get_string('coursecohortsenrolled', 'totara_cohort') + '</h2>'
             },
-            url+'cohort.php?selected=' + this.config.enrolledselected
+            url + 'cohort.php?selected=' + this.config.enrolledselected
                     + '&instancetype=' + this.config.instancetype
                     + '&instanceid=' + this.config.instanceid
                     + '&sesskey=' + this.config.sesskey,
             ehandler
         );
     }  // init_dialogs
-}
+};
 
 
 // Create handler for the dialog
@@ -119,7 +121,7 @@ totaraDialog_handler_coursecohorts = function() {
     this.add_cohort_delete_event_handlers();
 
     this.check_table_hidden_status();
-}
+};
 
 totaraDialog_handler_coursecohorts.prototype = new totaraDialog_handler_treeview_multiselect();
 
@@ -146,7 +148,7 @@ totaraDialog_handler_coursecohorts.prototype._update = function(response) {
 
         // Get id
         var itemid = $(this).attr('id').split('_');
-        itemid = itemid[itemid.length-1];  // The last item is the actual id
+        itemid = itemid[itemid.length - 1];  // The last item is the actual id
         itemid = parseInt(itemid);
 
         if (!self.cohort_item_exists(itemid)) {
@@ -165,28 +167,28 @@ totaraDialog_handler_coursecohorts.prototype._update = function(response) {
                 alert(data.error);
                 return;
             }
-            $.each(data['rows'], function(index, html) {
+            $.each(data.rows, function(index, html) {
                 self.create_item(html);
             });
 
             self._dialog.hide();
-        })
+        });
     } else {
         this._dialog.hide();
     }
-}
+};
 
 /**
  ** Checks if the item id exists in this category
  **/
 totaraDialog_handler_coursecohorts.prototype.cohort_item_exists = function(itemid) {
-    for (x in this.cohort_items) {
+    for (var x in this.cohort_items) {
         if (this.cohort_items[x] == itemid) {
             return true;
         }
     }
     return false;
-}
+};
 
 totaraDialog_handler_coursecohorts.prototype.check_table_hidden_status = function() {
     if (this.cohort_items.length == 0) {
@@ -194,7 +196,7 @@ totaraDialog_handler_coursecohorts.prototype.check_table_hidden_status = functio
     } else {
         $(this.cohort_table).show();
     }
-}
+};
 
 totaraDialog_handler_coursecohorts.prototype.add_cohort_delete_event_handlers = function() {
     // Remove previous click event handlers
@@ -206,7 +208,7 @@ totaraDialog_handler_coursecohorts.prototype.add_cohort_delete_event_handlers = 
         event.preventDefault();
         self.remove_cohort_item(this);
     });
-}
+};
 
 /**
  ** Adds an item
@@ -217,7 +219,7 @@ totaraDialog_handler_coursecohorts.prototype.add_cohort_item = function(itemid) 
     $('input:hidden[name="cohortsenrolled"]').val(this.cohort_items.join(','));
 
     this.check_table_hidden_status();
-}
+};
 
 /**
  ** Creates an element and then adds it
@@ -227,19 +229,19 @@ totaraDialog_handler_coursecohorts.prototype.create_item = function(html) {
 
     // Add the item element to the table
     this.cohort_table.append(element);
-}
+};
 
 totaraDialog_handler_coursecohorts.prototype.remove_cohort_item = function(item) {
     var itemid = $(item).closest('div').attr('id').match(/[\d]+$/);  // get the id part from e.g 'cohort-item-1'
     var row = $(item).closest('tr');
 
     // Remove the item from the array of items
-    this.cohort_items = $.grep(this.cohort_items, function (element, x) {
+    this.cohort_items = $.grep(this.cohort_items, function(element, x) {
         return (element == itemid);
     }, true);
 
     // Remove item from interface
-    row.remove()
+    row.remove();
 
     this.check_table_hidden_status();
 
@@ -248,4 +250,4 @@ totaraDialog_handler_coursecohorts.prototype.remove_cohort_item = function(item)
     var url = this._dialog.default_url.split("selected=");
     var params = url[1].slice(url[1].indexOf('&'));
     this._dialog.default_url = url[0] + 'selected=' + this.cohort_items.join(',') + params;
-}
+};

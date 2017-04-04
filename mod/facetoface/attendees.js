@@ -22,6 +22,8 @@
  * @subpackage facetoface
  */
 
+/* eslint-disable no-undef */
+
 M.totara_f2f_attendees = M.totara_f2f_attendees || {
 
     Y: null,
@@ -37,7 +39,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
         var module = this;
 
         // save a reference to the Y instance (all of its dependencies included)
@@ -48,11 +50,11 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             throw new Error('M.totara_f2f_attendees.init()-> jQuery dependency required for this module to function.');
         }
 
-        $('.selectall').click(function(){
+        $('.selectall').click(function() {
             $('[name="userid"]').prop("checked", true);
         });
 
-        $('.selectnone').click(function(){
+        $('.selectnone').click(function() {
             $('[name="userid"]').prop("checked", false);
         });
 
@@ -81,13 +83,13 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             var newtable = $(response);
             if (M.totara_f2f_attendees.config.approvalreqd == "1") {
                 if ($('<div></div>').append(newtable).find('div.addedattendees').length > 0) {
-                    //find the approval tab
-                    var tab = $('span:contains("' + M.util.get_string('approvalreqd','facetoface') + '")');
+                    // find the approval tab
+                    var tab = $('span:contains("' + M.util.get_string('approvalreqd', 'facetoface') + '")');
                     if (tab.length > 0) {
-                        //remove the nolink class if present and set up the link attributes
+                        // remove the nolink class if present and set up the link attributes
                         tab.parent('a').removeClass('nolink');
                         tab.parent('a').attr("href", M.cfg.wwwroot + '/mod/facetoface/attendees.php?s=' + M.totara_f2f_attendees.config.sessionid + '&action=approvalrequired');
-                        tab.parent('a').attr("title", M.util.get_string('approvalreqd','facetoface'));
+                        tab.parent('a').attr("title", M.util.get_string('approvalreqd', 'facetoface'));
                     }
                 }
             }
@@ -107,7 +109,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             var name = 'bulkaddresults';
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
 
             totaraDialogs[name] = new totaraDialog(
                 name,
@@ -127,9 +129,9 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             $(":checkbox").filter(function() {
                 var selectid = $(this).data('selectid');
                 if (operator == 'EQ') {
-                    return $('#'+selectid).val() == val;
+                    return $('#' + selectid).val() == val;
                 } else {
-                    return $('#'+selectid).val() != val;
+                    return $('#' + selectid).val() != val;
                 }
             }).prop("checked", "true");
         }
@@ -147,10 +149,10 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
 
         // Print notice of operation (boolean: true =>success false=>failure).
         function print_notice(success) {
-            var notice = M.util.get_string('updateattendeessuccessful','facetoface');
+            var notice = M.util.get_string('updateattendeessuccessful', 'facetoface');
             var classname = 'notifysuccess';
             if (!success) {
-                notice = M.util.get_string('updateattendeesunsuccessful','facetoface');
+                notice = M.util.get_string('updateattendeesunsuccessful', 'facetoface');
                 classname = 'notifyproblem';
             }
             $('div#noticeupdate').removeClass('hide').addClass(classname).text(notice);
@@ -175,7 +177,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             var selected = $(this).val();
             set_error(false); // Delete error if any.
 
-            switch(selected) {
+            switch (selected) {
                 case M.totara_f2f_attendees.config.selectall.toString():
                     $('.selectedcheckboxes').prop('checked', true);
                     break;
@@ -205,7 +207,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 $(':checkbox:checked').each(function(index) {
                     idchecked = (this.name).substring(19); // Checkbox id.
                     $(this).val(selected); // Mark value of this checkbox with the selected option.
-                    $('select#menusubmissionid_'+idchecked+' option[value='+selected+']').prop('selected', true);
+                    $('select#menusubmissionid_' + idchecked + ' option[value=' + selected + ']').prop('selected', true);
                 });
             }
         });
@@ -224,20 +226,20 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 return false;
             });
             // Add handler to edit job assignment button.
-            $('a.attendee-edit-job-assignment').on('click', function(){
-                $.get($(this).attr('href'), function(href){
+            $('a.attendee-edit-job-assignment').on('click', function() {
+                $.get($(this).attr('href'), function(href) {
                     editJobAssignmentModalForm(href);
                 });
                 return false;
             });
             // Add handler to view cancellation note.
-            $('a.attendee-cancellation-note').on('click', function(){
-                $.get($(this).attr('href'), function(data){
+            $('a.attendee-cancellation-note').on('click', function() {
+                $.get($(this).attr('href'), function(data) {
                     modalWindow(data);
                 });
                 return false;
             });
-        }
+        };
         this.attachCustomClickEvents();
 
         /**
@@ -248,14 +250,14 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             if (typeof data.error === 'undefined') {
                 bodyContent = data;
             }
-            var dialog = new M.core.dialogue ({
+            var dialog = new M.core.dialogue({
                 headerContent: null,
-                bodyContent  : bodyContent,
-                width        : 500,
-                zIndex       : 5,
-                centered     : true,
-                modal        : true,
-                render       : true
+                bodyContent: bodyContent,
+                width: 500,
+                zIndex: 5,
+                centered: true,
+                modal: true,
+                render: true
             });
             dialog.show();
         }
@@ -269,14 +271,14 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             if (typeof data.error === 'undefined') {
                 bodyContent = data;
             }
-            var dialog = new M.core.dialogue ({
+            var dialog = new M.core.dialogue({
                 headerContent: null,
-                bodyContent  : bodyContent,
-                width        : 500,
-                zIndex       : 5,
-                centered     : true,
-                modal        : true,
-                render       : true
+                bodyContent: bodyContent,
+                width: 500,
+                zIndex: 5,
+                centered: true,
+                modal: true,
+                render: true
             });
             var content = $('#' + dialog.get('id'));
             if (typeof data.error !== 'undefined') {
@@ -292,7 +294,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     apprObj += ('&submitbutton=' + $(this).attr('value'));
                     $.post(form.attr('action'), apprObj).done(function(data) {
                         if (data.result == 'success') {
-                            var span = "#usernote"+data.id;
+                            var span = "#usernote" + data.id;
                             $(span).html(data.usernote);
                             dialog.destroy(true);
                         } else {
@@ -317,12 +319,12 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             this.Y.use('panel', function(Y) {
                 var panel = new Y.Panel({
                     headerContent: null,
-                    bodyContent  : href,
-                    width        : 600,
-                    zIndex       : 5,
-                    centered     : true,
-                    modal        : true,
-                    render       : true
+                    bodyContent: href,
+                    width: 600,
+                    zIndex: 5,
+                    centered: true,
+                    modal: true,
+                    render: true
                 });
                 var $content = $('#' + panel.get('id'));
                 $content.find('input[type="text"]').eq(0).focus();
@@ -330,9 +332,9 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     var $theFrm = $content.find('form.mform');
                     var apprObj = $theFrm.serialize();
                     apprObj += ('&submitbutton=' + $(this).attr('value'));
-                    $.post($theFrm.attr('action'), apprObj).done(function(data){
+                    $.post($theFrm.attr('action'), apprObj).done(function(data) {
                         if (data.result == 'success') {
-                            var span = "#jobassign"+data.id;
+                            var span = "#jobassign" + data.id;
                             $(span).html(data.jobassignmentdisplayname);
                             panel.destroy(true);
                         } else {
@@ -392,9 +394,10 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 var updateusers = [];
                 var i = 0;
                 users.each(function(node) {
-                    if (checkbox = node.one('input[type=checkbox]')) {
+                    var checkbox = node.one('input[type=checkbox]');
+                    if (checkbox) {
                         if (checkbox._node.checked) {
-                            userid = checkbox.get('value');
+                            var userid = checkbox.get('value');
                             updateusers[i] = userid;
                             i++;
                         }
@@ -402,14 +405,14 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 });
 
                 if (updateusers.length == 0) {
-                    Y.use('panel', function (Y) {
+                    Y.use('panel', function(Y) {
                         var config = {
                             headerContent: M.util.get_string('updatewaitlist', 'facetoface'),
-                            bodyContent: M.util.get_string('waitlistselectoneormoreusers','facetoface'),
+                            bodyContent: M.util.get_string('waitlistselectoneormoreusers', 'facetoface'),
                             draggable: true,
                             modal: true
                         };
-                        dialog = new M.core.dialogue(config);
+                        var dialog = new M.core.dialogue(config);
 
                         dialog.addButton({
                             label: M.util.get_string('close', 'facetoface'),
@@ -464,7 +467,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                         sesskey: M.totara_f2f_attendees.config.sesskey
                     },
                     on: {
-                        success: function (x, o) {
+                        success: function(x, o) {
                             var parsedResponse;
                             // protected against malformed JSON response
                             try {
@@ -475,14 +478,14 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                             }
 
                             if (parsedResponse.result == 'overcapacity') {
-                                Y.use('moodle-core-notification-confirm', function () {
+                                Y.use('moodle-core-notification-confirm', function() {
                                     var confirm = new M.core.confirm({
                                         title: M.util.get_string('confirm', 'moodle'),
                                         question: M.util.get_string('areyousureconfirmwaitlist', 'facetoface'),
                                         yesLabel: M.util.get_string('yes', 'moodle'),
                                         noLabel: M.util.get_string('cancel', 'moodle')
                                     });
-                                    confirm.on('complete-yes', function () {
+                                    confirm.on('complete-yes', function() {
                                         confirm.hide();
                                         confirm.destroy();
                                         update_waitlist(nextaction, updateusers, true);
@@ -497,7 +500,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                             if (parsedResponse.result == 'success') {
                                 var attendees = parsedResponse.attendees;
 
-                                $('input[name=userid]').each(function (index, elem) {
+                                $('input[name=userid]').each(function(index, elem) {
                                     var userid = parseInt(elem.value);
                                     if (attendees.indexOf(userid) > -1) {
                                         $('input[name=userid][value=' + userid + ']').parents('tr').remove();
@@ -507,7 +510,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                                 print_notice(true);
                             }
                         },
-                        failure: function () {
+                        failure: function() {
                             print_notice(false);
                         }
                     }
@@ -515,14 +518,14 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             }
 
             if (action == 'playlottery') {
-                Y.use('panel', function (Y) {
+                Y.use('panel', function(Y) {
                     var config = {
                         headerContent: M.util.get_string('confirmlotteryheader', 'facetoface'),
-                        bodyContent: M.util.get_string('confirmlotterybody','facetoface'),
+                        bodyContent: M.util.get_string('confirmlotterybody', 'facetoface'),
                         draggable: true,
                         modal: true,
                     };
-                    dialogue = new M.core.dialogue(config);
+                    var dialogue = new M.core.dialogue(config);
                     dialogue.addButton({
                         label: M.util.get_string('ok', 'moodle'),
                         section: Y.WidgetStdMod.FOOTER,
@@ -558,6 +561,6 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             $('form#assignform input[name=remove]').attr('disabled', 'disabled');
             $('form#assignform input[name=add]').removeAttr('disabled');
             $('#removeselect').val(-1);
-        })
+        });
     }
-}
+};

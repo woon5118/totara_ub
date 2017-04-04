@@ -19,6 +19,9 @@
  * @package totara
  * @subpackage totara_feedback360
  */
+
+/* eslint-disable no-undef */
+
 $(document).ready(function() {
     var elements = document.getElementsByClassName('system_record_del');
     var index;
@@ -27,7 +30,7 @@ $(document).ready(function() {
     }
 });
 
-$(document).on('click', '.system_record_del', function (event) {
+$(document).on('click', '.system_record_del', function(event) {
     event.preventDefault();
     var userid = this.id;
     var sysnew = $('input[name="systemnew"]');
@@ -49,7 +52,7 @@ $(document).on('click', '.system_record_del', function (event) {
     sysnew.val(newval.join(','));
 });
 
-$(document).on('click', '.external_record_del', function (event) {
+$(document).on('click', '.external_record_del', function(event) {
     event.preventDefault();
 
     var email = this.id;

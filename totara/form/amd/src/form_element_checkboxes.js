@@ -29,7 +29,7 @@
 define(['jquery', 'totara_form/form'], function($, Form) {
 
     var ERROR_CONTAINER_CLASS = 'totara_form-error-container',
-        ERROR_CONTAINER_SELECTOR = '.'+ERROR_CONTAINER_CLASS;
+        ERROR_CONTAINER_SELECTOR = '.' + ERROR_CONTAINER_CLASS;
 
     /**
      * Checkboxes element
@@ -142,13 +142,13 @@ define(['jquery', 'totara_form/form'], function($, Form) {
             e.preventDefault();
             if (!this.validationerroradded) {
                 this.validationerroradded = true;
-                require(['core/templates', 'core/str', 'core/config'], function (templates, mdlstrings, mdlconfig) {
-                    mdlstrings.get_string('required','core').done(function (requiredstring) {
+                require(['core/templates', 'core/str', 'core/config'], function(templates, mdlstrings, mdlconfig) {
+                    mdlstrings.get_string('required', 'core').done(function(requiredstring) {
                         var context = {
                             errors_has_items: true,
                             errors: [{message: requiredstring}]
                         };
-                        templates.render('totara_form/validation_errors', context, mdlconfig.theme).done(function (template) {
+                        templates.render('totara_form/validation_errors', context, mdlconfig.theme).done(function(template) {
                             container.prepend(template);
                         });
                     });

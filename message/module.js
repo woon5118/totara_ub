@@ -12,7 +12,7 @@ M.core_message.init_refresh_page = function(Y, delay, url) {
 };
 
 M.core_message.combinedsearchgotfocus = function(e) {
-    if (e.target.get('value')==this.defaultsearchterm) {
+    if (e.target.get('value') == this.defaultsearchterm) {
         e.target.select();
     }
 };
@@ -20,7 +20,7 @@ M.core_message.combinedsearchgotfocus = function(e) {
 M.core_message.init_defaultoutputs = function(Y) {
     var defaultoutputs = {
 
-        init : function() {
+        init: function() {
             Y.all('#defaultmessageoutputs select').each(function(node) {
                 // attach event listener
                 node.on('change', defaultoutputs.changeState);
@@ -35,7 +35,7 @@ M.core_message.init_defaultoutputs = function(Y) {
             }, this);
         },
 
-        changeState : function(e) {
+        changeState: function(e) {
             var value = e.target._node.options[e.target.get('selectedIndex')].value;
             var parentnode = e.target.ancestor('td');
             switch (value) {
@@ -51,20 +51,20 @@ M.core_message.init_defaultoutputs = function(Y) {
             }
         },
 
-        updateCheckboxes : function(blocknode, disabled, checked) {
+        updateCheckboxes: function(blocknode, disabled, checked) {
             blocknode.all('input[type=checkbox]').each(function(node) {
                 node.removeAttribute('disabled');
                 if (disabled) {
-                    node.setAttribute('disabled', 1)
+                    node.setAttribute('disabled', 1);
                     node.removeAttribute('checked');
                 }
                 if (checked) {
-                    node.setAttribute('checked', 1)
+                    node.setAttribute('checked', 1);
                 }
             }, this);
         },
 
-        changeProviderState : function(e) {
+        changeProviderState: function(e) {
             var isenabled = e.target.get('checked') || undefined;
             var parentnode = e.target.ancestor('tr');
             if (!isenabled) {
@@ -83,31 +83,31 @@ M.core_message.init_defaultoutputs = function(Y) {
                 parentnode.removeClass('dimmed_text');
             }
         }
-    }
+    };
 
     defaultoutputs.init();
-}
+};
 
 M.core_message.init_editsettings = function(Y) {
     var editsettings = {
 
-        init : function() {
+        init: function() {
             var disableall = Y.one(".disableallcheckbox");
             disableall.on('change', editsettings.changeState);
             disableall.simulate("change");
         },
 
-        changeState : function(e) {
+        changeState: function(e) {
             Y.all('.notificationpreference').each(function(node) {
                 var disabled = e.target.get('checked');
 
                 node.removeAttribute('disabled');
                 if (disabled) {
-                    node.setAttribute('disabled', 1)
+                    node.setAttribute('disabled', 1);
                 }
             }, this);
         }
-    }
+    };
 
     editsettings.init();
-}
+};

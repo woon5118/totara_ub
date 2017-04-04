@@ -21,7 +21,8 @@
  * @subpackage totara_reportbuilder
  */
 
-var SVGNS = 'http://www.w3.org/2000/svg', XLINKNS = 'http://www.w3.org/1999/xlink';
+var SVGNS = 'http://www.w3.org/2000/svg',
+XLINKNS = 'http://www.w3.org/1999/xlink';
 
 M.totara_reportbuilder_verticaltableheadings = M.totara_reportbuilder_verticaltableheadings || {
     Y: null,
@@ -60,7 +61,7 @@ M.totara_reportbuilder_verticaltableheadings = M.totara_reportbuilder_verticalta
             }
         }
 
-        function make_svg (thEl, anchor) {
+        function make_svg(thEl, anchor) {
             var aEl = thEl.firstChild;
             var anonTextEl = aEl.firstChild;
             var string = anonTextEl.nodeValue;
@@ -86,7 +87,7 @@ M.totara_reportbuilder_verticaltableheadings = M.totara_reportbuilder_verticalta
             svg.appendChild(text);
             if (right_to_left()) {
                 text.setAttribute('x', 0);
-                text.setAttribute('y', - 2 * textHeight / 4);
+                text.setAttribute('y', -2 * textHeight / 4);
                 text.setAttribute('text-anchor', 'end');
                 text.setAttribute('transform', 'rotate(90)');
             } else {
@@ -96,12 +97,12 @@ M.totara_reportbuilder_verticaltableheadings = M.totara_reportbuilder_verticalta
                 text.setAttribute('transform', 'rotate(270)');
             }
             // Copy style from <a> element. More properties can be found using "console.log(window.getComputedStyle(aEl, null));".
-            text.setAttributeNS(null,"font-family", getStyleProp(aEl, 'font-family'));
-            text.setAttributeNS(null,"font-style", getStyleProp(aEl, 'font-style'));
-            text.setAttributeNS(null,"font-variant", getStyleProp(aEl, 'font-variant'));
-            text.setAttributeNS(null,"font-weight", getStyleProp(aEl, 'font-weight'));
-            text.setAttributeNS(null,"font-size", getStyleProp(aEl, 'font-size'));
-            text.setAttributeNS(null,"fill", getStyleProp(aEl, 'color'));
+            text.setAttributeNS(null, "font-family", getStyleProp(aEl, 'font-family'));
+            text.setAttributeNS(null, "font-style", getStyleProp(aEl, 'font-style'));
+            text.setAttributeNS(null, "font-variant", getStyleProp(aEl, 'font-variant'));
+            text.setAttributeNS(null, "font-weight", getStyleProp(aEl, 'font-weight'));
+            text.setAttributeNS(null, "font-size", getStyleProp(aEl, 'font-size'));
+            text.setAttributeNS(null, "fill", getStyleProp(aEl, 'color'));
             text.appendChild(document.createTextNode(string));
 
             // Is there an icon near the text?
@@ -111,7 +112,7 @@ M.totara_reportbuilder_verticaltableheadings = M.totara_reportbuilder_verticalta
                 var image = document.createElementNS(SVGNS, 'image');
                 var iconx = aEl.offsetHeight / 4;
                 if (iconx > width - 16)
-                    iconx = width - 16;
+                    { iconx = width - 16; }
                 if (right_to_left()) {
                     image.setAttribute('x', iconx + 4);
                 } else {
@@ -130,13 +131,13 @@ M.totara_reportbuilder_verticaltableheadings = M.totara_reportbuilder_verticalta
         }
 
         // Get the current computed style of an element.
-        function getStyleProp(elem, prop){
-            if(window.getComputedStyle)
-                return window.getComputedStyle(elem, null).getPropertyValue(prop);
-            else if(elem.currentStyle)
-                return elem.currentStyle[prop]; // IE.
+        function getStyleProp(elem, prop) {
+            if (window.getComputedStyle)
+                { return window.getComputedStyle(elem, null).getPropertyValue(prop); }
+            else if (elem.currentStyle)
+                { return elem.currentStyle[prop]; } // IE.
         }
 
     }
 
-}
+};

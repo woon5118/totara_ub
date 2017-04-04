@@ -20,6 +20,8 @@
  * @package mod_facetoface
  */
 
+/* eslint-disable no-undef */
+
 define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
     var addRemove = {
 
@@ -113,7 +115,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
                     // Filter.
                     $('#removeselect option').each(function(ind, elem) {
                         var $elem = $(elem);
-                        if($elem.text().search(value) !== -1) {
+                        if ($elem.text().search(value) !== -1) {
                             $elem.show();
                         } else {
                             $elem.hide();
@@ -133,7 +135,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
             });
         },
 
-        setupResultsDialog: function (viewresultslink, sessionid, listid) {
+        setupResultsDialog: function(viewresultslink, sessionid, listid) {
             // Work around to re-add id that was cleaned out when link added as part of a notification.
             viewresultslink.attr('id', 'viewbulkresults');
 
@@ -141,7 +143,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
             requiredstrings.push({key: 'bulkaddattendeesresults', component: 'facetoface'});
             requiredstrings.push({key: 'closebuttontitle', component: 'moodle'});
 
-            mdlstrings.get_strings(requiredstrings).done(function (strings) {
+            mdlstrings.get_strings(requiredstrings).done(function(strings) {
 
                 var handler = new totaraDialog_handler();
 
@@ -151,7 +153,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
                 }
                 var name = 'bulkaddvalidation';
                 var buttons = {};
-                buttons[tstr.closebuttontitle] = function () {
+                buttons[tstr.closebuttontitle] = function() {
                     handler._cancel();
                 };
                 totaraDialogs[name] = new totaraDialog(

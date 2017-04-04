@@ -21,14 +21,17 @@
  * @package totara
  * @subpackage program
  */
+
+/* eslint-disable no-undef */
+
 M.totara_programview = M.totara_programview || {
 
     Y: null,
     // optional php params and defaults defined here, args passed to init method
     // below will override these values
     config: {
-        userid:'',
-        user_fullname:''
+        userid: '',
+        user_fullname: ''
     },
 
     totaraDialog_extension: null,
@@ -39,7 +42,7 @@ M.totara_programview = M.totara_programview || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
 
         var module = this;
 
@@ -74,13 +77,13 @@ M.totara_programview = M.totara_programview || {
 
         totaraDialog_extension_handler.prototype.first_load = function() {
             M.totara_core.build_datepicker(Y, 'input[name="extensiontime"]', M.util.get_string('datepickerlongyeardisplayformat', 'totara_core'));
-            $('#ui-datepicker-div').css('z-index',1600);
-        }
+            $('#ui-datepicker-div').css('z-index', 1600);
+        };
 
         totaraDialog_extension_handler.prototype.every_load = function() {
             // rebind placeholder for date picker
             $('input[placeholder], textarea[placeholder]').placeholder();
-        }
+        };
 
         // Adapt the handler's save function
         totaraDialog_extension_handler.prototype._save = function() {
@@ -96,7 +99,7 @@ M.totara_programview = M.totara_programview || {
 
             if (dateformat.test(extensiontime) == false) {
                 alert(M.util.get_string('pleaseentervaliddate', 'totara_program', M.util.get_string('datepickerlongyearplaceholder', 'totara_core')));
-            } else if (extensionreason=='') {
+            } else if (extensionreason == '') {
                 alert(M.util.get_string('pleaseentervalidreason', 'totara_program'));
             } else {
                 success = true;
@@ -122,12 +125,12 @@ M.totara_programview = M.totara_programview || {
                 });
                 this._dialog.hide();
             }
-        }
+        };
 
         // Define the extension request dialog
         this.totaraDialog_extension = function() {
 
-            this.url = M.cfg.wwwroot + '/totara/program/view/set_extension.php?id='+module.config.id+'&amp;userid='+module.config.userid;
+            this.url = M.cfg.wwwroot + '/totara/program/view/set_extension.php?id=' + module.config.id + '&amp;userid=' + module.config.userid;
 
             // Setup the handler
             var handler = new totaraDialog_extension_handler();
@@ -146,7 +149,7 @@ M.totara_programview = M.totara_programview || {
             'unused', // buttonid unused
             {
                 buttons: buttonsObj,
-                title: '<h2>'+M.util.get_string('extensionrequest', 'totara_program', module.config.user_fullname)+'</h2>'
+                title: '<h2>' + M.util.get_string('extensionrequest', 'totara_program', module.config.user_fullname) + '</h2>'
             },
             this.url,
             handler
@@ -156,15 +159,15 @@ M.totara_programview = M.totara_programview || {
             this.open = function() {
             this.old_open();
             this.dialog.height(150);
-            }
+            };
 
-        }
+        };
 
-        totaraDialogs['extension'] = new this.totaraDialog_extension();
+        totaraDialogs.extension = new this.totaraDialog_extension();
 
         // Bind the extension request dialog to the 'Request an extension' link
         $('a#extrequestlink').click(function() {
-            totaraDialogs['extension'].open();
+            totaraDialogs.extension.open();
             return false;
         });
     },

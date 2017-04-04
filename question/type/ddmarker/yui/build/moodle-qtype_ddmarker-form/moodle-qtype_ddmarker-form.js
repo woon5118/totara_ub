@@ -50,7 +50,7 @@ Y.extend(DDMARKER_FORM, M.qtype_ddmarker.dd_base_class, {
         this.load_bg_image();
 
         var topnode = Y.one(this.get('topnode'));
-        topnode.one('.grid').on('mousemove', function (e) {
+        topnode.one('.grid').on('mousemove', function(e) {
             var img = topnode.one('.dropbackground');
             var x = Math.round(Number(e.pageX) - img.getX() - 1);
             var y = Math.round(Number(e.pageY) - img.getY() - 1);

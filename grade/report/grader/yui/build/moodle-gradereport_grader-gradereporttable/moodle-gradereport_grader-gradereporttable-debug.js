@@ -943,7 +943,7 @@ FloatingHeaders.prototype = {
 
         // Header position.
         // TL-9079: this causes the grader report headings to be based off the page left instead of element left
-        //gradeItemHeadingContainerStyles.left = this._getRelativeXFromX(this.headerRow.getX());
+        // gradeItemHeadingContainerStyles.left = this._getRelativeXFromX(this.headerRow.getX());
         if (Y.config.win.pageYOffset + this.pageHeaderHeight > this.headerRowTop) {
             headerFloats = true;
             if (Y.config.win.pageYOffset + this.pageHeaderHeight < this.lastUserCellTop) {

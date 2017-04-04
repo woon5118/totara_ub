@@ -32,6 +32,8 @@
  */
 define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_strings) {
 
+    /* global increment_filename build_querystring */
+
     M.totara_form = M.totara_form || {};
     M.totara_form.element_filemanager = M.totara_form.element_filemanager || {};
     M.totara_form.element_filemanager.templates = M.totara_form.element_filemanager.templates || {};
@@ -82,7 +84,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 this.filemanager = Y.one('#filemanager-' + options.client_id);
                 if (this.filemanager.hasClass('filemanager-container') || !this.filemanager.one('.filemanager-container')) {
                     this.dndcontainer = this.filemanager;
-                } else  {
+                } else {
                     this.dndcontainer = this.filemanager.one('.filemanager-container');
                     if (!this.dndcontainer.get('id')) {
                         this.dndcontainer.generateID();
@@ -102,13 +104,13 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
 
                 var labelid = 'fm-dialog-label_' + this.selectnode.get('id');
                 this.selectui = new M.core.dialogue({
-                    draggable    : true,
+                    draggable: true,
                     headerContent: '<h3 id="' + labelid + '">' + M.util.get_string('edit', 'moodle') + '</h3>',
-                    bodyContent  : this.selectnode,
-                    centered     : true,
-                    width        : '480px',
-                    modal        : true,
-                    visible      : false
+                    bodyContent: this.selectnode,
+                    centered: true,
+                    width: '480px',
+                    modal: true,
+                    visible: false
                 });
                 Y.one('#' + this.selectnode.get('id')).setAttribute('aria-labelledby', labelid);
                 this.selectui.hide();
@@ -116,7 +118,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 // Setup buttons onclick events.
                 this.setup_buttons();
                 // Set event handler for lazy loading of thumbnails.
-                this.filemanager.one('.fp-content').on(['scroll','resize'], this.content_scrolled, this);
+                this.filemanager.one('.fp-content').on(['scroll', 'resize'], this.content_scrolled, this);
                 // Display files.
                 this.viewmode = 1;
                 this.filemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked');
@@ -147,7 +149,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 var cfg = {
                     method: 'POST',
                     on: {
-                        complete: function(id,o,p) {
+                        complete: function(id, o, p) {
                             if (!o) {
                                 if (window.console.log) {
                                     window.console.log('IO FATAL');
@@ -157,7 +159,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                             var data = null;
                             try {
                                 data = Y.JSON.parse(o.responseText);
-                            } catch(e) {
+                            } catch (e) {
                                 scope.print_msg(M.util.get_string('invalidjson', 'repository'), 'error');
                                 Y.error(M.util.get_string('invalidjson', 'repository') + ":\n" + o.responseText);
                                 return;
@@ -165,7 +167,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                             if (data && data.tree && scope.set_current_tree) {
                                 scope.set_current_tree(data.tree);
                             }
-                            args.callback(id,data,p);
+                            args.callback(id, data, p);
                         }
                     },
                     arguments: {
@@ -216,7 +218,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 this.request({
                     action: 'list',
                     scope: scope,
-                    params: {'filepath' : filepath},
+                    params: {'filepath': filepath},
                     callback: function(id, obj, args) {
                         scope.filecount = obj.filecount;
                         scope.options = obj;
@@ -238,11 +240,11 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     var nodeid = this.msg_dlg_node.generateID();
 
                     this.msg_dlg = new M.core.dialogue({
-                        draggable    : true,
-                        bodyContent  : this.msg_dlg_node,
-                        centered     : true,
-                        modal        : true,
-                        visible      : false
+                        draggable: true,
+                        bodyContent: this.msg_dlg_node,
+                        centered: true,
+                        modal: true,
+                        visible: false
                     });
                     this.msg_dlg_node.one('.fp-msg-butok').on('click', function(e) {
                         e.preventDefault();
@@ -259,12 +261,12 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 return this.filemanager.ancestor('.fitem.disabled') !== null;
             },
             is_frozen: function() {
-                return this.options.frozen || this.filemanager.ancestor('[data-element-frozen="1"]') !== null
+                return this.options.frozen || this.filemanager.ancestor('[data-element-frozen="1"]') !== null;
             },
             setup_buttons: function() {
                 var button_download = this.filemanager.one('.fp-btn-download');
-                var button_create   = this.filemanager.one('.fp-btn-mkdir');
-                var button_addfile  = this.filemanager.one('.fp-btn-add');
+                var button_create = this.filemanager.one('.fp-btn-mkdir');
+                var button_addfile = this.filemanager.one('.fp-btn-add');
 
                 // Setup 'add file' button.
                 if (!this.is_frozen()) {
@@ -286,7 +288,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
 
                 // Setup 'make a folder' button.
                 if (this.options.subdirs && !this.is_frozen()) {
-                    button_create.on('click',function(e) {
+                    button_create.on('click', function(e) {
                         e.preventDefault();
                         if (this.is_disabled() || this.is_frozen()) {
                             return;
@@ -301,9 +303,9 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                                 return;
                             }
                             scope.request({
-                                action : 'mkdir',
-                                params : {filepath : scope.currentpath, newdirname : foldername},
-                                callback : function(id, obj, args) {
+                                action: 'mkdir',
+                                params: {filepath: scope.currentpath, newdirname: foldername},
+                                callback: function(id, obj, args) {
                                     var filepath = obj.filepath;
                                     scope.mkdir_dialog.hide();
                                     scope.refresh(filepath);
@@ -329,11 +331,11 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                         if (!this.mkdir_dialog) {
                             var node = Y.Node.createWithFilesSkin(M.totara_form.element_filemanager.templates.mkdir);
                             this.mkdir_dialog = new M.core.dialogue({
-                                draggable    : true,
-                                bodyContent  : node,
-                                centered     : true,
-                                modal        : true,
-                                visible      : false
+                                draggable: true,
+                                bodyContent: node,
+                                centered: true,
+                                modal: true,
+                                visible: false
                             });
                             node.one('.fp-dlg-butcreate').set('id', 'fm-mkdir-butcreate-' + this.client_id).on('click',
                                 perform_action, this);
@@ -348,7 +350,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                             }, this);
 
                             node.one('label').set('for', 'fm-newname-' + this.client_id);
-                            node.all('.fp-dlg-butcancel').on('click', function(e){
+                            node.all('.fp-dlg-butcancel').on('click', function(e) {
                                 e.preventDefault();
                                 this.mkdir_dialog.hide();
                             }, this);
@@ -375,7 +377,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 }
 
                 // Setup 'download this folder' button.
-                button_download.on('click',function(e) {
+                button_download.on('click', function(e) {
                     e.preventDefault();
                     if (this.is_disabled()) {
                         return;
@@ -399,9 +401,9 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                             if (obj) {
                                 scope.refresh(obj.filepath);
                                 var node = Y.Node.create('<iframe></iframe>').setStyles({
-                                    visibility : 'hidden',
-                                    width : '1px',
-                                    height : '1px'
+                                    visibility: 'hidden',
+                                    width: '1px',
+                                    height: '1px'
                                 });
                                 node.set('src', obj.fileurl);
                                 Y.one('body').appendChild(node);
@@ -433,7 +435,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 }, this);
             },
 
-            show_filepicker: function (e) {
+            show_filepicker: function(e) {
                 e.preventDefault();
                 if (this.is_disabled() || this.is_frozen()) {
                     // Don't show the file picker if this is disabled or frozen.
@@ -451,7 +453,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 var p = this.options.path;
                 this.pathbar.setContent('').addClass('empty');
                 if (p && p.length !== 0 && this.viewmode != 2) {
-                    for(var i = 0; i < p.length; i ++) {
+                    for (var i = 0; i < p.length; i++) {
                         var el = this.pathnode.cloneNode(true);
                         this.pathbar.appendChild(el);
 
@@ -499,9 +501,9 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     node.fileinfo.filename = '.';
                 }
                 this.request({
-                    action : 'list',
-                    params : {filepath : node.path ? node.path : ''},
-                    scope : this,
+                    action: 'list',
+                    params: {filepath: node.path ? node.path : ''},
+                    scope: this,
                     callback: function(id, obj, args) {
                         var list = obj.list,
                             scope = args.scope,
@@ -518,7 +520,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                         node.origlist = obj.list ? obj.list : null;
                         node.origpath = obj.path ? obj.path : null;
                         node.children = [];
-                        for(k in list) {
+                        for (k in list) {
                             if (list[k].type == 'folder' && retrieved_children[list[k].filepath]) {
                                 // If this child is a folder and has already been retrieved.
                                 retrieved_children[list[k].filepath].fileinfo = list[k];
@@ -541,7 +543,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
             },
             content_scrolled: function(e) {
                 setTimeout(Y.bind(function() {
-                    if (this.processingimages) {return;}
+                    if (this.processingimages) { return; }
                     this.processingimages = true;
                     var scope = this,
                         fpcontent = this.filemanager.one('.fp-content'),
@@ -556,7 +558,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                         };
                     // Replace src for visible images that need to be lazy-loaded.
                     if (scope.lazyloading) {
-                        fpcontent.all('img').each( function(node) {
+                        fpcontent.all('img').each(function(node) {
                             if (node.get('id') && scope.lazyloading[node.get('id')] && is_node_visible(node)) {
                                 node.setImgRealSrc(scope.lazyloading);
                             }
@@ -580,11 +582,11 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     element_template = Y.Node.create(M.totara_form.element_filemanager.templates.iconfilename);
                 }
                 var options = {
-                    viewmode : this.viewmode,
-                    appendonly : appendfiles !== null,
-                    filenode : element_template,
-                    callbackcontext : this,
-                    callback : function(e, node) {
+                    viewmode: this.viewmode,
+                    appendonly: appendfiles !== null,
+                    filenode: element_template,
+                    callbackcontext: this,
+                    callback: function(e, node) {
                         if (e.preventDefault) { e.preventDefault(); }
                         if (node.type == 'folder') {
                             this.refresh(node.filepath);
@@ -592,11 +594,11 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                             this.select_file(node);
                         }
                     },
-                    rightclickcallback : function(e, node) {
+                    rightclickcallback: function(e, node) {
                         if (e.preventDefault) { e.preventDefault(); }
                         this.select_file(node);
                     },
-                    classnamecallback : function(node) {
+                    classnamecallback: function(node) {
                         var classname = '';
                         if (node.type == 'folder' || (!node.type && !node.filename)) {
                             classname = classname + ' fp-folder';
@@ -613,7 +615,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                         if (node.originalmissing) {
                             classname = classname + ' fp-originalmissing';
                         }
-                        if (node.sortorder == 1) { classname = classname + ' fp-mainfile';}
+                        if (node.sortorder == 1) { classname = classname + ' fp-mainfile'; }
                         return Y.Lang.trim(classname);
                     }
                 };
@@ -624,7 +626,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     options.norootrightclick = true;
                     options.callback = function(e, node) {
                         // TODO MDL-32736 e is not an event here but an object with properties 'event' and 'node'.
-                        if (!node.fullname) {return;}
+                        if (!node.fullname) { return; }
                         if (node.type != 'folder') {
                             if (e.node.parent && e.node.parent.origpath) {
                                 // Set the current path.
@@ -664,7 +666,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
             },
             set_current_tree: function(tree) {
                 var appendfilepaths = function(list, node) {
-                    if (!node || !node.children || !node.children.length) {return;}
+                    if (!node || !node.children || !node.children.length) { return; }
                     for (var i in node.children) {
                         list[list.length] = node.children[i].filepath;
                         appendfilepaths(list, node.children[i]);
@@ -704,7 +706,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 var licensechanged = (newlicense != fileinfo.license);
 
                 var params, action;
-                var dialog_options = {callback : this.update_file, callbackargs : [true], scope : this};
+                var dialog_options = {callback: this.update_file, callbackargs: [true], scope: this};
                 if (fileinfo.type == 'folder') {
                     if (!newfilename) {
                         this.print_msg(M.util.get_string('entername', 'repository'), 'error');
@@ -716,7 +718,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                             this.show_confirm_dialog(dialog_options);
                             return;
                         }
-                        params = {filepath : fileinfo.filepath, newdirname : newfilename, newfilepath : targetpath};
+                        params = {filepath: fileinfo.filepath, newdirname: newfilename, newfilepath: targetpath};
                         action = 'updatedir';
                     }
                 } else {
@@ -730,9 +732,9 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                         return;
                     }
                     if (filenamechanged || filepathchanged || licensechanged || authorchanged) {
-                        params = {filepath : fileinfo.filepath, filename : fileinfo.fullname,
-                            newfilename : newfilename, newfilepath : targetpath,
-                            newlicense : newlicense, newauthor : newauthor};
+                        params = {filepath: fileinfo.filepath, filename: fileinfo.fullname,
+                            newfilename: newfilename, newfilepath: targetpath,
+                            newlicense: newlicense, newauthor: newauthor};
                         action = 'updatefile';
                     }
                 }
@@ -771,12 +773,12 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     var node = this.confirm_dlg_node;
                     node.generateID();
                     this.confirm_dlg = new M.core.dialogue({
-                        draggable    : true,
-                        bodyContent  : node,
-                        centered     : true,
-                        modal        : true,
-                        visible      : false,
-                        buttons      : {}
+                        draggable: true,
+                        bodyContent: node,
+                        centered: true,
+                        modal: true,
+                        visible: false,
+                        buttons: {}
                     });
                     var handle_confirm = function(ev) {
                         var dlgopt = this.confirm_dlg.dlgopt;
@@ -804,7 +806,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
             setup_select_file: function() {
                 var selectnode = this.selectnode;
                 // Bind labels with corresponding inputs.
-                selectnode.all('.fp-saveas,.fp-path,.fp-author,.fp-license').each(function (node) {
+                selectnode.all('.fp-saveas,.fp-path,.fp-author,.fp-license').each(function(node) {
                     node.all('label').set('for', node.one('input,select').generateID());
                 });
                 this.populate_licenses_select(selectnode.one('.fp-license select'));
@@ -832,11 +834,11 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     if (btn_setmain) {
                         btn_setmain.hide();
                     }
-                    selectnode.all('form input').each(function(){
+                    selectnode.all('form input').each(function() {
                         this.setAttribute('readonly', 'readonly');
                     });
-                    selectnode.all('form select').each(function(){
-                        this.setAttribute('disabled', 'disabled')
+                    selectnode.all('form select').each(function() {
+                        this.setAttribute('disabled', 'disabled');
                     });
                 } else {
                     btn_update.on('click', function(e) {
@@ -863,7 +865,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                         } else {
                             params.filename = fileinfo.fullname;
                             if (fileinfo.refcount) {
-                                dialog_options.message = M.util.get_string('confirmdeletefilewithhref', 'repository',fileinfo.refcount);
+                                dialog_options.message = M.util.get_string('confirmdeletefilewithhref', 'repository', fileinfo.refcount);
                             } else {
                                 dialog_options.message = M.util.get_string('confirmdeletefile', 'repository');
                             }
@@ -956,9 +958,9 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     e.preventDefault();
                     if (this.selectui.fileinfo.type != 'folder') {
                         var node = Y.Node.create('<iframe></iframe>').setStyles({
-                            visibility : 'hidden',
-                            width : '1px',
-                            height : '1px'
+                            visibility: 'hidden',
+                            width: '1px',
+                            height: '1px'
                         });
                         node.set('src', this.selectui.fileinfo.url);
                         Y.one('body').appendChild(node);
@@ -1002,7 +1004,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                 selectnode.all('.fp-license select option[selected]').set('selected', false);
                 selectnode.all('.fp-license select option[value=' + node.license + ']').set('selected', true);
                 selectnode.all('.fp-path select option[selected]').set('selected', false);
-                selectnode.all('.fp-path select option').each(function(el){
+                selectnode.all('.fp-path select option').each(function(el) {
                     if (el.get('value') == foldername) {
                         el.set('selected', true);
                     }
@@ -1011,11 +1013,11 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     selectnode.all('.fp-author input').setAttribute('readonly', 'readonly');
                     selectnode.all('.fp-license select').setAttribute('disabled', 'disabled');
                 } else {
-                    selectnode.all('.fp-author input').setAttribute('readonly',(node.type == 'folder') ? 'readonly' : '');
-                    selectnode.all('.fp-license select').setAttribute('disabled',(node.type == 'folder') ? 'disabled' : '');
+                    selectnode.all('.fp-author input').setAttribute('readonly', (node.type == 'folder') ? 'readonly' : '');
+                    selectnode.all('.fp-license select').setAttribute('disabled', (node.type == 'folder') ? 'disabled' : '');
                 }
                 // Display static information about a file (when known).
-                var attrs = ['datemodified','datecreated','size','dimensions','original','reflist'];
+                var attrs = ['datemodified', 'datecreated', 'size', 'dimensions', 'original', 'reflist'];
                 for (var i in attrs) {
                     if (selectnode.one('.fp-' + attrs[i])) {
                         var value = (node[attrs[i] + '_f']) ? node[attrs[i] + '_f'] : (node[attrs[i]] ? node[attrs[i]] : '');
@@ -1039,7 +1041,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     this.request({
                         action: 'getoriginal',
                         scope: this,
-                        params: {'filepath' : node.filepath,'filename' : node.fullname},
+                        params: {'filepath': node.filepath, 'filename': node.fullname},
                         callback: function(id, obj, args) {
                             // Check if we did not select another file meanwhile.
                             var scope = args.scope;
@@ -1066,7 +1068,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     this.request({
                         action: 'getreferences',
                         scope: this,
-                        params: {'filepath' : node.filepath,'filename' : node.fullname},
+                        params: {'filepath': node.filepath, 'filename': node.fullname},
                         callback: function(id, obj, args) {
                             // Check if we did not select another file meanwhile.
                             var scope = args.scope;
@@ -1141,7 +1143,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
     };
 
     return {
-        init_filemanager : function(options) {
+        init_filemanager: function(options) {
             var requiredstrings = [];
             requiredstrings.push({key: 'edit', component: 'moodle'});
             requiredstrings.push({key: 'invalidjson', component: 'repository'});
@@ -1162,7 +1164,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
             requiredstrings.push({key: 'unknownsource', component: 'repository'});
             requiredstrings.push({key: 'unknownsource', component: 'repository'});
 
-            core_strings.get_strings(requiredstrings).done(function () {
+            core_strings.get_strings(requiredstrings).done(function() {
                 var reqmodules = [
                     'moodle-core-notification-dialogue',
                     'core_filepicker',
@@ -1175,7 +1177,7 @@ define(['core/yui', 'core/templates', 'core/str'], function(Y, templates, core_s
                     'resize-plugin',
                     'dd-plugin'
                 ];
-                Y.use(reqmodules, function (Y) {
+                Y.use(reqmodules, function(Y) {
                     M.core_filepicker.set_templates(Y, options.filepicker.fptemplates);
                     options.filepicker.fptemplates = null;
                     M.totara_form.element_filemanager.templates = options.fmtemplates;

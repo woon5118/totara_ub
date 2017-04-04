@@ -41,7 +41,8 @@
     }
 }
 
-.section_add_menus .horizontal div, .section_add_menus .horizontal form {
+.section_add_menus .horizontal div,
+.section_add_menus .horizontal form {
     display: inline;
 }
 
@@ -105,7 +106,7 @@
         }
 
         .mod-indent-outer {
-            padding-left: 0px;
+            padding-left: 0;
             display: block;
         }
     }
@@ -182,7 +183,9 @@
     .activity {
         .commands {
             white-space: nowrap;
+            /* stylelint-disable */
             display: inline !important;
+            /* stylelint-enable */
         }
         .activityinstance {
             .groupinglabel {
@@ -209,7 +212,8 @@
     }
 }
 
-.section .activity .availabilityinfo, .section .activity .contentafterlink {
+.section .activity .availabilityinfo,
+.section .activity .contentafterlink {
     margin-top: 0.5em;
     margin-left: 30px;
 }
@@ -298,8 +302,8 @@
 .course-content ul.topics,
 .course-content ul.weeks {
     li.section .content {
-        margin-right: 0px;
-        margin-left: 0px;
+        margin-right: 0;
+        margin-left: 0;
         padding: 0;
     }
 }
@@ -365,16 +369,21 @@
     }
 }
 
-#site-news-forum h2, #frontpage-course-list h2, #frontpage-category-names h2, #frontpage-category-combo h2 {
+#site-news-forum h2,
+#frontpage-course-list h2,
+#frontpage-category-names h2,
+#frontpage-category-combo h2 {
     margin-bottom: 9px;
 }
 
-.path-site li.activity & > div, .path-course-view li.activity & > div {
+.path-site li.activity & > div,
+.path-course-view li.activity & > div {
     position: relative;
     padding: 0 16px 0 0;
 }
 
-li.section.hidden span.commands a.editing_hide, li.section.hidden span.commands a.editing_show {
+li.section.hidden span.commands a.editing_hide,
+li.section.hidden span.commands a.editing_show {
     cursor: default;
 }
 
@@ -427,7 +436,10 @@ input.titleeditor {
     display: none;
 }
 
-#page-course-pending .singlebutton, #page-course-index .singlebutton, #page-course-index-category .singlebutton, #page-course-editsection .singlebutton {
+#page-course-pending .singlebutton,
+#page-course-index .singlebutton,
+#page-course-index-category .singlebutton,
+#page-course-editsection .singlebutton {
     text-align: center;
 }
 
@@ -602,7 +614,6 @@ input.titleeditor {
             min-height: 0;
             padding: 0;
             margin: 3px 0;
-            margin-bottom: 3px;
             clear: both;
         }
         & > .content {
@@ -659,13 +670,15 @@ input.titleeditor {
     }
 }
 
-.course_category_tree .subcategories & > .paging, .courses & > .paging {
+.course_category_tree .subcategories & > .paging,
+.courses & > .paging {
     margin: 0;
     padding: 5px;
     text-align: center;
 }
 
-.courses & > .paging.paging-morelink, .course_category_tree .subcategories & > .paging.paging-morelink {
+.courses & > .paging.paging-morelink,
+.course_category_tree .subcategories & > .paging.paging-morelink {
     text-align: left;
 }
 
@@ -694,15 +707,17 @@ input.titleeditor {
         .iconsmall {
             width: 21px;
             height: 21px;
-            margin: 8px 8px 0px 0;
-            padding: 4px 8px 0px 0;
+            margin: 8px 8px 0 0;
+            padding: 4px 8px 0 0;
             vertical-align: text-bottom;
         }
     }
     .moodle-actionmenu {
         .iconsmall,
         .smallicon {
+            /* stylelint-disable */
             max-width: none !important; /** reset sets 100% !important which breaks on IE8 without this !important */
+            /* stylelint-enable */
             width: 21px;
             height: 21px;
             padding: 4px;
@@ -1107,7 +1122,6 @@ input.titleeditor {
         float: right;
         line-height: 40px;
         > div {
-            margin-left: 1em;
             margin: 10px 0;
             display: inline-block;
         }

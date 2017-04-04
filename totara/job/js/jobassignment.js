@@ -23,6 +23,9 @@
  * @package totara
  * @subpackage totara_core
  */
+
+/* eslint-disable no-undef */
+
 M.totara_jobassignment = M.totara_jobassignment || {
 
     Y: null,
@@ -36,7 +39,7 @@ M.totara_jobassignment = M.totara_jobassignment || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
+    init: function(Y, args) {
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -55,31 +58,31 @@ M.totara_jobassignment = M.totara_jobassignment || {
             throw new Error('M.totara_jobassignment.init()-> jQuery dependency required for this module to function.');
         }
 
-        ///
-        /// Position dialog
-        ///
+        // /
+        // / Position dialog
+        // /
         (function() {
-            var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/position/assign/';
+            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/position/assign/';
             totaraSingleSelectDialog(
                 'position',
                 M.util.get_string('chooseposition', 'totara_job') + M.totara_jobassignment.config.dialog_display_position,
-                url+'position.php?',
+                url + 'position.php?',
                 'positionid',
                 'positiontitle',
                 undefined,
-                M.totara_jobassignment.config.can_edit           //Make selection deletable
+                M.totara_jobassignment.config.can_edit           // Make selection deletable
             );
         })();
 
-        ///
-        /// Organisation dialog
-        ///
+        // /
+        // / Organisation dialog
+        // /
         (function() {
-            var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/organisation/assign/';
+            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/organisation/assign/';
             totaraSingleSelectDialog(
                 'organisation',
                 M.util.get_string('chooseorganisation', 'totara_job') + M.totara_jobassignment.config.dialog_display_organisation,
-                url+'find.php?',
+                url + 'find.php?',
                 'organisationid',
                 'organisationtitle',
                 undefined,
@@ -87,16 +90,16 @@ M.totara_jobassignment = M.totara_jobassignment || {
             );
         })();
 
-        ///
-        /// Manager dialog
-        ///
+        // /
+        // / Manager dialog
+        // /
         (function() {
-            var url = M.cfg.wwwroot+'/totara/job/dialog/assign_manager_html.php';
+            var url = M.cfg.wwwroot + '/totara/job/dialog/assign_manager_html.php';
 
             totaraAssignManagerDialog(
                 'manager',
                 M.util.get_string('choosemanager', 'totara_job') + M.totara_jobassignment.config.dialog_display_manager,
-                url + '?userid='+M.totara_jobassignment.config.userid,
+                url + '?userid=' + M.totara_jobassignment.config.userid,
                 'managerid',
                 'managerjaid',
                 'managertitle',
@@ -105,17 +108,17 @@ M.totara_jobassignment = M.totara_jobassignment || {
             );
         })();
 
-        ///
-        /// Temporary manager dialog
-        ///
+        // /
+        // / Temporary manager dialog
+        // /
         (function() {
-            var url = M.cfg.wwwroot+'/totara/job/dialog/assign_tempmanager_html.php';
+            var url = M.cfg.wwwroot + '/totara/job/dialog/assign_tempmanager_html.php';
             var usualmanagerid = $('input[name="managerid"]').val();
 
             totaraAssignManagerDialog(
                 'tempmanager',
                 M.util.get_string('choosetempmanager', 'totara_job') + M.totara_jobassignment.config.dialog_display_tempmanager,
-                url+'?userid='+M.totara_jobassignment.config.userid+'&usualmgrid=' + usualmanagerid,
+                url + '?userid=' + M.totara_jobassignment.config.userid + '&usualmgrid=' + usualmanagerid,
                 'tempmanagerid',
                 'tempmanagerjaid',
                 'tempmanagertitle',
@@ -124,16 +127,16 @@ M.totara_jobassignment = M.totara_jobassignment || {
             );
         })();
 
-        ///
-        /// Appraiser dialog
-        ///
+        // /
+        // / Appraiser dialog
+        // /
         (function() {
-            var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/position/assign/';
+            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/position/assign/';
 
             totaraSingleSelectDialog(
                 'appraiser',
                 M.util.get_string('chooseappraiser', 'totara_job') + M.totara_jobassignment.config.dialog_display_appraiser,
-                url+'manager.php?userid='+M.totara_jobassignment.config.userid,
+                url + 'manager.php?userid=' + M.totara_jobassignment.config.userid,
                 'appraiserid',
                 'appraisertitle',
                 undefined,
@@ -147,13 +150,13 @@ M.totara_jobassignment = M.totara_jobassignment || {
 totaraAssignManagerDialog = function(name, titleString, findUrl, useridKey, jaidKey, textElementId, deletable, selectedKey) {
     var assignManagerhandlerExtra = function() {
         var self = this;
-        var selected_val = $('#treeview_selected_val_'+self._title).val();
-        var item = $('.treeview span.unclickable#item_'+selected_val, self._container);
+        var selected_val = $('#treeview_selected_val_' + self._title).val();
+        var item = $('.treeview span.unclickable#item_' + selected_val, self._container);
         var customdata = item.data();
         $('input[name="' + useridKey + '"]').val(customdata.userid);
         $('input[name="' + jaidKey + '"]').val(customdata.jaid);
 
-        var text_element = $('#'+self.text_element_id);
+        var text_element = $('#' + self.text_element_id);
         text_element.html(customdata.displaystring);
         if (self.deletable) {
             self.setup_delete();
@@ -173,10 +176,10 @@ totaraAssignManagerDialog = function(name, titleString, findUrl, useridKey, jaid
         handler.setup_delete();
         // setup_delete() covers clearing the manageridjaid on delete, but we also need to ensure
         // the more useful managerid and managerjaid will be cleared on deletion.
-        var text_element = $('#'+handler.text_element_id);
+        var text_element = $('#' + handler.text_element_id);
         var deletebutton = text_element.find('.dialog-singleselect-deletable').first();
         if (deletebutton) {
-            deletebutton.click(function () {
+            deletebutton.click(function() {
                 $('input[name="' + useridKey + '"]').val('');
                 $('input[name="' + jaidKey + '"]').val('');
             });
@@ -188,15 +191,15 @@ totaraAssignManagerDialog = function(name, titleString, findUrl, useridKey, jaid
         return customdata.displaystring;
     };
 
-    buttonObj[M.util.get_string('ok', 'moodle')] = function() { handler._save() };
-    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
+    buttonObj[M.util.get_string('ok', 'moodle')] = function() { handler._save(); };
+    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
 
     totaraDialogs[name] = new totaraDialog(
         name,
-        'show-'+name+'-dialog',
+        'show-' + name + '-dialog',
         {
             buttons: buttonObj,
-            title: '<h2>'+titleString+'</h2>'
+            title: '<h2>' + titleString + '</h2>'
         },
         findUrl,
         handler
