@@ -142,17 +142,18 @@ class behat_completion extends behat_base {
         } else {
             $imgalttext = get_string("completion-alt-auto-y", 'core_completion', $activityname);
         }
-        $csselementforactivitytype = "li.modtype_".strtolower($activitytype);
+        $activityxpath = "//li[contains(concat(' ', @class, ' '), ' modtype_" . strtolower($activitytype) . " ')]";
+        $activityxpath .= "[descendant::*[contains(text(), '" . $activityname . "')]]";
 
         $xpathtocheck = "//span[contains(@class, 'sr-only') and contains(., '$imgalttext')]";
         $this->execute("behat_general::should_exist_in_the",
-            array($xpathtocheck, "xpath_element", $csselementforactivitytype, "css_element")
+            array($xpathtocheck, "xpath_element", $activityxpath, "xpath_element")
         );
 
     }
 
     /**
-     * Checks if the activity with specified name is maked as complete.
+     * Checks if the activity with specified name is maked as not complete.
      *
      * @Given /^the "(?P<activityname_string>(?:[^"]|\\")*)" "(?P<activitytype_string>(?:[^"]|\\")*)" activity with "(manual|auto)" completion should be marked as not complete$/
      */
@@ -162,11 +163,12 @@ class behat_completion extends behat_base {
         } else {
             $imgalttext = get_string("completion-alt-auto-n", 'core_completion', $activityname);
         }
-        $csselementforactivitytype = "li.modtype_".strtolower($activitytype);
+        $activityxpath = "//li[contains(concat(' ', @class, ' '), ' modtype_" . strtolower($activitytype) . " ')]";
+        $activityxpath .= "[descendant::*[contains(text(), '" . $activityname . "')]]";
 
         $xpathtocheck = "//span[contains(@class, 'sr-only') and contains(., '$imgalttext')]";
         $this->execute("behat_general::should_exist_in_the",
-            array($xpathtocheck, "xpath_element", $csselementforactivitytype, "css_element")
+            array($xpathtocheck, "xpath_element", $activityxpath, "xpath_element")
         );
     }
 
