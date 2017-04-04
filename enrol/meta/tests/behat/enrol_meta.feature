@@ -95,7 +95,8 @@ Feature: Enrolments are synchronised with meta courses
     And I press "Perform restore"
     And I trigger cron
     And I am on homepage
-    And I click on "Courses" in the totara menuAnd I follow "Course 4"
+    And I click on "Courses" in the totara menu
+    And I follow "Course 4"
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Course meta link (Course 1)"
     And I should see "Course meta link (Course 2)"
