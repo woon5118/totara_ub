@@ -432,6 +432,9 @@ class course_edit_form extends moodleform {
             $errors['enddate'] = get_string($errorcode, 'error');
         }
 
+        // Totara: add custom fields validation.
+        $errors += customfield_validation((object)$data, 'course', 'course');
+
         $errors = array_merge($errors, enrol_course_edit_validation($data, $this->context));
 
         $courseformat = course_get_format((object)array('format' => $data['format']));
