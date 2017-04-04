@@ -31,7 +31,7 @@ Feature: Test Quick Links block
     And I should see "Courses" in the "My Links" "block"
 
     # Check the learner can add new links.
-    When I click on "Actions" "link" in the "My Links" "block"
+    When I open the "My Links" blocks action menu
     And I follow "Configure My Links block"
     And I click on "Manage links" "link"
     And I set the field "linktitle" to "Totara"
@@ -45,7 +45,7 @@ Feature: Test Quick Links block
     And I should see "Courses" in the "My Links" "block"
 
     # Check the learner can remove links.
-    When I click on "Actions" "link" in the "My Links" "block"
+    When I open the "My Links" blocks action menu
     And I follow "Configure My Links block"
     And I click on "Manage links" "link"
     And I click on "Delete" "link" in the "Home" "table_row"
@@ -99,7 +99,7 @@ Feature: Test Quick Links block
     And I log in as "teacher1"
     And I follow "Course 1"
     And I click on "Turn editing on" "button"
-    And I click on "Actions" "link" in the "Course Links" "block"
+    And I open the "Course Links" blocks action menu
     And I follow "Configure Course Links block"
     And I click on "Manage links" "link"
     And I click on "Delete" "link" in the "Home" "table_row"
@@ -141,7 +141,7 @@ Feature: Test Quick Links block
     Then I should see "My Links"
 
     # Now, to test this we are going to use the url of the calendar.
-    When I click on "Actions" "link" in the "My Links" "block"
+    When I open the "My Links" blocks action menu
     And I follow "Configure My Links block"
     And I click on "Manage links" "link"
     And I set the field "linktitle" to "My calendar link"

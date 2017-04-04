@@ -74,7 +74,7 @@ Feature: Test Current Learning block
     And I log in as "learner1"
     And I click on "Dashboard" in the totara menu
     And I press "Customise this page"
-    When I click on "Actions" "link" in the "Current Learning" "block"
+    When I open the "Current Learning" blocks action menu
     And I follow "Delete Current Learning block"
     When I press "Yes"
     And I add the "Current Learning" block
@@ -122,7 +122,7 @@ Feature: Test Current Learning block
     And I log in as "learner1"
     And I click on "Dashboard" in the totara menu
     And I press "Customise this page"
-    When I click on "Actions" "link" in the "Current Learning" "block"
+    When I open the "Current Learning" blocks action menu
     And I follow "Delete Current Learning block"
     When I press "Yes"
     And I add the "Current Learning" block
