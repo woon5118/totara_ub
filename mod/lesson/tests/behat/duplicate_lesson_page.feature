@@ -17,6 +17,7 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
+    And I follow "Profile" in the user menu
     And I follow "Manage private files"
     And I upload "mod/lesson/tests/fixtures/moodle_logo.jpg" file to "Files" filemanager
     And I click on "Save changes" "button"

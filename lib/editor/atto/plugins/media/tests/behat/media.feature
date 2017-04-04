@@ -4,6 +4,7 @@ Feature: Add media to Atto
 
   Background:
   Given I log in as "admin"
+  And I follow "Profile" in the user menu
   And I follow "Manage private files..."
   And I upload "lib/editor/atto/tests/fixtures/moodle-logo.webm" file to "Files" filemanager
   And I upload "lib/editor/atto/tests/fixtures/moodle-logo.mp4" file to "Files" filemanager
