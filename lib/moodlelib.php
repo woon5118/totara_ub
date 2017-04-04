@@ -9419,6 +9419,7 @@ function get_performance_info() {
         $misses = 0;
         $sets = 0;
         foreach ($stats as $definition => $details) {
+            $html .= '<li>';
             switch ($details['mode']) {
                 case cache_store::MODE_APPLICATION:
                     $modeclass = 'application';
@@ -9457,6 +9458,7 @@ function get_performance_info() {
                 }
             }
             $html .= '</ul>';
+            $html .= '</li>';
             $text .= '} ';
         }
         $html .= '</ul> ';
