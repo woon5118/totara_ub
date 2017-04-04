@@ -111,7 +111,7 @@ class behat_transformations extends behat_base {
      * Transformations applicable to TableNode arguments should also
      * be applied, adding them in a different method for Behat API restrictions.
      *
-     * @Transform table:Surname,$NASTYSTRING1
+     * @Transform table:*
      * @param TableNode $tablenode
      * @return TableNode The transformed table
      */
