@@ -67,11 +67,10 @@ class completion_criteria_activity extends completion_criteria {
      */
     public function config_form_display(&$mform, $data = null) {
         $modnames = get_module_types_names();
-        $mform->addElement('advcheckbox',
-                'criteria_activity['.$data->id.']',
-                $modnames[self::get_mod_name($data->module)] . ' - ' . format_string($data->name),
-                null,
-                array('group' => 1));
+        $mform->addElement('checkbox', 'criteria_activity['.$data->id.']',
+                $modnames[self::get_mod_name($data->module)].
+                ' - '.
+                format_string($data->name));
 
         if ($this->id) {
             $mform->setDefault('criteria_activity_value['.$data->id.']', 1);
