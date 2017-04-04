@@ -35,20 +35,18 @@ class core_completionlib_testcase extends advanced_testcase {
     protected $module1;
     protected $module2;
 
+    /**
+     * TODO: TL-13942 remove this hack
+     * @depreacted
+     */
     protected function mock_setup() {
         global $DB, $CFG, $USER;
 
         $this->resetAfterTest();
 
         // NOTE: this mocking is totally idiotic and explodes like crazy!
-        $CFG->loglifetime = -1; // No legacy events.
-        $CFG->rolesactive = 0; // No normal events.
 
-        $dbman = $DB->get_manager();
         $DB = $this->createMock(get_class($DB));
-        $DB->expects($this->any())
-            ->method('get_manager')
-            ->will($this->returnValue($dbman));
         $CFG->enablecompletion = COMPLETION_ENABLED;
         $USER = (object)array('id' =>314159);
     }
@@ -62,7 +60,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         // Enable completion before creating modules, otherwise the completion data is not written in DB.
-        $CFG->enablecompletion = true;
+        set_config('enablecompletion', 1);
 
         // Create a course with activities.
         $this->course = $this->getDataGenerator()->create_course(array('enablecompletion' => true));
@@ -75,6 +73,8 @@ class core_completionlib_testcase extends advanced_testcase {
 
     /**
      * Asserts that two variables are equal.
+     *
+     * TODO: TL-13942 remove this hack
      *
      * @param  mixed   $expected
      * @param  mixed   $actual
@@ -97,40 +97,69 @@ class core_completionlib_testcase extends advanced_testcase {
         parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
     }
 
-    public function test_is_enabled() {
-return; // Totara: TL-13942 write proper tests!
-        global $CFG;
-        $this->mock_setup();
+    public function test_is_enabled_for_site() {
+        $this->resetAfterTest();
 
         // Config alone.
-        $CFG->enablecompletion = COMPLETION_DISABLED;
-        $this->assertEquals(COMPLETION_DISABLED, completion_info::is_enabled_for_site());
-        $CFG->enablecompletion = COMPLETION_ENABLED;
-        $this->assertEquals(COMPLETION_ENABLED, completion_info::is_enabled_for_site());
+        set_config('enablecompletion', 1);
+        $this->assertTrue(completion_info::is_enabled_for_site());
+        set_config('enablecompletion', 0);
+        $this->assertFalse(completion_info::is_enabled_for_site());
+    }
+
+    public function test_is_enabled_for_course() {
+        $this->resetAfterTest();
+
+        set_config('enablecompletion', 1);
 
         // Course.
-        $course = (object)array('id' =>13);
+        $course = $this->getDataGenerator()->create_course(array('enablecompletion' => COMPLETION_DISABLED));
         $c = new completion_info($course);
-        $course->enablecompletion = COMPLETION_DISABLED;
-        $this->assertEquals(COMPLETION_DISABLED, $c->is_enabled());
-        $course->enablecompletion = COMPLETION_ENABLED;
-        $this->assertEquals(COMPLETION_ENABLED, $c->is_enabled());
-        $CFG->enablecompletion = COMPLETION_DISABLED;
         $this->assertEquals(COMPLETION_DISABLED, $c->is_enabled());
 
-        // Course and CM.
-        $cm = new stdClass();
-        $cm->completion = COMPLETION_TRACKING_MANUAL;
-        $this->assertEquals(COMPLETION_DISABLED, $c->is_enabled($cm));
-        $CFG->enablecompletion = COMPLETION_ENABLED;
-        $course->enablecompletion = COMPLETION_DISABLED;
-        $this->assertEquals(COMPLETION_DISABLED, $c->is_enabled($cm));
-        $course->enablecompletion = COMPLETION_ENABLED;
-        $this->assertEquals(COMPLETION_TRACKING_MANUAL, $c->is_enabled($cm));
-        $cm->completion = COMPLETION_TRACKING_NONE;
-        $this->assertEquals(COMPLETION_TRACKING_NONE, $c->is_enabled($cm));
-        $cm->completion = COMPLETION_TRACKING_AUTOMATIC;
-        $this->assertEquals(COMPLETION_TRACKING_AUTOMATIC, $c->is_enabled($cm));
+        $course = $this->getDataGenerator()->create_course(array('enablecompletion' => COMPLETION_ENABLED));
+        $c = new completion_info($course);
+        $this->assertEquals(COMPLETION_ENABLED, $c->is_enabled());
+        set_config('enablecompletion', 0);
+        $this->assertEquals(COMPLETION_DISABLED, $c->is_enabled());
+    }
+
+    public function test_is_enabled_for_module() {
+        global $DB;
+        $this->resetAfterTest();
+
+        set_config('enablecompletion', 1);
+        $course = $this->getDataGenerator()->create_course(array('enablecompletion' => COMPLETION_ENABLED));
+
+        $completionnone = array('completion' => COMPLETION_TRACKING_NONE);
+        $forum1 = $this->getDataGenerator()->create_module('forum', array('course' => $course->id), $completionnone);
+        $cm1 = get_coursemodule_from_instance('forum', $forum1->id);
+
+        $completionmanual = array('completion' => COMPLETION_TRACKING_MANUAL);
+        $forum2 = $this->getDataGenerator()->create_module('forum', array('course' => $course->id), $completionmanual);
+        $cm2 = get_coursemodule_from_instance('forum', $forum2->id);
+
+        $completionauto = array('completion' => COMPLETION_TRACKING_AUTOMATIC);
+        $forum3 = $this->getDataGenerator()->create_module('forum', array('course' => $course->id), $completionauto);
+        $cm3 = get_coursemodule_from_instance('forum', $forum3->id);
+
+        set_config('enablecompletion', 0);
+        $c = new completion_info($course);
+        $this->assertEquals(COMPLETION_DISABLED, $c->is_enabled($cm1));
+        $this->assertEquals(COMPLETION_DISABLED, $c->is_enabled($cm2));
+        $this->assertEquals(COMPLETION_DISABLED, $c->is_enabled($cm3));
+
+        set_config('enablecompletion', 1);
+        $c = new completion_info($course);
+        $this->assertEquals(COMPLETION_TRACKING_NONE, $c->is_enabled($cm1));
+        $this->assertEquals(COMPLETION_TRACKING_MANUAL, $c->is_enabled($cm2));
+        $this->assertEquals(COMPLETION_TRACKING_AUTOMATIC, $c->is_enabled($cm3));
+
+        $course->enablecompletion = (string)COMPLETION_DISABLED;
+        $DB->update_record('course', $course);
+        $this->assertEquals(COMPLETION_DISABLED, $c->is_enabled($cm1));
+        $this->assertEquals(COMPLETION_DISABLED, $c->is_enabled($cm2));
+        $this->assertEquals(COMPLETION_DISABLED, $c->is_enabled($cm3));
     }
 
     public function test_update_state() {
