@@ -206,27 +206,25 @@ if ($roleid) {
   <?php // TL-7837 removed table ?>
   <div class="row-fluid user-multiselect">
     <div class="span5">
-      <label for="removeselect"><?php print_string('extusers', 'core_role'); ?></label>
-          <?php $currentuserselector->display() ?>
-      </td>
-      <td id="buttonscell">
-          <div id="addcontrols">
-              <input name="add" id="add" type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>"
-                     title="<?php print_string('add'); ?>" class="btn btn-secondary"/><br />
-          </div>
+        <label for="removeselect"><?php print_string('extusers', 'core_role'); ?></label>
+        <?php $currentuserselector->display() ?>
+    </div>
+    <div class="span2 controls">
+        <div id="addcontrols">
+            <input name="add" id="add" type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>"
+                    title="<?php print_string('add'); ?>" class="btn btn-secondary"/><br />
+        </div>
 
-          <div id="removecontrols">
-              <input name="remove" id="remove" type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>"
-                     title="<?php print_string('remove'); ?>" class="btn btn-secondary"/>
-          </div>
-      </td>
-      <td id="potentialcell">
-          <p><label for="addselect"><?php print_string('potusers', 'core_role'); ?></label></p>
-          <?php $potentialuserselector->display() ?>
-      </td>
-    </tr>
-  </table>
-</div></form>
+        <div id="removecontrols">
+            <input name="remove" id="remove" type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>"
+                    title="<?php print_string('remove'); ?>" class="btn btn-secondary"/>
+        </div>
+    </div>
+    <div class="span5">
+        <label for="addselect"><?php print_string('potusers', 'core_role'); ?></label>
+        <?php $potentialuserselector->display() ?>
+    </div>
+</div></div></form>
 
 <?php
     $PAGE->requires->js_init_call('M.core_role.init_add_assign_page');
