@@ -39,8 +39,7 @@ $functions = array(
         'description' => 'Returns a list of the site public settings, those not requiring authentication.',
         'type'        => 'read',
         'services'    => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-        'ajax'          => true,
-        'loginrequired' => false,
+        // Totara: this security sensitive info MUST NOT be exposed via ajax!
     ),
 
     'tool_mobile_get_config' => array(
