@@ -21,9 +21,6 @@ Feature: Add badges to the system
 
   @javascript
   Scenario: Accessing the badges
-    And I press "Customise this page"
-   # TODO MDL-57120 site "Badges" link not accessible without navigation block.
-    And I add the "Navigation" block if not present
     Given I navigate to "Site badges" node in "Site pages"
     Then I should see "There are no badges available."
 
