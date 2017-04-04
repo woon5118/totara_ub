@@ -1368,6 +1368,13 @@ class completion_info {
         $cmcontext = context_module::instance($data->coursemoduleid, MUST_EXIST);
         $coursecontext = $cmcontext->get_parent_context();
 
+        // Totara: we must update the caches before triggering events because the observers might use the cache.
+        if ($data->userid == $USER->id) {
+            $SESSION->completioncache[$cm->course][$cm->id] = $data;
+            // reset modinfo for user (no need to call rebuild_course_cache())
+            get_fast_modinfo($cm->course, 0, true);
+        }
+
         // Trigger an event for course module completion changed.
         $event = \core\event\course_module_completion_updated::create(array(
             'objectid' => $data->id,
@@ -1379,12 +1386,6 @@ class completion_info {
         ));
         $event->add_record_snapshot('course_modules_completion', $data);
         $event->trigger();
-
-        if ($data->userid == $USER->id) {
-            $SESSION->completioncache[$cm->course][$cm->id] = $data;
-            // reset modinfo for user (no need to call rebuild_course_cache())
-            get_fast_modinfo($cm->course, 0, true);
-        }
     }
 
      /**
