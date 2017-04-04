@@ -26,6 +26,7 @@ namespace core_message\search;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/message/lib.php');
 
 /**

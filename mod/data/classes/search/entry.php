@@ -26,6 +26,7 @@ namespace mod_data\search;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/mod/data/lib.php');
 require_once($CFG->dirroot . '/lib/grouplib.php');
 

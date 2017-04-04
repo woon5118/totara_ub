@@ -30,6 +30,7 @@ use tool_usertours\helper;
 use tool_usertours\tour;
 use tool_usertours\step;
 
+global $CFG;
 require_once($CFG->libdir . '/tablelib.php');
 
 /**

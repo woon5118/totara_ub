@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once("{$CFG->dirroot}/admin/renderer.php");
 
 class theme_bootstrapbase_core_admin_renderer extends core_admin_renderer {

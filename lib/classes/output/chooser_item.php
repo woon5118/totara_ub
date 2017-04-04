@@ -25,6 +25,7 @@
 namespace core\output;
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->libdir . '/externallib.php');
 
 use coding_exception;

@@ -24,6 +24,7 @@
  * @since      Moodle 2.9
  */
 
+global $CFG;
 require_once("$CFG->libdir/externallib.php");
 require_once("$CFG->dirroot/comment/lib.php");
 

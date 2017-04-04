@@ -26,6 +26,7 @@ namespace core_message\output\preferences;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/message/lib.php');
 
 use renderable;

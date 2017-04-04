@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 use tool_usertours\helper;
 use tool_usertours\tour;
 
+global $CFG;
 require_once($CFG->libdir . '/tablelib.php');
 
 /**

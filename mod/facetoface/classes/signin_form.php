@@ -22,6 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
 require_once("{$CFG->dirroot}/totara/reportbuilder/lib.php");
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");

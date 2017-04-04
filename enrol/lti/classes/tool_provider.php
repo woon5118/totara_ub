@@ -40,6 +40,7 @@ use moodle_exception;
 use moodle_url;
 use stdClass;
 
+global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 
 /**

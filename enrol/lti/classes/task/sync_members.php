@@ -36,6 +36,7 @@ use IMSGlobal\LTI\ToolProvider\ToolConsumer;
 use IMSGlobal\LTI\ToolProvider\User;
 use stdClass;
 
+global $CFG;
 require_once($CFG->dirroot . '/user/lib.php');
 
 /**

@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/totara/certification/lib.php');
 
 class totara_certification_observer {
