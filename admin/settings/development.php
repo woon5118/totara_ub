@@ -5,8 +5,6 @@
 if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     // Experimental settings page
-    $ADMIN->add('development', new admin_category('experimental', new lang_string('experimental','admin')));
-
     $temp = new admin_settingpage('experimentalsettings', new lang_string('experimentalsettings', 'admin'));
     //TODO: Re-enable cc-import once re-implemented in 2.0.x
     //$temp->add(new admin_setting_configcheckbox('enableimsccimport', new lang_string('enable_cc_import', 'imscc'), new lang_string('enable_cc_import_description', 'imscc'), 0));

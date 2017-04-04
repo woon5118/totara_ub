@@ -53,6 +53,8 @@ $ADMIN->add('root', new admin_category('development', new lang_string('developme
 
 // hidden unsupported category
 $ADMIN->add('root', new admin_category('unsupported', new lang_string('unsupported', 'admin'), true));
+// Experimental settings category - Totara: we need it here so that we may add stuff there from anywhere.
+$ADMIN->add('development', new admin_category('experimental', new lang_string('experimental','admin')));
 
 // hidden search script
 $ADMIN->add('root', new admin_externalpage('search', new lang_string('search', 'admin'), "$CFG->wwwroot/$CFG->admin/search.php", 'moodle/site:config', true));
