@@ -78,7 +78,7 @@ class behat_totara_job extends behat_base {
         }
         /** @var \Behat\Mink\Element\NodeElement $li */
         $li = reset($nodes);
-        $link = $li->find('xpath', '/a[text()='.$this->getSession()->getSelectorsHandler()->xpathLiteral($fullname).']');
+        $link = $li->find('xpath', '/a[text()='.behat_context_helper::escape($fullname).']');
         if (empty($link)) {
             throw new ExpectationException('Job Assignment at position '.$position.' is not the expected "'.$fullname.'".', $this->getSession());
         }
@@ -107,7 +107,7 @@ class behat_totara_job extends behat_base {
 
         // Note we don't use $this->find here - we should never ever need spin here.
         // If content becomes dynamic THEN we may need to convert this to spin, but lets try avoid it first.
-        $fnliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($fullname);
+        $fnliteral = behat_context_helper::escape($fullname);
         $elementxpath = '//*[contains(@class, \'totara-job-management-listing\')]/*/li//a[text()='.$fnliteral.']/parent::li//a[@title="Move '.$direction.'"]';
         $nodes = $this->getSession()->getDriver()->find($elementxpath);
 
@@ -145,7 +145,7 @@ class behat_totara_job extends behat_base {
 
         // Note we don't use $this->find here - we should never ever need spin here.
         // If content becomes dynamic THEN we may need to convert this to spin, but lets try avoid it first.
-        $fnliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($fullname);
+        $fnliteral = behat_context_helper::escape($fullname);
         $elementxpath = '//*[contains(@class, \'totara-job-management-listing\')]/*/li//a[text()='.$fnliteral.']/parent::li//a[@title="Delete"]';
         $nodes = $this->getSession()->getDriver()->find($elementxpath);
 
@@ -181,7 +181,7 @@ class behat_totara_job extends behat_base {
 
         // Note we don't use $this->find here - we should never ever need spin here.
         // If content becomes dynamic THEN we may need to convert this to spin, but lets try avoid it first.
-        $fnliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($fullname);
+        $fnliteral = behat_context_helper::escape($fullname);
         $elementxpath = '//*[contains(@class, \'totara-job-management-listing\')]/*/li//a[text()='.$fnliteral.']/parent::li//a[@title="Delete"]';
         $nodes = $this->getSession()->getDriver()->find($elementxpath);
 
@@ -212,7 +212,7 @@ class behat_totara_job extends behat_base {
 
         // Note we don't use $this->find here - we should never ever need spin here.
         // If content becomes dynamic THEN we may need to convert this to spin, but lets try avoid it first.
-        $fnliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($fullname);
+        $fnliteral = behat_context_helper::escape($fullname);
         $elementxpath = '//*[contains(@class, \'totara-job-management-listing\')]/*/li//a[text()='.$fnliteral.']/parent::li//a[@data-function="move"]';
         $nodes = $this->getSession()->getDriver()->find($elementxpath);
 

@@ -42,9 +42,9 @@ class behat_totara_customfield extends behat_base {
      * @param string $direction
      */
     public function i_should_not_be_able_to_move_the_totara_custom_field($fullname, $direction) {
-        $fn_literal = $this->getSession()->getSelectorsHandler()->xpathLiteral($fullname);
+        $fn_literal = behat_context_helper::escape($fullname);
         $string = $direction === 'up' ? 'moveup' : 'movedown';
-        $move_literal = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string($string));
+        $move_literal = behat_context_helper::escape(get_string($string));
         $xpath = "//td[text()={$fn_literal}]/ancestor::tr/td//a[@title={$move_literal}]";
         try {
             $this->find('xpath', $xpath, new coding_exception(__METHOD__));
@@ -69,9 +69,9 @@ class behat_totara_customfield extends behat_base {
      * @param string $direction
      */
     public function i_should_be_able_to_move_the_totara_custom_field($fullname, $direction) {
-        $fn_literal = $this->getSession()->getSelectorsHandler()->xpathLiteral($fullname);
+        $fn_literal = behat_context_helper::escape($fullname);
         $string = $direction === 'up' ? 'moveup' : 'movedown';
-        $move_literal = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string($string));
+        $move_literal = behat_context_helper::escape(get_string($string));
         $xpath = "//td[text()={$fn_literal}]/ancestor::tr/td//a[@title={$move_literal}]";
         $this->find('xpath', $xpath, new \Behat\Mink\Exception\ExpectationException("Could not find the {$move_literal} action for the {$fn_literal} Totara custom field", $this->getSession()));
     }
@@ -86,9 +86,9 @@ class behat_totara_customfield extends behat_base {
      * @param string $direction
      */
     public function i_click_to_move_the_totoara_custom_field($fullname, $direction) {
-        $fn_literal = $this->getSession()->getSelectorsHandler()->xpathLiteral($fullname);
+        $fn_literal = behat_context_helper::escape($fullname);
         $string = $direction === 'up' ? 'moveup' : 'movedown';
-        $move_literal = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string($string));
+        $move_literal = behat_context_helper::escape(get_string($string));
         $xpath = "//td[text()={$fn_literal}]/ancestor::tr/td//a[@title={$move_literal}]";
         $node = $this->find('xpath', $xpath, new \Behat\Mink\Exception\ExpectationException("Could not find the {$move_literal} action for the {$fn_literal} Totara custom field", $this->getSession()));
         $node->click();
@@ -104,7 +104,7 @@ class behat_totara_customfield extends behat_base {
      */
     public function i_should_see_the_form_validation_error_for_the_custom_field($errormsg, $fieldshortname) {
 
-        $fieldshortname_literal = $this->getSession()->getSelectorsHandler()->xpathLiteral('customfield_' . $fieldshortname);
+        $fieldshortname_literal = behat_context_helper::escape('customfield_' . $fieldshortname);
 
         $this->execute('behat_general::assert_element_contains_text', array($errormsg, '//div[contains(@id,' . $fieldshortname_literal . ')]', 'xpath_element'));
     }

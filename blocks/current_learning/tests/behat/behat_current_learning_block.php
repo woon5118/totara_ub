@@ -32,7 +32,7 @@ class behat_current_learning_block extends behat_base {
      * @Given /^I toggle "([^"]*)" in the current learning block$/
      */
     public function i_toggle_item_in_current_learning_block($program) {
-        $program_xpath = $this->getSession()->getSelectorsHandler()->xpathLiteral($program);
+        $program_xpath = behat_context_helper::escape($program);
         $xpath = ".//li[div[@class[contains(.,'block_current_learning-row-item')]][.//text()[.=" . $program_xpath . "]]]";
         $row = $this->find(
             'xpath',
@@ -55,7 +55,7 @@ class behat_current_learning_block extends behat_base {
      * @Given /^I should see "([^"]*)" in "([^"]*)" within the current learning block$/
      */
     public function i_should_see_course_in_program_within_the_current_learning_block($course, $program) {
-        $program_xpath = $this->getSession()->getSelectorsHandler()->xpathLiteral($program);
+        $program_xpath = behat_context_helper::escape($program);
         $xpath = ".//li[div[@class[contains(.,'block_current_learning-row-item')]][.//text()[.=" . $program_xpath . "]]]";
         $this->execute('behat_general::assert_element_contains_text', array($course, $xpath, 'xpath_element'));
     }
@@ -66,7 +66,7 @@ class behat_current_learning_block extends behat_base {
      * @Given /^I should not see "([^"]*)" in "([^"]*)" within the current learning block$/
      */
     public function i_should_not_see_course_in_program_within_the_current_learning_block($course, $program) {
-        $program_xpath = $this->getSession()->getSelectorsHandler()->xpathLiteral($program);
+        $program_xpath = behat_context_helper::escape($program);
         $xpath = ".//li[div[@class[contains(.,'block_current_learning-row-item')]][.//text()[.=" . $program_xpath . "]]]";
         $this->execute('behat_general::assert_element_not_contains_text', array($course, $xpath, 'xpath_element'));
     }

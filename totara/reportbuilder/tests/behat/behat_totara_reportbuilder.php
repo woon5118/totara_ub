@@ -52,8 +52,8 @@ class behat_totara_reportbuilder extends behat_base {
      * @Given /^I delete the "([^"]*)" column from the report$/
      */
     public function i_delete_the_column_from_the_report($columnname) {
-        $columnname_xpath = $this->getSession()->getSelectorsHandler()->xpathLiteral($columnname);
-        $delstring = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('delete'));
+        $columnname_xpath = behat_context_helper::escape($columnname);
+        $delstring = behat_context_helper::escape(get_string('delete'));
         $xpath = '//option[contains(., '.$columnname_xpath.') and @selected]/ancestor::tr//a[@title='.$delstring.']';
         $node = $this->find(
             'xpath',
@@ -72,8 +72,8 @@ class behat_totara_reportbuilder extends behat_base {
      * @Given /^I set aggregation for the "([^"]*)" column to "([^"]*)" in the report$/
      */
     public function i_set_aggregation_for_the_column_to_in_the_report($columnname, $aggregation) {
-        $columnname_xpath = $this->getSession()->getSelectorsHandler()->xpathLiteral($columnname);
-        $aggregation_xpath = $this->getSession()->getSelectorsHandler()->xpathLiteral($aggregation);
+        $columnname_xpath = behat_context_helper::escape($columnname);
+        $aggregation_xpath = behat_context_helper::escape($aggregation);
         $xpath = '//option[contains(., '.$columnname_xpath.') and @selected]/ancestor::tr//select//option[contains(., '.$aggregation_xpath.')]//ancestor::select';
         $select = $this->find(
             'xpath',
@@ -102,8 +102,8 @@ class behat_totara_reportbuilder extends behat_base {
      * @Then /^I should see "([^"]*)" in the "([^"]*)" report column for "([^"]*)"$/
      */
     public function i_should_see_in_the_report_column_for($value, $column, $rowcontent) {
-        $rowsearch = $this->getSession()->getSelectorsHandler()->xpathLiteral($rowcontent);
-        $valuesearch = $this->getSession()->getSelectorsHandler()->xpathLiteral($value);
+        $rowsearch = behat_context_helper::escape($rowcontent);
+        $valuesearch = behat_context_helper::escape($value);
         // Find the table.
         $xpath  = "//table[contains(concat(' ', normalize-space(@class), ' '), ' reportbuilder-table ')]";
         // Find the row

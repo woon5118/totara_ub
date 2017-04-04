@@ -106,7 +106,7 @@ class behat_totara_form extends behat_base {
         if ($this->running_javascript()) {
             $this->wait_for_pending_js();
         }
-        $locatorliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($locator);
+        $locatorliteral = behat_context_helper::escape($locator);
         $xpath = "//form[@data-totara-form]//*[label[contains(text(), {$locatorliteral})] or *[@name={$locatorliteral}] or *[@id={$locatorliteral}] or *[@data-element-label and contains(text(), {$locatorliteral})]]//ancestor::*[@data-element-type][1]";
         $nodes = $this->getSession()->getPage()->findAll('xpath', $xpath);
         if (empty($nodes)) {
