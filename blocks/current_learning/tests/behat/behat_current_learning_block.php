@@ -24,8 +24,6 @@
 // NOTE: no MOODLE_INTERNAL used, this file may be required by behat before including /config.php.
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Behat\Context\Step\Then as Then;
-
 class behat_current_learning_block extends behat_base {
 
     /**
@@ -59,7 +57,7 @@ class behat_current_learning_block extends behat_base {
     public function i_should_see_course_in_program_within_the_current_learning_block($course, $program) {
         $program_xpath = $this->getSession()->getSelectorsHandler()->xpathLiteral($program);
         $xpath = ".//li[div[@class[contains(.,'block_current_learning-row-item')]][.//text()[.=" . $program_xpath . "]]]";
-        return new Then('I should see "' . $course .'" in the "' . $xpath .'" "xpath_element"');
+        $this->execute('behat_general::assert_element_contains_text', array($course, $xpath, 'xpath_element'));
     }
 
     /**
@@ -70,7 +68,7 @@ class behat_current_learning_block extends behat_base {
     public function i_should_not_see_course_in_program_within_the_current_learning_block($course, $program) {
         $program_xpath = $this->getSession()->getSelectorsHandler()->xpathLiteral($program);
         $xpath = ".//li[div[@class[contains(.,'block_current_learning-row-item')]][.//text()[.=" . $program_xpath . "]]]";
-        return new Then('I should not see "' . $course .'" in the "' . $xpath .'" "xpath_element"');
+        $this->execute('behat_general::assert_element_not_contains_text', array($course, $xpath, 'xpath_element'));
     }
 
 }

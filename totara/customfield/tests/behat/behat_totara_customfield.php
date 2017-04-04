@@ -23,8 +23,6 @@
 
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
 
-use Behat\Behat\Context\Step\Then as Then;
-
 /**
  * Behat steps to work with Totara custom fields
  *
@@ -103,13 +101,12 @@ class behat_totara_customfield extends behat_base {
      *
      * @param string $errormsg
      * @param string $fieldshortname
-     * @return Then
      */
     public function i_should_see_the_form_validation_error_for_the_custom_field($errormsg, $fieldshortname) {
 
         $fieldshortname_literal = $this->getSession()->getSelectorsHandler()->xpathLiteral('customfield_' . $fieldshortname);
 
-        return new Then('I should see "' . $this->escape($errormsg) . '" in the "//div[contains(@id,' . $fieldshortname_literal . ')]" "xpath_element"');
+        $this->execute('behat_general::assert_element_contains_text', array($errormsg, '//div[contains(@id,' . $fieldshortname_literal . ')]', 'xpath_element'));
     }
 
 }

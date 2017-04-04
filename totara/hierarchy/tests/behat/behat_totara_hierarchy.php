@@ -31,7 +31,6 @@
 
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
 
-use Behat\Behat\Context\Step\Then as Then;
 use Behat\Gherkin\Node\TableNode as TableNode;
 use Behat\Behat\Tester\Exception\PendingException as PendingException;
 
@@ -325,9 +324,7 @@ class behat_totara_hierarchy extends behat_base {
      *
      * @Then /^I should see these hierarchy items at the following depths:$/
      */
-    public function iShouldSeeTheseHierarchyItemsAtTheFollowingDepths(TableNode $table)
-    {
-        $commands = array();
+    public function iShouldSeeTheseHierarchyItemsAtTheFollowingDepths(TableNode $table) {
         $data = $table->getRows();
 
         foreach ($data as $row => $columns) {
@@ -338,10 +335,8 @@ class behat_totara_hierarchy extends behat_base {
                 throw new Exception("The depth of hierarchy item \"{$columns[0]}\" is zero or missing. It must be a value or 1 or higher.");
             }
 
-            $commands[] = new Then("I should see hierarchy item \"{$columns[0]}\" in the \"" . ($row + 1) . "\" table row at depth \"{$columns[1]}\"");
+            $this->execute('behat_totara_hierarchy::iShouldSeeHierarchyItemInTheTableRowAtDepth', array($columns[0], $row + 1, $columns[1]));
         }
-
-        return $commands;
     }
 
     /**
@@ -360,9 +355,7 @@ class behat_totara_hierarchy extends behat_base {
             throw new Exception("The depth of '{$itemname}' heirarchy item is zero or missing. You must provide a value of 1 or higher.");
         }
 
-        return array(
-            new Then("I should see \"{$itemname}\" in the \"//table/tbody/tr[{$tablerow}]/td[1]/div[contains(@class, 'depth{$depth}')]/a\" \"xpath_element\"")
-        );
+        $this->execute('behat_general::assert_element_contains_text', array($itemname, "//table/tbody/tr[{$tablerow}]/td[1]/div[contains(@class, 'depth{$depth}')]/a", 'xpath_element'));
     }
 
 }
