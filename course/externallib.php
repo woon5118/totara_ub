@@ -3064,7 +3064,10 @@ class core_course_external extends external_api {
             }
 
             if ($params['field'] === 'ids') {
-                $courses = $DB->get_records_list('course', 'id', explode(',', $value), 'id ASC');
+                // PARAM_SEQUENCE still allows empty strings as well as integers. array_filter will remove these
+                // along with anything that == false, so also 0 which isn't a valid id either.
+                $idarray = array_filter(explode(',', $value));
+                $courses = $DB->get_records_list('course', 'id', $idarray, 'id ASC');
             } else {
                 $courses = $DB->get_records('course', array($params['field'] => $value), 'id ASC');
             }
@@ -3074,10 +3077,14 @@ class core_course_external extends external_api {
         foreach ($courses as $course) {
             $context = context_course::instance($course->id);
             $canupdatecourse = has_capability('moodle/course:update', $context);
-            $canviewhiddencourses = has_capability('moodle/course:viewhiddencourses', $context);
+
+            if (!$canupdatecourse and ($params['field'] === 'idnumber')) {
+                // Only those with course admin permissions can deal with idnumbers.
+                continue;
+            }
 
             // Check if the course is visible in the site for the user.
-            if (!$course->visible and !$canviewhiddencourses and !$canupdatecourse) {
+            if (!totara_course_is_viewable($course->id)) {
                 continue;
             }
             // Get the public course information, even if we are not enrolled.
