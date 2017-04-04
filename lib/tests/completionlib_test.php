@@ -163,7 +163,8 @@ class core_completionlib_testcase extends advanced_testcase {
     }
 
     public function test_update_state() {
-return; // Totara: TL-13942 write proper tests!
+        $this->markTestSkipped('TODO: TL-13942 write proper completion tests!');
+
         global $DB;
         $this->mock_setup();
 
@@ -262,7 +263,8 @@ return; // Totara: TL-13942 write proper tests!
     }
 
     public function test_internal_get_state() {
-return; // Totara: TL-13942 write proper tests!
+        $this->markTestSkipped('TODO: TL-13942 write proper completion tests!');
+
         global $DB;
         $this->mock_setup();
 
@@ -297,7 +299,8 @@ return; // Totara: TL-13942 write proper tests!
     }
 
     public function test_set_module_viewed() {
-return; // Totara: TL-13942 write proper tests!
+        $this->markTestSkipped('TODO: TL-13942 write proper completion tests!');
+
         $this->mock_setup();
 
         $c = $this->createMock('completion_info',
@@ -349,7 +352,8 @@ return; // Totara: TL-13942 write proper tests!
     }
 
     public function test_count_user_data() {
-return; // Totara: TL-13942 write proper tests!
+        $this->markTestSkipped('TODO: TL-13942 write proper completion tests!');
+
         global $DB;
         $this->mock_setup();
 
@@ -366,7 +370,8 @@ return; // Totara: TL-13942 write proper tests!
     }
 
     public function test_delete_all_state() {
-return; // Totara: TL-13942 write proper tests!
+        $this->markTestSkipped('TODO: TL-13942 write proper completion tests!');
+
         global $DB, $SESSION;
         $this->mock_setup();
 
@@ -399,7 +404,8 @@ return; // Totara: TL-13942 write proper tests!
     }
 
     public function test_reset_all_state() {
-return; // Totara: TL-13942 write proper tests!
+        $this->markTestSkipped('TODO: TL-13942 write proper completion tests!');
+
         global $DB;
         $this->mock_setup();
 
@@ -439,7 +445,8 @@ return; // Totara: TL-13942 write proper tests!
     }
 
     public function test_get_data() {
-return; // Totara: TL-13942 write proper tests!
+        $this->markTestSkipped('TODO: TL-13942 write proper completion tests!');
+
         global $DB, $SESSION;
         $this->mock_setup();
 
@@ -645,7 +652,8 @@ return; // Totara: TL-13942 write proper tests!
     }
 
     public function test_get_progress_all() {
-return; // Totara: TL-13942 write proper tests!
+        $this->markTestSkipped('TODO: TL-13942 write proper completion tests!');
+
         global $DB;
         $this->mock_setup();
 
@@ -724,7 +732,8 @@ return; // Totara: TL-13942 write proper tests!
     }
 
     public function test_inform_grade_changed() {
-return; // Totara: TL-13942 write proper tests!
+        $this->markTestSkipped('TODO: TL-13942 write proper completion tests!');
+
         $this->mock_setup();
 
         $c = $this->createMock('completion_info',
@@ -788,7 +797,8 @@ return; // Totara: TL-13942 write proper tests!
     }
 
     public function test_internal_get_grade_state() {
-return; // Totara: TL-13942 write proper tests!
+        $this->markTestSkipped('TODO: TL-13942 write proper completion tests!');
+
         $this->mock_setup();
 
         $item = new stdClass;
