@@ -35,7 +35,7 @@ define(['core/yui'], function(Y) {
     M.totara_form.element_filepicker = M.totara_form.element_filepicker || {};
     M.totara_form.element_filepicker.instances = M.totara_form.element_filepicker.instances || [];
 
-    M.totara_form.element_filepicker.callback = function(params) {
+    M.totara_form.element_filepicker.callback = function (params) {
         var html = '<div class="filepicker-container"><a href="' + params.url + '">' + params.file + '</a></div>';
         html += '<div class="dndupload-progressbars"></div>';
         M.totara_form.element_filepicker.Y.one('#file_info_' + params.client_id + ' .filepicker-filename').setContent(html);
@@ -47,7 +47,7 @@ define(['core/yui'], function(Y) {
     /**
      * This function is called for each file picker on page.
      */
-    M.totara_form.element_filepicker.init = function(Y, options) {
+    M.totara_form.element_filepicker.init = function (Y, options) {
         M.totara_form.element_filepicker.Y = Y;
         // For client side validation, initialize file status for this filepicker.
         M.totara_form.element_filepicker.instances[options.elementname] = {};
@@ -59,7 +59,7 @@ define(['core/yui'], function(Y) {
         if (!M.core_filepicker.instances[options.client_id]) {
             M.core_filepicker.init(Y, options);
         }
-        Y.on('click', function(e, client_id) {
+        Y.on('click', function (e, client_id) {
             e.preventDefault();
             if (this.ancestor('.fitem.disabled') === null) {
                 M.core_filepicker.instances[client_id].show();
@@ -88,8 +88,8 @@ define(['core/yui'], function(Y) {
     };
 
     return {
-        init_filepicker: function(options) {
-            Y.use(['core_filepicker', 'node', 'node-event-simulate', 'core_dndupload'], function(Y) {
+        init_filepicker : function(options) {
+            Y.use(['core_filepicker', 'node', 'node-event-simulate', 'core_dndupload'], function (Y) {
                 M.core_filepicker.set_templates(Y, options.fptemplates);
                 options.fptemplates = null;
                 M.totara_form.element_filepicker.init(Y, options);

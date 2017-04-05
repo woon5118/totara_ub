@@ -22,8 +22,6 @@
  * @subpackage totara_core
  */
 
-/* eslint-disable no-undef */
-
 M.totara_version_tracking = M.totara_version_tracking || {
 
     Y: null,
@@ -39,7 +37,7 @@ M.totara_version_tracking = M.totara_version_tracking || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
         var module = this;
@@ -137,7 +135,7 @@ M.totara_version_tracking = M.totara_version_tracking || {
 
     display_message: function(text) {
         text += M.util.get_string('totarareleaselink', 'totara_core');
-        $('div.totara-copyright p:last').append('<p>' + text + '</p>');
+        $('div.totara-copyright p:last').append('<p>'+text+'</p>');
         return true;
     }
 };

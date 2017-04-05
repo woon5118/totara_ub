@@ -37,7 +37,7 @@ define(['jquery',
 
     var filter_data_for_paging = function(data, page) {
         // Get the current page.
-        var currentPage = parseInt($(instanceselector + ' .pagination li.active a').attr('data-page'));
+        var currentPage = parseInt($(instanceselector+' .pagination li.active a').attr('data-page'));
         var newPage = null;
 
         if (page == 'next') {
@@ -111,7 +111,7 @@ define(['jquery',
      * Initialises handlers for pagination.
      */
     var initPaginationHandlers = function() {
-        $(instanceselector + ' .pagination').on('click', 'a', function(e) {
+        $(instanceselector+' .pagination').on('click', 'a', function(e) {
             e.preventDefault();
 
             var anchor = $(this); // The <li>
@@ -126,14 +126,14 @@ define(['jquery',
 
             filter_data_for_paging(_blockData, page).done(function(filteredData) {
                 templates.render('block_current_learning/main_content', filteredData).done(function(rendered) {
-                    $(instanceselector + ' .current-learning-content').html(rendered).trigger("block_current_learning:content_updated");
+                    $(instanceselector+' .current-learning-content').html(rendered).trigger("block_current_learning:content_updated");
                 }).fail(function(error) {
                     notification.exception(error);
                 });
 
                 // Re-render the footer.
                 templates.render('block_current_learning/paging', filteredData).done(function(rendered) {
-                    $(instanceselector + ' .panel-footer').replaceWith(rendered);
+                    $(instanceselector+' .panel-footer').replaceWith(rendered);
                     initPaginationHandlers();
                 }).fail(function(error) {
                     notification.exception(error);
@@ -146,9 +146,9 @@ define(['jquery',
      * Initialises tooltips using Bootstrap JS.
      */
     var initTooltips = function() {
-        var tooltipSelector = instanceselector + ' [data-toggle="tooltip"]';
+        var tooltipSelector = instanceselector+' [data-toggle="tooltip"]';
         $(tooltipSelector).tooltip();
-        $(instanceselector + ' .current-learning-content').on('block_current_learning:content_updated', function(event) {
+        $(instanceselector+' .current-learning-content').on('block_current_learning:content_updated', function(event) {
             $(tooltipSelector).tooltip();
         });
     };
@@ -161,7 +161,7 @@ define(['jquery',
      */
     var initStyles = function(blockData) {
         if (blockData.pagination.pages.length > 1) {
-            var mylearningPanel = $(instanceselector + ' .current-learning-content');
+            var mylearningPanel = $(instanceselector+' .current-learning-content');
             mylearningPanel.css('min-height', mylearningPanel.outerHeight());
         }
     };
@@ -173,7 +173,7 @@ define(['jquery',
      */
     var init = function(blockData) {
 
-        instanceselector = '#inst' + blockData.instanceid.toString();
+        instanceselector = '#inst'+blockData.instanceid.toString();
 
         if (blockData.pagination && blockData.pagination.itemsperpage) {
             items_per_page = blockData.pagination.itemsperpage;

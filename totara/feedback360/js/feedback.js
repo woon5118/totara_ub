@@ -20,12 +20,9 @@
  * @package totara
  * @subpackage totara_feedback360
  */
-
-/* eslint-disable no-undef */
-
 M.totara_feedback360_feedback = M.totara_feedback360_feedback || {
 
-  Y: null,
+  Y : null,
 
   /**
    * module initialisation method called by php js_init_call()
@@ -33,21 +30,21 @@ M.totara_feedback360_feedback = M.totara_feedback360_feedback || {
    * @param object    YUI instance
    * @param string    args supplied in JSON format
    */
-  init: function(Y, args) {
+  init : function(Y, args) {
     // save a reference to the Y instance (all of its dependencies included)
     this.Y = Y;
-    var formid = '#' + args;
+    formid = '#' + args;
 
     // check jQuery dependency is available
-    if (typeof $ === 'undefined') {
+    if ( typeof $ === 'undefined') {
       throw new Error('M.totara_feedback360_feedback.init()-> jQuery dependency required for this module to function.');
     }
     moveScroller();
 
-    $('#saveprogress').on('submit', function(e) {
+    $('#saveprogress').on('submit', function(e){
       window.onbeforeunload = null; // Prevent leaving page warning.
       e.preventDefault();
-      $('input[name=action]', $(formid)).attr('value', 'saveprogress');
+      $('input[name=action]', $(formid)).attr('value', 'saveprogress')
       $(formid).submit();
     });
 
@@ -57,7 +54,7 @@ M.totara_feedback360_feedback = M.totara_feedback360_feedback || {
             var sa = $("#feedbackhead-anchor");
             var ot = sa.offset().top;
             var s = $("#feedbackhead");
-            if (st > ot) {
+            if(st > ot) {
                 s.css({
                     position: "fixed",
                     top: "0px",
@@ -67,12 +64,12 @@ M.totara_feedback360_feedback = M.totara_feedback360_feedback || {
                 });
                 sa.height(s.outerHeight());
             } else {
-                if (st <= ot) {
+                if(st <= ot) {
                     s.css({
                         position: "relative",
                         top: "",
                         left: "",
-                        width: ""
+                        width:""
                     });
                 }
                 sa.height(0);
@@ -82,4 +79,4 @@ M.totara_feedback360_feedback = M.totara_feedback360_feedback || {
         move();
     }
   }
-};
+}

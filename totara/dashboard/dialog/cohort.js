@@ -20,8 +20,6 @@
  * @package totara_dashboard
  */
 
-/* eslint-disable no-undef */
-
 /**
  * This file contains the Javascript for the dialog that lets you assign dashboard to audiences.
  */
@@ -56,7 +54,7 @@ M.totara_dashboardcohort = M.totara_dashboardcohort || {
             throw new Error('M.totara_dashboardcohort.init()-> jQuery dependency required for this module.');
         }
 
-        this.config.sesskey = $('input:hidden[name="sesskey"]').val();
+        this.config['sesskey'] = $('input:hidden[name="sesskey"]').val();
 
         this.init_dialogs();
     },
@@ -69,17 +67,17 @@ M.totara_dashboardcohort = M.totara_dashboardcohort || {
         ehandler.baseurl = url;
 
         var dbuttons = {};
-        dbuttons[M.util.get_string('ok', 'moodle')] = function() { ehandler._update(); };
-        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel(); };
+        dbuttons[M.util.get_string('ok', 'moodle')] = function() { ehandler._update() }
+        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel() }
 
-        totaraDialogs.id_cohortsbtn = new totaraDialog(
+        totaraDialogs['id_cohortsbtn'] = new totaraDialog(
             'dashboard-cohorts-assigned-dialog',
             'id_cohortsbtn',
             {
                 buttons: dbuttons,
                 title: '<h2>' + M.util.get_string('assignedcohorts', 'totara_dashboard') + '</h2>'
             },
-            url + 'cohort.php?selected=' + this.config.selected
+            url+'cohort.php?selected=' + this.config.selected
                     + '&sesskey=' + this.config.sesskey,
             ehandler
         );
@@ -121,7 +119,7 @@ totaraDialog_handler_dashboardcohorts.prototype._update = function(response) {
 
     elements.each(function() {
         var itemid = $(this).attr('id').split('_');
-        itemid = itemid[itemid.length - 1];  // The last item is the actual id.
+        itemid = itemid[itemid.length-1];  // The last item is the actual id.
         itemid = parseInt(itemid);
 
         if (!self.cohort_item_exists(itemid)) {
@@ -140,7 +138,7 @@ totaraDialog_handler_dashboardcohorts.prototype._update = function(response) {
                 alert(data.error);
                 return;
             }
-            $.each(data.rows, function(index, html) {
+            $.each(data['rows'], function(index, html) {
                 self.create_item(html);
             });
 
@@ -156,7 +154,7 @@ totaraDialog_handler_dashboardcohorts.prototype._update = function(response) {
  * @param int itemid item id
  */
 totaraDialog_handler_dashboardcohorts.prototype.cohort_item_exists = function(itemid) {
-    for (var x in this.cohort_items) {
+    for (x in this.cohort_items) {
         if (this.cohort_items[x] == itemid) {
             return true;
         }
@@ -189,7 +187,7 @@ totaraDialog_handler_dashboardcohorts.prototype.add_cohort_delete_event_handlers
  */
 totaraDialog_handler_dashboardcohorts.prototype.add_published_status_change_handlers = function() {
     $('input[name="published[published]"]').change(function() {
-        if ($('input[name="published[published]"]:checked').val() == 1) {
+        if($('input[name="published[published]"]:checked').val() == 1) {
             $('#dashboard-cohorts-table-assigned a.dashboardcohortdeletelink').show();
         } else {
             $('#dashboard-cohorts-table-assigned a.dashboardcohortdeletelink').hide();
@@ -223,7 +221,7 @@ totaraDialog_handler_dashboardcohorts.prototype.remove_cohort_item = function(it
     var row = $(item).closest('tr');
 
     // Remove the item from the array of items.
-    this.cohort_items = $.grep(this.cohort_items, function(element, x) {
+    this.cohort_items = $.grep(this.cohort_items, function (element, x) {
         return (element == itemid);
     }, true);
 

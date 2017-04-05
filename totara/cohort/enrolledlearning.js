@@ -19,9 +19,6 @@
  * @package totara
  * @subpackage totara_cohort
  */
-
-/* eslint-disable no-undef */
-
 M.totara_cohortenrolledlearning = M.totara_cohortenrolledlearning || {
 
     Y: null,
@@ -45,15 +42,15 @@ M.totara_cohortenrolledlearning = M.totara_cohortenrolledlearning || {
         }
 
         // On click event for "View dates" links.
-        $('.assignment-duedates').on('click', function() {
-            $.get($(this).attr('href'), function(result) {
+        $('.assignment-duedates').on('click', function(){
+            $.get($(this).attr('href'), function(result){
                 M.totara_cohortenrolledlearning.datesDialogue = new M.core.dialogue({
                     headerContent: null,
-                    bodyContent: result,
-                    width: 500,
-                    centered: true,
-                    modal: true,
-                    render: true
+                    bodyContent  : result,
+                    width        : 500,
+                    centered     : true,
+                    modal        : true,
+                    render       : true
                 });
                 M.totara_cohortenrolledlearning.datesDialogue.show();
             });
@@ -63,9 +60,9 @@ M.totara_cohortenrolledlearning = M.totara_cohortenrolledlearning || {
         // On click events for column sorting and paging inside "View dates" popup.
         $('#page-admin-totara-cohort-enrolledlearning').on('click',
             '.moodle-dialogue-content #program_assignment_duedates a, ' +
-            '.moodle-dialogue-content #cert_assignment_duedates a', function(event) {
+            '.moodle-dialogue-content #cert_assignment_duedates a', function(event){
             if (!event.target.closest('td') || !$(event.target.closest('td')).hasClass('cell')) {
-                $.get($(event.target).attr('href'), function(result) {
+                $.get($(event.target).attr('href'), function(result){
                     M.totara_cohortenrolledlearning.datesDialogue.bodyNode.setHTML(result);
                 });
             } else {

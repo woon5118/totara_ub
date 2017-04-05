@@ -23,7 +23,7 @@
  * @subpackage totara_program_completion
  */
 
-define(['jquery', 'core/str'], function($, mdlstrings) {
+define(['jquery', 'core/str'], function ($, mdlstrings) {
     var blockjs = {
 
         /**
@@ -36,12 +36,12 @@ define(['jquery', 'core/str'], function($, mdlstrings) {
             requiredstrings.push({key: 'more', component: 'block_totara_program_completion'});
             requiredstrings.push({key: 'less', component: 'block_totara_program_completion'});
 
-            mdlstrings.get_strings(requiredstrings).done(function(strings) {
+            mdlstrings.get_strings(requiredstrings).done(function (strings) {
                 var tstr = [];
                 for (var i = 0; i < requiredstrings.length; i++) {
                     tstr[requiredstrings[i].key] = strings[i];
                 }
-                $('.block-totara-prog-completion-morelink' + instanceid).on('click', function(e) {
+                $('.block-totara-prog-completion-morelink' + instanceid).on('click', function (e) {
                     e.preventDefault();
                     $('.block-prog-completions-list .more' + instanceid).toggle();
                     if ($(this).text() == tstr.more) {

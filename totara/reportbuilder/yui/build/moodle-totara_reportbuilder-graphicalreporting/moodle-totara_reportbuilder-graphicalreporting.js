@@ -23,8 +23,6 @@ YUI.add('moodle-totara_reportbuilder-graphicalreporting', function (Y, NAME) {
  * @subpackage totara_reportbuilder
  */
 
-/* eslint-disable no-undef */
-
 M.reportbuilder = M.reportbuilder || {};
 var NS = M.reportbuilder.graphicalreport = M.reportbuilder.graphicalreport || {};
 

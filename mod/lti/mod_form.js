@@ -21,7 +21,7 @@
  * @copyright  Copyright (c) 2011 Moodlerooms Inc. (http://www.moodlerooms.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-(function() {
+(function(){
     var Y;
 
     M.mod_lti = M.mod_lti || {};
@@ -31,8 +31,8 @@
     M.mod_lti.LTI_SETTING_DELEGATE = 2;
 
     M.mod_lti.editor = {
-        init: function(yui3, settings) {
-            if (yui3) {
+        init: function(yui3, settings){
+            if(yui3){
                 Y = yui3;
             }
 
@@ -44,13 +44,13 @@
 
             this.addOptGroups();
 
-            var updateToolMatches = function() {
+            var updateToolMatches = function(){
                 self.updateAutomaticToolMatch(Y.one('#id_toolurl'));
                 self.updateAutomaticToolMatch(Y.one('#id_securetoolurl'));
             };
 
             var typeSelector = Y.one('#id_typeid');
-            typeSelector.on('change', function(e) {
+            typeSelector.on('change', function(e){
                 // Reset configuration fields when another preconfigured tool is selected.
                 self.resetToolFields();
 
@@ -58,7 +58,7 @@
 
                 self.toggleEditButtons();
 
-                if (self.getSelectedToolTypeOption().getAttribute('toolproxy')) {
+                if (self.getSelectedToolTypeOption().getAttribute('toolproxy')){
                     var allowname = Y.one('#id_instructorchoicesendname');
                     allowname.set('checked', !self.getSelectedToolTypeOption().getAttribute('noname'));
 
@@ -107,11 +107,11 @@
             ]);
 
             var debounce;
-            textAreas.on('keyup', function(e) {
+            textAreas.on('keyup', function(e){
                 clearTimeout(debounce);
 
                 // If no more changes within 2 seconds, look up the matching tool URL
-                debounce = setTimeout(function() {
+                debounce = setTimeout(function(){
                     updateToolMatches();
                 }, 2000);
             });
@@ -135,12 +135,12 @@
             }
         },
 
-        clearToolCache: function() {
+        clearToolCache: function(){
             this.urlCache = {};
             this.toolTypeCache = {};
         },
 
-        updateAutomaticToolMatch: function(field) {
+        updateAutomaticToolMatch: function(field){
             var self = this;
 
             var toolurl = field;
@@ -149,7 +149,7 @@
             var id = field.get('id') + '_lti_automatch_tool';
             var automatchToolDisplay = Y.one('#' + id);
 
-            if (!automatchToolDisplay) {
+            if(!automatchToolDisplay){
                 automatchToolDisplay = Y.Node.create('<span />')
                                         .set('id', id)
                                         .setStyle('padding-left', '1em');
@@ -160,7 +160,7 @@
             var url = toolurl.get('value');
 
             // Hide the display if the url box is empty
-            if (!url) {
+            if(!url){
                 automatchToolDisplay.setStyle('display', 'none');
             } else {
                 automatchToolDisplay.set('innerHTML', '');
@@ -172,11 +172,11 @@
 
             // A specific tool type is selected (not "auto")
             // We still need to check with the server to get privacy settings
-            if (selectedToolType > 0) {
+            if(selectedToolType > 0){
                 // If the entered domain matches the domain of the tool configuration...
                 var domainRegex = /(?:https?:\/\/)?(?:www\.)?([^\/]+)(?:\/|$)/i;
                 var match = domainRegex.exec(url);
-                if (match && match[1] && match[1].toLowerCase() === selectedOption.getAttribute('domain').toLowerCase()) {
+                if(match && match[1] && match[1].toLowerCase() === selectedOption.getAttribute('domain').toLowerCase()){
                     automatchToolDisplay.set('innerHTML', self.settings.green_check_icon_html + M.util.get_string('using_tool_configuration', 'lti') + selectedOption.get('text'));
                 } else {
                     // The entered URL does not match the domain of the tool configuration
@@ -189,19 +189,19 @@
 
             // Indicate the tool is manually configured
             // We still check the Launch URL with the server as course/site tools may override privacy settings
-            if (key.get('value') !== '' && secret.get('value') !== '') {
+            if(key.get('value') !== '' && secret.get('value') !== ''){
                 automatchToolDisplay.set('innerHTML', self.settings.green_check_icon_html + M.util.get_string('custom_config', 'lti'));
             }
 
-            var continuation = function(toolInfo, inputfield) {
+            var continuation = function(toolInfo, inputfield){
                 if (inputfield === undefined || (inputfield.get('id') != 'id_securetoolurl' || inputfield.get('value'))) {
                     self.updatePrivacySettings(toolInfo);
                 }
-                if (toolInfo.toolname) {
+                if(toolInfo.toolname){
                     automatchToolDisplay.set('innerHTML', self.settings.green_check_icon_html + M.util.get_string('using_tool_configuration', 'lti') + toolInfo.toolname);
-                } else if (!selectedToolType) {
+                } else if(!selectedToolType) {
                     // Inform them custom configuration is in use
-                    if (key.get('value') === '' || secret.get('value') === '') {
+                    if(key.get('value') === '' || secret.get('value') === ''){
                         automatchToolDisplay.set('innerHTML', self.settings.warning_icon_html + M.util.get_string('tool_config_not_found', 'lti'));
                     }
                 }
@@ -213,18 +213,18 @@
 
             // Cache urls which have already been checked to increase performance
             // Don't use URL cache if tool type manually selected
-            if (selectedToolType && self.toolTypeCache[selectedToolType]) {
+            if(selectedToolType && self.toolTypeCache[selectedToolType]){
                 return continuation(self.toolTypeCache[selectedToolType]);
-            } else if (self.urlCache[url] && !selectedToolType) {
+            } else if(self.urlCache[url] && !selectedToolType){
                 return continuation(self.urlCache[url]);
-            } else if (!selectedToolType && !url) {
+            } else if(!selectedToolType && !url) {
                 // No tool type or url set
                 return continuation({}, field);
             } else {
-                self.findToolByUrl(url, selectedToolType, function(toolInfo) {
-                    if (toolInfo) {
+                self.findToolByUrl(url, selectedToolType, function(toolInfo){
+                    if(toolInfo){
                         // Cache the result based on whether the URL or tool type was used to look up the tool
-                        if (!selectedToolType) {
+                        if(!selectedToolType){
                             self.urlCache[url] = toolInfo;
                         } else {
                             self.toolTypeCache[selectedToolType] = toolInfo;
@@ -241,13 +241,13 @@
         /**
          * Updates display of privacy settings to show course / site tool configuration settings.
          */
-        updatePrivacySettings: function(toolInfo) {
-            if (!toolInfo || !toolInfo.toolid) {
+        updatePrivacySettings: function(toolInfo){
+            if(!toolInfo || !toolInfo.toolid){
                 toolInfo = {
                     sendname: M.mod_lti.LTI_SETTING_DELEGATE,
                     sendemailaddr: M.mod_lti.LTI_SETTING_DELEGATE,
                     acceptgrades: M.mod_lti.LTI_SETTING_DELEGATE
-                };
+                }
             }
 
             var setting, control;
@@ -259,36 +259,36 @@
             };
 
             // Store a copy of user entered privacy settings as we may overwrite them
-            if (!this.userPrivacySettings) {
+            if(!this.userPrivacySettings){
                 this.userPrivacySettings = {};
             }
 
-            for (setting in privacyControls) {
-                if (privacyControls.hasOwnProperty(setting)) {
+            for(setting in privacyControls){
+                if(privacyControls.hasOwnProperty(setting)){
                     control = privacyControls[setting];
 
                     // Only store the value if it hasn't been forced by the editor
-                    if (!control.get('disabled')) {
+                    if(!control.get('disabled')){
                         this.userPrivacySettings[setting] = control.get('checked');
                     }
                 }
             }
 
             // Update UI based on course / site tool configuration
-            for (setting in privacyControls) {
-                if (privacyControls.hasOwnProperty(setting)) {
+            for(setting in privacyControls){
+                if(privacyControls.hasOwnProperty(setting)){
                     var settingValue = toolInfo[setting];
                     control = privacyControls[setting];
 
-                    if (settingValue == M.mod_lti.LTI_SETTING_NEVER) {
+                    if(settingValue == M.mod_lti.LTI_SETTING_NEVER){
                         control.set('disabled', true);
                         control.set('checked', false);
                         control.set('title', M.util.get_string('forced_help', 'lti'));
-                    } else if (settingValue == M.mod_lti.LTI_SETTING_ALWAYS) {
+                    } else if(settingValue == M.mod_lti.LTI_SETTING_ALWAYS){
                         control.set('disabled', true);
                         control.set('checked', true);
                         control.set('title', M.util.get_string('forced_help', 'lti'));
-                    } else if (settingValue == M.mod_lti.LTI_SETTING_DELEGATE) {
+                    } else if(settingValue == M.mod_lti.LTI_SETTING_DELEGATE){
                         control.set('disabled', false);
 
                         // Get the value out of the stored copy
@@ -301,7 +301,7 @@
             this.toggleGradeSection();
         },
 
-        getSelectedToolTypeOption: function() {
+        getSelectedToolTypeOption: function(){
             var typeSelector = Y.one('#id_typeid');
 
             return typeSelector.one('option[value="' + typeSelector.get('value') + '"]');
@@ -311,10 +311,10 @@
          * Separate tool listing into option groups. Server-side select control
          * doesn't seem to support this.
          */
-        addOptGroups: function() {
+        addOptGroups: function(){
             var typeSelector = Y.one('#id_typeid');
 
-            if (typeSelector.one('option[courseTool=1]')) {
+            if(typeSelector.one('option[courseTool=1]')){
                 // One ore more course tools exist
 
                 var globalGroup = Y.Node.create('<optgroup />')
@@ -325,19 +325,19 @@
                                     .set('id', 'course_tool_group')
                                     .set('label', M.util.get_string('course_tool_types', 'lti'));
 
-                var globalOptions = typeSelector.all('option[globalTool=1]').remove().each(function(node) {
+                var globalOptions = typeSelector.all('option[globalTool=1]').remove().each(function(node){
                     globalGroup.append(node);
                 });
 
-                var courseOptions = typeSelector.all('option[courseTool=1]').remove().each(function(node) {
+                var courseOptions = typeSelector.all('option[courseTool=1]').remove().each(function(node){
                     courseGroup.append(node);
                 });
 
-                if (globalOptions.size() > 0) {
+                if(globalOptions.size() > 0){
                     typeSelector.append(globalGroup);
                 }
 
-                if (courseOptions.size() > 0) {
+                if(courseOptions.size() > 0){
                     typeSelector.append(courseGroup);
                 }
             }
@@ -347,43 +347,43 @@
          * Adds buttons for creating, editing, and deleting tool types.
          * Javascript is a requirement to edit course level tools at this point.
          */
-        createTypeEditorButtons: function() {
+        createTypeEditorButtons: function(){
             var self = this;
 
             var typeSelector = Y.one('#id_typeid');
 
-            var createIcon = function(id, tooltip, iconhtml) {
+            var createIcon = function(id, tooltip, iconhtml){
                 return Y.Node.create('<a />')
                         .set('id', id)
                         .set('title', tooltip)
                         .setStyle('margin-left', '.5em')
                         .set('href', 'javascript:void(0);')
                         .append(Y.Node.create(iconhtml));
-            };
+            }
 
             var addIcon = createIcon('lti_add_tool_type', M.util.get_string('addtype', 'lti'), this.settings.add_icon_html);
             var editIcon = createIcon('lti_edit_tool_type', M.util.get_string('edittype', 'lti'), this.settings.edit_icon_html);
-            var deleteIcon = createIcon('lti_delete_tool_type', M.util.get_string('deletetype', 'lti'), this.settings.delete_icon_html);
+            var deleteIcon  = createIcon('lti_delete_tool_type', M.util.get_string('deletetype', 'lti'), this.settings.delete_icon_html);
 
-            editIcon.on('click', function(e) {
+            editIcon.on('click', function(e){
                 var toolTypeId = typeSelector.get('value');
 
-                if (self.getSelectedToolTypeOption().getAttribute('editable')) {
+                if(self.getSelectedToolTypeOption().getAttribute('editable')){
                     window.open(self.settings.instructor_tool_type_edit_url + '&action=edit&typeid=' + toolTypeId, 'edit_tool');
                 } else {
                     alert(M.util.get_string('cannot_edit', 'lti'));
                 }
             });
 
-            addIcon.on('click', function(e) {
+            addIcon.on('click', function(e){
                 window.open(self.settings.instructor_tool_type_edit_url + '&action=add', 'add_tool');
             });
 
-            deleteIcon.on('click', function(e) {
+            deleteIcon.on('click', function(e){
                 var toolTypeId = typeSelector.get('value');
 
-                if (self.getSelectedToolTypeOption().getAttribute('editable')) {
-                    if (confirm(M.util.get_string('delete_confirmation', 'lti'))) {
+                if(self.getSelectedToolTypeOption().getAttribute('editable')){
+                    if(confirm(M.util.get_string('delete_confirmation', 'lti'))){
                         self.deleteTool(toolTypeId);
                     }
                 } else {
@@ -396,13 +396,13 @@
             editIcon.insert(deleteIcon, 'after');
         },
 
-        toggleEditButtons: function() {
+        toggleEditButtons: function(){
             var lti_edit_tool_type = Y.one('#lti_edit_tool_type');
             var lti_delete_tool_type = Y.one('#lti_delete_tool_type');
 
             // Make the edit / delete icons look enabled / disabled.
             // Does not work in older browsers, but alerts will catch those cases.
-            if (this.getSelectedToolTypeOption().getAttribute('editable')) {
+            if(this.getSelectedToolTypeOption().getAttribute('editable')){
                 lti_edit_tool_type.setStyle('opacity', '1');
                 lti_delete_tool_type.setStyle('opacity', '1');
             } else {
@@ -411,7 +411,7 @@
             }
         },
 
-        addToolType: function(toolType) {
+        addToolType: function(toolType){
             var typeSelector = Y.one('#id_typeid');
             var course_tool_group = Y.one('#course_tool_group');
 
@@ -423,7 +423,7 @@
                             .setAttribute('courseTool', '1')
                             .setAttribute('domain', toolType.tooldomain);
 
-            if (course_tool_group) {
+            if(course_tool_group){
                 course_tool_group.append(option);
             } else {
                 typeSelector.append(option);
@@ -435,7 +435,7 @@
             this.updateAutomaticToolMatch(Y.one('#id_securetoolurl'));
             this.toggleEditButtons();
 
-            require(["core/notification"], function(notification) {
+            require(["core/notification"], function (notification) {
                 notification.addNotification({
                     message: M.util.get_string('tooltypeadded', 'lti'),
                     type: "success"
@@ -443,7 +443,7 @@
             });
         },
 
-        updateToolType: function(toolType) {
+        updateToolType: function(toolType){
             var typeSelector = Y.one('#id_typeid');
 
             var option = typeSelector.one('option[value="' + toolType.id + '"]');
@@ -455,7 +455,7 @@
             this.updateAutomaticToolMatch(Y.one('#id_toolurl'));
             this.updateAutomaticToolMatch(Y.one('#id_securetoolurl'));
 
-            require(["core/notification"], function(notification) {
+            require(["core/notification"], function (notification) {
                 notification.addNotification({
                     message: M.util.get_string('tooltypeupdated', 'lti'),
                     type: "success"
@@ -463,12 +463,12 @@
             });
         },
 
-        deleteTool: function(toolTypeId) {
+        deleteTool: function(toolTypeId){
             var self = this;
 
             Y.io(self.settings.instructor_tool_type_edit_url + '&action=delete&typeid=' + toolTypeId, {
                 on: {
-                    success: function() {
+                    success: function(){
                         self.getSelectedToolTypeOption().remove();
 
                         // Editing the tool may affect which tool gets matched automatically
@@ -476,15 +476,15 @@
                         self.updateAutomaticToolMatch(Y.one('#id_toolurl'));
                         self.updateAutomaticToolMatch(Y.one('#id_securetoolurl'));
 
-                        require(["core/notification"], function(notification) {
+                        require(["core/notification"], function (notification) {
                             notification.addNotification({
                                 message: M.util.get_string('tooltypedeleted', 'lti'),
                                 type: "success"
                             });
                         });
                     },
-                    failure: function() {
-                        require(["core/notification"], function(notification) {
+                    failure: function(){
+                        require(["core/notification"], function (notification) {
                             notification.addNotification({
                                 message: M.util.get_string('tooltypenotdeleted', 'lti'),
                                 type: "problem"
@@ -495,7 +495,7 @@
             });
         },
 
-        findToolByUrl: function(url, toolId, callback) {
+        findToolByUrl: function(url, toolId, callback){
             var self = this;
 
             Y.io(self.settings.ajax_url, {
@@ -506,14 +506,14 @@
                 },
 
                 on: {
-                    success: function(transactionid, xhr) {
+                    success: function(transactionid, xhr){
                         var response = xhr.response;
 
                         var toolInfo = Y.JSON.parse(response);
 
                         callback(toolInfo);
                     },
-                    failure: function() {
+                    failure: function(){
 
                     }
                 }

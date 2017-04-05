@@ -20,16 +20,13 @@
  * @package totara
  * @subpackage totara_core
  */
-
-/* eslint-disable no-undef */
-
  M.totara_goalitem = M.totara_goalitem || {
 
     Y: null,
     // optional php params and defaults defined here, args passed to init method
     // below will override these values
     config: {
-                id: 0
+                id:0
             },
 
     /**
@@ -38,7 +35,7 @@
      * @param object YUI instance
      * @param string args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -57,16 +54,16 @@
             throw new Error('M.totara_goalitem.init()-> jQuery dependency required for this module to function.');
         }
 
-        // /
-        // / Add related goal dialog
-        // /
+        ///
+        /// Add related goal dialog
+        ///
         (function() {
-            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/goal/related/';
+            var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/goal/related/';
             totaraMultiSelectDialog(
                 'related',
                 M.util.get_string('assignrelatedgoals', 'totara_hierarchy'),
-                url + 'find.php?id=' + M.totara_goalitem.config.id,
-                url + 'save.php?id=' + M.totara_goalitem.config.id + '&deleteexisting=1&add='
+                url+'find.php?id='+M.totara_goalitem.config.id,
+                url+'save.php?id='+M.totara_goalitem.config.id+'&deleteexisting=1&add='
             );
         })();
 
@@ -77,7 +74,7 @@
             totaraDialog_handler_assignEvidence = function() {
                 // Base url
                 var baseurl = '';
-            };
+            }
 
             totaraDialog_handler_assignEvidence.prototype = new totaraDialog_handler_treeview();
 
@@ -97,17 +94,17 @@
 
                     handler._handle_course_click(id);
                 });
-            };
+            }
 
             totaraDialog_handler_assignEvidence.prototype._handle_course_click = function(id) {
                 // Load course details
-                var url = this.baseurl + 'course.php?id=' + id + '&goal=' + M.totara_goalitem.config.id;
+                var url = this.baseurl+'course.php?id='+id+'&goal='+M.totara_goalitem.config.id;
 
                 // Indicate loading...
                 this._dialog.showLoading();
 
                 this._dialog._request(url, {object: this, method: '_display_evidence'});
-            };
+            }
 
             /**
              * Display course evidence items
@@ -126,11 +123,11 @@
                     e.preventDefault();
                     var type = $(this).parent().attr('type');
                     var instance = $(this).parent().attr('id');
-                    var url = handler.baseurl + 'add.php?goal=' + M.totara_goalitem.config.id + '&type=' + type + '&instance=' + instance;
+                    var url = handler.baseurl+'add.php?goal='+M.totara_goalitem.config.id+'&type='+type+'&instance='+instance;
                     handler._dialog._request(url, {object: handler, method: '_update'});
                 });
 
-            };
+            }
 
         } else { // use course-level dialog
 
@@ -138,7 +135,7 @@
             totaraDialog_handler_compEvidence = function() {
                 // Base url
                 var baseurl = '';
-            };
+            }
 
             totaraDialog_handler_compEvidence.prototype = new totaraDialog_handler_treeview_multiselect();
 
@@ -155,9 +152,9 @@
                 this._dialog.hide();
 
                 // Remove no item warning (if exists)
-                $('.noitems-' + this._title).remove();
+                $('.noitems-'+this._title).remove();
 
-                // Split response into table and div
+                //Split response into table and div
                 var new_table = $(response).find('table.list-evidence');
 
                 // Grab table
@@ -174,23 +171,23 @@
             };
 
             (function() {
-                var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/goal/evidenceitem/';
-                var saveurl = url + 'add.php?goal=' + M.totara_goalitem.config.id + '&type=coursecompletion&instance=0&deleteexisting=1&update=';
+                var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/goal/evidenceitem/';
+                var saveurl = url + 'add.php?goal='+M.totara_goalitem.config.id+'&type=coursecompletion&instance=0&deleteexisting=1&update=';
                 var buttonsObj = {};
                 var handler = new totaraDialog_handler_compEvidence();
                 handler.baseurl = url;
 
-                buttonsObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(saveurl); };
-                buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+                buttonsObj[M.util.get_string('save','totara_core')] = function() { handler._save(saveurl) }
+                buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
 
-                totaraDialogs.evidence = new totaraDialog(
+                totaraDialogs['evidence'] = new totaraDialog(
                     'evidence',
                     'show-evidence-dialog',
                     {
                          buttons: buttonsObj,
-                         title: '<h2>' + M.util.get_string('assigncoursecompletions', 'totara_hierarchy') + '</h2>'
+                         title: '<h2>' +  M.util.get_string('assigncoursecompletions','totara_hierarchy') + '</h2>'
                     },
-                    url + 'edit.php?id=' + M.totara_goalitem.config.id,
+                    url+'edit.php?id='+M.totara_goalitem.config.id,
                     handler
                 );
             })();
@@ -199,25 +196,25 @@
         if (typeof M.totara_goalitem.config.goaluseresourcelevelevidence !== 'undefined' &&
             M.totara_goalitem.config.goaluseresourcelevelevidence) {
 
-            // /
-            // / Assign evidence item dialog (resource-level)
-            // /
+            ///
+            /// Assign evidence item dialog (resource-level)
+            ///
             (function() {
-                var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/goal/evidenceitem/';
+                var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/goal/evidenceitem/';
                 var buttonsObj = {};
                 var handler = new totaraDialog_handler_assignEvidence();
                 handler.baseurl = url;
 
-                buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+                buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
 
-                totaraDialogs.evidence = new totaraDialog(
+                totaraDialogs['evidence'] = new totaraDialog(
                     'evidence',
                     'show-evidence-dialog',
                     {
                         buttons: buttonsObj,
-                        title: '<h2>' + M.util.get_string('assignnewevidenceitem', 'totara_hierarchy') + '</h2>'
+                        title: '<h2>' + M.util.get_string('assignnewevidenceitem','totara_hierarchy') + '</h2>'
                     },
-                    url + 'edit.php?id=' + M.totara_goalitem.config.id,
+                    url+'edit.php?id='+M.totara_goalitem.config.id,
                     handler
                 );
             })();

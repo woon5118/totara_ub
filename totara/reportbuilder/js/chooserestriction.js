@@ -20,8 +20,6 @@
  * @package totara_reportbuilder
  */
 
-/* eslint-disable no-undef */
-
 M.totara_reportbuilder_chooserestriction = M.totara_reportbuilder_chooserestriction || {
     Y: null,
     reportid: null,
@@ -34,7 +32,7 @@ M.totara_reportbuilder_chooserestriction = M.totara_reportbuilder_chooserestrict
      * @param reportid        Integer
      * @param pageurl         String
      */
-    init: function(Y, reportid, pageurl) {
+    init: function (Y, reportid, pageurl) {
         // Save a reference to the Y instance (all of its dependencies included).
         this.Y = Y;
 
@@ -51,16 +49,16 @@ M.totara_reportbuilder_chooserestriction = M.totara_reportbuilder_chooserestrict
         this.rb_init_choose_restriction_dialogs();
     },
 
-    rb_init_choose_restriction_dialogs: function() {
+    rb_init_choose_restriction_dialogs : function () {
         var dialog = this.addDialog();
     },
 
-    addDialog: function() {
+    addDialog: function () {
         var selected = [];
         var baseurl = M.cfg.wwwroot + '/totara/reportbuilder/';
         var title = M.util.get_string('chooserestrictiontitle', 'totara_reportbuilder');
         var name = 'chooserestriction';
-        var selected = $('#show-' + name + '-dialog').data('selected');
+        var selected = $('#show-'+name+'-dialog').data('selected');
         var find_url = baseurl + 'ajax/find_restriction.php?sesskey=' + M.cfg.sesskey;
         var reload_url = this.pageurl;
         if (reload_url.indexOf('?') === -1) {
@@ -93,14 +91,14 @@ M.totara_reportbuilder_chooserestriction = M.totara_reportbuilder_chooserestrict
             var valueparam = $.param({globalrestrictionids: values.join(',')});
             window.location.href = reload_url + '&' + valueparam;
         };
-        buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+        buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel();};
 
         totaraDialogs[name] = new totaraDialog(
             name,
-            'show-' + name + '-dialog',
+            'show-'+name+'-dialog',
             {
                 buttons: buttonObj,
-                title: '<h2>' + title + '</h2>',
+                title: '<h2>'+title+'</h2>',
                 width: 500
             },
             find_url + '&selected=' + selected + '&reportid=' + this.reportid,

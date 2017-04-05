@@ -23,9 +23,6 @@
  * @package totara
  * @subpackage totara_core
  */
-
-/* eslint-disable */
-
 M.totara_dialog = M.totara_dialog || {
 
     Y: null,
@@ -39,7 +36,7 @@ M.totara_dialog = M.totara_dialog || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -134,9 +131,9 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
         };
 
         // Instantiate the Dialog
-        $('<div class="totara-dialog" style="display: none;"><div id="' + this.title + '"></div></div>').appendTo($('body'));
+        $('<div class="totara-dialog" style="display: none;"><div id="'+this.title+'"></div></div>').appendTo($('body'));
 
-        this.dialog = $('#' + this.title).dialog(
+        this.dialog = $('#'+this.title).dialog(
             $.extend(default_config, this.config)
         );
 
@@ -147,13 +144,13 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
 
         // Bind hide() event to closing dialog
         // Need this to make sure hide() is called on ESCAPE and dialog closure with [X] button
-        $('#' + this.title).on("dialogclose", function(event) {
+        $('#'+this.title).on( "dialogclose", function(event) {
             event.preventDefault();
             obj.hide();
         });
 
         // Bind open event to button
-        $(document).on('click', '#' + this.buttonid, function(event) {
+        $(document).on('click', '#'+this.buttonid, function(event) {
 
             // Stop any default event occuring
             event.preventDefault();
@@ -162,7 +159,7 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
             obj.open();
         });
 
-    };
+    }
 
 
     /**
@@ -189,7 +186,7 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
         }
 
         this.load(this.default_url);
-    };
+    }
 
 
     /**
@@ -213,7 +210,7 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
 
         // Load page
         this._request(this.url, {}, type, query_data);
-    };
+    }
 
 
     /**
@@ -230,15 +227,15 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
             dialog.dialog.html(response);
         } else {
             // Print a generic error message
-            require(['core/str'], function(mdlstring) {
-                mdlstring.get_string('error:dialoggenericerror', 'totara_core').done(function(genericerror) {
+            require(['core/str'], function (mdlstring) {
+                mdlstring.get_string('error:dialoggenericerror', 'totara_core').done(function (genericerror) {
                     // Hide loading animation.
                     dialog.hideLoading();
                     dialog.dialog.html('<div class="box errorbox errorboxcontent">' + genericerror + '</div>');
                 })
-            ; });
+            ;})
         }
-    };
+    }
 
 
     /**
@@ -269,7 +266,7 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
         if (outputelement && this.handler._partial_load != undefined) {
             this.handler._partial_load(outputelement);
         }
-    };
+    }
 
 
     /**
@@ -300,8 +297,8 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
                 //
                 // if there is more than one parent with the class set,
                 // loads in the most specific one
-                var target = $(this).parents('.dialog-load-within').slice(0, 1);
-                if (target.length != 0) {
+                var target = $(this).parents('.dialog-load-within').slice(0,1);
+                if(target.length != 0) {
                     dialog.showLoading();
                     dialog._request(url, {outputelement: target});
                 } else {
@@ -315,7 +312,7 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
                 return false;
             });
         });
-    };
+    }
 
 
     /**
@@ -355,7 +352,7 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
                 return false;
             });
         });
-    };
+    }
 
 
     /**
@@ -363,8 +360,8 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
      * @return void
      */
     this.showLoading = function() {
-        $('div#' + this.title).addClass('yui-isloading');
-    };
+        $('div#'+this.title).addClass('yui-isloading');
+    }
 
 
     /**
@@ -372,8 +369,8 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
      * @return void
      */
     this.hideLoading = function() {
-        $('div#' + this.title).removeClass('yui-isloading');
-    };
+        $('div#'+this.title).removeClass('yui-isloading');
+    }
 
 
     /**
@@ -388,7 +385,7 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
         if (this.dialog.dialog("isOpen")) {
             this.dialog.dialog('close');
         }
-    };
+    }
 
 
     /**
@@ -452,7 +449,7 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
                 dialog.error(dialog, o.responseText, url);
             }
         });
-    };
+    }
 
 
     // Setup object
@@ -460,7 +457,7 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
 
 }
 
-/** ***************************************************************************/
+/*****************************************************************************/
 /** totaraDialog_handler **/
 
 function totaraDialog_handler() {
@@ -488,7 +485,7 @@ function totaraDialog_handler() {
 totaraDialog_handler.prototype._setup = function(dialog) {
     this._dialog = dialog;
     this._title = dialog.title;
-};
+}
 
 /**
  * Run on page load
@@ -503,7 +500,7 @@ totaraDialog_handler.prototype._load = function(dialog) {
     if (!this._loaded) {
 
         // Setup container
-        this._container = $('#' + this._title);
+        this._container = $('#'+this._title);
 
         // Run decendant method
         if (this.first_load != undefined) {
@@ -532,7 +529,7 @@ totaraDialog_handler.prototype._load = function(dialog) {
     }
 
     return true;
-};
+}
 
 /**
  * Add a row to a table on the calling page
@@ -544,22 +541,22 @@ totaraDialog_handler.prototype._load = function(dialog) {
 totaraDialog_handler.prototype._update = function(response) {
 
     // Remove no item warning (if exists)
-    $('.noitems-' + this._title).remove();
+    $('.noitems-'+this._title).remove();
 
     // Hide dialog
     this._dialog.hide();
 
     // Sometimes we want to have two dialogs changing the same table,
     // so here we support tagging tables by id, or class
-    var content = $('div.list-' + this._title);
+    var content = $('div.list-'+this._title);
 
     // Add replace div with updated data
     content.replaceWith(response);
 
     // Hide noscript objects
-    $('.totara-noscript', $('div.list-' + this._title)).hide();
+    $('.totara-noscript', $('div.list-'+this._title)).hide();
 
-};
+}
 
 
 /**
@@ -576,14 +573,14 @@ totaraDialog_handler.prototype._get_ids = function(elements, prefix) {
 
     // Loop through elements
     elements.each(
-        function(intIndex) {
+        function (intIndex) {
 
             // Get id attr
             var id = $(this).attr('id').split('_');
-            if (id[id.length - 2] == 'personal') {
-              id = 'p' + id[id.length - 1]; // If the item is a personal goal, we add a prefix
+            if (id[id.length-2] == 'personal') {
+              id = 'p' + id[id.length-1]; // If the item is a personal goal, we add a prefix
             } else {
-              id = id[id.length - 1];  // The last item is the actual id
+              id = id[id.length-1];  // The last item is the actual id
             }
             // Append to list
             ids.push(id);
@@ -591,7 +588,7 @@ totaraDialog_handler.prototype._get_ids = function(elements, prefix) {
     );
 
     return ids;
-};
+}
 
 /**
  * Serialize dropped items and send to url,
@@ -611,7 +608,7 @@ totaraDialog_handler.prototype._save = function(url) {
 
     // Send to server
     this._dialog._request(url, {object: this, method: '_update'});
-};
+}
 
 /**
  * Handle a 'cancel' request, by just closing the dialog
@@ -621,7 +618,7 @@ totaraDialog_handler.prototype._save = function(url) {
 totaraDialog_handler.prototype._cancel = function() {
     this._dialog.hide();
     return;
-};
+}
 
 
 /**
@@ -659,7 +656,7 @@ totaraDialog_handler.prototype._set_framework = function() {
 
     this._dialog.showLoading();  // Show loading icon and then perform request
     this._dialog._request(url, {outputelement: $('#browse-tab .treeview-wrapper', this._container)});
-};
+}
 
 /**
  * Change plan
@@ -678,10 +675,10 @@ totaraDialog_handler.prototype._set_plan = function() {
 
     this._dialog.showLoading();  // Show loading icon and then perform request
     this._dialog._request(url, {outputelement: $('#browse-tab .treeview-wrapper', this._container)});
-};
+}
 
 
-/** ***************************************************************************/
+/*****************************************************************************/
 /** totaraDialog_handler_treeview **/
 
 totaraDialog_handler_treeview = function() {};
@@ -703,7 +700,7 @@ totaraDialog_handler_treeview.prototype.setup_tabs = function(e, ui) {
     if (ui && $(ui.newTab).attr('aria-controls') === 'search-tab') {
         $('#id_query', this._container).focus();
     }
-};
+}
 
 
 /**
@@ -752,7 +749,7 @@ totaraDialog_handler_treeview.prototype.first_load = function() {
     .click(function(e) {
         e.preventDefault();
     });
-};
+}
 
 
 /**
@@ -779,7 +776,7 @@ totaraDialog_handler_treeview.prototype._partial_load = function(parent_element)
     }
 
     // Setup hierarchy
-    this._make_hierarchy(parent_element);// $('.treeview', parent_element));
+    this._make_hierarchy(parent_element);//$('.treeview', parent_element));
 
     // Disable selected item's anchors
     $('.selected > div > span a', parent_element).unbind('click')
@@ -793,7 +790,7 @@ totaraDialog_handler_treeview.prototype._partial_load = function(parent_element)
     }
 
     return true;
-};
+}
 
 /**
  * Setup hierarchy click handlers
@@ -807,7 +804,7 @@ totaraDialog_handler_treeview.prototype._make_hierarchy = function(parent_elemen
     // adding expandable/parent_element click events.
     $('span.expandonly', parent_element).each(function() {
         var elid = $(this).attr('id');
-        var selectable_spans = $('.treeview', handler._container).find('span#' + elid);
+        var selectable_spans = $('.treeview', handler._container).find('span#'+elid);
 
         // Disable the anchor
         $('a', selectable_spans).unbind('click');
@@ -830,7 +827,7 @@ totaraDialog_handler_treeview.prototype._make_hierarchy = function(parent_elemen
         // Id in format item_list_XX
         var id = par.attr('id').substr(10);
 
-        var url = handler._dialog.url + '&parentid=' + id;
+        var url = handler._dialog.url+'&parentid='+id;
         handler._dialog._request(url, {object: handler, method: '_update_hierarchy', data: id});
 
         return false;
@@ -847,7 +844,7 @@ totaraDialog_handler_treeview.prototype._make_hierarchy = function(parent_elemen
         var id = $(this).attr('id');
         handler._toggle_items(id, false);
     });
-};
+}
 
 /**
  * Add items to existing treeview
@@ -858,7 +855,7 @@ totaraDialog_handler_treeview.prototype._make_hierarchy = function(parent_elemen
  */
 totaraDialog_handler_treeview.prototype._update_hierarchy = function(response, parent_id) {
     var items = response;
-    var list = $('#browse-tab .treeview li#item_list_' + parent_id + ' ul:first', this._container);
+    var list = $('#browse-tab .treeview li#item_list_'+parent_id+' ul:first', this._container);
 
     // Remove all existing children
     $('li', list).remove();
@@ -873,7 +870,7 @@ totaraDialog_handler_treeview.prototype._update_hierarchy = function(response, p
     if (this._handle_update_hierarchy != undefined) {
         this._handle_update_hierarchy(list);
     }
-};
+}
 
 /**
  * Toggle selectability of treeview items
@@ -887,7 +884,7 @@ totaraDialog_handler_treeview.prototype._toggle_items = function(elid, type) {
     var handler = this;
 
     // Get elements from treeviews
-    var selectable_spans = $('.treeview', this._container).find('span#' + elid);
+    var selectable_spans = $('.treeview', this._container).find('span#'+elid);
 
     if (type) {
         selectable_spans.removeClass('unclickable');
@@ -908,7 +905,7 @@ totaraDialog_handler_treeview.prototype._toggle_items = function(elid, type) {
             e.preventDefault();
         });
     }
-};
+}
 
 /**
  * Bind click event to elements, i.e to make them deletable
@@ -944,7 +941,7 @@ totaraDialog_handler_treeview.prototype._make_deletable = function(parent_elemen
             return false;
         });
     });
-};
+}
 
 /**
  * @param object element the element to append
@@ -952,10 +949,10 @@ totaraDialog_handler_treeview.prototype._make_deletable = function(parent_elemen
  */
 totaraDialog_handler_treeview.prototype._append_to_selected = function(element) {
     var clone = element.closest('span').clone();  // Make a clone of the list item
-    var selected_area = $('.selected', this._container);
+    var selected_area = $('.selected', this._container)
 
     // Check if an element with the same ID already exists
-    if ($('#' + clone.attr('id'), selected_area).length < 1) {
+    if ($('#'+clone.attr('id'), selected_area).length < 1) {
 
         // Wrap item in a div
         var wrapped = $('<div></div>').append(clone);
@@ -979,10 +976,11 @@ totaraDialog_handler_treeview.prototype._append_to_selected = function(element) 
         // Make all selected items deletable
         this._make_deletable(selected_area);
     }
-};
+}
 
 
-/** ***************************************************************************/
+
+/*****************************************************************************/
 /** totaraDialog_handler_treeview_multiselect **/
 
 totaraDialog_handler_treeview_multiselect = function() {};
@@ -1000,7 +998,7 @@ totaraDialog_handler_treeview_multiselect.prototype.every_load = function() {
 
     // Make spans in selected pane deletable
     this._make_deletable($('.selected', this._container));
-};
+}
 
 /**
  * Bind hover/click event to elements, to make them selectable
@@ -1030,7 +1028,7 @@ totaraDialog_handler_treeview_multiselect.prototype._make_selectable = function(
         return false;
     });
 
-};
+}
 
 /**
  * Hierarchy update handler
@@ -1040,10 +1038,10 @@ totaraDialog_handler_treeview_multiselect.prototype._make_selectable = function(
  */
 totaraDialog_handler_treeview_multiselect.prototype._handle_update_hierarchy = function(parent_element) {
     this._make_selectable(parent_element);
-};
+}
 
 
-/** ***************************************************************************/
+/*****************************************************************************/
 /** totaraDialog_handler_treeview_multiselect_rb_filter **/
 
 totaraDialog_handler_treeview_multiselect_rb_filter = function() {};
@@ -1056,7 +1054,7 @@ totaraDialog_handler_treeview_multiselect_rb_filter.prototype = new totaraDialog
  */
 totaraDialog_handler_treeview_multiselect_rb_filter.prototype.first_load = function() {
     var id = this._title;
-    var linkcontainer = $('.list-' + id);
+    var linkcontainer = $('.list-'+id);
     var handler = this;
     // find all the currently selected items (by traversing the DOM on the
     // underlying page), then add them to the 'selected' panel without the
@@ -1066,12 +1064,12 @@ totaraDialog_handler_treeview_multiselect_rb_filter.prototype.first_load = funct
     $('.multiselect-selected-item', linkcontainer).each(function(i, el) {
         var item_id = $(this).data('id');
         var item_name = $(this).text();
-        preselected += '<div class="treeview-selected-item"><span id="item_' + item_id + '"><a href="#">' + item_name + '</a><span class="deletebutton">'
+        preselected += '<div class="treeview-selected-item"><span id="item_'+item_id+'"><a href="#">'+item_name+'</a><span class="deletebutton">'
                     + M.util.get_string('delete', 'totara_core')
-                    + '</span></span></div>';
-        handler._toggle_items('item_' + item_id, false);
+                    +'</span></span></div>';
+        handler._toggle_items('item_'+item_id, false);
     });
-    var selected_area = $('.selected', this._container);
+    var selected_area = $('.selected', this._container)
     selected_area.append(preselected);
 
     // call the original function as well
@@ -1081,12 +1079,12 @@ totaraDialog_handler_treeview_multiselect_rb_filter.prototype.first_load = funct
 totaraDialog_handler_treeview_multiselect_rb_filter.prototype._update = function(response) {
     var id = this._title;
     // update the hidden field
-    var hiddenfield = $('input[name=' + id + ']');
+    var hiddenfield = $('input[name='+id+']');
     var ids = hiddenfield.val();
     var id_array = (ids) ? ids.split(',') : [];
 
     // pull out selected IDs from selected column
-    $('#' + id + ' .selected .clickable').each(function(i, el) {
+    $('#'+id+' .selected .clickable').each(function(i, el){
         id_array.push($(this).attr('id').split('_')[1]);
     });
     var combined_ids = id_array.join(',');
@@ -1097,17 +1095,18 @@ totaraDialog_handler_treeview_multiselect_rb_filter.prototype._update = function
 
     // Sometimes we want to have two dialogs changing the same table,
     // so here we support tagging tables by id, or class
-    var content = $('div.list-' + this._title);
+    var content = $('div.list-'+this._title);
 
     // Replace div with updated data
     content.replaceWith(response);
 
     // Hide noscript objects
-    $('.totara-noscript', $('div.list-' + this._title)).hide();
+    $('.totara-noscript', $('div.list-'+this._title)).hide();
 };
 
 
-/** ***************************************************************************/
+
+/*****************************************************************************/
 /** totaraDialog_handler_treeview_singleselect **/
 
 totaraDialog_handler_treeview_singleselect = function(value_element_name, text_element_id, dualpane) {
@@ -1123,9 +1122,9 @@ totaraDialog_handler_treeview_singleselect = function(value_element_name, text_e
 
     // Use 2 panes in the dialog for getting to the selection items
     if (dualpane != 'undefined') {
-        this.dualpane = dualpane;
+        this.dualpane = dualpane
     } else {
-        this.dualpane = false;
+        this.dualpane=false;
     }
 };
 
@@ -1139,7 +1138,7 @@ totaraDialog_handler_treeview_singleselect.prototype = new totaraDialog_handler_
  */
 totaraDialog_handler_treeview_singleselect.prototype._handle_update_hierarchy = function(parent_element) {
     this._make_selectable(parent_element);
-};
+}
 
 /**
  * Setup delete buttons
@@ -1149,22 +1148,22 @@ totaraDialog_handler_treeview_singleselect.prototype._handle_update_hierarchy = 
 totaraDialog_handler_treeview_singleselect.prototype.setup_delete = function() {
     this.deletable = true;
 
-    var textel = $('#' + this.text_element_id);
-    var idel = $('input[name="' + this.value_element_name + '"]');
+    var textel = $('#'+this.text_element_id);
+    var idel = $('input[name="'+this.value_element_name+'"]');
     var deletebutton = $('<a href="#" class="dialog-singleselect-deletable"></a>');
     var handler = this;
 
     // Setup handler
     deletebutton.click(function(e) {
-        e.preventDefault();
+        e.preventDefault()
         idel.val('');
         textel.removeClass('nonempty');
         textel.empty();
         handler.setup_delete();
     });
 
-    require(['core/templates'], function(templates) {
-        templates.renderIcon('delete', M.util.get_string('delete', 'totara_core')).done(function(html) {
+    require(['core/templates'], function (templates) {
+        templates.renderIcon('delete', M.util.get_string('delete', 'totara_core')).done(function (html) {
             deletebutton.html(html);
         });
     });
@@ -1173,7 +1172,7 @@ totaraDialog_handler_treeview_singleselect.prototype.setup_delete = function() {
         textel.append(deletebutton);
     }
 
-};
+}
 
 
 /**
@@ -1187,7 +1186,7 @@ totaraDialog_handler_treeview_singleselect.prototype.first_load = function() {
     totaraDialog_handler_treeview.prototype.first_load.call(this);
 
     this._set_current_selected();
-};
+}
 
 /**
  * Setup treeview and click infrastructure
@@ -1197,11 +1196,11 @@ totaraDialog_handler_treeview_singleselect.prototype.first_load = function() {
 totaraDialog_handler_treeview_singleselect.prototype.every_load = function() {
 
     this._make_selectable($('.treeview', this._container));
-};
+}
 
 totaraDialog_handler_treeview_singleselect.prototype._set_current_selected = function() {
-    var current_val = $('input[name="' + this.value_element_name + '"]').val();
-    var current_text = $('#' + this.text_element_id).clone();
+    var current_val = $('input[name="'+this.value_element_name+'"]').val();
+    var current_text = $('#'+this.text_element_id).clone();
 
     // Strip delete button from current text
     $('.dialog-singleselect-deletable', current_text).remove();
@@ -1213,19 +1212,19 @@ totaraDialog_handler_treeview_singleselect.prototype._set_current_selected = fun
         current_text = 'None';
     }
 
-    label_length = $('#treeview_currently_selected_span_' + this._title + ' label').html().length;
-    if (current_text.length + label_length > max_title_length) {
-        current_text = current_text.substring(0, max_title_length - label_length) + '...';
+    label_length = $('#treeview_currently_selected_span_'+this._title+' label').html().length;
+    if (current_text.length+label_length > max_title_length) {
+        current_text = current_text.substring(0, max_title_length-label_length)+'...';
     }
 
-    $('#treeview_selected_text_' + this._title).text(current_text);
-    $('#treeview_selected_val_' + this._title).val(current_val);
+    $('#treeview_selected_text_'+this._title).text(current_text);
+    $('#treeview_selected_val_'+this._title).val(current_val);
 
     if (current_val != 0) {
-        $('#treeview_currently_selected_span_' + this._title).css('display', 'inline');
-        this._toggle_items('item_' + current_val, false);
+        $('#treeview_currently_selected_span_'+this._title).css('display', 'inline');
+        this._toggle_items('item_'+current_val, false);
     }
-};
+}
 
 /**
  * Take clicked/selected item and
@@ -1239,37 +1238,37 @@ totaraDialog_handler_treeview_singleselect.prototype._save = function() {
     dialog = this;
 
     // Get selected id
-    var selected_val = $('#treeview_selected_val_' + this._title).val();
+    var selected_val = $('#treeview_selected_val_'+this._title).val();
 
     if (selected_val === "0") {
-        if (!M.str.hasOwnProperty('totara_core') || !M.str.totara_core.hasOwnProperty('error:' + this._title + 'notselected')) {
-            require(['core/str'], function(mdlstring) {
-                mdlstring.get_string('error:itemnotselected', 'totara_core').done(function(itemnotselected) {
+        if (!M.str.hasOwnProperty('totara_core') || !M.str['totara_core'].hasOwnProperty('error:'+this._title+'notselected')) {
+            require(['core/str'], function (mdlstring) {
+                mdlstring.get_string('error:itemnotselected', 'totara_core').done(function (itemnotselected) {
                     alert(itemnotselected);
                 })
-            ; });
+            ;})
         } else {
-            alert(M.util.get_string('error:' + this._title + 'notselected', 'totara_core'));
+            alert(M.util.get_string('error:'+this._title+'notselected', 'totara_core'));
         }
         return false;
     }
 
     // Get selected text
-    var selected_text = $('.treeview span.unclickable#item_' + selected_val + ' a', dialog._container).html();
+    var selected_text = $('.treeview span.unclickable#item_'+selected_val+' a', dialog._container).html();
 
     // Update value element
     if (this.value_element_name) {
-        $('input[name="' + this.value_element_name + '"]').val(selected_val);
+        $('input[name="'+this.value_element_name+'"]').val(selected_val);
     }
 
     // Update text element
     if (this.text_element_id) {
 
         if (selected_text) {
-            $('#' + this.text_element_id).html(selected_text);
-            $('#' + this.text_element_id).addClass('nonempty');
+            $('#'+this.text_element_id).html(selected_text);
+            $('#'+this.text_element_id).addClass('nonempty');
         } else {
-            $('#' + this.text_element_id).removeClass('nonempty');
+            $('#'+this.text_element_id).removeClass('nonempty');
         }
 
         if (this.deletable) {
@@ -1283,7 +1282,7 @@ totaraDialog_handler_treeview_singleselect.prototype._save = function() {
     }
 
     this._dialog.hide();
-};
+}
 
 
 /**
@@ -1310,16 +1309,16 @@ totaraDialog_handler_treeview_singleselect.prototype._make_selectable = function
             var clicked = $(this);
 
             // Get current selection
-            var current_val = $('#treeview_selected_val_' + dialog._title).val();
+            var current_val = $('#treeview_selected_val_'+dialog._title).val();
 
             // Enable current (old) selection
-            dialog._toggle_items('item_' + current_val, true);
+            dialog._toggle_items('item_'+current_val, true);
 
             // Disable new selection
             dialog._toggle_items($(this).attr('id'), false);
 
             var clicked_id = clicked.attr('id').split('_');
-            clicked_id = clicked_id[clicked_id.length - 1];  // The last item is the actual id
+            clicked_id = clicked_id[clicked_id.length-1];  // The last item is the actual id
             clicked.attr('id', clicked_id);
 
             // Check for new-style clickhandlers
@@ -1341,29 +1340,29 @@ totaraDialog_handler_treeview_singleselect.prototype._make_selectable = function
         var max_title_length = 60;
 
         // Get current selection
-        var current_val = $('#treeview_selected_val_' + dialog._title).val();
+        var current_val = $('#treeview_selected_val_'+dialog._title).val();
 
         // Disable new selection
         dialog._toggle_items($(this).attr('id'), false);
 
-        label_length = $('#treeview_currently_selected_span_' + dialog._title + ' label').html().length;
+        label_length = $('#treeview_currently_selected_span_'+dialog._title+' label').html().length;
         if (dialog.get_selected_title) {
             selected_title = dialog.get_selected_title(clone);
-        } else if ($('a', clone).html().length + label_length > max_title_length) {
-            selected_title = $('a', clone).html().substring(0, max_title_length - label_length) + '...';
+        } else if ($('a', clone).html().length+label_length > max_title_length) {
+            selected_title = $('a', clone).html().substring(0, max_title_length-label_length)+'...';
         } else {
             selected_title = $('a', clone).html();
         }
 
-        $('#treeview_selected_text_' + dialog._title).html(selected_title);
+        $('#treeview_selected_text_'+dialog._title).html(selected_title);
         var selected_id = clone.attr('id').split('_')[1];
-        $('#treeview_selected_val_' + dialog._title).val(selected_id);
+        $('#treeview_selected_val_'+dialog._title).val(selected_id);
 
         // Make sure the info is displayed
-        $('#treeview_currently_selected_span_' + dialog._title).css('display', 'inline');
+        $('#treeview_currently_selected_span_'+dialog._title).css('display', 'inline');
 
         // Enable current (old) selection
-        dialog._toggle_items('item_' + current_val, true);
+        dialog._toggle_items('item_'+current_val, true);
 
         // Re-bind to right elements
         dialog._make_selectable(parent_element);
@@ -1372,10 +1371,10 @@ totaraDialog_handler_treeview_singleselect.prototype._make_selectable = function
     });
 
     // Make currently selected item unclickable
-    dialog._toggle_items('item_' + $('#treeview_selected_val_' + dialog._title).val(), false);
-};
+    dialog._toggle_items('item_' + $('#treeview_selected_val_'+dialog._title).val(), false);
+}
 
-/** ***************************************************************************/
+/*****************************************************************************/
 /** totaraDialog_handler_skeletalTreeview **/
 
 totaraDialog_handler_skeletalTreeview = function() {};
@@ -1412,7 +1411,7 @@ totaraDialog_handler_skeletalTreeview.prototype.every_load = function() {
 
     // Make spans in selected pane deletable
     this._make_deletable($('.selected', this._container));
-};
+}
 
 /**
  * Setup hierarchy click handlers
@@ -1446,7 +1445,7 @@ totaraDialog_handler_skeletalTreeview.prototype._make_hierarchy = function(paren
 
         return false;
     });
-};
+}
 
 /**
  * Update the hierarchy
@@ -1458,7 +1457,7 @@ totaraDialog_handler_skeletalTreeview.prototype._make_hierarchy = function(paren
 totaraDialog_handler_skeletalTreeview.prototype._update_hierarchy = function(response, parent_id) {
 
     var items = response;
-    var list = $('.treeview li#item_list_' + parent_id + ' ul:first', this._container);
+    var list = $('.treeview li#item_list_'+parent_id+' ul:first', this._container);
 
     // Remove placeholder child
     $('> li.loading', list).remove();
@@ -1469,7 +1468,7 @@ totaraDialog_handler_skeletalTreeview.prototype._update_hierarchy = function(res
     var handler = this;
 
     handler._make_selectable(list, false);
-};
+}
 
 /**
 * @param object element to make selectable
@@ -1514,9 +1513,9 @@ totaraDialog_handler_skeletalTreeview.prototype._make_selectable = function(elem
         });
     }
 
-};
+}
 
-/** ***************************************************************************/
+/*****************************************************************************/
 /** totaraDialog_handler_form **/
 
 totaraDialog_handler_form = function() {};
@@ -1579,7 +1578,7 @@ totaraDialog_handler_form.prototype._updatePage = function(response) {
         var id = $(this).attr('id');
 
         if (id) {
-            $('body #' + id).replaceWith($(this));
+            $('body #'+id).replaceWith($(this));
         }
     });
 
@@ -1587,7 +1586,7 @@ totaraDialog_handler_form.prototype._updatePage = function(response) {
     this._dialog.hide();
 };
 
-/** ***************************************************************************/
+/*****************************************************************************/
 /** totaraDialog_handler_selectable **/
 
 totaraDialog_handler_selectable = function(selected) { this.selected = selected; };
@@ -1600,7 +1599,7 @@ totaraDialog_handler_selectable.prototype.first_load = function() {
         multiple: false
     });
 
-    // Set selection
+    //Set selection
     this._set_selected();
 };
 
@@ -1633,7 +1632,7 @@ String.prototype.toTitleCase = function() {
     return this.replace(/\w\S*/g, function(text) { return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase(); });
 };
 
-/** ***************************************************************************/
+/*****************************************************************************/
 /** Factory methods **/
 
 /**
@@ -1657,20 +1656,20 @@ totaraSingleSelectDialog = function(name, title, find_url, value_element, text_e
     }
     handler.external_function = handler_extra;
 
-    buttonObj[M.util.get_string('ok', 'moodle')] = function() { handler._save(); };
-    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+    buttonObj[M.util.get_string('ok', 'moodle')] = function() { handler._save() };
+    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
     totaraDialogs[name] = new totaraDialog(
         name,
-        'show-' + name + '-dialog',
+        'show-'+name+'-dialog',
         {
             buttons: buttonObj,
-            title: '<h2>' + title + '</h2>'
+            title: '<h2>'+title+'</h2>'
         },
         find_url,
         handler
     );
-};
+}
 
 /**
  * Setup multi-select treeview dialog that calls a save page, and
@@ -1687,20 +1686,20 @@ totaraMultiSelectDialog = function(name, title, find_url, save_url) {
     var handler = new totaraDialog_handler_treeview_multiselect();
 
     var buttonObj = {};
-    buttonObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(save_url); };
-    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+    buttonObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(save_url) };
+    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
     totaraDialogs[name] = new totaraDialog(
         name,
-        'show-' + name + '-dialog',
+        'show-'+name+'-dialog',
         {
             buttons: buttonObj,
-            title: '<h2>' + title + '</h2>'
+            title: '<h2>'+title+'</h2>'
         },
         find_url,
         handler
     );
-};
+}
 
 /**
  * Setup multi-select treeview dialog for use in a report builder filter
@@ -1722,15 +1721,15 @@ totaraMultiSelectDialogRbFilter = function(name, title, find_url, save_url) {
     var handler = new totaraDialog_handler_treeview_multiselect_rb_filter();
 
     var buttonObj = {};
-    buttonObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(save_url); };
-    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+    buttonObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(save_url) };
+    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
     totaraDialogs[name] = new totaraDialog(
         name,
-        'show-' + name + '-dialog',
+        'show-'+name+'-dialog',
         {
             buttons: buttonObj,
-            title: '<h2>' + title + '</h2>'
+            title: '<h2>'+title+'</h2>'
         },
         find_url,
         handler
@@ -1739,18 +1738,18 @@ totaraMultiSelectDialogRbFilter = function(name, title, find_url, save_url) {
 
     // activate the 'delete' option next to any selected items in filters
     // (for this dialog only)
-    $(document).on('click', '.multiselect-selected-item[data-filtername=' + name + '] a', function(event) {
+    $(document).on('click', '.multiselect-selected-item[data-filtername='+name+'] a', function(event) {
         event.preventDefault();
 
         var container = $(this).parents('div.multiselect-selected-item');
         var filtername = container.data('filtername');
         var id = container.data('id');
-        var hiddenfield = $('input[name=' + filtername + ']');
+        var hiddenfield = $('input[name='+filtername+']');
 
         // take this element's ID out of the hidden form field
         var ids = hiddenfield.val();
         var id_array = ids.split(',');
-        var new_id_array = $.grep(id_array, function(n, i) { return n != id; });
+        var new_id_array = $.grep(id_array, function(n, i) { return n != id });
         var new_ids = new_id_array.join(',');
         hiddenfield.val(new_ids);
 
@@ -1759,7 +1758,7 @@ totaraMultiSelectDialogRbFilter = function(name, title, find_url, save_url) {
 
     });
 
-};
+}
 
 for (var init in window.dialoginits) {
     if (typeof window.dialoginits[init] === 'function') {

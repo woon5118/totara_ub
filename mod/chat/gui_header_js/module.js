@@ -34,21 +34,21 @@ M.mod_chat_header.init_input = function(Y) {
 
     var inputframe = {
 
-        waitflag: false,       // True when a submission is in progress
+        waitflag : false,       // True when a submission is in progress
 
         /**
          * Initialises the input frame
          *
          * @function
          */
-        init: function() {
+        init : function() {
             Y.one('#inputForm').on('submit', this.submit, this);
         },
         /**
          * Enables the input form
          * @this {M.mod_chat.js}
          */
-        enable_form: function() {
+        enable_form : function() {
             var el = Y.one('#input_chat_message');
             this.waitflag = false;
             el.set('className', '');
@@ -58,7 +58,7 @@ M.mod_chat_header.init_input = function(Y) {
          * Submits the entered message
          * @param {Event} e
          */
-        submit: function(e) {
+        submit : function(e) {
             e.halt();
             if (this.waitflag) {
                 return false;
@@ -90,9 +90,9 @@ M.mod_chat_header.init_users = function(Y, users) {
 
     var usersframe = {
 
-        timer: null,           // Stores the timer object
-        timeout: 1,            // The seconds between updates
-        users: [],             // An array of users
+        timer : null,           // Stores the timer object
+        timeout : 1,            // The seconds between updates
+        users : [],             // An array of users
 
         /**
          * Initialises the frame with list of users
@@ -101,7 +101,7 @@ M.mod_chat_header.init_users = function(Y, users) {
          * @this
          * @param {Array|null} users
          */
-        init: function(users) {
+        init : function(users) {
             this.users = users;
             this.start();
             Y.one(document.body).on('unload', this.stop, this);
@@ -112,7 +112,7 @@ M.mod_chat_header.init_users = function(Y, users) {
          * @function
          * @this
          */
-        start: function() {
+        start : function() {
             this.timer = setTimeout(function(self) {
                 self.update();
             }, this.timeout * 1000, this);
@@ -122,7 +122,7 @@ M.mod_chat_header.init_users = function(Y, users) {
          * @function
          * @this
          */
-        stop: function() {
+        stop : function() {
             clearTimeout(this.timer);
         },
         /**
@@ -131,9 +131,9 @@ M.mod_chat_header.init_users = function(Y, users) {
          * @function
          * @this
          */
-        update: function() {
+        update : function() {
             for (var i in this.users) {
-                var el = Y.one('#uidle' + this.users[i]);
+                var el  = Y.one('#uidle' + this.users[i]);
                 if (el) {
                     var parts = el.get('innerHTML').split(':');
                     var time = this.timeout + (parseInt(parts[0], 10) * 60) + parseInt(parts[1], 10);

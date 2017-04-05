@@ -20,9 +20,6 @@
  * @package totara
  * @subpackage totara_core
  */
-
-/* eslint-disable no-undef */
-
 M.totara_review = M.totara_review || {
 
     Y: null,
@@ -36,7 +33,7 @@ M.totara_review = M.totara_review || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
         if (args) {
@@ -71,10 +68,10 @@ M.totara_review = M.totara_review || {
         };
 
         handler._selectall = function() {
-          $('span.clickable', '#' + this._title).each(function() {
+          $('span.clickable', '#'+this._title).each(function(){
             $(this).click();
           });
-        };
+        }
 
         // extend handler base class function to add extra button
         handler.first_load = function() {
@@ -83,14 +80,14 @@ M.totara_review = M.totara_review || {
 
           // add our extra button
           if (right_to_left()) {
-            var $button = $('<button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="float: left;"><span class="ui-button-text">' + M.util.get_string('selectall', 'totara_question') + '</span></button>');
+            var $button = $('<button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="float: left;"><span class="ui-button-text">' + M.util.get_string('selectall','totara_question') + '</span></button>');
           } else {
-            var $button = $('<button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="float: right;"><span class="ui-button-text">' + M.util.get_string('selectall', 'totara_question') + '</span></button>');
+            var $button = $('<button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="float: right;"><span class="ui-button-text">' + M.util.get_string('selectall','totara_question') + '</span></button>');
           }
 
           $button.click(function() {
             handler._selectall();
-          });
+          })
 
           if ($('.planselector', this._container).length) {
             $('.planselector', this._container).before($button).css('width', '78%');
@@ -100,11 +97,11 @@ M.totara_review = M.totara_review || {
             $('.treeview-wrapper', this._container).before($button).css('width', '78%');
           }
 
-        };
+        }
 
         var buttonsObj = {};
-        buttonsObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(saveurl); };
-        buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+        buttonsObj[M.util.get_string('save','totara_core')] = function() { handler._save(saveurl); }
+        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); }
 
         totaraDialogs[this.config.formprefix] = new totaraDialog(
             this.config.formprefix,
@@ -128,7 +125,7 @@ M.totara_review = M.totara_review || {
             } else {
                 dialog.hide();
             }
-        };
+        }
 
         M.totara_review.addActions(this.config.formprefix + '_' + this.config.prefix + '_review');
 
@@ -151,7 +148,7 @@ M.totara_review = M.totara_review || {
 
         var longid = responseobj.find('p').attr('class');
 
-        if (typeof longid !== "undefined") {
+        if(typeof longid !== "undefined") {
             var thirdunderline = longid.indexOf('_', longid.indexOf('_', longid.indexOf('_') + 1) + 1);
             var shortid = longid.substr(0, thirdunderline);
             $('#id_' + shortid + '_choosereviewitem').closest('fieldset').after(responseobj.find('fieldset.collapsible'));
@@ -166,13 +163,13 @@ M.totara_review = M.totara_review || {
      * @param {Object} el optional The DOM element being deleted, for fancy removal from the display.
      */
     modalDelete: function(url, id, el) {
-      M.util.show_confirm_dialog(el,
+      M.util.show_confirm_dialog( el,
         {
           message: M.util.get_string('removeconfirm', 'totara_question'),
-          callback: function() {
+          callback: function () {
             $.get(url).done(function(data) {
               if (data == 'success') {
-                el.slideUp(250, function() {
+                el.slideUp(250, function(){
                   el.remove();
                 });
               }
@@ -182,7 +179,7 @@ M.totara_review = M.totara_review || {
     },
 
     addActions: function(id) {
-        $('.' + id).find('a.action-icon.delete').on('click', function() {
+        $('.' + id).find('a.action-icon.delete').on('click', function(){
             M.totara_review.modalDelete($(this).attr('href'), $(this).attr('data-reviewitemid'), $(this).closest('fieldset'));
             return false;
         });

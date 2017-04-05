@@ -25,14 +25,14 @@ define(['jquery', 'core/str', 'core/config', 'core/yui'], function($, mdlstrings
         /**
          * module initialisation method called by php js_call_amd()
          */
-        init: function() {
+        init : function(args) {
             // We need to make sure that the confirm notification is loaded.
-            Y.use('moodle-core-notification-confirm', function() {
-                $('.problemaggregation a').on('click', function(e) {
+            Y.use('moodle-core-notification-confirm', function(Y) {
+                $('.problemaggregation a').on('click', function (e) {
                     e.preventDefault();
                     modalConfirm($(this).attr('href'), 'fixconfirmsome');
                 });
-                $('.problemsolution a').on('click', function(e) {
+                $('.problemsolution a').on('click', function (e) {
                     e.preventDefault();
                     modalConfirm($(this).attr('href'), 'fixconfirmone');
                 });
@@ -42,14 +42,14 @@ define(['jquery', 'core/str', 'core/config', 'core/yui'], function($, mdlstrings
 
     function modalConfirm(url, scope) {
         var confirm = new M.core.confirm({
-            title: M.util.get_string('fixconfirmtitle', 'totara_program'),
-            question: M.util.get_string(scope, 'totara_program'),
-            width: 500
+            title        : M.util.get_string('fixconfirmtitle', 'totara_program'),
+            question     : M.util.get_string(scope, 'totara_program'),
+            width        : 500
         });
-        confirm.on('complete-yes', function() {
+        confirm.on('complete-yes', function(){
             window.location.href = url;
         });
-        confirm.on('complete-no', function(e) {
+        confirm.on('complete-no', function(e){
             e.preventDefault();
         });
         confirm.show();

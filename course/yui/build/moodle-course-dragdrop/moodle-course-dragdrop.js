@@ -222,7 +222,7 @@ Y.extend(DRAGSECTION, M.core.dragdrop, {
         // Prepare request parameters
         params.sesskey = M.cfg.sesskey;
         params.courseId = this.get('courseid');
-        params.class = 'section';
+        params['class'] = 'section';
         params.field = 'move';
         params.id = dragnodeid;
         params.value = dropnodeindex;
@@ -469,7 +469,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
         // Prepare request parameters
         params.sesskey = M.cfg.sesskey;
         params.courseId = this.get('courseid');
-        params.class = 'resource';
+        params['class'] = 'resource';
         params.field = 'move';
         params.id = Number(Y.Moodle.core_course.util.cm.getId(dragnode));
         params.sectionId = Y.Moodle.core_course.util.section.getId(dropnode.ancestor(M.course.format.get_section_wrapper(Y), true));

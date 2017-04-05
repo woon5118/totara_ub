@@ -22,8 +22,6 @@
  * @subpackage facetoface
  */
 
-/* eslint-disable no-undef */
-
 M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
 
     Y: null,
@@ -39,7 +37,7 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
         var module = this;
 
         // save a reference to the Y instance (all of its dependencies included)
@@ -97,16 +95,16 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
                 }
                 // Try to update editor
                 var bodyeditor = Y.one('#id_body_editor').getData('Editor');
-                if (bodyeditor && typeof bodyeditor.updateFromTextArea === "function") {
+                if(bodyeditor && typeof bodyeditor.updateFromTextArea === "function") {
                     bodyeditor.updateFromTextArea();
                 }
 
                 var prefixeditor = Y.one('#id_managerprefix_editor').getData('Editor');
-                if (prefixeditor && typeof prefixeditor.updateFromTextArea === "function") {
+                if(prefixeditor && typeof prefixeditor.updateFromTextArea === "function") {
                     prefixeditor.updateFromTextArea();
                 }
             });
 
         });
     }
-};
+}

@@ -26,7 +26,7 @@
  * @author  Sam Hemelryk <sam.hemelryk@totaralms.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['jquery', 'core/yui', 'core/str', 'totara_form/form'], function($, Y, core_strings, Form) {
+define(['jquery','core/yui', 'core/str', 'totara_form/form'], function($, Y, core_strings, Form) {
 
     /* global YUI_config */
 
@@ -84,7 +84,7 @@ define(['jquery', 'core/yui', 'core/str', 'totara_form/form'], function($, Y, co
             requiredstrings = this.input.data('requiredstrings'),
             yuimodules = this.input.data('yuimodules');
 
-        Y.use(['core_filepicker', 'node', 'node-event-simulate', 'core_dndupload'], function(Y) {
+        Y.use(['core_filepicker', 'node', 'node-event-simulate', 'core_dndupload'], function (Y) {
             M.core_filepicker.set_templates(Y, fptemplates);
         });
 
@@ -93,7 +93,7 @@ define(['jquery', 'core/yui', 'core/str', 'totara_form/form'], function($, Y, co
         // Apply to current Y instance too.
         Y.applyConfig(YUI_config);
 
-        core_strings.get_strings(requiredstrings).done(function() {
+        core_strings.get_strings(requiredstrings).done(function () {
             for (var i = 0; i < yuimodules.length; i++) {
                 self.initYUIModules(yuimodules[i]);
             }
@@ -108,7 +108,7 @@ define(['jquery', 'core/yui', 'core/str', 'totara_form/form'], function($, Y, co
      */
     AttoElement.prototype.initYUIModules = function(yuimodule) {
         var self = this;
-        Y.use(yuimodule.modules, function() {
+        Y.use(yuimodule.modules, function () {
             // Note: Eval is not pretty here, but it seems to be the most robust way to replicate the PHP JS stuff.
             /*eslint-disable no-eval*/
             var result = eval(yuimodule.functionstr);

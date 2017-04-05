@@ -23,10 +23,9 @@
  * @package totara
  * @subpackage totara_core
  */
-
-/* eslint-disable no-undef */
-
 define(['jquery', 'core/config'], function($, mdlconfig) {
+
+    /* global jQuery totaraDialog_handler_treeview_multiselect */
 
     var component = {
         // Optional php params and defaults defined here, args passed to init method
@@ -54,7 +53,7 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
             // Create the dialog.
             component.totaraDialog_handler_preRequisite = function() {
                 // Base url.
-                // var baseurl = '';
+                var baseurl = '';
             };
 
             component.totaraDialog_handler_preRequisite.prototype = new totaraDialog_handler_treeview_multiselect();
@@ -77,8 +76,7 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
         /**
          * Add change event handlers to input and select elements.
          */
-        add_handlers: function() {
-            /* eslint-disable no-undef */
+        add_handlers : function() {
             // Add hooks to learning plan component form elements.
             // Update when form elements change.
             jQuery('table.dp-plan-component-items input, table.dp-plan-component-items select').change(function() {
@@ -99,7 +97,6 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
                     component.totara_totara_plan_update
                 );
             });
-            /* eslint-enable */
         },
 
         /**
@@ -153,8 +150,8 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
             component.add_handlers();
 
             // Add duedate datepicker.
-            require(['core/str'], function(mdlstr) {
-                mdlstr.get_string('datepickerlongyeardisplayformat', 'totara_core').done(function(format) {
+            require(['core/str'], function (mdlstr) {
+                mdlstr.get_string('datepickerlongyeardisplayformat', 'totara_core').done(function (format) {
                     // This function does not use Y so no point in sending it.
                     M.totara_core.build_datepicker(null, "[id^=duedate_" + component.config.component_name + "]", format);
                 });

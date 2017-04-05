@@ -20,8 +20,6 @@
  * @package totara_reportbuilder
  */
 
-/* eslint-disable no-undef */
-
 /**
  * Javascript file containing JQuery bindings for email setting in scheduled reports.
  */
@@ -39,7 +37,7 @@ M.totara_email_scheduled_report = M.totara_email_scheduled_report || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function (Y, args) {
         // Save a reference to the Y instance (all of its dependencies included).
         this.Y = Y;
 
@@ -62,13 +60,13 @@ M.totara_email_scheduled_report = M.totara_email_scheduled_report || {
         this.rb_init_load_dialogs();
     },
 
-    rb_init_load_dialogs: function() {
+    rb_init_load_dialogs: function () {
         var module = this;
         this.rb_load_cohort_dialog();
         this.rb_load_user_dialog();
 
         // Activate the 'delete' option next to any selected items.
-        $(document).on('click', '.multiselect-selected-item a', function(event) {
+        $(document).on('click', '.multiselect-selected-item a', function (event) {
             event.preventDefault();
 
             var container = $(this).parents('div.multiselect-selected-item');
@@ -79,8 +77,8 @@ M.totara_email_scheduled_report = M.totara_email_scheduled_report || {
             // Take this element's ID out of the hidden form field.
             var ids = hiddenfield.val();
             var id_array = ids.split(',');
-            var new_id_array = $.grep(id_array, function(n, i) {
-                return n != id;
+            var new_id_array = $.grep(id_array, function (n, i) {
+                return n != id
             });
             var new_ids = new_id_array.join(',');
             hiddenfield.val(new_ids);
@@ -89,7 +87,7 @@ M.totara_email_scheduled_report = M.totara_email_scheduled_report || {
             container.remove();
         });
 
-        $('#addexternalemail').click(function(event) {
+        $('#addexternalemail').click(function (event) {
             var external_emails = $('input[name=externalemails]').val();
             var email = $('.reportbuilder_scheduled_addexternal'),
                 emailvalue = email.val().toLowerCase();
@@ -98,18 +96,18 @@ M.totara_email_scheduled_report = M.totara_email_scheduled_report || {
                 alert(M.util.get_string('err_email', 'form'));
             } else if (external_emails.search(emailvalue) != -1) {
                 alert(M.util.get_string('emailexternaluserisonthelist', 'totara_reportbuilder'));
-            } else {
+            } else{
                 module.rb_add_external_email(emailvalue);
                 email.val('');
             }
         });
     },
 
-    rb_load_cohort_dialog: function() {
+    rb_load_cohort_dialog: function () {
         $('#show-audiences-dialog').on('click', rbShowAudienceDialog);
     },
 
-    rb_load_user_dialog: function() {
+    rb_load_user_dialog: function () {
         $('#show-systemusers-dialog').on('click', rbShowUserDialog);
     },
 
@@ -137,18 +135,18 @@ M.totara_email_scheduled_report = M.totara_email_scheduled_report || {
                 emails: new_ids,
                 sesskey: M.cfg.sesskey
             }),
-            success: function(o) {
+            success: function (o) {
                 var container = $('div.list-externalemails');
                 container.replaceWith(o);
             },
-            error: function() {
+            error: function () {
                 alert(M.util.get_string('error:badresponsefromajax', 'totara_cohort'));
                 // Reload the broken page.
                 location.reload();
             }
         });
     }
-};
+}
 
 rbShowUserDialog = function() {
     var selected = M.totara_email_scheduled_report.config.existingsyusers;
@@ -161,7 +159,7 @@ rbShowUserDialog = function() {
         url + 'schedule_display_items_email.php?filtername=systemusers' + '&sesskey=' + M.cfg.sesskey + '&ids=',
         selected
     );
-};
+},
 
 rbShowAudienceDialog = function() {
     var selected = M.totara_email_scheduled_report.config.existingaud;
@@ -174,25 +172,25 @@ rbShowAudienceDialog = function() {
         url + 'schedule_display_items_email.php?filtername=audiences' + '&sesskey=' + M.cfg.sesskey + '&ids=',
         selected
     );
-};
+},
 
 rbDialog = function(name, title, find_url, save_url, selected) {
     var handler = new totaraDialog_handler_treeview_multiselect_rb_filter();
     var buttonObj = {};
-    buttonObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(save_url); };
-    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+    buttonObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(save_url) };
+    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
     totaraDialogs[name] = new totaraDialog(
         name,
-        'show-' + name + '-dialog',
+        'show-'+name+'-dialog',
         {
             buttons: buttonObj,
-            title: '<h2>' + title + '</h2>'
+            title: '<h2>'+title+'</h2>'
         },
         find_url + '&selected=' + selected,
         handler
     );
-};
+}
 
 validEmail = function(email) {
     var filter = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
@@ -201,4 +199,4 @@ validEmail = function(email) {
     } else {
         return false;
     }
-};
+}

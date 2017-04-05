@@ -19,9 +19,6 @@
  * @package totara
  * @subpackage totara_cohort
  */
-
-/* eslint-disable no-undef */
-
 M.totara_cohortvisiblelearning = M.totara_cohortvisiblelearning || {
 
     Y: null,

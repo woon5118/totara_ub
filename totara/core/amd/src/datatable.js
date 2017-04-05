@@ -22,7 +22,7 @@
  */
 define(['jquery', 'core/str', 'core/config', 'totara_core/jquery.dataTables-lazy'], function($, mdlstrings, mdlcfg) {
     var datatable = {
-        init: function(module, suffix, itemid) {
+        init: function (module, suffix, itemid) {
             var requiredstrings = [];
             requiredstrings.push({key: 'datatable:sEmptyTable', component: 'totara_core'});
             requiredstrings.push({key: 'datatable:sInfo', component: 'totara_core'});
@@ -52,13 +52,13 @@ define(['jquery', 'core/str', 'core/config', 'totara_core/jquery.dataTables-lazy
                         "bServerSide": true,
                         "sPaginationType": "full_numbers",
                         "sAjaxSource": mdlcfg.wwwroot + "/totara/" + module + "/lib/assign/ajax.php",
-                        "fnServerParams": function(aoData) {
-                            aoData.push({"name": "module", "value": module});
-                            aoData.push({"name": "suffix", "value": suffix});
-                            aoData.push({"name": "itemid", "value": itemid});
-                            aoData.push({"name": "sesskey", "value": mdlcfg.sesskey});
+                        "fnServerParams": function ( aoData ) {
+                            aoData.push( { "name": "module", "value": module } );
+                            aoData.push( { "name": "suffix", "value": suffix } );
+                            aoData.push( { "name": "itemid", "value": itemid } );
+                            aoData.push( { "name": "sesskey", "value": mdlcfg.sesskey } );
                         },
-                        "oLanguage": {
+                        "oLanguage" : {
                             "sEmptyTable":     tstr['datatable:sEmptyTable'],
                             "sInfo":           tstr['datatable:sInfo'],
                             "sInfoEmpty":      tstr['datatable:sInfoEmpty'],

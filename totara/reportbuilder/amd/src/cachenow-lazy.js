@@ -21,10 +21,10 @@
  * @package totara
  * @subpackage totara_reportbuilder
  */
-
-/* eslint-disable no-undef */
-
 define(['jquery', 'core/config', 'core/str'], function($, mdlconfig, mdlstrings) {
+
+    /* global totaraDialog totaraDialogs totaraDialog_handler */
+
     var dialoghandler = function() {
         var requiredstrings = [];
         requiredstrings.push({key: 'ok', component: 'moodle'});
@@ -37,7 +37,7 @@ define(['jquery', 'core/config', 'core/str'], function($, mdlconfig, mdlstrings)
 
             var handler = new totaraDialog_handler();
             var buttonObj = {};
-            $('.show-cachenow-dialog').css('display', 'inline');
+            $('.show-cachenow-dialog').css('display','inline');
 
             $('.show-cachenow-dialog').each(function(ind, inst) {
                 var id = $(inst).data('id');
@@ -61,7 +61,7 @@ define(['jquery', 'core/config', 'core/str'], function($, mdlconfig, mdlstrings)
                     url,
                     handler
                 );
-                $('#show-cachenow-dialog-' + id).bind('click', function() { $('#cachenotice_' + id).css('display', 'none'); });
+                $('#show-cachenow-dialog-'+id).bind('click', function() {$('#cachenotice_'+id).css('display', 'none');});
             });
         });
     };

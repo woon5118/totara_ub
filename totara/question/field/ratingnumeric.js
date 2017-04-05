@@ -21,10 +21,8 @@
  * @subpackage totara_question
  */
 
-/* eslint-disable no-undef */
-
 M.totara_question_ratingnumeric = M.totara_question_ratingnumeric || {
-  Y: null,
+  Y : null,
 
   config: {},
   /**
@@ -33,7 +31,7 @@ M.totara_question_ratingnumeric = M.totara_question_ratingnumeric || {
    * @param object    YUI instance
    * @param string    args supplied in JSON format
    */
-  init: function(Y, args) {
+  init : function(Y, args) {
     // save a reference to the Y instance (all of its dependencies included)
     this.Y = Y;
 
@@ -47,7 +45,7 @@ M.totara_question_ratingnumeric = M.totara_question_ratingnumeric || {
     }
 
     // check jQuery dependency is available
-    if (typeof $ === 'undefined') {
+    if ( typeof $ === 'undefined') {
       throw new Error('M.totara_question_ratingnumeric.init()-> jQuery dependency required for this module to function.');
     }
 
@@ -61,27 +59,25 @@ M.totara_question_ratingnumeric = M.totara_question_ratingnumeric || {
     var $sliderContainer = ('<div id="' + sliderName + '_container" class="question-rating-slider-container" />');
     $container.append($sliderContainer);
 
-    Y.use('slider', function(Y) {
+    Y.use('slider', function(Y){
 
-/* eslint-enable no-undef */
       if (right_to_left()) {
-/* eslint-disable no-undef */
         var slider = new Y.Slider({
-          min: parseInt(maxVal),
-          max: parseInt(minVal),
-          length: '150px',
+          min : parseInt(maxVal),
+          max : parseInt(minVal),
+          length : '150px',
           value: parseInt(defaultVal)
         });
       } else {
         var slider = new Y.Slider({
-          min: parseInt(minVal),
-          max: parseInt(maxVal),
-          length: '150px',
+          min : parseInt(minVal),
+          max : parseInt(maxVal),
+          length : '150px',
           value: parseInt(defaultVal)
         });
       }
 
-      slider.on('thumbMove', function(e) {
+      slider.on('thumbMove', function(e){
         $inputs.eq(slider.getValue() - parseInt(minVal)).prop('selected', true);
         $('#' + sliderName + '_currentVal').html(slider.getValue());
       });
@@ -91,11 +87,9 @@ M.totara_question_ratingnumeric = M.totara_question_ratingnumeric || {
 
       var sliderID = slider.get('id');
       var labelWidth = parseInt(slider.get('length')) + 40 + 'px';
-      var $slider = $('#' + sliderID);
+      var $slider = $('#'+sliderID);
 
-/* eslint-enable no-undef */
       if (right_to_left()) {
-/* eslint-disable no-undef */
         $slider.css('float', 'right');
         $slider.before('<span id="' + sliderName + '_minVal" style="display:inline-block; margin-left:5px; width:20px; text-align:left; float:right;">' + minVal + '</span>');
         $slider.after('<span id="' + sliderName + '_currentVal" style="display:inline-block; width:' + labelWidth + '; text-align:center; float:right; clear:both;">' + (defaultVal || minVal) + '</span>');
@@ -109,4 +103,4 @@ M.totara_question_ratingnumeric = M.totara_question_ratingnumeric || {
     });
 
   }
-};
+}

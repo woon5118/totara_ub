@@ -21,9 +21,7 @@
  * @subpackage theme
  */
 
-/* eslint-disable no-undef */
-
 // remove alt and title text for the datepicker image object
-if (typeof ($) == 'function' && typeof ($.datepicker) == 'object') {
+if (typeof($) == 'function' && typeof($.datepicker) == 'object') {
     $.datepicker.setDefaults({buttonText: ''});
 }

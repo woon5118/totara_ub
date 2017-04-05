@@ -24,9 +24,6 @@
  * @package totara
  * @subpackage totara_core
  */
-
-/* eslint-disable no-undef */
-
 M.totara_cohort = M.totara_cohort || {
 
     Y: null,
@@ -40,7 +37,7 @@ M.totara_cohort = M.totara_cohort || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
 
         var module = this;
 
@@ -67,15 +64,15 @@ M.totara_cohort = M.totara_cohort || {
         // Note: assigntype=2 is referring to the constant GOAL_ASSIGNMENT_AUDIENCE.
         //
         (function() {
-            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/goal/assign/';
+            var url = M.cfg.wwwroot+ '/totara/hierarchy/prefix/goal/assign/';
             var saveurl = url + 'assign.php';
             var findurl = url + 'find.php';
 
             // Dialog & handler for hierarchy picker.
             var thandler = new totaraDialog_handler_assigngoaltreeview();
             var tbuttons = {};
-            tbuttons[M.util.get_string('save', 'totara_core')] = function() { thandler._save(); };
-            tbuttons[M.util.get_string('cancel', 'moodle')] = function() { thandler._cancel(); };
+            tbuttons[M.util.get_string('save','totara_core')] = function() { thandler._save(); }
+            tbuttons[M.util.get_string('cancel','moodle')] = function() { thandler._cancel(); }
             var tdialog = new totaraDialog(
                 'assigngoaltreeviewdialog',
                 'nobutton',
@@ -87,7 +84,7 @@ M.totara_cohort = M.totara_cohort || {
                 thandler
             );
             tdialog.assigngoal_base_url = url;
-            totaraDialogs.assigngoaltreeview = tdialog;
+            totaraDialogs['assigngoaltreeview'] = tdialog;
 
             // Bind open event to group_selector menu(s)
             // Also set their default value
@@ -100,7 +97,7 @@ M.totara_cohort = M.totara_cohort || {
                 var id = M.totara_cohort.config.id;
                 var sesskey = M.totara_cohort.config.sesskey;
 
-                var dialog = totaraDialogs.assigngoaltreeview;
+                var dialog = totaraDialogs['assigngoaltreeview'];
                 var url = dialog.assigngoal_base_url;
                 var handler = dialog.handler;
 
@@ -114,46 +111,46 @@ M.totara_cohort = M.totara_cohort || {
             });
         })();
 
-        // /
-        // / Position dialog
-        // /
+        ///
+        /// Position dialog
+        ///
         (function() {
-            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/position/assign/';
+            var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/position/assign/';
 
             totaraSingleSelectDialog(
                 'position',
                 M.util.get_string('chooseposition', 'totara_hierarchy') +
                 module.config.display_selected_position,
-                url + 'position.php?',
+                url+'position.php?',
                 'positionid',
                 'positiontitle'
             );
         })();
 
 
-        // /
-        // / Organisation dialog
-        // /
+        ///
+        /// Organisation dialog
+        ///
         (function() {
-            var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/organisation/assign/';
+            var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/organisation/assign/';
 
             totaraSingleSelectDialog(
                 'organisation',
                 M.util.get_string('chooseorganisation', 'totara_hierarchy') +
                 module.config.display_selected_organisation,
-                url + 'find.php?',
+                url+'find.php?',
                 'organisationid',
                 'organisationtitle'
             );
         })();
 
 
-        // /
-        // / Confirmation dialog
-        // /
+        ///
+        /// Confirmation dialog
+        ///
         (function() {
             var submitAllowed = false;
-            $('#mform1').submit(function() {
+            $('#mform1').submit(function () {
                 return submitAllowed;
             });
 
@@ -161,13 +158,13 @@ M.totara_cohort = M.totara_cohort || {
             var name = 'confirm';
             var buttonsObj = {};
             buttonsObj[M.util.get_string('continue', 'moodle')] = function() { submitAllowed = true; $('#mform1').submit(); };
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
             var dialog = new totaraDialog(
                 name,
                 'id_submitbutton',
                 {
                     buttons: buttonsObj,
-                    title: '<h2>' + M.util.get_string('confirmdynamiccohortcreation', 'totara_cohort') + '</h2>'
+                    title: '<h2>'+ M.util.get_string('confirmdynamiccohortcreation', 'totara_cohort') +'</h2>'
                 },
                 '',
                 handler
@@ -187,7 +184,7 @@ M.totara_cohort = M.totara_cohort || {
                     orgincludechildren = 1;
                 }
 
-                dialog.default_url = M.cfg.wwwroot + '/cohort/criteria.php' +
+                dialog.default_url = M.cfg.wwwroot+'/cohort/criteria.php' +
                 '?cohortname=' + $('input[name="cohortname"]').val() +
                 '&profilefield=' + $('select[name="profilefield"]').val() +
                 '&profilefieldvalues=' + $('input[name="profilefieldvalues"]').val() +
@@ -197,7 +194,7 @@ M.totara_cohort = M.totara_cohort || {
                 '&orgincludechildren=' + orgincludechildren;
 
                 dialog.originalOpen();
-            };
+            }
 
             totaraDialogs[name] = dialog;
         })();
@@ -207,13 +204,13 @@ M.totara_cohort = M.totara_cohort || {
 
 // A function to handle the responses generated by handlers
 var assigngoal_handler_responsefunc = function(response) {
-    if (response.substr(0, 4) == 'DONE') {
+    if (response.substr(0,4) == 'DONE') {
         // Get all root elements in response
         var els = $(response.substr(4));
 
         // Update the assignments table.
         this.responsegoeshere.replaceWith(els);
-        els.effect('pulsate', {times: 3}, 2000);
+        els.effect('pulsate', { times: 3 }, 2000);
 
         $('#assigngoal_action_box').show();
 
@@ -222,7 +219,7 @@ var assigngoal_handler_responsefunc = function(response) {
     } else {
         this._dialog.render(response);
     }
-};
+}
 totaraDialog_handler_assigngoaltreeview = function() {};
 totaraDialog_handler_assigngoaltreeview.prototype = new totaraDialog_handler_treeview_multiselect();
 
@@ -255,7 +252,7 @@ totaraDialog_handler_assigngoaltreeview.prototype._save = function() {
     var success = true;
     extrafields.each(
         function(intIndex) {
-            if (typeof (this.assigngoal_validation_func) == 'function') {
+            if (typeof(this.assigngoal_validation_func) == 'function') {
                 success = success && this.assigngoal_validation_func(this);
             }
         }
@@ -271,7 +268,7 @@ totaraDialog_handler_assigngoaltreeview.prototype._save = function() {
     var url = this._dialog.saveurl + '&selected=' + selected_str;
     extrafields.each(
         function(intIndex) {
-            if ($(this).val() !== null) {
+            if ($(this).val() != null) {
                 url = url + '&' + $(this).attr('name') + '=' + $(this).val();
             }
         }
@@ -279,7 +276,7 @@ totaraDialog_handler_assigngoaltreeview.prototype._save = function() {
 
     // Send to server
     this._dialog._request(url, {object: this, method: '_update'});
-};
+}
 
 // TODO: T-11233 need to figure out a better way to share this common code between this and the formpicker.
 totaraDialog_handler_assigngoaltreeview.prototype._update = assigngoal_handler_responsefunc;

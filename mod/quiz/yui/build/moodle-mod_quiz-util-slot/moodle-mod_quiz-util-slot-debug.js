@@ -9,6 +9,8 @@ YUI.add('moodle-mod_quiz-util-slot', function (Y, NAME) {
 
 Y.namespace('Moodle.mod_quiz.util.slot');
 
+/* eslint no-eq-null:"warn" */
+
 /**
  * A collection of utility classes for use with slots.
  *
@@ -421,14 +423,14 @@ Y.Moodle.mod_quiz.util.slot = {
             link.set('title', M.util.get_string('questiondependencyremove', 'quiz', a));
             link.setData('action', 'removedependency');
             var newstring = M.util.get_string('questiondependsonprevious', 'quiz');
-            if (icon !== null) {
+            if (icon != null) {
                 icon.set('alt', newstring);
                 icon.set('src', M.util.image_url('t/locked', 'moodle'));
             } else {
                 // Font style icon
-                require(['core/templates'], function(templates) {
+                require(['core/templates'], function (templates) {
                     icon = link.one('.flex-icon');
-                    templates.renderIcon('lock', newstring).done(function(html) {
+                    templates.renderIcon('lock', newstring).done(function (html) {
                         templates.replaceNode(icon.getDOMNode(), html, '');
                     });
                 });
@@ -437,15 +439,15 @@ Y.Moodle.mod_quiz.util.slot = {
             link.set('title', M.util.get_string('questiondependencyadd', 'quiz', a));
             link.setData('action', 'adddependency');
             var newstring = M.util.get_string('questiondependencyfree', 'quiz');
-            if (icon !== null) {
+            if (icon != null) {
                 icon.set('alt', newstring);
                 icon.set('src', M.util.image_url('t/unlocked', 'moodle'));
             }
             else {
                 // Font style icon
-                require(['core/templates'], function(templates) {
+                require(['core/templates'], function (templates) {
                     icon = link.one('.flex-icon');
-                    templates.renderIcon('unlock-alt', newstring).done(function(html) {
+                    templates.renderIcon('unlock-alt', newstring).done(function (html) {
                         templates.replaceNode(icon.getDOMNode(), html, '');
                     });
                 });

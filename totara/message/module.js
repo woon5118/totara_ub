@@ -21,12 +21,9 @@
  * @package totara
  * @subpackage totara_core
  */
-
-/* eslint-disable no-undef */
-
 M.totara_message = M.totara_message || {
 
-    Y: null,
+    Y:null,
     // optional php params and defaults defined here, args passed to init method
     // below will override these values
     config: {},
@@ -37,7 +34,7 @@ M.totara_message = M.totara_message || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
         // if defined, parse args into this module's config object
@@ -61,19 +58,19 @@ M.totara_message = M.totara_message || {
      * @param string    session key
      * @param string    JSON string containing extra buttons for the dialog
      */
-    create_dialog: function(Y, id, selector, clean_fullme, sesskey, extrabuttonjson) {
+    create_dialog: function( Y, id, selector, clean_fullme, sesskey, extrabuttonjson ){
         // dismiss dialog
         (function() {
-            var url = M.cfg.wwwroot + '/totara/message/';
+            var url = M.cfg.wwwroot+'/totara/message/';
             var handler = new totaraDialog_handler_confirm();
-            var name = selector + id;
+            var name = selector+id;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('dismiss', 'totara_message')] = function() { handler._confirm(M.cfg.wwwroot + '/totara/message/dismiss.php?id=' + id + '&sesskey=' + sesskey, clean_fullme); };
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+            buttonsObj[M.util.get_string('dismiss', 'totara_message')] = function() { handler._confirm(M.cfg.wwwroot+'/totara/message/dismiss.php?id='+id+'&sesskey='+sesskey, clean_fullme) };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
             // JSON parse extrabuttons if a non-empty string is received
             if (extrabuttonjson && extrabuttonjson !== '') {
-                var jargs = Y.JSON.parse(extrabuttonjson);
+                var jargs = Y.JSON.parse( extrabuttonjson );
                 for (var a in jargs) {
                     if (Y.Object.owns(jargs, a)) {
                         // add extra buttons by looping through keys in jargs,
@@ -91,18 +88,18 @@ M.totara_message = M.totara_message || {
 
             totaraDialogs[name] = new totaraDialog(
                 name,
-                name + '-dialog',
+                name+'-dialog',
                 {
                     buttons: buttonsObj,
-                    title: '<h2>' + M.util.get_string('reviewitems', 'block_totara_alerts') + '</h2>',
+                    title: '<h2>'+M.util.get_string('reviewitems', 'block_totara_alerts')+'</h2>',
                     width: dialogueWidth,
                     height: 400
                 },
-                url + 'dismissmsg.php?id=' + id + '&sesskey=' + sesskey,
+                url+'dismissmsg.php?id='+id+'&sesskey='+sesskey,
                 handler
             );
             // Set this dialog to not bind links
-            $('#' + name).dialog('option', 'dialogClass', $('#' + name).dialog('option', 'dialogClass') + ' dialog-nobind');
+            $('#' + name).dialog('option','dialogClass', $('#' + name).dialog( 'option', 'dialogClass' ) + ' dialog-nobind');
         })();
     },
 
@@ -115,26 +112,26 @@ M.totara_message = M.totara_message || {
      * @param string    clean local URL
      * @param string    session key
      */
-    create_action_dialog: function(Y, action, action_str, clean_fullme, sesskey) {
+    create_action_dialog: function( Y, action, action_str, clean_fullme, sesskey ){
         // dismiss dialog
         (function() {
-            var url = M.cfg.wwwroot + '/totara/message/';
+            var url = M.cfg.wwwroot+'/totara/message/';
             var handler = new totaraDialog_handler_confirm();
-            var name = action + 'msg';
+            var name = action+'msg';
             var buttonsObj = {};
-            buttonsObj[action_str] = function() { handler._confirm(M.cfg.wwwroot + '/totara/message/action.php?' + action + '=' + action + '&sesskey=' + sesskey, clean_fullme); };
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+            buttonsObj[action_str] = function() { handler._confirm(M.cfg.wwwroot+'/totara/message/action.php?'+action+'='+action+'&sesskey='+sesskey, clean_fullme) };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
             totaraDialogs[name] = new totaraDialog(
                 name,
-                'totara-' + action,
+                'totara-'+action,
                 {
                     buttons: buttonsObj,
-                    title: '<h2>' + action_str + '</h2>',
+                    title: '<h2>'+action_str+'</h2>',
                     width: 600,
                     height: 400
                 },
-                url + 'actionmsg.php?' + action + '=' + action + '&sesskey=' + sesskey,
+                url+'actionmsg.php?'+action+'='+action+'&sesskey='+sesskey,
                 handler
             );
             // overload the load function so that we add the message ids
@@ -142,14 +139,14 @@ M.totara_message = M.totara_message || {
                     // Add loading animation
                     this.dialog.html('');
                     this.showLoading();
-                    var msgids = [];
+                    msgids = [];
                     $('form#totara_messages input[type="checkbox"]:checked').each(
-                                function() {
+                                function () {
                                     msgids.push($(this).attr('value'));
                                 });
 
                     // Save url
-                    this.url = url + '&msgids=' + msgids.join(',');
+                    this.url = url+'&msgids='+msgids.join(',');
 
                     // Load page
                     this._request(this.url);
@@ -168,28 +165,28 @@ M.totara_message = M.totara_message || {
      * @param string    return URL
      * @param string    session key
      */
-    create_accept_reject_dialog: function(Y, id, type, type_str, dialog_title, returnto, sesskey) {
+    create_accept_reject_dialog: function( Y, id, type, type_str, dialog_title, returnto, sesskey ){
 
         (function() {
-            $('#' + type + 'msg' + id + '-dialog').css('display', 'block');
-            var url = M.cfg.wwwroot + '/totara/message/';
+            $('#'+type+'msg'+id+'-dialog').css('display','block');
+            var url = M.cfg.wwwroot+'/totara/message/';
             var handler = new totaraDialog_handler_confirm();
-            var name = type + 'msg' + id;
+            var name = type+'msg'+id;
 
             var buttonsObj = {};
-            buttonsObj[type_str] = function() { handler._confirm(M.cfg.wwwroot + '/totara/message/' + type + '.php?id=' + id + '&sesskey=' + sesskey, returnto); };
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+            buttonsObj[type_str] = function() { handler._confirm(M.cfg.wwwroot+'/totara/message/'+type+'.php?id='+id+'&sesskey='+sesskey, returnto) };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
             totaraDialogs[name] = new totaraDialog(
                 name,
-                name + '-dialog',
+                name+'-dialog',
                 {
                     buttons: buttonsObj,
-                    title: '<h2>' + dialog_title + '</h2>',
+                    title: '<h2>'+dialog_title+'</h2>',
                     width: 600,
                     height: 400
                 },
-                url + 'acceptrejectmsg.php?id=' + id + '&event=on' + type,
+                url+'acceptrejectmsg.php?id='+id+'&event=on'+type,
                 handler
             );
         })();
@@ -198,7 +195,7 @@ M.totara_message = M.totara_message || {
     /**
      * Toggles disabled state of dismiss element, based on input disabled state
      */
-    dismiss_input_toggle: function() {
+    dismiss_input_toggle: function(){
         $('#totara_messages input[type=checkbox]').bind('click', function() {
             if ($('form#totara_messages input[type=checkbox]:checked').length) {
                 $('#totara-dismiss').attr('disabled', false);
@@ -211,9 +208,9 @@ M.totara_message = M.totara_message || {
     /**
      *
      */
-    select_all_none_checkbox: function() {
-        $('th.message_values_dismiss_link').html('<div id="totara_message_selects"><a id="all" href="#">' + M.util.get_string('all', 'moodle') +
-                                        '</a>/<a id="none" href="#">' + M.util.get_string('none', 'moodle') + '</a></div>');
+    select_all_none_checkbox: function(){
+        $('th.message_values_dismiss_link').html('<div id="totara_message_selects"><a id="all" href="#">'+M.util.get_string('all', 'moodle')+
+                                        '</a>/<a id="none" href="#">'+M.util.get_string('none', 'moodle')+'</a></div>');
         function jqCheckAll(flag) {
            if (flag === false) {
               $("form#totara_messages [type='checkbox']").prop('checked', false);
@@ -231,12 +228,12 @@ M.totara_message = M.totara_message || {
               }
            }
         }
-        $('#totara_message_selects #all').click(function() { jqCheckAll(true); return false; });
-        $('#totara_message_selects #none').click(function() { jqCheckAll(false); return false; });
+        $('#totara_message_selects #all').click(function() {jqCheckAll(true); return false;});
+        $('#totara_message_selects #none').click(function() {jqCheckAll(false); return false;});
     }
 };
 
-/** ***************************************************************************/
+/*****************************************************************************/
 /** totaraDialog_handler_confirm **/
 
 /**
@@ -270,17 +267,17 @@ totaraDialog_handler_confirm.prototype._confirm = function(url, returnto, extrab
     }
 
     // Grab message ids if available.
-    var msgids = [];
+    msgids = [];
 
     $('form#totara_messages input[type="checkbox"]:checked').each(
-                function() {
+                function () {
                     msgids.push($(this).attr('value'));
                 });
-    url = url + '&msgids=' + msgids.join(',');
+    url = url+'&msgids='+msgids.join(',');
 
     // Send to server.
     if (addreasonparam) {
-        url = url + "&reasonfordecision=" + encodeURIComponent(reasonfordecision.val());
+        url = url+"&reasonfordecision=" + encodeURIComponent(reasonfordecision.val());
     }
     this._dialog._request(url, {object: this, method: '_redirect'});
 };
@@ -304,7 +301,7 @@ totaraDialog_handler_confirm.prototype.setReturnTo = function(url) {
  */
 totaraDialog_handler_confirm.prototype._redirect = function() {
     this._dialog.hide();
-    if (this._returnTo === null) {
+    if (this._returnTo == null) {
         this._returnTo = M.cfg.wwwroot;
     }
     window.location = this._returnTo;

@@ -25,11 +25,11 @@
 define(['jquery'], function($) {
 
     var ERROR_CONTAINER_CLASS = 'totara_form-error-container',
-        ERROR_CONTAINER_SELECTOR = '.' + ERROR_CONTAINER_CLASS;
+        ERROR_CONTAINER_SELECTOR = '.'+ERROR_CONTAINER_CLASS;
 
     return {
-        init: function(id) {
-            (function(id) {
+        init: function (id) {
+            (function (id) {
                 // use closure as otherwise it would only validate the last element.
                 var element = $("#" + id);
 
@@ -38,10 +38,10 @@ define(['jquery'], function($) {
                         e.preventDefault();
                         if (!validate.added) {
                             validate.added = true;
-                            require(['core/templates', 'core/str', 'core/config'], function(templates, mdlstrings, mdlconfig) {
-                                mdlstrings.get_string('required', 'core').done(function(requiredstring) {
+                            require(['core/templates', 'core/str', 'core/config'], function (templates, mdlstrings, mdlconfig) {
+                                mdlstrings.get_string('required','core').done(function (requiredstring) {
                                     var context = {errors_has_items: true, errors: [{message: requiredstring}]};
-                                    templates.render('totara_form/validation_errors', context, mdlconfig.theme).done(function(template) {
+                                    templates.render('totara_form/validation_errors', context, mdlconfig.theme).done(function (template) {
                                         element.parent().prepend(template);
                                     });
                                 });

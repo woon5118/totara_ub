@@ -22,8 +22,6 @@
  * @subpackage cohort/rules
  */
 
-/* eslint-disable no-undef */
-
 /**
  * This class defines the Javascript which allows for deleting a rule via the rules list page.
  */
@@ -70,7 +68,8 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
             e.preventDefault();
             var link = $(this);
             var ruleid = link.attr('data-ruleid');
-            var confirmed = confirm(M.util.get_string('deleteruleconfirm', 'totara_cohort'));
+
+            confirmed = confirm(M.util.get_string('deleteruleconfirm', 'totara_cohort'));
 
             if (!confirmed) {
                 return;
@@ -84,16 +83,16 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
                     ruleid: ruleid
                 }),
                 beforeSend: function() {
-                    require(['core/templates'], function(templates) {
-                        templates.renderIcon('loading', M.util.get_string('savingrule', 'totara_cohort')).done(function(html) {
+                    require(['core/templates'], function (templates) {
+                        templates.renderIcon('loading', M.util.get_string('savingrule', 'totara_cohort')).done(function (html) {
                             link.replaceWith(html);
                         });
                     });
                 },
                 success: function(o) {
-                    if (o.action == 'delrule') {
+                    if (o.action == 'delrule'){
                         remove_rule(o.ruleid);
-                    } else if (o.action == 'delruleset') {
+                    } else if (o.action == 'delruleset'){
                         remove_ruleset(o.rulesetid);
                     }
 
@@ -101,7 +100,7 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
                 }, // success
                 error: function(h, t, e) {
                     alert(M.util.get_string('error:badresponsefromajax', 'totara_cohort'));
-                    // Reload the broken page
+                    //Reload the broken page
                     location.reload();
                 } // error
             }); // ajax
@@ -118,7 +117,8 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
             var link = $(this);
             var ruleparamid = link.closest('a').data('ruleparam-id');
             var ruleparamcontainer = link.closest('span.ruleparamcontainer');
-            var confirmed = confirm(M.util.get_string('deleteruleparamconfirm', 'totara_cohort'));
+
+            confirmed = confirm(M.util.get_string('deleteruleparamconfirm', 'totara_cohort'));
 
             if (!confirmed) {
                 return;
@@ -132,8 +132,8 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
                     ruleparamid: ruleparamid
                 }),
                 beforeSend: function() {
-                    require(['core/templates'], function(templates) {
-                        templates.renderIcon('loading', M.util.get_string('savingrule', 'totara_cohort')).done(function(html) {
+                    require(['core/templates'], function (templates) {
+                        templates.renderIcon('loading', M.util.get_string('savingrule', 'totara_cohort')).done(function (html) {
                             link.replaceWith(html);
                         });
                     });
@@ -198,4 +198,4 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
             ruleset.remove();
         }
     }  // init_deletelisteners
-};
+}

@@ -1,7 +1,4 @@
-
-/* eslint-disable no-undef */
-
-M.block_course_overview = {};
+M.block_course_overview = {}
 
 M.block_course_overview.add_handles = function(Y) {
     M.block_course_overview.Y = Y;
@@ -11,16 +8,15 @@ M.block_course_overview.add_handles = function(Y) {
     };
 
     YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
-        // Static Vars
-        var goingUp = false,
-lastY = 0;
+        //Static Vars
+        var goingUp = false, lastY = 0;
 
         var list = Y.Node.all('.course_list .coursebox');
         list.each(function(v, k) {
             // Replace move link and image with move_2d image.
             var imagenode = v.one('.course_title .move a img');
             if (imagenode === null) {
-                require(['core/templates'], function(templates) {
+                require(['core/templates'], function (templates) {
                     templates.renderIcon('arrows', '').done(function(html) {
                         v.one('.course_title .move a').replace(html);
                     });
@@ -45,9 +41,9 @@ lastY = 0;
         });
 
         Y.DD.DDM.on('drag:start', function(e) {
-            // Get our drag object
+            //Get our drag object
             var drag = e.target;
-            // Set some styles here
+            //Set some styles here
             drag.get('node').setStyle('opacity', '.25');
             drag.get('dragNode').addClass('block_course_overview');
             drag.get('dragNode').set('innerHTML', drag.get('node').get('innerHTML'));
@@ -60,7 +56,7 @@ lastY = 0;
 
         Y.DD.DDM.on('drag:end', function(e) {
             var drag = e.target;
-            // Put our styles back
+            //Put our styles back
             drag.get('node').setStyles({
                 visibility: '',
                 opacity: '1'
@@ -69,34 +65,34 @@ lastY = 0;
         });
 
         Y.DD.DDM.on('drag:drag', function(e) {
-            // Get the last y point
+            //Get the last y point
             var y = e.target.lastXY[1];
-            // is it greater than the lastY var?
+            //is it greater than the lastY var?
             if (y < lastY) {
-                // We are going up
+                //We are going up
                 goingUp = true;
             } else {
-                // We are going down.
+                //We are going down.
                 goingUp = false;
             }
-            // Cache for next check
+            //Cache for next check
             lastY = y;
         });
 
         Y.DD.DDM.on('drop:over', function(e) {
-            // Get a reference to our drag and drop nodes
+            //Get a reference to our drag and drop nodes
             var drag = e.drag.get('node'),
                 drop = e.drop.get('node');
 
-            // Are we dropping on a li node?
+            //Are we dropping on a li node?
             if (drop.hasClass('coursebox')) {
-                // Are we not going up?
+                //Are we not going up?
                 if (!goingUp) {
                     drop = drop.get('nextSibling');
                 }
-                // Add the node to this list
+                //Add the node to this list
                 e.drop.get('node').get('parentNode').insertBefore(drag, drop);
-                // Resize this nodes shim, so we can drop on it later.
+                //Resize this nodes shim, so we can drop on it later.
                 e.drop.sizeShim();
             }
         });
@@ -105,7 +101,7 @@ lastY = 0;
             var drop = e.drop.get('node'),
                 drag = e.drag.get('node');
 
-            // if we are not on an li, we must have been dropped on a ul
+            //if we are not on an li, we must have been dropped on a ul
             if (!drop.hasClass('coursebox')) {
                 if (!drop.contains(drag)) {
                     drop.appendChild(drag);
@@ -113,7 +109,7 @@ lastY = 0;
             }
         });
     });
-};
+}
 
 M.block_course_overview.save = function() {
     var Y = M.block_course_overview.Y;
@@ -122,17 +118,15 @@ M.block_course_overview.save = function() {
         sortorder[i] = sortorder[i].substring(7);
     }
     var params = {
-        sesskey: M.cfg.sesskey,
-        sortorder: sortorder
+        sesskey : M.cfg.sesskey,
+        sortorder : sortorder
     };
-    Y.io(M.cfg.wwwroot + '/blocks/course_overview/save.php', {
+    Y.io(M.cfg.wwwroot+'/blocks/course_overview/save.php', {
         method: 'POST',
-        /* eslint-enable no-undef */
         data: build_querystring(params),
-        /* eslint-disable no-undef */
         context: this
     });
-};
+}
 
 /**
  * Init a collapsible region, see print_collapsible_region in weblib.php
@@ -165,16 +159,16 @@ M.block_course_overview.CollapsibleRegion = function(Y, id, userpref, strtooltip
     this.userpref = userpref;
 
     // Find the divs in the document.
-    this.div = Y.one('#' + id);
+    this.div = Y.one('#'+id);
 
     // Get the caption for the collapsible region
-    var caption = this.div.one('#' + id + '_caption');
+    var caption = this.div.one('#'+id + '_caption');
     caption.setAttribute('title', strtooltip);
 
     // Create a link
     var a = Y.Node.create('<a href="#"></a>');
     // Create a local scoped lamba function to move nodes to a new link
-    var movenode = function(node) {
+    var movenode = function(node){
         node.remove();
         a.append(node);
     };
@@ -186,7 +180,7 @@ M.block_course_overview.CollapsibleRegion = function(Y, id, userpref, strtooltip
     var height = this.div.get('offsetHeight');
     if (this.div.hasClass('collapsed')) {
         // Shrink the div as it is collapsed by default
-        this.div.setStyle('height', caption.get('offsetHeight') + 'px');
+        this.div.setStyle('height', caption.get('offsetHeight')+'px');
     }
 
     // Create the animation.
@@ -194,8 +188,8 @@ M.block_course_overview.CollapsibleRegion = function(Y, id, userpref, strtooltip
         node: this.div,
         duration: 0.3,
         easing: Y.Easing.easeBoth,
-        to: {height: caption.get('offsetHeight')},
-        from: {height: height}
+        to: {height:caption.get('offsetHeight')},
+        from: {height:height}
     });
 
     // Handler for the animation finishing.

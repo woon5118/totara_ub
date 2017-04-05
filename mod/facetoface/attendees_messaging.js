@@ -22,8 +22,6 @@
  * @subpackage facetoface
  */
 
-/* eslint-disable no-undef */
-
 M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
 
     Y: null,
@@ -39,7 +37,7 @@ M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
         var module = this;
         var default_url;
 
@@ -66,8 +64,8 @@ M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
             var name = 'editrecipients';
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('update', 'moodle')] = function() { handler.update_recipients(); };
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+            buttonsObj[M.util.get_string('update','moodle')] = function() { handler.update_recipients(); };
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
 
             default_url = M.cfg.wwwroot + '/mod/facetoface/editrecipients.php?s=' + M.totara_f2f_attendees_messaging.config.sessionid;
             totaraDialogs[name] = new totaraDialog(
@@ -97,13 +95,11 @@ M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
             $("fieldset#id_recipientgroupsheader input:checked").each(function() {
                 // Get status code
                 var status = $(this).attr('id').substring(('id_recipient_group_').length);
-                /* eslint-enable no-undef */
-                for (var user in recipient_groups[status]) {
+                for (user in recipient_groups[status]) {
                     user = recipient_groups[status][user];
-                    recipients.append('<option value="' + user.id + '">' + user.firstname + ' ' + user.lastname + ', ' + user.email + '</option>');
-                    recipients_hidden.val(recipients_hidden.val() + ',' + user.id);
+                    recipients.append('<option value="'+user.id+'">'+user.firstname+' '+user.lastname+', '+user.email+'</option>');
+                    recipients_hidden.val(recipients_hidden.val()+','+user.id);
                 }
-                /* eslint-disable no-undef */
             });
 
             if ($("select[name=recipients] option").length) {
@@ -111,7 +107,7 @@ M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
                 $("input[name=submitbutton]").removeAttr('disabled');
             } else {
                 $('fieldset#id_recipientsheader').hide();
-                $("input[name=submitbutton]").attr('disabled', 'disabled');
+                $("input[name=submitbutton]").attr('disabled','disabled');
             }
         };
 
@@ -127,11 +123,11 @@ M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
             // Update default url to reflect currently selected users
             var selected = '';
             $("select[name=recipients] option").each(function() {
-                selected += $(this).val() + ',';
+                selected += $(this).val()+',';
             });
 
-            totaraDialogs.editrecipients.default_url = default_url + '&recipients=' + selected;
-            totaraDialogs.editrecipients.open();
+            totaraDialogs['editrecipients'].default_url = default_url + '&recipients=' + selected;
+            totaraDialogs['editrecipients'].open();
         });
 
         // Make recipient checkbox unclickable
@@ -140,7 +136,7 @@ M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
             $(this).children().attr('selected', false);
         });
     }
-};
+}
 
 
 /**
@@ -170,8 +166,8 @@ totaraDialog_handler_editrecipients.prototype.update_recipients = function() {
             return;
         }
 
-        recipients.append('<option value="' + value + '">' + title + '</option>');
-        recipients_hidden.val(recipients_hidden.val() + ',' + value);
+        recipients.append('<option value="'+value+'">'+title+'</option>');
+        recipients_hidden.val(recipients_hidden.val()+','+value);
     });
 
     // Check if anything selected
@@ -182,7 +178,7 @@ totaraDialog_handler_editrecipients.prototype.update_recipients = function() {
     } else {
         $('fieldset#id_recipientgroupsheader').show();
         $('fieldset#id_recipientsheader').hide();
-        $("input[name=submitbutton]").attr('disabled', 'disabled');
+        $("input[name=submitbutton]").attr('disabled','disabled');
     }
 
     this._cancel();

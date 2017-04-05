@@ -23,7 +23,7 @@
 /**
  * This file defines the functionality of the mygoals page
  */
-define(['jquery', 'core/config'], function($, mdlconfig) {
+define(['jquery', 'core/config'], function ($, mdlconfig) {
     var goals = {
         /**
          * sets up to handle altering company goals
@@ -32,7 +32,7 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
          * @param companyscope int goal::SCOPE_COMPANY
          */
         init_company: function(userid, companyscope) {
-            $('#companygoals').on('change', '.company_scalevalue_selector', function() {
+            $('#companygoals').on('change', '.company_scalevalue_selector', function () {
                 goals._update_goal(userid, companyscope, $(this).data('goalid'), $(this).val());
             });
         },
@@ -44,7 +44,7 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
          * @param personalscope int goal::SCOPE_PERSONAL
          */
         init_personal: function(userid, personalscope) {
-            $('#personalgoals').on('change', '.personal_scalevalue_selector', function() {
+            $('#personalgoals').on('change', '.personal_scalevalue_selector', function () {
                 goals._update_goal(userid, personalscope, $(this).data('goalid'), $(this).val());
             });
         },
@@ -56,7 +56,7 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
          * @param personalscope int goal::SCOPE_PERSONAL
          */
         init_single_personal: function(userid, personalscope) {
-            $('#page-totara-hierarchy-prefix-goal-item-view .personal_scalevalue_selector').change(function() {
+            $('#page-totara-hierarchy-prefix-goal-item-view .personal_scalevalue_selector').change( function () {
                 goals._update_goal(userid, personalscope, $(this).data('goalid'), $(this).val());
             });
         },
@@ -67,7 +67,7 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
          * @param userid int the id of the user to update
          * @param scope int whether this is the personal or company scopre to update
          */
-        _update_goal: function(userid, scope, goalid, value) {
+        _update_goal: function (userid, scope, goalid, value) {
             var params = {
                 scope: scope,
                 sesskey: mdlconfig.sesskey,

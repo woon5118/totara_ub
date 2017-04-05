@@ -22,8 +22,6 @@
  * @subpackage plan
  */
 
-/* eslint-disable no-undef */
-
 M.block_totara_addtoplan = M.block_totara_addtoplan || {
     Y: null,
 
@@ -58,4 +56,4 @@ M.block_totara_addtoplan = M.block_totara_addtoplan || {
             return false;
         });
     }
-};
+}

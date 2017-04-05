@@ -22,9 +22,10 @@
  * @subpackage totara_question
  */
 
-/* eslint-disable no-undef */
-
 define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
+
+    /* global totaraDialog totaraDialogs totaraDialog_handler openpopup */
+
     var myappraisal = {
 
         config: {},
@@ -35,23 +36,23 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
         * @param object    YUI instance
         * @param string    args supplied in JSON format
         */
-        init: function(args) {
+        init : function(args) {
             if (args) {
                 myappraisal.config = $.parseJSON(args);
             }
 
             var $mainForm = $('input#id_submitbutton').closest('form');
-            var $saveProgress = $("<input>").attr({"type": "hidden", "name": "submitaction"}).val('saveprogress');
-            var $completeStage = $("<input>").attr({"type": "hidden", "name": "submitaction"}).val('completestage');
+            var $saveProgress = $("<input>").attr({"type" : "hidden", "name" : "submitaction"}).val('saveprogress');
+            var $completeStage = $("<input>").attr({"type" : "hidden", "name" : "submitaction"}).val('completestage');
 
-            $('#saveprogress').on('submit', function(e) {
+            $('#saveprogress').on('submit', function(e){
               window.onbeforeunload = null; // Prevent leaving page warning.
               e.preventDefault();
               $mainForm.append($saveProgress);
               $mainForm.submit();
             });
 
-            $('#completestage').on('submit', function(e) {
+            $('#completestage').on('submit', function(e){
               window.onbeforeunload = null; // Prevent leaving page warning.
               e.preventDefault();
               $mainForm.append($completeStage);
@@ -86,9 +87,8 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
                     url: mdlcfg.wwwroot + '/totara/appraisal/snapshot.php' + '?' + urlparam,
                     options: "height=500,width=600,top=100,left=100,menubar=0,location=0,scrollbars,resizable,toolbar,status,directories=0,dependent"
                 };
-                /* eslint-disable no-undef */
                 openpopup(e, popupdata);
-                /* eslint-enable no-undef */
+
                 handler._cancel();
             };
 

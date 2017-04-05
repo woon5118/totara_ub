@@ -22,8 +22,6 @@
  * @subpackage goal
  */
 
-/* eslint-disable no-undef */
-
 /**
  * This file contains the Javascript for the dialog that lets you add audiences
  * to a personal goal type
@@ -46,14 +44,14 @@ M.totara_goalcohort = M.totara_goalcohort || {
     init: function(Y, selected) {
         // Save a reference to the Y instance (all of its dependencies included).
         this.Y = Y;
-        this.config.selected = selected;
+        this.config['selected'] = selected;
 
         // Check jQuery dependency is available.
         if (typeof $ === 'undefined') {
             throw new Error('M.totara_cohortlearning.init()-> jQuery dependency required for this module.');
         }
 
-        this.config.sesskey = M.cfg.sesskey;
+        this.config['sesskey'] = M.cfg.sesskey;
 
         // Hide the cohort/audience dialogue if goal type availability is 'all users' when the page loads.
         if ($('#id_audience').val() == 0) {
@@ -86,10 +84,10 @@ M.totara_goalcohort = M.totara_goalcohort || {
         ehandler.baseurl = url;
 
         var dbuttons = {};
-        dbuttons[M.util.get_string('ok', 'moodle')] = function() { ehandler._update(); };
-        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel(); };
+        dbuttons[M.util.get_string('ok', 'moodle')] = function() { ehandler._update() };
+        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel() };
 
-        totaraDialogs.id_cohortsaddenrolled = new totaraDialog(
+        totaraDialogs['id_cohortsaddenrolled'] = new totaraDialog(
             'goal-cohorts-enrolled-dialog',
             'id_cohortsaddenrolled',
             {
@@ -117,11 +115,11 @@ totaraDialog_handler_goalcohorts = function() {
     this.check_table_hidden_status();
 
     // Remove the empty tr that the html_writer inserts for an empty table.
-    $('#goal-cohorts-table-enrolled tbody tr').each(function() {
-        $(this).find('td').each(function() {
+    $('#goal-cohorts-table-enrolled tbody tr').each(function () {
+        $(this).find('td').each(function () {
             if ($(this).text().trim() == "") {
                 $(this).closest("tr").remove();
-            }
+            };
         });
     });
 
@@ -151,7 +149,7 @@ totaraDialog_handler_goalcohorts.prototype._update = function(response) {
 
         // Get id
         var itemid = $(this).attr('id').split('_');
-        itemid = itemid[itemid.length - 1];  // The last item is the actual id
+        itemid = itemid[itemid.length-1];  // The last item is the actual id
         itemid = parseInt(itemid);
 
         if (!self.cohort_item_exists(itemid)) {
@@ -169,12 +167,12 @@ totaraDialog_handler_goalcohorts.prototype._update = function(response) {
                 alert(data.error);
                 return;
             }
-            $.each(data.rows, function(index, html) {
+            $.each(data['rows'], function(index, html) {
                 self.create_item(html);
             });
 
             self._dialog.hide();
-        });
+        })
     } else {
         this._dialog.hide();
     }
@@ -193,7 +191,7 @@ totaraDialog_handler_goalcohorts.prototype.cohort_item_exists = function(itemid)
         }
     }
     return false;
-};
+}
 
 /**
  * Manage hide / showing the table containing the list fo audiences / cohorts.
@@ -257,12 +255,12 @@ totaraDialog_handler_goalcohorts.prototype.remove_cohort_item = function(item) {
     var row = $(item).closest('tr');
 
     // Remove the item from the array of items
-    this.cohort_items = $.grep(this.cohort_items, function(element, x) {
+    this.cohort_items = $.grep(this.cohort_items, function (element, x) {
         return (element == itemid);
     }, true);
 
     // Remove item from interface
-    row.remove();
+    row.remove()
 
     this.check_table_hidden_status();
 

@@ -582,7 +582,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                     SELECTOR.CONTENTWITHOUTLINK
                 ].join(', ')),
             availabilityinfo = activity.one(CSS.AVAILABILITYINFODIV),
-            nextaction = (action === 'hide') ? 'show' : 'hide',
+            nextaction = (action === 'hide') ? 'show': 'hide',
             buttontext = button.one('.menu-action-text'),
             newstring = M.util.get_string(nextaction, 'moodle');
 
@@ -591,8 +591,8 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         // Update button info.
         if (hideicon !== null) {
             // Font style icon
-            require(['core/templates'], function(templates) {
-                templates.renderIcon('core|t/' + nextaction, newstring).done(function(html) {
+            require(['core/templates'], function (templates) {
+                templates.renderIcon('core|t/' + nextaction, newstring).done(function (html) {
                     templates.replaceNode(hideicon.getDOMNode(), html, '');
                 });
             });
@@ -770,7 +770,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         var title = activitynode.one('.instancename').get('innerHTML');
         var groupnode = activitynode.one('a[data-action="groupsvisible"], a[data-action="groupsnone"], a[data-action="groupsseparate"]');
 
-        require(['core/templates', 'core/str'], function(templates, stringslib) {
+        require(['core/templates', 'core/str'], function (templates, stringslib) {
             var flexicon = "";
             var stringcurrent = '';
             var stringnext = '';
@@ -796,16 +796,16 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                 {key: stringcurrent, component: 'core'},
                 {key: stringnext, component: 'core'}
             ];
-            stringslib.get_strings(reqstrings).then(function(strings) {
+            stringslib.get_strings(reqstrings).then(function (strings) {
                 var stringparam = {
                     activityname: title,
                     now: strings[0],
-                    next: strings[1]
+                    next:strings[1]
                 };
                 return stringslib.get_string('changegroupingmode', 'moodle', stringparam);
-            }).then(function(string) {
+            }).then(function (string) {
                 return templates.renderIcon(flexicon, string);
-            }).then(function(html) {
+            }).then(function (html) {
                 groupnode.setContent(html);
             });
         });
@@ -901,13 +901,13 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         if (hideicon === null) {
             // Traditional style of icon
             button.one('img').setAttrs({
-                'alt': newstring,
-                'src': M.util.image_url('i/' + nextaction)
+                'alt' : newstring,
+                'src' : M.util.image_url('i/' + nextaction)
             });
         } else {
             // Font style icon
-            require(['core/templates'], function(templates) {
-                templates.renderIcon('core|i/' + nextaction, newstring).done(function(html) {
+            require(['core/templates'], function (templates) {
+                templates.renderIcon('core|i/' + nextaction, newstring).done(function (html) {
                     templates.replaceNode(hideicon.getDOMNode(), html, '');
                 });
             });
@@ -986,10 +986,10 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         var nodes = selectedpage.all(M.course.format.get_section_selector(Y) + '.current ' + SELECTOR.HIGHLIGHT + ' .flex-icon');
 
 
-        require(['core/templates'], function(templates) {
-            nodes.each(function(node) {
+        require(['core/templates'], function (templates) {
+            nodes.each(function (node) {
                 // Font style icon
-                templates.renderIcon('marker-off', old_string).done(function(html) {
+                templates.renderIcon('marker-off', old_string).done(function (html) {
                     templates.replaceNode(node.getDOMNode(), html, '');
                 });
             });
@@ -1017,8 +1017,8 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
                     .set('src', M.util.image_url('i/marked'));
             } else {
                 // Font style icon
-                require(['core/templates'], function(templates) {
-                    templates.renderIcon('marker-on', new_string).done(function(html) {
+                require(['core/templates'], function (templates) {
+                    templates.renderIcon('marker-on', new_string).done(function (html) {
                         templates.replaceNode(highlighticon.getDOMNode(), html, '');
                     });
                 });

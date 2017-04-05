@@ -22,10 +22,8 @@
  * @subpackage totara_question
  */
 
-/* eslint-disable no-undef */
-
 M.totara_question_multichoice = M.totara_question_multichoice || {
-  Y: null,
+  Y : null,
 
   config: {},
   /**
@@ -34,7 +32,7 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
    * @param object    YUI instance
    * @param string    args supplied in JSON format
    */
-  init: function(Y, args) {
+  init : function(Y, args) {
     // save a reference to the Y instance (all of its dependencies included)
     this.Y = Y;
 
@@ -48,18 +46,18 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
     }
 
     // check jQuery dependency is available
-    if (typeof $ === 'undefined') {
+    if ( typeof $ === 'undefined') {
       throw new Error('M.totara_question_multichoice.init()-> jQuery dependency required for this module to function.');
     }
 
     var savedchoices = M.totara_question_multichoice.config.savedchoices;
     var numVisible = 0;
-    var $container = $('#id_' + M.totara_question_multichoice.config.jsid);
+    var $container = $('#id_'+M.totara_question_multichoice.config.jsid);
     var max = M.totara_question_multichoice.config.max;
 
     var $allOptions = $container.find('div[id^="fgroup_id_choice_"]').slice(0, max);
 
-    $allOptions.each(function(i) {
+    $allOptions.each(function(i){
         $(this).find("input[type='text']").each(function(j, e) {
             if ($(e).val() != '') {
                 numVisible = i + 1;
@@ -75,7 +73,7 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
     // Hide from numVisible (default is 3) to last
     $allOptions.slice(numVisible, max).hide();
 
-    $allOptions.each(function() {
+    $allOptions.each(function(){
         var $this = $(this);
         if ($($this.find('span')).length > 0) {
             $this.find('span').hide();
@@ -85,7 +83,7 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
             var $unselectLink = $('<a href="#">' + M.util.get_string('defaultunselect', 'totara_question') + '</a>');
 
             $makeDefault.append($makeDefaultLink);
-            $makeDefaultLink.on('click', function() {
+            $makeDefaultLink.on('click', function(){
                 if (M.totara_question_multichoice.config.oneAnswer == 1) {
                     $allOptions.find('.unselectlink').hide();
                     $allOptions.find('.makedefaultlink').show();
@@ -99,7 +97,7 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
             });
 
             $unselect.append($unselectLink);
-            $unselectLink.on('click', function() {
+            $unselectLink.on('click', function(){
                 $this.find('input.makedefault').prop('checked', false);
                 $makeDefault.show();
                 $unselect.hide();
@@ -113,7 +111,7 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
     });
 
     // Select default options.
-    $allOptions.find('input.makedefault[checked="checked"]').each(function() {
+    $allOptions.find('input.makedefault[checked="checked"]').each(function(){
         $(this).closest('fieldset').find('.makedefaultlink a').click();
     });
 
@@ -129,7 +127,7 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
         $container.find('a.addoptionlink').addClass('disabled');
         $container.find('a.addoptionlink').hide();
     }
-    $container.find('a.addoptionlink').on('click', function() {
+    $container.find('a.addoptionlink').on('click', function(){
         if ($(this).hasClass('disabled')) {
             return false;
         }
@@ -174,7 +172,7 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
         $allOptions.find("input[type='text']").prop('disabled', true);
     }
 
-    $('#id_selectchoices').on('change', function(e) {
+    $('#id_selectchoices').on('change', function(e){
         var theVal = $(this).val();
         if (theVal != 0) {
             clearChoices();
@@ -182,7 +180,6 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
             disableOptionsChanges();
 
             numVisible = savedchoices[theVal].values.length;
-            var value;
             for (value in savedchoices[theVal].values) {
                 $allOptions.eq(value).find("input[type='text']").eq(0).val(savedchoices[theVal].values[value].name);
                 $allOptions.eq(value).find("input[type='text']").eq(1).val(savedchoices[theVal].values[value].score);
@@ -197,4 +194,4 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
         $allOptions.slice(numVisible, max).hide();
     });
     }
-};
+}

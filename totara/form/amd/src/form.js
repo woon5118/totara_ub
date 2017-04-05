@@ -336,7 +336,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
             var failed = true;
             if (debug) {
                 var waitForMilliseconds = 3000;
-                window.setTimeout(function() {
+                window.setTimeout(function () {
                     if (failed === true) {
                         MODULE.debug('Element #' + group.getId() + ' failed to call done() in ' + waitForMilliseconds + 'ms', group,
                             MODULE.LOGLEVEL.error);
@@ -369,7 +369,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
             var failed = true;
             if (debug) {
                 var waitForMilliseconds = 3000;
-                window.setTimeout(function() {
+                window.setTimeout(function () {
                     if (failed === true) {
                         MODULE.debug('Element #' + element.getId() + ' failed to call done() in ' + waitForMilliseconds + 'ms',
                             element, MODULE.LOGLEVEL.error);
@@ -669,7 +669,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                 // When that is done we can register the items.
                 groupDefer.done(function() {
                     // Now initialise the items.
-                    group.initItems(itemNodes).done(function() {
+                    group.initItems(itemNodes).done(function () {
                         deferred.resolve();
                     });
                 });
@@ -684,10 +684,10 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                     // When that is done we can register the items.
                     groupDefer.done(function() {
                         group.initItems(itemNodes).then(
-                            function() {
+                            function () {
                                 deferred.resolve();
                             },
-                            function(e) {
+                            function (e) {
                                 MODULE.debug('Failed to initialise the items within a group of type ' + groupData.module, self,
                                     MODULE.LOGLEVEL.error);
                                 deferred.reject();
@@ -1068,7 +1068,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
             if (button !== undefined) {
                 formdata.push({
                     name: button.attr('name'),
-                    value: button.val()}
+                    value : button.val()}
                 );
             }
             if (reloadOnly) {
@@ -1090,7 +1090,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                 success: function(data) {
                     this.ajaxSubmitHandler(deferred, data);
                 },
-                complete: function(jqXHR, status) {
+                complete : function(jqXHR, status) {
                     if (status !== 'success') {
                         deferred.resolve(status, {}, jqXHR);
                     }
@@ -1184,7 +1184,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
             var compare = Form.prototype.compare,
                 expected,
                 l, i,
-                valueIsArray = Array.isArray(value),
+                valueIsArray = Array.isArray(value) ,
                 result = null; // Null means we don't know.
 
             switch (operator) {
@@ -1314,7 +1314,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
             var self = this;
 
             self.node.setAttribute('novalidate', '');
-            jqueryElement.on('submit.working', {form: self}, self.submitHandler);
+            jqueryElement.on('submit.working', { form: self }, self.submitHandler);
 
         },
 
@@ -1462,7 +1462,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
          * @param {string} attributeName
          * @returns {string}
          */
-        getDataAttributeSelector: function(attributeName) {
+        getDataAttributeSelector: function (attributeName) {
             return '[' + attributeName + ']';
         },
 
@@ -1471,7 +1471,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
          *
          * @param {Object} formData Initialization data passed from server-side for a specific form.
          */
-        init: function(formData) {
+        init: function (formData) {
 
             MODULE.debug('Initialising form #' + formData.id, Form, MODULE.LOGLEVEL.info);
 
@@ -1506,24 +1506,24 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
             }
 
             form.initItems(itemNodes).then(
-                function() {
-                    form.initClientActions(actionsConfig).done(function() {
+                function () {
+                    form.initClientActions(actionsConfig).done(function () {
                         deferred.resolve(form);
                     });
                 },
-                function(e) {
+                function (e) {
                     MODULE.debug('Failed to initialise items in form #' + formData.id, Form, MODULE.LOGLEVEL.info);
                 }
             );
 
-            return deferred.promise().done(function(form) {
+            return deferred.promise().done(function (form) {
 
                 var formNode = form.node;
 
                 MODULE.debug('Re-enabling submission of form #' + formNode.getAttribute('id'), Form, MODULE.LOGLEVEL.debug);
 
                 // If there are custom validation functions then use them and switch off HTML5 validation.
-                var useCustomValidation = form.getElements(true).some(function(element) {
+                var useCustomValidation = form.getElements(true).some(function (element) {
                     return typeof element.isValid === 'function';
                 });
                 if (useCustomValidation) {
@@ -1544,10 +1544,10 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
          * @param {Object} [objProto] A prototype object to mix in.
          * @returns {Object}
          */
-        extend: function(parentObj, Obj, objProto) {
+        extend: function (parentObj, Obj, objProto) {
 
             if (!Obj || Obj === 'undefined') {
-                Obj = function() {
+                Obj = function () {
                     // Call the parent object constructor given the exact arguments provided here.
                     parentObj.apply(this, arguments);
                 };
@@ -1569,7 +1569,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
          * @param {Object} parameters
          * @param {string} target
          */
-        load: function(formclass, idsuffix, parameters, target) {
+        load: function (formclass, idsuffix, parameters, target) {
 
             var formdata = $.extend(parameters, {
                     sesskey: CFG.sesskey,
@@ -1583,11 +1583,11 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                 url: CFG.wwwroot + '/totara/form/ajax.php',
                 data: formdata,
                 context: this,
-                success: function(data) {
+                success: function (data) {
                     if (data.formstatus === 'display') {
                         MODULE.debug('Displaying the form for the first time.', Form, MODULE.LOGLEVEL.debug);
                         container.empty();
-                        Templates.render(data.templatename, data.templatedata).done(function(html, js) {
+                        Templates.render(data.templatename, data.templatedata).done(function (html, js) {
                             Templates.replaceNodeContents($('#' + target), html, js);
                             deferred.resolve('display', data.templatedata.formid);
                         }).fail(Notification.exception);
@@ -1596,7 +1596,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                         deferred.reject();
                     }
                 },
-                complete: function(jqXHR, status) {
+                complete : function(jqXHR, status) {
                     if (status !== 'success') {
                         deferred.resolve(status);
                     }
@@ -1642,7 +1642,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
          * @param {Object} obj The object sending the debug message.
          * @param {string} level The debug level, one of
          */
-        debug: function(message, obj, level) {
+        debug: function (message, obj, level) {
             if (debug) {
                 if (!window.console.log.apply) {
                     // IE9 doesn't provide apply on developer tool methods.

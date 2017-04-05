@@ -1,15 +1,12 @@
-
-/* eslint-disable no-undef */
-
 YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
     var DRAGDROPNAME = 'mod_feedback_dragdrop';
     var CSS = {
-        DRAGAREA: '#feedback_dragarea',
-        DRAGITEMCLASS: 'feedback_itemlist',
-        DRAGITEM: 'div.feedback_itemlist',
+        DRAGAREA : '#feedback_dragarea',
+        DRAGITEMCLASS : 'feedback_itemlist',
+        DRAGITEM : 'div.feedback_itemlist',
         DRAGLIST: '#feedback_dragarea form',
-        ITEMBOX: '#feedback_item_box_',
-        DRAGHANDLE: 'itemhandle'
+        ITEMBOX : '#feedback_item_box_',
+        DRAGHANDLE : 'itemhandle'
     };
 
     var DRAGDROP = function() {
@@ -18,26 +15,24 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
 
     Y.extend(DRAGDROP, M.core.dragdrop, {
 
-        initializer: function(params) {
-
-            // Static Vars
+        initializer : function(params) {
+            //Static Vars
             this.cmid = params.cmid;
-            this.goingUp = false;
-            this.lastY = 0;
+            this.goingUp = false, lastY = 0;
 
             var groups = ['feedbackitem'];
 
-            var handletitle = M.util.get_string('move_item', 'feedback');
+            handletitle = M.util.get_string('move_item', 'feedback');
             this.mydraghandle = this.get_drag_handle(handletitle, CSS.DRAGHANDLE, 'icon');
 
-            // Get the list of li's in the lists and add the drag handle.
-            var basenode = Y.Node.one(CSS.DRAGLIST);
-            var listitems = basenode.all(CSS.DRAGITEM).each(function(v) {
-                var item_id = this.get_node_id(v.get('id')); // Get the id of the feedback item.
+            //Get the list of li's in the lists and add the drag handle.
+            basenode = Y.Node.one(CSS.DRAGLIST);
+            listitems = basenode.all(CSS.DRAGITEM).each(function(v) {
+                var item_id = this.get_node_id(v.get('id')); //Get the id of the feedback item.
                 v.append(this.mydraghandle.cloneNode(true)); // Insert the new handle into the item box.
             }, this);
 
-            // We use a delegate to make all items draggable
+            //We use a delegate to make all items draggable
             var del = new Y.DD.Delegate({
                 container: CSS.DRAGLIST,
                 nodes: CSS.DRAGITEM,
@@ -48,7 +43,7 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
                 dragConfig: {groups: groups}
             });
 
-            // Add plugins to the delegate
+            //Add plugins to the delegate
             del.dd.plug(Y.Plugin.DDProxy, {
                 // Don't move the node at the end of the drag
                 moveOnEnd: false,
@@ -60,20 +55,20 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
             });
             del.dd.plug(Y.Plugin.DDWinScroll);
 
-            // Listen for all drop:over events
+            //Listen for all drop:over events
             del.on('drop:over', this.drop_over_handler, this);
-            // Listen for all drag:drag events
-            del.on('drag:drag', this.drag_drag_handler, this);
-            // Listen for all drag:start events
-            del.on('drag:start', this.drag_start_handler, this);
-            // Listen for a drag:end events
-            del.on('drag:end', this.drag_end_handler, this);
-            // Listen for all drag:drophit events
-            del.on('drag:drophit', this.drag_drophit_handler, this);
-            // Listen for all drag:dropmiss events
-            del.on('drag:dropmiss', this.drag_dropmiss_handler, this);
+            //Listen for all drag:drag events
+            del.on('drag:drag',  this.drag_drag_handler, this);
+            //Listen for all drag:start events
+            del.on('drag:start',  this.drag_start_handler, this);
+            //Listen for a drag:end events
+            del.on('drag:end',  this.drag_end_handler, this);
+            //Listen for all drag:drophit events
+            del.on('drag:drophit',  this.drag_drophit_handler, this);
+            //Listen for all drag:dropmiss events
+            del.on('drag:dropmiss',  this.drag_dropmiss_handler, this);
 
-            // Create targets for drop.
+            //Create targets for drop.
             var tar = new Y.DD.Drop({
                 groups: groups,
                 node: basenode
@@ -87,20 +82,20 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
          * @param e the event
          * @return void
          */
-        drop_over_handler: function(e) {
-            // Get a reference to our drag and drop nodes
+        drop_over_handler : function(e) {
+            //Get a reference to our drag and drop nodes
             var drag = e.drag.get('node'),
                 drop = e.drop.get('node');
 
-            // Are we dropping on an li node?
+            //Are we dropping on an li node?
             if (drop.hasClass(CSS.DRAGITEMCLASS)) {
-                // Are we not going up?
+                //Are we not going up?
                 if (!this.goingUp) {
                     drop = drop.get('nextSibling');
                 }
-                // Add the node to this list
+                //Add the node to this list
                 e.drop.get('node').get('parentNode').insertBefore(drag, drop);
-                // Resize this nodes shim, so we can drop on it later.
+                //Resize this nodes shim, so we can drop on it later.
                 e.drop.sizeShim();
             }
         },
@@ -111,18 +106,18 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
          * @param e the event
          * @return void
          */
-        drag_drag_handler: function(e) {
-            // Get the last y point
+        drag_drag_handler : function(e) {
+            //Get the last y point
             var y = e.target.lastXY[1];
-            // Is it greater than the lastY var?
+            //Is it greater than the lastY var?
             if (y < this.lastY) {
-                // We are going up
+                //We are going up
                 this.goingUp = true;
             } else {
-                // We are going down.
+                //We are going down.
                 this.goingUp = false;
             }
-            // Cache for next check
+            //Cache for next check
             this.lastY = y;
         },
 
@@ -132,11 +127,11 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
          * @param e the event
          * @return void
          */
-        drag_start_handler: function(e) {
-            // Get our drag object
+        drag_start_handler : function(e) {
+            //Get our drag object
             var drag = e.target;
 
-            // Set some styles here
+            //Set some styles here
             drag.get('node').addClass('drag_target_active');
             drag.get('dragNode').set('innerHTML', drag.get('node').get('innerHTML'));
             drag.get('dragNode').addClass('drag_item_active');
@@ -152,9 +147,9 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
          * @param e the event
          * @return void
          */
-        drag_end_handler: function(e) {
+        drag_end_handler : function(e) {
             var drag = e.target;
-            // Put our styles back
+            //Put our styles back
             drag.get('node').removeClass('drag_target_active');
         },
 
@@ -164,7 +159,7 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
          * @param e the event
          * @return void
          */
-        drag_drophit_handler: function(e) {
+        drag_drophit_handler : function(e) {
             var drop = e.drop.get('node'),
                 drag = e.drag.get('node'),
                 dragnode = Y.one(drag);
@@ -197,41 +192,41 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
          * @param spinner The spinner icon shown while saving
          * @return void
          */
-        save_item_order: function(cmid, itemorder, spinner) {
+        save_item_order : function(cmid, itemorder, spinner) {
 
             Y.io(M.cfg.wwwroot + '/mod/feedback/ajax.php', {
-                // The needed paramaters
+                //The needed paramaters
                 data: {action: 'saveitemorder',
                     id: cmid,
                     itemorder: itemorder,
                     sesskey: M.cfg.sesskey
                 },
 
-                timeout: 5000, // 5 seconds for timeout I think it is enough.
+                timeout: 5000, //5 seconds for timeout I think it is enough.
 
-                // Define the events.
+                //Define the events.
                 on: {
-                    start: function(transactionid) {
+                    start : function(transactionid) {
                         spinner.show();
                     },
-                    success: function(transactionid, xhr) {
+                    success : function(transactionid, xhr) {
                         var response = xhr.responseText;
                         var ergebnis = Y.JSON.parse(response);
                         window.setTimeout(function(e) {
                             spinner.hide();
                         }, 250);
                     },
-                    failure: function(transactionid, xhr) {
+                    failure : function(transactionid, xhr) {
                         var msg = {
-                            name: xhr.status + ' ' + xhr.statusText,
-                            message: xhr.responseText
+                            name : xhr.status+' '+xhr.statusText,
+                            message : xhr.responseText
                         };
                         return new M.core.exception(msg);
-                        // ~ this.ajax_failure(xhr);
+                        //~ this.ajax_failure(xhr);
                         spinner.hide();
                     }
                 },
-                context: this
+                context:this
             });
         },
 
@@ -241,15 +236,15 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
          * @param id The dom id, f.g.: feedback_item_22
          * @return int
          */
-        get_node_id: function(id) {
+        get_node_id : function(id) {
             return Number(id.replace(/^.*feedback_item_/i, ''));
         }
 
     }, {
-        NAME: DRAGDROPNAME,
-        ATTRS: {
-            cmid: {
-                value: 0
+        NAME : DRAGDROPNAME,
+        ATTRS : {
+            cmid : {
+                value : 0
             }
         }
 
@@ -258,8 +253,8 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
     M.mod_feedback = M.mod_feedback || {};
     M.mod_feedback.init_dragdrop = function(params) {
         return new DRAGDROP(params);
-    };
+    }
 
 }, '@VERSION@', {
-    requires: ['io', 'json-parse', 'dd-constrain', 'dd-proxy', 'dd-drop', 'dd-scroll', 'moodle-core-dragdrop', 'moodle-core-notification']
+    requires:['io', 'json-parse', 'dd-constrain', 'dd-proxy', 'dd-drop', 'dd-scroll', 'moodle-core-dragdrop', 'moodle-core-notification']
 });

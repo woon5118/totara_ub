@@ -29,7 +29,7 @@
 define(['jquery', 'totara_form/form'], function($, Form) {
 
     var ERROR_CONTAINER_CLASS = 'totara_form-error-container',
-        ERROR_CONTAINER_SELECTOR = '.' + ERROR_CONTAINER_CLASS;
+        ERROR_CONTAINER_SELECTOR = '.'+ERROR_CONTAINER_CLASS;
 
     /**
      * Checkbox element
@@ -80,7 +80,7 @@ define(['jquery', 'totara_form/form'], function($, Form) {
 
         // Only do this if we need to.
         if (input.attr('required')) {
-            require(['totara_form/modernizr'], function(Mod) {
+            require(['totara_form/modernizr'], function (Mod) {
                 if (!Mod.input.required) {
                     input.change($.proxy(self.polyFillValidate, self));
                     input.closest('form').find(submitselector).click($.proxy(self.polyFillValidate, self));
@@ -114,13 +114,13 @@ define(['jquery', 'totara_form/form'], function($, Form) {
         if (!input.prop('checked')) {
             e.preventDefault();
             if (input.closest('.tf_element').find(ERROR_CONTAINER_SELECTOR).length === 0) {
-                require(['core/templates', 'core/str', 'core/config'], function(templates, mdlstrings, mdlconfig) {
-                    mdlstrings.get_string('required', 'core').done(function(requiredstring) {
+                require(['core/templates', 'core/str', 'core/config'], function (templates, mdlstrings, mdlconfig) {
+                    mdlstrings.get_string('required', 'core').done(function (requiredstring) {
                         var context = {
                             errors_has_items: true,
                             errors: [{message: requiredstring}]
                         };
-                        templates.render('totara_form/validation_errors', context, mdlconfig.theme).done(function(template) {
+                        templates.render('totara_form/validation_errors', context, mdlconfig.theme).done(function (template) {
                             input.parent().prepend(template);
                         });
                     });

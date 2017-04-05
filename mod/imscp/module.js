@@ -75,7 +75,7 @@ M.mod_imscp.init = function(Y) {
                     var a = document.createElement('a');
                     a.appendChild(document.createTextNode(childnode.label));
                     a.setAttribute('id', 'ref_' + childnode.index);
-                    Y.YUI2.util.Event.addListener(a, "click", function() {
+                    Y.YUI2.util.Event.addListener(a, "click", function () {
                         imscp_activate_item_by_index(this.id.substr(4));
                     });
                     ul.appendChild(li);
@@ -104,11 +104,11 @@ M.mod_imscp.init = function(Y) {
          * @return void
          */
         var imscp_fixnav = function() {
-            imscp_buttons[0].set('disabled', (imscp_skipprev(imscp_current_node) === null));
-            imscp_buttons[1].set('disabled', (imscp_prev(imscp_current_node) === null));
-            imscp_buttons[2].set('disabled', (imscp_up(imscp_current_node) === null));
-            imscp_buttons[3].set('disabled', (imscp_next(imscp_current_node) === null));
-            imscp_buttons[4].set('disabled', (imscp_skipnext(imscp_current_node) === null));
+            imscp_buttons[0].set('disabled', (imscp_skipprev(imscp_current_node) == null));
+            imscp_buttons[1].set('disabled', (imscp_prev(imscp_current_node) == null));
+            imscp_buttons[2].set('disabled', (imscp_up(imscp_current_node) == null));
+            imscp_buttons[3].set('disabled', (imscp_next(imscp_current_node) == null));
+            imscp_buttons[4].set('disabled', (imscp_skipnext(imscp_current_node) == null));
         };
 
         var imscp_resize_layout = function(alsowidth) {
@@ -154,12 +154,12 @@ M.mod_imscp.init = function(Y) {
         };
 
         var imscp_resize_frame = function() {
-            var obj = Y.YUI2.util.Dom.get('imscp_object');
+            obj = Y.YUI2.util.Dom.get('imscp_object');
             if (obj) {
                 var content = imscp_layout_widget.getUnitByPosition('center').get('wrap');
                 // Basically trap IE6 and 7.
                 if (Y.YUI2.env.ua.ie > 5 && Y.YUI2.env.ua.ie < 8) {
-                    if (obj.style.setAttribute) {
+                    if( obj.style.setAttribute ) {
                         obj.style.setAttribute("cssText", 'width: ' + (content.offsetWidth - 6) + 'px; height: ' + (content.offsetHeight - 10) + 'px;');
                     }
                     else {
@@ -240,8 +240,8 @@ M.mod_imscp.init = function(Y) {
             minWidth: 600,
             minHeight: 400,
             units: [
-                {position: 'left', body: 'imscp_toc', header: M.util.get_string('toc', 'imscp'), width: 250, resize: true, gutter: '2px 5px 5px 2px', collapse: true, minWidth: 150},
-                {position: 'center', body: '<div id="imscp_content"></div>', gutter: '2px 5px 5px 2px', scroll: true}
+                { position: 'left', body: 'imscp_toc', header: M.util.get_string('toc', 'imscp'), width: 250, resize: true, gutter: '2px 5px 5px 2px', collapse: true, minWidth:150},
+                { position: 'center', body: '<div id="imscp_content"></div>', gutter: '2px 5px 5px 2px', scroll: true}
             ]
         });
         imscp_layout_widget.render();
@@ -255,11 +255,11 @@ M.mod_imscp.init = function(Y) {
 
         // Ugly resizing hack that works around problems with resizing of iframes and objects.
         left._resize.on('startResize', function() {
-            var obj = Y.YUI2.util.Dom.get('imscp_object');
+            obj = Y.YUI2.util.Dom.get('imscp_object');
             obj.style.display = 'none';
         });
         left._resize.on('endResize', function() {
-            var obj = Y.YUI2.util.Dom.get('imscp_object');
+            obj = Y.YUI2.util.Dom.get('imscp_object');
             obj.style.display = 'block';
             imscp_resize_frame();
         });

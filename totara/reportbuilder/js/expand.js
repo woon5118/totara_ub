@@ -21,8 +21,6 @@
  * @subpackage reportbuilder
  */
 
-/* eslint-disable no-undef */
-
 /**
  * Javascript file containing JQuery bindings for processing expanding information
  */
@@ -66,7 +64,7 @@ M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
             // Insert the content in the following row. We calculate colspan using the clicked row.
             var content = $(data).find('.rb-expand-row');
             var colspan = $(that).closest('tr').find('td').length;
-            content.find('td.rb-expand-cell').attr({colspan: colspan});
+            content.find('td.rb-expand-cell').attr({ colspan: colspan});
             content.insertAfter($(that).closest('tr'));
             // Mark the link as clicked.
             $(that).attr({clicked: true});
@@ -78,7 +76,7 @@ M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
      * Post the form values with expand data, render the result, redirect if told to do so.
      */
     clickEnrol: function(event) {
-        var button = $(event.target);
+        var button=$(event.target);
 
         var courseid = $('input[type="hidden"][name="courseid"]').attr('value');
         var id = $('.rb-display-table-container').attr('id');
@@ -101,7 +99,7 @@ M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
                 if (M.cfg.developerdebug) {
                     // Developer debug has been enabled. Lets display the exception nicely so that developers can hear something
                     // has gone wrong.
-                    YUI().use('moodle-core-notification-ajaxexception', function() {
+                    YUI().use('moodle-core-notification-ajaxexception', function () {
                         new M.core.ajaxException(data);
                     });
                 } else {
@@ -123,7 +121,7 @@ M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
                 $('.rb-expand-row').remove();
                 // Close and re-expand to refresh contents.
                 $('.rb-display-table-container div').attr({clicked: null});
-                that.trigger("click");
+                that.trigger( "click" );
             }
 
             // Remove any existing expanded contents.
@@ -133,7 +131,7 @@ M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
             // Insert the content in the following row. We calculate colspan using the clicked row.
             var content = $(data).find('.rb-expand-row');
             var colspan = $(that).closest('tr').find('td').length;
-            content.find('td.rb-expand-cell').attr({colspan: colspan});
+            content.find('td.rb-expand-cell').attr({ colspan: colspan});
             content.insertAfter($(that).closest('tr'));
             // Mark the link as clicked.
             that.attr({clicked: true});

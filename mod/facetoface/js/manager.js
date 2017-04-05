@@ -35,7 +35,7 @@ M.facetoface_managerselect = M.facetoface_managerselect || {
      * @param string    manager         The html to display the currently selected manager
      * @param string    sesskey         The sesskey
      */
-    init: function(Y, user, fid, manager, sesskey) {
+    init: function(Y, user, fid, manager, sesskey){
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -50,11 +50,11 @@ M.facetoface_managerselect = M.facetoface_managerselect || {
             throw new Error('M.facetoface_managerselect.init()-> jQuery dependency required for this module to function.');
         }
 
-        // /
-        // / Manager dialog
-        // /
+        ///
+        /// Manager dialog
+        ///
         (function() {
-            var url = M.cfg.wwwroot + '/mod/facetoface/approver/';
+            var url = M.cfg.wwwroot+'/mod/facetoface/approver/';
             var userid = M.facetoface_managerselect.config.userid;
             var fid = M.facetoface_managerselect.config.fid;
             var sesskey = M.facetoface_managerselect.config.sesskey;
@@ -62,7 +62,7 @@ M.facetoface_managerselect = M.facetoface_managerselect || {
             totaraSingleSelectDialog(
                 'manager',
                 M.util.get_string('selectmanager', 'mod_facetoface') + M.facetoface_managerselect.config.manager,
-                url + 'manager.php?userid=' + userid + '&fid=' + fid + '&sesskey=' + sesskey,
+                url+'manager.php?userid=' + userid + '&fid=' + fid + '&sesskey=' + sesskey,
                 'managerid',
                 'managertitle',
                 undefined,

@@ -22,9 +22,10 @@
  * @subpackage totara_program_completion
  */
 
-/* eslint-disable no-undef */
+define(['jquery', 'core/config', 'core/str'], function ($, mdlconfig, mdlstrings) {
 
-define(['jquery', 'core/config', 'core/str'], function($, mdlconfig, mdlstrings) {
+    /* global totaraDialog totaraDialogs totaraDialog_handler_treeview_multiselect */
+
     var edit = {
 
         // Optional php params and defaults defined here, args passed to init method
@@ -48,7 +49,7 @@ define(['jquery', 'core/config', 'core/str'], function($, mdlconfig, mdlstrings)
             requiredstrings.push({key: 'cancel', component: 'moodle'});
             requiredstrings.push({key: 'addprograms', component: 'block_totara_program_completion'});
 
-            mdlstrings.get_strings(requiredstrings).done(function(strings) {
+            mdlstrings.get_strings(requiredstrings).done(function (strings) {
                 var tstr = [];
                 for (var i = 0; i < requiredstrings.length; i++) {
                     tstr[requiredstrings[i].key] = strings[i];
@@ -63,14 +64,14 @@ define(['jquery', 'core/config', 'core/str'], function($, mdlconfig, mdlstrings)
                 pbuttons[tstr.save] = function() { phandler._update(); };
                 pbuttons[tstr.cancel] = function() { phandler._cancel(); };
 
-                totaraDialogs.addblockprograms = new totaraDialog(
+                totaraDialogs['addblockprograms'] = new totaraDialog(
                     'addblockprograms',
                     'add-block-programs-dialog',
                     {
                         buttons: pbuttons,
                         title: '<h2>' + tstr.addprograms + '</h2>'
                     },
-                    url + 'findprograms.php?selected=' + edit.programsselected
+                    url+'findprograms.php?selected=' + edit.programsselected
                             + '&blockid=' + edit.blockid
                             + '&sesskey=' + mdlconfig.sesskey,
                     phandler
@@ -134,7 +135,7 @@ define(['jquery', 'core/config', 'core/str'], function($, mdlconfig, mdlstrings)
                     alert(data.error);
                     return;
                 }
-                $.each(data.items, function(index, html) {
+                $.each(data['items'], function(index, html) {
                     self.create_item(html);
                 });
 
@@ -203,7 +204,7 @@ define(['jquery', 'core/config', 'core/str'], function($, mdlconfig, mdlstrings)
         var itemid = row.data('progid');
 
         // Remove the item from the array of items.
-        this.program_items = $.grep(this.program_items, function(element, x) {
+        this.program_items = $.grep(this.program_items, function (element, x) {
             return (element == itemid);
         }, true);
 

@@ -21,8 +21,6 @@
  * @subpackage reportbuilder
  */
 
-/* eslint-disable no-undef */
-
 /**
  * Javascript file containing JQuery bindings for show saved searches popup dialog box
  */
@@ -79,7 +77,7 @@ M.totara_reportbuilder_savedsearches = M.totara_reportbuilder_savedsearches || {
                     $('select[name=sid] option[value=' + idsearch + ']').text(searchname);
                 }
             });
-        };
+        }
 
         var managebutton = $('input[name=rb_manage_search]');
 
@@ -89,7 +87,7 @@ M.totara_reportbuilder_savedsearches = M.totara_reportbuilder_savedsearches || {
             var name = 'searchlist';
             var id = managebutton.attr('id').substr('show-searchlist-dialog-'.length);
             var buttons = {};
-            buttons[M.util.get_string('close', 'form')] = function() { handler._cancel(); };
+            buttons[M.util.get_string('close', 'form')] = function() { handler._cancel() };
 
             totaraDialogs[name] = new totaraDialog(
                 name,
@@ -103,4 +101,4 @@ M.totara_reportbuilder_savedsearches = M.totara_reportbuilder_savedsearches || {
             );
         }
     }
-};
+}

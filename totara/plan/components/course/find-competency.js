@@ -23,9 +23,6 @@
  * @package totara
  * @subpackage totara_core
  */
-
-/* eslint-disable no-undef */
-
 M.totara_plan_course_find_competency = M.totara_plan_course_find_competency || {
 
     Y: null,
@@ -41,7 +38,7 @@ M.totara_plan_course_find_competency = M.totara_plan_course_find_competency || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -64,7 +61,7 @@ M.totara_plan_course_find_competency = M.totara_plan_course_find_competency || {
         this.totaraDialog_handler_preRequisite = function() {
             // Base url
             var baseurl = '';
-        };
+        }
 
         this.totaraDialog_handler_preRequisite.prototype = new totaraDialog_handler_treeview_multiselect();
 
@@ -81,7 +78,7 @@ M.totara_plan_course_find_competency = M.totara_plan_course_find_competency || {
             this._dialog.hide();
 
             // Remove no item warning (if exists)
-            $('.noitems-' + this._title).remove();
+            $('.noitems-'+this._title).remove();
 
             // Grab table
             var table = $('div#dp-course-competencies-container table.dp-plan-component-items');
@@ -94,27 +91,27 @@ M.totara_plan_course_find_competency = M.totara_plan_course_find_competency || {
                 // Add new table
                 $('div#dp-course-competencies-container').prepend(response);
             }
-        };
+        }
 
 
         var url = M.cfg.wwwroot + '/totara/plan/components/course/';
-        var saveurl = url + 'update-competency.php?planid=' + this.config.plan_id + '&courseid=' + this.config.course_id + '&update=';
+        var saveurl = url + 'update-competency.php?planid='+this.config.plan_id+'&courseid='+this.config.course_id+'&update=';
 
         var handler = new this.totaraDialog_handler_preRequisite();
         handler.baseurl = url;
 
         var buttonsObj = {};
-        buttonsObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(saveurl); };
-        buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+        buttonsObj[M.util.get_string('save','totara_core')] = function() { handler._save(saveurl) }
+        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
 
-        totaraDialogs.evidence = new totaraDialog(
+        totaraDialogs['evidence'] = new totaraDialog(
             'assigncompetencies',
             'show-competency-dialog',
             {
                 buttons: buttonsObj,
                 title: '<h2>' + M.util.get_string('addlinkedcompetencies', 'totara_plan') + '</h2>'
             },
-            url + 'find-competency.php?planid=' + this.config.plan_id + '&courseid=' + this.config.course_id,
+            url+'find-competency.php?planid='+this.config.plan_id+'&courseid='+this.config.course_id,
             handler
         );
     }

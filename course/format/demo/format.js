@@ -18,12 +18,12 @@ M.course.format = M.course.format || {};
  */
 M.course.format.get_config = function() {
     return {
-        container_node: 'ul',
-        container_class: 'demosections',
-        section_node: 'li',
-        section_class: 'section'
+        container_node : 'ul',
+        container_class : 'demosections',
+        section_node : 'li',
+        section_class : 'section'
     };
-};
+}
 
 /**
  * Swap section
@@ -35,14 +35,14 @@ M.course.format.get_config = function() {
  */
 M.course.format.swap_sections = function(Y, node1, node2) {
     var CSS = {
-        COURSECONTENT: 'course-content',
-        SECTIONADDMENUS: 'section_add_menus'
+        COURSECONTENT : 'course-content',
+        SECTIONADDMENUS : 'section_add_menus'
     };
 
-    var sectionlist = Y.Node.all('.' + CSS.COURSECONTENT + ' ' + M.course.format.get_section_selector(Y));
+    var sectionlist = Y.Node.all('.'+CSS.COURSECONTENT+' '+M.course.format.get_section_selector(Y));
     // Swap menus
-    sectionlist.item(node1).one('.' + CSS.SECTIONADDMENUS).swap(sectionlist.item(node2).one('.' + CSS.SECTIONADDMENUS));
-};
+    sectionlist.item(node1).one('.'+CSS.SECTIONADDMENUS).swap(sectionlist.item(node2).one('.'+CSS.SECTIONADDMENUS));
+}
 
 /**
  * Process sections after ajax response
@@ -55,12 +55,12 @@ M.course.format.swap_sections = function(Y, node1, node2) {
  */
 M.course.format.process_sections = function(Y, sectionlist, response, sectionfrom, sectionto) {
     var CSS = {
-        SECTIONNAME: 'sectionname'
+        SECTIONNAME : 'sectionname'
     },
     SELECTORS = {
-        SECTIONLEFTSIDE: '.left .section-handle',
-        SECTIONLEFTSIDEICON: '.icon',
-        SECTIONLEFTSIDESR: '.sr-only'
+        SECTIONLEFTSIDE : '.left .section-handle',
+        SECTIONLEFTSIDEICON : '.icon',
+        SECTIONLEFTSIDESR : '.sr-only'
     };
     if (response.action == 'move') {
         // If moving up swap around 'sectionfrom' and 'sectionto' so the that loop operates.
@@ -76,7 +76,7 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
         for (var i = sectionfrom; i <= sectionto; i++) {
             // Update section title.
             var content = Y.Node.create('<span>' + response.sectiontitles[i] + '</span>');
-            sectionlist.item(i).all('.' + CSS.SECTIONNAME).setHTML(content);
+            sectionlist.item(i).all('.'+CSS.SECTIONNAME).setHTML(content);
 
             // Update move icon's title & inner access content to reflect updated sectionlist index
             ele = sectionlist.item(i).one(SELECTORS.SECTIONLEFTSIDE);
@@ -84,7 +84,7 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
             // Determine new string value to be used for the icon and its child nodes
             str = ele.getAttribute('title');
             stridx = str.lastIndexOf(' ');
-            newstr = str.substr(0, stridx + 1) + i;
+            newstr = str.substr(0, stridx +1) + i;
 
             // Update all instances where lang string is expected
             ele.setAttribute('title', newstr);
@@ -92,4 +92,4 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
             ele.one(SELECTORS.SECTIONLEFTSIDESR).setContent(newstr);
         }
     }
-};
+}

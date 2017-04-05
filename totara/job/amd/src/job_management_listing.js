@@ -28,7 +28,7 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Aja
         this.userid = userid;
 
         var self = this;
-        this.container = $('[data-enhance="job-management-listing"][data-enhanced="false"][data-userid="' + userid + '"]');
+        this.container = $('[data-enhance="job-management-listing"][data-enhanced="false"][data-userid="'+userid+'"]');
         if (!this.container) {
             return;
         }
@@ -68,8 +68,9 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Aja
     ListManager.prototype.items = [];
     ListManager.prototype.container = null;
     ListManager.prototype.register_item = function(id, sortorder, node) {
+        var self;
         // Set the ID on all data actions to make our life easier.
-        $(node).parent('li').find('a[data-action]').each(function() {
+        $(node).parent('li').find('a[data-action]').each(function(){
             $(this).attr('data-id', id);
         });
         this.items.push({
@@ -78,19 +79,19 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Aja
         });
     };
     ListManager.prototype.confirm_delete = function(itemid) {
-        var node = this.container.find('a.editjoblink[data-id="' + itemid + '"]'),
+        var node = this.container.find('a.editjoblink[data-id="'+itemid+'"]'),
             self = this,
             deferred = Str.get_strings([
-                {key: 'deletejobassignment', component: 'totara_job', param: null, lang: null},
-                {key: 'confirmdeletejobassignment', component: 'totara_job', param: node.text(), lang: null},
-                {key: 'delete', component: 'core', param: null, lang: null},
-                {key: 'cancel', component: 'core', param: null, lang: null}
+                { key: 'deletejobassignment', component: 'totara_job', param: null, lang: null },
+                { key: 'confirmdeletejobassignment', component: 'totara_job', param: node.text(), lang: null },
+                { key: 'delete', component: 'core', param: null, lang: null },
+                { key: 'cancel', component: 'core', param: null, lang: null }
             ]);
-        deferred.done(function(results) {
+        deferred.done(function(results){
             results.push(function() {
                 M.util.js_pending('totara_job-delete');
                 var deferred = self.delete_job_assignment(itemid);
-                deferred.done(function() {
+                deferred.done(function(){
                     M.util.js_complete('totara_job-delete');
                 });
             });
@@ -145,10 +146,10 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Aja
         M.util.js_pending('totara_job-move_item_up');
         var deferred = this.switch_items(switchItem, targetItem);
         deferred.done(function() {
-            var li = $(ul.find('a.editjoblink[data-id="' + targetItem.id + '"]').parents('li')[0]);
+            var li = $(ul.find('a.editjoblink[data-id="'+targetItem.id+'"]').parents('li')[0]);
             li.fadeOut(50, function() {
                 li.css({backgroundColor: '#fefdb2'});
-            }).fadeIn(500, function() {
+            }).fadeIn(500, function(){
                 li.css({backgroundColor: 'initial'});
             });
             M.util.js_complete('totara_job-move_item_up');
@@ -177,10 +178,10 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Aja
         M.util.js_pending('totara_job-move_item_down');
         var deferred = this.switch_items(switchItem, targetItem);
         deferred.done(function() {
-            var li = $(ul.find('a.editjoblink[data-id="' + targetItem.id + '"]').parents('li')[0]);
+            var li = $(ul.find('a.editjoblink[data-id="'+targetItem.id+'"]').parents('li')[0]);
             li.fadeOut(50, function() {
                 li.css({backgroundColor: '#fefdb2'});
-            }).fadeIn(500, function() {
+            }).fadeIn(500, function(){
                 li.css({backgroundColor: 'initial'});
             });
             M.util.js_complete('totara_job-move_item_down');
@@ -282,10 +283,10 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Aja
                 }
 
                 // Now grab the HTML, we'll piece it back together later.
-                itemanchor = this.container.find('a[data-id="' + jobassignid + '"]');
+                itemanchor = this.container.find('a[data-id="'+jobassignid+'"]');
                 itemanchor.attr('data-sortorder', sortorder);
                 li = itemanchor.parent('li');
-                html.push('<li>' + li.html() + '</li>');
+                html.push('<li>'+li.html()+'</li>');
             }
         }
         ul.empty();

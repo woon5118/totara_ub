@@ -22,9 +22,6 @@
  * @package totara
  * @subpackage totara_core
  */
-
-/* eslint-disable no-undef */
-
 M.totara_plan_program_find = M.totara_plan_program_find || {
 
     Y: null,
@@ -38,7 +35,7 @@ M.totara_plan_program_find = M.totara_plan_program_find || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -56,18 +53,18 @@ M.totara_plan_program_find = M.totara_plan_program_find || {
         }
 
         var url = M.cfg.wwwroot + '/totara/plan/components/program/';
-        var saveurl = url + 'update.php?id=' + this.config.plan_id + '&update=';
+        var saveurl = url + 'update.php?id='+this.config.plan_id+'&update=';
 
-        require(['totara_plan/component'], function(component) {
+        require(['totara_plan/component'], function (component) {
             component.init(M.totara_plan_program_find.config);
 
             var handler = new component.totaraDialog_handler_preRequisite();
             handler.baseurl = url;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(saveurl); };
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+            buttonsObj[M.util.get_string('save','totara_core')] = function() { handler._save(saveurl) }
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
 
-            totaraDialogs.evidence = new totaraDialog(
+            totaraDialogs['evidence'] = new totaraDialog(
                 'assignprograms',
                 'show-program-dialog',
                 {

@@ -23,14 +23,20 @@
  * @package totara_hierarchy
  */
 
-/* eslint-disable no-undef */
+define(['jquery', 'core/config', 'core/str'], function ($, config, strings) {
 
-define(['jquery', 'core/config', 'core/str'], function($, config, strings) {
+    /* global totaraDialog
+              totaraDialogs
+              totaraMultiSelectDialog
+              totaraDialog_handler_assignEvidence
+              totaraDialog_handler_treeview
+              totaraDialog_handler_compEvidence
+              totaraDialog_handler_treeview_multiselect */
 
     var loadItemDialogs = function(id, competencyuseresourcelevelevidence) {
         // Add related competency dialog.
-        strings.get_string('assignrelatedcompetencies', 'totara_hierarchy').done(function(assignrelatedcompetencies) {
-            var url = config.wwwroot + '/totara/hierarchy/prefix/competency/related/';
+        strings.get_string('assignrelatedcompetencies', 'totara_hierarchy').done(function (assignrelatedcompetencies) {
+            var url = config.wwwroot+'/totara/hierarchy/prefix/competency/related/';
             totaraMultiSelectDialog(
                 'related',
                 assignrelatedcompetencies,
@@ -65,7 +71,7 @@ define(['jquery', 'core/config', 'core/str'], function($, config, strings) {
 
             totaraDialog_handler_assignEvidence.prototype._handle_course_click = function(courseid) {
                 // Load course details
-                var url = this.baseurl + 'course.php?id=' + courseid + '&competency=' + id;
+                var url = this.baseurl+'course.php?id=' + courseid + '&competency=' + id;
 
                 // Indicate loading...
                 this._dialog.showLoading();
@@ -118,7 +124,7 @@ define(['jquery', 'core/config', 'core/str'], function($, config, strings) {
                 // Remove no item warning (if exists)
                 $('.noitems-' + this._title).remove();
 
-                // Split response into table and div
+                //Split response into table and div
                 var new_table = $(response).find('#list-evidence');
 
                 // Grab table
@@ -144,20 +150,20 @@ define(['jquery', 'core/config', 'core/str'], function($, config, strings) {
             requiredstrings.push({key: 'cancel', component: 'moodle'});
             requiredstrings.push({key: 'assigncoursecompletions', component: 'totara_hierarchy'});
 
-            strings.get_strings(requiredstrings).done(function(translated) {
+            strings.get_strings(requiredstrings).done(function (translated) {
                 var tstr = [];
                 for (var i = 0; i < requiredstrings.length; i++) {
                     tstr[requiredstrings[i].key] = translated[i];
                 }
-                buttonsObj[tstr.save] = function() { handler._save(saveurl); };
-                buttonsObj[tstr.cancel] = function() { handler._cancel(); };
+                buttonsObj[tstr.save] = function() { handler._save(saveurl);};
+                buttonsObj[tstr.cancel] = function() { handler._cancel();};
 
                 totaraDialogs.evidence = new totaraDialog(
                     'evidence',
                     'show-evidence-dialog',
                     {
                          buttons: buttonsObj,
-                         title: '<h2>' + tstr.assigncoursecompletions + '</h2>'
+                         title: '<h2>' +  tstr.assigncoursecompletions + '</h2>'
                     },
                     url + 'edit.php?id=' + id,
                     handler
@@ -171,7 +177,7 @@ define(['jquery', 'core/config', 'core/str'], function($, config, strings) {
             requiredstrings.push({key: 'cancel', component: 'moodle'});
             requiredstrings.push({key: 'assignnewevidenceitem', component: 'totara_hierarchy'});
 
-            strings.get_strings(requiredstrings).done(function(translated) {
+            strings.get_strings(requiredstrings).done(function (translated) {
                 var tstr = [];
                 for (var i = 0; i < requiredstrings.length; i++) {
                     tstr[requiredstrings[i].key] = translated[i];
@@ -182,7 +188,7 @@ define(['jquery', 'core/config', 'core/str'], function($, config, strings) {
                 var handler = new totaraDialog_handler_assignEvidence();
                 handler.baseurl = url;
 
-                buttonsObj[tstr.cancel] = function() { handler._cancel(); };
+                buttonsObj[tstr.cancel] = function() { handler._cancel();};
 
                 totaraDialogs.evidence = new totaraDialog(
                     'evidence',
@@ -206,7 +212,7 @@ define(['jquery', 'core/config', 'core/str'], function($, config, strings) {
          */
         item: function(id, competencyuseresourcelevelevidence) {
             var iteminited = $.Deferred();
-            iteminited.done(function() {
+            iteminited.done(function () {
                 loadItemDialogs(id, competencyuseresourcelevelevidence);
             });
 
@@ -223,13 +229,13 @@ define(['jquery', 'core/config', 'core/str'], function($, config, strings) {
 
         },
 
-        template: function(id) {
+        template: function (id) {
             var templateinited = $.Deferred();
 
-            templateinited.done(function() {
-                var url = config.wwwroot + '/totara/hierarchy/prefix/competency/template/';
+            templateinited.done(function () {
+                var url = config.wwwroot+'/totara/hierarchy/prefix/competency/template/';
 
-                strings.get_string('assignnewcompetency', 'competency').done(function(assignnewcompetency) {
+                strings.get_string('assignnewcompetency', 'competency').done(function (assignnewcompetency) {
                     totaraMultiSelectDialog(
                         'assignment',
                         '<h2>' + assignnewcompetency + '</h2>',

@@ -21,8 +21,6 @@
  * @subpackage totara_sync
  */
 
-/* eslint-disable no-undef */
-
 M.totara_syncdatabaseconnect = M.totara_syncdatabaseconnect || {
 
     Y: null,
@@ -36,7 +34,7 @@ M.totara_syncdatabaseconnect = M.totara_syncdatabaseconnect || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
@@ -100,7 +98,7 @@ M.totara_syncdatabaseconnect = M.totara_syncdatabaseconnect || {
                         $('<p class="db_connect_message">' + M.util.get_string('dbtestconnectfail', 'tool_totara_sync') + '</p>').insertAfter('#id_database_dbtest');
                     }
                 }
-            });
+            })
         });
     },
 };

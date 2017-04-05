@@ -19,10 +19,7 @@
  * @package totara
  * @subpackage totara_feedback360
  */
-
-/* eslint-disable no-undef */
-
-$(document).on('click', '.previewlink', function(event) {
+$(document).on('click', '.previewlink', function (event) {
     event.preventDefault();
     var formid = this.id;
     var url = $('input[name="popupurl"]').val() + formid;

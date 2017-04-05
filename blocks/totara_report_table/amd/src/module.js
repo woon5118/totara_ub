@@ -26,7 +26,7 @@
  * Javascript file containing JQuery bindings for processing changes to instant report
  */
 
-define(['jquery', 'core/config', 'core/templates'], function($, mdlconfig, templates) {
+define(['jquery', 'core/config', 'core/templates'], function ($, mdlconfig, templates) {
    var report_table = {
         /**
          * Change links behaviour to load report pages in ajax mode
@@ -34,13 +34,13 @@ define(['jquery', 'core/config', 'core/templates'], function($, mdlconfig, templ
          * @param blockid int
          * @returns {undefined}
          */
-        change_links: function(uniqueid, blockid) {
+        change_links: function (uniqueid, blockid) {
             var xhr = null;
 
             // Change links behaviour to load page using AJAX (pages and sorting).
             $('.block_totara_report_table.' + uniqueid + ' .content .rb-display-table-container').
                     find('div.paging a, th.header a').each(function() {
-                $(this).click(function(e) {
+                $(this).click(function(e){
                     e.preventDefault();
                     var $link = $(this),
                         href = $link.attr('href'),
@@ -55,14 +55,14 @@ define(['jquery', 'core/config', 'core/templates'], function($, mdlconfig, templ
 
                     // Add the wait icon if it is not already attached to the clicked item.
                     if ($(e.target).siblings('.instantreportwait').length === 0) {
-                        templates.renderIcon('loading', '', 'ft-size-600').done(function(html) {
-                            var $splash = $('<div class="instantreportwait">' + html + '</div>'),
+                        templates.renderIcon('loading', '', 'ft-size-600').done(function (html) {
+                            var $splash = $('<div class="instantreportwait">' + html +'</div>'),
                                 $content = $('.block_totara_report_table.' + uniqueid + ' .content .rb-display-table-container'),
                                 offset = $content.offset();
 
                             $(e.target).closest('.rb-display-table-container').append($splash);
-                            offset.left += $content.width() / 2 - $splash.width() / 2;
-                            offset.top += $content.height() / 2 - $splash.height() / 2;
+                            offset.left += $content.width()/2 - $splash.width()/2;
+                            offset.top += $content.height()/2 - $splash.height()/2;
                             $splash.css(offset);
                         });
                     }
@@ -83,11 +83,11 @@ define(['jquery', 'core/config', 'core/templates'], function($, mdlconfig, templ
          * @param string      querystring get parameters string for report
          * @param callback    function to run once data is refreshed
          */
-        refresh_results: function(uniqueid, querystring, callback) {
+        refresh_results: function (uniqueid, querystring, callback) {
             // Make the ajax call.
             return $.get(
                 mdlconfig.wwwroot + '/blocks/totara_report_table/ajax_instantreport.php?' + querystring
-            ).done(function(data) {
+            ).done( function (data) {
                 var $content = $('.block_totara_report_table.' + uniqueid + ' .content');
                 // Clear all waiting icons.
                 $content.find('.instantreportwait').remove();
@@ -115,7 +115,7 @@ define(['jquery', 'core/config', 'core/templates'], function($, mdlconfig, templ
 
             var savedListControl = $('#id_config_savedsearch');
 
-            $('#id_config_reportid').change(function() {
+            $('#id_config_reportid').change(function () {
                 var reportId = $(this).val();
 
                 if (reportId === '') {
@@ -129,7 +129,7 @@ define(['jquery', 'core/config', 'core/templates'], function($, mdlconfig, templ
                     url: mdlconfig.wwwroot + '/blocks/totara_report_table/ajax_list_saved.php',
                     data: {
                         'reportid': reportId,
-                        'sesskey': M.cfg.sesskey
+                        'sesskey' : M.cfg.sesskey
                     },
                     success: function(data) {
                         savedListControl.find('option').remove();

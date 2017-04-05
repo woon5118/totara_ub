@@ -21,16 +21,13 @@
  * @package totara
  * @subpackage program
  */
-
-/* eslint-disable no-undef */
-
 M.totara_programcontent = M.totara_programcontent || {
 
     Y: null,
     // optional php params and defaults defined here, args passed to init method
     // below will override these values
     config: {
-        userid: ''
+        userid:''
     },
 
     /**
@@ -39,7 +36,7 @@ M.totara_programcontent = M.totara_programcontent || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args) {
+    init: function(Y, args){
 
         var module = this;
 
@@ -105,13 +102,13 @@ M.totara_programcontent = M.totara_programcontent || {
             // Actually only need to send the one that's to be updated but simpler to send all.
             var setprefixes_ce = $('input:hidden[name=setprefixes_ce]').val(); // '12324234,142423434'
             var setprefixes_rc = $('input:hidden[name=setprefixes_rc]').val();
-            if (!setprefixes_rc) {
+            if (! setprefixes_rc) {
                 setprefixes_rc = '';
             }
 
             // get sortorder value for new courseset - at the end. It will be adjusted on server to fit
             // in with ce/rc grouping. It must always be unique within a program as move/delete etc use it
-            var sortorder = module.countCoursesets(setprefixes_ce) + module.countCoursesets(setprefixes_rc) + 1;
+            sortorder = module.countCoursesets(setprefixes_ce) + module.countCoursesets(setprefixes_rc) + 1;
 
             // Send data to server (get_html.php) to get the form elements for the new courseset and updated setprefixes elements
             // Add these to the form, then submit it to edit_content.php for redisplay
@@ -121,15 +118,15 @@ M.totara_programcontent = M.totara_programcontent || {
                     '&sortorder=' + sortorder +
                     '&setprefixes_ce=' + setprefixes_ce +
                     '&setprefixes_rc=' + setprefixes_rc +
-                    '&suf=' + suf,
+                    '&suf=' +suf,
                     function(data) {
-                $('#course_sets' + suf).append(data.html); // put new fragment in holding area
-                $('input[name="setprefixes_ce"]').val(data.setprefixes_ce);
-                $('input[name="setprefixes_rc"]').val(data.setprefixes_rc);
+                $('#course_sets'+suf).append(data['html']); // put new fragment in holding area
+                $('input[name="setprefixes_ce"]').val(data['setprefixes_ce']);
+                $('input[name="setprefixes_rc"]').val(data['setprefixes_rc']);
                 module.initCoursesets(); // Hide some buttons, set string on Add courses button
 
                 $('form[name="form_prog_content"]').submit();
-            });
+            })
 
             this._dialog.hide();
 
@@ -138,15 +135,15 @@ M.totara_programcontent = M.totara_programcontent || {
         // Define the dialog
         var totaraDialog_addmulticourse = function() {
 
-            this.url = M.cfg.wwwroot + '/totara/program/content/';
-            this.find_url = 'find_courses.php?id=' + module.config.id;
-            this.ajax_url = 'get_html.php?id=' + module.config.id;
+            this.url = M.cfg.wwwroot+'/totara/program/content/';
+            this.find_url = 'find_courses.php?id='+module.config.id;
+            this.ajax_url = 'get_html.php?id='+module.config.id;
 
             // Setup the handler
             var handler = new totaraDialog_handler_addmulticourse(this.url + this.ajax_url);
             var default_url = this.url + this.find_url;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok', 'totara_program')] = function() { handler._save(); };
+            buttonsObj[M.util.get_string('ok','totara_program')] = function() { handler._save(); };
             buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us (totara_dialog.js)
@@ -156,7 +153,7 @@ M.totara_programcontent = M.totara_programcontent || {
                 'unused',         // buttonid unused
                 {                 // config
                     buttons: buttonsObj,
-                    title: '<h2>' + M.util.get_string('addcourseset', 'totara_program') + '</h2>',
+                    title: '<h2>'+M.util.get_string('addcourseset', 'totara_program')+'</h2>',
                 },
                 default_url,
                 handler
@@ -199,12 +196,12 @@ M.totara_programcontent = M.totara_programcontent || {
                     '&sortorder=' + sortorder +
                     '&setprefixes_ce=' + setprefixes_ce
                     , function(data) {
-                $('#course_sets_ce').append(data.html);
-                $('input[name="setprefixes_ce"]').val(data.setprefixes_ce);
+                $('#course_sets_ce').append(data['html']);
+                $('input[name="setprefixes_ce"]').val(data['setprefixes_ce']);
                 module.initCoursesets();
 
                 $('form[name="form_prog_content"]').submit();
-            });
+            })
 
             this._dialog.hide();
         };
@@ -212,16 +209,16 @@ M.totara_programcontent = M.totara_programcontent || {
         // Define the dialog
         var totaraDialog_addcompetency = function() {
 
-            this.url = M.cfg.wwwroot + '/totara/program/content/';
-            this.find_url = 'find_competency.php?id=' + module.config.id;
-            this.ajax_url = 'get_html.php?id=' + module.config.id;
+            this.url = M.cfg.wwwroot+'/totara/program/content/';
+            this.find_url = 'find_competency.php?id='+module.config.id;
+            this.ajax_url = 'get_html.php?id='+module.config.id;
 
             // Setup the handler
             var handler = new totaraDialog_handler_addcompetency(this.url + this.ajax_url);
 
             var default_url = this.url + this.find_url;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok', 'totara_program')] = function() { handler._save(); };
+            buttonsObj[M.util.get_string('ok','totara_program')] = function() { handler._save(); };
             buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
@@ -231,7 +228,7 @@ M.totara_programcontent = M.totara_programcontent || {
                 'unused', // buttonid unused
                 {
                     buttons: buttonsObj,
-                    title: '<h2>' + M.util.get_string('addcompetency', 'totara_program') + module.config.display_selected_addcompetency + '</h2>'
+                    title: '<h2>'+ M.util.get_string('addcompetency', 'totara_program') + module.config.display_selected_addcompetency +'</h2>'
                 },
                 default_url,
                 handler
@@ -244,7 +241,7 @@ M.totara_programcontent = M.totara_programcontent || {
         // Create handler
         totaraDialog_handler_addrecurringcourse = function(contenturl) {
             this.contenturl = contenturl;
-        };
+        }
 
         // Set the dialog handler as a single select
         totaraDialog_handler_addrecurringcourse.prototype = new totaraDialog_handler_treeview_singleselect();
@@ -270,11 +267,11 @@ M.totara_programcontent = M.totara_programcontent || {
                 '&sortorder=' + sortorder +
                 '&setprefixes_ce=' + setprefixes_ce,
                 function(data) {
-                $('#course_sets_ce').append(data.html);
-                $('input[name="setprefixes_ce"]').val(data.setprefixes_ce);
+                $('#course_sets_ce').append(data['html']);
+                $('input[name="setprefixes_ce"]').val(data['setprefixes_ce']);
                 module.initCoursesets();
                 $('form[name="form_prog_content"]').submit();
-            });
+            })
 
             this._dialog.hide();
 
@@ -283,16 +280,16 @@ M.totara_programcontent = M.totara_programcontent || {
         // Define the dialog
         totaraDialog_addrecurringcourse = function() {
 
-            this.url = M.cfg.wwwroot + '/totara/program/content/';
-            this.find_url = 'find_course.php?id=' + module.config.id;
-            this.ajax_url = 'get_html.php?id=' + module.config.id;
+            this.url = M.cfg.wwwroot+'/totara/program/content/';
+            this.find_url = 'find_course.php?id='+module.config.id;
+            this.ajax_url = 'get_html.php?id='+module.config.id;
 
             // Setup the handler
             var handler = new totaraDialog_handler_addrecurringcourse(this.url + this.ajax_url);
 
             var default_url = this.url + this.find_url;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok', 'totara_program')] = function() { handler._save(); };
+            buttonsObj[M.util.get_string('ok','totara_program')] = function() { handler._save(); };
             buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
@@ -302,7 +299,7 @@ M.totara_programcontent = M.totara_programcontent || {
                 'unused', // buttonid unused
                 {
                     buttons: buttonsObj,
-                    title: '<h2>' + M.util.get_string('addcourse', 'totara_program') + module.config.display_selected_addrecurringcourse + '</h2>'
+                    title: '<h2>'+ M.util.get_string('addcourse', 'totara_program') + module.config.display_selected_addrecurringcourse +'</h2>'
                 },
                 default_url,
                 handler
@@ -342,8 +339,8 @@ M.totara_programcontent = M.totara_programcontent || {
                     '&sortorder=' + this.sortorder +
                     '&completiontype=' + this.completiontype, function(data) {
 
-                $('#' + self.coursesetprefix + 'courselist').html(data.courselisthtml);
-                $('#' + self.coursesetprefix + 'deletedcourseslist').html(data.deletedcourseshtml);
+                $('#'+self.coursesetprefix+'courselist').html(data['courselisthtml']);
+                $('#'+self.coursesetprefix+'deletedcourseslist').html(data['deletedcourseshtml']);
                 $('input[name="contentchanged"]').val(1);
                 module.initCoursesets();
 
@@ -357,10 +354,10 @@ M.totara_programcontent = M.totara_programcontent || {
         // Define the dialog
         totaraDialog_amendmulticourse = function() {
 
-            var url = M.cfg.wwwroot + '/totara/program/content/';
+            var url = M.cfg.wwwroot+'/totara/program/content/';
 
-            this.find_url = 'find_courses.php?id=' + module.config.id;
-            this.ajax_url = 'get_html.php?id=' + module.config.id;
+            this.find_url = 'find_courses.php?id='+module.config.id;
+            this.ajax_url = 'get_html.php?id='+module.config.id;
             this.default_url = url + this.find_url;
 
             // Setup the handler
@@ -368,7 +365,7 @@ M.totara_programcontent = M.totara_programcontent || {
 
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('ok', 'totara_program')] = function() { self.handler._save(); };
+            buttonsObj[M.util.get_string('ok','totara_program')] = function() { self.handler._save(); };
             buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { self.handler._cancel(); };
 
             // Call the parent dialog object and link us
@@ -378,7 +375,7 @@ M.totara_programcontent = M.totara_programcontent || {
                 'unused', // buttonid unused
                 {
                     buttons: buttonsObj,
-                    title: '<h2>' + M.util.get_string('addcourses', 'totara_program') + '</h2>'
+                    title: '<h2>'+ M.util.get_string('addcourses', 'totara_program') +'</h2>'
                 },
                 this.default_url,
                 this.handler
@@ -395,7 +392,7 @@ M.totara_programcontent = M.totara_programcontent || {
             // Store reference to this
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('saveallchanges', 'totara_program')] = function() { self.save(); };
+            buttonsObj[M.util.get_string('saveallchanges','totara_program')] = function() { self.save(); };
             buttonsObj[M.util.get_string('editcontent', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
@@ -405,7 +402,7 @@ M.totara_programcontent = M.totara_programcontent || {
               'unused', // buttonid unused
               {
                   buttons: buttonsObj,
-                  title: '<h2>' + M.util.get_string('confirmcontentchanges', 'totara_program') + '</h2>'
+                  title: '<h2>'+ M.util.get_string('confirmcontentchanges', 'totara_program') +'</h2>'
               },
               'unused', // default_url unused
               handler
@@ -423,11 +420,11 @@ M.totara_programcontent = M.totara_programcontent || {
 
             this.table = table;
             this.rows = rows;
-            };
+            }
 
             // Don't load anything
             this.load = function(url, method) {
-            };
+            }
         };
 
         /**
@@ -452,21 +449,21 @@ M.totara_programcontent = M.totara_programcontent || {
         };
 
         // Remove the 'unsaved changes' confirmation when submitting the form
-        $('form[name="form_prog_content"]').submit(function() {
+        $('form[name="form_prog_content"]').submit(function(){
             window.onbeforeunload = null;
         });
 
         // Remove the 'unsaved changes' confirmation when clicking the 'Cancel program management' link
-        $('#cancelprogramedits').click(function() {
+        $('#cancelprogramedits').click(function(){
             window.onbeforeunload = null;
             return true;
         });
 
         // Add a function to all addcontent buttons to launch the approriate add content dialog
         $('input[id^=addcontent]').click(function() {
-            module.config.debug && console.log('adding content ' + this.getAttribute('name'));
-            var name = this.getAttribute('name');
-            var suf = name.substr(name.lastIndexOf('_')); // _ce
+            module.config.debug && console.log('adding content '+this.getAttribute('name'));
+            name = this.getAttribute('name')
+            suf = name.substr(name.lastIndexOf('_')); //_ce
             return module.addContent(suf);
         });
 
@@ -476,7 +473,7 @@ M.totara_programcontent = M.totara_programcontent || {
         });
 
         // delegate course deletion to delete buttons rendered or created dynamically
-        $('.edit-program .coursedeletelink').click(function(event) {
+        $('.edit-program .coursedeletelink').click(function(event){
             event.preventDefault();
             module.deleteCourse(this.getAttribute('data-coursesetid'),
                                 this.getAttribute('data-coursesetprefix'),
@@ -487,11 +484,11 @@ M.totara_programcontent = M.totara_programcontent || {
         this.initCoursesets();
 
         // create instances of each dialog for the page
-        totaraDialogs.addmulticourse = new totaraDialog_addmulticourse();
-        totaraDialogs.addcompetency = new totaraDialog_addcompetency();
-        totaraDialogs.addrecurringcourse = new totaraDialog_addrecurringcourse();
-        totaraDialogs.amendcourses = new totaraDialog_amendmulticourse();
-        totaraDialogs.savechanges = new totaraDialog_savechanges();
+        totaraDialogs['addmulticourse'] = new totaraDialog_addmulticourse();
+        totaraDialogs['addcompetency'] = new totaraDialog_addcompetency();
+        totaraDialogs['addrecurringcourse'] = new totaraDialog_addrecurringcourse();
+        totaraDialogs['amendcourses'] = new totaraDialog_amendmulticourse();
+        totaraDialogs['savechanges'] = new totaraDialog_savechanges();
 
         this.storeInitialFormValues();
 
@@ -528,7 +525,7 @@ M.totara_programcontent = M.totara_programcontent || {
      * Hide any elements of all course sets that should not be displayed and
      * generally set up the display of course sets
      */
-    initCoursesets: function() {
+    initCoursesets: function(){
         var config = this.config;
         $('input[name=cancel]').css('display', 'none');
         $('input[name=update]').css('display', 'none');
@@ -542,37 +539,37 @@ M.totara_programcontent = M.totara_programcontent || {
         if (setprefixes_ce != '') {
             setprefixesarray = setprefixes_ce.split(',');
         }
-        for (i = 0; i < setprefixesarray.length; i++) {
+        for (i=0; i < setprefixesarray.length; i++) {
             var prefix = setprefixesarray[i];
-            if ($('select[name=' + prefix + 'completiontype]').val() != config.COMPLETIONTYPE_SOME) {
-                $('input[name=' + prefix + 'mincourses]').prop('disabled', true);
-                $('select[name=' + prefix + 'coursesumfield]').prop('disabled', true);
-                $('input[name=' + prefix + 'coursesumfieldtotal]').prop('disabled', true);
-            } else if ($('select[name=' + prefix + 'coursesumfield]').val() == 0) {
-                $('input[name=' + prefix + 'coursesumfieldtotal]').prop('disabled', true);
+            if ($('select[name='+prefix+'completiontype]').val() != config.COMPLETIONTYPE_SOME) {
+                $('input[name='+prefix+'mincourses]').prop('disabled', true);
+                $('select[name='+prefix+'coursesumfield]').prop('disabled', true);
+                $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', true);
+            } else if ($('select[name='+prefix+'coursesumfield]').val() == 0) {
+                $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', true);
             }
         }
 
-        $('div#course_sets_ce fieldset.course_set select[name$=completiontype]').on('change', function() {
+        $('div#course_sets_ce fieldset.course_set select[name$=completiontype]').on('change', function () {
             var prefix = $(this).closest('fieldset.course_set').prop('id');
             if ($(this).val() == config.COMPLETIONTYPE_SOME) {
-                $('input[name=' + prefix + 'mincourses]').prop('disabled', false);
-                $('select[name=' + prefix + 'coursesumfield]').prop('disabled', false);
-                if ($('select[name=' + prefix + 'coursesumfield]').val() != 0) {
-                    $('input[name=' + prefix + 'coursesumfieldtotal]').prop('disabled', false);
+                $('input[name='+prefix+'mincourses]').prop('disabled', false);
+                $('select[name='+prefix+'coursesumfield]').prop('disabled', false);
+                if ($('select[name='+prefix+'coursesumfield]').val() != 0) {
+                    $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', false);
                 }
             } else {
-                $('input[name=' + prefix + 'mincourses]').prop('disabled', true);
-                $('select[name=' + prefix + 'coursesumfield]').prop('disabled', true);
-                $('input[name=' + prefix + 'coursesumfieldtotal]').prop('disabled', true);
+                $('input[name='+prefix+'mincourses]').prop('disabled', true);
+                $('select[name='+prefix+'coursesumfield]').prop('disabled', true);
+                $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', true);
             }
         });
-        $('div#course_sets_ce fieldset.course_set select[name$=coursesumfield]').on('change', function() {
+        $('div#course_sets_ce fieldset.course_set select[name$=coursesumfield]').on('change', function () {
             var prefix = $(this).closest('fieldset.course_set').prop('id');
             if ($(this).val() == 0) {
-                $('input[name=' + prefix + 'coursesumfieldtotal]').prop('disabled', true);
+                $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', true);
             } else {
-                $('input[name=' + prefix + 'coursesumfieldtotal]').prop('disabled', false);
+                $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', false);
             }
 
         });
@@ -584,7 +581,7 @@ M.totara_programcontent = M.totara_programcontent || {
      * This function changes the completion type string next to the course ('and' or 'or')
      * to match the selection
      */
-    changeCompletionTypeString: function(el, prefix) {
+    changeCompletionTypeString: function(el, prefix){
         if (el.value == this.config.COMPLETIONTYPE_ANY || el.value == this.config.COMPLETIONTYPE_SOME || el.value == this.config.COMPLETIONTYPE_OPTIONAL) {
             var completiontypestr = M.util.get_string('or', 'totara_program');
         } else {
@@ -600,17 +597,17 @@ M.totara_programcontent = M.totara_programcontent || {
     /**
      * open the appropriate dialog to add a content type
      */
-    addContent: function(suf) {
+    addContent: function(suf){
         // get the type of content to be added
-        var contenttype = $('#contenttype' + suf).val();
+        var contenttype = $('#contenttype'+suf).val();
 
         if (contenttype == this.config.CONTENTTYPE_MULTICOURSE) {
-            totaraDialogs.addmulticourse.suf = suf; // store on dialog object
-            totaraDialogs.addmulticourse.open();
+            totaraDialogs['addmulticourse'].suf = suf; // store on dialog object
+            totaraDialogs['addmulticourse'].open();
         } else if (contenttype == this.config.CONTENTTYPE_COMPETENCY) {
-            totaraDialogs.addcompetency.open();
+            totaraDialogs['addcompetency'].open();
         } else if (contenttype == this.config.CONTENTTYPE_RECURRING) {
-            totaraDialogs.addrecurringcourse.open();
+            totaraDialogs['addrecurringcourse'].open();
         }
 
         return false;
@@ -618,23 +615,25 @@ M.totara_programcontent = M.totara_programcontent || {
     },
 
 
+
+
     /**
      * Function attached to each 'Add/Amend courses' button.
      * This retrieves all the currently selected courses in a course set
      * and passes the course ids to the dialog
      */
-    amendCourses: function(coursesetprefix) {
+    amendCourses: function(coursesetprefix){
 
-        var selectedcourses = $('input:hidden[name=' + coursesetprefix + 'courses]').val();
-        var coursesetid = $('input:hidden[name=' + coursesetprefix + 'id]').val();
-        var sortorder = $('input:hidden[name=' + coursesetprefix + 'sortorder]').val();
-        var completiontype = $('select[name=' + coursesetprefix + 'completiontype]').val();
+        var selectedcourses = $('input:hidden[name='+coursesetprefix+'courses]').val();
+        var coursesetid = $('input:hidden[name='+coursesetprefix+'id]').val();
+        var sortorder = $('input:hidden[name='+coursesetprefix+'sortorder]').val();
+        var completiontype = $('select[name='+coursesetprefix+'completiontype]').val();
 
         var selectedcourses_encoded = encodeURI(selectedcourses);
 
-        var dialog_url = M.cfg.wwwroot + '/totara/program/content/find_courses.php?id=' + this.config.id + '&selectedcourseids=' + selectedcourses_encoded;
+        var dialog_url = M.cfg.wwwroot+'/totara/program/content/find_courses.php?id='+this.config.id+'&selectedcourseids=' + selectedcourses_encoded;
 
-        var mydialog = totaraDialogs.amendcourses;
+        var mydialog = totaraDialogs['amendcourses'];
         mydialog.default_url = dialog_url;
         mydialog.handler.coursesetprefix = coursesetprefix;
         mydialog.handler.coursesetid = coursesetid;
@@ -649,18 +648,18 @@ M.totara_programcontent = M.totara_programcontent || {
      * Each course name in a multi-course set has a link with an onclick event
      * which calls this function to delete the course from the set
      */
-    deleteCourse: function(coursesetid, coursesetprefix, coursetodelete_id) {
-        // console.log('deleteCourse: coursesetid='+coursesetid+' coursesetprefix='+coursesetprefix+' coursetodelete_id='+coursetodelete_id)
-        var contenturl = M.cfg.wwwroot + '/totara/program/content/get_html.php?id=' + M.totara_programcontent.config.id;
+    deleteCourse: function(coursesetid, coursesetprefix, coursetodelete_id){
+        //console.log('deleteCourse: coursesetid='+coursesetid+' coursesetprefix='+coursesetprefix+' coursetodelete_id='+coursetodelete_id)
+        var contenturl = M.cfg.wwwroot+'/totara/program/content/get_html.php?id='+M.totara_programcontent.config.id;
 
-        var courseids_str = $('input[name=' + coursesetprefix + 'courses]').val();
-        var sortorder = $('input[name=' + coursesetprefix + 'sortorder]').val();
-        var completiontype = $('select[name=' + coursesetprefix + 'completiontype] option:selected').val();
+        var courseids_str = $('input[name='+coursesetprefix+'courses]').val();
+        var sortorder = $('input[name='+coursesetprefix+'sortorder]').val();
+        var completiontype = $('select[name='+coursesetprefix+'completiontype] option:selected').val();
 
         var courseids = courseids_str.split(',');
         var new_courseids = new Array();
 
-        for (var i = 0; i < courseids.length; i++) {
+        for (var i=0; i<courseids.length; i++) {
             if (courseids[i] != coursetodelete_id) {
                 new_courseids.push(courseids[i]);
             }
@@ -676,15 +675,15 @@ M.totara_programcontent = M.totara_programcontent || {
                 '&sortorder=' + sortorder +
                 '&completiontype=' + completiontype, function(data) {
 
-            $('#' + coursesetprefix + 'courselist').html(data.courselisthtml);
-            $('#' + coursesetprefix + 'deletedcourseslist').html(data.deletedcourseshtml);
+            $('#'+coursesetprefix+'courselist').html(data['courselisthtml']);
+            $('#'+coursesetprefix+'deletedcourseslist').html(data['deletedcourseshtml']);
             $('input[name="contentchanged"]').val(1);
 
             M.totara_programcontent.initCoursesets();
-            // $('form[name="form_prog_content"]').submit(); // deliberately off
+            //$('form[name="form_prog_content"]').submit(); // deliberately off
 
             // re-setup delete handlers after courses re-drawn by AJAX response
-            $('.edit-program .coursedeletelink').click(function() {
+            $('.edit-program .coursedeletelink').click(function(){
                 M.totara_programcontent.deleteCourse(this.getAttribute('data-coursesetid'),
                                                      this.getAttribute('data-coursesetprefix'),
                                                      this.getAttribute('data-coursetodelete_id'));
@@ -717,14 +716,14 @@ M.totara_programcontent = M.totara_programcontent || {
     /**
      *
      */
-    handleSaveChanges: function() {
+    handleSaveChanges: function(){
         // no need to display the confirmation dialog if there are no changes to save
         if (!this.isFormModified()) {
             window.onbeforeunload = null;
             return true;
         }
 
-        var dialog = totaraDialogs.savechanges;
+        var dialog = totaraDialogs['savechanges'];
 
         if (dialog.savechanges == true) {
             window.onbeforeunload = null;
@@ -737,13 +736,13 @@ M.totara_programcontent = M.totara_programcontent || {
         if (window.currentassignmentcount !== undefined) {
             html = M.util.get_string('affectedusercount', 'totara_program') + window.currentassignmentcount;
         }
-        html = html + '<' + 'p>' + M.util.get_string('tosavecontent', 'totara_program') + '<' + '/p>';
+        html = html + '<'+'p>' + M.util.get_string('tosavecontent', 'totara_program') +'<'+'/p>';
         dialog.open(html);
         dialog.save = function() {
             dialog.savechanges = true;
             this.hide();
             $('input[name="savechanges"]').trigger('click');
-        };
+        }
 
         return false;
     },
@@ -751,7 +750,7 @@ M.totara_programcontent = M.totara_programcontent || {
     /**
      * Checks if the form is modified by comparing the initial and current values
      */
-    isFormModified: function() {
+    isFormModified: function(){
         var form = $('form[name="form_prog_content"]');
         var isModified = false;
 
@@ -773,8 +772,8 @@ M.totara_programcontent = M.totara_programcontent || {
         // Check if textareas have been changed
         $('textarea', form).each(function() {
             // See if there's a tiny MCE instance for this text area
-            var instance;
-            if (typeof (tinyMCE) != 'undefined') {
+            var instance = undefined;
+            if (typeof(tinyMCE) != 'undefined') {
                 instance = tinyMCE.getInstanceById($(this).attr('id'));
             }
             if (instance != undefined && typeof instance.isDirty == 'function') {

@@ -1,6 +1,3 @@
-
-/* eslint-disable no-undef */
-
 /**
  * YUI module for advanced grading methods - the manage page
  *
@@ -11,15 +8,15 @@ YUI.add('moodle-core_grading-manage', function(Y) {
 
     var MANAGE = function() {
         MANAGE.superclass.constructor.apply(this, arguments);
-    };
+    }
 
     Y.extend(MANAGE, Y.Base, {
 
-        initializer: function(config) {
+        initializer : function(config) {
             this.setup_messagebox();
         },
 
-        setup_messagebox: function() {
+        setup_messagebox : function() {
             Y.one('#actionresultmessagebox span').setContent(M.util.get_string('clicktoclose', 'core_grading'));
             Y.one('#actionresultmessagebox').on('click', function(e) {
                 e.halt();
@@ -27,7 +24,7 @@ YUI.add('moodle-core_grading-manage', function(Y) {
                 var anim = new Y.Anim({
                     node: box,
                     duration: 1,
-                    to: {opacity: 0, height: 0},
+                    to: { opacity: 0, height: 0 },
                 });
                 anim.run();
                 anim.on('end', function() {
@@ -38,14 +35,14 @@ YUI.add('moodle-core_grading-manage', function(Y) {
         }
 
     }, {
-        NAME: 'grading_manage_page',
-        ATTRS: { }
+        NAME : 'grading_manage_page',
+        ATTRS : { }
     });
 
     M.core_grading = M.core_grading || {};
 
     M.core_grading.init_manage = function(config) {
         return new MANAGE(config);
-    };
+    }
 
-}, '@VERSION@', {requires: ['base', 'anim']});
+}, '@VERSION@', { requires:['base', 'anim'] });

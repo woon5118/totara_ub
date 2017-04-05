@@ -21,9 +21,9 @@
  * @package totara_customfield
  */
 
-/* eslint-disable no-undef */
+define(['jquery'], function ($) {
 
-define(['jquery'], function($) {
+    /* global google */
 
     /**
      * Creates a new Location management object.
@@ -245,11 +245,11 @@ define(['jquery'], function($) {
         if (!this.map) {
             return;
         }
-        if ($(fieldset).attr('data-location-refresh-' + this.fieldprefix) !== 'true') {
+        if ($(fieldset).attr('data-location-refresh-'+this.fieldprefix) !== 'true') {
             return;
         }
         // We only want to do this once, change it to false so that we know it has happened.
-        $(fieldset).attr('data-location-refresh-' + this.fieldprefix, 'false');
+        $(fieldset).attr('data-location-refresh-'+this.fieldprefix, 'false');
         this.google.maps.event.trigger(this.map, 'resize');
         // No need to check the location inputs exist, they must do if we got this far.
         this.location.lat = parseFloat(this.input_latitude.val());
@@ -268,7 +268,7 @@ define(['jquery'], function($) {
         // The search button exists only when defining the field.
         if (btn_search) {
             // Attach events to the search button.
-            btn_search.on('click', function() {
+            btn_search.on('click', function () {
                 self.address = input_addresslookup.val().trim();
                 self.geocode_address();
             });
@@ -276,7 +276,7 @@ define(['jquery'], function($) {
 
         // The address lookup exists only when defining the field.
         if (input_addresslookup && btn_search) {
-            self.address = input_addresslookup.keydown(function(evt) {
+            self.address = input_addresslookup.keydown(function (evt) {
                 if (evt.keyCode === 13) {
                     // Required, as enter will submit the form on this input.
                     evt.preventDefault();
@@ -289,7 +289,7 @@ define(['jquery'], function($) {
         // The use address button exists only when defining the field.
         if (btn_useaddress) {
             // Attach events to the "Use address" button.
-            btn_useaddress.on('click', function() {
+            btn_useaddress.on('click', function () {
                 self.address = input_address.val().trim();
                 self.geocode_address();
             });
@@ -298,7 +298,7 @@ define(['jquery'], function($) {
         // The view radio buttons exist only when defining the field.
         if (input_radioview) {
             // Attach events to the view radio buttons.
-            input_radioview.on('change', function() {
+            input_radioview.on('change', function () {
                 if (this.id.indexOf(self.fieldprefix) > -1) {
                     self.defaultzoomlevel = self.map.getZoom();
                     self.set_map_view();
@@ -316,7 +316,7 @@ define(['jquery'], function($) {
         var self = this,
             selectedradio = $('.radio_view[name="' + this.fieldprefix + 'view"]:checked');
 
-        selectedradio.each(function(index, element) {
+        selectedradio.each( function( index, element ) {
             if (element.id.indexOf(self.fieldprefix) > -1) {
                 switch (element.value) {
                     case 'hybrid':
@@ -347,24 +347,24 @@ define(['jquery'], function($) {
             return;
         }
         if (this.clientid) {
-            srcurl += '&client=' + this.clientid;
+            srcurl += '&client='+this.clientid;
         } else if (this.apikey) {
-            srcurl += '&key=' + this.apikey;
+            srcurl += '&key='+this.apikey;
         }
         $.ajax({
             url: srcurl,
             type: 'GET',
-            success: function(data, response) {
+            success: function (data, response) {
                 if (response == 'success' && data.results.length > 0) {
                     self.address = data.results[0].formatted_address;
                     self.location = data.results[0].geometry.location;
                     self.load_map();
                     $('#fgroup_id_' + self.fieldprefix + 'mapelements .felement .alert').hide();
                 } else {
-                    if ($('#fgroup_id_' + self.fieldprefix + 'mapelements .felement .alert').length === 0) {
-                        require(['core/templates', 'core/str'], function(templates, mdlstrings) {
-                            mdlstrings.get_string('locationnotfound', 'totara_customfield').done(function(notfound) {
-                                templates.render('core/notification_error', {message: notfound}).done(function(html) {
+                    if ($('#fgroup_id_' + self.fieldprefix + 'mapelements .felement .alert').length === 0){
+                        require(['core/templates', 'core/str'], function (templates, mdlstrings) {
+                            mdlstrings.get_string('locationnotfound', 'totara_customfield').done(function (notfound) {
+                                templates.render('core/notification_error', {message: notfound}).done(function (html) {
                                     $('#fgroup_id_' + self.fieldprefix + 'mapelements .felement').prepend(html);
                                 });
                             });
@@ -374,7 +374,7 @@ define(['jquery'], function($) {
                     }
                 }
             },
-            error: function() {
+            error: function () {
                 if (window.console && window.console.log) {
                     window.console.log('Failed to load Google maps API.');
                 }
@@ -431,11 +431,11 @@ define(['jquery'], function($) {
         this.input_longitude.val(this.location.lng);
 
         if (!fordisplay) {
-            this.marker.addListener('drag', function(e) {
+            this.marker.addListener('drag', function (e) {
                 self.input_latitude.val(e.latLng.lat());
                 self.input_longitude.val(e.latLng.lng());
             });
-            this.map.addListener('zoom_changed', function(e) {
+            this.map.addListener('zoom_changed', function (e) {
                 self.input_zoom.val(self.map.getZoom());
             });
         } else {
@@ -448,7 +448,7 @@ define(['jquery'], function($) {
             infowindow = new this.google.maps.InfoWindow({
                 content: contentstring
             });
-            this.marker.addListener('click', function() {
+            this.marker.addListener('click', function () {
                 infowindow.open(self.map, self.marker);
             });
         }
@@ -463,8 +463,8 @@ define(['jquery'], function($) {
     };
 
     return {
-        init: function(args) {
-            require(['totara_customfield/field_location_loader!' + args.mapparams], function() {
+        init: function (args) {
+            require(['totara_customfield/field_location_loader!'+args.mapparams], function() {
                 // google is now defined thanks to the async loader.
                 new Location(google, args);
             });

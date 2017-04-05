@@ -20,8 +20,6 @@
  * @package totara_connect
  */
 
-/* eslint-disable no-undef */
-
 /**
  * This file contains the Javascript for the dialog that lets you
  * add cohorts to a Totara Connect clients.
@@ -63,10 +61,10 @@ M.totara_connect_cohort = M.totara_connect_cohort || {
         ehandler.baseurl = url;
 
         var dbuttons = {};
-        dbuttons[M.util.get_string('ok', 'moodle')] = function() { ehandler._update(); };
-        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel(); };
+        dbuttons[M.util.get_string('ok', 'moodle')] = function() { ehandler._update() };
+        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel() };
 
-        totaraDialogs.id_cohortsadd = new totaraDialog(
+        totaraDialogs['id_cohortsadd'] = new totaraDialog(
             'totara-connect-cohorts-dialog',
             'id_cohortsadd',
             {
@@ -121,7 +119,7 @@ totaraDialog_handler_connectcohorts.prototype._update = function() {
 
         // Get id
         var itemid = $(this).attr('id').split('_');
-        itemid = itemid[itemid.length - 1];  // The last item is the actual id.
+        itemid = itemid[itemid.length-1];  // The last item is the actual id.
         itemid = parseInt(itemid);
 
         if (!self.cohort_item_exists(itemid)) {
@@ -140,12 +138,12 @@ totaraDialog_handler_connectcohorts.prototype._update = function() {
                 alert(data.error);
                 return;
             }
-            $.each(data.rows, function(index, html) {
+            $.each(data['rows'], function(index, html) {
                 self.create_item(html);
             });
 
             self._dialog.hide();
-        });
+        })
     } else {
         this._dialog.hide();
     }
@@ -155,7 +153,7 @@ totaraDialog_handler_connectcohorts.prototype._update = function() {
  * Checks if the item id exists in this category
  */
 totaraDialog_handler_connectcohorts.prototype.cohort_item_exists = function(itemid) {
-    for (var x in this.cohort_items) {
+    for (x in this.cohort_items) {
         if (this.cohort_items[x] == itemid) {
             return true;
         }
@@ -210,7 +208,7 @@ totaraDialog_handler_connectcohorts.prototype.remove_cohort_item = function(item
     var row = $(item).closest('tr');
 
     // Remove the item from the array of items.
-    this.cohort_items = $.grep(this.cohort_items, function(element, x) {
+    this.cohort_items = $.grep(this.cohort_items, function (element, x) {
         return (element == itemid);
     }, true);
 

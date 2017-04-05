@@ -40,14 +40,14 @@ define(['jquery'], function($) {
             }
 
             $placeholder.blur(blur);
-            $placeholder.focus(function() {
+            $placeholder.focus(function () {
                 if ($placeholder.hasClass('placeholder')) {
                     $placeholder.val('');
                     $placeholder.removeClass('placeholder');
                 }
             });
 
-            $placeholder.closest('form').find("input[type='submit']").click(function() {
+            $placeholder.closest('form').find("input[type='submit']").click(function () {
                 if ($placeholder.hasClass('placeholder')) {
                     $placeholder.val('');
                 }

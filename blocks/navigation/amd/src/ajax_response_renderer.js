@@ -74,8 +74,8 @@ define(['jquery'], function($) {
                 p.attr('aria-expanded', false);
                 p.addClass('branch');
 
-                require(['core/templates'], function(templates) {
-                    templates.renderIcon('collapsed').done(function(html) {
+                require(['core/templates'], function (templates) {
+                    templates.renderIcon('collapsed').done(function (html) {
                         if (p.attr('aria-expanded') === 'false') {
                             p.find('.flex-icon').remove();
                             p.prepend(html);
@@ -143,8 +143,8 @@ define(['jquery'], function($) {
                 li.removeClass('contains_branch');
                 p.addClass('emptybranch');
 
-                require(['core/templates'], function(templates) {
-                    templates.renderIcon('collapsed-empty').done(function(html) {
+                require(['core/templates'], function (templates) {
+                    templates.renderIcon('collapsed-empty').done(function (html) {
                         if (p.attr('aria-expanded') === 'true') {
                             p.find('.flex-icon').remove();
                             p.prepend(html);
@@ -175,8 +175,8 @@ define(['jquery'], function($) {
             } else {
                 if (element.parent().hasClass('contains_branch')) {
                     element.parent().removeClass('contains_branch');
-                    require(['core/templates'], function(templates) {
-                        templates.renderIcon('collapsed-empty').done(function(html) {
+                    require(['core/templates'], function (templates) {
+                        templates.renderIcon('collapsed-empty').done(function (html) {
                             if (element.attr('aria-expanded') === 'true') {
                                 element.find('.flex-icon').remove();
                                 element.prepend(html);

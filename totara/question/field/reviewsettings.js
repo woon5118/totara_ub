@@ -20,9 +20,6 @@
  * @package totara
  * @subpackage totara_core
  */
-
-/* eslint-disable no-undef */
-
 M.totara_review_settings = M.totara_review_settings || {
 
     /**

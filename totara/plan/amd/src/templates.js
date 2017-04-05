@@ -22,7 +22,7 @@
  * @subpackage plan
  */
 
-define(['jquery'], function($) {
+define(['jquery'], function ($) {
 
     var templatecontrol = {
         // Optional php params and defaults defined here, args passed to init method

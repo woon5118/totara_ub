@@ -23,8 +23,6 @@ YUI.add('moodle-totara_program-categoryexpander', function (Y, NAME) {
  * @subpackage program
  */
 
-/* eslint-disable no-undef */
-
 var CSS = {
         CONTENTNODE: 'content',
         COLLAPSEALL: 'collapse-all',
@@ -264,8 +262,8 @@ NS.run_expansion = function(categorynode) {
         categorynode.removeClass(CSS.SECTIONCOLLAPSED);
         categorynode.setAttribute('aria-expanded', 'true');
         categorychildren.fx.set('reverse', false);
-        require(['core/templates'], function(templates) {
-            templates.renderIcon('expanded').done(function(html) {
+        require(['core/templates'], function (templates) {
+            templates.renderIcon('expanded').done(function (html) {
                 if (categorynode.get('aria-expanded') === 'true') {
                     categorynode.one('.categoryname .flex-icon').remove();
                     categorynode.one('.categoryname').prepend(html);
@@ -277,8 +275,8 @@ NS.run_expansion = function(categorynode) {
         categorychildren.fx.once('end', function(e, categorynode) {
             categorynode.addClass(CSS.SECTIONCOLLAPSED);
             categorynode.setAttribute('aria-expanded', 'false');
-            require(['core/templates'], function(templates) {
-                templates.renderIcon('collapsed').done(function(html) {
+            require(['core/templates'], function (templates) {
+                templates.renderIcon('collapsed').done(function (html) {
                     if (categorynode.get('aria-expanded') === 'false') {
                         categorynode.one('.categoryname .flex-icon').remove();
                         categorynode.one('.categoryname').prepend(html);
@@ -441,8 +439,8 @@ NS.update_collapsible_actions = function(ancestor) {
         togglelink.setHTML(M.util.get_string('collapseall', 'moodle'))
             .addClass(CSS.COLLAPSEALL)
             .removeClass(CSS.DISABLED);
-        require(['core/templates'], function(templates) {
-            templates.renderIcon('expanded').done(function(html) {
+        require(['core/templates'], function (templates) {
+            templates.renderIcon('expanded').done(function (html) {
                 if (togglelink.hasClass(CSS.COLLAPSEALL)) {
                     togglelink.all('.flex-icon').remove();
                     togglelink.prepend(html);
@@ -454,8 +452,8 @@ NS.update_collapsible_actions = function(ancestor) {
         togglelink.setHTML(M.util.get_string('expandall', 'moodle'))
             .removeClass(CSS.COLLAPSEALL)
             .removeClass(CSS.DISABLED);
-        require(['core/templates'], function(templates) {
-            templates.renderIcon('collapsed').done(function(html) {
+        require(['core/templates'], function (templates) {
+            templates.renderIcon('collapsed').done(function (html) {
                 if (!togglelink.hasClass(CSS.COLLAPSEALL)) {
                     togglelink.all('.flex-icon').remove();
                     togglelink.prepend(html);

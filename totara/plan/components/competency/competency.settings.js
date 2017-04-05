@@ -21,8 +21,6 @@
  * @subpackage totara_plan
  */
 
-/* eslint-disable no-undef */
-
 $(document).ready(function() {
     // disable checkboxes on page load
     dp_competency_disable_dependencies();
