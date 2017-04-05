@@ -163,7 +163,7 @@ M.totara_coursecompetency = M.totara_coursecompetency || {
                 var table = $('table#list-coursecompetency');
 
                 // If table found
-                if (table.size()) {
+                if (table.length) {
                     table.replaceWith(new_table);
                 }
                 else {

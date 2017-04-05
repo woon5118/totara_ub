@@ -131,7 +131,7 @@ define(['jquery', 'core/config', 'core/str'], function ($, config, strings) {
                 var table = $('#list-evidence');
 
                 // If table found
-                if (table.size()) {
+                if (table.length) {
                     table.replaceWith(new_table);
                 }
                 else {

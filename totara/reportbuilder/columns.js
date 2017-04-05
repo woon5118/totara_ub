@@ -128,7 +128,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             });
             advancedSelector.children().each(function () {
                 var group = $(this);
-                if (group.children().size() == 0) {
+                if (group.children().length == 0) {
                     group.remove();
                 }
             });

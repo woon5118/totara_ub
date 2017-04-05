@@ -769,7 +769,7 @@ totaraDialog_handler_treeview.prototype._partial_load = function(parent_element)
         var treeview = $('.treeview', parent_element);
     }
 
-    if (treeview.size()) {
+    if (treeview.length) {
         treeview.treeview({
             prerendered: true
         });
