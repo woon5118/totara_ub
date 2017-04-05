@@ -51,7 +51,7 @@ Feature: Add and configure blocks throughout the site
   Scenario: Blocks on the dashboard page can have roles assigned to them
     Given I log in as "manager1"
     When I press "Customise this page"
-    Then I should see "Assign roles in Private files block"
+    Then I should see "Assign roles in Navigation block"
 
   Scenario: Blocks on courses can have roles assigned to them
     Given I log in as "teacher1"
@@ -63,7 +63,7 @@ Feature: Add and configure blocks throughout the site
   @javascript
   Scenario: Blocks can safely be customised
     Given I log in as "admin"
-    And I am on homepage
+    And I click on "Dashboard" in the totara menu
     And I press "Customise this page"
     And I add the "HTML" block
     And I configure the "(new HTML block)" block
