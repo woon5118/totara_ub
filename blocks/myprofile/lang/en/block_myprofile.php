@@ -46,5 +46,5 @@ $string['myprofile:myaddinstance'] = 'Add a new logged in user block to My learn
 $string['myprofile_settings'] = 'Visible user information';
 $string['pluginname'] = 'Logged in user';
 
-// Deprecated since Moodle 3.2.
+// Deprecated since Totara 10.
 $string['display_un'] = 'Display name';
