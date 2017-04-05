@@ -153,6 +153,10 @@ Structure of the user enroller panel
     text-align: right;
 }
 
+.dir-rtl .user-enroller-panel .uep-footer {
+    text-align: left;
+}
+
 .user-enroller-panel .uep-search {
     margin: 3px;
 }
