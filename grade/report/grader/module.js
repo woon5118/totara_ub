@@ -373,8 +373,9 @@ M.gradereport_grader.classes.ajax.prototype.get_above_cell = function(cell) {
     if (tr) {
         var column = 0;
         var ntemp = n;
-        while (ntemp = ntemp.previous('td.cell')) {
+        while (ntemp) {
             column++;
+            ntemp = ntemp.previous('td.cell');
         }
         next = tr.all('td.cell').item(column);
     }
@@ -401,8 +402,9 @@ M.gradereport_grader.classes.ajax.prototype.get_below_cell = function(cell) {
     if (tr && !tr.hasClass('avg')) {
         var column = 0;
         var ntemp = n;
-        while (ntemp = ntemp.previous('td.cell')) {
+        while (ntemp) {
             column++;
+            ntemp = ntemp.previous('td.cell');
         }
         next = tr.all('td.cell').item(column);
     }

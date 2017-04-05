@@ -957,7 +957,7 @@ tzv = null;
             * If the user manually empty the value in the input field, the date picker will never change selected value.
             */
             // if (dp_inst.lastVal !== undefined && (dp_inst.lastVal.length > 0 && this.$input.val().length === 0)) {
-            //	return;
+            //   return;
             // }
 
             if (this._defaults.timeOnly === true && this._defaults.timeOnlyShowDate === false) {
@@ -1758,7 +1758,7 @@ tzv = null;
                 // This is important if you are using the timezone option, javascript's Date
                 // object will only return the timezone offset for the current locale, so we
                 // adjust it accordingly.  If not using timezone option this won't matter..
-                if (tp_inst.timezone != null) {
+                if (tp_inst.timezone !== null) {
                     // look out for DST if tz wasn't specified
                     if (!tp_inst.support.timezone && tp_inst._defaults.timezone === null) {
                         tp_inst.timezone = date.getTimezoneOffset() * -1;
@@ -2249,6 +2249,7 @@ tzv = null;
                 window.console.log.apply(window.console, Array.prototype.slice.call(arguments));
             } else {
                 $.each(arguments, function(index, argument) {
+                    // eslint-disable-next-line
                     console.log(argument);
                 });
             }
@@ -2273,6 +2274,10 @@ tzv = null;
     * Microsecond support
     */
     if (!Date.prototype.getMicroseconds) {
+
+        /* eslint-disable no-extend-native */
+        // TODO: switch to window.performance.now() which has IE10+ support.
+        // http://stackoverflow.com/questions/6233927/microsecond-timing-in-javascript
         Date.prototype.microseconds = 0;
         Date.prototype.getMicroseconds = function() { return this.microseconds; };
         Date.prototype.setMicroseconds = function(m) {
@@ -2280,6 +2285,7 @@ tzv = null;
             this.microseconds = m % 1000;
             return this;
         };
+        /* eslint-enable no-extend-native */
     }
 
     /*

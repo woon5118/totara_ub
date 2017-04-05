@@ -214,7 +214,7 @@ totaraDialog_handler_assigngoaltreeview.prototype._save = function() {
     var url = this._dialog.saveurl + '&selected=' + selected_str;
     extrafields.each(
         function(intIndex) {
-            if ($(this).val() != null) {
+            if ($(this).val() !== null) {
                 url = url + '&' + $(this).attr('name') + '=' + $(this).val();
             }
         }

@@ -66,12 +66,12 @@ YUI.add('moodle-block_community-comments', function(Y) {
 
         hide: function(e, commentid) {
             this.panels[commentid].hide(); // hide the panel
-            if (this.event != null) {
+            if (this.event !== null) {
                 this.event.detach(); // we need to detach the body hide event
             // Note: it would work without but create js warning everytime
             // we click on the body
             }
-            if (this.panelevent != null) {
+            if (this.panelevent !== null) {
                 this.panelevent.detach(); // we need to detach the panel hide event
             // Note: it would work without but create js warning everytime
             // we click on the body

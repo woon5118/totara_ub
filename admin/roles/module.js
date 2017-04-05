@@ -96,7 +96,7 @@ M.core_role.init_cap_table_filter = function(Y, tableid, contextid) {
          */
         getFilterCookieValue: function() {
             var cookie = Y.Cookie.getSubs('captblflt');
-            if (cookie != null && cookie.fltcontext && cookie.fltcontext == this.context && parseInt(cookie.flttime) > new Date().getTime() - (60 * 60 * 1000)) {
+            if (cookie !== null && cookie.fltcontext && cookie.fltcontext == this.context && parseInt(cookie.flttime) > new Date().getTime() - (60 * 60 * 1000)) {
                 return cookie.fltvalue;
             }
             return '';

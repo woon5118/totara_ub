@@ -57,7 +57,7 @@ M.totara_reportbuilder_verticaltableheadings = M.totara_reportbuilder_verticalta
             if (document.createElementNS == undefined) {
                 setTimeout(function() { onCreateElementNsReady(func); }, 100);
             } else {
-                func;
+                func();
             }
         }
 
@@ -85,7 +85,9 @@ M.totara_reportbuilder_verticaltableheadings = M.totara_reportbuilder_verticalta
             // Add text.
             var text = document.createElementNS(SVGNS, 'text');
             svg.appendChild(text);
+            /* eslint-enable no-undef */
             if (right_to_left()) {
+            /* eslint-disable no-undef */
                 text.setAttribute('x', 0);
                 text.setAttribute('y', -2 * textHeight / 4);
                 text.setAttribute('text-anchor', 'end');

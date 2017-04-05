@@ -161,7 +161,7 @@ rbShowUserDialog = function() {
         url + 'schedule_display_items_email.php?filtername=systemusers' + '&sesskey=' + M.cfg.sesskey + '&ids=',
         selected
     );
-},
+};
 
 rbShowAudienceDialog = function() {
     var selected = M.totara_email_scheduled_report.config.existingaud;
@@ -174,7 +174,7 @@ rbShowAudienceDialog = function() {
         url + 'schedule_display_items_email.php?filtername=audiences' + '&sesskey=' + M.cfg.sesskey + '&ids=',
         selected
     );
-},
+};
 
 rbDialog = function(name, title, find_url, save_url, selected) {
     var handler = new totaraDialog_handler_treeview_multiselect_rb_filter();

@@ -104,11 +104,11 @@ M.mod_imscp.init = function(Y) {
          * @return void
          */
         var imscp_fixnav = function() {
-            imscp_buttons[0].set('disabled', (imscp_skipprev(imscp_current_node) == null));
-            imscp_buttons[1].set('disabled', (imscp_prev(imscp_current_node) == null));
-            imscp_buttons[2].set('disabled', (imscp_up(imscp_current_node) == null));
-            imscp_buttons[3].set('disabled', (imscp_next(imscp_current_node) == null));
-            imscp_buttons[4].set('disabled', (imscp_skipnext(imscp_current_node) == null));
+            imscp_buttons[0].set('disabled', (imscp_skipprev(imscp_current_node) === null));
+            imscp_buttons[1].set('disabled', (imscp_prev(imscp_current_node) === null));
+            imscp_buttons[2].set('disabled', (imscp_up(imscp_current_node) === null));
+            imscp_buttons[3].set('disabled', (imscp_next(imscp_current_node) === null));
+            imscp_buttons[4].set('disabled', (imscp_skipnext(imscp_current_node) === null));
         };
 
         var imscp_resize_layout = function(alsowidth) {

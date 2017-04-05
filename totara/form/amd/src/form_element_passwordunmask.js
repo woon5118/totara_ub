@@ -34,7 +34,7 @@ define(['jquery', 'totara_form/form'], function($, Form) {
         /* eslint-disable */
         String.prototype.repeat = function(count) {
             'use strict';
-            if (this == null) {
+            if (this === null) {
                 throw new TypeError('can\'t convert ' + this + ' to object');
             }
             var str = '' + this;

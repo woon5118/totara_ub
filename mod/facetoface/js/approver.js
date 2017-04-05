@@ -217,7 +217,7 @@ facetoface_handler.prototype._save = function() {
     // Add to url
     var url = this._dialog.saveurl;
 
-    if (selected_str != null && selected_str.length > 0) {
+    if (selected_str !== null && selected_str.length > 0) {
         url += '&users=' + selected_str;
     }
 

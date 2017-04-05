@@ -77,7 +77,7 @@ function scorm_resize(cwidth, cheight) {
         finalheight = winheight;
     }
     var toctree = document.getElementById('toctree');
-    if (toctree != null) {
+    if (toctree !== null) {
         var toctreeHeight = toctree.offsetHeight;
         document.getElementById('toctree').style.height = finalheighttoc + 'px';
         var scoframe2 = document.getElementById('scoframe1');

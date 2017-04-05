@@ -389,10 +389,11 @@ m = this.get(MANIPULATOR);
         },
         display: function(user) {
             var currentroles = user.get(CURRENTROLES),
-node = null;
+                node = null;
             for (var i in currentroles) {
                 if (currentroles[i] === true) {
-                    if (node = this.get('contentNode').one('#add_assignable_role_' + i)) {
+                    node = this.get('contentNode').one('#add_assignable_role_' + i);
+                    if (node) {
                         node.setAttribute('disabled', 'disabled');
                     }
                     this.roles.push(i);
@@ -418,7 +419,8 @@ node = null;
             }
             var node = null;
             for (var i in this.roles) {
-                if (node = this.get('contentNode').one('#add_assignable_role_' + this.roles[i])) {
+                node = this.get('contentNode').one('#add_assignable_role_' + this.roles[i]);
+                if (node) {
                     node.removeAttribute('disabled');
                 }
             }

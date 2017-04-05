@@ -117,7 +117,7 @@
     'keyword-spacing': 'warn',
     'linebreak-style': ['error', 'unix'],
     'lines-around-comment': 'off',
-    'max-len': ['warn', 180], // TOTARA: changed from 132 to 180.
+    'max-len': 'warn', // TOTARA: changed from 132 to 180.
     'max-lines': 'off',
     'max-depth': 'warn',
     'max-nested-callbacks': ['warn', 5],

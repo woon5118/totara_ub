@@ -550,7 +550,7 @@ totaraDialog_handler_cohortruletreeview.prototype._save = function() {
 
     extrafields.each(
         function(intIndex) {
-            if ($(this).val() != null) {
+            if ($(this).val() !== null) {
                 url = url + '&' + $(this).attr('name') + '=' + $(this).val();
             }
         }

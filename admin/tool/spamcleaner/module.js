@@ -31,7 +31,7 @@ M.tool_spamcleaner = {
     del_user: function(obj, id) {
         var context = M.tool_spamcleaner;
 
-        if (context.Y == null) {
+        if (context.Y === null) {
             // not initialised yet
             return;
         }
@@ -70,7 +70,7 @@ M.tool_spamcleaner = {
     ignore_user: function(obj, id) {
         var context = M.tool_spamcleaner;
 
-        if (context.Y == null) {
+        if (context.Y === null) {
             // not initilised yet
             return;
         }

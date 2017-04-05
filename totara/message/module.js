@@ -304,7 +304,7 @@ totaraDialog_handler_confirm.prototype.setReturnTo = function(url) {
  */
 totaraDialog_handler_confirm.prototype._redirect = function() {
     this._dialog.hide();
-    if (this._returnTo == null) {
+    if (this._returnTo === null) {
         this._returnTo = M.cfg.wwwroot;
     }
     window.location = this._returnTo;

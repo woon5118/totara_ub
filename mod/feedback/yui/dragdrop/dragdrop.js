@@ -19,11 +19,11 @@ YUI.add('moodle-mod_feedback-dragdrop', function(Y) {
     Y.extend(DRAGDROP, M.core.dragdrop, {
 
         initializer: function(params) {
+
             // Static Vars
             this.cmid = params.cmid;
-            /* eslint-enable no-undef */
-            this.goingUp = false, lastY = 0;
-            /* eslint-disable no-undef */
+            this.goingUp = false;
+            this.lastY = 0;
 
             var groups = ['feedbackitem'];
 

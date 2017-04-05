@@ -152,18 +152,18 @@ M.mod_quiz.nav.init = function(Y) {
 
     Y.all('#quiznojswarning').remove();
 
+    function nav_to_page(pageno) {
+        Y.one('#followingpage').set('value', pageno);
+
+        // Automatically submit the form. We do it this strange way because just
+        // calling form.submit() does not run the form's submit event handlers.
+        var submit = form.one('input[name="next"]');
+        submit.set('name', '');
+        submit.getDOMNode().click();
+    }
+
     var form = Y.one('#responseform');
     if (form) {
-        function nav_to_page(pageno) {
-            Y.one('#followingpage').set('value', pageno);
-
-            // Automatically submit the form. We do it this strange way because just
-            // calling form.submit() does not run the form's submit event handlers.
-            var submit = form.one('input[name="next"]');
-            submit.set('name', '');
-            submit.getDOMNode().click();
-        }
-
         Y.delegate('click', function(e) {
             if (this.hasClass('thispage')) {
                 return;

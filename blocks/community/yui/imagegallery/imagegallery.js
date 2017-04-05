@@ -60,7 +60,7 @@ YUI.add('moodle-block_community-imagegallery', function(Y) {
 
         show: function(e, imageid, screennumber) {
 
-            if (this.imageloadingevent != null) {
+            if (this.imageloadingevent !== null) {
                 this.imageloadingevent.detach();
             }
 
@@ -174,12 +174,12 @@ YUI.add('moodle-block_community-imagegallery', function(Y) {
             Y.one('#hubloadingimage').setStyle('display', 'none');
 
             this.panel.hide(); // hide the panel
-            if (this.event != null) {
+            if (this.event !== null) {
                 this.event.detach(); // we need to detach the body hide event
             // Note: it would work without but create js warning everytime
             // we click on the body
             }
-            if (this.panelevent != null) {
+            if (this.panelevent !== null) {
                 this.panelevent.detach(); // we need to detach the panel hide event
             // Note: it would work without but create js warning everytime
             // we click on the body

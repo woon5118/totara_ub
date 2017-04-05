@@ -243,7 +243,7 @@ YUI.add('moodle-core_filepicker', function(Y) {
                 var mytree = {};
                 var mytreeel = null;
                 for (var i in options.filepath) {
-                    if (mytreeel == null) {
+                    if (mytreeel === null) {
                         mytreeel = mytree;
                     } else {
                         mytreeel.children = [{}];
@@ -867,7 +867,7 @@ M.core_filepicker.init = function(Y, options) {
                     if (!(scope.active_repo.id == obj.repo_id && scope.viewmode == 2 && node && node.getChildrenEl())) {
                         return;
                     }
-                    if (cb != null) { // (in manual mode do not update current path)
+                    if (cb !== null) { // (in manual mode do not update current path)
                         scope.viewbar_set_enabled(true);
                         scope.parse_repository_options(obj);
                     }
@@ -884,7 +884,7 @@ M.core_filepicker.init = function(Y, options) {
                             scope.view_as_list([list[k]]);
                         }
                     }
-                    if (cb == null) {
+                    if (cb === null) {
                         node.refresh();
                     } else {
                         // invoke callback requested by TreeView component
@@ -914,7 +914,7 @@ M.core_filepicker.init = function(Y, options) {
          * appends those items to the end of the list. Otherwise (default behaviour)
          * clears the contents and displays the items from this.filelist */
         view_as_list: function(appenditems) {
-            var list = (appenditems != null) ? appenditems : this.filelist;
+            var list = (appenditems !== null) ? appenditems : this.filelist;
             this.viewmode = 2;
             if (!this.filelist || this.filelist.length == 0 && (!this.filepath || !this.filepath.length)) {
                 this.display_error(M.util.get_string('nofilesavailable', 'repository'), 'nofilesavailable');
@@ -924,7 +924,7 @@ M.core_filepicker.init = function(Y, options) {
             var element_template = Y.Node.create(M.core_filepicker.templates.listfilename);
             var options = {
                 viewmode: this.viewmode,
-                appendonly: (appenditems != null),
+                appendonly: (appenditems !== null),
                 filenode: element_template,
                 callbackcontext: this,
                 callback: function(e, node) {
@@ -958,15 +958,15 @@ M.core_filepicker.init = function(Y, options) {
          * clears the contents and displays the items from this.filelist */
         view_as_icons: function(appenditems) {
             this.viewmode = 1;
-            var list = (appenditems != null) ? appenditems : this.filelist;
+            var list = (appenditems !== null) ? appenditems : this.filelist;
             var element_template = Y.Node.create(M.core_filepicker.templates.iconfilename);
-            if ((appenditems == null) && (!this.filelist || !this.filelist.length)) {
+            if ((appenditems === null) && (!this.filelist || !this.filelist.length)) {
                 this.display_error(M.util.get_string('nofilesavailable', 'repository'), 'nofilesavailable');
                 return;
             }
             var options = {
                 viewmode: this.viewmode,
-                appendonly: (appenditems != null),
+                appendonly: (appenditems !== null),
                 filenode: element_template,
                 callbackcontext: this,
                 callback: function(e, node) {
@@ -1230,7 +1230,7 @@ filelinkcount = 0;
         },
         wait: function() {
             // First check there isn't already an interval in play, and if there is kill it now.
-            if (this.waitinterval != null) {
+            if (this.waitinterval !== null) {
                 clearInterval(this.waitinterval);
             }
             // Prepare the root node we will set content for and the loading template we want to display as a YUI node.
@@ -1529,7 +1529,7 @@ filelinkcount = 0;
                             type: l[k].type, value: list[item]});
                         radionode.all('label').setContent(labels[item]).set('for', '' + l[k].id + item);
                     }
-                    if (radionode == null) {
+                    if (radionode === null) {
                         node.one('.fp-login-radio').remove();
                     }
                 } else {

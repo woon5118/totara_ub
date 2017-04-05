@@ -111,28 +111,28 @@ define(['jquery'], function($) {
             };
             numberPolyfill.polyfills = [];
             numberPolyfill.isNumber = function(input) {
-              if ((input != null) && typeof input.toString === "function") {
+              if ((input !== null) && typeof input.toString === "function") {
                 return /^-?\d+(?:\.\d+)?$/.test(input.toString());
               } else {
                 return false;
               }
             };
             numberPolyfill.isFloat = function(input) {
-              if ((input != null) && typeof input.toString === "function") {
+              if ((input !== null) && typeof input.toString === "function") {
                 return /^-?\d+\.\d+$/.test(input.toString());
               } else {
                 return false;
               }
             };
             numberPolyfill.isInt = function(input) {
-              if ((input != null) && typeof input.toString === "function") {
+              if ((input !== null) && typeof input.toString === "function") {
                 return /^-?\d+$/.test(input.toString());
               } else {
                 return false;
               }
             };
             numberPolyfill.isNegative = function(input) {
-              if ((input != null) && typeof input.toString === "function") {
+              if ((input !== null) && typeof input.toString === "function") {
                 return /^-\d+(?:\.\d+)?$/.test(input.toString());
               } else {
                 return false;
@@ -302,16 +302,16 @@ define(['jquery'], function($) {
                 val = min || 0;
               }
               return {
-                min: (min != null) ? min : null,
-                max: (max != null) ? max : null,
-                step: (step != null) ? step : "1",
-                val: (val != null) ? val : null
+                min: (min !== null) ? min : null,
+                max: (max !== null) ? max : null,
+                step: (step !== null) ? step : "1",
+                val: (val !== null) ? val : null
               };
             };
             numberPolyfill.prototype.clipValues = function(value, min, max) {
-              if ((max != null) && parseFloat(value) > parseFloat(max)) {
+              if ((max !== null) && parseFloat(value) > parseFloat(max)) {
                 return max;
-              } else if ((min != null) && parseFloat(value) < parseFloat(min)) {
+              } else if ((min !== null) && parseFloat(value) < parseFloat(min)) {
                 return min;
               } else {
                 return value;
@@ -332,7 +332,7 @@ define(['jquery'], function($) {
                 } else if (cValue.precision < step.precision) {
                   numberPolyfill.raiseNumPrecision(cValue, step.precision);
                 }
-                if (min != null) {
+                if (min !== null) {
                   cValue = numberPolyfill.raiseNum(numberPolyfill.preciseSubtract(value, min));
                   numberPolyfill.raiseNumPrecision(cValue, step.precision);
                 }
@@ -343,7 +343,7 @@ define(['jquery'], function($) {
                     num: (Math.round(parseFloat(cValue.num) / (sn = parseFloat(step.num))) * sn).toString(),
                     precision: cValue.precision
                   });
-                  if (min != null) {
+                  if (min !== null) {
                     cValue = numberPolyfill.preciseAdd(cValue, min);
                   }
                   return cValue;
@@ -394,7 +394,7 @@ define(['jquery'], function($) {
                   }
                 } else {
                   min = p.elem.attr('min');
-                  p.elem.val((min != null) && numberPolyfill.isNumber(min) ? min : "0").change();
+                  p.elem.val((min !== null) && numberPolyfill.isNumber(min) ? min : "0").change();
                 }
               }
             };

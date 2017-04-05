@@ -426,6 +426,7 @@ M.course_dndupload = {
         // Process the file or the included data
         if (type.type == 'Files') {
             var files = e._event.dataTransfer.files;
+            // eslint-disable-next-line
             for (var i = 0, f; f = files[i]; i++) {
                 this.handle_file(f, section, sectionnumber);
             }
