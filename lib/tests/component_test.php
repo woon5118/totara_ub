@@ -45,7 +45,7 @@ class core_component_testcase extends advanced_testcase {
         $psr4namespaces->setAccessible(true);
         $this->oldpsr4namespaces = $psr4namespaces->getValue(null);
     }
-    public function tearDown() {
+    protected function tearDown() {
         $psr0namespaces = new ReflectionProperty('core_component', 'psr0namespaces');
         $psr0namespaces->setAccessible(true);
         $psr0namespaces->setValue(null, $this->oldpsr0namespaces);
@@ -53,6 +53,7 @@ class core_component_testcase extends advanced_testcase {
         $psr4namespaces = new ReflectionProperty('core_component', 'psr4namespaces');
         $psr4namespaces->setAccessible(true);
         $psr4namespaces->setValue(null, $this->oldpsr4namespaces);
+        parent::tearDown();
     }
 
     public function test_get_core_subsystems() {

@@ -61,11 +61,10 @@ class cachestore_redis_test extends cachestore_tests {
         parent::setUp();
     }
     protected function tearDown() {
-        parent::tearDown();
-
         if ($this->store instanceof cachestore_redis) {
             $this->store->purge();
         }
+        parent::tearDown();
     }
 
     /**

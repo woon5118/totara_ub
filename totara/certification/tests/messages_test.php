@@ -101,7 +101,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $this->programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
     }
 
-    public function tearDown() {
+    protected function tearDown() {
         $this->sink->close();
         parent::tearDown();
     }

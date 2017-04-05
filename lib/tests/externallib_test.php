@@ -36,11 +36,12 @@ class core_externallib_testcase extends advanced_testcase {
         $this->DB = null;
     }
 
-    public function tearDown() {
+    protected function tearDown() {
         global $DB;
         if ($this->DB !== null) {
             $DB = $this->DB;
         }
+        parent::tearDown();
     }
 
     public function test_validate_params() {

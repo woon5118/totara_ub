@@ -40,6 +40,7 @@ class antivirus_clamav_scanner_testcase extends advanced_testcase {
 
     protected function tearDown() {
         @unlink($this->tempfile);
+        parent::tearDown();
     }
 
     public function test_scan_file_not_exists() {

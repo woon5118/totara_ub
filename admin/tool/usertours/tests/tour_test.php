@@ -55,10 +55,11 @@ class tool_usertours_tour_testcase extends advanced_testcase {
     /**
      * Tear down to restore the original DB reference.
      */
-    public function tearDown() {
+    protected function tearDown() {
         global $DB;
 
         $DB = $this->db;
+        parent::tearDown();
     }
 
     /**

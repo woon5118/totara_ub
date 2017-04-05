@@ -45,6 +45,7 @@ class core_antivirus_testcase extends advanced_testcase {
 
     protected function tearDown() {
         @unlink($this->tempfile);
+        parent::tearDown();
     }
 
     public function test_manager_get_antivirus() {

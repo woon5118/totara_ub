@@ -45,13 +45,14 @@ class mod_data_lib_testcase extends advanced_testcase {
     /**
      * Tear Down to reset DB.
      */
-    public function tearDown() {
+    protected function tearDown() {
         global $DB;
 
         if (isset($this->DB)) {
             $DB = $this->DB;
             $this->DB = null;
         }
+        parent::tearDown();
     }
 
     public function test_data_delete_record() {

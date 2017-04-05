@@ -346,10 +346,12 @@ class logstore_standard_store_testcase extends advanced_testcase {
     /**
      * Reset any garbage collector changes to the previous state at the end of the test.
      */
-    public function tearDown() {
+    protected function tearDown() {
         if ($this->wedisabledgc) {
             gc_enable();
         }
+        gc_collect_cycles(); // Totara: run the gc!
         $this->wedisabledgc = false;
+        parent::tearDown();
     }
 }
