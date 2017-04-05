@@ -127,14 +127,14 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
             // Define update setting button div.
             var updatesettings = $('div#dp-component-update-submit');
 
-            if (noitems.size()) {
+            if (noitems.length) {
                 // If no items, just display message.
                 $('form#dp-component-update div#dp-component-update-table').append(noitems);
                 // Replace table with nothing.
                 table.empty();
                 // Hide update setting button when there are no items.
                 updatesettings.hide();
-            } else if (table.size()) {
+            } else if (table.length) {
                 // If table found.
                 table.replaceWith(new_table);
                 updatesettings.show();
