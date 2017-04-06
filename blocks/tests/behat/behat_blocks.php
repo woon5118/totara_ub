@@ -80,7 +80,7 @@ class behat_blocks extends behat_base {
     public function i_dock_block($blockname) {
 
         // Looking for both title and alt.
-        $xpath = "//input[@type='image'][@title='" . get_string('dockblock', 'block', $blockname) . "' or @alt='" . get_string('addtodock', 'block') . "']";
+        $xpath = "//a[contains(.,'" . get_string('addtodock', 'block') . "')]";
         $this->execute('behat_general::i_click_on_in_the',
             array($xpath, "xpath_element", $this->escape($blockname), "block")
         );
