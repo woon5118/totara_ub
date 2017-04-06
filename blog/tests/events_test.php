@@ -55,6 +55,16 @@ class core_blog_events_testcase extends advanced_testcase {
     /** @var $postid */
     private $postid;
 
+    protected function tearDown() {
+        $this->courseid = null;
+        $this->cmid = null;
+        $this->groupid = null;
+        $this->userid = null;
+        $this->tagid = null;
+        $this->postid = null;
+        parent::tearDown();
+    }
+
     /**
      * Setup the tests.
      */

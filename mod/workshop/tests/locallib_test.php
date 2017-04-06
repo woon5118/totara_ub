@@ -58,6 +58,7 @@ class mod_workshop_internal_api_testcase extends advanced_testcase {
 
     protected function tearDown() {
         $this->workshop = null;
+        $this->course = null;
         parent::tearDown();
     }
 

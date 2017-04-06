@@ -43,6 +43,11 @@ class mod_wiki_search_testcase extends advanced_testcase {
      */
     protected $wikicollabpageareaid = null;
 
+    protected function tearDown() {
+        $this->wikicollabpageareaid = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         $this->resetAfterTest(true);
         $this->setAdminUser();

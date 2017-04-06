@@ -50,6 +50,15 @@ class totara_program_upgradelib_testcase extends reportcache_advanced_testcase {
 
     private $past, $now, $future;
 
+    protected function tearDown() {
+        $this->data_generator = null;
+        $this->user1 = null;
+        $this->course1 = null;
+        $this->program1 = null;
+        $this->past = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         parent::setUp();
         global $DB;

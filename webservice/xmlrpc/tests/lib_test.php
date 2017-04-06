@@ -38,6 +38,11 @@ require_once($CFG->dirroot . '/webservice/xmlrpc/lib.php');
  */
 class webservice_xmlrpc_test extends advanced_testcase {
 
+    protected function tearDown() {
+        $this->mockresponse = null;
+        parent::tearDown();
+    }
+
     /**
      * Setup.
      */

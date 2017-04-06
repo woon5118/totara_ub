@@ -36,6 +36,11 @@ class block_totara_report_graph_testcase extends advanced_testcase {
      */
     protected $blockinstance;
 
+    protected function tearDown() {
+        $this->blockinstance = null;
+        parent::tearDown();
+    }
+
     protected function setUp() {
         $this->resetAfterTest();
 

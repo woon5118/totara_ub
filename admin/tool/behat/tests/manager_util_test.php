@@ -84,6 +84,14 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
     private $corecontexts = array('behat_test_context_1' => __DIR__.'/fixtures/core/behat_test_context_1.php',
                                   'behat_test_context_2' => __DIR__.'/fixtures/core/behat_test_context_2.php');
 
+    protected function tearDown() {
+        $this->featurepaths = null;
+        $this->contextspath = null;
+        $this->corefeatures = null;
+        $this->corecontexts = null;
+        parent::tearDown();
+    }
+
     /**
      * Setup test.
      */

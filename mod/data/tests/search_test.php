@@ -97,6 +97,21 @@ class mod_data_search_test extends advanced_testcase {
      */
     protected $databaseentryareaid = null;
 
+    protected function tearDown() {
+        $this->recorddata = null;
+        $this->recordcontentid = null;
+        $this->recordrecordid = null;
+        $this->recordfieldid = null;
+        $this->recordsearcharray = null;
+        $this->datarecordcount = null;
+        $this->groupdatarecordcount = null;
+        $this->datarecordset = null;
+        $this->finalrecord = null;
+        $this->approvedatarecordcount = null;
+        $this->databaseentryareaid = null;
+        parent::tearDown();
+    }
+
     /**
      * Set up function. In this instance we are setting up database
      * records to be used in the unit tests.

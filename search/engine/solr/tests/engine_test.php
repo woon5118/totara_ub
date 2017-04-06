@@ -142,6 +142,8 @@ class search_solr_engine_testcase extends advanced_testcase {
             $this->generator->teardown();
             $this->generator = null;
         }
+        $this->search = null;
+        $this->engine = null;
         parent::tearDown();
     }
 

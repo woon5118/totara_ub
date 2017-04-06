@@ -48,6 +48,12 @@ class tool_provider_testcase extends advanced_testcase {
      */
     protected $tool;
 
+    protected function tearDown() {
+        $this->tool = null;
+        $this->success = null;
+        parent::tearDown();
+    }
+
     /**
      * Test set up.
      *

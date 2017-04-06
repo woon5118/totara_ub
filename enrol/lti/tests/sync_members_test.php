@@ -59,6 +59,16 @@ class sync_members_testcase extends advanced_testcase {
     /** @var  ResourceLink $resourcelink */
     protected $resourcelink;
 
+    protected function tearDown() {
+        $this->task = null;
+        $this->tool = null;
+        $this->members = null;
+        $this->consumer = null;
+        $this->context = null;
+        $this->resourcelink = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         $this->resetAfterTest();
 

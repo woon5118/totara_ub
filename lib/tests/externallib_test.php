@@ -41,6 +41,7 @@ class core_externallib_testcase extends advanced_testcase {
         if ($this->DB !== null) {
             $DB = $this->DB;
         }
+        $this->DB = null;
         parent::tearDown();
     }
 

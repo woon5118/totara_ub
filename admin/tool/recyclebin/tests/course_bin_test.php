@@ -43,6 +43,12 @@ class tool_recyclebin_course_bin_tests extends advanced_testcase {
      */
     protected $quiz;
 
+    protected function tearDown() {
+        $this->course = null;
+        $this->quiz = null;
+        parent::tearDown();
+    }
+
     /**
      * Setup for each test.
      */

@@ -43,6 +43,11 @@ class mod_book_search_testcase extends advanced_testcase {
      */
     protected $bookchapterareaid = null;
 
+    protected function tearDown() {
+        $this->bookchapterareaid = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         $this->resetAfterTest(true);
         set_config('enableglobalsearch', true);

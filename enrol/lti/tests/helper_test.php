@@ -43,6 +43,12 @@ class enrol_lti_helper_testcase extends advanced_testcase {
      */
     public $user2;
 
+    protected function tearDown() {
+        $this->user1 = null;
+        $this->user2 = null;
+        parent::tearDown();
+    }
+
     /**
      * Test set up.
      *

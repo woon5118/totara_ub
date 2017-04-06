@@ -64,6 +64,7 @@ class core_form_duration_testcase extends basic_testcase {
      */
     protected function tearDown() {
         $this->element = null;
+        $this->mform = null;
         parent::tearDown();
     }
 

@@ -45,6 +45,15 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
     private $program;
     private $course;
 
+    protected function tearDown() {
+        $this->generator = null;
+        $this->cohort = null;
+        $this->ruleset = null;
+        $this->program = null;
+        $this->course = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
 
         $this->generator = $this->getDataGenerator()->get_plugin_generator('totara_cohort');

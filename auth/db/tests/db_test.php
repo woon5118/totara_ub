@@ -34,6 +34,12 @@ class auth_db_testcase extends advanced_testcase {
     /** @var int The amount of users to create for the large user set deletion test  */
     protected $largedeletionsetsize = 128;
 
+    protected function tearDown() {
+        $this->oldlog = null;
+        $this->largedeletionsetsize = null;
+        parent::tearDown();
+    }
+
     protected function init_auth_database() {
         global $DB, $CFG;
         require_once("$CFG->dirroot/auth/db/auth.php");

@@ -41,6 +41,14 @@ class totara_cohort_lib_testcase extends advanced_testcase {
     protected $cohort_dynamic;
     protected $cohort_set;
 
+    protected function tearDown() {
+        $this->course = null;
+        $this->program = null;
+        $this->cohort_dynamic = null;
+        $this->cohort_set = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         global $DB;
 

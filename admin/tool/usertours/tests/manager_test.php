@@ -60,6 +60,7 @@ class tool_usertours_manager_testcase extends advanced_testcase {
         global $DB;
 
         $DB = $this->db;
+        $this->db = null;
         parent::tearDown();
     }
 

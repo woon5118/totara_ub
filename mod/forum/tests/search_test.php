@@ -45,6 +45,11 @@ class mod_forum_search_testcase extends advanced_testcase {
      */
     protected $forumpostareaid = null;
 
+    protected function tearDown() {
+        $this->forumpostareaid = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         $this->resetAfterTest(true);
         set_config('enableglobalsearch', true);

@@ -30,6 +30,13 @@ defined('MOODLE_INTERNAL') || die();
  */
 class core_medialib_testcase extends advanced_testcase {
 
+    protected function tearDown() {
+        $this->ext = null;
+        $this->rank = null;
+        $this->num = null;
+        parent::tearDown();
+    }
+
     /**
      * Pre-test setup. Preserves $CFG.
      */

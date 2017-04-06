@@ -50,6 +50,15 @@ class assignsubmission_file_locallib_testcase extends advanced_testcase {
     /** @var stdClass $assign The assignment object. */
     protected $assign;
 
+    protected function tearDown() {
+        $this->user = null;
+        $this->course = null;
+        $this->cm = null;
+        $this->context = null;
+        $this->assign = null;
+        parent::tearDown();
+    }
+
     /**
      * Setup all the various parts of an assignment activity including creating an onlinetext submission.
      */

@@ -43,6 +43,11 @@ class mod_resource_search_testcase extends advanced_testcase {
      */
     protected $resourceareaid = null;
 
+    protected function tearDown() {
+        $this->resourceareaid = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         $this->resetAfterTest(true);
         set_config('enableglobalsearch', true);

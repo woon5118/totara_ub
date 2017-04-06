@@ -352,6 +352,7 @@ class logstore_standard_store_testcase extends advanced_testcase {
         }
         gc_collect_cycles(); // Totara: run the gc!
         $this->wedisabledgc = false;
+        $this->wedisabledgc = null;
         parent::tearDown();
     }
 }

@@ -58,6 +58,15 @@ class tool_usertours_role_filter_testcase extends advanced_testcase {
      */
     protected $roles;
 
+    protected function tearDown() {
+        $this->course = null;
+        $this->student = null;
+        $this->teacher = null;
+        $this->editingteacher = null;
+        $this->roles = null;
+        parent::tearDown();
+    }
+
     public function setUp() {
         global $DB;
 

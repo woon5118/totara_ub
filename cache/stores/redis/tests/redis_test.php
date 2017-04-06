@@ -64,6 +64,7 @@ class cachestore_redis_test extends cachestore_tests {
         if ($this->store instanceof cachestore_redis) {
             $this->store->purge();
         }
+        $this->store = null;
         parent::tearDown();
     }
 
