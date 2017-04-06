@@ -41,6 +41,8 @@ global $OUTPUT;
                     echo $OUTPUT->navbar_button();
                 }
 
+                echo $OUTPUT->navbar_plugin_output();
+
                 // Add profile menu (for logged in) or language menu (not logged in).
                 $haslangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );
                 echo ($haslangmenu && (!isloggedin() || isguestuser()) ? $OUTPUT->lang_menu() : '') . $OUTPUT->user_menu();
