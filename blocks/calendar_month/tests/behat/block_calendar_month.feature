@@ -29,7 +29,9 @@ Feature: Enable the calendar block in a course and test it's functionality
   @javascript
   Scenario: View a global event in the calendar block
     Given I log in as "admin"
-    And I click on "Home" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I press "Customise this page"
+    And I add the "Calendar" block
     And I create a calendar event with form data:
       | id_eventtype | Site |
       | id_name | Site Event |
@@ -44,7 +46,9 @@ Feature: Enable the calendar block in a course and test it's functionality
   @javascript
   Scenario: Filter site events in the calendar block
     Given I log in as "admin"
-    And I click on "Home" in the totara menu
+    And I click on "Dashboard" in the totara menu
+    And I press "Customise this page"
+    And I add the "Calendar" block
     And I create a calendar event with form data:
       | id_eventtype | Site |
       | id_name | Site Event |
