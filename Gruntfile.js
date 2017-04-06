@@ -542,6 +542,9 @@ module.exports = function(grunt) {
             // Always ignore the node_modules directory.
             args.push('--excludes', 'node_modules');
 
+            // Skip lint, we've got eslint now.
+            args.push('--no-lint');
+
             // Determine the most appropriate options to run with based upon the current location.
             if (grunt.file.isMatch('**/yui/**/*.js', src)) {
                 // When passed a JS file, build our containing module (this happen with
