@@ -47,7 +47,7 @@ Feature: Seminar Approval required
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
     And I click on "Test seminar name" "link"
-    And I press "Update this Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
     And I click on "Approval Options" "link"
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"
@@ -135,7 +135,7 @@ Feature: Seminar Approval required
       | Name              | Test seminar name        |
       | Description       | Test seminar description |
     And I click on "Test seminar name" "link"
-    And I press "Update this Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
     And I click on "Approval Options" "link"
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"

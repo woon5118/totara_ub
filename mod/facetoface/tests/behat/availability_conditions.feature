@@ -94,7 +94,7 @@ Feature: Seminar availability based on activity completion
     Given I log in as "teacher1"
     And I follow "Course 1"
     And I follow "View all events"
-    And I press "Update this Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
     And I click on "Delete" "link" in the ".availability-item" "css_element"
     And I click on "Add restriction..." "button"
@@ -121,7 +121,7 @@ Feature: Seminar availability based on activity completion
     Given I log in as "teacher1"
     And I follow "Course 1"
     And I follow "View all events"
-    And I press "Update this Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
     And I click on "Delete" "link" in the ".availability-item" "css_element"
     And I click on "Add restriction..." "button"

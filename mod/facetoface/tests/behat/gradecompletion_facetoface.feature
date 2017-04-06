@@ -35,7 +35,7 @@ Feature: Give a grade to a student for a seminar
         When I log in as "teacher1"
         And I click on "Find Learning" in the totara menu
         And I follow "Course 1"
-        And I navigate to "Grades" node in "Course administration"
+        And I click on "Grades" "link" in the "Navigation" "block"
         And I turn editing mode on
         And I set the field "Sam1 Student1 Test seminar name grade" to "100"
 
