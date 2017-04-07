@@ -49,9 +49,7 @@
   <div class="modal-content">
     <div class="tooltip-arrow" data-role="arrow"></div>
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-role="end">
-        <span aria-hidden="true">&times;</span>
-      </button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="{{# str }} closebuttontitle, core {{/ str }}" data-role="end">{{# flex_icon }} delete-ns, { "classes": "ft-size-100" } {{/ flex_icon }}</button>
       <h4 class="modal-title" data-placeholder="title"></h4>
     </div>
     <div class="modal-body" data-placeholder="body">
