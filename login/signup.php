@@ -26,7 +26,6 @@
 
 require('../config.php');
 require_once($CFG->dirroot . '/user/editlib.php');
-require_once($CFG->libdir . '/authlib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 // Try to prevent searching for sites that allow sign-up.
@@ -35,7 +34,12 @@ if (!isset($CFG->additionalhtmlhead)) {
 }
 $CFG->additionalhtmlhead .= '<meta name="robots" content="noindex" />';
 
-if (!$authplugin = signup_is_enabled()) {
+if (empty($CFG->registerauth)) {
+    print_error('notlocalisederrormessage', 'error', '', 'Sorry, you may not use this page.');
+}
+$authplugin = get_auth_plugin($CFG->registerauth);
+
+if (!$authplugin->can_signup()) {
     print_error('notlocalisederrormessage', 'error', '', 'Sorry, you may not use this page.');
 }
 
@@ -44,6 +48,7 @@ $PAGE->https_required();
 
 $PAGE->set_url('/login/signup.php');
 $PAGE->set_context(context_system::instance());
+$PAGE->set_pagelayout('login');
 
 // If wantsurl is empty or /login/signup.php, override wanted URL.
 // We do not want to end up here again if user clicks "Login".
@@ -75,8 +80,18 @@ if ($mform_signup->is_cancelled()) {
     redirect(get_login_url());
 
 } else if ($user = $mform_signup->get_data()) {
-    // Add missing required fields.
-    $user = signup_setup_new_user($user);
+    $user->confirmed   = 0;
+    $user->lang        = current_language();
+    $user->firstaccess = 0;
+    $user->timecreated = time();
+    $user->mnethostid  = $CFG->mnet_localhost_id;
+    $user->secret      = random_string(15);
+    $user->auth        = $CFG->registerauth;
+    // Initialize alternate name fields to empty strings.
+    $namefields = array_diff(get_all_user_name_fields(), useredit_get_required_name_fields());
+    foreach ($namefields as $namefield) {
+        $user->$namefield = '';
+    }
 
     $authplugin->user_signup($user, true); // prints notice and link to login/index.php
     exit; //never reached
@@ -119,11 +134,10 @@ $login      = get_string('login');
 $PAGE->navbar->add($login);
 $PAGE->navbar->add($newaccount);
 
-$PAGE->set_pagelayout('login');
 $PAGE->set_title($newaccount);
 $PAGE->set_heading($SITE->fullname);
 
 echo $OUTPUT->header();
-
-echo $OUTPUT->render($mform_signup);
+echo $OUTPUT->heading($newaccount);
+$mform_signup->display();
 echo $OUTPUT->footer();

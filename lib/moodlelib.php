@@ -5213,7 +5213,7 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
     if ($showfeedback) {
         echo $OUTPUT->notification($strdeleted.get_string('type_mod_plural', 'plugin'), 'notifysuccess');
     }
-    
+
     // Cleanup the rest of plugins. Deprecated since Moodle 3.2. TODO MDL-53297 remove in 3.6.
     $cleanuplugintypes = array('report', 'coursereport', 'format', 'totara');
     $callbacks = get_plugins_with_function('delete_course', 'lib.php');
@@ -5276,7 +5276,7 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
 
     // Delete course tags.
     core_tag_tag::remove_all_item_tags('core', 'course', $course->id);
-    
+
     // TOTARA - Delete course reminders.
     if (delete_reminders($course->id) === true && $showfeedback) {
         echo $OUTPUT->notification($strdeleted.get_string('remindersmenuitem', 'totara_coursecatalog'), 'notifysuccess');
@@ -6038,7 +6038,7 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
 
     $temprecipients = array();
     $tempreplyto = array();
-    
+
     $supportuser = core_user::get_support_user();
 
     // Make sure that we fall back onto some reasonable no-reply address.
@@ -6467,10 +6467,9 @@ function reset_password_and_mail($user) {
  * Send email to specified user with confirmation text and activation link.
  *
  * @param stdClass $user A {@link $USER} object
- * @param string $confirmationurl user confirmation URL
  * @return bool Returns true if mail was sent OK and false if there was an error.
  */
-function send_confirmation_email($user, $confirmationurl = null) {
+function send_confirmation_email($user) {
     global $CFG;
 
     $site = get_site();
@@ -6484,28 +6483,11 @@ function send_confirmation_email($user, $confirmationurl = null) {
     $strmgr = get_string_manager();
     $subject = $strmgr->get_string('emailconfirmationsubject', 'moodle', format_string($site->fullname), $user->lang);
 
-    if (empty($confirmationurl)) {
-        $confirmationurl = '/login/confirm.php';
-    }
-
-    $confirmationurl = new moodle_url($confirmationurl);
-    // Remove data parameter just in case it was included in the confirmation so we can add it manually later.
-    $confirmationurl->remove_params('data');
-    $confirmationpath = $confirmationurl->out(false);
-
-    // We need to custom encode the username to include trailing dots in the link.
-    // Because of this custom encoding we can't use moodle_url directly.
-    // Determine if a query string is present in the confirmation url.
-    $hasquerystring = strpos($confirmationpath, '?') !== false;
-    // Perform normal url encoding of the username first.
     $username = urlencode($user->username);
-    // Prevent problems with trailing dots not being included as part of link in some mail clients.
-    $username = str_replace('.', '%2E', $username);
-
-    $data->link = $confirmationpath . ( $hasquerystring ? '&' : '?') . 'data='. $user->secret .'/'. $username;
-
-    $message     = get_string('emailconfirmation', '', $data);
-    $messagehtml = text_to_html(get_string('emailconfirmation', '', $data), false, false, true);
+    $username = str_replace('.', '%2E', $username); // Prevent problems with trailing dots.
+    $data->link  = $CFG->wwwroot .'/login/confirm.php?data='. $user->secret .'/'. $username;
+    $message     = $strmgr->get_string('emailconfirmation', 'moodle', $data, $user->lang);
+    $messagehtml = text_to_html($strmgr->get_string('emailconfirmation', 'moodle', $data, $user->lang), false, false, true);
 
     $user->mailformat = 1;  // Always send HTML version as well.
 

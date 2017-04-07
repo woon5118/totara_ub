@@ -95,13 +95,11 @@ class login_signup_form extends moodleform implements renderable, templatable {
 
         profile_signup_fields($mform);
 
-        if (signup_captcha_enabled()) {
+        if ($this->signup_captcha_enabled()) {
             $mform->addElement('recaptcha', 'recaptcha_element', get_string('security_question', 'auth'), array('https' => $CFG->loginhttps));
             $mform->addHelpButton('recaptcha_element', 'recaptcha', 'auth');
             $mform->closeHeaderBefore('recaptcha_element');
         }
-
-        profile_signup_fields($mform);
 
         $requirenojs = false;
         $nojs = optional_param('nojs', 0, PARAM_BOOL);
@@ -155,15 +153,88 @@ class login_signup_form extends moodleform implements renderable, templatable {
     }
 
     function validation($data, $files) {
+        global $CFG, $DB;
         $errors = parent::validation($data, $files);
 
-        if (signup_captcha_enabled()) {
+        if ($this->signup_captcha_enabled()) {
             $recaptcha_element = $this->_form->getElement('recaptcha_element');
             if (!empty($this->_form->_submitValues['recaptcha_challenge_field'])) {
                 $challenge_field = $this->_form->_submitValues['recaptcha_challenge_field'];
                 $response_field = $this->_form->_submitValues['recaptcha_response_field'];
                 if (true !== ($result = $recaptcha_element->verify($challenge_field, $response_field))) {
-                    $errors['recaptcha'] = $result;
+                    $errors['recaptcha_element']
+                        = $result == 'incorrect-captcha-sol'
+                        ? get_string('incorrectpleasetryagain', 'auth')
+                        : $result;
+                }
+            } else {
+                $errors['recaptcha_element'] = get_string('missingrecaptchachallengefield');
+            }
+
+            if (!empty($errors['recaptcha_element'])) {
+                return $errors;
+            }
+        }
+
+        $authplugin = get_auth_plugin($CFG->registerauth);
+
+        if ($DB->record_exists('user', array('username'=>$data['username'], 'mnethostid'=>$CFG->mnet_localhost_id))) {
+            $errors['username'] = get_string('usernameexists');
+        } else {
+            //check allowed characters
+            if ($data['username'] !== core_text::strtolower($data['username'])) {
+                $errors['username'] = get_string('usernamelowercase');
+            } else {
+                if ($data['username'] !== core_user::clean_field($data['username'], 'username')) {
+                    $errors['username'] = get_string('invalidusername');
+                }
+
+            }
+        }
+
+        //check if user exists in external db
+        //TODO: maybe we should check all enabled plugins instead
+        if ($authplugin->user_exists($data['username'])) {
+            $errors['username'] = get_string('usernameexists');
+        }
+
+
+        if (! validate_email($data['email'])) {
+            $errors['email'] = get_string('invalidemail');
+
+        } else if ($DB->record_exists('user', array('email'=>$data['email']))) {
+            $errors['email'] = get_string('emailexists').' <a href="forgot_password.php">'.get_string('newpassword').'?</a>';
+        }
+        if (empty($data['email2'])) {
+            $errors['email2'] = get_string('missingemail');
+
+        } else if ($data['email2'] != $data['email']) {
+            $errors['email2'] = get_string('invalidemail');
+        }
+        if (!isset($errors['email'])) {
+            if ($err = email_is_not_allowed($data['email'])) {
+                $errors['email'] = $err;
+            }
+
+        }
+
+        $errmsg = '';
+        if (!check_password_policy($data['password'], $errmsg)) {
+            $errors['password'] = $errmsg;
+        }
+
+        // TOTARA: We need to validate that managerid is correct for the managerjaid specified.
+        if (get_config('totara_job', 'allowsignupmanager')) {
+            if (!empty($data['managerjaid'])) {
+                if (empty($data['managerid'])) {
+                    // Something's wrong. Advise the user to try again or select a manager later.
+                    $errors['managerselector'] = get_string('managernomatchja', 'totara_job');
+                } else {
+                    $managerja = \totara_job\job_assignment::get_with_id($data['managerjaid']);
+                    if ($managerja->userid != $data['managerid']) {
+                        // Something's wrong. Advise the user to try again or select a manager later.
+                        $errors['managerselector'] = get_string('managernomatchja', 'totara_job');
+                    }
                 }
             } else {
                 if (!empty($data['managerid'])) {
@@ -173,10 +244,23 @@ class login_signup_form extends moodleform implements renderable, templatable {
             }
         }
 
-        $errors += signup_validate_data($data, $files);
+        // Validate customisable profile fields. (profile_validation expects an object as the parameter with userid set)
+        $dataobject = (object)$data;
+        $dataobject->id = 0;
+        $errors += profile_validation($dataobject, $files);
 
         return $errors;
 
+    }
+
+    /**
+     * Returns whether or not the captcha element is enabled, and the admin settings fulfil its requirements.
+     * @return bool
+     */
+    function signup_captcha_enabled() {
+        global $CFG;
+        $authplugin = get_auth_plugin($CFG->registerauth);
+        return !empty($CFG->recaptchapublickey) && !empty($CFG->recaptchaprivatekey) && $authplugin->is_captcha_enabled();
     }
 
     /**

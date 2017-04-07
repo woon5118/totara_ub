@@ -110,8 +110,6 @@ information provided here is intended especially for developers.
   can call $mform->setForceLtr($elementName, true/false) on some form fields to manually
   set the value.
 * Action menus do_not_enhance() is deprecated, use a list of action_icon instead.
-* profile_field_base class has new methods: get_field_config_for_external() and get_field_properties().
-  This two new methods should be implemented by profile field plugins to make them compatible with Web Services.
 * The minifier library used by core_minify has been switched to https://github.com/matthiasmullie/minify - there are minor differences
   in minifier output.
 * context_header additional buttons can now have a class attribute provided in the link attributes.
@@ -123,7 +121,6 @@ information provided here is intended especially for developers.
   message_sent::create_from_ids() will show a debugging notice if the \core\message\message being sent is missing
   the courseid property, defaulting to SITEID automatically. In Moodle 3.6 (MDL-55449) courseid will be fully mandatory
   for all messages sent.
-* The send_confirmation_email() function has a new optional parameter $confirmationurl to provide a different confirmation URL.
 * Introduced a new hook for plugin developers:
     - <component>_course_module_background_deletion_recommended()
   This hook should be used in conjunction with the existing '<component>_pre_course_module_delete($mod)'. It must
