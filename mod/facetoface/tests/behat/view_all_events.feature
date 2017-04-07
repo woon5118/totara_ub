@@ -136,7 +136,7 @@ Feature: Check previous and upcomings sections are right populated
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all events"
-    And I press "Update this Seminar"
+    And I navigate to "Edit settings" in current page administration
     And I set the field "Users can sign-up to multiple events" to "0"
     And I press "Save and return to course"
     And I log out
