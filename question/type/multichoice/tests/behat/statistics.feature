@@ -32,7 +32,7 @@ Feature: Generating quiz results statistics using Multiple choice questions
     And I click on "Edit quiz" "button"
     And I click on "Add" "link"
     And I click on "a new question" "link"
-    And I set the field "qtype_qtype_multichoice" to "1"
+    And I set the field "item_qtype_multichoice" to "1"
     And I press "submitbutton"
 
     And I set the field "Question name" to "Question 1"
