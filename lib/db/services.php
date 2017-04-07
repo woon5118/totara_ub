@@ -1099,14 +1099,6 @@ $functions = array(
         'capabilities' => 'moodle/user:editownprofile, moodle/user:editprofile',
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
-    'core_user_set_user_preferences' => array(
-        'classname' => 'core_user_external',
-        'methodname' => 'set_user_preferences',
-        'classpath' => 'user/externallib.php',
-        'description' => 'Set user preferences.',
-        'type' => 'write',
-        'capabilities' => 'moodle/site:config',
-    ),
     'core_user_agree_site_policy' => array(
         'classname' => 'core_user_external',
         'methodname' => 'agree_site_policy',
