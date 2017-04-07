@@ -134,7 +134,7 @@ class api {
         $settings['typeoflogin'] = $typeoflogin;
 
         // Check if the user can sign-up to return the launch URL in that case.
-        $cansignup = signup_is_enabled();
+        $cansignup = false;
 
         if ($typeoflogin == self::LOGIN_VIA_BROWSER or
                 $typeoflogin == self::LOGIN_VIA_EMBEDDED_BROWSER or
