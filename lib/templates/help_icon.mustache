@@ -24,6 +24,7 @@
         "title": "Help with something",
         "url": "http://example.org/help",
         "linktext": "",
+        "alt": "Help icon",
         "icon":{
             "attributes": [
                 {"name": "class", "value": "iconhelp"},
@@ -34,5 +35,5 @@
     }
 }}
 <span class="helptooltip">
-    <a href="{{url}}" title={{#quote}}{{title}}{{/quote}} aria-haspopup="true" target="_blank">{{#icon}}{{>core/pix_icon}}{{/icon}}{{#linktext}}{{.}}{{/linktext}}</a>
+    <a href="{{url}}" title={{#quote}}{{title}}{{/quote}} aria-haspopup="true" target="_blank">{{#icon}}{{#flex_icon}}help, {"alt":"{{alt}}"} {{/flex_icon}}{{/icon}}{{#linktext}}{{.}}{{/linktext}}</a>
 </span>

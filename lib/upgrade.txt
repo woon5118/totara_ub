@@ -271,6 +271,8 @@ information provided here is intended especially for developers.
 * Updated JavaScript Mustache implementation from 2.1.3 to 2.2.1
 * Updated PHP Mustache implementation from 2.9.0 to 2.10.0
 * Provided identifiers in the form of data-url attributes for user menu items
+* core_renderer::render_help_icon() has changed.
+* help_icon::export_for_template() includes icon, linktext, title, url in the return object
 
 === 9.2 ===
 
