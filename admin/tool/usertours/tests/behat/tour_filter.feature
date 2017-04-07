@@ -12,7 +12,7 @@ Feature: Apply tour filters to a tour
       | Description         | My first tour |
       | Apply to URL match  | /my/% |
       | Tour is enabled     | 1 |
-      | Theme               | More |
+      | Theme               | Basis |
     And I add steps to the "First tour" tour:
       | targettype                  | Title             | Content |
       | Display in middle of page   | Welcome           | Welcome to your personal learning space. We'd like to give you a quick tour to show you some of the areas you may find helpful |
