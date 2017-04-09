@@ -1121,12 +1121,5 @@ $functions = array(
 );
 
 $services = array(
-   'Moodle mobile web service'  => array(
-        'functions' => array(), // Unused as we add the service in each function definition, third party services would use this.
-        'enabled' => 0,
-        'restrictedusers' => 0,
-        'shortname' => MOODLE_OFFICIAL_MOBILE_SERVICE,
-        'downloadfiles' => 1,
-        'uploadfiles' => 1
-    ),
+    // Totara: no services by default.
 );

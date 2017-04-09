@@ -1291,6 +1291,10 @@ function external_update_services() {
         $services = explode(',', $function->services);
 
         foreach ($services as $serviceshortname) {
+            if ($serviceshortname === 'moodle_mobile_app') {
+                // Totara: not compatible with Totara.
+                continue;
+            }
             // Get the service id by shortname.
             if (!empty($servicescache[$serviceshortname])) {
                 $serviceid = $servicescache[$serviceshortname];

@@ -218,6 +218,7 @@ if (!isset($CFG->langlocalroot)) {
 
 // Totara: make sure forbidden settings are disabled.
 $CFG->pathtounoconv = ''; // Unoconv is not secure for web servers!
+$CFG->enablemobilewebservice = '0'; // Not compatible with Totara.
 
 // The current directory in PHP version 4.3.0 and above isn't necessarily the
 // directory of the script when run from the command line. The require_once()

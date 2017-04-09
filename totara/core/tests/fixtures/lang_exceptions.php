@@ -27,7 +27,6 @@
 $exceptions = array(
     'core_admin' => array(
         'configallowoverride2', 'configallowswitch', 'configallowuserswitchrolestheycantassign', 'showuseridentity_desc', // Caps.
-        'configenablemobilewebservice', // Broken mobile app.
         'requiredentrieschanged', // Upgrade notes.
         'unsupporteddbtablerowformat', // Link to docs
         'cfgwwwrootslashwarning', // Link to moodle tracker
@@ -56,7 +55,6 @@ $exceptions = array(
     'mod_facetoface' => array('mincapacity_help'),
     'auth_ldap' => array('auth_ntlmsso_enabled'),
     'theme_bootstrapbase' => array('choosereadme'),
-    'tool_mobile' => true, // Experimental
     'tool_usertours' => true, // Not implemented yet
 
 );

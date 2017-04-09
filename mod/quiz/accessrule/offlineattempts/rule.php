@@ -105,6 +105,8 @@ class quizaccess_offlineattempts extends quiz_access_rule_base {
             mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
         global $CFG;
 
+        // Totara: moodle mobile is not compatible with Totara
+/*
         // Allow to enable the access rule only if the Mobile services are enabled.
         if ($CFG->enablemobilewebservice) {
             $mform->addElement('selectyesno', 'allowofflineattempts',
@@ -115,12 +117,15 @@ class quizaccess_offlineattempts extends quiz_access_rule_base {
             $mform->disabledIf('allowofflineattempts', 'timelimit[number]', 'neq', 0);
             $mform->disabledIf('allowofflineattempts', 'subnet', 'neq', '');
         }
+*/
     }
 
     public static function validate_settings_form_fields(array $errors,
             array $data, $files, mod_quiz_mod_form $quizform) {
         global $CFG;
 
+        // Totara: moodle mobile is not compatible with Totara
+/*
         if ($CFG->enablemobilewebservice) {
             // Do not allow offline attempts if:
             // - The quiz uses a timer.
@@ -133,7 +138,7 @@ class quizaccess_offlineattempts extends quiz_access_rule_base {
                 $errors['allowofflineattempts'] = get_string('offlineattemptserror', 'quizaccess_offlineattempts');
             }
         }
-
+*/
         return $errors;
     }
 }

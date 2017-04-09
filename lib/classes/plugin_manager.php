@@ -1163,6 +1163,7 @@ class core_plugin_manager {
             'tool_lp',
             'tool_lpimportcsv',
             'tool_lpmigrate',
+            'tool_mobile',
 
             // Upstream Moodle 3.1 removals.
             'webservice_amf',
@@ -1443,7 +1444,6 @@ class core_plugin_manager {
             'tool' => array(
                 'assignmentupgrade', 'availabilityconditions', 'behat', 'capability', 'customlang',
                 'dbtransfer', 'filetypes', 'generator', 'health', 'innodb',
-                'langimport', 'log', 'messageinbound', 'mobile', 'multilangupgrade', 'monitor',
                 'phpunit', 'profiling', 'recyclebin', 'replace', 'spamcleaner', 'task', 'templatelibrary',
                 'unittest', 'uploadcourse', 'uploaduser', 'unsuproles', 'usertours', 'xmldb'
                 // Totara:

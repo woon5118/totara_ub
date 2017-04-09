@@ -286,6 +286,7 @@ function totara_core_upgrade_delete_moodle_plugins() {
         'tool_lp',
         'tool_lpimportcsv',
         'tool_lpmigrate',
+        'tool_mobile',
 
         // Upstream Moodle 3.1 removals.
         'webservice_amf',
@@ -311,6 +312,16 @@ function totara_core_upgrade_delete_moodle_plugins() {
             if ($DB->record_exists('user', array('auth' => 'radius', 'deleted' => 0))) {
                 // Do not uninstall if users with this auth exist!
                 continue;
+            }
+        }
+        if ($deleteplugin === 'tool_mobile') {
+            $service = $DB->get_record('external_services', array('shortname' => 'moodle_mobile_app'));
+            if ($service) {
+                $DB->delete_records('external_services_functions', array('externalserviceid' => $service->id));
+                $DB->delete_records('external_services_users', array('externalserviceid' => $service->id));
+                $DB->delete_records('external_tokens', array('externalserviceid' => $service->id));
+                $DB->delete_records('external_services_functions', array('externalserviceid' => $service->id));
+                $DB->delete_records('external_services', array('id' => $service->id));
             }
         }
         uninstall_plugin($plugintype, $pluginname);

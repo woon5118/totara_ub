@@ -595,7 +595,6 @@ class core_component_testcase extends advanced_testcase {
         $this->assertCount(5, core_component::get_component_classes_in_namespace('core_user', 'output\\myprofile'));
 
         // Without namespace it returns classes/ classes.
-        $this->assertCount(2, core_component::get_component_classes_in_namespace('tool_mobile', ''));
         $this->assertCount(1, core_component::get_component_classes_in_namespace('tool_filetypes'));
     }
 
