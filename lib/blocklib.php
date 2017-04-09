@@ -44,10 +44,8 @@ define('BUI_CONTEXTS_CURRENT_SUBS', 1);
 
 // Position of "Add block" control, to be used in theme config as a value for $THEME->addblockposition:
 // - default: as a fake block that is displayed in editing mode
-// - flatnav: "Add block" item in the flat navigation drawer in editing mode
 // - custom: none of the above, theme will take care of displaying the control.
 define('BLOCK_ADDBLOCK_POSITION_DEFAULT', 0);
-define('BLOCK_ADDBLOCK_POSITION_FLATNAV', 1);
 define('BLOCK_ADDBLOCK_POSITION_CUSTOM', -1);
 
 /**

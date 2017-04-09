@@ -143,8 +143,6 @@ class navigation_node implements renderable {
     public $includesectionnum = false;
     /** @var bool does the node need to be loaded via ajax */
     public $requiresajaxloading = false;
-    /** @var bool If set to true this node will be added to the "flat" navigation */
-    public $showinflatnavigation = false;
 
     /**
      * Constructs a new navigation_node
@@ -433,27 +431,6 @@ class navigation_node implements renderable {
      */
     public function find($key, $type) {
         return $this->children->find($key, $type);
-    }
-
-    /**
-     * Walk the tree building up a list of all the flat navigation nodes.
-     *
-     * @param flat_navigation $nodes List of the found flat navigation nodes.
-     * @param boolean $showdivider Show a divider before the first node.
-     */
-    public function build_flat_navigation_list(flat_navigation $nodes, $showdivider = false) {
-        if ($this->showinflatnavigation) {
-            $indent = 0;
-            if ($this->type == self::TYPE_COURSE) {
-                $indent = 1;
-            }
-            $flat = new flat_navigation_node($this, $indent);
-            $flat->set_showdivider($showdivider);
-            $nodes->add($flat);
-        }
-        foreach ($this->children as $child) {
-            $child->build_flat_navigation_list($nodes, false);
-        }
     }
 
     /**
@@ -1163,7 +1140,6 @@ class global_navigation extends navigation_node {
 
         // Use the parents constructor.... good good reuse
         parent::__construct($properties);
-        $this->showinflatnavigation = true;
 
         // Initalise and set defaults
         $this->page = $page;
@@ -1251,7 +1227,6 @@ class global_navigation extends navigation_node {
         $this->rootnodes['currentcourse']->mainnavonly = true;
         if ($enrolledinanycourse) {
             $this->rootnodes['mycourses']->isexpandable = true;
-            $this->rootnodes['mycourses']->showinflatnavigation = true;
             if ($CFG->navshowallcourses) {
                 // When we show all courses we need to show both the my courses and the regular courses branch.
                 $this->rootnodes['courses']->isexpandable = true;
@@ -2570,7 +2545,6 @@ class global_navigation extends navigation_node {
         }
 
         $coursenode = $parent->add($coursename, $url, self::TYPE_COURSE, $shortname, $course->id);
-        $coursenode->showinflatnavigation = $coursetype == self::COURSE_MY;
         $dimmed = ($issite) ? '' : totara_get_style_visibility($course);
         $coursenode->hidden = (empty($dimmed)) ? false : true;
         // We need to decode &amp;'s here as they will have been added by format_string above and attributes will be encoded again
@@ -2776,7 +2750,6 @@ class global_navigation extends navigation_node {
             // Calendar
             $calendarurl = new moodle_url('/calendar/view.php', array('view' => 'month'));
             $node = $coursenode->add(get_string('calendar', 'calendar'), $calendarurl, self::TYPE_CUSTOM, null, 'calendar');
-            $node->showinflatnavigation = true;
         }
 
         if (isloggedin()) {
@@ -2785,7 +2758,6 @@ class global_navigation extends navigation_node {
                 $url = new moodle_url('/user/files.php');
                 $node = $coursenode->add(get_string('privatefiles'), $url, self::TYPE_SETTING);
                 $node->display = false;
-                $node->showinflatnavigation = true;
             }
         }
 
@@ -3624,221 +3596,6 @@ class breadcrumb_navigation_node extends navigation_node {
     public function set_last($val) {
         $this->last = $val;
     }
-}
-
-/**
- * Subclass of navigation_node allowing different rendering for the flat navigation
- * in particular allowing dividers and indents.
- *
- * @package   core
- * @category  navigation
- * @copyright 2016 Damyon Wiese
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class flat_navigation_node extends navigation_node {
-
-    /** @var $indent integer The indent level */
-    private $indent = 0;
-
-    /** @var $showdivider bool Show a divider before this element */
-    private $showdivider = false;
-
-    /**
-     * A proxy constructor
-     *
-     * @param mixed $navnode A navigation_node or an array
-     */
-    public function __construct($navnode, $indent) {
-        if (is_array($navnode)) {
-            parent::__construct($navnode);
-        } else if ($navnode instanceof navigation_node) {
-
-            // Just clone everything.
-            $objvalues = get_object_vars($navnode);
-            foreach ($objvalues as $key => $value) {
-                 $this->$key = $value;
-            }
-        } else {
-            throw coding_exception('Not a valid flat_navigation_node');
-        }
-        $this->indent = $indent;
-    }
-
-    /**
-     * Does this node represent a course section link.
-     * @return boolean
-     */
-    public function is_section() {
-        return $this->type == navigation_node::TYPE_SECTION;
-    }
-
-    /**
-     * In flat navigation - sections are active if we are looking at activities in the section.
-     * @return boolean
-     */
-    public function isactive() {
-        global $PAGE;
-
-        if ($this->is_section()) {
-            $active = $PAGE->navigation->find_active_node();
-            while ($active = $active->parent) {
-                if ($active->key == $this->key && $active->type == $this->type) {
-                    return true;
-                }
-            }
-        }
-        return $this->isactive;
-    }
-
-    /**
-     * Getter for "showdivider"
-     * @return boolean
-     */
-    public function showdivider() {
-        return $this->showdivider;
-    }
-
-    /**
-     * Setter for "showdivider"
-     * @param $val boolean
-     */
-    public function set_showdivider($val) {
-        $this->showdivider = $val;
-    }
-
-    /**
-     * Getter for "indent"
-     * @return boolean
-     */
-    public function get_indent() {
-        return $this->indent;
-    }
-
-    /**
-     * Setter for "indent"
-     * @param $val boolean
-     */
-    public function set_indent($val) {
-        $this->indent = $val;
-    }
-
-}
-
-/**
- * Class used to generate a collection of navigation nodes most closely related
- * to the current page.
- *
- * @package core
- * @copyright 2016 Damyon Wiese
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class flat_navigation extends navigation_node_collection {
-    /** @var moodle_page the moodle page that the navigation belongs to */
-    protected $page;
-
-    /**
-     * Constructor.
-     *
-     * @param moodle_page $page
-     */
-    public function __construct(moodle_page &$page) {
-        if (during_initial_install()) {
-            return false;
-        }
-        $this->page = $page;
-    }
-
-    /**
-     * Build the list of navigation nodes based on the current navigation and settings trees.
-     *
-     */
-    public function initialise() {
-        global $PAGE, $USER, $OUTPUT, $CFG;
-        if (during_initial_install()) {
-            return;
-        }
-
-        $current = false;
-
-        $course = $PAGE->course;
-
-        $this->page->navigation->initialise();
-
-        // First walk the nav tree looking for "flat_navigation" nodes.
-        if ($course->id > 1) {
-            // It's a real course.
-            $url = new moodle_url('/course/view.php', array('id' => $course->id));
-
-            $coursecontext = context_course::instance($course->id, MUST_EXIST);
-            // This is the name that will be shown for the course.
-            $coursename = empty($CFG->navshowfullcoursenames) ?
-                format_string($course->shortname, true, array('context' => $coursecontext)) :
-                format_string($course->fullname, true, array('context' => $coursecontext));
-
-            $flat = new flat_navigation_node(navigation_node::create($coursename, $url), 0);
-            $flat->key = 'coursehome';
-
-            $courseformat = course_get_format($course);
-            $coursenode = $PAGE->navigation->find_active_node();
-            $targettype = navigation_node::TYPE_COURSE;
-
-            // Single activity format has no course node - the course node is swapped for the activity node.
-            if (!$courseformat->has_view_page()) {
-                $targettype = navigation_node::TYPE_ACTIVITY;
-            }
-
-            while (!empty($coursenode) && ($coursenode->type != $targettype)) {
-                $coursenode = $coursenode->parent;
-            }
-            // There is one very strange page in mod/feedback/view.php which thinks it is both site and course
-            // context at the same time. That page is broken but we need to handle it (hence the SITEID).
-            if ($coursenode && $coursenode->key != SITEID) {
-                $this->add($flat);
-                foreach ($coursenode->children as $child) {
-                    if ($child->action) {
-                        $flat = new flat_navigation_node($child, 0);
-                        $this->add($flat);
-                    }
-                }
-            }
-
-            $this->page->navigation->build_flat_navigation_list($this, true);
-        } else {
-            $this->page->navigation->build_flat_navigation_list($this, false);
-        }
-
-        $admin = $PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN);
-        if (!$admin) {
-            // Try again - crazy nav tree!
-            $admin = $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN);
-        }
-        if ($admin) {
-            $flat = new flat_navigation_node($admin, 0);
-            $flat->set_showdivider(true);
-            $flat->key = 'sitesettings';
-            $this->add($flat);
-        }
-
-        // Add-a-block in editing mode.
-        if (isset($this->page->theme->addblockposition) &&
-                $this->page->theme->addblockposition == BLOCK_ADDBLOCK_POSITION_FLATNAV &&
-                $PAGE->user_is_editing() && $PAGE->user_can_edit_blocks() &&
-                ($addable = $PAGE->blocks->get_addable_blocks())) {
-            $url = new moodle_url($PAGE->url, ['bui_addblock' => '', 'sesskey' => sesskey()]);
-            $addablock = navigation_node::create(get_string('addblock'), $url);
-            $flat = new flat_navigation_node($addablock, 0);
-            $flat->set_showdivider(true);
-            $flat->key = 'addblock';
-            $this->add($flat);
-            $blocks = [];
-            foreach ($addable as $block) {
-                $blocks[] = $block->name;
-            }
-            $params = array('blocks' => $blocks, 'url' => '?' . $url->get_query_string(false));
-            $PAGE->requires->js_call_amd('core/addblockmodal', 'init', array($params));
-        }
-    }
-
 }
 
 /**
