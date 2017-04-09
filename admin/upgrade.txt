@@ -1,6 +1,6 @@
 This files describes API changes in /admin/*.
 
-=== 3.2 ===
+=== 10 ===
 
 * Admin settings have been refined to better support right-to-left languages. In RTL,
   most fields should not have their direction flipped, a URL, a path to a file, ...
