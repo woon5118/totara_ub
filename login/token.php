@@ -47,14 +47,11 @@ $username = trim(core_text::strtolower($username));
 if (is_restored_user($username)) {
     throw new moodle_exception('restoredaccountresetpassword', 'webservice');
 }
-
-$systemcontext = context_system::instance();
-
 $user = authenticate_user_login($username, $password);
 if (!empty($user)) {
 
     // Cannot authenticate unless maintenance access is granted.
-    $hasmaintenanceaccess = has_capability('moodle/site:maintenanceaccess', $systemcontext, $user);
+    $hasmaintenanceaccess = has_capability('moodle/site:maintenanceaccess', context_system::instance(), $user);
     if (!empty($CFG->maintenance_enabled) and !$hasmaintenanceaccess) {
         throw new moodle_exception('sitemaintenance', 'admin');
     }
@@ -89,19 +86,19 @@ if (!empty($user)) {
 
     // Get an existing token or create a new one.
     $token = external_generate_token_for_current_user($service);
-    $privatetoken = $token->privatetoken;
-    external_log_token_request($token);
 
-    $siteadmin = has_capability('moodle/site:config', $systemcontext, $USER->id);
+    // log token access
+    $DB->set_field('external_tokens', 'lastaccess', time(), array('id'=>$token->id));
+
+    $params = array(
+        'objectid' => $token->id,
+    );
+    $event = \core\event\webservice_token_sent::create($params);
+    $event->add_record_snapshot('external_tokens', $token);
+    $event->trigger();
 
     $usertoken = new stdClass;
     $usertoken->token = $token->token;
-    // Private token, only transmitted to https sites and non-admin users.
-    if (is_https() and !$siteadmin) {
-        $usertoken->privatetoken = $privatetoken;
-    } else {
-        $usertoken->privatetoken = null;
-    }
     echo json_encode($usertoken);
 } else {
     throw new moodle_exception('invalidlogin');

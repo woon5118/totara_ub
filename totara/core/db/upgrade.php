@@ -65,5 +65,15 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017040803, 'totara', 'core');
     }
 
+    if ($oldversion < 2017040900) {
+        // Remove private token column because all tokens were always supposed to be private.
+        $table = new xmldb_table('external_tokens');
+        $field = new xmldb_field('privatetoken', XMLDB_TYPE_CHAR, '64', null, null, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2017040900, 'totara', 'core');
+    }
+
     return true;
 }
