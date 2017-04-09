@@ -94,31 +94,31 @@ Feature: View gradebook when scales are used
     And I navigate to "View > User report" in the course gradebook
     And I select "Student 3" from the "Select all or one user" singleselect
     And the following should exist in the "user-grade" table:
-      | Grade item          | Grade | Range | Percentage | Contribution to course total |
-      | Test assignment one | C     | F–A   | 50.00 %    | 60.00 %                      |
-      | Sub category 1 total      | 3.00  | 0–5   | 60.00 %    | -                            |
-      | Course total        | 3.00  | 0–5   | 60.00 %    | -                            |
+      | Grade item                    | Grade | Range | Percentage | Contribution to course total |
+      | AssignmentTest assignment one | C     | F–A   | 50.00 %    | 60.00 %                      |
+      | NaturalSub category 1 total   | 3.00  | 0–5   | 60.00 %    | -                            |
+      | NaturalCourse total           | 3.00  | 0–5   | 60.00 %    | -                            |
     And I navigate to "Setup > Gradebook setup" in the course gradebook
     And the following should exist in the "grade_edit_tree_table" table:
-      | Name                | Max grade |
-      | Test assignment one | 5.00      |
-      | Sub category 1 total      | 5.00      |
-      | Course total        | 5.00      |
+      | Name                               | Max grade |
+      | Move AssignmentTest assignment one | 5.00      |
+      | NaturalSub category 1 total        | 5.00      |
+      | NaturalCourse total                | 5.00      |
     And I log out
     And I log in as "student2"
     And I follow "Grades" in the user menu
     And I click on "Course 1" "link" in the "region-main" "region"
     And the following should exist in the "user-grade" table:
-      | Grade item          | Grade | Range | Percentage | Contribution to course total |
-      | Test assignment one | B     | F–A   | 75.00 %    | 80.00 %                      |
-      | Sub category 1 total      | 4.00  | 0–5   | 80.00 %    | -                            |
-      | Course total        | 4.00  | 0–5   | 80.00 %    | -                            |
+      | Grade item                    | Grade | Range | Percentage | Contribution to course total |
+      | AssignmentTest assignment one | B     | F–A   | 75.00 %    | 80.00 %                      |
+      | NaturalSub category 1 total   | 4.00  | 0–5   | 80.00 %    | -                            |
+      | NaturalCourse total           | 4.00  | 0–5   | 80.00 %    | -                            |
 
   Scenario Outline: Test displaying scales in gradebook in all other aggregation methods
-    When I follow "Edit   Course 1"
+    When I follow "Edit Course 1"
     And I set the field "Aggregation" to "<aggregation>"
     And I press "Save changes"
-    And I follow "Edit   Sub category 1"
+    And I follow "Edit Sub category 1"
     And I expand all fieldsets
     And I set the field "Aggregation" to "<aggregation>"
     And I set the field "Category name" to "Sub category (<aggregation>)"
@@ -140,25 +140,25 @@ Feature: View gradebook when scales are used
     And I navigate to "View > User report" in the course gradebook
     And I select "Student 3" from the "Select all or one user" singleselect
     And the following should exist in the "user-grade" table:
-      | Grade item                   | Grade          | Range | Percentage    | Contribution to course total |
-      | Test assignment one          | C              | F–A   | 50.00 %       | <contrib3>                   |
-      | Sub category (<aggregation>) total<aggregation>. | 3.00           | 1–5   | 50.00 %       | -                            |
-      | Course total<aggregation>.   | <coursetotal3> | 0–100 | <courseperc3> | -                            |
+      | Grade item                                                    | Grade          | Range | Percentage    | Contribution to course total |
+      | AssignmentTest assignment one                                 | C              | F–A   | 50.00 %       | <contrib3>                   |
+      | <aggregation>Sub category (<aggregation>) total<aggregation>. | 3.00           | 1–5   | 50.00 %       | -                            |
+      | <aggregation>Course total<aggregation>.                       | <coursetotal3> | 0–100 | <courseperc3> | -                            |
     And I navigate to "Setup > Gradebook setup" in the course gradebook
     And the following should exist in the "grade_edit_tree_table" table:
-      | Name                | Max grade |
-      | Test assignment one | A (5)     |
-      | Sub category (<aggregation>) total<aggregation>. |           |
-      | Course total<aggregation>.   |           |
+      | Name                                                          | Max grade |
+      | Move AssignmentTest assignment one                            | A (5)     |
+      | <aggregation>Sub category (<aggregation>) total<aggregation>. |           |
+      | <aggregation>Course total<aggregation>.                       |           |
     And I log out
     And I log in as "student2"
     And I follow "Grades" in the user menu
     And I click on "Course 1" "link" in the "region-main" "region"
     And the following should exist in the "user-grade" table:
-      | Grade item                   | Grade          | Range | Percentage    | Contribution to course total |
-      | Test assignment one          | B              | F–A   | 75.00 %       | <contrib2>                   |
-      | Sub category (<aggregation>) total<aggregation>. | 4.00           | 1–5   | 75.00 %       | -                            |
-      | Course total<aggregation>.   | <coursetotal2> | 0–100 | <courseperc2> | -                            |
+      | Grade item                                                    | Grade          | Range | Percentage    | Contribution to course total |
+      | AssignmentTest assignment one                                 | B              | F–A   | 75.00 %       | <contrib2>                   |
+      | <aggregation>Sub category (<aggregation>) total<aggregation>. | 4.00           | 1–5   | 75.00 %       | -                            |
+      | <aggregation>Course total<aggregation>.                       | <coursetotal2> | 0–100 | <courseperc2> | -                            |
 
     Examples:
       | aggregation                         | coursetotal1 | coursetotal2 | coursetotal3 | coursetotal4 | coursetotal5 |overallavg | courseperc2 | courseperc3 | contrib2 | contrib3 |

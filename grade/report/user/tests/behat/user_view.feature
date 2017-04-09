@@ -52,51 +52,51 @@ Feature: View the user report as the student will see it
     And I select "Student 1" from the "Select all or one user" singleselect
     And I select "Myself" from the "View report as" singleselect
     Then the following should exist in the "user-grade" table:
-      | Grade item              | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
-      | Test assignment one     | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 13.33 %                      |
-      | Test assignment two     | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 5.83 %                       |
-      | Sub category 1 total    | 33.33 %           | 115.00 | 0–200 | 57.50 %    | -                            |
-      | Test assignment three   | 50.00 %           | 100.00 | 0–100 | 100.00 %   | 16.67 %                      |
-      | Test assignment four    | 50.00 %           | 50.00  | 0–100 | 50.00 %    | 8.33 %                       |
-      | Sub category 2 total    | 33.33 %           | 150.00 | 0–200 | 75.00 %    | -                            |
-      | Test assignment five    | 16.67 %           | 21.00  | 0–100 | 21.00 %    | 3.50 %                       |
-      | Test assignment six     | 16.67 %           | 97.00  | 0–100 | 97.00 %    | 16.17 %                      |
-      | Course total            | -                 | 383.00 | 0–600 | 63.83 %    | -                            |
+      | Grade item                      | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
+      | AssignmentTest assignment one   | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 13.33 %                      |
+      | AssignmentTest assignment two   | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 5.83 %                       |
+      | NaturalSub category 1 total     | 33.33 %           | 115.00 | 0–200 | 57.50 %    | -                            |
+      | AssignmentTest assignment three | 50.00 %           | 100.00 | 0–100 | 100.00 %   | 16.67 %                      |
+      | AssignmentTest assignment four  | 50.00 %           | 50.00  | 0–100 | 50.00 %    | 8.33 %                       |
+      | NaturalSub category 2 total     | 33.33 %           | 150.00 | 0–200 | 75.00 %    | -                            |
+      | AssignmentTest assignment five  | 16.67 %           | 21.00  | 0–100 | 21.00 %    | 3.50 %                       |
+      | AssignmentTest assignment six   | 16.67 %           | 97.00  | 0–100 | 97.00 %    | 16.17 %                      |
+      | NaturalCourse total             | -                 | 383.00 | 0–600 | 63.83 %    | -                            |
 
   Scenario: View the report as the student from both the teachers and students perspective
     When I navigate to "View > User report" in the course gradebook
     And I select "Student 1" from the "Select all or one user" singleselect
     And I select "User" from the "View report as" singleselect
     Then the following should exist in the "user-grade" table:
-      | Grade item              | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
-      | Test assignment one     | -                 | 80.00  | 0–100 | 80.00 %    | -                            |
-      | Test assignment two     | -                 | 35.00  | 0–100 | 35.00 %    | -                            |
-      | Sub category 1 total    | 33.33 %           | -      | 0–200 | -          | -                            |
-      | Test assignment five    | -                 | 21.00  | 0–100 | 21.00 %    | -                            |
-      | Course total            | -                 | -      | 0–600 | -          | -                            |
+      | Grade item                     | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
+      | AssignmentTest assignment one  | -                 | 80.00  | 0–100 | 80.00 %    | -                            |
+      | AssignmentTest assignment two  | -                 | 35.00  | 0–100 | 35.00 %    | -                            |
+      | NaturalSub category 1 total    | 33.33 %           | -      | 0–200 | -          | -                            |
+      | AssignmentTest assignment five | -                 | 21.00  | 0–100 | 21.00 %    | -                            |
+      | NaturalCourse total            | -                 | -      | 0–600 | -          | -                            |
     And the following should not exist in the "user-grade" table:
       | Grade item              |
-      | Test assignment three   |
-      | Test assignment four    |
-      | Sub category 2 total    |
-      | Test assignment six     |
+      | AssignmentTest assignment three |
+      | AssignmentTest assignment four  |
+      | NaturalSub category 2 total     |
+      | AssignmentTest assignment six   |
     And I log out
     And I log in as "student1"
     And I follow "Course 1"
     And I navigate to "User report" in the course gradebook
     Then the following should exist in the "user-grade" table:
-      | Grade item              | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
-      | Test assignment one     | -                 | 80.00  | 0–100 | 80.00 %    | -                            |
-      | Test assignment two     | -                 | 35.00  | 0–100 | 35.00 %    | -                            |
-      | Sub category 1 total    | 33.33 %           | -      | 0–200 | -          | -                            |
-      | Test assignment five    | -                 | 21.00  | 0–100 | 21.00 %    | -                            |
-      | Course total            | -                 | -      | 0–600 | -          | -                            |
+      | Grade item                     | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
+      | AssignmentTest assignment one  | -                 | 80.00  | 0–100 | 80.00 %    | -                            |
+      | AssignmentTest assignment two  | -                 | 35.00  | 0–100 | 35.00 %    | -                            |
+      | NaturalSub category 1 total    | 33.33 %           | -      | 0–200 | -          | -                            |
+      | AssignmentTest assignment five | -                 | 21.00  | 0–100 | 21.00 %    | -                            |
+      | NaturalCourse total            | -                 | -      | 0–600 | -          | -                            |
     And the following should not exist in the "user-grade" table:
-      | Grade item              |
-      | Test assignment three   |
-      | Test assignment four    |
-      | Sub category 2 total    |
-      | Test assignment six     |
+      | Grade item                      |
+      | AssignmentTest assignment three |
+      | AssingmentTest assignment four  |
+      | NaturalSub category 2 total     |
+      | AssignmentTest assignment six   |
 
   Scenario: View the report as the student from both the teachers and students perspective with totals excluding hidden
     Given I navigate to "Setup > Course grade settings" in the course gradebook
@@ -106,35 +106,35 @@ Feature: View the user report as the student will see it
     When I select "Student 1" from the "Select all or one user" singleselect
     And I select "User" from the "View report as" singleselect
     Then the following should exist in the "user-grade" table:
-      | Grade item              | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
-      | Test assignment one     | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 26.67 %                      |
-      | Test assignment two     | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 11.67 %                      |
-      | Sub category 1 total    | 66.67 %           | 115.00 | 0–200 | 57.50      | -                            |
-      | Test assignment five    | 33.33 %           | 21.00  | 0–100 | 21.00 %    | 7.00 %                       |
-      | Course total            | -                 | 136.00 | 0–300 | 45.33 %    | -                            |
+      | Grade item                     | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
+      | AssignmentTest assignment one  | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 26.67 %                      |
+      | AssignmentTest assignment two  | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 11.67 %                      |
+      | NaturalSub category 1 total    | 66.67 %           | 115.00 | 0–200 | 57.50      | -                            |
+      | AssignmentTest assignment five | 33.33 %           | 21.00  | 0–100 | 21.00 %    | 7.00 %                       |
+      | NaturalCourse total            | -                 | 136.00 | 0–300 | 45.33 %    | -                            |
     And the following should not exist in the "user-grade" table:
-      | Grade item              |
-      | Test assignment three   |
-      | Test assignment four    |
-      | Sub category 2 total    |
-      | Test assignment six     |
+      | Grade item                      |
+      | AssignmentTest assignment three |
+      | AssignmentTest assignment four  |
+      | NaturalSub category 2 total     |
+      | AssignmentTest assignment six   |
     And I log out
     And I log in as "student1"
     And I follow "Course 1"
     And I navigate to "User report" in the course gradebook
     Then the following should exist in the "user-grade" table:
-      | Grade item              | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
-      | Test assignment one     | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 26.67 %                      |
-      | Test assignment two     | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 11.67 %                      |
-      | Sub category 1 total    | 66.67 %           | 115.00 | 0–200 | 57.50      | -                            |
-      | Test assignment five    | 33.33 %           | 21.00  | 0–100 | 21.00 %    | 7.00 %                       |
-      | Course total            | -                 | 136.00 | 0–300 | 45.33 %    | -                            |
+      | Grade item                     | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
+      | AssignmentTest assignment one  | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 26.67 %                      |
+      | AssignmentTest assignment two  | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 11.67 %                      |
+      | NaturalSub category 1 total    | 66.67 %           | 115.00 | 0–200 | 57.50      | -                            |
+      | AssignmentTest assignment five | 33.33 %           | 21.00  | 0–100 | 21.00 %    | 7.00 %                       |
+      | NaturalCourse total            | -                 | 136.00 | 0–300 | 45.33 %    | -                            |
     And the following should not exist in the "user-grade" table:
-      | Grade item              |
-      | Test assignment three   |
-      | Test assignment four    |
-      | Sub category 2 total    |
-      | Test assignment six     |
+      | Grade item                      |
+      | AssignmentTest assignment three |
+      | AssignmentTest assignment four  |
+      | NaturalSub category 2 total     |
+      | AssignmentTest assignment six   |
 
   Scenario: View the report as the student from both the teachers and students perspective with totals including hidden
     Given I navigate to "Setup > Course grade settings" in the course gradebook
@@ -144,35 +144,35 @@ Feature: View the user report as the student will see it
     When I select "Student 1" from the "Select all or one user" singleselect
     And I select "User" from the "View report as" singleselect
     Then the following should exist in the "user-grade" table:
-      | Grade item              | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
-      | Test assignment one     | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 13.33 %                      |
-      | Test assignment two     | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 5.83 %                       |
-      | Sub category 1 total    | 33.33 %           | 115.00 | 0–200 | 57.50 %    | -                            |
-      | Test assignment five    | 16.67 %           | 21.00  | 0–100 | 21.00 %    | 3.50 %                       |
-      | Course total            | -                 | 383.00 | 0–600 | 63.83 %    | -                            |
+      | Grade item                     | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
+      | AssignmentTest assignment one  | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 13.33 %                      |
+      | AssignmentTest assignment two  | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 5.83 %                       |
+      | NaturalSub category 1 total    | 33.33 %           | 115.00 | 0–200 | 57.50 %    | -                            |
+      | AssignmentTest assignment five | 16.67 %           | 21.00  | 0–100 | 21.00 %    | 3.50 %                       |
+      | NaturalCourse total            | -                 | 383.00 | 0–600 | 63.83 %    | -                            |
     And the following should not exist in the "user-grade" table:
-      | Grade item              |
-      | Test assignment three   |
-      | Test assignment four    |
-      | Sub category 2 total    |
-      | Test assignment six     |
+      | Grade item                      |
+      | AssignmentTest assignment three |
+      | AssignmentTest assignment four  |
+      | NaturalSub category 2 total     |
+      | AssignmentTest assignment six   |
     And I log out
     And I log in as "student1"
     And I follow "Course 1"
     And I navigate to "User report" in the course gradebook
     Then the following should exist in the "user-grade" table:
-      | Grade item              | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
-      | Test assignment one     | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 13.33 %                      |
-      | Test assignment two     | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 5.83 %                       |
-      | Sub category 1 total    | 33.33 %           | 115.00 | 0–200 | 57.50 %    | -                            |
-      | Test assignment five    | 16.67 %           | 21.00  | 0–100 | 21.00 %    | 3.50 %                       |
-      | Course total            | -                 | 383.00 | 0–600 | 63.83 %    | -                            |
+      | Grade item                     | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
+      | AssignmentTest assignment one  | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 13.33 %                      |
+      | AssignmentTest assignment two  | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 5.83 %                       |
+      | NaturalSub category 1 total    | 33.33 %           | 115.00 | 0–200 | 57.50 %    | -                            |
+      | AssignmentTest assignment five | 16.67 %           | 21.00  | 0–100 | 21.00 %    | 3.50 %                       |
+      | NaturalCourse total            | -                 | 383.00 | 0–600 | 63.83 %    | -                            |
     And the following should not exist in the "user-grade" table:
-      | Grade item              |
-      | Test assignment three   |
-      | Test assignment four    |
-      | Sub category 2 total    |
-      | Test assignment six     |
+      | Grade item                      |
+      | AssignmentTest assignment three |
+      | AssignmentTest assignment four  |
+      | NaturalSub category 2 total     |
+      | AssignmentTest assignment six   |
 
   Scenario: View the report as the student from both the teachers and students perspective when the student can view hidden
     Given I log out
@@ -190,28 +190,28 @@ Feature: View the user report as the student will see it
     When I select "Student 1" from the "Select all or one user" singleselect
     And I select "User" from the "View report as" singleselect
     Then the following should exist in the "user-grade" table:
-      | Grade item              | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
-      | Test assignment one     | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 13.33 %                      |
-      | Test assignment two     | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 5.83 %                       |
-      | Sub category 1 total    | 33.33 %           | 115.00 | 0–200 | 57.50 %    | -                            |
-      | Test assignment three   | 50.00 %           | 100.00 | 0–100 | 100.00 %   | 16.67 %                      |
-      | Test assignment four    | 50.00 %           | 50.00  | 0–100 | 50.00 %    | 8.33 %                       |
-      | Sub category 2 total    | 33.33 %           | 150.00 | 0–200 | 75.00 %    | -                            |
-      | Test assignment five    | 16.67 %           | 21.00  | 0–100 | 21.00 %    | 3.50 %                       |
-      | Test assignment six     | 16.67 %           | 97.00  | 0–100 | 97.00 %    | 16.17 %                      |
-      | Course total            | -                 | 383.00 | 0–600 | 63.83 %    | -                            |
+      | Grade item                      | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
+      | AssignmentTest assignment one   | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 13.33 %                      |
+      | AssignmentTest assignment two   | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 5.83 %                       |
+      | NaturalSub category 1 total     | 33.33 %           | 115.00 | 0–200 | 57.50 %    | -                            |
+      | AssignmentTest assignment three | 50.00 %           | 100.00 | 0–100 | 100.00 %   | 16.67 %                      |
+      | AssignmentTest assignment four  | 50.00 %           | 50.00  | 0–100 | 50.00 %    | 8.33 %                       |
+      | NaturalSub category 2 total     | 33.33 %           | 150.00 | 0–200 | 75.00 %    | -                            |
+      | AssignmentTest assignment five  | 16.67 %           | 21.00  | 0–100 | 21.00 %    | 3.50 %                       |
+      | AssignmentTest assignment six   | 16.67 %           | 97.00  | 0–100 | 97.00 %    | 16.17 %                      |
+      | NaturalCourse total             | -                 | 383.00 | 0–600 | 63.83 %    | -                            |
     And I log out
     And I log in as "student1"
     And I follow "Course 1"
     And I navigate to "User report" in the course gradebook
     Then the following should exist in the "user-grade" table:
-      | Grade item              | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
-      | Test assignment one     | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 13.33 %                      |
-      | Test assignment two     | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 5.83 %                       |
-      | Sub category 1 total    | 33.33 %           | 115.00 | 0–200 | 57.50 %    | -                            |
-      | Test assignment three   | 50.00 %           | 100.00 | 0–100 | 100.00 %   | 16.67 %                      |
-      | Test assignment four    | 50.00 %           | 50.00  | 0–100 | 50.00 %    | 8.33 %                       |
-      | Sub category 2 total    | 33.33 %           | 150.00 | 0–200 | 75.00 %    | -                            |
-      | Test assignment five    | 16.67 %           | 21.00  | 0–100 | 21.00 %    | 3.50 %                       |
-      | Test assignment six     | 16.67 %           | 97.00  | 0–100 | 97.00 %    | 16.17 %                      |
-      | Course total            | -                 | 383.00 | 0–600 | 63.83 %    | -                            |
+      | Grade item                      | Calculated weight | Grade  | Range | Percentage | Contribution to course total |
+      | AssignmentTest assignment one   | 50.00 %           | 80.00  | 0–100 | 80.00 %    | 13.33 %                      |
+      | AssignmentTest assignment two   | 50.00 %           | 35.00  | 0–100 | 35.00 %    | 5.83 %                       |
+      | NaturalSub category 1 total     | 33.33 %           | 115.00 | 0–200 | 57.50 %    | -                            |
+      | AssignmentTest assignment three | 50.00 %           | 100.00 | 0–100 | 100.00 %   | 16.67 %                      |
+      | AssignmentTest assignment four  | 50.00 %           | 50.00  | 0–100 | 50.00 %    | 8.33 %                       |
+      | NaturalSub category 2 total     | 33.33 %           | 150.00 | 0–200 | 75.00 %    | -                            |
+      | AssignmentTest assignment five  | 16.67 %           | 21.00  | 0–100 | 21.00 %    | 3.50 %                       |
+      | AssignmentTest assignment six   | 16.67 %           | 97.00  | 0–100 | 97.00 %    | 16.17 %                      |
+      | NaturalCourse total             | -                 | 383.00 | 0–600 | 63.83 %    | -                            |
