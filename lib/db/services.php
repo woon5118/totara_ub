@@ -1082,14 +1082,6 @@ $functions = array(
         'capabilities' => 'moodle/user:viewdetails',
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
-    'core_user_get_user_preferences' => array(
-        'classname' => 'core_user_external',
-        'methodname' => 'get_user_preferences',
-        'classpath' => 'user/externallib.php',
-        'description' => 'Return user preferences.',
-        'type' => 'read',
-        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-    ),
     'core_user_update_picture' => array(
         'classname' => 'core_user_external',
         'methodname' => 'update_picture',
