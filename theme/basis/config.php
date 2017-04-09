@@ -31,7 +31,6 @@ $THEME->parents = array('roots', 'base');
 $THEME->yuicssmodules = array();
 $THEME->enable_dock = true;
 $THEME->sheets = array('totara', 'settings-noprocess');
-$THEME->supportscssoptimisation = false;
 $THEME->enable_dock = true;
 
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
