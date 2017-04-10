@@ -2373,6 +2373,9 @@ class core_accesslib_testcase extends advanced_testcase {
 
         $context = context_course::instance($testcourses[2]);
         $children = $context->get_child_contexts();
+        // Totara: MDL-55074 removed defaults for new navigation in theme_boost.
+        // Replace them for time being as we do not include that theme.
+        $this->assertCount(7, $children); // Depends on number of default blocks.
 
         $context = context_module::instance($testpages[3]);
         $children = $context->get_child_contexts();
@@ -2419,7 +2422,9 @@ class core_accesslib_testcase extends advanced_testcase {
         context_helper::reset_caches();
         context_helper::preload_course($SITE->id);
         $numfrontpagemodules = $DB->count_records('course_modules', array('course' => $SITE->id));
-        $this->assertEquals(3 + $numfrontpagemodules, context_inspection::test_context_cache_size()); // Depends on number of default blocks.
+        // Totara: MDL-55074 removed defaults for new navigation in theme_boost.
+        // Replace them for time being as we do not include that theme.
+        $this->assertEquals(6 + $numfrontpagemodules, context_inspection::test_context_cache_size()); // Depends on number of default blocks.
 
         // Test assign_capability(), unassign_capability() functions.
 

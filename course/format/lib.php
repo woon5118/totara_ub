@@ -485,7 +485,9 @@ abstract class format_base {
         }
         $blocknames = array(
             BLOCK_POS_LEFT => array(),
-            BLOCK_POS_RIGHT => array()
+            // Totara: MDL-55074 removed defaults for new navigation in theme_boost.
+            // Replace them for time being as we do not include that theme.
+            BLOCK_POS_RIGHT => array('search_forums', 'news_items', 'calendar_upcoming', 'recent_activity')
         );
         return $blocknames;
     }

@@ -2478,8 +2478,10 @@ function blocks_get_default_site_course_blocks() {
         return blocks_parse_default_blocks_list($CFG->defaultblocks_site);
     } else {
         return array(
-            BLOCK_POS_LEFT => array(),
-            BLOCK_POS_RIGHT => array()
+            // Totara: MDL-55074 removed defaults for new navigation in theme_boost.
+            // Replace them for time being as we do not include that theme.
+            BLOCK_POS_LEFT => array('site_main_menu'),
+            BLOCK_POS_RIGHT => array('course_summary', 'calendar_month')
         );
     }
 }
