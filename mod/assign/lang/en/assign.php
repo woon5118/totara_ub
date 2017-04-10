@@ -115,6 +115,7 @@ $string['collapsegradepanel'] = 'Collapse grade panel';
 $string['collapsereviewpanel'] = 'Collapse review panel';
 $string['comment'] = 'Comment';
 $string['completionsubmit'] = 'Student must submit to this activity to complete it';
+$string['completionusegradewithoutgradeenabled'] = 'To enable this setting, you must select a Grade Type or enable the default Feedback Type ({$a})';
 $string['conversionexception'] = 'Could not convert assignment. Exception was: {$a}.';
 $string['configshowrecentsubmissions'] = 'Everyone can see notifications of submissions in recent activity reports.';
 $string['confirmsubmission'] = 'Are you sure you want to submit your work for grading? You will not be able to make any more changes.';
