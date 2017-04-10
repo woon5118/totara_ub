@@ -230,3 +230,21 @@
     margin: 0 @padding-xs-horizontal;
     display: inline-block;
 }
+
+// For add/remove contact button on profile
+.ajax-contact-button {
+    height: 31px;
+    box-sizing: border-box;
+
+    &.loading {
+        > *:not(.loading-icon) {
+            display: none;
+        }
+        .loading-icon {
+            display: block;
+        }
+    }
+    .loading-icon {
+        display: none;
+    }
+}
