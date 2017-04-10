@@ -60,7 +60,7 @@ $string['filter_role'] = 'Role';
 $string['filter_role_help'] = 'A tour may be restricted to users with selected roles in the context where the tour is shown. For example, restricting a Dashboard tour to users with the role of student won\'t work if users have the role of student in a course (as is generally the case). A Dashboard tour can only be restricted to users with a system role.';
 $string['importtour'] = 'Import tour';
 $string['left'] = 'Left';
-$string['modifyshippedtourwarning'] = 'This is a user tour that has shipped with Moodle. Any modifications you make may be overridden during your next site upgrade.';
+$string['modifyshippedtourwarning'] = 'This is a user tour that has shipped with Totara. Any modifications you make may be overridden during your next site upgrade.';
 $string['movestepdown'] = 'Move step down';
 $string['movestepup'] = 'Move step up';
 $string['movetourdown'] = 'Move tour down';
@@ -108,7 +108,7 @@ $string['title_help'] = 'The title of a step may be added as plain text, enclose
 
 Alternatively, a language string ID may be entered in the format identifier,component (with no brackets or space after the comma).';
 $string['tourconfig'] = 'Tour configuration file to import';
-$string['tourlist_explanation'] = 'You can create as many tours as you like and enable them for different parts of Moodle. Only one tour can be created per page.';
+$string['tourlist_explanation'] = 'You can create as many tours as you like and enable them for different parts of Totara. Only one tour can be created per page.';
 $string['tours'] = 'Tours';
 $string['pausetour'] = 'Pause';
 $string['resumetour'] = 'Resume';
@@ -137,35 +137,3 @@ $string['target_selector_targetvalue_help'] = 'A CSS selector can be used to tar
 $string['viewtour_info'] = 'This is the \'{$a->tourname}\' tour. It applies to the path \'{$a->path}\'.';
 $string['viewtour_edit'] = 'You can <a href="{$a->editlink}">edit the tour defaults</a> and <a href="{$a->resetlink}">force the tour to be displayed</a> to all users again.';
 $string['tour_resetforall'] = 'The state of the tour has been reset. It will be displayed to all users again.';
-
-// Boost - administrator tour.
-$string['tour1_title_welcome'] = 'Welcome';
-$string['tour1_content_welcome'] = 'Welcome to the Boost theme for Moodle 3.2. If you\'ve used Moodle before you might find some things look a bit different.';
-$string['tour1_title_navigation'] = 'Navigation';
-$string['tour1_content_navigation'] = 'Major navigation is now through this nav drawer. The contents update depending on where you are in the site. Use the button at the top to hide or show it.';
-$string['tour1_title_customisation'] = 'Customisation';
-$string['tour1_content_customisation'] = 'To customise the look of your site and the front page, use the settings menu in the corner of this header. Try turning editing on right now.';
-$string['tour1_title_blockregion'] = 'Block region';
-$string['tour1_content_blockregion'] = 'There is still a block region over here. We recommend removing the Navigation and Administration blocks completely, as all the functionality is elsewhere in the Boost theme.';
-$string['tour1_title_addingblocks'] = 'Adding blocks';
-$string['tour1_content_addingblocks'] = 'In fact, think carefully about including any blocks on your pages. Blocks are not shown on the Moodle Mobile app, so as a general rule it\'s much better to make sure your site works well without any blocks.';
-$string['tour1_title_end'] = 'End of tour';
-$string['tour1_content_end'] = 'This has been a user tour, a new feature in Moodle 3.2. It won\'t show again unless you reset it using the link in the footer. As an admin you can also create your own tours like this!';
-
-// Boost - course view tour.
-$string['tour2_title_welcome'] = 'Welcome';
-$string['tour2_content_welcome'] = 'Welcome to the Boost theme for Moodle 3.2. If you\'ve used Moodle before you might find things look a bit different here on the course page.';
-$string['tour2_title_customisation'] = 'Customisation';
-$string['tour2_content_customisation'] = 'To change any course settings, use the settings menu in the corner of this header. You will find a similar settings menu on the home page of every activity, too. Try turning editing on right now.';
-$string['tour2_title_navigation'] = 'Navigation';
-$string['tour2_content_navigation'] = 'Navigation is now through this nav drawer. Use the button at the top to hide or show it. You will see that there are links for sections of your course.';
-$string['tour2_title_opendrawer'] = 'Open the nav drawer';
-$string['tour2_content_opendrawer'] = 'Try opening the nav drawer now.';
-$string['tour2_title_participants'] = 'Course participants';
-$string['tour2_content_participants'] = 'View participants here. This is also where you go to add or remove students.';
-$string['tour2_title_addblock'] = 'Add a block';
-$string['tour2_content_addblock'] = 'If you turn editing on you can add blocks from the nav drawer. However, think carefully about including any blocks on your pages. Blocks are not shown on the Moodle Mobile app, so for the best user experience it is better to make sure your course works well without any blocks.';
-$string['tour2_title_addingblocks'] = 'Adding blocks';
-$string['tour2_content_addingblocks'] = 'You can add blocks to this page using this button. However, think carefully about including any blocks on your pages. Blocks are not shown on the Moodle Mobile app, so for the best user experience it is better to make sure your course works well without any blocks.';
-$string['tour2_title_end'] = 'End of tour';
-$string['tour2_content_end'] = 'This has been a user tour, a new feature in Moodle 3.2. It won\'t show again unless you reset it using the link in the footer. The site admin can also create further tours for this site if required.';
