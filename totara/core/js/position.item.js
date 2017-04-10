@@ -149,8 +149,10 @@ M.totara_positionitem = M.totara_positionitem || {
         // table completes we can set up the component action on the new select
         // element because it has a new, unique ID different from when rendered
         // on page load.
+
         var formid = 'switchframework';
-        $(totaraDialogs.assignedcompetencies.dialog).bind('ajaxComplete', function(event) {
+        $(totaraDialogs.assignedcompetencies.dialog).on('ajaxComplete', function(event) {
+
             // to be double sure our newly appended DOM elements are ready to
             // have a listener bound by a component action generated ID, respond
             // when the attached parent node's 'contentready' event is fired.

@@ -161,15 +161,15 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
         $('#id_newcustomheading').prop('disabled', true);
 
         // handle changes to the column pulldowns
-        $('select.column_selector').unbind('change');
-        $('select.column_selector').bind('change', function() {
+        $('select.column_selector').off('change');
+        $('select.column_selector').on('change', function() {
             window.onbeforeunload = null;
             module.rb_update_col_row(this);
         });
 
         // handle changes to the advanced pulldowns
-        $('select.advanced_selector').unbind('change');
-        $('select.advanced_selector').bind('change', function() {
+        $('select.advanced_selector').off('change');
+        $('select.advanced_selector').on('change', function() {
             window.onbeforeunload = null;
             var column_selector = $('select.column_selector', $(this).parents('tr:first'));
             module.rb_update_col_row(column_selector);
@@ -177,15 +177,15 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
 
         // handle changes to the customise checkbox
         // use click instead of change event for IE
-        $('input.column_custom_heading_checkbox').unbind('click');
-        $('input.column_custom_heading_checkbox').bind('click', function() {
+        $('input.column_custom_heading_checkbox').off('click');
+        $('input.column_custom_heading_checkbox').on('click', function() {
             window.onbeforeunload = null;
             var column_selector = $('select.column_selector', $(this).parents('tr:first'));
             module.rb_update_col_row(column_selector);
         });
 
         // special case for the 'Add another column...' selector
-        $('select.new_column_selector').bind('change', function() {
+        $('select.new_column_selector').on('change', function() {
             window.onbeforeunload = null;
             var newHeadingBox = $('input.column_heading_text', $(this).parents('tr:first'));
             var newCheckBox = $('input.column_custom_heading_checkbox', $(this).parents('tr:first'));
@@ -244,8 +244,8 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
 
         // Add save button to options
         optionsbox.prepend(addbutton);
-        addbutton.unbind('click');
-        addbutton.bind('click', function(e) {
+        addbutton.off('click');
+        addbutton.on('click', function(e) {
             var data = {
                 action: 'add',
                 sesskey: module.config.user_sesskey,
@@ -349,8 +349,8 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
      */
     rb_init_deletebuttons: function() {
         var module = this;
-        $('.reportbuilderform table .deletecolbtn').unbind('click');
-        $('.reportbuilderform table .deletecolbtn').bind('click', function(e) {
+        $('.reportbuilderform table .deletecolbtn').off('click');
+        $('.reportbuilderform table .deletecolbtn').on('click', function(e) {
             e.preventDefault();
             var clickedbtn = $(this);
 
@@ -431,8 +431,8 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
      */
     rb_init_hidebuttons: function() {
         var module = this;
-        $('.reportbuilderform table .hidecolbtn').unbind('click');
-        $('.reportbuilderform table .hidecolbtn').bind('click', function(e) {
+        $('.reportbuilderform table .hidecolbtn').off('click');
+        $('.reportbuilderform table .hidecolbtn').on('click', function(e) {
             e.preventDefault();
             var clickedbtn = $(this);
 
@@ -475,8 +475,8 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
      */
     rb_init_showbuttons: function() {
         var module = this;
-        $('.reportbuilderform table .showcolbtn').unbind('click');
-        $('.reportbuilderform table .showcolbtn').bind('click', function(e) {
+        $('.reportbuilderform table .showcolbtn').off('click');
+        $('.reportbuilderform table .showcolbtn').on('click', function(e) {
             e.preventDefault();
             var clickedbtn = $(this);
 
@@ -520,8 +520,8 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
      */
     rb_init_movedown_btns: function() {
         var module = this;
-        $('.reportbuilderform table .movecoldownbtn').unbind('click');
-        $('.reportbuilderform table .movecoldownbtn').bind('click', function(e) {
+        $('.reportbuilderform table .movecoldownbtn').off('click');
+        $('.reportbuilderform table .movecoldownbtn').on('click', function(e) {
             e.preventDefault();
             var clickedbtn = $(this);
 
@@ -594,8 +594,8 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
      */
     rb_init_moveup_btns: function() {
         var module = this;
-        $('.reportbuilderform table .movecolupbtn').unbind('click');
-        $('.reportbuilderform table .movecolupbtn').bind('click', function(e) {
+        $('.reportbuilderform table .movecolupbtn').off('click');
+        $('.reportbuilderform table .movecolupbtn').on('click', function(e) {
             e.preventDefault();
             var clickedbtn = $(this);
 

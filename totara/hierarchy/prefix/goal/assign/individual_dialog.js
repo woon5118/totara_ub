@@ -32,6 +32,7 @@ M.totara_assignindividual = M.totara_assignindividual || {
      },
 
      init: function(Y, args){
+
          // Save a reference to the Y instance (all of its dependencies included).
          this.Y = Y;
          //
@@ -82,7 +83,9 @@ M.totara_assignindividual = M.totara_assignindividual || {
             // element because it has a new, unique ID different from when rendered
             // on page load.
             var formid = 'switchframework';
-            $(totaraDialogs.assigngoaltreeview.dialog).bind('ajaxComplete', function(event) {
+
+            $(totaraDialogs.assigngoaltreeview.dialog).on('ajaxComplete', function(event) {
+
                 // to be double sure our newly appended DOM elements are ready to
                 // have a listener bound by a component action generated ID, respond
                 // when the attached parent node's 'contentready' event is fired.
