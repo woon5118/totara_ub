@@ -685,6 +685,33 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
     }
 
     /**
+     * Totara: test user suspending
+     */
+    public function test_update_users_suspend() {
+        global $DB;
+        $this->resetAfterTest();
+
+        $this->setAdminUser();
+        $user = self::getDataGenerator()->create_user();
+
+        $sink = $this->redirectEvents();
+
+        // Note that user field validation is busted bool properties.
+        $request1 = array(
+            'id' => $user->id,
+            'username' => 'newusername',
+            'suspended' => 1,
+        );
+        core_user_external::update_users(array($request1));
+        $newuser = $DB->get_record('user', array('id' => $user->id));
+        $this->assertSame('1', $newuser->suspended);
+        $events = $sink->get_events();
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf('core\event\user_updated', $events[0]);
+        $this->assertInstanceOf('totara_core\event\user_suspended', $events[1]);
+    }
+
+    /**
      * Test add_user_private_files
      */
     public function test_add_user_private_files() {

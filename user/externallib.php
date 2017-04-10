@@ -585,8 +585,12 @@ class core_user_external extends external_api {
                 }
                 useredit_update_user_preference($userpref);
             }
-            if (isset($user['suspended']) and $user['suspended']) {
+
+            // Totara: trigger suspended event and kill sessions.
+            $newuser = core_user::get_user($user['id'], '*', MUST_EXIST);
+            if (!$existinguser->suspended and $newuser->suspended) {
                 \core\session\manager::kill_user_sessions($user['id']);
+                \totara_core\event\user_suspended::create_from_user($existinguser)->trigger();
             }
         }
 
