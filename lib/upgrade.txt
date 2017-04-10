@@ -273,6 +273,7 @@ information provided here is intended especially for developers.
 * Provided identifiers in the form of data-url attributes for user menu items
 * core_renderer::render_help_icon() has changed.
 * help_icon::export_for_template() includes icon, linktext, title, url in the return object
+* loglevel.js has been updated 1.4.1 from 1.4.0
 
 === 9.2 ===
 
