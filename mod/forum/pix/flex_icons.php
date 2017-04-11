@@ -56,4 +56,11 @@ $icons = array(
                         ),
                 ),
         ),
+    'mod_forum|t/selected' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-check',
+                ),
+        ),
 );
