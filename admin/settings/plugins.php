@@ -519,15 +519,18 @@ if ($hassiteconfig) {
     }
 }
 
-if ($hassiteconfig and $ADMIN->fulltree) { // Totara: do not load the settings when we do not need them, this saves lots of memory and file inclusions.
-    // Setup status.
-    $temp->add(new admin_setting_searchsetupinfo());
+if ($hassiteconfig) { // Totara: do not load the settings when we do not need them, this saves lots of memory and file inclusions.
 
-    // Search engine selection.
-    $temp->add(new admin_setting_heading('searchengineheading', new lang_string('searchengine', 'admin'), ''));
-    $temp->add(new admin_setting_configselect('searchengine',
-        new lang_string('selectsearchengine', 'admin'), '', 'solr', $engines));
-    $ADMIN->add('searchplugins', $temp);
+    if ($ADMIN->fulltree) {
+        // Setup status.
+        $temp->add(new admin_setting_searchsetupinfo());
+
+        // Search engine selection.
+        $temp->add(new admin_setting_heading('searchengineheading', new lang_string('searchengine', 'admin'), ''));
+        $temp->add(new admin_setting_configselect('searchengine',
+            new lang_string('selectsearchengine', 'admin'), '', 'solr', $engines));
+        $ADMIN->add('searchplugins', $temp);
+    }
     $ADMIN->add('searchplugins', new admin_externalpage('searchareas', new lang_string('searchareas', 'admin'),
         new moodle_url('/admin/searchareas.php')));
 
