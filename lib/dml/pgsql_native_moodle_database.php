@@ -724,11 +724,14 @@ class pgsql_native_moodle_database extends moodle_database {
 
         list($limitfrom, $limitnum) = $this->normalise_limit_from_num($limitfrom, $limitnum);
 
-        if ($limitnum) {
-            $sql .= " LIMIT $limitnum";
-        }
-        if ($limitfrom) {
-            $sql .= " OFFSET $limitfrom";
+        if ($limitfrom or $limitnum) {
+            if ($limitnum < 1) {
+                $limitnum = "ALL";
+            } else if (PHP_INT_MAX - $limitnum < $limitfrom) {
+                // this is a workaround for weird max int problem
+                $limitnum = "ALL";
+            }
+            $sql .= " LIMIT $limitnum OFFSET $limitfrom";
         }
 
         list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
@@ -763,11 +766,14 @@ class pgsql_native_moodle_database extends moodle_database {
 
         list($limitfrom, $limitnum) = $this->normalise_limit_from_num($limitfrom, $limitnum);
 
-        if ($limitnum) {
-            $sql .= " LIMIT $limitnum";
-        }
-        if ($limitfrom) {
-            $sql .= " OFFSET $limitfrom";
+        if ($limitfrom or $limitnum) {
+            if ($limitnum < 1) {
+                $limitnum = "ALL";
+            } else if (PHP_INT_MAX - $limitnum < $limitfrom) {
+                // this is a workaround for weird max int problem
+                $limitnum = "ALL";
+            }
+            $sql .= " LIMIT $limitnum OFFSET $limitfrom";
         }
 
         list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
