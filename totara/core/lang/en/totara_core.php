@@ -414,8 +414,6 @@ $string['mylearning'] = 'My Learning';
 $string['mypastbookings'] = 'My Past Bookings';
 $string['myprofile'] = 'My Profile';
 $string['myrecordoflearning'] = 'My Record of Learning';
-$string['mysqlneedsbarracuda'] = 'Advanced Totara features require InnoDB Barracuda storage format';
-$string['mysqlneedsfilepertable'] = 'Advanced Totara features require InnoDB File-Per-Table mode to be enabled';
 $string['mysqlneedsinnodb'] = 'The current database engine "{$a}" may not be compatible with Totara, it is strongly recommended to use InnoDB or XtraDB engine.';
 $string['myteaminstructionaltext'] = 'Choose a team member from the table on the right.';
 $string['noassessors'] = 'No assessors found';
@@ -648,3 +646,8 @@ $string['tempmanagerselectionallusers'] = 'All users';
 $string['tempmanagerselectiononlymanagers'] = 'Only staff managers';
 $string['tempmanagersupporttext'] = ' Note, only current team managers can be selected.';
 $string['updatetemporarymanagerstask'] = 'Update temporary managers';
+
+// Deprecated in 10
+
+$string['mysqlneedsbarracuda'] = 'Advanced Totara features require InnoDB Barracuda storage format';
+$string['mysqlneedsfilepertable'] = 'Advanced Totara features require InnoDB File-Per-Table mode to be enabled';

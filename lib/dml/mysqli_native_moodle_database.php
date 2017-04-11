@@ -85,16 +85,16 @@ class mysqli_native_moodle_database extends moodle_database {
             throw new dml_connection_exception($dberr);
         }
 
-        // Normally a check would be done before setting utf8mb4, but the database can be created
-        // before the enviroment checks are done. We'll proceed with creating the database and then do checks next.
-        $charset = 'utf8mb4';
-        if (isset($dboptions['dbcollation']) and (strpos($dboptions['dbcollation'], 'utf8_') === 0
-                || strpos($dboptions['dbcollation'], 'utf8mb4_') === 0)) {
-            $collation = $dboptions['dbcollation'];
-            $collationinfo = explode('_', $dboptions['dbcollation']);
-            $charset = reset($collationinfo);
-        } else {
-            $collation = 'utf8mb4_unicode_ci';
+        // Totara: always use utf8 by default, admins must set other collations in config.php file.
+        $charset = 'utf8';
+        $collation = 'utf8_unicode_ci'; // Developers need to use  _bin encoding to pass all phpunit tests.
+        if (isset($dboptions['dbcollation'])) {
+            if (strpos($dboptions['dbcollation'], 'utf8mb4_') === 0) {
+                $charset = 'utf8mb4';
+                $collation = $dboptions['dbcollation'];
+            } else if (strpos($dboptions['dbcollation'], 'utf8_') === 0) {
+                $collation = $dboptions['dbcollation'];
+            }
         }
 
         $result = $conn->query("CREATE DATABASE $dbname DEFAULT CHARACTER SET $charset DEFAULT COLLATE ".$collation);
@@ -223,6 +223,22 @@ class mysqli_native_moodle_database extends moodle_database {
     }
 
     /**
+     * Get expected database charset.
+     *
+     * NOTE: utf8 is the default, in Totara admins must set a utf8mb4 collation in config.php
+     *       before installation if they want to use full unicode in MySQL database.
+     *
+     * @return string
+     */
+    public function get_charset() {
+        if (isset($this->dboptions['dbcollation']) and strpos($this->dboptions['dbcollation'], 'utf8mb4_') === 0) {
+            return 'utf8mb4';
+        } else {
+            return 'utf8';
+        }
+    }
+
+    /**
      * Returns the current MySQL db collation.
      *
      * This is an ugly workaround for MySQL default collation problems.
@@ -238,6 +254,7 @@ class mysqli_native_moodle_database extends moodle_database {
         }
 
         $collation = null;
+        $charset = $this->get_charset();
 
         // Look for current collation of our config table (the first table that gets created),
         // so that we create all tables with the same collation.
@@ -249,6 +266,10 @@ class mysqli_native_moodle_database extends moodle_database {
         $this->query_end($result);
         if ($rec = $result->fetch_assoc()) {
             $collation = $rec['collation_name'];
+            if (strpos($collation, $charset . '_') !== 0) {
+                // We cannot continue, admin needs to fix config.php!
+                throw new moodle_exception("Unexpected collation '{$collation}' detected in the config table, admin needs to add it to config.php dbcollation setting and verify all existing database tables");
+            }
         }
         $result->close();
 
@@ -260,7 +281,7 @@ class mysqli_native_moodle_database extends moodle_database {
             $result = $this->mysqli->query($sql);
             $this->query_end($result);
             if ($rec = $result->fetch_assoc()) {
-                if (strpos($rec['@@collation_database'], 'utf8_') === 0 || strpos($rec['@@collation_database'], 'utf8mb4_') === 0) {
+                if (strpos($rec['@@collation_database'], $charset . '_') === 0) {
                     $collation = $rec['@@collation_database'];
                 }
             }
@@ -270,7 +291,7 @@ class mysqli_native_moodle_database extends moodle_database {
         if (!$collation) {
             // We want only utf8 compatible collations.
             $collation = null;
-            $sql = "SHOW COLLATION WHERE Collation LIKE 'utf8mb4\_%' AND Charset = 'utf8mb4'";
+            $sql = "SHOW COLLATION WHERE Collation LIKE '{$charset}\_%' AND Charset = '{$charset}'";
             $this->query_start($sql, NULL, SQL_QUERY_AUX);
             $result = $this->mysqli->query($sql);
             $this->query_end($result);
@@ -519,19 +540,11 @@ class mysqli_native_moodle_database extends moodle_database {
             throw new dml_connection_exception($dberr);
         }
 
-        if (isset($dboptions['dbcollation'])) {
-            $collationinfo = explode('_', $dboptions['dbcollation']);
-            $this->dboptions['dbcollation'] = $dboptions['dbcollation'];
-        } else {
-            $collationinfo = explode('_', $this->get_dbcollation());
-        }
-        $charset = reset($collationinfo);
-
         // Disable logging until we are fully setup.
         $this->query_log_prevent();
 
         $this->query_start("--set_charset()", null, SQL_QUERY_AUX);
-        $this->mysqli->set_charset($charset);
+        $this->mysqli->set_charset($this->get_charset());
         $this->query_end(true);
 
         // If available, enforce strict mode for the session. That guaranties
@@ -976,9 +989,7 @@ class mysqli_native_moodle_database extends moodle_database {
         // All new tables are created with this collation, we just have to make sure it is utf8 compatible,
         // if config table already exists it has this collation too.
         $collation = $this->get_dbcollation();
-
-        $collationinfo = explode('_', $collation);
-        $charset = reset($collationinfo);
+        $charset = $this->get_charset();
 
         $sql = "SHOW COLLATION WHERE Collation ='$collation' AND Charset = '$charset'";
         $this->query_start($sql, NULL, SQL_QUERY_AUX);
@@ -1615,8 +1626,8 @@ class mysqli_native_moodle_database extends moodle_database {
     public function sql_equal($fieldname, $param, $casesensitive = true, $accentsensitive = true, $notequal = false) {
         $equalop = $notequal ? '<>' : '=';
 
-        $collationinfo = explode('_', $this->get_dbcollation());
-        $bincollate = reset($collationinfo) . '_bin';
+        // Totara: Future MySQL versions will have case and accent sensitive collations, for now just look for the _bin versions.
+        $bincollate = $this->get_charset() . '_bin';
 
         if ($casesensitive) {
             // Current MySQL versions do not support case sensitive and accent insensitive.
@@ -1656,8 +1667,8 @@ class mysqli_native_moodle_database extends moodle_database {
         }
         $escapechar = $this->mysqli->real_escape_string($escapechar); // prevents problems with C-style escapes of enclosing '\'
 
-        $collationinfo = explode('_', $this->get_dbcollation());
-        $bincollate = reset($collationinfo) . '_bin';
+        // Totara: Future MySQL versions will have case and accent sensitive collations, for now just look for the _bin versions.
+        $bincollate = $this->get_charset() . '_bin';
 
         $LIKE = $notlike ? 'NOT LIKE' : 'LIKE';
 

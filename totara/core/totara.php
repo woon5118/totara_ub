@@ -1652,7 +1652,8 @@ function sql_cast2char($fieldname) {
 
     switch ($DB->get_dbfamily()) {
         case 'mysql':
-            $sql = ' CAST(' . $fieldname . ' AS CHAR) COLLATE utf8_bin';
+            $charset = $DB->get_charset();
+            $sql = ' CAST(' . $fieldname . ' AS CHAR) COLLATE ' . $charset . '_bin';
             break;
         case 'postgres':
             $sql = ' CAST(' . $fieldname . ' AS VARCHAR) ';

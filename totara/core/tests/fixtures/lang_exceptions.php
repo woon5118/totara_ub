@@ -28,7 +28,6 @@ $exceptions = array(
     'core_admin' => array(
         'configallowoverride2', 'configallowswitch', 'configallowuserswitchrolestheycantassign', 'showuseridentity_desc', // Caps.
         'requiredentrieschanged', // Upgrade notes.
-        'unsupporteddbtablerowformat', // Link to docs
         'cfgwwwrootslashwarning', // Link to moodle tracker
         'cfgwwwrootwarning', // Link to moodle tracker,
         'eventshandlersinuse', // Link to docs

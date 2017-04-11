@@ -74,15 +74,20 @@ $filepertable = $DB->get_record_sql("SHOW VARIABLES LIKE 'innodb_file_per_table'
 $filepertable = $filepertable ? $filepertable->value : '';
 $fileformat = $DB->get_record_sql("SHOW VARIABLES LIKE 'innodb_file_format'");
 $fileformat = $fileformat ? $fileformat->value : '';
+$largeprefix = $DB->get_record_sql("SHOW VARIABLES LIKE 'innodb_large_prefix'");
+$largeprefix = $largeprefix ? $largeprefix->value : '';
 $prefix = $DB->get_prefix();
 $database = $CFG->dbname;
 
 if (!empty($options['info'])) {
+    echo "Database driver:       " . get_class($DB) . "\n";
     echo "Database version:      " . $info['description'] . "\n";
     echo "Database name:         $database\n";
     echo "Database engine:       " . $DB->get_dbengine() . "\n";
+    echo "Database collation:    " . $DB->get_dbcollation() . "\n";
     echo "innodb_file_per_table: $filepertable\n";
     echo "innodb_file_format:    $fileformat\n";
+    echo "innodb_large_prefix:   $largeprefix\n";
 
     exit(0);
 
@@ -96,7 +101,7 @@ if (!empty($options['info'])) {
             continue;
         }
 
-        echo str_pad($prefix . $table, 32, ' ', STR_PAD_RIGHT);
+        echo str_pad($prefix . $table, 42, ' ', STR_PAD_RIGHT);
         echo str_pad($format, 11, ' ', STR_PAD_RIGHT);
 
         if ($format === 'Compact' or $format === 'Redundant') {
@@ -159,7 +164,7 @@ if (!empty($options['info'])) {
 
     foreach ($fixtables as $table) {
         $DB->change_database_structure("ALTER TABLE {$prefix}$table ROW_FORMAT=Compressed");
-        echo str_pad($prefix . $table, 32, ' ', STR_PAD_RIGHT) . " ... Compressed\n";
+        echo str_pad($prefix . $table, 42, ' ', STR_PAD_RIGHT) . " ... Compressed\n";
     }
 
     exit(0);

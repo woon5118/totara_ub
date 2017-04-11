@@ -154,6 +154,21 @@
           <ON_CHECK message="unoconvwarning" />
         </FEEDBACK>
       </CUSTOM_CHECK>
+      <CUSTOM_CHECK file="lib/upgradelib.php" function="check_mysql_file_per_table" level="required">
+        <FEEDBACK>
+          <ON_ERROR message="unsupporteddbfilepertable" />
+        </FEEDBACK>
+      </CUSTOM_CHECK>
+      <CUSTOM_CHECK file="lib/upgradelib.php" function="check_mysql_file_format" level="required">
+        <FEEDBACK>
+          <ON_ERROR message="unsupporteddbfileformat" />
+        </FEEDBACK>
+      </CUSTOM_CHECK>
+      <CUSTOM_CHECK file="lib/upgradelib.php" function="check_mysql_large_prefix" level="required">
+        <FEEDBACK>
+          <ON_ERROR message="unsupporteddblargeprefix" />
+        </FEEDBACK>
+      </CUSTOM_CHECK>
     </CUSTOM_CHECKS>
   </TOTARA>
 </COMPATIBILITY_MATRIX>

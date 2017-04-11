@@ -138,7 +138,7 @@ if (!empty($options['collation'])) {
     $skipped   = 0;
     $errors    = 0;
     foreach ($rs as $table) {
-        echo str_pad($table->name, 40). " - ";
+        echo str_pad($table->name, 50). " - ";
 
         if ($table->collation === $collation) {
             echo "NO CHANGE\n";
@@ -154,7 +154,7 @@ if (!empty($options['collation'])) {
         $rs2 = $DB->get_recordset_sql($sql);
         foreach ($rs2 as $column) {
             $column = (object)array_change_key_case((array)$column, CASE_LOWER);
-            echo '    '.str_pad($column->field, 36). " - ";
+            echo '    '.str_pad($column->field, 46). " - ";
             if ($column->collation === $collation) {
                 echo "NO CHANGE\n";
                 $skipped++;
@@ -200,6 +200,7 @@ if (!empty($options['collation'])) {
     }
     $rs->close();
     echo "Converted: $converted, skipped: $skipped, errors: $errors\n";
+    echo "Do not forget to add the collation to your config.php: \$CFG->dboptions['dbcollation'] = '{$collation}';\n";
     exit(0); // success
 
 } else if (!empty($options['list'])) {
@@ -215,7 +216,7 @@ if (!empty($options['collation'])) {
         } else {
             $counts[$table->collation] = 1;
         }
-        echo str_pad($table->name, 40);
+        echo str_pad($table->name, 50);
         echo $table->collation.  "\n";
         $collations = mysql_get_column_collations($table->name);
         foreach ($collations as $columname=>$collation) {
@@ -225,7 +226,7 @@ if (!empty($options['collation'])) {
                 $counts[$collation] = 1;
             }
             echo '    ';
-            echo str_pad($columname, 36);
+            echo str_pad($columname, 46);
             echo $collation.  "\n";
         }
     }
