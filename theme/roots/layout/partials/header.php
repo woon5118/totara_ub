@@ -39,6 +39,7 @@ global $OUTPUT;
             <?php
                 if ($hastotaramenu) {
                     echo $OUTPUT->navbar_button();
+                    echo $OUTPUT->search_box();
                 }
 
                 echo $OUTPUT->navbar_plugin_output();
