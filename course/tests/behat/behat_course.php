@@ -1617,7 +1617,7 @@ class behat_course extends behat_base {
      */
     public function i_should_see_the_courses_management_page($mode) {
         $this->execute("behat_general::assert_element_contains_text",
-            array("Course and category management", "h2", "css_element")
+            array("Course and category management", "#region-main h2", "css_element")
         );
 
         switch ($mode) {
@@ -1649,7 +1649,7 @@ class behat_course extends behat_base {
      */
     public function i_should_see_the_courses_management_page_with_a_course_selected($mode) {
         $this->execute("behat_general::assert_element_contains_text",
-            array("Course and category management", "h2", "css_element"));
+            array("Course and category management", "#region-main h2", "css_element"));
 
         switch ($mode) {
             case "Courses":

@@ -131,7 +131,7 @@ Feature: Test appraisal detailed report with numeric question
     And I set the following fields to these values:
       | Search Name | My search |
     And I press "Save changes"
-    Then I should see "Behat Test Appraisal detail report" in the "h2" "css_element"
+    Then I should see "Behat Test Appraisal detail report" in the "#region-main h2" "css_element"
 
     # Export parametric report test
     And I press "Export"
