@@ -36,5 +36,26 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
 
     // Totara 10 branching line.
 
+    // Set default scheduled tasks correctly.
+    if ($oldversion < 2017042800) {
+
+        $task = '\totara_appraisal\task\cleanup_task';
+        // If schecdule is * 3 * * * change to 0 3 * * *
+        $incorrectschedule = array(
+            'minute' => '*',
+            'hour' => '3',
+            'day' => '*',
+            'month' => '*',
+            'dayofweek' => '*'
+        );
+        $newschedule = $incorrectschedule;
+        $newschedule['minute'] = '0';
+
+        totara_upgrade_default_schedule($task, $incorrectschedule, $newschedule);
+
+        // Appraisal savepoint reached.
+        upgrade_plugin_savepoint(true, 2017042800, 'totara', 'appraisal');
+    }
+
     return true;
 }

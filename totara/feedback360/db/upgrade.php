@@ -61,5 +61,26 @@ function xmldb_totara_feedback360_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016123000, 'totara', 'feedback360');
     }
 
+    // Set default scheduled tasks correctly.
+    if ($oldversion < 2017042800) {
+
+        $task = '\totara_feedback360\task\cleanup_task';
+        // If schecdule is * 3 * * * change to 0 3 * * *
+        $incorrectschedule = array(
+            'minute' => '*',
+            'hour' => '3',
+            'day' => '*',
+            'month' => '*',
+            'dayofweek' => '*'
+        );
+        $newschedule = $incorrectschedule;
+        $newschedule['minute'] = '0';
+
+        totara_upgrade_default_schedule($task, $incorrectschedule, $newschedule);
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2017042800, 'totara_feedback360');
+    }
+
     return true;
 }

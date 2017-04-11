@@ -41,5 +41,26 @@ function xmldb_totara_cohort_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2017030300, 'totara_cohort');
     }
 
+    // Set default scheduled tasks correctly.
+    if ($oldversion < 2017042800) {
+
+        $task = '\totara_cohort\task\cleanup_task';
+        // If schecdule is * 3 * * * change to 0 3 * * *
+        $incorrectschedule = array(
+            'minute' => '*',
+            'hour' => '3',
+            'day' => '*',
+            'month' => '*',
+            'dayofweek' => '*'
+        );
+        $newschedule = $incorrectschedule;
+        $newschedule['minute'] = '0';
+
+        totara_upgrade_default_schedule($task, $incorrectschedule, $newschedule);
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2017042800, 'totara', 'cohort');
+    }
+
     return true;
 }
