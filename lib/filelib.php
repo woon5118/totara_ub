@@ -2191,7 +2191,7 @@ function file_safe_save_content($content, $destination) {
 
     // Prevent serving of incomplete file from concurrent request,
     // the rename() should be more atomic than fwrite().
-    ignore_user_abort(true);
+    $prevignore = ignore_user_abort(true);
     if ($fp = fopen($destination . '.tmp', 'xb')) {
         fwrite($fp, $content);
         fclose($fp);
@@ -2199,8 +2199,9 @@ function file_safe_save_content($content, $destination) {
         @chmod($destination, $CFG->filepermissions);
         @unlink($destination . '.tmp'); // Just in case anything fails.
     }
-    ignore_user_abort(false);
-    if (connection_aborted()) {
+    // Totara: do not stop if we were already ignoring user aborts!
+    ignore_user_abort($prevignore);
+    if (!$prevignore and connection_aborted()) {
         die();
     }
 }
