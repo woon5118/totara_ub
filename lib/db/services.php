@@ -333,7 +333,7 @@ $functions = array(
         'classpath' => 'course/externallib.php',
         'description' => 'Check if there is updates affecting the user for the given course and contexts.',
         'type' => 'read',
-        'ajax' => true,
+        // Totara: no ajax
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
     'core_enrol_get_course_enrolment_methods' => array(
@@ -613,7 +613,6 @@ $functions = array(
         'type' => 'write',
         'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-        'ajax' => true,
     ),
     'core_message_delete_contacts' => array(
         'classname' => 'core_message_external',
@@ -623,7 +622,6 @@ $functions = array(
         'type' => 'write',
         'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-        'ajax' => true,
     ),
     'core_message_delete_conversation' => array(
         'classname' => 'core_message_external',
@@ -1052,7 +1050,7 @@ $functions = array(
         'description' => 'Update users.',
         'type' => 'write',
         'capabilities' => 'moodle/user:update',
-        'ajax' => true,
+        // Totara: no ajax!
     ),
     'core_user_update_user_preferences' => array(
         'classname' => 'core_user_external',
