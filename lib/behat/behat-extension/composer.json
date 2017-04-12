@@ -1,7 +1,7 @@
 {
-    "name": "moodlehq/behat-extension",
-    "description": "Moodle behat extension",
-    "keywords": ["Moodle", "BDD", "Behat"],
+    "name": "totara/behat-extension",
+    "description": "Totara behat extension (fork of Moodle behat extension)",
+    "keywords": ["Totara", "BDD", "Behat"],
     "type": "library",
     "license": "GPLv3",
     "authors": [
@@ -10,17 +10,14 @@
             "email": "david.monllao@gmail.com",
             "homepage": "http://moodle.com",
             "role": "Developer"
+        },
+        {
+            "name": "Petr Skoda",
+            "email": "petr.skoda@totaralearning.com",
+            "homepage": "https://www.totaralms.com",
+            "role": "Developer"
         }
     ],
-    "require": {
-        "php": ">=5.4.4",
-        "behat/mink": "~1.7",
-        "behat/mink-extension": "~2.2",
-        "behat/mink-goutte-driver": "~1.2",
-        "behat/mink-selenium2-driver": "~1.3",
-        "symfony/process": "2.8.*",
-        "behat/behat": "3.2.*"
-    },
     "autoload": {
         "psr-0": {
             "Moodle\\BehatExtension": "src/"
