@@ -123,7 +123,7 @@ Feature: View the grading status of an assignment
     And I should see "In marking" in the "Student 1" "table_row"
     # The grade should also remain displayed as it's stored in the assign DB tables, but the final grade should be empty.
     And "Student 1" row "Grade" column of "generaltable" table should contain "50.00"
-    And "Student 1" row "Final grade" column of "generaltable" table should contain "-"
+    And "Student 1" row "Final gradeHide" column of "generaltable" table should contain "-"
     And I log out
 
   @javascript
