@@ -101,7 +101,7 @@ Feature: Course activity controls works as expected
     And I follow "Course 1"
     When I follow <targetpage>
     And I turn editing mode on
-    And I open the action menu in "Recent activity" "block"
+    #And I open the action menu in "Recent activity" "block"
     And I click on "Delete Recent activity block" "link"
     And I press "Yes"
     And <belowpage> "section" <should_see_other_sections> exist

@@ -238,7 +238,7 @@ Feature: Mapping courses in a feedback
     And I am on site homepage
     And I turn editing mode on
     And I add the "Feedback" block
-    And I add the "Main menu" block
+    And I add the "Quick Links" block
     And I click on "Delete" "link" in the "Course feedback" activity
     And I press "Yes"
     And I follow "Turn editing off"

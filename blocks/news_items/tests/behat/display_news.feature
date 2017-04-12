@@ -18,9 +18,6 @@ Feature: Latest announcements block displays the course latest news
     And I log out
     And I log in as "teacher1"
     And I follow "Course 1"
-    And I turn editing mode on
-    And I add the "Latest announcements" block
-    And I turn editing mode off
     When I add a new topic to "Announcements" forum with:
       | Subject | Discussion One |
       | Message | Not important |
