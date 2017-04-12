@@ -8,16 +8,6 @@ Feature: Set the site home page and dashboard as the default home page
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 1 |
-    # TODO MDL-57208 this functionality does not work without administration block.
-    And I log in as "admin"
-    And I am on site homepage
-    And I turn editing mode on
-    And I add the "Administration" block if not present
-    And I configure the "Administration" block
-    And I set the following fields to these values:
-      | Page contexts | Display throughout the entire site |
-    And I press "Save changes"
-    And I log out
 
   @javascript
   Scenario: Admin sets the site page and then the dashboard as the default home page
