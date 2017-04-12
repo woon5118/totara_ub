@@ -75,20 +75,10 @@ class behat_form_select extends behat_form_field {
             // don't close select option field and trigger event.
             if (!$singleselect) {
                 $dialoguexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' moodle-dialogue-focused ')]";
-                if (!$node = $this->session->getDriver()->find($dialoguexpath)) {
-                    $script = "Syn.trigger('change', {}, {{ELEMENT}})";
-                    try {
-                        $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
-                        $this->session->getDriver()->click('//body//div[@class="skiplinks"]');
-                    } catch (\Exception $e) {
-                        return;
-                    }
-                } else {
-                    try {
-                        $this->session->getDriver()->click($dialoguexpath);
-                    } catch (\Exception $e) {
-                        return;
-                    }
+                try {
+                    $this->session->getDriver()->click($dialoguexpath);
+                } catch (\Exception $e) {
+                    return;
                 }
             }
             $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
