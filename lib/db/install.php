@@ -117,7 +117,7 @@ function xmldb_main_install() {
 
     $defaults = array(
         'rolesactive'           => '0', // marks fully set up system
-        'auth'                  => 'email',
+        'auth'                  => '', // Totara: do not enable email auth by default.
         'auth_pop3mailbox'      => 'INBOX',
         'enrol_plugins_enabled' => 'manual,guest,self,cohort',
         'theme'                 => theme_config::DEFAULT_THEME,

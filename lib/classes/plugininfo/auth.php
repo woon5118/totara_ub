@@ -50,6 +50,12 @@ class auth extends base {
 
         // These two are always enabled and can't be disabled.
         $enabled = array('nologin'=>'nologin', 'manual'=>'manual');
+
+        if (empty($CFG->auth)) {
+            // Totara: nothing else if enabled by default.
+            return $enabled;
+        }
+
         foreach (explode(',', $CFG->auth) as $auth) {
             $enabled[$auth] = $auth;
         }
