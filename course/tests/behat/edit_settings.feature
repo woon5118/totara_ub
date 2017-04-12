@@ -26,7 +26,6 @@ Feature: Edit course settings
     And I follow "Edited course fullname"
     Then I should not see "Course 1"
     And I should not see "C1"
-    And I should see "Edited course fullname"
     And I should see "Edited course shortname"
     And I navigate to "Edit settings" in current page administration
     And the field "Course full name" matches value "Edited course fullname"
