@@ -16,7 +16,6 @@ Feature: Test that calendar works properly with calendar when dashboard set as h
     Given I log in as "admin"
     # Add the calendar block to the site front page.
     And I turn editing mode on
-    And I add the "Calendar" block
     And I navigate to "Dashboards" node in "Site administration > Appearance"
     # Add a dashboard.
     And I press "Create dashboard"
