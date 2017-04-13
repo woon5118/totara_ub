@@ -141,9 +141,7 @@ Feature: Mapping courses in a feedback
     And I follow "Course feedback"
     And I follow "Map feedback to courses"
     And I set the field "Courses" to "Course 2"
-    And I click on "Course 2" "list_item" in the ".form-autocomplete-suggestions" "css_element"
     And I set the field "Courses" to "Course 3"
-    And I click on "Course 3" "list_item" in the ".form-autocomplete-suggestions" "css_element"
     And I press "Save changes"
     And I log out
 
