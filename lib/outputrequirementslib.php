@@ -1571,10 +1571,10 @@ class page_requirements_manager {
      * Normally, this method is called automatically by the code that prints the
      * <head> tag. You should not normally need to call it in your own code.
      *
-     * @param renderer_base $renderer
+     * @param core_renderer $renderer
      * @return string the HTML code to go at the start of the <body> tag.
      */
-    public function get_top_of_body_code(renderer_base $renderer) {
+    public function get_top_of_body_code(core_renderer $renderer) {
         // First the skip links.
         $output = $renderer->render_skip_links($this->skiplinks);
 

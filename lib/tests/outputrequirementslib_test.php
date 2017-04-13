@@ -83,6 +83,7 @@ class core_outputrequirementslib_testcase extends advanced_testcase {
         $this->assertTrue($requirements->jquery_plugin('ui'));
 
         // Get the code containing the required jquery plugins.
+        /* @var core_renderer $renderer */
         $renderer = $PAGE->get_renderer('core', null, RENDERER_TARGET_MAINTENANCE);
         $requirecode = $requirements->get_top_of_body_code($renderer);
         // Make sure that the generated code does not contain backslashes.
