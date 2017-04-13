@@ -466,7 +466,6 @@ class page_requirements_manager {
      *
      * Included core plugins:
      *   - jQuery UI
-     *   - jQuery Migrate 1 (useful for code written for previous UI version)
      *   - jQuery Migrate 3 (useful for code written for previous UI version)
      *
      * Add-ons may include extra jQuery plugins in jquery/ directory,
@@ -514,7 +513,7 @@ class page_requirements_manager {
             return false;
         }
 
-        if ($component !== 'core' and in_array($plugin, array('jquery', 'ui', 'ui-css', 'migrate', 'migrate3'))) {
+        if ($component !== 'core' and in_array($plugin, array('jquery', 'ui', 'ui-css', 'migrate3'))) {
             debugging("jQuery plugin '$plugin' is included in Totara core, other components can not use the same name.", DEBUG_DEVELOPER);
             $component = 'core';
         } else if ($component !== 'core' and strpos($component, '_') === false) {
