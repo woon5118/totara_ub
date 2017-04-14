@@ -59,7 +59,8 @@ if (!$graph->is_valid()) {
 
 list($sql, $params, $cache) = $report->build_query(false, true, true);
 
-$records = $DB->get_recordset_sql($sql, $params, 0, $graph->get_max_records());
+$reportdb = $report->get_report_db();
+$records = $reportdb->get_recordset_sql($sql, $params, 0, $graph->get_max_records());
 foreach ($records as $record) {
     $graph->add_record($record);
 }
