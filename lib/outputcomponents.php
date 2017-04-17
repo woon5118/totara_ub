@@ -597,6 +597,11 @@ class pix_icon implements renderable, templatable {
         if (empty($this->attributes['class'])) {
             $this->attributes['class'] = '';
         }
+
+        // Set an additional class for big icons so that they can be styled properly.
+        if (substr($pix, 0, 2) === 'b/') {
+            $this->attributes['class'] .= ' iconsize-big';
+        }
     }
 
     /**
