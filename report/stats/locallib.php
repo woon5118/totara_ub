@@ -104,7 +104,6 @@ function report_stats_report($course, $report, $mode, $user, $roleid, $time) {
 
     $users = array();
     $table = new html_table();
-    $table->width = 'auto';
 
     if ($mode == STATS_MODE_DETAILED) {
         $param = stats_get_parameters($time, null, $course->id, $mode); // we only care about the table and the time string (if we have time)
@@ -133,19 +132,16 @@ function report_stats_report($course, $report, $mode, $user, $roleid, $time) {
             $users[$u->id] = fullname($u, true);
         }
 
-        $table->align = array('left','left','left','left','left','left','left','left');
         $table->data[] = array(html_writer::label(get_string('course'), 'menucourse'), html_writer::select($courseoptions, 'course', $course->id, false),
                                html_writer::label(get_string('users'), 'menuuserid'), html_writer::select($users, 'userid', $userid, false),
                                html_writer::label(get_string('statsreporttype'), 'menureport'), html_writer::select($reportoptions, 'report', ($report == 5) ? $report.$roleid : $report, false),
                                html_writer::label(get_string('statstimeperiod'), 'menutime'), html_writer::select($timeoptions, 'time', $time, false),
                                '<input type="submit" class="btn btn-secondary" value="'.get_string('view').'" />');
     } else if ($mode == STATS_MODE_RANKED) {
-        $table->align = array('left','left','left','left','left','left');
         $table->data[] = array(html_writer::label(get_string('statsreporttype'), 'menureport'), html_writer::select($reportoptions, 'report', ($report == 5) ? $report.$roleid : $report, false),
                                html_writer::label(get_string('statstimeperiod'), 'menutime'), html_writer::select($timeoptions, 'time', $time, false),
                                '<input type="submit" class="btn btn-secondary" value="'.get_string('view').'" />');
     } else if ($mode == STATS_MODE_GENERAL) {
-        $table->align = array('left','left','left','left','left','left','left');
         $table->data[] = array(html_writer::label(get_string('course'), 'menucourse'), html_writer::select($courseoptions, 'course', $course->id, false),
                                html_writer::label(get_string('statsreporttype'), 'menureport'), html_writer::select($reportoptions, 'report', ($report == 5) ? $report.$roleid : $report, false),
                                html_writer::label(get_string('statstimeperiod'), 'menutime'), html_writer::select($timeoptions, 'time', $time, false),
@@ -212,7 +208,6 @@ function report_stats_report($course, $report, $mode, $user, $roleid, $time) {
             }
 
             $table = new html_table();
-            $table->align = array('left','center','center','center');
             $param->table = str_replace('user_','',$param->table);
             switch ($param->table) {
                 case 'daily'  : $period = get_string('day'); break;
