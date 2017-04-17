@@ -302,7 +302,7 @@ class mod_choice_renderer extends plugin_renderer_base {
      * @param object $choices
      * @return string
      */
-    public function display_publish_anonymous_horizontal($choices) {
+    public function display_publish_anonymous_vertical($choices) {
         global $CHOICE_COLUMN_HEIGHT;
         debugging(__FUNCTION__.'() is deprecated. Please use mod_choice_renderer::display_publish_anonymous() instead.',
                 DEBUG_DEVELOPER);
@@ -315,7 +315,7 @@ class mod_choice_renderer extends plugin_renderer_base {
      * @param object $choices
      * @return string
      */
-    public function display_publish_anonymous_vertical($choices) {
+    public function display_publish_anonymous_horizontal($choices) {
         global $CHOICE_COLUMN_WIDTH;
         debugging(__FUNCTION__.'() is deprecated. Please use mod_choice_renderer::display_publish_anonymous() instead.',
                 DEBUG_DEVELOPER);
